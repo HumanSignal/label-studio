@@ -1,6 +1,6 @@
 {
-  "message": "Remove unecesary github conf set up on action ci",
-  "commit": "3a11b690480584b6849991e72b66ec074e4dad74",
-  "date": "2024-04-22T21:52:06.000Z",
-  "branch": "fb-echo-27-regenerate-first-release-commit-to-review"
+  "message": "Revert #5824",
+  "commit": "c3ef6015499d27319533be5701ad23f105645ed0",
+  "date": "2024-05-08T13:08:10.000Z",
+  "branch": "fb-optic-720/viewsstore-foreach"
 }

@@ -73,6 +73,24 @@ Then you can start the ML backend:
 label-studio-ml start ./dir_with_your_model
 ```
 
+
+## Labeling configuration
+
+In project `Settings > Labeling Interface > Browse Templates > Natural Language Processing > Text Classification`, you can find the default labeling configuration for text classification in Label Studio. This configuration includes a single `<Choices>` output and a single `<Text>` input. 
+Feel free to modify the set of labels in the `<Choices>` tag to match your specific task, for example:
+
+```xml
+<View>
+  <Text name="text" value="$text" />
+  <Choices name="label" toName="text" choice="single" showInLine="true">
+    <Choice value="label one" />
+    <Choice value="label two" />
+      <Choice value="label three" />
+  </Choices>
+</View>
+```
+
+
 ## Configuration
 
 Parameters can be set in `docker-compose.yml` before running the container.

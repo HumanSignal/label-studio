@@ -65,7 +65,7 @@ export class CommentsSdk {
     });
 
     if (commentUsers.length) {
-      this.lsf.store.mergeUsers(commentUsers);
+      this.lsf.store.enrichUsers(commentUsers);
     }
 
     return comments;

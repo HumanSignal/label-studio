@@ -149,6 +149,11 @@ Other methods and parameters are available within the `LabelStudioMLBase` class:
 - `self.label_interface` - Returns the Label Studio Label Interface object that contains all information about the labeling task.
 - `self.model_version` - Returns the current model version.
 
+## 4. Ensure the ML backend can access Label Studio data
+
+If your data is stored in a cloud, local directory, or has been imported into Label Studio, you will need to set the `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` environment variables. 
+
+For more information, see [Allow the ML backend to access Label Studio data](ml#Allow-the-ML-backend-to-access-Label-Studio-data). 
 
 ## 5. Run the ML backend server
 
@@ -179,6 +184,7 @@ To modify the host and port, use the following command line parameters:
 
 ```bash
 label-studio-ml start my_ml_backend -p 9091 --host 0.0.0.0
+```
 
 ### Test your ML backend
 

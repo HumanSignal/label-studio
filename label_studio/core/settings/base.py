@@ -556,6 +556,7 @@ TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
 INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
 STORAGE_PERMISSION = 'io_storages.permissions.StoragePermission'
+PROJECT_IMPORT_PERMISSION = 'projects.permissions.ProjectImportPermission'
 DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
 
 
@@ -738,3 +739,7 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
 
 CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE = get_env('CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE', 10000)
 CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT = get_env('CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT', 60)
+
+CONTEXTLOG_SYNC = False
+TEST_ENVIRONMENT = get_bool_env('TEST_ENVIRONMENT', False)
+DEBUG_CONTEXTLOG = get_bool_env('DEBUG_CONTEXTLOG', False)

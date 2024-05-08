@@ -38,45 +38,37 @@ Check the [Generative AI templates](https://labelstud.io/templates/gallery_gener
 
 ## Quickstart
 
-1. Build and start the Machine Learning backend on `http://localhost:9090`
-
-    ```bash
+1. Build and start the Machine Learning backend on `http://localhost:9090` <br /><br />
+```bash
 docker-compose up
 ```
 
-    Check if it works:
-
-    ```bash
+2. Check if it works: <br /><br />
+ ```bash
 $ curl http://localhost:9090/health
 {"status":"UP"}
 ```
 
-1. Open a Label Studio project and go to **Settings > Model**. [Connect the model](https://labelstud.io/guide/ml#Connect-the-model-to-Label-Studio), specifying `http://localhost:9090` as the URL. 
+3. Open a Label Studio project and go to **Settings > Model**. [Connect the model](https://labelstud.io/guide/ml#Connect-the-model-to-Label-Studio), specifying `http://localhost:9090` as the URL. 
    
    Ensure the **Interactive preannotations** toggle is enabled and click **Validate and Save**.
-2. The project config should be compatible with the ML backend. This ML backend can support various input data formats
+4. The project config should be compatible with the ML backend. This ML backend can support various input data formats
    like plain text, hypertext, images, and structured dialogs. To ensure the project config is compatible, follow these
    rules:
 
-   - The project should contain at least one `<TextArea>` tag to be used as a prompt input. To specify which `<TextArea>`
-  tag to use, set the `PROMPT_PREFIX` environment variable. For example, if your labeling config includes `<TextArea name="prompt" ...>`, then you would specify `PROMPT_PREFIX=prompt`.
-   - The project should contain at least one input data tag from the following list of supported tags: `<Text>`, `<Image>`
-  , `<HyperText>`, `<Paragraphs>`.
-   - If you want to capture the generated LLM response as a label, your labeling config should contain a `<Choices>` tag. For
-  example, `<Choices name="choices" ...>`.
-   - If you want to set the default prompt to be shown before the user input, you can set the `DEFAULT_PROMPT`
-  environment variable. For example, `DEFAULT_PROMPT="Classify this text as sarcastic or not. Text: {text}, Labels: {labels}"`
-  or `DEFAULT_PROMPT=/path/to/prompt.txt`. 
+   - The project should contain at least one `<TextArea>` tag to be used as a prompt input. To specify which `<TextArea>` tag  to use, set the `PROMPT_PREFIX` environment variable.   
+   For example, if your labeling config includes `<TextArea name="prompt" ...>`, then you would specify `PROMPT_PREFIX=prompt`.
+   - The project should contain at least one input data tag from the following list of supported tags: `<Text>`, `<Image>`, `<HyperText>`, `<Paragraphs>`.
+   - If you want to capture the generated LLM response as a label, your labeling config should contain a `<Choices>` tag.  
+   For example, `<Choices name="choices" ...>`.
+   - If you want to set the default prompt to be shown before the user input, you can set the `DEFAULT_PROMPT` environment variable. For example, `DEFAULT_PROMPT="Classify this text as sarcastic or not. Text: {text}, Labels: {labels}"` or `DEFAULT_PROMPT=/path/to/prompt.txt`. 
   
-    Note that the default prompt isn't supported with `USE_INTERNAL_PROMPT_TEMPLATE=1`
-  mode, so you will need to set `USE_INTERNAL_PROMPT_TEMPLATE=0` to use default prompt.
-  You can use the fields from `task['data']` in the prompt template, as well as special `{labels}` field to show the
-  list of available labels.
+    Note that the default prompt isn't supported with `USE_INTERNAL_PROMPT_TEMPLATE=1` mode, so you will need to set `USE_INTERNAL_PROMPT_TEMPLATE=0` to use default prompt. You can use the fields from `task['data']` in the prompt template, as well as special `{labels}` field to show the list of available labels.
 
-1. Open a task and ensure the **Auto-Annotation** toggle is enabled (it is located at the bottom of the labeling interface).
-2. Enter a prompt in the prompt input field and press `Shift+Enter`. The LLM response will be generated and displayed in
+5. Open a task and ensure the **Auto-Annotation** toggle is enabled (it is located at the bottom of the labeling interface).
+6. Enter a prompt in the prompt input field and press `Shift+Enter`. The LLM response will be generated and displayed in
    the response field.
-3. If you want to apply LLM auto-annotation to multiple tasks at once, go to the [Data Manager](https://labelstud.io/guide/manage_data), select a group of tasks and then select **Actions > Retrieve Predictions** (or **Batch Predictions** in Label Studio Enterprise).
+7. If you want to apply LLM auto-annotation to multiple tasks at once, go to the [Data Manager](https://labelstud.io/guide/manage_data), select a group of tasks and then select **Actions > Retrieve Predictions** (or **Batch Predictions** in Label Studio Enterprise).
 
 ## Configuration examples
 
