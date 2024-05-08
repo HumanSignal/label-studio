@@ -153,6 +153,10 @@ body {
   color: var(--color-white);
 }
 
+.page-tier-opensource .page-header nav a:not(.Button) {
+  color: var(--color-gray-900);
+}
+
 .page-header nav a:not(.Button):hover,
 .page-header nav a:not(.Button):hover span {
   color: var(--color-main-accent);
@@ -299,7 +303,7 @@ body {
     position: absolute;
     top: 98px;
     left: 0;
-    padding: 0 1em 1em 1em;
+    padding: 1em;
     border-bottom: 1px var(--color-gray-900) solid;
     flex-direction: column;
     overflow: auto;
@@ -938,7 +942,7 @@ h6 {
 
 .content-markdown a:not(.Button) {
   color: var(--color-blue-600);
-  text-decoration: underline; 
+  text-decoration: underline;
 }
 
 .content-markdown a:not(.Button):hover {
