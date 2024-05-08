@@ -219,6 +219,7 @@ export const TableHead = observer(
         useEffect(() => {
           ref.current?.addEventListener("mousedown", (event) => {
             const className = event.target.className;
+
             if (typeof className === "string" && className.includes("handle")) {
               event.preventDefault();
             }
