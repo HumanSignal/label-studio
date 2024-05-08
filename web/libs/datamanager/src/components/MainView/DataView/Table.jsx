@@ -73,7 +73,7 @@ export const DataView = injector(
 
     const isItemLoaded = useCallback(
       (data, index) => {
-        const rowExists = !!data[index];
+        const rowExists = index < data.length && !!data[index];
         const hasNextPage = dataStore.hasNextPage;
 
         return !hasNextPage || rowExists;
@@ -204,7 +204,7 @@ export const DataView = injector(
                   "Looks like you have not imported any data yet"
                 )}
               </Elem>
-              {!hasData && (
+              {!hasData && !!store.interfaces.get("import") && (
                 <Elem name="navigation">
                   <ImportButton look="primary" href="./import">
                     Go to import

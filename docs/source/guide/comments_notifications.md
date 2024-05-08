@@ -3,9 +3,9 @@ title: Comments and notifications
 short: Comments and notifications
 type: guide
 tier: enterprise
-section: "Labeling"
+section: "Create & Manage Projects"
 order: 0
-order_enterprise: 115
+order_enterprise: 146
 meta_title: Comment and notification systems in Label Studio
 meta_description: The Comments and Notifications feature defines how annotators, reviewers and administrators communicate and receive updates on projects and tasks.
 ---
@@ -25,12 +25,12 @@ The following two workflows are flexible and can be combined. For example, in Fi
 
 <center>
 <br>
-<img src="/images/comments-notifications/workflow-notifications.png" class="gif-border"/>
+<img src="/images/workflow-notifications.png"/>
 <br><i>Figure 1A. The workflow based on notifications</i><br>
 
 <br>
 
-<img src="/images/comments-notifications/workflow-data-manager.png" style="margin: 0 auto" class="gif-border"/>
+<img src="/images/workflow-data-manager.png" style="max-width: 17rem;"/>
 <br><i>Figure 2B. The workflow based on the Data Manager</i><br>
 </center>
 

@@ -3144,7 +3144,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 2,
       "deleted": false
     },
     "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short": {

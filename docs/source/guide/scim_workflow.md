@@ -4,10 +4,10 @@ short: SCIM workflows and API
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 381
+order_enterprise: 390
 meta_title: How SCIM works with Label Studio Enterprise
 meta_description: A description of SCIM workflows and entities
-section: "Administration"
+section: "Manage Your Organization"
 parent: "scim_setup"
 parent_enterprise: "scim_setup"
 date: 2024-01-25 10:07:22

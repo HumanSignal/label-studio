@@ -3,11 +3,11 @@ title: Integrate Label Studio into your machine learning pipeline
 short: Machine learning integration
 type: guide
 tier: all
-order: 355
-order_enterprise: 305
+order: 251
+order_enterprise: 251
 meta_title: Integrate Label Studio into your machine learning pipeline
 meta_description: Machine learning frameworks for integrating your model development pipeline seamlessly with your data labeling workflow.
-section: "Machine learning"
+section: "Machine Learning"
 ---
 
 You can use an ML backend to integrate your model development pipeline with your data labeling workflow. There are several use cases, including: 
@@ -285,7 +285,7 @@ After you start labeling, enable **Auto-Annotation** to see and use the smart op
    
 For image labeling, after you enable auto-annotation you can choose whether to **Auto accept annotation suggestions**. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear but you can reject or approve them manually, either individually or all at once.
 
-<br/><img src="/images/release-130/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />
+<br/><img src="/images/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />
    
 ### Delete predictions 
 

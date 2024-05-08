@@ -1,13 +1,13 @@
 ---
 title: Frontend reference
-short: Frontend reference
+short: Frontend
 type: guide
 tier: all
-order: 430
-order_enterprise: 530
+order: 416 
+order_enterprise: 416
 meta_title: Frontend Library Reference
 meta_description: Reference documentation for implementing the Label Studio frontend into your own machine learning or data science application workflows.
-section: "Integration and Development"
+section: "Integrate & Extend"
 ---
 
 Label Studio frontend (LSF) includes several UI options and callbacks that you can use when implementing the frontend with a custom labeling backend, or when customizing the Label Studio interface.

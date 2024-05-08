@@ -4,10 +4,12 @@ short: Project settings
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 59
+order_enterprise: 119
 meta_title: Project settings
 meta_description: Brief descriptions of all the options available when configuring the project settings
-section: "Project Management"
+section: "Create & Manage Projects"
+parent: "manage_projects"
+parent_enterprise: "manage_projects"
 date: 2024-02-06 22:28:14
 ---
 
@@ -506,3 +508,4 @@ From here, you can access actions that result in data loss, and should be used w
 * **Delete Project**
 
     Deleting a project permanently removes all tasks, annotations, and project data from Label Studio.
+

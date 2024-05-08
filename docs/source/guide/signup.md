@@ -3,11 +3,11 @@ title: Add users to Label Studio
 short: Add users
 type: guide
 tier: opensource
-order: 105
+order: 369
 order_enterprise: 0
 meta_title: Add users in Label Studio Community Edition
 meta_description: Sign up for Label Studio and invite users to collaborate on your data labeling, machine learning, and data science projects.
-section: "Administration"
+section: "Manage Your Organization"
 ---
 
 Sign up and create an account for Label Studio to start labeling data and setting up projects.

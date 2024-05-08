@@ -65,7 +65,7 @@ To call an external taxonomy, remove the `Choice` tags and specify the `apiUrl` 
 <Taxonomy name="taxonomy" toName="text" apiUrl="<YOUR_TAXONOMY_URL>" />
 ```
 
-!!! note Beta feature
+!!! todo Beta feature
     The feature to call external taxonomies through `apiUrl` is currently in its beta phase.  
 
 For example: 

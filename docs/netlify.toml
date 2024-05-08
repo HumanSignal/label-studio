@@ -1,28 +1,32 @@
 [[redirects]]
-  from = "https://heartex-docs.netlify.app/api/*"
-  to = "https://app.heartex.com/docs/api/:splat"
-  status = 301
-  force = true
+from = "https://heartex-docs.netlify.app/api/*"
+to = "https://app.heartex.com/docs/api/:splat"
+status = 301
+force = true
 
 [[redirects]]
-  from = "https://docs.humansignal.com/api/*"
-  to = "https://app.heartex.com/docs/api/:splat"
-  status = 301
-  force = true
+from = "https://docs.humansignal.com/api/*"
+to = "https://app.heartex.com/docs/api/:splat"
+status = 301
+force = true
 
 [[redirects]]
-  from = "/guide/starter_cloud"
-  to = "https://humansignal.com/platform/starter-cloud/manage"
-  status = 301
-  force = true
-  
-[[redirects]]
-  from = "/"
-  to = "/guide"
-  status = 301
-  force = true
+from = "/guide/starter_cloud"
+to = "https://humansignal.com/platform/starter-cloud/manage"
+status = 301
+force = true
 
 [[redirects]]
-  from = "/*"
-  to = "/404.html"
-  status = 404
+from = "/"
+to = "/guide"
+status = 301
+force = true
+
+[[redirects]]
+from = "/*"
+to = "/404.html"
+status = 404
+
+[dev]
+command = "yarn start"
+targetPort = 4000
