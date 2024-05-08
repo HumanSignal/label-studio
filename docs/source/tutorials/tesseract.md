@@ -1,10 +1,10 @@
 ---
 title: Interactive bounding boxes OCR with Tesseract 
 type: guide
-hide_menu: true
-hide_frontmatter_title: true
 tier: all
 order: 55
+hide_menu: true
+hide_frontmatter_title: true
 meta_title: Interactive bounding boxes OCR in Label Studio with a Tesseract backend
 meta_description: Tutorial for how to use Label Studio and Tesseract to assist with your OCR projects
 categories:

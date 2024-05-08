@@ -1,10 +1,10 @@
 ---
 title: Object detection with bounding boxes using MMDetection
 type: guide
-hide_menu: true
-hide_frontmatter_title: true
 tier: all
 order: 65
+hide_menu: true
+hide_frontmatter_title: true
 meta_title: Object detection in images with Label Studio and MMDetection
 meta_description: This is a tutorial on how to use the example MMDetection model backend with Label Studio for image segmentation tasks.
 categories:

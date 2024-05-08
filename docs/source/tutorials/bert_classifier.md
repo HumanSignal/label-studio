@@ -1,10 +1,10 @@
 ---
 title: Classify text with a BERT model
 type: guide
-hide_menu: true
-hide_frontmatter_title: true
 tier: all
 order: 35
+hide_menu: true
+hide_frontmatter_title: true
 meta_title: BERT-based text classification
 meta_description: Tutorial on how to use BERT-based text classification with your Label Studio project
 categories:
