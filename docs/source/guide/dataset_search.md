@@ -8,7 +8,7 @@ order_enterprise: 210
 meta_title: Data Discovery search and filtering in Label Studio 
 meta_description: Use filters, natural language search, and similarity search to refine your datasets. 
 date: 2023-08-23 12:18:50
-section: "Data Discovery"
+section: "Curate Datasets"
 ---
 
 Once your dataset is created, you will want to add records to projects as tasks. For some projects, this might be the complete dataset. But in most cases you will likely want to select a subset of data based on certain criteria. 
