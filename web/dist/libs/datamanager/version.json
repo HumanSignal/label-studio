@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-712: Remove warnings in the app related to injection occur before observer",
-  "commit": "9f1d0c707d44c452b223704aa11417b2ba3c039e",
-  "date": "2024-05-03T17:03:19.000Z",
-  "branch": "fb-optic-712/remove-warnings"
+  "message": "Revert #5824",
+  "commit": "c3ef6015499d27319533be5701ad23f105645ed0",
+  "date": "2024-05-08T13:08:10.000Z",
+  "branch": "fb-optic-720/viewsstore-foreach"
 }
