@@ -3,7 +3,7 @@ title: Use GLiNER for NER annotation
 type: guide
 tier: all
 order: 37
-hide_sidebar: true
+hide_menu: true
 hide_frontmatter_title: true
 meta_title: Use GLiNER for NER annotation
 meta_description: Tutorial on how to use GLiNER with your Label Studio project to complete NER tasks

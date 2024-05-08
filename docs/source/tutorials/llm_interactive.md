@@ -1,8 +1,10 @@
 ---
 title: Interactive LLM labeling with GPT
-type: blog
+type: guide
 tier: all
 order: 5
+hide_menu: true
+hide_frontmatter_title: true
 meta_title: Interactive LLM labeling with OpenAI or Azure API
 meta_description: Label Studio tutorial for interactive LLM labeling with OpenAI or Azure API
 categories:
