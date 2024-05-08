@@ -14,6 +14,7 @@ html {
   --color-green-100: #D4F1EB;
 
   --color-blue-600: #576CC1;
+  --color-blue-500: #617ADA;
   --color-blue-400: #6D87F1;
   --color-blue-300: #99ABF5;
   --color-blue-100: #D4DBFB;
@@ -936,12 +937,12 @@ h6 {
 }
 
 .content-markdown a:not(.Button) {
-  color: var(--color-blue-400);
-  text-decoration: none;
+  color: var(--color-blue-600);
+  text-decoration: underline; 
 }
 
 .content-markdown a:not(.Button):hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .content-markdown .headerlink {
