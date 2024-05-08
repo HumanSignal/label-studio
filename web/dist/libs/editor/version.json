@@ -1,6 +1,6 @@
 {
-  "message": "Revert #5824",
-  "commit": "c3ef6015499d27319533be5701ad23f105645ed0",
-  "date": "2024-05-08T13:08:10.000Z",
-  "branch": "fb-optic-720/viewsstore-foreach"
+  "message": "Merge branch 'develop' into fb-dia-989/hotkeys-stuck",
+  "commit": "cb6e68bc71dc0063679c60ac7d0ced52c1efd53a",
+  "date": "2024-05-08T20:42:38.000Z",
+  "branch": "fb-dia-989/hotkeys-stuck"
 }
