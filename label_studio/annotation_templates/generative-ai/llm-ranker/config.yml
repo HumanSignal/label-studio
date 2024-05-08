@@ -8,13 +8,13 @@ config: |
   <View>
      <View style="display: flex; align-items: center; font-size: 1em;">
         <View style="margin: 0.5em 0.5em 0 0;">
-          <Header name="task_header" value="Task: " style="font-size: 1em;"/>
+          <Header value="Task: " style="font-size: 1em;"/>
         </View>
         <Text name="task" value="$task"/>
       </View>
      <View style="display: flex; align-items: center; box-shadow: 2px 2px 5px #999; padding: 10px; border-radius: 5px; background-color: #E0E0E0; font-size: 1.25em;">
         <View style="margin: 0 1em 0 0">
-          <Header name="prompt_header" value="Prompt: "  />
+          <Header value="Prompt: "  />
         </View>
         <Text name="prompt" value="$prompt"/>
       </View>

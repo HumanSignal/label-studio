@@ -11,12 +11,7 @@ export const ImageDataGroup = (column) => {
 
   return original.total_annotations === 0 || !root.showPreviews ? (
     <div>
-      <img
-        src={value}
-        width="100%"
-        height={ImageDataGroup.height}
-        alt=""
-      />
+      <img src={value} width="100%" height={ImageDataGroup.height} alt="" />
     </div>
   ) : (
     <AnnotationPreview

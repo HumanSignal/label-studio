@@ -25,11 +25,11 @@ export const MenuItem = ({
 
     if (selected.has(name)) {
       return true;
-    } else if (exact) {
-      return pathname === url;
-    } else {
-      return pathname.includes(url);
     }
+    if (exact) {
+      return pathname === url;
+    }
+    return pathname.includes(url);
   })();
 
   const linkContent = (

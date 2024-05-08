@@ -3,11 +3,11 @@ title: Integrate Label Studio into your machine learning pipeline
 short: Machine learning integration
 type: guide
 tier: all
-order: 355
-order_enterprise: 305
+order: 251
+order_enterprise: 251
 meta_title: Integrate Label Studio into your machine learning pipeline
 meta_description: Machine learning frameworks for integrating your model development pipeline seamlessly with your data labeling workflow.
-section: "Machine learning"
+section: "Machine Learning"
 ---
 
 You can use an ML backend to integrate your model development pipeline with your data labeling workflow. There are several use cases, including: 
@@ -117,28 +117,85 @@ The [ML backend repo](https://github.com/HumanSignal/label-studio-ml-backend) in
 
 Some of them work without any additional configuration. Check the **Required parameters** column to see if you need to set any additional parameters. If the model has required parameters, you can set those parameters in `docker-compose.yml` within the model directory. 
 
-- **Auto-annotation** column indicates if the model can be used for auto-annotation in Label Studio: pre-annotated data when opening the labeling page, run predictions for the batch of data.
-- **Interactive mode** column indicates if the model can be used for interactive labeling in Label Studio: see interactive predictions when performing actions on labeling page.
-- **Training** column indicates if the model can be used for training in Label Studio: update the model state based the submitted annotations.
+- **Pre-annotation** column indicates if the model can be used for pre-annotation in Label Studio:  
+  you can see pre-annotated data when opening the labeling page or after running predictions for a batch of data.
+- **Interactive mode** column indicates if the model can be used for interactive labeling in Label Studio: see
+  interactive predictions when performing actions on labeling page.
+- **Training** column indicates if the model can be used for training in Label Studio: update the model state based the
+  submitted annotations.
 
-| MODEL_NAME                                                                                 | Description                                                                                                                               | Auto-annotation | Interactive mode | Training | Required parameters                           |
+| MODEL_NAME                                                                                 | Description                                                                                                                               | Pre-annotation | Interactive mode | Training | Required parameters                           |
 |--------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|-----------------|------------------|----------|-----------------------------------------------|
-| [segment_anything_model](/label_studio_ml/examples/segment_anything_model)                 | Image segmentation by [Meta](https://segment-anything.com/)                                                                               | ❌               | ✅                |   ❌       | None                                          |
-| [llm_interactive](/label_studio_ml/examples/llm_interactive)                               | Prompt engineering with [OpenAI](https://platform.openai.com/), Azure LLMs.                                                               | ✅               | ✅                | ✅        | OPENAI_API_KEY                                |
-| [grounding_dino](/label_studio_ml/examples/grounding_dino)                                 | Object detection with prompts. [Details](https://github.com/IDEA-Research/GroundingDINO)                                                  | ❌               | ✅                | ❌        | None                                          |
-| [tesseract](/label_studio_ml/examples/tesseract)                                           | Interactive OCR. [Details](https://github.com/tesseract-ocr/tesseract)                                                                    | ❌               | ✅                | ❌        | None                                          |
-| [easyocr](/label_studio_ml/examples/easyocr)                                               | Automated OCR. [EasyOCR](https://github.com/JaidedAI/EasyOCR)                                                                             | ✅               | ❌                | ❌        | None                                          |
-| [spacy](/label_studio_ml/examples/spacy)                                                   | NER by [SpaCy](https://spacy.io/)                                                                                                         | ✅               | ❌                | ❌        | None                                          |
-| [flair](/label_studio_ml/examples/flair)                                                   | NER by [flair](https://flairnlp.github.io/)                                                                                               | ✅               | ❌                | ❌        | None                                          |
-| [bert_classifier](/label_studio_ml/examples/bert_classifier)                               | Text classification with [Huggingface](https://huggingface.co/transformers/v3.0.2/model_doc/auto.html#automodelforsequenceclassification) | ✅               | ❌                | ✅        | None                                          |
-| [huggingface_llm](/label_studio_ml/examples/huggingface_llm)                               | LLM inference with [Hugging Face](https://huggingface.co/tasks/text-generation)                                                           | ✅               | ❌                | ❌        | None                                          |
-| [huggingface_ner](/label_studio_ml/examples/huggingface_ner)                               | NER by [Hugging Face](https://huggingface.co/docs/transformers/en/tasks/token_classification)                                             | ✅               | ❌                | ✅        | None                                          |
-| [nemo_asr](/label_studio_ml/examples/nemo_asr)                                             | Speech ASR by [NVIDIA NeMo](https://github.com/NVIDIA/NeMo)                                                                               | ✅               | ❌                | ❌        | None                                          |
-| [mmdetection](/label_studio_ml/examples/mmdetection-3)                                     | Object Detection with [OpenMMLab](https://github.com/open-mmlab/mmdetection)                                                              | ✅               | ❌                | ❌        | None                                          |
-| [sklearn_text_classifier](/label_studio_ml/examples/sklearn_text_classifier)               | Text classification with [scikit-learn](https://scikit-learn.org/stable/)                                                                 | ✅               | ❌                | ✅        | None                                          |
-| [interactive_substring_matching](/label_studio_ml/examples/interactive_substring_matching) | Simple keywords search                                                                                                                    | ❌               | ✅                | ❌        | None                                          |
-| [langchain_search_agent](/label_studio_ml/examples/langchain_search_agent)                 | RAG pipeline with Google Search and [Langchain](https://langchain.com/)                                                                   | ✅               | ✅                | ✅        | OPENAI_API_KEY, GOOGLE_CSE_ID, GOOGLE_API_KEY |
+| [segment_anything_model](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_model)                 | Image segmentation by [Meta](https://segment-anything.com/)                                                                               | ❌               | ✅                |   ❌       | None                                          |
+| [llm_interactive](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/llm_interactive)                               | Prompt engineering with [OpenAI](https://platform.openai.com/), Azure LLMs.                                                               | ✅               | ✅                | ✅        | OPENAI_API_KEY                                |
+| [grounding_dino](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/grounding_dino)                                 | Object detection with prompts. [Details](https://github.com/IDEA-Research/GroundingDINO)                                                  | ❌               | ✅                | ❌        | None                                          |
+| [tesseract](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/tesseract)                                           | Interactive OCR. [Details](https://github.com/tesseract-ocr/tesseract)                                                                    | ❌               | ✅                | ❌        | None                                          |
+| [easyocr](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/easyocr)                                               | Automated OCR. [EasyOCR](https://github.com/JaidedAI/EasyOCR)                                                                             | ✅               | ❌                | ❌        | None                                          |
+| [spacy](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/spacy)                                                   | NER by [SpaCy](https://spacy.io/)                                                                                                         | ✅               | ❌                | ❌        | None                                          |
+| [flair](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/flair)                                                   | NER by [flair](https://flairnlp.github.io/)                                                                                               | ✅               | ❌                | ❌        | None                                          |
+| [bert_classifier](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/bert_classifier)                               | Text classification with [Huggingface](https://huggingface.co/transformers/v3.0.2/model_doc/auto.html#automodelforsequenceclassification) | ✅               | ❌                | ✅        | None                                          |
+| [huggingface_llm](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/huggingface_llm)                               | LLM inference with [Hugging Face](https://huggingface.co/tasks/text-generation)                                                           | ✅               | ❌                | ❌        | None                                          |
+| [huggingface_ner](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/huggingface_ner)                               | NER by [Hugging Face](https://huggingface.co/docs/transformers/en/tasks/token_classification)                                             | ✅               | ❌                | ✅        | None                                          |
+| [nemo_asr](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/nemo_asr)                                             | Speech ASR by [NVIDIA NeMo](https://github.com/NVIDIA/NeMo)                                                                               | ✅               | ❌                | ❌        | None                                          |
+| [mmdetection](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/mmdetection-3)                                     | Object Detection with [OpenMMLab](https://github.com/open-mmlab/mmdetection)                                                              | ✅               | ❌                | ❌        | None                                          |
+| [sklearn_text_classifier](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/sklearn_text_classifier)               | Text classification with [scikit-learn](https://scikit-learn.org/stable/)                                                                 | ✅               | ❌                | ✅        | None                                          |
+| [interactive_substring_matching](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/interactive_substring_matching) | Simple keywords search                                                                                                                    | ❌               | ✅                | ❌        | None                                          |
+| [langchain_search_agent](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/langchain_search_agent)                 | RAG pipeline with Google Search and [Langchain](https://langchain.com/)                                                                   | ✅               | ✅                | ✅        | OPENAI_API_KEY, GOOGLE_CSE_ID, GOOGLE_API_KEY |
 
+## Allow the ML backend to access Label Studio data
+
+In most cases, you will need to set your environment variables to allow the ML backend access to the data in Label Studio. 
+
+Label Studio tasks can have multiple sources of resource files:
+
+* Direct `http` and `https` links.  
+    Example: `task['data'] = {"image": "http://example.com/photo_1.jpg"}`
+
+* Files that have been uploaded to Label Studio using the **Import** action.  
+    Example: `task['data'] = {"image": "https://ls-instance/data/upload/42/photo_1.jpg"}`
+
+* Files added through a [local storage connection](storage#Local-storage).  
+    Example: `task['data'] = {"image": "https://ls-instance/data/local-files/?d=folder/photo_1.jpg"}`
+
+* Files added through a [cloud storage](storage) (S3, GCS, Azure) connection.  
+    Example: `task['data'] = {"image": "s3://bucket/prefix/photo_1.jpg"}`
+
+When Label Studio invokes the `predict(tasks)` method on an ML backend, it sends tasks containing data sub-dictionaries with links to resource files. 
+
+Downloading files from direct `http` and `https` links (the first example above) is straightforward. However, the other three types (imported files, local storage files, and cloud storage files) are more complex. 
+
+To address this, the ML backend utilizes the `get_local_path(url, task_id)` function from the `label_studio_tools` package (this package is pre-installed with `label-studio-ml-backend`):
+
+```python
+from label_studio_tools.core.utils.io import get_local_path
+
+class MLBackend(LabelStudioMLBase)
+  def predict(tasks):
+    task = tasks[0]
+    locaL_path = get_local_path(task['data']['image'], task_id=task['id'])
+    with open(locaL_path, 'r') as f:
+      f.read()
+```
+
+The `get_local_path()` function resolves URIs to URLs, then downloads and caches the file.
+
+For this to work, you must specify the `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` environment variables for your ML backend before using `get_local_path`. 
+
+Note the following:
+
+* `LABEL_STUDIO_URL` must be accessible from the ML backend instance. 
+
+* If you are running the ML backend in Docker, `LABEL_STUDIO_URL` can’t contain `localhost`. Use the full IP address instead. You can get this using the `ifconfig` (Unix) or `ipconfig` (Windows) commands.
+
+* `LABEL_STUDIO_URL` must start either with `http://` or `https://`.
+
+To find your `LABEL_STUDIO_API_KEY`, open Label Studio and go to your [user account page](user_account#Access-token). 
+
+<div class="enterprise-only">
+
+Note that your user must also have access to the project that you are connecting to ML backend.
+
+</div>
 
 ## Model training
 
@@ -228,7 +285,7 @@ After you start labeling, enable **Auto-Annotation** to see and use the smart op
    
 For image labeling, after you enable auto-annotation you can choose whether to **Auto accept annotation suggestions**. If you automatically accept annotation suggestions, regions show up automatically and are immediately created. If you don't automatically accept suggestions, the regions appear but you can reject or approve them manually, either individually or all at once.
 
-<br/><img src="/images/release-130/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />
+<br/><img src="/images/predict-owl-region.gif" alt="" class="gif-border" width="800px" height="533px" />
    
 ### Delete predictions 
 

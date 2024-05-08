@@ -5,13 +5,13 @@
  * @returns {string} formatted date
  */
 export const formatDateValue = (value: string, format: string) => {
-  const [y, m, d] = value.split('-');
-  let text = '';
+  const [y, m, d] = value.split("-");
+  let text = "";
 
   for (const char of format) {
-    if (char === 'y') text += y;
-    if (char === 'm') text += m;
-    if (char === 'd') text += d;
+    if (char === "y") text += y;
+    if (char === "m") text += m;
+    if (char === "d") text += d;
   }
   return text;
 };

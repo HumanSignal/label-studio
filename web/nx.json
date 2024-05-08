@@ -20,21 +20,12 @@
     },
     "version": {
       "cache": true,
-      "inputs": [
-        "default",
-        "^production",
-        "{workspaceRoot}/tools/version.mjs"
-      ],
+      "inputs": ["default", "^production", "{workspaceRoot}/tools/version.mjs"],
       "outputs": ["{workspaceRoot}/dist/{projectRoot}/version.json"]
     },
     "build-storybook": {
       "cache": true,
-      "inputs": [
-        "default",
-        "^production",
-        "{projectRoot}/.storybook/**/*",
-        "{projectRoot}/tsconfig.storybook.json"
-      ]
+      "inputs": ["default", "^production", "{projectRoot}/.storybook/**/*", "{projectRoot}/tsconfig.storybook.json"]
     }
   },
   "namedInputs": {

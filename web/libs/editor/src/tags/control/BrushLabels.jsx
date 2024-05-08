@@ -1,14 +1,14 @@
-import React from 'react';
-import { observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
+import React from "react";
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
 
-import LabelMixin from '../../mixins/LabelMixin';
-import Registry from '../../core/Registry';
-import SelectedModelMixin from '../../mixins/SelectedModel';
-import Types from '../../core/Types';
-import { BrushModel } from './Brush';
-import { HtxLabels, LabelsModel } from './Labels/Labels';
-import ControlBase from './Base';
+import LabelMixin from "../../mixins/LabelMixin";
+import Registry from "../../core/Registry";
+import SelectedModelMixin from "../../mixins/SelectedModel";
+import Types from "../../core/Types";
+import { BrushModel } from "./Brush";
+import { HtxLabels, LabelsModel } from "./Labels/Labels";
+import ControlBase from "./Base";
 
 /**
  * The `BrushLabels` tag for image segmentation tasks is used in the area where you want to apply a mask or use a brush to draw a region on the image.
@@ -35,29 +35,29 @@ import ControlBase from './Base';
  */
 
 const Validation = types.model({
-  controlledTags: Types.unionTag(['Image']),
+  controlledTags: Types.unionTag(["Image"]),
 });
 
-const ModelAttrs = types.model('BrushLabelsModel', {
-  type: 'brushlabels',
-  children: Types.unionArray(['label', 'header', 'view', 'hypertext']),
+const ModelAttrs = types.model("BrushLabelsModel", {
+  type: "brushlabels",
+  children: Types.unionArray(["label", "header", "view", "hypertext"]),
 });
 
 const BrushLabelsModel = types.compose(
-  'BrushLabelsModel',
+  "BrushLabelsModel",
   ControlBase,
   LabelsModel,
   ModelAttrs,
   BrushModel,
   Validation,
   LabelMixin,
-  SelectedModelMixin.props({ _child: 'LabelModel' }),
+  SelectedModelMixin.props({ _child: "LabelModel" }),
 );
 
 const HtxBrushLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;
 });
 
-Registry.addTag('brushlabels', BrushLabelsModel, HtxBrushLabels);
+Registry.addTag("brushlabels", BrushLabelsModel, HtxBrushLabels);
 
 export { HtxBrushLabels, BrushLabelsModel };

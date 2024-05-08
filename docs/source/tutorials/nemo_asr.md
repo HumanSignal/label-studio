@@ -1,72 +1,104 @@
 ---
-title: Automatic Speech Recognition with NVIDIA NeMo
-type: blog
+title: Automatic Speech Recognition with NVidia NeMo
+type: guide
 tier: all
 order: 60
-meta_title: Automatic Speech Recognition with NVIDIA NeMo
-meta_description: Label Studio tutorial for Automatic Speech Recognition with NVIDIA NeMo
-
+hide_menu: true
+hide_frontmatter_title: true
+meta_title: Automatic Speech Recognition with NeMo
+meta_description: Tutorial on how to use set up Nvidia NeMo to use for ASR tasks in Label Studio
+categories:
+    - Audio/Speech Processing
+    - Automatic Speech Recognition
+    - NeMo
+    - NVidia
+image: "/tutorials/nvidia.png"
 ---
 
+<!--
 
-This an example of using [Nvidia's NeMo toolkit](https://github.com/NVIDIA/NeMo) for creating Automatic Speech Recognition (ASR), Natural Language Understanding (NLU) or Text-to-Speech (TTS) pre-annotations.
+-->
 
-With the NeMo ASR models, you can create audio pre-annotations with a text area, aka _transcriptions_.
+# ASR with NeMo
 
-<div style="margin:auto; text-align:center; width:100%"><img src="/images/nemo-asr.png" style="opacity: 0.7"/></div>
+This example demonstrates how to use the [NeMo](https://github.com/NVIDIA/NeMo/blob/main/nemo/collections/asr/README.md) to perform ASR (Automatic Speech Recognition) in Label Studio.
 
-## Start using it
+Use this model if you want to transcribe and fix your audio data.
 
-1. Follow [this installation guide](https://github.com/NVIDIA/NeMo#installation) to set up the NeMo environment.
+## Labeling interface
 
-2. On the same server or Docker container as NeMo, [install Label Studio](https://labelstud.io/guide/#Quickstart). 
+This example works with the Label Studio's pre-built **Audio Transcription** template (available under **Audio Processing > Audio Transcription**).  
 
-3. Install the Label Studio machine learning backend. From the command line, run the following: 
-```bash
-git clone https://github.com/heartexlabs/label-studio-ml-backend  
-```
-4. Set up the Label Studio ML backend environment:
-```bash
-cd label-studio-ml-backend
-# Install label-studio-ml and its dependencies
-pip install -U -e .
-# Install the nemo example dependencies
-pip install -r label_studio_ml/examples/requirements.txt
-```
-
-5. Initialize the Label Studio machine learning backend with the ASR example
-```bash
-label-studio-ml init my_model --from label_studio_ml/examples/nemo/asr.py
-```
-
-6. Start the machine learning backend. By default, the model starts on localhost with port 9090.
-```bash
-label-studio-ml start my_model
-```
-
-7. Start Label Studio:
-```bash
-label-studio start my_project --init
-```
-   
-8. In Label Studio, open the Settings page for your project and open the Labeling Interface section.
-
-9. From the template list, select `Automatic Speech Recognition`. You can also create your own with `<TextArea>` and `<Audio>` tags. Or copy this labeling config into the Label Studio UI: 
-```xml    
- <View>
-  <Audio name="audio" value="url" zoom="true" hotkey="ctrl+enter" />
+```xml
+<View>
+  <Audio name="audio" value="$audio" zoom="true" hotkey="ctrl+enter" />
   <Header value="Provide Transcription" />
-  <TextArea name="answer" transcription="true" toName="audio" rows="4" editable="true" maxSubmissions="1" />
+  <TextArea name="transcription" toName="audio"
+            rows="4" editable="true" maxSubmissions="1" />
 </View>
 ```
-10. In your project settings, open the Machine Learning page in the Label Studio UI. 
+
+But you can use any other labeling interface that combines `<Audio>` and `<TextArea>` elements.
+
+> Warning: If you use files hosted in Label Studio (e.g. audio files directly uploaded via import dialog), you must provide the `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` environment variables to the ML backend. For more information about finding your Label Studio API key, [see our documentation](https://labelstud.io/guide/user_account#Access-token).
+
+## Running with Docker (recommended)
+
+1. Start the Machine Learning backend on `http://localhost:9090` with the prebuilt image:
+
+```bash
+docker-compose up
+```
+
+2. Validate that backend is running:
+
+```bash
+$ curl http://localhost:9090/
+{"status":"UP"}
+```
+
+3. Create a project in Label Studio. Then from the **Model** page in the project settings, [connect the model](https://labelstud.io/guide/ml#Connect-the-model-to-Label-Studio). The default URL is `http://localhost:9090`.
 
 
-!!! note 
-    It takes some time to download models from the NeMo engine. The Label Studio UI might hang until the models finish automatically downloading.
+## Building from source (advanced)
+
+To build the ML backend from source, you have to clone the repository and build the Docker image:
+
+```bash
+docker-compose build
+```
+
+## Running without Docker (advanced)
+
+To run the ML backend without Docker, you have to clone the repository and install all dependencies using pip:
+
+```bash
+python -m venv ml-backend
+source ml-backend/bin/activate
+pip install -r requirements.txt
+```
+
+Then you can start the ML backend:
+
+```bash
+label-studio-ml start ./nemo_asr
+```
+
+## Configuration
+
+Parameters can be set in `docker-compose.yml` before running the container.
 
 
-11. Click **Add Model** and add the ML backend using this URL: `http://localhost:9090`.
+The following common parameters are available:
+- `MODEL_NAME` - Specify the model name for the ASR. (`QuartzNet15x5Base-En` by default)
+- `BASIC_AUTH_USER` - Specify the basic auth user for the model server
+- `BASIC_AUTH_PASS` - Specify the basic auth password for the model server
+- `LOG_LEVEL` - Set the log level for the model server
+- `WORKERS` - Specify the number of workers for the model server
+- `THREADS` - Specify the number of threads for the model server
+- `LABEL_STUDIO_HOST`: The host of the Label Studio instance. Default is `http://localhost:8080`.
+- `LABEL_STUDIO_API_KEY`: The API key for the Label Studio instance.
 
-12. Import audio data and start reviewing pre-annotations.
+## Customization
 
+The ML backend can be customized by adding your own models and logic inside `./nemo_asr/model.py`.

@@ -1,15 +1,15 @@
-import { observer } from 'mobx-react';
-import { FC, useEffect, useRef } from 'react';
-import { Hotkey } from '../../../core/Hotkey';
-import { useWaveform } from '../../../lib/AudioUltra/react';
-import { Controls } from '../../../components/Timeline/Controls';
-import { Region } from '../../../lib/AudioUltra/Regions/Region';
-import { Segment } from '../../../lib/AudioUltra/Regions/Segment';
-import { Regions } from '../../../lib/AudioUltra/Regions/Regions';
-import { Block } from '../../../utils/bem';
-import { ErrorMessage } from '../../../components/ErrorMessage/ErrorMessage';
+import { observer } from "mobx-react";
+import { type FC, useEffect, useRef } from "react";
+import { Hotkey } from "../../../core/Hotkey";
+import { useWaveform } from "../../../lib/AudioUltra/react";
+import { Controls } from "../../../components/Timeline/Controls";
+import type { Region } from "../../../lib/AudioUltra/Regions/Region";
+import type { Segment } from "../../../lib/AudioUltra/Regions/Segment";
+import type { Regions } from "../../../lib/AudioUltra/Regions/Regions";
+import { Block } from "../../../utils/bem";
+import { ErrorMessage } from "../../../components/ErrorMessage/ErrorMessage";
 
-import './view.styl';
+import "./view.styl";
 
 interface AudioUltraProps {
   item: any;
@@ -23,10 +23,10 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
   const { waveform, ...controls } = useWaveform(rootRef, {
     src: item._value,
     autoLoad: false,
-    waveColor: '#BEB9C5',
-    gridColor: '#BEB9C5',
+    waveColor: "#BEB9C5",
+    gridColor: "#BEB9C5",
     gridWidth: 1,
-    backgroundColor: '#fafafa',
+    backgroundColor: "#fafafa",
     autoCenter: true,
     zoomToCursor: true,
     height: item.height && !isNaN(Number(item.height)) ? Number(item.height) : 96,
@@ -39,7 +39,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
     zoom: item.defaultzoom ? Number(item.defaultzoom) : 1,
     showLabels: item.annotationStore.store.settings.showLabels,
     rate: item.defaultspeed ? Number(item.defaultspeed) : 1,
-    muted: item.muted === 'true',
+    muted: item.muted === "true",
     onLoad: item.onLoad,
     onPlaying: item.onPlaying,
     onSeek: item.onSeek,
@@ -51,7 +51,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
       deleteable: !item.readonly,
     },
     timeline: {
-      backgroundColor: '#ffffff',
+      backgroundColor: "#ffffff",
     },
     experimental: {
       backgroundCompute: true,
@@ -61,7 +61,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
   });
 
   useEffect(() => {
-    const hotkeys = Hotkey('Audio', 'Audio Segmentation');
+    const hotkeys = Hotkey("Audio", "Audio Segmentation");
 
     waveform.current?.load();
 
@@ -117,21 +117,21 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
       item.updateRegion(region);
     };
 
-    waveform.current?.on('beforeRegionsDraw', updateBeforeRegionDraw);
-    waveform.current?.on('afterRegionsDraw', updateAfterRegionDraw);
-    waveform.current?.on('regionSelected', selectRegion);
-    waveform.current?.on('regionCreated', createRegion);
-    waveform.current?.on('regionUpdatedEnd', updateRegion);
+    waveform.current?.on("beforeRegionsDraw", updateBeforeRegionDraw);
+    waveform.current?.on("afterRegionsDraw", updateAfterRegionDraw);
+    waveform.current?.on("regionSelected", selectRegion);
+    waveform.current?.on("regionCreated", createRegion);
+    waveform.current?.on("regionUpdatedEnd", updateRegion);
 
-    hotkeys.addNamed('region:delete', () => {
+    hotkeys.addNamed("region:delete", () => {
       waveform.current?.regions.clearSegments(false);
     });
 
-    hotkeys.addNamed('segment:delete', () => {
+    hotkeys.addNamed("segment:delete", () => {
       waveform.current?.regions.clearSegments(false);
     });
 
-    hotkeys.addNamed('region:delete-all', () => {
+    hotkeys.addNamed("region:delete-all", () => {
       waveform.current?.regions.clearSegments();
     });
 
@@ -145,7 +145,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
       {item.errors?.map((error: any, i: any) => (
         <ErrorMessage key={`err-${i}`} error={error} />
       ))}
-      <div ref={el => (rootRef.current = el)}></div>
+      <div ref={(el) => (rootRef.current = el)} />
       <Controls
         position={controls.currentTime}
         playing={controls.playing}
@@ -156,7 +156,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
         onPlay={() => controls.setPlaying(true)}
         onPause={() => controls.setPlaying(false)}
         allowFullscreen={false}
-        onVolumeChange={vol => controls.setVolume(vol)}
+        onVolumeChange={(vol) => controls.setVolume(vol)}
         onStepBackward={() => {
           waveform.current?.seekBackward(NORMALIZED_STEP);
           waveform.current?.syncCursor();
@@ -165,14 +165,14 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
           waveform.current?.seekForward(NORMALIZED_STEP);
           waveform.current?.syncCursor();
         }}
-        onPositionChange={pos => {
+        onPositionChange={(pos) => {
           waveform.current?.seek(pos);
           waveform.current?.syncCursor();
         }}
-        onSpeedChange={speed => controls.setRate(speed)}
-        onZoom={zoom => controls.setZoom(zoom)}
+        onSpeedChange={(speed) => controls.setRate(speed)}
+        onZoom={(zoom) => controls.setZoom(zoom)}
         amp={controls.amp}
-        onAmpChange={amp => controls.setAmp(amp)}
+        onAmpChange={(amp) => controls.setAmp(amp)}
         mediaType="audio"
         toggleVisibility={(layerName: string, isVisible: boolean) => {
           if (waveform.current) {

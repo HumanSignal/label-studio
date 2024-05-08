@@ -1,13 +1,13 @@
 ---
 title: Installation overview
-short: Overview
+short: Installation
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 452
+order_enterprise: 60
 meta_title: Installation overview for Label Studio Enterprise
 meta_description: Overview of the components involved when installing Label Studio Enterprise as an on-prem deployment
-section: "Install"
+section: "Install & Setup"
 ---
 
 

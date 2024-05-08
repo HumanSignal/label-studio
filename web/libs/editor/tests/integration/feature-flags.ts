@@ -1,4 +1,4 @@
-import * as FLAGS from '../../src/utils/feature-flags';
+import * as FLAGS from "../../src/utils/feature-flags";
 
 export const CURRENT_FLAGS = {
   [FLAGS.FF_DEV_1170]: true,
@@ -13,4 +13,3 @@ export const CURRENT_FLAGS = {
   [FLAGS.FF_OUTLINER_OPTIM]: true,
   [FLAGS.FF_DBLCLICK_DELAY]: true,
 };
-

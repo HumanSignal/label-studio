@@ -7,21 +7,18 @@ function startErrorsCollector() {
     this._start();
   }
 
-  CEErrorsCollector.prototype.errorHandler = function(ev)  {
-    // Ignore not meaningful error
-    if (ev.message === 'ResizeObserver loop limit exceeded') return;
-
+  CEErrorsCollector.prototype.errorHandler = function (ev) {
     this.errors.push(ev.message);
   };
-  CEErrorsCollector.prototype.destroy = function() {
+  CEErrorsCollector.prototype.destroy = function () {
     this.errors = null;
     this._finish();
   };
-  CEErrorsCollector.prototype._start = function()  {
-    window.addEventListener('error', this.errorHandler);
+  CEErrorsCollector.prototype._start = function () {
+    window.addEventListener("error", this.errorHandler);
   };
-  CEErrorsCollector.prototype._finish = function()  {
-    window.removeEventListener('error', this.errorHandler);
+  CEErrorsCollector.prototype._finish = function () {
+    window.removeEventListener("error", this.errorHandler);
   };
   window._ceErrorsCollector = new CEErrorsCollector();
 }

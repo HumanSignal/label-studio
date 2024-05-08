@@ -113,7 +113,6 @@ export const APIConfig = {
       method: "post",
     },
 
-
     /** Convert an annotation to draft */
     convertToDraft: {
       path: "/../annotations/:annotationID/convert-to-draft",

@@ -1,9 +1,9 @@
-import { ChangeEvent } from 'react';
+import type { ChangeEvent } from "react";
 
 export interface SettingsProperty {
   description: string;
   defaultValue: any;
-  type: 'boolean' | 'number' | 'text';
+  type: "boolean" | "number" | "text";
   min?: number;
   max?: number;
   step?: number;
@@ -11,4 +11,4 @@ export interface SettingsProperty {
   onChangeEvent?: (e: ChangeEvent) => void;
 }
 
-export type SettingsProperties = Record<string, SettingsProperty>
+export type SettingsProperties = Record<string, SettingsProperty>;

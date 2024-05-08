@@ -1,24 +1,24 @@
 /* global Sentry */
 
-import { createBrowserHistory } from 'history';
-import React from 'react';
-import { render } from 'react-dom';
-import { Router } from 'react-router-dom';
+import { createBrowserHistory } from "history";
+import React from "react";
+import { render } from "react-dom";
+import { Router } from "react-router-dom";
 import { initSentry } from "../config/Sentry";
-import { ApiProvider } from '../providers/ApiProvider';
-import { AppStoreProvider } from '../providers/AppStoreProvider';
-import { ConfigProvider } from '../providers/ConfigProvider';
-import { LibraryProvider } from '../providers/LibraryProvider';
-import { MultiProvider } from '../providers/MultiProvider';
-import { ProjectProvider } from '../providers/ProjectProvider';
-import { RoutesProvider } from '../providers/RoutesProvider';
+import { ApiProvider } from "../providers/ApiProvider";
+import { AppStoreProvider } from "../providers/AppStoreProvider";
+import { ConfigProvider } from "../providers/ConfigProvider";
+import { LibraryProvider } from "../providers/LibraryProvider";
+import { MultiProvider } from "../providers/MultiProvider";
+import { ProjectProvider } from "../providers/ProjectProvider";
+import { RoutesProvider } from "../providers/RoutesProvider";
 import { DRAFT_GUARD_KEY, DraftGuard, draftGuardCallback } from "../components/DraftGuard/DraftGuard";
-import './App.styl';
-import { AsyncPage } from './AsyncPage/AsyncPage';
-import ErrorBoundary from './ErrorBoundary';
-import { RootPage } from './RootPage';
-import { FF_OPTIC_2, isFF } from '../utils/feature-flags';
-import { ToastProvider, ToastViewport } from '../components/Toast/Toast';
+import "./App.styl";
+import { AsyncPage } from "./AsyncPage/AsyncPage";
+import ErrorBoundary from "./ErrorBoundary";
+import { RootPage } from "./RootPage";
+import { FF_OPTIC_2, isFF } from "../utils/feature-flags";
+import { ToastProvider, ToastViewport } from "../components/Toast/Toast";
 
 const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
 
@@ -54,18 +54,20 @@ const App = ({ content }) => {
   return (
     <ErrorBoundary>
       <Router history={browserHistory}>
-        <MultiProvider providers={[
-          <AppStoreProvider key="app-store"/>,
-          <ApiProvider key="api"/>,
-          <ConfigProvider key="config"/>,
-          <LibraryProvider key="lsf" libraries={libraries}/>,
-          <RoutesProvider key="rotes"/>,
-          <ProjectProvider key="project"/>,
-          <ToastProvider key="toast"/>,
-        ]}>
+        <MultiProvider
+          providers={[
+            <AppStoreProvider key="app-store" />,
+            <ApiProvider key="api" />,
+            <ConfigProvider key="config" />,
+            <LibraryProvider key="lsf" libraries={libraries} />,
+            <RoutesProvider key="rotes" />,
+            <ProjectProvider key="project" />,
+            <ToastProvider key="toast" />,
+          ]}
+        >
           <AsyncPage>
             <DraftGuard />
-            <RootPage content={content}/>
+            <RootPage content={content} />
             <ToastViewport />
           </AsyncPage>
         </MultiProvider>
@@ -74,7 +76,7 @@ const App = ({ content }) => {
   );
 };
 
-const root = document.querySelector('.app-wrapper');
-const content = document.querySelector('#main-content');
+const root = document.querySelector(".app-wrapper");
+const content = document.querySelector("#main-content");
 
-render(<App content={content.innerHTML}/>, root);
+render(<App content={content.innerHTML} />, root);

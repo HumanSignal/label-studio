@@ -1,13 +1,5 @@
 import { observer } from "mobx-react";
-import React, {
-  createContext,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import React, { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaCode } from "react-icons/fa";
 import { RiCodeLine } from "react-icons/ri";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -62,7 +54,7 @@ export const Table = observer(
     headerExtra,
     ...props
   }) => {
-    const colOrderKey = 'dm:columnorder';
+    const colOrderKey = "dm:columnorder";
     const tableHead = useRef();
     const [colOrder, setColOrder] = useState(JSON.parse(localStorage.getItem(colOrderKey)) ?? {});
     const listRef = useRef();
@@ -130,7 +122,7 @@ export const Table = observer(
 
         const onTaskLoad = async () => {
           if (isFF(FF_LOPS_E_3) && type === "DE") {
-            return new Promise(resolve => resolve(out));
+            return new Promise((resolve) => resolve(out));
           }
           const response = await api.task({ taskID: out.id });
 
@@ -144,12 +136,18 @@ export const Table = observer(
               style={{ width: 32, height: 32, padding: 0 }}
               onClick={() => {
                 modal({
-                  title: "Source for task " + out?.id,
+                  title: `Source for task ${out?.id}`,
                   style: { width: 800 },
                   body: <TaskSourceView content={out} onTaskLoad={onTaskLoad} sdkType={type} />,
                 });
               }}
-              icon={isFF(FF_LOPS_E_10) ? <Icon icon={RiCodeLine} style={{ width: 24, height: 24 }}/> : <Icon icon={FaCode}/>}
+              icon={
+                isFF(FF_LOPS_E_10) ? (
+                  <Icon icon={RiCodeLine} style={{ width: 24, height: 24 }} />
+                ) : (
+                  <Icon icon={FaCode} />
+                )
+              }
             />
           </Tooltip>
         );
@@ -157,7 +155,7 @@ export const Table = observer(
     });
 
     if (Object.keys(colOrder).length > 0) {
-      columns.sort( (a, b) => {
+      columns.sort((a, b) => {
         return colOrder[a.id] < colOrder[b.id] ? -1 : 1;
       });
     }
@@ -256,15 +254,14 @@ export const Table = observer(
       if (index >= 0) {
         const scrollOffset = index * h - height / 2 + h / 2; // + headerHeight
 
-        return cachedScrollOffset.current = scrollOffset;
-      } else {
-        return 0;
+        return (cachedScrollOffset.current = scrollOffset);
       }
+      return 0;
     }, []);
 
     const itemKey = useCallback(
       (index) => {
-        if (index > (data.length - 1)) {
+        if (index > data.length - 1) {
           return index;
         }
         return data[index]?.key ?? index;
@@ -281,8 +278,9 @@ export const Table = observer(
     }, [data]);
     const tableWrapper = useRef();
 
-    const right = tableWrapper.current?.firstChild?.firstChild.offsetWidth -
-      tableWrapper.current?.firstChild?.firstChild?.firstChild.offsetWidth || 0;
+    const right =
+      tableWrapper.current?.firstChild?.firstChild.offsetWidth -
+        tableWrapper.current?.firstChild?.firstChild?.firstChild.offsetWidth || 0;
 
     return (
       <>
@@ -295,13 +293,13 @@ export const Table = observer(
           >
             {isFF(FF_DEV_3873) ? (
               <FieldsButton
-                className={'columns__selector__button-new'}
+                className={"columns__selector__button-new"}
                 wrapper={FieldsButton.Checkbox}
                 icon={<LsGearNewUI />}
-                style={{ padding: '0' }}
-                tooltip={'Customize Columns'}
+                style={{ padding: "0" }}
+                tooltip={"Customize Columns"}
               />
-            ):(
+            ) : (
               <FieldsButton
                 wrapper={FieldsButton.Checkbox}
                 icon={<LsGear />}
@@ -317,11 +315,7 @@ export const Table = observer(
             )}
           </Block>
         )}
-        <TableBlock
-          ref={tableWrapper}
-          name="table"
-          mod={{ fit: props.fitToContent }}
-        >
+        <TableBlock ref={tableWrapper} name="table" mod={{ fit: props.fitToContent }}>
           <TableContext.Provider value={contextValue}>
             <StickyList
               ref={listRef}
@@ -463,14 +457,12 @@ const TaskSourceView = ({ content, onTaskLoad, sdkType }) => {
       };
 
       if (sdkType !== "DE") {
-        formatted.annotations =  response.annotations ?? [];
-        formatted.predictions =  response.predictions ?? [];
+        formatted.annotations = response.annotations ?? [];
+        formatted.predictions = response.predictions ?? [];
       }
       setSource(formatted);
     });
   }, []);
 
-  return (
-    <pre>{source ? JSON.stringify(source, null, "  ") : null}</pre>
-  );
+  return <pre>{source ? JSON.stringify(source, null, "  ") : null}</pre>;
 };

@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-ml-release-blocker'",
-  "commit": "ca5ca9fde589a0d7fe849630cbb78703bb2cdc43",
-  "date": "2024-04-18T16:44:49.000Z",
-  "branch": "fb-ml-release-blocker"
+  "message": "Revert #5824",
+  "commit": "c3ef6015499d27319533be5701ad23f105645ed0",
+  "date": "2024-05-08T13:08:10.000Z",
+  "branch": "fb-optic-720/viewsstore-foreach"
 }

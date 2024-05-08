@@ -11,20 +11,6 @@ style.textContent = `
   cursor: pointer;
   position: relative;
 }
-.collapsible-header::before {
-  content: "${is_collapsed ? "▶" : "▼"}";
-  font-size: 70%;
-  position: absolute;
-  left: -1.25em;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.collapsible-header:hover::before {
-  opacity: 1;
-}
-.collapsible-header.expanded::before {
-  content: "▼";
-}
 .toc button {
   margin-top: 1.5em;
   border-radius: 5px;
@@ -40,11 +26,9 @@ style.textContent = `
 }
 .onprem-highlight {
   display: block!important;
-  font-weight: bold;
+  font-weight: 400;
   margin: 1em 0 0 0;
-}
-.onprem-highlight *, .onprem-highlight p {
-  font-weight: bold;
+  font-size: 1rem;
 }
 `;
 
@@ -52,11 +36,16 @@ document.head.appendChild(style);
 
 function onDOMReady() {
   const headers = document.querySelectorAll(".content-markdown h2");
+  const toggleButtons = document.querySelectorAll(".release-note-toggle");
 
   // Process each h2 header
   headers.forEach((header) => {
     const expandedByDefault = header.classList.contains("expanded-by-default");
-    const initialState = expandedByDefault ? "expanded" : is_collapsed ? "collapsed" : "expanded";
+    const initialState = expandedByDefault
+      ? "expanded"
+      : is_collapsed
+      ? "collapsed"
+      : "expanded";
 
     header.classList.add("collapsible-header", initialState);
 
@@ -81,10 +70,22 @@ function onDOMReady() {
     });
   });
 
+  toggleButtons.forEach((button) =>
+    button.addEventListener("click", (e) => {
+      let header = e.target.parentElement.querySelector("h2");
+      let sibling = header.nextElementSibling;
+      let nextSibling = getNextHeaderOrSibling(header);
+      while (sibling && sibling !== nextSibling) {
+        toggleCollapse(header, sibling);
+        sibling = sibling.nextElementSibling;
+      }
+    })
+  );
+
   // Process hash links
-  if(location.hash) {
+  if (location.hash) {
     const header = document.querySelector(location.hash);
-    if(header.tagName === "H2") {
+    if (header.tagName === "H2") {
       let sibling = header.nextElementSibling;
       let nextSibling = getNextHeaderOrSibling(header);
       while (sibling && sibling !== nextSibling) {
@@ -92,8 +93,8 @@ function onDOMReady() {
         sibling = sibling.nextElementSibling;
       }
     } else {
-      let previousHeader = getPreviousSibling(header, "h2")
-      if(previousHeader) {
+      let previousHeader = getPreviousSibling(header, "h2");
+      if (previousHeader) {
         let sibling = previousHeader.nextElementSibling;
         let nextSibling = getNextHeaderOrSibling(previousHeader);
         while (sibling && sibling !== nextSibling) {
@@ -118,16 +119,15 @@ function onDOMReady() {
 
   // Create and configure Collapse/Expand button
   const collapseExpandBtn = document.createElement("button");
-  collapseExpandBtn.textContent = is_collapsed ? "Expand All": "Collapse All";
+  collapseExpandBtn.textContent = is_collapsed ? "Expand All" : "Collapse All";
   const toc = document.querySelector(".content-grid .toc");
   toc?.appendChild(collapseExpandBtn);
   let allExpanded = !is_collapsed;
   collapseExpandBtn.addEventListener("click", () => {
     if (allExpanded) {
-      collapseExpandBtn.textContent = 'Expand All';
-    }
-    else {
-      collapseExpandBtn.textContent = 'Collapse All';
+      collapseExpandBtn.textContent = "Expand All";
+    } else {
+      collapseExpandBtn.textContent = "Collapse All";
     }
     allExpanded = !allExpanded;
 
@@ -174,25 +174,28 @@ function toggleCollapse(header, content) {
 
 // Get the next h2 header or sibling element
 function getNextHeaderOrSibling(element) {
-  while (element.nextElementSibling && element.nextElementSibling.tagName !== "H2") {
+  while (
+    element.nextElementSibling &&
+    element.nextElementSibling.tagName !== "H2"
+  ) {
     element = element.nextElementSibling;
   }
   return element.nextElementSibling;
 }
 
 function getPreviousSibling(elem, selector) {
-	// Get the next sibling element
-	var sibling = elem.previousElementSibling;
+  // Get the next sibling element
+  var sibling = elem.previousElementSibling;
 
-	// If there's no selector, return the first sibling
-	if (!selector) return sibling;
+  // If there's no selector, return the first sibling
+  if (!selector) return sibling;
 
-	// If the sibling matches our selector, use it
-	// If not, jump to the next sibling and continue the loop
-	while (sibling) {
-		if (sibling.matches(selector)) return sibling;
-		sibling = sibling.previousElementSibling;
-	}
+  // If the sibling matches our selector, use it
+  // If not, jump to the next sibling and continue the loop
+  while (sibling) {
+    if (sibling.matches(selector)) return sibling;
+    sibling = sibling.previousElementSibling;
+  }
 }
 
 // Expand the second section (with the first release)
@@ -200,7 +203,7 @@ function expandSpecificSectionByDefault() {
   // Select the first h2 element and add the "expanded-by-default" class
   const header = document.querySelector(".content-markdown h2:nth-of-type(2)");
   if (header) {
-    if(header.tagName === "H2") {
+    if (header.tagName === "H2") {
       let sibling = header.nextElementSibling;
       let nextSibling = getNextHeaderOrSibling(header);
       while (sibling && sibling !== nextSibling) {
@@ -210,7 +213,6 @@ function expandSpecificSectionByDefault() {
     }
   }
 }
-
 
 // Initialize the script
 if (document.readyState === "loading") {

@@ -3,11 +3,11 @@ title: Get data into Label Studio
 short: Import data
 type: guide
 tier: all
-order: 255
-order_enterprise: 155
+order: 157
+order_enterprise: 157
 meta_title: Import Data into Label Studio
 meta_description: Label and annotate data for your machine learning and data science projects using common file formats or the Label Studio JSON format.
-section: "Import and Export"
+section: "Import & Export"
 ---
 
 Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 
@@ -17,6 +17,24 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
 - If your data is stored at internet-accessible URLs, in files, or directories, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI).
 - If your data is stored locally, [import it into Label Studio](#Import-data-from-a-local-directory).
 - If your data contains predictions or pre-annotations, see [Import pre-annotated data into Label Studio](predictions.html).
+
+<div class="enterprise-only">
+
+!!! info Tip
+    If your data is stored in Google Cloud, AWS, or Azure, you can [import your unstructured data as a dataset in Label Studio Enterprise](dataset_create). 
+    
+    From here, you can use semantic search and similarity search to curate data for labeling, which can then be added to different projects as tasks. For more information, see [Data Discovery overview](dataset_overview).
+
+</div>
+
+<div class="opensource-only">
+
+!!! error Enterprise
+    If your data is stored in Google Cloud, AWS, or Azure, you can [import your unstructured data as a dataset in Label Studio Enterprise](https://docs.humansignal.com/guide/dataset_create). 
+    
+    From here, you can use semantic search and similarity search to curate data for labeling, which can then be added to different projects as tasks. For more information, see [Data Discovery overview](https://docs.humansignal.com/guide/dataset_overview).
+
+</div>
 
 ## General guidelines for importing data
 
@@ -29,6 +47,7 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
     Uploading data through the Label Studio UI works fine for proof of concept projects, but it is not recommended for larger projects. You will also face challenges when you want export your data or move it to another Label Studio instance or even just redeploy Label Studio. Finally, Label Studio is not designed as a hosting service at scale and does not have backups for imported media resources. 
     
     We strongly recommend that you configure [source storage](storage) instead.
+
 
 ## Types of data you can import into Label Studio
 
@@ -203,7 +222,7 @@ Use this parameter to retrieve data from multi-column csv on [S3 or other cloud 
 
 If you import a file with a list of tasks, and every task in this list is a link to another file in the storage. In this case, you can use the `resolver` parameter to retrieve the content of these files from a storage. 
 
-**Use case**
+#### Use Case
 
 There is a list of tasks, where the "remote" field of every task is a link to a CSV file in the storage. Every CSV file has a “text” column with text to be labeled. Every CSV file has a “text” column with text to be labeled. For example:
 
@@ -221,7 +240,7 @@ id;text
 12;The most flexible data annotation tool. Quickly installable. Build custom UIs or use pre-built labeling templates.
 ```
 
-**Solution**
+#### Solution
 
 To retrieve the file, use the following parameters:
 
@@ -231,7 +250,7 @@ To retrieve the file, use the following parameters:
 
 3. Display the result.
 
-**Syntax**
+#### Syntax
 
 The syntax for the `resolver` parameter consists of a list of options separated by a `|` symbol.
 

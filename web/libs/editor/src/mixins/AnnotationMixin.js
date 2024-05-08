@@ -1,14 +1,12 @@
-import { getRoot, isAlive, types } from 'mobx-state-tree';
-import Types from '../core/Types';
-import { FF_DEV_3391, FF_SIMPLE_INIT, isFF } from '../utils/feature-flags';
+import { getRoot, isAlive, types } from "mobx-state-tree";
+import Types from "../core/Types";
+import { FF_DEV_3391, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 
-export const AnnotationMixin = types.model('AnnotationMixin', {
-
-}).views((self) => ({
+export const AnnotationMixin = types.model("AnnotationMixin", {}).views((self) => ({
   get annotation() {
     // annotation should not be accessed before store is initialized
     if (isFF(FF_SIMPLE_INIT) && !window.STORE_INIT_OK) {
-      console.error('LSF: annotation accessed before store is initialized', self);
+      console.error("LSF: annotation accessed before store is initialized", self);
     }
 
     if (!isAlive(self)) return null;
@@ -19,7 +17,8 @@ export const AnnotationMixin = types.model('AnnotationMixin', {
       if (root === self) {
         if (self.control) {
           return self.control.annotation;
-        } else if (self.obj) {
+        }
+        if (self.obj) {
           return self.obj.annotation;
         }
         return null;
@@ -31,7 +30,7 @@ export const AnnotationMixin = types.model('AnnotationMixin', {
       }
 
       // return connected annotation, not the globally selected one
-      return Types.getParentOfTypeString(self, 'Annotation');
+      return Types.getParentOfTypeString(self, "Annotation");
     }
 
     const as = self.annotationStore;
@@ -45,7 +44,8 @@ export const AnnotationMixin = types.model('AnnotationMixin', {
     if (root === self) {
       if (self.control) {
         return getRoot(self.control).annotationStore;
-      } else if (self.obj) {
+      }
+      if (self.obj) {
         return getRoot(self.obj).annotationStore;
       }
       return null;

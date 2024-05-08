@@ -1,9 +1,9 @@
-import React, { Children } from 'react';
+import React, { Children } from "react";
 import { Switch } from "react-router";
-import { StaticContent } from '../app/StaticContent/StaticContent';
-import { MenubarContext } from '../components/Menubar/Menubar';
+import { StaticContent } from "../app/StaticContent/StaticContent";
+import { MenubarContext } from "../components/Menubar/Menubar";
 
-import { SentryRoute as Route } from '../config/Sentry';
+import { SentryRoute as Route } from "../config/Sentry";
 
 const extractModalRoutes = (children) => {
   const modalRoutes = [];
@@ -42,20 +42,23 @@ export const RouteWithStaticFallback = ({ children, render, route, component, st
 
     const Static = () => {
       if (menubar?.contextIsSet(null) === false) menubar?.setContext(null);
-      return staticComponent ?? <StaticContent id="main-content"/>;
+      return staticComponent ?? <StaticContent id="main-content" />;
     };
 
-    const exactRoutes = modalRoutes.reduce((res, route) => {
-      if (route.props.exact) {
-        res.exact.push(route);
-      } else {
-        res.modal.push(route);
-      }
-      return res;
-    }, {
-      exact: [],
-      modal: [],
-    });
+    const exactRoutes = modalRoutes.reduce(
+      (res, route) => {
+        if (route.props.exact) {
+          res.exact.push(route);
+        } else {
+          res.modal.push(route);
+        }
+        return res;
+      },
+      {
+        exact: [],
+        modal: [],
+      },
+    );
 
     return (
       <>
@@ -64,7 +67,9 @@ export const RouteWithStaticFallback = ({ children, render, route, component, st
           {exactRoutes.exact}
           {children}
 
-          <Route exact><Static/></Route>
+          <Route exact>
+            <Static />
+          </Route>
         </Switch>
       </>
     );
@@ -82,10 +87,5 @@ export const RouteWithStaticFallback = ({ children, render, route, component, st
     routeProps.children = notFoundRenderer(children);
   }
 
-  return route !== false ? (
-    <Route {...props} {...routeProps}/>
-  ) : (
-    notFoundRenderer(children)
-  );
+  return route !== false ? <Route {...props} {...routeProps} /> : notFoundRenderer(children);
 };
-

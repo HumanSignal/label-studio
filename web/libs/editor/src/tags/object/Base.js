@@ -1,19 +1,20 @@
-import { types } from 'mobx-state-tree';
-import isMatch from 'lodash.ismatch';
-import InfoModal from '../../components/Infomodal/Infomodal';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import { FF_DEV_3391, FF_DEV_3666, isFF } from '../../utils/feature-flags';
-import { BaseTag } from '../TagBase';
+import { types } from "mobx-state-tree";
+import isMatch from "lodash.ismatch";
+import InfoModal from "../../components/Infomodal/Infomodal";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import { FF_DEV_3391, FF_DEV_3666, isFF } from "../../utils/feature-flags";
+import { BaseTag } from "../TagBase";
 
 const ObjectBase = types
   .model({
     ...(isFF(FF_DEV_3391)
       ? {
-        id: types.identifier,
-        name: types.string,
-      } : {
-        name: types.identifier,
-      }),
+          id: types.identifier,
+          name: types.string,
+        }
+      : {
+          name: types.identifier,
+        }),
     // TODO there should be a better way to force an update
     _needsUpdate: types.optional(types.number, 0),
   })
@@ -21,13 +22,13 @@ const ObjectBase = types
     isObjectTag: true,
     supportSuggestions: false,
   }))
-  .views(self => ({
+  .views((self) => ({
     /**
      * A list of all related regions
      * it is using for validation purposes
      */
     get allRegs() {
-      return self.annotation?.regionStore.regions.filter(r => r.object === self) || [];
+      return self.annotation?.regionStore.regions.filter((r) => r.object === self) || [];
     },
     /**
      * A list of regions related to the current object state
@@ -43,13 +44,13 @@ const ObjectBase = types
         obj = self._regionsCache.find(({ region }) => isMatch(region, params));
       }
 
-      return obj || self.regions.find(r => isMatch(r, params));
+      return obj || self.regions.find((r) => isMatch(r, params));
     },
     get isReady() {
       return true;
     },
   }))
-  .actions(self => {
+  .actions((self) => {
     const props = {};
 
     function addProp(name, value) {
@@ -73,8 +74,8 @@ const ObjectBase = types
       let exceeded;
 
       if (isFF(FF_DEV_3666)) {
-        exceeded = allStates.reduce(checkAndCollect, []).filter(e => e.selected);
-        exceeded.forEach(e => e.setSelected(false));
+        exceeded = allStates.reduce(checkAndCollect, []).filter((e) => e.selected);
+        exceeded.forEach((e) => e.setSelected(false));
       } else {
         exceeded = allStates.reduce(checkAndCollect, []);
       }

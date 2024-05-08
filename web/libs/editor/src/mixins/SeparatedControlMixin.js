@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
 const SeparatedControlMixin = types
   .model()
@@ -7,7 +7,7 @@ const SeparatedControlMixin = types
       isSeparated: true,
     };
   })
-  .views(self => ({
+  .views((self) => ({
     get obj() {
       return self.annotation?.names.get(self.toname);
     },

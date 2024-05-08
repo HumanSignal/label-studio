@@ -4,10 +4,12 @@ short: Dashboards
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 68
+order_enterprise: 125
 meta_title: Dashboard in Label Studio
 meta_description: Use Label Studio dashboards to monitor performance and progress.
-section: "Project Management"
+section: "Create & Manage Projects"
+parent: "manage_projects"
+parent_enterprise: "manage_projects"
 ---
 
 You can use the Label Studio Enterprise dashboards to help visualize your labeling progress across projects and resources. 

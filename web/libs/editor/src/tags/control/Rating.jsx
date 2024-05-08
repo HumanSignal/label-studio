@@ -1,19 +1,19 @@
-import React from 'react';
-import { Rate } from 'antd';
-import { inject, observer } from 'mobx-react';
-import { types } from 'mobx-state-tree';
-import { StarOutlined } from '@ant-design/icons';
+import React from "react";
+import { Rate } from "antd";
+import { inject, observer } from "mobx-react";
+import { types } from "mobx-state-tree";
+import { StarOutlined } from "@ant-design/icons";
 
-import RequiredMixin from '../../mixins/Required';
-import PerRegionMixin from '../../mixins/PerRegion';
-import InfoModal from '../../components/Infomodal/Infomodal';
-import Registry from '../../core/Registry';
-import { guidGenerator } from '../../core/Helpers';
-import ControlBase from './Base';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import ClassificationBase from './ClassificationBase';
-import PerItemMixin from '../../mixins/PerItem';
-import { FF_LSDV_4583, isFF } from '../../utils/feature-flags';
+import RequiredMixin from "../../mixins/Required";
+import PerRegionMixin from "../../mixins/PerRegion";
+import InfoModal from "../../components/Infomodal/Infomodal";
+import Registry from "../../core/Registry";
+import { guidGenerator } from "../../core/Helpers";
+import ControlBase from "./Base";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import ClassificationBase from "./ClassificationBase";
+import PerItemMixin from "../../mixins/PerItem";
+import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
 
 /**
  * The `Rating` tag adds a rating selection to the labeling interface. Use for labeling tasks involving ratings.
@@ -47,10 +47,10 @@ import { FF_LSDV_4583, isFF } from '../../utils/feature-flags';
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
 
-  maxrating: types.optional(types.string, '5'),
-  icon: types.optional(types.string, 'star'),
-  size: types.optional(types.string, 'medium'),
-  defaultvalue: types.optional(types.string, '0'),
+  maxrating: types.optional(types.string, "5"),
+  icon: types.optional(types.string, "star"),
+  size: types.optional(types.string, "medium"),
+  defaultvalue: types.optional(types.string, "0"),
 
   hotkey: types.maybeNull(types.string),
 });
@@ -58,10 +58,10 @@ const TagAttrs = types.model({
 const Model = types
   .model({
     pid: types.optional(types.string, guidGenerator),
-    type: 'rating',
+    type: "rating",
     rating: types.maybeNull(types.number),
   })
-  .views(self => ({
+  .views((self) => ({
     selectedValues() {
       return self.rating;
     },
@@ -77,9 +77,9 @@ const Model = types
       return self.rating > 0;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     getSelectedString() {
-      return self.rating + ' star';
+      return `${self.rating} star`;
     },
 
     needsUpdate() {
@@ -119,7 +119,8 @@ const Model = types
     },
   }));
 
-const RatingModel = types.compose('RatingModel',
+const RatingModel = types.compose(
+  "RatingModel",
   ControlBase,
   ClassificationBase,
   RequiredMixin,
@@ -130,24 +131,24 @@ const RatingModel = types.compose('RatingModel',
   Model,
 );
 
-const HtxRating = inject('store')(
+const HtxRating = inject("store")(
   observer(({ item, store }) => {
     let iconSize;
 
-    if (item.size === 'small') {
+    if (item.size === "small") {
       iconSize = 15;
-    } else if (item.size === 'medium') {
+    } else if (item.size === "medium") {
       iconSize = 25;
-    } else if (item.size === 'large') {
+    } else if (item.size === "large") {
       iconSize = 40;
     }
 
-    const visibleStyle = item.perRegionVisible() ? {} : { display: 'none' };
+    const visibleStyle = item.perRegionVisible() ? {} : { display: "none" };
 
     // rc-rate component listens for keypress event and hit the star if the key is Enter
     // but it doesn't check for any modifiers, so it removes star during submit (ctrl+enter)
     // so we'll just remove focus from component at the moment any modifier pressed
-    const dontBreakSubmit = e => {
+    const dontBreakSubmit = (e) => {
       if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) {
         // should be a star, because that's the only way this event can happen
         const star = document.activeElement;
@@ -168,13 +169,13 @@ const HtxRating = inject('store')(
           onChange={item.setRating}
         />
         {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && (
-          <sup style={{ fontSize: '9px' }}>[{item.hotkey}]</sup>
+          <sup style={{ fontSize: "9px" }}>[{item.hotkey}]</sup>
         )}
       </div>
     );
   }),
 );
 
-Registry.addTag('rating', RatingModel, HtxRating);
+Registry.addTag("rating", RatingModel, HtxRating);
 
 export { HtxRating, RatingModel };

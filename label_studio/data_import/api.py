@@ -29,12 +29,15 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from tasks.functions import update_tasks_counters
 from tasks.models import Prediction, Task
 from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
+
+from label_studio.core.utils.common import load_func
 
 from .functions import (
     async_import_background,
@@ -48,6 +51,8 @@ from .serializers import FileUploadSerializer, ImportApiSerializer, PredictionSe
 from .uploader import create_file_uploads, load_tasks
 
 logger = logging.getLogger(__name__)
+
+ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
 
 task_create_response_scheme = {
@@ -175,6 +180,7 @@ task_create_response_scheme = {
 # Import
 class ImportAPI(generics.CreateAPIView):
     permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [ProjectImportPermission]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = ImportApiSerializer
     queryset = Task.objects.all()
