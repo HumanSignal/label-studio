@@ -154,7 +154,7 @@ export const AppStore = types
 
     beforeDestroy() {
       clearTimeout(self._poll);
-      self.viewsStore?.forEach((view) => view.destroy());
+      self.viewsStore?.forEach?.((view) => view.destroy());
       window.removeEventListener("popstate", self.handlePopState);
       networkActivity.destroy();
     },
