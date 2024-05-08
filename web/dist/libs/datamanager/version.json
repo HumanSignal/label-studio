@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-712: Remove warnings in the app related to injection occur before observer",
-  "commit": "9f1d0c707d44c452b223704aa11417b2ba3c039e",
-  "date": "2024-05-03T17:03:19.000Z",
-  "branch": "fb-optic-712/remove-warnings"
+  "message": "fix: OPTIC-720: A TypeError: e.viewsStore.forEach is not a function error thrown on navigating away from Data Manager",
+  "commit": "3974e9dcf6699cc7d23a7aa668bc935b8776529b",
+  "date": "2024-05-08T13:09:02.000Z",
+  "branch": "fb-optic-720/typeerror"
 }
