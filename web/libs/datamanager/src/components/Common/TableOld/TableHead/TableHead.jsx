@@ -214,6 +214,7 @@ export const TableHead = observer(
           ref.current?.addEventListener("mousedown", (event) => {
             const className = event.target.className;
 
+            // This element could be an SVG element where className is an object, not a string.
             if (className?.includes?.("handle")) {
               event.preventDefault();
             }
