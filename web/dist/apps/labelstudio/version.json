@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-720: Fix e.viewsStore.forEach error",
-  "commit": "ca432bc0960dacf97dbe1ccef242f0f2d4eecde6",
-  "date": "2024-05-08T12:39:28.000Z",
+  "message": "fix actual error",
+  "commit": "6314e338c016a09875f09b9a2e7ed2e5737f5b35",
+  "date": "2024-05-08T12:46:29.000Z",
   "branch": "fb-optic-720/viewsstore-foreach"
 }
