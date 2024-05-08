@@ -1,6 +1,6 @@
 {
-  "message": "fix actual error",
-  "commit": "6314e338c016a09875f09b9a2e7ed2e5737f5b35",
-  "date": "2024-05-08T12:46:29.000Z",
+  "message": "Revert #5824",
+  "commit": "c3ef6015499d27319533be5701ad23f105645ed0",
+  "date": "2024-05-08T13:08:10.000Z",
   "branch": "fb-optic-720/viewsstore-foreach"
 }
