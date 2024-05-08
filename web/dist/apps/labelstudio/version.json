@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-712: Remove warnings in the app related to injection occur before observer",
-  "commit": "9f1d0c707d44c452b223704aa11417b2ba3c039e",
-  "date": "2024-05-03T17:03:19.000Z",
-  "branch": "fb-optic-712/remove-warnings"
+  "message": "fix: OPTIC-720: Fix e.viewsStore.forEach error",
+  "commit": "ca432bc0960dacf97dbe1ccef242f0f2d4eecde6",
+  "date": "2024-05-08T12:39:28.000Z",
+  "branch": "fb-optic-720/viewsstore-foreach"
 }
