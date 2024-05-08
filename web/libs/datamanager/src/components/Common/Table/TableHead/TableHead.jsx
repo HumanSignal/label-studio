@@ -220,7 +220,7 @@ export const TableHead = observer(
           ref.current?.addEventListener("mousedown", (event) => {
             const className = event.target.className;
 
-            if (typeof className === "string" && className.includes("handle")) {
+            if (className?.includes?.("handle")) {
               event.preventDefault();
             }
           });
