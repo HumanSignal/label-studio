@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into fb-dia-989/hotkeys-stuck",
-  "commit": "cb6e68bc71dc0063679c60ac7d0ced52c1efd53a",
-  "date": "2024-05-08T20:42:38.000Z",
-  "branch": "fb-dia-989/hotkeys-stuck"
+  "message": "chore: Ensure the same babel config is used across the project in a non conflicting way",
+  "commit": "82d5afa6b647175e86c1bd9f1d2b8578c19ce971",
+  "date": "2024-05-09T11:31:34.000Z",
+  "branch": "fix-dev-babel"
 }
