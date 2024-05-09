@@ -19,6 +19,25 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
     Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade. 
 
 <div class="release-note"><button class="release-note-toggle"></button>
+<a name="2111post1md"></a>
+
+## Label Studio Enterprise 2.11.1-1
+
+<div class="onprem-highlight">Bug fix</div>
+
+*May 07, 2024*
+
+Helm Chart version: 1.4.6
+
+### Bug fixes
+- The `COLLECT_ANALYTICS` environment variable can now be specified in uppercase or lowercase (`collect_analytics`).
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="2111md"></a>
 
 ## Label Studio Enterprise 2.11.1
