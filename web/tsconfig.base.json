@@ -33,6 +33,12 @@
       ],
       "@humansignal/utils/*": [
         "libs/storybook/src/utils/*"
+      ],
+      "@humansignal/editor": [
+        "libs/editor/src/index.js"
+      ],
+      "@humansignal/datamanager": [
+        "libs/datamanager/src/index.js"
       ]
     },
     "types": [

@@ -6,7 +6,6 @@ import { Button } from "../../components/Button/Button";
 import { modal } from "../../components/Modal/Modal";
 import { Space } from "../../components/Space/Space";
 import { useAPI } from "../../providers/ApiProvider";
-import { useLibrary } from "../../providers/LibraryProvider";
 import { useProject } from "../../providers/ProjectProvider";
 import { useContextProps, useFixedLocation, useParams } from "../../providers/RoutesProvider";
 import { addAction, addCrumb, deleteAction, deleteCrumb } from "../../services/breadrumbs";
@@ -65,16 +64,14 @@ export const DataManagerPage = ({ ...props }) => {
   const history = useHistory();
   const api = useAPI();
   const { project } = useProject();
-  const LabelStudio = useLibrary("lsf");
-  const DataManager = useLibrary("dm");
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
   const dataManagerRef = useRef();
   const projectId = project?.id;
 
   const init = useCallback(async () => {
-    if (!LabelStudio) return;
-    if (!DataManager) return;
+    if (!window.LabelStudio) return;
+    if (!window.DataManager) return;
     if (!root.current) return;
     if (!project?.id) return;
     if (dataManagerRef.current) return;
@@ -162,7 +159,7 @@ export const DataManagerPage = ({ ...props }) => {
     }
 
     setContextProps({ dmRef: dataManager });
-  }, [LabelStudio, DataManager, projectId]);
+  }, [projectId]);
 
   const destroyDM = useCallback(() => {
     if (dataManagerRef.current) {
@@ -177,7 +174,7 @@ export const DataManagerPage = ({ ...props }) => {
     return () => destroyDM();
   }, [root, init]);
 
-  if (!DataManager || !LabelStudio) {
+  if (!window.DataManager || !window.LabelStudio) {
     return (
       <div
         style={{

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Spinner } from "../../../components";
-import { useLibrary } from "../../../providers/LibraryProvider";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_3617, isFF } from "../../../utils/feature-flags";
 import "./Config.styl";
@@ -11,7 +10,6 @@ import { useAPI } from "../../../providers/ApiProvider";
 const configClass = cn("configure");
 
 export const Preview = ({ config, data, error, loading, project }) => {
-  const LabelStudio = useLibrary("lsf");
   const lsf = useRef(null);
   const rootRef = useRef();
   const api = useAPI();
@@ -50,7 +48,6 @@ export const Preview = ({ config, data, error, loading, project }) => {
 
   const initLabelStudio = useCallback(
     (config, task) => {
-      if (!LabelStudio) return;
       if (!task.data) return;
 
       console.info("Initializing LSF preview", { config, task });
@@ -88,7 +85,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
         return null;
       }
     },
-    [LabelStudio],
+    [],
   );
 
   useEffect(() => {
@@ -109,7 +106,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
         // there is can be weird error from LSF, but we can just skip it for now
         try {
           lsf.current.destroy();
-        } catch (e) {}
+        } catch (e) { }
         lsf.current = null;
       }
     };
