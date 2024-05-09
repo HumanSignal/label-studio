@@ -201,6 +201,7 @@ google-cloud-logging = "^3.10.0"
 mysqlclient = {version = "*", optional = true}
 django-csp = "3.7"
 openai = "^1.10.0"
+label-studio-tools = "0.0.4"
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"
