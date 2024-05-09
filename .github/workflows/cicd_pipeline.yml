@@ -135,8 +135,7 @@ jobs:
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.fork == false &&
       needs.changed_files.outputs.frontend == 'true' &&
-      !startsWith(needs.changed_files.outputs.commit-message, 'ci: Build frontend') &&
-      github.actor != 'dependabot[bot]'
+      !startsWith(needs.changed_files.outputs.commit-message, 'ci: Build frontend')
     permissions:
       contents: write
     uses: ./.github/workflows/frontend-build.yml
@@ -444,48 +443,6 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
     secrets: inherit
-
-  dependabot-auto-merge-frontend:
-    runs-on: ubuntu-latest
-    needs:
-      - tests-yarn-unit
-      - tests-yarn-integration
-      - tests-yarn-e2e
-    if: ${{ github.actor == 'dependabot[bot]' }}
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@v1
-        with:
-          github-token: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Enable auto-merge for Dependabot PRs
-        run: gh pr merge --auto --merge "$PR_URL"
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-  dependabot-auto-merge-backend:
-    runs-on: ubuntu-latest
-    needs:
-      - pytest
-    if: ${{ github.actor == 'dependabot[bot]' }}
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@v1
-        with:
-          github-token: '${{ secrets.GITHUB_TOKEN }}'
-      - name: Enable auto-merge for Dependabot PRs
-        run: gh pr merge --auto --merge "$PR_URL"
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
   check_gate:
     name: "Ready to merge"
