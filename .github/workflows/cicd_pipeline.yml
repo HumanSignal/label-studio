@@ -466,3 +466,19 @@ jobs:
         with:
           allowed-skips: gitleaks, bandit, ruff, blue, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e
           jobs: ${{ toJSON(needs) }}
+
+  dependabot-auto-merge:
+    name: "Auto Merge dependabot PR"
+    if: |
+      github.event_name == 'pull_request' &&
+      github.actor == 'dependabot[bot]' &&
+      ( startsWith(github.head_ref, 'dependabot/npm_and_yarn/') || startsWith(github.head_ref, 'dependabot/pip/') )
+    runs-on: ubuntu-latest
+    needs:
+      - check_gate
+    steps:
+      - name: Enable auto-merge for Dependabot PRs
+        run: gh pr merge --auto --merge "${PR_URL}"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GIT_PAT }}
