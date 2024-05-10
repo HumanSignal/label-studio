@@ -1,1 +1,1 @@
-locust==1.1
+locust==1.3.2
