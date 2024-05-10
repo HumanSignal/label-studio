@@ -49,23 +49,7 @@ class AzureBlobStorageMixin(models.Model):
         return str(self.account_key) if self.account_key else get_env('AZURE_BLOB_ACCOUNT_KEY')
 
     def get_client_and_container(self):
-        account_name = self.get_account_name()
-        account_key = self.get_account_key()
-        if not account_name or not account_key:
-            raise ValueError(
-                'Azure account name and key must be set using '
-                'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY '
-                'or account_name and account_key fields.'
-            )
-        connection_string = (
-            'DefaultEndpointsProtocol=https;AccountName='
-            + account_name
-            + ';AccountKey='
-            + account_key
-            + ';EndpointSuffix=core.windows.net'
-        )
-        client = BlobServiceClient.from_connection_string(conn_str=connection_string)
-        container = client.get_container_client(str(self.container))
+        client, container = AZURE.get_client_and_container(container=self.container, account_name=self.account_name, account_key=self.account_key)
         return client, container
 
     def get_container(self):
