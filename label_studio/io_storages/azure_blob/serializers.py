@@ -5,12 +5,21 @@ from io_storages.azure_blob.models import AzureBlobExportStorage, AzureBlobImpor
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from core.utils.params import get_env
+
+
+def get_credential_keys():
+    if get_env('AZURE_BLOB_ACCOUNT_KEY'):
+        secure_fields = ['account_name', 'account_key']
+    else:
+        secure_fields = ['account_client_id', 'account_client_secret', 'account_tenant']
+    return secure_fields
 
 
 class AzureBlobImportStorageSerializer(ImportStorageSerializer):
     type = serializers.ReadOnlyField(default='azure')
     presign = serializers.BooleanField(required=False, default=True)
-    secure_fields = ['account_name', 'account_key']
+    secure_fields = get_credential_keys()
 
     class Meta:
         model = AzureBlobImportStorage
@@ -46,8 +55,8 @@ class AzureBlobExportStorageSerializer(ExportStorageSerializer):
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
-        result.pop('account_name')
-        result.pop('account_key')
+        for key in  get_credential_keys():
+            result.pop(key)
         return result
 
     class Meta:

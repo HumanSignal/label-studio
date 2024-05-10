@@ -22,7 +22,7 @@ from organizations.models import Organization
 from projects.models import Project
 from tasks.serializers import TaskWithAnnotationsSerializer
 from users.models import User
-
+from azure import identity
 try:
     from businesses.models import BillingPlan, Business
 except ImportError:
@@ -197,17 +197,55 @@ def azure_client_mock():
         def download_blob(self, key):
             return DummyAzureBlob(self.name, key)
 
+    class DummyAzureCreds:
+        def __init__(self, container_name, **kwargs):
+            self.name = container_name
+
+
+        def get_blob_client(self, key):
+            return DummyAzureBlob(self.name, key)
+
+        def get_container_properties(self, **kwargs):
+            return SimpleNamespace(
+                name='test-container',
+                last_modified='2022-01-01 01:01:01',
+                etag='test-etag',
+                lease='test-lease',
+                public_access='public',
+                has_immutability_policy=True,
+                has_legal_hold=True,
+                immutable_storage_with_versioning_enabled=True,
+                metadata={'key': 'value'},
+                encryption_scope='test-scope',
+                deleted=False,
+                version='1.0.0',
+            )
+
+        def download_blob(self, key):
+            return DummyAzureBlob(self.name, key)
+
     class DummyAzureClient:
         def get_container_client(self, container_name):
             return DummyAzureContainer(container_name)
 
     # def dummy_generate_blob_sas(*args, **kwargs):
     #     return 'token'
+    class DummyAzureCredential:
+        def get_container_client(self, container_name):
+            return DummyAzureContainer(container_name)
 
     with mock.patch.object(models.BlobServiceClient, 'from_connection_string', return_value=DummyAzureClient()):
         with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
             yield
 
+    # with mock.patch.object(models.BlobServiceClient, return_value=DummyAzureClient()):
+    #     with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
+    #         yield
+
+    # with mock.patch.object(identity.ClientSecretCredential, return_value=DummyAzureCreds()):
+    #     # TODO: FIND OUT WHaT shoULD BE PATCHED
+    #     with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
+    #         yield
 
 @contextmanager
 def redis_client_mock():

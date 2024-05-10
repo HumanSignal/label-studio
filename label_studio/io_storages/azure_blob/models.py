@@ -8,6 +8,8 @@ from urllib.parse import urlparse
 
 from azure.core.exceptions import ResourceNotFoundError
 from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_blob_sas
+from azure.identity import ClientSecretCredential
+
 from core.redis import start_job_async_or_sync
 from core.utils.params import get_env
 from django.conf import settings
@@ -41,6 +43,9 @@ class AzureBlobStorageMixin(models.Model):
     )
     account_name = models.TextField(_('account_name'), null=True, blank=True, help_text='Azure Blob account name')
     account_key = models.TextField(_('account_key'), null=True, blank=True, help_text='Azure Blob account key')
+    account_client_id = models.TextField(_('account_client_id'), null=True, blank=True, help_text='Azure Blob client id')
+    account_client_secret = models.TextField(_('account_client_secret'), null=True, blank=True, help_text='Azure Blob client secret')
+    account_tenant_id = models.TextField(_('account_tenant_id'), null=True, blank=True, help_text='Azure Blob tenant id')
 
     def get_account_name(self):
         return str(self.account_name) if self.account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
@@ -48,24 +53,55 @@ class AzureBlobStorageMixin(models.Model):
     def get_account_key(self):
         return str(self.account_key) if self.account_key else get_env('AZURE_BLOB_ACCOUNT_KEY')
 
+    def get_account_client_id(self):
+        return str(self.account_key) if self.account_key else get_env('AZURE_CLIENT_ID')
+
+    def get_account_client_secret(self):
+        return str(self.account_key) if self.account_key else get_env('AZURE_CLIENT_SECRET')
+
+    def get_account_tenant_id(self):
+        return str(self.account_key) if self.account_key else get_env('AZURE_TENANT_ID')
+
+
     def get_client_and_container(self):
         account_name = self.get_account_name()
         account_key = self.get_account_key()
-        if not account_name or not account_key:
+        account_client_secret = self.get_account_client_secret()
+        account_client_id = self.get_account_client_id()
+        account_tenant_id = self.get_account_tenant_id()
+        if (not account_name or not account_key) or (not account_name or not (account_client_secret and account_client_id and account_tenant_id)):
             raise ValueError(
-                'Azure account name and key must be set using '
-                'environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY '
+                'Two authentications supported: '
+                '1) Azure account name and key are set '
+                'with environment variables AZURE_BLOB_ACCOUNT_NAME and AZURE_BLOB_ACCOUNT_KEY '
                 'or account_name and account_key fields.'
+
+                '2) Azure account serivce principle tenant, id, and secret are set '
+                'with environment variables AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, and AZURE_TENANT_ID'
+                'or account_tenant_id, account_client_secret and account_client_id fields.'
+
             )
-        connection_string = (
-            'DefaultEndpointsProtocol=https;AccountName='
-            + account_name
-            + ';AccountKey='
-            + account_key
-            + ';EndpointSuffix=core.windows.net'
-        )
-        client = BlobServiceClient.from_connection_string(conn_str=connection_string)
-        container = client.get_container_client(str(self.container))
+        if account_key:
+            connection_string = (
+                'DefaultEndpointsProtocol=https;AccountName='
+                + account_name
+                + ';AccountKey='
+                + account_key
+                + ';EndpointSuffix=core.windows.net'
+            )
+            client = BlobServiceClient.from_connection_string(conn_str=connection_string)
+            container = client.get_container_client(str(self.container))
+        elif account_client_secret:
+            credential = ClientSecretCredential(
+                tenant_id=account_tenant_id,
+                client_id=account_client_id,
+                client_secret=account_client_secret
+            )
+            client = BlobServiceClient(
+                    account_url=f"https://{account_name}.blob.core.windows.net",
+                    credential=credential)
+            container = client.get_container_client(str(self.container))
+
         return client, container
 
     def get_container(self):

@@ -91,6 +91,9 @@ def azure_credentials():
     """Mocked Azure credentials"""
     os.environ['AZURE_BLOB_ACCOUNT_NAME'] = 'testing'
     os.environ['AZURE_BLOB_ACCOUNT_KEY'] = 'testing'
+    os.environ['AZURE_CLIENT_ID'] = 'testing'
+    os.environ['AZURE_CLIENT_SECRET'] = 'testing'
+    os.environ['AZURE_TENANT_ID'] = 'testing'
 
 
 @pytest.fixture(scope='function')

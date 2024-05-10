@@ -27,6 +27,27 @@ azure_params: &azure_params
     skipAutofill: true
     allowEmpty: false
     protectedValue: true
+  - type: password
+    name: account_client_id
+    label: Account Client ID
+    autoComplete: "new-password"
+    skipAutofill: true
+    allowEmpty: true
+    protectedValue: true
+  - type: password
+    name: account client secret
+    label: Account  Client Secret
+    autoComplete: "new-password"
+    skipAutofill: true
+    allowEmpty: true
+    protectedValue: true
+  - type: password
+    name: account_tenant_id
+    label: Account Tenant ID
+    autoComplete: "new-password"
+    skipAutofill: true
+    allowEmpty: true
+    protectedValue: true
   - null
 
 ImportStorage:
