@@ -216,7 +216,7 @@ export class LSFWrapper {
         new CommentsSdk(this.lsfInstance, this.datamanager);
       }
 
-      this.datamanager.invoke("lsfInit", [this.datamanager, this.lsfInstance]);
+      this.datamanager.invoke("lsfInit", this.datamanager, this.lsfInstance);
     } catch (err) {
       console.error("Failed to initialize LabelStudio", settings);
       console.error(err);
