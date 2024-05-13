@@ -353,6 +353,7 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        operation_id='api_projects_validate_label_config',
         operation_summary='Validate project label config',
         operation_description="""
         Determine whether the label configuration for a specific project is valid.
