@@ -1,6 +1,6 @@
 {
-  "message": "Prepare SDKs for using LSF related plugins",
-  "commit": "fa84d0000b98cb43f27c35dbe6ea389f73525155",
-  "date": "2024-05-13T21:32:55.000Z",
+  "message": "Fix arguments passing in lsfInit and beforeLsfDestroy events",
+  "commit": "13432ba1d0551d3124baa8ddfae0757858ff3e8d",
+  "date": "2024-05-13T22:20:10.000Z",
   "branch": "fb-leap-883/custom-scripts"
 }
