@@ -216,7 +216,7 @@ export class LSFWrapper {
         new CommentsSdk(this.lsfInstance, this.datamanager);
       }
 
-      CustomScripts.init(this.lsfInstance, this.datamanager);
+      this.datamanager.invoke("lsfInit", [this.datamanager, this.lsfInstance]);
     } catch (err) {
       console.error("Failed to initialize LabelStudio", settings);
       console.error(err);
@@ -950,7 +950,6 @@ export class LSFWrapper {
   }
 
   destroy() {
-    CustomScripts.reset();
     this.lsfInstance?.destroy?.();
     this.lsfInstance = null;
   }
