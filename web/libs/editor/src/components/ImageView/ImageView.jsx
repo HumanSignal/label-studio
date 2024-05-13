@@ -1023,6 +1023,7 @@ export default observer(
                 state={this.state}
                 onMouseEnter={() => {
                   if (this.crosshairRef.current) {
+                    item.stageRef.container().style.cursor = Constants.NO_CURSOR;
                     this.crosshairRef.current.updateVisibility(true);
                   }
                 }}

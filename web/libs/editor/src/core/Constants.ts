@@ -29,6 +29,7 @@ export default {
   SUGGESTION_STROKE_WIDTH: 4,
 
   // cursors
+  NO_CURSOR: 'none',
   DEFAULT_CURSOR: "default",
   CHOOSE_CURSOR: "pointer",
   POINTER_CURSOR: "pointer",
