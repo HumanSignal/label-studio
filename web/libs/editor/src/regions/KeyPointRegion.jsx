@@ -264,7 +264,7 @@ const HtxKeyPointView = ({ item, setShapeRef }) => {
           }
         }}
         onMouseOut={() => {
-          stage.container().style.cursor = "default";
+          stage.container().style.cursor = item.parent.crosshair ? Constants.NO_CURSOR : Constants.DEFAULT_CURSOR;
 
           if (store.annotationStore.selected.relationMode) {
             item.setHighlight(false);
