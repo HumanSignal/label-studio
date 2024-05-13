@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-883: Custom Scripts",
-  "commit": "dc9e3546f10f68ebdf83f52d0abc8755c64544f1",
-  "date": "2024-05-13T19:35:24.000Z",
+  "message": "Prepare SDKs for using LSF related plugins",
+  "commit": "fa84d0000b98cb43f27c35dbe6ea389f73525155",
+  "date": "2024-05-13T21:32:55.000Z",
   "branch": "fb-leap-883/custom-scripts"
 }
