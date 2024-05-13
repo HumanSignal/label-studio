@@ -5,7 +5,6 @@ import logging
 from core.permissions import all_permissions
 from django.conf import settings
 from django.utils.decorators import method_decorator
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
