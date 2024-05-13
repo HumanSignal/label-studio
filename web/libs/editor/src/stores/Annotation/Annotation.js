@@ -587,6 +587,9 @@ export const Annotation = types
 
       self.relationStore.deleteNodeRelation(region);
 
+      const stage = self.objects[0];
+      stage.stageRef.container().style.cursor = (stage.crosshair) ? Constants.NO_CURSOR : Constants.DEFAULT_CURSOR;
+      
       if (region.type === "polygonregion") {
         detach(region);
       }
