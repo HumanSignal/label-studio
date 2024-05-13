@@ -79,14 +79,6 @@ class AllExportStorageTypesAPI(APIView):
         tags=['Storage'],
         operation_summary='List all import storages from the project',
         operation_description='Retrieve a list of the import storages of all types with their IDs.',
-        manual_parameters=[
-            openapi.Parameter(
-                name='project',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='A unique integer value identifying your project.',
-            ),
-        ],
         responses={200: 'List of ImportStorageSerializer'},
     ),
 )
@@ -119,14 +111,6 @@ class AllImportStorageListAPI(generics.ListAPIView):
         tags=['Storage'],
         operation_summary='List all export storages from the project',
         operation_description='Retrieve a list of the export storages of all types with their IDs.',
-        manual_parameters=[
-            openapi.Parameter(
-                name='project',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='A unique integer value identifying your project.',
-            ),
-        ],
         responses={200: 'List of ExportStorageSerializer'},
     ),
 )
