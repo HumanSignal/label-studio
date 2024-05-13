@@ -183,12 +183,11 @@ class FileUpload(models.Model):
                 tasks = self.read_tasks_list_from_txt()
             elif file_format == '.json':
                 try:
-                    # Attempt to treat as JSON_L
-                    tasks = self.read_tasks_list_from_jsonl()
-                except json.JSONDecodeError:
-                    # standard JSON
+                    # Attempt to treat as JSON
                     tasks = self.read_tasks_list_from_json()
-
+                except json.JSONDecodeError:
+                    # if not, treat as JSONL
+                    tasks = self.read_tasks_list_from_jsonl()
             # otherwise - only one object tag should be presented in label config
             elif not self.project.one_object_in_label_config:
                 raise ValidationError(
