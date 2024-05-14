@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into fb-dia-989/hotkeys-stuck",
-  "commit": "cb6e68bc71dc0063679c60ac7d0ced52c1efd53a",
-  "date": "2024-05-08T20:42:38.000Z",
-  "branch": "fb-dia-989/hotkeys-stuck"
+  "message": "fix: LEAP-1049: support loading TimeSeries URL from sub-property of data (#5610)",
+  "commit": "d8819c35df0430a6adf646faa99b73e6f5df3f4f",
+  "date": "2024-05-14T19:41:41.000Z",
+  "branch": "fb-LEAP-1049/harrymander-fix-for-timeseries-urls"
 }
