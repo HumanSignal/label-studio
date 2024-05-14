@@ -219,7 +219,7 @@ pre-commit = "3.3.3"
 s3transfer = "0.7.0"
 mock = ">=5.1.0"
 moto = ">=4.2.6"
-label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/ecd529ccc993ef23e8bb810ed8cafbd7c2892466.zip"}
+label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/d7168c5304349de42a632525c479ce04f149e84e.zip"}
 [tool.poetry.group.build.dependencies]
 twine = ">=4.0.2"
 
