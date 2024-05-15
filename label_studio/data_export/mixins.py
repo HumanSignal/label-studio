@@ -135,10 +135,7 @@ class ExportMixin:
             options['context'] = {'interpolate_key_frames': settings.INTERPOLATE_KEY_FRAMES}
             if 'interpolate_key_frames' in serialization_options:
                 options['context']['interpolate_key_frames'] = serialization_options['interpolate_key_frames']
-            if (
-                'include_annotation_history' in serialization_options
-                and serialization_options['include_annotation_history'] is False
-            ):
+            if serialization_options.get('include_annotation_history') is False:
                 options['omit'] = ['annotations.history']
         return options
 
