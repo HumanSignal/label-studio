@@ -543,12 +543,15 @@ export default types
 
       if (!entity.validate()) return;
 
-      entity.sendUserGenerate();
       handleSubmittingFlag(async () => {
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity);
+        if (allowedToSave.some((x) => x === false)) return;
+
+        entity.sendUserGenerate();
         await getEnv(self).events.invoke(event, self, entity);
         self.incrementQueuePosition();
+        entity.dropDraft();
       });
-      entity.dropDraft();
     }
 
     function updateAnnotation(extraData) {
@@ -561,11 +564,14 @@ export default types
       if (!entity.validate()) return;
 
       handleSubmittingFlag(async () => {
+        const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity);
+        if (allowedToSave.some((x) => x === false)) return;
+
         await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
         self.incrementQueuePosition();
+        entity.dropDraft();
+        !entity.sentUserGenerate && entity.sendUserGenerate();
       });
-      entity.dropDraft();
-      !entity.sentUserGenerate && entity.sendUserGenerate();
     }
 
     function skipTask(extraData) {
