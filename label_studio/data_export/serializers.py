@@ -155,6 +155,9 @@ class SerializationOptionsSerializer(serializers.Serializer):
 
     drafts = SerializationOption(required=False, help_text='JSON dict with parameters')
     predictions = SerializationOption(required=False, help_text='JSON dict with parameters')
+    include_annotation_history = serializers.BooleanField(
+        default=False, help_text='Include annotation history', required=False
+    )
     annotations__completed_by = SerializationOption(required=False, help_text='JSON dict with parameters')
     interpolate_key_frames = serializers.BooleanField(
         default=settings.INTERPOLATE_KEY_FRAMES, help_text='Interpolate video key frames', required=False
