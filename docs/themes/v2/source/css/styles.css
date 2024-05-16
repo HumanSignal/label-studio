@@ -1308,6 +1308,7 @@ ul {
   background-color: var(--color-gray-200);
   padding: 0.25em;
   border-radius: 4px;
+  word-break: break-all;
 }
 
 .content-markdown table {
