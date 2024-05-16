@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into fb-leap-883/custom-scripts",
-  "commit": "bc8345b717e23f5ecfe9324791591c6cf0f67c2f",
-  "date": "2024-05-16T17:30:41.000Z",
-  "branch": "fb-leap-883/custom-scripts"
+  "message": "feat: LEAP-1060: Add event to allow control annotations submitting",
+  "commit": "1624fda0297b7f792c5af85b3a16bc1961872246",
+  "date": "2024-05-16T14:26:44.000Z",
+  "branch": "fb-leap-1060"
 }
