@@ -1,13 +1,6 @@
 {
-<<<<<<< HEAD
-  "message": "Fix arguments passing in lsfInit and beforeLsfDestroy events",
-  "commit": "13432ba1d0551d3124baa8ddfae0757858ff3e8d",
-  "date": "2024-05-13T22:20:10.000Z",
+  "message": "Merge branch 'develop' into fb-leap-883/custom-scripts",
+  "commit": "bc8345b717e23f5ecfe9324791591c6cf0f67c2f",
+  "date": "2024-05-16T17:30:41.000Z",
   "branch": "fb-leap-883/custom-scripts"
-=======
-  "message": "fix: LEAP-1049: support loading TimeSeries URL from sub-property of data (#5610)",
-  "commit": "d8819c35df0430a6adf646faa99b73e6f5df3f4f",
-  "date": "2024-05-14T19:41:41.000Z",
-  "branch": "fb-LEAP-1049/harrymander-fix-for-timeseries-urls"
->>>>>>> develop
 }
