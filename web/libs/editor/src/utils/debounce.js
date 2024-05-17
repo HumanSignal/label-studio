@@ -11,8 +11,7 @@
 export function debounce(func, wait, immediate = false) {
   let timeout;
 
-  return function () {
-    const args = arguments;
+  return function (...args) {
     const later = () => {
       timeout = null;
       if (!immediate) {

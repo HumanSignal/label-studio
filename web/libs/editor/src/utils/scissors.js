@@ -1,4 +1,4 @@
-// namespaces
+// biome-ignore lint/correctness/noInvalidUseBeforeDeclaration: namespace
 const dwv = dwv || {};
 
 dwv.math = dwv.math || {};
