@@ -499,10 +499,10 @@ export const htmlEscape = (string) => {
 
 function findNodeAt(context, at) {
   for (let node = context.firstChild, l = 0; node; ) {
-    if (node.textContent.length + l >= at)
+    if (node.textContent.length + l >= at) {
       if (!node.firstChild) return [node, at - l];
-      else node = node.firstChild;
-    else {
+      node = node.firstChild;
+    } else {
       l += node.textContent.length;
       node = node.nextSibling;
     }
