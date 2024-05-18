@@ -725,7 +725,7 @@ class Project(ProjectMixin, models.Model):
             }
         return control_weights
 
-    def save(self, *args, recalc=True, **kwargs):
+    def save(self, *args, update_fields=None, recalc=True, **kwargs):
         exists = True if self.pk else False
         project_with_config_just_created = not exists and self.label_config
 
@@ -733,14 +733,18 @@ class Project(ProjectMixin, models.Model):
             self.data_types = extract_data_types(self.label_config)
             self.parsed_label_config = parse_config(self.label_config)
             self.label_config_hash = hash(str(self.parsed_label_config))
+            if update_fields is not None:
+                update_fields = {'data_types', 'parsed_label_config', 'label_config_hash'}.union(update_fields)
 
         if self.label_config and (self._label_config_has_changed() or not exists or not self.control_weights):
             self.control_weights = self.get_updated_weights()
+            if update_fields is not None:
+                update_fields = {'control_weights'}.union(update_fields)
 
         if self._label_config_has_changed():
             self.__original_label_config = self.label_config
 
-        super(Project, self).save(*args, **kwargs)
+        super(Project, self).save(*args, update_fields=update_fields, **kwargs)
 
         if not exists:
             steps = ProjectOnboardingSteps.objects.all()
