@@ -1730,12 +1730,12 @@ url = "https://github.com/HumanSignal/label-studio-converter/archive/83f38d69e50
 
 [[package]]
 name = "label-studio-sdk"
-version = "0.0.34.dev0"
+version = "0.0.35.dev0"
 description = "Label Studio annotation tool"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "c477e93b11d62a38ece040e0695eb9d39bc4c0f7.zip", hash = "sha256:57793555087af56590167298988bd25fba31323b38cf2f2aaa192a6d9717aa00"},
+    {file = "822241cea42b56208937ecbe9bd2f292c3aed445.zip", hash = "sha256:702413712726a3af716b7acfe052fb29e93fd2026c1e64b209ad426244ed55a2"},
 ]
 
 [package.dependencies]
@@ -1748,7 +1748,7 @@ xmljson = ">=0.2.0"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/c477e93b11d62a38ece040e0695eb9d39bc4c0f7.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/822241cea42b56208937ecbe9bd2f292c3aed445.zip"
 
 [[package]]
 name = "label-studio-tools"
