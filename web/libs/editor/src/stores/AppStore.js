@@ -565,7 +565,7 @@ export default types
 
       handleSubmittingFlag(async () => {
         const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity);
-        if (allowedToSave.some((x) => x === false)) return;
+        if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
         await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
         self.incrementQueuePosition();
