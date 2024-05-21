@@ -1,6 +1,6 @@
 {
-  "message": "Add idAttr into View and fix documentation",
-  "commit": "2691b13dbe96e382889f59cbd867a6792ce840e5",
-  "date": "2024-05-20T15:11:22.000Z",
-  "branch": "fb-leap-883/custom-scripts"
+  "message": "CI: Keep biome version sync",
+  "commit": "66eba02dd5b6a0ff08ebcf41c89cb056122ab404",
+  "date": "2024-05-17T22:07:44.000Z",
+  "branch": "ci/biome-version"
 }
