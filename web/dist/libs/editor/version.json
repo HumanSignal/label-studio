@@ -1,6 +1,6 @@
 {
-  "message": "CI: Keep biome version sync",
-  "commit": "66eba02dd5b6a0ff08ebcf41c89cb056122ab404",
-  "date": "2024-05-17T22:07:44.000Z",
-  "branch": "ci/biome-version"
+  "message": "Merge branch 'develop' into fb-leap-883/custom-scripts",
+  "commit": "42479fb028744f7519bcd1448ded23b1f4551268",
+  "date": "2024-05-21T13:35:26.000Z",
+  "branch": "fb-leap-883/custom-scripts"
 }
