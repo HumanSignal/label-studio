@@ -1,6 +1,6 @@
 {
-  "message": "Trigger CI",
-  "commit": "eace4c3a88e3541b2bea9b5c0f87410130d565a5",
-  "date": "2024-05-16T23:59:09.000Z",
-  "branch": "fb-leap-1060"
+  "message": "Add idAttr into View and fix documentation",
+  "commit": "2691b13dbe96e382889f59cbd867a6792ce840e5",
+  "date": "2024-05-20T15:11:22.000Z",
+  "branch": "fb-leap-883/custom-scripts"
 }
