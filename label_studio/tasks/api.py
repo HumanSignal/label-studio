@@ -241,8 +241,8 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         operation_summary='Get annotation by its ID',
         operation_description='Retrieve a specific annotation for a task using the annotation result ID.',
-        x_fern_sdk_group_name="annotations",
-        x_fern_sdk_method_name="get",
+        x_fern_sdk_group_name='annotations',
+        x_fern_sdk_method_name='get',
     ),
 )
 @method_decorator(

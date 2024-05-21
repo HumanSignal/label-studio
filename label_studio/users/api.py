@@ -208,7 +208,7 @@ class UserResetTokenAPI(APIView):
                 schema=openapi.Schema(
                     description='User token',
                     type=openapi.TYPE_OBJECT,
-                    properties={'detail': openapi.Schema(description='Token', type=openapi.TYPE_STRING)}
+                    properties={'detail': openapi.Schema(description='Token', type=openapi.TYPE_STRING)},
                 ),
             )
         },
