@@ -14,5 +14,5 @@ repos:
     hooks:
     -   id: biome-check
         args: [--config-path, ./web]
-        additional_dependencies: ["@biomejs/biome@1.7.0"]
+        additional_dependencies: ["@biomejs/biome@1.7.1"]
         files: ^web/.*
