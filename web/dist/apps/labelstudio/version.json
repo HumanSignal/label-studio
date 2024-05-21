@@ -1,6 +1,6 @@
 {
-  "message": "Add idAttr into View and fix documentation",
-  "commit": "2691b13dbe96e382889f59cbd867a6792ce840e5",
-  "date": "2024-05-20T15:11:22.000Z",
+  "message": "Merge branch 'develop' into fb-leap-883/custom-scripts",
+  "commit": "42479fb028744f7519bcd1448ded23b1f4551268",
+  "date": "2024-05-21T13:35:26.000Z",
   "branch": "fb-leap-883/custom-scripts"
 }
