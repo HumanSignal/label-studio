@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-854: NER Annotations disappear from UI when switching between annotations",
-  "commit": "254683d187dbc40cf06a48e3ffbd2655c9bc3eee",
-  "date": "2024-05-22T15:14:59.000Z",
+  "message": "change test name",
+  "commit": "048a2743fa6fd640fe96aca2a3db27d74da8bd8e",
+  "date": "2024-05-22T15:29:41.000Z",
   "branch": "fb-leap-854"
 }
