@@ -12,7 +12,6 @@ from django.conf import settings
 from tasks.models import Annotation, Task
 from tasks.serializers import TaskSerializerBulk
 
-
 logger = logging.getLogger(__name__)
 all_permissions = AllPermissions()
 
