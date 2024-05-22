@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1049: support loading TimeSeries URL from sub-property of data (#5610)",
-  "commit": "d8819c35df0430a6adf646faa99b73e6f5df3f4f",
-  "date": "2024-05-14T19:41:41.000Z",
-  "branch": "fb-LEAP-1049/harrymander-fix-for-timeseries-urls"
+  "message": "CI: Keep biome version sync",
+  "commit": "66eba02dd5b6a0ff08ebcf41c89cb056122ab404",
+  "date": "2024-05-17T22:07:44.000Z",
+  "branch": "ci/biome-version"
 }

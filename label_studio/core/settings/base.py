@@ -345,6 +345,13 @@ RQ_QUEUES = {
     },
 }
 
+# specify the list of the extensions that are allowed to be presented in auto generated OpenAPI schema
+# for example, by specifying in swagger_auto_schema(..., x_fern_sdk_group_name='projects') we can group endpoints
+# /api/projects/:
+#   get:
+#     x-fern-sdk-group-name: projects
+X_VENDOR_OPENAPI_EXTENSIONS = ['x-fern']
+
 # Swagger: automatic API documentation
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -362,6 +369,7 @@ SWAGGER_SETTINGS = {
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
     'OPERATIONS_SORTER': 'alpha',
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'core.utils.openapi_extensions.XVendorExtensionsAutoSchema',
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)

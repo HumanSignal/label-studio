@@ -205,8 +205,11 @@ class UserResetTokenAPI(APIView):
         responses={
             200: openapi.Response(
                 description='User token response',
-                type=openapi.TYPE_OBJECT,
-                properties={'detail': openapi.Schema(description='Token', type=openapi.TYPE_STRING)},
+                schema=openapi.Schema(
+                    description='User token',
+                    type=openapi.TYPE_OBJECT,
+                    properties={'detail': openapi.Schema(description='Token', type=openapi.TYPE_STRING)},
+                ),
             )
         },
     ),
