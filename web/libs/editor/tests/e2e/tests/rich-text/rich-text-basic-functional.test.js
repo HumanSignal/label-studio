@@ -91,7 +91,7 @@ Scenario("Creating, removing and restoring regions", async ({ I, LabelStudio, At
   });
 });
 
-Scenario("Region should show after move between annotation tabs", async ({ I, LabelStudio }) => {
+Scenario("Region should load after change between annotation tabs", async ({ I, LabelStudio }) => {
   I.amOnPage("/");
 
   LabelStudio.init({
