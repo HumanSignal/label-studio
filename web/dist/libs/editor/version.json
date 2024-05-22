@@ -1,6 +1,6 @@
 {
-  "message": "remove the validation of errors on clearSpans",
-  "commit": "f64c977adddabbb65ccf7a88f6159950515ac81f",
-  "date": "2024-05-22T15:49:53.000Z",
+  "message": "add semi-colon",
+  "commit": "faee15192b762b4497e6e591faad5f8e528380f2",
+  "date": "2024-05-22T20:25:52.000Z",
   "branch": "fb-leap-854"
 }
