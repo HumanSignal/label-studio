@@ -33,6 +33,8 @@ export const Tooltip = forwardRef(
       throw new Error("Tooltip accepts a single child only");
     }
 
+    console.log("Tooltip");
+
     const triggerElement = useRef<any>();
     const tooltipElement = useRef<HTMLDivElement>();
     const [offset, setOffset] = useState({});

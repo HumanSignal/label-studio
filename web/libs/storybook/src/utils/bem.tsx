@@ -60,7 +60,7 @@ type CNComponentProps = {
 
 export type BemComponent = FunctionComponent<CNComponentProps>;
 
-const CSS_PREFIX = process.env?.CSS_PREFIX ?? "";
+const CSS_PREFIX = "ls"
 
 const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?: CNMod) => {
   const rootName = block;
