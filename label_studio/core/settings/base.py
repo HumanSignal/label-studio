@@ -370,6 +370,7 @@ SWAGGER_SETTINGS = {
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
     'OPERATIONS_SORTER': 'alpha',
     'DEFAULT_AUTO_SCHEMA_CLASS': 'core.utils.openapi_extensions.XVendorExtensionsAutoSchema',
+    'DEFAULT_INFO': 'core.urls.open_api_info',
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
