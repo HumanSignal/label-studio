@@ -179,6 +179,17 @@ const Model = types
         }
       },
 
+      onDispose() {
+        self.regs.forEach((region) => {
+          try {
+            // remove all spans from the visible node, because without cleaning them, the regions won't be updated
+            region.clearSpans();
+          } catch (err) {
+            console.error(err);
+          }
+        });
+      },
+
       updateValue: flow(function* (store) {
         const valueFromTask = parseValue(self.value, store.task.dataObj);
         const value = yield self.resolveValue(valueFromTask);
