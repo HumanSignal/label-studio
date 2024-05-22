@@ -107,6 +107,8 @@ class ProjectFilterSet(FilterSet):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='list',
         operation_summary='List your projects',
         operation_description="""
     Return a list of the projects that you've created.
@@ -127,6 +129,8 @@ class ProjectFilterSet(FilterSet):
     decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Create new project',
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='create',
         operation_description="""
     Create a project and set up the labeling interface in Label Studio using the API.
 
@@ -189,14 +193,75 @@ class ProjectListAPI(generics.ListCreateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='get',
         operation_summary='Get project by ID',
         operation_description='Retrieve information about a project by project ID.',
+        responses={
+            '200': openapi.Response(
+                description='Project information',
+                schema=ProjectSerializer,
+                examples={
+                    'application/json': {
+                        "id": 1,
+                        "title": "My project",
+                        "description": "My first project",
+                        "label_config": "<View>[...]</View>",
+                        "expert_instruction": "Label all cats",
+                        "show_instruction": True,
+                        "show_skip_button": True,
+                        "enable_empty_annotation": True,
+                        "show_annotation_history": True,
+                        "organization": 1,
+                        "color": "#FF0000",
+                        "maximum_annotations": 1,
+                        "is_published": True,
+                        "model_version": "1.0.0",
+                        "is_draft": False,
+                        "created_by": {
+                            "id": 1,
+                            "first_name": "Jo",
+                            "last_name": "Doe",
+                            "email": "manager@humansignal.com"
+                        },
+                        "created_at": "2023-08-24T14:15:22Z",
+                        "min_annotations_to_start_training": 0,
+                        "start_training_on_annotation_update": True,
+                        "show_collab_predictions": True,
+                        "num_tasks_with_annotations": 10,
+                        "task_number": 100,
+                        "useful_annotation_number": 10,
+                        "ground_truth_number": 5,
+                        "skipped_annotations_number": 0,
+                        "total_annotations_number": 10,
+                        "total_predictions_number": 0,
+                        "sampling": "Sequential sampling",
+                        "show_ground_truth_first": True,
+                        "show_overlap_first": True,
+                        "overlap_cohort_percentage": 100,
+                        "task_data_login": "user",
+                        "task_data_password": "secret",
+                        "control_weights": {},
+                        "parsed_label_config": "{\"tag\": {...}}",
+                        "evaluate_predictions_automatically": False,
+                        "config_has_control_tags": True,
+                        "skip_queue": "REQUEUE_FOR_ME",
+                        "reveal_preannotations_interactively": True,
+                        "pinned_at": "2023-08-24T14:15:22Z",
+                        "finished_task_number": 10,
+                        "queue_total": 10,
+                        "queue_done": 100
+                    }}
+            )
+        },
     ),
 )
 @method_decorator(
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete project',
         operation_description='Delete a project by specified project ID.',
     ),
@@ -205,6 +270,8 @@ class ProjectListAPI(generics.ListCreateAPIView):
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='update',
         operation_summary='Update project',
         operation_description='Update the project settings for a specific project.',
         request_body=ProjectSerializer,
@@ -268,6 +335,8 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
     decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Get next task to label',
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='next_task',
         operation_description="""
     Get the next task for labeling. If you enable Machine Learning in
     your project, the response might include a "predictions"
@@ -510,14 +579,14 @@ class ProjectReimportAPI(generics.RetrieveAPIView):
             settings.HOSTNAME or 'https://localhost:8080'
         ),
         manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='A unique integer value identifying this project.',
-            ),
-        ]
-        + paginator_help('tasks', 'Projects')['manual_parameters'],
+                              openapi.Parameter(
+                                  name='id',
+                                  type=openapi.TYPE_INTEGER,
+                                  in_=openapi.IN_PATH,
+                                  description='A unique integer value identifying this project.',
+                              ),
+                          ]
+                          + paginator_help('tasks', 'Projects')['manual_parameters'],
     ),
 )
 class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, generics.DestroyAPIView):
