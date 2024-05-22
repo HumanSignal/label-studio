@@ -181,13 +181,9 @@ const Model = types
 
       onDispose() {
         self.regs.forEach((region) => {
-          try {
-            // remove all spans from the visible node, because without cleaning them, the regions won't be updated
-            region.clearSpans();
-          } catch (err) {
-            console.error(err);
-          }
-        });
+          // remove all spans from the visible node, because without cleaning them, the regions won't be updated
+          region.clearSpans();
+        })
       },
 
       updateValue: flow(function* (store) {
