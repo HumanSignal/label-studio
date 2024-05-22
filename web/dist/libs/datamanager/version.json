@@ -1,6 +1,6 @@
 {
-  "message": "CI: Keep biome version sync",
-  "commit": "66eba02dd5b6a0ff08ebcf41c89cb056122ab404",
-  "date": "2024-05-17T22:07:44.000Z",
-  "branch": "ci/biome-version"
+  "message": "fix: LEAP-854: NER Annotations disappear from UI when switching between annotations",
+  "commit": "254683d187dbc40cf06a48e3ffbd2655c9bc3eee",
+  "date": "2024-05-22T15:14:59.000Z",
+  "branch": "fb-leap-854"
 }
