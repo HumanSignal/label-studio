@@ -1,0 +1,108 @@
+.tooltip {
+  --animation-duration: 100ms;
+  --animation-curve: cubic-bezier(0.21, 1.04, 0.68, 1);
+  --animation-start: -10px;
+  --pointer-size: 10px;
+  --offset-x: 24px;
+
+  top: -1000px;
+  left: -1000px;
+  color: #fff;
+  display: none;
+  z-index: 10000;
+  padding: 4px 10px;
+  font-size: 14px;
+  line-height: 24px;
+  position: absolute;
+  pointer-events: none;
+  background-color: #000;
+  border-radius: 3px;
+
+  &::before {
+    left: 50%;
+    bottom: 0;
+    content: '';
+    width: var(10px);
+    height: var(10px);
+    display: block;
+    position: absolute;
+    background-color: inherit;
+    transform: translate(-50%, 50%) rotate(45deg);
+  }
+
+  &.before-appear,
+  &.before-disappear {
+    transition-property: opacity, transform;
+    transition-duration: var(100ms);
+    transition-timing-function: var(cubic-bezier(0.21, 1.04, 0.68, 1));
+  }
+
+  &.before-appear {
+    opacity: 0;
+    display: flex;
+    transform: translate3d(0, var(-10px), 0);
+  }
+
+  &.appear {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  &.visible {
+    opacity: 1;
+    display: flex;
+  }
+
+  &.before-disappear {
+    opacity: 1;
+    display: flex;
+    transform: translate3d(0, 0, 0);
+  }
+
+  &.disappear {
+    opacity: 0;
+    transform: translate3d(0, var(-10px), 0);
+  }
+
+  &_align {
+    &_top-center {
+      --animation-start: -10px;
+
+      &::before {
+        bottom: 0;
+        transform: translate(-50%, 50%) rotate(45deg);
+      }
+    }
+
+    &_bottom-center {
+      --animation-start: 10px;
+
+      &::before {
+        top: 0;
+        transform: translate(-50%, -50%) rotate(45deg);
+      }
+    }
+
+    &_top-left {
+      margin-left: calc(calc(var(24px) - (var(10px) / 2)) * -1);
+      --animation-start: -10px;
+
+      &::before {
+        bottom: 0;
+        left: 24px;
+        transform: translate(-50%, 50%) rotate(45deg);
+      }
+    }
+
+    &_top-right {
+      margin-left: calc(calc(var(24px) - (var(10px) / 2)));
+      --animation-start: -10px;
+
+      &::before {
+        bottom: 0;
+        right: 24px;
+        transform: translate(-50%, 50%) rotate(45deg);
+      }
+    }
+  }
+}
