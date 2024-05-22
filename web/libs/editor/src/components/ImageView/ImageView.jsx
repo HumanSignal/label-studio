@@ -1022,10 +1022,18 @@ export default observer(
                 imagePositionClassnames={imagePositionClassnames}
                 state={this.state}
                 onMouseEnter={() => {
-                  if (this.crosshairRef.current) {
+                  const isPanTool = item.getToolsManager().findSelectedTool()?.fullName === "ZoomPanTool";
+
+                  if (this.crosshairRef.current == null)
+                    return;
+
+                  if (this.crosshairRef.current)
                     item.stageRef.container().style.cursor = Constants.NO_CURSOR;
-                    this.crosshairRef.current.updateVisibility(true);
-                  }
+
+                  if (isPanTool)
+                    item.stageRef.container().style.cursor = Constants.MOVE_CURSOR;
+
+                  this.crosshairRef.current.updateVisibility(true);
                 }}
                 onMouseLeave={(e) => {
                   if (this.crosshairRef.current) {

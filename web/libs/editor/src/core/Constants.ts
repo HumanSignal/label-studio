@@ -42,4 +42,7 @@ export default {
 
   CONTRAST_VALUE: 100,
   CONTRAST_MAX: 400,
+
+  // Local storage flags
+  MOUSE_OVER_REGION: 'mouse_over_region'
 };

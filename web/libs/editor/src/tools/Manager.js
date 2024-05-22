@@ -1,6 +1,7 @@
 import { destroy } from "mobx-state-tree";
 import { guidGenerator } from "../utils/unique";
 import { FF_DEV_4081, isFF } from "../utils/feature-flags";
+import Constants from "../core/Constants";
 
 /** @type {Map<any, ToolsManager>} */
 const INSTANCES = new Map();
@@ -94,7 +95,7 @@ class ToolsManager {
     const stage = this.obj?.stageRef;
 
     if (stage) {
-      stage.container().style.cursor = "default";
+      stage.container().style.cursor = Constants.DEFAULT_CURSOR;
     }
   }
 
@@ -121,10 +122,34 @@ class ToolsManager {
 
     currentTool?.handleToolSwitch?.(tool);
 
+    const isMouseOverRegion = JSON.parse(localStorage.getItem(Constants.MOUSE_OVER_REGION));
+
     if (selected) {
       this.unselectAll();
       if (tool.setSelected) tool.setSelected(true);
+
+      if (this.obj?.stageRef == null)
+        return;
+
+      if (tool.canInteractWithRegions) {
+
+        let cursor = Constants.DEFAULT_CURSOR;
+
+        if (this.obj?.crosshair)
+          cursor = Constants.NO_CURSOR;
+
+        if (isMouseOverRegion)
+          cursor = Constants.POINTER_CURSOR;
+
+        this.obj.stageRef.container().style.cursor = cursor;
+      }
     } else {
+      if (isMouseOverRegion) {
+        this.obj.stageRef.container().style.cursor = Constants.POINTER_CURSOR;
+      } else {
+        this.obj.stageRef.container().style.cursor = this.obj?.crosshair ? Constants.NO_CURSOR : Constants.DEFAULT_CURSOR;
+      }
+
       const drawingTool = this.findDrawingTool();
 
       if (drawingTool) return this.selectTool(drawingTool, true);

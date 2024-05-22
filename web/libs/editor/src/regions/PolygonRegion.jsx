@@ -540,7 +540,8 @@ const Edges = memo(
 const HtxPolygonView = ({ item, setShapeRef }) => {
   const { store } = item;
   const { suggestion } = useContext(ImageViewContext) ?? {};
-
+  const isZoomPanTool = item.parent?.getToolsManager().findSelectedTool()?.fullName === "ZoomPanTool";
+  
   const regionStyles = useRegionStyles(item, {
     useStrokeAsFill: true,
   });
@@ -628,11 +629,17 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
           item.setHighlight(true);
           stage.container().style.cursor = Constants.RELATION_MODE_CURSOR;
         } else {
-          stage.container().style.cursor = Constants.POINTER_CURSOR;
+          localStorage.setItem(Constants.MOUSE_OVER_REGION, true);
+          stage.container().style.cursor = isZoomPanTool ? Constants.MOVE_CURSOR : Constants.POINTER_CURSOR;
         }
       }}
       onMouseOut={() => {
-        stage.container().style.cursor = item.parent.crosshair ? Constants.NO_CURSOR : Constants.DEFAULT_CURSOR;
+        localStorage.setItem(Constants.MOUSE_OVER_REGION, false);
+
+        if (isZoomPanTool)
+          stage.container().style.cursor = Constants.MOVE_CURSOR;
+        else
+          stage.container().style.cursor = item.parent.crosshair ? Constants.NO_CURSOR : Constants.DEFAULT_CURSOR;
 
         if (store.annotationStore.selected.relationMode) {
           item.setHighlight(false);
