@@ -1712,7 +1712,7 @@ description = "Format converter add-on for Label Studio"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "83f38d69e503a2fc53b2ff76576a097c36ada3e1.zip", hash = "sha256:761d272c699f7470debf8d3d6e50d0663e5e6f62b159414c120fcb7e055efa94"},
+    {file = "1abb2420cdbe9daf637b68b14162327662598dc2.zip", hash = "sha256:a0b49c3626ab3f5ad22add9798a1ae63e356dd8103fd33561c7b86b157eebd4e"},
 ]
 
 [package.dependencies]
@@ -1726,7 +1726,7 @@ ujson = "*"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-converter/archive/83f38d69e503a2fc53b2ff76576a097c36ada3e1.zip"
+url = "https://github.com/HumanSignal/label-studio-converter/archive/1abb2420cdbe9daf637b68b14162327662598dc2.zip"
 
 [[package]]
 name = "label-studio-sdk"
@@ -3955,4 +3955,4 @@ mysql = ["mysqlclient"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4"
-content-hash = "0c1d96c71c00511e17922f4afdae4f5e4685ead7cc3aa3b204505acaeebc0950"
+content-hash = "8da9820dd55c88ef6296be1d2b36fefef6d755bf530e4d629fd662b78a5d5613"
