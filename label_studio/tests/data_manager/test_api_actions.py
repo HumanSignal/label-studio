@@ -202,3 +202,33 @@ def test_action_remove_duplicates_with_annotations(business_client, project_id):
     assert task1.annotations.count() == 0, 'task1 annotations count wrong'
     assert task2.annotations.count() == 6, 'task2 annotations count wrong'
     assert task2.annotations.filter(was_cancelled=True).count() == 1, 'was_cancelled counter wrong'
+
+@pytest.mark.django_db
+def test_action_cache_labels(business_client, project_id):
+    """This test checks that the "cache_labels" action works correctly
+    when there are annotations distributed among multiple tasks.
+    """
+    # Setup
+    project = Project.objects.get(pk=project_id)
+
+    # task 1: add a task with specific labels
+    task_data = {'data': {'image': 'image1.jpg'}}
+    task1 = make_task(task_data, project)
+    make_annotation({'result': [{'from_name': 'label1', 'to_name': 'image', 'type': 'labels', 'value': {'labels': ['Label1']}}]}, task1.id)
+
+    # task 2: add a task with different labels
+    task_data = {'data': {'image': 'image2.jpg'}}
+    task2 = make_task(task_data, project)
+    make_annotation({'result': [{'from_name': 'label2', 'to_name': 'image', 'type': 'labels', 'value':  {'labels': ['Label2']}}]}, task2.id)
+
+    # call the "cache_labels" action
+    status = business_client.post(
+        f'/api/dm/actions?project={project_id}&id=cache_labels',
+        json={'selectedItems': {'all': True, 'excluded': []}, 'control_tag': 'label1', 'with_counters': 'yes'},
+    )
+
+    # Assertions
+    # Replace these with the actual assertions for your cache_labels function
+    assert status.status_code == 200, 'status code wrong'
+    assert project.tasks.count() == 2, 'tasks count wrong'
+    assert project.tasks.first().data.get('cache_label1') == 'Label1 (1)', 'cache_label1 wrong for task 1'
