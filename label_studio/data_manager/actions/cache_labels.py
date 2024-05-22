@@ -82,7 +82,7 @@ def cache_labels(project, queryset, request, **kwargs):
 
 def cache_labels_form(user, project):
     labels = project.get_parsed_config()
-    control_tags = []
+    control_tags = ['ALL']
     for key, _ in labels.items():
         control_tags.append(key)
 
@@ -99,7 +99,7 @@ def cache_labels_form(user, project):
                 {
                     'type': 'input',
                     'name': 'custom_control_tag',
-                    'label': "Custom control tag or 'ALL' to mix all tags",
+                    'label': "Custom control tag if it's not in label config",
                 },
                 {
                     'type': 'select',
