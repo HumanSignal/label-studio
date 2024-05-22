@@ -122,7 +122,8 @@ Scenario("Region should show after move between annotation tabs", async ({ I, La
             },
           },
         ],
-      },{
+      },
+      {
         id: "1235",
         result: [
           {
@@ -146,17 +147,17 @@ Scenario("Region should show after move between annotation tabs", async ({ I, La
   LabelStudio.waitForObjectsReady();
 
   // select second annotation
-  I.click('.lsf-annotation-button:nth-child(2)');
+  I.click(".lsf-annotation-button:nth-child(2)");
   // select first annotation
-  I.click('.lsf-annotation-button:nth-child(1)')
+  I.click(".lsf-annotation-button:nth-child(1)");
   // select second annotation again
-  I.click('.lsf-annotation-button:nth-child(2)')
+  I.click(".lsf-annotation-button:nth-child(2)");
   // check if region is visible
   within({ frame: ".lsf-richtext__iframe" }, () => {
     I.seeElement(locate(".htx-highlight").withText("Hello"));
   });
   // select first annotation again
-  I.click('.lsf-annotation-button:nth-child(1)')
+  I.click(".lsf-annotation-button:nth-child(1)");
   // check if region is visible
   within({ frame: ".lsf-richtext__iframe" }, () => {
     I.seeElement(locate(".htx-highlight").withText("world"));
