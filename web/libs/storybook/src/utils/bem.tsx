@@ -29,7 +29,7 @@ interface CN {
   toCSSSelector: () => string;
 }
 
-const process = global.process ?? import.meta;
+// const process = global.process ?? import.meta;
 
 type CNMix = string | CN | undefined;
 
@@ -60,7 +60,7 @@ type CNComponentProps = {
 
 export type BemComponent = FunctionComponent<CNComponentProps>;
 
-const CSS_PREFIX = "ls"
+const CSS_PREFIX = "ls-"
 
 const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?: CNMod) => {
   const rootName = block;
