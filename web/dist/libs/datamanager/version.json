@@ -1,6 +1,6 @@
 {
-  "message": "change test name",
-  "commit": "048a2743fa6fd640fe96aca2a3db27d74da8bd8e",
-  "date": "2024-05-22T15:29:41.000Z",
+  "message": "remove the validation of errors on clearSpans",
+  "commit": "f64c977adddabbb65ccf7a88f6159950515ac81f",
+  "date": "2024-05-22T15:49:53.000Z",
   "branch": "fb-leap-854"
 }
