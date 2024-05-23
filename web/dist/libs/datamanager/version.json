@@ -1,6 +1,6 @@
 {
-  "message": "CI: Keep biome version sync",
-  "commit": "66eba02dd5b6a0ff08ebcf41c89cb056122ab404",
-  "date": "2024-05-17T22:07:44.000Z",
-  "branch": "ci/biome-version"
+  "message": "add semi-colon",
+  "commit": "faee15192b762b4497e6e591faad5f8e528380f2",
+  "date": "2024-05-22T20:25:52.000Z",
+  "branch": "fb-leap-854"
 }
