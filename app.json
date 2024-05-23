@@ -6,14 +6,14 @@
     "data labeling"
   ],
   "website": "https://labelstud.io",
-  "repository": "https://github.com/heartexlabs/label-studio",
-  "logo": "https://labelstud.io/images/opossum/heartex_icon_opossum_green.svg",
+  "repository": "https://github.com/HumanSignal/label-studio",
+  "logo": "https://raw.githubusercontent.com/HumanSignal/label-studio/develop/images/heartex_icon_opossum_orang.svg",
   "stack": "container",
   "addons": [
     {
       "plan": "heroku-postgresql",
       "options": {
-        "version": "13"
+        "version": "16"
       }
     }
   ],
