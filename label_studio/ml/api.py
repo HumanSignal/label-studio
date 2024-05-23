@@ -188,11 +188,10 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
             },
         ),
         responses={
-            200: openapi.Response(title='Training OK', description='Training has successfully started.'),
+            200: openapi.Response(description='Training has successfully started.'),
             500: openapi.Response(
                 description='Training error',
                 schema=openapi.Schema(
-                    title='Error message',
                     description='Error message',
                     type=openapi.TYPE_STRING,
                     example='Server responded with an error.',
@@ -230,11 +229,10 @@ class MLBackendTrainAPI(APIView):
             ),
         ],
         responses={
-            200: openapi.Response(title='Predicting OK', description='Predicting has successfully started.'),
+            200: openapi.Response(description='Predicting has successfully started.'),
             500: openapi.Response(
                 description='Predicting error',
                 schema=openapi.Schema(
-                    title='Error message',
                     description='Error message',
                     type=openapi.TYPE_STRING,
                     example='Server responded with an error.',
@@ -287,7 +285,7 @@ class MLBackendPredictTestAPI(APIView):
         ],
         request_body=MLInteractiveAnnotatingRequest,
         responses={
-            200: openapi.Response(title='Annotating OK', description='Interactive annotation has succeeded.'),
+            200: openapi.Response(description='Interactive annotation has succeeded.'),
         },
     ),
 )
