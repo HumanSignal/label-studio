@@ -59,7 +59,7 @@ logger = logging.getLogger(__name__)
     decorator=swagger_auto_schema(
         tags=['Tasks'],
         x_fern_sdk_group_name='tasks',
-        x_fern_sdk_method_name='get_many',
+        x_fern_sdk_method_name='list',
         x_fern_pagination={
             'offset': '$request.page',
             'results': '$response.tasks',

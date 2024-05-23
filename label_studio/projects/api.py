@@ -108,7 +108,7 @@ class ProjectFilterSet(FilterSet):
     decorator=swagger_auto_schema(
         tags=['Projects'],
         x_fern_sdk_group_name='projects',
-        x_fern_sdk_method_name='get_many',
+        x_fern_sdk_method_name='list',
         x_fern_pagination={
             'offset': '$request.page',
             'results': '$response.results',
