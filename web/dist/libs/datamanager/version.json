@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-913: LEAP-926: LEAP-1007: Fix security vulnerabilities",
-  "commit": "977b56bf45ffb9734ae295fce11bbf4e7709bc31",
-  "date": "2024-05-23T19:17:28.000Z",
+  "message": "add express package in the resolutions",
+  "commit": "44d40bf01800d152c704b42d20cae9a17bd0c564",
+  "date": "2024-05-23T19:23:28.000Z",
   "branch": "fb-leap-913"
 }
