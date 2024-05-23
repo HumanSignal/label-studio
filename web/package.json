@@ -212,7 +212,8 @@
     "debug": "4.3.1",
     "webpack-dev-middleware": ">=5.3.4",
     "@babel/traverse": "^7.24.1",
-    "ip": ">=2.0.1"
+    "ip": ">=2.0.1",
+    "express": ">=2.0.1"
   },
   "babel": {
     "presets": [
