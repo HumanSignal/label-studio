@@ -507,3 +507,126 @@ stages:
     verify_response_with:
       function: tests.utils:empty_list
     status_code: 200
+
+---
+test_name: draft_permission
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice
+        value="pos"/><Choice value="neg"/></Choices></View>
+      title: Test Draft 1
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        text: Test example phrase1
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/tasks'
+  response:
+    save:
+      json:
+        task_pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        text: Test example phrase2
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/tasks'
+  response:
+    save:
+      json:
+        task2_pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      lead_time: 12.34
+      result:
+      - from_name: text_class
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - class_A
+    method: POST
+    url: '{django_live_url}/api/tasks/{task2_pk}/drafts'
+  response:
+    save:
+      json:
+        draft_id: id
+    status_code: 201
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    method: GET
+    url: '{django_live_url}/api/tasks/{task2_pk}/drafts'
+  response:
+    status_code: 200  
+
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/drafts/{draft_id}/'
+  response:
+    json:
+      annotation: null
+      created_ago: !re_match 0.+minutes
+      lead_time: 12.34
+      result:
+      - from_name: text_class
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - class_A
+      user: test_suites_user@heartex.com
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      draft_id: '{draft_id}'
+      lead_time: 91.01
+      result:
+      - from_name: text_class
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - class_A
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_pk}/annotations'
+  response:
+    status_code: 403
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/drafts/{draft_id}/'
+  response:
+    status_code: 200

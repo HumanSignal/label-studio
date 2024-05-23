@@ -1,0 +1,5 @@
+name: "CodeQL config"
+
+paths-ignore:
+  - label_studio/frontend/dist
+  - web/dist

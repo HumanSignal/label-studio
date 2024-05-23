@@ -23,7 +23,7 @@ If you want to identify the intent of an audio recording, such as an interview o
   <Labels name="labels" toName="audio">
     <Label value="Segment" />
   </Labels>
-  <AudioPlus name="audio" value="$audio"/>
+  <Audio name="audio" value="$audio"/>
   <Choices name="intent" toName="audio" perRegion="true" required="true">
     <Choice value="Question" />
     <Choice value="Request" />
@@ -46,9 +46,9 @@ Use the [Labels](/tags/labels.html) control tag to label specific segments of th
 </Labels>
 ```
 
-Use the [AudioPlus](/tags/audioplus.html) object tag to specify the audio data and display an audio wave that can be segmented:
+Use the [Audio](/tags/audio.html) object tag to specify the audio data and display an audio wave that can be segmented:
 ```xml
-<AudioPlus name="audio" value="$audio"/>
+<Audio name="audio" value="$audio"/>
 ```
 
 Use the [Choices](/tags/choices.html) control tag to classify the intent for each segmented region of the audio clip:
@@ -61,10 +61,12 @@ Use the [Choices](/tags/choices.html) control tag to classify the intent for eac
     <Choice value="Unsatisfied" />
   </Choices>
 ```
-Because of the `perRegion="true"` argument, each choice applies to a different segment labeled as a segment. The `required="true"` argument ensures that each labeled audio segment has a choice selected before the annotation can be submited.
+Because of the `perRegion="true"` argument, each choice applies to a different segment labeled as a segment. The `required="true"` argument ensures that each labeled audio segment has a choice selected before the annotation can be submitted.
+
+<!-- md nested-classification.md -->
 
 ## Related tags
 
 - [Labels](/tags/labels.html)
-- [AudioPlus](/tags/audioplus.html)
+- [Audio](/tags/audio.html)
 - [Choices](/tags/choices.html)

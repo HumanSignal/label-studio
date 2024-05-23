@@ -1,18 +1,23 @@
 ---
-title: Set up authentication for Label Studio
-short: Set up authentication
-badge: <i class='ent'></i>
+title: Set up SSO authentication for Label Studio
+short: SSO and SAML
+tier: enterprise
 type: guide
-order: 252
+order: 0
+order_enterprise: 384
 meta_title: Authentication for Label Studio Enterprise
 meta_description: Label Studio Enterprise documentation for setting up SSO and LDAP authentication for your data labeling, machine learning, and data science projects.
+section: "Manage Your Organization"
+
 ---
 
 Set up single sign-on using SAML to manage access to Label Studio using your existing Identity Provider (IdP), or use LDAP authentication.
 
-<div class="enterprise"><p>
-SSO and LDAP authentication are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
-</p></div>
+<div class="enterprise-only">
+
+SSO and LDAP authentication are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
+
+</div>
 
 To more easily [manage access to Label Studio Enterprise](manage_users.html), you can map SAML or LDAP groups to both `roles` or `workspaces`. 
 
@@ -22,42 +27,74 @@ The organization owner for Label Studio Enterprise can set up SSO & SAML for the
 - Microsoft Active Directory
 - [Okta](https://www.youtube.com/watch?v=Dr-_hyWIw4M)
 - OneLogin
-- [Ping Federate & Ping Identity & PingOne](pingone.html)
-- others that use SAML assertions
+- [Ping Federate and Ping Identity SAML SSO Setup Example](pingone.html)
+- Others that use SAML assertions
 
-After you set up SSO, you can no longer use native authentication to access the Label Studio UI unless you have the Owner role.
+After setting up the SSO, you can use native authentication to access the Label Studio UI, however it's not a recommended option especially for the user with the Owner role.
+
+- You can use SSO along with normal login. This is not a recommended option.
+
+- You can prevent a user from creating his own organization by using [DISABLE_SIGNUP_WITHOUT_LINK](signup.html#Restrict-signup-for-local-deployments) option.
 
 ### Connect your Identity Provider to Label Studio Enterprise
 
-Set up Label Studio Enterprise as a Service Provider (SP) with your Identity Provider (IdP) to use SAML authentication. Configure the IdP settings and set up the SAML attributes. 
+Set up Label Studio Enterprise as a Service Provider (SP) with your Identity Provider (IdP) to use SAML authentication. 
 
-1. In the Label Studio Enterprise UI, click the hamburger icon and select **Organization**.
-2. Click **SSO & SAML**.
-3. In the **Organization** field, specify the domain used for your organization by your SAML IdP. 
-4. Open your IdP configuration options and add the following URLs from Label Studio Enterprise to your IdP:
-  1. Copy the **URL for the Assertion Consumer Service (ACS)** that the IdP uses to redirect users to after a successful authentication and paste it into the appropriate location in your IdP configuration options.
-  2. Copy the **login URL** used for logging in to Label Studio Enterprise and paste it into the appropriate location in your IdP configuration options.
-  3. Copy the **logout URL** used to redirect users after successfully logging out of Label Studio Enterprise and paste it into the appropriate location in your IdP configuration options.
-5. In your IdP, generate a metadata XML file, or a URL that specifies the metadata for the IdP. 
-6. In Label Studio Enterprise, upload the metadata XML file or specify the metadata URL. 
-7. In your IdP, set up or confirm setup of the following SAML attributes. Label Studio Enterprise expects specific attribute mappings for user identities.
-   | Data | Required Attribute |
-   | --- | --- |
-   | Email address | Email |
-   | First or given name | FirstName |
-   | Last or family name | LastName |
-   | Group name | Groups |
-8. If you want users in specific groups to get access to specific workspaces in Label Studio Enterprise, map the **Workspace name** to a **Group** passed as SAML attributes in the SAML authentication response.
-    1. In the **Workspaces to Groups Mapping** section, click **+ Add Mapping**.
-    2. In the **Workspace** field, type a new workspace name or select a workspace from the drop-down list. Then, type a **Group** that matches a group name sent as an attribute in a SAML authentication response by your IdP. You can map multiple groups to the same workspace. 
-    3. Click **+ Add Mapping** to map additional workspaces to groups. 
-9. You can also map specific user groups to specific user roles in Label Studio Enterprise. 
-   1. In the **Roles to Groups Mapping** section, click **+ Add Mapping**.
-   2. Select a **Role** from the drop-down list of options, then type a **Group** that matches a group name sent as an attribute in a SAML authentication response by your IdP. You can map multiple groups to the same role. 
-   3. Click **+ Add Mapping** to map additional roles to groups. 
-10. Click **Save** to save your SAML and SSO settings. 
+The details will vary depending on your IdP, but in general you will complete the following steps:
 
-Test the configuration by logging in to Label Studio Enterprise with your SSO account.
+###### From Label Studio:
+
+1. Click the menu in the upper left and select **Organization**. 
+
+    ![Screenshot of Organization in the Label Studio menu](/images/general/menu_organization.png)
+    
+    If you do not see the option to select **Organization**, you are not logged in with the appropriate role. 
+2. Select **SSO & SAML** in the upper right. 
+3. In the **Organization** field, ensure the domain matches the domain used for your organization in your IdP.
+4. Copy the following URLs:
+    
+    * **Assertion Consumer Service (ACS) URL with Audience (EntityID), and Recipient (Reply) details**---The IdP uses this URL to redirect users to after a successful authentication.
+    * **Login URL**---This is the URL that users will use to log in to Label Studio. 
+    * **Logout URL**---This is the URL used to redirect users after successfully logging out of Label Studio.
+
+###### From your IdP:
+
+1. Paste the URLs copied from Label Studio in the appropriate location. 
+2. Generate a metadata XML file, or a URL that specifies the metadata for the IdP.
+3. Set up or confirm setup of the following SAML attributes. Label Studio Enterprise expects specific attribute mappings for user identities.
+
+    | Data | Required Attribute |
+    | --- | --- |
+    | Email address | Email |
+    | First or given name | FirstName |
+    | Last or family name | LastName |
+    | Group name | Groups | 
+
+
+
+###### From Label Studio:
+
+1. Return to the SSO & SAML page. 
+2. Upload the metadata XML file or specify the metadata URL.  
+3. Set up group mappings. These can also be added or edited later.
+
+    Ensure the group name you enter is the same as the group name sent as an attribute in a SAML authentication response by your IdP.
+
+    * **Organization Roles to Groups Mapping**---Map groups to roles at the organization level. The role set at the organization level is the default role of the user and is automatically assigned to workspaces and projects. For more information on roles, see [Roles in Label Studio Enterprise](manage_users#Roles-in-Label-Studio-Enterprise).
+    
+        You can map multiple groups to the same role. Note that users who are **Not Activated** or **Deactivated** do not count towards the seat limit for your account. 
+    * **Workspaces to Groups Mapping**---Add groups as members to workspaces. Users with Manager, Reviewer, or Annotator roles can only see workspaces after they've been added as a member to that workspace.
+    
+        Select an existing workspace or create a new one. You can map multiple groups to the same workspace. 
+    * **Projects to Groups Mapping**---Map groups to roles at the project level. Project-level roles can be **Annotator**, **Reviewer**, or **Inherit**. 
+    
+        You can map a group to different roles across multiple projects. You can also map multiple groups to the same roles and the same projects. For more information on roles, see [Roles in Label Studio Enterprise](manage_users#Roles-in-Label-Studio-Enterprise). 
+    
+        If you select **Inherit**, the group will inherit the role set above under **Organization Roles to Groups Mapping.** If the group is inheriting the Not Activated role, the users are mapped to the project, but they are not actually assigned to the project until the group is synced (meaning that the user authenticates with SSO). 
+4. Click **Save**.
+
+5. Test the configuration by logging in to Label Studio Enterprise with your SSO account.
+
 
 ### Setup SAML SSO with Okta video tutorial
 
@@ -102,17 +139,10 @@ AUTH_LDAP_USER_ATTR_MAP_USERNAME=sAMAccountName
 # Query the authenticating user in Label Studio, it can be [email|username]
 AUTH_LDAP_USER_QUERY_FIELD=email
 
-# Map LDAP groups to specific Label Studio Enterprise roles, using ';' to specify several groups
-AUTH_LDAP_ORGANIZATION_ROLE_ADMINISTRATOR=cn=admins,ou=users,o=123abc,dc=example,dc=com 
-AUTH_LDAP_ORGANIZATION_ROLE_MANAGER=cn=managers,ou=users,o=123abc,dc=example,dc=com 
-AUTH_LDAP_ORGANIZATION_ROLE_REVIEWER=cn=reviewers,ou=users,o=123abc,dc=example,dc=com
-AUTH_LDAP_ORGANIZATION_ROLE_ANNOTATOR=cn=annotators,ou=users,o=123abc,dc=example,dc=com;cn=guests,ou=users,o=123abc,dc=example,dc=com
-AUTH_LDAP_ORGANIZATION_ROLE_NOT_ACTIVATED=cn=not,ou=users,o=123abc,dc=example,dc=com 
-AUTH_LDAP_ORGANIZATION_ROLE_DEACTIVATED=cn=deactivated,ou=users,o=123abc,dc=example,dc=com
-
-# Map LDAP groups to specific Label Studio workspaces
-# Use a JSON format where keys are workspace titles and values are LDAP groups. Split groups with ';' to specify several groups.
-AUTH_LDAP_ORGANIZATION_WORKSPACES='{"Workspace 1":"cn=team1,ou=users,o=60cbc901ec2e8e387a3b2d3e,dc=jumpcloud,dc=com","Workspace 2":"cn=team2,ou=users,o=60cbc901ec2e8e387a3b2d3e,dc=jumpcloud,dc=com"}'
+# Group parameters
+AUTH_LDAP_GROUP_SEARCH_BASE_DN=ou=Users,o=group-id,dc=example,dc=com
+AUTH_LDAP_GROUP_SEARCH_FILTER_STR=(objectClass=groupOfNames)
+AUTH_LDAP_GROUP_TYPE=ou
 ```
 
 If you want to use a recursive scan to search in several LDAP groups to grant access to Label Studio, instead of relying on the simple search used by `AUTH_LDAP_USER_ON_TEMPLATE`, update your environment variables file like the following:
@@ -122,6 +152,30 @@ AUTH_LDAP_USER_DN_TEMPLATE=""
 # Specify the groups that you want to be able to log in, separated by ';' 
 AUTH_LDAP_USER_SEARCH_BASES="ou=guests,dc=domain,dc=com;ou=owners,dc=domain,dc=com"
 ```
+
+
+## User Role Mappings
+
+Map LDAP groups to specific Label Studio Enterprise roles using `;` to specify several groups.
+
+```bash
+AUTH_LDAP_ORGANIZATION_ROLE_ADMINISTRATOR=cn=admins,ou=users,o=123abc,dc=example,dc=com 
+AUTH_LDAP_ORGANIZATION_ROLE_MANAGER=cn=managers,ou=users,o=123abc,dc=example,dc=com 
+AUTH_LDAP_ORGANIZATION_ROLE_REVIEWER=cn=reviewers,ou=users,o=123abc,dc=example,dc=com
+AUTH_LDAP_ORGANIZATION_ROLE_ANNOTATOR=cn=annotators,ou=users,o=123abc,dc=example,dc=com;cn=guests,ou=users,o=123abc,dc=example,dc=com
+AUTH_LDAP_ORGANIZATION_ROLE_NOT_ACTIVATED=cn=not,ou=users,o=123abc,dc=example,dc=com 
+AUTH_LDAP_ORGANIZATION_ROLE_DEACTIVATED=cn=deactivated,ou=users,o=123abc,dc=example,dc=com
+```
+
+
+## Workspace Mappings
+
+Map LDAP groups to specific Label Studio workspaces. Use a JSON format where keys are workspace titles and values are LDAP groups. Split groups with `;` to specify several groups. 
+
+```bash
+AUTH_LDAP_ORGANIZATION_WORKSPACES='{"Workspace 1":"cn=team1,ou=users,o=60cbc901ec2e8e387a3b2d3e,dc=jumpcloud,dc=com","Workspace 2":"cn=team2,ou=users,o=60cbc901ec2e8e387a3b2d3e,dc=jumpcloud,dc=com"}'
+```
+
 
 ## Manage user access only with LDAP or SSO 
 
@@ -134,3 +188,13 @@ MANUAL_ROLE_MANAGEMENT=0
 ```
 
 Setting these options disables the Label Studio API and UI options to assign roles and workspaces for specific users within Label Studio and relies entirely on the settings in the environment variable file.
+
+### Enabling TLS on LDAP/Active Directory
+
+To enable a secure Transport Layer Security (TLS) connection on LDAP/Active Directory, add the following env variables:
+
+```bash
+AUTH_LDAP_CONNECTION_OPTIONS="OPT_X_TLS_CACERTFILE=/path/to/cert.crt;OPT_X_TLS_NEWCTX=0"
+```
+
+Where `OPT_X_TLS_CACERTFILE` points to a file with certificates. If you’re using self-signed certificates, you’ll need to add `OPT_X_TLS_NEWCTX=0` as the last entry of the `AUTH_LDAP_CONNECTION_OPTIONS` env variable.

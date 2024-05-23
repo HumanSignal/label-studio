@@ -2,7 +2,7 @@
 import logging
 
 from django.db import migrations
-from django.contrib.postgres.operations import TrigramExtension
+from core.utils.common import trigram_migration_operations
 
 logger = logging.getLogger(__name__)
 
@@ -26,14 +26,11 @@ def backwards(apps, schema_editor):
         return
 
     schema_editor.execute('drop index tasks_annotations_result_idx2;')
-
+    
 
 class Migration(migrations.Migration):
     atomic = False
 
     dependencies = [('tasks', '0016_auto_20220414_1408')]
 
-    operations = [
-        TrigramExtension(),
-        migrations.RunPython(forwards, backwards),
-    ]
+    operations = trigram_migration_operations(migrations.RunPython(forwards, backwards))

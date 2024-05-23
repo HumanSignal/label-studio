@@ -1,0 +1,96 @@
+{
+  "name": "editor",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/editor/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "defaultConfiguration": "production",
+      "options": {
+        "compiler": "babel",
+        "webpackConfig": "webpack.config.js",
+        "index": "libs/editor/public/index.html",
+        "tsConfig": "libs/editor/tsconfig.lib.json",
+        "main": "libs/editor/src/index.js",
+        "outputPath": "dist/libs/editor",
+        "isolatedConfig": true,
+        "assets": [
+          {
+            "glob": "public",
+            "input": "libs/editor",
+            "output": "public/"
+          }
+        ]
+      },
+      "configurations": {
+        "development": {
+          "extractLicenses": false,
+          "optimization": false,
+          "sourceMap": true,
+          "vendorChunk": true
+        },
+        "production": {
+          "optimization": true,
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/webpack:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "port": 3000,
+        "buildTarget": "editor:build",
+        "hmr": true,
+        "watch": true,
+        "liveReload": true
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "editor:build"
+        }
+      }
+    },
+    "unit": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/editor/jest.config.js",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "integration": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "libs/editor/cypress.config.ts",
+        "testingType": "e2e",
+        "baseUrl": "http://localhost:3000"
+      }
+    },
+    "version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/editor",
+        "command": "node ../../tools/version/version.mjs"
+      }
+    },
+    "docs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/editor",
+        "command": "node scripts/create-docs.js ../../../docs/source/tags"
+      }
+    }
+  }
+}

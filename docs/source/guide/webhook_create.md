@@ -1,13 +1,20 @@
 ---
 title: Create custom events for webhooks in Label Studio
-short: Custom Webhooks
+short: Webhook development
 type: guide
-order: 655
+tier: all
+order: 410
+order_enterprise: 410
 meta_title: Create Custom Webhooks in Label Studio
 meta_description: Label Studio documentation for creating custom webhook event triggers to create custom integrations between Label Studio and your machine learning pipeline
+section: "Integrate & Extend"
+parent: "webhooks"
+parent_enterprise: "webhooks"
+
 ---
 
 If you want to trigger custom events for webhooks in Label Studio, you can extend the webhook event model.
+
 
 ## Create a custom webhook event
 

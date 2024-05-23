@@ -1,0 +1,80 @@
+name: "/ff command"
+
+on:
+  repository_dispatch:
+    types: [ ff-command ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.client_payload.github.payload.issue.number }}-${{ github.event.client_payload.slash_command.command }}-${{ github.event.client_payload.slash_command.args.unnamed.arg1 || github.event.client_payload.slash_command.args.all }}
+
+jobs:
+
+  update-prepare:
+    name: "Update: Prepare"
+    if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'update'
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+  update-update-ff:
+    name: "Update: Update Feature Flags"
+    if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'update'
+    needs:
+      - update-prepare
+    uses: ./.github/workflows/feature-flags-update.yml
+    with:
+      ref: ${{ github.event.client_payload.pull_request.head.ref }}
+    secrets: inherit
+
+  update-update-comment:
+    name: "Update: Update Comment"
+    if: always()
+    needs:
+      - update-update-ff
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Get details
+        id: details
+        shell: bash
+        env:
+          PR_HEAD: ${{ github.event.client_payload.pull_request.head.ref }}
+        run: |
+          reaction='-1'
+          if [[ '${{ needs.update-update-ff.result }}' == 'success' ]]; then
+            reaction='+1'
+          fi
+          echo "reaction=${reaction}" >> $GITHUB_OUTPUT
+
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          reactions: ${{ steps.details.outputs.reaction }}
+
+  help:
+    if: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 == 'help' || !contains(fromJson('["update"]'), github.event.client_payload.slash_command.args.unnamed.arg1) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Command | Description
+            > --- | ---
+            > /ff update | Update feature flags
+          reaction-type: hooray

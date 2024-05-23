@@ -3,36 +3,34 @@
 import json
 import random
 import string
-
 from uuid import uuid4
-from locust import HttpUser, TaskSet, task, between
+
+from locust import HttpUser, TaskSet, between, task
 
 
 def randomString(stringLength):
-    """Generate a random string of fixed length """
+    """Generate a random string of fixed length"""
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
 
 
 class UserWorksWithProject(TaskSet):
-
     def on_start(self):
         # user creates the new project
         title = str(uuid4())
-        payload = json.dumps({
-            'title': title,
-            'is_published': True,
-            'skip_onboarding': True,
-            'label_config': "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"my_text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"
-        })
+        payload = json.dumps(
+            {
+                'title': title,
+                'is_published': True,
+                'skip_onboarding': True,
+                'label_config': '<View><Text name="my_text" value="$text"/><Choices name="my_class" toName="my_text"><Choice value="pos"/><Choice value="neg"/></Choices></View>',
+            }
+        )
         with self.client.post(
             '/api/projects',
             data=payload,
-            headers={
-                'content-type': 'application/json',
-                'Authorization': f'Token {self.client.token}'
-            },
-            catch_response=True
+            headers={'content-type': 'application/json', 'Authorization': f'Token {self.client.token}'},
+            catch_response=True,
         ) as r:
             if r.status_code != 201:
                 r.failure(r.status_code)
@@ -44,17 +42,33 @@ class UserWorksWithProject(TaskSet):
         tasks = []
         for i in range(10000):
             one_task = {
-                'data': {
-                    'text': randomString(random.randint(5, 200))
-                },
-                'annotations': [{
-                    'ground_truth': False,
-                    'result': [{"type": "choices", "from_name": "my_class", "to_name": "my_text", "value": {"choices": [random.choice(['pos', 'neg'])]}}],
-                }],
-                'predictions': [{
-                    'result': [{"type": "choices", "from_name": "my_class", "to_name": "my_text", "value": {"choices": [random.choice(['pos', 'neg'])]}}],
-                    'score': random.uniform(0, 1)
-                }]
+                'data': {'text': randomString(random.randint(5, 200))},
+                'annotations': [
+                    {
+                        'ground_truth': False,
+                        'result': [
+                            {
+                                'type': 'choices',
+                                'from_name': 'my_class',
+                                'to_name': 'my_text',
+                                'value': {'choices': [random.choice(['pos', 'neg'])]},
+                            }
+                        ],
+                    }
+                ],
+                'predictions': [
+                    {
+                        'result': [
+                            {
+                                'type': 'choices',
+                                'from_name': 'my_class',
+                                'to_name': 'my_text',
+                                'value': {'choices': [random.choice(['pos', 'neg'])]},
+                            }
+                        ],
+                        'score': random.uniform(0, 1),
+                    }
+                ],
             }
             tasks.append(one_task)
 
@@ -99,21 +113,46 @@ class UserWorksWithProject(TaskSet):
     @task(5)
     def import_tasks(self, tasks=None, name=None):
         if tasks is None:
-            payload = json.dumps([{"text": "example positive review"}, {"text": "example negative review"}])
+            payload = json.dumps([{'text': 'example positive review'}, {'text': 'example negative review'}])
         else:
             payload = json.dumps(tasks)
         headers = {'content-type': 'application/json', 'Authorization': f'Token {self.client.token}'}
-        self.client.post('/api/projects/%i/tasks/bulk' % self.project_id, payload, headers=headers, name=name or '/api/projects/<id>/tasks/bulk')
+        self.client.post(
+            '/api/projects/%i/tasks/bulk' % self.project_id,
+            payload,
+            headers=headers,
+            name=name or '/api/projects/<id>/tasks/bulk',
+        )
 
     @task(20)
     def complete_task_via_api(self):
-        r = self.client.get('/api/projects/%i/tasks' % self.project_id, headers={'Authorization': f'Token {self.client.token}'}, name='/api/projects/<id>/tasks')
+        r = self.client.get(
+            '/api/projects/%i/tasks' % self.project_id,
+            headers={'Authorization': f'Token {self.client.token}'},
+            name='/api/projects/<id>/tasks',
+        )
         tasks_list = r.json()
         if len(tasks_list):
             any_task = random.choice(tasks_list)
-            payload = json.dumps({"result": [{"type": "choices", "from_name": "my_class", "to_name": "my_text", "value": {"choices": [random.choice(['pos', 'neg'])]}}]})
+            payload = json.dumps(
+                {
+                    'result': [
+                        {
+                            'type': 'choices',
+                            'from_name': 'my_class',
+                            'to_name': 'my_text',
+                            'value': {'choices': [random.choice(['pos', 'neg'])]},
+                        }
+                    ]
+                }
+            )
             headers = {'content-type': 'application/json', 'Authorization': f'Token {self.client.token}'}
-            self.client.post('/api/tasks/%i/annotations' % any_task["id"], payload, headers=headers, name='/api/tasks/<id>/annotations')
+            self.client.post(
+                '/api/tasks/%i/annotations' % any_task['id'],
+                payload,
+                headers=headers,
+                name='/api/tasks/<id>/annotations',
+            )
 
     @task(1)
     def stop(self):
@@ -132,12 +171,8 @@ class WebsiteUser(HttpUser):
         response = self.client.get('/')
         csrftoken = response.cookies['csrftoken']
         username = str(uuid4())
-        payload = {
-            'email': f'{username}@loadtest.me',
-            'password': '12345678',
-            'title': username.upper()
-        }
-        r = self.client.post('/user/signup', payload, headers={'X-CSRFToken': csrftoken})
+        payload = {'email': f'{username}@loadtest.me', 'password': '12345678', 'title': username.upper()}
+        self.client.post('/user/signup', payload, headers={'X-CSRFToken': csrftoken})
         response = self.client.get('/api/current-user/token').json()
         self.client.token = response['detail']
         self.client.name = username

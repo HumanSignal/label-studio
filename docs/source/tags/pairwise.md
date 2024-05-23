@@ -6,9 +6,9 @@ meta_title: Pairwise Tag to Compare Objects
 meta_description: Customize Label Studio with the Pairwise tag for object comparison tasks for machine learning and data science projects.
 ---
 
-Use the Pairwise tag to compare two different objects and select one item from the list. If you want annotators to compare two objects and determine whether they are similar or not, use the Choices tag.
+The `Pairwise` tag is used to compare two different objects and select one item from the list. If you want annotators to compare two objects and determine whether they are similar or not, use the `Choices` tag.
 
-Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
+Use with the following data types: audio, image, HTML, paragraphs, text, time series, video.
 
 ### Parameters
 
@@ -19,8 +19,10 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [selectionStyle] | <code>string</code> | Style for the selection |
 
 ### Example
+
+Basic labeling configuration to compare two passages of text
+
 ```html
-<!--Basic labeling configuration to compare two passages of text -->
 <View>
   <Header value="Select the more accurate summary"/>
   <Pairwise name="pairwise" leftClass="text1" rightClass="text2" toName="txt-1,txt-2"></Pairwise>

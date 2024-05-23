@@ -1,0 +1,103 @@
+name: "Docker build & push OnTop"
+
+on:
+  workflow_call:
+    inputs:
+      base_docker_image_version:
+        description: 'Base Docker Image version'
+        type: string
+        required: true
+      tags:
+        description: 'Comma separated tags'
+        type: string
+        required: true
+      dockerfile_path:
+        description: "Dockerfile path"
+        type: string
+        required: true
+      ref:
+        description: "Dockerfile ref or sha"
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      base_docker_image_version:
+        description: 'Base Docker Image version'
+        type: string
+        required: true
+      tags:
+        description: 'Comma separated tags'
+        type: string
+        required: true
+      dockerfile_path:
+        description: "Dockerfile path"
+        type: string
+        required: true
+      ref:
+        description: "Dockerfile ref or sha"
+        type: string
+        required: true
+        default: develop
+
+env:
+  IMAGE_NAME: "${{ vars.DOCKERHUB_ORG }}/label-studio"
+
+jobs:
+  docker_build_and_push:
+    name: "Docker image"
+    timeout-minutes: 90
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      - name: Calculate Docker tags
+        id: calculate-docker-tags
+        uses: actions/github-script@v7
+        env:
+          TAGS: ${{ inputs.tags }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+        with:
+          script: |
+            const raw_tags_input = process.env.TAGS;
+            const image_name = process.env.IMAGE_NAME;
+            
+            const tags = raw_tags_input.split(',').map(x => x.trim());
+            const docker_tags = tags.map(x => `${image_name}:${x}`).join(',');
+            console.log(docker_tags);
+            core.setOutput("docker-tags", docker_tags);
+
+      - name: Edit Dockerfile
+        env:
+          BASE_DOCKER_IMAGE_VERSION: ${{ inputs.base_docker_image_version }}
+          DOCKERFILE_PATH: ${{ inputs.dockerfile_path }}
+        run: |
+          sed -i "s#^FROM .*#FROM ${IMAGE_NAME}:${BASE_DOCKER_IMAGE_VERSION}#g" "${DOCKERFILE_PATH}"
+          cat "${DOCKERFILE_PATH}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.3.0
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3.1.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Push Docker image
+        uses: docker/build-push-action@v5.3.0
+        id: docker_build_and_push
+        with:
+          context: .
+          file: ${{ inputs.dockerfile_path }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.calculate-docker-tags.outputs.docker-tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

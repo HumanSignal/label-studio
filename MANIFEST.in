@@ -1,16 +1,14 @@
-include deploy/requirements.txt
-
 # react LSF / react-app with dm
-recursive-include label_studio/frontend/dist/lsf *
-include label_studio/frontend/dist/react-app/*
-recursive-include label_studio/frontend/dist/dm/ *
+recursive-include web/dist/libs/editor *
+include web/dist/apps/labelstudio/*
+recursive-include web/dist/libs/datamanager/ *
 
 # html template files
 recursive-include label_studio *.html
 
 # exclude node modules
-prune label_studio/frontend/node_modules
-prune label_studio/frontend/build-tmp
+prune web/node_modules
+prune web/build-tmp
 
 # annotation templates
 recursive-include label_studio/annotation_templates *
@@ -21,6 +19,7 @@ recursive-include label_studio/core/static_build *
 include label_studio/core/utils/schema/*.json
 include label_studio/core/templatetags/*.py
 include label_studio/core/version_.py
+include label_studio/core/all_urls.json
 
 # io storages
 recursive-include label_studio/io_storages *.yml

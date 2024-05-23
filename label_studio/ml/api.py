@@ -1,25 +1,22 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-import drf_yasg.openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
-from django.utils.decorators import method_decorator
-from django.conf import settings
 
+import drf_yasg.openapi as openapi
+from core.feature_flags import flag_set
+from core.permissions import ViewClassPermission, all_permissions
+from django.conf import settings
+from django.http import Http404
+from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
+from ml.models import MLBackend
+from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
+from projects.models import Project, Task
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.views import APIView
 from rest_framework.response import Response
-
-from core.feature_flags import flag_set
-from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import get_object_with_check_and_log
-from projects.models import Project, Task
-from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
-from ml.models import MLBackend
-from ml.api_connector import MLApi
-from core.utils.common import bool_from_request
+from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
 
@@ -41,14 +38,8 @@ logger = logging.getLogger(__name__)
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'project': openapi.Schema(
-                    type=openapi.TYPE_INTEGER,
-                    description='Project ID'
-                ),
-                'url': openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description='ML backend URL'
-                ),
+                'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
+                'url': openapi.Schema(type=openapi.TYPE_STRING, description='ML backend URL'),
             },
         ),
     ),
@@ -68,12 +59,11 @@ logger = logging.getLogger(__name__)
         ),
         manual_parameters=[
             openapi.Parameter(
-                name='project',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_QUERY,
-                description='Project ID'),
+                name='project', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='Project ID'
+            ),
         ],
-    ))
+    ),
+)
 class MLBackendListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
@@ -82,20 +72,30 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     )
     serializer_class = MLBackendSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["is_interactive"]
+    filterset_fields = ['is_interactive']
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
-        project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        project = generics.get_object_or_404(Project, pk=project_pk)
+
         self.check_object_permissions(self.request, project)
-        ml_backends = MLBackend.objects.filter(project_id=project.id)
-        for mlb in ml_backends:
-            mlb.update_state()
+
+        ml_backends = project.update_ml_backends_state()
+
         return ml_backends
 
     def perform_create(self, serializer):
         ml_backend = serializer.save()
         ml_backend.update_state()
+
+        project = ml_backend.project
+
+        # In case we are adding the model, let's set it as the default
+        # to obtain predictions. This approach is consistent with uploading
+        # offline predictions, which would be set automatically.
+        if project.show_collab_predictions and not project.model_version:
+            project.model_version = ml_backend.title
+            project.save(update_fields=['model_version'])
 
 
 @method_decorator(
@@ -176,7 +176,8 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this ML backend.'),
+                description='A unique integer value identifying this ML backend.',
+            ),
         ],
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
@@ -187,11 +188,10 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
             },
         ),
         responses={
-            200: openapi.Response(title='Training OK', description='Training has successfully started.'),
+            200: openapi.Response(description='Training has successfully started.'),
             500: openapi.Response(
                 description='Training error',
                 schema=openapi.Schema(
-                    title='Error message',
                     description='Error message',
                     type=openapi.TYPE_STRING,
                     example='Server responded with an error.',
@@ -205,7 +205,7 @@ class MLBackendTrainAPI(APIView):
     permission_required = all_permissions.projects_change
 
     def post(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
 
         ml_backend.train()
@@ -216,42 +216,114 @@ class MLBackendTrainAPI(APIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
-        operation_summary='Request Interactive Annotation',
+        operation_summary='Predict',
         operation_description="""
-        Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
-        predicted region based on annotator input. 
-        See [set up machine learning](labelstud.io/guide/ml.html#Get-interactive-preannotations) for more.
+        After you add an ML backend, call this API with the ML backend ID to run a test prediction on specific task data               
         """,
         manual_parameters=[
             openapi.Parameter(
                 name='id',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
-                description='A unique integer value identifying this ML backend.'),
+                description='A unique integer value identifying this ML backend.',
+            ),
+        ],
+        responses={
+            200: openapi.Response(description='Predicting has successfully started.'),
+            500: openapi.Response(
+                description='Predicting error',
+                schema=openapi.Schema(
+                    description='Error message',
+                    type=openapi.TYPE_STRING,
+                    example='Server responded with an error.',
+                ),
+            ),
+        },
+    ),
+)
+class MLBackendPredictTestAPI(APIView):
+    serializer_class = MLBackendSerializer
+    permission_required = all_permissions.projects_change
+
+    def post(self, request, *args, **kwargs):
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, ml_backend)
+
+        random = request.query_params.get('random', False)
+        if random:
+            task = Task.get_random(project=ml_backend.project)
+            if not task:
+                raise Http404
+
+            kwargs = ml_backend._predict(task)
+            return Response(**kwargs)
+
+        else:
+            return Response(
+                status=status.HTTP_501_NOT_IMPLEMENTED,
+                data={'error': 'Not implemented - you must provide random=true query parameter'},
+            )
+
+
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
+        tags=['Machine Learning'],
+        operation_summary='Request Interactive Annotation',
+        operation_description="""
+        Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
+        predicted region based on annotator input. 
+        See [set up machine learning](https://labelstud.io/guide/ml.html#Get-interactive-preannotations) for more.
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='A unique integer value identifying this ML backend.',
+            ),
         ],
         request_body=MLInteractiveAnnotatingRequest,
         responses={
-            200: openapi.Response(title='Annotating OK', description='Interactive annotation has succeeded.'),
+            200: openapi.Response(description='Interactive annotation has succeeded.'),
         },
     ),
 )
 class MLBackendInteractiveAnnotating(APIView):
+    """
+    Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
+    predicted region based on annotator input.
+    """
 
     permission_required = all_permissions.tasks_view
 
+    def _error_response(self, message, log_function=logger.info):
+        log_function(message)
+        return Response({'errors': [message]}, status=status.HTTP_200_OK)
+
+    def _get_task(self, ml_backend, validated_data):
+        return generics.get_object_or_404(Task, pk=validated_data['task'], project=ml_backend.project)
+
+    def _get_credentials(self, request, context, project):
+        if flag_set('ff_back_dev_2362_project_credentials_060722_short', request.user):
+            context.update(
+                project_credentials_login=project.task_data_login,
+                project_credentials_password=project.task_data_password,
+            )
+        return context
+
     def post(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        """
+        Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
+        predicted region based on annotator input.
+        """
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
         serializer = MLInteractiveAnnotatingRequest(data=request.data)
         serializer.is_valid(raise_exception=True)
-        validated_data = serializer.validated_data
 
-        task = get_object_with_check_and_log(request, Task, pk=validated_data['task'], project=ml_backend.project)
-        context = validated_data.get('context')
-
-        if flag_set('ff_back_dev_2362_project_credentials_060722_short', request.user):
-            context['project_credentials_login'] = task.project.task_data_login
-            context['project_credentials_password'] = task.project.task_data_password
+        task = self._get_task(ml_backend, serializer.validated_data)
+        context = self._get_credentials(request, serializer.validated_data.get('context', {}), task.project)
 
         result = ml_backend.interactive_annotating(task, context, user=request.user)
 
@@ -267,7 +339,7 @@ class MLBackendInteractiveAnnotating(APIView):
         tags=['Machine Learning'],
         operation_summary='Get model versions',
         operation_description='Get available versions of the model.',
-        responses={"200": "List of available versions."},
+        responses={'200': 'List of available versions.'},
     ),
 )
 class MLBackendVersionsAPI(generics.RetrieveAPIView):
@@ -275,11 +347,11 @@ class MLBackendVersionsAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
 
     def get(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        ml_backend = generics.get_object_or_404(MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
         versions_response = ml_backend.get_versions()
         if versions_response.status_code == 200:
-            result = {'versions': versions_response.response.get("versions", [])}
+            result = {'versions': versions_response.response.get('versions', [])}
             return Response(data=result, status=200)
         elif versions_response.status_code == 404:
             result = {'versions': [ml_backend.model_version], 'message': 'Upgrade your ML backend version to latest.'}

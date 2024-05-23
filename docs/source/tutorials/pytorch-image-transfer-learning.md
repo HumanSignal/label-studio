@@ -1,17 +1,22 @@
 ---
-title:
-type: blog
+title: Transfer learning for images with PyTorch
+type: guide
+hide_menu: true
+tier: all
 order: 30
 meta_title: Computer Vision PyTorch Tutorial
 meta_description: Label Studio tutorial for computer vision that showcases transfer learning for images using PyTorch and Label Studio.
+section: "Machine learning"
+parent: "ml_tutorials"
+parent_enterprise: "ml_tutorials"
+parent_page_extension: "html"
 ---
 
-## Transfer learning for images with PyTorch
 
 This example explains the basics of computer vision with Label Studio and [PyTorch](https://pytorch.org/).
 The proposed model uses transfer learning from the popular ResNet image classifier and can be fine-tuned to your own data.
 
-You can use this example labeling config:
+You can use this example labeling configuration:
 
 ```xml
 <View>
@@ -180,7 +185,8 @@ label-studio-ml init my_backend
 
 The last command takes your script `./model.py` and creates an `./my_backend` directory at the same level, copying the configs and scripts needed to launch the ML backend in either development or production modes.
 
-> Note: You can specify different location for your model script, for example: `label-studio-ml init my_backend --script /path/to/my/script.py`
+!!! note 
+    You can specify different location for your model script, for example: `label-studio-ml init my_backend --script /path/to/my/script.py`
 
 ### Launch ML backend server
 

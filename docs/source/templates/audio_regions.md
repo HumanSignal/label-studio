@@ -28,7 +28,7 @@ If you want to perform audio classification tasks on specific segments of audio 
     <Label value="Other"></Label>
   </Labels>
   <Header value="Listen to the audio:"></Header>
-  <AudioPlus name="audio" value="$url"></AudioPlus>
+  <Audio name="audio" value="$url"></Audio>
 </View>
 ```
 
@@ -52,12 +52,12 @@ Use the [Labels](/tags/labels.html) control tag to allow annotators to segment t
 ```
 The `choice="multiple"` argument allows one audio segment to be labeled with multiple topics.
 
-Use the [AudioPlus](/tags/audioplus.html) object tag to specify the location of the audio file to classify:
+Use the [Audio](/tags/audio.html) object tag to specify the location of the audio file to classify:
 ```xml
-<AudioPlus name="audio" value="$url"></AudioPlus>
+<Audio name="audio" value="$url"></Audio>
 ```
 
 ## Related tags
 
-- [AudioPlus](/tags/audioplus.html)
+- [Audio](/tags/audio.html)
 - [Labels](/tags/labels.html)

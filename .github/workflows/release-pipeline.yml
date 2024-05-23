@@ -1,4 +1,4 @@
-name: "Release Pipeline"
+name: "Release: Pipeline"
 
 on:
   release:
@@ -10,20 +10,44 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  HOMEBREW_TAP_REPO_OWNER: "heartexlabs"
   HOMEBREW_TAP_REPO: "homebrew-tap"
 
 jobs:
   promote_docker_image:
     name: "Promote"
-    uses: heartexlabs/label-studio/.github/workflows/docker-release-promote.yml@develop
+    permissions:
+      contents: read
+      checks: read
+    uses: ./.github/workflows/docker-release-promote.yml
     with:
       release_tag: ${{ github.ref_name }}
     secrets: inherit
 
+#  build_ubi_docker_image:
+#    name: "Build UBI docker image"
+#    uses: ./.github/workflows/docker-build-ubi.yml
+#    with:
+#      sha: ${{ github.ref_name }}
+#      version: ${{ github.ref_name }}
+#    secrets: inherit
+
+  build_hugging_face_docker_image:
+    name: "Build Hugging Face docker image"
+    needs:
+      - promote_docker_image
+    uses: ./.github/workflows/docker-build-ontop.yml
+    with:
+      base_docker_image_version: ${{ github.ref_name }}
+      tags: "hf-latest,hf-${{ github.ref_name }}"
+      dockerfile_path: Dockerfile.hgface
+      ref: ${{ github.ref_name }}
+    secrets: inherit
+
   build-pypi:
     name: "Build"
-    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
+    permissions:
+      contents: write
+    uses: ./.github/workflows/build_pypi.yml
     with:
       version: ${{ github.ref_name }}
       ref: ${{ github.ref_name }}
@@ -31,26 +55,97 @@ jobs:
       release-id: ${{ github.event.release.id }}
     secrets: inherit
 
+  delete-rc-assets:
+    name: "Delete Release Candidate Assets"
+    runs-on: ubuntu-latest
+    needs:
+      - build-pypi
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Delete Release Candidate Assets
+        uses: actions/github-script@v7
+        env:
+          RELEASE_ID: "${{ github.event.release.id }}"
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const release_id = process.env.RELEASE_ID;
+            const rc_regexp = /label[-_]studio-\d+.\d+.\d+rc\d+/;
+            const {data: release} = await github.rest.repos.getRelease({
+              owner,
+              repo,
+              release_id,
+            });
+            for (let asset of release.assets) {
+              const match = asset.name.match(rc_regexp)
+              if (match) {
+                console.log(`Deleting asset ${asset.name}`)
+                await github.rest.repos.deleteReleaseAsset({
+                  owner,
+                  repo,
+                  asset_id: asset.id,
+                });
+              }
+            }
+
   update-homebrew-tap:
     name: "Update Homebrew Tap"
     runs-on: ubuntu-latest
     needs:
       - build-pypi
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: DispatchEvent
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
+            const {repo, owner} = context.repo;
             await github.rest.repos.createDispatchEvent({
-              owner: '${{ env.HOMEBREW_TAP_REPO_OWNER }}',
+              owner: owner,
               repo: '${{ env.HOMEBREW_TAP_REPO }}',
               event_type: 'upstream_formula_update',
               client_payload: {
-                formula: 'label-studio'
+                formula: 'label-studio',
+                version: '${{ github.ref_name }}',
+                actor: '${{ github.actor }}',
                 url: '${{ needs.build-pypi.outputs.pipy-artifact-url }}',
                 sha256: '${{ needs.build-pypi.outputs.pipy-artifact-digests-sha256 }}',
               }
             });
+
+  update-helm-chart:
+    name: "Update Helm Chart"
+    needs:
+      - promote_docker_image
+    uses: ./.github/workflows/bump-helm-chart.yml
+    with:
+      docker_image_version: ${{ github.ref_name }}
+    secrets: inherit
+
+  notify_slack_on_failure:
+    name: "Notify Slack on Failure"
+    needs:
+      - promote_docker_image
+      - build_hugging_face_docker_image
+      - build-pypi
+      - delete-rc-assets
+      - update-homebrew-tap
+      - update-helm-chart
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Send Notification to Slack
+        id: slack_notify_ops_release
+        uses: slackapi/slack-github-action@v1.26
+        with:
+          channel-id: '${{ vars.SLACK_CH_RELEASE_TRAIN }}'
+          slack-message: |
+            On or more steps of Label Studio OpenSource release pipeline got failed! <!subteam^${{ vars.SLACK_GR_DEVOPS }}>
+
+            ><https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|[Workflow run]>
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_LSE_BOT_TOKEN }}

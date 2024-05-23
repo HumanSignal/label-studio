@@ -1,0 +1,22 @@
+title: Speech Transcription
+type: community
+group: Audio/Speech Processing
+image: /static/templates/thumbnail-audio-sentiment.png
+details: <h1>Transcribe audio recordings with chunks</h1>
+config: |
+  <View>
+      <Audio name="audio" value="$audio" />
+      <Labels name="label" toName="audio">
+        <Label value="Speech"/>
+        <Label value="Noise" background="grey"/>
+      </Labels>
+      <TextArea name="transcription" toName="audio"
+                perRegion="true" whenTagName="label" whenLabelValue="Speech"
+                displayMode="region-list"/>
+      <Choices name="sentiment" toName="audio" showInline="true"
+               perRegion="true" whenTagName="label" whenLabelValue="Speech">
+          <Choice value="Positive" html="&lt;span style='font-size: 45px; vertical-align: middle;'&gt; &#128512; &lt;/span&gt;"/>
+          <Choice value="Neutral" html="&lt;span style='font-size: 45px; vertical-align: middle;'&gt; &#128528; &lt;/span&gt;"/>
+          <Choice value="Negative" html="&lt;span style='font-size: 45px; vertical-align: middle;'&gt; &#128577; &lt;/span&gt;"/>
+      </Choices>                               
+    </View>

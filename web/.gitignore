@@ -1,0 +1,122 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
+tmp
+/out-tsc
+
+# dependencies
+node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+.DS_Store
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+.nx/
+migrations.json
+
+# System Files
+.DS_Store
+Thumbs.db
+
+report.*.json
+.env*
+!.env.example
+!.env.build
+!.env.local
+!*.lock
+
+libs/**/package.json
+libs/**/package-lock.json
+libs/**/yarn.lock
+
+# editor ignored files
+
+libs/editor/__pycache__/
+
+# Logs
+libs/editor/logs
+libs/editor/*.log
+libs/editor/npm-debug.log*
+libs/editor/yarn-debug.log*
+libs/editor/yarn-error.log*
+libs/editor/report.*.json
+
+# Backend
+libs/editor/backend/env3/
+libs/editor/backend/__pycache__
+
+# MAC
+libs/editor/.DS_Store
+
+# Env
+libs/editor/.env.local
+libs/editor/.env.development.local
+libs/editor/.env.test.local
+libs/editor/.env.production.local
+
+# Testing
+libs/editor/coverage/
+libs/editor/tests/e2e/output/
+
+# codecept screenshots
+libs/editor/e2e/output
+
+
+# datamanager ignored files
+
+# Logs
+libs/datamanager/logs
+libs/datamanager/*.log
+libs/datamanager/npm-debug.log*
+libs/datamanager/yarn-debug.log*
+libs/datamanager/yarn-error.log*
+
+# Backend
+libs/datamanager/backend/env3/
+libs/datamanager/backend/__pycache__
+
+# MAC
+libs/datamanager/.DS_Store
+
+# Env
+libs/datamanager/.env
+libs/datamanager/.env.local
+libs/datamanager/.env.development.local
+libs/datamanager/.env.test.local
+libs/datamanager/.env.production.local
+
+libs/datamanager/report.*.json
+
+# Testing
+libs/datamanager/coverage/
+libs/datamanager/public/static/
+
+# Examples of local env
+libs/datamanager/src/examples
+
+# codecept screenshots
+libs/datamanager/e2e/output
+
+libs/datamanager/.cache

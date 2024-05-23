@@ -1,0 +1,120 @@
+name: "/docker command"
+
+on:
+  repository_dispatch:
+    types: [ docker-command ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.client_payload.github.payload.issue.number }}-${{ github.event.client_payload.slash_command.command }}-${{ github.event.client_payload.slash_command.args.unnamed.arg1 || github.event.client_payload.slash_command.args.all }}
+
+jobs:
+  create:
+    if: ${{ github.event.client_payload.slash_command.args.unnamed.arg1 == 'build' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      error-msg: ${{ steps.check-membership.outputs.error }}
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Add Workflow link to command comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+      - name: Check user's membership
+        uses: actions/github-script@v7
+        id: check-membership
+        env:
+          ACTOR: ${{ github.actor }}
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const actor = process.env.ACTOR;
+            const { data: membership } = await github.rest.orgs.getMembershipForUser({
+              org: owner,
+              username: actor,
+            });
+            if (membership.state != "active") {
+              const error = `Unfortunately you don't have membership in ${owner} organization`;
+              core.setOutput("error", error);
+              core.setFailed(error);
+            }
+
+  build-docker:
+    name: "Build"
+    needs:
+      - create
+    permissions:
+      contents: read
+      checks: write
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      sha: ${{ github.event.client_payload.pull_request.head.sha || github.event.after }}
+      branch_name: ${{ github.event.client_payload.pull_request.head.ref || github.ref_name }}
+    secrets: inherit
+
+  notification:
+    if: always()
+    needs:
+      - build-docker
+      - create
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Details
+        id: details
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          case "${{ needs.build-docker.result }}" in
+            success)
+              echo "comment=Docker image was pushed with the tag \`${{ needs.build-docker.outputs.build_version }}\`" >> $GITHUB_OUTPUT
+              echo "reaction=+1" >> $GITHUB_OUTPUT
+              ;;
+            skipped)
+              echo "comment=Workflow has been skipped" >> $GITHUB_OUTPUT
+              echo "reaction=confused" >> $GITHUB_OUTPUT
+              ;;
+            cancelled)
+              echo "comment=Workflow has been canceled" >> $GITHUB_OUTPUT
+              echo "reaction=confused" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "comment=**Error**: failed to execute \"${{ github.event.client_payload.slash_command.args.unnamed.arg1 }}\" command" >> $GITHUB_OUTPUT
+              echo "reaction=-1" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+      - name: Add reaction to command comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > ${{ steps.details.outputs.comment }}
+          reactions: ${{ steps.details.outputs.reaction }}
+
+  help:
+    if: github.event.client_payload.slash_command.args.unnamed.arg1 == 'help'
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Update comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: |
+            > Command | Description
+            > --- | ---
+            > /docker build | Build and push custom docker image
+          reaction-type: hooray

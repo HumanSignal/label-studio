@@ -1,10 +1,17 @@
 ---
-title:
-type: blog
+title: OpenMMLab Image object detector or MMDetection
+type: guide
+hide_menu: true
+tier: all
 order: 40
+meta_title: OpenMMLab Image object detector or MMDetection
+meta_description: Label Studio tutorial for OpenMMLab Image object detector or MMDetection
+section: "Machine learning"
+parent: "ml_tutorials"
+parent_enterprise: "ml_tutorials"
+parent_page_extension: "html"
 ---
 
-## OpenMMLab Image object detector or MMDetection
 
 This [Machine Learning backend](/guide/ml.html) lets you to automatically pre-annotate your images with bounding boxes. It's powered by the amazing [OpenMMLab MMDetection library](https://github.com/open-mmlab/mmdetection), which gives you access to many existing state-of-the-art models like FasterRCNN, RetinaNet, YOLO and others. 
 
@@ -27,9 +34,9 @@ Follow this installation guide and then play around with them, picking the best 
     ```
    For a specific task, the following occurs:
     - If the COCO object detector predicts a bbox with label `"airplane"`, you see the label `"Airplane"`.
-    - if it predicts `"car"` or `"truck"`, either of those predictions are squashed to show the `"Car"` label on the task.
+    - If it predicts `"car"` or `"truck"`, either of those predictions are squashed to show the `"Car"` label on the task.
 
-See [the full list of COCO labels](#The-full-list-of-COCO-labels) for reference.
+   For more information, see [the full list of COCO labels](#The-full-list-of-COCO-labels). 
 
 
 ## Installation
@@ -44,7 +51,7 @@ See [the full list of COCO labels](#The-full-list-of-COCO-labels) for reference.
 
 3. Download the `config_file` and `checkpoint_file` from MMDetection model zoo (use the [recommended Faster RCNN for a quickstart](https://mmdetection.readthedocs.io/en/latest/1_exist_data_model.html#inference-with-existing-models)). Place the `config_file` within the cloned [mmdetection repo](https://github.com/open-mmlab/mmdetection).
 
-Depending on your specific use case, there are different settings for how to run this ML backend:
+The following sections present the different settings for how to run this ML backend based on a specific use case. 
 
 ## Run ML backend on the same machine as Label Studio
 
@@ -88,9 +95,10 @@ In this case, you must provide the Label Studio hostname before running ML backe
 ## Other parameters
 
 You can also specify other parameters when you start this ML backend to fit your use case or environment.
+Addionaly check our [Quickstart](/guide/ml.html#Quickstart-with-an-example-ML-backend).
 
 #### GPU support
-If you have a GPU available, you can specify that with `device=gpu:0` when you start the ML backend to significantly speed up pre-annotation of images. For example:
+If you have a GPU available, you can specify that with `device=gpu:0` (or `cuda:0` for newer versions of pytorch and mmdetection) when you start the ML backend to significantly speed up pre-annotation of images. For example:
 
  ```bash
    label-studio-ml start coco-detector --with \

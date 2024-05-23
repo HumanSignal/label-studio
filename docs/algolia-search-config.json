@@ -1,0 +1,12 @@
+{
+  "index_name": "example",
+  "start_urls": ["https://label-studio-docs-new-theme-enterpris.netlify.app/guide"],
+  "selectors": {
+    "lvl0": ".content h1, .ResourcesBannerHeading",
+    "lvl1": ".content h2, .ResourcesContent h2",
+    "lvl2": ".content h3, .ResourcesContent h3",
+    "lvl3": ".content h4, .ResourcesContent h4",
+    "lvl4": ".content h5, .ResourcesContent h5",
+    "lvl5": ".content h6, .ResourcesContent h6"
+  }
+}

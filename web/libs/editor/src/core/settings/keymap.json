@@ -1,0 +1,178 @@
+{
+  "audio:back": {
+    "key": "ctrl+b",
+    "mac": "command+b",
+    "description": "Back for one second"
+  },
+  "audio:playpause": {},
+  "ts:grow-left": {
+    "key": "left",
+    "description": "Increase region to the left"
+  },
+  "ts:grow-right": {
+    "key": "right",
+    "description": "Increase region to the right"
+  },
+  "ts:shrink-left": {
+    "key": "alt+left",
+    "description": "Decrease region on the left"
+  },
+  "ts:shrink-right": {
+    "key": "alt+right",
+    "description": "Decrease region on the right"
+  },
+  "ts:grow-left-largre": {
+    "key": "shift+left"
+  },
+  "ts:grow-right-largre": {
+    "key": "shift+right"
+  },
+  "ts:shrink-left-largre": {
+    "key": "shift+alt+left"
+  },
+  "ts:shrink-right-largre": {
+    "key": "shift+alt+right"
+  },
+  "annotation:submit": {
+    "key": "ctrl+enter",
+    "mac": "command+enter",
+    "description": "Submit annotation"
+  },
+  "annotation:skip": {
+    "key": "ctrl+space",
+    "mac": "alt+enter",
+    "description": "Skip task"
+  },
+  "annotation:undo": {
+    "key": "ctrl+z",
+    "mac": "command+z",
+    "description": "Undo"
+  },
+  "annotation:redo": {
+    "key": "ctrl+shift+z",
+    "mac": "command+shift+z",
+    "description": "Redo"
+  },
+  "polygon:undo": {
+    "key": "ctrl+z",
+    "mac": "command+z",
+    "description": "Undo"
+  },
+  "polygon:redo": {
+    "key": "ctrl+shift+z",
+    "mac": "command+shift+z",
+    "description": "Redo"
+  },
+  "region:delete-all": {
+    "key": "ctrl+backspace",
+    "mac": "command+backspace",
+    "description": "Delete all regions"
+  },
+  "region:focus": {
+    "key": "enter",
+    "description": "Focus first focusable region"
+  },
+  "region:relation": {
+    "key": "alt+r",
+    "description": "Create relation between regions"
+  },
+  "region:visibility": {
+    "key": "alt+h",
+    "description": "Toggle selected region visibility"
+  },
+  "region:lock": {
+    "key": "alt+l",
+    "description": "Lock selected region"
+  },
+  "region:meta": {
+    "key": "alt+m",
+    "description": "Edit selected region meta"
+  },
+  "region:unselect": {
+    "key": "u",
+    "description": "Unselect region"
+  },
+  "region:exit": {
+    "key": "escape",
+    "description": "Exit relation mode, unselect region"
+  },
+  "region:delete": {
+    "key": "backspace",
+    "description": "Delete selected region"
+  },
+  "region:cycle": {
+    "key": "alt+.",
+    "description": "Cycle through regions"
+  },
+  "region:duplicate": {
+    "key": "ctrl+d",
+    "mac": "command+d",
+    "description": "Duplicate selected region"
+  },
+  "segment:delete": {
+    "key": "delete",
+    "description": "Delete selected region"
+  },
+  "media:playpause": {
+    "key": "alt+space",
+    "description": "Play/pause"
+  },
+  "media:step-backward": {
+    "key": "alt+left",
+    "description": "Go one step back"
+  },
+  "media:step-forward": {
+    "key": "alt+right",
+    "description": "Go one step forward"
+  },
+  "video:keyframe-backward": {
+    "key": "ctrl+alt+left",
+    "description": "Go to previous keyframe"
+  },
+  "video:keyframe-forward": {
+    "key": "ctrl+alt+right",
+    "description": "Go to next keyframe"
+  },
+  "video:backward": {
+    "key": "alt+left",
+    "description": "Go back"
+  },
+  "video:rewind": {
+    "key": "shift+ctrl+alt+left",
+    "description": "Go to first frame"
+  },
+  "video:forward": {
+    "key": "shift+alt+right",
+    "description": "Go forward"
+  },
+  "video:fastforward": {
+    "key": "shift+ctrl+alt+right",
+    "description": "Go to last frame"
+  },
+  "video:hop-backward": {
+    "key": "shift+alt+left",
+    "description": "Hop Backward"
+  },
+  "video:hop-forward": {
+    "key": "shift+alt+right",
+    "description": "Hop Forward"
+  },
+  "repeater:next-page": {
+    "key": "alt+right",
+    "description": "Next Page"
+  },
+  "repeater:previous-page": {
+    "key": "alt+left",
+    "description": "Previous Page"
+  },
+  "image:prev": {
+    "key": "ctrl+left",
+    "mac": "command+left",
+    "description": "Previous Image"
+  },
+  "image:next": {
+    "key": "ctrl+right",
+    "mac": "command+right",
+    "description": "Next Image"
+  }
+}

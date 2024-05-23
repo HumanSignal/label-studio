@@ -1,0 +1,64 @@
+name: "Tests"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
+jobs:
+  migrations:
+    name: "migrations"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DJANGO_SETTINGS_MODULE: core.settings.label_studio
+      COVERAGE_PROCESS_START: 1
+      LOG_DIR: pytest_logs
+      COLLECT_ANALYTICS: true
+      DEBUG_CONTEXTLOG: true
+      LABEL_STUDIO_TEST_ENVIRONMENT: false
+      SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
+      SENTRY_RATE: 0
+      DJANGO_DB: sqlite
+      JSON_LOG: 0
+      # SENTRY_DSN:
+
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Set up Python
+        id: setup_python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
+
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install Python dependencies
+        run: |
+          poetry install
+
+      - name: Test migrations
+        run: |
+          output=$(poetry run python label_studio/manage.py makemigrations)
+          if ! grep 'No changes detected' <<< "${output}"; then
+            error="${output}"
+            error="${error//'%'/'%25'}"
+            error="${error//$'\n'/'%0A'}"
+            error="${error//$'\r'/'%0D'}"
+            echo "::error::${error}"
+            exit 1
+          fi

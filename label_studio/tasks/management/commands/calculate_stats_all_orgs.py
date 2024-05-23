@@ -10,14 +10,14 @@ class Command(BaseCommand):
             dest='from_scratch',
             action='store_true',
             default=False,
-            help='Start recalculation from scratch'
+            help='Start recalculation from scratch',
         )
         parser.add_argument(
             '--redis',
             dest='redis',
             action='store_true',
             default=False,
-            help='Use rq workers with redis (async background processing)'
+            help='Use rq workers with redis (async background processing)',
         )
 
     def handle(self, *args, **options):

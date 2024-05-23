@@ -6,9 +6,9 @@ meta_title: Polygon Tag for Adding Polygons to Images
 meta_description: Customize Label Studio with the Polygon tag by adding polygons to images for segmentation machine learning and data science projects.
 ---
 
-Use the Polygon tag to add polygons to an image without selecting a label. This can be useful when you have only one label to assign to the polygon. Use for image segmentation tasks.
+The `Polygon` tag is used to add polygons to an image without selecting a label. This can be useful when you have only one label to assign to the polygon. Use for image segmentation tasks.
 
-Use with the following data types: image
+Use with the following data types: image.
 
 ### Parameters
 
@@ -24,10 +24,13 @@ Use with the following data types: image
 | [pointStyle] | <code>rectangle</code> \| <code>circle</code> | <code>circle</code> | Style of points |
 | [smart] | <code>boolean</code> |  | Show smart tool for interactive pre-annotations |
 | [smartOnly] | <code>boolean</code> |  | Only show smart tool for interactive pre-annotations |
+| [snap] | <code>pixel</code> \| <code>none</code> | <code>none</code> | Snap polygon to image pixels |
 
 ### Example
+
+Basic labeling configuration for polygonal image segmentation
+
 ```html
-<!--Basic labeling configuration for polygonal image segmentation -->
 <View>
   <Polygon name="rect-1" toName="img-1" />
   <Image name="img-1" value="$img" />

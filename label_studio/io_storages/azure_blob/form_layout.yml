@@ -13,14 +13,20 @@ title_container_prefix: &title_container_prefix
 
 # 1x3 grid
 azure_params: &azure_params
-  - type: text
+  - type: password
     name: account_name
     label: Account Name
-    placeholder: us-east-1
+    autoComplete: "off"
+    skipAutofill: true
+    allowEmpty: false
+    protectedValue: true
   - type: password
     name: account_key
     label: Account Key
     autoComplete: "new-password"
+    skipAutofill: true
+    allowEmpty: false
+    protectedValue: true
   - null
 
 ImportStorage:
@@ -58,7 +64,7 @@ ImportStorage:
             name: presign_ttl
             label: Expiration minutes
             min: 1
-            value: 1
+            value: 15
             dependency: presign
 
 ExportStorage:

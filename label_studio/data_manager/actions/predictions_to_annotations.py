@@ -2,11 +2,9 @@
 """
 import logging
 
-from django.utils.timezone import now
-
 from core.permissions import AllPermissions
-from core.redis import start_job_async_or_sync
-from tasks.models import Prediction, Annotation, Task, bulk_update_stats_project_tasks
+from django.utils.timezone import now
+from tasks.models import Annotation, Prediction, Task
 from tasks.serializers import TaskSerializerBulk
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
@@ -29,9 +27,7 @@ def predictions_to_annotations(project, queryset, **kwargs):
         else:
             predictions = predictions.filter(model_version=model_version)
 
-    predictions_values = list(predictions.values_list(
-        'result', 'model_version', 'task_id', 'id'
-    ))
+    predictions_values = list(predictions.values_list('result', 'model_version', 'task_id', 'id'))
 
     # prepare annotations
     annotations = []
@@ -42,7 +38,8 @@ def predictions_to_annotations(project, queryset, **kwargs):
             'result': result,
             'completed_by_id': user.pk,
             'task_id': task_id,
-            'parent_prediction_id': prediction_id
+            'parent_prediction_id': prediction_id,
+            'project': project,
         }
         body = TaskSerializerBulk.add_annotation_fields(body, user, 'prediction')
         annotations.append(body)
@@ -56,11 +53,11 @@ def predictions_to_annotations(project, queryset, **kwargs):
     if db_annotations:
         TaskSerializerBulk.post_process_annotations(user, db_annotations, 'prediction')
         # Execute webhook for created annotations
-        emit_webhooks_for_instance(user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations)
-        # recalculate tasks counters
-        start_job_async_or_sync(project.update_tasks_counters, Task.objects.filter(id__in=tasks_ids))
-        # recalculate is_labeled
-        start_job_async_or_sync(bulk_update_stats_project_tasks, Task.objects.filter(id__in=tasks_ids))
+        emit_webhooks_for_instance(
+            user.active_organization, project, WebhookAction.ANNOTATIONS_CREATED, db_annotations
+        )
+        # Update counters for tasks and is_labeled. It should be a single operation as counters affect bulk is_labeled update
+        project.update_tasks_counters_and_is_labeled(Task.objects.filter(id__in=tasks_ids))
     return {'response_code': 200, 'detail': f'Created {count} annotations'}
 
 
@@ -68,23 +65,28 @@ def predictions_to_annotations_form(user, project):
     versions = project.get_model_versions()
 
     # put the current model version on the top of the list
+    # if it exists
     first = project.model_version
-    if first is not None:
+    if first:
         try:
             versions.remove(first)
         except ValueError:
             pass
         versions = [first] + versions
 
-    return [{
-        'columnCount': 1,
-        'fields': [{
-            'type': 'select',
-            'name': 'model_version',
-            'label': 'Choose a model',
-            'options': versions,
-        }]
-    }]
+    return [
+        {
+            'columnCount': 1,
+            'fields': [
+                {
+                    'type': 'select',
+                    'name': 'model_version',
+                    'label': 'Choose predictions',
+                    'options': versions,
+                }
+            ],
+        }
+    ]
 
 
 actions = [
@@ -94,10 +96,12 @@ actions = [
         'title': 'Create Annotations From Predictions',
         'order': 91,
         'dialog': {
-            'text': 'This action will create new annotations from predictions with the selected model version '
-                    'for each selected task.',
+            'title': 'Create Annotations From Predictions',
+            'text': 'Create annotations from predictions using selected predictions set '
+            'for each selected task.'
+            'Your account will be assigned as an owner to those annotations. ',
             'type': 'confirm',
             'form': predictions_to_annotations_form,
-        }
+        },
     }
 ]

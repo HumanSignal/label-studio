@@ -1,0 +1,236 @@
+---
+test_name: tasks_api_filter
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- id: import_task
+  type: ref
+- name: get list of tasks
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?project={project_pk}'
+  response:
+    status_code: 200
+- id: create_annotation
+  type: ref
+- name: get task by id from data manager
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks/{task_pk}?project={project_pk}'
+  response:
+    status_code: 200
+    save:
+      json:
+        annotation_id: id
+    json:
+      annotations:
+        - completed_by:
+            email: test_suites_user@heartex.com
+
+- name: create_annotation_with_empty_result
+  request:
+    url: "{django_live_url}/api/tasks/{task_pk}/annotations"
+    json:
+      lead_time: 4.134
+      project: !int "{project_pk}"
+      result: []
+    method: POST
+    headers:
+      content-type: application/json
+  response:
+    status_code: 201
+    save:
+      json:
+        empty_ano_id: "id"
+
+- name: create_annotation_with_two_results
+  request:
+    url: "{django_live_url}/api/tasks/{task_pk}/annotations"
+    json:
+      lead_time: 4.134
+      project: !int "{project_pk}"
+      result:
+        - value:
+            choices:
+              - neg
+          id: wMmVN7k_47
+          from_name: sentiment
+          to_name: text
+          type: choices
+        - value:
+            choices:
+              - pos
+          id: wMmVN7k_48
+          from_name: sentiment
+          to_name: text
+          type: choices
+    method: POST
+    headers:
+      content-type: application/json
+  response:
+    status_code: 201
+    save:
+      json:
+        annotation_pk: "id"
+
+- name: create view with filter annotations_results empty
+  request:
+    method: POST
+    url: '{django_live_url}/api/dm/views'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:annotations_results"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 201
+    save:
+      json:
+        view_pk: id
+
+- name: get view with filter annotations_results empty
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?page=1&page_size=30&view={view_pk}&interaction=filter&project={project_pk}'
+  response:
+    status_code: 200
+    json:
+      total: 1
+
+- name: set filter to annotations_results not empty
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:annotations_results"
+              operator: empty
+              value: "false"
+              type: String
+  response:
+    status_code: 200
+
+- name: get annotations_results not empty view
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?page=1&page_size=30&view={view_pk}&interaction=filter&project={project_pk}'
+  response:
+    status_code: 200
+    json:
+      total: 0
+
+- name: delete annotation
+  request:
+    method: DELETE
+    url: '{django_live_url}/api/annotations/{annotation_pk}'
+  response:
+    status_code: 204
+
+- name: change filter to empty true again
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:annotations_results"
+              operator: empty
+              value: "true"
+              type: String
+  response:
+    status_code: 200
+
+
+- name: check empty count again
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?page=1&page_size=30&view={view_pk}&interaction=filter&project={project_pk}'
+  response:
+    status_code: 200
+    json:
+      total: 1
+
+- name: change filter to not empty
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: and
+          items:
+            - filter: "filter:tasks:annotations_results"
+              operator: empty
+              value: "false"
+              type: String
+  response:
+    status_code: 200
+
+- name: get the new view
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?page=1&page_size=30&view={view_pk}&interaction=filter&project={project_pk}'
+  response:
+    status_code: 200
+    json:
+      total: 0
+
+- name: change filter to equal
+  request:
+    method: PUT
+    url: '{django_live_url}/api/dm/views/{view_pk}?interaction=filter&project={project_pk}'
+    json:
+      project: '{project_pk}'
+      data:
+        filters:
+          conjunction: or
+          items:
+            - filter: "filter:tasks:annotations_results"
+              operator: equal
+              value: "123"
+              type: String
+
+            - filter: "filter:tasks:annotations_results"
+              operator: not_equal
+              value: "456"
+              type: String
+
+            - filter: "filter:tasks:predictions_results"
+              operator: equal
+              value: "789"
+              type: String
+
+            - filter: "filter:tasks:predictions_results"
+              operator: not_equal
+              value: "000"
+              type: String
+  response:
+    status_code: 200
+
+- name: get annotations_results/predictions_results equal/not equal
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?page=1&page_size=30&view={view_pk}&interaction=filter&project={project_pk}'
+  response:
+    status_code: 200
+    json:
+      total: 1

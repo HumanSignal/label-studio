@@ -10,6 +10,8 @@ The Number tag supports numeric classification. Use to classify tasks using numb
 
 Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
 
+[^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
+
 ### Parameters
 
 | Param | Type | Default | Description |
@@ -19,16 +21,19 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [min] | <code>number</code> |  | Minimum number value |
 | [max] | <code>number</code> |  | Maximum number value |
 | [step] | <code>number</code> | <code>1</code> | Step for value increment/decrement |
-| [defaultValue] | <code>number</code> |  | Default number value; will be added automaticaly to result for required fields |
+| [defaultValue] | <code>number</code> |  | Default number value; will be added automatically to result for required fields |
 | [hotkey] | <code>string</code> |  | Hotkey for increasing number value |
-| [required] | <code>boolean</code> | <code>false</code> | Whether to require number validation |
+| [required] | <code>boolean</code> | <code>false</code> | Whether number is required or not |
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
 | [perRegion] | <code>boolean</code> |  | Use this tag to classify specific regions instead of the whole object |
+| [perItem] | <code>boolean</code> |  | Use this tag to classify specific items inside the object instead of the whole object[^1] |
 | [slider] | <code>boolean</code> | <code>false</code> | Use slider look instead of input; use min and max to add your constraints |
 
 ### Example
+
+Basic labeling configuration for numeric classification of text
+
 ```html
-<!--Basic labeling configuration for numeric classification of text -->
 <View>
   <Text name="txt" value="$text" />
   <Number name="number" toName="txt" max="10" />

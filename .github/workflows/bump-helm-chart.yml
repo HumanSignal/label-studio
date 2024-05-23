@@ -1,0 +1,60 @@
+name: "Bump Helm Chart"
+
+on:
+  workflow_call:
+    inputs:
+      docker_image_version:
+        description: 'Label Studio Docker Image version'
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      docker_image_version:
+        description: 'Label Studio Docker Image version'
+        type: string
+        required: true
+
+env:
+  HELM_CHART_REPO_NAME: 'charts'
+  LS_CHART_PATH: 'heartex/label-studio/Chart.yaml'
+
+jobs:
+  bump-helm-chart:
+    name: "Bump Helm Chart"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name 'robot-ci-heartex'
+          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: "${{ github.repository_owner }}/${{ env.HELM_CHART_REPO_NAME }}"
+          token: ${{ secrets.GIT_PAT }}
+
+      - name: Edit Label Studio Chart
+        env:
+          LS_CHART_PATH: ${{ env.LS_CHART_PATH }}
+          DOCKER_IMAGE_VERSION: ${{ inputs.docker_image_version }}
+        run: |
+          regex="^version:[[:space:]]*([0-9-]+).([0-9-]+).([0-9-]+)"
+          if [[ $(cat ${LS_CHART_PATH} | grep '^version:') =~ $regex ]]; then
+            minor_version=$((${BASH_REMATCH[3]} + 1))
+            new_version="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${minor_version}"
+            sed -i "s#^version:.*#version: ${new_version}#g" "${LS_CHART_PATH}"
+          fi
+          
+          sed -i "s#^appVersion:.*#appVersion: \"${DOCKER_IMAGE_VERSION}\"#g" "${LS_CHART_PATH}"
+          cat "${LS_CHART_PATH}"
+
+      - name: Commit and Push
+        run: |
+          git add "${LS_CHART_PATH}"
+          git commit -m 'Bump Label Studio to ${{ inputs.docker_image_version }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git push origin

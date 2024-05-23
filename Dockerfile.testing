@@ -1,0 +1,19 @@
+# The image built from this Dockerfile will include the test dependencies,
+# and can be used for running the project's unit tests from within a container.
+# Use via the `make build-testing-image` and `make docker-testing-shell` Makefile targets.
+#
+# Try, for example, running `make docker-testing-shell` and then
+# `cd label_studio && DJANGO_DB=sqlite pytest .` from within the container.
+
+
+FROM heartexlabs/label-studio:latest
+
+USER 0
+
+# Copy and install test dependencies
+COPY --chown=1001:0 pyproject.toml .
+COPY --chown=1001:0 poetry.lock .
+RUN --mount=type=cache,target=$PIP_CACHE_DIR,uid=1001,gid=0 \
+    poetry check --lock && POETRY_VIRTUALENVS_CREATE=false poetry install --only test
+
+USER 1001

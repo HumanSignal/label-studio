@@ -1,6 +1,6 @@
 {
-  "message": "fix: DEV-2918: Prevent annotating collapsed phrases in paragraphs",
-  "commit": "13be53425cdd6434d109512d5b2b54b7c38aef2e",
+  "message": "fix: LEAP-447: Fix Number tag validation  (#1649)",
+  "commit": "524aa7db9517fb509cad0fa1146235577033b201",
   "branch": "master",
-  "date": "2022/09/05 16:16:04"
+  "date": "2024-01-30T23:47:06Z"
 }

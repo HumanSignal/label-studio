@@ -1,0 +1,46 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "importHelpers": true,
+    "target": "esnext",
+    "module": "esnext",
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@humansignal/frontend-test/*": [
+        "libs/frontend-test/src/*"
+      ],
+      "@humansignal/icons": [
+        "libs/storybook/icons.ts"
+      ],
+      "@humansignal/storybook": [
+        "libs/storybook/src/index.ts"
+      ],
+      "@humansignal/ui/*": [
+        "libs/storybook/src/components/*"
+      ],
+      "@humansignal/utils/*": [
+        "libs/storybook/src/utils/*"
+      ]
+    },
+    "types": [
+      "vite-plugin-svgr/client"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "tmp"
+  ]
+}

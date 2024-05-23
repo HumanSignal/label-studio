@@ -1,16 +1,15 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from rest_framework import serializers
-
 from tasks.models import Task
-from tasks.serializers import (
-    TaskSerializer, AnnotationSerializer, PredictionSerializer, TaskSerializerBulk)
+from tasks.serializers import AnnotationSerializer, PredictionSerializer, TaskSerializer, TaskSerializerBulk
+
 from .models import FileUpload
 
 
 class ImportApiSerializer(TaskSerializer):
-    """ Tasks serializer for Import API (TaskBulkCreateAPI)
-    """
+    """Tasks serializer for Import API (TaskBulkCreateAPI)"""
+
     annotations = AnnotationSerializer(many=True, default=[])
     predictions = PredictionSerializer(many=True, default=[])
 
@@ -26,4 +25,3 @@ class FileUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = FileUpload
         fields = ['id', 'file']
-

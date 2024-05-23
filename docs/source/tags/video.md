@@ -16,14 +16,16 @@ Use with the following data types: video
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | Name of the element |
 | value | <code>string</code> |  | URL of the video |
-| [frameRate] | <code>number</code> | <code>24</code> | videp frame rate per second; default is 24 |
+| [frameRate] | <code>number</code> | <code>24</code> | video frame rate per second; default is 24; can use task data like `$fps` |
 | [sync] | <code>string</code> |  | object name to sync with |
 | [muted] | <code>boolean</code> | <code>false</code> | muted video |
 | [height] | <code>number</code> | <code>600</code> | height of the video |
 
 ### Example
+
+Labeling configuration to display a video on the labeling interface
+
 ```html
-<!--Labeling configuration to display a video on the labeling interface-->
 <View>
   <Video name="video" value="$video" />
 </View>

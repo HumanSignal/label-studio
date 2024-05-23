@@ -1,0 +1,60 @@
+name: "Conda"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
+env:
+  CACHE_NAME_PREFIX: v1
+
+jobs:
+  conda:
+    name: Conda
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ "ubuntu-latest", "windows-latest" ]
+        python-version: [ "3.10" ]
+        include:
+          - os: "ubuntu-latest"
+            pip-cache-path: "~/.cache/pip"
+          - os: "windows-latest"
+            pip-cache-path: "~\\AppData\\Local\\pip\\Cache"
+    # required for poetry action
+    # see https://github.com/marketplace/actions/install-poetry-action#running-on-windows
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: ${{ inputs.head_sha }}
+
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v3.0.4
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          activate-environment: test-environment
+
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install Python dependencies
+        run: |
+          poetry install --with test
+
+      - name: Conda info
+        shell: bash -el {0}
+        run: |
+          conda info
+          conda list

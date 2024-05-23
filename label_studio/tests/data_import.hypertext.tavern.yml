@@ -1,0 +1,75 @@
+---
+test_name: Import files for hypertext
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+
+stages:
+- id: signup
+  type: ref
+
+- name: Setup labeling config
+  request:
+    data:
+      label_config: <View><Hypertext name="hyper" value="&lt;embed src='$image'/&gt;"/></View>
+      title: Hypertext Project
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+
+- name: Import file via UI uploads
+  request:
+    files:
+      image: tests/test_suites/samples/first.jpg
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import'
+  response:
+    status_code: 201
+    save:
+      json:
+        file_upload_ids: file_upload_ids
+
+- name: Task API and check that `$undefined$` is rename to `image`
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks?project={project_pk}'
+  response:
+    json:
+      tasks:
+        - annotations_ids: ''
+          annotations_results: ''
+          annotators: []
+          cancelled_annotations: 0
+          comment_authors: []
+          comment_count: 0
+          created_at: !anystr
+          data:
+            image: !anystr
+          drafts: []
+          file_upload: null
+          id: !anyint
+          inner_id: !anyint
+          is_labeled: false
+          last_comment_updated_at: null
+          meta: {}
+          overlap: 1
+          predictions_model_versions: ''
+          predictions_results: ''
+          project: !int '{project_pk}'
+          storage_filename: null
+          total_annotations: 0
+          total_predictions: 0
+          unresolved_comment_count: 0
+          updated_at: !anystr
+          updated_by: []
+      total: 1
+      total_annotations: 0
+      total_predictions: 0
+    status_code: 200

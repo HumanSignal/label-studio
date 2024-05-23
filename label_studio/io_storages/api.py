@@ -1,45 +1,55 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import logging
 import inspect
+import logging
 import os
 
-from rest_framework import generics
+from core.permissions import all_permissions
+from core.utils.io import read_yaml
+from django.conf import settings
+from drf_yasg import openapi as openapi
+from drf_yasg.utils import swagger_auto_schema
+from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
+from projects.models import Project
+from rest_framework import generics, status
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound, PermissionDenied
-from drf_yasg import openapi as openapi
-from django.conf import settings
-from drf_yasg.utils import swagger_auto_schema
+from rest_framework.settings import api_settings
 
-from core.permissions import all_permissions
-from core.utils.common import get_object_with_check_and_log
-from core.utils.io import read_yaml
-from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
-from projects.models import Project
+from label_studio.core.utils.common import load_func
 
 logger = logging.getLogger(__name__)
 
+StoragePermission = load_func(settings.STORAGE_PERMISSION)
+
 
 class ImportStorageListAPI(generics.ListCreateAPIView):
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
+
     serializer_class = ImportStorageSerializer
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
-        project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
-        ImportStorageClass = self.serializer_class.Meta.model
-        return ImportStorageClass.objects.filter(project_id=project.id)
+        StorageClass = self.serializer_class.Meta.model
+        storages = StorageClass.objects.filter(project_id=project.id)
+
+        # check failed jobs and sync their statuses
+        StorageClass.ensure_storage_statuses(storages)
+        return storages
 
 
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
 
+    permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
-    permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
@@ -47,18 +57,32 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ExportStorageListAPI(generics.ListCreateAPIView):
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
+
     permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
-        project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
-        ImportStorageClass = self.serializer_class.Meta.model
-        return ImportStorageClass.objects.filter(project_id=project.id)
+        StorageClass = self.serializer_class.Meta.model
+        storages = StorageClass.objects.filter(project_id=project.id)
+
+        # check failed jobs and sync their statuses
+        StorageClass.ensure_storage_statuses(storages)
+        return storages
 
     def perform_create(self, serializer):
+        # double check: not export storages don't validate connection in serializer,
+        # just make another explicit check here, note: in this create API we have credentials in request.data
+        instance = serializer.Meta.model(**serializer.validated_data)
+        try:
+            instance.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
+
         storage = serializer.save()
         if settings.SYNC_ON_TARGET_STORAGE_CREATION:
             storage.sync()
@@ -67,9 +91,10 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
 class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
 
+    permission_required = all_permissions.projects_change
+    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
-    permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
@@ -78,8 +103,8 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 class ImportStorageSyncAPI(generics.GenericAPIView):
 
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
 
     def get_queryset(self):
@@ -89,6 +114,9 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         storage = self.get_object()
         # check connectivity & access, raise an exception if not satisfied
+        if not storage.synchronizable:
+            response_data = {'message': f'Storage {str(storage.id)} is not synchronizable'}
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
         storage.validate_connection()
         storage.sync()
         storage.refresh_from_db()
@@ -97,8 +125,8 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
 
 class ExportStorageSyncAPI(generics.GenericAPIView):
 
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
     def get_queryset(self):
@@ -108,6 +136,9 @@ class ExportStorageSyncAPI(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         storage = self.get_object()
         # check connectivity & access, raise an exception if not satisfied
+        if not storage.synchronizable:
+            response_data = {'message': f'Storage {str(storage.id)} is not synchronizable'}
+            return Response(status=status.HTTP_400_BAD_REQUEST, data=response_data)
         storage.validate_connection()
         storage.sync()
         storage.refresh_from_db()
@@ -115,25 +146,40 @@ class ExportStorageSyncAPI(generics.GenericAPIView):
 
 
 class StorageValidateAPI(generics.CreateAPIView):
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
+
     permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
 
     def create(self, request, *args, **kwargs):
-        instance = None
         storage_id = request.data.get('id')
+        instance = None
         if storage_id:
             instance = generics.get_object_or_404(self.serializer_class.Meta.model.objects.all(), pk=storage_id)
             if not instance.has_permission(request.user):
                 raise PermissionDenied()
-        serializer = self.get_serializer(instance=instance, data=request.data)
+
+        # combine instance fields with request.data
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        # if storage exists, we have to use instance from DB,
+        # because instance from serializer won't have credentials, they were popped intentionally
+        if instance:
+            instance = serializer.update(instance, serializer.validated_data)
+        else:
+            instance = serializer.Meta.model(**serializer.validated_data)
+
+        # double check: not all storages validate connection in serializer, just make another explicit check here
+        try:
+            instance.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
         return Response()
 
 
 class StorageFormLayoutAPI(generics.RetrieveAPIView):
 
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
     swagger_schema = None
     storage_type = None
 

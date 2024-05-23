@@ -1,0 +1,9 @@
+theme_config:
+  tier: enterprise
+  root_domain: "heartex.com"
+
+# Deployment
+deploy:
+  type: aws-s3
+  region: us-east-1
+  bucket: docs.heartex.com

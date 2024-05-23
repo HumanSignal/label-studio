@@ -1,0 +1,44 @@
+version: "3.9"
+
+# rotating logs so they do not overflow
+x-logging:
+  logging: &default-logging
+    driver: "local"
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  # not replicated setup for test setup, use a proper aws S3 compatible cluster in production
+  minio:
+    image: quay.io/minio/minio:RELEASE.2023-03-13T19-46-17Z
+    command: server /data --console-address ":9009"
+    restart: unless-stopped
+    logging: *default-logging
+    ports:
+      - "9000:9000"
+      - "9009:9009"
+    volumes:
+      - minio-data:/data
+    # configure env vars in .env file or your systems environment
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minio_admin_do_not_use_in_production}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minio_admin_do_not_use_in_production}
+      - MINIO_PROMETHEUS_URL=${MINIO_PROMETHEUS_URL:-http://prometheus:9090}
+      - MINIO_PROMETHEUS_AUTH_TYPE=${MINIO_PROMETHEUS_AUTH_TYPE:-public}
+  prometheus:
+    image: quay.io/prometheus/prometheus:v2.37.1
+    restart: unless-stopped
+    logging: *default-logging
+    #    ports:
+    #      - "9090:9090"
+    volumes:
+      - "./prometheus/minio/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "prometheus-data:/prometheus"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+volumes:
+  minio-data:
+  prometheus-data:
+
+

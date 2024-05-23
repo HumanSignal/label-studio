@@ -12,7 +12,7 @@ title_bucket_prefix: &title_bucket_prefix
     label: Bucket Prefix
 
 # 2x3 grid
-aws_params: &aws_params
+aws_params_import: &aws_params_import
   - type: text
     name: region_name
     label: Region Name
@@ -27,19 +27,55 @@ aws_params: &aws_params
     autoComplete: "off"
     skipAutofill: true
     allowEmpty: false
+    protectedValue: true
   - type: password
     name: aws_secret_access_key
     label: Secret Access Key
     autoComplete: "new-password"
     skipAutofill: true
     allowEmpty: false
+    protectedValue: true
   - type: password
     name: aws_session_token
     autoComplete: "new-password"
     label: Session Token
     skipAutofill: true
-    allowEmpty: false
+    allowEmpty: true
+    protectedValue: true
 
+# 2x3 grid
+aws_params_export: &aws_params_export
+  - type: text
+    name: region_name
+    label: Region Name
+    placeholder: us-east-1
+  - type: text
+    name: s3_endpoint
+    label: S3 Endpoint
+  - type: text
+    name: aws_sse_kms_key_id
+    label: SSE KMS Key ID
+  - type: password
+    name: aws_access_key_id
+    label: Access Key ID
+    autoComplete: "off"
+    skipAutofill: true
+    allowEmpty: false
+    protectedValue: true
+  - type: password
+    name: aws_secret_access_key
+    label: Secret Access Key
+    autoComplete: "new-password"
+    skipAutofill: true
+    allowEmpty: false
+    protectedValue: true
+  - type: password
+    name: aws_session_token
+    autoComplete: "new-password"
+    label: Session Token
+    skipAutofill: true
+    allowEmpty: true
+    protectedValue: true
 
 
 ImportStorage:
@@ -57,7 +93,7 @@ ImportStorage:
           - regexp
   # AWS specific params
   - columnCount: 3
-    fields: *aws_params
+    fields: *aws_params_import
 
   # 2 columns grid
   - columnCount: 2
@@ -81,14 +117,14 @@ ImportStorage:
             name: presign_ttl
             label: Expiration minutes
             min: 1
-            value: 1
+            value: 15
             dependency: presign
 
 ExportStorage:
   - columnCount: 3
     fields: *title_bucket_prefix
   - columnCount: 3
-    fields: *aws_params
+    fields: *aws_params_export
   # 1 columns grid
   - columnCount: 1
     columns:

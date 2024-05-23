@@ -28,8 +28,7 @@ archive_dir: archives
 category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
-skip_render:
-    source/playground/render.html
+skip_render: source/playground/render.html
 favicon: images/favicon.ico
 
 # Writing
@@ -61,7 +60,7 @@ markdown:
   pedantic: false
   sanitize: false
   tables: true
-  breaks: true
+  breaks: false
   smartLists: true
   smartypants: true
 
@@ -70,7 +69,7 @@ markdown:
 # per_page: Posts displayed per page. (0 = disable pagination)
 # order_by: Posts order. (Order by date descending by default)
 index_generator:
-  path: ''
+  path: ""
   per_page: 10
   order_by: -date
 
@@ -93,15 +92,14 @@ pagination_dir: page
 
 # Extensions
 ## Plugins: https://hexo.io/plugins/
+plugins:
+  - hexo-footnote
 ## Themes: https://hexo.io/themes/
-theme: htx
+theme: v2
 
-# Deployment
-deploy:
-  type: aws-s3
-  region: us-east-1
-  bucket: labelstud.io
-
+sitemap:
+  path:
+    - sitemap-docs.xml
 
 search:
   path: search.xml
@@ -111,3 +109,6 @@ search:
 # plugin to include md into md: https://github.com/tea3/hexo-include-markdown
 include_markdown:
   dir: source/includes
+
+footnote:
+  location_target_class: location-target

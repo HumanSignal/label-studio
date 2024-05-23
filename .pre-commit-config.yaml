@@ -1,0 +1,19 @@
+default_stages: [pre-push]
+repos:
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.285
+    hooks:
+      - id: ruff
+        args: [ --no-fix, --show-fixes, --show-source ]
+-   repo: https://github.com/grantjenks/blue
+    rev: v0.9.1
+    hooks:
+      - id: blue
+        args: [ --check, --diff, --color ]
+-   repo: https://github.com/biomejs/pre-commit
+    rev: "v0.1.0"
+    hooks:
+    -   id: biome-check
+        args: [--config-path, ./web]
+        additional_dependencies: ["@biomejs/biome@1.7.1"]
+        files: ^web/.*

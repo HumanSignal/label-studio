@@ -1,17 +1,36 @@
 ---
-title: Manage data for your labeling project
-short: Manage data
+title: Use the Data Manager in projects
+short: Data Manager
 type: guide
-order: 401
-meta_title: Manage data for your labeling project
-meta_description: Manage, filter, and sort project data for your machine learning data science labeling project.
+tier: all
+order: 122
+order_enterprise: 122
+meta_title: Use the Data Manager in projects
+meta_description: Manage, filter, and sort project data for your labeling project.
+section: "Create & Manage Projects"
+parent: "manage_projects_lso"
+parent_enterprise: "manage_projects" 
+
 ---
 
 After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can filter and sort your data to prepare it for [labeling](labeling.html).
 
 You can also take steps to manage your data, such as assigning annotators to tasks in Label Studio Enterprise, or deleting tasks and annotations if needed. 
 
-<br/><img src="/images/ls-data-manager.png" alt="Screenshot of the Label Studio UI showing an OCR project including photographs of receipts, prediction scores, and other metadata for each labeling task." class="gif-border" width="800px" height="515px" />
+<div class="opensource-only">
+<br><br>
+<center><i>Data Manager Screenshot</i></center>
+<img class="make-intense-zoom" src="/images/terms/os/project--data-manager-min.png" alt="Screenshot of the Label Studio UI showing an OCR project including photographs of receipts, prediction scores, and other metadata for each labeling task.">
+</div>
+
+
+<div class="enterprise-only">
+<br><br>
+<center><i>Data Manager Screenshot</i></center>
+<img class="make-intense-zoom" src="/images/terms/ent/project--data-manager-min.png" alt="Screenshot of the Label Studio UI showing an OCR project including photographs of receipts, prediction scores, and other metadata for each labeling task.">
+</div>
+
+
 
 In Label Studio Community Edition, the data manager is the default view for your data. In Label Studio Enterprise, click **Data Manager** to open and view the data manager page. Every row in the data manager represents a labeling task in your dataset.
 
@@ -20,6 +39,8 @@ In Label Studio Community Edition, the data manager is the default view for your
 With filters and tabs, you can split data into different sections to be labeled by different annotators, or set up data in a particular order to perform labeling according to prediction score, or another value in your data.
 
 When you filter or sort the data before you label it, you modify which tasks and the order of the tasks you see when labeling. While [task sampling](start.html#Set_up_task_sampling_for_your_project) affects the task order for an entire project and can't be changed, filtering and sorting tasks can be changed at any time. 
+
+<img src="/images/data-manager-filters.png" class="gif-border">
 
 ### Example: Label new data first
 Sort the data in your project by date to focus on labeling the newest data first.
@@ -54,9 +75,12 @@ You can create tabs on the data manager to [split your dataset](#Example-Split-a
 
 Tabs that you create depend on your [labeling configuration setup](setup.html), because the labeling configuration defines the data fields available for filtering and sorting. 
 
-> If you make changes to the labeling configuration, any tabs in your data manager are removed. Finish project setup before setting up complex tabs in the Data Manager.
+!!! note 
+    If you make changes to the labeling configuration, any tabs in your data manager are removed. Make sure to finish the project setup before setting up complex tabs in the Data Manager.
 
-## <i class='ent'></i> Assign annotators to tasks
+<div class="enterprise-only">
+
+## Assign annotators to tasks
 
 In Label Studio Enterprise, if you're an administrator or project manager, you can assign annotators to tasks in a specific project. After you [add the annotator to the project or workspace](setup_project.html#Add-members-to-a-project), assign the annotator to specific tasks. You must assign annotators to tasks if you're using [manual task distribution](setup_project.html#Set-up-task-distribution-for-labeling).
 
@@ -66,6 +90,9 @@ In Label Studio Enterprise, if you're an administrator or project manager, you c
 4. Click **Assign**. 
 
 If you want to bulk assign tasks, you can use filters to identify exactly the tasks that you want to assign, then select the top checkbox on the data manager to select all tasks shown and assign them to an annotator.
+
+</div>
+
 
 ## Delete tasks or annotations
 If you have duplicate tasks, or want to remove annotations, you can delete tasks and annotations from Label Studio.

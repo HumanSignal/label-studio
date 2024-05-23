@@ -1,18 +1,19 @@
 ---
-title: Annotation statistics
-short: Annotation statistics
-badge: <i class='ent'></i>
+title: Task agreement and how it is calculated
+short: Task agreement matrix
+tier: enterprise
 type: guide
-order: 413
+order: 0
+order_enterprise: 307
 meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
+section: "Review & Measure Quality"
 ---
 
-<div class="enterprise"><p>
-Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
-</p></div>
+Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
 
 Annotation statistics help you determine the quality of your dataset, its readiness to be used to train models, and assess the performance of your annotators and reviewers.
+
 
 ## Task agreement
 
@@ -24,16 +25,29 @@ You can also see how the annotations from a specific annotator compare to the pr
 
 For more about viewing agreement in Label Studio Enterprise, see [Verify model and annotator performance](quality.html#Verify-model-and-annotator-performance).
 
+
+### Configure task agreement settings for a project
+
+To configure task agreement settings for a project, go to the project **Settings** page and select **Quality**. From here you can configure several the following:
+
+* Select which agreement metric to use. The default metric is the [basic matching function](#Basic-matching-function). 
+* Set a low agreement threshold. 
+
+    A low agreement threshold  ensures that a task cannot be marked complete until it meets a minimum agreement threshold. 
+* Customize the weight of different labels when calculating agreement. 
+
+For more information, see [Project settings - Task agreement](project_settings_lse#task-agreement). 
+
 ## Agreement method
 
 The agreement method defines how [agreement scores](stats.html#Agreement-score) across all annotations for a task are combined to form a single inter-annotator agreement score. Label Studio uses the mean average of all inter-annotation agreement scores for each annotation pair as the final task agreement score. 
 
 Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." width=800 height=365 src="/images/LSE/stats-no_grouping.png"/></div>
+<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." src="/images/stats-no_grouping.png"/></div>
 
 ### Example
 One annotation that labels the text span "Excellent tool" as "positive", a second annotation that labels the span "tool" as "positive", and a third annotation that labels the text span "tool" as "negative".
-<br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" width=800 height=100 src="/images/LSE/stats-agreement-example.jpg"/></div>
+<br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" src="/images/stats-agreement-example.png"/></div>
 
 The agreement score for the first two annotations is 50%, based on the intersection of the text spans. The agreement score comparing the second annotation with the third annotation is 0%, because the same text span was labeled differently. 
 

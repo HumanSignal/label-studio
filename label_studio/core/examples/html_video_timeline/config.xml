@@ -1,13 +1,13 @@
 <!-- {"title": "Video timeline segmentation", "category": "other", "complexity": "advanced"} -->
 <View>
-  <Header value="Video timeline segmentation via AudioPlus sync trick"/>
+  <Header value="Video timeline segmentation via Audio sync trick"/>
   <HyperText name="video" value="$video"/>
   <Labels name="tricks" toName="audio" choice="multiple">
     <Label value="Kickflip" background="#1BB500" />
     <Label value="360 Flip" background="#FFA91D" />
     <Label value="Trick" background="#358EF3" />
   </Labels>
-  <AudioPlus name="audio" value="$videoSource" speed="false"/>
+  <Audio name="audio" value="$videoSource" speed="false"/>
 </View>
 
 <!--

@@ -1,17 +1,17 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import os
 import uuid
+from time import time
 
+from core.utils.common import load_func
 from django import forms
 from django.conf import settings
-from django.shortcuts import redirect
 from django.contrib import auth
-from django.urls import reverse
 from django.core.files.images import get_image_dimensions
-
+from django.shortcuts import redirect
+from django.urls import reverse
 from organizations.models import Organization
-from core.utils.contextlog import ContextLog
-from core.utils.common import load_func
 
 
 def hash_upload(instance, filename):
@@ -24,7 +24,7 @@ def check_avatar(files):
     if not images:
         return None
 
-    filename, avatar = list(files.items())[0]  # get first file
+    _, avatar = list(files.items())[0]  # get first file
     w, h = get_image_dimensions(avatar)
     if not w or not h:
         raise forms.ValidationError("Can't read image, try another one")
@@ -32,25 +32,31 @@ def check_avatar(files):
     # validate dimensions
     max_width = max_height = 1200
     if w > max_width or h > max_height:
-        raise forms.ValidationError('Please use an image that is %s x %s pixels or smaller.'
-                                    % (max_width, max_height))
+        raise forms.ValidationError('Please use an image that is %s x %s pixels or smaller.' % (max_width, max_height))
+
+    valid_extensions = ['jpeg', 'jpg', 'gif', 'png']
+
+    filename = avatar.name
+    # check file extension
+    ext = os.path.splitext(filename)[1].lstrip('.').lower()
+    if ext not in valid_extensions:
+        raise forms.ValidationError('Please upload a valid image file with extensions: JPEG, JPG, GIF, or PNG.')
 
     # validate content type
     main, sub = avatar.content_type.split('/')
-    if not (main == 'image' and sub.lower() in ['jpeg', 'jpg', 'gif', 'png']):
-        raise forms.ValidationError(u'Please use a JPEG, GIF or PNG image.')
+    if not (main == 'image' and sub.lower() in valid_extensions):
+        raise forms.ValidationError('Please use a JPEG, GIF or PNG image.')
 
     # validate file size
     max_size = 1024 * 1024
     if len(avatar) > max_size:
-        raise forms.ValidationError('Avatar file size may not exceed ' + str(max_size/1024) + ' kb')
+        raise forms.ValidationError('Avatar file size may not exceed ' + str(max_size / 1024) + ' kb')
 
     return avatar
 
 
 def save_user(request, next_page, user_form):
-    """ Save user instance to DB
-    """
+    """Save user instance to DB"""
     user = user_form.save()
     user.username = user.email.split('@')[0]
     user.save()
@@ -64,19 +70,25 @@ def save_user(request, next_page, user_form):
     user.save(update_fields=['active_organization'])
 
     request.advanced_json = {
-        'email': user.email, 'allow_newsletters': user.allow_newsletters,
-        'update-notifications': 1, 'new-user': 1
+        'email': user.email,
+        'allow_newsletters': user.allow_newsletters,
+        'update-notifications': 1,
+        'new-user': 1,
     }
     redirect_url = next_page if next_page else reverse('projects:project-index')
-    auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
     return redirect(redirect_url)
 
 
 def proceed_registration(request, user_form, organization_form, next_page):
-    """ Register a new user for POST user_signup
-    """
+    """Register a new user for POST user_signup"""
     # save user to db
     save_user = load_func(settings.SAVE_USER)
     response = save_user(request, next_page, user_form)
 
     return response
+
+
+def login(request, *args, **kwargs):
+    request.session['last_login'] = time()
+    return auth.login(request, *args, **kwargs)

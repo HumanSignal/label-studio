@@ -1,0 +1,8 @@
+[codespell]
+skip = *.css*,*.yml,*.map,*.js,package-lock.json,*.ai,.venv,.git,build,*.egg-info,*.lock
+# aks - unfortunately, not case sensitive yet as promised
+#    see https://github.com/codespell-project/codespell/issues/2375
+# ist - from german
+# respone - response one, popular among examples along with resptwo, respthree
+# classe - spanish(?) example
+ignore-words-list = aks,postgressql,filterin,ser,ist,respone,classe,couldn

@@ -19,8 +19,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.pull_request.head.ref || github.ref }}
   cancel-in-progress: true
 
-permissions: read-all
-
 env:
   RELEASE_BRANCH_PREFIX: "ls-release/"
 
@@ -33,35 +31,46 @@ jobs:
       frontend: ${{ steps.changes.outputs.frontend }}
       docker: ${{ steps.changes.outputs.docker }}
       commit-message: ${{ steps.commit-details.outputs.commit-message }}
-    timeout-minutes: 5
+    timeout-minutes: 25
     steps:
-      - uses: hmarr/debug-action@v2.0.1
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         if: github.event_name == 'push'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
             src:
               - 'label_studio/!(frontend)/**'
-              - 'deploy/requirements**'
-              - 'setup.py'
+              - 'poetry.lock'
+              - 'pyproject.toml'
+              - '.github/workflows/bandit.yml'
+              - '.github/workflows/tests.yml'
+              - '.github/workflows/test_conda.yml'
+              - '.github/workflows/test_migrations.yml'
             frontend:
               - 'label_studio/frontend/**'
+              - 'web/**'
+              - '.github/workflows/frontend-build.yml'
+              - '.github/workflows/tests-yarn-unit.yml'
+              - '.github/workflows/tests-yarn-integration.yml'
+              - '.github/workflows/tests-yarn-e2e.yml'
             docker:
               - 'label_studio/**'
+              - 'web/**'
               - 'deploy/**'
               - 'Dockerfile**'
-              - 'setup.py'
+              - 'poetry.lock'
+              - 'pyproject.toml'
               - '.github/workflows/cicd_pipeline.yml'
               - '.github/workflows/docker-build.yml'
 
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         id: commit-details
         with:
           script: |
@@ -71,27 +80,13 @@ jobs:
                 repo,
                 ref: '${{ github.event.pull_request.head.sha || github.event.after }}'
             });
+            console.log(`Last commit message is "${commit.commit.message}"`)
             core.setOutput("commit-message", commit.commit.message);
-
-  pr_labeler:
-    name: "Validate"
-    if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: write
-    uses: heartexlabs/label-studio/.github/workflows/pr-labeler.yml@develop
-
-  validate_submodules:
-    name: "Validate"
-    uses: heartexlabs/label-studio/.github/workflows/submodules-validator.yml@develop
-    with:
-      head_sha: ${{ github.sha }}
-      base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
-      target_branch: ${{ github.event.pull_request.base.ref || github.event.ref }}
 
   gitleaks:
     name: "Linter"
     if: github.event_name == 'pull_request'
-    uses: heartexlabs/label-studio/.github/workflows/gitleaks.yml@develop
+    uses: ./.github/workflows/gitleaks.yml
     with:
       head_sha: ${{ github.sha }}
       base_sha: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -101,7 +96,34 @@ jobs:
     needs:
       - changed_files
     if: needs.changed_files.outputs.src == 'true'
-    uses: heartexlabs/label-studio/.github/workflows/bandit.yml@develop
+    uses: ./.github/workflows/bandit.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+
+  ruff:
+    name: "Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: ./.github/workflows/ruff.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+
+  blue:
+    name: "Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: ./.github/workflows/blue.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+
+  biome:
+    name: "Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.frontend == 'true'
+    uses: ./.github/workflows/biome.yml
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
@@ -113,12 +135,13 @@ jobs:
       github.event_name == 'pull_request' &&
       github.event.pull_request.head.repo.fork == false &&
       needs.changed_files.outputs.frontend == 'true' &&
-      needs.changed_files.outputs.commit-message != 'Build frontend'
+      !startsWith(needs.changed_files.outputs.commit-message, 'ci: Build frontend')
     permissions:
       contents: write
-    uses: heartexlabs/label-studio/.github/workflows/frontend-build.yml@develop
+    uses: ./.github/workflows/frontend-build.yml
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
+    secrets: inherit
 
   build-docker:
     name: "Build"
@@ -129,8 +152,9 @@ jobs:
       ( ( github.ref_name == 'develop' && needs.changed_files.outputs.docker == 'true' )
         || startsWith(github.ref_name, 'ls-release/') )
     permissions:
+      contents: read
       checks: write
-    uses: heartexlabs/label-studio/.github/workflows/docker-build.yml@develop
+    uses: ./.github/workflows/docker-build.yml
     with:
       sha: ${{ github.event.pull_request.head.sha || github.event.after }}
       branch_name: ${{ github.event.pull_request.head.ref || github.ref_name }}
@@ -141,10 +165,30 @@ jobs:
     needs:
       - changed_files
     if: needs.changed_files.outputs.src == 'true'
-    uses: heartexlabs/label-studio/.github/workflows/tests.yml@develop
+    uses: ./.github/workflows/tests.yml
     with:
-      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
 
+  migrations:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: ./.github/workflows/test_migrations.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  conda-test:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.src == 'true'
+    uses: ./.github/workflows/test_conda.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
 
   draft-release:
     name: "Draft Release"
@@ -155,56 +199,117 @@ jobs:
     permissions:
       contents: write
     outputs:
-      id: ${{ steps.create-draft-release.outputs.id }}
+      id: ${{ steps.update-draft-release.outputs.id }}
       rc-version: ${{ steps.create-draft-release.outputs.rc-version }}
     steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
       - name: Create release draft
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         id: create-draft-release
+        env:
+          TARGET_COMMITISH: "${{ github.ref_name }}"
+          RELEASE_BRANCH_PREFIX: "${{ env.RELEASE_BRANCH_PREFIX }}"
+          DEFAULT_BRANCH: "${{ github.event.repository.default_branch }}"
         with:
           script: |
             const { repo, owner } = context.repo;
-            const target_commitish = '${{ github.ref_name }}';
-            let version = target_commitish.replace('${{ env.RELEASE_BRANCH_PREFIX }}', '')
-            core.setOutput("rc-version", `${version}rc${{ github.run_id }}`);
-            
-            const {data: releases} = await github.rest.repos.listReleases({
+            const target_commitish = process.env.TARGET_COMMITISH;
+            const default_branch = process.env.DEFAULT_BRANCH;
+            let version = target_commitish.replace(process.env.RELEASE_BRANCH_PREFIX, '')
+            const regexp = '^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(\.post([0-9]+))?$';
+
+            const {data: compare} = await github.rest.repos.compareCommits({
+              owner,
+              repo,
+              base: default_branch,
+              head: target_commitish,
+            });
+            const rc_version = `${version}rc${ compare.ahead_by }`
+            console.log(`rc-version: ${rc_version}`)
+            core.setOutput("rc-version", rc_version);
+
+            function compareVersions(a, b) {
+              if (a[1] === b[1])
+                if (a[2] === b[2])
+                  if (a[3] === b[3])
+                    return (+a[5] || -1) - (+b[5] || -1)
+                  else
+                    return +a[3] - b[3]
+                else
+                  return +a[2] - b[2]
+              else
+                return +a[1] - b[1]
+            }
+
+            const versionMatch = version.match(regexp)
+            if (!versionMatch) {
+              core.setFailed(`Version "${version}" from branch "${target_commitish}" does not match the regexp ${regexp}`)
+              process.exit()
+            }
+
+            const tags = await github.paginate(
+              github.rest.repos.listTags,
+              {
                 owner,
                 repo,
-            });
-            
-            let release = releases.find((e) => {
-                return target_commitish.endsWith(e.target_commitish) && e.draft
-            })
-            
+                per_page: 100
+              },
+              (response) => response.data
+            );
+            console.log(`Tags:`)
+            console.log(tags.map(e => e.name))
+            const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
+            console.log(`Tags for ${version}:`)
+            console.log(matchedTags.map(e => e.name))
+            if (matchedTags.length !== 0) {
+                let newHotfixNumber = 0
+                for (let matchedTag of matchedTags) {
+                    const matchVersion = matchedTag.name.match('^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(.post([0-9]+))?$')
+                    if (matchVersion && matchVersion[5]) {
+                        const hotfixNumber = parseInt(matchVersion[5])
+                        if (newHotfixNumber <= hotfixNumber) {
+                            newHotfixNumber = hotfixNumber + 1
+                        }
+                    }
+                }
+                version = `${version}.post${newHotfixNumber}`
+            }
+            console.log(`New version: ${version}`)
+
+            const rawTags = tags.map(e => e.name)
+            const tagsWithNew = [...rawTags, version]
+            const sortedTags = tagsWithNew
+              .filter(e => e.match(regexp))
+              .map((e => e.match(regexp)))
+              .sort(compareVersions)
+              .reverse()
+              .map(e => e[0])
+            const previousTag = sortedTags[sortedTags.indexOf(version)+1]
+            console.log(`Previous version: ${previousTag}`)
+
+            console.log('Find or Create a Draft release')
+            const releases = await github.paginate(
+              github.rest.repos.listReleases,
+              {
+                owner,
+                repo,
+                per_page: 100
+              },
+              (response) => response.data
+            );
+            let release = releases.find(e => target_commitish.endsWith(e.target_commitish) && e.draft)
             if (release) {
                 console.log(`Draft release already exist ${release.html_url}`)
             } else {
                 console.log(`Draft release is not found creating a new one`)
-                const {data: tags} = await github.rest.repos.listTags({
-                    owner,
-                    repo,
-                    per_page: 100
-                });
-                console.log(`Tags:`)
-                console.log(tags.map(e => e.name))
-                const matchedTags = tags.filter(e => e.name.indexOf(version) !== -1)
-                console.log(`Tags for ${version}:`)
-                console.log(matchedTags.map(e => e.name))
-                if (matchedTags.length !== 0) {
-                    let newHotfixNumber = 0
-                    for (let matchedTag of matchedTags) {
-                        const matchVersion = matchedTag.name.match('^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(.post([0-9]+))?$')
-                        if (matchVersion && matchVersion[5]) {
-                            const hotfixNumber = parseInt(matchVersion[5])
-                            if (newHotfixNumber <= hotfixNumber) {
-                                newHotfixNumber = hotfixNumber + 1
-                            }
-                        }
-                    }
-                    version = `${version}.post${newHotfixNumber}`
-                }
-                console.log(`New version: ${version}`)
                 const {data: newDraftRelease} = await github.rest.repos.createRelease({
                     owner,
                     repo,
@@ -213,15 +318,85 @@ jobs:
                     name: version,
                     tag_name: version,
                     target_commitish: target_commitish,
-                    generate_release_notes: true,
                 });
                 console.log(`Draft release is created ${newDraftRelease.html_url}`)
                 release = newDraftRelease;
                 core.setOutput("created", true);
             }
-            
             core.setOutput("id", release.id);
             core.setOutput("tag_name", release.tag_name);
+
+      - uses: actions/cache@v4
+        name: Configure pip cache
+        id: pip-cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-gh-actions-${{ hashFiles('.github/helpers/gh_changelog_generator/requirements.txt') }}
+
+      - name: Install tools and dependencies
+        run: |
+          pip3 install -r .github/helpers/gh_changelog_generator/requirements.txt
+
+      - name: Generate release changelog
+        id: changelog_md
+        env:
+          RELEASE_VERSION: "${{ steps.create-draft-release.outputs.tag_name }}"
+          CURRENT_REF: "${{ github.event.after }}"
+          GH_REPO: "${{ github.repository }}"
+          GH_TOKEN: "${{ secrets.GIT_PAT }}"
+          JIRA_SERVER: "${{ vars.JIRA_SERVER }}"
+          JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
+          JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
+          JIRA_PROJECT: "DEV"
+          JIRA_RN_FIELD: "customfield_10064"
+          LAUNCHDARKLY_SDK_KEY: "${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}"
+          LAUNCHDARKLY_ENVIRONMENT: "community"
+          OUTPUT_FILE_MD: "${{ github.workspace }}/output.md"
+          OUTPUT_FILE_JSON: "${{ github.workspace }}/output.json"
+          WORKFLOW_RUN_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: |
+          set -eux
+
+          previous_tag=$(git tag --sort=-committerdate | head -n1)
+
+          export PREVIOUS_REF="tags/${previous_tag}"
+          python3 .github/helpers/gh_changelog_generator/gh_changelog_generator.py
+
+          echo "changelog_msg_b64=$(cat '${{ env.OUTPUT_FILE_MD }}' | base64 -w 0)" >> $GITHUB_OUTPUT
+
+          echo "CHANGELOG_MD<<CHANGELOG_MD_EOF" >> $GITHUB_ENV
+          cat '${{ env.OUTPUT_FILE_MD }}' >> $GITHUB_ENV
+          echo >> $GITHUB_ENV
+          echo "CHANGELOG_MD_EOF" >> $GITHUB_ENV
+
+          echo "CHANGELOG_JSON<<CHANGELOG_JSON_EOF" >> $GITHUB_ENV
+          cat '${{ env.OUTPUT_FILE_JSON }}' >> $GITHUB_ENV
+          echo >> $GITHUB_ENV
+          echo "CHANGELOG_JSON_EOF" >> $GITHUB_ENV
+
+      - name: Update Draft Release
+        uses: actions/github-script@v7
+        id: update-draft-release
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+
+            const { data: release } = await github.rest.repos.updateRelease({
+                owner,
+                repo,
+                release_id: '${{ steps.create-draft-release.outputs.id }}',
+                draft: true,
+                prerelease: false,
+                name: '${{ steps.create-draft-release.outputs.tag_name }}',
+                tag_name: '${{ steps.create-draft-release.outputs.tag_name }}',
+                target_commitish: '${{ github.ref_name }}',
+                body: atob(`${{ steps.changelog_md.outputs.changelog_msg_b64 }}`)
+            });
+            console.log(`Draft release is updated: ${release.html_url}`)
+            core.setOutput("id", release.id);
+            core.setOutput("tag_name", release.tag_name);
+            core.setOutput("html_url", release.html_url);
 
   build-pypi:
     name: "Build"
@@ -230,9 +405,82 @@ jobs:
     if: |
       github.event_name == 'push' &&
       startsWith(github.ref_name, 'ls-release/')
-    uses: heartexlabs/label-studio/.github/workflows/build_pypi.yml@develop
+    permissions:
+      contents: write
+    uses: ./.github/workflows/build_pypi.yml
     with:
       version: ${{ needs.draft-release.outputs.rc-version }}
       ref: ${{ github.ref_name }}
       release-id: ${{ needs.draft-release.outputs.id }}
     secrets: inherit
+
+  tests-yarn-unit:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.frontend == 'true'
+    uses: ./.github/workflows/tests-yarn-unit.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  tests-yarn-integration:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.frontend == 'true'
+    uses: ./.github/workflows/tests-yarn-integration.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  tests-yarn-e2e:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.frontend == 'true'
+    uses: ./.github/workflows/tests-yarn-e2e.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  check_gate:
+    name: "Ready to merge"
+    if: always()
+    needs:
+      - gitleaks
+      - bandit
+      - ruff
+      - blue
+      - biome
+      - pytest
+      - migrations
+      - build-docker
+      - tests-yarn-unit
+      - tests-yarn-integration
+      - tests-yarn-e2e
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          allowed-skips: gitleaks, bandit, ruff, blue, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e
+          jobs: ${{ toJSON(needs) }}
+
+  dependabot-auto-merge:
+    name: "Auto Merge dependabot PR"
+    if: |
+      always() &&
+      needs.check_gate.result == 'success' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      ( startsWith(github.head_ref, 'dependabot/npm_and_yarn/') || startsWith(github.head_ref, 'dependabot/pip/') )
+    runs-on: ubuntu-latest
+    needs:
+      - check_gate
+    steps:
+      - name: Enable auto-merge for Dependabot PRs
+        run: gh pr merge --admin --squash "${PR_URL}"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GIT_PAT }}

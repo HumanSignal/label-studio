@@ -1,6 +1,6 @@
 {
-  "message": "feat: DEV-1752: Support links to drafts and annotations (#101)\n\n* Support links in Label Stream\r\n\r\n* Introduce FF\r\n\r\n* Fix FF name\r\n\r\n* Fix label stream loading when preload is empty",
-  "commit": "72105e4385620cf4a59b5bd3e68adca19287bf8b",
+  "message": "feat: DIA-820: [FE] Make List type columns display as intended type with out the ability for users to change type for Data Discovery",
+  "commit": "18fac7b33e411aede836b930791018f7f659acf7",
   "branch": "master",
-  "date": "2022-09-02T18:15:25Z"
+  "date": "2024-01-17T08:26:43Z"
 }

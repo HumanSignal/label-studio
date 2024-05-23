@@ -2,57 +2,88 @@
 title: Ranker
 type: tags
 order: 419
-meta_title: Ranker Tag for Model Ranking
-meta_description: Customize Label Studio with the Ranker tag to rank the predictions from different models to rank model quality in your machine learning and data science projects.
+meta_title: Ranker Tag allows you to rank items in a List or, if Buckets are used, pick relevant items from a List
+meta_description: Customize Label Studio by sorting results for machine learning and data science projects.
 ---
 
-Use the Ranker tag to rank the results from models. This tag uses the "prediction" field from a labeling task instead of the "data" field to display content for labeling on the interface. Carefully structure your labeling tasks to work with this tag. See [import pre-annotated data](../guide/predictions.html).
-
-Use with the following data types: text
-
-The Ranker tag renders a given list of strings and allows you to drag and reorder them.
-To see this tag in action:
-1. Save the example JSON below as a file called <code>example_ranker_tag.json</code>.
-2. Upload it as a task on the Label Studio UI.
-3. Set up a project with the given labeling configuration.
+The `Ranker` tag is used to rank items in a `List` tag or pick relevant items from a `List`, depending on using nested `Bucket` tags.
+In simple case of `List` + `Ranker` tags the first one becomes interactive and saved result is a dict with the only key of tag's name and with value of array of ids in new order.
+With `Bucket`s any items from the `List` can be moved to these buckets, and resulting groups will be exported as a dict `{ bucket-name-1: [array of ids in this bucket], ... }`
+By default all items will sit in `List` and will not be exported, unless they are moved to a bucket. But with `default="true"` parameter you can specify a bucket where all items will be placed by default, so exported result will always have all items from the list, grouped by buckets.
+Columns and items can be styled in `Style` tag by using respective `.htx-ranker-column` and `.htx-ranker-item` classes. Titles of columns are defined in `title` parameter of `Bucket` tag.
+Note: When `Bucket`s used without `default` param, the original list will also be stored as "_" named column in results, but that's internal value and this may be changed later.
 
 ### Parameters
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| name | <code>string</code> |  | Name of group |
-| [axis] | <code>y</code> \| <code>x</code> | <code>y</code> | Whether to use a vertical or horizantal axis direction for ranking |
-| lockAxis | <code>x</code> \| <code>y</code> |  | Lock axis |
-| sortedHighlightColor | <code>string</code> |  | Sorted color in HTML color name |
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | Name of the element |
+| toName | <code>string</code> | List tag name to connect to |
 
 ### Example
+
+Visual appearance can be changed via Style tag with these predefined classnames
+
 ```html
-<!--Labeling configuration for ranking predicted text output from a model -->
 <View>
-  <Text name="txt-1" value="$text"></Text>
-  <Ranker name="ranker-1" toName="txt-1" ranked="true" sortedHighlightColor="red"></Ranker>
+  <Style>
+    .htx-ranker-column { background: cornflowerblue; }
+    .htx-ranker-item { background: lightgoldenrodyellow; }
+  </Style>
+  <List name="results" value="$items" title="Search Results" />
+  <Ranker name="rank" toName="results" />
 </View>
 ```
 ### Example
+
+Example task data for Ranker tag
+
+```json
+{
+  "items": [
+    { "id": "blog", "title": "10 tips to write a better function", "body": "There is nothing worse than being left in the lurch when it comes to writing a function!" },
+    { "id": "mdn", "title": "Arrow function expressions", "body": "An arrow function expression is a compact alternative to a traditional function" },
+    { "id": "wiki", "title": "Arrow (computer science)", "body": "In computer science, arrows or bolts are a type class..." }
+  ]
+}
+```
+### Example
+
+Example result for Ranker tag
+
+```json
+{
+  "from_name": "rank",
+  "to_name": "results",
+  "type": "ranker",
+  "value": { "ranker": { "rank": ["mdn", "wiki", "blog"] } }
+}
+```
+### Example
+
+Example of using Buckets with Ranker tag
+
 ```html
-<!--Example JSON task to use to see the Ranker tag in action -->
-[{
-  "data": {
-    "text": "Some text for the ranker tag"
-  },
-  "predictions": [{
-    "model_version": "1564027355",
-    "result": [{
-      "from_name": "ranker-1",
-      "to_name": "ranker-1",
-      "type": "ranker",
-      "value": {
-        "items": ["abc", "def", "ghk", "more more more", "really long text"],
-        "weights": [1.00, 0.78, 0.75, 0.74, 0.74],
-        "selected": [false, false, false, false, false]
-      }
-    }],
-    "score": 1.0
-  }]
-}]
+<View>
+  <List name="results" value="$items" title="Search Results" />
+  <Ranker name="rank" toName="results">
+    <Bucket name="best" title="Best results" />
+    <Bucket name="ads" title="Paid results" />
+  </Ranker>
+</View>
+```
+### Example
+
+Example result for Ranker tag with Buckets; data is the same
+
+```json
+{
+  "from_name": "rank",
+  "to_name": "results",
+  "type": "ranker",
+  "value": { "ranker": {
+    "best": ["mdn"],
+    "ads": ["blog"]
+  } }
+}
 ```

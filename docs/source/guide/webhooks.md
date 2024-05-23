@@ -1,10 +1,14 @@
 ---
 title: Set up webhooks in Label Studio
-short: Webhook Setup
+short: Webhooks
 type: guide
-order: 650
+tier: all
+order: 407
+order_enterprise: 407
 meta_title: Configure Webhooks in Label Studio
-meta_description: Label Studio documentation for setting up and configuring webhooks to integrate Label Studio with your machine learning pipeline
+meta_description: Label Studio documentation for setting up and configuring webhooks to integrate Label Studio with your machine learning pipeline.
+section: "Integrate & Extend"
+
 ---
 
 Webhooks in Label Studio let you set up integrations that subscribe to certain events that occur inside Label Studio. When an event is triggered, Label Studio sends an HTTP POST request to the configured webhook URL. For example:
@@ -36,11 +40,13 @@ Limit the number of requests to your server by subscribing only to the events re
 Label Studio makes two main types of events available to integrate with webhooks: project-level task events and organization events.
 
 <table>
+<thead>
   <tr>
     <th>Event Action</th>
     <th>Details</th>
     <th>Use Case</th>
   </tr>
+  </thead>
   <tr>
     <td><a href="webhook_reference.html#Task-Created">Task Created</a></td>
     <td>For a specific project, triggers when new tasks are created. One event per import action. Bulk task creation is sent as one event.</td>

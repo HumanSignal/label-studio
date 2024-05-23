@@ -6,7 +6,7 @@
     <Choice value="Eukarya">
       <Choice value="Human" />
       <Choice value="Oppossum" />
-      <Choice value="Extraterrestial" />
+      <Choice value="Extraterrestrial" />
     </Choice>
   </Taxonomy>
 </View>

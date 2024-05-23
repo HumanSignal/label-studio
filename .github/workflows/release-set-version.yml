@@ -1,0 +1,113 @@
+name: "Release: Set version"
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        type: string
+      branch:
+        description: 'Branch reference'
+        required: true
+        default: 'develop'
+        type: string
+
+env:
+  PYTHON_VERSION_FILE: "pyproject.toml"
+
+jobs:
+  commit-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          ref: ${{ inputs.branch }}
+          fetch-depth: 1
+
+      - name: Get GitHub user details
+        id: get-github-user
+        uses: actions/github-script@v7
+        env:
+          ACTOR_USERNAME: ${{ github.event.sender.login }}
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const actor_username = process.env.ACTOR_USERNAME;
+            
+            let user_name = 'robot-ci-heartex';
+            let user_email = 'robot-ci-heartex@users.noreply.github.com';
+            
+            try {
+              const {data: user} = await github.rest.users.getByUsername({
+                username: actor_username,
+              });
+              user_name = user.login;
+              user_email = user.email;
+            } catch (e) {
+              console.log(e)
+            }
+            
+            core.setOutput('user_name', user_name);
+            core.setOutput('user_email', user_email);
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name '${{ steps.get-github-user.outputs.user_name }}'
+          git config --global user.email '${{ steps.get-github-user.outputs.user_email }}'
+
+      - name: Validate user input
+        id: validate-user-input
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          
+          regexp='^[v]?([0-9]+)\.([0-9]+)\.([0-9]+)(\.[a-zA-Z]+([0-9]+))?$'
+          
+          if [[ "${{ inputs.version }}" =~ $regexp ]]; then
+              echo "${{ inputs.version }} does match the regexp ${regexp}"
+          else
+              echo "::error::${{ inputs.version }} does not match the regexp ${regexp}"
+              exit 1
+          fi
+
+      - name: Install toml
+        run: |
+          set -euo pipefail
+          wget -q -O- "https://github.com/gnprice/toml-cli/releases/download/v0.2.3/toml-0.2.3-x86_64-linux.tar.gz" | tar -xz -C .
+          mv toml-0.2.3-x86_64-linux/toml toml
+          chmod +x toml
+
+      - name: Manage version
+        env:
+          PROVIDED_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
+          ./toml set '${{ env.PYTHON_VERSION_FILE }}' tool.poetry.version "$version" > pyproject.toml.new
+          mv -f pyproject.toml.new '${{ env.PYTHON_VERSION_FILE }}'
+
+      - name: Commit version file
+        id: make-commit
+        run: |
+          set -euo pipefail
+          git add ${{ env.PYTHON_VERSION_FILE }}
+          git commit -m "chore: Bump version to ${{ inputs.version }}" -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          echo "commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          git push origin HEAD:refs/heads/${{ inputs.branch }}

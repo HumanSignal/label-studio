@@ -1,0 +1,268 @@
+---
+title: Label Studio Docs
+meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.
+---
+<div class="home-page-index">
+<div class="home-page-title-grid">
+  <div class="home-page-inner-wrapper">
+    <div class="enterprise-only">
+      <svg width="141" height="106" viewBox="0 0 141 106" fill="none" xmlns="http://www.w3.org/2000/svg" class="HeaderSquares">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M35.7182 105.65L35.7182 35.4513L70.8177 35.4513L70.8177 70.5509L105.917 70.5509L105.917 35.4513L105.917 105.65L35.7182 105.65Z" fill="#FF7557"/>
+        <rect width="35.1784" height="35.1784" transform="matrix(4.37114e-08 1 1 -4.37114e-08 0.650391 0.349609)" fill="#FFA663"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M140.65 0.350746L140.65 70.5498L70.4513 70.5498L70.4513 0.350749L140.65 0.350746ZM105.551 35.4502L105.551 70.5497L70.4514 70.5497L70.4514 35.4502L105.551 35.4502Z" fill="#E37BD3"/>
+        </svg>
+    </div>
+    <%- partial("component/heading", {text: "Label Studio Documentation", size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
+    <div class="opensource-only">
+      <p class="Text Large">Discover our Quick Start installation guide, instructions on building custom UIs, pre-built labeling templates to get you labeling more quickly, and much more.</p>
+      <%- partial("component/button", { url: "/guide/quick_start.html", label: "Quick Start Guide", customClass: "Button" }) %>
+    </div>
+    
+    <div class="enterprise-only">
+      <p class="Text Large">Discover how to build custom UIs or take advantage of pre-built labeling templates, manage team member permissions and workflows, and much more.</p>
+      <%- partial("component/button", { url: "/guide/saas.html", label: "Cloud Setup Guide", customClass: "Button" }) %>
+      <%- partial("component/button", { url: "/guide/install_enterprise.html", label: "On-Prem Installation Guide", customClass: "Button" }) %>
+    </div>
+  </div>
+</div>
+<div class="opensource-only">
+  <div class="column-wrapper">
+    <div class="columns">
+      <a href="https://labelstud.io/blog/zero-to-one-getting-started-with-label-studio/" target="_blank" class="card card-link card-image">
+        <img src="../images/design/get-started.png" alt=""/>
+        <div class="card-text">
+          <%- partial("component/heading", {text: "Label Studio 101", tag: "h2", customClass: "card-title" }) %>
+          <p class="Text">Brand new to Label Studio? We've created a jam-packed new tutorial with the most important information to get you up and running.</p>
+          <div class="Link">Get started<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+        </div>
+      </a>
+      <a href="https://labelstud.io/blog/introduction-to-machine-learning-with-label-studio/" target="_blank" class="card card-link card-image">
+        <img src="../images/design/machine-learning.png" alt=""/>
+        <div class="card-text">
+          <%- partial("component/heading", {text: "Machine Learning with Label Studio", tag: "h2", customClass: "card-title" }) %>
+          <p class="Text">Learn the background knowledge and steps required to integrate Machine Learning models into your Label Studio workflow.</p>
+          <div class="Link">Learn more<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+        </div>
+      </a>
+      <a href="/templates/" class="card card-link card-image">
+        <img src="../images/design/templates.png" alt=""/>
+        <div class="card-text">
+          <%- partial("component/heading", {text: "Use templates", tag: "h2", customClass: "card-title" }) %>
+          <p class="Text">Label Studio provides multiple out-of-the-box labeling configurations to help get you started.</p>
+          <div class="Link">Explore templates<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+        </div>
+      </a>
+    </div>
+  </div>
+  <div class="column-wrapper">
+    <h2 class="Heading Large">Popular articles</h2>
+    <div class="columns">
+      <ol class="structured-list">
+        <li><a href="/guide/get_started" class="Link">About Label Studio</a></li>
+        <li><a href="/guide/install" class="Link">Install Label Studio</a></li>
+        <li><a href="/guide/storage" class="Link">Sync data from external storage</a></li>
+      </ol>
+      <ol start="4" class="structured-list">
+        <li><a href="/guide/predictions" class="Link">Import pre-annotated data into Label Studio</a></li>
+        <li><a href="/guide/tasks" class="Link">Get data into Label Studio</a></li>
+        <li><a href="/guide/ml" class="Link">Integrate Label Studio into your machine learning pipeline</a></li>
+      </ol>
+      <ol start="7" class="structured-list">
+        <li><a href="/guide/labeling" class="Link">Label data</a></li>
+        <li><a href="/guide/setup_project" class="Link">Create and configure projects</a></li>
+        <li><a href="/guide/export" class="Link">Export annotations and data from Label Studio</a></li>
+      </ol>
+    </div>
+  </div>
+  <div class="column-wrapper">
+    <h2 class="Heading Large">Get help</h2>
+    <div class="columns">
+      <a href="https://slack.labelstud.io" target="_blank" class="card card-link">
+        <div class="card-text">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="card-icon">
+            <circle cx="15" cy="15" r="15" fill="#F0F0F0"/>
+            <circle cx="15" cy="15" r="15" fill="url(#paint0_linear_430_4317)"/>
+            <path d="M21.4 10.2H20.6V16.6C20.6 17.04 20.24 17.4 19.8 17.4H10.2V18.2C10.2 19.08 10.92 19.8 11.8 19.8H19.8L23 23V11.8C23 10.92 22.28 10.2 21.4 10.2ZM19 14.2V8.6C19 7.72 18.28 7 17.4 7H8.6C7.72 7 7 7.72 7 8.6V19L10.2 15.8H17.4C18.28 15.8 19 15.08 19 14.2Z" fill="white"/>
+            <defs>
+            <linearGradient id="paint0_linear_430_4317" x1="0" y1="0" x2="36.0944" y2="12.7577" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FFA663"/>
+            <stop offset="0.515625" stop-color="#FF7557"/>
+            <stop offset="1" stop-color="#E37BD3"/>
+            </linearGradient>
+            </defs>
+            </svg>            
+          <%- partial("component/heading", {text: "Join Slack", tag: "h2", customClass: "card-title" }) %>
+          <p class="Text">Ask questions, get feedback, and discuss your data labeling projects.</p>
+          <div class="Link">Get started<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/channel/UCbloiVAlCYzBatZXk-b5rFQ" target="_blank" class="card card-link">
+        <div class="card-text">
+          <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="card-icon">
+            <circle cx="15" cy="15" r="15" fill="#F0F0F0"/>
+            <circle cx="15" cy="15" r="15" fill="url(#paint0_linear_430_4326)"/>
+            <path d="M9.23675 9.5C8.64353 9.5 8.0746 9.73566 7.65513 10.1551C7.23566 10.5746 7 11.1435 7 11.7368V18.9632C7 19.5564 7.23566 20.1253 7.65513 20.5448C8.0746 20.9643 8.64353 21.1999 9.23675 21.1999H15.7749C16.3682 21.1999 16.9371 20.9643 17.3566 20.5448C17.776 20.1253 18.0117 19.5564 18.0117 18.9632V11.7368C18.0117 11.1435 17.776 10.5746 17.3566 10.1551C16.9371 9.73566 16.3682 9.5 15.7749 9.5H9.23675ZM21.5375 19.9219L19.044 17.4787V13.2853L21.5299 10.7884C22.0716 10.2447 23 10.628 23 11.3954V19.3073C23 20.0699 22.0819 20.4553 21.5375 19.9219Z" fill="white"/>
+            <defs>
+            <linearGradient id="paint0_linear_430_4326" x1="0" y1="0" x2="36.0944" y2="12.7577" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#FFA663"/>
+            <stop offset="0.515625" stop-color="#FF7557"/>
+            <stop offset="1" stop-color="#E37BD3"/>
+            </linearGradient>
+            </defs>
+            </svg>            
+          <%- partial("component/heading", {text: "Video tutorials", tag: "h2", customClass: "card-title" }) %>
+          <p class="Text">Explore Label Studio's library of video tutorials and demos.</p>
+          <div class="Link">Start watching<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+        </div>
+      </a>
+    </div>
+  </div>
+  <!-- <div class="column-wrapper">
+    <h2 class="Heading Large">Latest Updates</h3>
+    <ul class="changelog">
+      <li class="changelog-item">
+        <span class="Text Eyebrow">Label Studio 2.9.1</span>
+        <a href="" class="Link block-link">Bug fixes</a>
+      </li>
+      <li class="changelog-item">
+        <span class="Text Eyebrow">Label Studio 2.9.0</span>
+        <a href="" class="Link block-link">Improved member list filtering from the Organization page, collapsible Ranker items, various UI improvements</a>
+      </li>
+      <li class="changelog-item">
+        <span class="Text Eyebrow">Label Studio 2.8.0</span>
+        <a href="" class="Link block-link">Improved member list filtering from the Organization page, collapsible Ranker items, various UI improvements</a>
+      </li>
+    </ul>
+    <a href="https://github.com/HumanSignal/label-studio/releases" class="Link">View all release notes<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></a>
+  </div> -->
+</div>
+
+  <div class="enterprise-only">
+    <div class="column-wrapper">
+      <div class="columns">
+        <a href="https://labelstud.io/blog/zero-to-one-getting-started-with-label-studio/" target="_blank" class="card card-link card-image">
+          <img src="../images/design/get-started.png" alt=""/>
+          <div class="card-text">
+            <%- partial("component/heading", {text: "Label Studio 101", tag: "h2", customClass: "card-title" }) %>
+            <p class="Text">Brand new to Label Studio? We've created a jam-packed new tutorial with the most important information to get you up and running.</p>
+            <div class="Link">Get started<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+          </div>
+        </a>
+        <a href="https://labelstud.io/blog/introduction-to-machine-learning-with-label-studio/" target="_blank" class="card card-link card-image">
+          <img src="../images/design/machine-learning.png" alt=""/>
+          <div class="card-text">
+            <%- partial("component/heading", {text: "Machine Learning with Label Studio", tag: "h2", customClass: "card-title" }) %>
+            <p class="Text">Learn the background knowledge and steps required to integrate Machine Learning models into your Label Studio workflow.</p>
+            <div class="Link">Learn more<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+          </div>
+        </a>
+        <a href="/templates/" class="card card-link card-image">
+          <img src="../images/design/templates.png" alt=""/>
+          <div class="card-text">
+            <%- partial("component/heading", {text: "Use templates", tag: "h2", customClass: "card-title" }) %>
+            <p class="Text">Label Studio provides multiple out-of-the-box labeling configurations to help get you started.</p>
+            <div class="Link">Explore templates<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="column-wrapper">
+      <h2 class="Heading Large">Popular articles</h2>
+      <div class="columns">
+        <ol class="structured-list">
+          <li><a href="/guide/get_started" class="Link">About Label Studio</a></li>
+          <li><a href="/guide/storage" class="Link">Sync data from external storage</a></li>
+          <li><a href="/guide/predictions" class="Link">Import pre-annotated data into Label Studio</a></li>
+        </ol>
+        <ol start="4" class="structured-list">
+          <li><a href="/guide/tasks" class="Link">Get data into Label Studio</a></li>
+          <li><a href="/guide/ml" class="Link">Integrate Label Studio into your machine learning pipeline</a></li>
+          <li><a href="/guide/labeling" class="Link">Label data</a></li>
+        </ol>
+        <ol start="7" class="structured-list">
+          <li><a href="/guide/setup_project" class="Link">Create and configure projects</a></li>
+          <li><a href="/guide/export" class="Link">Export annotations and data from Label Studio</a></li>
+          <li><a href="/guide/manage_data" class="Link">Use the Data Manager in projects</a></li>
+        </ol>
+      </div>
+    </div>
+    <div class="column-wrapper">
+      <h2 class="Heading Large">Get help</h2>
+      <div class="columns">
+        <a href="https://slack.labelstud.io" target="_blank" class="card card-link">
+          <div class="card-text">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="card-icon">
+              <circle cx="15" cy="15" r="15" fill="#F0F0F0"/>
+              <circle cx="15" cy="15" r="15" fill="url(#paint0_linear_430_4330)"/>
+              <path d="M21.4 10.2H20.6V16.6C20.6 17.04 20.24 17.4 19.8 17.4H10.2V18.2C10.2 19.08 10.92 19.8 11.8 19.8H19.8L23 23V11.8C23 10.92 22.28 10.2 21.4 10.2ZM19 14.2V8.6C19 7.72 18.28 7 17.4 7H8.6C7.72 7 7 7.72 7 8.6V19L10.2 15.8H17.4C18.28 15.8 19 15.08 19 14.2Z" fill="white"/>
+              <defs>
+              <linearGradient id="paint0_linear_430_4317" x1="0" y1="0" x2="36.0944" y2="12.7577" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FFA663"/>
+              <stop offset="0.515625" stop-color="#FF7557"/>
+              <stop offset="1" stop-color="#E37BD3"/>
+              </linearGradient>
+              </defs>
+              </svg>            
+            <%- partial("component/heading", {text: "Join Slack", tag: "h2", customClass: "card-title" }) %>
+            <p class="Text">Ask questions, get feedback, and discuss your data labeling projects.</p>
+            <div class="Link">Join our community<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+          </div>
+        </a>
+        <a href="https://support.humansignal.com/hc/en-us" target="_blank" class="card card-link">
+          <div class="card-text">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="card-icon">
+              <circle cx="15" cy="15" r="15" fill="#F0F0F0"/>
+              <circle cx="15" cy="15" r="15" fill="url(#paint0_linear_430_4330)"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12.3788 8.937C13.234 8.22429 14.292 8 15.2 8C16.108 8 17.1661 8.22429 18.0213 8.937C18.9215 9.68714 19.4001 10.8134 19.4001 12.2C19.4001 13.1545 19.1542 13.934 18.6948 14.5657C18.2623 15.1604 17.71 15.5198 17.3421 15.7498C17.2795 15.7888 17.223 15.824 17.1717 15.856C16.8592 16.0504 16.7406 16.1242 16.6475 16.2212C16.6452 16.2235 16.6428 16.2257 16.6404 16.2279C16.6216 16.2452 16.6 16.2649 16.6 16.4001V17.8001H13.8V16.4001C13.8 15.5026 14.1226 14.8081 14.6276 14.2821C14.9898 13.9048 15.4581 13.6195 15.743 13.4459C15.7858 13.4199 15.8245 13.3963 15.858 13.3753C16.1901 13.1678 16.3378 13.0459 16.4303 12.9188C16.4959 12.8286 16.6 12.6456 16.6 12.2C16.6 11.4867 16.3786 11.2129 16.2288 11.088C16.034 10.9257 15.692 10.8 15.2 10.8C14.708 10.8 14.366 10.9257 14.1713 11.088C14.0214 11.2129 13.8 11.4867 13.8 12.2V12.9H11V12.2C11 10.8134 11.4786 9.68714 12.3788 8.937ZM13.8 22.0001V19.2001H16.6V22.0001H13.8Z" fill="white"/>
+              <defs> 
+              <linearGradient id="paint0_linear_430_4330" x1="0" y1="0" x2="36.0944" y2="12.7577" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FFA663"/>
+              <stop offset="0.515625" stop-color="#FF7557"/>
+              <stop offset="1" stop-color="#E37BD3"/>
+              </linearGradient>
+              </defs>
+              </svg>            
+            <%- partial("component/heading", {text: "Support portal", tag: "h2", customClass: "card-title" }) %>
+            <p class="Text">Open a support ticket, find troubleshooting content and FAQ.</p>
+            <div class="Link">Get help<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+          </div>
+        </a>
+        <a href="https://www.youtube.com/channel/UCbloiVAlCYzBatZXk-b5rFQ" target="_blank" class="card card-link">
+          <div class="card-text">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" class="card-icon">
+              <circle cx="15" cy="15" r="15" fill="#F0F0F0"/>
+              <circle cx="15" cy="15" r="15" fill="url(#paint0_linear_430_4330)"/>
+              <path d="M9.23675 9.5C8.64353 9.5 8.0746 9.73566 7.65513 10.1551C7.23566 10.5746 7 11.1435 7 11.7368V18.9632C7 19.5564 7.23566 20.1253 7.65513 20.5448C8.0746 20.9643 8.64353 21.1999 9.23675 21.1999H15.7749C16.3682 21.1999 16.9371 20.9643 17.3566 20.5448C17.776 20.1253 18.0117 19.5564 18.0117 18.9632V11.7368C18.0117 11.1435 17.776 10.5746 17.3566 10.1551C16.9371 9.73566 16.3682 9.5 15.7749 9.5H9.23675ZM21.5375 19.9219L19.044 17.4787V13.2853L21.5299 10.7884C22.0716 10.2447 23 10.628 23 11.3954V19.3073C23 20.0699 22.0819 20.4553 21.5375 19.9219Z" fill="white"/>
+              <defs>
+              <linearGradient id="paint0_linear_430_4326" x1="0" y1="0" x2="36.0944" y2="12.7577" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FFA663"/>
+              <stop offset="0.515625" stop-color="#FF7557"/>
+              <stop offset="1" stop-color="#E37BD3"/>
+              </linearGradient>
+              </defs>
+              </svg>            
+            <%- partial("component/heading", {text: "Video tutorials", tag: "h2", customClass: "card-title" }) %>
+            <p class="Text">Explore Label Studio's library of video tutorials and demos.</p>
+            <div class="Link">Start watching<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></div>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="column-wrapper">
+
+      <% let recentReleaseNotes = getRecentReleaseNotes(); %>
+      <h2 class="Heading Large">Latest Updates</h2>
+      <ul class="changelog">
+        <% for (const note of recentReleaseNotes) { %>
+          <li class="changelog-item">
+            <a href="/guide/release_notes/#<%= note.id %>" class="Link block-link">
+              <%= note.title %>
+              </a>
+            </li>
+        <% } %>
+        </ul>
+      
+      <a href="/guide/release_notes.html" class="Link">View all release notes<svg width="14" height="13" fill="#131522" xmlns="http://www.w3.org/2000/svg"><path d="M7.441 12.236 6.291 11.1l3.995-3.995H.25V5.442h10.036L6.29 1.453 7.441.31l5.964 5.964-5.964 5.963Z" /></svg></a>
+    </div>
+  </div>
+</div>

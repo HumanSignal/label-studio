@@ -1,11 +1,15 @@
 ---
-title: Available Helm values for Label Studio Enterprise Kubernetes deployments
+title: Available Helm values for Label Studio Helm Chart
 short: Available Helm values
-badge: <i class='ent'></i>
+tier: all
 type: guide
-order: 220
-meta_title: Available Helm values for Label Studio Enterprise Kubernetes deployments
-meta_description: For cases when you want to customize your Label Studio Enterprise Kubernetes deployment, review these available Helm values that you can set in your Helm chart.
+order: 72
+order_enterprise: 72
+meta_title: Available Helm values for Label Studio Helm Chart
+meta_description: For cases when you want to customize your Label Studio Kubernetes deployment, review these available Helm values that you can set in your Helm chart.
+section: "Install & Setup"
+parent: "install_k8s"
+parent_enterprise: "install_enterprise_k8s"
 ---
 
 <!-- Fix for long values in table cells -->
@@ -33,204 +37,289 @@ meta_description: For cases when you want to customize your Label Studio Enterpr
   }
 </style>
 
-Refer to these tables with available Helm chart values for your `lse-values.yaml` file
-when configuring your Label Studio Enterprise deployment on Kubernetes. See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html) for more.
+Refer to these tables with available Helm chart values for your `values.yaml` file
+when configuring your Label Studio deployment on Kubernetes. See [Deploy Label Studio on Kubernetes](install_k8s.html) for more.
 
 ## Global parameters
+
 Global parameters for the Helm chart.
 
-| Key                                                                         | Type   | Default Value                       | Description                                                                                         |
-|-----------------------------------------------------------------------------|--------|-------------------------------------|-----------------------------------------------------------------------------------------------------|
-| `global.imagePullSecrets`                                                   | string | []                                  | Image pull secret to use for registry authentication                                                |
-| `global.image.repository`                                                   | string | heartexlabs/label-studio-enterprise | Image repository                                                                                    |
-| `global.image.pullPolicy`                                                   | string | IfNotPresent                        | Image pull policy                                                                                   |
-| `global.image.tag`                                                          | string | ""                                  | Image tag (immutable tags are recommended)                                                          |
-| `global.djangoConfig.db`                                                    | string | default                             | Django default config name                                                                          |
-| `global.djangoConfig.settings_module`                                       | string | htx.settings.label_studio           | Django default settings module name                                                                 |
-| `global.enterpriseLicense.secretName`                                       | string | ""                                  | Name of an existing secret holding the Label Studio Enterprise license information                  |
-| `global.enterpriseLicense.secretKey`                                        | string | license                             | Key of an existing secret holding the enterprise license information                                |
-| `global.pgConfig.host`                                                      | string | ""                                  | PostgreSQL hostname                                                                                 |
-| `global.pgConfig.port`                                                      | string | 5432                                | PostgreSQL port                                                                                     |
-| `global.pgConfig.dbName`                                                    | string | ""                                  | PostgreSQL database name                                                                            |
-| `global.pgConfig.userName`                                                  | string | ""                                  | PostgreSQL database user account                                                                    |
-| `global.pgConfig.password.secretName`                                       | string | ""                                  | Name of an existing secret holding the password of PostgreSQL database user account                 |
-| `global.pgConfig.password.secretKey`                                        | string | ""                                  | Key of an existing secret holding the password of PostgreSQL database user account                  |
-| `global.redisConfig.host`                                                   | string | ""                                  | Redis connection string in a format:  `redis://[:password]@localhost:6379/1`                        |
-| `global.redisConfig.password.secretName`                                    | string | ""                                  | Name of an existing secret holding the password of Redis database                                   |
-| `global.redisConfig.password.secretKey`                                     | string | ""                                  | Key of an existing secret holding the password of Redis database                                    |
-| `global.extraEnvironmentVars`                                               | map    | {}                                  | Key/value map of an extra Environment variables, for example, `PYTHONUNBUFFERED: 1`                 |
-| `global.extraEnvironmentSecrets`                                            | map    | {}                                  | Key/value map of an extra Secrets                                                                   |
-| `global.contextPath`                                                        | string | /                                   | Context path appended for health/readiness checks                                                   |
-| `global.persistence.enabled`                                                | string | false                               | Enable persistent storage. See more about setting up [persistent storage](persistent_storage.html). |
-| `global.persistence.type`                                                   | string | volume                              | Persistent storage type                                                                             |
-| `global.persistence.config.s3.accessKey`                                    | string | ""                                  | Access key to use to access AWS S3                                                                  |
-| `global.persistence.config.s3.secretKey`                                    | string | ""                                  | Secret key to use to access AWS S3                                                                  |
-| `global.persistence.config.s3.accessKeyExistingSecret`                      | string | ""                                  | Existing Secret name to extract Access key from to access AWS S3                                    |
-| `global.persistence.config.s3.accessKeyExistingSecretKey`                   | string | ""                                  | Existing Secret key to extract Access key from to access AWS S3                                     |
-| `global.persistence.config.s3.secretKeyExistingSecret`                      | string | ""                                  | Existing Secret name to extract Access secret key from to access AWS S3                             |
-| `global.persistence.config.s3.secretKeyExistingSecretKey`                   | string | ""                                  | Existing Secret key to extract Access secret key from to access AWS S3                              |
-| `global.persistence.config.s3.region`                                       | string | ""                                  | AWS S3 region                                                                                       |
-| `global.persistence.config.s3.bucket`                                       | string | ""                                  | AWS S3 bucket name                                                                                  |
-| `global.persistence.config.s3.folder`                                       | string | ""                                  | AWS S3 folder name                                                                                  |
-| `global.persistence.config.s3.urlExpirationSecs`                            | string | 86400                               | The number of seconds that a presigned URL is valid for                                             |
-| `global.persistence.config.volume.storageClass`                             | string | ""                                  | StorageClass for Persistent Volume                                                                  |
-| `global.persistence.config.volume.size`                                     | string | 5Gi                                 | Persistent volume size                                                                              |
-| `global.persistence.config.volume.annotations`                              | map    | {}                                  | Persistent volume additional annotations                                                            |
-| `global.persistence.config.volume.existingClaim`                            | string | ""                                  | Name of an existing PVC to use                                                                      |
-| `global.persistence.config.volume.resourcePolicy`                           | string | ""                                  | PVC resource policy                                                                                 |
-| `global.persistence.config.azure.storageAccountName`                        | string | ""                                  | Azure Storage Account Name to use to access Azure Blob Storage                                      |
-| `global.persistence.config.azure.storageAccountKey`                         | string | ""                                  | Azure Storage Account Key to use to access Azure Blob Storage                                       |
-| `global.persistence.config.azure.storageAccountNameExistingSecret`          | string | ""                                  | Existing Secret name to extract Azure Storage Account Name from to access Azure Blob Storage        |
-| `global.persistence.config.azure.storageAccountNameExistingSecretKey`       | string | ""                                  | Existing Secret key to extract Azure Storage Account Name from to use to access Azure Blob Storage  |
-| `global.persistence.config.azure.storageAccountKeyExistingSecret`           | string | ""                                  | Existing Secret name to extract Azure Storage Account Key from to access Azure Blob Storage         |
-| `global.persistence.config.azure.storageAccountKeyExistingSecretKey`        | string | ""                                  | Existing Secret key to extract Azure Storage Account Key from to use to access Azure Blob Storage   |
-| `global.persistence.config.azure.containerName`                             | string | ""                                  | Azure Storage container name                                                                        |
-| `global.persistence.config.azure.folder`                                    | string | ""                                  | Azure Storage folder name                                                                           |
-| `global.persistence.config.azure.urlExpirationSecs`                         | string | 86400                               | The number of seconds that a presigned URL is valid for                                             |
-| `global.persistence.config.gcs.projectID`                                   | string | ""                                  | GCP Project ID to use                                                                               |
-| `global.persistence.config.gcs.applicationCredentialsJSON`                  | string | ""                                  | Service Account key to access GCS                                                                   |
-| `global.persistence.config.gcs.applicationCredentialsJSONExistingSecret`    | string | ""                                  | Existing Secret name to extract Service Account Key from to access GCS                              |
-| `global.persistence.config.gcs.applicationCredentialsJSONExistingSecretKey` | string | ""                                  | Existing Secret key to extract Service Account Key from to access GCS                               |
-| `global.persistence.config.gcs.bucket`                                      | string | ""                                  | GCS bucket name                                                                                     |
-| `global.persistence.config.gcs.folder`                                      | string | ""                                  | GCS folder name                                                                                     |
-| `global.persistence.config.gcs.urlExpirationSecs`                           | string | 86400                               | The number of seconds that a presigned URL is valid for                                             |
-| `featureFlags`                                                              | map    | {}                                  | Key/value map of Feature Flags                                                                      |
+| Parameter                                                                   | Description                                                                                                                         | Default                    |
+|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
+| `global.imagePullSecrets`                                                   | Global Docker registry secret names as an array                                                                                     | `[]`                       |
+| `global.image.repository`                                                   | Image repository                                                                                                                    | `heartexlabs/label-studio` |
+| `global.image.pullPolicy`                                                   | Image pull policy                                                                                                                   | `IfNotPresent`             |
+| `global.image.tag`                                                          | Image tag (immutable tags are recommended)                                                                                          | `develop`                  |
+| `global.pgConfig.host`                                                      | PostgreSQL hostname                                                                                                                 | `""`                       |
+| `global.pgConfig.port`                                                      | PostgreSQL port                                                                                                                     | `5432`                     |
+| `global.pgConfig.dbName`                                                    | PostgreSQL database name                                                                                                            | `""`                       |
+| `global.pgConfig.userName`                                                  | PostgreSQL database user account                                                                                                    | `""`                       |
+| `global.pgConfig.password.secretName`                                       | Name of an existing secret holding the password of PostgreSQL database user account                                                 | `""`                       |
+| `global.pgConfig.password.secretKey`                                        | Key of an existing secret holding the password of PostgreSQL database user account                                                  | `""`                       |
+| `global.pgConfig.ssl.pgSslMode`                                             | [PostgreSQL SSL mode](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNECT-SSLMODE)                             | `""`                       |
+| `global.pgConfig.ssl.pgSslSecretName`                                       | Name of an existing secret holding the ssl certificate for PostgreSQL host                                                          | `""`                       |
+| `global.pgConfig.ssl.pgSslRootCertSecretKey`                                | Key of an existing secret holding the ssl certificate for PostgreSQL host                                                           | `""`                       |
+| `global.pgConfig.ssl.pgSslCertSecretKey`                                    | Name of an existing secret holding the ssl certificate private key for PostgreSQL host                                              | `""`                       |
+| `global.pgConfig.ssl.pgSslKeySecretKey`                                     | Key of an existing secret holding the ssl certificate private key for PostgreSQL host                                               | `""`                       |
+| `global.redisConfig.host`                                                   | Redis connection string in a format: redis://[:password]@localhost:6379/1                                                           | `""`                       |
+| `global.redisConfig.password.secretName`                                    | Name of an existing secret holding the password of Redis database                                                                   | `""`                       |
+| `global.redisConfig.password.secretKey`                                     | Key of an existing secret holding the password of Redis database                                                                    | `""`                       |
+| `global.redisConfig.ssl.redisSslCertReqs`                                   | Whether to validate the server public key or ignore it. Accepts (`""`, `"optional"`, `"required"`).                                 | `""`                       |
+| `global.redisConfig.ssl.redisSslSecretName`                                 | Name of an existing secret holding the ssl certificate for Redis host                                                               | `""`                       |
+| `global.redisConfig.ssl.redisSslCaCertsSecretKey`                           | Key of an existing secret holding the ssl certificate for Redis host                                                                | `""`                       |
+| `global.redisConfig.ssl.redisSslCertFileSecretKey`                          | Name of an existing secret holding the ssl certificate private key for Redis host                                                   | `""`                       |
+| `global.redisConfig.ssl.redisSslKeyFileSecretKey`                           | Key of an existing secret holding the ssl certificate private key for Redis host                                                    | `""`                       |
+| `global.extraEnvironmentVars`	                                              | Key/value map of an extra Environment variables, for example, `PYTHONUNBUFFERED: 1`                                                 | `{}`                       |
+| `global.extraEnvironmentSecrets`                                            | Key/value map of an extra Secrets                                                                                                   | `{}`                       |
+| `global.persistence.enabled`                                                | Enable persistent storage. [See more about setting up persistent storage](https://labelstud.io/guide/persistent_storage.html)       | `true`                     |
+| `global.persistence.type`                                                   | Persistent storage type                                                                                                             | `volume`                   |
+| `global.persistence.config.s3.accessKey`                                    | Access key to use to access AWS S3                                                                                                  | `""`                       |
+| `global.persistence.config.s3.secretKey`                                    | Secret key to use to access AWS S3                                                                                                  | `""`                       |
+| `global.persistence.config.s3.accessKeyExistingSecret`                      | Existing Secret name to extract Access key from to access AWS S3                                                                    | `""`                       |
+| `global.persistence.config.s3.accessKeyExistingSecretKey`                   | Existing Secret key to extract Access key from to access AWS S3                                                                     | `""`                       |
+| `global.persistence.config.s3.secretKeyExistingSecret`                      | Existing Secret name to extract Access secret key from to access AWS S3                                                             | `""`                       |
+| `global.persistence.config.s3.secretKeyExistingSecretKey`                   | Existing Secret key to extract Access secret key from to access AWS S3                                                              | `""`                       |
+| `global.persistence.config.s3.region`                                       | AWS S3 region                                                                                                                       | `""`                       |
+| `global.persistence.config.s3.bucket`                                       | AWS S3 bucket name                                                                                                                  | `""`                       |
+| `global.persistence.config.s3.folder`                                       | AWS S3 folder name                                                                                                                  | `""`                       |
+| `global.persistence.config.s3.urlExpirationSecs`                            | The number of seconds that a presigned URL is valid for                                                                             | `86400`                    |
+| `global.persistence.config.s3.endpointUrl`                                  | Custom S3 URL to use when connecting to S3, including scheme                                                                        | `""`                       |
+| `global.persistence.config.volume.storageClass`                             | StorageClass for Persistent Volume                                                                                                  | `""`                       |
+| `global.persistence.config.volume.size`                                     | Persistent volume size                                                                                                              | `10Gi`                     |
+| `global.persistence.config.volume.accessModes`                              | PVC Access mode                                                                                                                     | `[ReadWriteOnce]`          |
+| `global.persistence.config.volume.annotations`	                             | Persistent volume additional annotations                                                                                            | `{}`                       |
+| `global.persistence.config.volume.existingClaim`                            | Name of an existing PVC to use                                                                                                      | `""`                       |
+| `global.persistence.config.volume.resourcePolicy`                           | PVC resource policy                                                                                                                 | `""`                       |
+| `global.persistence.config.volume.annotations`                              | Persistent volume additional annotations                                                                                            | `{}`                       |
+| `global.persistence.config.azure.storageAccountName`                        | Azure Storage Account Name to use to access Azure Blob Storage                                                                      | `""`                       |
+| `global.persistence.config.azure.storageAccountKey`                         | Azure Storage Account Key to use to access Azure Blob Storage                                                                       | `""`                       |
+| `global.persistence.config.azure.storageAccountNameExistingSecret`          | Existing Secret name to extract Azure Storage Account Name from to access Azure Blob Storage                                        | `""`                       |
+| `global.persistence.config.azure.storageAccountNameExistingSecretKey`       | Existing Secret key to extract Azure Storage Account Name from to use to access Azure Blob Storage                                  | `""`                       |
+| `global.persistence.config.azure.storageAccountKeyExistingSecret`           | Existing Secret name to extract Azure Storage Account Key from to access Azure Blob Storage                                         | `""`                       |
+| `global.persistence.config.azure.storageAccountKeyExistingSecretKey`        | Existing Secret key to extract Azure Storage Account Key from to use to access Azure Blob Storage                                   | `""`                       |
+| `global.persistence.config.azure.containerName`                             | Azure Storage container name                                                                                                        | `""`                       |
+| `global.persistence.config.azure.folder`                                    | Azure Storage folder name                                                                                                           | `""`                       |
+| `global.persistence.config.azure.urlExpirationSecs`                         | The number of seconds that a presigned URL is valid for                                                                             | `86400`                    |
+| `global.persistence.config.gcs.projectID`                                   | GCP Project ID to use                                                                                                               | `""`                       |
+| `global.persistence.config.gcs.applicationCredentialsJSON`                  | Service Account key to access GCS                                                                                                   | `""`                       |
+| `global.persistence.config.gcs.applicationCredentialsJSONExistingSecret`    | Existing Secret name to extract Service Account Key from to access GCS                                                              | `""`                       |
+| `global.persistence.config.gcs.applicationCredentialsJSONExistingSecretKey` | Existing Secret key to extract Service Account Key from to access GCS                                                               | `""`                       |
+| `global.persistence.config.gcs.bucket`                                      | GCS bucket name                                                                                                                     | `""`                       |
+| `global.persistence.config.gcs.folder`                                      | GCS folder name                                                                                                                     | `""`                       |
+| `global.persistence.config.gcs.urlExpirationSecs`                           | The number of seconds that a presigned URL is valid for                                                                             | `86400`                    |
+| `global.featureFlags`                                                       | Key/value map of Feature Flags                                                                                                      | `{}`                       |
+| `global.envInjectSources`                                                   | List of file names of a shell scripts to load additional environment variables from. This is useful when using Vault Agent Injector | `[]`                       |
+| `global.cmdWrapper`                                                         | Additional commands to run prior to starting App. Useful to run wrappers before startup command                                     | `""`                       |
+| `global.customCaCerts`                                                      | List of file names of SSL certificates to add into trust chain                                                                      | `[]`                       |
 
 ## App parameters
-Parameters specific to the `app` portion of the Label Studio Enterprise deployment.
 
-| Key                                                     | Type    | Default  Value    | Description                                                                                 |
-|---------------------------------------------------------|---------|-------------------|---------------------------------------------------------------------------------------------|
-| `app.enabled`                                           | string  | true              | Enable app pod                                                                              |
-| `app.deploymentStrategy.type`                           | string  | RollingUpdate     | Deployment strategy type                                                                    |
-| `app.deploymentStrategy.rollingUpdate.maxSurge`         | string  | 2                 | The maximum number of pods that can be created over the desired number of pods              |
-| `app.deploymentStrategy.rollingUpdate.maxUnavailable`   | string  | 0                 | The maximum number of pods that can be unavailable during the update process                |
-| `app.replicas`                                          | string  | 1                 | Amount of app pod replicas                                                                  |
-| `app.NameOverride`                                      | string  | ""                | String to partially override release template name                                          |
-| `app.FullnameOverride`                                  | string  | ""                | String to fully override release template name                                              |
-| `app.resources.requests.memory`                         | string  | 384Mi             | The requested memory resources for the App container                                        |
-| `app.resources.requests.cpu`                            | string  | 250m              | The requested cpu resources for the App container                                           |
-| `app.resources.limits.memory`                           | string  | 1024Mi            | The memory resources limits for the App container                                           |
-| `app.resources.limits.cpu`                              | string  | 750m              | The cpu resources limits for the App container                                              |
-| `app.logLevel`                                          | string  | INFO              | Application log level                                                                       |
-| `app.debug`                                             | string  | ""                | Application DEBUG mode                                                                      |
-| `app.extraEnvironmentVars`                              | map     | {}                | A map of extra environment variables to set                                                 |
-| `app.extraEnvironmentSecrets`                           | map     | {}                | A map of extra environment secrets to set                                                   |
-| `app.nodeSelector`                                      | map     | {}                | labels for pod assignment, formatted as a multi-line string or YAML map                     |
-| `app.annotations`                                       | map     | {}                | k8s annotations to attach to the app pods                                                   |
-| `app.extraLabels`                                       | map     | {}                | extra k8s labels to attach                                                                  |
-| `app.affinity`                                          | map     | {}                | Affinity for pod assignment                                                                 |
-| `app.tolerations`                                       | list    | []                | Toleration settings for pod                                                                 |
-| `app.readinessProbe.enabled`                            | string  | true              | Enable redinessProbe                                                                        |
-| `app.readinessProbe.path`                               | string  | /version          | Path for reasinessProbe                                                                     |
-| `app.readinessProbe.failureThreshold`                   | string  | 2                 | When a probe fails, Kubernetes will try failureThreshold times before giving up             |
-| `app.readinessProbe.initialDelaySeconds`                | string  | 10                | Number of seconds after the container has started before probe initiates                    |
-| `app.readinessProbe.periodSeconds`                      | string  | 10                | How often (in seconds) to perform the probe                                                 |
-| `app.readinessProbe.successThreshold`                   | string  | 1                 | Minimum consecutive successes for the probe to be considered successful after having failed |
-| `app.readinessProbe.timeoutSeconds`                     | string  | 5                 | Number of seconds after which the probe times out                                           |
-| `app.livenessProbe.enabled`                             | string  | true              | Enable livenessProbe                                                                        |
-| `app.livenessProbe.path`                                | string  | /health           | Path for livenessProbe                                                                      |
-| `app.livenessProbe.failureThreshold`                    | string  | 3                 | When a probe fails, Kubernetes will try failureThreshold times before giving up             |
-| `app.livenessProbe.initialDelaySeconds`                 | string  | 60                | Number of seconds after the container has started before probe initiates                    |
-| `app.livenessProbe.periodSeconds`                       | string  | 10                | How often (in seconds) to perform the probe                                                 |
-| `app.livenessProbe.successThreshold`                    | string  | 1                 | Minimum consecutive successes for the probe to be considered successful after having failed |
-| `app.livenessProbe.timeoutSeconds`                      | string  | 5                 | Number of seconds after which the probe times out                                           |
-| `app.service.type`                                      | string  | ClusterIP         | k8s service type                                                                            |
-| `app.service.port`                                      | string  | 80                | k8s service port                                                                            |
-| `app.service.targetPort`                                | string  | 8085              | k8s servuce target port                                                                     |
-| `app.service.portName`                                  | string  | service           | k8s service port name                                                                       |
-| `app.service.annotations`                               | map     | {}                | Custom annotations for app service                                                          |
-| `app.service.sessionAffinity`                           | string  | "None"            | Session Affinity for Kubernetes service, can be "None" or "ClientIP"                        |
-| `app.service.sessionAffinityConfig`                     | map     | {}                | Additional settings for the sessionAffinity                                                 |
-| `app.ingress.enabled`                                   | string  | true              | Enable ingress                                                                              |
-| `app.ingress.className`                                 | string  | ""                | Ingress classname                                                                           |
-| `app.ingress.annotations`                               | map     | {}                | Additional ingress annotations                                                              |
-| `app.ingress.host`                                      | string  | app.heartex.local | Ingress host                                                                                |
-| `app.ingress.path`                                      | string  | /                 | Ingress path                                                                                |
-| `app.ingress.extraPaths`                                | list    | []                | Extra paths to prepend to the host configuration                                            |
-| `app.ingress.tls`                                       | list    | []                | TLS secrets definition                                                                      |
-| `app.serviceAccount.create`                             | string  | true              | Enable the creation of a ServiceAccount for app pod                                         |
-| `app.serviceAccount.name`                               | string  | ""                | Name of the created ServiceAccount                                                          |
-| `app.serviceAccount.annotations`                        | map     | {}                | Custom annotations for app ServiceAccount                                                   |
-| `app.extraVolumes`                                      | list    | []                | Array to add extra volumes                                                                  |
-| `app.extraVolumeMounts`                                 | list    | []                | Array to add extra mounts (normally used with extraVolumes)                                 |
-| `app.podSecurityContext.enabled`                        | string  | false             | Enable pod Security Context                                                                 |
-| `app.containerSecurityContext.enabled`                  | string  | true              | Enable container Security Context                                                           |
-| `app.containerSecurityContext.runAsNonRoot`             | string  | true              | Avoid running as root User                                                                  |
-| `app.containerSecurityContext.allowPrivilegeEscalation` | string  | false             | Controls whether a process can gain more privileges than its parent process                 |
-| `app.topologySpreadConstraints`                         | list    | [ ]               | Topology Spread Constraints for pod assignment                                              |
-| `app.dnsPolicy`                                         | string  | ""                | Pod DNS policy                                                                              |
-| `app.enableServiceLinks`                                | boolean | false             | Service environment variables                                                               |
-| `app.shareProcessNamespace`                             | boolean | false             | Enable shared process namespace in a pod                                                    |
-| `app.automountServiceAccountToken`                      | bollean | true              | Automount service account token for the server service account                              |
+Parameters specific to the `app` portion of the Label Studio deployment.
 
-
-
+| Parameter                                      | Description                                                                                                          | Default                  |
+|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|--------------------------|
+| `app.args`                                     | Override default container args (useful when using custom images)	                                                   | `["label-studio-uwsgi"]` |
+| `app.deploymentStrategy.type`                  | Deployment strategy type                                                                                             | `RollingUpdate`          |
+| `app.replicas`                                 | Amount of app pod replicas                                                                                           | `1`                      |
+| `app.NameOverride`                             | String to partially override release template name                                                                   | `""`                     |
+| `app.FullnameOverride`                         | String to fully override release template name                                                                       | `""`                     |
+| `app.resources.requests.memory`                | The requested memory resources for the App container                                                                 | `384Mi`                  |
+| `app.resources.requests.cpu`                   | The requested cpu resources for the App container                                                                    | `250m`                   |
+| `app.resources.limits.memory`                  | The memory resources limits for the App container                                                                    | `""`                     |
+| `app.resources.limits.cpu`                     | The cpu resources limits for the App container                                                                       | `""`                     |
+| `app.initContainer.resources.requests`         | Init container db-migrations resource requests                                                                       | `{}`                     |
+| `app.initContainer.resources.limits`           | Init container db-migrations resource limits                                                                         | `{}`                     |
+| `app.readinessProbe.enabled`                   | Enable redinessProbe                                                                                                 | `false`                  |
+| `app.readinessProbe.path`                      | Path for reasinessProbe                                                                                              | `/version`               |
+| `app.readinessProbe.failureThreshold`          | When a probe fails, Kubernetes will try failureThreshold times before giving up                                      | `2`                      |
+| `app.readinessProbe.initialDelaySeconds`       | Number of seconds after the container has started before probe initiates                                             | `60`                     |
+| `app.readinessProbe.periodSeconds`             | How often (in seconds) to perform the probe                                                                          | `10`                     |
+| `app.readinessProbe.successThreshold`          | Minimum consecutive successes for the probe to be considered successful after having failed                          | `1`                      |
+| `app.readinessProbe.timeoutSeconds`            | Number of seconds after which the probe times out                                                                    | `5`                      |
+| `app.livenessProbe.enabled`                    | Enable livenessProbe                                                                                                 | `true`                   |
+| `app.livenessProbe.path`                       | Path for livenessProbe                                                                                               | `/health`                |
+| `app.livenessProbe.failureThreshold`           | When a probe fails, Kubernetes will try failureThreshold times before giving up                                      | `3`                      |
+| `app.livenessProbe.initialDelaySeconds`        | Number of seconds after the container has started before probe initiates                                             | `60`                     |
+| `app.livenessProbe.periodSeconds`              | How often (in seconds) to perform the probe                                                                          | `10`                     |
+| `app.livenessProbe.successThreshold`           | Minimum consecutive successes for the probe to be considered successful after having failed                          | `1`                      |
+| `app.livenessProbe.timeoutSeconds`             | Number of seconds after which the probe times out                                                                    | `5`                      |
+| `app.extraEnvironmentVars`                     | A map of extra environment variables to set                                                                          | `{}`                     |
+| `app.extraEnvironmentSecrets`                  | A map of extra environment secrets to set                                                                            | `{}`                     |
+| `app.nodeSelector`                             | Labels for pod assignment, formatted as a multi-line string or YAML map                                              | `{}`                     |
+| `app.annotations`                              | k8s annotations to attach to the app pods                                                                            | `{}`                     |
+| `app.extraLabels`                              | extra k8s labels to attach                                                                                           | `{}`                     |
+| `app.affinity`                                 | Affinity for pod assignment                                                                                          | `{}`                     |
+| `app.tolerations`                              | Toleration settings for pod                                                                                          | `[]`                     |
+| `app.nginx.resources.requests`                 | Nginx sidecar container: resource requests                                                                           | `{}`                     |
+| `app.nginx.resources.limits`                   | Nginx sidecar container: resource limits                                                                             | `{}`                     |
+| `app.dnsPolicy`                                | Pod DNS policy                                                                                                       | `ClusterFirst`           |
+| `app.enableServiceLinks`                       | Service environment variables                                                                                        | `false`                  |
+| `app.shareProcessNamespace`                    | Enable shared process namespace in a pod                                                                             | `false`                  |
+| `app.automountServiceAccountToken`             | Automount service account token for the server service account                                                       | `true`                   |
+| `app.serviceAccount.create`                    | Enable the creation of a ServiceAccount for app pod                                                                  | `true`                   |
+| `app.serviceAccount.name`                      | Name of the created ServiceAccount                                                                                   |                          |
+| `app.serviceAccount.annotations`               | Custom annotations for app ServiceAccount                                                                            | `{}`                     |
+| `app.podSecurityContext.enabled`               | Enable pod Security Context                                                                                          | `true`                   |
+| `app.podSecurityContext.fsGroup`               | Group ID for the pod                                                                                                 | `1001`                   |
+| `app.containerSecurityContext.enabled`         | Enable container security context                                                                                    | `true`                   |
+| `app.containerSecurityContext.runAsUser`       | User ID for the container                                                                                            | `1001`                   |
+| `app.containerSecurityContext.runAsNonRoot`    | Avoid privilege escalation to root user                                                                              | `true`                   |
+| `app.extraVolumes`                             | Array to add extra volumes                                                                                           | `[]`                     |
+| `app.extraVolumeMounts`                        | Array to add extra mounts (normally used with extraVolumes)                                                          | `[]`                     |
+| `app.topologySpreadConstraints`                | Topology Spread Constraints for pod assignment                                                                       | `[]`                     |
+| `app.nginx.args`                               | Override default container args (useful when using custom images)	                                                   | `["nginx"]`              |
+| `app.nginx.livenessProbe.enabled`              | Nginx sidecar container: Enable livenessProbe                                                                        | `true`                   |
+| `app.nginx.livenessProbe.path`                 | Nginx sidecar container: path for livenessProbe                                                                      | `/nginx_health`          |
+| `app.nginx.livenessProbe.failureThreshold`     | Nginx sidecar container: when a probe fails, Kubernetes will try failureThreshold times before giving up             | `2`                      |
+| `app.nginx.livenessProbe.initialDelaySeconds`  | Nginx sidecar container: Number of seconds after the container has started before probe initiates                    | `60`                     |
+| `app.nginx.livenessProbe.periodSeconds`        | Nginx sidecar container: How often (in seconds) to perform the probe                                                 | `5`                      |
+| `app.nginx.livenessProbe.successThreshold`     | Nginx sidecar container: Minimum consecutive successes for the probe to be considered successful after having failed | `1`                      |
+| `app.nginx.livenessProbe.timeoutSeconds`       | Nginx sidecar container: Number of seconds after which the probe times out                                           | `3`                      |
+| `app.nginx.readinessProbe.enabled`             | Nginx sidecar container: Enable readinessProbe                                                                        | `true`                   |
+| `app.nginx.readinessProbe.path`                | Nginx sidecar container: Path for readinessProbe                                                                     | `/version`               |
+| `app.nginx.readinessProbe.failureThreshold`    | Nginx sidecar container: When a probe fails, Kubernetes will try failureThreshold times before giving up             | `2`                      |
+| `app.nginx.readinessProbe.initialDelaySeconds` | Nginx sidecar container: Number of seconds after the container has started before probe initiates                    | `60`                     |
+| `app.nginx.readinessProbe.periodSeconds`       | Nginx sidecar container: How often (in seconds) to perform the probe                                                 | `10`                     |
+| `app.nginx.readinessProbe.successThreshold`    | Nginx sidecar container: Minimum consecutive successes for the probe to be considered successful after having failed | `1`                      |
+| `app.nginx.readinessProbe.timeoutSeconds`      | Nginx sidecar container: Number of seconds after which the probe times out                                           | `5`                      |
+| `app.service.type`                             | k8s service type                                                                                                     | `ClusterIP`              |
+| `app.service.port`                             | k8s service port                                                                                                     | `80`                     |
+| `app.service.targetPort`                       | k8s service target port                                                                                              | `8085`                   |
+| `app.service.portName`                         | k8s service port name                                                                                                | `service`                |
+| `app.service.annotations`	                     | Custom annotations for app service                                                                                   | `{}`                     |
+| `app.service.sessionAffinity`                  | Custom annotations for app service                                                                                   | `None`                   |
+| `app.service.sessionAffinityConfig`	           | Additional settings for the sessionAffinity                                                                          | `{}`                     |
+| `app.ingress.enabled`                          | Set to true to enable ingress record generation	                                                                     | `false`                  |
+| `app.ingress.className`                        | IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)                                        | `""`                     |
+| `app.ingress.host`                             | Default host for the ingress resource	                                                                               | `""`                     |
+| `app.ingress.path`                             | The Path to LabelStudio. You may need to set this to '/*' in order to use this with ALB ingress controllers.         | `/`                      |
+| `app.ingress.extraPaths`                       | Extra paths to prepend to the host configuration                                                                     | `[]`                     |
+| `app.ingress.tls`                              | TLS secrets definition                                                                                               | `[]`                     |
+| `app.ingress.annotations`                      | Additional ingress annotations                                                                                       | `{}`                     |
+| `app.rbac.create`                              | Specifies whether RBAC resources should be created for app service                                                   | `false`                  |
+| `app.rbac.rules`                               | Custom RBAC rules to set for app service		                                                                           | `[]`                     |
+| `app.contextPath`                              | Context path appended for health/readiness checks                                                                    | `/`                      |
+| `app.cmdWrapper`                               | Additional commands to run prior to starting App. Useful to run wrappers before startup command                      | `""`                     |
 
 
 ## Rqworker parameters
 
 Parameters specific to the `rqworkers` service of your Label Studio Enterprise deployment.
 
-| Key                                                          | Type     | Default  | Description                                                                                 |
-|--------------------------------------------------------------|----------|----------|---------------------------------------------------------------------------------------------|
-| `rqworker.enabled`                                           | string   | true     | Enable rqworker pod                                                                         |
-| `rqworker.NameOverride`                                      | string   | ""       | String to partially override release template name                                          |
-| `rqworker.FullnameOverride`                                  | string   | ""       | String to fully override release template name                                              |
-| `rqworker.deploymentStrategy.type`                           | string   | Recreate | Deployment strategy type                                                                    |
-| `rqworker.replicas`                                          | string   | 1        | Amount of rqworker replicas                                                                 |
-| `rqworker.resources.requests.memory`                         | string   | 256Mi    | The requested memory resources for the Rqworker container                                   |
-| `rqworker.resources.requests.cpu`                            | string   | 100m     | The requested cpu resources for the Rqworker container                                      |
-| `rqworker.resources.limits.memory`                           | string   | 512Mi    | The memory resources limits for the Rqworker container                                      |
-| `rqworker.resources.limits.cpu`                              | string   | 500m     | The cpu resources limits for the Rqworker container                                         |
-| `rqworker.logLevel`                                          | string   | INFO     | Rqworker log level                                                                          |
-| `rqworker.debug`                                             | string   | ""       | Rqworker DEBUG mode                                                                         |
-| `rqworker.extraEnvironmentVars`                              | map      | {}       | A map of extra environment variables to set                                                 |
-| `rqworker.extraEnvironmentSecrets`                           | map      | {}       | A map of extra environment secrets to set                                                   |
-| `rqworker.nodeSelector`                                      | map      | {}       | labels for pod assignment, formatted as a multi-line string or YAML map                     |
-| `rqworker.annotations`                                       | map      | {}       | k8s annotations to attach to the rqworker pods                                              |
-| `rqworker.extraLabels`                                       | map      | {}       | extra k8s labels to attach                                                                  |
-| `rqworker.affinity`                                          | map      | {}       | Affinity for pod assignment                                                                 |
-| `rqworker.tolerations`                                       | list     | []       | Toleration settings for pod                                                                 |
-| `rqworker.readinessProbe.enabled`                            | string   | false    | Enable redinessProbe                                                                        |
-| `rqworker.readinessProbe.path`                               | string   | /version | Path for reasinessProbe                                                                     |
-| `rqworker.readinessProbe.failureThreshold`                   | string   | 2        | When a probe fails, Kubernetes will try failureThreshold times before giving up             |
-| `rqworker.readinessProbe.initialDelaySeconds`                | string   | 35       | Number of seconds after the container has started before probe initiates                    |
-| `rqworker.readinessProbe.periodSeconds`                      | string   | 5        | How often (in seconds) to perform the probe                                                 |
-| `rqworker.readinessProbe.successThreshold`                   | string   | 1        | Minimum consecutive successes for the probe to be considered successful after having failed |
-| `rqworker.readinessProbe.timeoutSeconds`                     | string   | 3        | Number of seconds after which the probe times out                                           |
-| `rqworker.livenessProbe.enabled`                             | string   | false    | Enable livenessProbe                                                                        |
-| `rqworker.livenessProbe.path`                                | string   | /health  | Path for livenessProbe                                                                      |
-| `rqworker.livenessProbe.failureThreshold`                    | string   | 2        | When a probe fails, Kubernetes will try failureThreshold times before giving up             |
-| `rqworker.livenessProbe.initialDelaySeconds`                 | string   | 60       | Number of seconds after the container has started before probe initiates                    |
-| `rqworker.livenessProbe.periodSeconds`                       | string   | 5        | How often (in seconds) to perform the probe                                                 |
-| `rqworker.livenessProbe.successThreshold`                    | string   | 1        | Minimum consecutive successes for the probe to be considered successful after having failed |
-| `rqworker.livenessProbe.timeoutSeconds`                      | string   | 3        | Number of seconds after which the probe times out                                           |
-| `rqworker.serviceAccount.create`                             | string   | true     | Enable the creation of a ServiceAccount for rqworker pod                                    |
-| `rqworker.serviceAccount.name`                               | string   | ""       | Name of the created ServiceAccount                                                          |
-| `rqworker.serviceAccount.annotations`                        | map      | {}       | Custom annotations for app ServiceAccount                                                   |
-| `rqworker.extraVolumes`                                      | list     | []       | Array to add extra volumes                                                                  |
-| `rqworker.extraVolumeMounts`                                 | list     | []       | Array to add extra mounts (normally used with extraVolumes)                                 |
-| `rqworker.podSecurityContext.enabled`                        | string   | false    | Enable pod Security Context                                                                 |
-| `rqworker.containerSecurityContext.enabled`                  | string   | true     | Enable container Security Context                                                           |
-| `rqworker.containerSecurityContext.runAsNonRoot`             | string   | true     | Avoid running as root User                                                                  |
-| `rqworker.containerSecurityContext.allowPrivilegeEscalation` | string   | false    | Controls whether a process can gain more privileges than its parent process                 |
-| `rqworker.topologySpreadConstraints`                         | list     | [ ]      | Topology Spread Constraints for pod assignment                                              |
-| `rqworker.dnsPolicy`                                         | string   | ""       | Pod DNS policy                                                                              |
-| `rqworker.enableServiceLinks`                                | boolean  | false    | Service environment variables                                                               |
-| `rqworker.shareProcessNamespace`                             | boolean  | false    | Enable shared process namespace in a pod                                                    |
-| `rqworker.automountServiceAccountToken`                      | bollean  | true     | Automount service account token for the server service account                              |
+| Parameter                                        | Description                                                                                     | Default                                |
+|--------------------------------------------------|-------------------------------------------------------------------------------------------------|----------------------------------------|
+| `rqworker.enabled`                               | Enable rqworker pod                                                                             | `true`                                 |
+| `rqworker.NameOverride`                          | String to partially override release template name                                              | `""`                                   |
+| `rqworker.FullnameOverride`                      | String to fully override release template name                                                  | `""`                                   |
+| `rqworker.deploymentStrategy.type`               | Deployment strategy type                                                                        | `Recreate`                             |
+| `rqworker.extraEnvironmentVars`                  | A map of extra environment variables to set                                                     | `{}`                                   |
+| `rqworker.extraEnvironmentSecrets`               | A map of extra environment secrets to set                                                       | `{}`                                   |
+| `rqworker.nodeSelector`                          | labels for pod assignment, formatted as a multi-line string or YAML map                         | `{}`                                   |
+| `rqworker.annotations`                           | k8s annotations to attach to the rqworker pods                                                  | `{}`                                   |
+| `rqworker.extraLabels`                           | extra k8s labels to attach                                                                      | `{}`                                   |
+| `rqworker.affinity`                              | Affinity for pod assignment                                                                     | `{}`                                   |
+| `rqworker.tolerations`                           | Toleration settings for pod                                                                     | `[]`                                   |
+| `rqworker.queues.high.replicas`                  | Rqworker queue "high" replicas amount                                                           | `1`                                    |
+| `rqworker.queues.high.args`                      | Rqworker queue "high" launch arguments                                                          | `"high"`                               |
+| `rqworker.queues.low.replicas`                   | Rqworker queue "low" replicas amount                                                            | `1`                                    |
+| `rqworker.queues.low.args`                       | Rqworker queue "low" launch arguments                                                           | `"low"`                                |
+| `rqworker.queues.default.replicas`               | Rqworker queue "default" replicas amount                                                        | `1`                                    |
+| `rqworker.queues.default.args`                   | Rqworker queue "default" launch arguments                                                       | `"default"`                            |
+| `rqworker.queues.critical.replicas`              | Rqworker queue "critical" replicas amount                                                       | `1`                                    |
+| `rqworker.queues.critical.args`                  | Rqworker queue "critical" launch arguments                                                      | `"critical"`                           |
+| `rqworker.queues.all.replicas`                   | Rqworker queue "all" replicas amount                                                            | `1`                                    |
+| `rqworker.queues.all.args`                       | Rqworker queue "all" launch arguments                                                           | `"low", "default", "critical", "high"` |
+| `rqworker.dnsPolicy`                             | Pod DNS policy                                                                                  | `ClusterFirst`                         |
+| `rqworker.enableServiceLinks`                    | Service environment variables                                                                   | `false`                                |
+| `rqworker.shareProcessNamespace`                 | Enable shared process namespace in a pod                                                        | `false`                                |
+| `rqworker.automountServiceAccountToken`          | Automount service account token for the server service account                                  | `true`                                 |
+| `rqworker.readinessProbe.enabled`                | Enable redinessProbe                                                                            | `false`                                |
+| `rqworker.readinessProbe.path`                   | Path for reasinessProbe                                                                         | `/version`                             |
+| `rqworker.readinessProbe.failureThreshold`       | When a probe fails, Kubernetes will try failureThreshold times before giving up                 | `2`                                    |
+| `rqworker.readinessProbe.initialDelaySeconds`    | Number of seconds after the container has started before probe initiates                        | `60`                                   |
+| `rqworker.readinessProbe.periodSeconds`          | How often (in seconds) to perform the probe                                                     | `5`                                    |
+| `rqworker.readinessProbe.successThreshold`       | Minimum consecutive successes for the probe to be considered successful after having failed     | `1`                                    |
+| `rqworker.readinessProbe.timeoutSeconds`         | Number of seconds after which the probe times out                                               | `3`                                    |
+| `rqworker.livenessProbe.enabled`                 | Enable livenessProbe                                                                            | `false`                                |
+| `rqworker.livenessProbe.path`                    | Path for livenessProbe                                                                          | `/health`                              |
+| `rqworker.livenessProbe.failureThreshold`        | When a probe fails, Kubernetes will try failureThreshold times before giving up                 | `2`                                    |
+| `rqworker.livenessProbe.initialDelaySeconds`     | Number of seconds after the container has started before probe initiates                        | `60`                                   |
+| `rqworker.livenessProbe.periodSeconds`           | How often (in seconds) to perform the probe                                                     | `5`                                    |
+| `rqworker.livenessProbe.successThreshold`        | Minimum consecutive successes for the probe to be considered successful after having failed     | `1`                                    |
+| `rqworker.livenessProbe.timeoutSeconds`          | Number of seconds after which the probe times out                                               | `3`                                    |
+| `rqworker.serviceAccount.create`                 | Enable the creation of a ServiceAccount for rqworker pod                                        | `true`                                 |
+| `rqworker.serviceAccount.name`                   | Name of the created ServiceAccount                                                              | `""`                                   |
+| `rqworker.podSecurityContext.enabled`            | Enable pod Security Context                                                                     | `true`                                 |
+| `rqworker.podSecurityContext.fsGroup`            | Group ID for the pod                                                                            | `1001`                                 |
+| `rqworker.containerSecurityContext.enabled`      | Enable container security context                                                               | `true`                                 |
+| `rqworker.containerSecurityContext.runAsUser`    | User ID for the container                                                                       | `1001`                                 |
+| `rqworker.containerSecurityContext.runAsNonRoot` | Avoid privilege escalation to root user                                                         | `true`                                 |
+| `rqworker.serviceAccount.annotations`            | Custom annotations for app ServiceAccount                                                       | `{}`                                   |
+| `rqworker.extraVolumes`                          | Array to add extra volumes                                                                      | `[]`                                   |
+| `rqworker.extraVolumeMounts`                     | Array to add extra mounts (normally used with extraVolumes)                                     | `[]`                                   |
+| `rqworker.topologySpreadConstraints`             | Topology Spread Constraints for pod assignment                                                  | `[]`                                   |
+| `rqworker.rbac.create`                           | Specifies whether RBAC resources should be created for rqworker service                         | `false`                                |
+| `rqworker.rbac.rules`                            | Custom RBAC rules to set for rqworker service		                                                 | `[]`                                   |
+| `rqworker.cmdWrapper`                            | Additional commands to run prior to starting App. Useful to run wrappers before startup command | `""`                                   |
 
-## Deprecated parameters
+## Label Studio Enterprise parameters
 
-Deprecated parameters no longer in use or supported by Label Studio Enterprise Helm charts. 
+| Parameter                                 | Description                                                                        | Default   |
+|-------------------------------------------|------------------------------------------------------------------------------------|-----------|
+| `enterprise.enabled`                      | Enable Enterprise features                                                         | `false`   |
+| `enterprise.enterpriseLicense.secretName` | Name of an existing secret holding the Label Studio Enterprise license information | `""`      |
+| `enterprise.enterpriseLicense.secretKey`  | Key of an existing secret holding the enterprise license information               | `license` |
 
-| Key                               | Type   | Default Value | Description               |
-|-----------------------------------|--------|---------------|---------------------------|
-| `minio.enabled`                   | string | true          | Enable minio deployment   |
-| `minio.accessKey.password`        | string | minio         | Minio accesskey           |
-| `minio.secretKey.password`        | string | minio123      | Minio accessPassword      |
-| `minio.resources.requests.cpu`    | string | 250m          | Minio requested resources |
-| `minio.resources.requests.memory` | string | 256Mi         | Minio limits resources    |
-| `minio.mode`                      | string | standalone    | Minio mode                |
-| `minio.persistence.enabled`       | string | false         | Minio enable persistence  |
+## Sub-charts parameters
+
+| Parameter                  | Description                                                                                             | Default       |
+|----------------------------|---------------------------------------------------------------------------------------------------------|---------------|
+| `postgresql.enabled`       | Enable Postgresql sub-chart                                                                             | `true`        |
+| `postgresql.architecture`  | PostgreSQL architecture (standalone or replication)                                                     | `standalone`  |
+| `postgresql.image.tag`     | PostgreSQL image tag                                                                                    | `13.8.0`      |
+| `postgresql.auth.username` | Name for a custom user to create	                                                                       | `labelstudio` |
+| `postgresql.auth.password` | Password for the custom user to create. Ignored if `auth.existingSecret` with key password is provided	 | `labelstudio` |
+| `postgresql.auth.database` | Name for a custom database to create	                                                                   | `labelstudio` |
+| `redis.enabled`            | Enable Redis sub-chart                                                                                  | `false`       |
+| `redis.architecture`       | Redis architecture. Allowed values: `standalone` or `replication`	                                      | `standalone`  |
+| `redis.auth.enabled`       | Enable password authentication	                                                                         | `false`       |
+
+## Other parameters
+| Parameter                 | Description                                      | Default         |
+|---------------------------|--------------------------------------------------|-----------------|
+| upgradeCheck.enabled      | Enable upgradecheck                              | `false`         |
+| ci                        | Indicate that deployment running for CI purposes | `false`         |
+| clusterDomain             | Kubernetes Cluster Domain                        | `cluster.local` |
+| checkConfig.skipEnvValues | Skip validation for env variables                | `false`         |
+
+## The `global.extraEnvironmentVars` usage
+
+The `global.extraEnvironmentVars` section can be used to configure environment properties of Label Studio.
+
+Any key value put under this section translates to environment variables used to control Label Studio's configuration. Every key is upper-cased before setting the environment variable.
+
+An example:
+
+```yaml
+global:
+  extraEnvironmentVars:
+     PG_USER: labelstudio
+```
+
+!!! note
+    If you are deploying to a production environment, you should set `SSRF_PROTECTION_ENABLED: true`. See [Secure Label Studio](security#Enable-SSRF-protection-for-production-environments). 
+
+
+## The `global.featureFlags` usage
+
+The `global.featureFlags` section can be used to set feature flags of Label Studio.
+
+Any key value put under this section translates to environment variables used to control Label Studio's feature flags configuration. Every key should start from `ff_` or `fflag_` in lower case.
+
+An example:
+
+```yaml
+global:
+  featureFlags:
+    fflag_enable_some_cool_feature_short: true
+```

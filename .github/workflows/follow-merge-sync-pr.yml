@@ -1,0 +1,117 @@
+name: 'Follow Merge: Sync PR LSE'
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - closed
+      - converted_to_draft
+      - ready_for_review
+      - synchronize
+    branches:
+      - develop
+      - 'lse-release/**'
+    paths-ignore:
+      - 'label_studio/frontend/**'
+      - 'docs/**'
+#      - 'web/dist/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+
+env:
+  DOWNSTREAM_REPOSITORY: "label-studio-enterprise"
+  DOWNSTREAM_EVENT_TYPE: "upstream_repo_update"
+
+jobs:
+  sync:
+    name: "Sync"
+    if: startsWith(github.head_ref, 'fb-')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Check user's membership
+        uses: actions/github-script@v7
+        id: check-membership
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            try {
+              return (await github.rest.orgs.getMembershipForUser({
+                org: owner,
+                username: '${{ github.actor }}',
+              }))?.data?.state == "active";
+            } catch (error) {
+              return false;
+            }
+
+      - name: Notify user on failure
+        if: steps.check-membership.outputs.result == 'false'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const result = await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: '${{ github.event.number }}',
+              body: [
+                'Hi @${{ github.actor }}!',
+                '',
+                `Unfortunately you don't have membership in ${owner} organization, your PR wasn't synced with ${owner}/${{ env.DOWNSTREAM_REPOSITORY }}.`
+              ].join('\n')
+            });
+
+      - name: Sync PR
+        uses: actions/github-script@v7
+        if: steps.check-membership.outputs.result == 'true'
+        id: sync-pr
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          HEAD_REF: ${{ github.head_ref }}
+          BASE_REF: ${{ github.base_ref }}
+          PR_HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          DOWNSTREAM_REPOSITORY: ${{ env.DOWNSTREAM_REPOSITORY }}
+          DOWNSTREAM_EVENT_TYPE: ${{ env.DOWNSTREAM_EVENT_TYPE }}
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const pr_head_repository = process.env.PR_HEAD_REPOSITORY;
+            const downstream_repository = process.env.DOWNSTREAM_REPOSITORY;
+            const downstream_event_type = process.env.DOWNSTREAM_EVENT_TYPE;
+            const [pr_owner, pr_repo] = pr_head_repository.split('/');
+            const head_ref = process.env.HEAD_REF;
+            const base_ref = process.env.BASE_REF;
+            let event_action = '${{ github.event.action }}';
+            let commit_sha = '${{ github.event.pull_request.head.sha }}';
+            if (${{ github.event.pull_request.merged }}) {
+              event_action = 'merged';
+              commit_sha = '${{ github.sha }}';
+            }
+            const getCommitResponse = await github.rest.repos.getCommit({
+              owner: pr_owner,
+              repo: pr_repo,
+              ref: commit_sha
+            });
+            const result = await github.rest.repos.createDispatchEvent({
+              owner: owner,
+              repo: downstream_repository,
+              event_type: downstream_event_type,
+              client_payload: {
+                branch_name: head_ref,
+                base_branch_name: base_ref,
+                repo_name: '${{ github.repository }}',
+                commit_sha : commit_sha,
+                title: process.env.TITLE,
+                html_url: '${{ github.event.pull_request.html_url }}',
+                actor: '${{ github.actor }}',
+                author_username: getCommitResponse.data.commit.author.name,
+                author_email: getCommitResponse.data.commit.author.email,
+                event_action: event_action
+              }
+            });
+            return result

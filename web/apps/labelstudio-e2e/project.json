@@ -1,0 +1,26 @@
+{
+  "name": "labelstudio-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/labelstudio-e2e/src",
+  "projectType": "application",
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/labelstudio-e2e/cypress.config.ts",
+        "baseUrl": "http://localhost:8080/",
+        "testingType": "e2e"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "labelstudio:serve:production"
+        },
+        "ci": {
+          "devServerTarget": "labelstudio:serve-static"
+        }
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["labelstudio"]
+}

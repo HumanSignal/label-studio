@@ -11,5 +11,5 @@
     <Label value="Anticipation" background="#ffa953" />
   </Labels>
 
-  <AudioPlus name="audio" value="$audio"/>
+  <Audio name="audio" value="$audio"/>
 </View>

@@ -1,13 +1,73 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from django.urls import path, include
-
-from .s3.api import *
-from .azure_blob.api import *
-from .gcs.api import *
-from .redis.api import *
-from .localfiles.api import *
-from .all_api import *
+from django.conf import settings
+from django.urls import include, path
+from io_storages.all_api import (
+    AllExportStorageListAPI,
+    AllExportStorageTypesAPI,
+    AllImportStorageListAPI,
+    AllImportStorageTypesAPI,
+)
+from io_storages.azure_blob.api import (
+    AzureBlobExportStorageDetailAPI,
+    AzureBlobExportStorageFormLayoutAPI,
+    AzureBlobExportStorageListAPI,
+    AzureBlobExportStorageSyncAPI,
+    AzureBlobExportStorageValidateAPI,
+    AzureBlobImportStorageDetailAPI,
+    AzureBlobImportStorageFormLayoutAPI,
+    AzureBlobImportStorageListAPI,
+    AzureBlobImportStorageSyncAPI,
+    AzureBlobImportStorageValidateAPI,
+)
+from io_storages.gcs.api import (
+    GCSExportStorageDetailAPI,
+    GCSExportStorageFormLayoutAPI,
+    GCSExportStorageListAPI,
+    GCSExportStorageSyncAPI,
+    GCSExportStorageValidateAPI,
+    GCSImportStorageDetailAPI,
+    GCSImportStorageFormLayoutAPI,
+    GCSImportStorageListAPI,
+    GCSImportStorageSyncAPI,
+    GCSImportStorageValidateAPI,
+)
+from io_storages.localfiles.api import (
+    LocalFilesExportStorageDetailAPI,
+    LocalFilesExportStorageFormLayoutAPI,
+    LocalFilesExportStorageListAPI,
+    LocalFilesExportStorageSyncAPI,
+    LocalFilesExportStorageValidateAPI,
+    LocalFilesImportStorageDetailAPI,
+    LocalFilesImportStorageFormLayoutAPI,
+    LocalFilesImportStorageListAPI,
+    LocalFilesImportStorageSyncAPI,
+    LocalFilesImportStorageValidateAPI,
+)
+from io_storages.redis.api import (
+    RedisExportStorageDetailAPI,
+    RedisExportStorageFormLayoutAPI,
+    RedisExportStorageListAPI,
+    RedisExportStorageSyncAPI,
+    RedisExportStorageValidateAPI,
+    RedisImportStorageDetailAPI,
+    RedisImportStorageFormLayoutAPI,
+    RedisImportStorageListAPI,
+    RedisImportStorageSyncAPI,
+    RedisImportStorageValidateAPI,
+)
+from io_storages.s3.api import (
+    S3ExportStorageDetailAPI,
+    S3ExportStorageFormLayoutAPI,
+    S3ExportStorageListAPI,
+    S3ExportStorageSyncAPI,
+    S3ExportStorageValidateAPI,
+    S3ImportStorageDetailAPI,
+    S3ImportStorageFormLayoutAPI,
+    S3ImportStorageListAPI,
+    S3ImportStorageSyncAPI,
+    S3ImportStorageValidateAPI,
+)
 
 app_name = 'storages'
 
@@ -19,7 +79,7 @@ _api_urlpatterns = [
     path('types', AllImportStorageTypesAPI.as_view(), name='storage-types'),
     path('export/types', AllExportStorageTypesAPI.as_view(), name='export-storage-types'),
     # Amazon S3
-    path('s3', S3ImportStorageListAPI.as_view(), name='storage-s3-list'),
+    path('s3/', S3ImportStorageListAPI.as_view(), name='storage-s3-list'),
     path('s3/<int:pk>', S3ImportStorageDetailAPI.as_view(), name='storage-s3-detail'),
     path('s3/<int:pk>/sync', S3ImportStorageSyncAPI.as_view(), name='storage-s3-sync'),
     path('s3/validate', S3ImportStorageValidateAPI.as_view(), name='storage-s3-validate'),
@@ -30,7 +90,7 @@ _api_urlpatterns = [
     path('export/s3/validate', S3ExportStorageValidateAPI.as_view(), name='export-storage-s3-validate'),
     path('export/s3/form', S3ExportStorageFormLayoutAPI.as_view(), name='export-storage-s3-form'),
     # Microsoft Azure
-    path('azure', AzureBlobImportStorageListAPI.as_view(), name='storage-azure-list'),
+    path('azure/', AzureBlobImportStorageListAPI.as_view(), name='storage-azure-list'),
     path('azure/<int:pk>', AzureBlobImportStorageDetailAPI.as_view(), name='storage-azure-detail'),
     path('azure/<int:pk>/sync', AzureBlobImportStorageSyncAPI.as_view(), name='storage-azure-sync'),
     path('azure/validate', AzureBlobImportStorageValidateAPI.as_view(), name='storage-azure-validate'),
@@ -41,7 +101,7 @@ _api_urlpatterns = [
     path('export/azure/validate', AzureBlobExportStorageValidateAPI.as_view(), name='export-storage-azure-validate'),
     path('export/azure/form', AzureBlobExportStorageFormLayoutAPI.as_view(), name='export-storage-azure-form'),
     # Google Cloud Storage
-    path('gcs', GCSImportStorageListAPI.as_view(), name='storage-gcs-list'),
+    path('gcs/', GCSImportStorageListAPI.as_view(), name='storage-gcs-list'),
     path('gcs/<int:pk>', GCSImportStorageDetailAPI.as_view(), name='storage-gcs-detail'),
     path('gcs/<int:pk>/sync', GCSImportStorageSyncAPI.as_view(), name='storage-gcs-sync'),
     path('gcs/validate', GCSImportStorageValidateAPI.as_view(), name='storage-gcs-validate'),
@@ -52,7 +112,7 @@ _api_urlpatterns = [
     path('export/gcs/validate', GCSExportStorageValidateAPI.as_view(), name='export-storage-gcs-validate'),
     path('export/gcs/form', GCSExportStorageFormLayoutAPI.as_view(), name='export-storage-gcs-form'),
     # Redis DB
-    path('redis', RedisImportStorageListAPI.as_view(), name='storage-redis-list'),
+    path('redis/', RedisImportStorageListAPI.as_view(), name='storage-redis-list'),
     path('redis/<int:pk>', RedisImportStorageDetailAPI.as_view(), name='storage-redis-detail'),
     path('redis/<int:pk>/sync', RedisImportStorageSyncAPI.as_view(), name='storage-redis-sync'),
     path('redis/validate', RedisImportStorageValidateAPI.as_view(), name='storage-redis-validate'),
@@ -66,7 +126,7 @@ _api_urlpatterns = [
 if settings.ENABLE_LOCAL_FILES_STORAGE:
     _api_urlpatterns += [
         # Local files
-        path('localfiles', LocalFilesImportStorageListAPI.as_view(), name='storage-localfiles-list'),
+        path('localfiles/', LocalFilesImportStorageListAPI.as_view(), name='storage-localfiles-list'),
         path('localfiles/<int:pk>', LocalFilesImportStorageDetailAPI.as_view(), name='storage-localfiles-detail'),
         path('localfiles/<int:pk>/sync', LocalFilesImportStorageSyncAPI.as_view(), name='storage-localfiles-sync'),
         path('localfiles/validate', LocalFilesImportStorageValidateAPI.as_view(), name='storage-localfiles-validate'),

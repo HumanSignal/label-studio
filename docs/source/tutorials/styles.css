@@ -1,16 +1,5 @@
-h1 {
-  margin-top: 2.5em !important;
-}
-
-.content {
-  max-width: 1200px !important;
-  width: unset !important;
-  margin: 60px auto 50px auto;
-  padding: 0;
-}
-
 .blog-body {
-  margin-bottom: 100px;
+  margin: 0 -2em;
 }
 
 .grid {
@@ -39,7 +28,14 @@ h1 {
 
 .card {
   margin: 2em 2em;
+  border: none;
+  padding: 0;
 }
+
+a:has(.card) {
+  text-decoration: none;
+}
+
 .card .image-wrap {
   transition: linear 0.25s;
   border-radius: 7px;

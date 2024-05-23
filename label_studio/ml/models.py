@@ -1,20 +1,19 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
-from django.db import models
 
-from django.utils.translation import gettext_lazy as _
-from django.dispatch import receiver
-from django.db.models.signals import post_save
+from core.utils.common import conditional_atomic, db_is_not_sqlite, load_func, safe_float
 from django.conf import settings
-
-from core.utils.common import safe_float, conditional_atomic, load_func
-
-from ml.api_connector import MLApi
+from django.db import models, transaction
+from django.db.models import Count, JSONField, Q
+from django.db.models.signals import post_save, pre_delete
+from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
+from ml.api_connector import PREDICT_URL, TIMEOUT_PREDICT, MLApi
 from projects.models import Project
 from tasks.models import Prediction
-from tasks.serializers import TaskSimpleSerializer, PredictionSerializer
-from webhooks.serializers import WebhookSerializer, Webhook
+from tasks.serializers import PredictionSerializer, TaskSimpleSerializer
+from webhooks.serializers import Webhook, WebhookSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +30,11 @@ class MLBackendState(models.TextChoices):
     PREDICTING = 'PR', _('Predicting')
 
 
+class MLBackendAuth(models.TextChoices):
+    NONE = 'NONE', _('None')
+    BASIC_AUTH = 'BASIC_AUTH', _('Basic Auth')
+
+
 class MLBackend(models.Model):
     """ """
 
@@ -42,8 +46,7 @@ class MLBackend(models.Model):
     is_interactive = models.BooleanField(
         _('is_interactive'),
         default=False,
-        help_text=("Used to interactively annotate tasks. "
-                   'If true, model returns one list with results')
+        help_text=('Used to interactively annotate tasks. ' 'If true, model returns one list with results'),
     )
     url = models.TextField(
         _('url'),
@@ -62,6 +65,29 @@ class MLBackend(models.Model):
         default='default',
         help_text='Name of the machine learning backend',
     )
+
+    auth_method = models.CharField(
+        max_length=255,
+        choices=MLBackendAuth.choices,
+        default=MLBackendAuth.NONE,
+    )
+
+    basic_auth_user = models.TextField(
+        _('basic auth user'),
+        blank=True,
+        null=True,
+        default='',
+        help_text='HTTP Basic Auth user',
+    )
+
+    basic_auth_pass = models.TextField(
+        _('basic auth password'),
+        blank=True,
+        null=True,
+        default='',
+        help_text='HTTP Basic Auth password',
+    )
+
     description = models.TextField(
         _('description'),
         blank=True,
@@ -69,6 +95,13 @@ class MLBackend(models.Model):
         default='',
         help_text='Description for the machine learning backend',
     )
+
+    extra_params = JSONField(
+        _('extra params'),
+        null=True,
+        help_text='Any extra parameters passed to the ML Backend during the setup',
+    )
+
     model_version = models.TextField(
         _('model version'),
         blank=True,
@@ -92,41 +125,82 @@ class MLBackend(models.Model):
     auto_update = models.BooleanField(
         _('auto_update'),
         default=True,
-        help_text='If false, model version is set by the user, if true - getting latest version from backend.'
+        help_text='If false, model version is set by the user, if true - getting latest version from backend.',
     )
 
     def __str__(self):
         return f'{self.title} (id={self.id}, url={self.url})'
 
+    def __init__(self, *args, **kwargs):
+        super(MLBackend, self).__init__(*args, **kwargs)
+        self.__original_title = self.title
+
+    def save(self, *args, **kwargs):
+        """
+        Overrides the save() method to update the associated project's model_version field.
+        If the title of the model instance is changed and the model_version
+        of the related project is currently the same as the original title,
+        the project's model_version is updated to the new title.
+        """
+        p = self.project
+
+        if self.title != self.__original_title and p.model_version == self.__original_title:
+            with transaction.atomic():
+                p.model_version = self.title
+                p.save(update_fields=['model_version'])
+                super().save(*args, **kwargs)
+                # reset original field to current field after save
+                self.__original_title = self.title
+        else:
+            super().save(*args, **kwargs)
+
     @staticmethod
-    def healthcheck_(url):
-        return MLApi(url=url).health()
+    def healthcheck_(url, auth_method=None, **kwargs):
+        return MLApi(url=url, auth_method=auth_method, **kwargs).health()
 
     def has_permission(self, user):
+        user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     @staticmethod
-    def setup_(url, project, model_version=None):
-        api = MLApi(url=url)
+    def setup_(url, project, auth_method=None, **kwargs):
+        api = MLApi(url=url, auth_method=auth_method, **kwargs)
+
         if not isinstance(project, Project):
             project = Project.objects.get(pk=project)
-        return api.setup(project, model_version=model_version)
+        return api.setup(project, **kwargs)
 
     def healthcheck(self):
-        return self.healthcheck_(self.url)
+        return self.healthcheck_(
+            self.url, self.auth_method, basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass
+        )
 
     def setup(self):
-        return self.setup_(self.url, self.project, None if self.auto_update else self.model_version)
+        return self.setup_(
+            self.url,
+            self.project,
+            self.auth_method,
+            extra_params=self.extra_params,
+            basic_auth_user=self.basic_auth_user,
+            basic_auth_pass=self.basic_auth_pass,
+        )
 
     @property
     def api(self):
-        return MLApi(url=self.url, timeout=self.timeout)
+        return MLApi(
+            url=self.url,
+            timeout=self.timeout,
+            auth_method=self.auth_method,
+            basic_auth_user=self.basic_auth_user,
+            basic_auth_pass=self.basic_auth_pass,
+        )
 
     @property
     def not_ready(self):
         return self.state in (MLBackendState.DISCONNECTED, MLBackendState.ERROR)
 
     def update_state(self):
+        model_version = None
         if self.healthcheck().is_error:
             self.state = MLBackendState.DISCONNECTED
         else:
@@ -140,10 +214,11 @@ class MLBackend(models.Model):
                 model_version = setup_response.response.get('model_version')
                 logger.info(f'ML backend responds with success: {setup_response.response}')
                 if self.auto_update:
-                    self.model_version = model_version
                     logger.debug(f'Changing model version: {self.model_version} -> {model_version}')
+                    self.model_version = model_version
                 self.error_message = None
         self.save()
+        return model_version
 
     def train(self):
         train_response = self.api.train(self.project)
@@ -157,8 +232,34 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
+    def _predict(self, task):
+        """This is low level prediction method that is used for debugging"""
+        ml_api = self.api
+        task_ser = TaskSimpleSerializer(task).data
+
+        request_params = ml_api._prep_prediction_req([task_ser], self.project)
+        ml_api_result = ml_api._request(PREDICT_URL, request_params, verbose=False, timeout=TIMEOUT_PREDICT)
+
+        if ml_api_result.is_error:
+            logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
+            return
+
+        results = ml_api_result.response.get('results', None)
+
+        return {
+            'status': 200,
+            'data': {
+                'status': ml_api_result.status_code,
+                'error_message': ml_api_result.error_message,
+                'url': ml_api._get_url(PREDICT_URL),
+                'task': task_ser,
+                'request': request_params,
+                'response': results,
+            },
+        }
+
     def predict_tasks(self, tasks):
-        self.update_state()
+        model_version = self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
             return
@@ -168,8 +269,15 @@ class MLBackend(models.Model):
 
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
+        # Filter tasks that already contain the current model version in predictions
+        tasks = tasks.annotate(predictions_count=Count('predictions')).exclude(
+            Q(predictions_count__gt=0) & Q(predictions__model_version=model_version)
+        )
+        if not tasks.exists():
+            logger.debug(f'All tasks already have prediction from model version={self.model_version}')
+            return model_version
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
+        ml_api_result = self.api.make_predictions(tasks_ser, self.project)
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
@@ -188,11 +296,10 @@ class MLBackend(models.Model):
         elif len(responses) == 1 and len(tasks) != 1:
             logger.warning(
                 f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
-                f"switched to one-by-one task retrieval"
+                f'switched to one-by-one task retrieval'
             )
-            for task in tasks:
-                self.__predict_one_task(task)
-            return
+            instances = [self.predict_one_task(task, model_version=model_version) for task in tasks]
+            return instances
 
         # wrong result number
         elif len(responses) != len(tasks_ser):
@@ -203,28 +310,30 @@ class MLBackend(models.Model):
             if 'result' not in response:
                 logger.info(
                     f"ML backend returns an incorrect prediction, it should be a dict with the 'result' field:"
-                    f" {response}"
+                    f' {response}'
                 )
                 return
-
             predictions.append(
                 {
                     'task': task['id'],
                     'result': response['result'],
                     'score': response.get('score'),
-                    'model_version': ml_api_result.response.get('model_version', self.model_version),
+                    'model_version': response.get('model_version', self.model_version),
                 }
             )
-        with conditional_atomic():
+        with conditional_atomic(predicate=db_is_not_sqlite):
             prediction_ser = PredictionSerializer(data=predictions, many=True)
             prediction_ser.is_valid(raise_exception=True)
-            prediction_ser.save()
+            instances = prediction_ser.save()
+        return instances
 
-    def __predict_one_task(self, task):
-        self.update_state()
-        if self.not_ready:
-            logger.debug(f'ML backend {self} is not ready to predict {task}')
-            return
+    def predict_one_task(self, task, model_version):
+        if not model_version:
+            self.update_state()
+            if self.not_ready:
+                logger.debug(f'ML backend {self} is not ready to predict {task}')
+                return
+
         if task.predictions.filter(model_version=self.model_version).exists():
             # prediction already exists
             logger.info(
@@ -235,7 +344,7 @@ class MLBackend(models.Model):
         ml_api = self.api
 
         task_ser = TaskSimpleSerializer(task).data
-        ml_api_result = ml_api.make_predictions([task_ser], self.model_version, self.project)
+        ml_api_result = ml_api.make_predictions([task_ser], self.project)
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
@@ -247,12 +356,13 @@ class MLBackend(models.Model):
         task_id = task_ser['id']
         r = prediction_response['result']
         score = prediction_response.get('score')
-        with conditional_atomic():
+        with conditional_atomic(predicate=db_is_not_sqlite):
             prediction = Prediction.objects.create(
                 result=r,
                 score=safe_float(score),
                 model_version=self.model_version,
                 task_id=task_id,
+                project=task.project,
                 cluster=prediction_response.get('cluster'),
                 neighbors=prediction_response.get('neighbors'),
                 mislabeling=safe_float(prediction_response.get('mislabeling', 0)),
@@ -267,13 +377,14 @@ class MLBackend(models.Model):
         if user:
             options = {'user': user}
         if not self.is_interactive:
-            result['errors'] = ["Model is not set to be used for interactive preannotations"]
+            result['errors'] = ['Model is not set to be used for interactive preannotations']
             return result
 
-        tasks_ser = InteractiveAnnotatingDataSerializer([task], many=True, expand=['drafts', 'predictions', 'annotations'], context=options).data
+        tasks_ser = InteractiveAnnotatingDataSerializer(
+            [task], many=True, expand=['drafts', 'predictions', 'annotations'], context=options
+        ).data
         ml_api_result = self.api.make_predictions(
             tasks=tasks_ser,
-            model_version=self.model_version,
             project=self.project,
             context=context,
         )
@@ -284,8 +395,9 @@ class MLBackend(models.Model):
 
         if not (isinstance(ml_api_result.response, dict) and 'results' in ml_api_result.response):
             logger.info(f'ML backend returns an incorrect response, it must be a dict: {ml_api_result.response}')
-            result['errors'] = ['Incorrect response from ML service: '
-                                'ML backend returns an incorrect response, it must be a dict.']
+            result['errors'] = [
+                'Incorrect response from ML service: ' 'ML backend returns an incorrect response, it must be a dict.'
+            ]
             return result
 
         ml_results = ml_api_result.response.get(
@@ -296,22 +408,28 @@ class MLBackend(models.Model):
         )
         if not isinstance(ml_results, list) or len(ml_results) < 1:
             logger.warning(f'ML backend has to return list with 1 annotation but it returned: {type(ml_results)}')
-            result['errors'] = ['Incorrect response from ML service: '
-                                'ML backend has to return list with more than 1 result.']
+            result['errors'] = [
+                'Incorrect response from ML service: ' 'ML backend has to return list with more than 1 result.'
+            ]
             return result
-
         result['data'] = ml_results[0]
         return result
 
     @staticmethod
-    def get_versions_(url, project):
-        api = MLApi(url=url)
+    def get_versions_(url, project, auth_method, **kwargs):
+        api = MLApi(url=url, auth_method=auth_method, **kwargs)
         if not isinstance(project, Project):
             project = Project.objects.get(pk=project)
         return api.get_versions(project)
 
     def get_versions(self):
-        return self.get_versions_(self.url, self.project)
+        return self.get_versions_(
+            self.url,
+            self.project,
+            self.auth_method,
+            basic_auth_user=self.basic_auth_user,
+            basic_auth_pass=self.basic_auth_pass,
+        )
 
 
 class MLBackendPredictionJob(models.Model):
@@ -346,14 +464,16 @@ class MLBackendTrainJob(models.Model):
         project = self.ml_backend.project
         ml_api = project.get_ml_api()
         if not ml_api:
-            logger.error(f'Training job {self.id}: Can\'t collect training jobs for project {project.id}: ML API is null')
+            logger.error(
+                f"Training job {self.id}: Can't collect training jobs for project {project.id}: ML API is null"
+            )
             return None
         ml_api_result = ml_api.get_train_job_status(self)
         if ml_api_result.is_error:
             if ml_api_result.status_code == 410:
                 return {'job_status': 'removed'}
             logger.info(
-                f'Training job {self.id}: Can\'t collect training jobs for project {project}: '
+                f"Training job {self.id}: Can't collect training jobs for project {project}: "
                 f'ML API returns error {ml_api_result.error_message}'
             )
             return None
@@ -378,6 +498,15 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
     return True
 
 
+@receiver(pre_delete, sender=MLBackend)
+def modify_project_model_version(sender, instance, **kwargs):
+    project = instance.project
+
+    if project.model_version == instance.title:
+        project.model_version = ''
+        project.save(update_fields=['model_version'])
+
+
 @receiver(post_save, sender=MLBackend)
 def create_ml_webhook(sender, instance, created, **kwargs):
     if not created:
@@ -389,11 +518,8 @@ def create_ml_webhook(sender, instance, created, **kwargs):
         logger.info(f'Webhook {webhook_url} already exists for project {project}: skip creating new one.')
         return
     logger.info(f'Create ML backend webhook {webhook_url}')
-    ser = WebhookSerializer(data=dict(
-        project=project.id,
-        url=webhook_url,
-        send_payload=True,
-        send_for_all_actions=True)
+    ser = WebhookSerializer(
+        data=dict(project=project.id, url=webhook_url, send_payload=True, send_for_all_actions=True)
     )
     if ser.is_valid():
         ser.save(organization=project.organization)

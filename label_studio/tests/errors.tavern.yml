@@ -34,5 +34,5 @@ stages:
   response:
     json:
       detail: test
-      exc_info: Tracebacks disabled in settings
+      exc_info: ~
     status_code: 500

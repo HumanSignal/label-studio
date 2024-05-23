@@ -41,7 +41,7 @@ Use the [Pairwise](/tags/pairwise.html) control tag to apply pairwise selections
 <Pairwise name="pw" toName="text1,text2" />
 ```
 
-Use the [Text](tags/text.html) object tag to specify two samples of text with distinct names:
+Use the [Text](/tags/text.html) object tag to specify two samples of text with distinct names:
 ```xml
 <Text name="text1" value="$text1" />
 <Text name="text2" value="$text2" />
@@ -50,5 +50,5 @@ Use the [Text](tags/text.html) object tag to specify two samples of text with di
 ## Related tags
 - [Header](/tags/header.html)
 - [Pairwise](/tags/pairwise.html)
-- [Text](tags/text.html)
+- [Text](/tags/text.html)
 

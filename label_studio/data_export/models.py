@@ -9,8 +9,9 @@ from datetime import datetime
 
 import ujson as json
 from core import version
+from core.feature_flags import flag_set
 from core.utils.common import load_func
-from core.utils.io import get_all_files_from_dir, get_temp_dir, read_bytes_stream
+from core.utils.io import get_all_files_from_dir, get_temp_dir, path_to_open_binary_file
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
@@ -18,7 +19,6 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from label_studio_converter import Converter
 from tasks.models import Annotation
-
 
 logger = logging.getLogger(__name__)
 
@@ -98,10 +98,10 @@ class DataExport(object):
         """Generate two files: meta info and result file and store them locally for logging"""
         filename_results = os.path.join(settings.EXPORT_DIR, name + '.json')
         filename_info = os.path.join(settings.EXPORT_DIR, name + '-info.json')
-        annotation_number = Annotation.objects.filter(task__project=project).count()
+        annotation_number = Annotation.objects.filter(project=project).count()
         try:
             platform_version = version.get_git_version()
-        except:
+        except:  # noqa: E722
             platform_version = 'none'
             logger.error('Version is not detected in save_export_files()')
         info = {
@@ -143,6 +143,11 @@ class DataExport(object):
 
     @staticmethod
     def generate_export_file(project, tasks, output_format, download_resources, get_args):
+        """Generate export file and return it as an open file object.
+
+        Be sure to close the file after using it, to avoid wasting disk space.
+        """
+
         # prepare for saving
         now = datetime.now()
         data = json.dumps(tasks, ensure_ascii=False)
@@ -165,13 +170,82 @@ class DataExport(object):
                 output_file = files[0]
                 ext = os.path.splitext(output_file)[-1]
                 content_type = f'application/{ext}'
-                out = read_bytes_stream(output_file)
+                out = path_to_open_binary_file(output_file)
                 filename = name + os.path.splitext(output_file)[-1]
                 return out, content_type, filename
 
             # otherwise pack output directory into archive
             shutil.make_archive(tmp_dir, 'zip', tmp_dir)
-            out = read_bytes_stream(os.path.abspath(tmp_dir + '.zip'))
+            out = path_to_open_binary_file(os.path.abspath(tmp_dir + '.zip'))
             content_type = 'application/zip'
             filename = name + '.zip'
             return out, content_type, filename
+
+
+class ConvertedFormat(models.Model):
+    class Status(models.TextChoices):
+        CREATED = 'created', _('Created')
+        IN_PROGRESS = 'in_progress', _('In progress')
+        FAILED = 'failed', _('Failed')
+        COMPLETED = 'completed', _('Completed')
+
+    project = models.ForeignKey(
+        'projects.Project',
+        null=True,
+        related_name='export_conversions',
+        on_delete=models.CASCADE,
+    )
+    organization = models.ForeignKey(
+        'organizations.Organization',
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='export_conversions',
+    )
+    export = models.ForeignKey(
+        Export,
+        related_name='converted_formats',
+        on_delete=models.CASCADE,
+        help_text='Export snapshot for this converted file',
+    )
+    file = models.FileField(
+        upload_to=settings.DELAYED_EXPORT_DIR,
+        null=True,
+    )
+    status = models.CharField(
+        max_length=64,
+        choices=Status.choices,
+        default=Status.CREATED,
+    )
+    traceback = models.TextField(null=True, blank=True, help_text='Traceback report in case of errors')
+    export_type = models.CharField(max_length=64)
+    created_at = models.DateTimeField(
+        _('created at'),
+        null=True,
+        auto_now_add=True,
+        help_text='Creation time',
+    )
+    updated_at = models.DateTimeField(
+        _('updated at'),
+        null=True,
+        auto_now_add=True,
+        help_text='Updated time',
+    )
+    finished_at = models.DateTimeField(
+        _('finished at'),
+        help_text='Complete or fail time',
+        null=True,
+        default=None,
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='+',
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name=_('created by'),
+    )
+
+    def delete(self, *args, **kwargs):
+        if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
+            if self.file:
+                self.file.delete()
+        super().delete(*args, **kwargs)

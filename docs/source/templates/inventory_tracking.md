@@ -26,7 +26,7 @@ Inventory Tracking system allows you to label exact products by given brand name
 </View>
 ```
 
-Let's get trough configuration. `View` is used only for layout purposes. The main thing here is the `value` in `PolygonLabels`, it allows us to load labels dynamically for every task from related array in task data, one `Label` per item. Every parameter from such item in data will be present as parameter in generated `Label` tag.
+Let's get through configuration. `View` is used only for layout purposes. The main thing here is the `value` in `PolygonLabels`, it allows us to load labels dynamically for every task from related array in task data, one `Label` per item. Every parameter from such item in data will be present as parameter in generated `Label` tag.
 
 Also there is new `html` parameter for `Label` tag which allows to display rich content as label. This content should be html-escaped:
 - `<` &rarr; `&lt;`

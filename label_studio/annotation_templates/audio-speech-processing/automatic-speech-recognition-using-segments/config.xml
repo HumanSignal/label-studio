@@ -4,7 +4,7 @@
     <Label value="Noise" />
   </Labels>
 
-  <AudioPlus name="audio" value="$audio"/>
+  <Audio name="audio" value="$audio"/>
 
   <TextArea name="transcription" toName="audio"
             rows="2" editable="true"
