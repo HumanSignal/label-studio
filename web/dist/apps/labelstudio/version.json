@@ -1,6 +1,6 @@
 {
-  "message": "add semi-colon",
-  "commit": "faee15192b762b4497e6e591faad5f8e528380f2",
-  "date": "2024-05-22T20:25:52.000Z",
-  "branch": "fb-leap-854"
+  "message": "fix: LEAP-913: LEAP-926: LEAP-1007: Fix security vulnerabilities",
+  "commit": "977b56bf45ffb9734ae295fce11bbf4e7709bc31",
+  "date": "2024-05-23T19:17:28.000Z",
+  "branch": "fb-leap-913"
 }
