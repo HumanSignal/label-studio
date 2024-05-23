@@ -95,20 +95,17 @@ logger = logging.getLogger(__name__)
                                 # TODO: provide schema for DataManagerTaskSerializer
                             ),
                         ),
-                        'total': openapi.Schema(
-                            description='Total number of tasks',
-                            type=openapi.TYPE_INTEGER
-                        ),
+                        'total': openapi.Schema(description='Total number of tasks', type=openapi.TYPE_INTEGER),
                         'total_annotations': openapi.Schema(
-                            description='Total number of annotations',
-                            type=openapi.TYPE_INTEGER),
+                            description='Total number of annotations', type=openapi.TYPE_INTEGER
+                        ),
                         'total_predictions': openapi.Schema(
-                            description='Total number of predictions',
-                            type=openapi.TYPE_INTEGER),
+                            description='Total number of predictions', type=openapi.TYPE_INTEGER
+                        ),
                     },
-                )
+                ),
             )
-        }
+        },
     ),
 )
 class TaskListAPI(DMTaskListAPI):
