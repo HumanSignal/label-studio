@@ -201,19 +201,19 @@
     "yargs": "^17.7.1"
   },
   "resolutions": {
-    "jpeg-js": "0.4.4",
-    "d3-color": "3.1.0",
-    "merge": "2.1.1",
-    "diff": "3.5.0",
-    "follow-redirects": "^1.15.6",
-    "xml2js": "0.5.0",
-    "axios": "1.6.0",
-    "@cypress/request": "3.0.0",
-    "debug": "4.3.1",
-    "webpack-dev-middleware": ">=5.3.4",
     "@babel/traverse": "^7.24.1",
+    "@cypress/request": "3.0.0",
+    "axios": "1.6.0",
+    "d3-color": "3.1.0",
+    "debug": "4.3.1",
+    "diff": "3.5.0",
+    "express": ">=4.19.2",
+    "follow-redirects": "^1.15.6",
     "ip": ">=2.0.1",
-    "express": ">=2.0.1"
+    "jpeg-js": "0.4.4",
+    "merge": "2.1.1",
+    "webpack-dev-middleware": ">=5.3.4",
+    "xml2js": "0.5.0"
   },
   "babel": {
     "presets": [
