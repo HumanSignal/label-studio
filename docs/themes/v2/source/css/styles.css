@@ -1757,7 +1757,7 @@ details+details {
 }
 
 /******
-Footer 
+Footer
 ******/
 
 .Footer {
@@ -2671,5 +2671,9 @@ code.hljs {
 }
 
 .gif-border {
+    border: 1px #f1f1f1 solid;
+}
+
+.content-markdown img {
     border: 1px #f1f1f1 solid;
 }
