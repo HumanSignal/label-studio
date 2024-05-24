@@ -24,10 +24,11 @@ To more easily [manage access to Label Studio Enterprise](manage_users.html), yo
 ## Set up SAML SSO
 
 The organization owner for Label Studio Enterprise can set up SSO & SAML for the instance. Label Studio Enterprise supports the following IdPs:
-- Microsoft Active Directory
 - [Okta](https://www.youtube.com/watch?v=Dr-_hyWIw4M)
-- OneLogin
+- [Google SAML](google_saml.html)
 - [Ping Federate and Ping Identity SAML SSO Setup Example](pingone.html)
+- OneLogin
+- Microsoft Active Directory
 - Others that use SAML assertions
 
 After setting up the SSO, you can use native authentication to access the Label Studio UI, however it's not a recommended option especially for the user with the Owner role.
