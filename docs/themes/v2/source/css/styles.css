@@ -1383,6 +1383,7 @@ ul {
   height: auto;
   margin: 1em 0;
   display: block;
+  border: 1px #f1f1f1 solid;
 }
 
 .content-markdown hr {
@@ -1757,7 +1758,7 @@ details+details {
 }
 
 /******
-Footer 
+Footer
 ******/
 
 .Footer {
@@ -2669,3 +2670,12 @@ code.hljs {
     border-color: var(--color-gray-700);
   }
 }
+
+.gif-border {
+    border: 1px #f1f1f1 solid;
+}
+
+.no-border {
+    border: unset !important;
+}
+
