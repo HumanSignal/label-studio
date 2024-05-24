@@ -1383,6 +1383,7 @@ ul {
   height: auto;
   margin: 1em 0;
   display: block;
+  border: 1px #f1f1f1 solid;
 }
 
 .content-markdown hr {
@@ -2674,6 +2675,7 @@ code.hljs {
     border: 1px #f1f1f1 solid;
 }
 
-.content-markdown img {
-    border: 1px #f1f1f1 solid;
+.no-border {
+    border: unset !important;
 }
+
