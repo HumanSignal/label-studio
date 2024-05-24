@@ -111,4 +111,9 @@ MANUAL_ROLE_MANAGEMENT=0
 
 Setting these options disables the Label Studio API and UI options to assign roles and workspaces for specific users within Label Studio and relies entirely on the settings in the environment variable file.
 
+!!! info Tip
+    If you are using the SaaS version of Label Studio (Label Studio Enterprise Cloud) and would like to enable these restrictions for your organization, [open a ticket](https://support.humansignal.com/hc/en-us/requests/new) to submit your request.  
+    
+    If requested, we can also disable the common login option for your organization. When disabled, users can only use the SSO login fields and the common login  option is disabled completely. 
+
 
