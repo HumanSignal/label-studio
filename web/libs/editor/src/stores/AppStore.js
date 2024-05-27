@@ -741,7 +741,7 @@ export default types
         // reversing the list caused problems before when task is reloaded and list is reversed again.
         // AnnotationsCarousel has its own ordering anyway, so we just keep technical order
         // as simple as possible.
-        let current = as.annotations.at(-1);
+        const current = as.annotations.at(-1);
         const currentPrediction = !current && as.predictions.at(-1);
 
         if (current) {
@@ -750,12 +750,7 @@ export default types
           // and we only call it once on already visible annotation
           current.reinitHistory();
         } else if (currentPrediction) {
-          current = as.selectPrediction(currentPrediction.id);
-        }
-
-        if (isFF(FF_CUSTOM_SCRIPT)) {
-          if (current) current.setInitialValues();
-          self.setHistory(annotationHistory);
+          as.selectPrediction(currentPrediction.id);
         }
 
         // annotation history is set when annotation is selected,
