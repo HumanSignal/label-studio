@@ -111,8 +111,8 @@ task_create_response_scheme = {
     name='post',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='projects',
-        x_fern_sdk_method_name='import_tasks',
+        x_fern_sdk_group_name='tasks',
+        x_fern_sdk_method_name='create_many',
         responses=task_create_response_scheme,
         manual_parameters=[
             openapi.Parameter(
@@ -492,7 +492,7 @@ class ReImportAPI(ImportAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='files',
+        x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='list',
         operation_summary='Get files list',
         manual_parameters=[
@@ -513,13 +513,14 @@ class ReImportAPI(ImportAPI):
         operation_description="""
         Retrieve the list of uploaded files used to create labeling tasks for a specific project.
         """,
+
     ),
 )
 @method_decorator(
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='files',
+        x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='delete_many',
         operation_summary='Delete files',
         operation_description="""
@@ -567,7 +568,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='get',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='files',
+        x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='get',
         operation_summary='Get file upload',
         operation_description='Retrieve details about a specific uploaded file.',
@@ -577,7 +578,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='files',
+        x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='update',
         operation_summary='Update file upload',
         operation_description='Update a specific uploaded file.',
@@ -588,7 +589,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='files',
+        x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='delete',
         operation_summary='Delete file upload',
         operation_description='Delete a specific uploaded file.',
@@ -619,7 +620,13 @@ class UploadedFileResponse(generics.RetrieveAPIView):
 
     @override_report_only_csp
     @csp(SANDBOX=[])
-    @swagger_auto_schema(auto_schema=None)
+    @swagger_auto_schema(
+        tags=['Import'],
+        x_fern_sdk_group_name=['projects', 'files'],
+        x_fern_sdk_method_name='download',
+        operation_summary='Download file',
+        operation_description='Download a specific uploaded file.',
+    )
     def get(self, *args, **kwargs):
         request = self.request
         filename = kwargs['filename']

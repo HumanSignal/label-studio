@@ -25,6 +25,8 @@ logger = logging.getLogger(__name__)
     name='post',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
+        x_fern_sdk_group_name='ml',
+        x_fern_sdk_method_name='create',
         operation_summary='Add ML Backend',
         operation_description="""
     Add an ML backend to a project using the Label Studio UI or by sending a POST request using the following cURL 
@@ -48,6 +50,8 @@ logger = logging.getLogger(__name__)
     name='get',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
+        x_fern_sdk_group_name='ml',
+        x_fern_sdk_method_name='list',
         operation_summary='List ML backends',
         operation_description="""
     List all configured ML backends for a specific project by ID.
@@ -102,6 +106,8 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
+        x_fern_sdk_group_name='ml',
+        x_fern_sdk_method_name='update',
         operation_summary='Update ML Backend',
         operation_description="""
     Update ML backend parameters using the Label Studio UI or by sending a PATCH request using the following cURL command:
@@ -117,6 +123,8 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
+        x_fern_sdk_group_name='ml',
+        x_fern_sdk_method_name='get',
         operation_summary='Get ML Backend',
         operation_description="""
     Get details about a specific ML backend connection by ID. For example, make a GET request using the
@@ -132,6 +140,8 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
+        x_fern_sdk_group_name='ml',
+        x_fern_sdk_method_name='delete',
         operation_summary='Remove ML Backend',
         operation_description="""
     Remove an existing ML backend connection by ID. For example, use the
@@ -164,6 +174,8 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
+        x_fern_sdk_group_name='ml',
+        x_fern_sdk_method_name='train',
         operation_summary='Train',
         operation_description="""
         After you add an ML backend, call this API with the ML backend ID to start training with 
@@ -216,7 +228,7 @@ class MLBackendTrainAPI(APIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
-        operation_summary='Predict',
+        operation_summary='Test prediction',
         operation_description="""
         After you add an ML backend, call this API with the ML backend ID to run a test prediction on specific task data               
         """,
@@ -269,6 +281,8 @@ class MLBackendPredictTestAPI(APIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
+        x_fern_sdk_group_name='ml',
+        x_fern_sdk_method_name='predict_interactive',
         operation_summary='Request Interactive Annotation',
         operation_description="""
         Send a request to the machine learning backend set up to be used for interactive preannotations to retrieve a
@@ -337,6 +351,8 @@ class MLBackendInteractiveAnnotating(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Machine Learning'],
+        x_fern_sdk_group_name='ml',
+        x_fern_sdk_method_name='list_model_versions',
         operation_summary='Get model versions',
         operation_description='Get available versions of the model.',
         responses={'200': 'List of available versions.'},

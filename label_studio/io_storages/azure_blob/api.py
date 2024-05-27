@@ -23,6 +23,8 @@ from io_storages.azure_blob.serializers import AzureBlobExportStorageSerializer,
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['import_storage', 'azure'],
+        x_fern_sdk_method_name='list',
         operation_summary='Get all import storage',
         operation_description='Get list of all Azure import storage connections.',
         manual_parameters=[
@@ -39,6 +41,8 @@ from io_storages.azure_blob.serializers import AzureBlobExportStorageSerializer,
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['import_storage', 'azure'],
+        x_fern_sdk_method_name='create',
         operation_summary='Create new storage',
         operation_description='Get new Azure import storage',
     ),
@@ -52,6 +56,8 @@ class AzureBlobImportStorageListAPI(ImportStorageListAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['import_storage', 'azure'],
+        x_fern_sdk_method_name='get',
         operation_summary='Get import storage',
         operation_description='Get a specific Azure import storage connection.',
     ),
@@ -60,6 +66,8 @@ class AzureBlobImportStorageListAPI(ImportStorageListAPI):
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['import_storage', 'azure'],
+        x_fern_sdk_method_name='update',
         operation_summary='Update import storage',
         operation_description='Update a specific Azure import storage connection.',
     ),
@@ -68,6 +76,8 @@ class AzureBlobImportStorageListAPI(ImportStorageListAPI):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['import_storage', 'azure'],
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete import storage',
         operation_description='Delete a specific Azure import storage connection.',
     ),
@@ -81,6 +91,8 @@ class AzureBlobImportStorageDetailAPI(ImportStorageDetailAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['import_storage', 'azure'],
+        x_fern_sdk_method_name='sync',
         operation_summary='Sync import storage',
         operation_description='Sync tasks from an Azure import storage connection.',
     ),
@@ -93,6 +105,8 @@ class AzureBlobImportStorageSyncAPI(ImportStorageSyncAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['export_storage', 'azure'],
+        x_fern_sdk_method_name='sync',
         operation_summary='Sync export storage',
         operation_description='Sync tasks from an Azure export storage connection.',
     ),
@@ -105,6 +119,8 @@ class AzureBlobExportStorageSyncAPI(ExportStorageSyncAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['import_storage', 'azure'],
+        x_fern_sdk_method_name='validate',
         operation_summary='Validate import storage',
         operation_description='Validate a specific Azure import storage connection.',
     ),
@@ -117,6 +133,8 @@ class AzureBlobImportStorageValidateAPI(ImportStorageValidateAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['export_storage', 'azure'],
+        x_fern_sdk_method_name='validate',
         operation_summary='Validate export storage',
         operation_description='Validate a specific Azure export storage connection.',
     ),
@@ -129,6 +147,8 @@ class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['export_storage', 'azure'],
+        x_fern_sdk_method_name='list',
         operation_summary='Get all export storage',
         operation_description='Get a list of all Azure export storage connections.',
         manual_parameters=[
@@ -145,6 +165,8 @@ class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['export_storage', 'azure'],
+        x_fern_sdk_method_name='create',
         operation_summary='Create export storage',
         operation_description='Create a new Azure export storage connection to store annotations.',
     ),
@@ -158,6 +180,8 @@ class AzureBlobExportStorageListAPI(ExportStorageListAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['export_storage', 'azure'],
+        x_fern_sdk_method_name='get',
         operation_summary='Get export storage',
         operation_description='Get a specific Azure export storage connection.',
     ),
@@ -166,6 +190,8 @@ class AzureBlobExportStorageListAPI(ExportStorageListAPI):
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['export_storage', 'azure'],
+        x_fern_sdk_method_name='update',
         operation_summary='Update export storage',
         operation_description='Update a specific Azure export storage connection.',
     ),
@@ -174,6 +200,8 @@ class AzureBlobExportStorageListAPI(ExportStorageListAPI):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Storage: Azure'],
+        x_fern_sdk_group_name=['export_storage', 'azure'],
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete export storage',
         operation_description='Delete a specific Azure export storage connection.',
     ),

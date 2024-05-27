@@ -429,6 +429,8 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
         tags=['Projects'],
         operation_id='api_projects_validate_label_config',
         operation_summary='Validate project label config',
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='validate_config',
         operation_description="""
         Determine whether the label configuration for a specific project is valid.
         """,
@@ -508,6 +510,8 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='tasks',
+        x_fern_sdk_method_name='create_many_status',
         operation_summary='Get project import info',
         operation_description='Return data related to async project import operation',
         manual_parameters=[

@@ -23,6 +23,8 @@ from io_storages.localfiles.serializers import LocalFilesExportStorageSerializer
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['import_storage', 'local'],
+        x_fern_sdk_method_name='list',
         operation_summary='Get all import storage',
         operation_description='Get a list of all local file import storage connections.',
         manual_parameters=[
@@ -39,6 +41,8 @@ from io_storages.localfiles.serializers import LocalFilesExportStorageSerializer
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['import_storage', 'local'],
+        x_fern_sdk_method_name='create',
         operation_summary='Create import storage',
         operation_description='Create a new local file import storage connection.',
     ),
@@ -52,6 +56,8 @@ class LocalFilesImportStorageListAPI(ImportStorageListAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['import_storage', 'local'],
+        x_fern_sdk_method_name='get',
         operation_summary='Get import storage',
         operation_description='Get a specific local file import storage connection.',
     ),
@@ -60,6 +66,8 @@ class LocalFilesImportStorageListAPI(ImportStorageListAPI):
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['import_storage', 'local'],
+        x_fern_sdk_method_name='update',
         operation_summary='Update import storage',
         operation_description='Update a specific local file import storage connection.',
     ),
@@ -68,6 +76,8 @@ class LocalFilesImportStorageListAPI(ImportStorageListAPI):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['import_storage', 'local'],
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete import storage',
         operation_description='Delete a specific local import storage connection.',
     ),
@@ -81,6 +91,8 @@ class LocalFilesImportStorageDetailAPI(ImportStorageDetailAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['import_storage', 'local'],
+        x_fern_sdk_method_name='sync',
         operation_summary='Sync import storage',
         operation_description='Sync tasks from a local file import storage connection.',
     ),
@@ -93,6 +105,8 @@ class LocalFilesImportStorageSyncAPI(ImportStorageSyncAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['export_storage', 'local'],
+        x_fern_sdk_method_name='sync',
         operation_summary='Sync export storage',
         operation_description='Sync tasks from a local file export storage connection.',
     ),
@@ -105,6 +119,8 @@ class LocalFilesExportStorageSyncAPI(ExportStorageSyncAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['import_storage', 'local'],
+        x_fern_sdk_method_name='validate',
         operation_summary='Validate import storage',
         operation_description='Validate a specific local file import storage connection.',
     ),
@@ -117,6 +133,8 @@ class LocalFilesImportStorageValidateAPI(ImportStorageValidateAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['export_storage', 'local'],
+        x_fern_sdk_method_name='validate',
         operation_summary='Validate export storage',
         operation_description='Validate a specific local file export storage connection.',
     ),
@@ -129,6 +147,8 @@ class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['export_storage', 'local'],
+        x_fern_sdk_method_name='list',
         operation_summary='Get all export storage',
         operation_description='Get a list of all Local export storage connections.',
         manual_parameters=[
@@ -145,6 +165,8 @@ class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['export_storage', 'local'],
+        x_fern_sdk_method_name='create',
         operation_summary='Create export storage',
         operation_description='Create a new local file export storage connection to store annotations.',
     ),
@@ -158,6 +180,8 @@ class LocalFilesExportStorageListAPI(ExportStorageListAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['export_storage', 'local'],
+        x_fern_sdk_method_name='get',
         operation_summary='Get export storage',
         operation_description='Get a specific local file export storage connection.',
     ),
@@ -166,6 +190,8 @@ class LocalFilesExportStorageListAPI(ExportStorageListAPI):
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['export_storage', 'local'],
+        x_fern_sdk_method_name='update',
         operation_summary='Update export storage',
         operation_description='Update a specific local file export storage connection.',
     ),
@@ -174,6 +200,8 @@ class LocalFilesExportStorageListAPI(ExportStorageListAPI):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Storage: Local'],
+        x_fern_sdk_group_name=['export_storage', 'local'],
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete export storage',
         operation_description='Delete a specific local file export storage connection.',
     ),

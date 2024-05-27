@@ -27,6 +27,8 @@ logger = logging.getLogger(__name__)
     name='create',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name='labels',
+        x_fern_sdk_method_name='create',
         operation_summary='Create labels',
         operation_description='Add labels to your project without updating the labeling configuration.',
     ),
@@ -35,6 +37,8 @@ logger = logging.getLogger(__name__)
     name='destroy',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name='labels',
+        x_fern_sdk_method_name='delete',
         operation_summary='Remove labels',
         operation_description='Remove labels from your project without updating the labeling configuration.',
     ),
@@ -43,6 +47,8 @@ logger = logging.getLogger(__name__)
     name='partial_update',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name='labels',
+        x_fern_sdk_method_name='update',
         operation_summary='Update labels',
         operation_description='Update labels used for your project without updating the labeling configuration.',
     ),
@@ -51,6 +57,8 @@ logger = logging.getLogger(__name__)
     name='retrieve',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name='labels',
+        x_fern_sdk_method_name='get',
         operation_summary='Get label',
         operation_description="""
         Retrieve a specific custom label used for your project by its ID.
@@ -61,6 +69,8 @@ logger = logging.getLogger(__name__)
     name='list',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name='labels',
+        x_fern_sdk_method_name='list',
         operation_summary='List labels',
         operation_description='List all custom labels added to your project separately from the labeling configuration.',
     ),
@@ -99,6 +109,8 @@ class LabelAPI(viewsets.ModelViewSet):
     name='create',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name=['projects', 'labels'],
+        x_fern_sdk_method_name='create',
         operation_summary='Create label links',
         operation_description='Create label links to link new custom labels to your project labeling configuration.',
     ),
@@ -107,6 +119,8 @@ class LabelAPI(viewsets.ModelViewSet):
     name='destroy',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name=['projects', 'labels'],
+        x_fern_sdk_method_name='delete',
         operation_summary='Remove label link',
         operation_description="""
         Remove a label link that links custom labels to your project labeling configuration. If you remove a label link,
@@ -118,6 +132,8 @@ class LabelAPI(viewsets.ModelViewSet):
     name='partial_update',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name=['projects', 'labels'],
+        x_fern_sdk_method_name='update',
         operation_summary='Update label link',
         operation_description="""
         Update a label link that links custom labels to a project labeling configuration, for example if the fromName,  
@@ -129,6 +145,8 @@ class LabelAPI(viewsets.ModelViewSet):
     name='retrieve',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name=['projects', 'labels'],
+        x_fern_sdk_method_name='get',
         operation_summary='Get label link',
         operation_description='Get label links for a specific project configuration. ',
     ),
@@ -137,6 +155,8 @@ class LabelAPI(viewsets.ModelViewSet):
     name='list',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name=['projects', 'labels'],
+        x_fern_sdk_method_name='list',
         operation_summary='List label links',
         operation_description='List label links for a specific label and project.',
     ),
@@ -181,6 +201,8 @@ class LabelLinkAPI(viewsets.ModelViewSet):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Labels'],
+        x_fern_sdk_group_name=['projects', 'labels'],
+        x_fern_sdk_method_name='update_many',
         operation_summary='Bulk update labels',
         operation_description="""
         If you want to update the labels in saved annotations, use this endpoint.

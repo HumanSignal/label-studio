@@ -44,6 +44,8 @@ _common_storage_list = _get_common_storage_list()
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage'],
+        x_fern_sdk_group_name='import_storage',
+        x_fern_sdk_method_name='list_types',
         operation_summary='List all import storages types',
         operation_description='Retrieve a list of the import storages types.',
         responses={'200': "A list of import storages types {'name': name, 'title': title}."},
@@ -60,6 +62,8 @@ class AllImportStorageTypesAPI(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage'],
+        x_fern_sdk_group_name='export_storage',
+        x_fern_sdk_method_name='list_types',
         operation_summary='List all export storages types',
         operation_description='Retrieve a list of the export storages types.',
         responses={'200': "A list of export storages types {'name': name, 'title': title}."},
@@ -76,6 +80,8 @@ class AllExportStorageTypesAPI(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage'],
+        x_fern_sdk_group_name='import_storage',
+        x_fern_sdk_method_name='list',
         operation_summary='List all import storages from the project',
         operation_description='Retrieve a list of the import storages of all types with their IDs.',
         responses={200: 'List of ImportStorageSerializer'},
@@ -108,6 +114,8 @@ class AllImportStorageListAPI(generics.ListAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage'],
+        x_fern_sdk_group_name='export_storage',
+        x_fern_sdk_method_name='list',
         operation_summary='List all export storages from the project',
         operation_description='Retrieve a list of the export storages of all types with their IDs.',
         responses={200: 'List of ExportStorageSerializer'},

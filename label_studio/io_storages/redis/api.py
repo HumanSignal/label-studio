@@ -22,6 +22,8 @@ from io_storages.redis.serializers import RedisExportStorageSerializer, RedisImp
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['import_storage', 'redis'],
+        x_fern_sdk_method_name='list',
         operation_summary='Get all import storage',
         operation_description='Get a list of all Redis import storage connections.',
         manual_parameters=[
@@ -38,6 +40,8 @@ from io_storages.redis.serializers import RedisExportStorageSerializer, RedisImp
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['import_storage', 'redis'],
+        x_fern_sdk_method_name='create',
         operation_summary='Create import storage',
         operation_description='Create a new Redis import storage connection.',
     ),
@@ -51,6 +55,8 @@ class RedisImportStorageListAPI(ImportStorageListAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['import_storage', 'redis'],
+        x_fern_sdk_method_name='get',
         operation_summary='Get import storage',
         operation_description='Get a specific Redis import storage connection.',
     ),
@@ -59,6 +65,8 @@ class RedisImportStorageListAPI(ImportStorageListAPI):
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['import_storage', 'redis'],
+        x_fern_sdk_method_name='update',
         operation_summary='Update import storage',
         operation_description='Update a specific Redis import storage connection.',
     ),
@@ -67,6 +75,8 @@ class RedisImportStorageListAPI(ImportStorageListAPI):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['import_storage', 'redis'],
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete import storage',
         operation_description='Delete a specific Redis import storage connection.',
     ),
@@ -80,6 +90,8 @@ class RedisImportStorageDetailAPI(ImportStorageDetailAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['import_storage', 'redis'],
+        x_fern_sdk_method_name='sync',
         operation_summary='Sync import storage',
         operation_description='Sync tasks from a specific Redis import storage connection.',
     ),
@@ -92,6 +104,8 @@ class RedisImportStorageSyncAPI(ExportStorageSyncAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['export_storage', 'redis'],
+        x_fern_sdk_method_name='sync',
         operation_summary='Sync export storage',
         operation_description='Sync tasks from a specific Redis export storage connection.',
     ),
@@ -104,6 +118,8 @@ class RedisExportStorageSyncAPI(ExportStorageSyncAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['import_storage', 'redis'],
+        x_fern_sdk_method_name='validate',
         operation_summary='Validate import storage',
         operation_description='Validate a specific Redis import storage connection.',
     ),
@@ -116,6 +132,8 @@ class RedisImportStorageValidateAPI(ImportStorageValidateAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['export_storage', 'redis'],
+        x_fern_sdk_method_name='validate',
         operation_summary='Validate export storage',
         operation_description='Validate a specific Redis export storage connection.',
     ),
@@ -128,6 +146,8 @@ class RedisExportStorageValidateAPI(ExportStorageValidateAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['export_storage', 'redis'],
+        x_fern_sdk_method_name='list',
         operation_summary='Get all export storage',
         operation_description='Get a list of all Redis export storage connections.',
         manual_parameters=[
@@ -144,6 +164,8 @@ class RedisExportStorageValidateAPI(ExportStorageValidateAPI):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['export_storage', 'redis'],
+        x_fern_sdk_method_name='create',
         operation_summary='Create export storage',
         operation_description='Create a new Redis export storage connection to store annotations.',
     ),
@@ -157,6 +179,8 @@ class RedisExportStorageListAPI(ExportStorageListAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['export_storage', 'redis'],
+        x_fern_sdk_method_name='get',
         operation_summary='Get export storage',
         operation_description='Get a specific Redis export storage connection.',
     ),
@@ -165,6 +189,8 @@ class RedisExportStorageListAPI(ExportStorageListAPI):
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['export_storage', 'redis'],
+        x_fern_sdk_method_name='update',
         operation_summary='Update export storage',
         operation_description='Update a specific Redis export storage connection.',
     ),
@@ -173,6 +199,8 @@ class RedisExportStorageListAPI(ExportStorageListAPI):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Storage: Redis'],
+        x_fern_sdk_group_name=['export_storage', 'redis'],
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete export storage',
         operation_description='Delete a specific Redis export storage connection.',
     ),
