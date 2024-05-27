@@ -513,7 +513,6 @@ class ReImportAPI(ImportAPI):
         operation_description="""
         Retrieve the list of uploaded files used to create labeling tasks for a specific project.
         """,
-
     ),
 )
 @method_decorator(

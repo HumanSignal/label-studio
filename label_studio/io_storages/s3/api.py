@@ -44,7 +44,7 @@ from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorag
         x_fern_sdk_group_name=['import_storage', 's3'],
         x_fern_sdk_method_name='create',
         operation_summary='Create new S3 storage',
-        operation_description='Get new S3 import storage'
+        operation_description='Get new S3 import storage',
     ),
 )
 class S3ImportStorageListAPI(ImportStorageListAPI):
