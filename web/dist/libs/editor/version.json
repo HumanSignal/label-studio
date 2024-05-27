@@ -1,6 +1,6 @@
 {
-  "message": "Add feature flag",
-  "commit": "3064ddb25657dfabb2afa263047b43b077cfb72a",
-  "date": "2024-05-27T12:12:31.000Z",
+  "message": "Revert history fix",
+  "commit": "75cf9804ee2bdb12bb47dee2d2a600b59e27ee2d",
+  "date": "2024-05-27T14:12:22.000Z",
   "branch": "fb-leap-883/custom-scripts"
 }
