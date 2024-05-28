@@ -115,14 +115,38 @@ _api_urlpatterns = [
     # Microsoft Azure Service Principal
     path('azure_spi/', AzureServicePrincipalImportStorageListAPI.as_view(), name='storage-azure_spi-list'),
     path('azure_spi/<int:pk>', AzureServicePrincipalImportStorageDetailAPI.as_view(), name='storage-azure_spi-detail'),
-    path('azure_spi/<int:pk>/sync', AzureServicePrincipalImportStorageSyncAPI.as_view(), name='storage-azure_spi-sync'),
-    path('azure_spi/validate', AzureServicePrincipalImportStorageValidateAPI.as_view(), name='storage-azure_spi-validate'),
+    path(
+        'azure_spi/<int:pk>/sync', AzureServicePrincipalImportStorageSyncAPI.as_view(), name='storage-azure_spi-sync'
+    ),
+    path(
+        'azure_spi/validate',
+        AzureServicePrincipalImportStorageValidateAPI.as_view(),
+        name='storage-azure_spi-validate',
+    ),
     path('azure_spi/form', AzureServicePrincipalImportStorageFormLayoutAPI.as_view(), name='storage-azure_spi-form'),
-    path('export/azure_spi', AzureServicePrincipalExportStorageListAPI.as_view(), name='export-storage-azure_spi-list'),
-    path('export/azure_spi/<int:pk>', AzureServicePrincipalExportStorageDetailAPI.as_view(), name='export-storage-azure_spi-detail'),
-    path('export/azure_spi/<int:pk>/sync', AzureServicePrincipalExportStorageSyncAPI.as_view(), name='export-storage-azure_spi-sync'),
-    path('export/azure_spi/validate', AzureServicePrincipalExportStorageValidateAPI.as_view(), name='export-storage-azure_spi-validate'),
-    path('export/azure_spi/form', AzureServicePrincipalExportStorageFormLayoutAPI.as_view(), name='export-storage-azure_spi-form'),
+    path(
+        'export/azure_spi', AzureServicePrincipalExportStorageListAPI.as_view(), name='export-storage-azure_spi-list'
+    ),
+    path(
+        'export/azure_spi/<int:pk>',
+        AzureServicePrincipalExportStorageDetailAPI.as_view(),
+        name='export-storage-azure_spi-detail',
+    ),
+    path(
+        'export/azure_spi/<int:pk>/sync',
+        AzureServicePrincipalExportStorageSyncAPI.as_view(),
+        name='export-storage-azure_spi-sync',
+    ),
+    path(
+        'export/azure_spi/validate',
+        AzureServicePrincipalExportStorageValidateAPI.as_view(),
+        name='export-storage-azure_spi-validate',
+    ),
+    path(
+        'export/azure_spi/form',
+        AzureServicePrincipalExportStorageFormLayoutAPI.as_view(),
+        name='export-storage-azure_spi-form',
+    ),
     # Google Cloud Storage
     path('gcs/', GCSImportStorageListAPI.as_view(), name='storage-gcs-list'),
     path('gcs/<int:pk>', GCSImportStorageDetailAPI.as_view(), name='storage-gcs-detail'),

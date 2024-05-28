@@ -15,7 +15,7 @@ from .utils import set_secured
 class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
     type = serializers.ReadOnlyField(default='azure_spi')
     presign = serializers.BooleanField(required=False, default=True)
-    is_secured=False
+    is_secured = False
     secure_fields = ['client_secret']
 
     @property
@@ -63,9 +63,8 @@ class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
 
 class AzureServicePrincipalExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default='azure_spi')
-    is_secured=False
+    is_secured = False
     secure_fields = ['client_secret']
-
 
     def to_representation(self, instance):
         result = super().to_representation(instance)

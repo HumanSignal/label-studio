@@ -39,7 +39,8 @@ logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(l
 
 AZURE_ACCOUNT_URL_TEMPLATE = Template('https://${account_name}.blob.core.windows.net')
 AZURE_SIGNED_URL_TEMPLATE = Template('${account_url}/${container_name}/${blob_name}?${sas_token}')
-AZURE_URL_PATTERN = r"https?://(?P<account_name>.*).blob.core.windows.net/(?P<container_name>[^/]+)/(?P<blob_name>.+)?(?P<sas_token>.*)"
+AZURE_URL_PATTERN = r'https?://(?P<account_name>.*).blob.core.windows.net/(?P<container_name>[^/]+)/(?P<blob_name>.+)?(?P<sas_token>.*)'
+
 
 class AzureServicePrincipalStorageMixin(models.Model):
     prefix = models.TextField(_('prefix'), null=True, blank=True, help_text='Azure blob prefix name')
@@ -51,56 +52,61 @@ class AzureServicePrincipalStorageMixin(models.Model):
     )
     account_name = models.TextField(_('account_name'), null=True, blank=True, help_text='Azure Blob account name')
     container = models.TextField(_('container'), null=True, blank=True, help_text='Azure blob container')
-    tenant_id = models.TextField(_('tenant_id'),null=True,blank=True, help_text='Azure Tenant ID')
-    client_id = models.TextField(_('client_id'),null=True,blank=True, help_text='Azure Blob Service Principal Client ID')
-    client_secret = models.TextField(_('client_secret'),null=True,blank=True, help_text='Azure Blob Service Principal Client Secret')
-    user_delegation_key = models.TextField(_('user_delegation_key'),null=True,blank=True,help_text='User Delegation Key (Backend)')
+    tenant_id = models.TextField(_('tenant_id'), null=True, blank=True, help_text='Azure Tenant ID')
+    client_id = models.TextField(
+        _('client_id'), null=True, blank=True, help_text='Azure Blob Service Principal Client ID'
+    )
+    client_secret = models.TextField(
+        _('client_secret'), null=True, blank=True, help_text='Azure Blob Service Principal Client Secret'
+    )
+    user_delegation_key = models.TextField(
+        _('user_delegation_key'), null=True, blank=True, help_text='User Delegation Key (Backend)'
+    )
 
     @property
-    def delegation_key(self)->UserDelegationKey:
+    def delegation_key(self) -> UserDelegationKey:
         key = UserDelegationKey()
         # A function to create a key if necessary...
         def create_key():
             delegation_key_expiry_time = datetime.now() + timedelta(days=1)
-            blob_service_client = self.blobservice_client        
+            blob_service_client = self.blobservice_client
             user_delegation_key = blob_service_client.get_user_delegation_key(
-                key_start_time=datetime.now(),
-                key_expiry_time=delegation_key_expiry_time
+                key_start_time=datetime.now(), key_expiry_time=delegation_key_expiry_time
             )
             logger.info('User Delegation Key : Regenerated...')
             # We create a serialized version...
             self.user_delegation_key = set_secured(json.dumps(vars(user_delegation_key)))
             self.save(update_fields=['user_delegation_key'])
-    
+
             return user_delegation_key
 
         if not self.user_delegation_key:
             key = create_key()
         else:
             key = UserDelegationKey()
-            #TODO : Chiffrer la user_delegation_key en base.
-            #TODO : Utiliser une variable d'env pour la clef de chiffrement.
+            # TODO : Chiffrer la user_delegation_key en base.
+            # TODO : Utiliser une variable d'env pour la clef de chiffrement.
             db_key = get_secured(self.user_delegation_key)
             key_dict = json.loads(db_key)
-            for prop,val in key_dict.items():
-                setattr(key,prop,val)
+            for prop, val in key_dict.items():
+                setattr(key, prop, val)
             # We check if the key is expired or not...
             now = datetime.now(tz=timezone.utc)
-            key_expiration = datetime.strptime(key.signed_expiry,'%Y-%m-%dT%H:%M:%S%z')
-            if now+timedelta(hours=1)>key_expiration:
+            key_expiration = datetime.strptime(key.signed_expiry, '%Y-%m-%dT%H:%M:%S%z')
+            if now + timedelta(hours=1) > key_expiration:
                 # Key too old, we recreate it...
                 key = create_key()
         return key
-    
+
     @property
-    def blobservice_client(self)->BlobServiceClient:
+    def blobservice_client(self) -> BlobServiceClient:
         account_url = self.get_account_url()
-        credential = ClientSecretCredential(self.tenant_id,self.client_id,get_secured(self.client_secret))
-        blobservice_client = BlobServiceClient(account_url,credential=credential)
+        credential = ClientSecretCredential(self.tenant_id, self.client_id, get_secured(self.client_secret))
+        blobservice_client = BlobServiceClient(account_url, credential=credential)
         return blobservice_client
-    
+
     @property
-    def container_client(self)->ContainerClient:
+    def container_client(self) -> ContainerClient:
         blobservice_client = self.blobservice_client
         container_client = blobservice_client.get_container_client((str(self.container)))
         return container_client
@@ -144,7 +150,6 @@ class AzureServicePrincipalStorageMixin(models.Model):
                 raise KeyError(f'{self.url_scheme}://{self.container}/{self.prefix} not found.')
 
 
-
 class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, ImportStorage):
     url_scheme = 'azure-spi'
 
@@ -152,24 +157,25 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
     presign_ttl = models.PositiveSmallIntegerField(
         _('presign_ttl'), default=1, help_text='Presigned URLs TTL (in minutes)'
     )
+
     def can_resolve_url(self, url):
-        can_resolve=False
-        if isinstance(url,str):
-            match = re.match(AZURE_URL_PATTERN,url)
+        can_resolve = False
+        if isinstance(url, str):
+            match = re.match(AZURE_URL_PATTERN, url)
             if match:
                 # To match, we need to ensure account_name and container_name matches.
                 url_account_name = match.group('account_name')
                 url_container_name = match.group('container_name')
                 if self.account_name == url_account_name and self.container == url_container_name:
-                    can_resolve=True
-        if isinstance(url,list):
+                    can_resolve = True
+        if isinstance(url, list):
             for sub_url in url:
                 if self.can_resolve_url(sub_url):
-                    can_resolve=True
+                    can_resolve = True
                     break
         return can_resolve
-             
-    def get_sas_token(self,blob_name:str):
+
+    def get_sas_token(self, blob_name: str):
         expiry = datetime.utcnow() + timedelta(minutes=self.presign_ttl)
         sas_token = generate_blob_sas(
             account_name=self.get_account_name(),
@@ -214,14 +220,14 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
         return self._scan_and_create_links(AzureServicePrincipalImportStorageLink)
 
     def generate_http_url(self, url):
-        match = re.match(AZURE_URL_PATTERN,url)
+        match = re.match(AZURE_URL_PATTERN, url)
         if match:
             match_dict = match.groupdict()
             sas_token = self.get_sas_token(match_dict['blob_name'])
             url = f"{self.get_account_url()}/{self.container}/{match_dict['blob_name']}?{sas_token}"
         return url
 
-    def get_blob_metadata(self, key)->dict:
+    def get_blob_metadata(self, key) -> dict:
         blob = self.container_client.get_blob_client(key)
         return dict(blob.get_blob_properties())
 
@@ -241,12 +247,12 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
                 result = self.resolve_uri(uri[key], task)
                 resolved[key] = result if result else uri[key]
             return resolved
-        elif isinstance(uri,str):
+        elif isinstance(uri, str):
             try:
                 # extract uri first from task data
                 if self.presign and task is not None:
                     sig = urlparse(uri)
-                    if sig.query!='':
+                    if sig.query != '':
                         return uri
                 # resolve uri to url using storages
                 http_url = self.generate_http_url(uri)
@@ -254,7 +260,6 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
 
             except Exception:
                 logger.info(f"Can't resolve URI={uri}", exc_info=True)
-
 
     class Meta:
         abstract = True
@@ -265,7 +270,9 @@ class AzureServicePrincipalImportStorage(ProjectStorageMixin, AzureServicePrinci
         abstract = False
 
 
-class AzureServicePrincipalExportStorage(AzureServicePrincipalStorageMixin, ExportStorage):  # note: order is important!
+class AzureServicePrincipalExportStorage(
+    AzureServicePrincipalStorageMixin, ExportStorage
+):  # note: order is important!
     def save_annotation(self, annotation):
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
