@@ -440,6 +440,8 @@ const AnnotationStoreModel = types
           .filter((r) => r.area.classification)
           .forEach((r) => r.from_name.updateFromResult?.(r.mainValue));
       });
+
+      getEnv(self).events.invoke("selectHistory", self.selectedHistory);
     }
 
     function addAnnotationFromPrediction(entity) {
