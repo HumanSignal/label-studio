@@ -1771,13 +1771,12 @@ testing = ["pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "py
 
 [[package]]
 name = "label-studio-converter"
-version = "0.0.58"
+version = "0.0.59.dev0"
 description = "Format converter add-on for Label Studio"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "label-studio-converter-0.0.58.tar.gz", hash = "sha256:027101d949c42daa630a1900b08185433b3fb45d36217e7b2c25267126c53ee4"},
-    {file = "label_studio_converter-0.0.58-py3-none-any.whl", hash = "sha256:c6f55ebe19498c4634da261675eca516e6089e4503fe36127393e60ee55ba525"},
+    {file = "1abb2420cdbe9daf637b68b14162327662598dc2.zip", hash = "sha256:a0b49c3626ab3f5ad22add9798a1ae63e356dd8103fd33561c7b86b157eebd4e"},
 ]
 
 [package.dependencies]
@@ -1789,14 +1788,18 @@ Pillow = ">=10.0.1"
 requests = ">=2.22.0,<3"
 ujson = "*"
 
+[package.source]
+type = "url"
+url = "https://github.com/HumanSignal/label-studio-converter/archive/1abb2420cdbe9daf637b68b14162327662598dc2.zip"
+
 [[package]]
 name = "label-studio-sdk"
-version = "0.0.34.dev0"
+version = "0.0.35.dev0"
 description = "Label Studio annotation tool"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "ecd529ccc993ef23e8bb810ed8cafbd7c2892466.zip", hash = "sha256:a38defd57fbccf2b7d8fcf94862ce724055b4d5064094dfad9e071c083098220"},
+    {file = "822241cea42b56208937ecbe9bd2f292c3aed445.zip", hash = "sha256:702413712726a3af716b7acfe052fb29e93fd2026c1e64b209ad426244ed55a2"},
 ]
 
 [package.dependencies]
@@ -1809,7 +1812,7 @@ xmljson = ">=0.2.0"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/ecd529ccc993ef23e8bb810ed8cafbd7c2892466.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/822241cea42b56208937ecbe9bd2f292c3aed445.zip"
 
 [[package]]
 name = "label-studio-tools"

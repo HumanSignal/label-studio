@@ -1,8 +1,10 @@
 ---
 title: RAG with a Langchain search agent
-type: blog
+type: guide
 tier: all
 order: 45
+hide_menu: true
+hide_frontmatter_title: true
 meta_title: RAG with a Langchain search agent
 meta_description: Use Langchain, OpenAI, and Google to generate responses based on Google search results. 
 categories:

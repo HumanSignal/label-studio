@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-712: Remove warnings in the app related to injection occur before observer",
-  "commit": "9f1d0c707d44c452b223704aa11417b2ba3c039e",
-  "date": "2024-05-03T17:03:19.000Z",
-  "branch": "fb-optic-712/remove-warnings"
+  "message": "reordering resolutions",
+  "commit": "f471a7ea61f3e0c75d3058015efe6b4e216011e3",
+  "date": "2024-05-24T14:29:55.000Z",
+  "branch": "fb-leap-913"
 }

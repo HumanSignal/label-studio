@@ -4,10 +4,11 @@ short: Back up Label Studio
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 473
+order_enterprise: 78
 meta_title: Back up Label Studio Enterprise on-prem
 meta_description: How to back up your on-prem Label Studio Enterprise environment
 section: "Install"
+parent_enterprise: "install_enterprise"
 date: 2024-01-22 15:54:30
 ---
 

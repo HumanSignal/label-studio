@@ -9,6 +9,8 @@ import { FF_LSDV_1148, FF_MULTI_OBJECT_HOTKEYS, isFF } from "../utils/feature-fl
 import { isDefined, isMacOS } from "../utils/utilities";
 import defaultKeymap from "./settings/keymap.json";
 
+type Keymap = typeof defaultKeymap;
+
 if (!isFF(FF_MULTI_OBJECT_HOTKEYS)) {
   const prev = (defaultKeymap as Keymap)["image:prev"];
   const next = (defaultKeymap as Keymap)["image:next"];

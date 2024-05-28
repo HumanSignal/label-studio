@@ -471,6 +471,19 @@ def setup_project_choices(client):
     return setup_project(client, project_choices)
 
 
+@pytest.fixture()
+def contextlog_test_config(settings):
+    """
+    Configure settings for contextlog tests in CI.
+    Be sure that responses is activated in any testcase where this fixture is used.
+    """
+
+    settings.COLLECT_ANALYTICS = True
+    settings.CONTEXTLOG_SYNC = True
+    settings.TEST_ENVIRONMENT = False
+    settings.DEBUG_CONTEXTLOG = False
+
+
 @pytest.fixture
 def business_client(client):
     # we work in empty database, so let's create business user and login

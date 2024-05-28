@@ -91,14 +91,6 @@ class OrganizationMemberPagination(PageNumberPagination):
         tags=['Organizations'],
         operation_summary='Get organization members list',
         operation_description='Retrieve a list of the organization members and their IDs.',
-        manual_parameters=[
-            openapi.Parameter(
-                name='id',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='A unique integer value identifying this organization.',
-            ),
-        ],
     ),
 )
 class OrganizationMemberListAPI(generics.ListAPIView):
@@ -142,12 +134,6 @@ class OrganizationMemberListAPI(generics.ListAPIView):
         operation_summary='Soft delete an organization member',
         operation_description='Soft delete a member from the organization.',
         manual_parameters=[
-            openapi.Parameter(
-                name='pk',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='A unique integer value identifying this organization.',
-            ),
             openapi.Parameter(
                 name='user_pk',
                 type=openapi.TYPE_INTEGER,

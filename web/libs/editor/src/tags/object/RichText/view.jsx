@@ -276,6 +276,7 @@ class RichTextPieceView extends Component {
     this.dispose?.();
     item.setLoaded(false);
     item.setReady(false);
+    item.onDispose();
   }
 
   markObjectAsLoaded() {

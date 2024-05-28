@@ -111,6 +111,8 @@ task_create_response_scheme = {
     name='post',
     decorator=swagger_auto_schema(
         tags=['Import'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='import_tasks',
         responses=task_create_response_scheme,
         manual_parameters=[
             openapi.Parameter(
@@ -490,6 +492,8 @@ class ReImportAPI(ImportAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Import'],
+        x_fern_sdk_group_name='files',
+        x_fern_sdk_method_name='list',
         operation_summary='Get files list',
         manual_parameters=[
             openapi.Parameter(
@@ -515,6 +519,8 @@ class ReImportAPI(ImportAPI):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Import'],
+        x_fern_sdk_group_name='files',
+        x_fern_sdk_method_name='delete_many',
         operation_summary='Delete files',
         operation_description="""
         Delete uploaded files for a specific project.
@@ -561,6 +567,8 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='get',
     decorator=swagger_auto_schema(
         tags=['Import'],
+        x_fern_sdk_group_name='files',
+        x_fern_sdk_method_name='get',
         operation_summary='Get file upload',
         operation_description='Retrieve details about a specific uploaded file.',
     ),
@@ -569,6 +577,8 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Import'],
+        x_fern_sdk_group_name='files',
+        x_fern_sdk_method_name='update',
         operation_summary='Update file upload',
         operation_description='Update a specific uploaded file.',
         request_body=FileUploadSerializer,
@@ -578,6 +588,8 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Import'],
+        x_fern_sdk_group_name='files',
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete file upload',
         operation_description='Delete a specific uploaded file.',
     ),

@@ -78,3 +78,6 @@ docker-compose.override.yml
 
 # actions-hub
 .github/actions-hub
+
+# Local Netlify folder
+.netlify

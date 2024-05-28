@@ -47,6 +47,8 @@ logger = logging.getLogger(__name__)
     name='post',
     decorator=swagger_auto_schema(
         tags=['Tasks'],
+        x_fern_sdk_group_name='tasks',
+        x_fern_sdk_method_name='create',
         operation_summary='Create task',
         operation_description='Create a new labeling task in Label Studio.',
         request_body=TaskSerializer,
@@ -56,6 +58,12 @@ logger = logging.getLogger(__name__)
     name='get',
     decorator=swagger_auto_schema(
         tags=['Tasks'],
+        x_fern_sdk_group_name='tasks',
+        x_fern_sdk_method_name='list',
+        x_fern_pagination={
+            'offset': '$request.page',
+            'results': '$response.tasks',
+        },
         operation_summary='Get tasks list',
         operation_description="""
     Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
@@ -72,6 +80,32 @@ logger = logging.getLogger(__name__)
                 description='Resolve task data URIs using Cloud Storage',
             ),
         ],
+        responses={
+            '200': openapi.Response(
+                description='Tasks list',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'tasks': openapi.Schema(
+                            description='List of tasks',
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(
+                                description='Task object',
+                                type=openapi.TYPE_OBJECT,
+                                # TODO: provide schema for DataManagerTaskSerializer
+                            ),
+                        ),
+                        'total': openapi.Schema(description='Total number of tasks', type=openapi.TYPE_INTEGER),
+                        'total_annotations': openapi.Schema(
+                            description='Total number of annotations', type=openapi.TYPE_INTEGER
+                        ),
+                        'total_predictions': openapi.Schema(
+                            description='Total number of predictions', type=openapi.TYPE_INTEGER
+                        ),
+                    },
+                ),
+            )
+        },
     ),
 )
 class TaskListAPI(DMTaskListAPI):
@@ -107,6 +141,8 @@ class TaskListAPI(DMTaskListAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Tasks'],
+        x_fern_sdk_group_name='tasks',
+        x_fern_sdk_method_name='get',
         operation_summary='Get task',
         operation_description="""
         Get task data, metadata, annotations and other attributes for a specific labeling task by task ID.
@@ -120,6 +156,8 @@ class TaskListAPI(DMTaskListAPI):
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Tasks'],
+        x_fern_sdk_group_name='tasks',
+        x_fern_sdk_method_name='update',
         operation_summary='Update task',
         operation_description='Update the attributes of an existing labeling task.',
         manual_parameters=[
@@ -132,6 +170,8 @@ class TaskListAPI(DMTaskListAPI):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Tasks'],
+        x_fern_sdk_group_name='tasks',
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete task',
         operation_description='Delete a task in Label Studio. This action cannot be undone!',
         manual_parameters=[
@@ -241,12 +281,16 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         operation_summary='Get annotation by its ID',
         operation_description='Retrieve a specific annotation for a task using the annotation result ID.',
+        x_fern_sdk_group_name='annotations',
+        x_fern_sdk_method_name='get',
     ),
 )
 @method_decorator(
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Annotations'],
+        x_fern_sdk_group_name='annotations',
+        x_fern_sdk_method_name='update',
         operation_summary='Update annotation',
         operation_description='Update existing attributes on an annotation.',
         request_body=AnnotationSerializer,
@@ -256,6 +300,8 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Annotations'],
+        x_fern_sdk_group_name='annotations',
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete annotation',
         operation_description="Delete an annotation. This action can't be undone!",
     ),
@@ -314,6 +360,8 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Annotations'],
+        x_fern_sdk_group_name='annotations',
+        x_fern_sdk_method_name='list',
         operation_summary='Get all task annotations',
         operation_description='List all annotations for a task.',
         manual_parameters=[
@@ -325,6 +373,8 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Annotations'],
+        x_fern_sdk_group_name='annotations',
+        x_fern_sdk_method_name='create',
         operation_summary='Create annotation',
         operation_description="""
         Add annotations to a task like an annotator does. The content of the result field depends on your 
@@ -487,6 +537,8 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
     name='list',
     decorator=swagger_auto_schema(
         tags=['Predictions'],
+        x_fern_sdk_group_name='predictions',
+        x_fern_sdk_method_name='list',
         operation_summary='List predictions',
         filter_inspectors=[DjangoFilterDescriptionInspector],
         operation_description='List all predictions and their IDs.',
@@ -496,6 +548,8 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
     name='create',
     decorator=swagger_auto_schema(
         tags=['Predictions'],
+        x_fern_sdk_group_name='predictions',
+        x_fern_sdk_method_name='create',
         operation_summary='Create prediction',
         operation_description='Create a prediction for a specific task.',
     ),
@@ -504,6 +558,8 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
     name='retrieve',
     decorator=swagger_auto_schema(
         tags=['Predictions'],
+        x_fern_sdk_group_name='predictions',
+        x_fern_sdk_method_name='get',
         operation_summary='Get prediction details',
         operation_description='Get details about a specific prediction by its ID.',
         manual_parameters=[
@@ -526,6 +582,8 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
     name='partial_update',
     decorator=swagger_auto_schema(
         tags=['Predictions'],
+        x_fern_sdk_group_name='predictions',
+        x_fern_sdk_method_name='update',
         operation_summary='Update prediction',
         operation_description='Update prediction data by prediction ID.',
         manual_parameters=[
@@ -537,6 +595,8 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
     name='destroy',
     decorator=swagger_auto_schema(
         tags=['Predictions'],
+        x_fern_sdk_group_name='predictions',
+        x_fern_sdk_method_name='delete',
         operation_summary='Delete prediction',
         operation_description='Delete a prediction by prediction ID.',
         manual_parameters=[

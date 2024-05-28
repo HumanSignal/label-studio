@@ -3,11 +3,13 @@ title: Use the Data Manager in projects
 short: Data Manager
 type: guide
 tier: all
-order: 160
-order_enterprise: 65
+order: 122
+order_enterprise: 122
 meta_title: Use the Data Manager in projects
 meta_description: Manage, filter, and sort project data for your labeling project.
-section: "Project Management"
+section: "Create & Manage Projects"
+parent: "manage_projects_lso"
+parent_enterprise: "manage_projects" 
 
 ---
 
