@@ -621,6 +621,10 @@ export default types
 
         entity.beforeSend();
         if (!entity.validate()) return;
+        if (isFF(FF_CUSTOM_SCRIPT)) {
+          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity);
+          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
+        }
 
         const isDirty = entity.history.canUndo;
 
@@ -638,6 +642,10 @@ export default types
 
         entity.beforeSend();
         if (!entity.validate()) return;
+        if (isFF(FF_CUSTOM_SCRIPT)) {
+          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity);
+          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
+        }
 
         const isDirty = entity.history.canUndo;
 
