@@ -109,6 +109,10 @@ class ProjectFilterSet(FilterSet):
         tags=['Projects'],
         x_fern_sdk_group_name='projects',
         x_fern_sdk_method_name='list',
+        x_fern_pagination={
+            'offset': '$request.page',
+            'results': '$response.results',
+        },
         operation_summary='List your projects',
         operation_description="""
     Return a list of the projects that you've created.
