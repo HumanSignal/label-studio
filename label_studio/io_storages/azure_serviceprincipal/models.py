@@ -3,19 +3,25 @@
 import json
 import logging
 import re
-from datetime import datetime, timedelta,timezone
+from datetime import datetime, timedelta, timezone
+from string import Template
 from urllib.parse import urlparse
+
 from azure.core.exceptions import ResourceNotFoundError
-from azure.storage.blob import BlobSasPermissions,generate_blob_sas,UserDelegationKey
-from azure.storage.blob import ContainerClient,BlobServiceClient
+from azure.identity import ClientSecretCredential
+from azure.storage.blob import (
+    BlobSasPermissions,
+    BlobServiceClient,
+    ContainerClient,
+    UserDelegationKey,
+    generate_blob_sas,
+)
 from core.redis import start_job_async_or_sync
 from core.utils.params import get_env
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from azure.identity import ClientSecretCredential
-from typing import Dict,Tuple
 from django.utils.translation import gettext_lazy as _
 from io_storages.base_models import (
     ExportStorage,
@@ -25,8 +31,8 @@ from io_storages.base_models import (
     ProjectStorageMixin,
 )
 from tasks.models import Annotation
-from string import Template
-from .utils import get_secured,set_secured
+
+from .utils import get_secured, set_secured
 
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)

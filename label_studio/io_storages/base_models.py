@@ -93,7 +93,7 @@ class StorageInfo(models.Model):
 
     @property
     def time_in_progress(self):
-        if not 'time_failure' in self.meta:
+        if 'time_failure' not in self.meta:
             return datetime.fromisoformat(self.meta['time_in_progress'])
         else:
             return datetime.fromisoformat(self.meta['time_failure'])

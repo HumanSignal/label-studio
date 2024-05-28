@@ -15,8 +15,14 @@ from io_storages.api import (
     ImportStorageSyncAPI,
     ImportStorageValidateAPI,
 )
-from io_storages.azure_serviceprincipal.models import AzureServicePrincipalImportStorage,AzureServicePrincipalExportStorage
-from io_storages.azure_serviceprincipal.serializers import AzureServicePrincipalExportStorageSerializer, AzureServicePrincipalImportStorageSerializer
+from io_storages.azure_serviceprincipal.models import (
+    AzureServicePrincipalExportStorage,
+    AzureServicePrincipalImportStorage,
+)
+from io_storages.azure_serviceprincipal.serializers import (
+    AzureServicePrincipalExportStorageSerializer,
+    AzureServicePrincipalImportStorageSerializer,
+)
 
 
 @method_decorator(

@@ -5,7 +5,10 @@ from core.feature_flags import flag_set
 from io_storages.base_models import ImportStorage
 
 from .azure_blob.api import AzureBlobExportStorageListAPI, AzureBlobImportStorageListAPI
-from .azure_serviceprincipal.api import AzureServicePrincipalExportStorageListAPI,AzureServicePrincipalImportStorageListAPI
+from .azure_serviceprincipal.api import (
+    AzureServicePrincipalExportStorageListAPI,
+    AzureServicePrincipalImportStorageListAPI,
+)
 from .gcs.api import GCSExportStorageListAPI, GCSImportStorageListAPI
 from .redis.api import RedisExportStorageListAPI, RedisImportStorageListAPI
 from .s3.api import S3ExportStorageListAPI, S3ImportStorageListAPI

@@ -1,11 +1,16 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 
-from io_storages.azure_serviceprincipal.models import AzureServicePrincipalImportStorage, AzureServicePrincipalExportStorage
+from io_storages.azure_serviceprincipal.models import (
+    AzureServicePrincipalExportStorage,
+    AzureServicePrincipalImportStorage,
+)
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+
 from .utils import set_secured
+
 
 class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
     type = serializers.ReadOnlyField(default='azure_spi')

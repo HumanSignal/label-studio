@@ -1,13 +1,13 @@
 import fnmatch
 import logging
+import os
 import re
 
 from azure.storage.blob import BlobServiceClient
 from core.utils.params import get_env
+from cryptography.fernet import Fernet
 from django.conf import settings
 
-from cryptography.fernet import Fernet
-import os
 key = os.getenv('ENCRYPT_KEY','CEcJNMyffg-wHysgcW0xaYleNQt9o2LExxsEgB7GkD8=')
 secret_encrypter = Fernet(key.encode())
 
