@@ -60,6 +60,10 @@ logger = logging.getLogger(__name__)
         tags=['Tasks'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='list',
+        x_fern_pagination={
+            'offset': '$request.page',
+            'results': '$response.tasks',
+        },
         operation_summary='Get tasks list',
         operation_description="""
     Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
@@ -76,6 +80,32 @@ logger = logging.getLogger(__name__)
                 description='Resolve task data URIs using Cloud Storage',
             ),
         ],
+        responses={
+            '200': openapi.Response(
+                description='Tasks list',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'tasks': openapi.Schema(
+                            description='List of tasks',
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(
+                                description='Task object',
+                                type=openapi.TYPE_OBJECT,
+                                # TODO: provide schema for DataManagerTaskSerializer
+                            ),
+                        ),
+                        'total': openapi.Schema(description='Total number of tasks', type=openapi.TYPE_INTEGER),
+                        'total_annotations': openapi.Schema(
+                            description='Total number of annotations', type=openapi.TYPE_INTEGER
+                        ),
+                        'total_predictions': openapi.Schema(
+                            description='Total number of predictions', type=openapi.TYPE_INTEGER
+                        ),
+                    },
+                ),
+            )
+        },
     ),
 )
 class TaskListAPI(DMTaskListAPI):
