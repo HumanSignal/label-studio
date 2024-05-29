@@ -1,6 +1,6 @@
 {
-  "message": "reordering resolutions",
-  "commit": "f471a7ea61f3e0c75d3058015efe6b4e216011e3",
-  "date": "2024-05-24T14:29:55.000Z",
-  "branch": "fb-leap-913"
+  "message": "feat: LEAP-1097: Allow to update annotation only with changes",
+  "commit": "93e6762dee39d6141a11969f8dcedd2538fa69fc",
+  "date": "2024-05-29T15:29:22.000Z",
+  "branch": "fb-leap-1097/update-only-changed"
 }
