@@ -52,7 +52,9 @@ _view_request_body = openapi.Schema(
                                 properties={
                                     'filter': openapi.Schema(type=openapi.TYPE_STRING, description='Field name'),
                                     'type': openapi.Schema(type=openapi.TYPE_STRING, description='Field type'),
-                                    'operator': openapi.Schema(type=openapi.TYPE_STRING, description='Filter operator'),
+                                    'operator': openapi.Schema(
+                                        type=openapi.TYPE_STRING, description='Filter operator'
+                                    ),
                                     'value': openapi.Schema(type=openapi.TYPE_STRING, description='Filter value'),
                                 },
                             ),
@@ -72,10 +74,11 @@ _view_request_body = openapi.Schema(
                         },
                     ),
                 ),
-            }
+            },
         ),
         'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-    })
+    },
+)
 
 
 @method_decorator(
@@ -102,9 +105,7 @@ _view_request_body = openapi.Schema(
         operation_summary='Create view',
         operation_description='Create a view for a specific project.',
         request_body=_view_request_body,
-        responses={
-            201: ViewSerializer
-        }
+        responses={201: ViewSerializer},
     ),
 )
 @method_decorator(
@@ -144,9 +145,7 @@ _view_request_body = openapi.Schema(
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='View ID'),
         ],
         request_body=_view_request_body,
-        responses={
-            201: ViewSerializer
-        }
+        responses={201: ViewSerializer},
     ),
 )
 @method_decorator(

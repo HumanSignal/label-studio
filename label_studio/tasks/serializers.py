@@ -9,7 +9,6 @@ from core.utils.common import load_func, retry_database_locked
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from drf_yasg import openapi
-from drf_yasg.utils import swagger_serializer_method
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import generics, serializers
@@ -34,15 +33,15 @@ class PredictionQuerySerializer(serializers.Serializer):
 class PredictionResultField(serializers.JSONField):
     class Meta:
         swagger_schema_fields = {
-            "type": openapi.TYPE_ARRAY,
-            "title": "Prediction result list",
-            "description": "List of prediction results for the task",
-            "items": {
-                "type": openapi.TYPE_OBJECT,
-                "title": "Prediction result items (regions)",
-                "description": "List of predicted regions for the task",
-            }
-         }
+            'type': openapi.TYPE_ARRAY,
+            'title': 'Prediction result list',
+            'description': 'List of prediction results for the task',
+            'items': {
+                'type': openapi.TYPE_OBJECT,
+                'title': 'Prediction result items (regions)',
+                'description': 'List of predicted regions for the task',
+            },
+        }
 
 
 class PredictionSerializer(ModelSerializer):

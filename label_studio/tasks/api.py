@@ -69,17 +69,9 @@ logger = logging.getLogger(__name__)
     Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
     """,
         manual_parameters=[
+            openapi.Parameter(name='view', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='View ID'),
             openapi.Parameter(
-                name='view',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_QUERY,
-                description='View ID'
-            ),
-            openapi.Parameter(
-                name='project',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_QUERY,
-                description='Project ID'
+                name='project', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='Project ID'
             ),
             openapi.Parameter(
                 name='resolve_uri',
@@ -106,7 +98,7 @@ logger = logging.getLogger(__name__)
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_QUERY,
                 description='Specify which fields to include in the response',
-            )
+            ),
         ],
         responses={
             '200': openapi.Response(
@@ -593,7 +585,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
                     description='Prediction result',
                     items=openapi.Schema(
                         type=openapi.TYPE_OBJECT,
-                    )
+                    ),
                 ),
                 'score': openapi.Schema(
                     type=openapi.TYPE_NUMBER,

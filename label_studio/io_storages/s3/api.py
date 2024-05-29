@@ -2,7 +2,7 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi as openapi
-from drf_yasg.utils import swagger_auto_schema, no_body
+from drf_yasg.utils import no_body, swagger_auto_schema
 from io_storages.api import (
     ExportStorageDetailAPI,
     ExportStorageFormLayoutAPI,
