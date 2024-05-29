@@ -337,6 +337,11 @@ export const FF_SAFE_TEXT = "fflag_fix_leap_466_text_sanitization";
 
 export const FF_MULTI_OBJECT_HOTKEYS = "fflag_fix_leap_246_multi_object_hotkeys_160124_short";
 
+/**
+ * It changes the reviewer flow to be more user-friendly and intuitive.
+ */
+export const FF_REVIEWER_FLOW = "fflag_feat_all_leap_1081_reviewer_flow_updates";
+
 Object.assign(window, {
   APP_SETTINGS: {
     ...(window.APP_SETTINGS ?? {}),
