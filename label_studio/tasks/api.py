@@ -42,6 +42,23 @@ from webhooks.utils import (
 logger = logging.getLogger(__name__)
 
 
+_task_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'data': openapi.Schema(
+            title='Task data',
+            description='Task data dictionary with arbitrary keys and values',
+            type=openapi.TYPE_OBJECT,
+            example={'id': 1, 'my_image_url': '/static/samples/kittens.jpg'},
+        ),
+        'project': openapi.Schema(
+            type=openapi.TYPE_INTEGER,
+            description='Project ID',
+        ),
+    },
+)
+
+
 # TODO: fix after switch to api/tasks from api/dm/tasks
 @method_decorator(
     name='post',
@@ -51,7 +68,7 @@ logger = logging.getLogger(__name__)
         x_fern_sdk_method_name='create',
         operation_summary='Create task',
         operation_description='Create a new labeling task in Label Studio.',
-        request_body=TaskSerializer,
+        request_body=_task_schema,
     ),
 )
 @method_decorator(
@@ -183,7 +200,7 @@ class TaskListAPI(DMTaskListAPI):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
-        request_body=TaskSimpleSerializer,
+        request_body=_task_schema,
     ),
 )
 @method_decorator(

@@ -92,6 +92,80 @@ _task_data_schema = openapi.Schema(
     example={'id': 1, 'my_image_url': '/static/samples/kittens.jpg'},
 )
 
+_project_schema = openapi.Schema(
+    title='Project',
+    description='Project',
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'title': openapi.Schema(
+            title='title',
+            description='Project title',
+            type=openapi.TYPE_STRING,
+        ),
+        'description': openapi.Schema(
+            title='description',
+            description='Project description',
+            type=openapi.TYPE_STRING,
+        ),
+        'label_config': openapi.Schema(
+            title='label_config',
+            description='Label config in XML format',
+            type=openapi.TYPE_STRING,
+        ),
+        'expert_instruction': openapi.Schema(
+            title='expert_instruction',
+            description='Labeling instructions',
+            type=openapi.TYPE_STRING,
+        ),
+        'show_instruction': openapi.Schema(
+            title='show_instruction',
+            description='Show labeling instructions',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'show_skip_button': openapi.Schema(
+            title='show_skip_button',
+            description='Show skip button',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'enable_empty_annotation': openapi.Schema(
+            title='enable_empty_annotation',
+            description='Allow empty annotations',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'show_annotation_history': openapi.Schema(
+            title='show_annotation_history',
+            description='Show annotation history',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'reveal_preannotations_interactively': openapi.Schema(
+            title='reveal_preannotations_interactively',
+            description='Reveal preannotations interactively',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'show_collab_predictions': openapi.Schema(
+            title='show_collab_predictions',
+            description='Show collaborative predictions',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'maximum_annotations': openapi.Schema(
+            title='maximum_annotations',
+            description='Maximum annotations per task',
+            type=openapi.TYPE_INTEGER,
+        ),
+        'color': openapi.Schema(
+            title='color',
+            description='Project color in HEX format',
+            type=openapi.TYPE_STRING,
+            default='#FFFFFF',
+        ),
+        'control_weights': openapi.Schema(
+            title='control_weights',
+            description='Control weights',
+            type=openapi.TYPE_OBJECT,
+        ),
+    },
+)
+
 
 class ProjectListPagination(PageNumberPagination):
     page_size = 30
@@ -145,6 +219,7 @@ class ProjectFilterSet(FilterSet):
     """.format(
             settings.HOSTNAME or 'https://localhost:8080'
         ),
+        request_body=_project_schema,
     ),
 )
 class ProjectListAPI(generics.ListCreateAPIView):
