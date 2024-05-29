@@ -168,10 +168,10 @@ export const Controls = controlsInjector(
         );
       }
 
-      const look = disabled || submitDisabled ? "disabled" : "primary";
+      const isDisabled = disabled || submitDisabled;
+      const look = isDisabled ? "disabled" : "primary";
 
       if (isFF(FF_PROD_E_111)) {
-        const isDisabled = disabled || submitDisabled;
         const useExitOption = !isDisabled && isNotQuickView;
 
         const SubmitOption = ({ isUpdate, onClickMethod }) => {
@@ -245,15 +245,17 @@ export const Controls = controlsInjector(
         }
 
         if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
-          const isUpdate = sentUserGenerate || versions.result;
+          const isUpdate = isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result;
+          const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo;
+          const isUpdateDisabled = isDisabled || noChanges;
           const button = (
-            <ButtonTooltip key="update" title="Update this task: [ Alt+Enter ]">
+            <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Alt+Enter ]"}>
               <Button
                 aria-label="submit"
                 name="submit"
-                disabled={disabled || submitDisabled}
+                disabled={isUpdateDisabled}
                 look={look}
-                mod={{ has_icon: useExitOption, disabled: isDisabled }}
+                mod={{ has_icon: useExitOption, disabled: isUpdateDisabled }}
                 onClick={async (event) => {
                   if (event.target.classList.contains("lsf-dropdown__trigger")) return;
                   const selected = store.annotationStore?.selected;
@@ -291,7 +293,7 @@ export const Controls = controlsInjector(
               <Elem name="tooltip-wrapper">
                 <Button
                   aria-label="submit"
-                  disabled={disabled || submitDisabled}
+                  disabled={isDisabled}
                   look={look}
                   onClick={async () => {
                     const selected = store.annotationStore?.selected;
@@ -309,12 +311,14 @@ export const Controls = controlsInjector(
         }
 
         if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
-          const isUpdate = sentUserGenerate || versions.result;
+          const isUpdate = isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result;
+          const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo;
+          const isUpdateDisabled = isDisabled || noChanges;
           const button = (
-            <ButtonTooltip key="update" title="Update this task: [ Alt+Enter ]">
+            <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Alt+Enter ]"}>
               <Button
                 aria-label="submit"
-                disabled={disabled || submitDisabled}
+                disabled={isUpdateDisabled}
                 look={look}
                 onClick={async () => {
                   const selected = store.annotationStore?.selected;
