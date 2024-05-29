@@ -4,7 +4,7 @@ import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { Block, Elem } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 import { IconBan } from "../../assets/icons";
-import { FF_PROD_E_111, isFF } from "../../utils/feature-flags";
+import { FF_PROD_E_111, FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import "./Controls.styl";
 import { useCallback, useMemo, useState } from "react";
 import { LsChevron } from "../../assets/icons";
