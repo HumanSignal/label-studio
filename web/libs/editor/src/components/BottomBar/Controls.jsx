@@ -31,7 +31,14 @@ const controlsInjector = inject(({ store }) => {
 
 export const Controls = controlsInjector(
   observer(({ store, history, annotation }) => {
-    const isReview = store.hasInterface("review");
+    // @todo check for Quick View mode
+    const canReview = isFF(FF_REVIEWER_FLOW)
+      // && store.explore — that doesn't work as expected
+      && annotation.user?.email
+      && store.user?.email !== annotation.user?.email
+      && !isNaN(annotation.pk);
+
+    const isReview = store.hasInterface("review") || canReview;
     const isNotQuickView = store.hasInterface("topbar:prevnext");
     const historySelected = isDefined(store.annotationStore.selectedHistory);
     const { userGenerate, sentUserGenerate, versions, results, editable: annotationEditable } = annotation;
