@@ -2,7 +2,7 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi as openapi
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import swagger_auto_schema, no_body
 from io_storages.api import (
     ExportStorageDetailAPI,
     ExportStorageFormLayoutAPI,
@@ -95,6 +95,15 @@ class S3ImportStorageDetailAPI(ImportStorageDetailAPI):
         x_fern_sdk_method_name='sync',
         operation_summary='Sync import storage',
         operation_description='Sync tasks from an S3 import storage connection.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_PATH,
+                description='Storage ID',
+            ),
+        ],
+        request_body=no_body,
     ),
 )
 class S3ImportStorageSyncAPI(ImportStorageSyncAPI):

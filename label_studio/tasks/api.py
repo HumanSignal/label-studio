@@ -69,9 +69,17 @@ logger = logging.getLogger(__name__)
     Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
     """,
         manual_parameters=[
-            openapi.Parameter(name='view', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='View ID'),
             openapi.Parameter(
-                name='project', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='Project ID'
+                name='view',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='View ID'
+            ),
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='Project ID'
             ),
             openapi.Parameter(
                 name='resolve_uri',
@@ -79,6 +87,26 @@ logger = logging.getLogger(__name__)
                 in_=openapi.IN_QUERY,
                 description='Resolve task data URIs using Cloud Storage',
             ),
+            openapi.Parameter(
+                name='fields',
+                type=openapi.TYPE_STRING,
+                enum=['all', 'task_only'],
+                default='task_only',
+                in_=openapi.IN_QUERY,
+                description='Set to "all" if you want to include annotations and predictions in the response',
+            ),
+            openapi.Parameter(
+                name='review',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description='Get tasks for review',
+            ),
+            openapi.Parameter(
+                name='include',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description='Specify which fields to include in the response',
+            )
         ],
         responses={
             '200': openapi.Response(
@@ -552,6 +580,37 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         x_fern_sdk_method_name='create',
         operation_summary='Create prediction',
         operation_description='Create a prediction for a specific task.',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['task', 'result'],
+            properties={
+                'task': openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description='Task ID for which the prediction is created',
+                ),
+                'result': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    description='Prediction result',
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                    )
+                ),
+                'score': openapi.Schema(
+                    type=openapi.TYPE_NUMBER,
+                    description='Prediction score',
+                ),
+                'model_version': openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description='Model version',
+                ),
+            },
+        ),
+        responses={
+            '201': openapi.Response(
+                description='Created prediction',
+                schema=PredictionSerializer,
+            )
+        },
     ),
 )
 @method_decorator(
