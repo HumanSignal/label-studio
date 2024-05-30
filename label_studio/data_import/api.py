@@ -55,6 +55,27 @@ logger = logging.getLogger(__name__)
 ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
 
+_import_api_single_item_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'data': openapi.Schema(type=openapi.TYPE_OBJECT, description='Data of the task'),
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID for this task'),
+        'annotations': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(type=openapi.TYPE_OBJECT),
+            description='Annotations for this task',
+        ),
+        'predictions': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(type=openapi.TYPE_OBJECT),
+            description='Predictions for this task',
+        ),
+        'is_labeled': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Whether the task is labeled or not'),
+        'overlap': openapi.Schema(type=openapi.TYPE_NUMBER, description='Overlap for the task'),
+    },
+    required=[],
+)
+
 task_create_response_scheme = {
     201: openapi.Response(
         description='Tasks successfully imported',
@@ -176,6 +197,10 @@ task_create_response_scheme = {
             <br>
         """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
+        ),
+        request_body=openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=_import_api_single_item_schema,
         ),
     ),
 )
