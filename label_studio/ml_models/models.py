@@ -25,6 +25,8 @@ class ModelInterface(models.Model):
 
     description = models.TextField(_('description'), null=True, blank=True, help_text='Model description')
 
+    base_model = models.TextField(_('base model'), null=True, blank=True, default='gpt-3.5-turbo', help_text='Base model used by this model (Like gpt-3.5-turbo)')
+
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, related_name='created_models', on_delete=models.SET_NULL, null=True
     )
