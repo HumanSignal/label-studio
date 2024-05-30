@@ -1,6 +1,6 @@
 {
-  "message": "reordering resolutions",
-  "commit": "f471a7ea61f3e0c75d3058015efe6b4e216011e3",
-  "date": "2024-05-24T14:29:55.000Z",
-  "branch": "fb-leap-913"
+  "message": "Add beforeSaveAnnotation event into accepting and rejecting actions",
+  "commit": "217f6c1a6faf3e7758c250fa74d98bc393109df9",
+  "date": "2024-05-28T13:44:01.000Z",
+  "branch": "fb-leap-883/custom-scripts"
 }
