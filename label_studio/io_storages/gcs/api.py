@@ -1,7 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from django.utils.decorators import method_decorator
-from drf_yasg import openapi as openapi
+from drf_yasg import openapi
 from drf_yasg.utils import no_body, swagger_auto_schema
 from io_storages.api import (
     ExportStorageDetailAPI,
@@ -17,6 +17,40 @@ from io_storages.api import (
 )
 from io_storages.gcs.models import GCSExportStorage, GCSImportStorage
 from io_storages.gcs.serializers import GCSExportStorageSerializer, GCSImportStorageSerializer
+
+_gcs_import_storage_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket name'),
+        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket prefix'),
+        'regex_filter': openapi.Schema(
+            type=openapi.TYPE_STRING, description='Cloud storage regex for filtering objects'
+        ),
+        'use_blob_urls': openapi.Schema(
+            type=openapi.TYPE_BOOLEAN, description='Interpret objects as BLOBs and generate URLs'
+        ),
+        'google_application_credentials': openapi.Schema(
+            type=openapi.TYPE_STRING, description='The content of GOOGLE_APPLICATION_CREDENTIALS json file'
+        ),
+        'google_project_id': openapi.Schema(type=openapi.TYPE_STRING, description='Google project ID'),
+        'presign': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Presign URLs for direct download'),
+        'presign_ttl': openapi.Schema(type=openapi.TYPE_INTEGER, description='Presign TTL in minutes'),
+    },
+    required=[],
+)
+
+_gcs_export_storage_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket name'),
+        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket prefix'),
+        'google_application_credentials': openapi.Schema(
+            type=openapi.TYPE_STRING, description='The content of GOOGLE_APPLICATION_CREDENTIALS json file'
+        ),
+        'google_project_id': openapi.Schema(type=openapi.TYPE_STRING, description='Google project ID'),
+    },
+    required=[],
+)
 
 
 @method_decorator(
@@ -35,6 +69,7 @@ from io_storages.gcs.serializers import GCSExportStorageSerializer, GCSImportSto
                 description='Project ID',
             ),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -45,6 +80,7 @@ from io_storages.gcs.serializers import GCSExportStorageSerializer, GCSImportSto
         x_fern_sdk_method_name='create',
         operation_summary='Create import storage',
         operation_description='Create a new GCS import storage connection.',
+        request_body=_gcs_import_storage_schema,
     ),
 )
 class GCSImportStorageListAPI(ImportStorageListAPI):
@@ -60,6 +96,7 @@ class GCSImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='get',
         operation_summary='Get import storage',
         operation_description='Get a specific GCS import storage connection.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -70,6 +107,7 @@ class GCSImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='update',
         operation_summary='Update import storage',
         operation_description='Update a specific GCS import storage connection.',
+        request_body=_gcs_import_storage_schema,
     ),
 )
 @method_decorator(
@@ -80,6 +118,7 @@ class GCSImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete import storage',
         operation_description='Delete a specific GCS import storage connection.',
+        request_body=no_body,
     ),
 )
 class GCSImportStorageDetailAPI(ImportStorageDetailAPI):
@@ -118,6 +157,7 @@ class GCSImportStorageSyncAPI(ImportStorageSyncAPI):
         x_fern_sdk_method_name='sync',
         operation_summary='Sync export storage',
         operation_description='Sync tasks from an GCS export storage connection.',
+        request_body=no_body,
     ),
 )
 class GCSExportStorageSyncAPI(ExportStorageSyncAPI):
@@ -132,6 +172,7 @@ class GCSExportStorageSyncAPI(ExportStorageSyncAPI):
         x_fern_sdk_method_name='validate',
         operation_summary='Validate import storage',
         operation_description='Validate a specific GCS import storage connection.',
+        request_body=no_body,
     ),
 )
 class GCSImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -146,6 +187,7 @@ class GCSImportStorageValidateAPI(ImportStorageValidateAPI):
         x_fern_sdk_method_name='validate',
         operation_summary='Validate export storage',
         operation_description='Validate a specific GCS export storage connection.',
+        request_body=no_body,
     ),
 )
 class GCSExportStorageValidateAPI(ExportStorageValidateAPI):
@@ -168,6 +210,7 @@ class GCSExportStorageValidateAPI(ExportStorageValidateAPI):
                 description='Project ID',
             ),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -178,6 +221,7 @@ class GCSExportStorageValidateAPI(ExportStorageValidateAPI):
         x_fern_sdk_method_name='create',
         operation_summary='Create export storage',
         operation_description='Create a new GCS export storage connection to store annotations.',
+        request_body=_gcs_export_storage_schema,
     ),
 )
 class GCSExportStorageListAPI(ExportStorageListAPI):
@@ -193,6 +237,7 @@ class GCSExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='get',
         operation_summary='Get export storage',
         operation_description='Get a specific GCS export storage connection.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -203,6 +248,7 @@ class GCSExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='update',
         operation_summary='Update export storage',
         operation_description='Update a specific GCS export storage connection.',
+        request_body=_gcs_export_storage_schema,
     ),
 )
 @method_decorator(
@@ -213,6 +259,7 @@ class GCSExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete export storage',
         operation_description='Delete a specific GCS export storage connection.',
+        request_body=no_body,
     ),
 )
 class GCSExportStorageDetailAPI(ExportStorageDetailAPI):

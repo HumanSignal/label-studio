@@ -18,6 +18,43 @@ from io_storages.api import (
 from io_storages.s3.models import S3ExportStorage, S3ImportStorage
 from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorageSerializer
 
+_s3_import_storage_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket name'),
+        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket prefix'),
+        'regex_filter': openapi.Schema(
+            type=openapi.TYPE_STRING, description='Cloud storage regex for filtering objects'
+        ),
+        'use_blob_urls': openapi.Schema(
+            type=openapi.TYPE_BOOLEAN, description='Interpret objects as BLOBs and generate URLs'
+        ),
+        'aws_access_key_id': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_ACCESS_KEY_ID'),
+        'aws_secret_access_key': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_SECRET_ACCESS_KEY'),
+        'aws_session_token': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_SESSION_TOKEN'),
+        'aws_sse_kms_key_id': openapi.Schema(type=openapi.TYPE_STRING, description='AWS SSE KMS Key ID'),
+        'region_name': openapi.Schema(type=openapi.TYPE_STRING, description='AWS Region'),
+        's3_endpoint': openapi.Schema(type=openapi.TYPE_STRING, description='S3 Endpoint'),
+        'presign': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Presign URLs for download'),
+        'presign_ttl': openapi.Schema(type=openapi.TYPE_INTEGER, description='Presign TTL in seconds'),
+        'recursive_scan': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Scan recursively'),
+    },
+)
+
+_s3_export_storage_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket name'),
+        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket prefix'),
+        'aws_access_key_id': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_ACCESS_KEY_ID'),
+        'aws_secret_access_key': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_SECRET_ACCESS_KEY'),
+        'aws_session_token': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_SESSION_TOKEN'),
+        'aws_sse_kms_key_id': openapi.Schema(type=openapi.TYPE_STRING, description='AWS SSE KMS Key ID'),
+        'region_name': openapi.Schema(type=openapi.TYPE_STRING, description='AWS Region'),
+        's3_endpoint': openapi.Schema(type=openapi.TYPE_STRING, description='S3 Endpoint'),
+    },
+)
+
 
 @method_decorator(
     name='get',
@@ -45,6 +82,7 @@ from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorag
         x_fern_sdk_method_name='create',
         operation_summary='Create new S3 storage',
         operation_description='Get new S3 import storage',
+        request_body=_s3_import_storage_schema,
     ),
 )
 class S3ImportStorageListAPI(ImportStorageListAPI):
@@ -60,6 +98,7 @@ class S3ImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='get',
         operation_summary='Get import storage',
         operation_description='Get a specific S3 import storage connection.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -70,6 +109,7 @@ class S3ImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='update',
         operation_summary='Update import storage',
         operation_description='Update a specific S3 import storage connection.',
+        request_body=_s3_import_storage_schema,
     ),
 )
 @method_decorator(
@@ -80,6 +120,7 @@ class S3ImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete import storage',
         operation_description='Delete a specific S3 import storage connection.',
+        request_body=no_body,
     ),
 )
 class S3ImportStorageDetailAPI(ImportStorageDetailAPI):
@@ -118,6 +159,7 @@ class S3ImportStorageSyncAPI(ImportStorageSyncAPI):
         x_fern_sdk_method_name='validate',
         operation_summary='Validate import storage',
         operation_description='Validate a specific S3 import storage connection.',
+        request_body=no_body,
     ),
 )
 class S3ImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -164,6 +206,7 @@ class S3ExportStorageValidateAPI(ExportStorageValidateAPI):
         x_fern_sdk_method_name='create',
         operation_summary='Create export storage',
         operation_description='Create a new S3 export storage connection to store annotations.',
+        request_body=_s3_export_storage_schema,
     ),
 )
 class S3ExportStorageListAPI(ExportStorageListAPI):
@@ -179,6 +222,7 @@ class S3ExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='get',
         operation_summary='Get export storage',
         operation_description='Get a specific S3 export storage connection.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -189,6 +233,7 @@ class S3ExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='update',
         operation_summary='Update export storage',
         operation_description='Update a specific S3 export storage connection.',
+        request_body=_s3_export_storage_schema,
     ),
 )
 @method_decorator(
@@ -199,6 +244,7 @@ class S3ExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete export storage',
         operation_description='Delete a specific S3 export storage connection.',
+        request_body=no_body,
     ),
 )
 class S3ExportStorageDetailAPI(ExportStorageDetailAPI):
@@ -214,6 +260,7 @@ class S3ExportStorageDetailAPI(ExportStorageDetailAPI):
         x_fern_sdk_method_name='sync',
         operation_summary='Sync export storage',
         operation_description='Sync tasks from an S3 export storage connection.',
+        request_body=no_body,
     ),
 )
 class S3ExportStorageSyncAPI(ExportStorageSyncAPI):

@@ -17,6 +17,35 @@ from io_storages.api import (
 from io_storages.redis.models import RedisExportStorage, RedisImportStorage
 from io_storages.redis.serializers import RedisExportStorageSerializer, RedisImportStorageSerializer
 
+_redis_import_storage_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'path': openapi.Schema(type=openapi.TYPE_STRING, description='Storage prefix (optional)'),
+        'host': openapi.Schema(type=openapi.TYPE_STRING, description='Server Host IP (optional)'),
+        'port': openapi.Schema(type=openapi.TYPE_STRING, description='Server Port (optional)'),
+        'password': openapi.Schema(type=openapi.TYPE_STRING, description='Server Password (optional)'),
+        'regex_filter': openapi.Schema(
+            type=openapi.TYPE_STRING, description='Cloud storage regex for filtering objects'
+        ),
+        'use_blob_urls': openapi.Schema(
+            type=openapi.TYPE_BOOLEAN, description='Interpret objects as BLOBs and generate URLs'
+        ),
+    },
+    required=[],
+)
+
+_redis_export_storage_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'path': openapi.Schema(type=openapi.TYPE_STRING, description='Storage prefix (optional)'),
+        'host': openapi.Schema(type=openapi.TYPE_STRING, description='Server Host IP (optional)'),
+        'port': openapi.Schema(type=openapi.TYPE_STRING, description='Server Port (optional)'),
+        'password': openapi.Schema(type=openapi.TYPE_STRING, description='Server Password (optional)'),
+        'db': openapi.Schema(type=openapi.TYPE_INTEGER, description='Database ID of database to use'),
+    },
+    required=[],
+)
+
 
 @method_decorator(
     name='get',
@@ -34,6 +63,7 @@ from io_storages.redis.serializers import RedisExportStorageSerializer, RedisImp
                 description='Project ID',
             ),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -44,6 +74,7 @@ from io_storages.redis.serializers import RedisExportStorageSerializer, RedisImp
         x_fern_sdk_method_name='create',
         operation_summary='Create import storage',
         operation_description='Create a new Redis import storage connection.',
+        request_body=_redis_import_storage_schema,
     ),
 )
 class RedisImportStorageListAPI(ImportStorageListAPI):
@@ -59,6 +90,7 @@ class RedisImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='get',
         operation_summary='Get import storage',
         operation_description='Get a specific Redis import storage connection.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -69,6 +101,7 @@ class RedisImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='update',
         operation_summary='Update import storage',
         operation_description='Update a specific Redis import storage connection.',
+        request_body=_redis_import_storage_schema,
     ),
 )
 @method_decorator(
@@ -79,6 +112,7 @@ class RedisImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete import storage',
         operation_description='Delete a specific Redis import storage connection.',
+        request_body=no_body,
     ),
 )
 class RedisImportStorageDetailAPI(ImportStorageDetailAPI):
@@ -117,6 +151,7 @@ class RedisImportStorageSyncAPI(ExportStorageSyncAPI):
         x_fern_sdk_method_name='sync',
         operation_summary='Sync export storage',
         operation_description='Sync tasks from a specific Redis export storage connection.',
+        request_body=no_body,
     ),
 )
 class RedisExportStorageSyncAPI(ExportStorageSyncAPI):
@@ -131,6 +166,7 @@ class RedisExportStorageSyncAPI(ExportStorageSyncAPI):
         x_fern_sdk_method_name='validate',
         operation_summary='Validate import storage',
         operation_description='Validate a specific Redis import storage connection.',
+        request_body=no_body,
     ),
 )
 class RedisImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -145,6 +181,7 @@ class RedisImportStorageValidateAPI(ImportStorageValidateAPI):
         x_fern_sdk_method_name='validate',
         operation_summary='Validate export storage',
         operation_description='Validate a specific Redis export storage connection.',
+        request_body=no_body,
     ),
 )
 class RedisExportStorageValidateAPI(ExportStorageValidateAPI):
@@ -167,6 +204,7 @@ class RedisExportStorageValidateAPI(ExportStorageValidateAPI):
                 description='Project ID',
             ),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -177,6 +215,7 @@ class RedisExportStorageValidateAPI(ExportStorageValidateAPI):
         x_fern_sdk_method_name='create',
         operation_summary='Create export storage',
         operation_description='Create a new Redis export storage connection to store annotations.',
+        request_body=_redis_export_storage_schema,
     ),
 )
 class RedisExportStorageListAPI(ExportStorageListAPI):
@@ -192,6 +231,7 @@ class RedisExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='get',
         operation_summary='Get export storage',
         operation_description='Get a specific Redis export storage connection.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -202,6 +242,7 @@ class RedisExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='update',
         operation_summary='Update export storage',
         operation_description='Update a specific Redis export storage connection.',
+        request_body=_redis_export_storage_schema,
     ),
 )
 @method_decorator(
@@ -212,6 +253,7 @@ class RedisExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete export storage',
         operation_description='Delete a specific Redis export storage connection.',
+        request_body=no_body,
     ),
 )
 class RedisExportStorageDetailAPI(ExportStorageDetailAPI):

@@ -18,6 +18,20 @@ from io_storages.api import (
 from io_storages.localfiles.models import LocalFilesExportStorage, LocalFilesImportStorage
 from io_storages.localfiles.serializers import LocalFilesExportStorageSerializer, LocalFilesImportStorageSerializer
 
+_local_files_import_storage_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'path': openapi.Schema(type=openapi.TYPE_STRING, description='Local path'),
+        'regex_filter': openapi.Schema(type=openapi.TYPE_STRING, description='Regex for filtering objects'),
+        'use_blob_urls': openapi.Schema(
+            type=openapi.TYPE_BOOLEAN, description='Interpret objects as BLOBs and generate URLs'
+        ),
+    },
+    required=[],
+)
+
+_local_files_export_storage_schema = _local_files_import_storage_schema
+
 
 @method_decorator(
     name='get',
@@ -35,6 +49,7 @@ from io_storages.localfiles.serializers import LocalFilesExportStorageSerializer
                 description='Project ID',
             ),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -45,6 +60,7 @@ from io_storages.localfiles.serializers import LocalFilesExportStorageSerializer
         x_fern_sdk_method_name='create',
         operation_summary='Create import storage',
         operation_description='Create a new local file import storage connection.',
+        request_body=_local_files_import_storage_schema,
     ),
 )
 class LocalFilesImportStorageListAPI(ImportStorageListAPI):
@@ -60,6 +76,7 @@ class LocalFilesImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='get',
         operation_summary='Get import storage',
         operation_description='Get a specific local file import storage connection.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -70,6 +87,7 @@ class LocalFilesImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='update',
         operation_summary='Update import storage',
         operation_description='Update a specific local file import storage connection.',
+        request_body=_local_files_import_storage_schema,
     ),
 )
 @method_decorator(
@@ -80,6 +98,7 @@ class LocalFilesImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete import storage',
         operation_description='Delete a specific local import storage connection.',
+        request_body=no_body,
     ),
 )
 class LocalFilesImportStorageDetailAPI(ImportStorageDetailAPI):
@@ -118,6 +137,7 @@ class LocalFilesImportStorageSyncAPI(ImportStorageSyncAPI):
         x_fern_sdk_method_name='sync',
         operation_summary='Sync export storage',
         operation_description='Sync tasks from a local file export storage connection.',
+        request_body=no_body,
     ),
 )
 class LocalFilesExportStorageSyncAPI(ExportStorageSyncAPI):
@@ -132,6 +152,7 @@ class LocalFilesExportStorageSyncAPI(ExportStorageSyncAPI):
         x_fern_sdk_method_name='validate',
         operation_summary='Validate import storage',
         operation_description='Validate a specific local file import storage connection.',
+        request_body=no_body,
     ),
 )
 class LocalFilesImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -146,6 +167,7 @@ class LocalFilesImportStorageValidateAPI(ImportStorageValidateAPI):
         x_fern_sdk_method_name='validate',
         operation_summary='Validate export storage',
         operation_description='Validate a specific local file export storage connection.',
+        request_body=no_body,
     ),
 )
 class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
@@ -168,6 +190,7 @@ class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
                 description='Project ID',
             ),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -178,6 +201,7 @@ class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
         x_fern_sdk_method_name='create',
         operation_summary='Create export storage',
         operation_description='Create a new local file export storage connection to store annotations.',
+        request_body=_local_files_export_storage_schema,
     ),
 )
 class LocalFilesExportStorageListAPI(ExportStorageListAPI):
@@ -193,6 +217,7 @@ class LocalFilesExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='get',
         operation_summary='Get export storage',
         operation_description='Get a specific local file export storage connection.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -203,6 +228,7 @@ class LocalFilesExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='update',
         operation_summary='Update export storage',
         operation_description='Update a specific local file export storage connection.',
+        request_body=_local_files_export_storage_schema,
     ),
 )
 @method_decorator(
@@ -213,6 +239,7 @@ class LocalFilesExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete export storage',
         operation_description='Delete a specific local file export storage connection.',
+        request_body=no_body,
     ),
 )
 class LocalFilesExportStorageDetailAPI(ExportStorageDetailAPI):

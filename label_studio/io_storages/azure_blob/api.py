@@ -18,6 +18,36 @@ from io_storages.api import (
 from io_storages.azure_blob.models import AzureBlobExportStorage, AzureBlobImportStorage
 from io_storages.azure_blob.serializers import AzureBlobExportStorageSerializer, AzureBlobImportStorageSerializer
 
+_azure_blob_import_storage_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'container': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob container'),
+        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob prefix name'),
+        'regex_filter': openapi.Schema(
+            type=openapi.TYPE_STRING, description='Cloud storage regex for filtering objects'
+        ),
+        'use_blob_urls': openapi.Schema(
+            type=openapi.TYPE_BOOLEAN, description='Interpret objects as BLOBs and generate URLs'
+        ),
+        'account_name': openapi.Schema(type=openapi.TYPE_STRING, description='Azure Blob account name'),
+        'account_key': openapi.Schema(type=openapi.TYPE_STRING, description='Azure Blob account key'),
+        'presign': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Presign URLs for direct download'),
+        'presign_ttl': openapi.Schema(type=openapi.TYPE_INTEGER, description='Presign TTL in minutes'),
+    },
+    required=[],
+)
+
+_azure_blob_export_storage_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'container': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob container'),
+        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob prefix name'),
+        'account_name': openapi.Schema(type=openapi.TYPE_STRING, description='Azure Blob account name'),
+        'account_key': openapi.Schema(type=openapi.TYPE_STRING, description='Azure Blob account key'),
+    },
+    required=[],
+)
+
 
 @method_decorator(
     name='get',
@@ -35,6 +65,7 @@ from io_storages.azure_blob.serializers import AzureBlobExportStorageSerializer,
                 description='Project ID',
             ),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -45,6 +76,7 @@ from io_storages.azure_blob.serializers import AzureBlobExportStorageSerializer,
         x_fern_sdk_method_name='create',
         operation_summary='Create new storage',
         operation_description='Get new Azure import storage',
+        request_body=_azure_blob_import_storage_schema,
     ),
 )
 class AzureBlobImportStorageListAPI(ImportStorageListAPI):
@@ -60,6 +92,7 @@ class AzureBlobImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='get',
         operation_summary='Get import storage',
         operation_description='Get a specific Azure import storage connection.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -70,6 +103,7 @@ class AzureBlobImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='update',
         operation_summary='Update import storage',
         operation_description='Update a specific Azure import storage connection.',
+        request_body=_azure_blob_import_storage_schema,
     ),
 )
 @method_decorator(
@@ -80,6 +114,7 @@ class AzureBlobImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete import storage',
         operation_description='Delete a specific Azure import storage connection.',
+        request_body=no_body,
     ),
 )
 class AzureBlobImportStorageDetailAPI(ImportStorageDetailAPI):
@@ -118,6 +153,7 @@ class AzureBlobImportStorageSyncAPI(ImportStorageSyncAPI):
         x_fern_sdk_method_name='sync',
         operation_summary='Sync export storage',
         operation_description='Sync tasks from an Azure export storage connection.',
+        request_body=no_body,
     ),
 )
 class AzureBlobExportStorageSyncAPI(ExportStorageSyncAPI):
@@ -132,6 +168,7 @@ class AzureBlobExportStorageSyncAPI(ExportStorageSyncAPI):
         x_fern_sdk_method_name='validate',
         operation_summary='Validate import storage',
         operation_description='Validate a specific Azure import storage connection.',
+        request_body=no_body,
     ),
 )
 class AzureBlobImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -146,6 +183,7 @@ class AzureBlobImportStorageValidateAPI(ImportStorageValidateAPI):
         x_fern_sdk_method_name='validate',
         operation_summary='Validate export storage',
         operation_description='Validate a specific Azure export storage connection.',
+        request_body=no_body,
     ),
 )
 class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):
@@ -168,6 +206,7 @@ class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):
                 description='Project ID',
             ),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -178,6 +217,7 @@ class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):
         x_fern_sdk_method_name='create',
         operation_summary='Create export storage',
         operation_description='Create a new Azure export storage connection to store annotations.',
+        request_body=_azure_blob_export_storage_schema,
     ),
 )
 class AzureBlobExportStorageListAPI(ExportStorageListAPI):
@@ -193,6 +233,7 @@ class AzureBlobExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='get',
         operation_summary='Get export storage',
         operation_description='Get a specific Azure export storage connection.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -203,6 +244,7 @@ class AzureBlobExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='update',
         operation_summary='Update export storage',
         operation_description='Update a specific Azure export storage connection.',
+        request_body=_azure_blob_export_storage_schema,
     ),
 )
 @method_decorator(
@@ -213,6 +255,7 @@ class AzureBlobExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete export storage',
         operation_description='Delete a specific Azure export storage connection.',
+        request_body=no_body,
     ),
 )
 class AzureBlobExportStorageDetailAPI(ExportStorageDetailAPI):
