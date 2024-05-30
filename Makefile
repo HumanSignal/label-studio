@@ -77,3 +77,7 @@ fmt-check-all:
 # Configure pre-push hook using pre-commit
 configure-hooks:
 	pre-commit install --hook-type pre-push
+
+build-and-push-package:
+	poetry config repositories.gar https://europe-west1-python.pkg.dev/ovodata-ava-nonprod/ava-label-studio-fork/
+	poetry publish --build --repository=gar
