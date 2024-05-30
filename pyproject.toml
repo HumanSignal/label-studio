@@ -103,7 +103,7 @@ target-version = ['py38']
 
 [tool.poetry]
 
-name = "label-studio"
+name = "ava-label-studio-fork"
 version = "1.12.1"
 description = "Label Studio annotation tool"
 authors = [
