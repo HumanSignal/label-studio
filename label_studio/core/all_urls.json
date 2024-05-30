@@ -1,5 +1,47 @@
 [
     {
+        "url": "/__debug__/render_panel/",
+        "module": "debug_toolbar.views.render_panel",
+        "name": "djdt:render_panel",
+        "decorators": ""
+    },
+    {
+        "url": "/__debug__/history_sidebar/",
+        "module": "debug_toolbar.panels.history.views.history_sidebar",
+        "name": "djdt:history_sidebar",
+        "decorators": ""
+    },
+    {
+        "url": "/__debug__/history_refresh/",
+        "module": "debug_toolbar.panels.history.views.history_refresh",
+        "name": "djdt:history_refresh",
+        "decorators": ""
+    },
+    {
+        "url": "/__debug__/sql_select/",
+        "module": "debug_toolbar.panels.sql.views.sql_select",
+        "name": "djdt:sql_select",
+        "decorators": ""
+    },
+    {
+        "url": "/__debug__/sql_explain/",
+        "module": "debug_toolbar.panels.sql.views.sql_explain",
+        "name": "djdt:sql_explain",
+        "decorators": ""
+    },
+    {
+        "url": "/__debug__/sql_profile/",
+        "module": "debug_toolbar.panels.sql.views.sql_profile",
+        "name": "djdt:sql_profile",
+        "decorators": ""
+    },
+    {
+        "url": "/__debug__/template_source/",
+        "module": "debug_toolbar.panels.templates.views.template_source",
+        "name": "djdt:template_source",
+        "decorators": ""
+    },
+    {
         "url": "/",
         "module": "core.views.main",
         "name": "main",
@@ -943,7 +985,7 @@
     },
     {
         "url": "/api/ml/<int:pk>/predict/test",
-        "module": "ml.api.MLBackendPredictAPI",
+        "module": "ml.api.MLBackendPredictTestAPI",
         "name": "ml:api:ml-predict-test",
         "decorators": ""
     },
