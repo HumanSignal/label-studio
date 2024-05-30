@@ -17,7 +17,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import no_body, swagger_auto_schema
 from projects.functions.stream_history import fill_history_annotation
 from projects.models import Project
 from rest_framework import generics, viewsets
@@ -41,7 +41,6 @@ from webhooks.utils import (
 
 logger = logging.getLogger(__name__)
 
-
 _task_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
@@ -54,6 +53,51 @@ _task_schema = openapi.Schema(
         'project': openapi.Schema(
             type=openapi.TYPE_INTEGER,
             description='Project ID',
+        ),
+    },
+)
+
+_annotation_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'result': openapi.Schema(type=openapi.TYPE_OBJECT, description='Labeling result in JSON format'),
+        'task': openapi.Schema(type=openapi.TYPE_INTEGER, description='Corresponding task for this annotation'),
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID for this annotation'),
+        'completed_by': openapi.Schema(
+            type=openapi.TYPE_INTEGER, description='User ID of the person who created this annotation'
+        ),
+        'updated_by': openapi.Schema(type=openapi.TYPE_INTEGER, description='Last user who updated this annotation'),
+        'was_cancelled': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='User skipped the task'),
+        'ground_truth': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='This annotation is a Ground Truth'),
+        'lead_time': openapi.Schema(
+            type=openapi.TYPE_NUMBER, description='How much time it took to annotate the task'
+        ),
+    },
+    required=[],
+)
+
+_prediction_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    required=['task', 'result'],
+    properties={
+        'task': openapi.Schema(
+            type=openapi.TYPE_INTEGER,
+            description='Task ID for which the prediction is created',
+        ),
+        'result': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            description='Prediction result',
+            items=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+            ),
+        ),
+        'score': openapi.Schema(
+            type=openapi.TYPE_NUMBER,
+            description='Prediction score',
+        ),
+        'model_version': openapi.Schema(
+            type=openapi.TYPE_STRING,
+            description='Model version',
         ),
     },
 )
@@ -187,6 +231,7 @@ class TaskListAPI(DMTaskListAPI):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -214,6 +259,7 @@ class TaskListAPI(DMTaskListAPI):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
+        request_body=no_body,
     ),
 )
 class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
@@ -320,6 +366,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_description='Retrieve a specific annotation for a task using the annotation result ID.',
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='get',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -330,7 +377,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         x_fern_sdk_method_name='update',
         operation_summary='Update annotation',
         operation_description='Update existing attributes on an annotation.',
-        request_body=AnnotationSerializer,
+        request_body=_annotation_schema,
     ),
 )
 @method_decorator(
@@ -341,6 +388,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         x_fern_sdk_method_name='delete',
         operation_summary='Delete annotation',
         operation_description="Delete an annotation. This action can't be undone!",
+        request_body=no_body,
     ),
 )
 class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
@@ -404,6 +452,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Task ID'),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -432,7 +481,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Task ID'),
         ],
-        request_body=AnnotationSerializer,
+        request_body=_annotation_schema,
     ),
 )
 class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
@@ -534,7 +583,6 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
 
 
 class AnnotationDraftListAPI(generics.ListCreateAPIView):
-
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
     permission_required = ViewClassPermission(
@@ -557,7 +605,6 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
 
 
 class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
-
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
     queryset = AnnotationDraft.objects.all()
@@ -579,6 +626,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_summary='List predictions',
         filter_inspectors=[DjangoFilterDescriptionInspector],
         operation_description='List all predictions and their IDs.',
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -589,31 +637,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         x_fern_sdk_method_name='create',
         operation_summary='Create prediction',
         operation_description='Create a prediction for a specific task.',
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            required=['task', 'result'],
-            properties={
-                'task': openapi.Schema(
-                    type=openapi.TYPE_INTEGER,
-                    description='Task ID for which the prediction is created',
-                ),
-                'result': openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    description='Prediction result',
-                    items=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                    ),
-                ),
-                'score': openapi.Schema(
-                    type=openapi.TYPE_NUMBER,
-                    description='Prediction score',
-                ),
-                'model_version': openapi.Schema(
-                    type=openapi.TYPE_STRING,
-                    description='Model version',
-                ),
-            },
-        ),
+        request_body=_prediction_schema,
         responses={
             '201': openapi.Response(
                 description='Created prediction',
@@ -633,6 +657,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -644,6 +669,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
+        request_body=_prediction_schema,
     ),
 )
 @method_decorator(
@@ -657,6 +683,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
+        request_body=_prediction_schema,
     ),
 )
 @method_decorator(
@@ -670,6 +697,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
+        request_body=no_body,
     ),
 )
 class PredictionAPI(viewsets.ModelViewSet):
