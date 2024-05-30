@@ -9,7 +9,7 @@ from django.conf import settings
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import no_body, swagger_auto_schema
 from ml.models import MLBackend
 from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
 from projects.models import Project, Task
@@ -19,6 +19,25 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 logger = logging.getLogger(__name__)
+
+_ml_backend_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'url': openapi.Schema(type=openapi.TYPE_STRING, description='ML backend URL'),
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
+        'is_interactive': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Is interactive'),
+        'title': openapi.Schema(type=openapi.TYPE_STRING, description='Title'),
+        'description': openapi.Schema(type=openapi.TYPE_STRING, description='Description'),
+        'auth_method': openapi.Schema(
+            type=openapi.TYPE_STRING, description='Auth method', enum=['NONE', 'BASIC_AUTH']
+        ),
+        'basic_auth_user': openapi.Schema(type=openapi.TYPE_STRING, description='Basic auth user'),
+        'basic_auth_pass': openapi.Schema(type=openapi.TYPE_STRING, description='Basic auth password'),
+        'extra_params': openapi.Schema(type=openapi.TYPE_OBJECT, description='Extra parameters'),
+        'timeout': openapi.Schema(type=openapi.TYPE_INTEGER, description='Response model timeout'),
+    },
+    required=[],
+)
 
 
 @method_decorator(
@@ -37,13 +56,7 @@ logger = logging.getLogger(__name__)
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-                'url': openapi.Schema(type=openapi.TYPE_STRING, description='ML backend URL'),
-            },
-        ),
+        request_body=_ml_backend_schema,
     ),
 )
 @method_decorator(
@@ -66,6 +79,7 @@ logger = logging.getLogger(__name__)
                 name='project', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='Project ID'
             ),
         ],
+        request_body=no_body,
     ),
 )
 class MLBackendListAPI(generics.ListCreateAPIView):
@@ -117,6 +131,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
+        request_body=_ml_backend_schema,
     ),
 )
 @method_decorator(
@@ -134,6 +149,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
+        request_body=no_body,
     ),
 )
 @method_decorator(
@@ -151,6 +167,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
+        request_body=no_body,
     ),
 )
 @method_decorator(name='put', decorator=swagger_auto_schema(auto_schema=None))
