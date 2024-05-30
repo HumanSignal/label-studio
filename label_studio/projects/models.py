@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import os
 import json
 import logging
 from typing import Any, Mapping, Optional
@@ -202,7 +203,7 @@ class Project(ProjectMixin, models.Model):
     )
     maximum_annotations = models.IntegerField(
         _('maximum annotation number'),
-        default=3,
+        default=os.environ.get("LABEL_STUDIO_MAX_ANNOTATORS_PER_TASK", 1),
         help_text='Maximum number of annotations for one task. '
         'If the number of annotations per task is equal or greater '
         'to this value, the task is completed (is_labeled=True)',
