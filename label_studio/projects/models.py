@@ -203,7 +203,7 @@ class Project(ProjectMixin, models.Model):
     )
     maximum_annotations = models.IntegerField(
         _('maximum annotation number'),
-        default=1,
+        default=int(os.environ.get("LABEL_STUDIO_MAX_ANNOTATORS_PER_TASK", 1)),
         help_text='Maximum number of annotations for one task. '
         'If the number of annotations per task is equal or greater '
         'to this value, the task is completed (is_labeled=True)',
