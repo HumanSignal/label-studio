@@ -220,11 +220,17 @@ s3transfer = "0.7.0"
 mock = ">=5.1.0"
 moto = ">=4.2.6"
 label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/ecd529ccc993ef23e8bb810ed8cafbd7c2892466.zip"}
+
 [tool.poetry.group.build.dependencies]
 twine = ">=4.0.2"
 
 [tool.poetry.extras]
 mysql = ["mysqlclient"]
+
+[[tool.poetry.source]]
+name = "gar"
+url = "https://europe-west1-python.pkg.dev/ovodata-ava-nonprod/ava-label-studio-fork/simple/"
+priority = "primary"
 
 [build-system]
 requires = ["poetry-core"]
