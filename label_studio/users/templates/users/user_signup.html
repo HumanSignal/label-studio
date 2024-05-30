@@ -30,12 +30,11 @@
       </div>
 
     <div>
-      <input name="allow_newsletters" id="allow_newsletters" type="hidden" value="true">
+      <input name="allow_newsletters" id="allow_newsletters" type="hidden" value="false" disabled>
       <label for="allow_newsletters_visual" style="display: inline-block; cursor: pointer;">
 
         <input name="allow_newsletters_visual" id="allow_newsletters_visual"
-               type="checkbox" style="width: auto" checked="true"
-               onchange="document.getElementById('allow_newsletters').value=document.getElementById('allow_newsletters_visual').checked">
+               type="checkbox" style="width: auto" disabled>
         Get the latest news from Heidi
         <img src="{{ settings.HOSTNAME }}{% static 'images/heidi.png' %}" alt="Heidi"
              width="25" style="display: inline; margin: 0; position: relative; top: 5px; left: 0px">

@@ -202,7 +202,7 @@ class Project(ProjectMixin, models.Model):
     )
     maximum_annotations = models.IntegerField(
         _('maximum annotation number'),
-        default=1,
+        default=3,
         help_text='Maximum number of annotations for one task. '
         'If the number of annotations per task is equal or greater '
         'to this value, the task is completed (is_labeled=True)',

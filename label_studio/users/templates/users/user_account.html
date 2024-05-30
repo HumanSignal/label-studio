@@ -157,11 +157,11 @@
           <input name="first_name" type="hidden" value="{{ user.first_name }}">
           <input name="last_name" type="hidden" value="{{ user.last_name }}">
 
-          <input name="allow_newsletters" type="hidden"
-                 value="{% if user.allow_newsletters is None %}true{% else %}{{ user.allow_newsletters|yesno:"false,true" }}{% endif %}">
+          <input name="allow_newsletters" type="hidden" disabled
+                 value="false">
 
           <input name="allow_newsletters_visual" id="allow_newsletters_visual" type="checkbox"
-                 style="width: auto;"
+                 style="width: auto;" disabled
                  {% if user.allow_newsletters %}checked="true"{% endif %}
                  onclick="smart_submit()">
 
