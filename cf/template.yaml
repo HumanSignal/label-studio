@@ -1,0 +1,62 @@
+# TODO:
+# - setup the beanstalk application to run the labelstudio docker container
+# - setup CORS on the S3 bucket
+# - Check that uploads can happen for label studio + that we can persist projects and annotations
+#
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation template to create the infra needed to deploy the LabelStudio Instance for SalmonVision"
+
+Resources:
+  LabelStudioDBInstance:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      DBInstanceIdentifier: !Sub "${AWS::StackName}-labelstudio-postgres-instance"
+      AllocatedStorage: "20" # Free tier allows up to 20GB
+      DBInstanceClass: "db.t3.micro" # Free tier eligible instance type
+      Engine: "postgres"
+      MasterUsername: "chinook"
+      MasterUserPassword: "zBMgsfPKKQVohqK"
+      DBName: "labelstudio"
+      BackupRetentionPeriod: 7
+      VPCSecurityGroups:
+        - !GetAtt LabelStudioDBSecurityGroup.GroupId
+      # FIXME: change this to false and setup a VPC for the Beanstalk and EC2 instance to access it only
+      PubliclyAccessible: true
+      StorageType: "gp2"
+
+  LabelStudioDBSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Enable access to the RDS instance
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 0.0.0.0/0 # Allows access from anywhere. Restrict this in a production environment.
+
+  LabelStudioBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-labelstudio-bucket"
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  BucketName:
+    Description: Name of the created S3 bucket
+    Value: !Ref LabelStudioBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-BucketName"
+
+  DBInstanceEndpoint:
+    Description: The connection endpoint for the LabelStudio RDS instance
+    Value: !GetAtt LabelStudioDBInstance.Endpoint.Address
