@@ -2931,6 +2931,33 @@
       "version": 4,
       "deleted": false
     },
+    "fflag_feat_front_optic_767_annotator_project_multiselect_short": {
+      "key": "fflag_feat_front_optic_767_annotator_project_multiselect_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "bdc3dbe4886b4e34a39856f59ad5e71a",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_front_prod_281_project_list_search_19072023_short": {
       "key": "fflag_feat_front_prod_281_project_list_search_19072023_short",
       "on": false,
