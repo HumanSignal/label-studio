@@ -243,7 +243,7 @@ Want to use **The Coolest Feature X** but Label Studio doesn't support it? Check
 ## Citation
 
 ```tex
-@misc{Label Studio,
+@misc{LabelStudio,
   title={{Label Studio}: Data labeling software},
   url={https://github.com/heartexlabs/label-studio},
   note={Open source software available from https://github.com/heartexlabs/label-studio},
