@@ -707,6 +707,11 @@ DATA_MANAGER_FILTER_ALLOWLIST = list(
 )
 
 if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
+    CSP_FRAME_SRC = (
+        "'self'",
+        "'report-sample'",
+        'https://humansignal.com',
+    )
     CSP_DEFAULT_SRC = (
         "'self'",
         "'report-sample'",
@@ -719,6 +724,7 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
         "'unsafe-eval'",
         'blob:',
         'browser.sentry-cdn.com',
+        'https://*.amplitude.com',
         'https://*.googletagmanager.com',
     )
     CSP_IMG_SRC = (
@@ -732,6 +738,7 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
     CSP_CONNECT_SRC = (
         "'self'",
         "'report-sample'",
+        'https://*.amplitude.com',
         'https://*.google-analytics.com',
         'https://*.analytics.google.com',
         'https://analytics.google.com',
