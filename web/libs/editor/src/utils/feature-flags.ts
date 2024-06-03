@@ -342,6 +342,8 @@ export const FF_MULTI_OBJECT_HOTKEYS = "fflag_fix_leap_246_multi_object_hotkeys_
  */
 export const FF_REVIEWER_FLOW = "fflag_feat_all_leap_1081_reviewer_flow_updates";
 
+export const FF_CUSTOM_SCRIPT = "fflag_feat_all_leap_883_custom_script_270524_short";
+
 Object.assign(window, {
   APP_SETTINGS: {
     ...(window.APP_SETTINGS ?? {}),

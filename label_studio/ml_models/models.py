@@ -157,19 +157,6 @@ class ModelRun(models.Model):
 
     completed_at = models.DateTimeField(_('completed at'), null=True, default=None)
 
-    # todo may need to clean up in future
-    @property
-    def input_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input.csv'
-
-    @property
-    def output_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/output.csv'
-
-    @property
-    def error_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
-
     def delete_predictions(self):
         """
         Deletes any predictions that have originated from a ModelRun
