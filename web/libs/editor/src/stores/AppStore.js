@@ -15,7 +15,7 @@ import Settings from "./SettingsStore";
 import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
-import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
+import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_REVIEWER_FLOW, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";
 
