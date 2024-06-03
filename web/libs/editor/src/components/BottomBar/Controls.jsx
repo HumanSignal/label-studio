@@ -31,11 +31,15 @@ const controlsInjector = inject(({ store }) => {
 
 export const Controls = controlsInjector(
   observer(({ store, history, annotation }) => {
-    // @todo check for Quick View mode
     const canReview = isFF(FF_REVIEWER_FLOW)
-      // && store.explore — that doesn't work as expected
+      // not a current user — we can only review others' annotations
       && annotation.user?.email
       && store.user?.email !== annotation.user?.email
+      // we have this only in LSE
+      && store.hasInterface("annotations:history")
+      // Quick View — we don't have View All in Label Stream
+      && store.hasInterface("annotations:view-all")
+      // annotation was submitted already
       && !isNaN(annotation.pk);
 
     const isReview = store.hasInterface("review") || canReview;
