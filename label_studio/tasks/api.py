@@ -113,6 +113,7 @@ _prediction_schema = openapi.Schema(
         operation_summary='Create task',
         operation_description='Create a new labeling task in Label Studio.',
         request_body=_task_schema,
+        responses={'201': TaskSerializer},
     ),
 )
 @method_decorator(
@@ -246,6 +247,7 @@ class TaskListAPI(DMTaskListAPI):
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
         request_body=_task_schema,
+        responses={'200': TaskSerializer},
     ),
 )
 @method_decorator(
@@ -378,6 +380,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_summary='Update annotation',
         operation_description='Update existing attributes on an annotation.',
         request_body=_annotation_schema,
+        responses={'200': AnnotationSerializer},
     ),
 )
 @method_decorator(
@@ -482,6 +485,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Task ID'),
         ],
         request_body=_annotation_schema,
+        responses={'201': AnnotationSerializer},
     ),
 )
 class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
@@ -670,6 +674,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
         request_body=_prediction_schema,
+        responses={'200': PredictionSerializer},
     ),
 )
 @method_decorator(
@@ -684,6 +689,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
         request_body=_prediction_schema,
+        responses={'200': PredictionSerializer},
     ),
 )
 @method_decorator(
