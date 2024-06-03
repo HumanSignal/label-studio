@@ -322,15 +322,19 @@ export default types
           const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
           const entity = annotationStore.selected;
           const areResultsEmpty = entity.results.length === 0;
+          const isReview = self.hasInterface("review");
+          const isUpdate = !isReview && isDefined(entity.pk);
+          const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && !entity.history.canUndo;
 
           if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
           if (annotationStore.viewingAll) return;
+          if (isUpdateDisabled) return;
 
           entity?.submissionInProgress();
 
-          if (self.hasInterface("review")) {
+          if (isReview) {
             self.acceptAnnotation();
-          } else if (!isDefined(entity.pk) && self.hasInterface("submit")) {
+          } else if (!isUpdate && self.hasInterface("submit")) {
             self.submitAnnotation();
           } else if (self.hasInterface("update")) {
             self.updateAnnotation();
