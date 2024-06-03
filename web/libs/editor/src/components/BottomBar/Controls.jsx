@@ -256,7 +256,7 @@ export const Controls = controlsInjector(
           const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
           const isUpdateDisabled = isDisabled || noChanges;
           const button = (
-            <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Alt+Enter ]"}>
+            <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Ctrl+Enter ]"}>
               <Button
                 aria-label="submit"
                 name="submit"
@@ -323,7 +323,7 @@ export const Controls = controlsInjector(
           const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
           const isUpdateDisabled = isDisabled || noChanges;
           const button = (
-            <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Alt+Enter ]"}>
+            <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Ctrl+Enter ]"}>
               <Button
                 aria-label="submit"
                 disabled={isUpdateDisabled}
