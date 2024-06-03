@@ -21,6 +21,7 @@ from io_storages.gcs.serializers import GCSExportStorageSerializer, GCSImportSto
 _gcs_import_storage_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
         'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket name'),
         'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket prefix'),
         'regex_filter': openapi.Schema(
@@ -42,6 +43,7 @@ _gcs_import_storage_schema = openapi.Schema(
 _gcs_export_storage_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
         'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket name'),
         'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket prefix'),
         'google_application_credentials': openapi.Schema(

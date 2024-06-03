@@ -170,11 +170,12 @@ _prediction_schema = openapi.Schema(
                         'tasks': openapi.Schema(
                             description='List of tasks',
                             type=openapi.TYPE_ARRAY,
-                            items=openapi.Schema(
-                                description='Task object',
-                                type=openapi.TYPE_OBJECT,
-                                # TODO: provide schema for DataManagerTaskSerializer
-                            ),
+                            items=DataManagerTaskSerializer
+                            # items=openapi.Schema(
+                            #     description='Task object',
+                            #     type=openapi.TYPE_OBJECT,
+                            #     # TODO: provide schema for DataManagerTaskSerializer
+                            # ),
                         ),
                         'total': openapi.Schema(description='Total number of tasks', type=openapi.TYPE_INTEGER),
                         'total_annotations': openapi.Schema(

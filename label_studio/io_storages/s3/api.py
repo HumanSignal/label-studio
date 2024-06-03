@@ -21,6 +21,7 @@ from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorag
 _s3_import_storage_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
         'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket name'),
         'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket prefix'),
         'regex_filter': openapi.Schema(
@@ -44,6 +45,7 @@ _s3_import_storage_schema = openapi.Schema(
 _s3_export_storage_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
         'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket name'),
         'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket prefix'),
         'aws_access_key_id': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_ACCESS_KEY_ID'),

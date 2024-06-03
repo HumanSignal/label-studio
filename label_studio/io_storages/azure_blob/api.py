@@ -21,6 +21,7 @@ from io_storages.azure_blob.serializers import AzureBlobExportStorageSerializer,
 _azure_blob_import_storage_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
         'container': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob container'),
         'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob prefix name'),
         'regex_filter': openapi.Schema(
@@ -40,6 +41,7 @@ _azure_blob_import_storage_schema = openapi.Schema(
 _azure_blob_export_storage_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
         'container': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob container'),
         'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob prefix name'),
         'account_name': openapi.Schema(type=openapi.TYPE_STRING, description='Azure Blob account name'),

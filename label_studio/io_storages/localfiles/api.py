@@ -21,6 +21,7 @@ from io_storages.localfiles.serializers import LocalFilesExportStorageSerializer
 _local_files_import_storage_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
         'path': openapi.Schema(type=openapi.TYPE_STRING, description='Local path'),
         'regex_filter': openapi.Schema(type=openapi.TYPE_STRING, description='Regex for filtering objects'),
         'use_blob_urls': openapi.Schema(

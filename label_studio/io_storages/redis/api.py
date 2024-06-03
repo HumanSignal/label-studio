@@ -20,6 +20,7 @@ from io_storages.redis.serializers import RedisExportStorageSerializer, RedisImp
 _redis_import_storage_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
         'path': openapi.Schema(type=openapi.TYPE_STRING, description='Storage prefix (optional)'),
         'host': openapi.Schema(type=openapi.TYPE_STRING, description='Server Host IP (optional)'),
         'port': openapi.Schema(type=openapi.TYPE_STRING, description='Server Port (optional)'),
@@ -37,6 +38,7 @@ _redis_import_storage_schema = openapi.Schema(
 _redis_export_storage_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
         'path': openapi.Schema(type=openapi.TYPE_STRING, description='Storage prefix (optional)'),
         'host': openapi.Schema(type=openapi.TYPE_STRING, description='Server Host IP (optional)'),
         'port': openapi.Schema(type=openapi.TYPE_STRING, description='Server Port (optional)'),
