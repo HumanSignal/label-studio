@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1099: Allow to update annotation only with changes",
-  "commit": "8cb2172d19b2a0ed53781cce6e35d552657b61f7",
-  "date": "2024-05-29T17:56:20.000Z",
+  "message": "Merge branch 'develop' into fb-leap-1099/update-only-changed",
+  "commit": "ec18f7bcc1bb713bcd78030a3a24cab42f659644",
+  "date": "2024-06-03T21:57:22.000Z",
   "branch": "fb-leap-1099/update-only-changed"
 }
