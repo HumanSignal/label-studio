@@ -324,7 +324,9 @@ export default types
           const areResultsEmpty = entity.results.length === 0;
           const isReview = self.hasInterface("review");
           const isUpdate = !isReview && isDefined(entity.pk);
-          const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && !entity.history.canUndo;
+          // no changes were made over previously submitted version — no drafts, no pending changes
+          const noChanges = !entity.history.canUndo && !entity.draftId;
+          const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && noChanges;
 
           if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
           if (annotationStore.viewingAll) return;

@@ -252,7 +252,8 @@ export const Controls = controlsInjector(
 
         if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
           const isUpdate = isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result;
-          const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo;
+          // no changes were made over previously submitted version — no drafts, no pending changes
+          const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
           const isUpdateDisabled = isDisabled || noChanges;
           const button = (
             <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Alt+Enter ]"}>
@@ -318,7 +319,8 @@ export const Controls = controlsInjector(
 
         if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
           const isUpdate = isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result;
-          const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo;
+          // no changes were made over previously submitted version — no drafts, no pending changes
+          const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
           const isUpdateDisabled = isDisabled || noChanges;
           const button = (
             <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Alt+Enter ]"}>
