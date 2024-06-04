@@ -5,7 +5,7 @@ import logging
 import drf_yasg.openapi as openapi
 from core.permissions import ViewClassPermission, all_permissions
 from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import no_body, swagger_auto_schema
 from rest_framework import generics, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
@@ -20,11 +20,29 @@ from users.serializers import UserSerializer, UserSerializerUpdate
 
 logger = logging.getLogger(__name__)
 
+_user_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'id': openapi.Schema(type=openapi.TYPE_INTEGER, description='User ID'),
+        'first_name': openapi.Schema(type=openapi.TYPE_STRING, description='First name of the user'),
+        'last_name': openapi.Schema(type=openapi.TYPE_STRING, description='Last name of the user'),
+        'username': openapi.Schema(type=openapi.TYPE_STRING, description='Username of the user'),
+        'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email of the user'),
+        'avatar': openapi.Schema(type=openapi.TYPE_STRING, description='Avatar URL of the user'),
+        'initials': openapi.Schema(type=openapi.TYPE_STRING, description='Initials of the user'),
+        'phone': openapi.Schema(type=openapi.TYPE_STRING, description='Phone number of the user'),
+        'allow_newsletters': openapi.Schema(
+            type=openapi.TYPE_BOOLEAN, description='Whether the user allows newsletters'
+        ),
+    },
+)
+
 
 @method_decorator(
     name='update',
     decorator=swagger_auto_schema(
         tags=['Users'],
+        x_fern_audiences=['internal'],
         operation_summary='Save user details',
         operation_description="""
     Save details for a specific user, such as their name or contact information, in Label Studio.
@@ -41,6 +59,7 @@ logger = logging.getLogger(__name__)
         tags=['Users'],
         x_fern_sdk_group_name='users',
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='List users',
         operation_description='List the users that exist on the Label Studio server.',
     ),
@@ -51,9 +70,11 @@ logger = logging.getLogger(__name__)
         tags=['Users'],
         x_fern_sdk_group_name='users',
         x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Create new user',
         operation_description='Create a user in Label Studio.',
-        request_body=UserSerializer,
+        request_body=_user_schema,
+        responses={201: UserSerializer},
     ),
 )
 @method_decorator(
@@ -62,11 +83,14 @@ logger = logging.getLogger(__name__)
         tags=['Users'],
         x_fern_sdk_group_name='users',
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get user info',
         operation_description='Get info about a specific Label Studio user, based on the user ID.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='User ID'),
         ],
+        request_body=no_body,
+        responses={200: UserSerializer},
     ),
 )
 @method_decorator(
@@ -75,6 +99,7 @@ logger = logging.getLogger(__name__)
         tags=['Users'],
         x_fern_sdk_group_name='users',
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update user details',
         operation_description="""
         Update details for a specific user, such as their name or contact information, in Label Studio.
@@ -82,7 +107,8 @@ logger = logging.getLogger(__name__)
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='User ID'),
         ],
-        request_body=UserSerializer,
+        request_body=_user_schema,
+        responses={200: UserSerializer},
     ),
 )
 @method_decorator(
@@ -91,11 +117,13 @@ logger = logging.getLogger(__name__)
         tags=['Users'],
         x_fern_sdk_group_name='users',
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete user',
         operation_description='Delete a specific Label Studio user.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='User ID'),
         ],
+        request_body=no_body,
     ),
 )
 class UserAPI(viewsets.ModelViewSet):
@@ -182,8 +210,10 @@ class UserAPI(viewsets.ModelViewSet):
         tags=['Users'],
         x_fern_sdk_group_name='users',
         x_fern_sdk_method_name='reset_token',
+        x_fern_audiences=['public'],
         operation_summary='Reset user token',
         operation_description='Reset the user token for the current user.',
+        request_body=no_body,
         responses={
             201: openapi.Response(
                 description='User token response',
@@ -214,8 +244,10 @@ class UserResetTokenAPI(APIView):
         tags=['Users'],
         x_fern_sdk_group_name='users',
         x_fern_sdk_method_name='get_token',
+        x_fern_audiences=['public'],
         operation_summary='Get user token',
         operation_description='Get a user token to authenticate to the API as the current user.',
+        request_body=no_body,
         responses={
             200: openapi.Response(
                 description='User token response',
@@ -244,8 +276,11 @@ class UserGetTokenAPI(APIView):
         tags=['Users'],
         x_fern_sdk_group_name='users',
         x_fern_sdk_method_name='whoami',
+        x_fern_audiences=['public'],
         operation_summary='Retrieve my user',
         operation_description='Retrieve details of the account that you are using to access the API.',
+        request_body=no_body,
+        responses={200: UserSerializer},
     ),
 )
 class UserWhoAmIAPI(generics.RetrieveAPIView):

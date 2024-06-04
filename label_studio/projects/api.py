@@ -183,6 +183,7 @@ class ProjectFilterSet(FilterSet):
         tags=['Projects'],
         x_fern_sdk_group_name='projects',
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         x_fern_pagination={
             'offset': '$request.page',
             'results': '$response.results',
@@ -209,6 +210,7 @@ class ProjectFilterSet(FilterSet):
         operation_summary='Create new project',
         x_fern_sdk_group_name='projects',
         x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_description="""
     Create a project and set up the labeling interface in Label Studio using the API.
 
@@ -274,6 +276,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         tags=['Projects'],
         x_fern_sdk_group_name='projects',
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get project by ID',
         operation_description='Retrieve information about a project by project ID.',
         responses={
@@ -342,6 +345,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         tags=['Projects'],
         x_fern_sdk_group_name='projects',
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete project',
         operation_description='Delete a project by specified project ID.',
     ),
@@ -352,6 +356,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         tags=['Projects'],
         x_fern_sdk_group_name='projects',
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update project',
         operation_description='Update the project settings for a specific project.',
         request_body=ProjectSerializer,
@@ -417,6 +422,7 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_summary='Get next task to label',
         x_fern_sdk_group_name='projects',
         x_fern_sdk_method_name='next_task',
+        x_fern_audiences=['public'],
         operation_description="""
     Get the next task for labeling. If you enable Machine Learning in
     your project, the response might include a "predictions"
@@ -471,6 +477,7 @@ class LabelStreamHistoryAPI(generics.RetrieveAPIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_audiences=['internal'],
         operation_summary='Validate label config',
         operation_description='Validate an arbitrary labeling configuration.',
         responses={204: 'Validation success'},
@@ -506,6 +513,7 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
         operation_summary='Validate project label config',
         x_fern_sdk_group_name='projects',
         x_fern_sdk_method_name='validate_config',
+        x_fern_audiences=['public'],
         operation_description="""
         Determine whether the label configuration for a specific project is valid.
         """,
@@ -587,6 +595,7 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
         tags=['Projects'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='create_many_status',
+        x_fern_audiences=['public'],
         operation_summary='Get project import info',
         operation_description='Return data related to async project import operation',
         manual_parameters=[
@@ -612,6 +621,7 @@ class ProjectImportAPI(generics.RetrieveAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_audiences=['internal'],
         operation_summary='Get project reimport info',
         operation_description='Return data related to async project reimport operation',
         manual_parameters=[
@@ -637,6 +647,9 @@ class ProjectReimportAPI(generics.RetrieveAPIView):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='delete_all_tasks',
+        x_fern_audiences=['public'],
         operation_summary='Delete all tasks',
         operation_description='Delete all tasks from a specific project.',
         manual_parameters=[
@@ -653,6 +666,7 @@ class ProjectReimportAPI(generics.RetrieveAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_audiences=['internal'],  # TODO: deprecate this endpooint in favor of tasks:tasks-list
         operation_summary='List project tasks',
         operation_description="""
             Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:

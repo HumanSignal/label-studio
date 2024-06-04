@@ -87,6 +87,7 @@ _view_request_body = openapi.Schema(
         tags=['Data Manager'],
         x_fern_sdk_group_name='views',
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='List views',
         operation_description='List all views for a specific project.',
         manual_parameters=[
@@ -102,6 +103,7 @@ _view_request_body = openapi.Schema(
         tags=['Data Manager'],
         x_fern_sdk_group_name='views',
         x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Create view',
         operation_description='Create a view for a specific project.',
         request_body=_view_request_body,
@@ -114,6 +116,7 @@ _view_request_body = openapi.Schema(
         tags=['Data Manager'],
         x_fern_sdk_group_name='views',
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get view details',
         operation_description='Get the details about a specific view in the data manager',
         manual_parameters=[
@@ -125,6 +128,7 @@ _view_request_body = openapi.Schema(
     name='update',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_audiences=['internal'],
         operation_summary='Put view',
         operation_description='Overwrite view data with updated filters and other information for a specific project.',
         request_body=_view_request_body,
@@ -154,6 +158,7 @@ _view_request_body = openapi.Schema(
         tags=['Data Manager'],
         x_fern_sdk_group_name='views',
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete view',
         operation_description='Delete a specific view by ID.',
         manual_parameters=[
@@ -180,6 +185,7 @@ class ViewAPI(viewsets.ModelViewSet):
         tags=['Data Manager'],
         x_fern_sdk_group_name='views',
         x_fern_sdk_method_name='delete_all',
+        x_fern_audiences=['public'],
         operation_summary='Delete all project views',
         operation_description='Delete all views for a specific project',
         request_body=ViewResetSerializer,
@@ -358,6 +364,7 @@ class TaskListAPI(generics.ListCreateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_audiences=['internal'],
         operation_summary='Get data manager columns',
         operation_description='Retrieve the data manager columns available for the tasks in a specific project.',
     ),
@@ -378,6 +385,7 @@ class ProjectColumnsAPI(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_audiences=['internal'],
         operation_summary='Get project state',
         operation_description='Retrieve the project state for the data manager.',
     ),
@@ -412,6 +420,7 @@ class ProjectStateAPI(APIView):
         tags=['Data Manager'],
         x_fern_sdk_group_name='actions',
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['internal'],
         operation_summary='Get actions',
         operation_description='Retrieve all the registered actions with descriptions that data manager can use.',
     ),
@@ -422,6 +431,7 @@ class ProjectStateAPI(APIView):
         tags=['Data Manager'],
         x_fern_sdk_group_name='actions',
         x_fern_sdk_method_name='create',
+        x_fern_audiences=['internal'],
         operation_summary='Post actions',
         operation_description='Perform an action with the selected items from a specific view.',
     ),

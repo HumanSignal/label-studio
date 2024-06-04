@@ -110,6 +110,7 @@ _prediction_schema = openapi.Schema(
         tags=['Tasks'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Create task',
         operation_description='Create a new labeling task in Label Studio.',
         request_body=_task_schema,
@@ -126,6 +127,7 @@ _prediction_schema = openapi.Schema(
             'offset': '$request.page',
             'results': '$response.tasks',
         },
+        x_fern_audiences=['public'],
         operation_summary='Get tasks list',
         operation_description="""
     Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
@@ -225,6 +227,7 @@ class TaskListAPI(DMTaskListAPI):
         tags=['Tasks'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get task',
         operation_description="""
         Get task data, metadata, annotations and other attributes for a specific labeling task by task ID.
@@ -241,6 +244,7 @@ class TaskListAPI(DMTaskListAPI):
         tags=['Tasks'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update task',
         operation_description='Update the attributes of an existing labeling task.',
         manual_parameters=[
@@ -256,6 +260,7 @@ class TaskListAPI(DMTaskListAPI):
         tags=['Tasks'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete task',
         operation_description='Delete a task in Label Studio. This action cannot be undone!',
         manual_parameters=[
@@ -368,6 +373,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_description='Retrieve a specific annotation for a task using the annotation result ID.',
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         request_body=no_body,
     ),
 )
@@ -377,6 +383,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update annotation',
         operation_description='Update existing attributes on an annotation.',
         request_body=_annotation_schema,
@@ -389,6 +396,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete annotation',
         operation_description="Delete an annotation. This action can't be undone!",
         request_body=no_body,
@@ -450,6 +458,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='Get all task annotations',
         operation_description='List all annotations for a task.',
         manual_parameters=[
@@ -464,6 +473,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Create annotation',
         operation_description="""
         Add annotations to a task like an annotator does. The content of the result field depends on your 
@@ -627,6 +637,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Predictions'],
         x_fern_sdk_group_name='predictions',
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='List predictions',
         filter_inspectors=[DjangoFilterDescriptionInspector],
         operation_description='List all predictions and their IDs.',
@@ -639,6 +650,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Predictions'],
         x_fern_sdk_group_name='predictions',
         x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Create prediction',
         operation_description='Create a prediction for a specific task.',
         request_body=_prediction_schema,
@@ -656,6 +668,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Predictions'],
         x_fern_sdk_group_name='predictions',
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get prediction details',
         operation_description='Get details about a specific prediction by its ID.',
         manual_parameters=[
@@ -669,6 +682,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
     decorator=swagger_auto_schema(
         tags=['Predictions'],
         operation_summary='Put prediction',
+        x_fern_audiences=['internal'],
         operation_description='Overwrite prediction data by prediction ID.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
@@ -683,6 +697,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Predictions'],
         x_fern_sdk_group_name='predictions',
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update prediction',
         operation_description='Update prediction data by prediction ID.',
         manual_parameters=[
@@ -698,6 +713,7 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Predictions'],
         x_fern_sdk_group_name='predictions',
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete prediction',
         operation_description='Delete a prediction by prediction ID.',
         manual_parameters=[
@@ -727,6 +743,7 @@ class PredictionAPI(viewsets.ModelViewSet):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Annotations'],
+        x_fern_audiences=['internal'],
         operation_summary='Convert annotation to draft',
         operation_description='Convert annotation to draft',
     ),
