@@ -555,7 +555,7 @@ export default types
       }
       handleSubmittingFlag(async () => {
         if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity);
+          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
           if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
           entity.sendUserGenerate();
@@ -622,7 +622,9 @@ export default types
         entity.beforeSend();
         if (!entity.validate()) return;
         if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity);
+          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+            event: "acceptAnnotation",
+          });
           if (allowedToSave && allowedToSave.some((x) => x === false)) return;
         }
 
@@ -643,7 +645,9 @@ export default types
         entity.beforeSend();
         if (!entity.validate()) return;
         if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity);
+          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+            event: "rejectAnnotation",
+          });
           if (allowedToSave && allowedToSave.some((x) => x === false)) return;
         }
 
