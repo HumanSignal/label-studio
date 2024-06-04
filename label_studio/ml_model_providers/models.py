@@ -44,7 +44,9 @@ class ModelProviderConnection(models.Model):
     # This will need to be updated if we ever use this model in LSO as `is_owner` and
     # `is_administrator` only exist in LSE
     def has_permission(self, user):
-        return (user.is_administrator or user.is_owner) and user.active_organization_id == self.organization_id
+        return (
+            user.is_administrator or user.is_owner or user.is_manager
+        ) and user.active_organization_id == self.organization_id
 
     def validate_api_key(self):
         """
