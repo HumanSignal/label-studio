@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1097: Show Review buttons in Quick View",
-  "commit": "a7b65760801f1843596e3e3bd87df1d89ad9c0b5",
-  "date": "2024-05-29T17:49:10.000Z",
+  "message": "Merge branch 'develop' into fb-leap-1097/review-in-quick-view",
+  "commit": "1fef9faaca176f8522594617e6bdcb27771a4bb2",
+  "date": "2024-06-04T11:44:06.000Z",
   "branch": "fb-leap-1097/review-in-quick-view"
 }
