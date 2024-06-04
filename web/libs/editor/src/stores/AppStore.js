@@ -335,7 +335,7 @@ export default types
 
           entity?.submissionInProgress();
 
-          if (self.hasInterface("review")) {
+          if (self.hasInterface("review") || entity.canBeReviewed) {
             self.acceptAnnotation();
           } else if (!isDefined(entity.pk) && self.hasInterface("submit")) {
             self.submitAnnotation();

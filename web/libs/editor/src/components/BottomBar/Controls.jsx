@@ -31,18 +31,7 @@ const controlsInjector = inject(({ store }) => {
 
 export const Controls = controlsInjector(
   observer(({ store, history, annotation }) => {
-    const canReview = isFF(FF_REVIEWER_FLOW)
-      // not a current user — we can only review others' annotations
-      && annotation.user?.email
-      && store.user?.email !== annotation.user?.email
-      // we have this only in LSE
-      && store.hasInterface("annotations:history")
-      // Quick View — we don't have View All in Label Stream
-      && store.hasInterface("annotations:view-all")
-      // annotation was submitted already
-      && !isNaN(annotation.pk);
-
-    const isReview = store.hasInterface("review") || canReview;
+    const isReview = store.hasInterface("review") || annotation.canBeReviewed;
     const isNotQuickView = store.hasInterface("topbar:prevnext");
     const historySelected = isDefined(store.annotationStore.selectedHistory);
     const { userGenerate, sentUserGenerate, versions, results, editable: annotationEditable } = annotation;
