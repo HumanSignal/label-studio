@@ -582,7 +582,9 @@ export default types
 
       handleSubmittingFlag(async () => {
         if (isFF(FF_CUSTOM_SCRIPT)) {
-          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity);
+          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+            event: "updateAnnotation",
+          });
           if (allowedToSave && allowedToSave.some((x) => x === false)) return;
         }
         await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
