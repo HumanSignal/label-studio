@@ -118,6 +118,15 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
+  biome:
+    name: "Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.frontend == 'true'
+    uses: ./.github/workflows/biome.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+
   build-frontend:
     name: "Build"
     needs:
@@ -335,13 +344,6 @@ jobs:
           CURRENT_REF: "${{ github.event.after }}"
           GH_REPO: "${{ github.repository }}"
           GH_TOKEN: "${{ secrets.GIT_PAT }}"
-          AHA_SERVER: "https://labelstudio.aha.io"
-          AHA_TOKEN: "${{ secrets.AHA_TOKEN }}"
-          AHA_PRODUCT: "LSDV"
-          AHA_RN_FIELD: "release_notes"
-          AHA_FETCH_STRATEGY: "TAG"
-          AHA_TAG: "LS ${{ steps.create-draft-release.outputs.tag_name }}"
-          AHA_ADDITIONAL_RELEASES_TAG: "oss"
           JIRA_SERVER: "${{ vars.JIRA_SERVER }}"
           JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
           JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
@@ -450,6 +452,7 @@ jobs:
       - bandit
       - ruff
       - blue
+      - biome
       - pytest
       - migrations
       - build-docker
@@ -461,6 +464,23 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-failures: tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e
-          allowed-skips: gitleaks, bandit, ruff, blue, pytest, migrations, conda-test, build-docker
+          allowed-skips: gitleaks, bandit, ruff, blue, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e
           jobs: ${{ toJSON(needs) }}
+
+  dependabot-auto-merge:
+    name: "Auto Merge dependabot PR"
+    if: |
+      always() &&
+      needs.check_gate.result == 'success' &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      ( startsWith(github.head_ref, 'dependabot/npm_and_yarn/') || startsWith(github.head_ref, 'dependabot/pip/') )
+    runs-on: ubuntu-latest
+    needs:
+      - check_gate
+    steps:
+      - name: Enable auto-merge for Dependabot PRs
+        run: gh pr merge --admin --squash "${PR_URL}"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GIT_PAT }}

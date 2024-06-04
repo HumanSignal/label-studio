@@ -1,14 +1,14 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-import NormalizationMixin from '../mixins/Normalization';
-import RegionsMixin from '../mixins/Regions';
-import { AreaMixin } from '../mixins/AreaMixin';
-import Registry from '../core/Registry';
-import { FF_DEV_2715, isFF } from '../utils/feature-flags';
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import { AreaMixin } from "../mixins/AreaMixin";
+import Registry from "../core/Registry";
+import { FF_DEV_2715, isFF } from "../utils/feature-flags";
 
-import { AudioUltraRegionModel as _audioUltraRegionModel } from './AudioRegion/AudioUltraRegionModel';
-import { AudioRegionModel as _audioRegionModel } from './AudioRegion/AudioRegionModel';
-import { EditableRegion } from './EditableRegion';
+import { AudioUltraRegionModel as _audioUltraRegionModel } from "./AudioRegion/AudioUltraRegionModel";
+import { AudioRegionModel as _audioRegionModel } from "./AudioRegion/AudioRegionModel";
+import { EditableRegion } from "./EditableRegion";
 
 // this type is used in auto-generated documentation
 /**
@@ -30,17 +30,15 @@ import { EditableRegion } from './EditableRegion';
  * @property {number} value.channel channel identifier which was targeted
  */
 
-const EditableAudioModel = types
-  .model('EditableAudioModel', {})
-  .volatile(() => ({
-    editableFields: [
-      { property: 'start', label: 'Start' },
-      { property: 'end', label: 'End' },
-    ],
-  }));
+const EditableAudioModel = types.model("EditableAudioModel", {}).volatile(() => ({
+  editableFields: [
+    { property: "start", label: "Start" },
+    { property: "end", label: "End" },
+  ],
+}));
 
 const AudioRegionModel = types.compose(
-  'AudioRegionModel',
+  "AudioRegionModel",
   RegionsMixin,
   AreaMixin,
   NormalizationMixin,
@@ -50,7 +48,7 @@ const AudioRegionModel = types.compose(
 );
 
 const AudioUltraRegionModel = types.compose(
-  'AudioRegionModel',
+  "AudioRegionModel",
   RegionsMixin,
   AreaMixin,
   NormalizationMixin,
@@ -65,7 +63,7 @@ if (isFF(FF_DEV_2715)) {
   _exportAudioRegion = AudioUltraRegionModel;
 }
 
-Registry.addRegionType(_exportAudioRegion, 'audioplus');
-Registry.addRegionType(_exportAudioRegion, 'audio');
+Registry.addRegionType(_exportAudioRegion, "audioplus");
+Registry.addRegionType(_exportAudioRegion, "audio");
 
 export { _exportAudioRegion as AudioRegionModel };

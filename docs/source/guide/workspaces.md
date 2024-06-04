@@ -4,10 +4,10 @@ short: Workspaces
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 53
+order_enterprise: 101
 meta_title: Workspaces
 meta_description: An overview of workspaces and actions you can perform with workspaces. 
-section: "Project Management"
+section: "Create & Manage Projects"
 date: 2024-02-05 17:36:34
 ---
 

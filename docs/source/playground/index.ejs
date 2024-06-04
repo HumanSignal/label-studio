@@ -10,8 +10,8 @@ meta_description: Label Studio interactive demo and playground for data labeling
     display: block;
   }
   .page-type-playground .container {
-    max-width: 1800px;
-    padding: 1em;
+    max-width: 110rem;
+    padding: 1em 2.5rem;
   }
   .page-type-playground .content-footer {
     max-width: 1030px;
@@ -22,6 +22,9 @@ meta_description: Label Studio interactive demo and playground for data labeling
     .page-type-playground .content-footer {
       padding-left: 1em;
       padding-right: 1em;
+    }
+    .page-type-playground .container {
+      padding: 1em;
     }
   }
   .content {
@@ -76,27 +79,69 @@ meta_description: Label Studio interactive demo and playground for data labeling
 
   .editor-row {
       display: flex;
-      margin-bottom: 1em;
+      margin: 0 auto 1.5em;
       width: 100% !important;
+      max-width: 110rem;
+  }
+
+  .intro-wrapper{
+    background: white;
+    border: 1px solid var(--color-gray-300);
+    border-radius: .75rem;
+    padding: 1.5rem;
+    max-width: 110rem;
+    margin: 0 auto 1.5rem;
   }
 
    .data-row {
       display: flex;
+      max-width: 110rem;
+      margin: 0 auto;
+      background: white; 
+      border: 1px solid var(--color-gray-300);
+      border-radius: .75rem;
+      padding: 1.5rem;
    }
 
   .preview-col {
       width: 60%;
       flex: 1;
+      background: white;
+      border: 1px solid var(--color-gray-300);
+      border-radius: .75rem;
+      padding: 1.5rem;
    }
 
   .editor-area {
       border: 1px solid rgba(34,36,38,.15);
-      border-radius: 0.28571429rem;
+      border-radius: .5rem;
+      overflow: hidden;
+  }
+
+  .config-col p{
+    margin: .75rem 0 0 0;
+    color: var(--color-gray-600);
   }
 
   .config-col {
-      margin-right: 2em;
+      margin-right: 1.5em;
       width: 40%;
+      background: white;
+      border: 1px solid var(--color-gray-300);
+      border-radius: .75rem;
+      padding: 1.5rem;
+  }
+
+  .config-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .config-wrapper h4{
+    margin-top: 0;
+    margin-bottom: 0;
   }
 
   .input-col {
@@ -112,7 +157,8 @@ meta_description: Label Studio interactive demo and playground for data labeling
   }
 
   h4 {
-    margin-bottom: 1rem!important;
+    margin-bottom: 1rem;
+    margin-top: 0 !important;
   }
 
   /* hide title "basic template configs" */
@@ -128,9 +174,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
   }
 
   .message, .accordion {
-    width: 90%;
-    max-width: 1150px;
-    margin: 1em auto 1.75em auto;
+    margin-top: .5rem;
   }
   .grid {
     display: -webkit-box;
@@ -148,14 +192,23 @@ meta_description: Label Studio interactive demo and playground for data labeling
     padding: 0;
   }
 
+  .loading{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .loading img{
+    border: none;
+  }
+
   .column {
     width: 20% !important;
   }
   .use-template {
     font-weight: normal!important;
-  }
-  .use-template:hover {
-    border-bottom: 1px dashed currentColor;
+    margin-bottom: .5rem;
+    display: block;
   }
 
   @font-face {
@@ -171,7 +224,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
   i.icon {
     opacity: 0.75;
     display: inline-block;
-    margin: 0 0.25rem 0 0;
+    margin: 0 0 0 0;
     width: 1.18em;
     height: 1em;
     font-family: 'Icons';
@@ -185,6 +238,11 @@ meta_description: Label Studio interactive demo and playground for data labeling
     -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
   }
+
+  i.icon + .ui{
+    margin-top: .75rem;
+  }
+
   i.icon:before {
     background: none !important;
   }
@@ -233,12 +291,12 @@ meta_description: Label Studio interactive demo and playground for data labeling
 
   .share-buttons {
     float:right;
-    margin: 1.2em 1em 1em 1em;
+    margin: 0 0 0 1em;
   }
   .share-buttons i {
     cursor: pointer;
-    opacity: 0.5 !important;
-    color: #f58a48;
+
+    color: var(--color-orange-400);
     transition: 0.25s;
   }
   .share-buttons i:hover {
@@ -247,9 +305,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
   }
 
   .intro {
-    max-width: 700px;
-    margin: 0 auto;
-    margin-top: 1.5em;
+    text-align: left;
   }
 
 @media screen and (max-width: 900px) {
@@ -276,6 +332,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
 
     .editor-row {
         flex-direction: column;
+        max-width: 1300px;
     }
     .data-row {
         flex-direction: column;
@@ -293,9 +350,10 @@ meta_description: Label Studio interactive demo and playground for data labeling
 }
 
 .playground-cta {
-  background-color: var(--color-gray-10);
-  border: 1px var(--color-gray-900) solid;
+  background-color: var(--color-gray-100);
+  border: 1px var(--color-gray-300) solid;
   padding: 2em;
+  border-radius: .75rem;
   max-width: 1030px;
   margin: 3em auto -1em auto;
   display: flex;
@@ -303,6 +361,7 @@ meta_description: Label Studio interactive demo and playground for data labeling
   flex-direction: column;
   position: relative;
   text-align: center;
+  overflow: hidden;
 }
 
 .playground-cta > svg {
@@ -324,11 +383,6 @@ meta_description: Label Studio interactive demo and playground for data labeling
   z-index: 2;
 }
 
-.page-tier-enterprise .playground-cta {
-  background-color: var(--color-yellow-5);
-  border: 1px var(--color-yellow-100) solid;
-}
-
 .page-tier-enterprise .Secondary:not(:hover) {
   background-color: #fff;
 }
@@ -336,19 +390,19 @@ meta_description: Label Studio interactive demo and playground for data labeling
 </style>
 
 <!-- html -->
+<div class="intro-wrapper">
+  <div class="intro">
+    <h4>1. Choose annotation template</h4>
+  </div>
 
-<div class="intro">
-    <h4 style="text-align: center">1. Choose annotation template</h4>
+  <%- include('template_titles') %>
 </div>
-
-
-<%- include('template_titles') %>
 
 <div>
   <div class="editor-row">
     <div class="config-col">
-      <div>
-        <h4 style="display: inline-block">2. Edit Labeling config</h4>
+      <div class="config-wrapper">
+        <h4 style="display: inline-block">2. Edit labeling config</h4>
         <span class="share-buttons">
           <i class="icon copy outline" style="cursor: pointer" title="Copy labeling config"></i>
           <i class="icon share" style="cursor: pointer" title="Copy link to this playground"></i>
@@ -360,21 +414,21 @@ meta_description: Label Studio interactive demo and playground for data labeling
                 id="id_label_config"></textarea>
       </div>
 
-      <div style="margin-top: 1em">
+      <p>
         Start typing in the config, and you can quickly preview the labeling interface.
         At the bottom of the page, you have live serialization updates
         of what Label Studio expects as an input and what it gives you as a result of your labeling work.
-      </div>
+      </p>
     </div>
 
     <div class="preview-col">
-      <h4>3. Inspect Interface preview</h4>
+      <h4>3. Inspect interface preview</h4>
       <div class="validation"></div>
       <div id="editor-wrap">
       </div>
       <div class="preview" id="preload-editor">
         <div class="loading" style="margin: 20px; opacity: 0.8">
-            <img width="40px" src="/images/loading.gif">
+            <img width="40px" src="/images/design/loading.gif">
             <span style="position: relative; top: -14px">&nbsp;&nbsp;&nbsp;Loading Label Studio, please wait ...</span>
         </div>
       </div>
@@ -403,20 +457,12 @@ meta_description: Label Studio interactive demo and playground for data labeling
     <a href="https://labelstud.io/guide/install.html" class="Button Secondary">Install Open Source</a>
     <a href="https://humansignal.com/free-trial" class="Button">Try Enterprise Cloud</a>
   </div>
-  <svg width="67" height="68" viewBox="0 0 67 68" fill="none" xmlns="http://www.w3.org/2000/svg" class="opensource-only">
-    <rect x="22.4653" y="45.0219" width="22.2281" height="22.2281" fill="#FF8267"/>
-    <rect x="22.4653" y="22.7938" width="22.2281" height="22.2281" fill="#FFC27B"/>
-    <rect x="44.6936" y="0.565613" width="22.2281" height="22.2281" fill="#DD7DFF"/>
-    <rect x="44.6936" y="22.7938" width="22.2281" height="22.2281" fill="#FF8267"/>
-    <rect x="0.237305" y="22.7938" width="22.2281" height="22.2281" fill="#DD7DFF"/>
-  </svg>
-  <svg width="68" height="68" viewBox="0 0 68 68" fill="none" xmlns="http://www.w3.org/2000/svg" class="enterprise-only">
-    <rect x="22.5437" y="45.0219" width="22.2281" height="22.2281" fill="#FFF9F2"/>
-    <rect x="22.5437" y="22.7938" width="22.2281" height="22.2281" fill="#FFB156"/>
-    <rect x="45.5437" y="44.7938" width="22.2281" height="22.2281" fill="#FFB156"/>
-    <rect x="44.7719" y="0.565643" width="22.2281" height="22.2281" fill="#FFCF96"/>
-    <rect x="44.7719" y="22.7938" width="22.2281" height="22.2281" fill="#FFF9F2"/>
-    <rect x="0.315643" y="22.7938" width="22.2281" height="22.2281" fill="#FFCF96"/>
+  <svg width="67" height="68" viewBox="0 0 67 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="22.4653" y="45.0219" width="22.2281" height="22.2281" fill="#FF7557"/>
+    <rect x="22.4653" y="22.7938" width="22.2281" height="22.2281" fill="#FFA663"/>
+    <rect x="44.6936" y="0.565613" width="22.2281" height="22.2281" fill="#E37BD3"/>
+    <rect x="44.6936" y="22.7938" width="22.2281" height="22.2281" fill="#FF7557"/>
+    <rect x="0.237305" y="22.7938" width="22.2281" height="22.2281" fill="#E37BD3"/>
   </svg>
 </div>
 

@@ -1,7 +1,7 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
 export const EditableRegion = types
-  .model('EditableRegion')
+  .model("EditableRegion")
   .volatile(() => ({
     editorEnabled: true,
     /**
@@ -18,7 +18,7 @@ export const EditableRegion = types
     },
 
     isPropertyEditable(name) {
-      return self.editableFields.some(f => f.property === name);
+      return self.editableFields.some((f) => f.property === name);
     },
 
     get hasEditableFields() {

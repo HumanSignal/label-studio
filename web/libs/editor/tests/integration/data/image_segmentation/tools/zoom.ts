@@ -8,5 +8,6 @@ export const simpleConfig = `
 `;
 
 export const simpleImageData = {
-  image: 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg',
+  image:
+    "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
 };

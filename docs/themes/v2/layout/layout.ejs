@@ -5,7 +5,7 @@
 
 <% var defaultSeo = {
   description: "Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.",
-  ogImage: isEnterpriseTheme ? "enterprise-OG-default.png" : "docs-OG-default.png"
+  ogImage: isEnterpriseTheme ? "og-default-enterprise.png" : "og-default-ls.png"
 } %>
 
 <!DOCTYPE html>
@@ -64,21 +64,19 @@
   <% } %>
   <meta name="twitter:description" content="<%- page.meta_description ? page.meta_description : defaultSeo.description %>">
 
-  <% if (page.image) { %>
-    <meta property="og:image" content="https://<%- config.theme_config.root_domain %><%- page.image %>" />
-    <meta name="thumbnail" content="https://<%- config.theme_config.root_domain %><%- page.image %>"/>
-    <meta name="twitter:image" content="https://<%- config.theme_config.root_domain %><%- page.image %>"/>
+  <% if (page.title) { %>
+    <meta name="twitter:image" content="http://<%- config.theme_config.root_domain %>/open-graph-image?title=<%- encodeURIComponent(page.title) %>&category=<%- path.split('/')[0] %>"/>
+    <meta property="og:image" content="http://<%- config.theme_config.root_domain %>/open-graph-image?title=<%- encodeURIComponent(page.title) %>&category=<%- path.split('/')[0] %>"/>
   <% } else { %>
-    <meta name="twitter:image" content="https://<%- config.theme_config.root_domain %>/images/<%- defaultSeo.ogImage %>"/>
-    <meta name="thumbnail" content="https://<%- config.theme_config.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
     <meta property="og:image" content="https://<%- config.theme_config.root_domain %>/images/<%- defaultSeo.ogImage %>" />
+    <meta name="twitter:image" content="https://<%- config.theme_config.root_domain %>/images/<%- defaultSeo.ogImage %>"/>
   <% } %>
 
   <meta name="msapplication-TileColor" content="#4fc08d">
   <meta name="theme-color" content="#4fc08d">
   
   <% if (isEnterpriseTheme) { %>
-    <link rel="icon" type="image/svg+xml" href="/images/favicon-enterprise.svg" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
   <% } else { %>
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
   <% } %>
@@ -98,6 +96,8 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js" defer></script>
 </head>
 <body class="<%- 'page-tier-' + theme.tier %>">
+  
+  
 
   <% if(isEnterpriseTheme) {%>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K6H522B"
@@ -115,31 +115,18 @@
       <aside class="page-sidebar">
         <%- partial("partials/toc", { type: page.type, tier: tier }) %>
       </aside>
-
-      <script>
-        let sidebar = document.querySelector(".page-sidebar");
-        let activeSidebarLink = sidebar.querySelector("[aria-current]");
-        if(activeSidebarLink) sidebar.scrollTop = activeSidebarLink.getBoundingClientRect().y - 120;
-      </script>
     <% } %>
     <div class="content">
       <% if(isEnterpriseTheme) { %>
-        <svg width="77" height="77" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="content-decoration">
-          <rect x="75.875" y="26" width="25" height="25" transform="rotate(-180 75.875 26)" stroke="#ECEEFD" stroke-width="0.504975"/>
-          <rect x="50.875" y="51" width="25" height="25" transform="rotate(-180 50.875 51)" stroke="#ECEEFD" stroke-width="0.504975"/>
-          <rect x="50.875" y="26" width="25" height="25" transform="rotate(-180 50.875 26)" fill="#FFDBB0"/>
-          <rect x="26" y="76" width="25" height="25" transform="rotate(-180 26 76)" stroke="#ECEEFD" stroke-width="0.504975"/>
-          <rect x="26" y="51" width="25" height="25" transform="rotate(-180 26 51)" fill="#FFEDD8"/>
-          <rect x="26" y="26" width="25" height="25" transform="rotate(-180 26 26)" fill="#FFC27B"/>
-        </svg>
+        
       <% } else { %>
-        <svg width="77" height="77" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="content-decoration">
-          <rect x="75.875" y="26" width="25" height="25" transform="rotate(-180 75.875 26)" stroke="#ECEEFD" stroke-width="0.504975"/>
-          <rect x="50.875" y="51" width="25" height="25" transform="rotate(-180 50.875 51)" stroke="#ECEEFD" stroke-width="0.504975"/>
-          <rect x="50.875" y="26" width="25" height="25" transform="rotate(-180 50.875 26)" fill="#FF8267"/>
-          <rect x="26" y="76" width="25" height="25" transform="rotate(-180 26 76)" stroke="#ECEEFD" stroke-width="0.504975"/>
-          <rect x="26" y="51" width="25" height="25" transform="rotate(-180 26 51)" fill="#DD7DFF"/>
-          <rect x="26" y="26" width="25" height="25" transform="rotate(-180 26 26)" fill="#FFC27B"/>
+        <svg width="50" height="50" viewBox="0 0 77 77" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="content-decoration">
+          <rect x="75.875" y="26" width="25" height="25" transform="rotate(-180 75.875 26)" stroke="#E1DED5" stroke-width="0.504975"/>
+          <rect x="50.875" y="51" width="25" height="25" transform="rotate(-180 50.875 51)" stroke="#E1DED5" stroke-width="0.504975"/>
+          <rect x="50.875" y="26" width="25" height="25" transform="rotate(-180 50.875 26)" fill="#FF7557"/>
+          <rect x="26" y="76" width="25" height="25" transform="rotate(-180 26 76)" stroke="#E1DED5" stroke-width="0.504975"/>
+          <rect x="26" y="51" width="25" height="25" transform="rotate(-180 26 51)" fill="#E37BD3"/>
+          <rect x="26" y="26" width="25" height="25" transform="rotate(-180 26 26)" fill="#FFA663"/>
         </svg>
       <% } %>
         
@@ -207,6 +194,13 @@
       </div>
     </div>
   </main>
+
+  <script>
+    var savedScrollPosition = localStorage.getItem('labelstudio_scrollPosition');
+      if (savedScrollPosition) {
+        document.querySelector(".page-sidebar").scrollTop = savedScrollPosition;
+      }
+  </script>
 
   <% if (page.permalink.includes("concat.html") || page.permalink.includes("release_notes.html")) { %>
     <%- js('js/collapse.js') %>

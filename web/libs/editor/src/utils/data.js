@@ -1,5 +1,5 @@
-import { escapeHtml, isString } from './utilities';
-import get from 'lodash.get';
+import { escapeHtml, isString } from "./utilities";
+import get from "lodash.get";
 
 /**
  * Simple way to retrieve linked data in `value` param from task
@@ -10,16 +10,16 @@ import get from 'lodash.get';
  * @param {object} task
  */
 export const parseValue = (value, task) => {
-  const reVar = /\$[\w[\].{}]+/ig;
+  const reVar = /\$[\w[\].{}]+/gi;
 
-  if (!value) return '';
+  if (!value) return "";
 
   // value can refer to structures, not only texts, so just replace wouldn't be enough
   if (value.match(reVar)?.[0] === value) {
-    return get(task, value.slice(1)) ?? '';
+    return get(task, value.slice(1)) ?? "";
   }
 
-  return value.replace(reVar, (v) => get(task, v.slice(1) ?? ''));
+  return value.replace(reVar, (v) => get(task, v.slice(1) ?? ""));
 };
 
 /**
@@ -30,43 +30,43 @@ export const parseValue = (value, task) => {
  * @param {string} text
  * @returns {{ [string]: number[] }}
  */
-export const parseCSV = (text, separator = 'auto') => {
+export const parseCSV = (text, separator = "auto") => {
   // @todo iterate over newlines for better performance
-  const lines = text.split('\n');
+  const lines = text.split("\n");
   let names;
 
-  if (separator !== 'auto' && !lines[0].includes(separator)) {
-    throw new Error([`Cannot find provided separator "${separator}".`, `Row 1: ${lines[0]}`].join('\n'));
+  if (separator !== "auto" && !lines[0].includes(separator)) {
+    throw new Error([`Cannot find provided separator "${separator}".`, `Row 1: ${lines[0]}`].join("\n"));
   }
 
   // detect separator (2nd line is definitely with data)
-  if (separator === 'auto' && lines.length > 1) {
+  if (separator === "auto" && lines.length > 1) {
     const candidates = lines[1].trim().match(/[,;\s\t]/g);
 
-    if (!candidates.length) throw new Error('No separators found');
-    if (candidates.some(c => c !== candidates[0])) {
+    if (!candidates.length) throw new Error("No separators found");
+    if (candidates.some((c) => c !== candidates[0])) {
       const list = Array.from(new Set(candidates))
         .map(escapeHtml)
-        .map(s => `"${s}"`)
-        .join(', ');
+        .map((s) => `"${s}"`)
+        .join(", ");
 
       throw new Error(
         [
           `More than one possible separator found: ${list}`,
           'You can provide correct one with <Timeseries sep=",">',
-        ].join('\n'),
+        ].join("\n"),
       );
     }
     separator = candidates[0];
     if (lines[0].split(separator).length !== lines[1].split(separator).length)
       throw new Error(
         [
-          'Different amount of elements in rows.',
+          "Different amount of elements in rows.",
           `Row 1: ${lines[0]}`,
           `Row 2: ${lines[1]}`,
           `Guessed separator: ${separator}`,
           'You can provide correct one with <Timeseries sep=",">',
-        ].join('\n'),
+        ].join("\n"),
       );
   }
 
@@ -76,10 +76,10 @@ export const parseCSV = (text, separator = 'auto') => {
       `[^"${separator}]+`, // usual value, no quotes, between separators
       `(?=${separator}(?:${separator}|$))`, // empty value in the middle or at the end of string
       `^(?=${separator})`, // empty value at the start of the string
-    ].join('|'),
-    'g',
+    ].join("|"),
+    "g",
   );
-  const split = text => text.trim().match(re);
+  const split = (text) => text.trim().match(re);
 
   // detect header; if it is omitted, use indices as a header names
   names = split(lines[0]);
@@ -90,7 +90,7 @@ export const parseCSV = (text, separator = 'auto') => {
 
   if (!names.every((n, i) => isNaN(n) === isNaN(secondLine[i]))) {
     lines.shift();
-    names = names.map(n => n.toLowerCase());
+    names = names.map((n) => n.toLowerCase());
   } else {
     names = names.map((_, i) => String(i));
   }
@@ -102,11 +102,11 @@ export const parseCSV = (text, separator = 'auto') => {
   if (names.length !== split(lines[0]).length) {
     throw new Error(
       [
-        'Column names count differs from data columns count.',
-        `Columns: ${names.join(', ')};`,
+        "Column names count differs from data columns count.",
+        `Columns: ${names.join(", ")};`,
         `Data: ${lines[0]};`,
         `Separator: "${separator}".`,
-      ].join('\n'),
+      ].join("\n"),
     );
   }
 
@@ -132,8 +132,8 @@ export const parseCSV = (text, separator = 'auto') => {
  * @param {string} value
  * @returns {object|false}
  */
-export const tryToParseJSON = value => {
-  if (isString(value) && value[0] === '{') {
+export const tryToParseJSON = (value) => {
+  if (isString(value) && value[0] === "{") {
     try {
       return JSON.parse(value);
     } catch (e) {
@@ -149,15 +149,15 @@ export const tryToParseJSON = value => {
  * Accept value type as a parameter
  * Returns type, seperator and options object by analyzing valueType
  */
-export const parseTypeAndOption = valueType => {
+export const parseTypeAndOption = (valueType) => {
   const [, type, sep] = valueType.match(/^(\w+)(.)?/) ?? [];
   const options = {};
 
   if (sep) {
     const pairs = valueType.split(sep).slice(1);
 
-    pairs.forEach(pair => {
-      const [k, v] = pair.split('=', 2);
+    pairs.forEach((pair) => {
+      const [k, v] = pair.split("=", 2);
 
       options[k] = v ?? true; // options without values are `true`
     });

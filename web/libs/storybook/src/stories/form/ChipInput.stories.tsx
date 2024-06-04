@@ -1,11 +1,11 @@
-import { Meta, StoryObj } from '@storybook/react';
-import { ChipInput } from '../../components/form/ChipInput/ChipInput';
-import { within, userEvent } from '@storybook/testing-library';
-import z from 'zod';
+import type { Meta, StoryObj } from "@storybook/react";
+import { ChipInput } from "../../components/form/ChipInput/ChipInput";
+import { within, userEvent } from "@storybook/testing-library";
+import z from "zod";
 
 const meta: Meta<typeof ChipInput> = {
   component: ChipInput,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     onChange: {
       control: false,
@@ -15,7 +15,7 @@ const meta: Meta<typeof ChipInput> = {
     },
     format: {
       control: {
-        type: 'select',
+        type: "select",
       },
     },
     validate: {
@@ -34,26 +34,22 @@ export const Default: Story = {
 export const CustomPlaceholder: Story = {
   argTypes: meta.argTypes,
   args: {
-    placeholder: 'This is an arbitrary placeholder',
+    placeholder: "This is an arbitrary placeholder",
   },
   async play({ canvasElement }) {
     const canvas = within(canvasElement);
 
-    await userEvent.type(
-      canvas.getByTestId('chip-input-field'),
-      'hello@world.com another@email.com ',
-      {
-        delay: 50,
-      }
-    );
+    await userEvent.type(canvas.getByTestId("chip-input-field"), "hello@world.com another@email.com ", {
+      delay: 50,
+    });
   },
 };
 
 export const WithDefaultValue: Story = {
   argTypes: meta.argTypes,
   args: {
-    format: 'email',
-    value: ['any@google.com', 'another@email.com'],
+    format: "email",
+    value: ["any@google.com", "another@email.com"],
   },
 };
 
@@ -61,6 +57,6 @@ export const CustomValidation: Story = {
   argTypes: meta.argTypes,
   args: {
     validate: z.string().min(3),
-    value: ['one', 'two'],
+    value: ["one", "two"],
   },
 };

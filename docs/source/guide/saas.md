@@ -4,10 +4,10 @@ short: SaaS configuration
 type: guide
 tier: enterprise
 order: 0
-order_enterprise: 384
+order_enterprise: 96
 meta_title: app.humansignal.com Settings
 meta_description: This page contains information about the settings that are used on app.humansignal.com, available to HumanSignal SaaS customers.
-section: "Administration"
+section: "Install & Setup"
 ---
 
 This document describes the IP configuration, hostnames, and usage limits that govern the interactions with app.humansignal.com (app.heartex.com).

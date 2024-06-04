@@ -15,7 +15,7 @@ jobs:
   main:
     name: "yarn e2e"
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
@@ -51,6 +51,9 @@ jobs:
         id: run-lsf-server
         timeout-minutes: 1
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        env:
+          NODE_ENV: production
+          BUILD_NO_MINIMIZATION: true
         run: |
           set -xeuo pipefail
           

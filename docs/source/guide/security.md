@@ -2,11 +2,11 @@
 title: Secure Label Studio
 type: guide
 tier: all
-order: 143
-order_enterprise: 405
+order: 99
+order_enterprise: 99
 meta_title: Secure Label Studio
 meta_description: About the security and hardening processes used by various Label Studio editions, and how you can configure a more secure data labeling project.
-section: "Security and Privacy"
+section: "Install & Setup"
 ---
 
 Label Studio provides many ways to secure access to your data and your deployment architecture.
@@ -101,7 +101,7 @@ In Label Studio Enterprise, if you're using Amazon S3, Label Studio can use an I
 </div>
 
 
-!!! attention Note on securing cloud data
+!!! warning Note on securing cloud data
     If you need to secure your data in a way to ensure that it is not touched by Label Studio, see [Source storage Sync and URI resolving](storage#Source-storage-Sync-and-URI-resolving). 
 
 ### Secure access to Redis storage
@@ -122,7 +122,7 @@ Label Studio collects usage statistics including the number of page visits, numb
 
 <div class="opensource-only">
 
-You can disable data collection by setting the environment variable `collect_analytics` to `False`. 
+You can disable data collection by setting the environment variable `COLLECT_ANALYTICS` to `False`. 
 
 </div>
 
@@ -148,6 +148,7 @@ CUSTOM_CA_CERTS=/tmp/my.cert
 
 1. Upload your self-signed certificate as a k8s secret.
    Upload `my.cert` as a secrets with a name `test-my-root-cert`:
+   
 ```yaml
 kubectl create secret generic test-my-root-cert --from-file=file=my.cert
 ```

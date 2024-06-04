@@ -1,9 +1,9 @@
-import { decode, encode } from '@thi.ng/rle-pack';
-import chroma from 'chroma-js';
-import Constants from '../core/Constants';
+import { decode, encode } from "@thi.ng/rle-pack";
+import chroma from "chroma-js";
+import Constants from "../core/Constants";
 
-import * as Colors from './colors';
-import { FF_LSDV_4583, isFF } from './feature-flags';
+import * as Colors from "./colors";
+import { FF_LSDV_4583, isFF } from "./feature-flags";
 
 /**
  * Given a single channel UInt8 image data mask with non-zero values indicating the
@@ -16,8 +16,8 @@ import { FF_LSDV_4583, isFF } from './feature-flags';
  * @returns {string} Data URL containing the mask as an image.
  */
 function mask2DataURL(singleChannelData, w, h, color) {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
 
   canvas.width = w;
   canvas.height = h;
@@ -41,17 +41,17 @@ function mask2DataURL(singleChannelData, w, h, color) {
  */
 function maskDataURL2Image(maskDataURL, { color = Constants.FILL_COLOR } = {}) {
   return new Promise((resolve, _reject) => {
-    const img = document.createElement('img');
+    const img = document.createElement("img");
 
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const nw = img.width,
-        nh = img.height;
+      const canvas = document.createElement("canvas");
+      const nw = img.width;
+      const nh = img.height;
 
       canvas.width = nw;
       canvas.height = nh;
 
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
 
       ctx.drawImage(img, 0, 0);
 
@@ -98,9 +98,9 @@ function setMaskPixelColors(ctx, data, nw, nh, color, numChannels) {
   const endian = checkEndian();
   let finalColor;
 
-  if (endian === 'little endian') {
+  if (endian === "little endian") {
     finalColor = (alpha << 24) | (blue << 16) | (green << 8) | red;
-  } else if (endian === 'big endian') {
+  } else if (endian === "big endian") {
     finalColor = (red << 24) | (green << 16) | (blue << 8) | alpha;
   } else {
     // The most common architectures (x86 and ARM) are both little endian, so just assume that.
@@ -108,7 +108,8 @@ function setMaskPixelColors(ctx, data, nw, nh, color, numChannels) {
     finalColor = (alpha << 24) | (blue << 16) | (green << 8) | red;
   }
 
-  let x, y;
+  let x;
+  let y;
   const sourceNumChannels = numChannels; // Could be 1-channel mask or RGBA mask.
 
   for (y = 0; y <= nh; y++) {
@@ -117,9 +118,10 @@ function setMaskPixelColors(ctx, data, nw, nh, color, numChannels) {
       // This means indexing the source should be multiplied by the number
       // of channels, while for the target every 32-bit entry contains the full
       // RGBA value so we can index into it directly.
-      const idx = (y * nw + x);
+      const idx = y * nw + x;
 
-      if (data[idx * sourceNumChannels]) { // If the mask is set at this position...
+      if (data[idx * sourceNumChannels]) {
+        // If the mask is set at this position...
         dataView[idx] = finalColor;
       }
     }
@@ -138,11 +140,11 @@ function setMaskPixelColors(ctx, data, nw, nh, color, numChannels) {
  */
 function RLE2Region(item, { color = Constants.FILL_COLOR } = {}) {
   const { rle } = item;
-  const nw = item.currentImageEntity.naturalWidth,
-    nh = item.currentImageEntity.naturalHeight;
+  const nw = item.currentImageEntity.naturalWidth;
+  const nh = item.currentImageEntity.naturalHeight;
 
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
 
   canvas.width = nw;
   canvas.height = nh;
@@ -154,7 +156,7 @@ function RLE2Region(item, { color = Constants.FILL_COLOR } = {}) {
 
   const rgb = chroma(color).rgb();
 
-  for (let i = newdata.data.length / 4; i--;) {
+  for (let i = newdata.data.length / 4; i--; ) {
     if (newdata.data[i * 4 + 3]) {
       newdata.data[i * 4] = rgb[0];
       newdata.data[i * 4 + 1] = rgb[1];
@@ -171,30 +173,27 @@ function RLE2Region(item, { color = Constants.FILL_COLOR } = {}) {
 }
 
 /**
-* Exports region using canvas. Doesn't require Konva#Stage access
-* @param {Region} region Brush region
-*/
+ * Exports region using canvas. Doesn't require Konva#Stage access
+ * @param {Region} region Brush region
+ */
 function exportRLE(region) {
-  const {
-    naturalWidth,
-    naturalHeight,
-  } = region.currentImageEntity;
+  const { naturalWidth, naturalHeight } = region.currentImageEntity;
 
   // Prepare the canvas with sizes of image and stage
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
 
-  // We only care about physical size, so set canvas dimensions to 
+  // We only care about physical size, so set canvas dimensions to
   // image's natural dimensions
   canvas.width = naturalWidth;
   canvas.height = naturalHeight;
 
   // Make canvas offscreen and invisible
-  canvas.style.setProperty('position', 'absolute');
-  canvas.style.setProperty('bottom', '200%');
-  canvas.style.setProperty('right', '200%');
-  canvas.style.setProperty('opacity', '0');
+  canvas.style.setProperty("position", "absolute");
+  canvas.style.setProperty("bottom", "200%");
+  canvas.style.setProperty("right", "200%");
+  canvas.style.setProperty("opacity", "0");
 
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   document.body.appendChild(canvas);
 
@@ -218,22 +217,19 @@ function exportRLE(region) {
   // If the region was changed manually, we'll have access to user tuoches
   // Render those on the canvas after RLE
   if (region.touches.length > 0) {
-    region.touches.forEach(touch => {
+    region.touches.forEach((touch) => {
       // We're using relative coordinates to calculate points
       // This way we don't need to have access to Konva#Stage and
       // render relatively to the image's natural dimensions
       const { relativePoints: points } = touch.toJSON();
 
       /**
-        * Converts any given relative (x, y) to absolute position on an image
-        * @param {number} x
-        * @param {number} y
-        */
+       * Converts any given relative (x, y) to absolute position on an image
+       * @param {number} x
+       * @param {number} y
+       */
       const relativeToAbsolutePoint = (x, y) => {
-        return [
-          naturalWidth * (x / 100),
-          naturalHeight * (y / 100),
-        ];
+        return [naturalWidth * (x / 100), naturalHeight * (y / 100)];
       };
 
       ctx.save();
@@ -244,10 +240,10 @@ function exportRLE(region) {
         ctx.lineTo(...relativeToAbsolutePoint(points[2 * i], points[2 * i + 1]));
       }
 
-      ctx.strokeStyle = '#000';
-      ctx.lineWidth = touch.relativeStrokeWidth / 100 * naturalWidth;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
+      ctx.strokeStyle = "#000";
+      ctx.lineWidth = (touch.relativeStrokeWidth / 100) * naturalWidth;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
       ctx.globalCompositeOperation = touch.compositeOperation;
       ctx.stroke();
     });
@@ -256,7 +252,7 @@ function exportRLE(region) {
   const imageData = ctx.getImageData(0, 0, naturalWidth, naturalHeight).data;
 
   // Grayscale pixels respecting the opacity
-  for (let i = imageData.length / 4; i--;) {
+  for (let i = imageData.length / 4; i--; ) {
     imageData[i * 4] = imageData[i * 4 + 1] = imageData[i * 4 + 2] = imageData[i * 4 + 3];
   }
 
@@ -277,8 +273,8 @@ function Region2RLE(region) {
   if (isFF(FF_LSDV_4583)) return exportRLE(region);
 
   // Legacy encoder
-  const nw = region.currentImageEntity.naturalWidth,
-    nh = region.currentImageEntity.naturalHeight;
+  const nw = region.currentImageEntity.naturalWidth;
+  const nh = region.currentImageEntity.naturalHeight;
   const stage = region.object?.stageRef;
   const parent = region.parent;
 
@@ -297,17 +293,17 @@ function Region2RLE(region) {
 
   !isVisible && layer.show();
   // hide labels on regions and show them later
-  layer.findOne('.highlight').hide();
+  layer.findOne(".highlight").hide();
 
-  const width = stage.getWidth(),
-    height = stage.getHeight(),
-    scaleX = stage.getScaleX(),
-    scaleY = stage.getScaleY(),
-    x = stage.getX(),
-    y = stage.getY(),
-    offsetX = stage.getOffsetX(),
-    offsetY = stage.getOffsetY(),
-    rotation = stage.getRotation();
+  const width = stage.getWidth();
+  const height = stage.getHeight();
+  const scaleX = stage.getScaleX();
+  const scaleY = stage.getScaleY();
+  const x = stage.getX();
+  const y = stage.getY();
+  const offsetX = stage.getOffsetX();
+  const offsetY = stage.getOffsetY();
+  const rotation = stage.getRotation();
 
   stage
     .setWidth(parent.stageWidth)
@@ -322,15 +318,15 @@ function Region2RLE(region) {
   stage.drawScene();
   // resize to original size
   const canvas = layer.toCanvas({ pixelRatio: nw / region.currentImageEntity.stageWidth });
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   // get the resulting raw data and encode into RLE format
   const data = ctx.getImageData(0, 0, nw, nh);
 
-  for (let i = data.data.length / 4; i--;) {
+  for (let i = data.data.length / 4; i--; ) {
     data.data[i * 4] = data.data[i * 4 + 1] = data.data[i * 4 + 2] = data.data[i * 4 + 3];
   }
-  layer.findOne('.highlight').show();
+  layer.findOne(".highlight").show();
   stage
     .setWidth(width)
     .setHeight(height)
@@ -350,17 +346,29 @@ function Region2RLE(region) {
 }
 
 function brushSizeCircle(size) {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const canvasPadding = 8;
+  const canvasOffset = 4;
+  const canvasSize = size * 4 + canvasPadding;
+  const circlePos = size / 2 + canvasOffset;
+  const circleRadius = size / 2;
 
-  canvas.width = size * 4 + 8;
-  canvas.height = size * 4 + 8;
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
 
   ctx.beginPath();
-  ctx.arc(size / 2 + 4, size / 2 + 4, size / 2, 0, 2 * Math.PI, false);
+  ctx.arc(circlePos, circlePos, circleRadius, 0, 2 * Math.PI, false);
+
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "black";
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(circlePos, circlePos, circleRadius, 0, 2 * Math.PI, false);
 
   ctx.lineWidth = 2;
-  ctx.strokeStyle = 'white';
+  ctx.strokeStyle = "white";
   ctx.stroke();
 
   return canvas.toDataURL();
@@ -372,7 +380,7 @@ function brushSizeCircle(size) {
  * @returns {string} Data URL containing inline SVG already enclosed in quotes
  */
 function encodeSVG(data) {
-  data = data.replace(/\s{2,}/g, ' ');
+  data = data.replace(/\s{2,}/g, " ");
 
   const symbols = /[\r\n%#()<>?[\\\]^`{|}]/g;
   const escaped = data.replace(symbols, encodeURIComponent);
@@ -387,14 +395,14 @@ function encodeSVG(data) {
  * @param {number} [score] Score in [0, 1] range
  * @returns {string} Data URL containing inline SVG already enclosed in quotes
  */
-const labelToSVG = (function() {
+const labelToSVG = (() => {
   const SVG_CACHE = {};
 
   function calculateTextWidth(text) {
-    const svg = document.createElement('svg');
-    const svgText = document.createElement('text');
+    const svg = document.createElement("svg");
+    const svgText = document.createElement("text");
 
-    svgText.style = 'font-size: 9.5px; font-weight: bold; color: red; fill: red; font-family: Monaco';
+    svgText.style = "font-size: 9.5px; font-weight: bold; color: red; fill: red; font-family: Monaco";
     svgText.innerHTML = text;
 
     svg.appendChild(svgText);
@@ -407,7 +415,7 @@ const labelToSVG = (function() {
     return textLen;
   }
 
-  return function({ label, score }) {
+  return ({ label, score }) => {
     let cacheKey = label;
 
     if (score !== null) cacheKey = cacheKey + score;
@@ -433,7 +441,7 @@ const labelToSVG = (function() {
     }
 
     const xmlns = 'xmlns="http://www.w3.org/2000/svg"';
-    const res = `<svg ${xmlns} height="16" width="${width}">${items.join('')}</svg>`;
+    const res = `<svg ${xmlns} height="16" width="${width}">${items.join("")}</svg>`;
     const enc = encodeSVG(res);
 
     SVG_CACHE[cacheKey] = enc;
@@ -457,8 +465,10 @@ const labelToSVG = (function() {
  * }}
  */
 const trim = (canvas) => {
-  let copy, width = canvas.width, height = canvas.height;
-  const ctx = canvas.getContext('2d');
+  let copy;
+  let width = canvas.width;
+  let height = canvas.height;
+  const ctx = canvas.getContext("2d");
   const bbox = {
     top: null,
     left: null,
@@ -467,15 +477,17 @@ const trim = (canvas) => {
   };
 
   try {
-    copy = document.createElement('canvas').getContext('2d');
+    copy = document.createElement("canvas").getContext("2d");
     const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const l = pixels.data.length;
-    let i, x, y;
+    let i;
+    let x;
+    let y;
 
     for (i = 0; i < l; i += 4) {
       if (pixels.data[i + 3] !== 0) {
         x = (i / 4) % canvas.width;
-        y = ~ ~ ((i / 4) / canvas.width);
+        y = ~~(i / 4 / canvas.width);
 
         if (bbox.top === null) {
           bbox.top = y;
@@ -534,18 +546,18 @@ function checkEndian() {
   const uint8Array = new Uint8Array(arrayBuffer);
   const uint16array = new Uint16Array(arrayBuffer);
 
-  uint8Array[0] = 0xAA; // set first byte
-  uint8Array[1] = 0xBB; // set second byte
+  uint8Array[0] = 0xaa; // set first byte
+  uint8Array[1] = 0xbb; // set second byte
 
-  if (uint16array[0] === 0xBBAA) {
-    return 'little endian';
-  } else if (uint16array[0] === 0xAABB) {
-    return 'big endian';
-  } else {
-    // The most common architectures (x86 and ARM) are both little endian, so just assume that.
-    console.error('Can not determine platform endianness, assuming little endian');
-    return 'little endian';
+  if (uint16array[0] === 0xbbaa) {
+    return "little endian";
   }
+  if (uint16array[0] === 0xaabb) {
+    return "big endian";
+  }
+  // The most common architectures (x86 and ARM) are both little endian, so just assume that.
+  console.error("Can not determine platform endianness, assuming little endian");
+  return "little endian";
 }
 
 export default {

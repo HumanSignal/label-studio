@@ -1,5 +1,6 @@
 export const simpleImageData = {
-  image: 'https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg',
+  image:
+    "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
 };
 
 export const simpleRectangleConfig = `
@@ -10,92 +11,92 @@ export const simpleRectangleConfig = `
 
 export const simpleRectangleResult = [
   {
-    'id': 'rect_1',
-    'original_width': 2242,
-    'original_height': 2802,
-    'image_rotation': 0,
-    'value': {
-      'x': 20,
-      'y': 20,
-      'width': 60,
-      'height': 60,
-      'rotation': 0,
+    id: "rect_1",
+    original_width: 2242,
+    original_height: 2802,
+    image_rotation: 0,
+    value: {
+      x: 20,
+      y: 20,
+      width: 60,
+      height: 60,
+      rotation: 0,
     },
-    'from_name': 'rect',
-    'to_name': 'image',
-    'type': 'rectangle',
-    'origin': 'manual',
+    from_name: "rect",
+    to_name: "image",
+    type: "rectangle",
+    origin: "manual",
   },
 ];
 
 export const fourRectanglesResult = [
   {
-    'id': 'rect_1',
-    'original_width': 2242,
-    'original_height': 2802,
-    'image_rotation': 0,
-    'value': {
-      'x': 20,
-      'y': 20,
-      'width': 20,
-      'height': 20,
-      'rotation': 0,
+    id: "rect_1",
+    original_width: 2242,
+    original_height: 2802,
+    image_rotation: 0,
+    value: {
+      x: 20,
+      y: 20,
+      width: 20,
+      height: 20,
+      rotation: 0,
     },
-    'from_name': 'rect',
-    'to_name': 'image',
-    'type': 'rectangle',
-    'origin': 'manual',
+    from_name: "rect",
+    to_name: "image",
+    type: "rectangle",
+    origin: "manual",
   },
   {
-    'id': 'rect_2',
-    'original_width': 2242,
-    'original_height': 2802,
-    'image_rotation': 0,
-    'value': {
-      'x': 60,
-      'y': 20,
-      'width': 20,
-      'height': 20,
-      'rotation': 0,
+    id: "rect_2",
+    original_width: 2242,
+    original_height: 2802,
+    image_rotation: 0,
+    value: {
+      x: 60,
+      y: 20,
+      width: 20,
+      height: 20,
+      rotation: 0,
     },
-    'from_name': 'rect',
-    'to_name': 'image',
-    'type': 'rectangle',
-    'origin': 'manual',
+    from_name: "rect",
+    to_name: "image",
+    type: "rectangle",
+    origin: "manual",
   },
   {
-    'id': 'rect_3',
-    'original_width': 2242,
-    'original_height': 2802,
-    'image_rotation': 0,
-    'value': {
-      'x': 20,
-      'y': 60,
-      'width': 20,
-      'height': 20,
-      'rotation': 0,
+    id: "rect_3",
+    original_width: 2242,
+    original_height: 2802,
+    image_rotation: 0,
+    value: {
+      x: 20,
+      y: 60,
+      width: 20,
+      height: 20,
+      rotation: 0,
     },
-    'from_name': 'rect',
-    'to_name': 'image',
-    'type': 'rectangle',
-    'origin': 'manual',
+    from_name: "rect",
+    to_name: "image",
+    type: "rectangle",
+    origin: "manual",
   },
   {
-    'id': 'rect_4',
-    'original_width': 2242,
-    'original_height': 2802,
-    'image_rotation': 0,
-    'value': {
-      'x': 60,
-      'y': 60,
-      'width': 20,
-      'height': 20,
-      'rotation': 0,
+    id: "rect_4",
+    original_width: 2242,
+    original_height: 2802,
+    image_rotation: 0,
+    value: {
+      x: 60,
+      y: 60,
+      width: 20,
+      height: 20,
+      rotation: 0,
     },
-    'from_name': 'rect',
-    'to_name': 'image',
-    'type': 'rectangle',
-    'origin': 'manual',
+    from_name: "rect",
+    to_name: "image",
+    type: "rectangle",
+    origin: "manual",
   },
 ];
 
@@ -106,21 +107,21 @@ export const simpleEllipseConfig = `
             </View>`;
 export const simpleEllipseResult = [
   {
-    'id': 'ellipse_1',
-    'original_width': 2242,
-    'original_height': 2802,
-    'image_rotation': 0,
-    'value': {
-      'x': 50,
-      'y': 50,
-      'radiusX': 30,
-      'radiusY': 30,
-      'rotation': 0,
+    id: "ellipse_1",
+    original_width: 2242,
+    original_height: 2802,
+    image_rotation: 0,
+    value: {
+      x: 50,
+      y: 50,
+      radiusX: 30,
+      radiusY: 30,
+      rotation: 0,
     },
-    'from_name': 'ellipse',
-    'to_name': 'image',
-    'type': 'ellipse',
-    'origin': 'manual',
+    from_name: "ellipse",
+    to_name: "image",
+    type: "ellipse",
+    origin: "manual",
   },
 ];
 export const simplePolygonConfig = `
@@ -130,18 +131,18 @@ export const simplePolygonConfig = `
             </View>`;
 export const simplePolygonResult = [
   {
-    'id': 'polygon_1',
-    'original_width': 2242,
-    'original_height': 2802,
-    'image_rotation': 0,
-    'value': {
+    id: "polygon_1",
+    original_width: 2242,
+    original_height: 2802,
+    image_rotation: 0,
+    value: {
       /*
         ____
        | ___|
        | |___
        |____|
        */
-      'points': [
+      points: [
         [20, 20],
         [80, 20],
         [80, 40],
@@ -152,10 +153,10 @@ export const simplePolygonResult = [
         [20, 80],
       ],
     },
-    'from_name': 'polygon',
-    'to_name': 'image',
-    'type': 'polygon',
-    'origin': 'manual',
+    from_name: "polygon",
+    to_name: "image",
+    type: "polygon",
+    origin: "manual",
   },
 ];
 export const simplePointConfig = `
@@ -165,18 +166,18 @@ export const simplePointConfig = `
             </View>`;
 export const simplePointResult = [
   {
-    'id': 'keypoint_1',
-    'original_width': 2242,
-    'original_height': 2802,
-    'image_rotation': 0,
-    'value': {
+    id: "keypoint_1",
+    original_width: 2242,
+    original_height: 2802,
+    image_rotation: 0,
+    value: {
       x: 50,
       y: 50,
       width: 100 / 2242,
     },
-    'from_name': 'keypoint',
-    'to_name': 'image',
-    'type': 'keypoint',
-    'origin': 'manual',
+    from_name: "keypoint",
+    to_name: "image",
+    type: "keypoint",
+    origin: "manual",
   },
 ];

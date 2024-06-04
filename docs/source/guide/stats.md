@@ -1,13 +1,13 @@
 ---
 title: Task agreement and how it is calculated
-short: Task agreement
+short: Task agreement matrix
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 260
+order_enterprise: 307
 meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
-section: "Quality control"
+section: "Review & Measure Quality"
 ---
 
 Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
@@ -43,11 +43,11 @@ For more information, see [Project settings - Task agreement](project_settings_l
 The agreement method defines how [agreement scores](stats.html#Agreement-score) across all annotations for a task are combined to form a single inter-annotator agreement score. Label Studio uses the mean average of all inter-annotation agreement scores for each annotation pair as the final task agreement score. 
 
 Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." width=800 height=365 src="/images/LSE/stats-no_grouping.png"/></div>
+<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." src="/images/stats-no_grouping.png"/></div>
 
 ### Example
 One annotation that labels the text span "Excellent tool" as "positive", a second annotation that labels the span "tool" as "positive", and a third annotation that labels the text span "tool" as "negative".
-<br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" width=800 height=100 src="/images/LSE/stats-agreement-example.jpg"/></div>
+<br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" src="/images/stats-agreement-example.png"/></div>
 
 The agreement score for the first two annotations is 50%, based on the intersection of the text spans. The agreement score comparing the second annotation with the third annotation is 0%, because the same text span was labeled differently. 
 

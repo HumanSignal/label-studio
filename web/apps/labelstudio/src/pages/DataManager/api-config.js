@@ -1,4 +1,4 @@
-import { isDefined } from '../../utils/helpers';
+import { isDefined } from "../../utils/helpers";
 
 /** @type {import("../utils/api-proxy").APIProxyOptions} */
 export const APIConfig = {

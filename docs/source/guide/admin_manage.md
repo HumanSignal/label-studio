@@ -3,11 +3,11 @@ title: Manage user accounts
 short: Manage user accounts
 tier: opensource
 type: guide
-order: 108
+order: 372
 order_enterprise: 0
 meta_title: Manage user accounts
 meta_description: Manage existing user accounts in Label Studio Community edition
-section: "Administration"
+section: "Manage Your Organization"
 date: 2024-02-06 16:36:44
 ---
 

@@ -4,10 +4,10 @@ short: Manage projects
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 62
+order_enterprise: 116
 meta_title: Manage projects in Label Studio Enterprise
 meta_description: A description of various project management actions available.
-section: "Project Management"
+section: "Create & Manage Projects"
 ---
 
 For more project actions, see:
@@ -20,7 +20,6 @@ For more project actions, see:
 You can use the **All Projects** page to view projects across all workspaces. 
 
 ![Screenshot of the All Projects page](/images/project/projects_page.png)
-
 
 ## Search projects
 

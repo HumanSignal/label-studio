@@ -14,58 +14,58 @@ const config = `
 
 const data = {
   image:
-    'https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg',
+    "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
 };
 
 const result = [
   {
-    from_name: 'tag',
-    id: 'CPnIaS1e7v',
+    from_name: "tag",
+    id: "CPnIaS1e7v",
     image_rotation: 0,
     original_height: 2802,
     original_width: 2242,
-    to_name: 'img',
-    type: 'ellipselabels',
-    origin: 'manual',
+    to_name: "img",
+    type: "ellipselabels",
+    origin: "manual",
     value: {
       x: 50.4,
       y: 50.76307363927427,
-      ellipselabels: ['Hello'],
+      ellipselabels: ["Hello"],
       rotation: 0,
       radiusY: 10.672358591248665,
       radiusX: 13.333333333333334,
     },
   },
   {
-    from_name: 'tag',
-    id: 'CPnIaS1e8v',
+    from_name: "tag",
+    id: "CPnIaS1e8v",
     image_rotation: 0,
     original_height: 2802,
     original_width: 2242,
-    to_name: 'img',
-    type: 'ellipselabels',
-    origin: 'manual',
+    to_name: "img",
+    type: "ellipselabels",
+    origin: "manual",
     value: {
       x: 80,
       y: 80,
-      ellipselabels: ['World'],
+      ellipselabels: ["World"],
       rotation: 0,
       radiusY: 5,
       radiusX: 7,
     },
   },
   {
-    from_name: 'choice',
-    id: 'CkRNBWbSiK',
-    to_name: 'img',
-    type: 'choices',
-    origin: 'manual',
+    from_name: "choice",
+    id: "CkRNBWbSiK",
+    to_name: "img",
+    type: "choices",
+    origin: "manual",
     value: {
-      choices: ['Space'],
+      choices: ["Space"],
     },
   },
 ];
 
-const title = 'Ellipses on Image';
+const title = "Ellipses on Image";
 
 module.exports = { config, data, result, title };

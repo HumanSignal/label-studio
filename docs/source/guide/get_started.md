@@ -1,11 +1,11 @@
 ---
 title: Label Studio overview
-short: Overview
+short: About Label Studio
 type: guide
 tier: all
-order: 5
-order_enterprise: 5
-section: "Get started"
+order: 2
+order_enterprise: 2
+section: "Discover & Learn"
 meta_title: Overview of Label Studio
 meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.
 ---
@@ -112,7 +112,7 @@ The component parts of Label Studio are available as modular extensible packages
 | [Machine Learning Backends](https://github.com/HumanSignal/label-studio-ml-backend) | Python   | Predict data labels at various parts of the labeling process. |
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png"/></div>
 
 
 

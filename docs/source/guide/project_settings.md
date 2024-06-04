@@ -3,11 +3,12 @@ title: Project settings
 short: Project settings
 tier: opensource
 type: guide
-order: 165
+order: 119
 order_enterprise: 0
 meta_title: Project settings
 meta_description: Brief descriptions of all the options available when configuring the project settings
-section: "Project Management"
+section: "Create & Manage Projects"
+parent: "manage_projects_lso"
 date: 2024-02-06 22:28:27
 ---
 
@@ -32,7 +33,13 @@ The labeling interface is the central configuration point for projects. This det
 
 For information on setting up the labeling interface, see [Labeling configuration](setup). 
 
-## Instructions
+## Annotation
+
+<dl>
+
+<dt>Labeling Instructions</dt>
+
+<dd>
 
 Specify instructions to show the users as they annotate task. This field accepts HTML formatting. 
 
@@ -40,33 +47,44 @@ Enable **Show before labeling** to display a pop-up message to users when they e
 
 If disabled, users will need to click the **Show instructions** action at the bottom of the labeling interface. 
 
-## Machine learning
-
-Click **Add Model** to connect an machine learning (ML) backend to your project. For more information about using ML backends, see [Machine learning integration](ml).
-
-<dl>
-
-<dt>ML-Assisted Labeling</dt>
-
-<dd>
-
-| Field          | Description    |
-| ------------- | ------------ |
-| **Start model training after any annotations are submitted or updated**         | Triggers the connected ML backend to start the training process each time an annotation is created or updated.   |
-| **Retrieve predictions when loading a task automatically** | When enabled, Label Studio automatically fetches predictions from the connected ML backend for each task as it is loaded by a user. This means that when a user navigates to a new task, Label Studio sends a request to the ML backend to retrieve any available predictions for that task, which are then displayed to the user. <br /><br />When disabled, someone must manually retrieve predictions. This can be done in using the **Actions** menu in the Data Manager.  |
-| **Show predictions to annotators in the Label Stream and Quick View** | When enabled, predictions are shown to users during the labeling process. This is enabled by default.<br /><br />Disable this option to hide predictions from users. For example, you might want to hide predictions to prevent bias. |
-
 </dd>
 
-<dt>Model Version</dt>
+<dt>Live Predictions</dt>
 
 <dd>
 
-If you have multiple versions, you can select which version is used to generate predictions. 
+If you have an ML backend or model connected, you can use this setting to determine whether tasks should be pre-labeled using predictions from the model. For more information, see [Integrate Label Studio into your machine learning pipeline](ml). 
+
+Use the drop-down menu to select the predictions source. For example, you can select a [connected model](#Model) or a set of [predictions](#Predictions). 
 
 </dd>
 
 </dl>
+
+## Model
+
+Click **Connect Model** to connect a machine learning (ML) backend to your project. For more information on connecting a model, see [Machine learning integration](ml).
+
+You have the following configuration options:
+
+| Field          | Description    |
+| ------------- | ------------ |
+| **Start model training on annotation submission**         | Triggers the connected ML backend to start the training process each time an annotation is created or updated. <br /><br />This is part of an [active learning loop](active_learning) where the model can be continuously improved as new annotations are added to the dataset. When this setting is enabled, the ML backend's `fit()` method is called, allowing the model to learn from the most recent annotations and potentially improve its predictions for subsequent tasks.   |
+| [**Interactive preannotations**](ml#interactive-pre-annotations)         | (Available when creating or editing a model connection)<br /><br />Enable this option to allow the model to assist with the labeling process by providing real-time predictions or suggestions as annotators work on tasks.  <br /><br />In other words, as you interact with data (for example, by drawing a region on an image, highlighting text, or asking an LLM a question), the ML backend receives this input and returns predictions based on it.   |
+
+
+And the following actions are available from the overflow menu next to a connected model:
+
+| Action          | Description    |
+| ------------- | ------------ |
+| **Start Training**         | Manually initiate training. Use this action if you want to control when the model training occurs, such as after a specific number of annotations have been collected or at certain intervals.  |
+| **Send Test Request**         | (Available from the overflow menu next to the connected model)<br /><br />Use this for troubleshooting and sending a test resquest to the connected model.   |
+| **Edit**         | Edit the model name, URL, and parameters. For more information, see [Connect a model to Label Studio](ml#Connect-a-model-to-Label-Studio). |
+| **Delete**         | Remove the connection to the model. |
+
+## Predictions
+
+From here you can view predictions that have been imported or generated when executing the **Retrieve Predictions** action from the Data Manager. For more information, see [Import pre-annotated data into Label Studio](predictions). 
 
 ## Cloud storage
 

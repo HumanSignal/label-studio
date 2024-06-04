@@ -5,7 +5,6 @@ import logging
 from core.permissions import all_permissions
 from django.conf import settings
 from django.utils.decorators import method_decorator
-from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -79,14 +78,6 @@ class AllExportStorageTypesAPI(APIView):
         tags=['Storage'],
         operation_summary='List all import storages from the project',
         operation_description='Retrieve a list of the import storages of all types with their IDs.',
-        manual_parameters=[
-            openapi.Parameter(
-                name='project',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='A unique integer value identifying your project.',
-            ),
-        ],
         responses={200: 'List of ImportStorageSerializer'},
     ),
 )
@@ -119,14 +110,6 @@ class AllImportStorageListAPI(generics.ListAPIView):
         tags=['Storage'],
         operation_summary='List all export storages from the project',
         operation_description='Retrieve a list of the export storages of all types with their IDs.',
-        manual_parameters=[
-            openapi.Parameter(
-                name='project',
-                type=openapi.TYPE_INTEGER,
-                in_=openapi.IN_PATH,
-                description='A unique integer value identifying your project.',
-            ),
-        ],
         responses={200: 'List of ExportStorageSerializer'},
     ),
 )

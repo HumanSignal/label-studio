@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviderConnection
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
+from tasks.models import Annotation, Prediction
 
 
 def validate_string_list(value):
@@ -54,11 +55,20 @@ class ModelVersion(models.Model):
 
     parent_model = models.ForeignKey(ModelInterface, related_name='model_versions', on_delete=models.CASCADE)
 
+    prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
+
     @property
     def full_title(self):
         return f'{self.parent_model.title}__{self.title}'
 
-    prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
+    def delete(self, *args, **kwargs):
+        """
+        Deletes Predictions associated with ModelVersion
+        """
+        model_runs = ModelRun.objects.filter(model_version=self.id)
+        for model_run in model_runs:
+            model_run.delete_predictions()
+        super().delete(*args, **kwargs)
 
 
 class ThirdPartyModelVersion(ModelVersion):
@@ -147,15 +157,23 @@ class ModelRun(models.Model):
 
     completed_at = models.DateTimeField(_('completed at'), null=True, default=None)
 
-    # todo may need to clean up in future
-    @property
-    def input_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input.csv'
+    def delete_predictions(self):
+        """
+        Deletes any predictions that have originated from a ModelRun
 
-    @property
-    def output_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/output.csv'
+        Executing a raw SQL query here for speed. This ignores any foreign key relationships
+        so if another model has a Prediction fk and set to on_delete=CASCADE for example,
+        it will not take affect. The only relationship like this that currently exists
+        is in Annotation.parent_prediction, which we are handling here
+        """
+        predictions = Prediction.objects.filter(model_run=self.id)
+        prediction_ids = [p.id for p in predictions]
+        Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
+        predictions._raw_delete(predictions.db)
 
-    @property
-    def error_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
+    def delete(self, *args, **kwargs):
+        """
+        Deletes Predictions associated with ModelRun
+        """
+        self.delete_predictions()
+        super().delete(*args, **kwargs)

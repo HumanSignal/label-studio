@@ -1,6 +1,6 @@
 <% const isEnterpriseTheme = theme.tier === "enterprise" %>
   <ul class="page-sidebar-list">
-    <% const pages = site.pages.filter(page => !page.hide_menu && page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")); %>
+    <% const pages = site.pages.filter(page => !page.hide_menu && page.path !== "guide/index.html" && page.type === type && (page.tier === theme.tier || page.tier === "all" || page.type === "tags" || page.type === "playground" || page.type === "templates")); %>
     <% if(isEnterpriseTheme) pages.forEach(page => page.order = page.order_enterprise ? page.order_enterprise : page.order) %>
     <% const orderedPages = pages.sort('order') %>
     <% const parentPages = orderedPages.filter(page => isEnterpriseTheme ? page.parent_enterprise === undefined : page.parent === undefined) %>
@@ -8,12 +8,10 @@
 
     <% const pagesArray = parentPages.map(page => {
       var fileName = page.path.replace(/^.+?\/([\w-]+)\.html/, '$1')
-      let childPages = childrenPages.filter(child => child.parent_enterprise === fileName || child.parent === fileName);
 
       return {
         page: page,
         fileName: fileName,
-        childPages: childPages
       }
     }) %>
 
@@ -52,39 +50,118 @@
         </ul>
           <% if(locals.component === "nav") { %>
             <button>
-              <%- p.page.section || tocHeaderFileName %>
+              <%- p.page.section || tocHeaderFileName %>
+              <% if(p.page.section === "Curate Datasets" || tocHeaderFileName === "Curate Datasets") {%>
+                <svg width="41" height="16" viewBox="0 0 41 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_47_53391)">
+                  <path d="M37 0H4C1.79086 0 0 1.79086 0 4V12C0 14.2091 1.79086 16 4 16H37C39.2091 16 41 14.2091 41 12V4C41 1.79086 39.2091 0 37 0Z" fill="url(#paint0_linear_47_53391)"/>
+                  <path d="M4 2V3.2H4.6V11.6C4.6 12.2365 4.85286 12.847 5.30294 13.2971C5.75303 13.7471 6.36348 14 7 14C7.63652 14 8.24697 13.7471 8.69706 13.2971C9.14714 12.847 9.4 12.2365 9.4 11.6V3.2H10V2H4ZM6.4 10.4C6.04 10.4 5.8 10.16 5.8 9.8C5.8 9.44 6.04 9.2 6.4 9.2C6.76 9.2 7 9.44 7 9.8C7 10.16 6.76 10.4 6.4 10.4ZM7.6 8C7.24 8 7 7.76 7 7.4C7 7.04 7.24 6.8 7.6 6.8C7.96 6.8 8.2 7.04 8.2 7.4C8.2 7.76 7.96 8 7.6 8ZM8.2 5H5.8V3.2H8.2V5Z" fill="#FDFDFC"/>
+                  <path d="M12.8516 3.6001H15.8396C16.2876 3.6001 16.6996 3.6961 17.0756 3.8881C17.4516 4.0801 17.7476 4.3401 17.9636 4.6681C18.1796 4.9961 18.2876 5.3521 18.2876 5.7361C18.2876 6.1681 18.1596 6.5601 17.9036 6.9121C17.6476 7.2561 17.3236 7.4721 16.9316 7.5601C17.4356 7.6241 17.8556 7.8561 18.1916 8.2561C18.5356 8.6561 18.7076 9.1241 18.7076 9.6601C18.7076 10.0921 18.5956 10.4881 18.3716 10.8481C18.1476 11.2001 17.8436 11.4801 17.4596 11.6881C17.0756 11.8961 16.6556 12.0001 16.1996 12.0001H12.8516V3.6001ZM16.1276 10.8961C16.5356 10.8961 16.8716 10.7641 17.1356 10.5001C17.3996 10.2281 17.5316 9.8961 17.5316 9.5041C17.5316 9.1201 17.3956 8.7961 17.1236 8.5321C16.8596 8.2601 16.5316 8.1241 16.1396 8.1241H14.0036V10.8961H16.1276ZM15.8036 7.1761C16.1716 7.1761 16.4836 7.0521 16.7396 6.8041C16.9956 6.5561 17.1236 6.2561 17.1236 5.9041C17.1236 5.5681 16.9956 5.2841 16.7396 5.0521C16.4836 4.8201 16.1716 4.7041 15.8036 4.7041H14.0036V7.1761H15.8036ZM22.5337 12.1201C21.9817 12.1201 21.4777 11.9881 21.0217 11.7241C20.5657 11.4521 20.2017 11.0841 19.9297 10.6201C19.6657 10.1481 19.5337 9.6241 19.5337 9.0481C19.5337 8.4961 19.6657 7.9881 19.9297 7.5241C20.1937 7.0601 20.5537 6.6961 21.0097 6.4321C21.4737 6.1601 21.9777 6.0241 22.5217 6.0241C23.0417 6.0241 23.5137 6.1481 23.9377 6.3961C24.3617 6.6441 24.6977 6.9801 24.9457 7.4041C25.1937 7.8281 25.3177 8.3001 25.3177 8.8201L25.2937 9.3001H20.6017C20.6577 9.8601 20.8617 10.3081 21.2137 10.6441C21.5737 10.9721 22.0257 11.1361 22.5697 11.1361C22.9457 11.1361 23.2857 11.0601 23.5897 10.9081C23.9017 10.7561 24.1337 10.5481 24.2857 10.2841L25.1617 10.8241C24.9377 11.2241 24.5937 11.5401 24.1297 11.7721C23.6657 12.0041 23.1337 12.1201 22.5337 12.1201ZM24.1897 8.4601C24.1497 8.0361 23.9657 7.6841 23.6377 7.4041C23.3177 7.1241 22.9297 6.9841 22.4737 6.9841C22.0017 6.9841 21.6017 7.1161 21.2737 7.3801C20.9537 7.6441 20.7457 8.0041 20.6497 8.4601H24.1897ZM28.9896 12.0721C28.3576 12.0721 27.8456 11.8801 27.4536 11.4961C27.0696 11.1041 26.8776 10.5681 26.8776 9.8881V7.2001H25.7376V6.1441H26.8776V4.5601H27.9816V6.1441H29.5656V7.2001H27.9816V9.8401C27.9816 10.2081 28.0896 10.5001 28.3056 10.7161C28.5216 10.9321 28.7976 11.0401 29.1336 11.0401C29.2856 11.0401 29.4296 11.0201 29.5656 10.9801L29.6256 11.9521C29.4416 12.0321 29.2296 12.0721 28.9896 12.0721ZM36.0083 12.0001H34.9043V11.1601C34.7443 11.4321 34.4803 11.6601 34.1123 11.8441C33.7443 12.0281 33.3603 12.1201 32.9603 12.1201C32.4323 12.1201 31.9483 11.9881 31.5083 11.7241C31.0683 11.4521 30.7203 11.0841 30.4643 10.6201C30.2163 10.1481 30.0923 9.6321 30.0923 9.0721C30.0923 8.5121 30.2163 8.0001 30.4643 7.5361C30.7203 7.0641 31.0683 6.6961 31.5083 6.4321C31.9483 6.1601 32.4323 6.0241 32.9603 6.0241C33.3603 6.0241 33.7443 6.1161 34.1123 6.3001C34.4803 6.4761 34.7443 6.7041 34.9043 6.9841V6.1441H36.0083V12.0001ZM31.1843 9.0721C31.1843 9.4481 31.2683 9.7881 31.4363 10.0921C31.6123 10.3961 31.8523 10.6361 32.1563 10.8121C32.4603 10.9881 32.7963 11.0761 33.1643 11.0761C33.5163 11.0761 33.8523 10.9881 34.1723 10.8121C34.5003 10.6361 34.7443 10.4081 34.9043 10.1281V8.0281C34.7443 7.7401 34.5043 7.5081 34.1843 7.3321C33.8643 7.1561 33.5243 7.0681 33.1643 7.0681C32.7963 7.0681 32.4603 7.1561 32.1563 7.3321C31.8523 7.5001 31.6123 7.7401 31.4363 8.0521C31.2683 8.3561 31.1843 8.6961 31.1843 9.0721Z" fill="#FDFDFC"/>
+                  </g>
+                  <defs>
+                  <linearGradient id="paint0_linear_47_53391" x1="0" y1="0" x2="30.4842" y2="27.6104" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#FFA663"/>
+                  <stop offset="0.515625" stop-color="#FF7557"/>
+                  <stop offset="1" stop-color="#E37BD3"/>
+                  </linearGradient>
+                  <clipPath id="clip0_47_53391">
+                  <rect width="41" height="16" fill="white"/>
+                  </clipPath>
+                  </defs>
+                </svg>
+                <% } %>
               <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
               </svg>
             </button>
           <% } else { %>
-            <%- partial("component/text", {text: p.page.section || tocHeaderFileName, size: "Eyebrow", tag: "h3"}) %>
+            <div class="toc-section-heading">
+              <%- partial("component/text", {text: p.page.section || tocHeaderFileName, size: "Eyebrow", tag: "h3"}) %>
+              <% if(p.page.section === "Curate Datasets" || tocHeaderFileName === "Curate Datasets") {%>
+                <svg width="41" height="16" viewBox="0 0 41 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_47_5339)">
+                  <path d="M37 0H4C1.79086 0 0 1.79086 0 4V12C0 14.2091 1.79086 16 4 16H37C39.2091 16 41 14.2091 41 12V4C41 1.79086 39.2091 0 37 0Z" fill="url(#paint0_linear_47_5339)"/>
+                  <path d="M4 2V3.2H4.6V11.6C4.6 12.2365 4.85286 12.847 5.30294 13.2971C5.75303 13.7471 6.36348 14 7 14C7.63652 14 8.24697 13.7471 8.69706 13.2971C9.14714 12.847 9.4 12.2365 9.4 11.6V3.2H10V2H4ZM6.4 10.4C6.04 10.4 5.8 10.16 5.8 9.8C5.8 9.44 6.04 9.2 6.4 9.2C6.76 9.2 7 9.44 7 9.8C7 10.16 6.76 10.4 6.4 10.4ZM7.6 8C7.24 8 7 7.76 7 7.4C7 7.04 7.24 6.8 7.6 6.8C7.96 6.8 8.2 7.04 8.2 7.4C8.2 7.76 7.96 8 7.6 8ZM8.2 5H5.8V3.2H8.2V5Z" fill="#FDFDFC"/>
+                  <path d="M12.8516 3.6001H15.8396C16.2876 3.6001 16.6996 3.6961 17.0756 3.8881C17.4516 4.0801 17.7476 4.3401 17.9636 4.6681C18.1796 4.9961 18.2876 5.3521 18.2876 5.7361C18.2876 6.1681 18.1596 6.5601 17.9036 6.9121C17.6476 7.2561 17.3236 7.4721 16.9316 7.5601C17.4356 7.6241 17.8556 7.8561 18.1916 8.2561C18.5356 8.6561 18.7076 9.1241 18.7076 9.6601C18.7076 10.0921 18.5956 10.4881 18.3716 10.8481C18.1476 11.2001 17.8436 11.4801 17.4596 11.6881C17.0756 11.8961 16.6556 12.0001 16.1996 12.0001H12.8516V3.6001ZM16.1276 10.8961C16.5356 10.8961 16.8716 10.7641 17.1356 10.5001C17.3996 10.2281 17.5316 9.8961 17.5316 9.5041C17.5316 9.1201 17.3956 8.7961 17.1236 8.5321C16.8596 8.2601 16.5316 8.1241 16.1396 8.1241H14.0036V10.8961H16.1276ZM15.8036 7.1761C16.1716 7.1761 16.4836 7.0521 16.7396 6.8041C16.9956 6.5561 17.1236 6.2561 17.1236 5.9041C17.1236 5.5681 16.9956 5.2841 16.7396 5.0521C16.4836 4.8201 16.1716 4.7041 15.8036 4.7041H14.0036V7.1761H15.8036ZM22.5337 12.1201C21.9817 12.1201 21.4777 11.9881 21.0217 11.7241C20.5657 11.4521 20.2017 11.0841 19.9297 10.6201C19.6657 10.1481 19.5337 9.6241 19.5337 9.0481C19.5337 8.4961 19.6657 7.9881 19.9297 7.5241C20.1937 7.0601 20.5537 6.6961 21.0097 6.4321C21.4737 6.1601 21.9777 6.0241 22.5217 6.0241C23.0417 6.0241 23.5137 6.1481 23.9377 6.3961C24.3617 6.6441 24.6977 6.9801 24.9457 7.4041C25.1937 7.8281 25.3177 8.3001 25.3177 8.8201L25.2937 9.3001H20.6017C20.6577 9.8601 20.8617 10.3081 21.2137 10.6441C21.5737 10.9721 22.0257 11.1361 22.5697 11.1361C22.9457 11.1361 23.2857 11.0601 23.5897 10.9081C23.9017 10.7561 24.1337 10.5481 24.2857 10.2841L25.1617 10.8241C24.9377 11.2241 24.5937 11.5401 24.1297 11.7721C23.6657 12.0041 23.1337 12.1201 22.5337 12.1201ZM24.1897 8.4601C24.1497 8.0361 23.9657 7.6841 23.6377 7.4041C23.3177 7.1241 22.9297 6.9841 22.4737 6.9841C22.0017 6.9841 21.6017 7.1161 21.2737 7.3801C20.9537 7.6441 20.7457 8.0041 20.6497 8.4601H24.1897ZM28.9896 12.0721C28.3576 12.0721 27.8456 11.8801 27.4536 11.4961C27.0696 11.1041 26.8776 10.5681 26.8776 9.8881V7.2001H25.7376V6.1441H26.8776V4.5601H27.9816V6.1441H29.5656V7.2001H27.9816V9.8401C27.9816 10.2081 28.0896 10.5001 28.3056 10.7161C28.5216 10.9321 28.7976 11.0401 29.1336 11.0401C29.2856 11.0401 29.4296 11.0201 29.5656 10.9801L29.6256 11.9521C29.4416 12.0321 29.2296 12.0721 28.9896 12.0721ZM36.0083 12.0001H34.9043V11.1601C34.7443 11.4321 34.4803 11.6601 34.1123 11.8441C33.7443 12.0281 33.3603 12.1201 32.9603 12.1201C32.4323 12.1201 31.9483 11.9881 31.5083 11.7241C31.0683 11.4521 30.7203 11.0841 30.4643 10.6201C30.2163 10.1481 30.0923 9.6321 30.0923 9.0721C30.0923 8.5121 30.2163 8.0001 30.4643 7.5361C30.7203 7.0641 31.0683 6.6961 31.5083 6.4321C31.9483 6.1601 32.4323 6.0241 32.9603 6.0241C33.3603 6.0241 33.7443 6.1161 34.1123 6.3001C34.4803 6.4761 34.7443 6.7041 34.9043 6.9841V6.1441H36.0083V12.0001ZM31.1843 9.0721C31.1843 9.4481 31.2683 9.7881 31.4363 10.0921C31.6123 10.3961 31.8523 10.6361 32.1563 10.8121C32.4603 10.9881 32.7963 11.0761 33.1643 11.0761C33.5163 11.0761 33.8523 10.9881 34.1723 10.8121C34.5003 10.6361 34.7443 10.4081 34.9043 10.1281V8.0281C34.7443 7.7401 34.5043 7.5081 34.1843 7.3321C33.8643 7.1561 33.5243 7.0681 33.1643 7.0681C32.7963 7.0681 32.4603 7.1561 32.1563 7.3321C31.8523 7.5001 31.6123 7.7401 31.4363 8.0521C31.2683 8.3561 31.1843 8.6961 31.1843 9.0721Z" fill="#FDFDFC"/>
+                  </g>
+                  <defs>
+                  <linearGradient id="paint0_linear_47_5339" x1="0" y1="0" x2="30.4842" y2="27.6104" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#FFA663"/>
+                  <stop offset="0.515625" stop-color="#FF7557"/>
+                  <stop offset="1" stop-color="#E37BD3"/>
+                  </linearGradient>
+                  <clipPath id="clip0_47_5339">
+                  <rect width="41" height="16" fill="white"/>
+                  </clipPath>
+                  </defs>
+                </svg>
+                <% } %>
+            </div>
           <% } %>
         <ul class="page-sidebar-list">
       <% }
       tocHeader = p.page.section;
       %>
+      <% const pageTitle = p.page.short || p.page.title %>
       <li>
         <a href="<%- url_for(p.page.path) %>" class="<%- p.page.is_new ? ' new' : '' %>" <%- page.title === p.page.title ? 'aria-current="page"' : '' %>>
-        <%- p.page.short ? p.page.short: p.page.title %></a>
-        <% if(p.childPages.length > 0) {%>
-          <% const activeChildPage = p.childPages.filter(child => page.title === child.title || page.title === p.page.title) %>
-          <button class="page-sidebar-toggle-children-list<%- activeChildPage.length > 0 ? ' active' : ''%>">
-            <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
-            </svg>
-          </button>
-          <ul class="page-sidebar-children-list<%- activeChildPage.length > 0 ? ' page-sidebar-children-list-active' : ''%>">
-          <% p.childPages.forEach(child => { %>
-            <li>
-              <a href="<%- url_for(child.path) %>" class="<%- child.is_new ? ' new' : '' %>" <%- page.title === child.title ? 'aria-current="page"' : '' %>>
-              <%- child.short ? child.short: child.title %></a>
-            </li>
-          <% }) %>
+          <%- pageTitle %>
+        </a>
+        <% const childrenPages = orderedPages.filter(page => page.parent_enterprise === p.fileName || page.parent === p.fileName ) %>
+        <% if(childrenPages.length > 0) {%>
+            <button class="page-sidebar-toggle-children-list">
+              <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
+              </svg>
+            </button>
+            <ul class="page-sidebar-children-list">
+            <% childrenPages.forEach(function (p, index) { %>
+            <% const pageTitle = p.short || p.title %>
+            <% const fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
+              <li>
+                <a href="<%- url_for(p.path) %>" class="page-sidebar-children-link<%- p.is_new ? ' new' : '' %>" <%- page.title === p.title ? 'aria-current="page"' : '' %>>
+                  <%- pageTitle %>
+                </a>
+                <% const grandChildrenPages = orderedPages.filter(page => page.parent_enterprise === fileName || page.parent === fileName ) %>
+                <% if(grandChildrenPages.length > 0) {%>
+                    <ul class="page-sidebar-grandchildren-list">
+                      <% grandChildrenPages.forEach(function (p, index) { %>
+                    <li>
+                      <% const pageTitle = p.short || p.title %>
+                      <a href="<%- url_for(p.path) %>" class="page-sidebar-children-link<%- p.is_new ? ' new' : '' %>" <%- page.title === p.title ? 'aria-current="page"' : '' %>>
+                        <%- pageTitle %>
+                      </a>
+                    </li>
+                  
+                  <% }) %>
+                </ul>
+                <% } %>
+              </li>
+            
+            <% }) %>
           </ul>
         <% } %>
+        <% if(pageTitle == "Frontend") { %>
+          <% if(!isEnterpriseTheme) {%>
+            <li>
+            <a href="https://github.com/HumanSignal/label-studio/blob/develop/CONTRIBUTING.md" target="_blank">Contribution guide
+              <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+                <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+              </svg>
+            </a>
+          </li>
+          <% } %>
+          <li>
+            <a href="https://labelstud.io/integrations/" target="_blank">Integrations directory
+              <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+                <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+              </svg>
+            </a>
+          </li>
+          <% } %>
       </li>
     <% }) %>
+    
 </ul>
 
 <% if(locals.component === "nav") { %>
@@ -95,14 +172,79 @@
     </svg>
   </button>
 <% } else { %>
-  <%- partial("component/text", {text: "Support", size: "Eyebrow", tag: "h3"}) %>
+  <div class="toc-section-heading"><%- partial("component/text", {text: "Support", size: "Eyebrow", tag: "h3"}) %></div>
 <% } %>
 <ul class="page-sidebar-list">
-  <li>
+  <% if(isEnterpriseTheme) { %>
+    <li>
     <a href="https://support.humansignal.com" target="_blank">Troubleshooting
       <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
         <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
       </svg>
     </a>
   </li>
+  <% } %>
+  <% if(!isEnterpriseTheme) { %>
+    <li>
+      <a href="https://github.com/HumanSignal/label-studio/issues" target="_blank">GitHub Issues
+        <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+          <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+        </svg>
+      </a>
+    </li>
+  <% } %>
+  <li>
+    <a href="https://slack.labelstud.io" target="_blank">Join Slack
+      <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+        <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+      </svg>
+    </a>
+  </li>
+  <% if(!isEnterpriseTheme) { %>
+    <li>
+      <a href="https://community.labelstud.io/" target="_blank">Ask on Discourse
+        <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+          <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+        </svg>
+      </a>
+    </li>
+  <% } %>
+  <li>
+    <a href="https://humansignal.com/contact-sales/" target="_blank">Contact Sales
+      <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+        <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+      </svg>
+    </a>
+  </li>
+  <% if(isEnterpriseTheme) {%>
+    <li>
+      <a href="https://support.humansignal.com/hc/en-us/requests/new" target="_blank">Submit A Ticket
+        <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+          <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+        </svg>
+      </a>
+    </li>
+  <% } %>
 </ul>
+
+<% if(!isEnterpriseTheme) {%>
+<% if(locals.component === "nav") { %>
+  <button>
+    What's New
+    <svg width="13" height="8" viewBox="0 0 13 8" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M0.292969 0.805007L1.00008 0.0979004L6.64652 5.74435L12.293 0.0979004L13.0001 0.805007L6.64652 7.15856L0.292969 0.805007Z" />
+    </svg>
+  </button>
+<% } else { %>
+  <div class="toc-section-heading"><%- partial("component/text", {text: "What's New", size: "Eyebrow", tag: "h3"}) %></div>
+<% } %>
+<ul class="page-sidebar-list">  
+    <li>
+      <a href="https://github.com/HumanSignal/label-studio/releases" target="_blank">Release notes
+        <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="icon-external-link">
+          <path d="M10.9002 9.29957L9.46026 9.30898L9.46026 3.34236L1.73377 11.0689L0.698549 10.0336L8.42504 2.30714L2.46783 2.31656L2.46783 0.867251L10.9001 0.867252L10.9002 9.29957Z" fill="#6D87F1"/>
+        </svg>
+      </a>
+    </li>
+</ul>
+<% } %>
