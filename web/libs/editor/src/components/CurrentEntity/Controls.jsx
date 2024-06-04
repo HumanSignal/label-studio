@@ -1,3 +1,7 @@
+/**
+ * @deprecated This component is not used anywhere.
+ */
+
 import { inject, observer } from "mobx-react";
 import { Button } from "../../common/Button/Button";
 import { Block, Elem } from "../../utils/bem";

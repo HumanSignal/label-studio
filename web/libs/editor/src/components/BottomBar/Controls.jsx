@@ -1,3 +1,9 @@
+/**
+ * This panel is used with FF_1170 + FF_3873 in new interface,
+ * but it's also used in old interface with FF_3873, but without FF_1170.
+ * Only this component should get interface updates, other versions should be removed.
+ */
+
 import { inject, observer } from "mobx-react";
 import { Button } from "../../common/Button/Button";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
@@ -168,10 +174,10 @@ export const Controls = controlsInjector(
         );
       }
 
-      const look = disabled || submitDisabled ? "disabled" : "primary";
+      const isDisabled = disabled || submitDisabled;
+      const look = isDisabled ? "disabled" : "primary";
 
       if (isFF(FF_PROD_E_111)) {
-        const isDisabled = disabled || submitDisabled;
         const useExitOption = !isDisabled && isNotQuickView;
 
         const SubmitOption = ({ isUpdate, onClickMethod }) => {
@@ -245,15 +251,18 @@ export const Controls = controlsInjector(
         }
 
         if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
-          const isUpdate = sentUserGenerate || versions.result;
+          const isUpdate = isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result;
+          // no changes were made over previously submitted version — no drafts, no pending changes
+          const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
+          const isUpdateDisabled = isDisabled || noChanges;
           const button = (
-            <ButtonTooltip key="update" title="Update this task: [ Alt+Enter ]">
+            <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Ctrl+Enter ]"}>
               <Button
                 aria-label="submit"
                 name="submit"
-                disabled={disabled || submitDisabled}
+                disabled={isUpdateDisabled}
                 look={look}
-                mod={{ has_icon: useExitOption, disabled: isDisabled }}
+                mod={{ has_icon: useExitOption, disabled: isUpdateDisabled }}
                 onClick={async (event) => {
                   if (event.target.classList.contains("lsf-dropdown__trigger")) return;
                   const selected = store.annotationStore?.selected;
@@ -291,7 +300,7 @@ export const Controls = controlsInjector(
               <Elem name="tooltip-wrapper">
                 <Button
                   aria-label="submit"
-                  disabled={disabled || submitDisabled}
+                  disabled={isDisabled}
                   look={look}
                   onClick={async () => {
                     const selected = store.annotationStore?.selected;
@@ -309,12 +318,15 @@ export const Controls = controlsInjector(
         }
 
         if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
-          const isUpdate = sentUserGenerate || versions.result;
+          const isUpdate = isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result;
+          // no changes were made over previously submitted version — no drafts, no pending changes
+          const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
+          const isUpdateDisabled = isDisabled || noChanges;
           const button = (
-            <ButtonTooltip key="update" title="Update this task: [ Alt+Enter ]">
+            <ButtonTooltip key="update" title={noChanges ? "No changes were made" : "Update this task: [ Ctrl+Enter ]"}>
               <Button
                 aria-label="submit"
-                disabled={disabled || submitDisabled}
+                disabled={isUpdateDisabled}
                 look={look}
                 onClick={async () => {
                   const selected = store.annotationStore?.selected;
