@@ -25,6 +25,14 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from tasks.openapi_schema import (
+    annotation_request_schema,
+    annotation_response_example,
+    prediction_request_schema,
+    prediction_response_example,
+    task_request_schema,
+    task_response_example,
+)
 from tasks.serializers import (
     AnnotationDraftSerializer,
     AnnotationSerializer,
@@ -41,67 +49,6 @@ from webhooks.utils import (
 
 logger = logging.getLogger(__name__)
 
-_task_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'data': openapi.Schema(
-            title='Task data',
-            description='Task data dictionary with arbitrary keys and values',
-            type=openapi.TYPE_OBJECT,
-            example={'id': 1, 'my_image_url': '/static/samples/kittens.jpg'},
-        ),
-        'project': openapi.Schema(
-            type=openapi.TYPE_INTEGER,
-            description='Project ID',
-        ),
-    },
-)
-
-_annotation_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'result': openapi.Schema(type=openapi.TYPE_OBJECT, description='Labeling result in JSON format'),
-        'task': openapi.Schema(type=openapi.TYPE_INTEGER, description='Corresponding task for this annotation'),
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID for this annotation'),
-        'completed_by': openapi.Schema(
-            type=openapi.TYPE_INTEGER, description='User ID of the person who created this annotation'
-        ),
-        'updated_by': openapi.Schema(type=openapi.TYPE_INTEGER, description='Last user who updated this annotation'),
-        'was_cancelled': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='User skipped the task'),
-        'ground_truth': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='This annotation is a Ground Truth'),
-        'lead_time': openapi.Schema(
-            type=openapi.TYPE_NUMBER, description='How much time it took to annotate the task'
-        ),
-    },
-    required=[],
-)
-
-_prediction_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    required=['task', 'result'],
-    properties={
-        'task': openapi.Schema(
-            type=openapi.TYPE_INTEGER,
-            description='Task ID for which the prediction is created',
-        ),
-        'result': openapi.Schema(
-            type=openapi.TYPE_ARRAY,
-            description='Prediction result',
-            items=openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-            ),
-        ),
-        'score': openapi.Schema(
-            type=openapi.TYPE_NUMBER,
-            description='Prediction score',
-        ),
-        'model_version': openapi.Schema(
-            type=openapi.TYPE_STRING,
-            description='Model version',
-        ),
-    },
-)
-
 
 # TODO: fix after switch to api/tasks from api/dm/tasks
 @method_decorator(
@@ -113,8 +60,12 @@ _prediction_schema = openapi.Schema(
         x_fern_audiences=['public'],
         operation_summary='Create task',
         operation_description='Create a new labeling task in Label Studio.',
-        request_body=_task_schema,
-        responses={'201': TaskSerializer},
+        request_body=task_request_schema,
+        responses={
+            '201': openapi.Response(
+                description='Created task', schema=TaskSerializer, examples={'application/json': task_response_example}
+            )
+        },
     ),
 )
 @method_decorator(
@@ -177,6 +128,8 @@ _prediction_schema = openapi.Schema(
                                 description='Task object',
                                 type=openapi.TYPE_OBJECT,
                                 # TODO: provide schema for DataManagerTaskSerializer
+                                # Right now the schema is defined in override.yml to ensure each item in paginated response is Task object derived from "#/components/schemas/Task"
+                                # We need to figure out more elegant way to define schema for DataManagerTaskSerializer to keep it in sync with Task object
                             ),
                         ),
                         'total': openapi.Schema(description='Total number of tasks', type=openapi.TYPE_INTEGER),
@@ -236,6 +189,11 @@ class TaskListAPI(DMTaskListAPI):
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
         request_body=no_body,
+        responses={
+            '200': openapi.Response(
+                description='Task', schema=TaskSerializer, examples={'application/json': task_response_example}
+            )
+        },
     ),
 )
 @method_decorator(
@@ -250,8 +208,12 @@ class TaskListAPI(DMTaskListAPI):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
-        request_body=_task_schema,
-        responses={'200': TaskSerializer},
+        request_body=task_request_schema,
+        responses={
+            '200': openapi.Response(
+                description='Updated task', schema=TaskSerializer, examples={'application/json': task_response_example}
+            )
+        },
     ),
 )
 @method_decorator(
@@ -375,6 +337,13 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         x_fern_sdk_method_name='get',
         x_fern_audiences=['public'],
         request_body=no_body,
+        responses={
+            '200': openapi.Response(
+                description='Retrieved annotation',
+                schema=AnnotationSerializer,
+                examples={'application/json': annotation_response_example},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -386,8 +355,14 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         x_fern_audiences=['public'],
         operation_summary='Update annotation',
         operation_description='Update existing attributes on an annotation.',
-        request_body=_annotation_schema,
-        responses={'200': AnnotationSerializer},
+        request_body=annotation_request_schema,
+        responses={
+            '200': openapi.Response(
+                description='Updated annotation',
+                schema=AnnotationSerializer,
+                examples={'application/json': annotation_response_example},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -465,6 +440,13 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Task ID'),
         ],
         request_body=no_body,
+        responses={
+            '200': openapi.Response(
+                description='Annotation',
+                schema=AnnotationSerializer(many=True),
+                examples={'application/json': [annotation_response_example]},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -494,8 +476,14 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Task ID'),
         ],
-        request_body=_annotation_schema,
-        responses={'201': AnnotationSerializer},
+        request_body=annotation_request_schema,
+        responses={
+            '201': openapi.Response(
+                description='Created annotation',
+                schema=AnnotationSerializer,
+                examples={'application/json': annotation_response_example},
+            )
+        },
     ),
 )
 class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
@@ -642,6 +630,13 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         filter_inspectors=[DjangoFilterDescriptionInspector],
         operation_description='List all predictions and their IDs.',
         request_body=no_body,
+        responses={
+            '200': openapi.Response(
+                description='Predictions list',
+                schema=PredictionSerializer(many=True),
+                examples={'application/json': [prediction_response_example]},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -653,11 +648,12 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         x_fern_audiences=['public'],
         operation_summary='Create prediction',
         operation_description='Create a prediction for a specific task.',
-        request_body=_prediction_schema,
+        request_body=prediction_request_schema,
         responses={
             '201': openapi.Response(
                 description='Created prediction',
                 schema=PredictionSerializer,
+                examples={'application/json': prediction_response_example},
             )
         },
     ),
@@ -675,6 +671,13 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
         request_body=no_body,
+        responses={
+            '200': openapi.Response(
+                description='Prediction details',
+                schema=PredictionSerializer,
+                examples={'application/json': prediction_response_example},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -687,8 +690,14 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
-        request_body=_prediction_schema,
-        responses={'200': PredictionSerializer},
+        request_body=prediction_request_schema,
+        responses={
+            '200': openapi.Response(
+                description='Updated prediction',
+                schema=PredictionSerializer,
+                examples={'application/json': prediction_response_example},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -703,8 +712,14 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
-        request_body=_prediction_schema,
-        responses={'200': PredictionSerializer},
+        request_body=prediction_request_schema,
+        responses={
+            '200': openapi.Response(
+                description='Updated prediction',
+                schema=PredictionSerializer,
+                examples={'application/json': prediction_response_example},
+            )
+        },
     ),
 )
 @method_decorator(

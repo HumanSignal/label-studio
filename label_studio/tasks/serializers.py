@@ -46,7 +46,12 @@ class PredictionResultField(serializers.JSONField):
 
 class PredictionSerializer(ModelSerializer):
     result = PredictionResultField()
-    model_version = serializers.CharField(allow_blank=True, required=False)
+    model_version = serializers.CharField(
+        allow_blank=True,
+        required=False,
+        help_text='Model version - tag for predictions that can be used to filter tasks in Data Manager, as well as '
+        'select specific model version for showing preannotations in the labeling interface',
+    )
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
 
     class Meta:
