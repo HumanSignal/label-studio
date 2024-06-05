@@ -272,6 +272,7 @@ class ProjectExportFilesAuthCheck(APIView):
         tags=['Export'],
         x_fern_sdk_group_name=['projects', 'exports'],
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='List all export snapshots',
         operation_description="""
         Returns a list of exported files for a specific project by ID.
@@ -367,6 +368,7 @@ class ExportListAPI(generics.ListCreateAPIView):
         tags=['Export'],
         x_fern_sdk_group_name=['projects', 'exports'],
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get export snapshot by ID',
         operation_description="""
         Retrieve information about an export file by export ID for a specific project.
@@ -611,6 +613,7 @@ def set_convert_background_failure(job, connection, type, value, traceback_obj):
         tags=['Export'],
         x_fern_sdk_group_name=['projects', 'exports'],
         x_fern_sdk_method_name='convert',
+        x_fern_audiences=['public'],
         operation_summary='Export conversion',
         operation_description="""
         Convert export snapshot to selected format
