@@ -132,8 +132,8 @@ task_create_response_scheme = {
     name='post',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='tasks',
-        x_fern_sdk_method_name='create_many',
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='import_tasks',
         x_fern_audiences=['public'],
         responses=task_create_response_scheme,
         manual_parameters=[
@@ -200,6 +200,8 @@ task_create_response_scheme = {
             host=(settings.HOSTNAME or 'https://localhost:8080')
         ),
         request_body=openapi.Schema(
+            title='tasks',
+            description='List of tasks to import',
             type=openapi.TYPE_ARRAY,
             items=_import_api_single_item_schema,
         ),
