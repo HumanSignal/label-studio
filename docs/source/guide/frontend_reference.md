@@ -289,11 +289,11 @@ This events group contains events related to the annotation.
 Annotation is going to be saved as the result of the `submit` or `update` action. 
 Returning `false` from this event will prevent saving the annotation.
 
-| Argument         | Type     | Description                                                                                                              |
-|------------------|----------|--------------------------------------------------------------------------------------------------------------------------|
-| `labelStudio`    | `Object` | Instance of Label Studio                                                                                                 |
-| `annotation`     | `Object` | Current annotation                                                                                                       |
-| `payload`        | `Object` | Additional information                                                                                                   |
+| Argument         | Type     | Description                                                                        |
+|------------------|----------|------------------------------------------------------------------------------------|
+| `labelStudio`    | `Object` | Instance of Label Studio                                                           |
+| `annotation`     | `Object` | Current annotation                                                                 |
+| `payload`        | `Object` | Additional information                                                             |
 | `payload.event`  | `string` | Indicates which event is going to be next (`submitAnnotation`, `updateAnnotation`) |
 
 
