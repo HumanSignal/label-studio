@@ -20,6 +20,7 @@ import {
   FF_DEV_1536,
   FF_LSDV_4620_3_ML,
   FF_LSDV_4998,
+  FF_REVIEWER_FLOW,
   FF_SIMPLE_INIT,
   isFF,
 } from "../utils/feature-flags";
@@ -329,15 +330,21 @@ export default types
           const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
           const entity = annotationStore.selected;
           const areResultsEmpty = entity.results.length === 0;
+          const isReview = self.hasInterface("review");
+          const isUpdate = !isReview && isDefined(entity.pk);
+          // no changes were made over previously submitted version — no drafts, no pending changes
+          const noChanges = !entity.history.canUndo && !entity.draftId;
+          const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && noChanges;
 
           if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
           if (annotationStore.viewingAll) return;
+          if (isUpdateDisabled) return;
 
           entity?.submissionInProgress();
 
-          if (self.hasInterface("review")) {
+          if (isReview) {
             self.acceptAnnotation();
-          } else if (!isDefined(entity.pk) && self.hasInterface("submit")) {
+          } else if (!isUpdate && self.hasInterface("submit")) {
             self.submitAnnotation();
           } else if (self.hasInterface("update")) {
             self.updateAnnotation();
