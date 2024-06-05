@@ -143,13 +143,14 @@ _view_request_body = openapi.Schema(
         tags=['Data Manager'],
         x_fern_sdk_group_name='views',
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update view',
         operation_description='Update view data with additional filters and other information for a specific project.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='View ID'),
         ],
         request_body=_view_request_body,
-        responses={201: ViewSerializer},
+        responses={200: ViewSerializer},
     ),
 )
 @method_decorator(
