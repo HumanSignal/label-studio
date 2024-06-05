@@ -101,21 +101,25 @@ _project_schema = openapi.Schema(
             title='title',
             description='Project title',
             type=openapi.TYPE_STRING,
+            example='My project',
         ),
         'description': openapi.Schema(
             title='description',
             description='Project description',
             type=openapi.TYPE_STRING,
+            example='My first project',
         ),
         'label_config': openapi.Schema(
             title='label_config',
             description='Label config in XML format',
             type=openapi.TYPE_STRING,
+            example='<View>[...]</View>',
         ),
         'expert_instruction': openapi.Schema(
             title='expert_instruction',
-            description='Labeling instructions',
+            description='Labeling instructions to show to the user',
             type=openapi.TYPE_STRING,
+            example='Label all cats',
         ),
         'show_instruction': openapi.Schema(
             title='show_instruction',
@@ -139,12 +143,12 @@ _project_schema = openapi.Schema(
         ),
         'reveal_preannotations_interactively': openapi.Schema(
             title='reveal_preannotations_interactively',
-            description='Reveal preannotations interactively',
+            description='Reveal preannotations interactively. If set to True, predictions will be shown to the user only after selecting the area of interest',
             type=openapi.TYPE_BOOLEAN,
         ),
         'show_collab_predictions': openapi.Schema(
             title='show_collab_predictions',
-            description='Show collaborative predictions',
+            description='Show predictions to annotators',
             type=openapi.TYPE_BOOLEAN,
         ),
         'maximum_annotations': openapi.Schema(
@@ -160,8 +164,15 @@ _project_schema = openapi.Schema(
         ),
         'control_weights': openapi.Schema(
             title='control_weights',
-            description='Control weights',
+            description='Dict of weights for each control tag in metric calculation. Each control tag (e.g. label or choice) will '
+            "have it's own key in control weight dict with weight for each label and overall weight."
+            'For example, if bounding box annotation with control tag named my_bbox should be included with 0.33 weight in agreement calculation, '
+            'and the first label Car should be twice more important than Airplaine, then you have to need the specify: '
+            "{'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplaine': 0.5}, 'overall': 0.33}",
             type=openapi.TYPE_OBJECT,
+            example={
+                'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplaine': 0.5}, 'overall': 0.33}
+            },
         ),
     },
 )
@@ -216,7 +227,7 @@ class ProjectFilterSet(FilterSet):
 
     ```bash
     curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
-    --data '{{"label_config": "<View>[...]</View>"}}'
+    --data '{{"title": "My project", "label_config": "<View></View>"}}'
     ```
     """.format(
             settings.HOSTNAME or 'https://localhost:8080'
