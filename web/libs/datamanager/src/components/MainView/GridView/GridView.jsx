@@ -23,7 +23,7 @@ const GridHeader = observer(({ row, selected }) => {
   );
 });
 
-const GridBody = observer(({ row, fields }) => {
+export const GridBody = observer(({ row, fields }) => {
   const dataFields = fields.filter((f) => f.parent?.alias === "data");
   const thumbnail = dataFields.filter((field) => field.alias === "thumbnail");
 
