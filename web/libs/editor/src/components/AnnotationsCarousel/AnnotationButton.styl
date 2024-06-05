@@ -4,7 +4,7 @@
   border-radius 4px 4px 0 0
   border-width 1px 1px 0px 1px
   border-style solid
-  background-color rgba(137, 128, 152, 0.08)
+  background-color var(--sand_200)
   border-color transparent
   margin-top 2px
   align-items center
@@ -33,14 +33,14 @@
     line-height 16px
     letter-spacing 0.4px
     text-align left
-    color: #898098;
+    color: var(--sand_700);
   &__entity-id
     font-size 10px
     font-weight 400
     line-height 16px
     letter-spacing 0.4px
     text-align left
-    color #898098
+    color: var(--sand_700);
     margin-left 8px
   &__created
     font-size 10px
@@ -48,7 +48,7 @@
     line-height 16px
     letter-spacing 0.4px
     text-align left
-    color #898098
+    color: var(--sand_700);
 
   &:hover
     background-color var(--grape_0)
@@ -65,12 +65,12 @@
       visibility visible
 
   &_selected
-    background-color #FFFFFF
-    border-color rgba(137, 128, 152, 0.16)
+    background-color var(--sand_0)
+    border-color var(--sand_300)
 
     &:hover
-      background-color #FFFFFF
-      border-color rgba(137, 128, 152, 0.16)
+      background-color var(--sand_0)
+      border-color var(--sand_300)
       border-bottom-color transparent
 
     .annotation-button__ellipsisIcon
@@ -88,12 +88,12 @@
     display flex
     border-radius 4px
     &_groundTruth
-      color #FFC53D
+      color var(--canteloupe_400)
   &__ellipsisIcon
     transform rotate(90deg)
     display flex
     border-radius 4px
-    color #898098
+    color var(--sand_700)
     visibility hidden
     &:hover
       color var(--grape_500)
@@ -106,7 +106,7 @@
     left: calc(50% + 5px);
     border-radius 4px
     color #FAFAFA
-    border 2px solid #FAFAFA
+    border 2px solid var(--sand_300)
     display flex
     width 10px
     height 10px
@@ -114,11 +114,11 @@
     align-items center
     justify-content center
     &_approved
-      background-color #389E0D
+      background-color var(--success_color)
     &_skipped
-      background-color #CF1322
+      background-color var(--danger_color)
     &_updated
-      background-color #1D39C4
+      background-color var(--grape_500)
       svg
         display block
   &_contextMenuOpen
