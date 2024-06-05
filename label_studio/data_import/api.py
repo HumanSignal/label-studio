@@ -134,6 +134,7 @@ task_create_response_scheme = {
         tags=['Import'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='create_many',
+        x_fern_audiences=['public'],
         responses=task_create_response_scheme,
         manual_parameters=[
             openapi.Parameter(
@@ -519,6 +520,7 @@ class ReImportAPI(ImportAPI):
         tags=['Import'],
         x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='Get files list',
         manual_parameters=[
             openapi.Parameter(
@@ -546,6 +548,7 @@ class ReImportAPI(ImportAPI):
         tags=['Import'],
         x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='delete_many',
+        x_fern_audiences=['public'],
         operation_summary='Delete files',
         operation_description="""
         Delete uploaded files for a specific project.
@@ -594,6 +597,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
         tags=['Import'],
         x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get file upload',
         operation_description='Retrieve details about a specific uploaded file.',
     ),
@@ -604,6 +608,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
         tags=['Import'],
         x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update file upload',
         operation_description='Update a specific uploaded file.',
         request_body=FileUploadSerializer,
@@ -615,6 +620,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
         tags=['Import'],
         x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete file upload',
         operation_description='Delete a specific uploaded file.',
     ),
@@ -648,6 +654,7 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         tags=['Import'],
         x_fern_sdk_group_name=['projects', 'files'],
         x_fern_sdk_method_name='download',
+        x_fern_audiences=['public'],
         operation_summary='Download file',
         operation_description='Download a specific uploaded file.',
     )
