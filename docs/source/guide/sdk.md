@@ -12,12 +12,12 @@ section: "Integrate & Extend"
 ---
 
 
-The [Label Studio Python SDK]((https://label-studio.docs.buildwithfern.com/)) allows you to seamlessly integrate Label Studio into your data science and machine learning pipelines. 
+The [**Label Studio Python SDK**](https://label-studio.docs.buildwithfern.com/) allows you to seamlessly integrate Label Studio into your data science and machine learning pipelines.
+
+The SDK provides a set of predefined classes and methods to interact with the Label Studio API directly from your Python scripts, making it easier to manage projects, import tasks, and handle annotations. 
 
 
 ## Benefits to using the Python SDK
-
-The SDK provides a set of predefined classes and methods to interact with the Label Studio API directly from your Python scripts, making it easier to manage projects, import tasks, and handle annotations. This has multiple potential benefits:
 
 - **Streamlined API Interactions**: The SDK simplifies API interactions with user-friendly Python methods and classes.
 - **Integration**: Easily integrate Label Studio actions into your existing data science workflows.
@@ -72,8 +72,8 @@ from label_studio_sdk._legacy import Project
 
 ## Resources and links
 
-* [Getting started with the Python SDK](https://label-studio.docs.buildwithfern.com/api-reference/introduction/getting-started) - This will lead you through several basic tasks using the SDK. 
-* [API reference](https://label-studio.docs.buildwithfern.com/) - This the reference for our API calls and parameters. 
-* [Label Studio Python Library README](https://github.com/HumanSignal/label-studio-sdk/tree/fern-bot/05-23-2024-0427PM?tab=readme-ov-file#label-studio-python-library) - This includes getting started information and more code examples.  
-* [5 Tips and Tricks for Label Studio’s API and SDK](https://labelstud.io/blog/5-tips-and-tricks-for-label-studio-s-api-and-sdk/)
+* [**Getting started with the Python SDK**](https://label-studio.docs.buildwithfern.com/api-reference/introduction/getting-started) - This will lead you through several basic tasks using the SDK. 
+* [**API reference**](https://label-studio.docs.buildwithfern.com/) - This is our reference for all available Label Studio API requests and parameters. 
+* [**Label Studio Python Library README**](https://github.com/HumanSignal/label-studio-sdk/tree/fern-bot/05-23-2024-0427PM?tab=readme-ov-file#label-studio-python-library) - This includes getting started information and more code examples.  
+* [**5 Tips and Tricks for Label Studio’s API and SDK**](https://labelstud.io/blog/5-tips-and-tricks-for-label-studio-s-api-and-sdk/) - This provides additional user guidance and more examples.
 
