@@ -350,7 +350,7 @@ export const Annotation = types
         && self.user?.email
         && store.user?.email !== self.user?.email
         // we have this only in LSE
-        && store.hasInterface("annotations:history")
+        && getEnv(self).events.hasEvent("acceptAnnotation")
         // Quick View — we don't have View All in Label Stream
         && store.hasInterface("annotations:view-all")
         // annotation was submitted already
