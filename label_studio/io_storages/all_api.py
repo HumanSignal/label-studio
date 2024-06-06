@@ -5,8 +5,8 @@ import logging
 from core.permissions import all_permissions
 from django.conf import settings
 from django.utils.decorators import method_decorator
-from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
@@ -57,10 +57,13 @@ _common_storage_list = _get_common_storage_list()
                 type=openapi.TYPE_ARRAY,
                 items=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
-                    properties={'name': openapi.Schema(type=openapi.TYPE_STRING), 'title': openapi.Schema(type=openapi.TYPE_STRING)}
+                    properties={
+                        'name': openapi.Schema(type=openapi.TYPE_STRING),
+                        'title': openapi.Schema(type=openapi.TYPE_STRING),
+                    },
                 ),
             )
-        }
+        },
     ),
 )
 class AllImportStorageTypesAPI(APIView):
@@ -86,10 +89,13 @@ class AllImportStorageTypesAPI(APIView):
                 type=openapi.TYPE_ARRAY,
                 items=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
-                    properties={'name': openapi.Schema(type=openapi.TYPE_STRING), 'title': openapi.Schema(type=openapi.TYPE_STRING)}
+                    properties={
+                        'name': openapi.Schema(type=openapi.TYPE_STRING),
+                        'title': openapi.Schema(type=openapi.TYPE_STRING),
+                    },
                 ),
             )
-        }
+        },
     ),
 )
 class AllExportStorageTypesAPI(APIView):
