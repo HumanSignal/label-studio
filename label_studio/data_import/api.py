@@ -54,28 +54,6 @@ logger = logging.getLogger(__name__)
 
 ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
-
-_import_api_single_item_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'data': openapi.Schema(type=openapi.TYPE_OBJECT, description='Data of the task'),
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID for this task'),
-        'annotations': openapi.Schema(
-            type=openapi.TYPE_ARRAY,
-            items=openapi.Schema(type=openapi.TYPE_OBJECT),
-            description='Annotations for this task',
-        ),
-        'predictions': openapi.Schema(
-            type=openapi.TYPE_ARRAY,
-            items=openapi.Schema(type=openapi.TYPE_OBJECT),
-            description='Predictions for this task',
-        ),
-        'is_labeled': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Whether the task is labeled or not'),
-        'overlap': openapi.Schema(type=openapi.TYPE_NUMBER, description='Overlap for the task'),
-    },
-    required=[],
-)
-
 task_create_response_scheme = {
     201: openapi.Response(
         description='Tasks successfully imported',
@@ -143,6 +121,28 @@ task_create_response_scheme = {
                 in_=openapi.IN_PATH,
                 description='A unique integer value identifying this project.',
             ),
+            openapi.Parameter(
+                name='commit_to_project',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description='Set to "true" to immediately commit tasks to the project.',
+            ),
+            openapi.Parameter(
+                name='return_task_ids',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description='Set to "true" to return task IDs in the response.',
+            ),
+            openapi.Parameter(
+                name='preannotated_from_fields',
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(type=openapi.TYPE_STRING),
+                in_=openapi.IN_QUERY,
+                description='List of fields to preannotate from the task data. For example, if you provide a list of'
+                ' `{"text": "text", "prediction": "label"}` items in the request, the system will create '
+                'a task with the `text` field and a prediction with the `label` field when '
+                '`preannoted_from_fields=["prediction"]`.',
+            ),
         ],
         operation_summary='Import tasks',
         operation_description="""
@@ -203,7 +203,30 @@ task_create_response_scheme = {
             title='tasks',
             description='List of tasks to import',
             type=openapi.TYPE_ARRAY,
-            items=_import_api_single_item_schema,
+            items=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                # TODO: this example doesn't work - perhaps we need to migrate to drf-spectacular for "anyOf" support
+                # also fern will change to at least provide a list of examples FER-1969
+                # right now we can only rely on documenation examples
+                # properties={
+                #     'data': openapi.Schema(type=openapi.TYPE_OBJECT, description='Data of the task'),
+                #     'annotations': openapi.Schema(
+                #         type=openapi.TYPE_ARRAY,
+                #         items=annotation_request_schema,
+                #         description='Annotations for this task',
+                #     ),
+                #     'predictions': openapi.Schema(
+                #         type=openapi.TYPE_ARRAY,
+                #         items=prediction_request_schema,
+                #         description='Predictions for this task',
+                #     )
+                # },
+                # example={
+                #     'data': {'image': 'http://example.com/image.jpg'},
+                #     'annotations': [annotation_response_example],
+                #     'predictions': [prediction_response_example]
+                # }
+            ),
         ),
     ),
 )
