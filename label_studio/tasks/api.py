@@ -629,6 +629,20 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_summary='List predictions',
         filter_inspectors=[DjangoFilterDescriptionInspector],
         operation_description='List all predictions and their IDs.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='task',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='Filter predictions by task ID',
+            ),
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='Filter predictions by project ID',
+            ),
+        ],
         request_body=no_body,
         responses={
             '200': openapi.Response(
