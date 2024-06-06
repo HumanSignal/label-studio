@@ -285,6 +285,18 @@ Draft is sent to the server.
 
 This events group contains events related to the annotation.
 
+### `beforeSaveAnnotation`
+Annotation is going to be saved as the result of the `submit` or `update` action. 
+Returning `false` from this event will prevent saving the annotation.
+
+| Argument         | Type     | Description                                                                                  |
+|------------------|----------|----------------------------------------------------------------------------------------------|
+| `labelStudio`    | `Object` | Instance of Label Studio                                                                     |
+| `annotation`     | `Object` | Current annotation                                                                           |
+| `payload`        | `Object` | Additional information                                                                       |
+| `payload.event`  | `string` | Indicates which event is about to be executed (`submitAnnotation`, `updateAnnotation`, etc.) |
+
+
 ### `submitAnnotation`
 
 Annotation is submitted.
@@ -307,10 +319,13 @@ Annotation is updated.
 
 Annotation is selected.
 
-| Argument      | Type     | Description              |
-| ------------- | -------- | ------------------------ |
-| `labelStudio` | `Object` | Instance of Label Studio |
-| `annotation`  | `Object` | Current annotation       |
+| Argument              | Type      | Description                                   |
+|-----------------------|-----------|-----------------------------------------------|
+| `annotation`          | `Object`  | Current annotation                            |
+| `previousAnnotation`  | `Object`  | Previous annotation                           |
+| `payload`             | `Object?` | Additional information                        |
+| `payload.fromViewAll` | `boolean` | `true` if ViewAll has just been switched off  |
+
 
 ### `deleteAnnotation`
 
@@ -332,6 +347,15 @@ Annotation is set as Ground Truth (the star button clicked).
 | `params`         | `Object`  |                                  |
 | `params.isDirty` | `Boolean` | `true` if annotation was changed |
 | `params.entity`  | `Object`  | Current annotation               |
+
+### `selectHistory`
+Step in the annotation history is selected.
+
+| Argument      | Type     | Description                 |
+|---------------|----------|-----------------------------|
+| `labelStudio` | `Object` | Instance of Label Studio    |
+| `annotation`  | `Object` | Current annotation          |
+| `historyItem` | `Object` | Current history item        |
 
 #### Region events
 
