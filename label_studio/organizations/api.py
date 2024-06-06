@@ -257,7 +257,7 @@ class OrganizationInviteAPI(generics.RetrieveAPIView):
     decorator=swagger_auto_schema(
         tags=['Invites'],
         x_fern_sdk_group_name='organizations',
-        x_fern_sdk_method_name='reset_invite',
+        x_fern_sdk_method_name='reset_token',
         operation_summary='Reset organization token',
         operation_description='Reset the token used in the invitation link to invite someone to an organization.',
         responses={200: OrganizationInviteSerializer()},

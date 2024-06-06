@@ -85,7 +85,7 @@ _s3_export_storage_schema = openapi.Schema(
         x_fern_sdk_method_name='create',
         x_fern_audiences=['public'],
         operation_summary='Create new S3 storage',
-        operation_description='Get new S3 import storage',
+        operation_description='Create new S3 import storage',
         request_body=_s3_import_storage_schema,
     ),
 )

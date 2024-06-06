@@ -79,7 +79,7 @@ _azure_blob_export_storage_schema = openapi.Schema(
         x_fern_sdk_method_name='create',
         x_fern_audiences=['public'],
         operation_summary='Create new storage',
-        operation_description='Get new Azure import storage',
+        operation_description='Create new Azure import storage',
         request_body=_azure_blob_import_storage_schema,
     ),
 )

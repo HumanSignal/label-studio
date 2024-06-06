@@ -520,7 +520,7 @@ class ReImportAPI(ImportAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name=['projects', 'files'],
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='list',
         x_fern_audiences=['public'],
         operation_summary='Get files list',
@@ -548,7 +548,7 @@ class ReImportAPI(ImportAPI):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name=['projects', 'files'],
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='delete_many',
         x_fern_audiences=['public'],
         operation_summary='Delete files',
@@ -597,7 +597,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='get',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name=['projects', 'files'],
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='get',
         x_fern_audiences=['public'],
         operation_summary='Get file upload',
@@ -608,7 +608,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name=['projects', 'files'],
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='update',
         x_fern_audiences=['public'],
         operation_summary='Update file upload',
@@ -620,7 +620,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name=['projects', 'files'],
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='delete',
         x_fern_audiences=['public'],
         operation_summary='Delete file upload',
@@ -654,7 +654,7 @@ class UploadedFileResponse(generics.RetrieveAPIView):
     @csp(SANDBOX=[])
     @swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name=['projects', 'files'],
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='download',
         x_fern_audiences=['public'],
         operation_summary='Download file',
