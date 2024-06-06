@@ -126,12 +126,16 @@ task_create_response_scheme = {
                 type=openapi.TYPE_BOOLEAN,
                 in_=openapi.IN_QUERY,
                 description='Set to "true" to immediately commit tasks to the project.',
+                default=True,
+                required=False,
             ),
             openapi.Parameter(
                 name='return_task_ids',
                 type=openapi.TYPE_BOOLEAN,
                 in_=openapi.IN_QUERY,
                 description='Set to "true" to return task IDs in the response.',
+                default=False,
+                required=False,
             ),
             openapi.Parameter(
                 name='preannotated_from_fields',
@@ -142,6 +146,8 @@ task_create_response_scheme = {
                 ' `{"text": "text", "prediction": "label"}` items in the request, the system will create '
                 'a task with the `text` field and a prediction with the `label` field when '
                 '`preannoted_from_fields=["prediction"]`.',
+                default=None,
+                required=False,
             ),
         ],
         operation_summary='Import tasks',
