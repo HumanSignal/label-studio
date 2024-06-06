@@ -12,7 +12,7 @@ section: "Integrate & Extend"
 ---
 
 
-The [**Label Studio Python SDK**](https://label-studio.docs.buildwithfern.com/) allows you to seamlessly integrate Label Studio into your data science and machine learning pipelines.
+The [**Label Studio Python SDK**](https://api.labelstud.io/) allows you to seamlessly integrate Label Studio into your data science and machine learning pipelines.
 
 The SDK provides a set of predefined classes and methods to interact with the Label Studio API directly from your Python scripts, making it easier to manage projects, import tasks, and handle annotations. 
 
@@ -67,6 +67,8 @@ from label_studio_sdk import Client
 from label_studio_sdk.data_manager import Filters, Column, Operator, Type
 from label_studio_sdk._legacy import Project
 ```
+
+If you're looking for the documentation for the older version, you can find it [here](https://labelstud.io/sdk/).
 
 
 ## Resources and links
