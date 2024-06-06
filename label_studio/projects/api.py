@@ -677,7 +677,7 @@ class ProjectReimportAPI(generics.RetrieveAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
-        x_fern_audiences=['internal'],  # TODO: deprecate this endpooint in favor of tasks:tasks-list
+        x_fern_audiences=['internal'],  # TODO: deprecate this endpoint in favor of tasks:tasks-list
         operation_summary='List project tasks',
         operation_description="""
             Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
