@@ -40,11 +40,10 @@ LABEL_STUDIO_URL = 'http://localhost:8080'
 API_KEY = 'd6f8a2622d39e9d89ff0dfef1a80ad877f4ee9e3'
 
 # Import the SDK and the client module
-from label_studio_sdk import Client
+from label_studio_sdk.client import LabelStudio
 
 # Connect to the Label Studio API and check the connection
-ls = Client(url=LABEL_STUDIO_URL, api_key=API_KEY)
-ls.check_connection()
+ls = LabelStudio(base_url=LABEL_STUDIO_URL, api_key=API_KEY)
 ```
 
 ## SDK versions and compatibility
@@ -72,8 +71,8 @@ from label_studio_sdk._legacy import Project
 
 ## Resources and links
 
-* [**Getting started with the Python SDK**](https://label-studio.docs.buildwithfern.com/api-reference/introduction/getting-started) - This will lead you through several basic tasks using the SDK. 
-* [**API reference**](https://label-studio.docs.buildwithfern.com/) - This is our reference for all available Label Studio API requests and parameters. 
-* [**Label Studio Python Library README**](https://github.com/HumanSignal/label-studio-sdk/tree/fern-bot/05-23-2024-0427PM?tab=readme-ov-file#label-studio-python-library) - This includes getting started information and more code examples.  
+* [**Getting started with the Python SDK**](https://api.labelstud.io/api-reference/introduction/getting-started) - This will lead you through several basic tasks using the SDK. 
+* [**API reference**](https://api.labelstud.io/) - This is our reference for all available Label Studio API requests and parameters. 
+* [**Label Studio Python Library README**](https://github.com/HumanSignal/label-studio-sdk) - This includes getting started information and more code examples.  
 * [**5 Tips and Tricks for Label Studio’s API and SDK**](https://labelstud.io/blog/5-tips-and-tricks-for-label-studio-s-api-and-sdk/) - This provides additional user guidance and more examples.
 
