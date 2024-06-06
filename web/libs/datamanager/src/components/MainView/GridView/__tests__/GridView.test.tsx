@@ -46,9 +46,6 @@ const fields = [
   },
 ];
 
-const loadedImage =
-  "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
-
 describe("GridBody", () => {
   it("renders the image when the data source is an array", async () => {
     const ImageModel = types.model({
@@ -60,10 +57,10 @@ describe("GridBody", () => {
     const rowArrayImage = ImageModel.create({
       data: {
         image: [
-          "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
-          "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
-          "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
-          "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
+          "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg?v=1",
+          "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg?v=2",
+          "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg?v=3",
+          "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg?v=4",
         ],
       },
     });
@@ -74,7 +71,7 @@ describe("GridBody", () => {
     const imageElement = await screen.findByRole("img");
 
     //Check if the image is loaded with the expected src
-    expect(imageElement.src).toBe(loadedImage);
+    expect(imageElement.src).toBe(rowArrayImage.data.image[0]);
   });
 
   it("renders the image when the data source is an string", async () => {
@@ -97,6 +94,6 @@ describe("GridBody", () => {
     const imageElement = await screen.findByRole("img");
 
     //Check if the image is loaded with the expected src
-    expect(imageElement.src).toBe(loadedImage);
+    expect(imageElement.src).toBe(rowArrayImage.data.image);
   });
 });
