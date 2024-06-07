@@ -31,9 +31,7 @@ export const GridBody = observer(({ row, fields }) => {
     const field_type = field.currentType;
     let value = getProperty(row, valuePath);
 
-    /**The value is an array...
-     * In this case, we take the first element of the array
-     */
+    // for multilayered images we display the first one
     if (Array.isArray(value)) {
       value = value[0];
     }
