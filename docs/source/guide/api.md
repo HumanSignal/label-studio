@@ -53,27 +53,27 @@ label-studio user --username <username>
 
 </div>
 
-See [API documentation for authentication](https://api.labelstud.io/api-reference/introduction/getting-started).
+See [API documentation for authentication](https://api.labelstud.io/api-reference/introduction/getting-started#authentication).
 
 ### List all projects
 
-To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`, or primary key. If you don't know what your project ID is, you might want to get a list of all projects in Label Studio that you can access. See the [List your projects API endpoint documentation](https://api.labelstud.io/api-reference/introduction/getting-started).
+To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`, or primary key. If you don't know what your project ID is, you might want to get a list of all projects in Label Studio that you can access. See the [List your projects API endpoint documentation](https://api.labelstud.io/api-reference/api-reference/projects/list).
 
 ### Create and set up a project
 
-Create a project and set up the labeling interface in Label Studio using the API. See the [Create new project API endpoint documentation](https://api.labelstud.io/api-reference/introduction/getting-started).
+Create a project and set up the labeling interface in Label Studio using the API. See the [Create new project API endpoint documentation](https://api.labelstud.io/api-reference/api-reference/projects/create).
 
-If you want to make sure the configuration for your labeling interface is valid before submitting it using the API, you can use the [validate label config](https://api.labelstud.io/api-reference/introduction/getting-started) API endpoint.
+If you want to make sure the configuration for your labeling interface is valid before submitting it using the API, you can use the [validate label config](https://api.labelstud.io/api-reference/api-reference/projects/validate-config) API endpoint.
 
 ### Import tasks using the API
 
-To import tasks using the API, make sure you know the project ID that you want to add tasks to. See additional examples and parameter descriptions in the [import data endpoint documentation](https://api.labelstud.io/api-reference/introduction/getting-started)
+To import tasks using the API, make sure you know the project ID that you want to add tasks to. See additional examples and parameter descriptions in the [import data endpoint documentation](https://api.labelstud.io/api-reference/api-reference/tasks/create)
 
 ### Retrieve tasks
-Retrieve a paginated list of tasks for a specific project. If you want, you can also retrieve tasks and annotations using this API endpoint, as an alternative to exporting annotations. See details and parameters in the [list project tasks endpoint documentation](https://api.labelstud.io/api-reference/introduction/getting-started).
+Retrieve a paginated list of tasks for a specific project. If you want, you can also retrieve tasks and annotations using this API endpoint, as an alternative to exporting annotations. See details and parameters in the [list project tasks endpoint documentation](https://api.labelstud.io/api-reference/api-reference/tasks/list).
 
 ### Export annotations
 
-To export annotations, first see [which formats are available to export for your project](https://api.labelstud.io/api-reference/introduction/getting-started). 
+To export annotations, first see [which formats are available to export for your project](https://api.labelstud.io/api-reference/api-reference/projects/exports/list-formats). 
 
-Choose your selected format from the response and then call the export endpoint. See the [export annotations](https://api.labelstud.io/api-reference/introduction/getting-started) endpoint documentation for more details.
+Choose your selected format from the response and then call the export endpoint. See the [export annotations](https://api.labelstud.io/api-reference/api-reference/tasks/list) endpoint documentation for more details.

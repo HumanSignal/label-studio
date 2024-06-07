@@ -109,7 +109,7 @@ Click **Connect Model** and complete the following fields:
 | **Interactive preannotations**  | Enable this option to allow the model to assist with the labeling process by providing real-time predictions or suggestions as annotators work on tasks.  <br /><br />In other words, as you interact with data (for example, by drawing a region on an image, highlighting text, or asking an LLM a question), the ML backend receives this input and returns predictions based on it. For more information, see [Interactive pre-annotations](#Interactive-pre-annotations) below. |
 
 !!! info Tip
-    You can also [add an ML backend using the API](https://api.labelstud.io/api-reference/introduction/getting-started). You will need the project ID and the machine learning backend URL. 
+    You can also [add an ML backend using the API](https://api.labelstud.io/api-reference/api-reference/ml/create). You will need the project ID and the machine learning backend URL. 
 
 ## Example models
 
