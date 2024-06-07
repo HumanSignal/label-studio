@@ -310,6 +310,7 @@ class ImportAPI(generics.CreateAPIView):
             async_import_background,
             project_import.id,
             request.user.id,
+            queue_name='high',
             on_failure=set_import_background_failure,
             project_id=project.id,
             organization_id=request.user.active_organization.id,
@@ -438,6 +439,7 @@ class ReImportAPI(ImportAPI):
             project_reimport.id,
             organization_id,
             self.request.user,
+            queue_name='high',
             on_failure=set_reimport_background_failure,
             project_id=project.id,
         )
