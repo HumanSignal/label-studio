@@ -11,9 +11,9 @@ import Base from "./Base";
 
 /**
  * The `List` tag is used to display a list of similar items like articles, search results, etc. Task data in the `value` parameter should be an array of objects with `id`, `title`, `body`, and `html` fields.
- * 
+ *
  * It's much more lightweight to use `List` than to group other tags like Text. Also, you can attach classifications to provide additional data about this list.
- * 
+ *
  * The `List` tag can be used with the `Ranker` tag to rank items or pick relevant items from a list.
  * Items can be styled in `Style` tag by using `.htx-ranker-item` class.
  * @example
