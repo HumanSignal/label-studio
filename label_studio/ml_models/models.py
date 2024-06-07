@@ -110,6 +110,7 @@ class ModelRun(models.Model):
     class ProjectSubset(models.TextChoices):
         ALL = 'All', _('All')
         HASGT = 'HasGT', _('HasGT')
+        SAMPLE = 'Sample', _('Sample')
 
     class FileType(models.TextChoices):
         INPUT = 'Input', _('Input')
