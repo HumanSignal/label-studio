@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-1110/cs-polishing'",
-  "commit": "1b40b6e27da40b37dcf909caa1e0e5d358916112",
-  "date": "2024-06-05T17:17:11.000Z",
-  "branch": "fb-leap-1110/cs-polishing"
+  "message": "Fix linting",
+  "commit": "2393938080d4e2f830d0578af5977f7436892c1b",
+  "date": "2024-06-07T16:53:17.000Z",
+  "branch": "docs/doc-219-list-tag"
 }
