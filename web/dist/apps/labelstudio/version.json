@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-1110/cs-polishing'",
-  "commit": "1b40b6e27da40b37dcf909caa1e0e5d358916112",
-  "date": "2024-06-05T17:17:11.000Z",
-  "branch": "fb-leap-1110/cs-polishing"
+  "message": "delete wrong yarn and fix the package",
+  "commit": "180425584d1915258c74221587a2c268db5f9e31",
+  "date": "2024-06-07T14:06:52.000Z",
+  "branch": "fb-leap-1052"
 }
