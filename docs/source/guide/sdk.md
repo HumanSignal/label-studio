@@ -68,6 +68,8 @@ from label_studio_sdk.data_manager import Filters, Column, Operator, Type
 from label_studio_sdk._legacy import Project
 ```
 
+If you're looking for the documentation for the older version, you can find it [here](https://labelstud.io/sdk/).
+
 
 ## Resources and links
 
