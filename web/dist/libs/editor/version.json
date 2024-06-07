@@ -1,6 +1,6 @@
 {
-  "message": "docs: DOC-219: Update List tag description and examples",
-  "commit": "88440a16e06c92fe3ec5e4126a024403e0bfb8ea",
-  "date": "2024-06-07T14:49:40.000Z",
+  "message": "Fix linting",
+  "commit": "2393938080d4e2f830d0578af5977f7436892c1b",
+  "date": "2024-06-07T16:53:17.000Z",
   "branch": "docs/doc-219-list-tag"
 }
