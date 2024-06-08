@@ -1,0 +1,13 @@
+{
+  "AWSEBDockerrunVersion": 1,
+  "Image": {
+    "Name": "heartexlabs/label-studio:latest",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": 8080,
+      "HostPort": 80
+    }
+  ]
+}

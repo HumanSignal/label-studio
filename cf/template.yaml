@@ -1,15 +1,18 @@
-# TODO:
-# - setup the beanstalk application to run the labelstudio docker container
-# - setup CORS on the S3 bucket
-# - Check that uploads can happen for label studio + that we can persist projects and annotations
-#
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: CloudFormation template to create the infra needed to deploy the LabelStudio Instance for SalmonVision"
+Description: CloudFormation template to create the infra needed to deploy the LabelStudio Instance for SalmonVision."
+
+Parameters:
+  InstancePort:
+    NoEcho: "true"
+    Type: String
+    Description: Listen Port
+    Default: "80"
 
 Resources:
   LabelStudioDBInstance:
     Type: "AWS::RDS::DBInstance"
+    DeletionPolicy: Retain
     Properties:
       DBInstanceIdentifier: !Sub "${AWS::StackName}-labelstudio-postgres-instance"
       AllocatedStorage: "20" # Free tier allows up to 20GB
@@ -25,6 +28,11 @@ Resources:
       PubliclyAccessible: true
       StorageType: "gp2"
 
+  ECRRepository:
+    Type: "AWS::ECR::Repository"
+    Properties:
+      RepositoryName: !Sub "${AWS::StackName}-repository"
+
   LabelStudioDBSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
@@ -37,6 +45,7 @@ Resources:
 
   LabelStudioBucket:
     Type: "AWS::S3::Bucket"
+    DeletionPolicy: Retain
     Properties:
       BucketName: !Sub "${AWS::StackName}-labelstudio-bucket"
       AccessControl: Private
@@ -49,14 +58,147 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+              - DELETE
+              - HEAD
+            AllowedOrigins:
+              - "*"
+            ExposedHeaders:
+              - "x-amz-server-side-encryption"
+              - "x-amz-request-id"
+              - "x-amz-id-2"
+            MaxAge: 3000
+
+  ElasticBeanstalkApplication:
+    Type: "AWS::ElasticBeanstalk::Application"
+    Properties:
+      ApplicationName: !Sub "${AWS::StackName}-application"
+
+  ElasticBeanstalkApplicationVersion:
+    Type: "AWS::ElasticBeanstalk::ApplicationVersion"
+    Properties:
+      ApplicationName: !Ref ElasticBeanstalkApplication
+      # FIXME: pass it as a parameter or find a way to inline the docker-compose.yml file instead
+      SourceBundle:
+        S3Bucket: salmonvision-elasticbeanstalk-sourcebundle
+        S3Key: docker-compose.yml
+
+  ElasticBeanstalkRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AWSElasticBeanstalkWebTier"
+        - "arn:aws:iam::aws:policy/AWSElasticBeanstalkMulticontainerDocker"
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess" # Managed policy for full access to S3
+        - "arn:aws:iam::aws:policy/AmazonRDSFullAccess" # Managed policy for full access to RDS
+        - "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly" # Managed policy for full access to ECR
+
+  ElasticBeanstalkInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Roles:
+        - !Ref ElasticBeanstalkRole
+
+  ElasticBeanstalkConfigurationTemplate:
+    Type: AWS::ElasticBeanstalk::ConfigurationTemplate
+    Properties:
+      ApplicationName: !Ref ElasticBeanstalkApplication
+      Description: AWS ElasticBeanstalk Configuration Template for SalmonVision
+      OptionSettings:
+        - Namespace: "aws:elasticbeanstalk:environment"
+          OptionName: "LoadBalancerType"
+          Value: "classic"
+          # TODO: make port 443 work and add SSL certificate
+          # - Namespace: "aws:elb:loadbalancer"
+          #   OptionName: "LoadBalancerHTTPPort"
+          #   Value: "80"
+          # - Namespace: "aws:elb:loadbalancer"
+          #   OptionName: "LoadBalancerHTTPSPort"
+          #   Value: "443"
+          # - Namespace: "aws:elb:listener"
+          #   OptionName: "ListenerProtocol"
+          #   Value: "HTTP"
+          # - Namespace: "aws:elb:listener"
+          #   OptionName: "InstancePort"
+          #   Value: "80"
+          # - Namespace: "aws:elb:listener"
+          #   OptionName: "InstanceProtocol"
+          #   Value: "HTTP"
+          # - Namespace: "aws:elb:listener"
+          #   OptionName: "LoadBalancerPort"
+          #   Value: "80"
+          # - Namespace: "aws:elb:listener"
+          #   OptionName: "SSLCertificateId" # Optional: Add SSL certificate ARN if needed
+        - Namespace: aws:autoscaling:asg
+          OptionName: MinSize
+          Value: "1"
+        - Namespace: aws:autoscaling:asg
+          OptionName: MaxSize
+          Value: "1"
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: IamInstanceProfile
+          Value: !Ref ElasticBeanstalkInstanceProfile
+      SolutionStackName: "64bit Amazon Linux 2023 v4.3.2 running Docker"
+
+  ElasticBeanstalkEnvironment:
+    Type: "AWS::ElasticBeanstalk::Environment"
+    Properties:
+      ApplicationName: !Ref ElasticBeanstalkApplication
+      VersionLabel: !Ref ElasticBeanstalkApplicationVersion
+      TemplateName: !Ref ElasticBeanstalkConfigurationTemplate
+      CNAMEPrefix: "salmonvision-application"
+      OptionSettings:
+        - Namespace: aws:autoscaling:launchconfiguration
+          OptionName: IamInstanceProfile
+          Value: !Ref ElasticBeanstalkInstanceProfile
 
 Outputs:
   BucketName:
-    Description: Name of the created S3 bucket
+    Description: Name of the created S3 bucket to store data uploads from labelstudio UI
     Value: !Ref LabelStudioBucket
     Export:
-      Name: !Sub "${AWS::StackName}-BucketName"
+      Name: !Sub "${AWS::StackName}-labelstudio-s3-bucket"
 
   DBInstanceEndpoint:
     Description: The connection endpoint for the LabelStudio RDS instance
     Value: !GetAtt LabelStudioDBInstance.Endpoint.Address
+    Export:
+      Name: !Sub "${AWS::StackName}-database-endpoint"
+
+  ElasticBeanstalkEnvironmentURL:
+    Description: The URL of the Elastic Beanstalk environment
+    Value: !GetAtt ElasticBeanstalkEnvironment.EndpointURL
+    Export:
+      Name: !Sub "${AWS::StackName}-web-application-endpoint"
+
+  ECRRepositoryURI:
+    Description: The URI of the ECR repository
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}"
+    Export:
+      Name: !Sub "${AWS::StackName}-docker-container-registry-endpoint"
+
+  # AWSEBLoadBalancerURL:
+  #   Value:
+  #     "Fn::Join":
+  #       - ""
+  #       - - "http://"
+  #         - "Fn::GetAtt":
+  #             - AWSEBLoadBalancer
+  #             - DNSName
+  #   Description: The ElasticBeanstalk ELB URL of the website
+  #   Export:
+  #     Name: !Sub "${AWS::StackName}-endpoint"
