@@ -20,7 +20,17 @@ fi
 aws s3 cp docker-compose.yml s3://salmonvision-elasticbeanstalk-sourcebundle/
 
 # Create a change set
-create_output=$(aws cloudformation create-change-set --stack-name "$STACK_NAME" --template-body file://template.yaml --change-set-name "$CHANGE_SET_NAME" --change-set-type UPDATE --no-cli-pager --capabilities CAPABILITY_IAM 2>&1)
+create_output=$(
+	aws cloudformation create-change-set \
+		--stack-name "$STACK_NAME" \
+		--template-body file://template.yaml \
+		--change-set-name "$CHANGE_SET_NAME" \
+		--change-set-type UPDATE \
+		--no-cli-pager \
+		--capabilities CAPABILITY_IAM \
+		--parameters ParameterKey=DBUser,ParameterValue=chinook ParameterKey=DBPassword,ParameterValue=zBMgsfPKKQVohqK \
+		2>&1
+)
 create_status=$?
 
 if [ $create_status -ne 0 ]; then

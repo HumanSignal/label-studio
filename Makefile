@@ -1,19 +1,16 @@
 # Automating the tagging of the docker images
-
-NAME   := 391155498039.dkr.ecr.eu-north-1.amazonaws.com/salmonvision-repository
+CONTAINER_REPOSITORY := 391155498039.dkr.ecr.eu-north-1.amazonaws.com
+NAME   := ${CONTAINER_REPOSITORY}/salmonvision-repository
 TAG    := $$(git rev-parse --short HEAD)
 IMG    := ${NAME}:${TAG}
 LATEST := ${NAME}:latest
-
-docker_foo:
-	echo ${IMG}
 
 docker_build:
 	@docker build -t ${IMG} .
 	@docker tag ${IMG} ${LATEST}
 
 docker_login:
-	@aws ecr get-login-password | docker login --username AWS --password-stdin 391155498039.dkr.ecr.eu-north-1.amazonaws.com
+	@aws ecr get-login-password | docker login --username AWS --password-stdin ${CONTAINER_REPOSITORY}
 
 docker_push:
 	@docker push ${NAME}

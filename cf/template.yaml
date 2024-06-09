@@ -2,6 +2,29 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: CloudFormation template to create the infra needed to deploy the LabelStudio Instance for SalmonVision."
 
+Parameters:
+  DBUser:
+    Description: The database admin account username
+    Type: String
+    MinLength: 1
+    MaxLength: 16
+    AllowedPattern: "[a-zA-Z][a-zA-Z0-9]*"
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+
+  DBPassword:
+    Description: The database admin account password
+    Type: String
+    NoEcho: true
+    MinLength: 8
+    MaxLength: 41
+    AllowedPattern: "[a-zA-Z0-9]*"
+    ConstraintDescription: must contain only alphanumeric characters.
+
+  # VersionLabel:
+  #   Description: The version label of the Elastic Beanstalk application
+  #   Type: String
+  #   Default: "v0"
+
 Resources:
   LabelStudioDBInstance:
     Type: "AWS::RDS::DBInstance"
@@ -11,8 +34,10 @@ Resources:
       AllocatedStorage: "20" # Free tier allows up to 20GB
       DBInstanceClass: "db.t3.micro" # Free tier eligible instance type
       Engine: "postgres"
-      MasterUsername: "chinook"
-      MasterUserPassword: "zBMgsfPKKQVohqK"
+      MasterUsername: !Ref DBUser
+      MasterUserPassword: !Ref DBPassword
+      # MasterUsername: "chinook"
+      # MasterUserPassword: "zBMgsfPKKQVohqK"
       DBName: "labelstudio"
       BackupRetentionPeriod: 7
       VPCSecurityGroups:
@@ -67,7 +92,7 @@ Resources:
               - "x-amz-server-side-encryption"
               - "x-amz-request-id"
               - "x-amz-id-2"
-            MaxAge: 3000
+            MaxAge: 3001
 
   ElasticBeanstalkApplication:
     Type: "AWS::ElasticBeanstalk::Application"
@@ -78,7 +103,6 @@ Resources:
     Type: "AWS::ElasticBeanstalk::ApplicationVersion"
     Properties:
       ApplicationName: !Ref ElasticBeanstalkApplication
-      # FIXME: pass it as a parameter or find a way to inline the docker-compose.yml file instead
       SourceBundle:
         S3Bucket: salmonvision-elasticbeanstalk-sourcebundle
         S3Key: docker-compose.yml
@@ -163,6 +187,11 @@ Outputs:
     Value: !GetAtt LabelStudioDBInstance.Endpoint.Address
     Export:
       Name: !Sub "${AWS::StackName}-database-endpoint"
+  ElasticBeanstalkApplicationName:
+    Description: The name of the Elastic Beanstalk application
+    Value: !Ref ElasticBeanstalkApplication
+    Export:
+      Name: !Sub "${AWS::StackName}-application-name"
 
   ElasticBeanstalkEnvironmentURL:
     Description: The URL of the Elastic Beanstalk environment
@@ -170,20 +199,20 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-web-application-endpoint"
 
+  ElasticBeanstalkEnvironmentName:
+    Description: The Name of the ElasticBeanstalkEnvironment
+    Value: !Ref ElasticBeanstalkEnvironment
+    Export:
+      Name: !Sub "${AWS::StackName}-environment-name"
+
+  ElasticBeanstalkApplicationEnvironmentVersion:
+    Description: The version of the Elastic Beanstalk application
+    Value: !Ref ElasticBeanstalkApplicationVersion
+    Export:
+      Name: !Sub "${AWS::StackName}-environment-version"
+
   ECRRepositoryURI:
     Description: The URI of the ECR repository
     Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}"
     Export:
       Name: !Sub "${AWS::StackName}-docker-container-registry-endpoint"
-
-  # AWSEBLoadBalancerURL:
-  #   Value:
-  #     "Fn::Join":
-  #       - ""
-  #       - - "http://"
-  #         - "Fn::GetAtt":
-  #             - AWSEBLoadBalancer
-  #             - DNSName
-  #   Description: The ElasticBeanstalk ELB URL of the website
-  #   Export:
-  #     Name: !Sub "${AWS::StackName}-endpoint"
