@@ -1,9 +1,6 @@
 # TODO
 
-- Make it easy to deploy for dev and prod profiles
-  - Use STAGE as an ENV variable
 - investigate why in the ECRs only the last one keep a tag, tag it also with git sha
-- Update docker-compose.yml file to connect to the right DB (the prod one)
 - Move bash variables to common file
   - Same with the S3 bucket
 - Make the S3 bucket work

@@ -43,8 +43,6 @@ Resources:
       Engine: "postgres"
       MasterUsername: !Ref DBUser
       MasterUserPassword: !Ref DBPassword
-      # MasterUsername: "chinook"
-      # MasterUserPassword: "zBMgsfPKKQVohqK"
       DBName: "labelstudio"
       BackupRetentionPeriod: 7
       VPCSecurityGroups:
@@ -94,7 +92,7 @@ Resources:
               - "x-amz-server-side-encryption"
               - "x-amz-request-id"
               - "x-amz-id-2"
-            MaxAge: 3001
+            MaxAge: 3000
 
   ElasticBeanstalkApplication:
     Type: "AWS::ElasticBeanstalk::Application"

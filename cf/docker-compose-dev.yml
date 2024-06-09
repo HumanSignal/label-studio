@@ -1,7 +1,6 @@
 ---
 services:
   label-studio:
-    # image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/dev-salmonvision-container-registry
     image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/dev-salmonvision
     ports:
       - "80:8080"
