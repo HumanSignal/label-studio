@@ -1,16 +1,26 @@
 #!/usr/bin/env bash
 
+# This script deploys the required infrastructure to run Salmon Vision.
+#
+# Currently, two cloudformation stacks are deployed:
+#
+# - SourceBundleBucket: which creates an S3 bucket to store the docker-compose.yml file that Beanstalk uses
+# - Backend: Database setup, S3 buckets to store asset uploads, ECR repository to push new docker images.
+#
+# Make sure that your AWS profile is activated and that you can deploy the changes via the CLI.
+
 set -x
 
 project_root="$(dirname "${BASH_SOURCE[0]}")/.."
 
 AWS_ACCOUNT_ID="391155498039"
 STAGE=prod
-# TODO
-# STACK_NAME="${STAGE}_salmonvision"
-STACK_NAME=salmonvision
-CHANGE_SET_NAME="change-set-$(date +%Y%m%d%H%M%S)"
-SOURCE_BUNDLE_BUCKET_NAME="salmonvision-elasticbeanstalk-sourcebundle-${AWS_ACCOUNT_ID}"
+# Prefix for the stack names to be deployed
+PREFIX_STACK_NAME="${STAGE}-salmonvision"
+SOURCE_BUNDLE_BUCKET_STACK_NAME="${PREFIX_STACK_NAME}-bucketsourcebundle"
+SOURCE_BUNDLE_BUCKET_NAME="${PREFIX_STACK_NAME}-elasticbeanstalk-sourcebundle-${AWS_ACCOUNT_ID}"
+BACKEND_STACK_NAME="${PREFIX_STACK_NAME}-backend"
+BACKEND_CHANGE_SET_NAME="change-set-$(date +%Y%m%d%H%M%S)"
 
 # Template validation
 # -------------------
@@ -49,26 +59,26 @@ fi
 aws cloudformation deploy \
 	--template-file "${project_root}"/cf/templates/bucket_source_bundle.yml \
 	\
-	--stack-name "${STACK_NAME}-bucketsourcebundle" \
+	--stack-name ${SOURCE_BUNDLE_BUCKET_STACK_NAME} \
 	--parameter-overrides BucketName=${SOURCE_BUNDLE_BUCKET_NAME} \
 	--capabilities CAPABILITY_IAM
 
 # Uploading the docker-compose file in the provisioned bucket
-aws s3 cp "${project_root}"/cf/docker-compose.yml s3://"${SOURCE_BUNDLE_BUCKET_NAME}"/
+aws s3 cp "${project_root}"/cf/docker-compose-"${STAGE}".yml s3://"${SOURCE_BUNDLE_BUCKET_NAME}"/docker-compose.yml
 
 # Backend template
 # ----------------
 
-# Create a change set
+# Note: set --change-set-type CREATE if you need to recreate from scratch
 create_output=$(
 	aws cloudformation create-change-set \
-		--stack-name "$STACK_NAME" \
+		--stack-name ${BACKEND_STACK_NAME} \
 		--template-body file://"${project_root}"/cf/templates/backend.yml \
-		--change-set-name "$CHANGE_SET_NAME" \
+		--change-set-name "$BACKEND_CHANGE_SET_NAME" \
 		--change-set-type UPDATE \
-		--no-cli-pager \
 		--capabilities CAPABILITY_IAM \
-		--parameters ParameterKey=SourceBundleBucketName,ParameterValue=${SOURCE_BUNDLE_BUCKET_NAME} ParameterKey=DBUser,ParameterValue=chinook ParameterKey=DBPassword,ParameterValue=zBMgsfPKKQVohqK \
+		--parameters ParameterKey=Stage,ParameterValue=${STAGE} ParameterKey=SourceBundleBucketName,ParameterValue=${SOURCE_BUNDLE_BUCKET_NAME} ParameterKey=DBUser,ParameterValue=chinook ParameterKey=DBPassword,ParameterValue=zBMgsfPKKQVohqK \
+		--no-cli-pager \
 		2>&1
 )
 create_status=$?
@@ -78,35 +88,34 @@ if [ $create_status -ne 0 ]; then
 	exit 1
 fi
 
-# Wait for the change set to be created
 aws cloudformation wait change-set-create-complete \
-	--stack-name "$STACK_NAME" \
-	--change-set-name "$CHANGE_SET_NAME"
+	--stack-name ${BACKEND_STACK_NAME} \
+	--change-set-name "$BACKEND_CHANGE_SET_NAME"
 
-# Describe the change set
 describe_output=$(aws cloudformation describe-change-set \
-	--stack-name "$STACK_NAME" \
-	--change-set-name "$CHANGE_SET_NAME" \
+	--stack-name ${BACKEND_STACK_NAME} \
+	--change-set-name "$BACKEND_CHANGE_SET_NAME" \
 	--no-cli-pager)
 resource_changes=$(echo "$describe_output" | jq '.Changes | length')
 
 if [ "$resource_changes" -eq 0 ]; then
 	echo "No changes detected. Deleting change set."
 	aws cloudformation delete-change-set \
-		--stack-name "$STACK_NAME" \
-		--change-set-name "$CHANGE_SET_NAME" \
+		--stack-name ${BACKEND_STACK_NAME} \
+		--change-set-name "$BACKEND_CHANGE_SET_NAME" \
 		--no-cli-pager
 	exit 0
 else
 	echo "Changes detected. Executing change set."
 	aws cloudformation execute-change-set \
-		--stack-name "$STACK_NAME" \
-		--change-set-name "$CHANGE_SET_NAME" \
+		--stack-name "$BACKEND_STACK_NAME" \
+		--change-set-name "$BACKEND_CHANGE_SET_NAME" \
 		--no-cli-pager
+
 	# Wait for the change set execution to complete
 	while true; do
 		status=$(aws cloudformation describe-stacks \
-			--stack-name "$STACK_NAME" \
+			--stack-name "$BACKEND_STACK_NAME" \
 			--query "Stacks[0].StackStatus" \
 			--output text)
 		echo "Current stack status: $status"

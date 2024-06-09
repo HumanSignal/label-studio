@@ -1,0 +1,23 @@
+services:
+  label-studio:
+    # image: heartexlabs/label-studio:latest
+    # Using the image pushed to ECR
+    # image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/salmonvision-repository:latest
+    image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/prod-salmonvision-backend-repository
+    ports:
+      - "80:8080"
+    # Environment variables do not work with Env configs through Beanstalk UI configuration
+    environment:
+      # S3 setup
+      STORAGE_TYPE: s3
+      STORAGE_AWS_REGION_NAME: eu-north-1
+      STORAGE_AWS_BUCKET_NAME: "prod-salmonvision-backend-labelstudio-bucket"
+      STORAGE_AWS_FOLDER: ""
+
+      # Database setup
+      DJANGO_DB: default
+      POSTGRE_NAME: postgres
+      POSTGRE_USER: chinook
+      POSTGRE_PASSWORD: zBMgsfPKKQVohqK
+      POSTGRE_PORT: 5432
+      POSTGRE_HOST: prod-salmonvision-backend-labelstudio-postgres-instance.cb4ggme085vi.eu-north-1.rds.amazonaws.com

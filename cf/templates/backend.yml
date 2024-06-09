@@ -3,6 +3,12 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: CloudFormation template to create the infra needed to deploy the LabelStudio Instance for SalmonVision."
 
 Parameters:
+  Stage:
+    Description: The stage {dev, prod} to use
+    Type: String
+    MinLength: 1
+    MaxLength: 16
+
   DBUser:
     Description: The database admin account username
     Type: String
@@ -171,7 +177,7 @@ Resources:
       ApplicationName: !Ref ElasticBeanstalkApplication
       VersionLabel: !Ref ElasticBeanstalkApplicationVersion
       TemplateName: !Ref ElasticBeanstalkConfigurationTemplate
-      CNAMEPrefix: "salmonvision-application"
+      CNAMEPrefix: !Sub "${Stage}-salmonvision-application"
       OptionSettings:
         - Namespace: aws:autoscaling:launchconfiguration
           OptionName: IamInstanceProfile
