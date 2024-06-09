@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # This script runs a full deployment of SalmonVision
+# It requires that the STAGE variable is set to either prod or dev
 # It does the following:
 # - Deploy the cloudformation infrastructure
 # - Logging into ECR
@@ -11,7 +12,14 @@ set -x
 
 project_root="$(dirname "${BASH_SOURCE[0]}")/.."
 
-STAGE=dev
+"${project_root}"/cf/check_stage.sh
+
+# Check the exit status of the external script
+if [[ $? -ne 0 ]]; then
+	echo "Exiting main script due to error in check_stage.sh"
+	exit 1
+fi
+
 DOCKER_CONTAINER_REPOSITORY=391155498039.dkr.ecr.eu-north-1.amazonaws.com
 DOCKER_IMAGE_NAME="${DOCKER_CONTAINER_REPOSITORY}/${STAGE}-salmonvision"
 GIT_SHA=$(git rev-parse --short HEAD)

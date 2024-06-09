@@ -2,10 +2,20 @@
 
 # This script triggers an elastic beanstalk environment deploy.
 # It pulls the latest docker image from the ECR and redeploys it on the EC2 instances.
+# It requires that the STAGE variable is set to either prod or dev
 
 set -x
 
-STAGE=dev
+project_root="$(dirname "${BASH_SOURCE[0]}")/.."
+
+"${project_root}"/cf/check_stage.sh
+
+# Check the exit status of the external script
+if [[ $? -ne 0 ]]; then
+	echo "Exiting main script due to error in check_stage.sh"
+	exit 1
+fi
+
 PREFIX_STACK_NAME="${STAGE}-salmonvision"
 BACKEND_STACK_NAME="${PREFIX_STACK_NAME}-backend"
 

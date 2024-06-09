@@ -6,6 +6,7 @@
 #
 # - SourceBundleBucket: which creates an S3 bucket to store the docker-compose.yml file that Beanstalk uses
 # - Backend: Database setup, S3 buckets to store asset uploads, ECR repository to push new docker images.
+# It requires that the STAGE variable is set to either prod or dev
 #
 # Make sure that your AWS profile is activated and that you can deploy the changes via the CLI.
 
@@ -13,8 +14,15 @@ set -x
 
 project_root="$(dirname "${BASH_SOURCE[0]}")/.."
 
+"${project_root}"/cf/check_stage.sh
+
+# Check the exit status of the external script
+if [[ $? -ne 0 ]]; then
+	echo "Exiting main script due to error in check_stage.sh"
+	exit 1
+fi
+
 AWS_ACCOUNT_ID="391155498039"
-STAGE=dev
 # Prefix for the stack names to be deployed
 PREFIX_STACK_NAME="${STAGE}-salmonvision"
 SOURCE_BUNDLE_BUCKET_STACK_NAME="${PREFIX_STACK_NAME}-bucketsourcebundle"
