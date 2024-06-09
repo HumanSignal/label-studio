@@ -20,9 +20,9 @@ PREFIX_STACK_NAME="${STAGE}-salmonvision"
 BACKEND_STACK_NAME="${PREFIX_STACK_NAME}-backend"
 
 # Querying and parsing CF stack to deploy the beanstalk environment
-APPLICATION_NAME=$(aws cloudformation describe-stacks --stack-name ${BACKEND_STACK_NAME} | jq '.Stacks[0].Outputs[] | select(.OutputKey == "ElasticBeanstalkApplicationName").OutputValue' --raw-output)
-ENVIRONMENT_NAME=$(aws cloudformation describe-stacks --stack-name ${BACKEND_STACK_NAME} | jq '.Stacks[0].Outputs[] | select(.OutputKey == "ElasticBeanstalkEnvironmentName").OutputValue' --raw-output)
-VERSION_LABEL=$(aws cloudformation describe-stacks --stack-name ${BACKEND_STACK_NAME} | jq '.Stacks[0].Outputs[] | select(.OutputKey == "ElasticBeanstalkApplicationEnvironmentVersion").OutputValue' --raw-output)
+APPLICATION_NAME=$(aws cloudformation describe-stacks --stack-name "${BACKEND_STACK_NAME}" | jq '.Stacks[0].Outputs[] | select(.OutputKey == "ElasticBeanstalkApplicationName").OutputValue' --raw-output)
+ENVIRONMENT_NAME=$(aws cloudformation describe-stacks --stack-name "${BACKEND_STACK_NAME}" | jq '.Stacks[0].Outputs[] | select(.OutputKey == "ElasticBeanstalkEnvironmentName").OutputValue' --raw-output)
+VERSION_LABEL=$(aws cloudformation describe-stacks --stack-name "${BACKEND_STACK_NAME}" | jq '.Stacks[0].Outputs[] | select(.OutputKey == "ElasticBeanstalkApplicationEnvironmentVersion").OutputValue' --raw-output)
 
 echo "Deploying the application ${APPLICATION_NAME} with environment ${ENVIRONMENT_NAME} and version ${VERSION_LABEL}"
 aws elasticbeanstalk update-environment \
