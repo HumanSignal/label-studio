@@ -1,9 +1,27 @@
 #!/usr/bin/env bash
 
+set -x
+
 project_root="$(dirname "${BASH_SOURCE[0]}")/.."
+
+CONTAINER_REPOSITORY=391155498039.dkr.ecr.eu-north-1.amazonaws.com
+NAME="${CONTAINER_REPOSITORY}/salmonvision-repository"
+TAG=$(git rev-parse --short HEAD)
+IMG="${NAME}:${TAG}"
+LATEST="${NAME}:latest"
 
 echo "Deploying AWS infrastructure"
 "${project_root}"/cf/deploy-infra.sh
+
+echo "Building docker image"
+docker build -t "${IMG}" "${project_root}"
+docker tag "${IMG}" "${LATEST}"
+
+echo "Logging into ECR"
+aws ecr get-login-password | docker login --username AWS --password-stdin ${CONTAINER_REPOSITORY}
+
+echo "Pushing to ECR"
+docker push "${NAME}"
 
 echo "Deploying new environment code"
 "${project_root}"/cf/deploy-environment.sh
