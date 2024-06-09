@@ -29,6 +29,7 @@ if [ "$validation_status" -ne 0 ]; then
 fi
 
 # 2. Backend template
+
 aws cloudformation validate-template \
 	--template-body file://"${project_root}"/cf/templates/backend.yml \
 	--no-cli-pager
