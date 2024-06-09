@@ -20,10 +20,11 @@ Parameters:
     AllowedPattern: "[a-zA-Z0-9]*"
     ConstraintDescription: must contain only alphanumeric characters.
 
-  # VersionLabel:
-  #   Description: The version label of the Elastic Beanstalk application
-  #   Type: String
-  #   Default: "v0"
+  SourceBundleBucketName:
+    Description: The source bundle bucket name
+    Type: String
+    MinLength: 1
+    MaxLength: 150
 
 Resources:
   LabelStudioDBInstance:
@@ -92,7 +93,7 @@ Resources:
               - "x-amz-server-side-encryption"
               - "x-amz-request-id"
               - "x-amz-id-2"
-            MaxAge: 3002
+            MaxAge: 3001
 
   ElasticBeanstalkApplication:
     Type: "AWS::ElasticBeanstalk::Application"
@@ -104,7 +105,8 @@ Resources:
     Properties:
       ApplicationName: !Ref ElasticBeanstalkApplication
       SourceBundle:
-        S3Bucket: salmonvision-elasticbeanstalk-sourcebundle
+        S3Bucket: !Ref SourceBundleBucketName
+        # S3Bucket: salmonvision-elasticbeanstalk-sourcebundle
         S3Key: docker-compose.yml
 
   ElasticBeanstalkRole:

@@ -1,0 +1,33 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation template to create the Source Bundle S3 bucket needed by Beanstalk to fetch docker-compose.yml
+
+Parameters:
+  BucketName:
+    Description: The bucket name (must be unique)
+    Type: String
+    MinLength: 1
+    MaxLength: 150
+
+Resources:
+  SourceBundleBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Ref BucketName
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  BucketName:
+    Description: Name of the created S3 bucket to store source bundles
+    Value: !Ref SourceBundleBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-source-bundle-s3-bucket"
