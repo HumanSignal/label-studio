@@ -11,11 +11,11 @@ set -x
 
 project_root="$(dirname "${BASH_SOURCE[0]}")/.."
 
-STAGE=prod
+STAGE=dev
 DOCKER_CONTAINER_REPOSITORY=391155498039.dkr.ecr.eu-north-1.amazonaws.com
-DOCKER_IMAGE_NAME="${DOCKER_CONTAINER_REPOSITORY}/${STAGE}-salmonvision-backend-repository"
-DOCKER_IMAGE_TAG=$(git rev-parse --short HEAD)
-DOCKER_IMAGE="${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+DOCKER_IMAGE_NAME="${DOCKER_CONTAINER_REPOSITORY}/${STAGE}-salmonvision"
+GIT_SHA=$(git rev-parse --short HEAD)
+DOCKER_IMAGE="${DOCKER_IMAGE_NAME}:${GIT_SHA}"
 DOCKER_TAG_LATEST="${DOCKER_IMAGE_NAME}:latest"
 
 echo "Deploying AWS infrastructure"

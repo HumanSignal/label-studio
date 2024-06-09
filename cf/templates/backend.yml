@@ -53,11 +53,6 @@ Resources:
       PubliclyAccessible: true
       StorageType: "gp2"
 
-  ECRRepository:
-    Type: "AWS::ECR::Repository"
-    Properties:
-      RepositoryName: !Sub "${AWS::StackName}-repository"
-
   LabelStudioDBSecurityGroup:
     Type: "AWS::EC2::SecurityGroup"
     Properties:
@@ -218,9 +213,3 @@ Outputs:
     Value: !Ref ElasticBeanstalkApplicationVersion
     Export:
       Name: !Sub "${AWS::StackName}-environment-version"
-
-  ECRRepositoryURI:
-    Description: The URI of the ECR repository
-    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}"
-    Export:
-      Name: !Sub "${AWS::StackName}-docker-container-registry-endpoint"

@@ -1,9 +1,11 @@
+---
 services:
   label-studio:
     # image: heartexlabs/label-studio:latest
     # Using the image pushed to ECR
     # image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/salmonvision-repository:latest
-    image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/prod-salmonvision-backend-repository
+    # image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/prod-salmonvision-backend-repository
+    image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/prod-salmonvision
     ports:
       - "80:8080"
     # Environment variables do not work with Env configs through Beanstalk UI configuration

@@ -14,16 +14,30 @@ set -x
 project_root="$(dirname "${BASH_SOURCE[0]}")/.."
 
 AWS_ACCOUNT_ID="391155498039"
-STAGE=prod
+STAGE=dev
 # Prefix for the stack names to be deployed
 PREFIX_STACK_NAME="${STAGE}-salmonvision"
 SOURCE_BUNDLE_BUCKET_STACK_NAME="${PREFIX_STACK_NAME}-bucketsourcebundle"
+ECR_STACK_NAME="${PREFIX_STACK_NAME}-container-registry"
 SOURCE_BUNDLE_BUCKET_NAME="${PREFIX_STACK_NAME}-elasticbeanstalk-sourcebundle-${AWS_ACCOUNT_ID}"
 BACKEND_STACK_NAME="${PREFIX_STACK_NAME}-backend"
 BACKEND_CHANGE_SET_NAME="change-set-$(date +%Y%m%d%H%M%S)"
 
 # Template validation
 # -------------------
+
+# 0. ECR template
+#
+aws cloudformation validate-template \
+	--template-body file://"${project_root}"/cf/templates/ecr.yml \
+	--no-cli-pager
+validation_status=$?
+
+# Check if the command was successful
+if [ "$validation_status" -ne 0 ]; then
+	echo "Template validation failed"
+	exit 1
+fi
 
 # 1. bucket_source_bundle template
 
@@ -38,7 +52,7 @@ if [ "$validation_status" -ne 0 ]; then
 	exit 1
 fi
 
-# 2. Backend template
+# # 2. Backend template
 
 aws cloudformation validate-template \
 	--template-body file://"${project_root}"/cf/templates/backend.yml \
@@ -54,6 +68,15 @@ fi
 # Deploying CF templates
 # ----------------------
 
+# 0. ecr
+
+aws cloudformation deploy \
+	--template-file "${project_root}"/cf/templates/ecr.yml \
+	\
+	--stack-name ${ECR_STACK_NAME} \
+	--parameter-overrides Stage=${STAGE} \
+	--capabilities CAPABILITY_IAM
+
 # 1. bucket_source_bundle
 
 aws cloudformation deploy \
@@ -63,11 +86,11 @@ aws cloudformation deploy \
 	--parameter-overrides BucketName=${SOURCE_BUNDLE_BUCKET_NAME} \
 	--capabilities CAPABILITY_IAM
 
-# Uploading the docker-compose file in the provisioned bucket
+# # Uploading the docker-compose file in the provisioned bucket
 aws s3 cp "${project_root}"/cf/docker-compose-"${STAGE}".yml s3://"${SOURCE_BUNDLE_BUCKET_NAME}"/docker-compose.yml
 
-# Backend template
-# ----------------
+# # Backend template
+# # ----------------
 
 # Note: set --change-set-type CREATE if you need to recreate from scratch
 create_output=$(

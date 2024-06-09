@@ -1,0 +1,23 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation template to create ECR repository
+
+Parameters:
+  Stage:
+    Description: The stage {prod, dev}
+    Type: String
+    MinLength: 1
+    MaxLength: 150
+
+Resources:
+  ECRRepository:
+    Type: "AWS::ECR::Repository"
+    Properties:
+      RepositoryName: !Sub "${Stage}-salmonvision"
+
+Outputs:
+  ECRRepositoryURI:
+    Description: The URI of the ECR repository
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}"
+    Export:
+      Name: !Sub "${AWS::StackName}-salmonvision"

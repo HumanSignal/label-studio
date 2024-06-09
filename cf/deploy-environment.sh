@@ -5,7 +5,7 @@
 
 set -x
 
-STAGE=prod
+STAGE=dev
 PREFIX_STACK_NAME="${STAGE}-salmonvision"
 BACKEND_STACK_NAME="${PREFIX_STACK_NAME}-backend"
 
