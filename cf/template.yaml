@@ -2,13 +2,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: CloudFormation template to create the infra needed to deploy the LabelStudio Instance for SalmonVision."
 
-Parameters:
-  InstancePort:
-    NoEcho: "true"
-    Type: String
-    Description: Listen Port
-    Default: "80"
-
 Resources:
   LabelStudioDBInstance:
     Type: "AWS::RDS::DBInstance"
@@ -122,27 +115,19 @@ Resources:
         - Namespace: "aws:elasticbeanstalk:environment"
           OptionName: "LoadBalancerType"
           Value: "classic"
-          # TODO: make port 443 work and add SSL certificate
-          # - Namespace: "aws:elb:loadbalancer"
-          #   OptionName: "LoadBalancerHTTPPort"
-          #   Value: "80"
-          # - Namespace: "aws:elb:loadbalancer"
-          #   OptionName: "LoadBalancerHTTPSPort"
-          #   Value: "443"
-          # - Namespace: "aws:elb:listener"
-          #   OptionName: "ListenerProtocol"
-          #   Value: "HTTP"
-          # - Namespace: "aws:elb:listener"
-          #   OptionName: "InstancePort"
-          #   Value: "80"
-          # - Namespace: "aws:elb:listener"
-          #   OptionName: "InstanceProtocol"
-          #   Value: "HTTP"
-          # - Namespace: "aws:elb:listener"
-          #   OptionName: "LoadBalancerPort"
-          #   Value: "80"
-          # - Namespace: "aws:elb:listener"
-          #   OptionName: "SSLCertificateId" # Optional: Add SSL certificate ARN if needed
+        # TODO: SSL setup
+        # - Namespace: "aws:elb:listener:443"
+        #   OptionName: "ListenerProtocol"
+        #   Value: "HTTPS"
+        # - Namespace: "aws:elb:listener:443"
+        #   OptionName: "ListenerPort"
+        #   Value: "443"
+        # - Namespace: "aws:elb:listener:443"
+        #   OptionName: "ListenerEnabled"
+        #   Value: "true"
+        # - Namespace: "aws:elb:listener:443"
+        #   OptionName: "SSLCertificateId"
+        #   Value: ARN SSL certificate
         - Namespace: aws:autoscaling:asg
           OptionName: MinSize
           Value: "1"
