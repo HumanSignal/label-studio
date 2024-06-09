@@ -23,10 +23,9 @@ if [[ $? -ne 0 ]]; then
 fi
 
 AWS_ACCOUNT_ID="391155498039"
-# Prefix for the stack names to be deployed
 PREFIX_STACK_NAME="${STAGE}-salmonvision"
-SOURCE_BUNDLE_BUCKET_STACK_NAME="${PREFIX_STACK_NAME}-bucketsourcebundle"
 ECR_STACK_NAME="${PREFIX_STACK_NAME}-container-registry"
+SOURCE_BUNDLE_BUCKET_STACK_NAME="${PREFIX_STACK_NAME}-bucketsourcebundle"
 SOURCE_BUNDLE_BUCKET_NAME="${PREFIX_STACK_NAME}-elasticbeanstalk-sourcebundle-${AWS_ACCOUNT_ID}"
 BACKEND_STACK_NAME="${PREFIX_STACK_NAME}-backend"
 BACKEND_CHANGE_SET_NAME="change-set-$(date +%Y%m%d%H%M%S)"
@@ -80,18 +79,16 @@ fi
 
 aws cloudformation deploy \
 	--template-file "${project_root}"/cf/templates/ecr.yml \
-	\
-	--stack-name ${ECR_STACK_NAME} \
-	--parameter-overrides Stage=${STAGE} \
+	--stack-name "${ECR_STACK_NAME}" \
+	--parameter-overrides Stage="${STAGE}" \
 	--capabilities CAPABILITY_IAM
 
 # 1. bucket_source_bundle
 
 aws cloudformation deploy \
 	--template-file "${project_root}"/cf/templates/bucket_source_bundle.yml \
-	\
-	--stack-name ${SOURCE_BUNDLE_BUCKET_STACK_NAME} \
-	--parameter-overrides BucketName=${SOURCE_BUNDLE_BUCKET_NAME} \
+	--stack-name "${SOURCE_BUNDLE_BUCKET_STACK_NAME}" \
+	--parameter-overrides BucketName="${SOURCE_BUNDLE_BUCKET_NAME}" \
 	--capabilities CAPABILITY_IAM
 
 # # Uploading the docker-compose file in the provisioned bucket
@@ -103,12 +100,12 @@ aws s3 cp "${project_root}"/cf/docker-compose-"${STAGE}".yml s3://"${SOURCE_BUND
 # Note: set --change-set-type CREATE if you need to recreate from scratch
 create_output=$(
 	aws cloudformation create-change-set \
-		--stack-name ${BACKEND_STACK_NAME} \
+		--stack-name "${BACKEND_STACK_NAME}" \
 		--template-body file://"${project_root}"/cf/templates/backend.yml \
-		--change-set-name "$BACKEND_CHANGE_SET_NAME" \
+		--change-set-name "${BACKEND_CHANGE_SET_NAME}" \
 		--change-set-type UPDATE \
 		--capabilities CAPABILITY_IAM \
-		--parameters ParameterKey=Stage,ParameterValue=${STAGE} ParameterKey=SourceBundleBucketName,ParameterValue=${SOURCE_BUNDLE_BUCKET_NAME} ParameterKey=DBUser,ParameterValue=chinook ParameterKey=DBPassword,ParameterValue=zBMgsfPKKQVohqK \
+		--parameters ParameterKey=Stage,ParameterValue="${STAGE}" ParameterKey=SourceBundleBucketName,ParameterValue="${SOURCE_BUNDLE_BUCKET_NAME}" ParameterKey=DBUser,ParameterValue=chinook ParameterKey=DBPassword,ParameterValue=zBMgsfPKKQVohqK \
 		--no-cli-pager \
 		2>&1
 )
@@ -120,33 +117,33 @@ if [ $create_status -ne 0 ]; then
 fi
 
 aws cloudformation wait change-set-create-complete \
-	--stack-name ${BACKEND_STACK_NAME} \
+	--stack-name "${BACKEND_STACK_NAME}" \
 	--change-set-name "$BACKEND_CHANGE_SET_NAME"
 
 describe_output=$(aws cloudformation describe-change-set \
-	--stack-name ${BACKEND_STACK_NAME} \
-	--change-set-name "$BACKEND_CHANGE_SET_NAME" \
+	--stack-name "${BACKEND_STACK_NAME}" \
+	--change-set-name "${BACKEND_CHANGE_SET_NAME}" \
 	--no-cli-pager)
 resource_changes=$(echo "$describe_output" | jq '.Changes | length')
 
 if [ "$resource_changes" -eq 0 ]; then
 	echo "No changes detected. Deleting change set."
 	aws cloudformation delete-change-set \
-		--stack-name ${BACKEND_STACK_NAME} \
-		--change-set-name "$BACKEND_CHANGE_SET_NAME" \
+		--stack-name "${BACKEND_STACK_NAME}" \
+		--change-set-name "${BACKEND_CHANGE_SET_NAME}" \
 		--no-cli-pager
 	exit 0
 else
 	echo "Changes detected. Executing change set."
 	aws cloudformation execute-change-set \
-		--stack-name "$BACKEND_STACK_NAME" \
-		--change-set-name "$BACKEND_CHANGE_SET_NAME" \
+		--stack-name "${BACKEND_STACK_NAME}" \
+		--change-set-name "${BACKEND_CHANGE_SET_NAME}" \
 		--no-cli-pager
 
 	# Wait for the change set execution to complete
 	while true; do
 		status=$(aws cloudformation describe-stacks \
-			--stack-name "$BACKEND_STACK_NAME" \
+			--stack-name "${BACKEND_STACK_NAME}" \
 			--query "Stacks[0].StackStatus" \
 			--output text)
 		echo "Current stack status: $status"
