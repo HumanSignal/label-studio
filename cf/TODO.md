@@ -1,6 +1,7 @@
 # TODO
 
 - clean up RDS instances and unused S3 buckets
+- Make it easy to deploy for dev and prod profiles
 - Update docker-compose.yml file to connect to the right DB (the prod one)
 - Move bash variables to common file
   - Same with the S3 bucket
