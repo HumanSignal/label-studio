@@ -200,7 +200,7 @@ google-cloud-logging = "^3.10.0"
 mysqlclient = {version = "*", optional = true}
 django-csp = "3.7"
 openai = "^1.10.0"
-label-studio-sdk = "^1.0.0"
+label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/36f4dfa4c0a9fbb6ee571469aa057ce221910e04.zip"}
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"
