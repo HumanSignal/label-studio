@@ -24,7 +24,7 @@ from django.db import transaction
 from django.db.models import Prefetch
 from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
-from label_studio_converter import Converter
+from label_studio_sdk.converter import Converter
 from tasks.models import Annotation, Task
 
 ONLY = 'only'

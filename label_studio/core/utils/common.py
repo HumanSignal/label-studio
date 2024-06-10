@@ -476,11 +476,11 @@ def collect_versions(force=False):
     except:  # noqa: E722
         pass
 
-    # converter
+    # converter from label-studio-sdk
     try:
-        import label_studio_converter
+        import label_studio_sdk.converter
 
-        result['label-studio-converter'] = {'version': label_studio_converter.__version__}
+        result['label-studio-converter'] = {'version': label_studio_sdk.__version__}
     except Exception:
         pass
 
