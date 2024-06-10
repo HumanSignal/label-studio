@@ -91,7 +91,7 @@ You can remove your MinIO installation by removing the containers and the associ
 This operation is destructive and will remove all data stored in MinIO.
 ```bash
 docker-compose -f docker-compose.minio.yml down --volumes
-````
+```
 
 
 ## Data persistence
