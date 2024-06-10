@@ -17,10 +17,11 @@ from io_storages.api import (
 )
 from io_storages.azure_blob.models import AzureBlobExportStorage, AzureBlobImportStorage
 from io_storages.azure_blob.serializers import AzureBlobExportStorageSerializer, AzureBlobImportStorageSerializer
+
 from .openapi_schema import (
     _azure_blob_export_storage_schema,
-    _azure_blob_import_storage_schema,
     _azure_blob_export_storage_schema_with_id,
+    _azure_blob_import_storage_schema,
     _azure_blob_import_storage_schema_with_id,
 )
 

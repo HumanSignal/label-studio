@@ -17,10 +17,11 @@ from io_storages.api import (
 )
 from io_storages.s3.models import S3ExportStorage, S3ImportStorage
 from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorageSerializer
+
 from .openapi_schema import (
     _s3_export_storage_schema,
-    _s3_import_storage_schema,
     _s3_export_storage_schema_with_id,
+    _s3_import_storage_schema,
     _s3_import_storage_schema_with_id,
 )
 

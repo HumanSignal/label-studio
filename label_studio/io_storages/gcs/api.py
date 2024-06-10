@@ -17,9 +17,12 @@ from io_storages.api import (
 )
 from io_storages.gcs.models import GCSExportStorage, GCSImportStorage
 from io_storages.gcs.serializers import GCSExportStorageSerializer, GCSImportStorageSerializer
+
 from .openapi_schema import (
-    _gcs_export_storage_schema, _gcs_export_storage_schema_with_id,
-    _gcs_import_storage_schema, _gcs_import_storage_schema_with_id
+    _gcs_export_storage_schema,
+    _gcs_export_storage_schema_with_id,
+    _gcs_import_storage_schema,
+    _gcs_import_storage_schema_with_id,
 )
 
 
