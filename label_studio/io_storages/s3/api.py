@@ -17,44 +17,11 @@ from io_storages.api import (
 )
 from io_storages.s3.models import S3ExportStorage, S3ImportStorage
 from io_storages.s3.serializers import S3ExportStorageSerializer, S3ImportStorageSerializer
-
-_s3_import_storage_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-        'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket name'),
-        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket prefix'),
-        'regex_filter': openapi.Schema(
-            type=openapi.TYPE_STRING, description='Cloud storage regex for filtering objects'
-        ),
-        'use_blob_urls': openapi.Schema(
-            type=openapi.TYPE_BOOLEAN, description='Interpret objects as BLOBs and generate URLs'
-        ),
-        'aws_access_key_id': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_ACCESS_KEY_ID'),
-        'aws_secret_access_key': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_SECRET_ACCESS_KEY'),
-        'aws_session_token': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_SESSION_TOKEN'),
-        'aws_sse_kms_key_id': openapi.Schema(type=openapi.TYPE_STRING, description='AWS SSE KMS Key ID'),
-        'region_name': openapi.Schema(type=openapi.TYPE_STRING, description='AWS Region'),
-        's3_endpoint': openapi.Schema(type=openapi.TYPE_STRING, description='S3 Endpoint'),
-        'presign': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Presign URLs for download'),
-        'presign_ttl': openapi.Schema(type=openapi.TYPE_INTEGER, description='Presign TTL in seconds'),
-        'recursive_scan': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Scan recursively'),
-    },
-)
-
-_s3_export_storage_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-        'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket name'),
-        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='S3 bucket prefix'),
-        'aws_access_key_id': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_ACCESS_KEY_ID'),
-        'aws_secret_access_key': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_SECRET_ACCESS_KEY'),
-        'aws_session_token': openapi.Schema(type=openapi.TYPE_STRING, description='AWS_SESSION_TOKEN'),
-        'aws_sse_kms_key_id': openapi.Schema(type=openapi.TYPE_STRING, description='AWS SSE KMS Key ID'),
-        'region_name': openapi.Schema(type=openapi.TYPE_STRING, description='AWS Region'),
-        's3_endpoint': openapi.Schema(type=openapi.TYPE_STRING, description='S3 Endpoint'),
-    },
+from .openapi_schema import (
+    _s3_export_storage_schema,
+    _s3_import_storage_schema,
+    _s3_export_storage_schema_with_id,
+    _s3_import_storage_schema_with_id,
 )
 
 
@@ -168,7 +135,8 @@ class S3ImportStorageSyncAPI(ImportStorageSyncAPI):
         x_fern_audiences=['public'],
         operation_summary='Validate import storage',
         operation_description='Validate a specific S3 import storage connection.',
-        request_body=no_body,
+        request_body=_s3_import_storage_schema_with_id,
+        responses={200: openapi.Response(description='Validation successful')},
     ),
 )
 class S3ImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -184,6 +152,8 @@ class S3ImportStorageValidateAPI(ImportStorageValidateAPI):
         x_fern_audiences=['public'],
         operation_summary='Validate export storage',
         operation_description='Validate a specific S3 export storage connection.',
+        request_body=_s3_export_storage_schema_with_id,
+        responses={200: openapi.Response(description='Validation successful')},
     ),
 )
 class S3ExportStorageValidateAPI(ExportStorageValidateAPI):

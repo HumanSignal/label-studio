@@ -16,36 +16,11 @@ from io_storages.api import (
 )
 from io_storages.redis.models import RedisExportStorage, RedisImportStorage
 from io_storages.redis.serializers import RedisExportStorageSerializer, RedisImportStorageSerializer
-
-_redis_import_storage_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-        'path': openapi.Schema(type=openapi.TYPE_STRING, description='Storage prefix (optional)'),
-        'host': openapi.Schema(type=openapi.TYPE_STRING, description='Server Host IP (optional)'),
-        'port': openapi.Schema(type=openapi.TYPE_STRING, description='Server Port (optional)'),
-        'password': openapi.Schema(type=openapi.TYPE_STRING, description='Server Password (optional)'),
-        'regex_filter': openapi.Schema(
-            type=openapi.TYPE_STRING, description='Cloud storage regex for filtering objects'
-        ),
-        'use_blob_urls': openapi.Schema(
-            type=openapi.TYPE_BOOLEAN, description='Interpret objects as BLOBs and generate URLs'
-        ),
-    },
-    required=[],
-)
-
-_redis_export_storage_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-        'path': openapi.Schema(type=openapi.TYPE_STRING, description='Storage prefix (optional)'),
-        'host': openapi.Schema(type=openapi.TYPE_STRING, description='Server Host IP (optional)'),
-        'port': openapi.Schema(type=openapi.TYPE_STRING, description='Server Port (optional)'),
-        'password': openapi.Schema(type=openapi.TYPE_STRING, description='Server Password (optional)'),
-        'db': openapi.Schema(type=openapi.TYPE_INTEGER, description='Database ID of database to use'),
-    },
-    required=[],
+from .openapi_schema import (
+    _redis_export_storage_schema,
+    _redis_import_storage_schema,
+    _redis_export_storage_schema_with_id,
+    _redis_import_storage_schema_with_id,
 )
 
 
@@ -176,7 +151,8 @@ class RedisExportStorageSyncAPI(ExportStorageSyncAPI):
         x_fern_audiences=['public'],
         operation_summary='Validate import storage',
         operation_description='Validate a specific Redis import storage connection.',
-        request_body=no_body,
+        request_body=_redis_import_storage_schema_with_id,
+        responses={200: openapi.Response(description='Validation successful')},
     ),
 )
 class RedisImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -192,7 +168,8 @@ class RedisImportStorageValidateAPI(ImportStorageValidateAPI):
         x_fern_audiences=['public'],
         operation_summary='Validate export storage',
         operation_description='Validate a specific Redis export storage connection.',
-        request_body=no_body,
+        request_body=_redis_export_storage_schema_with_id,
+        responses={200: openapi.Response(description='Validation successful')},
     ),
 )
 class RedisExportStorageValidateAPI(ExportStorageValidateAPI):

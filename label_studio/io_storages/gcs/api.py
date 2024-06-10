@@ -17,41 +17,9 @@ from io_storages.api import (
 )
 from io_storages.gcs.models import GCSExportStorage, GCSImportStorage
 from io_storages.gcs.serializers import GCSExportStorageSerializer, GCSImportStorageSerializer
-
-_gcs_import_storage_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-        'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket name'),
-        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket prefix'),
-        'regex_filter': openapi.Schema(
-            type=openapi.TYPE_STRING, description='Cloud storage regex for filtering objects'
-        ),
-        'use_blob_urls': openapi.Schema(
-            type=openapi.TYPE_BOOLEAN, description='Interpret objects as BLOBs and generate URLs'
-        ),
-        'google_application_credentials': openapi.Schema(
-            type=openapi.TYPE_STRING, description='The content of GOOGLE_APPLICATION_CREDENTIALS json file'
-        ),
-        'google_project_id': openapi.Schema(type=openapi.TYPE_STRING, description='Google project ID'),
-        'presign': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Presign URLs for direct download'),
-        'presign_ttl': openapi.Schema(type=openapi.TYPE_INTEGER, description='Presign TTL in minutes'),
-    },
-    required=[],
-)
-
-_gcs_export_storage_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-        'bucket': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket name'),
-        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='GCS bucket prefix'),
-        'google_application_credentials': openapi.Schema(
-            type=openapi.TYPE_STRING, description='The content of GOOGLE_APPLICATION_CREDENTIALS json file'
-        ),
-        'google_project_id': openapi.Schema(type=openapi.TYPE_STRING, description='Google project ID'),
-    },
-    required=[],
+from .openapi_schema import (
+    _gcs_export_storage_schema, _gcs_export_storage_schema_with_id,
+    _gcs_import_storage_schema, _gcs_import_storage_schema_with_id
 )
 
 
@@ -182,7 +150,9 @@ class GCSExportStorageSyncAPI(ExportStorageSyncAPI):
         x_fern_audiences=['public'],
         operation_summary='Validate import storage',
         operation_description='Validate a specific GCS import storage connection.',
-        request_body=no_body,
+        request_body=_gcs_import_storage_schema_with_id,
+        # expecting empty response
+        responses={200: openapi.Response(description='OK')},
     ),
 )
 class GCSImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -198,7 +168,9 @@ class GCSImportStorageValidateAPI(ImportStorageValidateAPI):
         x_fern_audiences=['public'],
         operation_summary='Validate export storage',
         operation_description='Validate a specific GCS export storage connection.',
-        request_body=no_body,
+        request_body=_gcs_export_storage_schema_with_id,
+        # expecting empty response
+        responses={200: openapi.Response(description='OK')},
     ),
 )
 class GCSExportStorageValidateAPI(ExportStorageValidateAPI):
