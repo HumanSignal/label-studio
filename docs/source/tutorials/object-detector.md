@@ -49,7 +49,7 @@ Follow this installation guide and then play around with them, picking the best 
     label-studio-ml init coco-detector --from label_studio_ml/examples/mmdetection/mmdetection.py
     ```
 
-3. Download the `config_file` and `checkpoint_file` from MMDetection model zoo (use the [recommended Faster RCNN for a quickstart](https://mmdetection.readthedocs.io/en/latest/1_exist_data_model.html#inference-with-existing-models)). Place the `config_file` within the cloned [mmdetection repo](https://github.com/open-mmlab/mmdetection).
+3. Download the `config_file` and `checkpoint_file` from MMDetection model zoo (use the [recommended Faster RCNN for a quickstart](https://mmdetection.readthedocs.io/en/latest/user_guides/inference.html)). Place the `config_file` within the cloned [mmdetection repo](https://github.com/open-mmlab/mmdetection).
 
 The following sections present the different settings for how to run this ML backend based on a specific use case. 
 
