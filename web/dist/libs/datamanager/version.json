@@ -1,6 +1,6 @@
 {
-  "message": "Fix linting",
-  "commit": "95b1e07df22242cafab5cf6c3813c2bc5ef7fb96",
-  "date": "2024-06-10T13:57:33.000Z",
-  "branch": "fb-leap-1097/review-in-quick-view"
+  "message": "Merge branch 'develop' into 'fb-leap-1052'",
+  "commit": "23bf7f9b573e4bb9a40a8c10fcae2296bc90ad44",
+  "date": "2024-06-10T15:08:55.000Z",
+  "branch": "fb-leap-1052"
 }
