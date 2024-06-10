@@ -345,16 +345,18 @@ export const Annotation = types
     get canBeReviewed() {
       const store = self.store;
 
-      return isFF(FF_REVIEWER_FLOW)
+      return (
+        isFF(FF_REVIEWER_FLOW) &&
         // not a current user — we can only review others' annotations
-        && self.user?.email
-        && store.user?.email !== self.user?.email
+        self.user?.email &&
+        store.user?.email !== self.user?.email &&
         // we have this only in LSE
-        && getEnv(self).events.hasEvent("acceptAnnotation")
+        getEnv(self).events.hasEvent("acceptAnnotation") &&
         // Quick View — we don't have View All in Label Stream
-        && store.hasInterface("annotations:view-all")
+        store.hasInterface("annotations:view-all") &&
         // annotation was submitted already
-        && !isNaN(self.pk);
+        !isNaN(self.pk)
+      );
     },
   }))
   .actions((self) => ({
