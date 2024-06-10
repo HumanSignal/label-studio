@@ -1,6 +1,5 @@
 # TODO
 
-- Script to make users and API keys for rcloning videos onto S3
 - investigate why in the ECRs only the last one keep a tag, tag it also with git sha
 - Move bash variables to common file
   - Same with the S3 bucket
