@@ -1,7 +1,7 @@
 ---
 services:
   label-studio:
-    image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/dev-salmonvision
+    image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/dev-salmonvision-webapp
     ports:
       - "80:8080"
     environment:

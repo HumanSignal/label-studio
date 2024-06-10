@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
-Description: CloudFormation template to create ECR repository
+Description: CloudFormation template to create ECR repositories needed for SalmonVision. The webapp and the ML backends.
 
 Parameters:
   Stage:
@@ -10,14 +10,47 @@ Parameters:
     MaxLength: 150
 
 Resources:
-  ECRRepository:
+  ECRRepositoryWebApp:
     Type: "AWS::ECR::Repository"
     Properties:
-      RepositoryName: !Sub "${Stage}-salmonvision"
+      RepositoryName: !Sub "${Stage}-salmonvision-webapp"
+
+  ECRRepositoryYOLOMLBackendRGB:
+    Type: "AWS::ECR::Repository"
+    Properties:
+      RepositoryName: !Sub "${Stage}-salmonvision-mlbackend-rgb-yolo"
+
+  ECRRepositoryYOLOMLBackendSonar:
+    Type: "AWS::ECR::Repository"
+    Properties:
+      RepositoryName: !Sub "${Stage}-salmonvision-mlbackend-sonar-yolo"
+
+  ECRRepositoryYOLOMLBackendAerial:
+    Type: "AWS::ECR::Repository"
+    Properties:
+      RepositoryName: !Sub "${Stage}-salmonvision-mlbackend-aerial-yolo"
 
 Outputs:
-  ECRRepositoryURI:
-    Description: The URI of the ECR repository
-    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepository}"
+  ECRRepositoryWebAppURI:
+    Description: The URI of the Web App ECR repository
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepositoryWebApp}"
     Export:
-      Name: !Sub "${AWS::StackName}-salmonvision"
+      Name: !Sub "${AWS::StackName}-salmonvision-webapp"
+
+  ECRRepositoryYOLOMLBackendRGBURI:
+    Description: The URI of the YOLO ML backend RGB ECR repository
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepositoryYOLOMLBackendRGB}"
+    Export:
+      Name: !Sub "${AWS::StackName}-salmonvision-yolo-ml-backend-rgb"
+
+  ECRRepositoryYOLOMLBackendSonarURI:
+    Description: The URI of the YOLO ML backend Sonar ECR repository
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepositoryYOLOMLBackendSonar}"
+    Export:
+      Name: !Sub "${AWS::StackName}-salmonvision-yolo-ml-backend-sonar"
+
+  ECRRepositoryYOLOMLBackendAerialURI:
+    Description: The URI of the YOLO ML backend Aerial ECR repository
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRRepositoryYOLOMLBackendAerial}"
+    Export:
+      Name: !Sub "${AWS::StackName}-salmonvision-yolo-ml-backend-aerial"

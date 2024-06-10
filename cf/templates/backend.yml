@@ -92,7 +92,7 @@ Resources:
               - "x-amz-server-side-encryption"
               - "x-amz-request-id"
               - "x-amz-id-2"
-            MaxAge: 3000
+            MaxAge: 3001
 
   ElasticBeanstalkApplication:
     Type: "AWS::ElasticBeanstalk::Application"
@@ -105,7 +105,6 @@ Resources:
       ApplicationName: !Ref ElasticBeanstalkApplication
       SourceBundle:
         S3Bucket: !Ref SourceBundleBucketName
-        # S3Bucket: salmonvision-elasticbeanstalk-sourcebundle
         S3Key: docker-compose.yml
 
   ElasticBeanstalkRole:
