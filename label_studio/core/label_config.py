@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import xmljson
 from django.conf import settings
-from label_studio_tools.core import label_config
+from label_studio_sdk._extensions.label_studio_tools.core import label_config
 
 from label_studio.core.utils.exceptions import (
     LabelStudioValidationErrorSentryIgnored,
