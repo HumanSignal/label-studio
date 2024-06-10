@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-1097/review-in-quick-view'",
-  "commit": "f58ba0c61182d6005f05b8449829f74b1f66e6d8",
-  "date": "2024-06-10T11:44:42.000Z",
+  "message": "Fix linting",
+  "commit": "95b1e07df22242cafab5cf6c3813c2bc5ef7fb96",
+  "date": "2024-06-10T13:57:33.000Z",
   "branch": "fb-leap-1097/review-in-quick-view"
 }
