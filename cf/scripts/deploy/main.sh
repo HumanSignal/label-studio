@@ -21,23 +21,24 @@ if [[ $? -ne 0 ]]; then
 fi
 
 DOCKER_CONTAINER_REPOSITORY=391155498039.dkr.ecr.eu-north-1.amazonaws.com
-DOCKER_IMAGE_NAME="${DOCKER_CONTAINER_REPOSITORY}/${STAGE}-salmonvision"
+DOCKER_IMAGE_NAME="${DOCKER_CONTAINER_REPOSITORY}/${STAGE}-salmonvision-webapp"
 GIT_SHA=$(git rev-parse --short HEAD)
-DOCKER_IMAGE="${DOCKER_IMAGE_NAME}:${GIT_SHA}"
-DOCKER_TAG_LATEST="${DOCKER_IMAGE_NAME}:latest"
 
 echo "Deploying AWS infrastructure"
 "${project_root}"/cf/scripts/deploy/infra/main.sh
 
 echo "Building docker image"
-docker build -t "${DOCKER_IMAGE}" "${project_root}"
-docker tag "${DOCKER_IMAGE}" "${DOCKER_TAG_LATEST}"
+docker build \
+	-t "${DOCKER_IMAGE_NAME}:${GIT_SHA}" \
+	-t "${DOCKER_IMAGE_NAME}:latest" \
+	"${project_root}"
 
 echo "Logging into ECR"
 aws ecr get-login-password | docker login --username AWS --password-stdin ${DOCKER_CONTAINER_REPOSITORY}
 
 echo "Pushing to ECR"
-docker push "${DOCKER_IMAGE_NAME}"
+docker push "${DOCKER_IMAGE_NAME}:${GIT_SHA}"
+docker push "${DOCKER_IMAGE_NAME}:latest"
 
 echo "Deploying new environment code"
 "${project_root}"/cf/scripts/deploy/environment/main.sh
