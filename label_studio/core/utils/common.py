@@ -46,7 +46,9 @@ from django.utils.crypto import get_random_string
 from django.utils.module_loading import import_string
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
-from label_studio_sdk._extensions.label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
+from label_studio_sdk._extensions.label_studio_tools.core.utils.exceptions import (
+    LabelStudioXMLSyntaxErrorSentryIgnored,
+)
 from pkg_resources import parse_version
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
