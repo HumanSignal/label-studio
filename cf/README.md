@@ -3,6 +3,23 @@
 This folder contains a set of scripts and template to deploy Label Studio
 Community Edition to AWS.
 
+## Folder structure
+
+```txt
+.
+├── README.md                      <-- this README file
+├── docker-compose-dev.yml         <-- docker-compose.yml file for prod
+├── docker-compose-prod.yml        <-- docker-compose.yml file for env
+├── scripts                        <-- contains all scripts to deploy the cf templates
+│   ├── deploy
+│   └── utils
+└── templates                      <-- cf templates
+    ├── backend.yml                <-- label studio web app
+    ├── bucket_source_bundle.yml   <-- s3 bucket used by backend to store the docker-compose.yml
+    ├── ecr.yml                    <-- ECR creation of the salmonvision webapp and ML backends
+    └── edge_assets.yml            <-- S3 buckets and IAM users to upload video assets from edge devices located on site
+```
+
 ## AWS credentials
 
 Ask your AWS administrator to create a user and generate your API credentials.
