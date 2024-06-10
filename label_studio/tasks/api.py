@@ -17,7 +17,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.utils import swagger_auto_schema
+from drf_yasg.utils import no_body, swagger_auto_schema
 from projects.functions.stream_history import fill_history_annotation
 from projects.models import Project
 from rest_framework import generics, viewsets
@@ -25,6 +25,14 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from tasks.openapi_schema import (
+    annotation_request_schema,
+    annotation_response_example,
+    prediction_request_schema,
+    prediction_response_example,
+    task_request_schema,
+    task_response_example,
+)
 from tasks.serializers import (
     AnnotationDraftSerializer,
     AnnotationSerializer,
@@ -49,9 +57,15 @@ logger = logging.getLogger(__name__)
         tags=['Tasks'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Create task',
         operation_description='Create a new labeling task in Label Studio.',
-        request_body=TaskSerializer,
+        request_body=task_request_schema,
+        responses={
+            '201': openapi.Response(
+                description='Created task', schema=TaskSerializer, examples={'application/json': task_response_example}
+            )
+        },
     ),
 )
 @method_decorator(
@@ -64,6 +78,7 @@ logger = logging.getLogger(__name__)
             'offset': '$request.page',
             'results': '$response.tasks',
         },
+        x_fern_audiences=['public'],
         operation_summary='Get tasks list',
         operation_description="""
     Retrieve a list of tasks with pagination for a specific view or project, by using filters and ordering.
@@ -79,6 +94,26 @@ logger = logging.getLogger(__name__)
                 in_=openapi.IN_QUERY,
                 description='Resolve task data URIs using Cloud Storage',
             ),
+            openapi.Parameter(
+                name='fields',
+                type=openapi.TYPE_STRING,
+                enum=['all', 'task_only'],
+                default='task_only',
+                in_=openapi.IN_QUERY,
+                description='Set to "all" if you want to include annotations and predictions in the response',
+            ),
+            openapi.Parameter(
+                name='review',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description='Get tasks for review',
+            ),
+            openapi.Parameter(
+                name='include',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description='Specify which fields to include in the response',
+            ),
         ],
         responses={
             '200': openapi.Response(
@@ -93,6 +128,8 @@ logger = logging.getLogger(__name__)
                                 description='Task object',
                                 type=openapi.TYPE_OBJECT,
                                 # TODO: provide schema for DataManagerTaskSerializer
+                                # Right now the schema is defined in override.yml to ensure each item in paginated response is Task object derived from "#/components/schemas/Task"
+                                # We need to figure out more elegant way to define schema for DataManagerTaskSerializer to keep it in sync with Task object
                             ),
                         ),
                         'total': openapi.Schema(description='Total number of tasks', type=openapi.TYPE_INTEGER),
@@ -143,6 +180,7 @@ class TaskListAPI(DMTaskListAPI):
         tags=['Tasks'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get task',
         operation_description="""
         Get task data, metadata, annotations and other attributes for a specific labeling task by task ID.
@@ -150,6 +188,12 @@ class TaskListAPI(DMTaskListAPI):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
+        request_body=no_body,
+        responses={
+            '200': openapi.Response(
+                description='Task', schema=TaskSerializer, examples={'application/json': task_response_example}
+            )
+        },
     ),
 )
 @method_decorator(
@@ -158,12 +202,18 @@ class TaskListAPI(DMTaskListAPI):
         tags=['Tasks'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update task',
         operation_description='Update the attributes of an existing labeling task.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
-        request_body=TaskSimpleSerializer,
+        request_body=task_request_schema,
+        responses={
+            '200': openapi.Response(
+                description='Updated task', schema=TaskSerializer, examples={'application/json': task_response_example}
+            )
+        },
     ),
 )
 @method_decorator(
@@ -172,11 +222,13 @@ class TaskListAPI(DMTaskListAPI):
         tags=['Tasks'],
         x_fern_sdk_group_name='tasks',
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete task',
         operation_description='Delete a task in Label Studio. This action cannot be undone!',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='Task ID'),
         ],
+        request_body=no_body,
     ),
 )
 class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
@@ -283,6 +335,15 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_description='Retrieve a specific annotation for a task using the annotation result ID.',
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
+        request_body=no_body,
+        responses={
+            '200': openapi.Response(
+                description='Retrieved annotation',
+                schema=AnnotationSerializer,
+                examples={'application/json': annotation_response_example},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -291,9 +352,17 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update annotation',
         operation_description='Update existing attributes on an annotation.',
-        request_body=AnnotationSerializer,
+        request_body=annotation_request_schema,
+        responses={
+            '200': openapi.Response(
+                description='Updated annotation',
+                schema=AnnotationSerializer,
+                examples={'application/json': annotation_response_example},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -302,8 +371,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete annotation',
         operation_description="Delete an annotation. This action can't be undone!",
+        request_body=no_body,
     ),
 )
 class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
@@ -362,11 +433,20 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='Get all task annotations',
         operation_description='List all annotations for a task.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Task ID'),
         ],
+        request_body=no_body,
+        responses={
+            '200': openapi.Response(
+                description='Annotation',
+                schema=AnnotationSerializer(many=True),
+                examples={'application/json': [annotation_response_example]},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -375,6 +455,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         x_fern_sdk_group_name='annotations',
         x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Create annotation',
         operation_description="""
         Add annotations to a task like an annotator does. The content of the result field depends on your 
@@ -395,7 +476,14 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Task ID'),
         ],
-        request_body=AnnotationSerializer,
+        request_body=annotation_request_schema,
+        responses={
+            '201': openapi.Response(
+                description='Created annotation',
+                schema=AnnotationSerializer,
+                examples={'application/json': annotation_response_example},
+            )
+        },
     ),
 )
 class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
@@ -497,7 +585,6 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
 
 
 class AnnotationDraftListAPI(generics.ListCreateAPIView):
-
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
     permission_required = ViewClassPermission(
@@ -520,7 +607,6 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
 
 
 class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
-
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
     queryset = AnnotationDraft.objects.all()
@@ -539,9 +625,32 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Predictions'],
         x_fern_sdk_group_name='predictions',
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='List predictions',
         filter_inspectors=[DjangoFilterDescriptionInspector],
         operation_description='List all predictions and their IDs.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='task',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='Filter predictions by task ID',
+            ),
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='Filter predictions by project ID',
+            ),
+        ],
+        request_body=no_body,
+        responses={
+            '200': openapi.Response(
+                description='Predictions list',
+                schema=PredictionSerializer(many=True),
+                examples={'application/json': [prediction_response_example]},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -550,8 +659,17 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Predictions'],
         x_fern_sdk_group_name='predictions',
         x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Create prediction',
         operation_description='Create a prediction for a specific task.',
+        request_body=prediction_request_schema,
+        responses={
+            '201': openapi.Response(
+                description='Created prediction',
+                schema=PredictionSerializer,
+                examples={'application/json': prediction_response_example},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -560,11 +678,20 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Predictions'],
         x_fern_sdk_group_name='predictions',
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get prediction details',
         operation_description='Get details about a specific prediction by its ID.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
+        request_body=no_body,
+        responses={
+            '200': openapi.Response(
+                description='Prediction details',
+                schema=PredictionSerializer,
+                examples={'application/json': prediction_response_example},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -572,10 +699,19 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
     decorator=swagger_auto_schema(
         tags=['Predictions'],
         operation_summary='Put prediction',
+        x_fern_audiences=['internal'],
         operation_description='Overwrite prediction data by prediction ID.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
+        request_body=prediction_request_schema,
+        responses={
+            '200': openapi.Response(
+                description='Updated prediction',
+                schema=PredictionSerializer,
+                examples={'application/json': prediction_response_example},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -584,11 +720,20 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Predictions'],
         x_fern_sdk_group_name='predictions',
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update prediction',
         operation_description='Update prediction data by prediction ID.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
+        request_body=prediction_request_schema,
+        responses={
+            '200': openapi.Response(
+                description='Updated prediction',
+                schema=PredictionSerializer,
+                examples={'application/json': prediction_response_example},
+            )
+        },
     ),
 )
 @method_decorator(
@@ -597,11 +742,13 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Predictions'],
         x_fern_sdk_group_name='predictions',
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete prediction',
         operation_description='Delete a prediction by prediction ID.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_INTEGER, in_=openapi.IN_PATH, description='Prediction ID'),
         ],
+        request_body=no_body,
     ),
 )
 class PredictionAPI(viewsets.ModelViewSet):
@@ -625,6 +772,7 @@ class PredictionAPI(viewsets.ModelViewSet):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Annotations'],
+        x_fern_audiences=['internal'],
         operation_summary='Convert annotation to draft',
         operation_description='Convert annotation to draft',
     ),

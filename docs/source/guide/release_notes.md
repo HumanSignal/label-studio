@@ -19,9 +19,94 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
     Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade. 
 
 <div class="release-note"><button class="release-note-toggle"></button>
+<a name="2120md"></a>
+
+## Label Studio Enterprise 2.12.0
+
+<div class="onprem-highlight">New experimental Cache Labels action in the Data Manager, annotation history in snapshots, new setting to restrict local imports into Label Studio, and changes to how the Hide Storage Settings for Manager environment variable works. </div>
+
+*Jun 04, 2024*
+
+Helm Chart version: 1.4.8
+
+
+### Enhancements
+
+- There is a new experimental **Cache Labels** action available from the Data Manager. This action extracts labels from annotations or predictions and compiles that information into a new column in the Data Manager. You can then use this column for faster searching and filtering.
+
+    To enable experimental features, set the `EXPERIMENTAL_FEATURES` environment variable to `True`. However, note that experimental features are not fully supported.
+- When you create a new snapshot, you will now have the option to include annotation history:
+
+    ![Screenshot of the snapshot dialog](/images/releases/2_12_snapshot.png)
+- There is a new setting that can restrict users from uploading data directly to Label Studio, forcing them to only use cloud storage. If you would like to enable this setting, set the `DISABLE_PROJECT_IMPORTS` environment variable to `True`.
+- For organizations with the  `HIDE_STORAGE_SETTINGS_FOR_MANAGER` environment variable set to `True`, Managers will now be able to sync data from external storage as necessary rather than request assistance from an Admin user.
+
+### Security
+
+- Updated xml2js and Babel to avoid a vulnerabilities found in earlier versions.
+
+### Bug fixes
+
+- Fixed an issue in which users were allowed to submit empty annotations when using hotkeys, even though empty annotations were disabled via the **Allow empty annotations** project setting. 
+
+- Fixed an issue with button sizing inconsistency when selecting date ranges.
+
+- Fixed an issue where regions were disappearing when a user would switch between annotations and predictions.
+
+- Fixed an issue that prevented users from fetching the URL for TimeSeries objects.
+
+- Fixed an issue where, if there was no name provided for a cloud storage connection, the project settings page would not load.
+
+- Fixed an issue with environment variables that have the prefix `LABEL_STUDIO_` appearing in context logs.
+
+- Fixed an issue where errors were appearing in the user console related to loading large JS files.
+
+- Fixed an issue in which users who have their own organization could not be added to another organization using SCIM.
+
+- Fixed an issue where SCIM was not handling adding or disabling users in situations where the user limit was exceeded.
+
+- Fixed an issue where SCIM was creating duplicate users in situations in which there were discrepancies in casing used in their domain names.
+
+- Fixed an issue where logs were failing because the default level was set to `DEBUG`. The default log level is now `INFO`.
+
+- Fixed an issue in which the **Start Training** action for ML backends was sending the `PROJECT_UPDATE` webhook event instead of `START_TRAINING`.
+
+- Fixed an issue where the **Batch Predictions** action was failing under certain conditions.
+
+- Fixed an issue where tooltips on the dashboard were causing confusing mouseover behavior even when not visible.
+
+- Fixed an issue where multiple errors would appear in the console when users navigated away from the Data Manager.
+
+- Fixed an issue where the progress bar for projects was not properly accounting for tasks that required additional annotators due to low agreement settings.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="2111post2md"></a>
+
+## Label Studio Enterprise 2.11.1.post2
+
+<div class="onprem-highlight">Bug fix</div>
+
+*May 30, 2024*
+
+Helm Chart version: 1.4.8
+
+### Bug fixes
+- Fix Redis connection with SSL.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="2111post1md"></a>
 
-## Label Studio Enterprise 2.11.1-1
+## Label Studio Enterprise 2.11.1.post1
 
 <div class="onprem-highlight">Bug fix</div>
 
@@ -140,7 +225,7 @@ When you use this action, annotations from duplicated tasks are consolidated int
 </div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="2110post1md"></a>
 
-## Label Studio Enterprise 2.11.0-1
+## Label Studio Enterprise 2.11.0.post1
 
 <div class="onprem-highlight">Bug fix</div>
 
@@ -203,7 +288,7 @@ For more information, see [Project-level roles](#Project-level-roles).
 </div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="2101post2md"></a>
 
-## Label Studio Enterprise 2.10.1-2
+## Label Studio Enterprise 2.10.1.post2
 
 <div class="onprem-highlight">Bug fix</div>
 
@@ -222,7 +307,7 @@ Helm Chart version: 1.4.0
 </div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="2101post1md"></a>
 
-## Label Studio Enterprise 2.10.1-1
+## Label Studio Enterprise 2.10.1.post1
 
 <div class="onprem-highlight">Security-related fixes</div>
 
