@@ -1,0 +1,92 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: CloudFormation template to create the infrastructure to allow video asset uploads from the edge devices (RPis) located on sites
+
+Parameters:
+  Stage:
+    Description: The stage {prod, dev}
+    Type: String
+    MinLength: 1
+    MaxLength: 150
+
+Resources:
+  LabelStudioSourceBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-labelstudio-source"
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - "*"
+            AllowedMethods:
+              - GET
+            AllowedOrigins:
+              - "*"
+            ExposedHeaders:
+              - "x-amz-server-side-encryption"
+              - "x-amz-request-id"
+              - "x-amz-id-2"
+            MaxAge: 3001
+
+  LabelStudioTargetBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-labelstudio-target"
+      AccessControl: Private
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  EdgeUser:
+    Type: "AWS::IAM::User"
+    Properties:
+      UserName: !Sub "${Stage}-edge-user"
+
+  S3FullAccessPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: S3FullAccessPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "s3:*"
+            Resource:
+              - !Sub "arn:aws:s3:::${LabelStudioSourceBucket}"
+              - !Sub "arn:aws:s3:::${LabelStudioSourceBucket}/*"
+      Users:
+        - !Ref EdgeUser
+
+Outputs:
+  LabelStudioSourceBucketName:
+    Description: Name of the created S3 bucket to store source data from edge devices
+    Value: !Ref LabelStudioSourceBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-labelstudio-s3-source"
+
+  LabelStudioTargetBucketName:
+    Description: Name of the created S3 bucket to store target data from LabelStudio. Eg. Annotations and tasks.
+    Value: !Ref LabelStudioTargetBucket
+    Export:
+      Name: !Sub "${AWS::StackName}-labelstudio-s3-target"
+
+  EdgeUserName:
+    Description: Name of the edge IAM user
+    Value: !Ref EdgeUser

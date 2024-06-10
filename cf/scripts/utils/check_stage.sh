@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Util script to check whether the STAGE variable is set
+# Util script to check whether the STAGE variable is set. Useful when deploying cloudformation templates and ensuring that dev or prod is set.
 
 # Check if the STAGE variable is set
 if [[ -z "$STAGE" ]]; then

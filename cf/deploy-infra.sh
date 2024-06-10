@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# FIXME: remove
 # This script deploys the required infrastructure to run Salmon Vision.
 #
 # Currently, two cloudformation stacks are deployed:
@@ -59,7 +60,20 @@ if [ "$validation_status" -ne 0 ]; then
 	exit 1
 fi
 
-# # 2. Backend template
+# 2. Edge Assets
+#
+aws cloudformation validate-template \
+	--template-body file://"${project_root}"/cf/templates/edge_assets.yml \
+	--no-cli-pager
+validation_status=$?
+
+# Check if the command was successful
+if [ "$validation_status" -ne 0 ]; then
+	echo "Template validation failed"
+	exit 1
+fi
+
+# 3. Backend template
 
 aws cloudformation validate-template \
 	--template-body file://"${project_root}"/cf/templates/backend.yml \
@@ -91,11 +105,19 @@ aws cloudformation deploy \
 	--parameter-overrides BucketName="${SOURCE_BUNDLE_BUCKET_NAME}" \
 	--capabilities CAPABILITY_IAM
 
-# # Uploading the docker-compose file in the provisioned bucket
+# Uploading the docker-compose file in the provisioned bucket
 aws s3 cp "${project_root}"/cf/docker-compose-"${STAGE}".yml s3://"${SOURCE_BUNDLE_BUCKET_NAME}"/docker-compose.yml
 
-# # Backend template
-# # ----------------
+# 2. Edge Assets
+
+# aws cloudformation deploy \
+# 	--template-file ./cf/templates/edge_assets.yml \
+# 	--stack-name prod-salmonvision-edge-assets \
+# 	--parameter-overrides Stage="${STAGE}" \
+# 	--capabilities CAPABILITY_NAMED_IAM
+
+# 3. Backend template
+# ----------------
 
 # Note: set --change-set-type CREATE if you need to recreate from scratch
 create_output=$(

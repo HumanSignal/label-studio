@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# FIXME: remove
 # This script runs a full deployment of SalmonVision
 # It requires that the STAGE variable is set to either prod or dev
 # It does the following:
@@ -11,9 +10,9 @@
 
 set -x
 
-project_root="$(dirname "${BASH_SOURCE[0]}")/.."
+project_root="$(dirname "${BASH_SOURCE[0]}")/../../.."
 
-"${project_root}"/cf/check_stage.sh
+"${project_root}"/cf/scripts/utils/check_stage.sh
 
 # Check the exit status of the external script
 if [[ $? -ne 0 ]]; then
@@ -28,7 +27,11 @@ DOCKER_IMAGE="${DOCKER_IMAGE_NAME}:${GIT_SHA}"
 DOCKER_TAG_LATEST="${DOCKER_IMAGE_NAME}:latest"
 
 echo "Deploying AWS infrastructure"
-"${project_root}"/cf/deploy-infra.sh
+"${project_root}"/cf/scripts/deploy/infra/ecr.sh
+"${project_root}"/cf/scripts/deploy/infra/edge_assets.sh
+"${project_root}"/cf/scripts/deploy/infra/bucket_source_bundle.sh
+# Note: the backend stack should be deployed last
+"${project_root}"/cf/scripts/deploy/infra/backend.sh
 
 echo "Building docker image"
 docker build -t "${DOCKER_IMAGE}" "${project_root}"
@@ -41,4 +44,4 @@ echo "Pushing to ECR"
 docker push "${DOCKER_IMAGE_NAME}"
 
 echo "Deploying new environment code"
-"${project_root}"/cf/deploy-environment.sh
+"${project_root}"/cf/scripts/deploy/environment/main.sh

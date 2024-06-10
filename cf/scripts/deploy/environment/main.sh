@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 
-# FIXME: remove
 # This script triggers an elastic beanstalk environment deploy.
 # It pulls the latest docker image from the ECR and redeploys it on the EC2 instances.
 # It requires that the STAGE variable is set to either prod or dev
 
 set -x
 
-project_root="$(dirname "${BASH_SOURCE[0]}")/.."
+project_root="$(dirname "${BASH_SOURCE[0]}")/../../../.."
 
-"${project_root}"/cf/check_stage.sh
+"${project_root}"/cf/scripts/utils/check_stage.sh
 
 # Check the exit status of the external script
 if [[ $? -ne 0 ]]; then
