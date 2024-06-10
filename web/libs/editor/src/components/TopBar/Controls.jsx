@@ -1,3 +1,7 @@
+/**
+ * @deprecated It was used only without FF_3873 in old interface.
+ */
+
 import { inject, observer } from "mobx-react";
 import { Button } from "../../common/Button/Button";
 import { Tooltip } from "../../common/Tooltip/Tooltip";

@@ -43,6 +43,9 @@ logger = logging.getLogger(__name__)
     decorator=swagger_auto_schema(
         tags=['Export'],
         operation_summary='Get export formats',
+        x_fern_sdk_group_name=['projects', 'exports'],
+        x_fern_sdk_method_name='list_formats',
+        x_fern_audiences=['public'],
         operation_description='Retrieve the available export formats for the current project by ID.',
         manual_parameters=[
             openapi.Parameter(
@@ -80,6 +83,9 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='create_export',
+        x_fern_audiences=['public'],
         manual_parameters=[
             openapi.Parameter(
                 name='export_type',
@@ -264,6 +270,9 @@ class ProjectExportFilesAuthCheck(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
+        x_fern_sdk_group_name=['projects', 'exports'],
+        x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='List all export snapshots',
         operation_description="""
         Returns a list of exported files for a specific project by ID.
@@ -283,6 +292,9 @@ class ProjectExportFilesAuthCheck(APIView):
     decorator=swagger_auto_schema(
         tags=['Export'],
         operation_summary='Create new export snapshot',
+        x_fern_sdk_group_name=['projects', 'exports'],
+        x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_description="""
         Create a new export request to start a background task and generate an export file for a specific project by ID.
         """,
@@ -354,6 +366,9 @@ class ExportListAPI(generics.ListCreateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
+        x_fern_sdk_group_name=['projects', 'exports'],
+        x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get export snapshot by ID',
         operation_description="""
         Retrieve information about an export file by export ID for a specific project.
@@ -378,6 +393,9 @@ class ExportListAPI(generics.ListCreateAPIView):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Export'],
+        x_fern_sdk_group_name=['projects', 'exports'],
+        x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete export snapshot',
         operation_description="""
         Delete an export file by specified export ID.
@@ -442,6 +460,9 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Export'],
+        x_fern_sdk_group_name=['projects', 'exports'],
+        x_fern_sdk_method_name='download',
+        x_fern_audiences=['public'],
         operation_summary='Download export snapshot as file in specified format',
         operation_description="""
         Download an export file in the specified format for a specific project. Specify the project ID with the `id`
@@ -590,6 +611,9 @@ def set_convert_background_failure(job, connection, type, value, traceback_obj):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Export'],
+        x_fern_sdk_group_name=['projects', 'exports'],
+        x_fern_sdk_method_name='convert',
+        x_fern_audiences=['public'],
         operation_summary='Export conversion',
         operation_description="""
         Convert export snapshot to selected format

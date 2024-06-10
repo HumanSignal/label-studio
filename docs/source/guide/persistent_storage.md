@@ -2,11 +2,11 @@
 title: Set up persistent storage
 type: guide
 tier: all
-order: 85
-order_enterprise: 475
+order: 87
+order_enterprise: 87
 meta_title: Set up persistent storage with Label Studio
 meta_description: Configure persistent storage with Label Studio hosted in the cloud to store uploaded data such as task data, user images, and more.
-section: "Install"
+section: "Install & Setup"
 ---
 
 If you host Label Studio in the cloud, you want to set up persistent storage for uploaded task data, user images, and more in the same cloud service as your deployment.
@@ -77,7 +77,6 @@ Select the relevant tab and follow the steps for your desired option:
 
 1. Follow the steps to [create an IAM role and policy for your service account](https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html) in the Amazon EKS User Guide.
 2. Use the following IAM Policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
-
 ```json
 {
   "Version": "2012-10-17",
@@ -114,7 +113,6 @@ Select the relevant tab and follow the steps for your desired option:
    - Retrieve the Role arn for the next step.
 4. After you create an IAM role, add it as an annotation in your `ls-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
-
 ```yaml
 global:
   persistence:
@@ -143,7 +141,6 @@ rqworker:
 1. Create an IAM user with **Programmatic access**. See [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) in the AWS Identity and Access Management User Guide.
 2. When creating the user, for the **Set permissions** option, choose to **Attach existing policies directly**.
 3. Select **Create policy** and attach the following policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
-
 ```json
 {
   "Version": "2012-10-17",
@@ -175,7 +172,6 @@ rqworker:
 4. After you create the user, save the username and access key somewhere secure.
 5. Update your `ls-values.yaml` file with your newly-created access key ID and secret key as `<YOUR_ACCESS_KEY_ID>` and `<YOUR_SECRET_ACCESS_KEY>`.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
-
 ```yaml
 global:
   persistence:
@@ -195,12 +191,10 @@ global:
 
 
 1. Create a Kubernetes secret with your AWS access keys:
-
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-literal=accesskey=<YOUR_ACCESS_KEY_ID> --from-literal=secretkey=<YOUR_SECRET_ACCESS_KEY>
 ```
 2. Update your `ls-values.yaml` file with your newly-created kubernetes secret:
-
 ```yaml
 global:
   persistence:
@@ -226,7 +220,6 @@ To create an IAM role without using OIDC in EKS, follow these steps.
 2. Select the name of `YOUR_NODE_GROUP` with Label Studio deployed.
 3. On the **Details** page, locate and select the option for Node IAM Role ARN and choose to **Attach existing policies directly**.
 3. Select **Create policy** and attach the following policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
-
 ```json
 {
   "Version": "2012-10-17",
@@ -257,7 +250,6 @@ To create an IAM role without using OIDC in EKS, follow these steps.
 
 4. After you add an IAM policy, configure your `ls-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
-
 ```yaml
 global:
   persistence:
@@ -277,7 +269,6 @@ global:
 1. Create an IAM user with **Programmatic access**. See [Creating an IAM user in your AWS account](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html) in the AWS Identity and Access Management User Guide.
 2. When creating the user, for the **Set permissions** option, choose to **Attach existing policies directly**.
 3. Select **Create policy** and attach the following policy, replacing `<YOUR_S3_BUCKET>` with the name of your bucket:
-
 ```json
 {
   "Version": "2012-10-17",
@@ -308,7 +299,6 @@ global:
 
 4. After you create the user, save the username and access key somewhere secure.
 5. Update your `env.list` file, replacing `<YOUR_ACCESS_KEY_ID>` and `<YOUR_SECRET_ACCESS_KEY>` with your newly-created access key ID and secret key. Optionally, you can specify a folder using `STORAGE_AWS_FOLDER` (default is `""` or omit this argument):
-
 ```shell
 STORAGE_TYPE=s3
 STORAGE_AWS_ACCESS_KEY_ID="<YOUR_ACCESS_KEY_ID>"
@@ -376,7 +366,6 @@ After you create a bucket and set up IAM permissions, connect Label Studio to yo
     Make sure that Workload Identity is enabled on your GKE cluster and that you meet the necessary prerequisites. See [Using Workload Identity](https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity) in the Google Kubernetes Engine guide.
 
 1. Set up the following environment variables, specifying the service account you created as the `GCP_SA` variable, and replacing the other references in `<>` as needed:
-
 ```shell
 GCP_SA=<Service-Account-You-Created>
 APP_SA="serviceAccount:<GCP_PROJECT_ID>.svc.id.goog[<K8S_NAMESPACE>/<HELM_RELEASE_NAME>-lse-app]"
@@ -384,7 +373,6 @@ WORKER_SA="serviceAccount:<GCP_PROJECT_ID>.svc.id.goog[<K8S_NAMESPACE>/<HELM_REL
 ```
 
 2. Create an IAM policy binding between the Kubernetes service account on your cluster and the GCS service account you created, allowing the K8s service account for the Label Studio app and the related rqworkers to impersonate the other service account. From the command line, run the following:
-
 ```shell
 gcloud iam service-accounts add-iam-policy-binding ${GCP_SA} \
     --role roles/iam.workloadIdentityUser \
@@ -396,7 +384,6 @@ gcloud iam service-accounts add-iam-policy-binding ${GCP_SA} \
 
 3. After binding the service accounts, update your `ls-values.yaml` file to include the values for the service account and other configurations. Update the `projectID`, `bucket`, and replace the`<GCP_SERVICE_ACCOUNT>` with the relevant values for your deployment.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
-
 ```yaml
 global:
   persistence:
@@ -425,9 +412,9 @@ You can use a service account key that you create, or if you already have a Kube
 
 #### Create a new service account key
 1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
+
 2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `ls-values.yaml` file.
    Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
-
 ```yaml
 global:
   persistence:
@@ -444,12 +431,11 @@ global:
 #### Use an existing Kubernetes secret and key
 
 1. Create a Kubernetes secret with your GCS service account JSON file, replacing `<PATH_TO_JSON>` with the path to the service account JSON file:
-
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-file=key_json=<PATH_TO_JSON>
 ```
-2. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
 
+2. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
 ```yaml
 global:
    persistence:
@@ -463,14 +449,12 @@ global:
             bucket: "<YOUR_BUCKET_NAME>"
 ```
 
-  </div>
-
-  <div data-name="Docker Compose">
+</div>
+<div data-name="Docker Compose">
 
 1. Create a service account key from the UI and download the JSON. Follow the steps for [Creating and managing service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) in the Google Cloud Identity and Access Management guide.
 2. After downloading the JSON for the service account key, update or create references to the JSON, your projectID, and your bucket in your `env.list` file.
    Optionally, you can choose a folder by specifying `STORAGE_GCS_FOLDER` (default is `""` or omit this argument):
-
 ```shell
 STORAGE_TYPE=gcs
 STORAGE_GCS_BUCKET_NAME="<YOUR_BUCKET_NAME>"
@@ -480,12 +464,13 @@ GOOGLE_APPLICATION_CREDENTIALS="/opt/heartex/secrets/key.json"
 ```
 
 3. Place the downloaded JSON file from step 1 in the same directory as your `env.list` file.
-4. Append the following entry in `docker-compose.yml` file as the path for `app.volumes`:
 
+4. Append the following entry in `docker-compose.yml` file as the path for `app.volumes`:
 ```yaml
 - ./service-account-file.json:/opt/heartex/secrets/key.json:ro
 ```
-  </div>
+
+</div>
 </div>
 
 
@@ -501,13 +486,11 @@ Create a Microsoft Azure Storage container to use as persistent storage with Lab
     Make sure that you set **Stock Keeping Unit (SKU)** to `Premium_LRS` and the **kind** parameter to `BlockBlobStorage`. This configuration results in storage that uses solid state drives (SSDs) rather than standard hard disk drives (HDDs). If you set this parameter to an HDD-based storage option, your instance might be too slow and could malfunction.
 
 2. Find the generated key in the **Storage accounts > Access keys** section in the [Azure Portal](https://portal.azure.com/) or by running the following command:
-
 ```shell
 az storage account keys list --account-name=${STORAGE_ACCOUNT}
 ```
 
 3. Create a storage container within your storage account by following the steps to [Upload, download, and list blobs with the Azure portal](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-portal) in the Microsoft Azure product documentation, or run the following command:
-
 ```shell
 az storage container create --name <YOUR_CONTAINER_NAME> \
           --account-name <YOUR_STORAGE_ACCOUNT> \
@@ -520,7 +503,6 @@ az storage container create --name <YOUR_CONTAINER_NAME> \
     In the case if you're going to use direct file upload feature and store media files like audio, video, csv you should complete this step.
 
 Set up CORS access to your bucket. See [Configuring cross-origin resource sharing (CORS)](https://docs.microsoft.com/en-us/rest/api/storageservices/cross-origin-resource-sharing--cors--support-for-the-azure-storage-services#enabling-cors-for-azure-storage) in the Azure User Guide. Use or modify the following example:
-
 ```xml
 <Cors>
     <CorsRule>
@@ -542,7 +524,6 @@ You can connect Label Studio to your Azure container using account keys in Kuber
 
 Update your `ls-values.yaml` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created.
 Optionally, you can choose a folder by specifying `folder` (default is `""` or omit this argument):
-
 ```yaml
 global:
   persistence:
@@ -558,12 +539,10 @@ global:
 
 If you have an existing key, you can use that instead to create a Kubernetes secret.
 1. Create a Kubernetes secret with your Azure access key:
-
 ```shell
 kubectl create secret generic <YOUR_SECRET_NAME> --from-literal=storageaccountname=<YOUR_STORAGE_ACCOUNT> --from-literal=storageaccountkey=<YOUR_STORAGE_KEY>
 ```
 2. Update your `ls-values.yaml` file with your newly-created Kubernetes secret:
-
 ```yaml
 global:
    persistence:
@@ -584,7 +563,6 @@ global:
 
 Update your `env.list` file with the `YOUR_CONTAINER_NAME`, `YOUR_STORAGE_ACCOUNT`, and `YOUR_STORAGE_KEY` that you created.
 Optionally, you can choose a folder by specifying `STORAGE_AZURE_FOLDER` (default is `""` or omit this argument):
-
 ```shell
 STORAGE_TYPE=azure
 STORAGE_AZURE_ACCOUNT_NAME="<YOUR_STORAGE_ACCOUNT>"

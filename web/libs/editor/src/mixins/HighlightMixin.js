@@ -156,6 +156,10 @@ export const HighlightMixin = types
       }
     },
 
+    clearSpans() {
+      self._spans = null;
+    },
+
     /**
      * Removes current highlights
      */

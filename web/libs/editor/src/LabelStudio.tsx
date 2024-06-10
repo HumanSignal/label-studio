@@ -158,6 +158,7 @@ export class LabelStudio {
         this.store.selfDestroy();
       }
       destroy(this.store);
+      Hotkey.unbindAll();
       if (isFF(FF_LSDV_4620_3_ML)) {
         /*
             ...

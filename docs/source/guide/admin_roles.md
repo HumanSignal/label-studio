@@ -4,10 +4,10 @@ short: Roles and permissions
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 368
+order_enterprise: 375
 meta_title: User roles and permissions
 meta_description: A description of the user roles and permissions available in Label Studio Enterprise. 
-section: "Administration"
+section: "Manage Your Organization"
 parent: "manage_users"
 parent_enterprise: "manage_users"
 date: 2024-02-05 17:19:21

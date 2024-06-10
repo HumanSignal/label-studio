@@ -3,11 +3,11 @@ title: Write your own ML backend
 short: Write your own ML backend
 type: guide
 tier: all
-order: 360
-order_enterprise: 310
+order: 254
+order_enterprise: 254
 meta_title: Write your own ML backend
 meta_description: Set up your machine learning model to output and consume predictions in your data science and data labeling projects. 
-section: "Machine learning"
+section: "Machine Learning"
 
 ---
 

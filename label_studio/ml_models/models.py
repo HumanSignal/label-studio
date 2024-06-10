@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviderConnection
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
-from tasks.models import Prediction
+from tasks.models import Annotation, Prediction
 
 
 def validate_string_list(value):
@@ -110,6 +110,7 @@ class ModelRun(models.Model):
     class ProjectSubset(models.TextChoices):
         ALL = 'All', _('All')
         HASGT = 'HasGT', _('HasGT')
+        SAMPLE = 'Sample', _('Sample')
 
     class FileType(models.TextChoices):
         INPUT = 'Input', _('Input')
@@ -157,25 +158,19 @@ class ModelRun(models.Model):
 
     completed_at = models.DateTimeField(_('completed at'), null=True, default=None)
 
-    # todo may need to clean up in future
-    @property
-    def input_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input.csv'
-
-    @property
-    def output_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/output.csv'
-
-    @property
-    def error_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
-
     def delete_predictions(self):
         """
         Deletes any predictions that have originated from a ModelRun
-        """
 
-        Prediction.objects.filter(model_run=self.id).delete()
+        Executing a raw SQL query here for speed. This ignores any foreign key relationships
+        so if another model has a Prediction fk and set to on_delete=CASCADE for example,
+        it will not take affect. The only relationship like this that currently exists
+        is in Annotation.parent_prediction, which we are handling here
+        """
+        predictions = Prediction.objects.filter(model_run=self.id)
+        prediction_ids = [p.id for p in predictions]
+        Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
+        predictions._raw_delete(predictions.db)
 
     def delete(self, *args, **kwargs):
         """

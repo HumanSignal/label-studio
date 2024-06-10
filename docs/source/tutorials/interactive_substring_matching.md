@@ -1,8 +1,10 @@
 ---
 title: Interactive substring matching for NER tasks
-type: blog
+type: guide
 tier: all
 order: 30
+hide_menu: true
+hide_frontmatter_title: true
 meta_title: Interactive substring matching for NER tasks
 meta_description: Use the interactive substring matching model for labeling NER tasks in Label Studio
 categories:

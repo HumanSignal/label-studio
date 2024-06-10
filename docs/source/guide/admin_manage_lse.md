@@ -4,10 +4,10 @@ short: Manage user accounts
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 365
+order_enterprise: 372
 meta_title: Manage user accounts
 meta_description: How to assign users to roles, delete users, deactivate users
-section: "Administration"
+section: "Manage Your Organization"
 parent: "manage_users"
 parent_enterprise: "manage_users"
 date: 2024-02-06 12:00:25
