@@ -43,6 +43,24 @@ STAGE=dev ./cf/scripts/deploy/main.sh
 The progress of the deployment can be tracked from the AWS Console under the
 Cloudformation and ElasticBeanstalk services.
 
+### Infrastructure
+
+To deploy the infrastructure only, run the following command:
+
+```sh
+STAGE=dev ./cf/scripts/deploy/infra/main.sh
+```
+
+If you want to deploy only a specific component of the infrastructure, it can
+be achieved by running the following scripts:
+
+```sh
+STAGE=dev ./cf/scripts/deploy/infra/backend.sh
+STAGE=dev ./cf/scripts/deploy/infra/bucket_source_bundle.sh
+STAGE=dev ./cf/scripts/deploy/infra/ecr.sh
+STAGE=dev ./cf/scripts/deploy/infra/edge_assets.sh
+```
+
 ### Trigger ElasticBeanstalk Environment update
 
 To trigger an environment update, run the following command:

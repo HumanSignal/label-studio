@@ -27,11 +27,7 @@ DOCKER_IMAGE="${DOCKER_IMAGE_NAME}:${GIT_SHA}"
 DOCKER_TAG_LATEST="${DOCKER_IMAGE_NAME}:latest"
 
 echo "Deploying AWS infrastructure"
-"${project_root}"/cf/scripts/deploy/infra/ecr.sh
-"${project_root}"/cf/scripts/deploy/infra/edge_assets.sh
-"${project_root}"/cf/scripts/deploy/infra/bucket_source_bundle.sh
-# Note: the backend stack should be deployed last
-"${project_root}"/cf/scripts/deploy/infra/backend.sh
+"${project_root}"/cf/scripts/deploy/infra/main.sh
 
 echo "Building docker image"
 docker build -t "${DOCKER_IMAGE}" "${project_root}"
