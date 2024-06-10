@@ -28,11 +28,66 @@ from tasks.models import Annotation, Prediction, Task
 
 logger = logging.getLogger(__name__)
 
+_view_request_body = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'data': openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            description='Custom view data',
+            properties={
+                'filters': openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    description='Filters for the view',
+                    properties={
+                        'conjunction': openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description='Type of conjunction',
+                            enum=['and', 'or'],
+                        ),
+                        'items': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            description='Filter items',
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                properties={
+                                    'filter': openapi.Schema(type=openapi.TYPE_STRING, description='Field name'),
+                                    'type': openapi.Schema(type=openapi.TYPE_STRING, description='Field type'),
+                                    'operator': openapi.Schema(
+                                        type=openapi.TYPE_STRING, description='Filter operator'
+                                    ),
+                                    'value': openapi.Schema(type=openapi.TYPE_STRING, description='Filter value'),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+                'ordering': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    description='Ordering for the view',
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'column': openapi.Schema(type=openapi.TYPE_STRING, description='Field name'),
+                            'direction': openapi.Schema(
+                                type=openapi.TYPE_STRING, description='Order direction', enum=['asc', 'desc']
+                            ),
+                        },
+                    ),
+                ),
+            },
+        ),
+        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
+    },
+)
+
 
 @method_decorator(
     name='list',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_sdk_group_name='views',
+        x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='List views',
         operation_description='List all views for a specific project.',
         manual_parameters=[
@@ -46,14 +101,22 @@ logger = logging.getLogger(__name__)
     name='create',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_sdk_group_name='views',
+        x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Create view',
         operation_description='Create a view for a specific project.',
+        request_body=_view_request_body,
+        responses={201: ViewSerializer},
     ),
 )
 @method_decorator(
     name='retrieve',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_sdk_group_name='views',
+        x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get view details',
         operation_description='Get the details about a specific view in the data manager',
         manual_parameters=[
@@ -65,8 +128,10 @@ logger = logging.getLogger(__name__)
     name='update',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_audiences=['internal'],
         operation_summary='Put view',
         operation_description='Overwrite view data with updated filters and other information for a specific project.',
+        request_body=_view_request_body,
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='View ID'),
         ],
@@ -76,17 +141,25 @@ logger = logging.getLogger(__name__)
     name='partial_update',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_sdk_group_name='views',
+        x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update view',
         operation_description='Update view data with additional filters and other information for a specific project.',
         manual_parameters=[
             openapi.Parameter(name='id', type=openapi.TYPE_STRING, in_=openapi.IN_PATH, description='View ID'),
         ],
+        request_body=_view_request_body,
+        responses={200: ViewSerializer},
     ),
 )
 @method_decorator(
     name='destroy',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_sdk_group_name='views',
+        x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete view',
         operation_description='Delete a specific view by ID.',
         manual_parameters=[
@@ -111,8 +184,11 @@ class ViewAPI(viewsets.ModelViewSet):
 
     @swagger_auto_schema(
         tags=['Data Manager'],
-        operation_summary='Reset project views',
-        operation_description='Reset all views for a specific project.',
+        x_fern_sdk_group_name='views',
+        x_fern_sdk_method_name='delete_all',
+        x_fern_audiences=['public'],
+        operation_summary='Delete all project views',
+        operation_description='Delete all views for a specific project',
         request_body=ViewResetSerializer,
     )
     @action(detail=False, methods=['delete'])
@@ -289,6 +365,7 @@ class TaskListAPI(generics.ListCreateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_audiences=['internal'],
         operation_summary='Get data manager columns',
         operation_description='Retrieve the data manager columns available for the tasks in a specific project.',
     ),
@@ -309,6 +386,7 @@ class ProjectColumnsAPI(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_audiences=['internal'],
         operation_summary='Get project state',
         operation_description='Retrieve the project state for the data manager.',
     ),
@@ -341,6 +419,9 @@ class ProjectStateAPI(APIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_sdk_group_name='actions',
+        x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='Get actions',
         operation_description='Retrieve all the registered actions with descriptions that data manager can use.',
     ),
@@ -349,6 +430,9 @@ class ProjectStateAPI(APIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Data Manager'],
+        x_fern_sdk_group_name='actions',
+        x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Post actions',
         operation_description='Perform an action with the selected items from a specific view.',
     ),

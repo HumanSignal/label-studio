@@ -169,6 +169,7 @@ def samples_paragraphs(request):
     return HttpResponse(json.dumps(result), content_type='application/json')
 
 
+@swagger_auto_schema(methods=['GET'], auto_schema=None)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def localfiles_data(request):
