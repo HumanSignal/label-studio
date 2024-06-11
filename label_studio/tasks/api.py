@@ -120,7 +120,8 @@ logger = logging.getLogger(__name__)
                 in_=openapi.IN_QUERY,
                 description='Additional query to filter tasks. It must be JSON encoded string of dict containing '
                 'one of the following parameters: `{"filters": ..., "selectedItems": ..., "ordering": ...}`\n\n'
-                '* **filters**: dict with "conjunction": str ("or" / "and") and "items": list of filters. Each filter is a dictionary with keys: `"filter"`, `"operator"`, `"type"`, `"value"`. '
+                '* **filters**: dict with `"conjunction"` string (`"or"` or `"and"`) and list of filters in `"items"` array. '
+                'Each filter is a dictionary with keys: `"filter"`, `"operator"`, `"type"`, `"value"`. '
                 '[Read more about available filters](https://labelstud.io/sdk/data_manager.html)<br/>'
                 '                   Example: `{"conjunction": "or", "items": [{"filter": "filter:tasks:completed_at", "operator": "greater", "type": "Datetime", "value": "2021-01-01T00:00:00.000Z"}]}`\n'
                 '* **selectedItems**: dictionary with keys: `"all"`, `"included"`, `"excluded"`. If "all" is `false`, `"included"` must be used. If "all" is `true`, `"excluded"` must be used.<br/>'
