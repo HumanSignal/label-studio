@@ -86,7 +86,7 @@ class CompletedByDMSerializer(UserSerializer):
 class AnnotationSerializer(FlexFieldsModelSerializer):
     """ """
 
-    result = AnnotationResultField()
+    result = AnnotationResultField(required=False)
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
     completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
@@ -609,7 +609,7 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
 
 
 class AnnotationDraftSerializer(ModelSerializer):
-    result = AnnotationResultField()
+
     user = serializers.CharField(default=serializers.CurrentUserDefault())
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
