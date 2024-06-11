@@ -35,7 +35,6 @@ import { isDefined, sortAnnotations } from "../../utils/utilities";
  * Components
  */
 import { Annotation } from "./Annotation";
-import { AnnotationTab } from "../AnnotationTab/AnnotationTab";
 import { BottomBar } from "../BottomBar/BottomBar";
 import Debug from "../Debug";
 import Grid from "./Grid";
@@ -257,7 +256,7 @@ class App extends Component {
               showingBottomBar: newUIEnabled,
             }}
           >
-            {outlinerEnabled ? (
+            {true && (
               newUIEnabled ? (
                 <SideTabsPanels
                   panelsHidden={viewingAll}
@@ -278,20 +277,6 @@ class App extends Component {
                   {mainContent}
                 </SidePanels>
               )
-            ) : (
-              <>
-                {mainContent}
-
-                {viewingAll === false && (
-                  <Block name="menu" mod={{ bsp: settings.bottomSidePanel }}>
-                    {store.hasInterface("side-column") && (
-                      <AnnotationTab store={store} />
-                    )}
-                  </Block>
-                )}
-
-                {newUIEnabled && store.hasInterface("topbar") && <BottomBar store={store} />}
-              </>
             )}
           </Block>
         </Provider>
