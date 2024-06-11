@@ -59,7 +59,7 @@ export const Controls = controlsInjector(
         if (addedCommentThisSession) {
           selected?.submissionInProgress();
           callback();
-        } else if (Object.keys(currentComment).length > 0) {
+        } else if (currentComment[annotation.id]?.trim()) {
           e.preventDefault();
           selected?.submissionInProgress();
           await commentFormSubmit();
