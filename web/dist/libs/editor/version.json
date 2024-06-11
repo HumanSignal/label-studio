@@ -1,6 +1,6 @@
 {
-  "message": "add tests for empty message",
-  "commit": "c830faf271d1c8cb7501c29b88883619763c9837",
-  "date": "2024-06-11T22:00:14.000Z",
+  "message": "add more comments to check if it's working even with comments from another annotations",
+  "commit": "e57f5c666f46d762363b4d4aaf5e7f40fc10e3ae",
+  "date": "2024-06-11T22:05:48.000Z",
   "branch": "fb-leap-1123"
 }
