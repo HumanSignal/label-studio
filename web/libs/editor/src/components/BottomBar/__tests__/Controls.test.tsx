@@ -11,8 +11,8 @@ const mockStore = {
   skipTask: jest.fn(),
   commentStore: {
     currentComment: {
-      'a3r0f':'Its working',
-      'a0lsu':'Its working fine',
+      a3r0fa: "It's working",
+      a0lsuf: "It's working fine",
     },
     commentFormSubmit: jest.fn(),
     setTooltipMessage: jest.fn(),
@@ -32,7 +32,7 @@ const mockHistory = {
 };
 
 const mockAnnotation = {
-  id:'a31wsd',
+  id: "a31wsd",
   canBeReviewed: false,
   userGenerate: false,
   sentUserGenerate: false,
@@ -61,7 +61,7 @@ describe("Controls", () => {
 
   test("When skip button is clicked, but there is an empty message on currentComment and annotators must leave a comment on skip, it must not submit and setToolTipMessage", () => {
     mockStore.hasInterface = (a: string) => (a === "skip" || a === "comments:skip") ?? true;
-    mockStore.commentStore.currentComment['a31wsd'] = '   ';
+    mockStore.commentStore.currentComment.a31wsd = "   ";
 
     const { getByLabelText } = render(
       <Provider store={mockStore}>
