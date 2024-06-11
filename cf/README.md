@@ -1,7 +1,7 @@
 # Infrastructure on AWS
 
-This folder contains a set of scripts and template to deploy Label Studio
-Community Edition to AWS.
+This folder contains a set of scripts and templates to deploy Salmon Vision
+(based on Label Studio Community Edition) to AWS.
 
 ## Folder structure
 
