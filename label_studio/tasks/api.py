@@ -114,6 +114,18 @@ logger = logging.getLogger(__name__)
                 in_=openapi.IN_QUERY,
                 description='Specify which fields to include in the response',
             ),
+            openapi.Parameter(
+                name='query',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description='Additional query to filter tasks. It must be JSON encoded string of dict containing '
+                'one of the following parameters: \n\n'
+                '- "filters": list of filters, each filter is a dictionary with keys: "filter", "operator", "type", "value". '
+                '             Example: [{"filter": "filter:completed_at", "operator": "gt", "type": "datetime", "value": "2021-01-01T00:00:00.000Z"}] \n'
+                '- "selectedItems": dictionary with keys: "all", "included", "excluded". '
+                '             Example: {"all": false, "included": [1, 2, 3], "excluded": [4, 5]} \n'
+                '- "ordering": list of fields to order by. Example: ["completed_at"]',
+            ),
         ],
         responses={
             '200': openapi.Response(
