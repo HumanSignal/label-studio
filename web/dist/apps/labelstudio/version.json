@@ -1,6 +1,6 @@
 {
-  "message": "add more comments to check if it's working even with comments from another annotations",
-  "commit": "e57f5c666f46d762363b4d4aaf5e7f40fc10e3ae",
-  "date": "2024-06-11T22:05:48.000Z",
+  "message": "fix biome",
+  "commit": "a87345c69cf7a8d3056bf6d00ab6ff7a4ce7d34e",
+  "date": "2024-06-11T22:10:21.000Z",
   "branch": "fb-leap-1123"
 }
