@@ -120,11 +120,11 @@ logger = logging.getLogger(__name__)
                 in_=openapi.IN_QUERY,
                 description='Additional query to filter tasks. It must be JSON encoded string of dict containing '
                 'one of the following parameters: `{"filters": ..., "selectedItems": ..., "ordering": ...}`\n\n'
-                '* **filters**: list of filters, each filter is a dictionary with keys: "filter", "operator", "type", "value".<br/>'
-                '                   Example: `[{"filter": "filter:completed_at", "operator": "gt", "type": "datetime", "value": "2021-01-01T00:00:00.000Z"}]`\n'
-                '* **selectedItems**: dictionary with keys: `"all"`, `"included"`, `"excluded"`.<br/>'
-                '                   Example: `{"all": false, "included": [1, 2, 3], "excluded": [4, 5]}`\n'
-                '* **ordering**: list of fields to order by.<br/>\n'
+                '* **filters**: list of filters, each filter is a dictionary with keys: `"filter"`, `"operator"`, `"type"`, `"value"`.<br/>'
+                '                   Example: `[{"filter": "filter:tasks:completed_at", "operator": "greater", "type": "Datetime", "value": "2021-01-01T00:00:00.000Z"}]`\n'
+                '* **selectedItems**: dictionary with keys: `"all"`, `"included"`, `"excluded"`. If "all" is `false`, `"included"` must be used. If "all" is `true`, `"excluded"` must be used.<br/>'
+                '                   Examples: `{"all": false, "included": [1, 2, 3]}` or `{"all": true, "excluded": [4, 5]}`\n'
+                '* **ordering**: list of fields to order by. Currently, ordering is supported by only one parameter. <br/>\n'
                 '                   Example: `["completed_at"]`',
             ),
         ],
