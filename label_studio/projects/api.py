@@ -733,7 +733,7 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
         Task.delete_tasks_without_signals(Task.objects.filter(project=project))
         project.summary.reset()
         emit_webhooks_for_instance(request.user.active_organization, None, WebhookAction.TASKS_DELETED, task_ids)
-        return Response(data={'tasks': task_ids}, status=204)
+        return Response(status=204)
 
     def get(self, *args, **kwargs):
         return super(ProjectTaskListAPI, self).get(*args, **kwargs)
