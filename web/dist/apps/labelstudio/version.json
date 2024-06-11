@@ -1,6 +1,6 @@
 {
-  "message": "fix skip just when its the right ann id",
-  "commit": "cf12bb1b120309a3d759942e066f2e0054993686",
-  "date": "2024-06-11T21:54:18.000Z",
+  "message": "add tests for empty message",
+  "commit": "c830faf271d1c8cb7501c29b88883619763c9837",
+  "date": "2024-06-11T22:00:14.000Z",
   "branch": "fb-leap-1123"
 }
