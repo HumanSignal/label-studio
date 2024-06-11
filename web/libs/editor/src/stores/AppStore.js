@@ -330,7 +330,7 @@ export default types
           const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
           const entity = annotationStore.selected;
           const areResultsEmpty = entity.results.length === 0;
-          const isReview = self.hasInterface("review");
+          const isReview = self.hasInterface("review") || entity.canBeReviewed;
           const isUpdate = !isReview && isDefined(entity.pk);
           // no changes were made over previously submitted version — no drafts, no pending changes
           const noChanges = !entity.history.canUndo && !entity.draftId;
