@@ -571,6 +571,10 @@ const Model = types
         height,
       };
     },
+
+    get lowestZIndex() {
+      return self.regs.reduce((acc, region) => isDefined(region.zIndex) ? Math.min(acc, region.zIndex) : acc, 0);
+    },
   }))
 
   // actions for the tools

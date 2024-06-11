@@ -2,6 +2,15 @@ import { types } from "mobx-state-tree";
 import { FF_DBLCLICK_DELAY, FF_DEV_3793, FF_ZOOM_OPTIM, isFF } from "../utils/feature-flags";
 export const KonvaRegionMixin = types
   .model({})
+  .volatile(() => ({
+    zIndex: 0,
+  }))
+  .actions((self) => ({
+    sendToBack() {
+      self.zIndex = self.object.lowestZIndex - 1;
+      self.annotation.unselectArea(self);
+    },
+  }))
   .views((self) => {
     return {
       get bboxCoords() {

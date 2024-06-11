@@ -9,7 +9,7 @@ import ObjectTag from "../../components/Tags/Object";
 import Tree from "../../core/Tree";
 import styles from "./ImageView.module.scss";
 import { errorBuilder } from "../../core/DataValidator/ConfigValidator";
-import { chunks, findClosestParent } from "../../utils/utilities";
+import { chunks, findClosestParent, fixMobxObserve } from "../../utils/utilities";
 import Konva from "konva";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Toolbar } from "../Toolbar/Toolbar";
@@ -1157,6 +1157,10 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
   const { brushRegions, shapeRegions } = splitRegions(regions);
 
   const { brushRegions: suggestedBrushRegions, shapeRegions: suggestedShapeRegions } = splitRegions(item.suggestions);
+
+  // trigger re-render if regions reordered
+  fixMobxObserve(item.lowestZIndex);
+  shapeRegions.sort((a, b) => a.zIndex - b.zIndex);
 
   const renderableRegions = Object.entries({
     brush: brushRegions,

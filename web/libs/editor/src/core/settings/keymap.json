@@ -84,6 +84,10 @@
     "key": "alt+l",
     "description": "Lock selected region"
   },
+  "region:send-back": {
+    "key": "alt+b",
+    "description": "Send region to back"
+  },
   "region:meta": {
     "key": "alt+m",
     "description": "Edit selected region meta"

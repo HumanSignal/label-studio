@@ -1,7 +1,7 @@
 import chroma from "chroma-js";
 import { observer } from "mobx-react";
 import { type FC, useMemo, useState } from "react";
-import { IconLink, IconPlusAlt, IconTrash, IconWarning } from "../../../assets/icons";
+import { IconLink, IconPlusAlt, IconSortDown, IconTrash, IconWarning } from "../../../assets/icons";
 import { IconEyeClosed, IconEyeOpened } from "../../../assets/icons/timeline";
 import { Button, type ButtonProps } from "../../../common/Button/Button";
 import { Block, Elem } from "../../../utils/bem";
@@ -126,6 +126,14 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
         {!region.isReadOnly() && entityButtons}
       </Elem>
       <Elem name="group" mod={{ align: "right" }}>
+        {region.bboxCoords && (
+          <RegionActionButton
+            tooltip="Send to back"
+            hotkey="region:send-back"
+            icon={<IconSortDown />}
+            onClick={region.sendToBack}
+          />
+        )}
         <LockButton
           item={region}
           annotation={region?.annotation}
