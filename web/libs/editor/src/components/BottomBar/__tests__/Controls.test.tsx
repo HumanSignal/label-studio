@@ -29,6 +29,7 @@ const mockHistory = {
 };
 
 const mockAnnotation = {
+  id:'a31wsd',
   canBeReviewed: false,
   userGenerate: false,
   sentUserGenerate: false,
@@ -40,6 +41,26 @@ const mockAnnotation = {
 describe("Controls", () => {
   test("When skip button is clicked, if there is no currentComment and annotators must leave a comment on skip, it must not submit and setToolTipMessage", () => {
     mockStore.hasInterface = (a: string) => (a === "skip" || a === "comments:skip") ?? true;
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    const skipTask = getByLabelText("skip-task");
+    fireEvent.click(skipTask);
+
+    expect(mockStore.skipTask).not.toHaveBeenCalled();
+    expect(mockStore.commentStore.commentFormSubmit).not.toHaveBeenCalled();
+    expect(mockStore.commentStore.setTooltipMessage).toHaveBeenCalledWith("Please enter a comment before skipping");
+  });
+
+  test("When skip button is clicked, but there is an empty message on currentComment and annotators must leave a comment on skip, it must not submit and setToolTipMessage", () => {
+    mockStore.hasInterface = (a: string) => (a === "skip" || a === "comments:skip") ?? true;
+    mockStore.commentStore.currentComment = {
+      ['a31wsd']:'   '
+    }
 
     const { getByLabelText } = render(
       <Provider store={mockStore}>
