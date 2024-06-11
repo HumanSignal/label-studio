@@ -1,20 +1,3 @@
-# Automating the tagging of the docker images
-CONTAINER_REPOSITORY := 391155498039.dkr.ecr.eu-north-1.amazonaws.com
-NAME   := ${CONTAINER_REPOSITORY}/salmonvision-repository
-TAG    := $$(git rev-parse --short HEAD)
-IMG    := ${NAME}:${TAG}
-LATEST := ${NAME}:latest
-
-docker_build:
-	@docker build -t ${IMG} .
-	@docker tag ${IMG} ${LATEST}
-
-docker_login:
-	@aws ecr get-login-password | docker login --username AWS --password-stdin ${CONTAINER_REPOSITORY}
-
-docker_push:
-	@docker push ${NAME}
-
 # Run Django dev server with Sqlite
 run-dev:
 	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio python label_studio/manage.py runserver

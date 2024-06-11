@@ -20,6 +20,15 @@ docker-compose.yaml is used for docker on EC2 (from beanstalk)
 - setting up SSL termination elastic beanstalk
   - Need access to the registrar
 
+## CORS Setup
+
+Follow the guide and setup the following keys: https://labelstud.io/guide/persistent_storage#Set-up-Amazon-S3
+
+```txt
+STORAGE_AWS_ACCESS_KEY_ID="<YOUR_ACCESS_KEY_ID>"
+STORAGE_AWS_SECRET_ACCESS_KEY="<YOUR_SECRET_ACCESS_KEY>"
+```
+
 ## SSL certificates
 
 ### Resources
