@@ -207,9 +207,10 @@ class GCS(object):
             bucket_name=bucket_name,
         )
 
-        blob = bucket.get_blob(blob_name)
+        blob = bucket.blob(blob_name)
 
         if not presign:
+            blob.reload()  # needed to know the content type
             return f'data:{blob.content_type};base64,{base64.b64encode(blob.download_as_bytes()).decode("utf-8")}'
 
         # this flag should be OFF, maybe we need to enable it for 1-2 customers, we have to check it
