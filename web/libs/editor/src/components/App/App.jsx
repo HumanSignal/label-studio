@@ -43,7 +43,6 @@ import { InstructionsModal } from "../InstructionsModal/InstructionsModal";
 import { RelationsOverlay } from "../RelationsOverlay/RelationsOverlay";
 import Segment from "../Segment/Segment";
 import Settings from "../Settings/Settings";
-import { SidebarTabs } from "../SidebarTabs/SidebarTabs";
 import { SidePanels } from "../SidePanels/SidePanels";
 import { SideTabsPanels } from "../SidePanels/TabPanels/SideTabsPanels";
 import { TopBar } from "../TopBar/TopBar";
@@ -286,9 +285,7 @@ class App extends Component {
                 {viewingAll === false && (
                   <Block name="menu" mod={{ bsp: settings.bottomSidePanel }}>
                     {store.hasInterface("side-column") && (
-                      <SidebarTabs>
-                        <AnnotationTab store={store} />
-                      </SidebarTabs>
+                      <AnnotationTab store={store} />
                     )}
                   </Block>
                 )}
