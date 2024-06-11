@@ -44,6 +44,20 @@ class PredictionResultField(serializers.JSONField):
         }
 
 
+class AnnotationResultField(serializers.JSONField):
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_ARRAY,
+            'title': 'Annotation result list',
+            'description': 'List of annotation results for the task',
+            'items': {
+                'type': openapi.TYPE_OBJECT,
+                'title': 'Annotation result items (regions)',
+                'description': 'List of annotated regions for the task',
+            },
+        }
+
+
 class PredictionSerializer(ModelSerializer):
     result = PredictionResultField()
     model_version = serializers.CharField(
@@ -72,6 +86,7 @@ class CompletedByDMSerializer(UserSerializer):
 class AnnotationSerializer(FlexFieldsModelSerializer):
     """ """
 
+    result = AnnotationResultField()
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
     completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
@@ -594,6 +609,7 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
 
 
 class AnnotationDraftSerializer(ModelSerializer):
+    result = AnnotationResultField()
     user = serializers.CharField(default=serializers.CurrentUserDefault())
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
