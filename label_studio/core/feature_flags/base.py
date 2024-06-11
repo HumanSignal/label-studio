@@ -86,6 +86,9 @@ def flag_set(feature_flag, user=None, override_system_default=None):
     `override_default` is used to override any system defaults in place in case no files or LD API flags provided
 
     stale_feature_flags will be checked to confirm if the feature flags are still active
+
+    stale feature flags are considered "deprecated" and should not be changeable in any circumstance.
+    They are an intermediary step before code references to the flag being removed completely.
     """
 
     if feature_flag in STALE_FEATURE_FLAGS:
