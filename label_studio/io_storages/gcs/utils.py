@@ -176,6 +176,7 @@ class GCS(object):
     def generate_http_url(
         cls,
         url: str,
+        presign: bool,
         google_application_credentials: Union[str, dict] = None,
         google_project_id: str = None,
         presign_ttl: int = 1,
@@ -183,6 +184,7 @@ class GCS(object):
         """
         Gets gs:// like URI string and returns presigned https:// URL
         :param url: input URI
+        :param presign: Whether to generate presigned URL. If false, will generate base64 encoded data URL
         :param google_application_credentials:
         :param google_project_id:
         :param presign_ttl: Presign TTL in minutes
@@ -205,7 +207,10 @@ class GCS(object):
             bucket_name=bucket_name,
         )
 
-        blob = bucket.blob(blob_name)
+        blob = bucket.get_blob(blob_name)
+
+        if not presign:
+            return f'data:{blob.content_type};base64,{base64.b64encode(blob.download_as_bytes()).decode("utf-8")}'
 
         # this flag should be OFF, maybe we need to enable it for 1-2 customers, we have to check it
         if settings.GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS:
