@@ -14,7 +14,6 @@ const mockStore = {
     commentFormSubmit: jest.fn(),
     setTooltipMessage: jest.fn(),
   },
-  rejectAnnotation: jest.fn(),
   annotationStore: {
     selected: {
       submissionInProgress: jest.fn(),
@@ -39,7 +38,7 @@ const mockAnnotation = {
 };
 
 describe("Controls", () => {
-  test("When reject button is clicked, if there is no currentComment and annotators must leave a comment on skip, it must not submit and setToolTipMessage", () => {
+  test("When skip button is clicked, if there is no currentComment and annotators must leave a comment on skip, it must not submit and setToolTipMessage", () => {
     mockStore.hasInterface = (a: string) => (a === "skip" || a === "comments:skip") ?? true;
 
     const { getByLabelText } = render(
@@ -56,7 +55,7 @@ describe("Controls", () => {
     expect(mockStore.commentStore.setTooltipMessage).toHaveBeenCalledWith("Please enter a comment before skipping");
   });
 
-  test("When reject button is clicked, if there is no currentComment and annotators doesn't need to leave a comment on skip, it must submit", async () => {
+  test("When skip button is clicked, if there is no currentComment and annotators doesn't need to leave a comment on skip, it must submit", async () => {
     mockStore.hasInterface = (a: string) => a === "skip" ?? true;
     const { getByLabelText } = render(
       <Provider store={mockStore}>
