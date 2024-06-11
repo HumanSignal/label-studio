@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-1052'",
-  "commit": "23bf7f9b573e4bb9a40a8c10fcae2296bc90ad44",
-  "date": "2024-06-10T15:08:55.000Z",
-  "branch": "fb-leap-1052"
+  "message": "feat: LEAP-1108: Allow to send image regions to back",
+  "commit": "a18235793965f067edfd7b2d468db4b625e4a2d9",
+  "date": "2024-06-11T11:22:23.000Z",
+  "branch": "fb-leap-1108/send-to-back"
 }
