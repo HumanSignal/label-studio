@@ -23,7 +23,7 @@ jobs:
       github.event.client_payload.event_action == 'merged'
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Details
         id: details
@@ -42,7 +42,6 @@ jobs:
               ;;
             */label-studio-sdk)
               echo "poetry=true" >> $GITHUB_OUTPUT
-              echo "poetry_group=test" >> $GITHUB_OUTPUT
               ;;
             *)
               echo '::error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
@@ -190,7 +189,7 @@ jobs:
         run: |
           set -xeuo pipefail
 
-          poetry add "https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip" --lock --group "${{ steps.details.outputs.poetry_group }}"
+          poetry add "https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip" --lock
 
           git add pyproject.toml poetry.lock
           git status -s
@@ -223,7 +222,7 @@ jobs:
         if: steps.details.outputs.build_lsf_docs
         continue-on-error: true
         working-directory: tmp/scripts
-        run: node create-docs.js
+        run: NODE_PATH=$(npm root -g) node create-docs.js
 
       - name: "LSF Docs: Commit and Push"
         if: steps.details.outputs.build_lsf_docs && steps.lsf-docs-build.conclusion == 'success'
@@ -439,7 +438,7 @@ jobs:
       github.event.client_payload.event_action == 'closed'
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Get PR
         uses: actions/github-script@v7

@@ -1,13 +1,13 @@
 ---
 title: Set up SCIM2 for Label Studio
-short: Set up SCIM2
+short: SCIM2
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 490
+order_enterprise: 387
 meta_title: System for Cross-domain Identity Management (SCIM) for Label Studio Enterprise
 meta_description: Label Studio Enterprise documentation for setting up SCIM2
-section: "Install"
+section: "Manage Your Organization"
 
 ---
 

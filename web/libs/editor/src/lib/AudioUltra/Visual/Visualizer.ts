@@ -1,15 +1,15 @@
-import { WaveformAudio } from '../Media/WaveformAudio';
-import { averageMinMax, clamp, debounce, defaults, warn } from '../Common/Utils';
-import { Waveform, WaveformOptions } from '../Waveform';
-import { CanvasCompositeOperation, Layer, RenderingContext } from './Layer';
-import { Events } from '../Common/Events';
-import { LayerGroup } from './LayerGroup';
-import { Playhead } from './PlayHead';
-import { rgba } from '../Common/Color';
-import { Cursor } from '../Cursor/Cursor';
-import { Padding } from '../Common/Style';
-import { TimelineOptions } from '../Timeline/Timeline';
-import './Loader';
+import type { WaveformAudio } from "../Media/WaveformAudio";
+import { averageMinMax, clamp, debounce, defaults, warn } from "../Common/Utils";
+import type { Waveform, WaveformOptions } from "../Waveform";
+import { type CanvasCompositeOperation, Layer, type RenderingContext } from "./Layer";
+import { Events } from "../Common/Events";
+import { LayerGroup } from "./LayerGroup";
+import { Playhead } from "./PlayHead";
+import { rgba } from "../Common/Color";
+import type { Cursor } from "../Cursor/Cursor";
+import type { Padding } from "../Common/Style";
+import type { TimelineOptions } from "../Timeline/Timeline";
+import "./Loader";
 
 // Amount of data samples to buffer on either side of the renderable area
 const BUFFER_SAMPLES = 2;
@@ -26,24 +26,25 @@ interface VisualizerEvents {
   heightAdjusted: (Visualizer: Visualizer) => void;
 }
 
-export type VisualizerOptions = Pick<WaveformOptions,
-| 'zoomToCursor'
-| 'autoCenter'
-| 'splitChannels'
-| 'cursorWidth'
-| 'zoom'
-| 'amp'
-| 'padding'
-| 'playhead'
-| 'timeline'
-| 'height'
-| 'waveHeight'
-| 'gridWidth'
-| 'gridColor'
-| 'waveColor'
-| 'backgroundColor'
-| 'container'
-> 
+export type VisualizerOptions = Pick<
+  WaveformOptions,
+  | "zoomToCursor"
+  | "autoCenter"
+  | "splitChannels"
+  | "cursorWidth"
+  | "zoom"
+  | "amp"
+  | "padding"
+  | "playhead"
+  | "timeline"
+  | "height"
+  | "waveHeight"
+  | "gridWidth"
+  | "gridColor"
+  | "waveColor"
+  | "backgroundColor"
+  | "container"
+>;
 
 export class Visualizer extends Events<VisualizerEvents> {
   private wrapper!: HTMLElement;
@@ -65,9 +66,9 @@ export class Visualizer extends Events<VisualizerEvents> {
   private splitChannels = false;
   private padding: Padding = { top: 0, bottom: 0, left: 0, right: 0 };
   private gridWidth = 1;
-  private gridColor = rgba('rgba(0, 0, 0, 0.1)');
-  private backgroundColor = rgba('#fff');
-  private waveColor = rgba('#000');
+  private gridColor = rgba("rgba(0, 0, 0, 0.1)");
+  private backgroundColor = rgba("#fff");
+  private waveColor = rgba("#000");
   private baseWaveHeight = 96;
   private originalWaveHeight = 0;
   private waveHeight = 32;
@@ -79,7 +80,7 @@ export class Visualizer extends Events<VisualizerEvents> {
   private _loader!: HTMLElement;
 
   timelineHeight: number = defaults.timelineHeight;
-  timelinePlacement: TimelineOptions['placement'] = 'top';
+  timelinePlacement: TimelineOptions["placement"] = "top";
   maxZoom = 1500;
   playhead: Playhead;
   reservedSpace = 0;
@@ -106,20 +107,24 @@ export class Visualizer extends Events<VisualizerEvents> {
     this.backgroundColor = options.backgroundColor ? rgba(options.backgroundColor) : this.backgroundColor;
     this.zoom = options.zoom ?? this.zoom;
     this.amp = options.amp ?? this.amp;
-    this.playhead = new Playhead({ 
-      ...options.playhead,
-      x: 0, 
-      color: rgba('#000'), 
-      fillColor: rgba('#BAE7FF'),
-      width: options.cursorWidth ?? 1,
-    }, this, this.wf);
+    this.playhead = new Playhead(
+      {
+        ...options.playhead,
+        x: 0,
+        color: rgba("#000"),
+        fillColor: rgba("#BAE7FF"),
+        width: options.cursorWidth ?? 1,
+      },
+      this,
+      this.wf,
+    );
 
     this.initialRender();
     this.attachEvents();
   }
 
   init(audio: WaveformAudio) {
-    this.init = () => warn('Visualizer is already initialized');
+    this.init = () => warn("Visualizer is already initialized");
     this.audio = audio;
     this.setLoading(false);
 
@@ -130,12 +135,12 @@ export class Visualizer extends Events<VisualizerEvents> {
       this.handleResize();
     }
 
-    this.invoke('initialized', [this]);
+    this.invoke("initialized", [this]);
   }
 
   setLoading(loading: boolean) {
     if (loading) {
-      this._loader = document.createElement('loading-progress-bar');
+      this._loader = document.createElement("loading-progress-bar");
       this._container.appendChild(this._loader);
     } else {
       this._container.removeChild(this._loader);
@@ -179,7 +184,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
     this.getSamplesPerPx();
 
-    this.wf.invoke('zoom', [this.zoom]);
+    this.wf.invoke("zoom", [this.zoom]);
     this.draw();
   }
 
@@ -213,7 +218,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
   draw(dry = false, forceDraw = false) {
     if (this.isDestroyed) return;
-    if (this.drawing && !forceDraw) return warn('Concurrent render detected');
+    if (this.drawing && !forceDraw) return warn("Concurrent render detected");
 
     this.drawing = true;
 
@@ -231,7 +236,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
       this.renderCursor();
 
-      this.invoke('draw', [this]);
+      this.invoke("draw", [this]);
 
       this.transferImage();
 
@@ -242,19 +247,19 @@ export class Visualizer extends Events<VisualizerEvents> {
   destroy() {
     if (this.isDestroyed) return;
 
-    this.invoke('destroy', [this]);
+    this.invoke("destroy", [this]);
     this.clear();
     this.playhead.destroy();
     this.audio = null;
     this.removeEvents();
-    this.layers.forEach(layer => layer.remove());
+    this.layers.forEach((layer) => layer.remove());
     this.wrapper.remove();
 
     super.destroy();
   }
 
   clear() {
-    this.layers.get('main')?.clear();
+    this.layers.get("main")?.clear();
     this.transferImage();
   }
 
@@ -263,7 +268,7 @@ export class Visualizer extends Events<VisualizerEvents> {
   }
 
   setAmp(amp: number) {
-    this.amp = clamp(amp, 1, Infinity);
+    this.amp = clamp(amp, 1, Number.POSITIVE_INFINITY);
     this.draw();
   }
 
@@ -273,7 +278,7 @@ export class Visualizer extends Events<VisualizerEvents> {
       return;
     }
 
-    const offset = (this.width / 2) / this.zoomedWidth;
+    const offset = this.width / 2 / this.zoomedWidth;
 
     this.scrollLeft = clamp(this.currentTime - offset, 0, 1);
   }
@@ -291,7 +296,7 @@ export class Visualizer extends Events<VisualizerEvents> {
   private async renderAvailableChannels() {
     if (!this.audio) return;
 
-    const layer = this.getLayer('waveform');
+    const layer = this.getLayer("waveform");
 
     if (!layer || !layer.isVisible) {
       this.lastRenderedWidth = 0;
@@ -303,14 +308,19 @@ export class Visualizer extends Events<VisualizerEvents> {
     const dataLength = this.dataLength;
     const scrollLeftPx = this.getScrollLeftPx();
     const iStart = clamp(scrollLeftPx * this.samplesPerPx, 0, dataLength);
-    const iEnd = clamp(iStart + (this.width * this.samplesPerPx), 0, dataLength);
+    const iEnd = clamp(iStart + this.width * this.samplesPerPx, 0, dataLength);
 
     const renderableData = iEnd - iStart;
     const zoom = this.zoom;
     const amp = this.amp;
 
     // Render all channels, full waveform
-    if (this.width !== this.lastRenderedWidth || zoom !== this.lastRenderedZoom || amp !== this.lastRenderedAmp || renderableData < CACHE_RENDER_THRESHOLD) {
+    if (
+      this.width !== this.lastRenderedWidth ||
+      zoom !== this.lastRenderedZoom ||
+      amp !== this.lastRenderedAmp ||
+      renderableData < CACHE_RENDER_THRESHOLD
+    ) {
       for (let i = 0; i < this.audio.channelCount; i++) {
         await this.renderWave(i, layer, iStart, iEnd);
       }
@@ -320,7 +330,6 @@ export class Visualizer extends Events<VisualizerEvents> {
       await this.renderPartialWave(layer, iStart, iEnd);
     }
   }
-
 
   /**
    * Render the waveform for a single channel
@@ -335,7 +344,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
     const x = 0;
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (this.isDestroyed || !this.audio) return resolve(false);
 
       // The waveform layer should be cleared during the render of the first channel, and not subsequent channels in a
@@ -373,13 +382,13 @@ export class Visualizer extends Events<VisualizerEvents> {
   private async renderPartialWave(layer: Layer, iStart: number, iEnd: number) {
     const renderId = this.renderId;
     let x = 0;
-    const channelCount = (this.audio?.channelCount ?? 1);
+    const channelCount = this.audio?.channelCount ?? 1;
     const height = this.baseWaveHeight / channelCount;
     const scrollLeftPx = this.getScrollLeftPx();
     const dataLength = this.dataLength;
     let deltaX = this.lastRenderedScrollLeftPx - scrollLeftPx;
 
-    if (deltaX < 1 && deltaX > -1 || !this.audio) return false;
+    if ((deltaX < 1 && deltaX > -1) || !this.audio) return false;
 
     deltaX = Math.round(deltaX);
     const diff = deltaX * this.samplesPerPx;
@@ -390,8 +399,7 @@ export class Visualizer extends Events<VisualizerEvents> {
     layer.shift(deltaX, 0);
 
     for (let channelNumber = 0; channelNumber < channelCount; channelNumber++) {
-      await new Promise(resolve => {
-
+      await new Promise((resolve) => {
         let sStart = iStart;
         let sEnd = iEnd;
 
@@ -408,7 +416,7 @@ export class Visualizer extends Events<VisualizerEvents> {
           x = clamp(this.width + deltaX - BUFFER_SAMPLES, 0, this.width);
         }
 
-        sEnd = clamp(sEnd + (this.samplesPerPx * BUFFER_SAMPLES), 0, dataLength);
+        sEnd = clamp(sEnd + this.samplesPerPx * BUFFER_SAMPLES, 0, dataLength);
 
         const renderIterator = this.renderSlice(layer, height, sStart, sEnd, channelNumber, x);
 
@@ -434,7 +442,14 @@ export class Visualizer extends Events<VisualizerEvents> {
    * Render a slice of the waveform for a single channel between iStart and iEnd timestamps,
    * returning an iterator that can be used to render the slice.
    */
-  private *renderSlice(layer: Layer, height: number, iStart: number, iEnd: number, channelNumber: number, x = 0): Generator<any, void, any> {
+  private *renderSlice(
+    layer: Layer,
+    height: number,
+    iStart: number,
+    iEnd: number,
+    channelNumber: number,
+    x = 0,
+  ): Generator<any, void, any> {
     const bufferChunks = this.audio?.chunks?.[channelNumber];
 
     if (!bufferChunks) return;
@@ -442,7 +457,7 @@ export class Visualizer extends Events<VisualizerEvents> {
     const bufferChunkSize = bufferChunks.length;
     const paddingTop = this.padding?.top ?? 0;
     const paddingLeft = this.padding?.left ?? 0;
-    const zero = height * channelNumber + (defaults.timelinePlacement as number ? this.reservedSpace : 0);
+    const zero = height * channelNumber + ((defaults.timelinePlacement as number) ? this.reservedSpace : 0);
     const y = zero + paddingTop + height / 2;
     let total = 0;
 
@@ -459,7 +474,7 @@ export class Visualizer extends Events<VisualizerEvents> {
     // Find all chunks in buffer chunks that are between iStart and iEnd
     const now = performance.now();
 
-    for (let i = 0; i < bufferChunkSize; i++) { 
+    for (let i = 0; i < bufferChunkSize; i++) {
       const slice = bufferChunks[i];
       const sliceLength = slice.length;
 
@@ -508,7 +523,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
     renderable.forEach((v: number) => {
       const H2 = height / 2;
-      const H = (v * this.amp * H2);
+      const H = v * this.amp * H2;
 
       layer.lineTo(offset + 1, zero + H2 + H);
     });
@@ -521,7 +536,7 @@ export class Visualizer extends Events<VisualizerEvents> {
   }
 
   private drawMiddleLine() {
-    this.useLayer('background', (layer) => {
+    this.useLayer("background", (layer) => {
       layer.clear();
       if (layer.isVisible) {
         // Set background
@@ -557,9 +572,13 @@ export class Visualizer extends Events<VisualizerEvents> {
 
   get height() {
     let height = 0;
-    const timelineLayer = this.getLayer('timeline');
-    const waveformLayer = this.getLayer('waveform');
-    const waveformHeight = Math.max(this.originalWaveHeight, this.waveHeight * (this.splitChannels ? this.audio?.channelCount ?? 1 : 1) + this.timelineHeight) - this.timelineHeight;
+    const timelineLayer = this.getLayer("timeline");
+    const waveformLayer = this.getLayer("waveform");
+    const waveformHeight =
+      Math.max(
+        this.originalWaveHeight,
+        this.waveHeight * (this.splitChannels ? this.audio?.channelCount ?? 1 : 1) + this.timelineHeight,
+      ) - this.timelineHeight;
 
     if (this.baseWaveHeight !== waveformHeight) {
       this.baseWaveHeight = waveformHeight;
@@ -589,13 +608,13 @@ export class Visualizer extends Events<VisualizerEvents> {
 
     if (this.waveContainer instanceof HTMLElement) {
       result = this.waveContainer;
-    } else if (typeof this.waveContainer === 'string') {
+    } else if (typeof this.waveContainer === "string") {
       result = document.querySelector(this.waveContainer as string);
     }
 
-    if (!result) throw new Error('Container element does not exist.');
+    if (!result) throw new Error("Container element does not exist.");
 
-    result.style.position = 'relative';
+    result.style.position = "relative";
 
     this._container = result;
 
@@ -617,17 +636,17 @@ export class Visualizer extends Events<VisualizerEvents> {
   private createLayers() {
     const { container } = this;
 
-    this.wrapper = document.createElement('div');
-    this.wrapper.style.height = '100%';
+    this.wrapper = document.createElement("div");
+    this.wrapper.style.height = "100%";
 
-    this.createLayer({ name: 'main' });
-    this.createLayer({ name: 'background', offscreen: true, zIndex: 0, isVisible: false });
-    this.createLayer({ name: 'waveform', offscreen: true, zIndex: 100 });
-    this.createLayerGroup({ name: 'regions', offscreen: true, zIndex: 101, compositeOperation: 'source-over' });
-    const controlsLayer = this.createLayer({ name: 'controls', offscreen: true, zIndex: 1000 });
+    this.createLayer({ name: "main" });
+    this.createLayer({ name: "background", offscreen: true, zIndex: 0, isVisible: false });
+    this.createLayer({ name: "waveform", offscreen: true, zIndex: 100 });
+    this.createLayerGroup({ name: "regions", offscreen: true, zIndex: 101, compositeOperation: "source-over" });
+    const controlsLayer = this.createLayer({ name: "controls", offscreen: true, zIndex: 1000 });
 
     this.playhead.setLayer(controlsLayer);
-    this.layers.get('main')?.appendTo(this.wrapper);
+    this.layers.get("main")?.appendTo(this.wrapper);
     container.appendChild(this.wrapper);
   }
 
@@ -635,8 +654,16 @@ export class Visualizer extends Events<VisualizerEvents> {
     this.reservedSpace = height;
   }
 
-  createLayer(options : {name: string, groupName?:string, offscreen?: boolean, zIndex?: number, opacity?: number, compositeOperation?: CanvasCompositeOperation, isVisible?: boolean}) {
-    const { name, offscreen = false, zIndex = 1, opacity = 1, compositeOperation = 'source-over', isVisible } = options;
+  createLayer(options: {
+    name: string;
+    groupName?: string;
+    offscreen?: boolean;
+    zIndex?: number;
+    opacity?: number;
+    compositeOperation?: CanvasCompositeOperation;
+    isVisible?: boolean;
+  }) {
+    const { name, offscreen = false, zIndex = 1, opacity = 1, compositeOperation = "source-over", isVisible } = options;
 
     if (!options.groupName && this.layers.has(name)) throw new Error(`Layer ${name} already exists.`);
 
@@ -662,14 +689,13 @@ export class Visualizer extends Events<VisualizerEvents> {
 
       layer = (group as LayerGroup).addLayer(layerOptions);
     } else {
-
       layer = new Layer(layerOptions);
       this.layers.set(name, layer);
     }
 
-    this.invoke('layerAdded', [layer]);
-    layer.on('layerUpdated', () => {
-      const mainLayer = this.getLayer('main');
+    this.invoke("layerAdded", [layer]);
+    layer.on("layerUpdated", () => {
+      const mainLayer = this.getLayer("main");
 
       this.setContainerHeight();
 
@@ -682,8 +708,22 @@ export class Visualizer extends Events<VisualizerEvents> {
     return layer;
   }
 
-  createLayerGroup(options : {name: string, offscreen?: boolean, zIndex?: number, opacity?: number, compositeAsGroup?: boolean, compositeOperation?: CanvasCompositeOperation}) {
-    const { name, offscreen = false, zIndex = 1, opacity = 1, compositeOperation = 'source-over', compositeAsGroup = true } = options;
+  createLayerGroup(options: {
+    name: string;
+    offscreen?: boolean;
+    zIndex?: number;
+    opacity?: number;
+    compositeAsGroup?: boolean;
+    compositeOperation?: CanvasCompositeOperation;
+  }) {
+    const {
+      name,
+      offscreen = false,
+      zIndex = 1,
+      opacity = 1,
+      compositeOperation = "source-over",
+      compositeAsGroup = true,
+    } = options;
 
     if (this.layers.has(name)) throw new Error(`LayerGroup ${name} already exists.`);
 
@@ -699,8 +739,8 @@ export class Visualizer extends Events<VisualizerEvents> {
       opacity,
     });
 
-    this.invoke('layerAdded', [layer]);
-    layer.on('layerUpdated', () => {
+    this.invoke("layerAdded", [layer]);
+    layer.on("layerUpdated", () => {
       this.invokeLayersUpdated();
     });
     this.layers.set(name, layer);
@@ -712,8 +752,8 @@ export class Visualizer extends Events<VisualizerEvents> {
     const layer = this.layers.get(name);
 
     if (layer) {
-      this.invoke('layerRemoved', [layer]);
-      layer.off('layerUpdated', this.invokeLayersUpdated);
+      this.invoke("layerRemoved", [layer]);
+      layer.off("layerUpdated", this.invokeLayersUpdated);
       layer.remove();
     }
     this.layers.delete(name);
@@ -736,7 +776,7 @@ export class Visualizer extends Events<VisualizerEvents> {
   }
 
   private invokeLayersUpdated = debounce(async () => {
-    this.invoke('layersUpdated', [this.layers]);
+    this.invoke("layersUpdated", [this.layers]);
   }, 150);
 
   private attachEvents() {
@@ -745,22 +785,22 @@ export class Visualizer extends Events<VisualizerEvents> {
     this.observer.observe(this.wrapper);
 
     // DOM events
-    this.wrapper.addEventListener('wheel', this.preventScrollX);
-    this.wrapper.addEventListener('wheel', this.handleScroll, {
+    this.wrapper.addEventListener("wheel", this.preventScrollX);
+    this.wrapper.addEventListener("wheel", this.handleScroll, {
       passive: true,
     });
-    this.wrapper.addEventListener('click', this.handleSeek);
-    this.wrapper.addEventListener('mousedown', this.handleMouseDown);
+    this.wrapper.addEventListener("click", this.handleSeek);
+    this.wrapper.addEventListener("mousedown", this.handleMouseDown);
 
     // Cursor events
-    this.on('mouseMove', this.playHeadMove);
+    this.on("mouseMove", this.playHeadMove);
 
-    this.on('layerAdded', this.invokeLayersUpdated);
-    this.on('layerRemoved', this.invokeLayersUpdated);
+    this.on("layerAdded", this.invokeLayersUpdated);
+    this.on("layerRemoved", this.invokeLayersUpdated);
 
     // WF events
-    this.wf.on('playing', this.handlePlaying);
-    this.wf.on('seek', this.handlePlaying);
+    this.wf.on("playing", this.handlePlaying);
+    this.wf.on("seek", this.handlePlaying);
   }
 
   private removeEvents() {
@@ -769,20 +809,20 @@ export class Visualizer extends Events<VisualizerEvents> {
     this.observer.disconnect();
 
     // DOM events
-    this.wrapper.removeEventListener('wheel', this.preventScrollX);
-    this.wrapper.removeEventListener('wheel', this.handleScroll);
-    this.wrapper.removeEventListener('click', this.handleSeek);
-    this.wrapper.removeEventListener('mousedown', this.handleMouseDown);
+    this.wrapper.removeEventListener("wheel", this.preventScrollX);
+    this.wrapper.removeEventListener("wheel", this.handleScroll);
+    this.wrapper.removeEventListener("click", this.handleSeek);
+    this.wrapper.removeEventListener("mousedown", this.handleMouseDown);
 
     // Cursor events
-    this.off('mouseMove', this.playHeadMove);
+    this.off("mouseMove", this.playHeadMove);
 
-    this.off('layerAdded', this.invokeLayersUpdated);
-    this.off('layerRemoved', this.invokeLayersUpdated);
+    this.off("layerAdded", this.invokeLayersUpdated);
+    this.off("layerRemoved", this.invokeLayersUpdated);
 
     // WF events
-    this.wf.off('playing', this.handlePlaying);
-    this.wf.off('seek', this.handlePlaying);
+    this.wf.off("playing", this.handlePlaying);
+    this.wf.off("seek", this.handlePlaying);
   }
 
   private playHeadMove = (e: MouseEvent, cursor: Cursor) => {
@@ -790,31 +830,33 @@ export class Visualizer extends Events<VisualizerEvents> {
     if (e.target && this.container.contains(e.target)) {
       const { x, y } = cursor;
       const { playhead, playheadPadding, height } = this;
-      const playHeadTop = (this.reservedSpace - playhead.capHeight - playhead.capPadding);
+      const playHeadTop = this.reservedSpace - playhead.capHeight - playhead.capPadding;
 
-      if (x >= playhead.x - playheadPadding && 
-        x <= (playhead.x + playhead.width + playheadPadding) &&
-          y >= playHeadTop &&
-          y <= height) {
+      if (
+        x >= playhead.x - playheadPadding &&
+        x <= playhead.x + playhead.width + playheadPadding &&
+        y >= playHeadTop &&
+        y <= height
+      ) {
         if (!playhead.isHovered) {
-          playhead.invoke('mouseEnter', [e]);
+          playhead.invoke("mouseEnter", [e]);
         }
         this.draw(true);
       } else if (playhead.isHovered) {
-        playhead.invoke('mouseLeave', [e]);
+        playhead.invoke("mouseLeave", [e]);
         this.draw(true);
       }
     }
   };
 
   private handleSeek = (e: MouseEvent) => {
-    const mainLayer = this.getLayer('main');
+    const mainLayer = this.getLayer("main");
 
     if (!this.wf.loaded || this.seekLocked || !(e.target && mainLayer?.canvas?.contains(e.target))) return;
     const offset = this.wrapper.getBoundingClientRect().left;
     const x = e.clientX - offset;
     const duration = this.wf.duration;
-    const currentPosition = this.scrollLeft + ((x / this.container.clientWidth) / this.zoom);
+    const currentPosition = this.scrollLeft + x / this.container.clientWidth / this.zoom;
     const playheadX = clamp(x, 0, this.width);
 
     this.playhead.setX(playheadX);
@@ -823,7 +865,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
   private handleMouseDown = (e: MouseEvent) => {
     if (!this.wf.loaded) return;
-    this.playhead.invoke('mouseDown', [e]);
+    this.playhead.invoke("mouseDown", [e]);
   };
 
   private handlePlaying = (currentTime: number) => {
@@ -836,14 +878,14 @@ export class Visualizer extends Events<VisualizerEvents> {
     if (!this.wf.loaded) return;
 
     if (this.isZooming(e)) {
-      const zoom = this.zoom - (e.deltaY * 0.2);
+      const zoom = this.zoom - e.deltaY * 0.2;
 
       this.setZoom(zoom);
-      this.wf.invoke('zoom', [this.zoom]);
+      this.wf.invoke("zoom", [this.zoom]);
     } else if (this.zoom > 1) {
       // Base values
       const maxScroll = this.scrollWidth;
-      const maxRelativeScroll = maxScroll / this.fullWidth * this.zoom;
+      const maxRelativeScroll = (maxScroll / this.fullWidth) * this.zoom;
       const delta = (Math.abs(e.deltaX) === 0 ? e.deltaY : e.deltaX) * this.zoom * 1.25;
       const position = this.scrollLeft * this.zoom;
 
@@ -854,7 +896,7 @@ export class Visualizer extends Events<VisualizerEvents> {
       const scrollLeft = newRelativePosition / this.zoom;
 
       if (scrollLeft !== this.scrollLeft) {
-        this.wf.invoke('scroll', [scrollLeft]);
+        this.wf.invoke("scroll", [scrollLeft]);
         this.setScrollLeft(scrollLeft);
       }
     }
@@ -863,7 +905,7 @@ export class Visualizer extends Events<VisualizerEvents> {
   private updatePosition(redraw = true) {
     if (!this.wf.loaded) return;
     const maxScroll = this.scrollWidth;
-    const maxRelativeScroll = maxScroll / this.fullWidth * this.zoom;
+    const maxRelativeScroll = (maxScroll / this.fullWidth) * this.zoom;
 
     this.setScrollLeft(clamp(this.scrollLeft, 0, maxRelativeScroll), redraw);
   }
@@ -905,7 +947,7 @@ export class Visualizer extends Events<VisualizerEvents> {
 
     this.getSamplesPerPx();
 
-    this.layers.forEach(layer => layer.setSize(newWidth, newHeight));
+    this.layers.forEach((layer) => layer.setSize(newWidth, newHeight));
   }
 
   private handleResize = () => {
@@ -929,18 +971,20 @@ export class Visualizer extends Events<VisualizerEvents> {
     this.lastRenderedScrollLeftPx = 0;
   }
 
-  private transferImage(layers: string[] = ['background', 'waveform', 'regions', 'controls']) {
-    const main = this.layers.get('main')!;
+  private transferImage(layers: string[] = ["background", "waveform", "regions", "controls"]) {
+    const main = this.layers.get("main")!;
 
     main.clear();
 
     if (layers) {
-      const list = Array.from(this.layers).sort((a, b) => {
-        return a[1].index - b[1].index;
-      }).filter(([_, layer]) => layer.offscreen);
+      const list = Array.from(this.layers)
+        .sort((a, b) => {
+          return a[1].index - b[1].index;
+        })
+        .filter(([_, layer]) => layer.offscreen);
 
       list.forEach(([name, layer]) => {
-        if (name === 'main') return;
+        if (name === "main") return;
         layer.transferTo(main);
       });
     }

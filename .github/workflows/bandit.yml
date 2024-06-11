@@ -8,7 +8,7 @@ on:
         type: string
 
 env:
-  BANDIT_VERSION: 1.7.5
+  BANDIT_VERSION: 1.7.8
   PROJECT_PATH: 'label_studio/'
   REPORT_PATH: 'bandit_results/bandit_security_report.txt'
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
         uses: actions/checkout@v4

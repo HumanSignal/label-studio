@@ -11,7 +11,7 @@ x-logging:
 services:
   # not replicated setup for test setup, use a proper aws S3 compatible cluster in production
   minio:
-    image: quay.io/minio/minio:RELEASE.2023-03-13T19-46-17Z
+    image: quay.io/minio/minio:RELEASE.2024-02-13T15-35-11Z
     command: server /data --console-address ":9009"
     restart: unless-stopped
     logging: *default-logging

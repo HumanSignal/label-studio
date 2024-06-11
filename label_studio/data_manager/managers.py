@@ -6,12 +6,27 @@ from datetime import datetime
 
 import ujson as json
 from core.feature_flags import flag_set
+from core.utils.db import fast_first
 from data_manager.prepare_params import ConjunctionEnum
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db import models
-from django.db.models import Aggregate, Avg, Case, Exists, F, FloatField, OuterRef, Q, Subquery, TextField, Value, When
+from django.db.models import (
+    Aggregate,
+    Avg,
+    Case,
+    DateTimeField,
+    Exists,
+    F,
+    FloatField,
+    OuterRef,
+    Q,
+    Subquery,
+    TextField,
+    Value,
+    When,
+)
 from django.db.models.functions import Cast, Coalesce, Concat
 from pydantic import BaseModel
 
@@ -495,11 +510,77 @@ class GroupConcat(Aggregate):
         super().__init__(expression, distinct='DISTINCT ' if distinct else '', output_field=output_field, **extra)
 
 
-def annotate_completed_at(queryset):
+def newest_annotation_subquery() -> Subquery:
     from tasks.models import Annotation
 
-    newest = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
-    return queryset.annotate(completed_at=Case(When(is_labeled=True, then=Subquery(newest.values('created_at')))))
+    newest_annotations = Annotation.objects.filter(task=OuterRef('pk')).order_by('-id')[:1]
+    return Subquery(newest_annotations.values('created_at'))
+
+
+def base_annotate_completed_at(queryset: TaskQuerySet) -> TaskQuerySet:
+    return queryset.annotate(completed_at=Case(When(is_labeled=True, then=newest_annotation_subquery())))
+
+
+def annotate_completed_at(queryset: TaskQuerySet) -> TaskQuerySet:
+    LseProject = load_func(settings.LSE_PROJECT)
+    get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
+
+    is_lse_project = bool(LseProject)
+    has_custom_agreement_queryset = bool(get_tasks_agreement_queryset)
+
+    if (
+        is_lse_project
+        and has_custom_agreement_queryset
+        and flag_set('fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short', user='auto')
+    ):
+        return annotated_completed_at_considering_agreement_threshold(queryset)
+
+    return base_annotate_completed_at(queryset)
+
+
+def annotated_completed_at_considering_agreement_threshold(queryset):
+    LseProject = load_func(settings.LSE_PROJECT)
+    get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
+
+    is_lse_project = bool(LseProject)
+    has_custom_agreement_queryset = bool(get_tasks_agreement_queryset)
+
+    project_exists = is_lse_project and hasattr(queryset, 'project') and queryset.project is not None
+
+    project_id = queryset.project.id if project_exists else None
+
+    if project_id is None or not is_lse_project or not has_custom_agreement_queryset:
+        return base_annotate_completed_at(queryset)
+
+    lse_project = fast_first(
+        LseProject.objects.filter(project_id=project_id).values(
+            'agreement_threshold', 'max_additional_annotators_assignable'
+        )
+    )
+
+    agreement_threshold = lse_project['agreement_threshold'] if lse_project else None
+    if not lse_project or not agreement_threshold:
+        # This project doesn't use task_agreement so don't consider it when determining completed_at
+        return base_annotate_completed_at(queryset)
+
+    queryset = get_tasks_agreement_queryset(queryset)
+    max_additional_annotators_assignable = lse_project['max_additional_annotators_assignable']
+
+    completed_at_case = Case(
+        When(
+            # If agreement_threshold is set, evaluate all conditions
+            Q(is_labeled=True)
+            & (
+                Q(_agreement__gte=agreement_threshold)
+                | Q(annotation_count__gte=(F('overlap') + max_additional_annotators_assignable))
+            ),
+            then=newest_annotation_subquery(),
+        ),
+        default=Value(None),
+        output_field=DateTimeField(),
+    )
+
+    return queryset.annotate(completed_at=completed_at_case)
 
 
 def annotate_storage_filename(queryset: TaskQuerySet) -> TaskQuerySet:

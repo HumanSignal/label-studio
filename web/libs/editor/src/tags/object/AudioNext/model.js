@@ -1,16 +1,15 @@
-import { getRoot, getType, types } from 'mobx-state-tree';
-import { customTypes } from '../../../core/CustomTypes';
-import { guidGenerator } from '../../../core/Helpers.ts';
-import { AnnotationMixin } from '../../../mixins/AnnotationMixin';
-import IsReadyMixin from '../../../mixins/IsReadyMixin';
-import ProcessAttrsMixin from '../../../mixins/ProcessAttrs';
-import { SyncableMixin } from '../../../mixins/Syncable';
-import { AudioRegionModel } from '../../../regions/AudioRegion';
-import Utils from '../../../utils';
-import { isDefined } from '../../../utils/utilities';
-import ObjectBase from '../Base';
-import { WS_SPEED, WS_VOLUME, WS_ZOOM_X } from './constants';
-
+import { getRoot, getType, types } from "mobx-state-tree";
+import { customTypes } from "../../../core/CustomTypes";
+import { guidGenerator } from "../../../core/Helpers.ts";
+import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
+import IsReadyMixin from "../../../mixins/IsReadyMixin";
+import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
+import { SyncableMixin } from "../../../mixins/Syncable";
+import { AudioRegionModel } from "../../../regions/AudioRegion";
+import Utils from "../../../utils";
+import { isDefined } from "../../../utils/utilities";
+import ObjectBase from "../Base";
+import { WS_SPEED, WS_VOLUME, WS_ZOOM_X } from "./constants";
 
 /**
  * The Audio tag plays audio and shows its waveform. Use for audio annotation tasks where you want to label regions of audio, see the waveform, and manipulate audio during annotation.
@@ -56,33 +55,34 @@ const TagAttrs = types.model({
   hotkey: types.maybeNull(types.string),
   showlabels: types.optional(types.boolean, false),
   showscores: types.optional(types.boolean, false),
-  height: types.optional(types.string, '88'),
-  cursorwidth: types.optional(types.string, '2'),
-  cursorcolor: types.optional(customTypes.color, '#333'),
-  defaultscale: types.optional(types.string, '1'),
+  height: types.optional(types.string, "88"),
+  cursorwidth: types.optional(types.string, "2"),
+  cursorcolor: types.optional(customTypes.color, "#333"),
+  defaultscale: types.optional(types.string, "1"),
   autocenter: types.optional(types.boolean, true),
   scrollparent: types.optional(types.boolean, true),
 });
 
 export const AudioModel = types.compose(
-  'AudioModel',
+  "AudioModel",
   TagAttrs,
   SyncableMixin,
   ProcessAttrsMixin,
   ObjectBase,
   AnnotationMixin,
   IsReadyMixin,
-  types.model('AudioModel', {
-    type: 'audio',
-    _value: types.optional(types.string, ''),
+  types
+    .model("AudioModel", {
+      type: "audio",
+      _value: types.optional(types.string, ""),
 
-    playing: types.optional(types.boolean, false),
-    regions: types.array(AudioRegionModel),
-  })
+      playing: types.optional(types.boolean, false),
+      regions: types.array(AudioRegionModel),
+    })
     .volatile(() => ({
       errors: [],
     }))
-    .views(self => ({
+    .views((self) => ({
       get hasStates() {
         const states = self.states();
 
@@ -100,29 +100,32 @@ export const AudioModel = types.compose(
       activeStates() {
         const states = self.states();
 
-        return states && states.filter(s => getType(s).name === 'LabelsModel' && s.isSelected);
+        return states && states.filter((s) => getType(s).name === "LabelsModel" && s.isSelected);
       },
     }))
     ////// Sync actions
-    .actions(self => ({
+    .actions((self) => ({
       ////// Outgoing
       triggerSync(event, data) {
         if (!self._ws) return;
 
-        self.syncSend({
-          playing: self._ws.isPlaying(),
-          time: self._ws.getCurrentTime(),
-          speed: self._ws.rate ?? 1,
-          ...data,
-        }, event);
+        self.syncSend(
+          {
+            playing: self._ws.isPlaying(),
+            time: self._ws.getCurrentTime(),
+            speed: self._ws.rate ?? 1,
+            ...data,
+          },
+          event,
+        );
       },
 
       triggerSyncPlay() {
-        self.triggerSync('play');
+        self.triggerSync("play");
       },
 
       triggerSyncPause() {
-        self.triggerSync('pause');
+        self.triggerSync("pause");
       },
 
       ////// Incoming
@@ -155,13 +158,13 @@ export const AudioModel = types.compose(
       },
 
       registerSyncHandlers() {
-        self.syncHandlers.set('play', self.handleSyncPlay);
-        self.syncHandlers.set('pause', self.handleSyncPause);
-        self.syncHandlers.set('seek', self.handleSyncSeek);
-        self.syncHandlers.set('speed', self.handleSyncSpeed);
+        self.syncHandlers.set("play", self.handleSyncPlay);
+        self.syncHandlers.set("pause", self.handleSyncPause);
+        self.syncHandlers.set("seek", self.handleSyncSeek);
+        self.syncHandlers.set("speed", self.handleSyncSpeed);
       },
     }))
-    .actions(self => ({
+    .actions((self) => ({
       needsUpdate() {
         self.handleNewRegions();
       },
@@ -172,7 +175,7 @@ export const AudioModel = types.compose(
 
       handleNewRegions() {
         if (!self._ws?.isReady) return;
-        self.regs.map(reg => {
+        self.regs.map((reg) => {
           if (reg._ws_region) return;
           self.createWsRegion(reg);
         });
@@ -194,14 +197,14 @@ export const AudioModel = types.compose(
 
       createRegion(wsRegion, states) {
         let bgColor = self.selectedregionbg;
-        const st = states.find(s => s.type === 'labels');
+        const st = states.find((s) => s.type === "labels");
 
         if (st) bgColor = Utils.Colors.convertToRGBA(st.getSelectedColor(), 0.3);
 
         const r = AudioRegionModel.create({
           id: wsRegion.id ? wsRegion.id : guidGenerator(),
           pid: wsRegion.pid ? wsRegion.pid : guidGenerator(),
-          parentID: wsRegion.parent_id === null ? '' : wsRegion.parent_id,
+          parentID: wsRegion.parent_id === null ? "" : wsRegion.parent_id,
           start: wsRegion.start,
           end: wsRegion.end,
           score: wsRegion.score,
@@ -221,7 +224,7 @@ export const AudioModel = types.compose(
       },
 
       selectRange(ev, ws_region) {
-        const selectedRegions = self.regs.filter(r => r.start >= ws_region.start && r.end <= ws_region.end);
+        const selectedRegions = self.regs.filter((r) => r.start >= ws_region.start && r.end <= ws_region.end);
 
         ws_region.remove && ws_region.remove();
         if (!selectedRegions.length) return;
@@ -247,7 +250,7 @@ export const AudioModel = types.compose(
         const states = self.getAvailableStates();
 
         if (states.length === 0) {
-          wsRegion.on('update-end', ev => self.selectRange(ev,wsRegion));
+          wsRegion.on("update-end", (ev) => self.selectRange(ev, wsRegion));
           return;
         }
 
@@ -266,16 +269,16 @@ export const AudioModel = types.compose(
       handlePlay() {
         if (self._ws) {
           self.playing = !self.playing;
-          self._ws.isPlaying() ? self.triggerSync('play') : self.triggerSync('pause');
+          self._ws.isPlaying() ? self.triggerSync("play") : self.triggerSync("pause");
         }
       },
 
       handleSeek() {
-        self.triggerSync('seek');
+        self.triggerSync("seek");
       },
 
       handleSpeed(speed) {
-        self.triggerSync('speed', { speed });
+        self.triggerSync("speed", { speed });
       },
 
       createWsRegion(region) {
@@ -296,10 +299,9 @@ export const AudioModel = types.compose(
         self._ws = ws;
         const history = self.annotation.history;
 
-        self.regs.forEach(reg => {
+        self.regs.forEach((reg) => {
           self.createWsRegion(reg);
         });
-
 
         // In cases where we do skipNextUndoState on region creation, we need to make sure
         // that we don't skip the next undo state after it is resolved entirely.
@@ -322,7 +324,7 @@ export const AudioModel = types.compose(
           }
         } catch (err) {
           self._ws = null;
-          console.warn('Already destroyed');
+          console.warn("Already destroyed");
         }
       },
     })),

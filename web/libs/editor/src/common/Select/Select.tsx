@@ -1,10 +1,28 @@
-import React, { Children, cloneElement, createContext, CSSProperties, FC, KeyboardEvent, MouseEvent, ReactChild, ReactFragment, ReactNode, ReactPortal, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { BemWithSpecifiContext, cn } from '../../utils/bem';
-import { shallowEqualArrays } from 'shallow-equal';
-import { isDefined } from '../../utils/utilities';
-import { Dropdown } from '../Dropdown/Dropdown';
-import './Select.styl';
-import { FF_DEV_2669, isFF } from '../../utils/feature-flags';
+import React, {
+  Children,
+  cloneElement,
+  createContext,
+  type CSSProperties,
+  type FC,
+  type KeyboardEvent,
+  type MouseEvent,
+  type ReactChild,
+  type ReactFragment,
+  type ReactNode,
+  type ReactPortal,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { BemWithSpecifiContext, cn } from "../../utils/bem";
+import { shallowEqualArrays } from "shallow-equal";
+import { isDefined } from "../../utils/utilities";
+import { Dropdown } from "../Dropdown/Dropdown";
+import "./Select.styl";
+import { FF_DEV_2669, isFF } from "../../utils/feature-flags";
 
 type FoundChild = ReactChild | ReactFragment | ReactPortal;
 
@@ -12,10 +30,10 @@ interface SelectProps {
   placeholder?: ReactNode;
   value?: string | string[];
   defaultValue?: string | string[];
-  size?: 'normal' | 'medium' | 'small';
+  size?: "normal" | "medium" | "small";
   style?: CSSProperties;
-  variant?: 'base' | 'rounded';
-  surface?: 'base' | 'emphasis';
+  variant?: "base" | "rounded";
+  surface?: "base" | "emphasis";
   multiple?: boolean;
   renderMultipleSelected?: (value: string[]) => ReactNode;
   tabIndex?: number;
@@ -39,7 +57,7 @@ const SelectContext = createContext<SelectContextProps>({
   multiple: false,
   focused: false,
   currentValue: [],
-  setCurrentValue() { },
+  setCurrentValue() {},
 });
 
 const { Block, Elem } = BemWithSpecifiContext();
@@ -50,13 +68,13 @@ const findSelectedChild = (children: ReactNode, value?: string | string[]): Foun
 
     const { type, props } = child as any;
 
-    if (type.displayName === 'Select.Option') {
+    if (type.displayName === "Select.Option") {
       if (props.value === value) {
         res = child;
       } else if (Array.isArray(value) && value.length === 1) {
         res = findSelectedChild(children, value[0]);
       }
-    } else if (type.displayName === 'Select.OptGroup') {
+    } else if (type.displayName === "Select.OptGroup") {
       res = findSelectedChild(props.children, value);
     }
 
@@ -77,19 +95,16 @@ export const Select: SelectComponent<SelectProps> = ({
   surface,
   dataTestid,
   tabIndex = 0,
-  placeholder = 'Select value',
+  placeholder = "Select value",
 }) => {
   const dropdown = useRef<any>();
   const rootRef = useRef();
-  const [currentValue, setCurrentValue] = useState(
-    multiple
-      ? ([] as string[]).concat(value ?? []).flat(10)
-      : value,
-  );
+  const [currentValue, setCurrentValue] = useState(multiple ? ([] as string[]).concat(value ?? []).flat(10) : value);
   const [focused, setFocused] = useState<string | null>();
 
-  const options = Children.toArray(children).filter((child: any) => { // toArray is returning incorrect types which don't have type.displayName or props, but the actual child does.
-    return child.type.displayName === 'Select.Option' && !child.props.exclude;
+  const options = Children.toArray(children).filter((child: any) => {
+    // toArray is returning incorrect types which don't have type.displayName or props, but the actual child does.
+    return child.type.displayName === "Select.Option" && !child.props.exclude;
   });
 
   const setValue = (newValue?: string | string[]) => {
@@ -97,7 +112,7 @@ export const Select: SelectComponent<SelectProps> = ({
 
     if (multiple && Array.isArray(currentValue) && newValue) {
       if (!Array.isArray(newValue) && currentValue.includes(newValue)) {
-        updatedValue = currentValue.filter(v => v !== newValue);
+        updatedValue = currentValue.filter((v) => v !== newValue);
       } else {
         updatedValue = [...currentValue, newValue].flat(10);
       }
@@ -124,16 +139,13 @@ export const Select: SelectComponent<SelectProps> = ({
 
   const selected = useMemo(() => {
     if (isFF(FF_DEV_2669) && multiple && renderMultipleSelected) {
-      return renderMultipleSelected(Array.isArray(currentValue) ? currentValue : [currentValue || '']);
+      return renderMultipleSelected(Array.isArray(currentValue) ? currentValue : [currentValue || ""]);
     }
     if (multiple && Array.isArray(currentValue) && currentValue?.length > 1) {
       return <>Multiple values selected</>;
     }
 
-    const foundChild = findSelectedChild(
-      children,
-      defaultValue ?? currentValue,
-    ) as any;
+    const foundChild = findSelectedChild(children, defaultValue ?? currentValue) as any;
 
     const result = foundChild?.props?.children;
 
@@ -146,33 +158,36 @@ export const Select: SelectComponent<SelectProps> = ({
     setFocused(child.props.value);
   };
 
-  const focusNext = useCallback((direction) => {
-    const selectedIndex = options.findIndex((c: any) => c.props.value === focused);
+  const focusNext = useCallback(
+    (direction) => {
+      const selectedIndex = options.findIndex((c: any) => c.props.value === focused);
 
-    let nextIndex = selectedIndex === -1 ? 0 : selectedIndex + direction;
+      let nextIndex = selectedIndex === -1 ? 0 : selectedIndex + direction;
 
-    if (nextIndex >= options.length) {
-      nextIndex = 0;
-    } else if (nextIndex < 0) {
-      nextIndex = options.length - 1;
-    }
+      if (nextIndex >= options.length) {
+        nextIndex = 0;
+      } else if (nextIndex < 0) {
+        nextIndex = options.length - 1;
+      }
 
-    focusItem(nextIndex);
-  }, [focused]);
+      focusItem(nextIndex);
+    },
+    [focused],
+  );
 
   const handleKeyboard = (e: KeyboardEvent) => {
     if (document.activeElement !== rootRef.current) {
       return;
     }
 
-    if (['ArrowDown', 'ArrowUp'].includes(e.key)) {
+    if (["ArrowDown", "ArrowUp"].includes(e.key)) {
       if (dropdown?.current.visible) {
-        focusNext(e.key === 'ArrowDown' ? 1 : -1);
+        focusNext(e.key === "ArrowDown" ? 1 : -1);
       } else {
         dropdown.current?.open();
         focusItem();
       }
-    } else if ((e.code === 'Space' || e.code === 'Enter') && isDefined(focused)) {
+    } else if ((e.code === "Space" || e.code === "Enter") && isDefined(focused)) {
       context.setCurrentValue(focused);
     }
   };
@@ -189,10 +204,17 @@ export const Select: SelectComponent<SelectProps> = ({
 
   return (
     <SelectContext.Provider value={context}>
-      <Block ref={rootRef} name="select" mod={{ size, surface }} style={style} tabIndex={tabIndex} onKeyDown={handleKeyboard}>
+      <Block
+        ref={rootRef}
+        name="select"
+        mod={{ size, surface }}
+        style={style}
+        tabIndex={tabIndex}
+        onKeyDown={handleKeyboard}
+      >
         <Dropdown.Trigger
           ref={dropdown}
-          className={cn('select', { elem: 'dropdown', mod: { variant } }).toClassName()}
+          className={cn("select", { elem: "dropdown", mod: { variant } }).toClassName()}
           content={<Elem name="list">{children}</Elem>}
           onToggle={(visible: boolean) => {
             if (!visible) setFocused(null);
@@ -207,7 +229,7 @@ export const Select: SelectComponent<SelectProps> = ({
     </SelectContext.Provider>
   );
 };
-Select.displayName = 'Select';
+Select.displayName = "Select";
 
 interface SelectOptionProps {
   value?: string;
@@ -222,12 +244,9 @@ const SelectOption: FC<SelectOptionProps> = ({ value, children, style }) => {
     const option = String(value);
 
     if (multiple && Array.isArray(currentValue)) {
-      return currentValue
-        .map(v => String(v))
-        .includes(option);
-    } else {
-      return option === String(currentValue);
+      return currentValue.map((v) => String(v)).includes(option);
     }
+    return option === String(currentValue);
   }, [value, focused, currentValue]);
 
   const isFocused = useMemo(() => {
@@ -252,7 +271,7 @@ const SelectOption: FC<SelectOptionProps> = ({ value, children, style }) => {
   );
 };
 
-SelectOption.displayName = 'Select.Option';
+SelectOption.displayName = "Select.Option";
 
 interface SelectioOptGroupProps {
   label?: JSX.Element | string;
@@ -268,8 +287,7 @@ const SelectOptGroup: FC<SelectioOptGroupProps> = ({ label, children, style }) =
   );
 };
 
-SelectOptGroup.displayName = 'Select.OptGroup';
+SelectOptGroup.displayName = "Select.OptGroup";
 
 Select.Option = SelectOption;
 Select.OptGroup = SelectOptGroup;
-

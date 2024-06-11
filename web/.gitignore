@@ -12,6 +12,7 @@ node_modules
 .project
 .classpath
 .c9/
+.DS_Store
 *.launch
 .settings/
 *.sublime-workspace
@@ -46,7 +47,9 @@ report.*.json
 !.env.local
 !*.lock
 
-
+libs/**/package.json
+libs/**/package-lock.json
+libs/**/yarn.lock
 
 # editor ignored files
 

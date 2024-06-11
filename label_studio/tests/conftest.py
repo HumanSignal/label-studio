@@ -372,7 +372,7 @@ def project_dialog():
     label = """<View>
       <TextEditor>
         <Text name="dialog" value="$dialog"></Text>
-        <Header name="header" value="Your answer is:"></Header>
+        <Header value="Your answer is:"></Header>
         <TextArea name="answer"></TextArea>
       </TextEditor>
     </View>"""
@@ -469,6 +469,19 @@ def setup_project_ranker(client):
 @pytest.fixture
 def setup_project_choices(client):
     return setup_project(client, project_choices)
+
+
+@pytest.fixture()
+def contextlog_test_config(settings):
+    """
+    Configure settings for contextlog tests in CI.
+    Be sure that responses is activated in any testcase where this fixture is used.
+    """
+
+    settings.COLLECT_ANALYTICS = True
+    settings.CONTEXTLOG_SYNC = True
+    settings.TEST_ENVIRONMENT = False
+    settings.DEBUG_CONTEXTLOG = False
 
 
 @pytest.fixture

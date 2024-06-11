@@ -5,9 +5,9 @@ title: On-Premises Release Notes for Label Studio Enterprise
 short: On-Prem Release Notes
 type: guide
 tier: enterprise
-order: 221
-order_enterprise: 142
-section: "Reference"
+order: 0
+order_enterprise: 451
+section: "What's New"
 meta_title: On-premises release notes for Label Studio Enterprise
 meta_description: Review new features, enhancements, and bug fixes for on-premises Label Studio Enterprise installations. 
 ---
@@ -15,18 +15,836 @@ meta_description: Review new features, enhancements, and bug fixes for on-premis
 !!! note 
     The release notes for Label Studio Community Edition are available from the <a href="https://github.com/HumanSignal/label-studio/releases">Label Studio GitHub repository</a>.
 
-## New helm chart
+!!! note 
+    Before upgrading, review the steps outlined in [Upgrade Label Studio Enterprise](upgrade_enterprise) and ensure that you complete the recommended tests after each upgrade. 
 
-A common chart for LS and LSE has been released and is available as of LSE version 2.3.x. The chart can be accessed at the following repository: https://github.com/HumanSignal/charts/tree/master/heartex/label-studio.
+<div class="release-note"><button class="release-note-toggle"></button>
+<a name="2120md"></a>
 
-### Migration Process
+## Label Studio Enterprise 2.12.0
 
-The migration process can be performed without any downtime. The steps required to carry out the migration are documented in the migration guide, available at: https://github.com/HumanSignal/charts/blob/master/heartex/label-studio/FAQs.md#label-studio-enterprise-upgrade-from-decommissioned-label-studio-enterprise-helm-chart.
+<div class="onprem-highlight">New experimental Cache Labels action in the Data Manager, annotation history in snapshots, new setting to restrict local imports into Label Studio, and changes to how the Hide Storage Settings for Manager environment variable works. </div>
+
+*Jun 04, 2024*
+
+Helm Chart version: 1.4.8
 
 
+### Enhancements
+
+- There is a new experimental **Cache Labels** action available from the Data Manager. This action extracts labels from annotations or predictions and compiles that information into a new column in the Data Manager. You can then use this column for faster searching and filtering.
+
+    To enable experimental features, set the `EXPERIMENTAL_FEATURES` environment variable to `True`. However, note that experimental features are not fully supported.
+- When you create a new snapshot, you will now have the option to include annotation history:
+
+    ![Screenshot of the snapshot dialog](/images/releases/2_12_snapshot.png)
+- There is a new setting that can restrict users from uploading data directly to Label Studio, forcing them to only use cloud storage. If you would like to enable this setting, set the `DISABLE_PROJECT_IMPORTS` environment variable to `True`.
+- For organizations with the  `HIDE_STORAGE_SETTINGS_FOR_MANAGER` environment variable set to `True`, Managers will now be able to sync data from external storage as necessary rather than request assistance from an Admin user.
+
+### Security
+
+- Updated xml2js and Babel to avoid a vulnerabilities found in earlier versions.
+
+### Bug fixes
+
+- Fixed an issue in which users were allowed to submit empty annotations when using hotkeys, even though empty annotations were disabled via the **Allow empty annotations** project setting. 
+
+- Fixed an issue with button sizing inconsistency when selecting date ranges.
+
+- Fixed an issue where regions were disappearing when a user would switch between annotations and predictions.
+
+- Fixed an issue that prevented users from fetching the URL for TimeSeries objects.
+
+- Fixed an issue where, if there was no name provided for a cloud storage connection, the project settings page would not load.
+
+- Fixed an issue with environment variables that have the prefix `LABEL_STUDIO_` appearing in context logs.
+
+- Fixed an issue where errors were appearing in the user console related to loading large JS files.
+
+- Fixed an issue in which users who have their own organization could not be added to another organization using SCIM.
+
+- Fixed an issue where SCIM was not handling adding or disabling users in situations where the user limit was exceeded.
+
+- Fixed an issue where SCIM was creating duplicate users in situations in which there were discrepancies in casing used in their domain names.
+
+- Fixed an issue where logs were failing because the default level was set to `DEBUG`. The default log level is now `INFO`.
+
+- Fixed an issue in which the **Start Training** action for ML backends was sending the `PROJECT_UPDATE` webhook event instead of `START_TRAINING`.
+
+- Fixed an issue where the **Batch Predictions** action was failing under certain conditions.
+
+- Fixed an issue where tooltips on the dashboard were causing confusing mouseover behavior even when not visible.
+
+- Fixed an issue where multiple errors would appear in the console when users navigated away from the Data Manager.
+
+- Fixed an issue where the progress bar for projects was not properly accounting for tasks that required additional annotators due to low agreement settings.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="2111post2md"></a>
+
+## Label Studio Enterprise 2.11.1.post2
+
+<div class="onprem-highlight">Bug fix</div>
+
+*May 30, 2024*
+
+Helm Chart version: 1.4.8
+
+### Bug fixes
+- Fix Redis connection with SSL.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="2111post1md"></a>
+
+## Label Studio Enterprise 2.11.1.post1
+
+<div class="onprem-highlight">Bug fix</div>
+
+*May 07, 2024*
+
+Helm Chart version: 1.4.6
+
+### Bug fixes
+- The `COLLECT_ANALYTICS` environment variable can now be specified in uppercase or lowercase (`collect_analytics`).
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="2111md"></a>
+
+## Label Studio Enterprise 2.11.1
+
+<div class="onprem-highlight">Improved machine learning & LLM integrations, action to remove duplicated tasks, Redis ACL support, and other enhancements and bug fixes</div>
+
+*Apr 30, 2024*
+
+Helm Chart version: 1.4.4
+
+### New features 
+
+#### Improved machine learning & LLM integrations
+
+This release streamlines the way ML models and LLMs are connected to Label Studio with a focus on security and simplified user experience. 
+
+Using the powerful ML backend integration, users can add models and customize automated workflows for:
+
+- **Pre-labeling**: Letting ML/AI models predict labels autonomously, which can then be reviewed by human annotators.
+- **Interactive labeling**: An automated process that applies initial labels to data, which are then refined through manual review, enhancing the efficiency and accuracy of data annotation for machine learning models.
+- **Model evaluation and fine-tuning**: Used in models like the Segment Anything Model (SAM), involves a human-in-the-loop approach where the model provides initial predictions or annotations, and a human annotator interacts directly with these predictions to correct or refine them.
+
+Label Studio Enterprise users can add custom models, or reference a [new examples library](https://github.com/HumanSignal/label-studio-ml-backend/tree/master) to connect popular models, including Segment Anything, OpenAI, Grounding DINO, select Hugging Face models, Tesseract, and more.
+
+Updates to the ML backend integration in this release include:
+
+- New support for basic auth, which means users can now connect to hosted ML backends that require a password.
+- The ability to specify additional parameters to pass to the model, which means users can now easily connect to Azure-hosted OpenAI in addition to OpenAI and popular ML models.
+- An improved UI and simplified project settings, including:
+    - A new **Live Predictions** section under the **Annotation** page of the project settings makes it easier select whether you want to use predictions or a model in your annotation workflow.
+    - A new **Predictions** page, where you can easily upload and manage predictions.
+    - Removed obsolete settings that are no longer compatible (for example, auto-updating version).
+    - Fixed various usability issues related to the annotation experience with a model connected.
+
+For more information, see [Integrate Label Studio into your machine learning pipeline](ml).
+
+![Screenshot of the new ML backend screens](/images/releases/2-11-0-ml-backend2.png)
+
+![Screenshot of the new ML backend screens](/images/releases/2-11-0-ml-backend.png)
+
+
+#### Remove Duplicated Tasks action
+
+There is a new Remove Duplicated Tasks action available from the Data Manager. This action had previously only been available as an experimental feature.  
+
+When you use this action, annotations from duplicated tasks are consolidated into one task (the first task found among the duplicated tasks). 
+
+![Screenshot of the Remove Duplicated Tasks action](/images/releases/2-11-1-remove-duplicate.png)
+
+
+### Enhancements
+
+- Redis ACLs are now supported.
+
+- Improved usability for project dashboards by changing how time filtering works to more accurately reflect annotation progress.
+
+- Multiple domains per organization are now supported for SSO login.
+
+
+### Security
+
+- Enhanced validation to ensure that projects created through the API have workspaces within the active organization.
+
+- Fixed an issue in which insufficient permission checks were performed for certain API calls.
+
+
+### Bug fixes
+
+- Fixed an issue where, during the review process, the mouse cursor would disappear against light gray backgrounds.
+
+- Fixed an issue where some tasks were not displayed when using the review explorer.
+
+- Fixed an issue with missing text in results for specific OS and browsers.
+
+- Fixed an issue which could produce incorrect unresolved comment counts when updating the comment `is_resolved` state
+
+- Fixed an issue in which the Dashboards page returned an error if the project had no tasks.
+
+- Fixed an issue with project dashboard label distribution charts in which some labels could be improperly grouped.
+
+- Fixed an issue where blank charts would be created in the project dashboards. 
+
+- Fixed an issue in which project dashboard charts would return errors and appear empty.
+
+- Fixed an issue is which the `TextArea` input area would resize while you were editing it.
+
+- Fixed an issue with loading data manager while there are trailing special characters in keys of imported data.
+
+- Fixed an issue where validation would fail for `<Table>` tags when the imported data used list format.
+
+- Fixed an issue in which exporting data would use excessive memory.
+
+- Fixed an issue in which some icons were not displayed correctly.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="2110post1md"></a>
+
+## Label Studio Enterprise 2.11.0.post1
+
+<div class="onprem-highlight">Bug fix</div>
+
+*Apr 29, 2024*
+
+Helm Chart version: 1.4.4
+
+### Bug fixes
+- Fixed an issue where application logging was not working. 
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="2110md"></a>
+
+## Label Studio Enterprise 2.11.0
+
+<div class="onprem-highlight">New ability to configure project-level roles, setting to hide the Cloud Storage page from Manager roles, other enhancements and bug fixes </div>
+
+*Apr 09, 2024*
+
+Helm Chart version: 1.4.2
+
+### New features
+
+#### Project-level roles
+
+You can now assign the Reviewer or Annotator role to users on a per-project basis. This will help simplify team management and allow more flexibility for project managers within your organization to meet the needs of each project.  
+
+This feature was previously only available to organizations who had enabled SCIM for their user management. Now, project-level roles can be assigned as part of the project membership settings, and is applicable to any user who has the Annotator or Reviewer role at the organization level. For example, a user can be an Annotator at the organization level, but have the Reviewer role for a specific project. Similarly, a user with the Reviewer role at the organization level can be assigned as an Annotator to different projects as needed. 
+
+For more information, see [Project-level roles](#Project-level-roles).
+
+![Screenshot of the project-level roles](/images/releases/2-11-0-project-level-roles.png)
+
+### Enhancements
+
+- Added support for `X-Api-Key: <token>` as an alternative to `Authentication: Token <token>`. This will make it easier to use API keys when integrating with cloud-based services. 
+- Small UI improvement to make it clearer which project members are included in the project by default.
+- There is a new setting in place that can control access to the Cloud Storage page for users with the Manager role. If you would like to enable this setting, set the `HIDE_STORAGE_SETTINGS_FOR_MANAGER` environment variable to `True`.
+- Several enhancements for organizations with SCIM enabled, including:
+    - More detailed error messages.
+    - Allow workspace and role mappings to support multiple SCIM groups.
+
+### Bug fixes
+
+- Fixed an issue where Google Cloud Logging was not working due to a missing dependency.
+- Fixed an issue where `/api/version` was not reporting all updates.
+- Fixed an issue where, after revoking an invite to users who are already in projects, the project failed to load.
+
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="2101post2md"></a>
+
+## Label Studio Enterprise 2.10.1.post2
+
+<div class="onprem-highlight">Bug fix</div>
+
+*Apr 02, 2024*
+
+Helm Chart version: 1.4.0
+
+### Bug fixes
+
+- Fixed an issue that prevented the docker-compose instance from starting due to a misconfiguration in the internal discovery settings.
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="2101post1md"></a>
+
+## Label Studio Enterprise 2.10.1.post1
+
+<div class="onprem-highlight">Security-related fixes</div>
+
+*Mar 13, 2024*
+
+Helm Chart version: 1.4.0
+
+### Security
+
+- Upgrade vulnerable versions of Pillow and Cryptography
+- Remove unused `requirements.*.txt` files that referred to old packages with CVEs
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="2101md"></a>
+
+## Label Studio Enterprise 2.10.1
+
+<div class="onprem-highlight">New <b>Reset Cache</b> action for projects, security update for activity logs, various bug fixes</div>
+
+*Mar 12, 2024*
+
+Helm chart version: 1.4.0
+
+### Enhancements
+
+There is a new **Reset Cache** action available from project settings under the **Danger Zone** section. You can use this action to reset and recalculate the labeling cache. 
+
+This action is particularly useful for situations in which you are attempting to modify the labeling configuration and you receive a validation error pointing to non-existent labels or drafts. 
+
+![Screenshot of the Reset Cache action](/images/releases/2-10-1-reset-cache.png)
+
+### Security
+
+Fixed an issue where sensitive information was available in activity logs. 
+
+### Bug fixes
+
+- Fixed an issue where users could not submit annotations if the labeling configuration included the `TextArea` tag with the `required` and `skipDuplicates` parameters.
+
+- Fixed an issue where the Projects page was displaying the wrong number when indicating how many projects are displayed on the page.
+
+- Fixed an issue where when calling `GET api/tasks?projects={id}&fields=all`, reviews were not returned.
+
+- Fixed an issue where an empty draft was created every time a user clicked **View all annotations**.
+
+- Fixed an issue where the URL in email invites was missing the `http` protocol.
+
+- Fixed an issue where sometimes the **Refresh** action on the project dashboard would be stuck in a loading state.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="2100md"></a>
+
+## Label Studio Enterprise 2.10.0
+
+<div class="onprem-highlight">Granular API-level control over annotation history, UI enhancements for performance and user experience, security updates, bug fixes</div>
+
+*Feb 13, 2024*
+
+Helm chart version:  1.4.0
+
+### Enhancements
+
+- More granular API-level controls: 
+
+    - Implemented datetime filtering to the per-project annotation history API to support analytics queries and reporting.  Now you can filter [`/api/projects/{id}/annotation-history`](https://app.heartex.com/docs/api/#tag/Annotation-History/operation/api_projects_annotation-history_list) by `created_at_from` and `created_at_to`.
+
+- Made several updates to the UI to improve performance and user experience, including:
+
+    - Better formatting for longer text strings when using the grid view in the Data Manager.
+
+    - The Projects page is now limited to 12 projects per page, improving load time performance..
+
+    - Added a confirmation message after deleting a user.
+
+
+### Security
+
+- Implemented comprehensive HTML sanitization to safeguard against vulnerabilities and ensure a secure user experience.
+
+- This release includes several measures to increase SSRF protection, which address [`CVE-2023-47116`](https://github.com/HumanSignal/label-studio/security/advisories/GHSA-p59w-9gqw-wj8r):
+    - When `SSRF_PROTECTION_ENABLED` is set to `true` (note that it defaults to `false`), our new default is to ban [all IPs within reserved blocks](https://en.wikipedia.org/wiki/Reserved_IP_addresses), for both IPv4 and IPv6.
+    - We are introducing two new environment variables, to be used in conjunction with `SSRF_PROTECTION_ENABLED=true`:
+        - `USER_ADDITIONAL_BANNED_SUBNETS` — Use this to specify additional IP addresses or CIDR blocks to ban from server-side requests (e.g. the URL-based file uploader).
+        - `USE_DEFAULT_BANNED_SUBNETS` — This is set to `True` by default. If you would like to have full control over banned subnets, you can set this to `False` and use `USER_ADDITIONAL_BANNED_SUBNETS` to specify all the IP addresses/CIDR blocks you’d like to disallow instead.
+    - We have also improved our error messages to make it clearer when an action is being blocked due to SSRF protections.
+
+
+### Bug fixes
+
+- Fixed an issue with the Number tag in which the `max`  constraint was not working.
+
+- Fixed an issue with the Number tag where `toName`  was not validated.
+
+- Fixed an issue in which users were seeing an error when switching from task details to settings while working with a video annotation.
+
+- Fixed an issue where comments that were entered but not submitted were preserved even when navigating between annotations. This could lead to users accidentally submitting comments they did not want to save.
+
+- Fixed several issues where the refresh action was disabled depending on the selections that users would make when filtering for date and time ranges in the project dashboard.
+
+- Fixed an issue where users were not shown a confirmation message after clicking **Submit and exit** in the label stream.
+
+- Fixed an issue where Label Studio crashed when configuring multiple hotkeys using the `hotkey=","` format.
+
+- Fixed an issue where annotation drafts were not saving when switching to view all mode.
+
+- Fixed an issue where users would encounter an error when using the **Storage filename** filter in the Data Manager.
+
+- Fixed an issue where relations were not displayed if they were added by a user while reviewing a task.
+
+- Fixed an issue where the **Comments** tab was disappearing when users resized their screen.
+
+- Fixed an issue where drop-downs were occasionally displaying offset from their triggering element.
+
+- Fixed an issue where, if a user attempted to de-select a region by clicking outside of it, they would create a new region instead.
+
+- Fixed a small styling issue in the **Delete Member** modal title.
+
+- Fixed an issue where users could not use the Magic Wand tool with image preloading enabled.
+
+- Fixed an issue with duplicate default hotkeys when working with multi-image segmentation.
+
+- Fixed an issue where the Organization page roles filter would briefly display an incorrect number.
+
+- Fixed an issue where deactivated users were not listed in Members pages.
+
+- Fixed an issue where the **Review** button counter was not displaying the correct count in certain scenarios.
+
+- Fixed an issue where the Data Manager was not displaying `false`  or `0`  values as expected.
+
+- Fixed an issue where, when assigning tasks in bulk, 1 out of ~150 tasks would be left unassigned.
+
+- Fixed an issue where, if a user was a member of multiple organizations, they would not see a confirmation message after saving an annotation draft.
+
+- Fixed a regression issue in which regions text was not displayed properly in regions list.
+
+- Fixed an issue where invite signup links were missing `http` validation.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="290-2md"></a>
+
+## Label Studio Enterprise 2.9.0-2
+
+<div class="onprem-highlight">Bug fix</div>
+
+*Jan 26, 2024*
+
+Helm chart version: 1.3.3
+
+### Bug fixes
+- Fixed an issue where users were unable to use the **View all annotations** option when the project included images that had an empty URL.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="290-1md"></a>
+
+## Label Studio Enterprise 2.9.0-1
+
+<div class="onprem-highlight">Bug fix</div>
+
+*Jan 23, 2024*
+
+Helm chart version: 1.3.3
+
+### Bug fixes
+- Hotfix for displaying non-string values in Text tag
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="290md"></a>
+
+## Label Studio Enterprise 2.9.0
+
+<div class="onprem-highlight">Improved webhook performance and various UI improvements</div>
+
+*Jan 16, 2024*
+
+Helm chart version: 1.3.3
+
+### Enhancements
+
+- Improved webhook performance by assigning them to their own queue.
+
+- Adjusted spacing in the SCIM and SAML/SSO pages to improve readability.
+
+- When configuring SCIM with Okta, we will respond to their `userName` filter requests with the `email` attribute to ensure unique identifiers while maintaining compatibility.
+
+- When hovering over the **Submitted Annotations** card on the project dashboard, the tooltip will make it clear when the number includes skipped and empty annotations.
+
+
+### Security
+
+- Fixed an issue with HTML sanitization to address a vulnerability identified by CodeQL.
+- Addressed [`CVE-2024-23633`](https://github.com/HumanSignal/label-studio/security/advisories/GHSA-fq23-g58m-799r) by setting a `sandbox` CSP header on the `/data/upload/` endpoint. 
+
+### Bug fixes
+
+- Fixed some usability issues in the project Dashboards page related to the date picker and page refresh.
+
+- Fixed an issue where, when labeling tasks, hiding a region would create a draft and display the **Fix and Accept** action, even if no other changes had been made.
+
+- Fixed an issue where credential validation was failing in the Label Studio interface for cloud storages configured using SDK.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="280md"></a>
+
+## Label Studio Enterprise 2.8.0
+
+<div class="onprem-highlight">Improved member list filtering from the Organization page, collapsible Ranker items, various UI improvements</div>
+
+*Dec 19, 2023*
+
+Helm chart version: 1.3.2
+
+### Enhancements
+
+- The members list on the Organization page now allows you to filter by one or more roles. By default, Deactivated and Not Activated users are hidden. This makes it easier to locate users within the member list.
+
+    ![Screenshot of org list filter](/images/releases/2-8-0-org-list.png)
+
+- You can now expand and collapse Ranker items for easier management and rearrangement.
+
+    ![Animated gif of Ranker in action](/images/releases/2-8-0-ranker2.gif)
+
+- Added a new `disable_reviewer_annotator_tokens`setting for organization licenses. When set to `true`, token authorization is disabled for users in the Reviewer and Annotator role. This will help maintain organization security by preventing users from accessing Label Studio via the API.
+
+- Updated the font and spacing for the **Submit and Exit** button to match Label Studio UI styling guidelines.
+
+- Updated text on the SAML and SCIM settings pages to match Label Studio UI styling guidelines.
+
+- Improved error message clarity when configuring SCIM.
+
+- Added the ability to reinstate deleted users by re-inviting them to the organization.
+
+- Improved usability of the Label Interface Settings options, so that clicking anywhere within the description toggles the setting.
+
+### Security
+
+- Upgraded urllib3 to 1.26.18 to address [CVE-2023-45803](https://github.com/advisories/GHSA-g4mx-q9vg-27p4), and Django to 3.2.23 to address [CVE-2023-46695](https://github.com/advisories/GHSA-qmf9-6jqf-j8fq).
+
+- Patched an ORM leak vulnerability. 
+
+- Due to an XSS vulnerability, we previously added a requirement that users must log in to view the Label Studio API doc reference and Swagger. You can now view the [API docs](https://app.heartex.com/docs/api/) without logging in. However, the Swagger version is still only available to logged in users. 
+
+
+### Bug fixes
+
+- Fixed an issue where reviewers could not see annotation ID column.
+
+- Fixed an issue where role selections were not persisting after reloading the Organization page.
+
+- Fixed an issue where deleted users were appearing in the members list on the Organization page.
+
+- Fixed an issue where the Labeling Interface was not saving user changed.
+
+- Fixed an issue where activity logs contained sensitive information when using SCIM.
+
+- Fixed an issue where users were unable to edit polygon points.
+
+- Fixed a sync error when importing large amounts of tasks from Azure storage.
+
+- Fixed an issue where the crosshair parameter was not working.
+
+- Fixed an issue where the **Draft saved successfully** message was appearing when it wasn’t needed.
+
+- Fixed some usability issues in the project Dashboards page related to the date picker and page refresh.
+
+- Fixed an issue with wrong position of brushstroke highlighted on hover.
+
+- Fixed an issue with relation positions in multi-image segmentation.
+
+- Fixed an issue where the **Auto accept annotation suggestions** toggle was not working as expected in some situations.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="270-1md"></a>
+
+## Label Studio Enterprise 2.7.0-1
+
+<div class="onprem-highlight">Bug fix</div>
+
+*Dec 06, 2023*
+
+### Bug fixes
+- Fix UWSGI config to support IPv4 only host networks.
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="270md"></a>
+
+## Label Studio Enterprise 2.7.0
+
+<div class="onprem-highlight">External taxonomy, group visibility in label distribution charts, soft delete users</div>
+
+*Nov 21, 2023*
+
+Helm chart version: 1.2.9
+
+### New Features
+
+#### External taxonomy
+
+This release introduces the ability to load an external taxonomy into your labeling configuration. The mechanism for this is a new `apiUrl` parameter on the Taxonomy tag, which allows you to load your taxonomy from an external JSON-formatted file. Previously, you had to use `Choice` tags to manually define your taxonomy within the labeling configuration. 
+
+This feature provides multiple benefits, including:
+
+- **Performance** - Significant performance improvements for large taxonomies.
+- **Usability and standardization** - With JSON formatting and the ability to manage taxonomies in your editor of choice, external taxonomies are easier to organize and update.
+- **Security** - You can now securely store taxonomies outside of Label Studio.
+
+Fore more information, see [Quickly Load and Manage Large-Scale Taxonomies From External Sources](https://humansignal.com/blog/new-quickly-load-and-manage-large-scale-taxonomies-from-external-sources/), the [Taxonomy template](https://docs.humansignal.com/templates/taxonomy), and [Taxonomy tag](https://docs.humansignal.com/tags/taxonomy). 
+
+![Animated gif showing taxonomy in action](/images/releases/2-7-0-taxonomy.gif)
+
+#### Group visibility in label distribution charts and drag-and-drop reordering
+
+When a labeling configuration includes multiple label groups, you can now use the project dashboard to gain insight into label group performance.   
+
+A new **Summary** view displays a donut chart showing label group distribution. This allows for more visibility into your labeling progress, and will help you identify areas within a project that might need additional task data.  
+
+![Screenshot of label group distribution chart](/images/releases/2-7-0-label-groups.png)
+
+You will also now be able to drag-and-drop the KPIs and charts to reorder them to your preference. 
+
+For more information, see [Introducing Label Distribution Charts for Label Groups and User Soft Delete](https://humansignal.com/blog/introducing-label-distribution-charts-for-label-groups-and-user-soft-delete/). 
+
+![Animated gif showing dashboard reordering](/images/releases/2-7-0-reorder.gif)
+
+#### Soft delete users
+
+Administrators can now delete users through the app or the API. This feature is intended to provide enhanced user management for administrators while minimizing potential security risks. 
+
+Previously, administrators could only remove users by deactivating their account. However, this made it difficult to differentiate between users who are unlikely to return (such as a former employee) and users who might be temporarily inactive (such as freelance annotators). Now you can choose to either deactivate or delete a user. 
+
+For more information, see [Introducing Label Distribution Charts for Label Groups and User Soft Delete](https://humansignal.com/blog/introducing-label-distribution-charts-for-label-groups-and-user-soft-delete/). 
+
+![Screenshot of user delete action](/images/releases/2-7-0-user-delete.png)
+
+### Enhancements
+
+- Added support for AWS Signature Version 4 query parameters.
+- The **Submitted Annotations** metric on project dashboards now includes a tooltip with additional information about skipped and empty annotations.
+
+    ![Screenshot of tooltip on dashboard](/images/releases/2-7-0-tooltip.png)
+
+### Security
+
+- Fixed an SSRF DNS rebinding issue.
+- Fixed an XSS vulnerability on certain error pages.
+- Fixed an XSS vulnerability related to file extensions for avatars. This change addresses [`CVE-2023-47115`](https://github.com/HumanSignal/label-studio/security/advisories/GHSA-q68h-xwq5-mm7x).
+
+### Bug fixes
+
+- Fixed an issue where a validation error was improperly displayed when setting the labeling configuration for a project.
+- Fixed an issue with zoom performance in Image Segmentation cases.
+- Fixed an issue where annotator performance dashboard agreements were incorrect.
+- Fixed a run time error seen when syncing with Azure blob storage.
+- Fixed an issue where tasks created through source storage were not triggering webhooks.
+- Fixed an issue where code was unnecessarily executing when contextual scrolling was disabled.
+- Fixed an issue where draft annotations were not being saved before navigating away.
+- Fixed an issue where `PATCH api/tasks/<id>` was returning an error.
+- Fixed an issue where a duplicate project would incorrectly contain an annotation count with no annotations copied.
+- Fixed an issue where agreement groundtruth API calls were using excess resources.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="260-2md"></a>
+
+## Label Studio Enterprise 2.6.0-2
+
+<div class="onprem-highlight">Improved label and review stream counter</div>
+
+*Oct 27, 2023*
+
+### Enhancements
+- Improved label and review stream task counter to reflect the total available tasks for the user. 
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="260-1md"></a>
+
+## Label Studio Enterprise 2.6.0-1
+
+<div class="onprem-highlight">Bug fix</div>
+
+*Oct 26, 2023*
+
+### Bug fixes
+
+- Fixed an issue where `PATCH api/tasks/<id>` was returning errors. 
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="260md"></a>
+
+## Label Studio Enterprise 2.6.0
+
+<div class="onprem-highlight">New <code>snap</code> parameter for KeyPoint, KeyPointLabels, Polygon, and PolygonLabels tags, improved usability when reviewing video in Outliner </div>
+
+*Oct 24, 2023*
+
+### Enhancements
+
+- The [Keypoint](https://labelstud.io/tags/keypoint), [KeyPointLabels](https://docs.humansignal.com/tags/keypointlabels), [Polygon](https://docs.humansignal.com/tags/polygon), and [PolygonLabels](https://docs.humansignal.com/tags/polygonlabels) tags all support a new `snap` parameter for use in Image Segmentation labeling. When `snap="pixel"` is enabled, the (x, y) coordinates of each point are rounded to the pixel size. This enhancement will help ensure precise and uniform coordinates within images. For polygons, points are snapped to the pixel edge. For example, given a polygon point with the coordinates (0.25, 0.25), your resultant coordinates would snap to the edge of the pixel at (0,0). For keypoints, points are snapped to the pixel center.  For example, given a keypoint with the coordinates (0.25, 0.25), your resultant coordinates would snap to the center of the pixel at (0.5,0.5).
+- When reviewing video in Outliner, if you click on a marked region, the video playback will automatically jump to the selected region. Previously, users had to manually scroll to the starting point. This change will make it easier to quickly view and edit video segments.
+
+### Breaking changes
+
+- This release adds a deployment-wide `VERIFY_SSL_CERTS` setting that defaults to `true`. Customers who are loading data (e.g. uploading tasks) from https URLs without verifiable SSL certificates must set `VERIFY_SSL_CERTS` to `false` in their environment variables before deploying Label Studio 2.6.0+.
+- Add `WINDOWS_SQLITE_BINARY_HOST_PREFIX` environment variable to support hosting SQLite binaries on a server other than [sqlite.org](http://sqlite.org/), for Windows deployments running Python 3.8 only.
+
+### Bug fixes
+
+- Fixed an issue where pressing `Ctrl +` or `Ctrl -` (Windows) or `Cmd +` or `Cmd -` (Mac) was not zooming in/out on images as expected.
+- Fixed an issue where the number of drafts displayed in the project summary was not updated when drafts were submitted as annotations.
+- Fixed an issue where, in certain contexts, labeling instructions were displayed in raw HTML.
+- Fixed an issue that occurred after project creation in which users were prevented from moving forward if changes were made in the template preview.
+- Fixed an issue where AWS Lambdas custom agreement functions only worked for `Choice` tags.
+- Fixed an issue where custom metrics for agreements weren’t working for annotations that had drafts.
+- Fixed an issue where users were unable to navigate through their task list after saving a draft.
+- Fixed an issue where, when viewing the Projects page, reviewers and managers were not seeing the total number of annotations in a project.
+- Fixed an issue where blank drafts were being created when annotations were submitted.
+- Fixed several issues with how annotation drafts were handled. Users will now see a more descriptive error message when trying to update a labeling configuration that is still being used in annotations or in drafts. Also, when using the Data Manager to delete all annotations, this will also delete all task drafts and annotation drafts.
+- Fixed an issue where when duplicating a project that had cloud storage, the storage sync status and number of synced items was also copied when they should be reset.
+- Fixed an issue of missing annotators from members dashboard when a performance optimization is enabled.
+- Fixed an issue where `<Choice selected="true">` was not working within the `Taxonomy` tag.
+- Fixed an issue that would cause a blank draft to be created when using hot-keyed annotation submit.
+
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="250-1md"></a>
+
+## Label Studio Enterprise 2.5.0-1
+
+<div class="onprem-highlight">Security fix</div>
+
+*Sep 30, 2023*
+
+### Security
+- Security fix for Data Manager
+
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="250md"></a>
+
+## Label Studio Enterprise 2.5.0
+
+<div class="onprem-highlight">Project-level roles for SAML/SCIM, ability to pause annotation sessions</div>
+
+*Sep 28, 2023*
+
+### New features
+
+- Project-level roles are now available and configurable through SAML or SCIM.  By mapping user groups to project roles, you'll have more granular access controls for your data and you can simplify permissions management for internal teams and annotators. For more information, see [the HumanSignal blog](https://humansignal.com/blog/manage-and-restrict-access-to-your-data-at-a-more-granular-level-with-project-based-roles/) and [the related documentation](https://docs.humansignal.com/guide/scim_setup#Set-up-group-mapping). 
+
+    ![Screenshot of SCIM mapping for project roles](/images/releases/2-5-0-project-roles.png)
+
+- Users can now pause their annotation session so that they can take a break from annotating without it affecting their lead time scores. They can do this by selecting **Submit and Exit** or **Update and Exit**. Their work is automatically saved as a draft. For more information, see [Exit a labeling flow](https://docs.humansignal.com/guide/labeling#Exiting-a-labeling-flow). 
+
+    ![Screenshot of the Save and Exit option when labeling](/images/releases/2-5-0-submit-and-exit.png)
+
+### Enhancements
+
+- Improved performance of prediction counter calculations, leading to faster response times for project pages and stats calculations. 
+- Improved dashboard load times, correcting an issue that caused projects with numerous different labels to timeout. 
+
+### Bug fixes
+
+- Fixed an issue where attempting to access AWS target storage resulted in a 403 error. This was fixed by allowing prefix-level bucket access. 
+- Fixed an issue where an XSS vulnerability meant that a user’s cookies could be exposed when viewing our API documentation. As a result, users must now be logged in when visiting the Label Studio Enterprise [API docs page](https://app.heartex.com/docs/api/) or the [Swagger page](https://app.heartex.com/swagger). 
+- Fixed an issue where users’ changes to the Labeling Interface Settings were not being saved. 
+- Fixed a performance issue when using mouse clicks to interact with OCR regions that have large numbers (>50) of bounding boxes. 
+- Fixed an issue where Admin users who were assigned the Reviewer role in a project (using the SCIM project-role mapping) were seeing their own annotations in the review stream for the project. 
+- Fixed an issue where organization-level roles rather than project-level roles were being reflected in project cards. 
+- Fixed an issue to ensure that project-level role mapping is removed when the associated SCIM and SAML mappings are removed. 
+- Fixed an issue with login page indexing that was preventing users from being added to projects. 
+- Fixed an issue where the predictions counter was not correct when using project-level role mapping. 
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="2410md"></a>
 
 ## Label Studio Enterprise 2.4.10
+
+<div class="onprem-highlight">Contextual scrolling for audio and video, search field on the Projects page, autocomplete prompt when editing the labeling configuration</div>
 
 *Sep 13, 2023*
 
@@ -114,9 +932,15 @@ This release addresses a vulnerability regarding how SECRET_KEY is set.
 - Fixed an issue causing deadlocks on task import when running parallel jobs. 
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="249-7md"></a>
 
 ## Label Studio Enterprise 2.4.9-7
+
+<div class="onprem-highlight">Bug fixes</div>
 
 *Aug 22, 2023*
 
@@ -128,9 +952,15 @@ This release addresses a vulnerability regarding how SECRET_KEY is set.
 
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="249-6md"></a>
 
 ## Label Studio Enterprise 2.4.9-6
+
+<div class="onprem-highlight">Bug fixes</div>
 
 *Aug 21, 2023*
 
@@ -140,9 +970,15 @@ This release addresses a vulnerability regarding how SECRET_KEY is set.
 
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="249-5md"></a>
 
 ## Label Studio Enterprise 2.4.9-5
+
+<div class="onprem-highlight">Bug fix</div>
 
 *Aug 11, 2023*
 
@@ -151,9 +987,15 @@ This release addresses a vulnerability regarding how SECRET_KEY is set.
 
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="249-4md"></a>
 
 ## Label Studio Enterprise 2.4.9-4
+
+<div class="onprem-highlight">Draft column in the Data Manager</div>
 
 *Aug 04, 2023*
 <!-- Release notes generated using configuration in .github/release.yml at lse-release/2.4.9 -->
@@ -169,9 +1011,15 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="249-2md"></a>
 
 ## Label Studio Enterprise 2.4.9-2
+
+<div class="onprem-highlight">New workspace actions, per-image classifications</div>
 
 *July 26, 2023*
 
@@ -206,9 +1054,15 @@ Add Draft Column to the Data Manager
 - Tooltip is missing when expanding / collapsing "Archived Workspaces" section
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="248-1md"></a>
 
 ## Label Studio Enterprise 2.4.8-1
+
+<div class="onprem-highlight">Bug fix</div>
 
 *Jun 26, 2023*
 
@@ -217,9 +1071,15 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="248md"></a>
 
 ## Label Studio Enterprise 2.4.8
+
+<div class="onprem-highlight">Enhanced UI for panels and tabs, new Ranker tag, new Outliner filter, async imports</div>
 
 *Jun 16, 2023*
 
@@ -322,9 +1182,15 @@ Add Draft Column to the Data Manager
 - Shorten ordered by title in outliner to allow for filters
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="247md"></a>
 
 ## Label Studio Enterprise 2.4.7
+
+<div class="onprem-highlight">Updated content for empty project pages, UI changes for async export conversion</div>
 
 *May 18, 2023*
 
@@ -343,9 +1209,15 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="246-1md"></a>
 
 ## Label Studio Enterprise 2.4.6-1
+
+<div class="onprem-highlight">Bug fix</div>
 
 *May 09, 2023*
 
@@ -354,9 +1226,15 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="246md"></a>
 
 ## Label Studio Enterprise 2.4.6
+
+<div class="onprem-highlight">Data Manager actions for reviewers, better placement for annotation instructions, allow email lists when inviting users</div>
 
 *Apr 27, 2023*
 
@@ -374,9 +1252,15 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="245md"></a>
 
 ## Label Studio Enterprise 2.4.5
+
+<div class="onprem-highlight">Performance optimization for projects API, storage link resolver for nested task data fields</div>
 
 *Apr 10, 2023*
 
@@ -399,16 +1283,21 @@ Add Draft Column to the Data Manager
 
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="244md"></a>
 
 ## Label Studio Enterprise 2.4.4
+<div class="onprem-highlight"><code>skipDuplicates</code> parameter for TextArea, audio v3 Web Audio alternative decoder option, S3 custom endpoint for persistent storage </div>
 
 ### New features
 - New parameter skipDuplicates of TextArea allows to keep submissions unique.
 
 ### Enhancements
 - Audio v3 webaudio alternative decoder option
-- s3 custom endpoint support for persistent storage
+- S3 custom endpoint support for persistent storage
 - Table tag ordering items alphabetically
 
 ### Bug fixes
@@ -425,9 +1314,15 @@ Add Draft Column to the Data Manager
 - Audio playback and playhead remain in sync.
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="243md"></a>
 
 ## Label Studio Enterprise 2.4.3
+
+<div class="onprem-highlight">New <code>splitchannels</code> option on audio configs, keyboard shortcuts for the Data Manager, restore locked annotations</div>
 
 ### Enhancements
 - Support simultaneous render of multi-channel audio with added splitchannels="true" option on Audio config (larger memory requirement)
@@ -455,9 +1350,15 @@ Add Draft Column to the Data Manager
 - The first Audio V3 region created is not added to the undo stack
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="242md"></a>
 
 ## Label Studio Enterprise 2.4.2
+
+<div class="onprem-highlight">Label placement change for regions, YOLO support for PolygonLabels</div>
 
 ### New features
 - Labels are not displayed inside the regions
@@ -496,9 +1397,14 @@ Add Draft Column to the Data Manager
 - Saving model version on Machine Learning settings doesn't work
 
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="241md"></a>
 
 ## Label Studio Enterprise 2.4.1
+<div class="onprem-highlight">Improved logging, API for project annotation history</div>
 
 ### New features and enhancements 
 - Add project annotation history API
@@ -530,9 +1436,16 @@ Add Draft Column to the Data Manager
 - Prevent annotation duplicates when 'Re-queue skipped tasks back to the annotator' parameter is selected
 - Add Google project ID to Source/Target GCS form
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="240md"></a>
 
 ## Label Studio Enterprise 2.4.0
+
+<div class="onprem-highlight">Audio player enhancements, comments and notifications improvements, support for numpad hotkeys</div>
+
 This section highlights the new features and enhancements, and bug fixes in Label Studio Enterprise 2.4.
 
 ### New features and enhancements 
@@ -610,10 +1523,25 @@ This section highlights the new features and enhancements, and bug fixes in Labe
 - Filtering failed to work for Annotation results.
 - Returned `400` bad requests on incorrect XML.
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="231md"></a>
 
 ## Label Studio Enterprise 2.3.1
+
+<div class="onprem-highlight">New helm chart, multiple usability enhancements, including new Data Manager columns and the ability to duplicate projects</div>
+
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.3.1.
+
+### New helm chart
+
+A common chart for LS and LSE has been released and is available as of LSE version 2.3.x. The chart can be accessed at the following repository: https://github.com/HumanSignal/charts/tree/master/heartex/label-studio.
+
+#### Migration Process
+
+The migration process can be performed without any downtime. The steps required to carry out the migration are documented in the migration guide, available at: https://github.com/HumanSignal/charts/blob/master/heartex/label-studio/FAQs.md#label-studio-enterprise-upgrade-from-decommissioned-label-studio-enterprise-helm-chart.
 
 ### Breaking changes
 Label Studio Enterprise 2.3.1 includes the following breaking change:
@@ -863,9 +1791,15 @@ Label Studio 2.3.1 includes the following bug fixes:
 - Updated swagger docs for `AllStorage` APIs.
 - Added example output for `HyperTextLabels` in the Label Studio documentation suite.
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="2210md"></a>
 
 ## Label Studio Enterprise 2.2.10
+
+<div class="onprem-highlight">Bug fixes</div>
 
 This section highlights the bug fixes in Label Studio Enterprise 2.2.10.
 
@@ -881,9 +1815,15 @@ Label Studio 2.2.10 includes the following bug fixes:
 - Fixed an issue when the Safari browser stopped working.
 - Fixed scrollable area in **Review** mode.
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="229md"></a>
 
 ## Label Studio Enterprise 2.2.9
+
+<div class="onprem-highlight">Dynamic Labels template, Comments column in the Data Manager, decommissioning MinIO</div>
 
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.9. 
 
@@ -954,9 +1894,15 @@ Label Studio 2.2.9 includes the following bug fixes:
 - Fixed synchronization speed between video and audio.
 - Fixed an issue with prop `whenChoiceValue`.
 
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
 <a name="228md"></a>
 
 ## Label Studio Enterprise 2.2.8
+
+<div class="onprem-highlight">Comment visibility, SCIM enhancements, Redis SSL support, notification center, drafts in Annotation History, new history types</div>
 
 This section highlights the breaking changes, new features and enhancements, and bug fixes in Label Studio Enterprise 2.2.8. 
 
@@ -1027,9 +1973,16 @@ Label Studio 2.2.8 includes the following bug fixes:
 - After annotations from predictions `is_labeled` should be recalculated.
 - Fixed 404 on skip.
 
-<a name="22md"></a>
+
+
+
+
+</div><div class="release-note"><button class="release-note-toggle"></button>
+<a name="220md"></a>
 
 ## Label Studio Enterprise 2.2.0
+
+<div class="onprem-highlight">SCIM 2.0 support, rotating bounding boxes, 'Last updated by' column in the Data Manager, ability to navigate to the previous task </div>
 
 This section highlights the new features and enhancements in Label Studio Enterprise 2.2.0.
 
@@ -1080,3 +2033,4 @@ Label Studio Enterprise 2.2.0 introduces the following new features and enhancem
     <br>
     <div style="margin:auto; text-align:center;"><img src="/images/lead-time.png" style="opacity: 0.8"/></div>
     <i>Figure 5: Lead Time column in Data Manager. </i>
+</div>

@@ -20,7 +20,7 @@ _DATA_TYPES = {
     'HyperText': [str],
     'Image': [str, list],
     'Paragraphs': [list, str],
-    'Table': [dict, str],
+    'Table': [dict, list, str],
     'TimeSeries': [dict, list, str],
     'TimeSeriesChannel': [dict, list, str],
     'List': [list, str],

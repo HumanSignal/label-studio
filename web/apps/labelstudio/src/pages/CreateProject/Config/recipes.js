@@ -13,14 +13,14 @@ export const recipes = [
     <Label value="Airplane" background="green"/>
     <Label value="Car" background="blue"/>
   </RectangleLabels>
-</View>`
+</View>`,
   },
   {
     title: "Polygon labeling",
     type: "community",
     group: "Computer Vision",
     image: "polygon.png",
-    details: ``,
+    details: "",
     config: `<View>
   <Header value="Select label and click on image to start"/>
   <Image name="image" value="$image"/>
@@ -54,6 +54,6 @@ export const recipes = [
   </Labels>
 
   <Text name="text" value="$text"/>
-</View>`
-  }
+</View>`,
+  },
 ];

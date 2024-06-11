@@ -33,6 +33,7 @@ def any_api_client(request, client_and_token, business_client):
     return result
 
 
+@pytest.mark.parametrize('use_x_api_key', [True, False])
 @pytest.mark.parametrize(
     'payload, response, status_code',
     [
@@ -68,8 +69,12 @@ def any_api_client(request, client_and_token, business_client):
     ],
 )
 @pytest.mark.django_db
-def test_create_project(client_and_token, payload, response, status_code):
+def test_create_project(client_and_token, payload, response, status_code, use_x_api_key):
     client, token = client_and_token
+
+    if use_x_api_key:
+        client.credentials(HTTP_X_API_KEY=token.key)
+
     payload['organization_pk'] = client.organization_pk
     with ml_backend_mock():
         r = client.post(

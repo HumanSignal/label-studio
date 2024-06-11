@@ -1,55 +1,31 @@
 ---
 title: Installation overview
-short: Overview
+short: Installation
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 452
-meta_title: Set up an active learning loop with Label Studio
-meta_description: Set up an end-to-end active learning loop with Label Studio using the ML backend SDK and webhooks to perform model training and predictions and labeling.
-section: "Install"
+order_enterprise: 60
+meta_title: Installation overview for Label Studio Enterprise
+meta_description: Overview of the components involved when installing Label Studio Enterprise as an on-prem deployment
+section: "Install & Setup"
 ---
 
-Main Label Studio Enterprise components:
-<img src="https://docs.heartex.com/images/LSE_k8s_scheme.png" class="gif-border"/>
 
-There are different ways you can set up Label Studio Enterprise:
+The two central components of Label Studio Enterprise are the main app and the RQ (Redis Queue) workers. An on-prem deployment typically also includes the following components:
 
-<ul class="page-sidebar-list">
-      <li>
-        <a href="/guide/install_enterprise_k8s.html" class="">
-        Kubernetes</a>
-      </li>
-      <li>
-        <a href="/guide/install_enterprise_docker.html" class="">
-        Docker Compose</a>
-      </li>
-      <li>
-        <a href="/guide/install_k8s_airgapped.html" class="">
-        Airgapped Server</a>
-      </li>
-      <li>
-        <a href="/guide/ingress_config.html" class="">
-        Set up an ingress controller</a>
-      </li>
-      <li>
-        <a href="/guide/persistent_storage.html" class="">
-        Set up persistent storage</a>
-      </li>
-      <li>
-        <a href="/guide/auth_setup.html" class="">
-        Set up authentication</a>
-      </li>
-      <li>
-        <a href="/guide/email_setup.html" class="">
-        Set up email backend</a>
-      </li>
-      <li>
-        <a href="/guide/scim_setup.html" class="">
-        Set up SCIM2</a>
-      </li>
-      <li>
-        <a href="/guide/helm_values.html" class="">
-        Available Helm values</a>
-      </li>      
-</ul>
+* [**Identity provider**](auth_setup): An external IdP that connects to the main app to send a SAML or SCIM2.0 assertion to Label Studio. Identity providers help you manage user credentials and access. Common IdPs include Okta, Ping, Microsoft Active Directory. 
+
+    While integrating an identity provider is recommended for managing user authentication and access control in a more scalable and secure manner, Label Studio Enterprise can be deployed with its own internal user management system if preferred. 
+* [**Load balancer/ingress**](ingress_config): This serves as a traffic manager that directs incoming network requests to the main app.
+* [**PostgresSQL database**](install_enterprise_k8s#Optional-set-up-TLS-for-PostgreSQL): This connects with the main app to store annotation metadata. It also connects with the RQ workers to store reports and pre-annotations.
+* [**Redis**](install_enterprise_k8s#Optional-set-up-TLS-for-Redis): This works with the main app to perform background tasks such as computing statistical reports and predictions. It also communicates with the RQ workers to manage the background jobs queue. 
+* [**Cloud storage**](persistent_storage): Cloud storage works with both the main app and the RQ workers to manage assets and data.
+  * Persistent storage for assets such as avatars and snapshots. 
+  * Import storage that passes data to Label Studio to be used in labeling tasks. 
+  * Export storage for saving the exported annotation data as those tasks are labeled. 
+* **Integrations**: For example, these can be a [custom ML backend](ml) that calculates pre-annotations, or any other third-party services that you integrate with Label Studio using [webhooks](webhooks). 
+
+
+![Diagram of what is included in an on-prem Label Studio Enterprise deployment using Kubernetes](/images/LSE_k8s_scheme.png)
+
+

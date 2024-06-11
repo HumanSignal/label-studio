@@ -1,11 +1,11 @@
 ---
 title: Compare Community and Enterprise Features
-short: Enterprise vs Community
+short: Open Source vs Enterprise
 type: guide
 tier: all
-order: 20
-order_enterprise: 15
-section: "Get started"
+order: 28 
+order_enterprise: 28
+section: "Discover & Learn"
 meta_title: Label Studio Community and Enterprise Features
 meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects.
 ---
@@ -15,11 +15,13 @@ Label Studio is available as open source software as well as an [Enterprise clo
 <a class="Button" href="https://humansignal.com/free-trial" target="_blank" style="margin-bottom: 2em;">Free Enterprise Trial</a>
 
 <table>
+<thead>
   <tr>
     <th>Functionality</th>
     <th>Community</th>
     <th>Enterprise</th>
   </tr>
+  </thead>
 
 <tr>
     <td colspan="3"><b>Data Management</b></td>

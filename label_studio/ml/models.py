@@ -4,12 +4,12 @@ import logging
 
 from core.utils.common import conditional_atomic, db_is_not_sqlite, load_func, safe_float
 from django.conf import settings
-from django.db import models
-from django.db.models import Count, Q
-from django.db.models.signals import post_save
+from django.db import models, transaction
+from django.db.models import Count, JSONField, Q
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
-from ml.api_connector import MLApi
+from ml.api_connector import PREDICT_URL, TIMEOUT_PREDICT, MLApi
 from projects.models import Project
 from tasks.models import Prediction
 from tasks.serializers import PredictionSerializer, TaskSimpleSerializer
@@ -28,6 +28,11 @@ class MLBackendState(models.TextChoices):
     ERROR = 'ER', _('Error')
     TRAINING = 'TR', _('Training')
     PREDICTING = 'PR', _('Predicting')
+
+
+class MLBackendAuth(models.TextChoices):
+    NONE = 'NONE', _('None')
+    BASIC_AUTH = 'BASIC_AUTH', _('Basic Auth')
 
 
 class MLBackend(models.Model):
@@ -60,6 +65,29 @@ class MLBackend(models.Model):
         default='default',
         help_text='Name of the machine learning backend',
     )
+
+    auth_method = models.CharField(
+        max_length=255,
+        choices=MLBackendAuth.choices,
+        default=MLBackendAuth.NONE,
+    )
+
+    basic_auth_user = models.TextField(
+        _('basic auth user'),
+        blank=True,
+        null=True,
+        default='',
+        help_text='HTTP Basic Auth user',
+    )
+
+    basic_auth_pass = models.TextField(
+        _('basic auth password'),
+        blank=True,
+        null=True,
+        default='',
+        help_text='HTTP Basic Auth password',
+    )
+
     description = models.TextField(
         _('description'),
         blank=True,
@@ -67,6 +95,13 @@ class MLBackend(models.Model):
         default='',
         help_text='Description for the machine learning backend',
     )
+
+    extra_params = JSONField(
+        _('extra params'),
+        null=True,
+        help_text='Any extra parameters passed to the ML Backend during the setup',
+    )
+
     model_version = models.TextField(
         _('model version'),
         blank=True,
@@ -96,36 +131,76 @@ class MLBackend(models.Model):
     def __str__(self):
         return f'{self.title} (id={self.id}, url={self.url})'
 
+    def __init__(self, *args, **kwargs):
+        super(MLBackend, self).__init__(*args, **kwargs)
+        self.__original_title = self.title
+
+    def save(self, *args, **kwargs):
+        """
+        Overrides the save() method to update the associated project's model_version field.
+        If the title of the model instance is changed and the model_version
+        of the related project is currently the same as the original title,
+        the project's model_version is updated to the new title.
+        """
+        p = self.project
+
+        if self.title != self.__original_title and p.model_version == self.__original_title:
+            with transaction.atomic():
+                p.model_version = self.title
+                p.save(update_fields=['model_version'])
+                super().save(*args, **kwargs)
+                # reset original field to current field after save
+                self.__original_title = self.title
+        else:
+            super().save(*args, **kwargs)
+
     @staticmethod
-    def healthcheck_(url):
-        return MLApi(url=url).health()
+    def healthcheck_(url, auth_method=None, **kwargs):
+        return MLApi(url=url, auth_method=auth_method, **kwargs).health()
 
     def has_permission(self, user):
         user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
     @staticmethod
-    def setup_(url, project, model_version=None):
-        api = MLApi(url=url)
+    def setup_(url, project, auth_method=None, **kwargs):
+        api = MLApi(url=url, auth_method=auth_method, **kwargs)
+
         if not isinstance(project, Project):
             project = Project.objects.get(pk=project)
-        return api.setup(project, model_version=model_version)
+        return api.setup(project, **kwargs)
 
     def healthcheck(self):
-        return self.healthcheck_(self.url)
+        return self.healthcheck_(
+            self.url, self.auth_method, basic_auth_user=self.basic_auth_user, basic_auth_pass=self.basic_auth_pass
+        )
 
     def setup(self):
-        return self.setup_(self.url, self.project, None if self.auto_update else self.model_version)
+        return self.setup_(
+            self.url,
+            self.project,
+            self.auth_method,
+            extra_params=self.extra_params,
+            basic_auth_user=self.basic_auth_user,
+            basic_auth_pass=self.basic_auth_pass,
+        )
 
     @property
     def api(self):
-        return MLApi(url=self.url, timeout=self.timeout)
+        return MLApi(
+            url=self.url,
+            timeout=self.timeout,
+            auth_method=self.auth_method,
+            basic_auth_user=self.basic_auth_user,
+            basic_auth_pass=self.basic_auth_pass,
+        )
 
     @property
     def not_ready(self):
         return self.state in (MLBackendState.DISCONNECTED, MLBackendState.ERROR)
 
     def update_state(self):
+        model_version = None
         if self.healthcheck().is_error:
             self.state = MLBackendState.DISCONNECTED
         else:
@@ -143,6 +218,7 @@ class MLBackend(models.Model):
                     self.model_version = model_version
                 self.error_message = None
         self.save()
+        return model_version
 
     def train(self):
         train_response = self.api.train(self.project)
@@ -156,8 +232,34 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
+    def _predict(self, task):
+        """This is low level prediction method that is used for debugging"""
+        ml_api = self.api
+        task_ser = TaskSimpleSerializer(task).data
+
+        request_params = ml_api._prep_prediction_req([task_ser], self.project)
+        ml_api_result = ml_api._request(PREDICT_URL, request_params, verbose=False, timeout=TIMEOUT_PREDICT)
+
+        if ml_api_result.is_error:
+            logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
+            return
+
+        results = ml_api_result.response.get('results', None)
+
+        return {
+            'status': 200,
+            'data': {
+                'status': ml_api_result.status_code,
+                'error_message': ml_api_result.error_message,
+                'url': ml_api._get_url(PREDICT_URL),
+                'task': task_ser,
+                'request': request_params,
+                'response': results,
+            },
+        }
+
     def predict_tasks(self, tasks):
-        self.update_state()
+        model_version = self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
             return
@@ -169,13 +271,13 @@ class MLBackend(models.Model):
 
         # Filter tasks that already contain the current model version in predictions
         tasks = tasks.annotate(predictions_count=Count('predictions')).exclude(
-            Q(predictions_count__gt=0) & Q(predictions__model_version=self.model_version)
+            Q(predictions_count__gt=0) & Q(predictions__model_version=model_version)
         )
         if not tasks.exists():
             logger.debug(f'All tasks already have prediction from model version={self.model_version}')
-            return
+            return model_version
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
+        ml_api_result = self.api.make_predictions(tasks_ser, self.project)
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
@@ -196,9 +298,8 @@ class MLBackend(models.Model):
                 f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
                 f'switched to one-by-one task retrieval'
             )
-            for task in tasks:
-                self.predict_one_task(task)
-            return
+            instances = [self.predict_one_task(task, model_version=model_version) for task in tasks]
+            return instances
 
         # wrong result number
         elif len(responses) != len(tasks_ser):
@@ -223,10 +324,11 @@ class MLBackend(models.Model):
         with conditional_atomic(predicate=db_is_not_sqlite):
             prediction_ser = PredictionSerializer(data=predictions, many=True)
             prediction_ser.is_valid(raise_exception=True)
-            prediction_ser.save()
+            instances = prediction_ser.save()
+        return instances
 
-    def predict_one_task(self, task, check_state=True):
-        if check_state:
+    def predict_one_task(self, task, model_version):
+        if not model_version:
             self.update_state()
             if self.not_ready:
                 logger.debug(f'ML backend {self} is not ready to predict {task}')
@@ -242,7 +344,7 @@ class MLBackend(models.Model):
         ml_api = self.api
 
         task_ser = TaskSimpleSerializer(task).data
-        ml_api_result = ml_api.make_predictions([task_ser], self.model_version, self.project)
+        ml_api_result = ml_api.make_predictions([task_ser], self.project)
         if ml_api_result.is_error:
             logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
@@ -283,7 +385,6 @@ class MLBackend(models.Model):
         ).data
         ml_api_result = self.api.make_predictions(
             tasks=tasks_ser,
-            model_version=self.model_version,
             project=self.project,
             context=context,
         )
@@ -315,14 +416,20 @@ class MLBackend(models.Model):
         return result
 
     @staticmethod
-    def get_versions_(url, project):
-        api = MLApi(url=url)
+    def get_versions_(url, project, auth_method, **kwargs):
+        api = MLApi(url=url, auth_method=auth_method, **kwargs)
         if not isinstance(project, Project):
             project = Project.objects.get(pk=project)
         return api.get_versions(project)
 
     def get_versions(self):
-        return self.get_versions_(self.url, self.project)
+        return self.get_versions_(
+            self.url,
+            self.project,
+            self.auth_method,
+            basic_auth_user=self.basic_auth_user,
+            basic_auth_pass=self.basic_auth_pass,
+        )
 
 
 class MLBackendPredictionJob(models.Model):
@@ -389,6 +496,15 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
         return False
 
     return True
+
+
+@receiver(pre_delete, sender=MLBackend)
+def modify_project_model_version(sender, instance, **kwargs):
+    project = instance.project
+
+    if project.model_version == instance.title:
+        project.model_version = ''
+        project.save(update_fields=['model_version'])
 
 
 @receiver(post_save, sender=MLBackend)

@@ -1,11 +1,11 @@
-import { rgba, RgbaColorArray } from '../Common/Color';
-import { Padding } from '../Common/Style';
-import { defaults, toPrecision } from '../Common/Utils';
-import { Layer } from '../Visual/Layer';
-import { Visualizer } from '../Visual/Visualizer';
-import { Waveform } from '../Waveform';
+import { rgba, type RgbaColorArray } from "../Common/Color";
+import type { Padding } from "../Common/Style";
+import { defaults, toPrecision } from "../Common/Utils";
+import type { Layer } from "../Visual/Layer";
+import type { Visualizer } from "../Visual/Visualizer";
+import type { Waveform } from "../Waveform";
 
-type TimelinePlacement = 'top' | 'bottom';
+type TimelinePlacement = "top" | "bottom";
 export interface TimelineOptions {
   selectedColor?: RgbaColorArray;
   placement?: TimelinePlacement;
@@ -15,15 +15,15 @@ export interface TimelineOptions {
   fontSize?: number;
   fontColor?: string;
   fontFamily?: string;
-  gridColor?: string|RgbaColorArray;
-  backgroundColor?: string|RgbaColorArray;
+  gridColor?: string | RgbaColorArray;
+  backgroundColor?: string | RgbaColorArray;
 }
 
 type LabelMaxWidth = {
-  [includeMs: string]: number, // true | false
-}
+  [includeMs: string]: number; // true | false
+};
 
-export type TimelineMark = { x: number, time: number, type: 'mark' | 'label', includeMs: boolean };
+export type TimelineMark = { x: number; time: number; type: "mark" | "label"; includeMs: boolean };
 
 export class Timeline {
   private waveform: Waveform;
@@ -35,11 +35,11 @@ export class Timeline {
   private initHeight = defaults.timelineHeight as number;
   private fontSize = 12;
   private gridWidth = 1;
-  private fontFamily = 'Arial';
-  private fontColor = rgba('#413C4A');
-  private selectionColor = rgba('rgba(65, 60, 74, 0.08)');
-  private gridColor = rgba('rgba(137,128,152,0.16)');
-  private backgroundColor = rgba('#fff');
+  private fontFamily = "Arial";
+  private fontColor = rgba("#413C4A");
+  private selectionColor = rgba("rgba(65, 60, 74, 0.08)");
+  private gridColor = rgba("rgba(137,128,152,0.16)");
+  private backgroundColor = rgba("#fff");
   private _labeMaxWidth: LabelMaxWidth = {
     true: 0, // includeMs
     false: 0,
@@ -52,7 +52,8 @@ export class Timeline {
     this.padding = { ...this.padding, ...options?.padding };
     this.fontSize = options?.fontSize ?? this.fontSize;
     this.fontFamily = options?.fontFamily ?? this.fontFamily;
-    this.height = options?.height ?? defaults.timelinePlacement ? options?.height ?? defaults.timelineHeight : this.height;
+    this.height =
+      options?.height ?? defaults.timelinePlacement ? options?.height ?? defaults.timelineHeight : this.height;
     this.initHeight = this.height;
     this.gridWidth = options?.gridWidth ?? this.gridWidth;
     this.fontColor = options?.fontColor ? rgba(options?.fontColor) : this.fontColor;
@@ -62,11 +63,11 @@ export class Timeline {
 
     this.visualizer.reserveSpace({ height: this.height });
 
-    this.layer = this.visualizer.createLayer({ name: 'timeline', offscreen: true, zIndex: 103 });
-    this.visualizer.on('initialized', () => {
-      this.visualizer.on('draw', () => this.render());
+    this.layer = this.visualizer.createLayer({ name: "timeline", offscreen: true, zIndex: 103 });
+    this.visualizer.on("initialized", () => {
+      this.visualizer.on("draw", () => this.render());
     });
-    this.layer.on('layerUpdated', () => {
+    this.layer.on("layerUpdated", () => {
       this.height = this.layer.isVisible ? this.initHeight : 0;
       this.visualizer.reserveSpace({ height: this.height });
       this.render();
@@ -82,8 +83,8 @@ export class Timeline {
     const strokeStyle = this.gridColor.toString();
     const fillStyle = this.backgroundColor.toString();
     const placement = this.placement;
-    const yOffset = placement === 'top' ? 0 : offset;
-    const xOffset = placement === 'top' ? (this.padding?.left || 0) : 0;
+    const yOffset = placement === "top" ? 0 : offset;
+    const xOffset = placement === "top" ? this.padding?.left || 0 : 0;
 
     layer.clear();
     if (this.layer.isVisible) {
@@ -100,9 +101,8 @@ export class Timeline {
       layer.stroke();
     }
   }
-  
-  private renderTimelineRegions() {
 
+  private renderTimelineRegions() {
     const timelineRegions = this.waveform?.regions.timelineRegions;
 
     if (timelineRegions.length) {
@@ -113,29 +113,30 @@ export class Timeline {
 
       const currentTime = this.waveform.currentTime;
 
-      timelineRegions.sort((a, b) => a.start - b.start).forEach((region) => {
-        const { end, start, selected, color } = region;
+      timelineRegions
+        .sort((a, b) => a.start - b.start)
+        .forEach((region) => {
+          const { end, start, selected, color } = region;
 
-        const playing = (start <= currentTime && end >= currentTime);
-        const xStart = (start * zoomedWidth / duration) - scrollOffset;
-        const xEnd = (end - start) * zoomedWidth / duration;
+          const playing = start <= currentTime && end >= currentTime;
+          const xStart = (start * zoomedWidth) / duration - scrollOffset;
+          const xEnd = ((end - start) * zoomedWidth) / duration;
 
-        const top = 0;
-        const layer = this.layer;
-        const regionColor = color.clone();
+          const top = 0;
+          const layer = this.layer;
+          const regionColor = color.clone();
 
-        if (playing) {
-          regionColor.darken(selected ? 0.3 : 0.4);
-        }
+          if (playing) {
+            regionColor.darken(selected ? 0.3 : 0.4);
+          }
 
-        layer.fillStyle = regionColor.translucent(0.8).toString();
-        layer.fillRect(xStart, top, xEnd, height);
-      });
+          layer.fillStyle = regionColor.translucent(0.8).toString();
+          layer.fillRect(xStart, top, xEnd, height);
+        });
     }
   }
 
   private renderSelected() {
-
     const selectedRegions = this.waveform?.regions.selected;
 
     if (selectedRegions.length) {
@@ -143,10 +144,10 @@ export class Timeline {
       const { duration } = this.waveform;
       const { zoomedWidth } = this.visualizer;
       const scrollOffset = this.visualizer.getScrollLeftPx();
-      const start = selectedRegions.sort((a, b) => a.start - b.start)[0].start ;
+      const start = selectedRegions.sort((a, b) => a.start - b.start)[0].start;
       const end = selectedRegions.sort((a, b) => b.end - a.end)[0].end;
-      const xStart = (start * zoomedWidth / duration) - scrollOffset;
-      const xEnd = (end - start) * zoomedWidth / duration;
+      const xStart = (start * zoomedWidth) / duration - scrollOffset;
+      const xEnd = ((end - start) * zoomedWidth) / duration;
       const top = 0;
       const layer = this.layer;
 
@@ -162,29 +163,32 @@ export class Timeline {
     const offset = containerHeight - height;
     const placement = this.placement;
     const layer = this.layer;
-    const yOffset = placement === 'top' ? 0 : offset;
-    const xOffset = placement === 'top' ? (this.padding?.left || 0) : 0;
-    const markYOffset = placement === 'top' ? (mark.type === 'label' ? height * 0.75 : height * 0.875) : yOffset;
-    const markHeight = placement === 'top' ? 
-      (mark.type === 'label'
-        ? height * 0.25 : height * 0.125)
-      : mark.type === 'label' ? height / 2 : height / 3;
+    const yOffset = placement === "top" ? 0 : offset;
+    const xOffset = placement === "top" ? this.padding?.left || 0 : 0;
+    const markYOffset = placement === "top" ? (mark.type === "label" ? height * 0.75 : height * 0.875) : yOffset;
+    const markHeight =
+      placement === "top"
+        ? mark.type === "label"
+          ? height * 0.25
+          : height * 0.125
+        : mark.type === "label"
+          ? height / 2
+          : height / 3;
 
     layer.moveTo(mark.x + xOffset, markYOffset);
     layer.lineTo(mark.x + xOffset, markYOffset + markHeight);
 
-    if (mark.type === 'label') {
+    if (mark.type === "label") {
       const ts = this.formatTime(mark.time * 1000, mark.includeMs);
-      const markXOffset = placement === 'top' ?
-        (mark.x - (this.getDownscaledTextWidth(layer, ts) / 2)) :
-        (mark.x + (this.padding?.left || 6));
+      const markXOffset =
+        placement === "top" ? mark.x - this.getDownscaledTextWidth(layer, ts) / 2 : mark.x + (this.padding?.left || 6);
 
       layer.fillStyle = this.fontColor.toString();
       layer.font = `${fontSize * pixelRatio}px ${this.fontFamily}`;
       layer.fillText(
         ts,
         markXOffset,
-        placement === 'top' ? yOffset + ((height * 0.75) / 2) + (fontSize / 2) - this.gridWidth : yOffset + height - 8,
+        placement === "top" ? yOffset + (height * 0.75) / 2 + fontSize / 2 - this.gridWidth : yOffset + height - 8,
       );
     }
   }
@@ -208,14 +212,14 @@ export class Timeline {
     const includeMs = viewableDuration < 60;
     const precision = 10;
 
-    const factor = Math.pow(10, 10);
+    const factor = 10 ** 10;
 
     for (let i = segmentStart; i < segmentEnd; i += interval) {
       const time = toPrecision(i, precision);
 
       const isLabelInterval = Math.round(time * factor) % Math.round(labelInterval * factor);
 
-      const intervalType: TimelineMark['type'] = isLabelInterval === 0 ? 'label' : 'mark';
+      const intervalType: TimelineMark["type"] = isLabelInterval === 0 ? "label" : "mark";
 
       this.renderInterval({ x: this.mapToPx(i - exactStart), time, type: intervalType, includeMs });
     }
@@ -246,7 +250,7 @@ export class Timeline {
       return this._labeMaxWidth[key];
     }
 
-    const formatTemplate = `MM:MM:MM:MM${includeMs ? 'M' : ''}`;
+    const formatTemplate = `MM:MM:MM:MM${includeMs ? "M" : ""}`;
 
     const maxWidth = this.layer.measureText(formatTemplate).width;
 
@@ -263,44 +267,39 @@ export class Timeline {
 
     const exactInterval = toPrecision(lineSpace, Math.abs(significantDigits));
 
-    const significantDigitValue = Math.ceil(exactInterval / Math.pow(10, significantDigits));
+    const significantDigitValue = Math.ceil(exactInterval / 10 ** significantDigits);
 
-    let interval = Math.pow(10, significantDigits);
+    let interval = 10 ** significantDigits;
 
     if (significantDigitValue > 6) {
-      interval = Math.pow(10, significantDigits) * 7.5;
-    } 
-    else if (significantDigitValue > 4) {
-      interval = Math.pow(10, significantDigits) * 5;
-    }
-    else if (significantDigitValue > 2) {
-      interval = Math.pow(10, significantDigits) * 2.5;
-    }
-    else if (significantDigitValue > 1) {
-      interval = Math.pow(10, significantDigits) * 1.25;
+      interval = 10 ** significantDigits * 7.5;
+    } else if (significantDigitValue > 4) {
+      interval = 10 ** significantDigits * 5;
+    } else if (significantDigitValue > 2) {
+      interval = 10 ** significantDigits * 2.5;
+    } else if (significantDigitValue > 1) {
+      interval = 10 ** significantDigits * 1.25;
     }
 
     const includeMs = viewableDuration < 60;
 
-    const exactLabelInterval = Math.ceil((this.getLabelMaxWidth(includeMs) + this.getLabelPadding() * 2) / this.mapToPx(interval)) * interval;
+    const exactLabelInterval =
+      Math.ceil((this.getLabelMaxWidth(includeMs) + this.getLabelPadding() * 2) / this.mapToPx(interval)) * interval;
 
     const significantLabelDigits = Math.floor(Math.log10(exactLabelInterval));
 
-    const significantLabelDigitValue = Math.ceil(exactLabelInterval / Math.pow(10, significantLabelDigits));
+    const significantLabelDigitValue = Math.ceil(exactLabelInterval / 10 ** significantLabelDigits);
 
     let labelInterval = toPrecision(10, significantLabelDigits);
 
     if (significantLabelDigitValue > 5) {
-      labelInterval = Math.pow(10, significantLabelDigits) * 7.5;
-    } 
-    else if (significantLabelDigitValue > 3) {
-      labelInterval = Math.pow(10, significantLabelDigits) * 5;
-    }
-    else if (significantLabelDigitValue > 2) {
-      labelInterval = Math.pow(10, significantLabelDigits) * 2.5;
-    }
-    else if (significantLabelDigitValue > 1) {
-      labelInterval = Math.pow(10, significantLabelDigits) * 1.25;
+      labelInterval = 10 ** significantLabelDigits * 7.5;
+    } else if (significantLabelDigitValue > 3) {
+      labelInterval = 10 ** significantLabelDigits * 5;
+    } else if (significantLabelDigitValue > 2) {
+      labelInterval = 10 ** significantLabelDigits * 2.5;
+    } else if (significantLabelDigitValue > 1) {
+      labelInterval = 10 ** significantLabelDigits * 1.25;
     }
 
     return [interval, labelInterval];

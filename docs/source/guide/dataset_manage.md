@@ -8,7 +8,7 @@ order_enterprise: 215
 meta_title: Manage a dataset in Label Studio Enterprise
 meta_description: How to manage your datasets in Label Studio Enterprise 
 date: 2023-08-23 12:07:13
-section: "Data Discovery"
+section: "Curate Datasets"
 ---
 
 

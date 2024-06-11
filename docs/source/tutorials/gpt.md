@@ -1,11 +1,15 @@
 ---
 title: Chatbot response generation with HuggingFace's GPT2 model
-type: blog
+type: guide
+hide_menu: true
 tier: all
 order: 50
 meta_title: Chatbot response generation with HuggingFace's GPT2 model
 meta_description: Label Studio tutorial for Chatbot response generation with HuggingFace's GPT2 model
-
+section: "Machine learning"
+parent: "ml_tutorials"
+parent_enterprise: "ml_tutorials"
+parent_page_extension: "html"
 ---
 
 

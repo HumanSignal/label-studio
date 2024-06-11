@@ -16,7 +16,6 @@ from django.conf import settings
 
 from .common import get_app_version, get_client_ip
 from .io import find_file, get_config_dir
-from .params import get_bool_env
 
 logger = logging.getLogger(__name__)
 
@@ -43,16 +42,8 @@ class ContextLog(object):
     _log_payloads = _load_log_payloads()
 
     def __init__(self):
-        self.collect_analytics = settings.COLLECT_ANALYTICS
         self.version = get_app_version()
         self.server_id = self._get_server_id()
-
-    def _get_label_studio_env(self):
-        env = {}
-        for env_key, env_value in os.environ.items():
-            if env_key.startswith('LABEL_STUDIO_'):
-                env[env_key] = env_value
-        return env
 
     def _get_server_id(self):
         user_id_file = os.path.join(get_config_dir(), 'user_id')
@@ -86,11 +77,11 @@ class ContextLog(object):
             return
 
     def _assert_field_in_test(self, field, payload, view_name):
-        if get_bool_env('TEST_ENVIRONMENT', False):
+        if settings.TEST_ENVIRONMENT:
             assert field in payload, f'The field "{field}" should be presented for "{view_name}"'
 
     def _assert_type_in_test(self, type, payload, view_name):
-        if get_bool_env('TEST_ENVIRONMENT', False):
+        if settings.TEST_ENVIRONMENT:
             assert isinstance(payload, type), f'The type of payload is not "{type}" for "{view_name}"'
 
     def _get_fields(self, view_name, payload, fields):
@@ -210,7 +201,7 @@ class ContextLog(object):
             return True
 
     def dont_send(self, request):
-        return not self.collect_analytics or self._exclude_endpoint(request)
+        return not settings.COLLECT_ANALYTICS or self._exclude_endpoint(request)
 
     def send(self, request=None, response=None, body=None):
         if self.dont_send(request):
@@ -219,14 +210,16 @@ class ContextLog(object):
             payload = self.create_payload(request, response, body)
         except Exception as exc:
             logger.debug(exc, exc_info=True)
-            if get_bool_env('TEST_ENVIRONMENT', False):
+            if settings.TEST_ENVIRONMENT:
                 raise
         else:
-            if get_bool_env('TEST_ENVIRONMENT', False):
+            if settings.TEST_ENVIRONMENT:
                 pass
-            elif get_bool_env('DEBUG_CONTEXTLOG', False):
+            elif settings.DEBUG_CONTEXTLOG:
                 logger.debug('In DEBUG mode, contextlog is not sent.')
                 logger.debug(json.dumps(payload, indent=2))
+            elif settings.CONTEXTLOG_SYNC:
+                self.send_job(request, response, body)
             else:
                 thread = threading.Thread(target=self.send_job, args=(request, response, body))
                 thread.start()
@@ -262,7 +255,6 @@ class ContextLog(object):
             'client_ip': get_client_ip(request),
             'is_docker': self._is_docker(),
             'python': str(sys.version_info[0]) + '.' + str(sys.version_info[1]),
-            'env': self._get_label_studio_env(),
             'version': self.version,
             'view_name': request.resolver_match.view_name if request.resolver_match else None,
             'namespace': request.resolver_match.namespace if request.resolver_match else None,
@@ -297,7 +289,7 @@ class ContextLog(object):
                 }
             )
         self._secure_data(payload, request)
-        for key in ('json', 'response', 'values', 'env'):
+        for key in ('json', 'response', 'values'):
             payload[key] = payload[key] or None
         return payload
 

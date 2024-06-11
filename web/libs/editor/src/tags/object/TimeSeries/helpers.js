@@ -1,14 +1,14 @@
-import * as d3 from 'd3';
-import Utils from '../../../utils';
-import { defaultStyle } from '../../../core/Constants';
+import * as d3 from "d3";
+import Utils from "../../../utils";
+import { defaultStyle } from "../../../core/Constants";
 
 export const line = (x, y) =>
   d3
     .line()
-    .x(d => x(d[0]))
-    .y(d => y(d[1]));
+    .x((d) => x(d[0]))
+    .y((d) => y(d[1]));
 
-export const idFromValue = value => value.substr(1);
+export const idFromValue = (value) => value.substr(1);
 
 export const getOptimalWidth = () => ((window.screen && window.screen.width) || 1440) * (window.devicePixelRatio || 2);
 
@@ -32,13 +32,13 @@ export const getRegionColor = (region, alpha = 1) => {
 };
 
 // clear d3 sourceEvent via async call to prevent infinite loops
-export const clearD3Event = f => setTimeout(f, 0);
+export const clearD3Event = (f) => setTimeout(f, 0);
 
 // check if we are in recursive event loop, caused by `event`
-export const checkD3EventLoop = event => {
+export const checkD3EventLoop = (event) => {
   if (!d3.event.sourceEvent) return true;
   if (event) return d3.event.sourceEvent.type === event;
-  return ['start', 'brush', 'end'].includes(d3.event.sourceEvent.type);
+  return ["start", "brush", "end"].includes(d3.event.sourceEvent.type);
 };
 
 const formatDateDiff = (start, end) => {
@@ -48,15 +48,15 @@ const formatDateDiff = (start, end) => {
   return [start.toLocaleTimeString(), end.toLocaleTimeString()];
 };
 
-export const formatRegion = node => {
+export const formatRegion = (node) => {
   let ranges = [];
 
-  if (node.parent.format === 'date') {
+  if (node.parent.format === "date") {
     ranges = formatDateDiff(new Date(node.start), new Date(node.end));
   } else {
     ranges = [node.start, node.end];
   }
-  return node.instant ? ranges[0] : ranges.join('–');
+  return node.instant ? ranges[0] : ranges.join("–");
 };
 
-export const formatTrackerTime = time => new Date(time).toUTCString();
+export const formatTrackerTime = (time) => new Date(time).toUTCString();
