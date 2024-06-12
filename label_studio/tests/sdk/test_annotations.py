@@ -9,7 +9,7 @@ from label_studio_sdk.client import LabelStudio
 from label_studio_sdk.data_manager import Column, Filters, Operator, Type
 
 
-def test_annotation_create_and_update(django_live_url, business_client):
+def test_annotations_CRUD(django_live_url, business_client):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
     p = ls.projects.create(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
 
@@ -34,6 +34,23 @@ def test_annotation_create_and_update(django_live_url, business_client):
     for task_with_annotation in ls.tasks.list(project=p.id, fields='all'):
         updated_annotation = task_with_annotation.annotations[0]
     assert updated_annotation['result'][0]['value'] == {'choices': ['Negative']}
+
+    # create another annotation
+    another_annotation = ls.annotations.create(
+        id=task_id,
+        result=[{'from_name': 'label', 'to_name': 'my_text', 'type': 'choices', 'value': {'choices': ['Neutral']}}],
+    )
+
+    # check that there are two annotations
+    annotations = ls.annotations.list(task_id)
+    assert len(annotations) == 2
+
+    # delete one annotation
+    ls.annotations.delete(id=annotation_id)
+    annotations = ls.annotations.list(task_id)
+    assert len(annotations) == 1
+    assert annotations[0].id == another_annotation.id
+    assert annotations[0].result[0]['value']['choices'] == ['Neutral']
 
 
 def test_annotation_marks_task_as_labeled(django_live_url, business_client):
