@@ -1,12 +1,9 @@
-import json
-
 import pytest
 
 from label_studio.tests.sdk.common import LABEL_CONFIG_AND_TASKS
 
 pytestmark = pytest.mark.django_db
 from label_studio_sdk.client import LabelStudio
-from label_studio_sdk.data_manager import Column, Filters, Operator, Type
 
 
 def test_predictions_CRUD(django_live_url, business_client):
@@ -32,8 +29,10 @@ def test_predictions_CRUD(django_live_url, business_client):
     # create another prediction
     another_prediction = ls.predictions.create(
         task=task.id,
-        result=[{'from_name': 'label', 'to_name': 'my_text', 'type': 'choices', 'value': {'choices': ['Neutral']}},
-                {'from_name': 'label', 'to_name': 'my_text', 'type': 'choices', 'value': {'choices': ['Negative']}}],
+        result=[
+            {'from_name': 'label', 'to_name': 'my_text', 'type': 'choices', 'value': {'choices': ['Neutral']}},
+            {'from_name': 'label', 'to_name': 'my_text', 'type': 'choices', 'value': {'choices': ['Negative']}},
+        ],
         score=0.8,
         model_version='1.0.1',
     )
@@ -57,11 +56,11 @@ def test_create_predictions_with_import(django_live_url, business_client):
     ls.projects.import_tasks(
         id=p.id,
         request=[
-            {"my_text": "Hello world", "my_label": "Positive"},
-            {"my_text": "Goodbye Label Studio", "my_label": "Negative"},
-            {"my_text": "What a beautiful day", "my_label": "Positive"},
+            {'my_text': 'Hello world', 'my_label': 'Positive'},
+            {'my_text': 'Goodbye Label Studio', 'my_label': 'Negative'},
+            {'my_text': 'What a beautiful day', 'my_label': 'Positive'},
         ],
-        preannotated_from_fields=['my_label']
+        preannotated_from_fields=['my_label'],
     )
 
     # check predictions for each class
@@ -109,7 +108,7 @@ def test_create_predictions_with_import(django_live_url, business_client):
                     }
                 ],
             },
-        ]
+        ],
     )
 
     # check for new predictions
