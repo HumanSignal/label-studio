@@ -1,0 +1,20 @@
+---
+services:
+  label-studio:
+    image: 391155498039.dkr.ecr.eu-north-1.amazonaws.com/dev-salmonvision-webapp
+    ports:
+      - "80:8080"
+    environment:
+      # S3 setup
+      STORAGE_TYPE: s3
+      STORAGE_AWS_REGION_NAME: eu-north-1
+      STORAGE_AWS_BUCKET_NAME: "dev-salmonvision-backend-labelstudio-bucket"
+      STORAGE_AWS_FOLDER: ""
+
+      # Database setup
+      DJANGO_DB: default
+      POSTGRE_NAME: postgres
+      POSTGRE_USER: chinook
+      POSTGRE_PASSWORD: zBMgsfPKKQVohqK
+      POSTGRE_PORT: 5432
+      POSTGRE_HOST: dev-salmonvision-backend-labelstudio-postgres-instance.cb4ggme085vi.eu-north-1.rds.amazonaws.com
