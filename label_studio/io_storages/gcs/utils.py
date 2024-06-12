@@ -222,7 +222,8 @@ class GCS(object):
                 cls.get_client(google_application_credentials=maybe_credentials) if maybe_credentials else None
             )
             blob.reload(client=maybe_client)  # needed to know the content type
-            return f'data:{blob.content_type};base64,{base64.b64encode(blob.download_as_bytes()).decode("utf-8")}'
+            blob_bytes = blob.download_as_bytes(client=maybe_client)
+            return f'data:{blob.content_type};base64,{base64.b64encode(blob_bytes).decode("utf-8")}'
 
         url = blob.generate_signed_url(
             version='v4',
