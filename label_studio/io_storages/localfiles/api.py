@@ -18,20 +18,12 @@ from io_storages.api import (
 from io_storages.localfiles.models import LocalFilesExportStorage, LocalFilesImportStorage
 from io_storages.localfiles.serializers import LocalFilesExportStorageSerializer, LocalFilesImportStorageSerializer
 
-_local_files_import_storage_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-        'path': openapi.Schema(type=openapi.TYPE_STRING, description='Local path'),
-        'regex_filter': openapi.Schema(type=openapi.TYPE_STRING, description='Regex for filtering objects'),
-        'use_blob_urls': openapi.Schema(
-            type=openapi.TYPE_BOOLEAN, description='Interpret objects as BLOBs and generate URLs'
-        ),
-    },
-    required=[],
+from .openapi_schema import (
+    _local_files_export_storage_schema,
+    _local_files_export_storage_schema_with_id,
+    _local_files_import_storage_schema,
+    _local_files_import_storage_schema_with_id,
 )
-
-_local_files_export_storage_schema = _local_files_import_storage_schema
 
 
 @method_decorator(
@@ -161,7 +153,8 @@ class LocalFilesExportStorageSyncAPI(ExportStorageSyncAPI):
         x_fern_audiences=['public'],
         operation_summary='Validate import storage',
         operation_description='Validate a specific local file import storage connection.',
-        request_body=no_body,
+        request_body=_local_files_import_storage_schema_with_id,
+        responses={200: openapi.Response(description='Validation successful')},
     ),
 )
 class LocalFilesImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -177,7 +170,8 @@ class LocalFilesImportStorageValidateAPI(ImportStorageValidateAPI):
         x_fern_audiences=['public'],
         operation_summary='Validate export storage',
         operation_description='Validate a specific local file export storage connection.',
-        request_body=no_body,
+        request_body=_local_files_export_storage_schema_with_id,
+        responses={200: openapi.Response(description='Validation successful')},
     ),
 )
 class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
