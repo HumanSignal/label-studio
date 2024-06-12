@@ -209,17 +209,20 @@ class GCS(object):
 
         blob = bucket.blob(blob_name)
 
-        if not presign:
-            blob.reload()  # needed to know the content type
-            return f'data:{blob.content_type};base64,{base64.b64encode(blob.download_as_bytes()).decode("utf-8")}'
-
         # this flag should be OFF, maybe we need to enable it for 1-2 customers, we have to check it
         if settings.GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS:
             # google_application_credentials has higher priority,
             # use Application Default Credentials (ADC) when google_application_credentials is empty only
-            kwargs = {} if google_application_credentials else cls._get_default_credentials()
+            maybe_credentials = {} if google_application_credentials else cls._get_default_credentials()
         else:
-            kwargs = {}
+            maybe_credentials = {}
+
+        if not presign:
+            maybe_client = (
+                cls.get_client(google_application_credentials=maybe_credentials) if maybe_credentials else None
+            )
+            blob.reload(client=maybe_client)  # needed to know the content type
+            return f'data:{blob.content_type};base64,{base64.b64encode(blob.download_as_bytes()).decode("utf-8")}'
 
         url = blob.generate_signed_url(
             version='v4',
@@ -227,7 +230,7 @@ class GCS(object):
             expiration=timedelta(minutes=presign_ttl),
             # Allow GET requests using this URL.
             method='GET',
-            **kwargs,
+            **maybe_credentials,
         )
 
         logger.debug('Generated GCS signed url: ' + url)
