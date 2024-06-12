@@ -671,6 +671,29 @@ class ProjectReimportAPI(generics.RetrieveAPIView):
                 description='A unique integer value identifying this project.',
             ),
         ],
+        responses={
+            204: openapi.Response(
+                description='List of deleted task IDs',
+                schema=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        'tasks': openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                description='Task object',
+                                properties={
+                                    'id': openapi.Schema(
+                                        type=openapi.TYPE_INTEGER,
+                                        description='Task ID',
+                                    ),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            )
+        },
     ),
 )
 @method_decorator(
