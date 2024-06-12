@@ -421,14 +421,14 @@ class ProjectStateAPI(APIView):
                     'delete_annotators',
                 ],
                 example='delete_tasks',
-                required=True
+                required=True,
             ),
             openapi.Parameter(
                 name='project',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_QUERY,
                 description='Project ID',
-                required=True
+                required=True,
             ),
             openapi.Parameter(
                 name='view',

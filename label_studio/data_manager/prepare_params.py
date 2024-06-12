@@ -162,20 +162,10 @@ class Type(CustomEnum):
 example_request_1 = {
     'filters': {
         'conjunction': 'or',
-        'items': [
-            {
-                'filter': 'filter:tasks:id',
-                'operator': 'greater',
-                'type': 'Number',
-                'value': 123
-            }
-        ]
+        'items': [{'filter': 'filter:tasks:id', 'operator': 'greater', 'type': 'Number', 'value': 123}],
     },
-    'selectedItems': {
-        'all': True,
-        'excluded': [124, 125, 126]
-    },
-    'ordering': ['tasks:total_annotations']
+    'selectedItems': {'all': True, 'excluded': [124, 125, 126]},
+    'ordering': ['tasks:total_annotations'],
 }
 
 example_request_2 = {
@@ -186,15 +176,12 @@ example_request_2 = {
                 'filter': 'filter:tasks:completed_at',
                 'operator': 'in',
                 'type': 'Datetime',
-                'value': {'min': '2021-01-01T00:00:00.000Z', 'max': '2025-01-01T00:00:00.000Z'}
+                'value': {'min': '2021-01-01T00:00:00.000Z', 'max': '2025-01-01T00:00:00.000Z'},
             }
-        ]
+        ],
     },
-    'selectedItems': {
-        'all': False,
-        'included': [1, 2, 3]
-    },
-    'ordering': ['-tasks:completed_at']
+    'selectedItems': {'all': False, 'included': [1, 2, 3]},
+    'ordering': ['-tasks:completed_at'],
 }
 
 # Define the schemas for filters and selectedItems
@@ -254,16 +241,13 @@ filters_schema = openapi.Schema(
                             openapi.Schema(type=openapi.TYPE_STRING, title="String", description='String'),
                             openapi.Schema(type=openapi.TYPE_INTEGER, title="Integer", description='Integer'),
                             openapi.Schema(
-                                type=openapi.TYPE_NUMBER,
-                                title="Float",
-                                format='float',
-                                description='Float'
+                                type=openapi.TYPE_NUMBER, title="Float", format='float', description='Float'
                             ),
                             openapi.Schema(type=openapi.TYPE_BOOLEAN, title="Boolean", description='Boolean'),
                             openapi.Schema(
                                 type=openapi.TYPE_OBJECT,
                                 title="Dictionary",
-                                description='Dictionary is used for some operator types, e.g. `in` and `not_in`'
+                                description='Dictionary is used for some operator types, e.g. `in` and `not_in`',
                             ),
                             openapi.Schema(
                                 type=openapi.TYPE_OBJECT,
@@ -275,7 +259,7 @@ filters_schema = openapi.Schema(
                     ),
                 },
                 required=['filter', 'operator', 'type', 'value'],
-                example=example_request_1['filters']['items'][0]
+                example=example_request_1['filters']['items'][0],
             ),
             description='List of filter items',
         ),
