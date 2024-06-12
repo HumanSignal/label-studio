@@ -328,7 +328,51 @@ class TaskListAPI(generics.ListCreateAPIView):
         tags=['Data Manager'],
         x_fern_audiences=['internal'],
         operation_summary='Get data manager columns',
-        operation_description='Retrieve the data manager columns available for the tasks in a specific project.',
+        operation_description=(
+            'Retrieve the data manager columns available for the tasks in a specific project. '
+            'For more details, see [GET api/actions](#/Data%20Manager/get_api_actions).'
+        ),
+        manual_parameters=[
+            openapi.Parameter(
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='Project ID',
+                required=True,
+            )
+        ],
+        responses={
+            200: openapi.Response(
+                description='Columns retrieved successfully',
+                examples={
+                    'application/json': {
+                        'columns': [
+                            {
+                                'id': 'id',
+                                'title': 'ID',
+                                'type': 'Number',
+                                'help': 'Task ID',
+                                'target': 'tasks',
+                                'visibility_defaults': {'explore': True, 'labeling': False},
+                                'project_defined': False,
+                            },
+                            {
+                                'id': 'completed_at',
+                                'title': 'Completed',
+                                'type': 'Datetime',
+                                'target': 'tasks',
+                                'help': 'Last annotation date',
+                                'visibility_defaults': {'explore': True, 'labeling': False},
+                                'project_defined': False,
+                            },
+                            # ... other columns ...
+                        ]
+                    }
+                },
+            ),
+            400: openapi.Response(description='Invalid project ID supplied'),
+            404: openapi.Response(description='Project not found'),
+        },
     ),
 )
 class ProjectColumnsAPI(APIView):
