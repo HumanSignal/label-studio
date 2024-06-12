@@ -305,10 +305,13 @@ def get_prepare_params(request, project):
                     logger.error(f'Error parsing selectedItems: {e}')
                     raise DataManagerException(
                         'selectedItems must be JSON encoded string for dict: {"all": [true|false], '
-                        f'"excluded | included": [...task_ids...]}. Found: {selected}')
+                        '"excluded | included": [...task_ids...]}. '
+                        f'Found: {selected}'
+                    )
             else:
                 raise DataManagerException(
-                    'selectedItems must be dict: {"all": [true|false], ' '"excluded | included": [...task_ids...]}. '
+                    'selectedItems must be dict: {"all": [true|false], '
+                    '"excluded | included": [...task_ids...]}. '
                     f'Found type: {type(selected)} with value: {selected}'
                 )
         filters = data.get('filters', None)
