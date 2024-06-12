@@ -47,20 +47,22 @@ def test_delete_multi_tasks(django_live_url, business_client):
     tasks = [task for task in ls.tasks.list(project=p.id)]
     assert len(tasks) == 10
 
-    # TODO: RND-94 uncomment when delete_tasks action is implemented for projects.actions.create(id='delete_tasks')
-    # tasks_ids_to_delete = [t.id for t in tasks[:5]]
-    #
-    # ls.actions.create(request_options={
-    #     'additional_query_parameters': {
-    #         'project': p.id,
-    #         'id': 'delete_tasks'
-    #     },
-    #     'additional_body_parameters': {
-    #         'selectedItems': {"all": False, "included": tasks_ids_to_delete},
-    #     }
-    # })
-    # assert len(get_tasks()) == 5
-    #
+    tasks_ids_to_delete = [t.id for t in tasks[:5]]
+
+    # delete specific tasks
+    ls.actions.create(
+        project=p.id,
+        id='delete_tasks',
+        selected_items={"all": False, "included": tasks_ids_to_delete}
+    )
+    assert len([task for task in ls.tasks.list(project=p.id)]) == 5
+
+    ls.actions.create(
+        project=p.id,
+        id='delete_tasks',
+        selected_items={"all": True, "excluded": [tasks[5].id]}
+    )
+    # another way of calling delete action
     # ls.actions.create(request_options={
     #     'additional_query_parameters': {
     #         'project': p.id,
@@ -70,18 +72,17 @@ def test_delete_multi_tasks(django_live_url, business_client):
     #         'selectedItems': {"all": True, "excluded": [tasks[5].id]},
     #     }
     # })
-    #
-    # remaining_tasks = get_tasks()
-    # assert len(remaining_tasks) == 1
-    # assert remaining_tasks[0].data['my_text'] == 'Test task 5'
+
+    remaining_tasks = [task for task in ls.tasks.list(project=p.id)]
+    assert len(remaining_tasks) == 1
+    assert remaining_tasks[0].data['my_text'] == 'Test task 5'
 
     # remove all tasks
-    # TODO: RND-93
-    # ls.tasks.delete_all_tasks(id=p.id)
-    # tasks = []
-    # for task in ls.tasks.list(project=p.id):
-    #     tasks.append(task)
-    # assert len(tasks) == 0
+    ls.tasks.delete_all_tasks(id=p.id)
+    any_task_found = False
+    for task in ls.tasks.list(project=p.id):
+        any_task_found = True
+    assert not any_task_found
 
 
 def test_export_tasks(django_live_url, business_client):
