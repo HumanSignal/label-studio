@@ -6,7 +6,6 @@ from label_studio.tests.sdk.common import LABEL_CONFIG_AND_TASKS
 
 pytestmark = pytest.mark.django_db
 from label_studio_sdk.client import LabelStudio
-from label_studio_sdk.core.api_error import ApiError
 from tests.sdk.utils import sdk_logs
 
 
@@ -50,18 +49,10 @@ def test_delete_multi_tasks(django_live_url, business_client):
     tasks_ids_to_delete = [t.id for t in tasks[:5]]
 
     # delete specific tasks
-    ls.actions.create(
-        project=p.id,
-        id='delete_tasks',
-        selected_items={"all": False, "included": tasks_ids_to_delete}
-    )
+    ls.actions.create(project=p.id, id='delete_tasks', selected_items={'all': False, 'included': tasks_ids_to_delete})
     assert len([task for task in ls.tasks.list(project=p.id)]) == 5
 
-    ls.actions.create(
-        project=p.id,
-        id='delete_tasks',
-        selected_items={"all": True, "excluded": [tasks[5].id]}
-    )
+    ls.actions.create(project=p.id, id='delete_tasks', selected_items={'all': True, 'excluded': [tasks[5].id]})
     # another way of calling delete action
     # ls.actions.create(request_options={
     #     'additional_query_parameters': {

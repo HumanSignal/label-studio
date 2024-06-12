@@ -5,7 +5,6 @@ from label_studio.tests.sdk.common import LABEL_CONFIG_AND_TASKS
 pytestmark = pytest.mark.django_db
 from label_studio_sdk.client import LabelStudio
 from label_studio_sdk.data_manager import Column, Filters, Operator, Type
-from label_studio_sdk.core.api_error import ApiError
 
 
 def test_create_view(django_live_url, business_client):

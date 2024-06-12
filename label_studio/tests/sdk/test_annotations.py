@@ -1,10 +1,12 @@
-import pytest
 import json
+
+import pytest
+
 from label_studio.tests.sdk.common import LABEL_CONFIG_AND_TASKS
 
 pytestmark = pytest.mark.django_db
 from label_studio_sdk.client import LabelStudio
-from label_studio_sdk.data_manager import Filters, Column, Operator, Type
+from label_studio_sdk.data_manager import Column, Filters, Operator, Type
 
 
 def test_annotation_create_and_update(django_live_url, business_client):
@@ -44,14 +46,12 @@ def test_annotation_marks_task_as_labeled(django_live_url, business_client):
     task_data = [{'data': {'my_text': 'Test task'}}, {'data': {'my_text': 'Test task 2'}}]
     ls.projects.import_tasks(id=p.id, request=task_data)
 
-    filters = Filters.create(Filters.OR, [
-        Filters.item(
-            Column.completed_at,
-            Operator.EMPTY,
-            Type.Datetime,
-            Filters.value(False)
-        ),
-    ])
+    filters = Filters.create(
+        Filters.OR,
+        [
+            Filters.item(Column.completed_at, Operator.EMPTY, Type.Datetime, Filters.value(False)),
+        ],
+    )
     query = json.dumps({'filters': filters})
 
     labeled_tasks = []
