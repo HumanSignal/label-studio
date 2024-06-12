@@ -11,6 +11,7 @@ from data_manager.actions import get_all_actions, perform_action
 from data_manager.functions import evaluate_predictions, get_prepare_params, get_prepared_queryset
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.models import View
+from data_manager.prepare_params import prepare_params_schema
 from data_manager.serializers import DataManagerTaskSerializer, ViewResetSerializer, ViewSerializer
 from django.conf import settings
 from django.utils.decorators import method_decorator
@@ -434,7 +435,26 @@ class ProjectStateAPI(APIView):
         x_fern_sdk_method_name='create',
         x_fern_audiences=['public'],
         operation_summary='Post actions',
-        operation_description='Perform an action with the selected items from a specific view.',
+        operation_description='Perform a Data Manager action with the selected tasks and filters.',
+        request_body=prepare_params_schema,
+        manual_parameters=[
+            openapi.Parameter(
+                name='id',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description='Action name ID, the full list of actions can be retrieved with a GET request',
+                enum=['delete_tasks', 'delete_tasks_annotations', 'delete_tasks_predictions']
+            ),
+            openapi.Parameter(
+                name='project', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='Project ID'
+            ),
+            openapi.Parameter(
+                name='view',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='View ID (optional, it has higher priority than request body payload)'
+            ),
+        ],
     ),
 )
 class ProjectActionsAPI(APIView):
