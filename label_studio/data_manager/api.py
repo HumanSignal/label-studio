@@ -11,7 +11,7 @@ from data_manager.actions import get_all_actions, perform_action
 from data_manager.functions import evaluate_predictions, get_prepare_params, get_prepared_queryset
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.models import View
-from data_manager.prepare_params import prepare_params_schema
+from data_manager.prepare_params import prepare_params_schema, filters_schema, ordering_schema
 from data_manager.serializers import DataManagerTaskSerializer, ViewResetSerializer, ViewSerializer
 from django.conf import settings
 from django.utils.decorators import method_decorator
@@ -36,45 +36,8 @@ _view_request_body = openapi.Schema(
             type=openapi.TYPE_OBJECT,
             description='Custom view data',
             properties={
-                'filters': openapi.Schema(
-                    type=openapi.TYPE_OBJECT,
-                    description='Filters for the view',
-                    properties={
-                        'conjunction': openapi.Schema(
-                            type=openapi.TYPE_STRING,
-                            description='Type of conjunction',
-                            enum=['and', 'or'],
-                        ),
-                        'items': openapi.Schema(
-                            type=openapi.TYPE_ARRAY,
-                            description='Filter items',
-                            items=openapi.Schema(
-                                type=openapi.TYPE_OBJECT,
-                                properties={
-                                    'filter': openapi.Schema(type=openapi.TYPE_STRING, description='Field name'),
-                                    'type': openapi.Schema(type=openapi.TYPE_STRING, description='Field type'),
-                                    'operator': openapi.Schema(
-                                        type=openapi.TYPE_STRING, description='Filter operator'
-                                    ),
-                                    'value': openapi.Schema(type=openapi.TYPE_STRING, description='Filter value'),
-                                },
-                            ),
-                        ),
-                    },
-                ),
-                'ordering': openapi.Schema(
-                    type=openapi.TYPE_ARRAY,
-                    description='Ordering for the view',
-                    items=openapi.Schema(
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                            'column': openapi.Schema(type=openapi.TYPE_STRING, description='Field name'),
-                            'direction': openapi.Schema(
-                                type=openapi.TYPE_STRING, description='Order direction', enum=['asc', 'desc']
-                            ),
-                        },
-                    ),
-                ),
+                'filters': filters_schema,
+                'ordering': ordering_schema
             },
         ),
         'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
@@ -443,7 +406,11 @@ class ProjectStateAPI(APIView):
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_QUERY,
                 description='Action name ID, the full list of actions can be retrieved with a GET request',
-                enum=['delete_tasks', 'delete_tasks_annotations', 'delete_tasks_predictions']
+                enum=[
+                    "retrieve_tasks_predictions", "predictions_to_annotations", "remove_duplicates",
+                    "delete_tasks", "delete_ground_truths", "delete_tasks_annotations",
+                    "delete_tasks_reviews", "delete_tasks_predictions", "delete_reviewers", "delete_annotators"
+                ]
             ),
             openapi.Parameter(
                 name='project', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='Project ID'
@@ -452,9 +419,15 @@ class ProjectStateAPI(APIView):
                 name='view',
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_QUERY,
-                description='View ID (optional, it has higher priority than request body payload)'
+                description='View ID (optional, it has higher priority than filters, '
+                            'selectedItems and ordering from the request body payload)'
             ),
         ],
+        responses={
+            200: openapi.Response(
+                description='Action performed successfully'
+            )
+        }
     ),
 )
 class ProjectActionsAPI(APIView):

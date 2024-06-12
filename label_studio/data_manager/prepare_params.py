@@ -44,13 +44,6 @@ class PrepareParams(BaseModel):
     request: Optional[Any] = None
 
 
-'<br/>'
-'                   Example: `{"conjunction": "or", "items": [{"filter": "filter:tasks:completed_at", "operator": "greater", "type": "Datetime", "value": "2021-01-01T00:00:00.000Z"}]}`\n'
-'* **selectedItems**: dictionary with keys: `"all"`, `"included"`, `"excluded"`. If "all" is `false`, `"included"` must be used. If "all" is `true`, `"excluded"` must be used.<br/>'
-'                   Examples: `{"all": false, "included": [1, 2, 3]}` or `{"all": true, "excluded": [4, 5]}`\n'
-'* **ordering**: list of fields to order by. Currently, ordering is supported by only one parameter. <br/>\n'
-'                   Example: `["completed_at"]`'
-
 class CustomEnum(Enum):
     def __init__(self, value, description):
         self._value_ = value
@@ -219,15 +212,21 @@ filters_schema = openapi.Schema(
         )
     },
     required=['conjunction', 'items'],
-    description='Filters to apply on tasks. '
-                'You can use [the helper class `Filters` from this page](https://labelstud.io/sdk/data_manager.html) '
-                'to create Data Manager Filters.'
+    description=(
+        'Filters to apply on tasks. '
+        'You can use [the helper class `Filters` from this page](https://labelstud.io/sdk/data_manager.html) '
+        'to create Data Manager Filters.<br>'
+        'Example: `{"conjunction": "or", "items": [{"filter": "filter:tasks:completed_at", "operator": "greater", '
+        '"type": "Datetime", "value": "2021-01-01T00:00:00.000Z"}]}`'
+    )
 )
 
 selected_items_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     required=['all'],
-    description='Task selection by IDs. If filters are applied, the selection will be applied to the filtered tasks.',
+    description='Task selection by IDs. If filters are applied, the selection will be applied to the filtered tasks.'
+                'If "all" is `false`, `"included"` must be used. If "all" is `true`, `"excluded"` must be used.<br>'
+                'Examples: `{"all": false, "included": [1, 2, 3]}` or `{"all": true, "excluded": [4, 5]}`',
     oneOf=[
         openapi.Schema(
             title='all: false',
@@ -258,20 +257,24 @@ selected_items_schema = openapi.Schema(
     ]
 )
 
+# Define ordering schema
+ordering_schema = openapi.Schema(
+    type=openapi.TYPE_ARRAY,
+    items=openapi.Schema(
+        type=openapi.TYPE_STRING,
+        enum=Column.enums_for_ordering(),
+    ),
+    description='List of fields to order by. Fields are similar to filters but without the `filter:` prefix. '
+                'To reverse the order, add a minus sign before the field name, e.g. `-tasks:created_at`.'
+)
+
 # Define the main schema for the data payload
 data_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
         'filters': filters_schema,
         'selectedItems': selected_items_schema,
-        'ordering': openapi.Schema(
-            type=openapi.TYPE_ARRAY,
-            items=openapi.Schema(
-                type=openapi.TYPE_STRING,
-                enum=Column.enums_for_ordering(),
-            ),
-            description='List of fields to order by. Fields are similar to filters but without the `filter:` prefix.'
-        )
+        'ordering': ordering_schema
     },
     description='Additional query to filter and order tasks'
 )
@@ -281,11 +284,7 @@ prepare_params_schema = openapi.Schema(
     properties={
         'filters': filters_schema,
         'selectedItems': selected_items_schema,
-        'ordering': openapi.Schema(
-            type=openapi.TYPE_ARRAY,
-            items=openapi.Schema(type=openapi.TYPE_STRING, enum=Column.enums_for_ordering()),
-            description='List of fields to order by. Currently, ordering is supported by only one field.'
-        )
+        'ordering': ordering_schema
     },
     description='Data payload containing task filters, selected task items, and ordering'
 )
