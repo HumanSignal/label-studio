@@ -158,6 +158,45 @@ class Type(CustomEnum):
     Unknown = 'Unknown', 'Unknown is explicitly converted to string format'
 
 
+# Example request and response
+example_request_1 = {
+    'filters': {
+        'conjunction': 'or',
+        'items': [
+            {
+                'filter': 'filter:tasks:id',
+                'operator': 'greater',
+                'type': 'Number',
+                'value': 123
+            }
+        ]
+    },
+    'selectedItems': {
+        'all': True,
+        'excluded': [124, 125, 126]
+    },
+    'ordering': ['tasks:total_annotations']
+}
+
+example_request_2 = {
+    'filters': {
+        'conjunction': 'or',
+        'items': [
+            {
+                'filter': 'filter:tasks:completed_at',
+                'operator': 'in',
+                'type': 'Datetime',
+                'value': {'min': '2021-01-01T00:00:00.000Z', 'max': '2025-01-01T00:00:00.000Z'}
+            }
+        ]
+    },
+    'selectedItems': {
+        'all': False,
+        'included': [1, 2, 3]
+    },
+    'ordering': ['-tasks:completed_at']
+}
+
 # Define the schemas for filters and selectedItems
 filters_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
@@ -184,6 +223,7 @@ filters_schema = openapi.Schema(
                             'Filter identifier, it should start with `filter:tasks:` prefix, '
                             'e.g. `filter:tasks:agreement`. '
                             'For `task.data` fields it may look like `filter:tasks:data.field_name`. '
+                            'If you need more info about columns, check the `Get data manager columns` API endpoint. '
                             'Possible values:<br>'
                             + '<br>'.join(
                                 [
@@ -209,22 +249,25 @@ filters_schema = openapi.Schema(
                         + '<br>'.join([f'<li>`{key}`<br> {desc}</li>' for key, desc in Type.descriptions().items()]),
                     ),
                     'value': openapi.Schema(
-                        type=openapi.TYPE_STRING,
+                        type=openapi.TYPE_OBJECT,
                         oneOf=[
-                            openapi.Schema(type=openapi.TYPE_STRING, description='String'),
-                            openapi.Schema(type=openapi.TYPE_INTEGER, description='Integer'),
-                            openapi.Schema(type=openapi.TYPE_NUMBER, format='float', description='Float'),
-                            openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Boolean'),
-                            openapi.Schema(type=openapi.TYPE_OBJECT, description='Dictionary'),
+                            openapi.Schema(type=openapi.TYPE_STRING, title="String", description='String'),
+                            openapi.Schema(type=openapi.TYPE_INTEGER, title="Integer", description='Integer'),
                             openapi.Schema(
-                                type=openapi.TYPE_ARRAY,
-                                items=openapi.Schema(
-                                    type=openapi.TYPE_STRING,
-                                    oneOf=[
-                                        openapi.Schema(type=openapi.TYPE_STRING),
-                                        openapi.Schema(type=openapi.TYPE_INTEGER),
-                                    ],
-                                ),
+                                type=openapi.TYPE_NUMBER,
+                                title="Float",
+                                format='float',
+                                description='Float'
+                            ),
+                            openapi.Schema(type=openapi.TYPE_BOOLEAN, title="Boolean", description='Boolean'),
+                            openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                title="Dictionary",
+                                description='Dictionary is used for some operator types, e.g. `in` and `not_in`'
+                            ),
+                            openapi.Schema(
+                                type=openapi.TYPE_OBJECT,
+                                title="List",
                                 description='List of strings or integers',
                             ),
                         ],
@@ -232,6 +275,7 @@ filters_schema = openapi.Schema(
                     ),
                 },
                 required=['filter', 'operator', 'type', 'value'],
+                example=example_request_1['filters']['items'][0]
             ),
             description='List of filter items',
         ),
@@ -304,4 +348,5 @@ prepare_params_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={'filters': filters_schema, 'selectedItems': selected_items_schema, 'ordering': ordering_schema},
     description='Data payload containing task filters, selected task items, and ordering',
+    example=example_request_1,
 )

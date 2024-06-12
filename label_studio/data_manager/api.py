@@ -395,14 +395,19 @@ class ProjectStateAPI(APIView):
         x_fern_sdk_method_name='create',
         x_fern_audiences=['public'],
         operation_summary='Post actions',
-        operation_description='Perform a Data Manager action with the selected tasks and filters.',
+        operation_description=(
+            'Perform a Data Manager action with the selected tasks and filters. '
+            'Note: More complex actions require additional parameters in the request body. '
+            'Call `GET api/actions?project=<id>` to explore them. <br>'
+            'Example: `GET api/actions?id=delete_tasks&project=1`'
+        ),
         request_body=prepare_params_schema,
         manual_parameters=[
             openapi.Parameter(
                 name='id',
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_QUERY,
-                description='Action name ID, the full list of actions can be retrieved with a GET request',
+                description='Action name ID, see the full list of actions in the `GET api/actions` request',
                 enum=[
                     'retrieve_tasks_predictions',
                     'predictions_to_annotations',
@@ -415,9 +420,15 @@ class ProjectStateAPI(APIView):
                     'delete_reviewers',
                     'delete_annotators',
                 ],
+                example='delete_tasks',
+                required=True
             ),
             openapi.Parameter(
-                name='project', type=openapi.TYPE_INTEGER, in_=openapi.IN_QUERY, description='Project ID'
+                name='project',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='Project ID',
+                required=True
             ),
             openapi.Parameter(
                 name='view',
