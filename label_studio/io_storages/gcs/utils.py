@@ -214,13 +214,12 @@ class GCS(object):
             # google_application_credentials has higher priority,
             # use Application Default Credentials (ADC) when google_application_credentials is empty only
             maybe_credentials = {} if google_application_credentials else cls._get_default_credentials()
+            maybe_client = None if google_application_credentials else cls.get_client()
         else:
             maybe_credentials = {}
+            maybe_client = None
 
         if not presign:
-            maybe_client = (
-                cls.get_client(google_application_credentials=maybe_credentials) if maybe_credentials else None
-            )
             blob.reload(client=maybe_client)  # needed to know the content type
             blob_bytes = blob.download_as_bytes(client=maybe_client)
             return f'data:{blob.content_type};base64,{base64.b64encode(blob_bytes).decode("utf-8")}'
