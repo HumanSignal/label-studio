@@ -32,7 +32,7 @@ If using other web browsers, or older versions of supported web browsers, unexpe
 
 Install Label Studio in a clean Python environment. We highly recommend using a virtual environment (venv or conda) to reduce the likelihood of package conflicts or missing packages.
 
-## Install using pip
+## Install with pip
 
 To install Label Studio with pip and a virtual environment, you need Python version 3.8 or later. Run the following:
 
