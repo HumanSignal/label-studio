@@ -40,6 +40,8 @@ HasObjectPermission = load_func(settings.MEMBER_PERM)
     name='get',
     decorator=swagger_auto_schema(
         tags=['Organizations'],
+        x_fern_sdk_group_name='organizations',
+        x_fern_sdk_method_name='list',
         operation_summary='List your organizations',
         operation_description="""
         Return a list of the organizations you've created or that you have access to.
@@ -89,6 +91,12 @@ class OrganizationMemberPagination(PageNumberPagination):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Organizations'],
+        x_fern_sdk_group_name=['organizations', 'members'],
+        x_fern_sdk_method_name='list',
+        x_fern_pagination={
+            'offset': '$request.page',
+            'results': '$response.results',
+        },
         operation_summary='Get organization members list',
         operation_description='Retrieve a list of the organization members and their IDs.',
     ),
@@ -131,6 +139,8 @@ class OrganizationMemberListAPI(generics.ListAPIView):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Organizations'],
+        x_fern_sdk_group_name=['organizations', 'members'],
+        x_fern_sdk_method_name='delete',
         operation_summary='Soft delete an organization member',
         operation_description='Soft delete a member from the organization.',
         manual_parameters=[
@@ -179,6 +189,8 @@ class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroy
     name='get',
     decorator=swagger_auto_schema(
         tags=['Organizations'],
+        x_fern_sdk_group_name='organizations',
+        x_fern_sdk_method_name='get',
         operation_summary=' Get organization settings',
         operation_description='Retrieve the settings for a specific organization by ID.',
     ),
@@ -187,6 +199,8 @@ class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroy
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Organizations'],
+        x_fern_sdk_group_name='organizations',
+        x_fern_sdk_method_name='update',
         operation_summary='Update organization settings',
         operation_description='Update the settings for a specific organization by ID.',
     ),
@@ -216,6 +230,8 @@ class OrganizationAPI(generics.RetrieveUpdateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Invites'],
+        x_fern_sdk_group_name='organizations',
+        x_fern_sdk_method_name='get_invite',
         operation_summary='Get organization invite link',
         operation_description='Get a link to use to invite a new member to an organization in Label Studio Enterprise.',
         responses={200: OrganizationInviteSerializer()},
@@ -240,6 +256,8 @@ class OrganizationInviteAPI(generics.RetrieveAPIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Invites'],
+        x_fern_sdk_group_name='organizations',
+        x_fern_sdk_method_name='reset_token',
         operation_summary='Reset organization token',
         operation_description='Reset the token used in the invitation link to invite someone to an organization.',
         responses={200: OrganizationInviteSerializer()},

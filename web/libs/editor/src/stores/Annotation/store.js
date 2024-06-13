@@ -441,7 +441,7 @@ const AnnotationStoreModel = types
           .forEach((r) => r.from_name.updateFromResult?.(r.mainValue));
       });
 
-      getEnv(self).events.invoke("selectHistory", self.selectedHistory);
+      getEnv(self).events.invoke("selectHistory", self.store, self.selected, self.selectedHistory);
     }
 
     function addAnnotationFromPrediction(entity) {

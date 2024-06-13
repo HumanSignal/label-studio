@@ -54,7 +54,6 @@ logger = logging.getLogger(__name__)
 
 ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
-
 task_create_response_scheme = {
     201: openapi.Response(
         description='Tasks successfully imported',
@@ -113,6 +112,7 @@ task_create_response_scheme = {
         tags=['Import'],
         x_fern_sdk_group_name='projects',
         x_fern_sdk_method_name='import_tasks',
+        x_fern_audiences=['public'],
         responses=task_create_response_scheme,
         manual_parameters=[
             openapi.Parameter(
@@ -120,6 +120,34 @@ task_create_response_scheme = {
                 type=openapi.TYPE_INTEGER,
                 in_=openapi.IN_PATH,
                 description='A unique integer value identifying this project.',
+            ),
+            openapi.Parameter(
+                name='commit_to_project',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description='Set to "true" to immediately commit tasks to the project.',
+                default=True,
+                required=False,
+            ),
+            openapi.Parameter(
+                name='return_task_ids',
+                type=openapi.TYPE_BOOLEAN,
+                in_=openapi.IN_QUERY,
+                description='Set to "true" to return task IDs in the response.',
+                default=False,
+                required=False,
+            ),
+            openapi.Parameter(
+                name='preannotated_from_fields',
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(type=openapi.TYPE_STRING),
+                in_=openapi.IN_QUERY,
+                description='List of fields to preannotate from the task data. For example, if you provide a list of'
+                ' `{"text": "text", "prediction": "label"}` items in the request, the system will create '
+                'a task with the `text` field and a prediction with the `label` field when '
+                '`preannoted_from_fields=["prediction"]`.',
+                default=None,
+                required=False,
             ),
         ],
         operation_summary='Import tasks',
@@ -176,6 +204,35 @@ task_create_response_scheme = {
             <br>
         """.format(
             host=(settings.HOSTNAME or 'https://localhost:8080')
+        ),
+        request_body=openapi.Schema(
+            title='tasks',
+            description='List of tasks to import',
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                # TODO: this example doesn't work - perhaps we need to migrate to drf-spectacular for "anyOf" support
+                # also fern will change to at least provide a list of examples FER-1969
+                # right now we can only rely on documenation examples
+                # properties={
+                #     'data': openapi.Schema(type=openapi.TYPE_OBJECT, description='Data of the task'),
+                #     'annotations': openapi.Schema(
+                #         type=openapi.TYPE_ARRAY,
+                #         items=annotation_request_schema,
+                #         description='Annotations for this task',
+                #     ),
+                #     'predictions': openapi.Schema(
+                #         type=openapi.TYPE_ARRAY,
+                #         items=prediction_request_schema,
+                #         description='Predictions for this task',
+                #     )
+                # },
+                # example={
+                #     'data': {'image': 'http://example.com/image.jpg'},
+                #     'annotations': [annotation_response_example],
+                #     'predictions': [prediction_response_example]
+                # }
+            ),
         ),
     ),
 )
@@ -310,6 +367,7 @@ class ImportAPI(generics.CreateAPIView):
             async_import_background,
             project_import.id,
             request.user.id,
+            queue_name='high',
             on_failure=set_import_background_failure,
             project_id=project.id,
             organization_id=request.user.active_organization.id,
@@ -438,6 +496,7 @@ class ReImportAPI(ImportAPI):
             project_reimport.id,
             organization_id,
             self.request.user,
+            queue_name='high',
             on_failure=set_reimport_background_failure,
             project_id=project.id,
         )
@@ -492,8 +551,9 @@ class ReImportAPI(ImportAPI):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='files',
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='Get files list',
         manual_parameters=[
             openapi.Parameter(
@@ -519,8 +579,9 @@ class ReImportAPI(ImportAPI):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='files',
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='delete_many',
+        x_fern_audiences=['public'],
         operation_summary='Delete files',
         operation_description="""
         Delete uploaded files for a specific project.
@@ -567,8 +628,9 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='get',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='files',
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get file upload',
         operation_description='Retrieve details about a specific uploaded file.',
     ),
@@ -577,8 +639,9 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='files',
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update file upload',
         operation_description='Update a specific uploaded file.',
         request_body=FileUploadSerializer,
@@ -588,8 +651,9 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Import'],
-        x_fern_sdk_group_name='files',
+        x_fern_sdk_group_name=['files'],
         x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete file upload',
         operation_description='Delete a specific uploaded file.',
     ),
@@ -619,7 +683,14 @@ class UploadedFileResponse(generics.RetrieveAPIView):
 
     @override_report_only_csp
     @csp(SANDBOX=[])
-    @swagger_auto_schema(auto_schema=None)
+    @swagger_auto_schema(
+        tags=['Import'],
+        x_fern_sdk_group_name=['files'],
+        x_fern_sdk_method_name='download',
+        x_fern_audiences=['public'],
+        operation_summary='Download file',
+        operation_description='Download a specific uploaded file.',
+    )
     def get(self, *args, **kwargs):
         request = self.request
         filename = kwargs['filename']

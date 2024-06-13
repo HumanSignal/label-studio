@@ -46,7 +46,9 @@ from django.utils.crypto import get_random_string
 from django.utils.module_loading import import_string
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
-from label_studio_tools.core.utils.exceptions import LabelStudioXMLSyntaxErrorSentryIgnored
+from label_studio_sdk._extensions.label_studio_tools.core.utils.exceptions import (
+    LabelStudioXMLSyntaxErrorSentryIgnored,
+)
 from pkg_resources import parse_version
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
@@ -476,11 +478,11 @@ def collect_versions(force=False):
     except:  # noqa: E722
         pass
 
-    # converter
+    # converter from label-studio-sdk
     try:
-        import label_studio_converter
+        import label_studio_sdk.converter
 
-        result['label-studio-converter'] = {'version': label_studio_converter.__version__}
+        result['label-studio-converter'] = {'version': label_studio_sdk.__version__}
     except Exception:
         pass
 
@@ -546,8 +548,8 @@ def import_from_string(func_string):
     """
     try:
         return import_string(func_string)
-    except ImportError:
-        msg = f'Could not import {func_string} from settings'
+    except ImportError as e:
+        msg = f'Could not import {func_string} from settings: {e}'
         raise ImportError(msg)
 
 
