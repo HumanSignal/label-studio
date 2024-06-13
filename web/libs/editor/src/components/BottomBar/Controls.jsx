@@ -44,7 +44,6 @@ export const Controls = controlsInjector(
     const buttons = [];
 
     const [isInProgress, setIsInProgress] = useState(false);
-
     const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
 
@@ -60,7 +59,7 @@ export const Controls = controlsInjector(
         if (addedCommentThisSession) {
           selected?.submissionInProgress();
           callback();
-        } else if ((currentComment ?? "").trim()) {
+        } else if (currentComment[annotation.id]?.trim()) {
           e.preventDefault();
           selected?.submissionInProgress();
           await commentFormSubmit();
