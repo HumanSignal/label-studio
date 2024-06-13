@@ -1,6 +1,6 @@
 {
-  "message": "chore: LEAP-1149: bump braces from 3.0.2 to 3.0.3 in /web (#5966)",
-  "commit": "4bc7cccf37b8e743439a6a8182f63c954bdb4c84",
-  "date": "2024-06-13T17:44:43.000Z",
-  "branch": "develop"
+  "message": "Merge branch 'develop' into 'fb-TRIAG-600/redis-fields'",
+  "commit": "33c1061a3dd714f51b4183db9c3d94148a29446f",
+  "date": "2024-06-13T20:58:32.000Z",
+  "branch": "fb-TRIAG-600/redis-fields"
 }
