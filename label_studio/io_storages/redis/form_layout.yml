@@ -21,9 +21,10 @@ redis_params: &redis_params
     label: Port
 
 ImportStorage:
+  # Title
   - columnCount: 1
     fields: *redis_title
-  # Title, Path, Password, Host and Port
+  # Path, Password, Host and Port
   - columnCount: 2
     fields: *redis_params
   # Regex filter
