@@ -119,7 +119,9 @@ logger = logging.getLogger(__name__)
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_QUERY,
                 description='Additional query to filter tasks. It must be JSON encoded string of dict containing '
-                'one of the following parameters: `{"filters": ..., "selectedItems": ..., "ordering": ...}`\n\n'
+                'one of the following parameters: `{"filters": ..., "selectedItems": ..., "ordering": ...}`. Check '
+                '[Data Manager > Create View > see `data` field](#tag/Data-Manager/operation/api_dm_views_create) '
+                'for more details about filters, selectedItems and ordering.\n\n'
                 '* **filters**: dict with `"conjunction"` string (`"or"` or `"and"`) and list of filters in `"items"` array. '
                 'Each filter is a dictionary with keys: `"filter"`, `"operator"`, `"type"`, `"value"`. '
                 '[Read more about available filters](https://labelstud.io/sdk/data_manager.html)<br/>'
