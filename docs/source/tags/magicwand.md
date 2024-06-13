@@ -1,6 +1,5 @@
 ---
 title: Magicwand
-type: tags
 order: 413
 meta_title: Magic Wand Tag for Quick Thresholded Flood Filling During Image Segmentation
 meta_description: Customize Label Studio with a Magic Wand tag to quickly click and drag to threshold flood fill image areas during image segmentation labeling for machine learning and data science projects.
