@@ -294,7 +294,7 @@ class MLBackend(models.Model):
                 # ML backend can return single prediction per task or multiple predictions
                 response = [response]
 
-            # get  all predictions per task
+            # get all predictions per task
             for r in response:
                 if 'result' not in r:
                     logger.error(
