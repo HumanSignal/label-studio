@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1123: Fix the skip button when the annotator doesn't leave a comment (#5973)",
-  "commit": "c036abe5807d4d1e37d38d52825caae6d6f45148",
-  "date": "2024-06-13T14:42:50.000Z",
+  "message": "chore: LEAP-1149: bump braces from 3.0.2 to 3.0.3 in /web (#5966)",
+  "commit": "4bc7cccf37b8e743439a6a8182f63c954bdb4c84",
+  "date": "2024-06-13T17:44:43.000Z",
   "branch": "develop"
 }
