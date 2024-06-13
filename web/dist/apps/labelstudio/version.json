@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-1052'",
-  "commit": "23bf7f9b573e4bb9a40a8c10fcae2296bc90ad44",
-  "date": "2024-06-10T15:08:55.000Z",
-  "branch": "fb-leap-1052"
+  "message": "chore: LEAP-1149: bump braces from 3.0.2 to 3.0.3 in /web (#5966)",
+  "commit": "4bc7cccf37b8e743439a6a8182f63c954bdb4c84",
+  "date": "2024-06-13T17:44:43.000Z",
+  "branch": "develop"
 }
