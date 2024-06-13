@@ -1,6 +1,6 @@
 {
-  "message": "chore: LEAP-1149: bump braces from 3.0.2 to 3.0.3 in /web (#5966)",
-  "commit": "4bc7cccf37b8e743439a6a8182f63c954bdb4c84",
-  "date": "2024-06-13T17:44:43.000Z",
-  "branch": "develop"
+  "message": "chore: bump braces from 3.0.2 to 3.0.3 in /web/libs/editor/tests/e2e",
+  "commit": "835ab312610c52afe8b2e7e311f51696ced42a21",
+  "date": "2024-06-13T18:54:36.000Z",
+  "branch": "dependabot/npm_and_yarn/web/libs/editor/tests/e2e/braces-3.0.3"
 }
