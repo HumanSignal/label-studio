@@ -1,8 +1,10 @@
-# 2x2 grid
-redis_params: &redis_params
+redis_title: &redis_title
   - type: text
     name: title
     label: Storage Title
+
+# 2x2 grid
+redis_params: &redis_params
   - type: text
     name: path
     label: Path
@@ -19,6 +21,8 @@ redis_params: &redis_params
     label: Port
 
 ImportStorage:
+  - columnCount: 1
+    fields: *redis_title
   # Title, Path, Password, Host and Port
   - columnCount: 2
     fields: *redis_params
