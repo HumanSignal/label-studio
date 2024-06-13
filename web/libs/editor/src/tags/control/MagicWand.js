@@ -24,7 +24,6 @@ import { FF_DEV_4081, isFF } from "../../utils/feature-flags";
  * ![Animated GIF showing Magic Wand clicking on cloud and dragging, automatically segmenting and selecting
  * pixels to create a mask](../images/magicwand_example.gif)
  *
- *
  * ### CORS Configuration
  *
  * The Magic Wand requires pixel-level access to images that are being labelled in order to do its
