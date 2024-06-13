@@ -239,20 +239,20 @@ filters_schema = openapi.Schema(
                     'value': openapi.Schema(
                         type=openapi.TYPE_OBJECT,
                         oneOf=[
-                            openapi.Schema(type=openapi.TYPE_STRING, title="String", description='String'),
-                            openapi.Schema(type=openapi.TYPE_INTEGER, title="Integer", description='Integer'),
+                            openapi.Schema(type=openapi.TYPE_STRING, title='String', description='String'),
+                            openapi.Schema(type=openapi.TYPE_INTEGER, title='Integer', description='Integer'),
                             openapi.Schema(
-                                type=openapi.TYPE_NUMBER, title="Float", format='float', description='Float'
+                                type=openapi.TYPE_NUMBER, title='Float', format='float', description='Float'
                             ),
-                            openapi.Schema(type=openapi.TYPE_BOOLEAN, title="Boolean", description='Boolean'),
+                            openapi.Schema(type=openapi.TYPE_BOOLEAN, title='Boolean', description='Boolean'),
                             openapi.Schema(
                                 type=openapi.TYPE_OBJECT,
-                                title="Dictionary",
+                                title='Dictionary',
                                 description='Dictionary is used for some operator types, e.g. `in` and `not_in`',
                             ),
                             openapi.Schema(
                                 type=openapi.TYPE_OBJECT,
-                                title="List",
+                                title='List',
                                 description='List of strings or integers',
                             ),
                         ],
