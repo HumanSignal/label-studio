@@ -54,6 +54,14 @@ const { TextArea } = Input;
  *   <Rectangle name="bbox" toName="image" strokeWidth="3"/>
  *   <TextArea name="transcription" toName="image" editable="true" perRegion="true" required="true" maxSubmissions="1" rows="5" placeholder="Recognized Text" displayMode="region-list"/>
  * </View>
+ * @example
+ * <!--
+ *  You can keep submissions unique.
+ * -->
+ * <View>
+ *   <Audio name="audio" value="$audio"/>
+ *   <TextArea name="genre" toName="audio" skipDuplicates="true" />
+ * </View>
  * @name TextArea
  * @meta_title Textarea Tag for Text areas
  * @meta_description Customize Label Studio with the TextArea tag to support audio transcription, image captioning, and OCR tasks for machine learning and data science projects.
@@ -64,6 +72,7 @@ const { TextArea } = Input;
  * @param {string=} [placeholder]          - Placeholder text
  * @param {string=} [maxSubmissions]       - Maximum number of submissions
  * @param {boolean=} [editable=false]      - Whether to display an editable textarea
+ * @param {boolean} [skipDuplicates=false] - Prevent duplicates in textarea inputs
  * @param {boolean=} [transcription=false] - If false, always show editor
  * @param {tag|region-list} [displayMode=tag] - Display mode for the textarea; region-list shows it for every region in regions list
  * @param {number} [rows]                  - Number of rows in the textarea
@@ -71,6 +80,7 @@ const { TextArea } = Input;
  * @param {string} [requiredMessage]       - Message to show if validation fails
  * @param {boolean=} [showSubmitButton]    - Whether to show or hide the submit button. By default it shows when there are more than one rows of text, such as in textarea mode.
  * @param {boolean} [perRegion]            - Use this tag to label regions instead of whole objects
+ * @param {boolean} [perItem]              - Use this tag to label items inside objects instead of whole objects
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),

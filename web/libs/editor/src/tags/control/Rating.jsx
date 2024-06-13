@@ -41,6 +41,7 @@ import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
  * @param {boolean} [required=false]          - Whether rating validation is required
  * @param {string} [requiredMessage]          - Message to show if validation fails
  * @param {boolean} [perRegion]               - Use this tag to rate regions instead of the whole object
+ * @param {boolean} [perItem]                 - Use this tag to rate items inside the object instead of the whole object
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),

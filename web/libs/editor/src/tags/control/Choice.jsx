@@ -43,6 +43,7 @@ import { sanitizeHtml } from "../../utils/html";
  * @param {style} [style]      - CSS style of the checkbox element
  * @param {string} [hotkey]    - Hotkey for the selection
  * @param {string} [html]      - Can be used to show enriched content, it has higher priority than `value`, however `value` will be used in the exported result (should be properly escaped)
+ * @param {string} [hint]      - Hint for choice on hover
  * @param {string} [color]     - Color for Taxonomy item
  */
 const TagAttrs = types.model({
