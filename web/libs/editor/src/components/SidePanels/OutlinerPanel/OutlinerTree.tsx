@@ -1,36 +1,36 @@
-import chroma from 'chroma-js';
-import { observer } from 'mobx-react';
-import Tree from 'rc-tree';
+import chroma from "chroma-js";
+import { observer } from "mobx-react";
+import Tree from "rc-tree";
 import {
   createContext,
-  FC,
-  MouseEvent,
-  ReactNode,
+  type FC,
+  type MouseEvent,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useRef,
-  useState
-} from 'react';
-import { IconWarning, LsSparks } from '../../../assets/icons';
-import { IconChevronLeft, IconEyeClosed, IconEyeOpened } from '../../../assets/icons/timeline';
-import { IconArrow } from '../../../assets/icons/tree';
-import { Tooltip } from '../../../common/Tooltip/Tooltip';
-import Registry from '../../../core/Registry';
-import { PER_REGION_MODES } from '../../../mixins/PerRegionModes';
-import { Block, cn, Elem } from '../../../utils/bem';
-import { FF_DEV_2755, FF_DEV_3873, FF_OUTLINER_OPTIM, isFF } from '../../../utils/feature-flags';
-import { flatten, isDefined, isMacOS } from '../../../utils/utilities';
-import { NodeIcon } from '../../Node/Node';
-import { LockButton } from '../Components/LockButton';
-import { RegionControlButton } from '../Components/RegionControlButton';
-import './TreeView.styl';
-import ResizeObserver from '../../../utils/resize-observer';
-import { EventDataNode, Key } from 'rc-tree/es/interface';
+  useState,
+} from "react";
+import { IconWarning, LsSparks } from "../../../assets/icons";
+import { IconChevronLeft, IconEyeClosed, IconEyeOpened } from "../../../assets/icons/timeline";
+import { IconArrow } from "../../../assets/icons/tree";
+import { Tooltip } from "../../../common/Tooltip/Tooltip";
+import Registry from "../../../core/Registry";
+import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
+import { Block, cn, Elem } from "../../../utils/bem";
+import { FF_DEV_2755, FF_DEV_3873, FF_OUTLINER_OPTIM, isFF } from "../../../utils/feature-flags";
+import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
+import { NodeIcon } from "../../Node/Node";
+import { LockButton } from "../Components/LockButton";
+import { RegionControlButton } from "../Components/RegionControlButton";
+import "./TreeView.styl";
+import ResizeObserver from "../../../utils/resize-observer";
+import type { EventDataNode, Key } from "rc-tree/es/interface";
 
 const { localStorage } = window;
-const localStoreName = 'collapsed-label-pos';
+const localStoreName = "collapsed-label-pos";
 const MIN_REGIONS_TREE_ROW_HEIGHT = 34;
 
 interface OutlinerContextProps {
@@ -46,11 +46,8 @@ interface OutlinerTreeProps {
   footer: ReactNode;
 }
 
-const OutlinerTreeComponent: FC<OutlinerTreeProps> = ({
-  regions,
-  footer,
-}) => {
-  const rootClass = cn('tree');
+const OutlinerTreeComponent: FC<OutlinerTreeProps> = ({ regions, footer }) => {
+  const rootClass = cn("tree");
   const regionsTree = useDataTree({
     regions,
     rootClass,
@@ -62,13 +59,9 @@ const OutlinerTreeComponent: FC<OutlinerTreeProps> = ({
 
   return (
     <OutlinerContext.Provider value={{ regions }}>
-      <OutlinerInnerTreeComponent
-        regions={regions}
-        regionsTree={regionsTree}
-      />
+      <OutlinerInnerTreeComponent regions={regions} regionsTree={regionsTree} />
     </OutlinerContext.Provider>
   );
-
 };
 
 interface OutlinerInnerTreeProps {
@@ -76,20 +69,26 @@ interface OutlinerInnerTreeProps {
   regionsTree: any[];
 }
 
-const iconGetter = ({ entity }: any) => <NodeIconComponent node={entity}/>;
-const switcherIconGetter = ({ isLeaf }: any) => <SwitcherIcon isLeaf={isLeaf}/>;
+const iconGetter = ({ entity }: any) => <NodeIconComponent node={entity} />;
+const switcherIconGetter = ({ isLeaf }: any) => <SwitcherIcon isLeaf={isLeaf} />;
 const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regions, regionsTree }) => {
   const blockRef = useRef<HTMLElement>();
   const [height, setHeight] = useState(0);
-  let resizeObserver:ResizeObserver|null = useMemo(() => {
+  let resizeObserver: ResizeObserver | null = useMemo(() => {
     let lastHeight = 0;
 
     return new ResizeObserver((entities) => {
-      if (!entities?.[0]?.contentRect || entities?.[0]?.contentRect?.height === lastHeight) {
-        return;
-      }
-      lastHeight = entities?.[0]?.contentRect?.height || 1;
-      setHeight(lastHeight);
+      requestAnimationFrame(() => {
+        if (!entities?.[0]?.contentRect || entities?.[0]?.contentRect?.height === lastHeight) {
+          return;
+        }
+        lastHeight = entities?.[0]?.contentRect?.height || 1;
+
+        // ensure the component is still mounted
+        if (blockRef.current) {
+          setHeight(lastHeight);
+        }
+      });
     });
   }, []);
 
@@ -110,19 +109,24 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
   }, []);
   const eventHandlers = useEventHandlers();
   const selectedKeys = regions.selection.keys;
-  const rootClass = cn('tree');
+  const rootClass = cn("tree");
   let expandedKeys = undefined;
   let onExpand = undefined;
   // It works only for 'label' mode yet.
   // To enable this feature at other group modes, it needs to set correct pos at regionsTree for these modes
   // It also doesn't work with nesting level more than 1
-  const isPersistCollapseEnabled = isFF(FF_DEV_2755) && regions.group === 'label';
+  const isPersistCollapseEnabled = isFF(FF_DEV_2755) && regions.group === "label";
 
   if (isFF(FF_DEV_2755)) {
-    const [collapsedPos, setCollapsedPos] = useState(localStorage.getItem(localStoreName)?.split?.(',')?.filter(pos => !!pos) ?? []);
+    const [collapsedPos, setCollapsedPos] = useState(
+      localStorage
+        .getItem(localStoreName)
+        ?.split?.(",")
+        ?.filter((pos) => !!pos) ?? [],
+    );
 
     const updateLocalStorage = (collapsedPos: Array<string>) => {
-      localStorage.setItem(localStoreName, collapsedPos.join(','));
+      localStorage.setItem(localStoreName, collapsedPos.join(","));
     };
 
     const collapse = (pos: string) => {
@@ -133,17 +137,23 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
     };
 
     const expand = (pos: string) => {
-      const newCollapsedPos = collapsedPos.filter(cPos => cPos !== pos);
+      const newCollapsedPos = collapsedPos.filter((cPos) => cPos !== pos);
 
       setCollapsedPos(newCollapsedPos);
       updateLocalStorage(newCollapsedPos);
     };
 
-    expandedKeys = regionsTree.filter((item: any) => !collapsedPos.includes(item.pos)).map((item: any) => item.key) ?? [];
+    expandedKeys =
+      regionsTree.filter((item: any) => !collapsedPos.includes(item.pos)).map((item: any) => item.key) ?? [];
 
-    onExpand = (internalExpandedKeys:Key[], { node }: {
-      node: EventDataNode,
-    }):void => {
+    onExpand = (
+      internalExpandedKeys: Key[],
+      {
+        node,
+      }: {
+        node: EventDataNode;
+      },
+    ): void => {
       const region = regionsTree.find((region: any) => region.key === node.key);
       // pos is equal to label name
       const pos = region.pos;
@@ -153,90 +163,77 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
   }
 
   return (
-    <Block name="outliner-tree"
-      {...(
-        isFF(FF_OUTLINER_OPTIM)
-          ? { ref: setRef }
-          : {}
-      )}
-    >
-      {
-        !!height && (
-          <Tree
-            key={regions.group}
-            draggable={regions.group === 'manual'}
-            multiple
-            defaultExpandAll
-            defaultExpandParent={!isPersistCollapseEnabled}
-            autoExpandParent
-            checkable={false}
-            prefixCls="lsf-tree"
-            className={rootClass.toClassName()}
-            treeData={regionsTree}
-            selectedKeys={selectedKeys}
-            icon={iconGetter}
-            switcherIcon={switcherIconGetter}
-            {...(
-              isFF(FF_OUTLINER_OPTIM)
-                ? {
-                  virtual: true,
-                  itemHeight: MIN_REGIONS_TREE_ROW_HEIGHT,
-                  height,
-                }
-                : {}
-            )}
-            {...eventHandlers}
-            {
-              ...(isPersistCollapseEnabled ? {
+    <Block name="outliner-tree" {...(isFF(FF_OUTLINER_OPTIM) ? { ref: setRef } : {})}>
+      {!!height && (
+        <Tree
+          key={regions.group}
+          draggable={regions.group === "manual"}
+          multiple
+          defaultExpandAll
+          defaultExpandParent={!isPersistCollapseEnabled}
+          autoExpandParent
+          checkable={false}
+          prefixCls="lsf-tree"
+          className={rootClass.toClassName()}
+          treeData={regionsTree}
+          selectedKeys={selectedKeys}
+          icon={iconGetter}
+          switcherIcon={switcherIconGetter}
+          {...(isFF(FF_OUTLINER_OPTIM)
+            ? {
+                virtual: true,
+                itemHeight: MIN_REGIONS_TREE_ROW_HEIGHT,
+                height,
+              }
+            : {})}
+          {...eventHandlers}
+          {...(isPersistCollapseEnabled
+            ? {
                 expandedKeys,
                 onExpand,
-              } : {})
-            }
-          />
-        )
-      }
+              }
+            : {})}
+        />
+      )}
     </Block>
   );
-
 });
 
-const useDataTree = ({
-  regions,
-  rootClass,
-  footer,
-}: any) => {
+const useDataTree = ({ regions, rootClass, footer }: any) => {
   const processor = useCallback((item: any, idx, _false, _null, _onClick) => {
     const { id, type, hidden, isDrawing } = item ?? {};
     const style = item?.background ?? item?.getOneColor?.();
-    const color = chroma(style ?? '#666').alpha(1);
+    const color = chroma(style ?? "#666").alpha(1);
     const mods: Record<string, any> = { hidden, type, isDrawing };
 
     const label = (() => {
       if (!type) {
-        return 'No Label';
-      } else if (type.includes('label')) {
+        return "No Label";
+      }
+      if (type.includes("label")) {
         return item.value;
-      } else if (type.includes('region') || type.includes('range')) {
-        const labelsInResults = item.labelings
-          .map((result: any) => result.selectedLabels || []);
+      }
+      if (type.includes("region") || type.includes("range")) {
+        const labelsInResults = item.labelings.map((result: any) => result.selectedLabels || []);
 
         const labels: any[] = [].concat(...labelsInResults);
 
         return (
           <Block name="labels-list">
             {labels.map((label, index) => {
-              const color = label.background || '#000000';
+              const color = label.background || "#000000";
 
               return [
-                index ? ', ' : null,
+                index ? ", " : null,
                 <Elem key={label.id} style={{ color }}>
-                  {label.value || 'No label'}
+                  {label.value || "No label"}
                 </Elem>,
               ];
             })}
           </Block>
         );
-      } else if (type.includes('tool')) {
+      }
+      if (type.includes("tool")) {
         return item.value;
       }
     })();
@@ -250,11 +247,11 @@ const useDataTree = ({
       entity: item,
       color: color.css(),
       style: {
-        '--icon-color': color.css(),
-        '--text-color': color.css(),
-        '--selection-color': color.alpha(0.1).css(),
+        "--icon-color": color.css(),
+        "--text-color": color.css(),
+        "--selection-color": color.alpha(0.1).css(),
       },
-      className: rootClass.elem('node').mod(mods).toClassName(),
+      className: rootClass.elem("node").mod(mods).toClassName(),
       title: (data: any) => <RootTitle {...data} />,
     };
   }, []);
@@ -263,9 +260,9 @@ const useDataTree = ({
 
   if (footer) {
     regionsTreeData.push({
-      key: '__footer__',
+      key: "__footer__",
       disabled: true,
-      className: rootClass.elem('node').mod({ type: 'footer' }).toClassName(),
+      className: rootClass.elem("node").mod({ type: "footer" }).toClassName(),
       title: footer,
     });
   }
@@ -331,7 +328,7 @@ const useEventHandlers = () => {
     const regions = node.item.annotation.regionStore;
     // TODO this can blow up if we have lots of stuff there
     const nodes: any[] = regions.filterByParentID(node.pid);
-    const childrenHeight = nodes.map(c => treeHeight(c));
+    const childrenHeight = nodes.map((c) => treeHeight(c));
 
     if (!childrenHeight.length) return 0;
 
@@ -342,10 +339,10 @@ const useEventHandlers = () => {
     if (node.classification) return false;
     const dropKey = node.props.eventKey;
     const dragKey = dragNode.props.eventKey;
-    const dropPos = node.props.pos.split('-');
+    const dropPos = node.props.pos.split("-");
     const regions = node.item.annotation.regionStore;
 
-    dropPosition = dropPosition - parseInt(dropPos[dropPos.length - 1]);
+    dropPosition = dropPosition - Number.parseInt(dropPos[dropPos.length - 1]);
     const treeDepth = dropPos.length;
 
     const dragReg = regions.findRegionID(dragKey);
@@ -354,19 +351,19 @@ const useEventHandlers = () => {
     regions.unhighlightAll();
 
     if (treeDepth === 2 && dropToGap && dropPosition === -1) {
-      dragReg.setParentID('');
+      dragReg.setParentID("");
     } else if (dropPosition !== -1) {
       // check if the dragReg can be a child of dropReg
       const selDrop: any[] = dropReg.labeling?.selectedLabels || [];
-      const labelWithConstraint = selDrop.filter(l => l.groupcancontain);
+      const labelWithConstraint = selDrop.filter((l) => l.groupcancontain);
 
       if (labelWithConstraint.length) {
         const selDrag: any[] = dragReg.labeling.selectedLabels;
 
-        const set1 = flatten(labelWithConstraint.map(l => l.groupcancontain.split(',')));
-        const set2 = flatten(selDrag.map(l => (l.alias ? [l.alias, l.value] : [l.value])));
+        const set1 = flatten(labelWithConstraint.map((l) => l.groupcancontain.split(",")));
+        const set2 = flatten(selDrag.map((l) => (l.alias ? [l.alias, l.value] : [l.value])));
 
-        if (set1.filter(value => -1 !== set2.indexOf(value)).length === 0) return;
+        if (set1.filter((value) => -1 !== set2.indexOf(value)).length === 0) return;
       }
 
       // check drop regions tree depth
@@ -400,77 +397,82 @@ const useEventHandlers = () => {
 };
 
 const SwitcherIcon: FC<any> = observer(({ isLeaf }) => {
-  return isLeaf ? null : <IconArrow/>;
+  return isLeaf ? null : <IconArrow />;
 });
 
 const NodeIconComponent: FC<any> = observer(({ node }) => {
-  return node ? <NodeIcon node={node}/> : null;
+  return node ? <NodeIcon node={node} /> : null;
 });
 
-const RootTitle: FC<any> = observer(({
-  item, // can be undefined for group titles in Labels or Tools mode
-  label,
-  isArea,
-  ...props
-}) => {
-  const hovered = item?.highlighted;
-  const [collapsed, setCollapsed] = useState(false);
+const RootTitle: FC<any> = observer(
+  ({
+    item, // can be undefined for group titles in Labels or Tools mode
+    label,
+    isArea,
+    ...props
+  }) => {
+    const hovered = item?.highlighted;
+    const [collapsed, setCollapsed] = useState(false);
 
-  const controls = useMemo(() => {
-    if (!isArea) return [];
-    return item.perRegionDescControls ?? [];
-  }, [item?.perRegionDescControls, isArea]);
+    const controls = useMemo(() => {
+      if (!isArea) return [];
+      return item.perRegionDescControls ?? [];
+    }, [item?.perRegionDescControls, isArea]);
 
-  const hasControls = useMemo(() => {
-    return controls.length > 0;
-  }, [controls.length]);
+    const hasControls = useMemo(() => {
+      return controls.length > 0;
+    }, [controls.length]);
 
-  const toggleCollapsed = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setCollapsed(!collapsed);
-  }, [collapsed]);
+    const toggleCollapsed = useCallback(
+      (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setCollapsed(!collapsed);
+      },
+      [collapsed],
+    );
 
-  return (
-    <Block name="outliner-item">
-      <Elem name="content">
-        {!props.isGroup && <Elem name="index">{props.idx + 1}</Elem>}
-        <Elem name="title">
-          {label}
-          {item?.text && <Elem name="text">{item.text.replace(/\\n/g, '\n')}</Elem>}
-          {item?.isDrawing && (
-            <Elem tag="span" name="incomplete">
-              <Tooltip title={`Incomplete ${item.type?.replace('region', '') ?? 'region'}`}>
-                <IconWarning />
-              </Tooltip>
-            </Elem>
-          )}
-        </Elem>
-        <RegionControls
-          hovered={hovered}
-          item={item}
-          entity={props.entity}
-          regions={props.children}
-          type={props.type}
-          collapsed={collapsed}
-          hasControls={hasControls && isArea}
-          toggleCollapsed={toggleCollapsed}
-        />
-      </Elem>
-      {(hasControls && isArea) && (
-        <Elem name="ocr">
-          <RegionItemDesc
+    return (
+      <Block name="outliner-item">
+        <Elem name="content">
+          {!props.isGroup && <Elem name="index">{props.idx + 1}</Elem>}
+          <Elem name="title">
+            {label}
+            {item?.text && <Elem name="text">{item.text.replace(/\\n/g, "\n")}</Elem>}
+            {item?.isDrawing && (
+              <Elem tag="span" name="incomplete">
+                <Tooltip title={`Incomplete ${item.type?.replace("region", "") ?? "region"}`}>
+                  <IconWarning />
+                </Tooltip>
+              </Elem>
+            )}
+          </Elem>
+          <RegionControls
+            hovered={hovered}
             item={item}
-            controls={controls}
+            entity={props.entity}
+            regions={props.children}
+            type={props.type}
             collapsed={collapsed}
-            setCollapsed={setCollapsed}
-            selected={props.selected}
+            hasControls={hasControls && isArea}
+            toggleCollapsed={toggleCollapsed}
           />
         </Elem>
-      )}
-    </Block>
-  );
-});
+        {hasControls && isArea && (
+          <Elem name="ocr">
+            <RegionItemDesc
+              item={item}
+              controls={controls}
+              collapsed={collapsed}
+              setCollapsed={setCollapsed}
+              selected={props.selected}
+            />
+          </Elem>
+        )}
+      </Block>
+    );
+  },
+);
 
 interface RegionControlsProps {
   item: any;
@@ -483,111 +485,104 @@ interface RegionControlsProps {
   toggleCollapsed: (e: any) => void;
 }
 
-const RegionControls: FC<RegionControlsProps> = observer(({
-  hovered,
-  item,
-  entity,
-  collapsed,
-  regions,
-  hasControls,
-  type,
-  toggleCollapsed,
-}) => {
-  const { regions: regionStore } = useContext(OutlinerContext);
+const RegionControls: FC<RegionControlsProps> = observer(
+  ({ hovered, item, entity, collapsed, regions, hasControls, type, toggleCollapsed }) => {
+    const { regions: regionStore } = useContext(OutlinerContext);
 
-  const hidden = useMemo(() => {
-    if (type?.includes('region') || type?.includes('range')) {
-      return entity.hidden;
-    } else if ((!type || type.includes('label') || type?.includes('tool')) && regions) {
-      return Object.values(regions).every(({ hidden }) => hidden);
-    }
-    return false;
-  }, [entity, type, regions]);
+    const hidden = useMemo(() => {
+      if (type?.includes("region") || type?.includes("range")) {
+        return entity.hidden;
+      }
+      if ((!type || type.includes("label") || type?.includes("tool")) && regions) {
+        return Object.values(regions).every(({ hidden }) => hidden);
+      }
+      return false;
+    }, [entity, type, regions]);
 
-  const onToggleHidden = useCallback(() => {
-    if (type?.includes('region') || type?.includes('range')) {
-      entity.toggleHidden();
-    } else if (!type || type.includes('label')) {
-      regionStore.setHiddenByLabel(!hidden, entity);
-    } else if (type?.includes('tool')) {
-      regionStore.setHiddenByTool(!hidden, entity);
-    }
-  }, [item, item?.toggleHidden, hidden]);
+    const onToggleHidden = useCallback(() => {
+      if (type?.includes("region") || type?.includes("range")) {
+        entity.toggleHidden();
+      } else if (!type || type.includes("label")) {
+        regionStore.setHiddenByLabel(!hidden, entity);
+      } else if (type?.includes("tool")) {
+        regionStore.setHiddenByTool(!hidden, entity);
+      }
+    }, [item, item?.toggleHidden, hidden]);
 
-  const onToggleCollapsed = useCallback((e: MouseEvent) => {
-    toggleCollapsed(e);
-  }, [toggleCollapsed]);
+    const onToggleCollapsed = useCallback(
+      (e: MouseEvent) => {
+        toggleCollapsed(e);
+      },
+      [toggleCollapsed],
+    );
 
-  const onToggleLocked = useCallback(() => {
-    item.setLocked((locked: boolean) => !locked);
-  }, []);
+    const onToggleLocked = useCallback(() => {
+      item.setLocked((locked: boolean) => !locked);
+    }, []);
 
-  return (
-    <Elem name="controls" mod={{ withControls: hasControls, newUI: isFF(FF_DEV_3873) }}>
-      {isFF(FF_DEV_3873) ? (
-        <Tooltip title={'Confidence Score'}>
-          <Elem name="control-wrapper">
-            <Elem name="control" mod={{ type: 'predict' }}>
-              {item?.origin === 'prediction' && (
-                <LsSparks style={{ width: 18, height: 18 }}/>
-              )}
+    return (
+      <Elem name="controls" mod={{ withControls: hasControls, newUI: isFF(FF_DEV_3873) }}>
+        {isFF(FF_DEV_3873) ? (
+          <Tooltip title={"Confidence Score"}>
+            <Elem name="control-wrapper">
+              <Elem name="control" mod={{ type: "predict" }}>
+                {item?.origin === "prediction" && <LsSparks style={{ width: 18, height: 18 }} />}
+              </Elem>
+              <Elem name="control" mod={{ type: "score" }}>
+                {isDefined(item?.score) && item.score.toFixed(2)}
+              </Elem>
             </Elem>
-            <Elem name="control" mod={{ type: 'score' }}>
+          </Tooltip>
+        ) : (
+          <>
+            <Elem name="control" mod={{ type: "score" }}>
               {isDefined(item?.score) && item.score.toFixed(2)}
             </Elem>
+            <Elem name="control" mod={{ type: "dirty" }}>
+              {/* dirtyness is not implemented yet */}
+            </Elem>
+            <Elem name="control" mod={{ type: "predict" }}>
+              {item?.origin === "prediction" && <LsSparks style={{ width: 18, height: 18 }} />}
+            </Elem>
+          </>
+        )}
+        <Elem name={"wrapper"}>
+          <Elem name="control" mod={{ type: "lock" }}>
+            <LockButton
+              item={item}
+              annotation={item?.annotation}
+              hovered={hovered}
+              locked={item?.locked}
+              onClick={onToggleLocked}
+            />
           </Elem>
-        </Tooltip>
-      ) : (
-        <>
-          <Elem name="control" mod={{ type: 'score' }}>
-            {isDefined(item?.score) && item.score.toFixed(2)}
-          </Elem>
-          <Elem name="control" mod={{ type: 'dirty' }}>
-            {/* dirtyness is not implemented yet */}
-          </Elem>
-          <Elem name="control" mod={{ type: 'predict' }}>
-            {item?.origin === 'prediction' && (
-              <LsSparks style={{ width: 18, height: 18 }}/>
+          <Elem name="control" mod={{ type: "visibility" }}>
+            {isFF(FF_DEV_3873) ? (
+              <RegionControlButton onClick={onToggleHidden} style={hidden ? undefined : { display: "none" }}>
+                {hidden ? <IconEyeClosed /> : <IconEyeOpened />}
+              </RegionControlButton>
+            ) : (
+              <RegionControlButton onClick={onToggleHidden}>
+                {hidden ? <IconEyeClosed /> : <IconEyeOpened />}
+              </RegionControlButton>
             )}
           </Elem>
-        </>
-      )}
-      <Elem name={'wrapper'}>
-        <Elem name="control" mod={{ type: 'lock' }}>
-          <LockButton
-            item={item}
-            annotation={item?.annotation}
-            hovered={hovered}
-            locked={item?.locked}
-            onClick={onToggleLocked}
-          />
-        </Elem>
-        <Elem name="control" mod={{ type: 'visibility' }}>
-          {isFF(FF_DEV_3873) ? (
-            <RegionControlButton onClick={onToggleHidden} style={hidden ? undefined : ({ display: 'none' })}>
-              {hidden ? <IconEyeClosed/> : <IconEyeOpened/>}
-            </RegionControlButton>
-          ) : (
-            <RegionControlButton onClick={onToggleHidden}>
-              {hidden ? <IconEyeClosed/> : <IconEyeOpened/>}
-            </RegionControlButton>
+          {hasControls && (
+            <Elem name="control" mod={{ type: "visibility" }}>
+              <RegionControlButton onClick={onToggleCollapsed}>
+                <IconChevronLeft
+                  style={{
+                    transform: `rotate(${collapsed ? -90 : 90}deg)`,
+                  }}
+                />
+              </RegionControlButton>
+            </Elem>
           )}
         </Elem>
-        {hasControls && (
-          <Elem name="control" mod={{ type: 'visibility' }}>
-            <RegionControlButton onClick={onToggleCollapsed}>
-              <IconChevronLeft
-                style={{
-                  transform: `rotate(${collapsed ? -90 : 90}deg)`,
-                }}
-              />
-            </RegionControlButton>
-          </Elem>
-        )}
       </Elem>
-    </Elem>
-  );
-});
+    );
+  },
+);
 
 interface RegionItemOCSProps {
   item: any;
@@ -597,21 +592,19 @@ interface RegionItemOCSProps {
   setCollapsed: (value: boolean) => void;
 }
 
-const RegionItemDesc: FC<RegionItemOCSProps> = observer(({
-  item,
-  collapsed,
-  setCollapsed,
-  selected,
-}) => {
+const RegionItemDesc: FC<RegionItemOCSProps> = observer(({ item, collapsed, setCollapsed, selected }) => {
   const controls: any[] = item.perRegionDescControls || [];
 
-  const onClick = useCallback((e) => {
-    e.stopPropagation();
+  const onClick = useCallback(
+    (e) => {
+      e.stopPropagation();
 
-    if (!selected) {
-      item.annotation.selectArea(item);
-    }
-  }, [item, selected, collapsed]);
+      if (!selected) {
+        item.annotation.selectArea(item);
+      }
+    },
+    [item, selected, collapsed],
+  );
 
   return (
     <Block
@@ -642,6 +635,5 @@ const RegionItemDesc: FC<RegionItemOCSProps> = observer(({
     </Block>
   );
 });
-
 
 export const OutlinerTree = observer(OutlinerTreeComponent);

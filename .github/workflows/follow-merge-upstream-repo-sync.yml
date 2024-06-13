@@ -42,7 +42,6 @@ jobs:
               ;;
             */label-studio-sdk)
               echo "poetry=true" >> $GITHUB_OUTPUT
-              echo "poetry_group=test" >> $GITHUB_OUTPUT
               ;;
             *)
               echo '::error::Repository ${{ github.event.client_payload.repo_name }} is not supported'
@@ -190,7 +189,7 @@ jobs:
         run: |
           set -xeuo pipefail
 
-          poetry add "https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip" --lock --group "${{ steps.details.outputs.poetry_group }}"
+          poetry add "https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip" --lock
 
           git add pyproject.toml poetry.lock
           git status -s

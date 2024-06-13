@@ -5,10 +5,7 @@ import { DEFAULT_PAGE_SIZE, getStoredPageSize } from "../../components/Common/Pa
 import { FF_LOPS_E_3, isFF } from "../../utils/feature-flags";
 
 const listIncludes = (list, id) => {
-  const index =
-    id !== undefined
-      ? Array.from(list).findIndex((item) => item.id === id)
-      : -1;
+  const index = id !== undefined ? Array.from(list).findIndex((item) => item.id === id) : -1;
 
   return index >= 0;
 };
@@ -69,7 +66,7 @@ const MixinBase = types
         self.selected = selected;
         self.highlighted = selected;
 
-        getRoot(self).SDK.invoke('taskSelected');
+        getRoot(self).SDK.invoke("taskSelected");
       }
     },
 
@@ -105,7 +102,6 @@ const MixinBase = types
       }
 
       self.associatedList = associatedList;
-
     },
 
     setLoading(id) {
@@ -132,17 +128,16 @@ const MixinBase = types
     },
   }));
 
-export const DataStore = (
-  modelName,
-  { listItemType, apiMethod, properties, associatedItemType },
-) => {
+export const DataStore = (modelName, { listItemType, apiMethod, properties, associatedItemType }) => {
   const model = types
     .model(modelName, {
       ...(properties ?? {}),
       list: types.optional(types.array(listItemType), []),
       selectedId: types.optional(types.maybeNull(types.number), null),
       highlightedId: types.optional(types.maybeNull(types.number), null),
-      ...(associatedItemType ? { associatedList: types.optional(types.maybeNull(types.array(associatedItemType)), []) } : {}),
+      ...(associatedItemType
+        ? { associatedList: types.optional(types.maybeNull(types.array(associatedItemType)), []) }
+        : {}),
     })
     .views((self) => ({
       get selected() {
@@ -179,8 +174,9 @@ export const DataStore = (
       },
 
       fetch: flow(function* ({ id, query, pageNumber = null, reload = false, interaction, pageSize } = {}) {
-        let currentViewId, currentViewQuery;
-        const requestId = self.requestId = guidGenerator();
+        let currentViewId;
+        let currentViewQuery;
+        const requestId = (self.requestId = guidGenerator());
         const root = getRoot(self);
 
         if (id) {
@@ -197,13 +193,11 @@ export const DataStore = (
 
         self.loading = true;
 
-        if(interaction === "filter" || interaction === "ordering" || reload) {
+        if (interaction === "filter" || interaction === "ordering" || reload) {
           self.page = 1;
         } else if (reload || isDefined(pageNumber)) {
-          if (self.page === 0)
-            self.page = 1;
-          else if (isDefined(pageNumber))
-            self.page = pageNumber;
+          if (self.page === 0) self.page = 1;
+          else if (isDefined(pageNumber)) self.page = pageNumber;
         } else {
           self.page++;
         }
@@ -227,7 +221,7 @@ export const DataStore = (
 
         if (interaction) Object.assign(params, { interaction });
 
-        const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === 'DE' });
+        const data = yield root.apiCall(apiMethod, params, {}, { allowToCancel: root.SDK.type === "DE" });
 
         // We cancel current request processing if request id
         // changed during the request. It indicates that something
@@ -246,12 +240,13 @@ export const DataStore = (
           associatedList = data[apiMethodSettings?.associatedType];
         }
 
-        if (list) self.setList({
-          total,
-          list,
-          reload: reload || isDefined(pageNumber),
-          associatedList,
-        });
+        if (list)
+          self.setList({
+            total,
+            list,
+            reload: reload || isDefined(pageNumber),
+            associatedList,
+          });
 
         if (isDefined(highlightedID) && !listIncludes(self.list, highlightedID)) {
           self.highlighted = null;
@@ -261,7 +256,7 @@ export const DataStore = (
 
         self.loading = false;
 
-        root.SDK.invoke('dataFetched', self);
+        root.SDK.invoke("dataFetched", self);
       }),
 
       reload: flow(function* ({ id, query, interaction } = {}) {
@@ -278,10 +273,7 @@ export const DataStore = (
       },
 
       focusNext() {
-        const index = Math.min(
-          self.list.length - 1,
-          self.list.indexOf(self.highlighted) + 1,
-        );
+        const index = Math.min(self.list.length - 1, self.list.indexOf(self.highlighted) + 1);
 
         self.highlighted = self.list[index];
         self.updated = guidGenerator();

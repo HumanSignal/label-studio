@@ -17,6 +17,7 @@ env:
   NODE: "18"
   FRONTEND_MONOREPO_DIR: "web"
   FRONTEND_BUILD_COMMIT_MESSAGE: "ci: Build frontend"
+  DOCS_TARGET_DIR: "docs/source/tags"
 
 jobs:
   build:
@@ -45,13 +46,24 @@ jobs:
           node-version: "${{ env.NODE }}"
           directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
-      - name: "Monorepo: Build"
+      - name: "Build"
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
         run: yarn build
 
-      - name: Commit and Push
+      - name: "Generate version files"
+        continue-on-error: true
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn version:libs
+
+      - name: "Generate docs tags files"
+        continue-on-error: true
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn docs
+
+      - name: "Commit and Push"
         run: |
           git add "${{ env.FRONTEND_MONOREPO_DIR }}" || true
+          git add "${{ env.DOCS_TARGET_DIR }}" || true
           git status -s
           git commit -m '${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
           git push origin HEAD

@@ -1,4 +1,3 @@
-
 export const API_CONFIG = {
   gateway: `${window.APP_SETTINGS.hostname}/api`,
   endpoints: {
@@ -34,7 +33,7 @@ export const API_CONFIG = {
     dataSummary: "/projects/:pk/summary",
 
     // DM
-    deleteTabs: 'DELETE:/dm/views/reset',
+    deleteTabs: "DELETE:/dm/views/reset",
 
     // Storages
     listStorages: "/storages/:target?",
@@ -53,8 +52,9 @@ export const API_CONFIG = {
     updateMLBackend: "PATCH:/ml/:pk",
     deleteMLBackend: "DELETE:/ml/:pk",
     trainMLBackend: "POST:/ml/:pk/train",
-    predictWithML: "POST:/ml/:pk/predict",
+    predictWithML: "POST:/ml/:pk/predict/test",
     projectModelVersions: "/projects/:pk/model-versions",
+    deletePredictions: "DELETE:/projects/:pk/model-versions",
     modelVersions: "/ml/:pk/versions",
     mlInteractive: "POST:/ml/:pk/interactive-annotating",
 
@@ -64,7 +64,7 @@ export const API_CONFIG = {
     exportFormats: "/projects/:pk/export/formats",
 
     // Version
-    version: '/version',
+    version: "/version",
 
     // Webhook
     webhooks: "/webhooks",

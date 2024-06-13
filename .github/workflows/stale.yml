@@ -6,13 +6,33 @@
 name: "Close stale issues and PRs"
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "30 1 * * *" # At 01:30
 
+#env:
+#  CLOSE_ISSUE_MESSAGE: >
+#    This issue has been closed due to inactivity.
+#
+#    If you need further assistance or have questions, you can
+#    also search for similar issues on [Discourse](https://community.labelstud.io/).
+#
+#    For more detailed information, please visit [Documentation site](https://labelstud.io/guide/).
+#
+#  WARN_ISSUE_MESSAGE: >
+#    It seems there has been no activity on this issue for a while, and it is being closed **in 30 days**.
+#    If you believe this issue should remain open, please leave a comment.
+#
+#    If you need further assistance or have questions, you can
+#    also search for similar issues on [Dicourse](https://community.labelstud.io/).
+#
+#    For more detailed information, please visit our [Documentation site](https://labelstud.io/guide/).
+
 permissions:
+  contents: read
   issues: write
   pull-requests: write
-
+  actions: write
 jobs:
   stale:
     runs-on: ubuntu-latest
@@ -20,12 +40,16 @@ jobs:
     steps:
       - uses: actions/stale@v9
         with:
+          repo-token: ${{ secrets.GIT_PAT }}
           days-before-issue-stale: -1
           days-before-issue-close: -1 # never closed automatically
-          stale-pr-message: "This PR is stale because it has been open 172 days with no activity. Remove stale label or comment or this will be closed in 10 days."
+          stale-pr-message: "This PR is stale because it has been open 45 days with no activity. Remove `stale` label or comment or this will be closed in 10 days."
           close-pr-message: "This PR was closed because it has been stalled for 10 days with no activity."
-          days-before-pr-stale: 172
+          days-before-pr-stale: 45
           days-before-pr-close: 10
-          stale-pr-label: "no-pr-activity"
+          stale-pr-label: stale
+          stale-issue-label: stale
           exempt-pr-labels: "awaiting-approval,work-in-progress"
           exempt-draft-pr: true
+          operations-per-run: 500
+          remove-stale-when-updated: true

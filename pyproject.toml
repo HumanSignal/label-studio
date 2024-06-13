@@ -104,7 +104,7 @@ target-version = ['py38']
 [tool.poetry]
 
 name = "label-studio"
-version = "1.11.1.dev0"
+version = "1.12.2.dev0"
 description = "Label Studio annotation tool"
 authors = [
     "Heartex <hello@heartex.ai>",
@@ -179,7 +179,7 @@ defusedxml = ">=0.7.1"
 numpy = "^1.24.3"
 ordered-set = "4.0.2"
 pandas = ">=0.24.0"
-psycopg2-binary = "2.9.6"
+psycopg2-binary = "2.9.9"
 pydantic = "<=1.11.0,>=1.7.3"
 python-dateutil = ">=2.8.1"
 pytz = "~=2022.1"
@@ -188,25 +188,28 @@ urllib3 = "^1.26.18"
 rq = "1.10.1"
 rules = "2.2"
 ujson = ">=3.0.0"
-xmljson = "0.2.0"
+xmljson = "0.2.1"
 colorama = ">=0.4.4"
 boxing = ">=0.1.4"
 redis = "~=3.5"
 sentry-sdk = ">=1.1.0"
 launchdarkly-server-sdk = "8.2.1"
 python-json-logger = "2.0.4"
-label-studio-converter = "0.0.58"
 google-cloud-storage = "^2.13.0"
+google-cloud-logging = "^3.10.0"
 mysqlclient = {version = "*", optional = true}
 django-csp = "3.7"
 openai = "^1.10.0"
+
+# Humansignal repo dependencies
+
+label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/f6fb130d41380704d36045e21839d3f27ddf2883.zip"}
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"
 pytest-cov = "2.12.1"
 pytest-django = "4.1.0"
 pytest-mock = "1.10.3"
-requests-mock = "1.5.2"
 tavern = "2.3.0"
 fakeredis = "1.5.0"
 pytest-env = "0.6.2"
@@ -218,7 +221,7 @@ pre-commit = "3.3.3"
 s3transfer = "0.7.0"
 mock = ">=5.1.0"
 moto = ">=4.2.6"
-label-studio-sdk = { url = "https://github.com/HumanSignal/label-studio-sdk/archive/b74e2d693f203bfb16c8919fd9670ec8e2c5f8ea.zip" }
+requests-mock = "1.12.1"
 [tool.poetry.group.build.dependencies]
 twine = ">=4.0.2"
 

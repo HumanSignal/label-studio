@@ -41,8 +41,6 @@ _api_urlpatterns = [
     path('<int:pk>/reimports/<int:reimport_pk>/', api.ProjectReimportAPI.as_view(), name='project-reimports'),
     # Tasks list for the project: get and destroy
     path('<int:pk>/tasks/', api.ProjectTaskListAPI.as_view(), name='project-tasks-list'),
-    # Tasks containing ground truth list for the project: get and destroy
-    path('<int:pk>/ground-truth-tasks/', api.ProjectGroundTruthTaskListAPI.as_view(), name='project-gt-tasks-list'),
     # Generate sample task for this project
     path('<int:pk>/sample-task/', api.ProjectSampleTask.as_view(), name='project-sample-task'),
     # List available model versions

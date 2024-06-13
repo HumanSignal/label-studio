@@ -1,22 +1,24 @@
-import { configure } from 'mobx';
-import { destroy } from 'mobx-state-tree';
-import { render, unmountComponentAtNode } from 'react-dom';
-import { toCamelCase } from 'strman';
+import { configure } from "mobx";
+import { destroy } from "mobx-state-tree";
+import { render, unmountComponentAtNode } from "react-dom";
+import { toCamelCase } from "strman";
 
-import { LabelStudio as LabelStudioReact } from './Component';
-import App from './components/App/App';
-import { configureStore } from './configureStore';
-import legacyEvents from './core/External';
-import { Hotkey } from './core/Hotkey';
-import defaultOptions from './defaultOptions';
-import { destroy as destroySharedStore } from './mixins/SharedChoiceStore/mixin';
-import { EventInvoker } from './utils/events';
-import { FF_LSDV_4620_3_ML, isFF } from './utils/feature-flags';
-import { cleanDomAfterReact, findReactKey } from './utils/reactCleaner';
-import { isDefined } from './utils/utilities';
+import { LabelStudio as LabelStudioReact } from "./Component";
+import App from "./components/App/App";
+import { configureStore } from "./configureStore";
+import legacyEvents from "./core/External";
+import { Hotkey } from "./core/Hotkey";
+import defaultOptions from "./defaultOptions";
+import { destroy as destroySharedStore } from "./mixins/SharedChoiceStore/mixin";
+import { EventInvoker } from "./utils/events";
+import { FF_LSDV_4620_3_ML, isFF } from "./utils/feature-flags";
+import { cleanDomAfterReact, findReactKey } from "./utils/reactCleaner";
+import { isDefined } from "./utils/utilities";
 
 declare global {
-  interface Window { Htx: any }
+  interface Window {
+    Htx: any;
+  }
 }
 
 configure({
@@ -32,12 +34,12 @@ type LSFTask = any;
 // because those options will go as initial values for AppStore
 // but it's not types yet, so here is some excerpt of its params
 type LSFOptions = Record<string, any> & {
-  interfaces: string[],
-  keymap: Keymap,
-  user: LSFUser,
-  users: LSFUser[],
-  task: LSFTask,
-}
+  interfaces: string[];
+  keymap: Keymap;
+  user: LSFUser;
+  users: LSFUser[];
+  task: LSFTask;
+};
 
 export class LabelStudio {
   static Component = LabelStudioReact;
@@ -45,8 +47,8 @@ export class LabelStudio {
   static instances = new Set<LabelStudio>();
 
   static destroyAll() {
-    this.instances.forEach(inst => inst.destroy?.());
-    this.instances.clear();
+    LabelStudio.instances.forEach((inst) => inst.destroy?.());
+    LabelStudio.instances.clear();
   }
 
   options: Partial<LSFOptions>;
@@ -59,7 +61,7 @@ export class LabelStudio {
   getRootElement(root: Element | string) {
     let element: Element | null = null;
 
-    if (typeof root === 'string') {
+    if (typeof root === "string") {
       element = document.getElementById(root);
     } else {
       element = root;
@@ -113,9 +115,7 @@ export class LabelStudio {
       if (isRendered) {
         clearRenderedApp();
       }
-      render((
-        <App store={this.store} />
-      ), rootElement);
+      render(<App store={this.store} />, rootElement);
     };
 
     const clearRenderedApp = () => {
@@ -158,6 +158,7 @@ export class LabelStudio {
         this.store.selfDestroy();
       }
       destroy(this.store);
+      Hotkey.unbindAll();
       if (isFF(FF_LSDV_4620_3_ML)) {
         /*
             ...
@@ -173,11 +174,11 @@ export class LabelStudio {
   supportLegacyEvents() {
     const keys = Object.keys(legacyEvents);
 
-    keys.forEach(key => {
+    keys.forEach((key) => {
       const callback = this.options[key];
 
       if (isDefined(callback)) {
-        const eventName = toCamelCase(key.replace(/^on/, ''));
+        const eventName = toCamelCase(key.replace(/^on/, ""));
 
         this.events.on(eventName, callback);
       }

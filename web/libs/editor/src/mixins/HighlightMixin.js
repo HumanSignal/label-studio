@@ -1,27 +1,25 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-import Utils from '../utils';
-import { guidGenerator } from '../utils/unique';
-import Constants, { defaultStyle } from '../core/Constants';
-import { isDefined } from '../utils/utilities';
-import { FF_LSDV_4620_3, isFF } from '../utils/feature-flags';
+import Utils from "../utils";
+import { guidGenerator } from "../utils/unique";
+import Constants, { defaultStyle } from "../core/Constants";
+import { isDefined } from "../utils/utilities";
+import { FF_LSDV_4620_3, isFF } from "../utils/feature-flags";
 
-const HIGHLIGHT_CN = 'htx-highlight';
-const HIGHLIGHT_NO_LABEL_CN = 'htx-no-label';
+const HIGHLIGHT_CN = "htx-highlight";
+const HIGHLIGHT_NO_LABEL_CN = "htx-no-label";
 const IDENTIFIER_LENGTH = 5;
 const LABEL_COLOR_ALPHA = 0.3;
 
 export const HighlightMixin = types
   .model()
-  .views(self => ({
+  .views((self) => ({
     get _hasSpans() {
       // @todo is it possible that only some spans are connected?
-      return self._spans ? (
-        self._spans.every(span => span.isConnected)
-      ) : false;
+      return self._spans ? self._spans.every((span) => span.isConnected) : false;
     },
     get identifier() {
-      return `${self.id.split('#')[0]}-${self.ouid}`;
+      return `${self.id.split("#")[0]}-${self.ouid}`;
     },
     get className() {
       return `${HIGHLIGHT_CN}-${self.identifier}`;
@@ -35,7 +33,7 @@ export const HighlightMixin = types
 
       // in this case labels presence can't be changed from settings — manual mode
       if (isDefined(self.parent.showlabels)) {
-        classNames.push('htx-manual-label');
+        classNames.push("htx-manual-label");
       }
 
       return classNames;
@@ -58,7 +56,7 @@ export const HighlightMixin = types
       `;
     },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     /**
      * Create highlights from the stored `Range`
      */
@@ -70,7 +68,7 @@ export const HighlightMixin = types
         }
 
         self._spans = self.parent.createSpansByGlobalOffsets(self.globalOffsets);
-        self._spans?.forEach(span => span.className = self.classNames.join(' '));
+        self._spans?.forEach((span) => (span.className = self.classNames.join(" ")));
         self.updateSpans();
         if (!init) {
           self.parent.setStyles({ [self.identifier]: self.styles });
@@ -96,7 +94,7 @@ export const HighlightMixin = types
 
       // Avoid rendering before view is ready
       if (!range) {
-        console.warn('No range found to highlight');
+        console.warn("No range found to highlight");
         return void 0;
       }
 
@@ -108,7 +106,7 @@ export const HighlightMixin = types
       const identifier = guidGenerator(IDENTIFIER_LENGTH);
       // @todo use label-based stylesheets created only once
       const stylesheet = createSpanStylesheet(root.ownerDocument, identifier, labelColor);
-      const classNames = ['htx-highlight', stylesheet.className];
+      const classNames = ["htx-highlight", stylesheet.className];
 
       if (!(self.parent.showlabels ?? self.store.settings.showLabels)) {
         classNames.push(HIGHLIGHT_NO_LABEL_CN);
@@ -116,7 +114,7 @@ export const HighlightMixin = types
 
       // in this case labels presence can't be changed from settings — manual mode
       if (isDefined(self.parent.showlabels)) {
-        classNames.push('htx-manual-label');
+        classNames.push("htx-manual-label");
       }
 
       self._stylesheet = stylesheet;
@@ -156,6 +154,10 @@ export const HighlightMixin = types
 
         Utils.Selection.applySpanStyles(lastSpan, { label: self.getLabels() });
       }
+    },
+
+    clearSpans() {
+      self._spans = null;
     },
 
     /**
@@ -207,7 +209,7 @@ export const HighlightMixin = types
       if (first.scrollIntoViewIfNeeded) {
         first.scrollIntoViewIfNeeded();
       } else {
-        first.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        first.scrollIntoView({ block: "center", behavior: "smooth" });
       }
     },
 
@@ -227,7 +229,9 @@ export const HighlightMixin = types
       } else {
         try {
           self._stylesheet.remove();
-        } catch (e) { /* something went wrong */ }
+        } catch (e) {
+          /* something went wrong */
+        }
       }
     },
 
@@ -268,13 +272,13 @@ export const HighlightMixin = types
     },
 
     getLabels() {
-      return (self.labeling?.selectedLabels ?? []).map(label => label.value).join(',');
+      return (self.labeling?.selectedLabels ?? []).map((label) => label.value).join(",");
     },
 
     getLabelColor() {
       const labelColor = self.parent.highlightcolor || (self.style || self.tag || defaultStyle).fillcolor;
 
-      return Utils.Colors.convertToRGBA(labelColor ?? '#DA935D', LABEL_COLOR_ALPHA);
+      return Utils.Colors.convertToRGBA(labelColor ?? "#DA935D", LABEL_COLOR_ALPHA);
     },
 
     find(span) {
@@ -291,7 +295,7 @@ export const HighlightMixin = types
       }
       const classList = [].concat(classNames); // convert any input to array
 
-      self._spans.forEach(span => span.classList.add(...classList));
+      self._spans.forEach((span) => span.classList.add(...classList));
     },
 
     /**
@@ -304,28 +308,26 @@ export const HighlightMixin = types
       }
       const classList = [].concat(classNames); // convert any input to array
 
-      self._spans.forEach(span => span.classList.remove(...classList));
+      self._spans.forEach((span) => span.classList.remove(...classList));
     },
 
     toggleHidden(e) {
       self.hidden = !self.hidden;
       if (self.hidden) {
-        self.addClass('__hidden');
+        self.addClass("__hidden");
       } else {
-        self.removeClass('__hidden');
+        self.removeClass("__hidden");
       }
 
       e?.stopPropagation();
     },
   }));
 
-
-
 export const STATE_CLASS_MODS = {
-  active: '__active',
-  highlighted: '__highlighted',
-  collapsed: '__collapsed',
-  hidden: '__hidden',
+  active: "__active",
+  highlighted: "__highlighted",
+  collapsed: "__collapsed",
+  hidden: "__hidden",
   noLabel: HIGHLIGHT_NO_LABEL_CN,
 };
 
@@ -347,7 +349,7 @@ const createSpanStylesheet = (document, identifier, color) => {
   };
 
   const activeColorOpacity = 0.8;
-  const toActiveColor = color => Utils.Colors.rgbaChangeAlpha(color, activeColorOpacity);
+  const toActiveColor = (color) => Utils.Colors.rgbaChangeAlpha(color, activeColorOpacity);
 
   const initialActiveColor = toActiveColor(color);
 
@@ -393,9 +395,9 @@ const createSpanStylesheet = (document, identifier, color) => {
     `,
   };
 
-  const styleTag = document.createElement('style');
+  const styleTag = document.createElement("style");
 
-  styleTag.type = 'text/css';
+  styleTag.type = "text/css";
   styleTag.id = `highlight-${identifier}`;
   document.head.appendChild(styleTag);
 
@@ -418,12 +420,12 @@ const createSpanStylesheet = (document, identifier, color) => {
    * Set region color
    * @param {string} color
    */
-  const setColor = color => {
+  const setColor = (color) => {
     const newActiveColor = toActiveColor(color);
     // sheet could change during iframe transfers, so look up in the tag
     const stylesheet = styleTag.sheet ?? styleTag.styleSheet;
     // they are on different positions for old/new regions
-    const rule = [...stylesheet.rules].find(rule => rule.selectorText.includes('__active'));
+    const rule = [...stylesheet.rules].find((rule) => rule.selectorText.includes("__active"));
     const { style } = rule;
 
     // document in a closure may be a working iframe, so go up from the tag
@@ -437,7 +439,7 @@ const createSpanStylesheet = (document, identifier, color) => {
    * Set cursor style
    * @param {string} cursor
    */
-  const setCursor = cursor => {
+  const setCursor = (cursor) => {
     styleTag.ownerDocument.documentElement.style.setProperty(variables.cursor, cursor);
   };
 
@@ -456,4 +458,3 @@ const createSpanStylesheet = (document, identifier, color) => {
     remove,
   };
 };
-

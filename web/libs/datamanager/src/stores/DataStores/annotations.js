@@ -5,11 +5,7 @@ import { DynamicModel } from "../DynamicModel";
 export const create = (columns) => {
   const AnnotationModelBase = DynamicModel("AnnotationModelBase", columns);
 
-  const AnnotationModel = types.compose(
-    "AnnotationModel",
-    AnnotationModelBase,
-    DataStoreItem,
-  );
+  const AnnotationModel = types.compose("AnnotationModel", AnnotationModelBase, DataStoreItem);
 
   return DataStore("AnnotationStore", {
     apiMethod: "annotations",

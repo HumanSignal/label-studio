@@ -1,26 +1,26 @@
-const Helper = require('@codeceptjs/helper');
+const Helper = require("@codeceptjs/helper");
 
 const getPage = (h) => {
   return (h.Puppeteer ?? h.Playwright).page;
 };
 
 class MouseActions extends Helper {
-  clickAt(x, y, buttonName = 'left') {
+  clickAt(x, y, buttonName = "left") {
     const page = getPage(this.helpers);
 
     return page.mouse.click(x, y, { button: buttonName, delay: 80 });
   }
-  dblClickAt(x, y, buttonName = 'left') {
+  dblClickAt(x, y, buttonName = "left") {
     const page = getPage(this.helpers);
 
     return page.mouse.click(x, y, { button: buttonName, delay: 80, clickCount: 2 });
   }
-  pressMouseDown(buttonName = 'left') {
+  pressMouseDown(buttonName = "left") {
     const page = getPage(this.helpers);
 
     return page.mouse.down({ button: buttonName });
   }
-  pressMouseUp(buttonName = 'left') {
+  pressMouseUp(buttonName = "left") {
     const page = getPage(this.helpers);
 
     return page.mouse.up({ button: buttonName });
@@ -53,7 +53,7 @@ class MouseActions extends Helper {
    * @param {number} [steps=1]
    * @returns {Promise<void>}
    */
-  async dragAndDropMouse(from, to, button = 'left', steps = 1) {
+  async dragAndDropMouse(from, to, button = "left", steps = 1) {
     const page = getPage(this.helpers);
 
     await page.mouse.move(from.x, from.y, { steps });

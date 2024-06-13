@@ -204,12 +204,6 @@
         "decorators": ""
     },
     {
-        "url": "/api/projects/<int:pk>/ground-truth-tasks/",
-        "module": "projects.api.ProjectGroundTruthTaskListAPI",
-        "name": "projects:api:project-gt-tasks-list",
-        "decorators": ""
-    },
-    {
         "url": "/api/projects/<int:pk>/sample-task/",
         "module": "projects.api.ProjectSampleTask",
         "name": "projects:api:project-sample-task",
@@ -945,6 +939,12 @@
         "url": "/api/ml/<int:pk>/train",
         "module": "ml.api.MLBackendTrainAPI",
         "name": "ml:api:ml-train",
+        "decorators": ""
+    },
+    {
+        "url": "/api/ml/<int:pk>/predict/test",
+        "module": "ml.api.MLBackendPredictAPI",
+        "name": "ml:api:ml-predict-test",
         "decorators": ""
     },
     {

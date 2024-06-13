@@ -57,11 +57,11 @@ export const transformData = (columns: Array<InputItem[]>, titles: string[]) => 
 
     queryData.columns[id] = {
       id,
-      title: titles[idx] || '',
-      itemIds: items.map(item => item.id),
+      title: titles[idx] || "",
+      itemIds: items.map((item) => item.id),
     };
 
-    items.forEach(item => {
+    items.forEach((item) => {
       queryData.items[item.id] = item;
     });
 

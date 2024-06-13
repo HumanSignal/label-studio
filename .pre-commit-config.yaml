@@ -10,3 +10,10 @@ repos:
     hooks:
       - id: blue
         args: [ --check, --diff, --color ]
+-   repo: https://github.com/biomejs/pre-commit
+    rev: "v0.1.0"
+    hooks:
+    -   id: biome-check
+        args: [--config-path, ./web]
+        additional_dependencies: ["@biomejs/biome@1.7.1"]
+        files: ^web/.*

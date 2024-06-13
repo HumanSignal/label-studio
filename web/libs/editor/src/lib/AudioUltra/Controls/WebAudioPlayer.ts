@@ -1,6 +1,6 @@
-import { WaveformAudio } from '../Media/WaveformAudio';
-import { Waveform } from '../Waveform';
-import { Player } from './Player';
+import type { WaveformAudio } from "../Media/WaveformAudio";
+import type { Waveform } from "../Waveform";
+import { Player } from "./Player";
 
 export class WebAudioPlayer extends Player {
   private audioContext?: AudioContext;
@@ -20,7 +20,7 @@ export class WebAudioPlayer extends Player {
 
     if (!this.audioContext) return;
 
-    if (this.audioContext.state === 'suspended') {
+    if (this.audioContext.state === "suspended") {
       await this.audioContext.resume();
     }
   }
@@ -48,7 +48,7 @@ export class WebAudioPlayer extends Player {
       if (this.audioBufferSource?.playbackRate) {
         this.audioBufferSource.playbackRate.value = this._rate;
       }
-      this.wf.invoke('rateChanged', [value]);
+      this.wf.invoke("rateChanged", [value]);
     }
   }
 
@@ -79,7 +79,7 @@ export class WebAudioPlayer extends Player {
       }
     } catch (err: any) {
       // InvalidStateError is thrown when the audio is already playing
-      if (err.name !== 'InvalidStateError') throw err;
+      if (err.name !== "InvalidStateError") throw err;
     }
 
     this.timestamp = performance.now();
@@ -103,7 +103,7 @@ export class WebAudioPlayer extends Player {
       this.audioBufferSource.stop();
     } catch (err: any) {
       // InvalidStateError is thrown when the audio is already stopped
-      if (err.name !== 'InvalidStateError') throw err;
+      if (err.name !== "InvalidStateError") throw err;
     }
     this.audioBufferSource.disconnect();
     this.audioBufferSource.onended = null;

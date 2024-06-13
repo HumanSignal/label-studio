@@ -4,10 +4,10 @@ short: Review annotations
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 255
+order_enterprise: 304
 meta_title: Review annotation quality in Label Studio
 meta_description: In data labeling projects, start evaluating annotator performance against ground truth annotations, predictions, and other annotator's annotations.
-section: "Quality control"
+section: "Review & Measure Quality"
 ---
 
 After multiple labelers have annotated tasks, review their output to validate the quality of the results. You can also perform this task after a model has predicted labels for tasks in your dataset. To configure the settings for reviewing annotations, see [Set up review settings for your project](setup_project.html#Set-up-review-settings-for-your-project).

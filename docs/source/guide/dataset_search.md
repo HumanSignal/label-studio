@@ -8,7 +8,7 @@ order_enterprise: 210
 meta_title: Data Discovery search and filtering in Label Studio 
 meta_description: Use filters, natural language search, and similarity search to refine your datasets. 
 date: 2023-08-23 12:18:50
-section: "Data Discovery"
+section: "Curate Datasets"
 ---
 
 Once your dataset is created, you will want to add records to projects as tasks. For some projects, this might be the complete dataset. But in most cases you will likely want to select a subset of data based on certain criteria. 
@@ -21,6 +21,9 @@ Label studio provides several search mechanisms:
 * **Similarity searching** - Select one or more records and then sort the data based on semantic similarity to your selections. 
 * **Combined searches** - Combine similarity searching and natural language searching. 
 * **Filtering** - Reduce your dataset to only show records that have a certain threshold of similarity to your searches.
+
+!!! attention
+    Search results are limited to 16,384 records at a time. All records with the dataset are stored, but the Label Studio interface is limited to returning a smaller subset per search. As you change your search query, you’ll see different sets of records (all with a max of 16,384 at a time).
 
 ## How searches work
 

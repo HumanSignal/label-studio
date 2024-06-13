@@ -1,20 +1,19 @@
 ---
 title: Data Discovery overview - Beta 🧪
-short: Overview
+short: Data Discovery overview
 tier: enterprise
 type: guide
 order: 0
 order_enterprise: 201
 meta_title: Data Discovery overview and features
 meta_description: An overview of Label Studio's Data Discovery functionality, including features and limitations. 
-section: "Data Discovery"
+section: "Curate Datasets"
 date: 2023-11-10 15:23:18
 ---
 
 > Streamline your data preparation process using Data Discovery in Label Studio. 
 
-!!! note Beta release
-    This feature is currently in beta. To enable Data Discovery, contact your customer success manager or email [cs@humansignal.com](mailto:cs@humansignal.com). 
+<div class="admonition todo"><p class="admonition-title">Beta Release</p><p>This feature is currently in beta. To enable Data Discovery, contact your customer success manager or email <a href="mailto:cs@humansignal.com">cs@humansignal.com</a>.</p></div>
 
 In machine learning, the quality and relevance of the data used for training directly affects model performance. However, sifting through extensive unstructured datasets to find relevant items can be cumbersome and time-consuming. 
 
@@ -57,6 +56,7 @@ This targeted approach to data gathering not only saves valuable time but also c
 | **Supported storage for import** | Google Cloud storage <br><br>AWS S3 <br><br>Azure blob storage |
 | **Number of storage sources per dataset** | One |
 | **Maximum number of records per dataset** | 1 million |
+| **Maximum number of records returned per search** | 16,384 |
 | **Number of datasets per org** | 10 |
 | **Supported search types** | Natural language search <br><br>Similarity search |
 | **Supported filter types** | Similarity score |

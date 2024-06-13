@@ -4,10 +4,12 @@ short: Upgrade Label Studio
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 470
+order_enterprise: 75
 meta_title: Upgrade Label Studio Enterprise
 meta_description: Steps you should take when upgrading Label Studio Enterprise.
-section: "Install"
+section: "Install & Setup"
+parent: "install"
+parent_enterprise: "install_enterprise"
 date: 2023-09-27 10:57:03
 ---
 
