@@ -1,21 +1,63 @@
-import pytest
 import json
+
+import pytest
+
 from label_studio.tests.utils import make_project, make_task, register_ml_backend_mock
 
 
 @pytest.fixture
 def ml_backend_for_test_predict(ml_backend):
     # ML backend with single prediction per task
-    register_ml_backend_mock(ml_backend, url='http://localhost:9092', predictions={'results': [
-        {'model_version': 'ModelSingle', 'score': 0.1, 'result': [{'from_name': 'label', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['Single']}}]},
-    ]})
+    register_ml_backend_mock(
+        ml_backend,
+        url='http://localhost:9092',
+        predictions={
+            'results': [
+                {
+                    'model_version': 'ModelSingle',
+                    'score': 0.1,
+                    'result': [
+                        {'from_name': 'label', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['Single']}}
+                    ],
+                },
+            ]
+        },
+    )
     # ML backend with multiple predictions per task
-    register_ml_backend_mock(ml_backend, url='http://localhost:9093', predictions={'results': [
-        [
-            {'model_version': 'ModelA', 'score': 0.2, 'result': [{'from_name': 'label', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['label_A']}}]},
-            {'model_version': 'ModelB', 'score': 0.3, 'result': [{'from_name': 'label', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['label_B']}}]},
-        ]
-    ]})
+    register_ml_backend_mock(
+        ml_backend,
+        url='http://localhost:9093',
+        predictions={
+            'results': [
+                [
+                    {
+                        'model_version': 'ModelA',
+                        'score': 0.2,
+                        'result': [
+                            {
+                                'from_name': 'label',
+                                'to_name': 'text',
+                                'type': 'choices',
+                                'value': {'choices': ['label_A']},
+                            }
+                        ],
+                    },
+                    {
+                        'model_version': 'ModelB',
+                        'score': 0.3,
+                        'result': [
+                            {
+                                'from_name': 'label',
+                                'to_name': 'text',
+                                'type': 'choices',
+                                'value': {'choices': ['label_B']},
+                            }
+                        ],
+                    },
+                ]
+            ]
+        },
+    )
     yield ml_backend
 
 
@@ -35,7 +77,7 @@ def test_get_single_prediction_on_task(business_client, ml_backend_for_test_pred
             title='test_get_single_prediction_on_task',
         ),
         user=business_client.user,
-        use_ml_backend=False
+        use_ml_backend=False,
     )
 
     make_task({'data': {'text': 'test 1'}}, project)
@@ -79,7 +121,7 @@ def test_get_multiple_predictions_on_task(business_client, ml_backend_for_test_p
             title='test_get_multiple_predictions_on_task',
         ),
         user=business_client.user,
-        use_ml_backend=False
+        use_ml_backend=False,
     )
 
     make_task({'data': {'text': 'test 1'}}, project)
