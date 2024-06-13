@@ -51,3 +51,5 @@ jobs:
           stale-issue-label: stale
           exempt-pr-labels: "awaiting-approval,work-in-progress"
           exempt-draft-pr: true
+          operations-per-run: 500
+          remove-stale-when-updated: true
