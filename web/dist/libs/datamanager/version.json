@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-1123'",
-  "commit": "cd96f5f72308c945b466ad832927241def1f9de6",
-  "date": "2024-06-12T17:05:00.000Z",
-  "branch": "fb-leap-1123"
+  "message": "fix: LEAP-1123: Fix the skip button when the annotator doesn't leave a comment (#5973)",
+  "commit": "c036abe5807d4d1e37d38d52825caae6d6f45148",
+  "date": "2024-06-13T14:42:50.000Z",
+  "branch": "develop"
 }
