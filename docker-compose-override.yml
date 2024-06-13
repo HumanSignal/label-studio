@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  nginx:
+    environment:
+      - COLLECT_ANALYTICS=0
+    volumes:
+      - ./mydata:/label-studio/data:rw
+      - ./deploy/nginx/certs:/certs:ro
+      - ./deploy/default.conf:/etc/nginx/nginx.conf
+      - ./web/dist:/label-studio/web/dist
+  app:
+    expose:
+      - "8000"
+    environment:
+      - DJANGO_DB=default
+      - POSTGRE_NAME=postgres
+      - POSTGRE_USER=postgres
+      - POSTGRE_PASSWORD=
+      - POSTGRE_PORT=5432
+      - POSTGRE_HOST=db
+      - COLLECT_ANALYTICS=0
+      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
+      - JSON_LOG=1
+    #      - LOG_LEVEL=DEBUG
+    volumes:
+      - ./mydata:/label-studio/data:rw
+      - ./web/dist:/label-studio/web/dist
