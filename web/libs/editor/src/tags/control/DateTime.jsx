@@ -29,7 +29,6 @@ const zero = (n) => (n < 10 ? "0" : "") + n;
  *
  * Use with the following data types: audio, image, HTML, paragraph, text, time series, video
  *
- *
  * @example
  * <View>
  *   <Text name="txt" value="$text" />

@@ -22,7 +22,6 @@ import { sanitizeHtml } from "../../utils/html";
 /**
  * The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.
  *
- *
  * @example
  * <!--Basic text classification labeling configuration-->
  * <View>

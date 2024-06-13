@@ -20,7 +20,6 @@ import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
  *
  * Use with the following data types: audio, image, HTML, paragraphs, text, time series, video
  *
- *
  * @example
  * <!--Basic labeling configuration for numeric classification of text -->
  * <View>
