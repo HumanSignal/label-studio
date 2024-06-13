@@ -29,7 +29,6 @@ const zero = (n) => (n < 10 ? "0" : "") + n;
  *
  * Use with the following data types: audio, image, HTML, paragraph, text, time series, video
  *
- * [^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
  *
  * @example
  * <View>
@@ -51,7 +50,6 @@ const zero = (n) => (n < 10 ? "0" : "") + n;
  * @param {boolean} [required=false] - Whether datetime is required or not
  * @param {string} [requiredMessage] - Message to show if validation fails
  * @param {boolean} [perRegion]      - Use this option to label regions instead of the whole object
- * @param {boolean} [perItem]        - Use this option to label items inside the object instead of the whole object[^FF_LSDV_4583]
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),

@@ -38,10 +38,6 @@ const { TextArea } = Input;
  *
  * Use with the following data types: audio, image, HTML, paragraphs, text, time series, video.
  *
- * [^FF_LSDV_4659]: `fflag_feat_front_lsdv_4659_skipduplicates_060323_short` should be enabled to use `skipDuplicates` attribute
- * [^FF_LSDV_4712]: `fflag_feat_front_lsdv_4712_skipduplicates_editing_110423_short` should be enabled to keep submissions unique during editing existed results
- * [^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
- *
  * @example
  * <!--Basic labeling configuration to display only a text area -->
  * <View>
@@ -58,14 +54,6 @@ const { TextArea } = Input;
  *   <Rectangle name="bbox" toName="image" strokeWidth="3"/>
  *   <TextArea name="transcription" toName="image" editable="true" perRegion="true" required="true" maxSubmissions="1" rows="5" placeholder="Recognized Text" displayMode="region-list"/>
  * </View>
- * @example
- * <!--
- *  You can keep submissions unique[^FF_LSDV_4659][^FF_LSDV_4712]
- * -->
- * <View>
- *   <Audio name="audio" value="$audio"/>
- *   <TextArea name="genre" toName="audio" skipDuplicates="true" />
- * </View>
  * @name TextArea
  * @meta_title Textarea Tag for Text areas
  * @meta_description Customize Label Studio with the TextArea tag to support audio transcription, image captioning, and OCR tasks for machine learning and data science projects.
@@ -76,7 +64,6 @@ const { TextArea } = Input;
  * @param {string=} [placeholder]          - Placeholder text
  * @param {string=} [maxSubmissions]       - Maximum number of submissions
  * @param {boolean=} [editable=false]      - Whether to display an editable textarea
- * @param {boolean} [skipDuplicates=false] - Prevent duplicates in textarea inputs[^FF_LSDV_4659][^FF_LSDV_4712] (see example below)
  * @param {boolean=} [transcription=false] - If false, always show editor
  * @param {tag|region-list} [displayMode=tag] - Display mode for the textarea; region-list shows it for every region in regions list
  * @param {number} [rows]                  - Number of rows in the textarea
@@ -84,7 +71,6 @@ const { TextArea } = Input;
  * @param {string} [requiredMessage]       - Message to show if validation fails
  * @param {boolean=} [showSubmitButton]    - Whether to show or hide the submit button. By default it shows when there are more than one rows of text, such as in textarea mode.
  * @param {boolean} [perRegion]            - Use this tag to label regions instead of whole objects
- * @param {boolean} [perItem]              - Use this tag to label items inside objects instead of whole objects[^FF_LSDV_4583]
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),

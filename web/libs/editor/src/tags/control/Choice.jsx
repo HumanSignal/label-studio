@@ -22,7 +22,6 @@ import { sanitizeHtml } from "../../utils/html";
 /**
  * The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.
  *
- * [^FF_PROD_309]: The `hint` attribute works only when `fflag_feat_front_prod_309_choice_hint_080523_short` is enabled
  *
  * @example
  * <!--Basic text classification labeling configuration-->
@@ -44,7 +43,6 @@ import { sanitizeHtml } from "../../utils/html";
  * @param {style} [style]      - CSS style of the checkbox element
  * @param {string} [hotkey]    - Hotkey for the selection
  * @param {string} [html]      - Can be used to show enriched content, it has higher priority than `value`, however `value` will be used in the exported result (should be properly escaped)
- * @param {string} [hint]      - Hint for choice on hover[^FF_PROD_309]
  * @param {string} [color]     - Color for Taxonomy item
  */
 const TagAttrs = types.model({
