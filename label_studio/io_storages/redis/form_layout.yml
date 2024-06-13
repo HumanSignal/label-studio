@@ -1,6 +1,9 @@
 # 2x2 grid
 redis_params: &redis_params
   - type: text
+    name: title
+    label: Storage Title
+  - type: text
     name: path
     label: Path
   - type: password
@@ -16,7 +19,7 @@ redis_params: &redis_params
     label: Port
 
 ImportStorage:
-  # Title, Bucket, Prefix
+  # Title, Path, Password, Host and Port
   - columnCount: 2
     fields: *redis_params
   # Regex filter
