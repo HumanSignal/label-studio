@@ -1,6 +1,5 @@
 import pytest
 from label_studio_sdk.client import LabelStudio
-from label_studio.tests.ml.test_predict import ml_backend_for_test_predict as ml_backend_for_test_batch_predictions
 
 
 @pytest.mark.django_db
