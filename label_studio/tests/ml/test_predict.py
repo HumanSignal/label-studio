@@ -81,8 +81,6 @@ def test_get_single_prediction_on_task(business_client, ml_backend_for_test_pred
     )
 
     make_task({'data': {'text': 'test 1'}}, project)
-    make_task({'data': {'text': 'test 2'}}, project)
-    make_task({'data': {'text': 'test 3'}}, project)
 
     # setup ML backend with single prediction per task
     response = business_client.post(
@@ -125,8 +123,6 @@ def test_get_multiple_predictions_on_task(business_client, ml_backend_for_test_p
     )
 
     make_task({'data': {'text': 'test 1'}}, project)
-    make_task({'data': {'text': 'test 2'}}, project)
-    make_task({'data': {'text': 'test 3'}}, project)
 
     # setup ML backend with multiple predictions per task
     response = business_client.post(

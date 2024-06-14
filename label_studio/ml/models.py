@@ -258,6 +258,37 @@ class MLBackend(models.Model):
             },
         }
 
+    def _get_predictions_from_ml_backend_one_by_one(
+        self, serialized_tasks: List[Dict], current_responses: List[Dict]
+    ) -> List[Dict]:
+        """
+        This is helper method to get predictions from ML backend one by one
+        in case when tasks length doesn't match responses length
+        Note: don't use this function outside of this class
+        """
+
+        if len(current_responses) == 1:
+            # In case ML backend doesn't support batch of tasks, do it one by one
+            # TODO: remove this block after all ML backends will support batch processing
+            logger.warning(
+                f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
+                f'switched to one-by-one task retrieval'
+            )
+            predictions = []
+            for serialized_task in serialized_tasks:
+                # get predictions per task
+                predictions.extend(self._get_predictions_from_ml_backend([serialized_task]))
+
+            return predictions
+        else:
+            # complete failure - likely ML backend skipped some tasks, we can't match them
+            logger.error(
+                f'Number of tasks and responses are not equal: '
+                f'{len(serialized_tasks)} tasks != {len(current_responses)} responses. '
+                f'Returning empty predictions.'
+            )
+            return []
+
     def _get_predictions_from_ml_backend(self, serialized_tasks: List[Dict]) -> List[Dict]:
         result = self.api.make_predictions(serialized_tasks, self.project)
 
@@ -269,33 +300,19 @@ class MLBackend(models.Model):
             logger.error(f'ML backend returns an incorrect response, it must be a dict: {result.response}')
             return []
         elif not isinstance(result.response['results'], list) or len(result.response['results']) == 0:
-            logger.error('ML backend returns an incorrect response, it must be a list with at least one result')
+            logger.error(
+                'ML backend returns an incorrect response, results field must be a list with at least one item'
+            )
             return []
 
         responses = result.response['results']
 
         predictions = []
         if len(serialized_tasks) != len(responses):
-            if len(responses) == 1:
-                # In case ML backend doesn't support batch of tasks, do it one by one
-                # TODO: remove this block after all ML backends will support batch processing
-                logger.warning(
-                    f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
-                    f'switched to one-by-one task retrieval'
-                )
-                for serialized_task in serialized_tasks:
-                    # get predictions per task
-                    predictions.extend(self._get_predictions_from_ml_backend([serialized_task]))
-
-                return predictions
-            else:
-                # complete failure - likely ML backend skipped some tasks, we can't match them
-                logger.error(
-                    f'Number of tasks and responses are not equal: '
-                    f'{len(serialized_tasks)} tasks != {len(responses)} responses. '
-                    f'Returning empty predictions.'
-                )
-                return []
+            # Number of tasks and responses are not equal
+            # It can happen if ML backend doesn't support batch processing but only process one task at a time
+            # In the future versions, we may better consider this as an error and deprecate this code branch
+            return self._get_predictions_from_ml_backend_one_by_one(serialized_tasks, responses)
 
         # ML backend supports batch processing
         for task, response in zip(serialized_tasks, responses):

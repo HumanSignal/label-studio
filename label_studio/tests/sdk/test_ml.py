@@ -1,64 +1,6 @@
 import pytest
 from label_studio_sdk.client import LabelStudio
 
-from label_studio.tests.utils import register_ml_backend_mock
-
-
-@pytest.fixture
-def ml_backend_for_test_batch_predictions(ml_backend):
-    # ML backend with single prediction per task
-    register_ml_backend_mock(
-        ml_backend,
-        url='http://localhost:9094',
-        predictions={
-            'results': [
-                {
-                    'model_version': 'ModelSingle',
-                    'score': 0.1,
-                    'result': [
-                        {'from_name': 'label', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['Single']}}
-                    ],
-                },
-            ]
-        },
-    )
-    # ML backend with multiple predictions per task
-    register_ml_backend_mock(
-        ml_backend,
-        url='http://localhost:9095',
-        predictions={
-            'results': [
-                [
-                    {
-                        'model_version': 'ModelA',
-                        'score': 0.2,
-                        'result': [
-                            {
-                                'from_name': 'label',
-                                'to_name': 'text',
-                                'type': 'choices',
-                                'value': {'choices': ['label_A']},
-                            }
-                        ],
-                    },
-                    {
-                        'model_version': 'ModelB',
-                        'score': 0.3,
-                        'result': [
-                            {
-                                'from_name': 'label',
-                                'to_name': 'text',
-                                'type': 'choices',
-                                'value': {'choices': ['label_B']},
-                            }
-                        ],
-                    },
-                ]
-            ]
-        },
-    )
-    yield ml_backend
-
 
 @pytest.mark.django_db
 def test_batch_predictions_single_prediction_per_task(
@@ -89,7 +31,7 @@ def test_batch_predictions_single_prediction_per_task(
     assert len(tasks) == 3
 
     # setup ML backend with single prediction per task
-    ls.ml.create(url='http://localhost:9094', project=p.id, title='ModelSingle')
+    ls.ml.create(url='http://localhost:9092', project=p.id, title='ModelSingle')
 
     # batch predict tasks via actions
     ls.actions.create(
@@ -171,7 +113,7 @@ def test_batch_predictions_multiple_predictions_per_task(
     assert len(tasks) == 3
 
     # setup ML backend with multiple predictions per task
-    ls.ml.create(url='http://localhost:9095', project=p.id, title='ModelMultiple')
+    ls.ml.create(url='http://localhost:9093', project=p.id, title='ModelMultiple')
 
     # batch predict tasks via actions
     ls.actions.create(
