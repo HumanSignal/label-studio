@@ -38,7 +38,7 @@ From the Prompts page, click **Create Model** in the upper right and then comple
 | Name | Enter a name for the prompt model. |
 | Description | Enter a description for the prompt model.  |
 | Type | Select the model type. At this time, we only support [text classification](prompts_overview#Text-classification). |
-| Target Project| Select the project you want to use. The projects that are listed must have a text-based dataset (meaning you are labeling text, not images).<br><br>You must have access to the project. If you are in the Manager role, you need to be added to the project to have access.  |
+| Target Project| Select the project you want to use. The projects that are listed must have a text-based dataset (meaning you are labeling text, not images).<br><br>You must have access to the project. If you are in the Manager role, you need to be added to the project to have access. <br><br>If you don't see a project listed, then you do not have any eligible projects available. This is likely because the project is set up for multiple selection (e.g. `choice="multiple"`), is using a data type that isn't supported (video, audio), or you do not have access to the project.   |
 | Model Classes | This list is generated from the labeling configuration of the target project. |
 
 </div>
