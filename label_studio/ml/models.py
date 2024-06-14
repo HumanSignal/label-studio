@@ -308,6 +308,7 @@ class MLBackend(models.Model):
                         'result': r['result'],
                         'score': r.get('score'),
                         'model_version': r.get('model_version', self.model_version),
+                        'project': task['project']
                     }
                 )
         return predictions
