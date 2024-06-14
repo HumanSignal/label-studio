@@ -46,6 +46,7 @@ jobs:
         with:
           filters: |
             src:
+              - 'label_studio/!(frontend)/**'
               - 'poetry.lock'
               - 'pyproject.toml'
               - '.github/workflows/bandit.yml'
@@ -140,7 +141,7 @@ jobs:
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
       build_static: false
-      generate_version_files: true
+      generate_version_files: false
       generate_doc_tags_files: true
     secrets: inherit
 
