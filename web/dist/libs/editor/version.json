@@ -1,6 +1,6 @@
 {
-  "message": "ci: PLT-366: Build frontend static in develop/release",
-  "commit": "00541e414a3face2060207a3a3c48b9687d93a0c",
-  "date": "2024-06-14T13:06:49.000Z",
-  "branch": "ci-PLT-366"
+  "message": "ci: PLT-366: Build frontend static in develop/release (#5988)",
+  "commit": "b0f6a0cc338db72530d165052dc9588fba5b4c06",
+  "date": "2024-06-14T13:18:24.000Z",
+  "branch": "develop"
 }
