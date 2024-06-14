@@ -46,6 +46,7 @@ jobs:
         with:
           filters: |
             src:
+              - 'label_studio/!(frontend)/**'
               - 'poetry.lock'
               - 'pyproject.toml'
               - '.github/workflows/bandit.yml'
