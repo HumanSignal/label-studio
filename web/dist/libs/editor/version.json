@@ -1,6 +1,6 @@
 {
-  "message": "chore: bump braces from 3.0.2 to 3.0.3 in /web/libs/editor/tests/e2e",
-  "commit": "835ab312610c52afe8b2e7e311f51696ced42a21",
-  "date": "2024-06-13T18:54:36.000Z",
+  "message": "Merge branch 'develop' into 'dependabot/npm_and_yarn/web/libs/editor/tests/e2e/braces-3.0.3'",
+  "commit": "a5970fba56c87b0831cd580e8fdae79ef31c7a07",
+  "date": "2024-06-14T13:31:57.000Z",
   "branch": "dependabot/npm_and_yarn/web/libs/editor/tests/e2e/braces-3.0.3"
 }
