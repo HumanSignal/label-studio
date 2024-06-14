@@ -6,7 +6,7 @@ type: guide
 order: 0
 order_enterprise: 225
 meta_title: Prompts overview
-meta_description: An overview of the Prompts feature in the HumanSignal platform.
+meta_description: An overview of the Prompts feature in the HumanSignal platform
 section: Prompts
 date: 2024-05-15 14:30:14
 ---

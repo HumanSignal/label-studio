@@ -1,12 +1,12 @@
 ---
 title: Generate predictions from a prompt
 short: Generate predictions from a prompt
-tier: all
+tier: enterprise
 type: guide
 order: 0
 order_enterprise: 234
 meta_title: Generate predictions
-meta_description: description
+meta_description: Generate predictions to auto-label project tasks
 section: Prompts
 date: 2024-06-13 21:54:22
 ---

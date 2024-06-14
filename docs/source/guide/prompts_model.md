@@ -6,7 +6,7 @@ type: guide
 order: 0
 order_enterprise: 228
 meta_title: Create a model
-meta_description: How to create a Prompts model. 
+meta_description: How to create a Prompts model
 section: Prompts
 date: 2024-06-11 16:53:16
 ---

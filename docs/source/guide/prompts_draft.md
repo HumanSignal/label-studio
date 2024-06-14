@@ -1,12 +1,12 @@
 ---
 title: Draft a prompt
 short: Draft a prompt
-tier: all
+tier: enterprise
 type: guide
 order: 0
 order_enterprise: 231
 meta_title: Draft a prompt
-meta_description: description
+meta_description: Create and evaluate an LLM prompt
 section: Prompts
 date: 2024-06-12 14:09:09
 ---
