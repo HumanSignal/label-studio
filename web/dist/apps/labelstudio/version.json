@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-TRIAG-600/redis-fields'",
-  "commit": "32748f4b980fdcad979a60e29ccd4cf0cb6b2dc7",
-  "date": "2024-06-14T13:56:23.000Z",
-  "branch": "fb-TRIAG-600/redis-fields"
+  "message": "fix: TRIAG-600: Add missing storage title field to Redis config (#5985)",
+  "commit": "590c8a487d28b2298670e962591acc39498646b2",
+  "date": "2024-06-14T23:52:47.000Z",
+  "branch": "develop"
 }
