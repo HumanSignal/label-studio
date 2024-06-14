@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1020: Relation side panel improvements (#5711)",
-  "commit": "9df4eb93ccd4a94a587375f50a225bd754d0df1d",
-  "date": "2024-06-14T14:28:49.000Z",
-  "branch": "develop"
+  "message": "Merge branch 'develop' into 'fb-TRIAG-600/redis-fields'",
+  "commit": "32748f4b980fdcad979a60e29ccd4cf0cb6b2dc7",
+  "date": "2024-06-14T13:56:23.000Z",
+  "branch": "fb-TRIAG-600/redis-fields"
 }
