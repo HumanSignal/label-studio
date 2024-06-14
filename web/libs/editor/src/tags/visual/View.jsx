@@ -28,6 +28,7 @@ import { AnnotationMixin } from "../../mixins/AnnotationMixin";
  * @param {block|inline} display
  * @param {string} [style] CSS style string
  * @param {string} [className] - Class name of the CSS style to apply. Use with the Style tag
+ * @param {string} [idAttr] - Unique ID attribute to use in CSS
  * @param {region-selected|choice-selected|no-region-selected|choice-unselected} [visibleWhen] Control visibility of the content. Can also be used with `when*` attributes below to narrow down visibility
  * @param {string} [whenTagName] Use with visibleWhen. Narrow down visibility by tag name. For regions, use the name of the object tag, for choices, use the name of the choices tag
  * @param {string} [whenLabelValue] Use with visibleWhen="region-selected". Narrow down visibility by label value
@@ -37,6 +38,7 @@ const TagAttrs = types.model({
   classname: types.optional(types.string, ""),
   display: types.optional(types.string, "block"),
   style: types.maybeNull(types.string),
+  idattr: types.optional(types.string, ""),
 });
 
 const Model = types.model({
@@ -113,7 +115,7 @@ const HtxView = observer(({ item }) => {
   }
 
   return (
-    <div className={item.classname} style={style}>
+    <div id={item.idattr} className={item.classname} style={style}>
       {Tree.renderChildren(item, item.annotation)}
     </div>
   );

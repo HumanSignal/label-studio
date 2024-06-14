@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1049: support loading TimeSeries URL from sub-property of data (#5610)",
-  "commit": "d8819c35df0430a6adf646faa99b73e6f5df3f4f",
-  "date": "2024-05-14T19:41:41.000Z",
-  "branch": "fb-LEAP-1049/harrymander-fix-for-timeseries-urls"
+  "message": "fix: LEAP-1123: Fix the skip button when the annotator doesn't leave a comment (#5973)",
+  "commit": "c036abe5807d4d1e37d38d52825caae6d6f45148",
+  "date": "2024-06-13T14:42:50.000Z",
+  "branch": "develop"
 }

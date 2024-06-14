@@ -15,7 +15,15 @@ import Settings from "./SettingsStore";
 import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
-import { FF_DEV_1536, FF_LSDV_4620_3_ML, FF_LSDV_4998, FF_SIMPLE_INIT, isFF } from "../utils/feature-flags";
+import {
+  FF_CUSTOM_SCRIPT,
+  FF_DEV_1536,
+  FF_LSDV_4620_3_ML,
+  FF_LSDV_4998,
+  FF_REVIEWER_FLOW,
+  FF_SIMPLE_INIT,
+  isFF,
+} from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
 import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";
 
@@ -322,15 +330,21 @@ export default types
           const shouldDenyEmptyAnnotation = self.hasInterface("annotations:deny-empty");
           const entity = annotationStore.selected;
           const areResultsEmpty = entity.results.length === 0;
+          const isReview = self.hasInterface("review") || entity.canBeReviewed;
+          const isUpdate = !isReview && isDefined(entity.pk);
+          // no changes were made over previously submitted version — no drafts, no pending changes
+          const noChanges = !entity.history.canUndo && !entity.draftId;
+          const isUpdateDisabled = isFF(FF_REVIEWER_FLOW) && isUpdate && noChanges;
 
           if (shouldDenyEmptyAnnotation && areResultsEmpty) return;
           if (annotationStore.viewingAll) return;
+          if (isUpdateDisabled) return;
 
           entity?.submissionInProgress();
 
-          if (self.hasInterface("review")) {
+          if (isReview) {
             self.acceptAnnotation();
-          } else if (!isDefined(entity.pk) && self.hasInterface("submit")) {
+          } else if (!isUpdate && self.hasInterface("submit")) {
             self.submitAnnotation();
           } else if (self.hasInterface("update")) {
             self.updateAnnotation();
@@ -543,12 +557,25 @@ export default types
 
       if (!entity.validate()) return;
 
-      entity.sendUserGenerate();
+      if (!isFF(FF_CUSTOM_SCRIPT)) {
+        entity.sendUserGenerate();
+      }
       handleSubmittingFlag(async () => {
+        if (isFF(FF_CUSTOM_SCRIPT)) {
+          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
+          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
+
+          entity.sendUserGenerate();
+        }
         await getEnv(self).events.invoke(event, self, entity);
         self.incrementQueuePosition();
+        if (isFF(FF_CUSTOM_SCRIPT)) {
+          entity.dropDraft();
+        }
       });
-      entity.dropDraft();
+      if (!isFF(FF_CUSTOM_SCRIPT)) {
+        entity.dropDraft();
+      }
     }
 
     function updateAnnotation(extraData) {
@@ -561,11 +588,23 @@ export default types
       if (!entity.validate()) return;
 
       handleSubmittingFlag(async () => {
+        if (isFF(FF_CUSTOM_SCRIPT)) {
+          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+            event: "updateAnnotation",
+          });
+          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
+        }
         await getEnv(self).events.invoke("updateAnnotation", self, entity, extraData);
         self.incrementQueuePosition();
+        if (isFF(FF_CUSTOM_SCRIPT)) {
+          entity.dropDraft();
+          !entity.sentUserGenerate && entity.sendUserGenerate();
+        }
       });
-      entity.dropDraft();
-      !entity.sentUserGenerate && entity.sendUserGenerate();
+      if (!isFF(FF_CUSTOM_SCRIPT)) {
+        entity.dropDraft();
+        !entity.sentUserGenerate && entity.sendUserGenerate();
+      }
     }
 
     function skipTask(extraData) {
@@ -591,6 +630,12 @@ export default types
 
         entity.beforeSend();
         if (!entity.validate()) return;
+        if (isFF(FF_CUSTOM_SCRIPT)) {
+          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+            event: "acceptAnnotation",
+          });
+          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
+        }
 
         const isDirty = entity.history.canUndo;
 
@@ -608,6 +653,12 @@ export default types
 
         entity.beforeSend();
         if (!entity.validate()) return;
+        if (isFF(FF_CUSTOM_SCRIPT)) {
+          const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, {
+            event: "rejectAnnotation",
+          });
+          if (allowedToSave && allowedToSave.some((x) => x === false)) return;
+        }
 
         const isDirty = entity.history.canUndo;
 

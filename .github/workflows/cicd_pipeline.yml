@@ -132,8 +132,7 @@ jobs:
     needs:
       - changed_files
     if: |
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.fork == false &&
+      github.event_name == 'push' &&
       needs.changed_files.outputs.frontend == 'true' &&
       !startsWith(needs.changed_files.outputs.commit-message, 'ci: Build frontend')
     permissions:

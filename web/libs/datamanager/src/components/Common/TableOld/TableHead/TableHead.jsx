@@ -212,7 +212,12 @@ export const TableHead = observer(
 
         useEffect(() => {
           ref.current?.addEventListener("mousedown", (event) => {
-            if (event.target.className.includes("handle")) event.preventDefault();
+            const className = event.target.className;
+
+            // This element could be an SVG element where className is an object, not a string.
+            if (className?.includes?.("handle")) {
+              event.preventDefault();
+            }
           });
         }, []);
 
