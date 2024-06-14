@@ -1,7 +1,8 @@
-from typing import Mapping, Optional, List
+from typing import List, Mapping, Optional
+
+from django.utils.functional import cached_property
 
 from core.redis import start_job_async_or_sync
-from django.utils.functional import cached_property
 from users.models import User
 
 
