@@ -54,9 +54,7 @@ jobs:
               - '.github/workflows/test_conda.yml'
               - '.github/workflows/test_migrations.yml'
             frontend:
-              - 'label_studio/frontend/**'
               - 'web/**'
-              - 'docs/source/tags/**'
               - '.github/workflows/frontend-build.yml'
               - '.github/workflows/tests-yarn-unit.yml'
               - '.github/workflows/tests-yarn-integration.yml'
