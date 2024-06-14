@@ -1,7 +1,10 @@
 from typing import Mapping, Optional
 
-from core.redis import start_job_async_or_sync
+from django.db.models import QuerySet
 from django.utils.functional import cached_property
+
+from core.redis import start_job_async_or_sync
+from users.models import User
 
 
 class ProjectMixin:
@@ -85,9 +88,9 @@ class ProjectMixin:
         return True
 
     @cached_property
-    def all_members(self):
+    def all_members(self) -> QuerySet[User]:
         """
-        Returns all members of project
-        :return:
+        Returns all users of project
+        :return: List[User]
         """
-        return self.organization.members.values_list('user__id', flat=True)
+        return User.objects.filter(id__in=self.organization.members.values_list('user__id'))
