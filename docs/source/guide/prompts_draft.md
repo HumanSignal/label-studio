@@ -4,7 +4,7 @@ short: Draft a prompt
 tier: all
 type: guide
 order: 0
-order_enterprise: 3
+order_enterprise: 231
 meta_title: Draft a prompt
 meta_description: description
 section: Prompts
@@ -12,6 +12,8 @@ date: 2024-06-12 14:09:09
 ---
 
 With your [model created](prompts_model), you can begin drafting prompts. 
+
+## Draft a prompt and generate predictions
 
 
 1. Select your base model. For a description of all OpenAI models, see [Models overview](https://platform.openai.com/docs/models/models-overview).
@@ -24,6 +26,7 @@ With your [model created](prompts_model), you can begin drafting prompts.
 !!! note
     When you click **Evaluate**, you will create predictions for each ground truth task. When you return to the project, you will see this reflected in the project. You can see how many predictions a task has using the **Predictions** column in the Data Manager. 
 
+<br><br>
 <video src="../images/prompts/prompts.mp4" controls="controls" style="max-width: 800px;" class="gif-border" />
 
 ## Drafting effective prompts

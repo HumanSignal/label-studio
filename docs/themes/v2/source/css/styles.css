@@ -1383,6 +1383,7 @@ ul {
   height: auto;
   margin: 1em 0;
   display: block;
+  border: 1px #e5e5e5 solid;
 }
 
 .content-markdown hr {

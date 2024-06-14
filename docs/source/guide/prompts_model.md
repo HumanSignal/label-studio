@@ -4,7 +4,7 @@ short: Create a model
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 2
+order_enterprise: 228
 meta_title: Create a model
 meta_description: How to create a Prompts model. 
 section: Prompts

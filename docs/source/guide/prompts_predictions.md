@@ -4,7 +4,7 @@ short: Generate predictions from a prompt
 tier: all
 type: guide
 order: 0
-order_enterprise: 4
+order_enterprise: 234
 meta_title: Generate predictions
 meta_description: description
 section: Prompts
@@ -35,3 +35,5 @@ Once you have your predictions in place, you still need to convert them to annot
 
 
 From the Data Manager, select all the tasks you want to label and then select **Actions > Create Annotations from Predictions**. You are asked to select the model and version you want to use. 
+
+SCREENSHOT
