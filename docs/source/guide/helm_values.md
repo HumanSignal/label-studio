@@ -310,16 +310,3 @@ global:
     If you are deploying to a production environment, you should set `SSRF_PROTECTION_ENABLED: true`. See [Secure Label Studio](security#Enable-SSRF-protection-for-production-environments). 
 
 
-## The `global.featureFlags` usage
-
-The `global.featureFlags` section can be used to set feature flags of Label Studio.
-
-Any key value put under this section translates to environment variables used to control Label Studio's feature flags configuration. Every key should start from `ff_` or `fflag_` in lower case.
-
-An example:
-
-```yaml
-global:
-  featureFlags:
-    fflag_enable_some_cool_feature_short: true
-```

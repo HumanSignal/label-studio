@@ -4,14 +4,42 @@ on:
   workflow_call:
     inputs:
       ref:
-        required: true
         type: string
+        required: true
+      build_static:
+        type: boolean
+        required: false
+        default: true
+      generate_version_files:
+        type: boolean
+        required: false
+        default: true
+      generate_doc_tags_files:
+        type: boolean
+        required: false
+        default: true
   workflow_dispatch:
     inputs:
       ref:
         description: "Ref"
-        required: true
         type: string
+        required: true
+      build_static:
+        description: "Build Frontend static"
+        type: boolean
+        required: false
+        default: true
+      generate_version_files:
+        description: "Generate version files"
+        type: boolean
+        required: false
+        default: true
+      generate_doc_tags_files:
+        description: "Generate docs tags files"
+        type: boolean
+        required: false
+        default: true
+
 
 env:
   NODE: "18"
@@ -47,23 +75,29 @@ jobs:
           directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
       - name: "Build"
+        if: inputs.build_static
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
         run: yarn build
 
       - name: "Generate version files"
+        if: inputs.generate_version_files
         continue-on-error: true
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
         run: yarn version:libs
 
       - name: "Generate docs tags files"
+        if: inputs.generate_doc_tags_files
         continue-on-error: true
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
         run: yarn docs
 
       - name: "Commit and Push"
+        env:
+          COMMIT_MESSAGE: "${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}"
+          WORKFLOW_LINK: "Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           git add "${{ env.FRONTEND_MONOREPO_DIR }}" || true
           git add "${{ env.DOCS_TARGET_DIR }}" || true
           git status -s
-          git commit -m '${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
+          git commit -m "${COMMIT_MESSAGE}" -m "${WORKFLOW_LINK}" || true
           git push origin HEAD
