@@ -52,17 +52,18 @@ def test_delete_multi_tasks(django_live_url, business_client):
     ls.actions.create(project=p.id, id='delete_tasks', selected_items={'all': False, 'included': tasks_ids_to_delete})
     assert len([task for task in ls.tasks.list(project=p.id)]) == 5
 
-    ls.actions.create(project=p.id, id='delete_tasks', selected_items={'all': True, 'excluded': [tasks[5].id]})
-    # another way of calling delete action
-    # ls.actions.create(request_options={
-    #     'additional_query_parameters': {
-    #         'project': p.id,
-    #         'id': 'delete_tasks'
-    #     },
-    #     'additional_body_parameters': {
-    #         'selectedItems': {"all": True, "excluded": [tasks[5].id]},
-    #     }
-    # })
+    # another way of calling delete action instead of
+    #     ls.actions.create(project=p.id, id='delete_tasks', selected_items={'all': True, 'excluded': [tasks[5].id]})
+    import json
+    ls.actions.create(request_options={
+        'additional_query_parameters': {
+            'project': p.id,
+            'id': 'delete_tasks'
+        },
+        'additional_body_parameters': {
+            'selectedItems': json.dumps({"all": True, "excluded": [tasks[5].id]}),
+        }
+    })
 
     remaining_tasks = [task for task in ls.tasks.list(project=p.id)]
     assert len(remaining_tasks) == 1
@@ -94,7 +95,12 @@ def test_export_tasks(django_live_url, business_client):
     }
     ls.annotations.create(id=task_id, **annotation_data)
 
-    # by default, only tasks with annotations are exported
+    # export a singleton task
+    single_task = ls.tasks.get(id=task_id)
+    assert single_task.data['my_text'] == 'Test task 7'
+    assert single_task.total_annotations == 1
+    assert single_task.updated_by == [{'user_id': business_client.user.id}]
+
     exported_tasks = [task for task in ls.tasks.list(project=p.id, fields='all') if task.annotations]
     assert len(exported_tasks) == 1
     assert exported_tasks[0].data['my_text'] == 'Test task 7'
