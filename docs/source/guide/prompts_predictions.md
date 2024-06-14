@@ -36,4 +36,4 @@ Once you have your predictions in place, you still need to convert them to annot
 
 From the Data Manager, select all the tasks you want to label and then select **Actions > Create Annotations from Predictions**. You are asked to select the model and version you want to use. 
 
-SCREENSHOT
+![Gif of the of create annotations action](/images/prompts/create_annotations_1.png)
