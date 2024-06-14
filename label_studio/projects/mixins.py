@@ -1,5 +1,6 @@
-from typing import List, Mapping, Optional
+from typing import Mapping, Optional
 
+from django.db.models import QuerySet
 from django.utils.functional import cached_property
 
 from core.redis import start_job_async_or_sync
@@ -87,7 +88,7 @@ class ProjectMixin:
         return True
 
     @cached_property
-    def all_members(self) -> List[User]:
+    def all_members(self) -> QuerySet[User]:
         """
         Returns all users of project
         :return: List[User]
