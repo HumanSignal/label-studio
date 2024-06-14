@@ -275,18 +275,27 @@ class MLBackend(models.Model):
         responses = result.response['results']
 
         predictions = []
-        if len(responses) == 1 and len(serialized_tasks) > 1:
-            # In case ML backend doesn't support batch of tasks, do it one by one
-            # TODO: remove this block after all ML backends will support batch processing
-            logger.warning(
-                f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
-                f'switched to one-by-one task retrieval'
-            )
-            for serialized_task in serialized_tasks:
-                # get predictions per task
-                predictions.extend(self._get_predictions_from_ml_backend([serialized_task]))
+        if len(serialized_tasks) != len(responses):
+            if len(responses) == 1:
+                # In case ML backend doesn't support batch of tasks, do it one by one
+                # TODO: remove this block after all ML backends will support batch processing
+                logger.warning(
+                    f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
+                    f'switched to one-by-one task retrieval'
+                )
+                for serialized_task in serialized_tasks:
+                    # get predictions per task
+                    predictions.extend(self._get_predictions_from_ml_backend([serialized_task]))
 
-            return predictions
+                return predictions
+            else:
+                # complete failure - likely ML backend skipped some tasks, we can't match them
+                logger.error(
+                    f'Number of tasks and responses are not equal: '
+                    f'{len(serialized_tasks)} tasks != {len(responses)} responses. '
+                    f'Returning empty predictions.'
+                )
+                return []
 
         # ML backend supports batch processing
         for task, response in zip(serialized_tasks, responses):
@@ -308,7 +317,7 @@ class MLBackend(models.Model):
                         'result': r['result'],
                         'score': r.get('score'),
                         'model_version': r.get('model_version', self.model_version),
-                        'project': task['project']
+                        'project': task['project'],
                     }
                 )
         return predictions
