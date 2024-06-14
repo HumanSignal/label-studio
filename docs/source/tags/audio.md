@@ -53,7 +53,7 @@ Use with the following data types: audio
 
 ### Example
 
-Play audio on the labeling interface test
+Play audio on the labeling interface
 
 ```html
 <View>
