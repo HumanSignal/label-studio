@@ -1,6 +1,6 @@
 {
-  "message": "ci: PLT-366: Build frontend static in develop/release (#5988)",
-  "commit": "b0f6a0cc338db72530d165052dc9588fba5b4c06",
-  "date": "2024-06-14T13:18:24.000Z",
+  "message": "feat: LEAP-1020: Relation side panel improvements (#5711)",
+  "commit": "9df4eb93ccd4a94a587375f50a225bd754d0df1d",
+  "date": "2024-06-14T14:28:49.000Z",
   "branch": "develop"
 }
