@@ -15,9 +15,10 @@ date: 2024-06-11 16:53:16
 ## Prerequisites
 
 * An OpenAI API key. 
-* You need to have already have a project created that meets the following criteria:
-* Text-based annotations (meaning you are annotating text and not image or video files). 
-* At least one ground truth annotation, but the more you have the better your results. 
+* You need to have a project that meets the following criteria:
+  * Text-based data set (meaning you are annotating text and not image or video files). 
+  * The labeling configuration for the project must be set up to use single-class classification (`choice="single"`). 
+  * You should have at least one task with a [ground truth annotation](quality#Define-ground-truth-annotations-for-a-project). Only tasks with a ground truth will be listed in the prompt interface. 
 
 ## API key
 

@@ -24,16 +24,16 @@ With Prompts, you can:
 
 ## Auto-labeling with Prompts
  
-Prompts allows you to leverage GenAI to swiftly generate accurate predictions, enabling instant labeling of thousands of tasks. 
+Prompts allows you to leverage LLMs to swiftly generate accurate predictions, enabling instant labeling of thousands of tasks. 
 
-By leveraging AI to handle the bulk of the annotation work, you can significantly enhance the efficiency and speed of your data labeling workflows. This is particularly valuable when dealing with large datasets that require consistent and accurate labeling. Automating this process reduces the reliance on manual annotators, which not only cuts down on labor costs but also minimizes human errors and biases. With AI's ability to learn from the provided ground truth annotations, you can maintain a high level of accuracy and consistency across the dataset, ensuring high-quality labeled data for training machine learning models.
+By utilizing AI to handle the bulk of the annotation work, you can significantly enhance the efficiency and speed of your data labeling workflows. This is particularly valuable when dealing with large datasets that require consistent and accurate labeling. Automating this process reduces the reliance on manual annotators, which not only cuts down on labor costs but also minimizes human errors and biases. With AI's ability to learn from the provided ground truth annotations, you can maintain a high level of accuracy and consistency across the dataset, ensuring high-quality labeled data for training machine learning models.
 
 
 
 ## Prompt evaluation and fine-tuning
 
 !!! info Tip
-    While you can use this tool to do basic prompt evaluation and fine-tuning, we recommend using [Evals](evals_overview), which has been specifically designed for this purpose and has much more robust analytics. 
+    While you can use Prompts to do basic prompt evaluation and fine-tuning, we recommend using [Evals](evals_overview), which has been specifically designed for this purpose and has much more robust analytics. 
 
 As you evaluate your prompt against the ground truth annotations, we return an accuracy score for each version of your prompt. You can use this to iterate your prompt versions for [clarity, specificity, and context](prompts_draft#Drafting-effective-prompts). 
 
@@ -47,7 +47,7 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
 
 ### Text classification 
 
-At present, the Prompts feature supports text classification labeling tasks.  
+At present, the Prompts feature only supports text classification labeling tasks.  
 
 Text classification is the process of assigning predefined categories or labels to segments of text based on their content. This involves analyzing the text and determining which category or label best describes its subject, sentiment, or purpose. The goal is to organize and categorize textual data in a way that makes it easier to analyze, search, and utilize. 
 
