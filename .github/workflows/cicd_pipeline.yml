@@ -127,7 +127,7 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
-  build-frontend:
+  build-frontend-docs:
     name: "Build"
     needs:
       - changed_files
@@ -141,6 +141,27 @@ jobs:
     uses: ./.github/workflows/frontend-build.yml
     with:
       ref: ${{ github.event.pull_request.head.ref || github.ref }}
+      build_static: false
+      generate_version_files: true
+      generate_doc_tags_files: true
+    secrets: inherit
+
+  build-frontend-static:
+    name: "Build"
+    needs:
+      - changed_files
+    if: |
+      github.event_name == 'push' &&
+      needs.changed_files.outputs.frontend == 'true' &&
+      !startsWith(needs.changed_files.outputs.commit-message, 'ci: Build frontend')
+    permissions:
+      contents: write
+    uses: ./.github/workflows/frontend-build.yml
+    with:
+      ref: ${{ github.event.pull_request.head.ref || github.ref }}
+      build_static: true
+      generate_version_files: true
+      generate_doc_tags_files: true
     secrets: inherit
 
   build-docker:
