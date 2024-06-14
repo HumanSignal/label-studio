@@ -12,8 +12,6 @@ You can define nested classifications using the `Choice` tag, or retrieve extern
 
 Use with the following data types: audio, image, HTML, paragraphs, text, time series, video.
 
-[^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
-
 ### Parameters
 
 | Param | Type | Default | Description |
@@ -31,7 +29,7 @@ Use with the following data types: audio, image, HTML, paragraphs, text, time se
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
 | [placeholder=] | <code>string</code> |  | What to display as prompt on the input |
 | [perRegion] | <code>boolean</code> |  | Use this tag to classify specific regions instead of the whole object |
-| [perItem] | <code>boolean</code> |  | Use this tag to classify specific items inside the object instead of the whole object[^1] |
+| [perItem] | <code>boolean</code> |  | Use this tag to classify specific items inside the object instead of the whole object |
 | [legacy] | <code>boolean</code> |  | Use this tag to enable the legacy version of the Taxonomy tag. The legacy version supports the ability for annotators to add labels as needed. However, when true, the `apiUrl` parameter is not usable. |
 
 ### Example

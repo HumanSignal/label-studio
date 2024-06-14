@@ -18,36 +18,11 @@ from io_storages.api import (
 from io_storages.azure_blob.models import AzureBlobExportStorage, AzureBlobImportStorage
 from io_storages.azure_blob.serializers import AzureBlobExportStorageSerializer, AzureBlobImportStorageSerializer
 
-_azure_blob_import_storage_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-        'container': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob container'),
-        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob prefix name'),
-        'regex_filter': openapi.Schema(
-            type=openapi.TYPE_STRING, description='Cloud storage regex for filtering objects'
-        ),
-        'use_blob_urls': openapi.Schema(
-            type=openapi.TYPE_BOOLEAN, description='Interpret objects as BLOBs and generate URLs'
-        ),
-        'account_name': openapi.Schema(type=openapi.TYPE_STRING, description='Azure Blob account name'),
-        'account_key': openapi.Schema(type=openapi.TYPE_STRING, description='Azure Blob account key'),
-        'presign': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Presign URLs for direct download'),
-        'presign_ttl': openapi.Schema(type=openapi.TYPE_INTEGER, description='Presign TTL in minutes'),
-    },
-    required=[],
-)
-
-_azure_blob_export_storage_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'project': openapi.Schema(type=openapi.TYPE_INTEGER, description='Project ID'),
-        'container': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob container'),
-        'prefix': openapi.Schema(type=openapi.TYPE_STRING, description='Azure blob prefix name'),
-        'account_name': openapi.Schema(type=openapi.TYPE_STRING, description='Azure Blob account name'),
-        'account_key': openapi.Schema(type=openapi.TYPE_STRING, description='Azure Blob account key'),
-    },
-    required=[],
+from .openapi_schema import (
+    _azure_blob_export_storage_schema,
+    _azure_blob_export_storage_schema_with_id,
+    _azure_blob_import_storage_schema,
+    _azure_blob_import_storage_schema_with_id,
 )
 
 
@@ -178,7 +153,9 @@ class AzureBlobExportStorageSyncAPI(ExportStorageSyncAPI):
         x_fern_audiences=['public'],
         operation_summary='Validate import storage',
         operation_description='Validate a specific Azure import storage connection.',
-        request_body=no_body,
+        request_body=_azure_blob_import_storage_schema_with_id,
+        # expecting empty response
+        responses={200: openapi.Response(description='OK')},
     ),
 )
 class AzureBlobImportStorageValidateAPI(ImportStorageValidateAPI):
@@ -194,7 +171,9 @@ class AzureBlobImportStorageValidateAPI(ImportStorageValidateAPI):
         x_fern_audiences=['public'],
         operation_summary='Validate export storage',
         operation_description='Validate a specific Azure export storage connection.',
-        request_body=no_body,
+        request_body=_azure_blob_export_storage_schema_with_id,
+        # expecting empty response
+        responses={200: openapi.Response(description='OK')},
     ),
 )
 class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):

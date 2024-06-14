@@ -54,8 +54,6 @@ import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
  *
  * Use with the following data types: audio, image, HTML, paragraphs, text, time series, video.
  *
- * [^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
- *
  * @example
  * <!--Labeling configuration for providing a taxonomy of choices in response to a passage of text -->
  * <View>
@@ -88,7 +86,7 @@ import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
  * @param {string} [requiredMessage]      - Message to show if validation fails
  * @param {string} [placeholder=]         - What to display as prompt on the input
  * @param {boolean} [perRegion]           - Use this tag to classify specific regions instead of the whole object
- * @param {boolean} [perItem]             - Use this tag to classify specific items inside the object instead of the whole object[^FF_LSDV_4583]
+ * @param {boolean} [perItem]             - Use this tag to classify specific items inside the object instead of the whole object
  * @param {boolean} [legacy]              - Use this tag to enable the legacy version of the Taxonomy tag. The legacy version supports the ability for annotators to add labels as needed. However, when true, the `apiUrl` parameter is not usable.
  */
 const TagAttrs = types.model({

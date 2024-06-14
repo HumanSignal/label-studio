@@ -548,8 +548,8 @@ def import_from_string(func_string):
     """
     try:
         return import_string(func_string)
-    except ImportError:
-        msg = f'Could not import {func_string} from settings'
+    except ImportError as e:
+        msg = f'Could not import {func_string} from settings: {e}'
         raise ImportError(msg)
 
 
