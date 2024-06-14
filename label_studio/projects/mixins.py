@@ -1,7 +1,8 @@
-from typing import Mapping, Optional
+from typing import Mapping, Optional, List
 
 from core.redis import start_job_async_or_sync
 from django.utils.functional import cached_property
+from users.models import User
 
 
 class ProjectMixin:
@@ -85,9 +86,9 @@ class ProjectMixin:
         return True
 
     @cached_property
-    def all_members(self):
+    def all_members(self) -> List[User]:
         """
-        Returns all members of project
-        :return:
+        Returns all users of project
+        :return: List[User]
         """
-        return self.organization.members.values_list('user__id', flat=True)
+        return User.objects.filter(id__in=self.organization.members.values_list('user__id'))
