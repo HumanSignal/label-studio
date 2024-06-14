@@ -108,26 +108,6 @@ ProjectMixin = load_func(settings.PROJECT_MIXIN)
 recalculate_all_stats = load_func(settings.RECALCULATE_ALL_STATS)
 
 
-def update_stats(project):
-    tasks = project.tasks
-    task_count = len(tasks)
-    annotation_count = len(project.annotations)
-    prediction_count = len(project.predictions)
-    recalculate_stats_counts = {
-        'task_count': task_count,
-        'annotation_count': annotation_count,
-        'prediction_count': prediction_count,
-    }
-    project.update_tasks_counters_and_task_states(
-        tasks_queryset=tasks,
-        maximum_annotations_changed=False,
-        overlap_cohort_percentage_changed=False,
-        tasks_number_changed=True,
-        recalculate_stats_counts=recalculate_stats_counts,
-    )
-    project.summary.update_data_columns(tasks)
-
-
 class Project(ProjectMixin, models.Model):
     class SkipQueue(models.TextChoices):
         # requeue to the end of the same annotator’s queue => annotator gets this task at the end of the queue
