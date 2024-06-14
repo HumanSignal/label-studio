@@ -176,6 +176,7 @@ class GCS(object):
     def generate_http_url(
         cls,
         url: str,
+        presign: bool,
         google_application_credentials: Union[str, dict] = None,
         google_project_id: str = None,
         presign_ttl: int = 1,
@@ -183,6 +184,7 @@ class GCS(object):
         """
         Gets gs:// like URI string and returns presigned https:// URL
         :param url: input URI
+        :param presign: Whether to generate presigned URL. If false, will generate base64 encoded data URL
         :param google_application_credentials:
         :param google_project_id:
         :param presign_ttl: Presign TTL in minutes
@@ -211,9 +213,16 @@ class GCS(object):
         if settings.GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS:
             # google_application_credentials has higher priority,
             # use Application Default Credentials (ADC) when google_application_credentials is empty only
-            kwargs = {} if google_application_credentials else cls._get_default_credentials()
+            maybe_credentials = {} if google_application_credentials else cls._get_default_credentials()
+            maybe_client = None if google_application_credentials else cls.get_client()
         else:
-            kwargs = {}
+            maybe_credentials = {}
+            maybe_client = None
+
+        if not presign:
+            blob.reload(client=maybe_client)  # needed to know the content type
+            blob_bytes = blob.download_as_bytes(client=maybe_client)
+            return f'data:{blob.content_type};base64,{base64.b64encode(blob_bytes).decode("utf-8")}'
 
         url = blob.generate_signed_url(
             version='v4',
@@ -221,7 +230,7 @@ class GCS(object):
             expiration=timedelta(minutes=presign_ttl),
             # Allow GET requests using this URL.
             method='GET',
-            **kwargs,
+            **maybe_credentials,
         )
 
         logger.debug('Generated GCS signed url: ' + url)

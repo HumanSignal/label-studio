@@ -36,8 +36,6 @@ const { Option } = Select;
  *
  * The `Choices` tag can be used with any data types.
  *
- * [^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality.
- *
  * @example
  * <!--Basic text classification labeling configuration-->
  * <View>
@@ -94,7 +92,7 @@ const { Option } = Select;
  * @param {string} [whenLabelValue]    - Use with visibleWhen="region-selected". Narrow down visibility by label value
  * @param {string} [whenChoiceValue]   - Use with visibleWhen ("choice-selected" or "choice-unselected") and whenTagName, both are required. Narrow down visibility by choice value
  * @param {boolean} [perRegion]        - Use this tag to select a choice for a specific region instead of the entire task
- * @param {boolean} [perItem]          - Use this tag to select a choice for a specific item inside the object instead of the whole object[^FF_LSDV_4583]
+ * @param {boolean} [perItem]          - Use this tag to select a choice for a specific item inside the object instead of the whole object
  * @param {string} [value]             - Task data field containing a list of dynamically loaded choices (see example below)
  * @param {boolean} [allowNested]      - Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one.
  */

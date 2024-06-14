@@ -87,6 +87,7 @@ class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
     def generate_http_url(self, url):
         return GCS.generate_http_url(
             url=url,
+            presign=self.presign,
             google_application_credentials=self.google_application_credentials,
             google_project_id=self.google_project_id,
             presign_ttl=self.presign_ttl,
