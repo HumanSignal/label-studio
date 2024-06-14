@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'docs/ff-removal'",
-  "commit": "40fc0caad154f18e9d8beb627c71debe199cadb6",
-  "date": "2024-06-13T18:52:15.000Z",
-  "branch": "docs/ff-removal"
+  "message": "ci: PLT-366: Build frontend static in develop/release",
+  "commit": "00541e414a3face2060207a3a3c48b9687d93a0c",
+  "date": "2024-06-14T13:06:49.000Z",
+  "branch": "ci-PLT-366"
 }
