@@ -1,9 +1,9 @@
 import json
-import pytest
 
+import pytest
 from django.db.models.query import QuerySet
-from users.models import User
 from tests.utils import make_project
+from users.models import User
 
 
 @pytest.mark.django_db
@@ -31,6 +31,7 @@ def test_update_tasks_counters_and_task_states(business_client):
     ids = set(project.tasks.all().values_list('id', flat=True))
     obj = project._update_tasks_counters_and_task_states(ids, True, True, True)
     assert obj == 0
+
 
 @pytest.mark.django_db
 def test_project_all_members(business_client):
