@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { type FC, useCallback, useMemo, useEffect, useState, useRef } from "react";
+import { type FC, useCallback, useMemo, useEffect, useState} from "react";
 import { IconMenu, IconRelationBi, IconRelationLeft, IconRelationRight, IconTrash } from "../../../assets/icons";
 import { IconEyeClosed, IconEyeOpened } from "../../../assets/icons/timeline";
 import { Button } from "../../../common/Button/Button";
@@ -12,6 +12,7 @@ import TextArea from "antd/lib/input/TextArea";
 import DOMPurify from "dompurify";
 
 const RelationsComponent: FC<any> = ({ relationStore }) => {
+  const relations = relationStore.orderedRelations;
   return (
     <Block name="relations">
       <RelationsList relations={relationStore.relations} />
