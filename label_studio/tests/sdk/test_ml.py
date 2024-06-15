@@ -3,9 +3,7 @@ from label_studio_sdk.client import LabelStudio
 
 
 @pytest.mark.django_db
-def test_batch_predictions_single_prediction_per_task(
-    django_live_url, business_client, ml_backend_for_test_batch_predictions
-):
+def test_batch_predictions_single_prediction_per_task(django_live_url, business_client, ml_backend_for_test_predict):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
     p = ls.projects.create(
         title='New Project',
@@ -86,7 +84,7 @@ def test_batch_predictions_single_prediction_per_task(
 
 @pytest.mark.django_db
 def test_batch_predictions_multiple_predictions_per_task(
-    django_live_url, business_client, ml_backend_for_test_batch_predictions
+    django_live_url, business_client, ml_backend_for_test_predict
 ):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
     p = ls.projects.create(
