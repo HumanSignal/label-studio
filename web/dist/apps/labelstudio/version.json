@@ -1,6 +1,6 @@
 {
-  "message": "fix: TRIAG-600: Add missing storage title field to Redis config (#5985)",
-  "commit": "590c8a487d28b2298670e962591acc39498646b2",
-  "date": "2024-06-14T23:52:47.000Z",
+  "message": "ci: LEAP-1020: Relations panel improvements [INTERNAL] (#5964)",
+  "commit": "30fa696211d583f7beda92770a6e05f250828062",
+  "date": "2024-06-15T12:15:50.000Z",
   "branch": "develop"
 }
