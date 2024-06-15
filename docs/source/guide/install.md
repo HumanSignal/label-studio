@@ -11,7 +11,7 @@ section: "Install & Setup"
 
 Install Label Studio on premises or in the cloud. Choose the installation method that works best for your environment:
 
-- [Install with pip](#Install-with-pip)
+- [Install with pip](#Install-using-pip)
 - [Install with Docker](#Install-with-Docker)
 - [Install on Ubuntu](#Install-on-Ubuntu)
 - [Install from source](#Install-from-source)
@@ -32,7 +32,7 @@ If using other web browsers, or older versions of supported web browsers, unexpe
 
 Install Label Studio in a clean Python environment. We highly recommend using a virtual environment (venv or conda) to reduce the likelihood of package conflicts or missing packages.
 
-## Install with pip
+## Install using pip
 
 To install Label Studio with pip and a virtual environment, you need Python version 3.8 or later. Run the following:
 
