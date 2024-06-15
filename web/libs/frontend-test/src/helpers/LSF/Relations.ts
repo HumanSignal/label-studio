@@ -14,16 +14,16 @@ export const Relations = {
     return cy.wrap(relationList);
   },
   get hideAllRelationsButton() {
-    return cy.get('[aria-label="Hide all relations"]');
+    return cy.get('[aria-label="Hide all"]');
   },
   get showAllRelationsButton() {
-    return cy.get('[aria-label="Show all relations"]');
+    return cy.get('[aria-label="Show all"]');
   },
   get ascendingOrderRelationButton() {
-    return cy.get('[aria-label="Sort by ascending"]');
+    return cy.get('[aria-label="Order by oldest"]');
   },
   get descendingOrderRelationButton() {
-    return cy.get('[aria-label="Sort by descending"]');
+    return cy.get('[aria-label="Order by newest"]');
   },
   get hiddenRelations() {
     return this.relations.should("be.visible").get(".lsf-relations__item_hidden .lsf-relations__content");

@@ -38,9 +38,9 @@ const ToggleRelationsVisibilityButton = observer<FC<ToggleRelationsVisibilityBut
       disabled={isDisabled}
       onClick={toggleRelationsVisibility}
       mod={{ hidden: isAllHidden }}
-      aria-label={isAllHidden ? "Show all relations" : "Hide all relations"}
+      aria-label={isAllHidden ? "Show all" : "Hide all"}
       icon={isAllHidden ? <IconOutlinerEyeClosed /> : <IconOutlinerEyeOpened />}
-      tooltip={isAllHidden ? "Show all relations" : "Hide all relations"}
+      tooltip={isAllHidden ? "Show all" : "Hide all"}
       tooltipTheme="dark"
     />
   );
@@ -70,9 +70,9 @@ const ToggleRelationsOrderButton = observer<FC<ToggleRelationsOrderButtonProps>>
       onClick={toggleRelationsOrder}
       disabled={isDisabled}
       mod={{ order: relationStore.order }}
-      aria-label={isAsc ? "Sort by ascending" : "Sort by descending"}
+      aria-label={isAsc ? "Order by oldest" : "Order by newest"}
       icon={isAsc ? <IconSortUpNew /> : <IconSortDownNew />}
-      tooltip={isAsc ? "Sort by ascending" : "Sort by descending"}
+      tooltip={isAsc ? "Order by oldest" : "Order by newest"}
       tooltipTheme="dark"
     />
   );
