@@ -92,7 +92,7 @@ class ProjectMixin:
     def all_members(self) -> QuerySet['User']:
         """
         Returns all users of project
-        :return: List[User]
+        :return: QuerySet[User]
         """
         from users.models import User
 
