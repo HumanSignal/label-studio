@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-1020/better-relations'",
-  "commit": "4747723fbcf85a71a44fdecbaf19ad633bd1455b",
-  "date": "2024-06-14T14:47:00.000Z",
-  "branch": "fb-leap-1020/better-relations"
+  "message": "feat: LEAP-1020: Relation side panel improvements (#5711)",
+  "commit": "9df4eb93ccd4a94a587375f50a225bd754d0df1d",
+  "date": "2024-06-14T14:28:49.000Z",
+  "branch": "develop"
 }
