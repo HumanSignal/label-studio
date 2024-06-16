@@ -8,6 +8,7 @@ from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func, retry_database_locked
 from django.conf import settings
 from django.db import IntegrityError, transaction
+from drf_yasg import openapi
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import generics, serializers
@@ -29,8 +30,42 @@ class PredictionQuerySerializer(serializers.Serializer):
     project = serializers.IntegerField(required=False, help_text='Project ID to filter predictions')
 
 
+class PredictionResultField(serializers.JSONField):
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_ARRAY,
+            'title': 'Prediction result list',
+            'description': 'List of prediction results for the task',
+            'items': {
+                'type': openapi.TYPE_OBJECT,
+                'title': 'Prediction result items (regions)',
+                'description': 'List of predicted regions for the task',
+            },
+        }
+
+
+class AnnotationResultField(serializers.JSONField):
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_ARRAY,
+            'title': 'Annotation result list',
+            'description': 'List of annotation results for the task',
+            'items': {
+                'type': openapi.TYPE_OBJECT,
+                'title': 'Annotation result items (regions)',
+                'description': 'List of annotated regions for the task',
+            },
+        }
+
+
 class PredictionSerializer(ModelSerializer):
-    model_version = serializers.CharField(allow_blank=True, required=False)
+    result = PredictionResultField()
+    model_version = serializers.CharField(
+        allow_blank=True,
+        required=False,
+        help_text='Model version - tag for predictions that can be used to filter tasks in Data Manager, as well as '
+        'select specific model version for showing preannotations in the labeling interface',
+    )
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
 
     class Meta:
@@ -51,6 +86,7 @@ class CompletedByDMSerializer(UserSerializer):
 class AnnotationSerializer(FlexFieldsModelSerializer):
     """ """
 
+    result = AnnotationResultField(required=False)
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
     completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
@@ -573,6 +609,7 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
 
 
 class AnnotationDraftSerializer(ModelSerializer):
+
     user = serializers.CharField(default=serializers.CurrentUserDefault())
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')

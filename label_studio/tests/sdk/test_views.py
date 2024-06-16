@@ -3,15 +3,15 @@ import pytest
 from label_studio.tests.sdk.common import LABEL_CONFIG_AND_TASKS
 
 pytestmark = pytest.mark.django_db
-from label_studio_sdk import Client
+from label_studio_sdk.client import LabelStudio
 from label_studio_sdk.data_manager import Column, Filters, Operator, Type
 
 
 def test_create_view(django_live_url, business_client):
-    ls = Client(url=django_live_url, api_key=business_client.api_key)
-    p = ls.start_project(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
+    ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
+    p = ls.projects.create(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
 
-    project = ls.get_project(p.id)
+    project = ls.projects.get(id=p.id)
 
     filters = Filters.create(
         Filters.AND,
@@ -21,9 +21,9 @@ def test_create_view(django_live_url, business_client):
         ],
     )
 
-    view = project.create_view(title='Test View', filters=filters)
+    view = ls.views.create(project=project.id, data=dict(title='Test View', filters=filters))
 
-    assert view['data']['filters'] == {
+    assert view.data['filters'] == {
         'conjunction': 'and',
         'items': [
             {'filter': 'filter:tasks:id', 'operator': 'greater_or_equal', 'type': 'Number', 'value': 1},
@@ -33,24 +33,28 @@ def test_create_view(django_live_url, business_client):
 
 
 def test_get_tasks_from_view(django_live_url, business_client):
-    ls = Client(url=django_live_url, api_key=business_client.api_key)
-    p = ls.start_project(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
+    ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
+    p = ls.projects.create(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
 
-    project = ls.get_project(p.id)
+    project = ls.projects.get(id=p.id)
 
     task_data = [{'data': {'my_text': 'Test task ' + str(i)}} for i in range(10)]
-    p.import_tasks(task_data)
-    tasks = p.get_tasks()
+    ls.projects.import_tasks(id=project.id, request=task_data)
+    orig_tasks = []
+    for task in ls.tasks.list(project=project.id):
+        orig_tasks.append(task)
 
     filters = Filters.create(
         Filters.OR,
-        [Filters.item(Column.id, Operator.EQUAL, Type.Number, Filters.value(t['id'])) for t in tasks[::2]],
+        [Filters.item(Column.id, Operator.EQUAL, Type.Number, Filters.value(t.id)) for t in orig_tasks[::2]],
     )
 
-    project.create_view(title='Test View', filters=filters, ordering=['-' + Column.id])
-    views = project.get_views()
+    ls.views.create(project=project.id, data=dict(title='Test View', filters=filters, ordering=['-' + Column.id]))
+    views = ls.views.list(project=project.id)
     assert len(views) == 1
     view = views[0]
-    tasks_from_view = project.get_tasks(view_id=view['id'])
-    assert len(tasks_from_view) == 5
-    assert tasks_from_view == sorted(tasks[::2], key=lambda t: t['id'], reverse=True)
+    tasks = []
+    for task in ls.tasks.list(view=view.id):
+        tasks.append(task)
+    assert len(tasks) == 5
+    assert tasks == sorted(orig_tasks[::2], key=lambda t: t.id, reverse=True)

@@ -110,6 +110,7 @@ class ModelRun(models.Model):
     class ProjectSubset(models.TextChoices):
         ALL = 'All', _('All')
         HASGT = 'HasGT', _('HasGT')
+        SAMPLE = 'Sample', _('Sample')
 
     class FileType(models.TextChoices):
         INPUT = 'Input', _('Input')
@@ -156,19 +157,6 @@ class ModelRun(models.Model):
     predictions_updated_at = models.DateTimeField(_('predictions updated at'), null=True, default=None)
 
     completed_at = models.DateTimeField(_('completed at'), null=True, default=None)
-
-    # todo may need to clean up in future
-    @property
-    def input_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input.csv'
-
-    @property
-    def output_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/output.csv'
-
-    @property
-    def error_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
 
     def delete_predictions(self):
         """

@@ -1,6 +1,6 @@
 {
-  "message": "reordering resolutions",
-  "commit": "f471a7ea61f3e0c75d3058015efe6b4e216011e3",
-  "date": "2024-05-24T14:29:55.000Z",
-  "branch": "fb-leap-913"
+  "message": "ci: LEAP-1020: Relations panel improvements [INTERNAL] (#5964)",
+  "commit": "30fa696211d583f7beda92770a6e05f250828062",
+  "date": "2024-06-15T12:15:50.000Z",
+  "branch": "develop"
 }

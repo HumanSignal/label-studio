@@ -22,11 +22,11 @@ For information on using one of Label Studio's example backends, see [Set up an 
 
 Download and install `label-studio-ml-backend` from the repository:
 
-    ```bash
-    git clone https://github.com/HumanSignal/label-studio-ml-backend.git
-    cd label-studio-ml-backend/
-    pip install -e .
-    ```
+```bash
+git clone https://github.com/HumanSignal/label-studio-ml-backend.git
+cd label-studio-ml-backend/
+pip install -e .
+```
 
 ## 2. Create an empty ML backend
 

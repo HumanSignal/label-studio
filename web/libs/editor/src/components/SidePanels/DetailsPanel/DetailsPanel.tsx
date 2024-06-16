@@ -12,6 +12,8 @@ import { Relations as RelationsComponent } from "./Relations";
 // eslint-disable-next-line
 // @ts-ignore
 import { DraftPanel } from "../../DraftPanel/DraftPanel";
+import { RelationsControls } from "./RelationsControls";
+
 interface DetailsPanelProps extends PanelProps {
   regions: any;
   selection: any;
@@ -71,7 +73,10 @@ const RelationsTab: FC<any> = inject("store")(
       <>
         <Block name="relations">
           <Elem name="section-tab">
-            <Elem name="section-head">Relations ({relationStore.size})</Elem>
+            <Elem name="view-control">
+              <Elem name="section-head">Relations ({relationStore.size})</Elem>
+              <RelationsControls relationStore={relationStore} />
+            </Elem>
             <Elem name="section-content">
               <RelationsComponent relationStore={relationStore} />
             </Elem>
@@ -146,7 +151,10 @@ const GeneralPanel: FC<any> = inject("store")(
           </Elem>
         )}
         <Elem name="section">
-          <Elem name="section-head">Relations ({relationStore.size})</Elem>
+          <Elem name="view-control">
+            <Elem name="section-head">Relations ({relationStore.size})</Elem>
+            <RelationsControls relationStore={relationStore} />
+          </Elem>
           <Elem name="section-content">
             <RelationsComponent relationStore={relationStore} />
           </Elem>

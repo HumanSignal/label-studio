@@ -23,14 +23,22 @@ const GridHeader = observer(({ row, selected }) => {
   );
 });
 
-const GridBody = observer(({ row, fields }) => {
+export const GridBody = observer(({ row, fields }) => {
   const dataFields = fields.filter((f) => f.parent?.alias === "data");
 
   return dataFields.map((field, index) => {
     const valuePath = field.id.split(":")[1] ?? field.id;
-    const value = getProperty(row, valuePath);
+    const field_type = field.currentType;
+    let value = getProperty(row, valuePath);
 
-    return <GridDataGroup key={`${row.id}-${index}`} type={field.currentType} value={value} field={field} row={row} />;
+    /**The value is an array...
+     * In this case, we take the first element of the array
+     */
+    if (Array.isArray(value)) {
+      value = value[0];
+    }
+
+    return <GridDataGroup key={`${row.id}-${index}`} type={field_type} value={value} field={field} row={row} />;
   });
 });
 
