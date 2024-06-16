@@ -179,13 +179,28 @@ class MLBackend(LabelStudioMLBase)
 
 The `get_local_path()` function resolves URIs to URLs, then downloads and caches the file.
 
-For this to work, you must specify the `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` environment variables for your ML backend before using `get_local_path`. 
+For this to work, you must specify the `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` environment variables for your ML backend before using `get_local_path`. If you are using docker-compose.yml, these variables have to be added to the environment section. For example:
+
+```yaml
+services:
+  ml-backend-1:
+    container_name: ml-backend-1
+    ...
+    environment:
+      # Specify the Label Studio URL and API key to access
+      # uploaded, local storage and cloud storage files.
+      # Do not use 'localhost' as it does not work within Docker containers.
+      # Use prefix 'http://' or 'https://' for the URL always.
+      # Determine the actual IP using 'ifconfig' (Linux/Mac) or 'ipconfig' (Windows).
+      - LABEL_STUDIO_URL=http://192.168.42.42:8080/  # replace with your IP! 
+      - LABEL_STUDIO_API_KEY=<your-label-studio-api-key>
+```
 
 Note the following:
 
 * `LABEL_STUDIO_URL` must be accessible from the ML backend instance. 
 
-* If you are running the ML backend in Docker, `LABEL_STUDIO_URL` can’t contain `localhost`. Use the full IP address instead. You can get this using the `ifconfig` (Unix) or `ipconfig` (Windows) commands.
+* If you are running the ML backend in Docker, `LABEL_STUDIO_URL` can’t contain `localhost` or `0.0.0.0`. Use the full IP address instead, e.g. `192.168.42.42`. You can get this using the `ifconfig` (Unix) or `ipconfig` (Windows) commands.
 
 * `LABEL_STUDIO_URL` must start either with `http://` or `https://`.
 
