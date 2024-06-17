@@ -507,7 +507,7 @@ stages:
       - name: gcs
         title: Google Cloud Storage
       - name: azure
-        title: Microsoft Azure
+        title: Microsoft Azure - AccountKey
       - name: redis
         title: Redis
       - name: localfiles
@@ -524,7 +524,7 @@ stages:
       - name: gcs
         title: Google Cloud Storage
       - name: azure
-        title: Microsoft Azure
+        title: Microsoft Azure - AccountKey
       - name: redis
         title: Redis
       - name: localfiles
