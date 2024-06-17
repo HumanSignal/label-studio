@@ -151,7 +151,7 @@ class AzureServicePrincipalStorageMixin(models.Model):
 
 
 class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, ImportStorage):
-    url_scheme = 'azure-spi'
+    url_scheme = 'azure_spi'
 
     presign = models.BooleanField(_('presign'), default=True, help_text='Generate presigned URLs')
     presign_ttl = models.PositiveSmallIntegerField(
