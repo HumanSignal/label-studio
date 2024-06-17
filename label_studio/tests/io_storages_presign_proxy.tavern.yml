@@ -508,6 +508,8 @@ stages:
         title: Google Cloud Storage
       - name: azure
         title: Microsoft Azure - AccountKey
+      - name: azure_spi
+        title: Microsoft Azure - Service Principal
       - name: redis
         title: Redis
       - name: localfiles
@@ -525,6 +527,8 @@ stages:
         title: Google Cloud Storage
       - name: azure
         title: Microsoft Azure - AccountKey
+      - name: azure_spi
+        title: Microsoft Azure - Service Principal
       - name: redis
         title: Redis
       - name: localfiles
