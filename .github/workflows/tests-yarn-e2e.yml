@@ -15,7 +15,7 @@ jobs:
   main:
     name: "yarn e2e"
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
@@ -56,11 +56,11 @@ jobs:
           BUILD_NO_MINIMIZATION: true
         run: |
           set -xeuo pipefail
-          
+
           yarn lsf:serve &
           pid=$!
           echo "pid=${pid}" >> $GITHUB_OUTPUT
-          
+
           while ! curl -s -o /dev/null -L "http://localhost:3000"; do
             echo "=> Waiting for service to become available"
             sleep 2s

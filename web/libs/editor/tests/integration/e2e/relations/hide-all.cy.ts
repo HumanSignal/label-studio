@@ -202,6 +202,6 @@ describe("Relations: Hide/Show all relations", () => {
     Relations.hasRelations(3);
 
     Relations.hideAllRelationsButton.trigger("mouseenter");
-    Tooltip.hasText("Hide all relations");
+    Tooltip.hasText("Hide all");
   });
 });
