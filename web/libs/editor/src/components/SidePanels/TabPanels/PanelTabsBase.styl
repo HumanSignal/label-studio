@@ -259,7 +259,7 @@
       height 6px
       display none
       position absolute
-      background-color $accent_color
+      background-color var(--grape_500)
       border-radius 100%
 
     &[data-resize=grouped-top]::before
@@ -303,12 +303,11 @@
 
     &:hover::before, 
     &_drag::before
-      background-color $accent_color
+      background-color var(--grape_500)
       content ''
       width calc(100% + 50px)
       height 3px
       position absolute
-      background-color $accent_color
       border-radius 3px
       transform translate(0, -50%)
       cursor ns-resize
@@ -318,12 +317,11 @@
   &_dragBottom::after
     position absolute
     z-index 100
-    background-color $accent_color
     content ''
     width 100%
     height 6px
     position absolute
-    background-color $accent_color
+    background-color var(--grape_500)
     border-radius 6px
   &_dragBottom::after
     bottom 0

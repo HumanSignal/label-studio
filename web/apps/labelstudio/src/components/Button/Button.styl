@@ -80,7 +80,7 @@
         box-shadow none
 
     &_link
-      --button-color $accent_color
+      --button-color var(--primary_link)
       text-decoration underline
 
   &_look
@@ -95,11 +95,11 @@
         background-color #BBBBBB
 
       &:hover:not(:disabled)
-        background linear-gradient(0deg, rgba(#fff, 0.1), rgba(#fff, 0.1)), $accent_color
+        background linear-gradient(0deg, rgba(#fff, 0.1), rgba(#fff, 0.1)), var(--grape_700)
         box-shadow 0px 2px 4px rgba($accent_color, 0.3), inset 0px -1px 0px rgba(#000, 0.1)
 
       &:active:not(:disabled)
-        background linear-gradient(0deg, rgba(#000, 0.04), rgba(#000, 0.04)), $accent_color
+        background linear-gradient(0deg, rgba(#000, 0.04), rgba(#000, 0.04)), var(--grape_700)
         box-shadow inset 0px 1px 0px rgba(#000, 0.1)
 
       &:focus:not(:disabled)
@@ -189,7 +189,7 @@
       rgba(#fff, 0.2) 7px,
       rgba(#fff, 0.2) 12px
     )
-    background-color $accent_color
+    background-color var(--primary_link)
 
   &_size_small &__icon
     width 12px
