@@ -119,6 +119,10 @@ export default types
      */
     isSubmitting: false,
     /**
+     * Flag for submitting draft
+     */
+    isSubmittingDraft: false,
+    /**
      * Flag for disable task in Label Studio
      */
     noTask: types.optional(types.boolean, false),
@@ -265,6 +269,7 @@ export default types
         "showingDescription",
         "isLoading",
         "isSubmitting",
+        "isSubmittingDraft",
         "noTask",
         "noAccess",
         "labeledSuccess",
@@ -514,6 +519,7 @@ export default types
 
     function submitDraft(c, params = {}) {
       return new Promise((resolve) => {
+        self.setFlags({ isSubmittingDraft: true });
         const events = getEnv(self).events;
 
         if (!events.hasEvent("submitDraft")) return resolve();
@@ -521,6 +527,19 @@ export default types
 
         if (res && res.then) res.then(resolve);
         else resolve(res);
+      }).then(() => {
+        self.setFlags({ isSubmittingDraft: false });
+      });
+    }
+
+    function waitForDraftSubmission() {
+      return new Promise((resolve) => {
+        const checkInterval = setInterval(() => {
+          if (!self.isSubmittingDraft) {
+            clearInterval(checkInterval);
+            resolve();
+          }
+        }, 100); // Check every 100ms
       });
     }
 
@@ -561,6 +580,8 @@ export default types
         entity.sendUserGenerate();
       }
       handleSubmittingFlag(async () => {
+        await self.waitForDraftSubmission();
+
         if (isFF(FF_CUSTOM_SCRIPT)) {
           const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
           if (allowedToSave && allowedToSave.some((x) => x === false)) return;
@@ -937,6 +958,7 @@ export default types
       unskipTask,
       setTaskHistory,
       submitDraft,
+      waitForDraftSubmission,
       submitAnnotation,
       updateAnnotation,
       acceptAnnotation,
