@@ -8,7 +8,7 @@ body {
 }
 
 body, a, li, p, h1, h2, h3, h4, h5, h6, input, button, textarea, select, .label, .value {
-    font-family: "Roboto", Arial, sans-serif !important;
+    font-family: "Figtree", Arial, sans-serif !important;
 }
 h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
