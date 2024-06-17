@@ -36,6 +36,7 @@ except ImportError:
 
 from .utils import (
     azure_client_mock,
+    azure_client_sp_mock,
     create_business,
     gcs_client_mock,
     import_from_url_mock,
@@ -309,6 +310,10 @@ def azure_client():
     with azure_client_mock():
         yield
 
+@pytest.fixture(autouse=True)
+def azure_client_sp():
+    with azure_client_sp_mock():
+        yield
 
 @pytest.fixture(autouse=True)
 def redis_client():
