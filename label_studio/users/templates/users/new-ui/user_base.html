@@ -5,6 +5,7 @@
 
 
 {% block head %}
+<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/fonts.hellix.css' %}"/>
 <link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/login.css' %}"/>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129877673-1" nonce="{{request.csp_nonce}}"></script>
@@ -21,7 +22,7 @@ gtag('config', 'UA-129877673-1');
   <div class="left">
     <h2>Welcome</h2>
     <img src="{{ settings.HOSTNAME }}{% static 'images/label_studio_logo.svg' %}" height="93"  alt="Label Studio Logo"/>
-    <h3>A full-fledged open source solution for data labeling</h3>
+    <h3>A full-fledged open source solution for data labeling test</h3>
 
     {% include 'users/new-ui/user_tips.html' %}
 

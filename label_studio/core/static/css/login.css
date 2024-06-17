@@ -1,5 +1,9 @@
 /* Login / Signup pages*/
 
+.login_page_new_ui {
+  font-family: 'Hellix', sans-serif;
+}
+
 .login_page h1 {
   font-size: 24px;
   font-weight: 400;
@@ -49,7 +53,7 @@
   border-top: 2px solid transparent;
 }
 .login_page .toggle > *.active {
-  border-color: #1890FF;
+  border-color: green;
   color: #1890FF;
 }
 .login_page .toggle > *:hover {
@@ -251,8 +255,8 @@ html, body {
   border-top: 2px solid transparent;
 }
 .login_page_new_ui .toggle > *.active {
-  border-color: #1890FF;
-  color: #1890FF;
+  border-color: blue; 
+  color: red;
 }
 .login_page_new_ui .toggle > *:hover {
   color: #69C0FF;
