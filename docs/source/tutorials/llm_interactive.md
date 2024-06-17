@@ -5,13 +5,14 @@ tier: all
 order: 5
 hide_menu: true
 hide_frontmatter_title: true
-meta_title: Interactive LLM labeling with OpenAI or Azure API
-meta_description: Label Studio tutorial for interactive LLM labeling with OpenAI or Azure API
+meta_title: Interactive LLM labeling with OpenAI, Azure, or Ollama
+meta_description: Label Studio tutorial for interactive LLM labeling with OpenAI, Azure, or Ollama
 categories:
     - Generative AI
     - Large Language Model
     - OpenAI
     - Azure
+    - Ollama
     - ChatGPT
 image: "/tutorials/llm-interactive.png"
 ---
