@@ -5,13 +5,14 @@ tier: all
 order: 5
 hide_menu: true
 hide_frontmatter_title: true
-meta_title: Interactive LLM labeling with OpenAI or Azure API
-meta_description: Label Studio tutorial for interactive LLM labeling with OpenAI or Azure API
+meta_title: Interactive LLM labeling with OpenAI, Azure, or Ollama
+meta_description: Label Studio tutorial for interactive LLM labeling with OpenAI, Azure, or Ollama
 categories:
     - Generative AI
     - Large Language Model
     - OpenAI
     - Azure
+    - Ollama
     - ChatGPT
 image: "/tutorials/llm-interactive.png"
 ---
@@ -22,7 +23,7 @@ image: "/tutorials/llm-interactive.png"
 
 # Interactive LLM labeling
 
-This example server connects Label Studio to [OpenAI](https://platform.openai.com/)
+This example server connects Label Studio to [OpenAI](https://platform.openai.com/), [Ollama](https://ollama.com/),
 or [Azure](https://azure.microsoft.com/en-us/products/ai-services/openai-service) API to interact with GPT chat models (
 gpt-3.5-turbo, gpt-4, etc.).
 
@@ -358,7 +359,7 @@ When deploying the server, you can specify the following parameters as environme
 
 - `OPENAI_MODEL` (default: `gpt-3.5-turbo`) : The OpenAI model to use. 
 
-- `OPENAI_PROVIDER` (available options: `openai`, `azure`, default - `openai`) : The OpenAI provider to use.
+- `OPENAI_PROVIDER` (available options: `openai`, `azure`, `ollama`, default - `openai`) : The OpenAI provider to use.
 
 - `TEMPERATURE` (default: `0.7`): The temperature to use for the model.
 
@@ -379,3 +380,11 @@ variables:
   deployment in Azure.
 
 - `AZURE_API_VERSION`: This is the version of the Azure API you are using. The default value is `2023-05-15`.
+
+### Ollama Configuration
+
+If you are using Ollama as your LLM provider (`OPENAI_PROVIDER=ollama`), you need to specify the following environment variables: 
+
+- `OPENAI_MODEL` : The Ollama model to use, for example `llama3`. 
+
+- `OLLAMA_ENDPOINT`: This is the endpoint for your Ollama endpoint. It should be set to the appropriate value based on your setup. If you are running it locally, then it can typically be reached on `http://host.docker.internal:11434/v1/`

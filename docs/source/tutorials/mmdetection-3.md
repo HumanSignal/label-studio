@@ -27,7 +27,7 @@ https://mmdetection.readthedocs.io/en/latest/
 This example demonstrates how to use the MMDetection model with Label Studio to annotate images with bounding boxes. 
 The model is based on the YOLOv3 architecture with a MobileNetV2 backbone and trained on the COCO dataset. 
 
-![screenshot.png](screenshot.png)
+![screenshot.png](/tutorials/screenshot.png)
 
 ## Quick usage
 
@@ -53,25 +53,25 @@ There are two possible variants of labeling configurations that can be used:
     This will work for simple use cases. For example, Label Studio `Airplane` maps to MMDetection `airplane`.
 
     ```
-<View>
-  <Image name="image" value="$image"/>
-  <RectangleLabels name="label" toName="image">
-    <Label value="Airplane" background="green"/>
-    <Label value="Car" background="blue"/>
-  </RectangleLabels>
-</View>
-```
+    <View>
+      <Image name="image" value="$image"/>
+      <RectangleLabels name="label" toName="image">
+        <Label value="Airplane" background="green"/>
+        <Label value="Car" background="blue"/>
+      </RectangleLabels>
+    </View>
+    ```
 
 2. More complex labeling config with `predicted_values`:
 
     ```
-<View>
-  <Image name="image" value="$image"/>
-  <RectangleLabels name="label" toName="image">
-    <Label value="Vehicle" predicted_values="airplane,car" background="green"/>
-  </RectangleLabels>
-</View>
-```
+    <View>
+      <Image name="image" value="$image"/>
+      <RectangleLabels name="label" toName="image">
+        <Label value="Vehicle" predicted_values="airplane,car" background="green"/>
+      </RectangleLabels>
+    </View>
+    ```
 
 In this example, you can combine multiple labels into one Label Studio annotation the. For example, Label Studio `Vehicle` maps to MMDetection "airplane" and "car".
 
