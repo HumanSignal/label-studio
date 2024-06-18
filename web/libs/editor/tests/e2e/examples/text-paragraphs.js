@@ -9,7 +9,7 @@ const config = `
 `;
 
 const data = {
-  audio: "http://localhost:3000/public/files/barradeen-emotional.mp3",
+  audio: "/public/files/barradeen-emotional.mp3",
   dialogue: [
     {
       start: 3.1,

@@ -23,7 +23,7 @@ const config = `
 `;
 
 const data = {
-  url: "http://localhost:3000/public/files/barradeen-emotional.mp3",
+  url: "/public/files/barradeen-emotional.mp3",
 };
 
 const result = [
