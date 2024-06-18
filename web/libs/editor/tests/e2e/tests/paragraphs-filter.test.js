@@ -3,7 +3,7 @@ const { omitBy } = require("./helpers");
 
 Feature("Paragraphs filter");
 
-const AUDIO = "https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3";
+const AUDIO = "/public/files/barradeen-emotional.mp3";
 
 const ANNOTATIONS = [
   {

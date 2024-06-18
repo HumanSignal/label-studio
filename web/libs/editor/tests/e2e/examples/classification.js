@@ -23,7 +23,7 @@ const config = `
 `;
 
 const data = {
-  url: "https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3",
+  url: "/public/files/barradeen-emotional.mp3",
 };
 
 const result = [
