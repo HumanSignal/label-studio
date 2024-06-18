@@ -1,6 +1,6 @@
 Feature("Hotkeys").tag("@regress");
 
-const AUDIO_URL = "/files/barradeen-emotional.mp3";
+const AUDIO_URL = "http://localhost:3000/public/files/barradeen-emotional.mp3";
 
 Scenario("Hotkeys on re-initing lsf", async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
   const params = {

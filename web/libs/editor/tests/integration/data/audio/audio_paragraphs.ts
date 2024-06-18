@@ -18,7 +18,7 @@ export const config = `
 `;
 
 export const data = {
-  url: "/files/barradeen-emotional.mp3",
+  url: "http://localhost:3000/public/files/barradeen-emotional.mp3",
   text: [
     {
       text: "Dont you hate that?",

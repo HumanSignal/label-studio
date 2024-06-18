@@ -23,7 +23,7 @@ const configParams = new DataTable(["inline"]);
   configParams.add([inline]);
 });
 
-const AUDIO_URL = "/files/barradeen-emotional.mp3";
+const AUDIO_URL = "http://localhost:3000/public/files/barradeen-emotional.mp3";
 
 const TEXT_SELECTOR = "[name='text']";
 

@@ -51,7 +51,7 @@ const configWithScroll = `
 `;
 
 const data = {
-  url: "/files/barradeen-emotional.mp3",
+  url: "http://localhost:3000/public/files/barradeen-emotional.mp3",
   text: [
     {
       end: 3,

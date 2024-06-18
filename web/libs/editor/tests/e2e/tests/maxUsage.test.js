@@ -221,7 +221,7 @@ Data(maxUsageDataTable).Scenario(
   <Audio name="audio" value="$audio" />
 </View>`,
       data: {
-        audio: "/files/barradeen-emotional.mp3",
+        audio: "http://localhost:3000/public/files/barradeen-emotional.mp3",
       },
     });
 

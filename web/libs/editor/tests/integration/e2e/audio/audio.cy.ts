@@ -11,7 +11,7 @@ describe("Audio", () => {
       `,
       )
       .data({
-        audio: "/files/barradeen-emotional.mp3",
+        audio: "http://localhost:3000/public/files/barradeen-emotional.mp3",
       })
       .withResult([])
       .init();
@@ -32,7 +32,7 @@ describe("Audio", () => {
       `,
       )
       .data({
-        audio: "/files/barradeen-emotional.mp3",
+        audio: "http://localhost:3000/public/files/barradeen-emotional.mp3",
       })
       .withResult([])
       .init();
