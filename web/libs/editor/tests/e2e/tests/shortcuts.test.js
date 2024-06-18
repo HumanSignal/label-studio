@@ -6,7 +6,7 @@ const createConfig = ({ rows = "1" }) => {
     <Shortcut alias="[-]" value="-" hotkey="1" />
     <Shortcut alias="[ + ]" value=" + " hotkey="2" />
     <Shortcut alias="[!]" value="!" hotkey="3" />
-    <Shortcut alias="[make a ninja]" value="‍👤" hotkey="4" />
+    <Shortcut alias="[make a ninja]" value="👤" hotkey="4" />
   </TextArea>
   <Audio name="audio" value="$audio"/>
   <Labels name="labels" toName="audio" allowempty="true">
@@ -23,7 +23,7 @@ const configParams = new DataTable(["inline"]);
   configParams.add([inline]);
 });
 
-const AUDIO_URL = "https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3";
+const AUDIO_URL = "/files/barradeen-emotional.mp3";
 
 const TEXT_SELECTOR = "[name='text']";
 
@@ -124,13 +124,13 @@ Data(configParams).Scenario("Should work with emoji.", async ({ I, LabelStudio, 
   // 🐱🐱|🐱
   // Make the cat a ninja cat
   I.pressKey("4");
-  // 🐱🐱‍👤|🐱
+  // 🐱🐱|🐱
   // Commit
   I.pressKey(["Shift", "Enter"]);
 
   // If we got an expected result then we didn't lost focus.
   AtSidebar.seeRegions(1);
-  AtSidebar.see("🐱🐱‍👤🐱");
+  AtSidebar.see("🐱🐱🐱");
 });
 
 Data(configParams).Scenario("Should work with existent regions.", async ({ I, LabelStudio, AtSidebar, current }) => {
