@@ -214,11 +214,22 @@ class UpdatedByDMField(serializers.SerializerMethodField):
         }
 
 
+class AnnotatorsDMField(serializers.SerializerMethodField):
+    # TODO: get_updated_by implementation is weird, but we need to adhere schema to it
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_ARRAY,
+            'title': 'Annotators IDs',
+            'description': 'Annotators IDs who annotated this task',
+            'items': {'type': openapi.TYPE_INTEGER, 'title': 'User IDs'},
+        }
+
+
 class DataManagerTaskSerializer(TaskSerializer):
     predictions = PredictionSerializer(required=False, many=True, default=[], read_only=True)
     annotations = AnnotationSerializer(required=False, many=True, default=[], read_only=True)
     drafts = AnnotationDraftSerializer(required=False, many=True, default=[], read_only=True)
-    annotators = serializers.ListField(child=serializers.IntegerField(), required=False, read_only=True)
+    annotators = AnnotatorsDMField(required=False, read_only=True)
 
     inner_id = serializers.IntegerField(required=False)
     cancelled_annotations = serializers.IntegerField(required=False)
