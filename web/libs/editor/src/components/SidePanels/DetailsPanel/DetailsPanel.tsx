@@ -13,6 +13,7 @@ import { Relations as RelationsComponent } from "./Relations";
 // @ts-ignore
 import { DraftPanel } from "../../DraftPanel/DraftPanel";
 import { RelationsControls } from "./RelationsControls";
+
 interface DetailsPanelProps extends PanelProps {
   regions: any;
   selection: any;
