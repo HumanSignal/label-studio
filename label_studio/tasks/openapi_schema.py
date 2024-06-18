@@ -34,8 +34,8 @@ task_response_example = {
     'comment_count': 0,
     'unresolved_comment_count': 0,
     'last_comment_updated_at': '2024-01-15T09:30:00Z',
-    'updated_by': 1,
-    'file_upload': 1,
+    'updated_by': [{'user_id': 1}],
+    'file_upload': '42d46c4c-my-pic.jpeg',
     'comment_authors': [1],
 }
 

@@ -157,8 +157,23 @@ class TaskSimpleSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class TaskUpdatedBySerializerField(serializers.JSONField):
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_ARRAY,
+            'title': 'List of users',
+            'description': 'List of users who updated the task',
+            'items': {
+                'type': openapi.TYPE_OBJECT,
+                'title': 'User data',
+            },
+        }
+
+
 class BaseTaskSerializer(FlexFieldsModelSerializer):
     """Task Serializer with project scheme configs validation"""
+    updated_by = TaskUpdatedBySerializerField(required=False)
+    file_upload = serializers.CharField(required=False)
 
     def project(self, task=None):
         """Take the project from context"""
