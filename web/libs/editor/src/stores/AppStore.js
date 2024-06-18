@@ -518,8 +518,9 @@ export default types
     /* eslint-enable no-unused-vars */
 
     function submitDraft(c, params = {}) {
+      self.setFlags({ isSubmittingDraft: true });
+
       return new Promise((resolve) => {
-        self.setFlags({ isSubmittingDraft: true });
         const events = getEnv(self).events;
 
         if (!events.hasEvent("submitDraft")) return resolve();
