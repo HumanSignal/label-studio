@@ -57,12 +57,13 @@ def test_delete_multi_tasks(django_live_url, business_client):
     import json
 
     ls.actions.create(
+        project=p.id,
+        id='delete_tasks',
         request_options={
-            'additional_query_parameters': {'project': p.id, 'id': 'delete_tasks'},
             'additional_body_parameters': {
                 'selectedItems': json.dumps({'all': True, 'excluded': [tasks[5].id]}),
             },
-        }
+        },
     )
 
     remaining_tasks = [task for task in ls.tasks.list(project=p.id)]

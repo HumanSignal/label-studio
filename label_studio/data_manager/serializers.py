@@ -10,7 +10,14 @@ from drf_yasg import openapi
 from projects.models import Project
 from rest_framework import serializers
 from tasks.models import Task
-from tasks.serializers import AnnotationDraftSerializer, AnnotationSerializer, PredictionSerializer, TaskSerializer
+from tasks.serializers import (
+    AnnotationDraftSerializer,
+    AnnotationResultField,
+    AnnotationSerializer,
+    PredictionSerializer,
+    TaskSerializer,
+)
+from users.models import User
 
 from label_studio.core.utils.common import round_floats
 
@@ -225,10 +232,28 @@ class AnnotatorsDMField(serializers.SerializerMethodField):
         }
 
 
+class CompletedByDMSerializerWithGenericSchema(serializers.PrimaryKeyRelatedField):
+    # TODO: likely we need to remove full user details from GET /api/tasks/{id} as it non-secure and currently controlled by the export toggle
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_OBJECT,
+            'title': 'User details',
+            'description': 'User details who completed this annotation.',
+        }
+
+
+class AnnotationsDMFieldSerializer(AnnotationSerializer):
+    completed_by = CompletedByDMSerializerWithGenericSchema(required=False, queryset=User.objects.all())
+
+
+class AnnotationDraftDMFieldSerializer(AnnotationDraftSerializer):
+    result = AnnotationResultField(required=False)
+
+
 class DataManagerTaskSerializer(TaskSerializer):
     predictions = PredictionSerializer(required=False, many=True, default=[], read_only=True)
-    annotations = AnnotationSerializer(required=False, many=True, default=[], read_only=True)
-    drafts = AnnotationDraftSerializer(required=False, many=True, default=[], read_only=True)
+    annotations = AnnotationsDMFieldSerializer(required=False, many=True, default=[], read_only=True)
+    drafts = AnnotationDraftDMFieldSerializer(required=False, many=True, default=[], read_only=True)
     annotators = AnnotatorsDMField(required=False, read_only=True)
 
     inner_id = serializers.IntegerField(required=False)
