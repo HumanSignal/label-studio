@@ -1,6 +1,6 @@
 {
-  "message": "ci: LEAP-1020: Relations panel improvements [INTERNAL] (#5964)",
-  "commit": "30fa696211d583f7beda92770a6e05f250828062",
-  "date": "2024-06-15T12:15:50.000Z",
+  "message": "chore: Change the audio url for tests to a local one to avoid connection issues which cause test flakes (#6009)",
+  "commit": "ef63bed38664eedd12399ae13d5087a7a2285e33",
+  "date": "2024-06-18T17:48:40.000Z",
   "branch": "develop"
 }
