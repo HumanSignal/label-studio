@@ -89,7 +89,7 @@ class CompletedByDMSerializerWithGenericSchema(serializers.PrimaryKeyRelatedFiel
         swagger_schema_fields = {
             'type': openapi.TYPE_OBJECT,
             'title': 'User details',
-            'description': 'User details who completed this annotation.'
+            'description': 'User details who completed this annotation.',
         }
 
 

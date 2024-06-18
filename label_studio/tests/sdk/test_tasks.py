@@ -55,15 +55,15 @@ def test_delete_multi_tasks(django_live_url, business_client):
     # another way of calling delete action instead of
     #     ls.actions.create(project=p.id, id='delete_tasks', selected_items={'all': True, 'excluded': [tasks[5].id]})
     import json
-    ls.actions.create(request_options={
-        'additional_query_parameters': {
-            'project': p.id,
-            'id': 'delete_tasks'
-        },
-        'additional_body_parameters': {
-            'selectedItems': json.dumps({"all": True, "excluded": [tasks[5].id]}),
+
+    ls.actions.create(
+        request_options={
+            'additional_query_parameters': {'project': p.id, 'id': 'delete_tasks'},
+            'additional_body_parameters': {
+                'selectedItems': json.dumps({'all': True, 'excluded': [tasks[5].id]}),
+            },
         }
-    })
+    )
 
     remaining_tasks = [task for task in ls.tasks.list(project=p.id)]
     assert len(remaining_tasks) == 1

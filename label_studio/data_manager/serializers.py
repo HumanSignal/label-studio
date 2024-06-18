@@ -210,10 +210,7 @@ class UpdatedByDMField(serializers.SerializerMethodField):
             'type': openapi.TYPE_ARRAY,
             'title': 'User IDs',
             'description': 'User IDs who updated this task',
-            'items': {
-                'type': openapi.TYPE_OBJECT,
-                'title': 'User IDs'
-            },
+            'items': {'type': openapi.TYPE_OBJECT, 'title': 'User IDs'},
         }
 
 
