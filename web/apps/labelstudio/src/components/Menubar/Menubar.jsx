@@ -195,7 +195,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
                 <Menu.Item label="Docs" href="https://labelstud.io/guide" icon={<IconBook />} target="_blank" />
                 <Menu.Item
                   label="GitHub"
-                  href="https://github.com/heartexlabs/label-studio"
+                  href="https://github.com/HumanSignal/label-studio"
                   icon={<LsGitHub />}
                   target="_blank"
                   rel="noreferrer"

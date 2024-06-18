@@ -1,6 +1,5 @@
 .projects-page
   min-height calc(100vh - var(--header-height))
-  background-color #FAFAFA
 
   &__loading
     width 100%
@@ -36,7 +35,6 @@
     padding 10px 40px
     justify-content flex-end
     box-sizing border-box
-    background-color #fafafa
 
   @media (min-width 1200px)
     &__list
@@ -56,32 +54,35 @@
   flex-direction column
   align-items center
   &__heidi
-    height 256px
-    margin-top 1rem
+    height 12rem 
+    margin-top 6rem
   &__header
     font-size 32px
     font-weight 700
     margin 16px
     color var(--sand_900)
   p
-    font-size 24px
+    font-size 1.25rem
+    color var(--sand_700)
+    margin 0
   &__action
-    margin 72px 0 32px
+    margin 2rem 0
 
 .project-card
-  --text-color #000
+  --text-color var(--sand_900)
   flex 1
   display flex
   flex-direction column
-  background #FFFFFF
-  box-shadow 0px 1px 2px rgba(0, 0, 0, 0.15)
-  border-radius 4px
+  background var(--sand_0)
+  border 1px solid var(--sand_300)
+  border-radius .5rem
   overflow hidden
   color var(--text-color)
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
 
   &__header
     padding 12px 16px
-    box-shadow 0 1px 0 rgba(0, 0, 0, 0.1)
+    border-bottom 1px solid var(--sand_300)
 
   &__menu
     margin-left auto
@@ -99,7 +100,7 @@
     display flex
     font-size 16px
     font-weight 500
-    margin-bottom 5px
+    margin-bottom .25rem
     line-height 22px
     align-items center
 
@@ -115,7 +116,7 @@
     line-height 22px
 
   &__total
-    opacity 0.6
+    color var(--sand_600)
 
   &__annotation
     display flex
@@ -128,7 +129,7 @@
     grid-auto-columns max-content
 
     &-item
-      --icon-color #fff
+      --icon-color var(--sand_0)
       display flex
       align-items center
 
@@ -137,9 +138,9 @@
 
       &_type
         &_completed
-          --icon-color #64BF00
+          --icon-color var(--kale_400)
         &_rejected
-          --icon-color #DD0000
+          --icon-color var(--red_7)
         &_predictions
           --icon-color var(--grape_500)
 
@@ -153,7 +154,7 @@
     line-height 22px
     padding 12px 16px 0
     overflow hidden
-    color rgba(#000, 0.6)
+    color var(--sand_700)
     text-overflow ellipsis
     display -webkit-box
     word-break break-word
