@@ -6,6 +6,7 @@ import ujson as json
 from data_manager.models import Filter, FilterGroup, View
 from django.conf import settings
 from django.db import transaction
+from drf_yasg import openapi
 from projects.models import Project
 from rest_framework import serializers
 from tasks.models import Task
@@ -202,11 +203,25 @@ class ViewSerializer(serializers.ModelSerializer):
             return instance
 
 
+class UpdatedByDMField(serializers.SerializerMethodField):
+    # TODO: get_updated_by implementation is weird, but we need to adhere schema to it
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_ARRAY,
+            'title': 'User IDs',
+            'description': 'User IDs who updated this task',
+            'items': {
+                'type': openapi.TYPE_OBJECT,
+                'title': 'User IDs'
+            },
+        }
+
+
 class DataManagerTaskSerializer(TaskSerializer):
-    predictions = serializers.SerializerMethodField(required=False, read_only=True)
+    predictions = PredictionSerializer(required=False, many=True, default=[], read_only=True)
     annotations = AnnotationSerializer(required=False, many=True, default=[], read_only=True)
-    drafts = serializers.SerializerMethodField(required=False, read_only=True)
-    annotators = serializers.SerializerMethodField(required=False, read_only=True)
+    drafts = AnnotationDraftSerializer(required=False, many=True, default=[], read_only=True)
+    annotators = serializers.ListField(child=serializers.IntegerField(), required=False, read_only=True)
 
     inner_id = serializers.IntegerField(required=False)
     cancelled_annotations = serializers.IntegerField(required=False)
@@ -222,7 +237,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_model_versions = serializers.SerializerMethodField(required=False)
     avg_lead_time = serializers.FloatField(required=False)
     draft_exists = serializers.BooleanField(required=False)
-    updated_by = serializers.SerializerMethodField(required=False, read_only=True)
+    updated_by = UpdatedByDMField(required=False, read_only=True)
 
     CHAR_LIMITS = 500
 

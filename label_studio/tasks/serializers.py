@@ -83,13 +83,23 @@ class CompletedByDMSerializer(UserSerializer):
         fields = ['id', 'first_name', 'last_name', 'avatar', 'email', 'initials']
 
 
+class CompletedByDMSerializerWithGenericSchema(serializers.PrimaryKeyRelatedField):
+    # TODO: likely we need to remove full user details from GET /api/tasks/{id} as it non-secure and currently controlled by the export toggle
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_OBJECT,
+            'title': 'User details',
+            'description': 'User details who completed this annotation.'
+        }
+
+
 class AnnotationSerializer(FlexFieldsModelSerializer):
     """ """
 
     result = AnnotationResultField(required=False)
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
-    completed_by = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
+    completed_by = CompletedByDMSerializerWithGenericSchema(required=False, queryset=User.objects.all())
     unique_id = serializers.CharField(required=False, write_only=True)
 
     def create(self, *args, **kwargs):
@@ -157,23 +167,8 @@ class TaskSimpleSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class TaskUpdatedBySerializerField(serializers.JSONField):
-    class Meta:
-        swagger_schema_fields = {
-            'type': openapi.TYPE_ARRAY,
-            'title': 'List of users',
-            'description': 'List of users who updated the task',
-            'items': {
-                'type': openapi.TYPE_OBJECT,
-                'title': 'User data',
-            },
-        }
-
-
 class BaseTaskSerializer(FlexFieldsModelSerializer):
     """Task Serializer with project scheme configs validation"""
-    updated_by = TaskUpdatedBySerializerField(required=False)
-    file_upload = serializers.CharField(required=False)
 
     def project(self, task=None):
         """Take the project from context"""
@@ -624,7 +619,7 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
 
 
 class AnnotationDraftSerializer(ModelSerializer):
-
+    result = AnnotationResultField(required=False)
     user = serializers.CharField(default=serializers.CurrentUserDefault())
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')

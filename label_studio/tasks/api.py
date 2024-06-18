@@ -208,7 +208,7 @@ class TaskListAPI(DMTaskListAPI):
         request_body=no_body,
         responses={
             '200': openapi.Response(
-                description='Task', schema=TaskSerializer, examples={'application/json': task_response_example}
+                description='Task', schema=DataManagerTaskSerializer, examples={'application/json': task_response_example}
             )
         },
     ),
