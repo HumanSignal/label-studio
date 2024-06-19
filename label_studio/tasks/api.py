@@ -28,6 +28,7 @@ from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from tasks.openapi_schema import (
     annotation_request_schema,
     annotation_response_example,
+    dm_task_response_example,
     prediction_request_schema,
     prediction_response_example,
     task_request_schema,
@@ -210,7 +211,7 @@ class TaskListAPI(DMTaskListAPI):
             '200': openapi.Response(
                 description='Task',
                 schema=DataManagerTaskSerializer,
-                examples={'application/json': task_response_example},
+                examples={'application/json': dm_task_response_example},
             )
         },
     ),
