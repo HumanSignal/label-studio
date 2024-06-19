@@ -1,6 +1,6 @@
 {
-  "message": "chore: Change the audio url for tests to a local one to avoid connection issues which cause test flakes (#6009)",
-  "commit": "ef63bed38664eedd12399ae13d5087a7a2285e33",
-  "date": "2024-06-18T17:48:40.000Z",
+  "message": "chore(deps): bump socket.io from 2.4.1 to 2.5.1 in /web/libs/editor/tests/e2e (#6020)",
+  "commit": "bd086f9c0b46877ca4bbec175397253b7e4efede",
+  "date": "2024-06-19T22:47:48.000Z",
   "branch": "develop"
 }
