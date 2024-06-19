@@ -12,7 +12,6 @@ from rest_framework import serializers
 from tasks.models import Task
 from tasks.serializers import (
     AnnotationDraftSerializer,
-    AnnotationResultField,
     AnnotationSerializer,
     PredictionSerializer,
     TaskSerializer,
@@ -48,10 +47,10 @@ class FilterSerializer(serializers.ModelSerializer):
         if not column_copy.startswith(required_prefix):
             raise serializers.ValidationError(f'Filter "{column}" should start with "{required_prefix}"')
 
-        column_copy = column_copy[len(required_prefix):]
+        column_copy = column_copy[len(required_prefix) :]
 
         if column_copy.startswith(optional_prefix):
-            column_copy = column_copy[len(optional_prefix):]
+            column_copy = column_copy[len(optional_prefix) :]
 
         if column_copy.startswith('data.'):
             # Allow underscores if the filter is based on the `task.data` JSONField, because these don't leverage foreign keys.
@@ -332,7 +331,7 @@ class PredictionsDMFieldSerializer(serializers.SerializerMethodField):
                         'title': 'Last update time',
                     },
                 },
-            }
+            },
         }
 
 
