@@ -535,6 +535,8 @@ export default types
 
     function waitForDraftSubmission() {
       return new Promise((resolve) => {
+        if (!self.isSubmittingDraft) resolve();
+
         const checkInterval = setInterval(() => {
           if (!self.isSubmittingDraft) {
             clearInterval(checkInterval);
