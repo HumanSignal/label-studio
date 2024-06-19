@@ -191,7 +191,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
 
                 <VersionNotifier showNewVersion />
 
-                <Menu.Item label="API" href="/docs/api" icon={<IconTerminal />} target="_blank" />
+                <Menu.Item label="API" href="https://api.labelstud.io/api-reference/introduction/getting-started" icon={<IconTerminal />} target="_blank" />
                 <Menu.Item label="Docs" href="https://labelstud.io/guide" icon={<IconBook />} target="_blank" />
                 <Menu.Item
                   label="GitHub"
