@@ -521,7 +521,7 @@ export default types
 
         if (res && res.then) res.then(resolve);
         else resolve(res);
-      })
+      });
     }
 
     function waitForDraftSubmission() {
