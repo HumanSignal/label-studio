@@ -48,10 +48,10 @@ class FilterSerializer(serializers.ModelSerializer):
         if not column_copy.startswith(required_prefix):
             raise serializers.ValidationError(f'Filter "{column}" should start with "{required_prefix}"')
 
-        column_copy = column_copy[len(required_prefix) :]
+        column_copy = column_copy[len(required_prefix):]
 
         if column_copy.startswith(optional_prefix):
-            column_copy = column_copy[len(optional_prefix) :]
+            column_copy = column_copy[len(optional_prefix):]
 
         if column_copy.startswith('data.'):
             # Allow underscores if the filter is based on the `task.data` JSONField, because these don't leverage foreign keys.
@@ -210,7 +210,7 @@ class ViewSerializer(serializers.ModelSerializer):
             return instance
 
 
-class UpdatedByDMField(serializers.SerializerMethodField):
+class UpdatedByDMFieldSerializer(serializers.SerializerMethodField):
     # TODO: get_updated_by implementation is weird, but we need to adhere schema to it
     class Meta:
         swagger_schema_fields = {
@@ -221,7 +221,7 @@ class UpdatedByDMField(serializers.SerializerMethodField):
         }
 
 
-class AnnotatorsDMField(serializers.SerializerMethodField):
+class AnnotatorsDMFieldSerializer(serializers.SerializerMethodField):
     # TODO: get_updated_by implementation is weird, but we need to adhere schema to it
     class Meta:
         swagger_schema_fields = {
@@ -246,15 +246,101 @@ class AnnotationsDMFieldSerializer(AnnotationSerializer):
     completed_by = CompletedByDMSerializerWithGenericSchema(required=False, queryset=User.objects.all())
 
 
-class AnnotationDraftDMFieldSerializer(AnnotationDraftSerializer):
-    result = AnnotationResultField(required=False)
+class AnnotationDraftDMFieldSerializer(serializers.SerializerMethodField):
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_ARRAY,
+            'title': 'Annotation drafts',
+            'description': 'Drafts for this task',
+            'items': {
+                'type': openapi.TYPE_OBJECT,
+                'title': 'Draft object',
+                'properties': {
+                    'result': {
+                        'type': openapi.TYPE_ARRAY,
+                        'title': 'Draft result',
+                        'items': {
+                            'type': openapi.TYPE_OBJECT,
+                            'title': 'Draft result item',
+                        },
+                    },
+                    'created_at': {
+                        'type': openapi.TYPE_STRING,
+                        'format': 'date-time',
+                        'title': 'Creation time',
+                    },
+                    'updated_at': {
+                        'type': openapi.TYPE_STRING,
+                        'format': 'date-time',
+                        'title': 'Last update time',
+                    },
+                },
+            },
+        }
+
+
+class PredictionsDMFieldSerializer(serializers.SerializerMethodField):
+    class Meta:
+        swagger_schema_fields = {
+            'type': openapi.TYPE_ARRAY,
+            'title': 'Predictions',
+            'description': 'Predictions for this task',
+            'items': {
+                'type': openapi.TYPE_OBJECT,
+                'title': 'Prediction object',
+                'properties': {
+                    'result': {
+                        'type': openapi.TYPE_ARRAY,
+                        'title': 'Prediction result',
+                        'items': {
+                            'type': openapi.TYPE_OBJECT,
+                            'title': 'Prediction result item',
+                        },
+                    },
+                    'score': {
+                        'type': openapi.TYPE_NUMBER,
+                        'title': 'Prediction score',
+                    },
+                    'model_version': {
+                        'type': openapi.TYPE_STRING,
+                        'title': 'Model version',
+                    },
+                    'model': {
+                        'type': openapi.TYPE_OBJECT,
+                        'title': 'ML Backend instance',
+                    },
+                    'model_run': {
+                        'type': openapi.TYPE_OBJECT,
+                        'title': 'Model Run instance',
+                    },
+                    'task': {
+                        'type': openapi.TYPE_INTEGER,
+                        'title': 'Task ID related to the prediction',
+                    },
+                    'project': {
+                        'type': openapi.TYPE_NUMBER,
+                        'title': 'Project ID related to the prediction',
+                    },
+                    'created_at': {
+                        'type': openapi.TYPE_STRING,
+                        'format': 'date-time',
+                        'title': 'Creation time',
+                    },
+                    'updated_at': {
+                        'type': openapi.TYPE_STRING,
+                        'format': 'date-time',
+                        'title': 'Last update time',
+                    },
+                },
+            }
+        }
 
 
 class DataManagerTaskSerializer(TaskSerializer):
-    predictions = PredictionSerializer(required=False, many=True, default=[], read_only=True)
+    predictions = PredictionsDMFieldSerializer(required=False, read_only=True)
     annotations = AnnotationsDMFieldSerializer(required=False, many=True, default=[], read_only=True)
-    drafts = AnnotationDraftDMFieldSerializer(required=False, many=True, default=[], read_only=True)
-    annotators = AnnotatorsDMField(required=False, read_only=True)
+    drafts = AnnotationDraftDMFieldSerializer(required=False, read_only=True)
+    annotators = AnnotatorsDMFieldSerializer(required=False, read_only=True)
 
     inner_id = serializers.IntegerField(required=False)
     cancelled_annotations = serializers.IntegerField(required=False)
@@ -270,7 +356,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_model_versions = serializers.SerializerMethodField(required=False)
     avg_lead_time = serializers.FloatField(required=False)
     draft_exists = serializers.BooleanField(required=False)
-    updated_by = UpdatedByDMField(required=False, read_only=True)
+    updated_by = UpdatedByDMFieldSerializer(required=False, read_only=True)
 
     CHAR_LIMITS = 500
 
