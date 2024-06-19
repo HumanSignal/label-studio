@@ -119,10 +119,6 @@ export default types
      */
     isSubmitting: false,
     /**
-     * Flag for submitting draft
-     */
-    isSubmittingDraft: false,
-    /**
      * Flag for disable task in Label Studio
      */
     noTask: types.optional(types.boolean, false),
@@ -269,7 +265,6 @@ export default types
         "showingDescription",
         "isLoading",
         "isSubmitting",
-        "isSubmittingDraft",
         "noTask",
         "noAccess",
         "labeledSuccess",
@@ -518,8 +513,6 @@ export default types
     /* eslint-enable no-unused-vars */
 
     function submitDraft(c, params = {}) {
-      self.setFlags({ isSubmittingDraft: true });
-
       return new Promise((resolve) => {
         const events = getEnv(self).events;
 
@@ -528,21 +521,19 @@ export default types
 
         if (res && res.then) res.then(resolve);
         else resolve(res);
-      }).then(() => {
-        self.setFlags({ isSubmittingDraft: false });
-      });
+      })
     }
 
     function waitForDraftSubmission() {
       return new Promise((resolve) => {
-        if (!self.isSubmittingDraft) resolve();
+        if (!self.annotationStore.selected.isDraftSaving) resolve();
 
         const checkInterval = setInterval(() => {
-          if (!self.isSubmittingDraft) {
+          if (!self.annotationStore.selected.isDraftSaving) {
             clearInterval(checkInterval);
             resolve();
           }
-        }, 100); // Check every 100ms
+        }, 100);
       });
     }
 
