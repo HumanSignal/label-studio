@@ -1,6 +1,3 @@
-// Outliner + Details
-export const FF_DEV_1170 = "ff_front_1170_outliner_030222_short";
-
 // Fix lag on first video playing start
 export const FF_DEV_1265 = "ff_front_dev_1265_video_start_lag_100322_short";
 
