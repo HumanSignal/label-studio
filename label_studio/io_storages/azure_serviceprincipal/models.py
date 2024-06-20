@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import os
 import json
 import logging
 import re
@@ -31,9 +32,7 @@ from io_storages.base_models import (
     ProjectStorageMixin,
 )
 from tasks.models import Annotation
-
-from .utils import get_secured, set_secured
-
+from .utils import set_secured, get_secured
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)
 
@@ -50,6 +49,8 @@ class AzureServicePrincipalStorageMixin(models.Model):
     use_blob_urls = models.BooleanField(
         _('use_blob_urls'), default=False, help_text='Interpret objects as BLOBs and generate URLs'
     )
+
+
     account_name = models.TextField(_('account_name'), null=True, blank=True, help_text='Azure Blob account name')
     container = models.TextField(_('container'), null=True, blank=True, help_text='Azure blob container')
     tenant_id = models.TextField(_('tenant_id'), null=True, blank=True, help_text='Azure Tenant ID')
@@ -63,6 +64,17 @@ class AzureServicePrincipalStorageMixin(models.Model):
         _('user_delegation_key'), null=True, blank=True, help_text='User Delegation Key (Backend)'
     )
 
+    def get_account_name(self):
+        return str(self.account_name) if self.account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
+
+    def get_account_client_id(self):
+        return str(self.client_id) if self.client_id else get_env('AZURE_CLIENT_ID')
+
+    def get_account_client_secret(self):
+        return str(self.client_secret) if self.client_secret else get_env('AZURE_CLIENT_SECRET')
+
+    def get_account_tenant_id(self):
+        return str(self.tenant_id) if self.tenant_id else get_env('AZURE_TENANT_ID')
     @property
     def delegation_key(self) -> UserDelegationKey:
         key = UserDelegationKey()
@@ -101,7 +113,7 @@ class AzureServicePrincipalStorageMixin(models.Model):
     @property
     def blobservice_client(self) -> BlobServiceClient:
         account_url = self.get_account_url()
-        credential = ClientSecretCredential(self.tenant_id, self.client_id, get_secured(self.client_secret))
+        credential = ClientSecretCredential(self.get_account_tenant_id(), self.get_account_client_id(), get_secured(self.get_account_client_secret()))
         blobservice_client = BlobServiceClient(account_url, credential=credential)
         return blobservice_client
 
@@ -111,8 +123,6 @@ class AzureServicePrincipalStorageMixin(models.Model):
         container_client = blobservice_client.get_container_client((str(self.container)))
         return container_client
 
-    def get_account_name(self):
-        return str(self.account_name) if self.account_name else get_env('AZURE_BLOB_ACCOUNT_NAME')
 
     def get_account_url(self):
         account_name = self.get_account_name()
@@ -228,6 +238,8 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
         return url
 
     def get_blob_metadata(self, key) -> dict:
+        import pdb; pdb.set_trace()
+
         blob = self.container_client.get_blob_client(key)
         return dict(blob.get_blob_properties())
 
@@ -274,6 +286,8 @@ class AzureServicePrincipalExportStorage(
     AzureServicePrincipalStorageMixin, ExportStorage
 ):  # note: order is important!
     def save_annotation(self, annotation):
+        import pdb; pdb.set_trace()
+
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
         # get key that identifies this object in storage

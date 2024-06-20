@@ -94,6 +94,15 @@ def azure_credentials():
     os.environ['AZURE_BLOB_ACCOUNT_KEY'] = 'testing'
 
 
+@pytest.fixture(autouse=True)
+def azure_sp_credentials():
+    """Mocked Azure Service Principal authentication credentials"""
+    os.environ['AZURE_CLIENT_ID'] = 'testing'
+    os.environ['AZURE_CLIENT_SECRET'] = 'testing'
+    os.environ['AZURE_TENANT_ID'] = 'testing'
+    os.environ['AZURE_BLOB_ACCOUNT_NAME'] = 'testing'
+
+
 @pytest.fixture(scope='function')
 def s3(aws_credentials):
     with mock_s3():

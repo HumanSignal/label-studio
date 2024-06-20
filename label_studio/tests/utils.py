@@ -204,7 +204,7 @@ def azure_client_mock():
     # def dummy_generate_blob_sas(*args, **kwargs):
     #     return 'token'
 
-    with mock.patch.object(models.BlobServiceClient, 'from_connection_string', return_value=DummyAzureClient()):
+    with mock.patch.object(models.BlobServiceClient, 'get_container_client', return_value=DummyAzureClient()):
         with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
             yield
 
@@ -264,14 +264,8 @@ def azure_client_sp_mock():
         def download_blob(self, key):
             return DummyAzureBlob(self.name, key)
 
-    class DummyAzureClient:
-        def get_container_client(self, container_name):
-            return DummyAzureContainer(container_name)
 
-    # def dummy_generate_blob_sas(*args, **kwargs):
-    #     return 'token'
-
-    with mock.patch.object(models.BlobServiceClient, 'from_connection_string', return_value=DummyAzureClient()):
+    with mock.patch.object(models.BlobServiceClient, 'get_container_client', return_value=DummyAzureContainer('test-container')):
         with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
             yield
 

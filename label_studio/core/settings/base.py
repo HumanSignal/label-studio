@@ -684,6 +684,17 @@ if get_env('STORAGE_TYPE') == 'azure':
     AZURE_URL_EXPIRATION_SECS = int(get_env('STORAGE_AZURE_URL_EXPIRATION_SECS', '86400'))
     AZURE_LOCATION = get_env('STORAGE_AZURE_FOLDER', default='')
 
+if get_env('STORAGE_TYPE') == 'azure_spi':
+    CLOUD_FILE_STORAGE_ENABLED = True
+    DEFAULT_FILE_STORAGE = 'core.storage.CustomAzureStorage'
+    AZURE_ACCOUNT_NAME = get_env('STORAGE_AZURE_ACCOUNT_NAME')
+    AZURE_CLIENT_ID = get_env('STORAGE_AZURE_CLIENT_ID')
+    AZURE_CLIENT_SECRET = get_env('STORAGE_AZURE_CLIENT_SECRET')
+    AZURE_TENANT_ID = get_env('STORAGE_AZURE_TENANT_ID')
+    AZURE_CONTAINER = get_env('STORAGE_AZURE_CONTAINER_NAME')
+    AZURE_URL_EXPIRATION_SECS = int(get_env('STORAGE_AZURE_URL_EXPIRATION_SECS', '86400'))
+    AZURE_LOCATION = get_env('STORAGE_AZURE_FOLDER', default='')
+
 if get_env('STORAGE_TYPE') == 'gcs':
     CLOUD_FILE_STORAGE_ENABLED = True
     # DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
