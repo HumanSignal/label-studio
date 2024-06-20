@@ -1,6 +1,6 @@
 {
-  "message": "ci: LEAP-1020: Relations panel improvements [INTERNAL] (#5964)",
-  "commit": "30fa696211d583f7beda92770a6e05f250828062",
-  "date": "2024-06-15T12:15:50.000Z",
+  "message": "fix: LEAP-1169: LEAP-1165: LEAP-1177 Fix security issues (#6013)",
+  "commit": "119bb236f05d94ff92ec79e0dae15bd625a3ebbf",
+  "date": "2024-06-20T15:39:45.000Z",
   "branch": "develop"
 }

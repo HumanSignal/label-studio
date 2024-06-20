@@ -221,7 +221,7 @@ Data(maxUsageDataTable).Scenario(
   <Audio name="audio" value="$audio" />
 </View>`,
       data: {
-        audio: "https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3",
+        audio: "/public/files/barradeen-emotional.mp3",
       },
     });
 
