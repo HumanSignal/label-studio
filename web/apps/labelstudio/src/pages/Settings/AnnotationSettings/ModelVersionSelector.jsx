@@ -73,7 +73,7 @@ export const ModelVersionSelector = ({
 
   return (
     <div>
-      <p>Select which predictions or which model you want to use:</p>
+      <label>Select which predictions or which model you want to use:</label>
       <div style={{ display: "flex", alignItems: "center", width: 400 }}>
         <div style={{ flex: 1, paddingRight: 16 }}>
           <Select

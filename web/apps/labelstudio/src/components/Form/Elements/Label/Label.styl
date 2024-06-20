@@ -2,19 +2,19 @@
   margin-bottom 0
 
   &__text
-    padding 0 16px
+    padding 0 8px
     height 22px
     display flex
-    margin-bottom 4px
+    margin-bottom 0
     font-size 14px
-    line-height 22px
     justify-content space-between
+    line-height 120%
 
   &__description
-    margin-top 5px
-    font-size 14px
-    line-height 22px
-    color var(--sand_500)
+    font-size .875rem
+    color var(--sand_600)
+    font-weight 400
+    line-height 140%
 
     a
       color var(--grape_500)
@@ -31,9 +31,7 @@
 
   &_size_large &__text
     font-weight 500
-    font-size 16px
-    line-height 22px
-    margin-bottom 8px
+    font-size .875rem
 
   &_flat &__text
     padding 0
@@ -46,9 +44,8 @@
     color var(--sand_500)
 
   &_large &__text
-    font-size 16px
+    font-size .875rem
     font-weight 500
-    margin-bottom 8px
 
   &_placement_right
     display inline-flex
@@ -61,8 +58,7 @@
   &_placement_right &__text
   &_placement_left &__text
     margin-bottom 0
-    font-size 16px
-    line-height 22px
+    font-size .875rem
     height auto
     align-items center
 
@@ -77,3 +73,9 @@
 
     input[type=radio]
       margin-top 0
+
+label
+  font-weight 500
+  font-size .875rem
+  margin-bottom: 4px;
+  display: block;

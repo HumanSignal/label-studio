@@ -200,6 +200,8 @@ styled_scroll()
   // to prevent blinking on mode switching
   line-height: 21px
   margin-top: -6px
+  & a
+    color var(--primary_link)
 
 .configure__container > header .toggle-items {
   margin-left: auto;
@@ -378,7 +380,7 @@ styled_scroll()
   padding: 16px 16px 0
   overflow-y: auto
   border-left: 1px solid var(--sand_300)
-  background-color: $grey_2
+  background-color: var(--sand_100)
   display flex
   flex-direction column
   styled_scroll()
