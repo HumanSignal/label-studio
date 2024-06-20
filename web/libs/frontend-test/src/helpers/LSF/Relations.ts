@@ -4,6 +4,7 @@ export const Relations = {
   },
   get relationOrderList() {
     const relationList = [];
+    
 
     cy.get(".lsf-relations__item").each(($el) => {
       const from = $el.find(".lsf-detailed-region .lsf-labels-list span").first().text().trim();

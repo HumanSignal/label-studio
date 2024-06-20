@@ -93,6 +93,7 @@ const task = {
   data: { image },
 };
 
+
 describe("Relations: Select type of relation & write notes", () => {
   beforeEach(() => {
     LabelStudio.init({ config, task });

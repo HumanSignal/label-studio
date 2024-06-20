@@ -73,6 +73,7 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
         return null;
     }
   }, [relation.direction]);
+  
 
   const handleToggleDescription = () => {
     setShowDescription(!showDescription);
@@ -174,7 +175,6 @@ const RelationMeta: FC<any> = observer(({ relation }) => {
   const onChange = useCallback(
     (val: any) => {
       const values: any[] = wrapArray(val);
-
       relation.setRelations(values);
     },
     [relation],
