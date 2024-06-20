@@ -11,7 +11,7 @@ section: "Install & Setup"
 
 Install Label Studio on premises or in the cloud. Choose the installation method that works best for your environment:
 
-- [Install with pip](#Install-with-pip)
+- [Install with pip](#Install-using-pip)
 - [Install with Docker](#Install-with-Docker)
 - [Install on Ubuntu](#Install-on-Ubuntu)
 - [Install from source](#Install-from-source)
