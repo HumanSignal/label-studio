@@ -67,13 +67,19 @@
     text-align center
     font-size 14px
     line-height 22px
+    & a
+      color var(--primary_link)
+      text-decoration underline
+      &:hover
+        text-decoration none
+        color var(--primary_link)
 
     &:not(&_bare)
-      background rgba(0, 0, 0, 0.03)
+      background var(--sand_100)
       box-shadow inset 0px 1px 0px rgba(0, 0, 0, 0.05)
 
   &__close
-    --button-color $accent_color
+    --button-color var(--primary_link)
 
   &_fullscreen &__content
     width calc(100vw - 80px)

@@ -51,7 +51,7 @@ export const AnnotationSettings = () => {
 
             <Divider height={32} />
 
-            <Form.Row columnCount={1} style={{ borderTop: "1px solid #f1f1f1" }}>
+            <Form.Row columnCount={1}>
               <br />
               <Elem name={"header"}>Prelabeling</Elem>
               <div>
