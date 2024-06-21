@@ -11,7 +11,7 @@ describe("Audio", () => {
       `,
       )
       .data({
-        audio: "https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3",
+        audio: "/public/files/barradeen-emotional.mp3",
       })
       .withResult([])
       .init();
@@ -32,7 +32,7 @@ describe("Audio", () => {
       `,
       )
       .data({
-        audio: "https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3",
+        audio: "/public/files/barradeen-emotional.mp3",
       })
       .withResult([])
       .init();

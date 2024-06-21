@@ -158,7 +158,7 @@ const RedisStorage = ({ storage }) => {
       <DescriptionList.Item term="Path">{storage.path}</DescriptionList.Item>
       <DescriptionList.Item term="Host">
         {storage.host}
-        {storage.port ? `:${storage.post}` : ""}
+        {storage.port ? `:${storage.port}` : ""}
       </DescriptionList.Item>
     </>
   );
