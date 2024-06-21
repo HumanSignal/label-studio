@@ -1,14 +1,17 @@
 import { inject, observer } from "mobx-react";
 import type { FC } from "react";
+
 import { Block, Elem } from "../../../utils/bem";
 import { FF_DEV_2290, isFF } from "../../../utils/feature-flags";
 import { Comments as CommentsComponent } from "../../Comments/Comments";
 import { AnnotationHistory } from "../../CurrentEntity/AnnotationHistory";
+import { DraftPanel } from "../../DraftPanel/DraftPanel";
 import { PanelBase, type PanelProps } from "../PanelBase";
 import { RegionDetailsMain, RegionDetailsMeta } from "./RegionDetails";
 import { RegionItem } from "./RegionItem";
 import { Relations as RelationsComponent } from "./Relations";
-import { DraftPanel } from "../../DraftPanel/DraftPanel";
+import { RelationsControls } from "./RelationsControls";
+
 import "./DetailsPanel.styl";
 
 interface DetailsPanelProps extends PanelProps {
@@ -60,7 +63,10 @@ const RelationsTab: FC<any> = inject("store")(
       <>
         <Block name="relations">
           <Elem name="section-tab">
-            <Elem name="section-head">Relations ({relationStore.size})</Elem>
+            <Elem name="view-control">
+              <Elem name="section-head">Relations ({relationStore.size})</Elem>
+              <RelationsControls relationStore={relationStore} />
+            </Elem>
             <Elem name="section-content">
               <RelationsComponent relationStore={relationStore} />
             </Elem>
@@ -135,7 +141,10 @@ const GeneralPanel: FC<any> = inject("store")(
           </Elem>
         )}
         <Elem name="section">
-          <Elem name="section-head">Relations ({relationStore.size})</Elem>
+          <Elem name="view-control">
+            <Elem name="section-head">Relations ({relationStore.size})</Elem>
+            <RelationsControls relationStore={relationStore} />
+          </Elem>
           <Elem name="section-content">
             <RelationsComponent relationStore={relationStore} />
           </Elem>

@@ -273,10 +273,11 @@ def test_action_cache_labels(business_client, project_id):
 
     # Assertions
     # Replace these with the actual assertions for your cache_labels function
+    tasks = project.tasks
     assert status.status_code == 200, 'status code wrong'
-    assert project.tasks.count() == 2, 'tasks count wrong'
-    assert project.tasks.first().data.get('cache_label1') == 'Car: 1', 'cache_label1 wrong for task 1'
-    assert project.tasks.all()[1].data.get('cache_label1') == 'Airplane: 1, Car: 2', 'cache_label1 wrong for task 2'
+    assert tasks.count() == 2, 'tasks count wrong'
+    assert tasks.get(id=task1.id).data.get('cache_label1') == 'Car: 1', 'cache_label1 wrong for task 1'
+    assert tasks.get(id=task2.id).data.get('cache_label1') == 'Airplane: 1, Car: 2', 'cache_label1 wrong for task 2'
 
     # call the "cache_labels" action without counters
     status = business_client.post(
@@ -294,5 +295,5 @@ def test_action_cache_labels(business_client, project_id):
     # Assertions
     # Replace these with the actual assertions for your cache_labels function
     assert status.status_code == 200, 'status code wrong'
-    assert project.tasks.first().data.get('cache_label1') == 'Car', 'cache_label1 wrong for task 1'
-    assert project.tasks.all()[1].data.get('cache_label1') == 'Airplane, Car', 'cache_label1 wrong for task 2'
+    assert tasks.get(id=task1.id).data.get('cache_label1') == 'Car', 'cache_label1 wrong for task 1'
+    assert tasks.get(id=task2.id).data.get('cache_label1') == 'Airplane, Car', 'cache_label1 wrong for task 2'

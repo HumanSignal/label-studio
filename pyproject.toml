@@ -180,7 +180,7 @@ numpy = "^1.24.3"
 ordered-set = "4.0.2"
 pandas = ">=0.24.0"
 psycopg2-binary = "2.9.9"
-pydantic = "<=1.11.0,>=1.7.3"
+pydantic = ">=2.7.3"
 python-dateutil = ">=2.8.1"
 pytz = "~=2022.1"
 requests = "2.31.0"
@@ -200,7 +200,10 @@ google-cloud-logging = "^3.10.0"
 mysqlclient = {version = "*", optional = true}
 django-csp = "3.7"
 openai = "^1.10.0"
-label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/36f4dfa4c0a9fbb6ee571469aa057ce221910e04.zip"}
+
+# Humansignal repo dependencies
+
+label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/64eea7333be550a857481fa1158dcac39e7da3b7.zip"}
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"

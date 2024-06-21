@@ -23,7 +23,8 @@ image: "/tutorials/gliner.png"
 # Use GLiNER for NER annotation
 
 The GLiNER model is a BERT family model for generalist NER. We download the model from HuggingFace, but the original
-model is available on [GitHub](https://github.com/urchade/GLiNER).
+model is
+available on [GitHub](https://github.com/urchade/GLiNER).
 
 
 ## Running with Docker (recommended)

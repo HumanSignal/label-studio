@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'develop' into 'fb-leap-1052'",
-  "commit": "23bf7f9b573e4bb9a40a8c10fcae2296bc90ad44",
-  "date": "2024-06-10T15:08:55.000Z",
-  "branch": "fb-leap-1052"
+  "message": "fix: LEAP-1169: LEAP-1165: LEAP-1177 Fix security issues (#6013)",
+  "commit": "119bb236f05d94ff92ec79e0dae15bd625a3ebbf",
+  "date": "2024-06-20T15:39:45.000Z",
+  "branch": "develop"
 }

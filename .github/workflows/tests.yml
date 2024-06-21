@@ -159,7 +159,7 @@ jobs:
         run: poetry run pytest --cov=. --cov-report=xml -vv -n auto
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4.4.1
+        uses: codecov/codecov-action@v4.5.0
         with:
           name: codecov-python-${{ matrix.python-version }}
           flags: pytests

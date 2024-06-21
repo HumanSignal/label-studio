@@ -28,6 +28,7 @@ from tasks.models import Annotation, AnnotationDraft, Prediction, Task
 from tasks.openapi_schema import (
     annotation_request_schema,
     annotation_response_example,
+    dm_task_response_example,
     prediction_request_schema,
     prediction_response_example,
     task_request_schema,
@@ -114,6 +115,23 @@ logger = logging.getLogger(__name__)
                 in_=openapi.IN_QUERY,
                 description='Specify which fields to include in the response',
             ),
+            openapi.Parameter(
+                name='query',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description='Additional query to filter tasks. It must be JSON encoded string of dict containing '
+                'one of the following parameters: `{"filters": ..., "selectedItems": ..., "ordering": ...}`. Check '
+                '[Data Manager > Create View > see `data` field](#tag/Data-Manager/operation/api_dm_views_create) '
+                'for more details about filters, selectedItems and ordering.\n\n'
+                '* **filters**: dict with `"conjunction"` string (`"or"` or `"and"`) and list of filters in `"items"` array. '
+                'Each filter is a dictionary with keys: `"filter"`, `"operator"`, `"type"`, `"value"`. '
+                '[Read more about available filters](https://labelstud.io/sdk/data_manager.html)<br/>'
+                '                   Example: `{"conjunction": "or", "items": [{"filter": "filter:tasks:completed_at", "operator": "greater", "type": "Datetime", "value": "2021-01-01T00:00:00.000Z"}]}`\n'
+                '* **selectedItems**: dictionary with keys: `"all"`, `"included"`, `"excluded"`. If "all" is `false`, `"included"` must be used. If "all" is `true`, `"excluded"` must be used.<br/>'
+                '                   Examples: `{"all": false, "included": [1, 2, 3]}` or `{"all": true, "excluded": [4, 5]}`\n'
+                '* **ordering**: list of fields to order by. Currently, ordering is supported by only one parameter. <br/>\n'
+                '                   Example: `["completed_at"]`',
+            ),
         ],
         responses={
             '200': openapi.Response(
@@ -191,7 +209,9 @@ class TaskListAPI(DMTaskListAPI):
         request_body=no_body,
         responses={
             '200': openapi.Response(
-                description='Task', schema=TaskSerializer, examples={'application/json': task_response_example}
+                description='Task',
+                schema=DataManagerTaskSerializer,
+                examples={'application/json': dm_task_response_example},
             )
         },
     ),

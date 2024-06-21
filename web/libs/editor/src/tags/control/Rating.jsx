@@ -20,8 +20,6 @@ import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
  *
  * Use with the following data types: audio, image, HTML, paragraphs, text, time series, video.
  *
- * [^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
- *
  * @example
  * <!--Basic labeling configuration to rate the content of a text passage -->
  * <View>
@@ -42,7 +40,7 @@ import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
  * @param {boolean} [required=false]          - Whether rating validation is required
  * @param {string} [requiredMessage]          - Message to show if validation fails
  * @param {boolean} [perRegion]               - Use this tag to rate regions instead of the whole object
- * @param {boolean} [perItem]                 - Use this tag to rate items inside the object instead of the whole object[^FF_LSDV_4583]
+ * @param {boolean} [perItem]                 - Use this tag to rate items inside the object instead of the whole object
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
