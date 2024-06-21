@@ -1,6 +1,6 @@
 {
-  "message": "chore: Change the audio url for tests to a local one to avoid connection issues which cause test flakes (#6009)",
-  "commit": "ef63bed38664eedd12399ae13d5087a7a2285e33",
-  "date": "2024-06-18T17:48:40.000Z",
+  "message": "fix: LEAP-1169: LEAP-1165: LEAP-1177 Fix security issues (#6013)",
+  "commit": "119bb236f05d94ff92ec79e0dae15bd625a3ebbf",
+  "date": "2024-06-20T15:39:45.000Z",
   "branch": "develop"
 }
