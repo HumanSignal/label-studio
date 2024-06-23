@@ -9,6 +9,7 @@
 !deploy/default.conf
 !label_studio/**
 label_studio/frontend
+!etc/
 
 # FRONTEND
 !web

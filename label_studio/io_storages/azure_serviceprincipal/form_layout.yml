@@ -1,0 +1,97 @@
+# 1x1 grid
+title: &title
+  - type: text
+    name: title
+    label: Integration Name
+
+# 1x3 grid
+storage_params: &storage_params
+  - type: text
+    name: account_name
+    label: Storage Name
+    placeholder: <storage name> (not url)
+  - type: text
+    name: container
+    label: Container Name
+    required: true
+  - type: text
+    name: prefix
+    label: Container Prefix
+
+# 1x2 grid
+authentication_params: &authentication_params
+  - type: text
+    name: tenant_id
+    label: Tenant ID
+    placeholder: SPI Tenant ID
+    allowEmpty: false
+  - type: text
+    name: client_id
+    label: Client ID
+    placeholder: SPI Client ID
+    allowEmpty: false
+# 1x1 grid
+authentication_pwd: &authentication_pwd
+  - type: password
+    name: client_secret
+    label: Client Secret
+    autoComplete: "new-password"
+    skipAutofill: true
+    allowEmpty: false
+    protectedValue: true
+
+ImportStorage:
+  # Title, Bucket, Prefix
+  - columnCount: 1
+    fields: *title
+  # Bucket
+  - columnCount: 3
+    fields: *storage_params
+
+  # Regex filter
+  - columnCount: 1
+    fields:
+      - type: text
+        name: regex_filter
+        label: File Filter Regex
+        placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+        validators:
+          - regexp
+  # Azure Auth params
+  - columnCount: 2
+    fields: *authentication_params
+  - columnCount: 1
+    fields: *authentication_pwd
+  # 2 columns grid
+  - columnCount: 2
+    columns:
+      - width: 345
+        fields:
+          - type: toggle
+            name: use_blob_urls
+            label: Treat every items object as an image/src file
+            description: If unchecked, treat every item object as a JSON-formatted task. Optional
+      - fields:
+          - type: toggle
+            name: presign
+            label: Use pre-signed URLs
+            value: true
+          - type: counter
+            name: presign_ttl
+            label: Expiration minutes
+            min: 1
+            value: 15
+            dependency: presign
+
+ExportStorage:
+  # Title, Bucket, Prefix
+  - columnCount: 1
+    fields: *title
+  # Bucket
+  - columnCount: 3
+    fields: *storage_params
+  # Azure Auth params
+  - columnCount: 2
+    fields: *authentication_params
+  - columnCount: 1
+    fields: *authentication_pwd
