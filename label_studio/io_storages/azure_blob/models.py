@@ -120,6 +120,7 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
             yield file.name
 
     def get_data(self, key):
+        import pdb; pdb.set_trace()
         if self.use_blob_urls:
             data_key = settings.DATA_UNDEFINED_NAME
             return {data_key: f'{self.url_scheme}://{self.container}/{key}'}
@@ -172,8 +173,6 @@ class AzureBlobImportStorage(ProjectStorageMixin, AzureBlobImportStorageBase):
 
 class AzureBlobExportStorage(AzureBlobStorageMixin, ExportStorage):  # note: order is important!
     def save_annotation(self, annotation):
-        import pdb; pdb.set_trace()
-
         container = self.get_container()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)

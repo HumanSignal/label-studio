@@ -22,6 +22,8 @@ from organizations.models import Organization
 from projects.models import Project
 from tasks.serializers import TaskWithAnnotationsSerializer
 from users.models import User
+from unittest import mock
+from azure.identity import ClientSecretCredential
 
 try:
     from businesses.models import BillingPlan, Business
@@ -204,10 +206,9 @@ def azure_client_mock():
     # def dummy_generate_blob_sas(*args, **kwargs):
     #     return 'token'
 
-    with mock.patch.object(models.BlobServiceClient, 'get_container_client', return_value=DummyAzureClient()):
+    with mock.patch.object(models.BlobServiceClient, 'from_connection_string', return_value=DummyAzureClient()):
         with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
             yield
-
 
 
 @contextmanager
@@ -264,10 +265,23 @@ def azure_client_sp_mock():
         def download_blob(self, key):
             return DummyAzureBlob(self.name, key)
 
+    class DummyAzureClient:
+        def get_container_client(self, container_name):
+            return DummyAzureContainer(container_name)
 
-    with mock.patch.object(models.BlobServiceClient, 'get_container_client', return_value=DummyAzureContainer('test-container')):
-        with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
-            yield
+    class MockClientSecretCredential(ClientSecretCredential):
+        def __init__(self, tenant_id, client_id, client_secret):
+            # You can add any necessary initialization logic here
+            super().__init__(tenant_id, client_id, client_secret)
+
+        def get_token(self, *scopes, **kwargs):
+            # Customize the token retrieval behavior here if needed
+            return 'token'
+
+    with mock.patch.object(models.ClientSecretCredential, '__init__', return_value=MockClientSecretCredential()):
+        with mock.patch.object(models.BlobServiceClient, '__init__', return_value=DummyAzureClient()):
+            with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
+                yield
 
 
 @contextmanager

@@ -113,7 +113,8 @@ class AzureServicePrincipalStorageMixin(models.Model):
     @property
     def blobservice_client(self) -> BlobServiceClient:
         account_url = self.get_account_url()
-        credential = ClientSecretCredential(self.get_account_tenant_id(), self.get_account_client_id(), get_secured(self.get_account_client_secret()))
+        import pdb; pdb.set_trace()
+        credential = ClientSecretCredential(tenant_id=self.get_account_tenant_id(), client_id=self.get_account_client_id(), client_secret=get_secured(self.get_account_client_secret()))
         blobservice_client = BlobServiceClient(account_url, credential=credential)
         return blobservice_client
 
@@ -238,8 +239,6 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
         return url
 
     def get_blob_metadata(self, key) -> dict:
-        import pdb; pdb.set_trace()
-
         blob = self.container_client.get_blob_client(key)
         return dict(blob.get_blob_properties())
 
@@ -286,7 +285,6 @@ class AzureServicePrincipalExportStorage(
     AzureServicePrincipalStorageMixin, ExportStorage
 ):  # note: order is important!
     def save_annotation(self, annotation):
-        import pdb; pdb.set_trace()
 
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
