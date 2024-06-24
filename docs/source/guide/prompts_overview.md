@@ -58,7 +58,7 @@ By utilizing AI to handle the bulk of the annotation work, you can significantly
 
 ![Diagram of auto-labeling workflow](/images/prompts/prompter-diagram.png)
 
-### Bootstrapping projects with prompts
+### Bootstrapping projects with Prompts
 
 In this use case, you do not need a ground truth annotation set. You can use Prompts to generate predictions for tasks without returning accuracy scores for the predictions it generates. 
 
