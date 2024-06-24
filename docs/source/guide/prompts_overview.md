@@ -1,12 +1,12 @@
 ---
-title: Prompts overview
+title: Prompts overview - Beta 🧪
 short: Prompts overview
 tier: enterprise
 type: guide
 order: 0
 order_enterprise: 225
 meta_title: Prompts overview
-meta_description: An overview of the Prompts feature in the HumanSignal platform
+meta_description: An overview of the Prompts feature on the HumanSignal platform
 section: Prompts
 date: 2024-05-15 14:30:14
 ---
@@ -14,26 +14,86 @@ date: 2024-05-15 14:30:14
 
 Use Prompts to evaluate and refine your LLM prompts, and then generate predictions to automate your labeling process. 
 
-All you need to get started is an OpenAI API key and a dataset with some ground truth annotations. 
+All you need to get started is an OpenAI API key and a project. 
 
 With Prompts, you can:
 
-* Drastically increase the speed and efficiency of annotations, transforming subject matter experts (SMEs) into highly productive data scientists while reducing the dependency on non-SME manual annotators.
-* Enhance annotation throughput and accuracy, making the process faster and more scalable. 
+* Drastically improve the speed and efficiency of annotations, transforming subject matter experts (SMEs) into highly productive data scientists while reducing the dependency on non-SME manual annotators.
+* Increase annotation throughput, accuracy, and consistency, making the process faster and more scalable. 
 * Empower users to harness the full potential of AI-driven text labeling, setting a new standard for efficiency and innovation in data labeling.
+* Leverage subject matter expertise to rapidly bootstrap projects with labels, allowing you to decrease time to ML development. 
+* Allow your subject matter experts time focus on higher-level tasks rather than being bogged down by repetitive manual work.
 
-## Auto-labeling with Prompts
+
+## Use cases
+
+
+### Auto-labeling with Prompts
  
 Prompts allows you to leverage LLMs to swiftly generate accurate predictions, enabling instant labeling of thousands of tasks. 
 
 By utilizing AI to handle the bulk of the annotation work, you can significantly enhance the efficiency and speed of your data labeling workflows. This is particularly valuable when dealing with large datasets that require consistent and accurate labeling. Automating this process reduces the reliance on manual annotators, which not only cuts down on labor costs but also minimizes human errors and biases. With AI's ability to learn from the provided ground truth annotations, you can maintain a high level of accuracy and consistency across the dataset, ensuring high-quality labeled data for training machine learning models.
 
+#### Workflow
+
+1. If you don't already have one, create a project and import a text-based dataset. 
+
+    * [Create a project](setup_project)
+    * [Sync data from external storage](storage)
+2. Annotate a subset of tasks, marking as many as possible as ground truth annotation. The more ground truths you have in your dataset, the more accurate your prompt evaluation results will be. 
+
+    * [Labeling guide](labeling)
+    * [Define ground truth annotations for a project](quality#Define-ground-truth-annotations-for-a-project)
+    * [Blog - What's a ground truth dataset?](https://humansignal.com/blog/what-s-a-ground-truth-dataset/)
+3. Go to the Prompts page and create a new model. If you haven't already, you will also need to add an OpenAI API key.
+
+    * [Create a model](prompts_model)
+    * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
+4. Write a prompt and evaluate it against your ground truth dataset. 
+
+    * [Draft a prompt](prompt_draft)
+5. When your prompt is returning an overall accuracy that is acceptable, you can choose to apply it to the rest of the tasks in your project. 
+
+    * [Generate predictions from a prompt](prompts_predictions)
+
+![Diagram of auto-labeling workflow](/images/prompts/prompter-diagram.png)
+
+### Bootstrapping projects with prompts
+
+In this use case, you do not need a ground truth annotation set. You can use Prompts to generate predictions for tasks, but you cannot return accuracy scores for the predictions it generates. 
+
+This use case is ideal for organizations looking to kickstart new initiatives without the initial burden of creating extensive ground truth annotations, allowing you to start analyzing and utilizing you data immediately. This is particularly beneficial for projects with tight timelines or limited resources.
+
+By generating predictions and converting them into annotations, you can also quickly build a labeled dataset, which can then be refined and improved over time with the help of subject matter experts. This approach accelerates the project initiation phase, enabling faster experimentation and iteration. 
+
+Additionally, this workflow provides a scalable solution for continuously expanding datasets, ensuring that new data can be integrated and labeled efficiently as the project evolves.
+
+!!! note
+    You can still follow this use case even if you already have ground truth annotations. You will have the option to select task sample without taking ground truth data into consideration. 
 
 
-## Prompt evaluation and fine-tuning
+#### Workflow
 
-!!! info Tip
-    While you can use Prompts to do basic prompt evaluation and fine-tuning, we recommend using [Evals](evals_overview), which has been specifically designed for this purpose and has much more robust analytics. 
+1. If you don't already have one, create a project and import a text-based dataset. 
+
+    * [Create a project](setup_project)
+    * [Sync data from external storage](storage)
+2. Go to the Prompts page and create a new model. If you haven't already, you will also need to add an OpenAI API key.
+
+    * [Create a model](prompts_model)
+    * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
+3. Write a prompt and run it against your task samples. 
+
+    * [Draft a prompt](prompt_draft)
+  
+When you run your prompt, you create predictions for the selected sample (this can be a portion of the project tasks or all tasks). From here you have several options:
+
+* Continue to work on your prompt and generate new predictions each time you run it against your sample. 
+* Return to the project and begin reviewing your predictions. If you convert your predictions into annotations, you can use subject matter experts to begin reviewing and accepting the annotations. 
+* As you review the annotations, you can identify ground truths. With a ground truth dataset, you can further refine your prompt using its accuracy score. 
+
+
+### Prompt evaluation and fine-tuning
 
 As you evaluate your prompt against the ground truth annotations, we return an accuracy score for each version of your prompt. You can use this to iterate your prompt versions for [clarity, specificity, and context](prompts_draft#Drafting-effective-prompts). 
 
@@ -43,46 +103,42 @@ This accuracy score provides a measurable way to evaluate and refine the perform
 
 This feedback loop allows you to iteratively fine-tune your prompts, optimizing the accuracy of predictions and enhancing the overall reliability of your data annotation processes. In industries where data accuracy directly impacts decision-making and operational efficiency, this capability is invaluable.
 
-## Model types
+#### Workflow
 
-### Text classification 
-
-At present, the Prompts feature only supports text classification labeling tasks.  
-
-Text classification is the process of assigning predefined categories or labels to segments of text based on their content. This involves analyzing the text and determining which category or label best describes its subject, sentiment, or purpose. The goal is to organize and categorize textual data in a way that makes it easier to analyze, search, and utilize. 
-
-Text classification labeling tasks are fundamental in many applications, enabling efficient data organization, improving searchability, and providing valuable insights through data analysis. Some examples include:
-
-* **Spam Detection**: Classifying emails as "spam" or "not spam."
-* **Sentiment Analysis**: Categorizing user reviews as "positive," "negative," or "neutral."
-* **Topic Categorization**: Assigning articles to categories like "politics," "sports," "technology," etc.
-* **Support Ticket Classification**: Labeling customer support tickets based on the issue type, such as "billing," "technical support," or "account management."
-* **Content Moderation**: Identifying and labeling inappropriate content on social media platforms, such as "offensive language," "hate speech," or "harassment."
-
-
-## Workflow
-
-1. Create a project and import a text-based dataset. 
+1. If you don't already have one, create a project and import a text-based dataset. 
 
     * [Create a project](setup_project)
     * [Sync data from external storage](storage)
-2. Annotate a subset of tasks, marking as many as possible as ground truth annotation. The more ground truths you have in your dataset, the better your results will be. 
+2. Annotate a subset of tasks, marking as many as possible as ground truth annotation. The more ground truths you have in your dataset, the more accurate your prompt evaluation results will be. 
 
     * [Labeling guide](labeling)
     * [Define ground truth annotations for a project](quality#Define-ground-truth-annotations-for-a-project)
     * [Blog - What's a ground truth dataset?](https://humansignal.com/blog/what-s-a-ground-truth-dataset/)
-3. Go to the Prompts page and create a new model. The first time you create a model, you will be asked to provide an OpenAI API key. 
+3. Go to the Prompts page and create a new model. If you haven't already, you will also need to add an OpenAI API key.
 
     * [Create a model](prompts_model)
     * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
 4. Write a prompt and evaluate it against your ground truth dataset. 
 
     * [Draft a prompt](prompt_draft)
-5. When your prompt is returning an overall accuracy that is acceptable, you can apply it to the rest of the tasks in your project. 
+5. Continue iterating and refining your prompt until you reach an acceptable accuracy score. 
 
-    * [Generate predictions from a prompt](prompts_predictions)
+## Model types
 
-![Diagram of auto-labeling workflow](/images/prompts/prompter-diagram.png)
+### Text classification 
+
+At present, the Prompts feature only supports single-label text classification labeling tasks.  
+
+Text classification is the process of assigning predefined categories or labels to segments of text based on their content. This involves analyzing the text and determining which category or label best describes its subject, sentiment, or purpose. The goal is to organize and categorize textual data in a way that makes it easier to analyze, search, and utilize. 
+
+Text classification labeling tasks are fundamental in many applications, enabling efficient data organization, improving searchability, and providing valuable insights through data analysis. Some examples include:
+
+* **Spam Detection**: Classifying emails as "spam" or "ham" (not spam). 
+* **Sentiment Analysis**: Categorizing user reviews as "positive," "negative," or "neutral."
+* **Topic Categorization**: Assigning articles to categories like "politics," "sports," "technology," etc.
+* **Support Ticket Classification**: Labeling customer support tickets based on the issue type, such as "billing," "technical support," or "account management."
+* **Content Moderation**: Identifying and labeling inappropriate content on social media platforms, such as "offensive language," "hate speech," or "harassment."
+
 
 ## Features, requirements, and constraints
 
@@ -96,7 +152,7 @@ Text classification labeling tasks are fundamental in many applications, enablin
 | **Supported base models** | OpenAI gpt-3.5-turbo-16k <br>OpenAI gpt-3.5-turbo-instruct <br>OpenAI gpt-4-turbo <br>OpenAI gpt-3.5-turbo <br>OpenAI gpt-4o <br>OpenAI gpt-4 |
 | **Number of API keys per org** | 1 (OpenAI API key only) |
 | **Required permissions** | **Owners, Administrators, Managers** -- Can create Prompt models and update projects with auto-annotations. Managers can only apply models to projects in which they are already a member. <br><br>**Reviewers and Annotators** -- No access to the Prompts tool, but can see the predictions generated by the prompts from within the project (depending on your [project settings](project_settings_lse)).  |
-| **Enterprise vs. Open Source** | Label Studio Enterprise only |
+| **Enterprise vs. Open Source** | Label Studio Enterprise (Cloud only)|
 
 </div>
 
