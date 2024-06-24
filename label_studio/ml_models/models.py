@@ -1,5 +1,4 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
 from django.conf import settings
 from django.db import models
@@ -20,7 +19,6 @@ def validate_string_list(value):
 
 
 class ModelInterface(models.Model):
-
     title = models.CharField(_('title'), max_length=500, null=False, blank=False, help_text='Model name')
 
     description = models.TextField(_('description'), null=True, blank=True, help_text='Model description')
@@ -72,7 +70,6 @@ class ModelVersion(models.Model):
 
 
 class ThirdPartyModelVersion(ModelVersion):
-
     provider = models.CharField(
         max_length=255,
         choices=ModelProviderConnection.ModelProviders.choices,
@@ -149,6 +146,12 @@ class ModelRun(models.Model):
         default=None,
         help_text='Job ID for inference job for a ModelRun e.g. Adala job ID',
     )
+
+    total_predictions = models.IntegerField(_('total predictions'), default=0)
+
+    total_correct_predictions = models.IntegerField(_('total correct predictions'), default=0)
+
+    total_tasks = models.IntegerField(_('total tasks'), default=0)
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
