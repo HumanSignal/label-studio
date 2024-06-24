@@ -181,7 +181,7 @@ numpy = "^1.24.3"
 ordered-set = "4.0.2"
 pandas = ">=0.24.0"
 psycopg2-binary = "2.9.9"
-pydantic = "<=1.11.0,>=1.7.3"
+pydantic = ">=2.7.3"
 python-dateutil = ">=2.8.1"
 pytz = "~=2022.1"
 requests = "2.31.0"
@@ -204,7 +204,7 @@ openai = "^1.10.0"
 
 # Humansignal repo dependencies
 
-label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/f6fb130d41380704d36045e21839d3f27ddf2883.zip"}
+label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/64eea7333be550a857481fa1158dcac39e7da3b7.zip"}
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"
