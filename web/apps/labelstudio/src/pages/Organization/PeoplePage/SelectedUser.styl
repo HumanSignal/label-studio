@@ -1,6 +1,7 @@
 .user-info
   padding 20px 24px
-  border 1px solid rgba(0,0,0,0.15)
+  border 1px solid var(--sand_300)
+  background var(--sand_0)
   align-self start
   display flex
   flex-direction column
@@ -13,14 +14,15 @@
     width 32px
     height 32px
     position absolute
-    --button-color $accent_color
+    --button-color var(--grape_500)
+    border none
 
   &__header
     display grid
     grid-template auto / 64px auto
     column-gap 16px
     line-height 1.5
-    color rgba(0, 0, 0, 0.6)
+    color var(--sand_600)
     margin-bottom 16px
     align-items center
 
@@ -30,8 +32,9 @@
   &__full-name
     font-size 1.5em
     margin 0
-    color #000
-    margin-bottom 16px
+    font-weight 500
+    line-height 1.2
+    color var(--sand_900)
 
   &__section
     & + &
@@ -43,7 +46,7 @@
       font-weight 500
 
   &__last-active
-    color gray
+    color var(--sand_600)
     margin-top 32px
     margin-bottom 0
 
@@ -63,6 +66,6 @@
     color: $accent_color
 
     &:hover
-      background-color #f1f1f1
+      background-color var(--grape_0)
 
 

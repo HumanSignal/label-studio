@@ -81,7 +81,7 @@ export class Modal extends React.Component {
                     tag={Button}
                     name="close"
                     type="text"
-                    icon={<Icon size="18" color="#0099FF" icon={FaTimes} />}
+                    icon={<Icon size="18" color="#617ADA" icon={FaTimes} />}
                   />
                 )}
               </Modal.Header>

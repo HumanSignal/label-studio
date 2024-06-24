@@ -4,7 +4,7 @@
   border-radius 4px 4px 0 0
   border-width 1px 1px 0px 1px
   border-style solid
-  background-color rgba(137, 128, 152, 0.08)
+  background-color var(--sand_200)
   border-color transparent
   margin-top 2px
   align-items center
@@ -25,22 +25,22 @@
     gap 8px
     flex: 1 0 auto;
     .annotation-button__userpic_prediction
-      background-color #EFDBFF
-      color #7735D6
+      background-color var(--plum_100)
+      color var(--plum_500)
   &__name
     font-size 12px
     font-weight 400
     line-height 16px
     letter-spacing 0.4px
     text-align left
-    color: #898098;
+    color: var(--sand_700);
   &__entity-id
     font-size 10px
     font-weight 400
     line-height 16px
     letter-spacing 0.4px
     text-align left
-    color #898098
+    color: var(--sand_700);
     margin-left 8px
   &__created
     font-size 10px
@@ -48,11 +48,11 @@
     line-height 16px
     letter-spacing 0.4px
     text-align left
-    color #898098
+    color: var(--sand_700);
 
   &:hover
-    background-color rgba(9, 109, 217, 0.12)
-    border-color rgba(9, 109, 217, 0.16)
+    background-color var(--grape_0)
+    border-color var(--grape_100)
     border-bottom-color transparent
 
     .annotation-button__name
@@ -65,12 +65,12 @@
       visibility visible
 
   &_selected
-    background-color #FFFFFF
-    border-color rgba(137, 128, 152, 0.16)
+    background-color var(--sand_0)
+    border-color var(--sand_300)
 
     &:hover
-      background-color #FFFFFF
-      border-color rgba(137, 128, 152, 0.16)
+      background-color var(--sand_0)
+      border-color var(--sand_300)
       border-bottom-color transparent
 
     .annotation-button__ellipsisIcon
@@ -88,16 +88,16 @@
     display flex
     border-radius 4px
     &_groundTruth
-      color #FFC53D
+      color var(--canteloupe_400)
   &__ellipsisIcon
     transform rotate(90deg)
     display flex
     border-radius 4px
-    color #898098
+    color var(--sand_700)
     visibility hidden
     &:hover
-      color #096DD9
-      background rgba(9, 109, 217, 0.12)
+      color var(--grape_500)
+      background var(--grape_0)
   &__picSection
     position relative
   &__status
@@ -106,7 +106,7 @@
     left: calc(50% + 5px);
     border-radius 4px
     color #FAFAFA
-    border 2px solid #FAFAFA
+    border 2px solid var(--sand_300)
     display flex
     width 10px
     height 10px
@@ -114,25 +114,25 @@
     align-items center
     justify-content center
     &_approved
-      background-color #389E0D
+      background-color var(--success_color)
     &_skipped
-      background-color #CF1322
+      background-color var(--danger_color)
     &_updated
-      background-color #1D39C4
+      background-color var(--grape_500)
       svg
         display block
   &_contextMenuOpen
     .annotation-button
       &__ellipsisIcon
-        color #096DD9
-        background #096DD91F
+        color var(--grape_500)
+        background var(--grape_0)
 
 .AnnotationButtonContextMenu
   border-radius 4px
   box-shadow: 0px 1px 3px 1px #26262626, 0px 1px 2px 0px #2626264D;
   &__seperator
     height 1px
-    background-color rgba(137, 128, 152, 0.12)
+    background-color var(--sand_100)
   &__option
     display flex
     margin 8px
@@ -140,14 +140,14 @@
     white-space nowrap
     gap 2px
     cursor pointer
-    font-size 16px
+    font-size 14px
     font-weight 400
-    line-height 24px
-    letter-spacing 0.5px
+    line-height 22px
     border-radius 4px
     padding-right 32px
     &:hover
-      background-color rgba(65, 60, 74, 0.08)
+      background-color var(--grape_0)
+      color var(--grape_500)
     &_duplicate
       padding-top 6px
       padding-bottom 6px
@@ -158,7 +158,11 @@
     &_delete
       padding-top 6px
       padding-bottom 6px
-      color #CF1322
+      color var(--danger_color)
+      &:hover
+        background-color var(--red_1)
+        color var(--danger_color)
+    &_delete
       .AnnotationButtonContextMenu__icon
         display flex
         padding 4px 11px 4px 12px

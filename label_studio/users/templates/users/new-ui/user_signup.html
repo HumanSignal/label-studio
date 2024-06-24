@@ -2,55 +2,60 @@
 {% load static %}
 
 {% block user_content %}
-
-  <form id="signup-form"
+  <div class="form-wrapper">
+    <h2>Sign Up</h2>
+    <form id="signup-form"
         action="{% url 'user-signup' %}?{% if next %}&next={{ next }}{% endif %}{% if token %}&token={{ token }}{% endif %}"
         method="post"
-  >
+    >
     {% csrf_token %}
-    <div>
-      <input type="text" class="ls-input" name="email" id="email" placeholder="Email" value="{{ form.data.email }}">
-      {% if user_form.errors.email %}
-        <ul class="field_errors">
-          {% for error in user_form.errors.email %}
-            <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
+      <div class="input-wrapper">
+        <label>Email Address</label>
+        <input type="text" class="ls-input" name="email" id="email" value="{{ form.data.email }}">
+        {% if user_form.errors.email %}
+          <ul class="field_errors">
+            {% for error in user_form.errors.email %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+        </div>
+      <div class="input-wrapper">
+        <label>Password</label>
+        <input type="password" class="ls-input" name="password" id="password">
+        {% if user_form.errors.password %}
+          <ul class="field_errors">
+            {% for error in user_form.errors.password %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
       </div>
-    <div>
-      <input type="password" class="ls-input" name="password" id="password" placeholder="Password">
-      {% if user_form.errors.password %}
-        <ul class="field_errors">
-          {% for error in user_form.errors.password %}
-            <li>{{ error }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
+      <div class="form-group">
+        <input name="allow_newsletters" id="allow_newsletters" type="hidden" value="true">
+        <input name="allow_newsletters_visual" id="allow_newsletters_visual" class="ls-checkbox"
+                type="checkbox" style="width: auto" checked="true"
+                onchange="document.getElementById('allow_newsletters').value=document.getElementById('allow_newsletters_visual').checked">
+        <label for="allow_newsletters_visual" style="display: inline-block; cursor: pointer;">
+          Get the latest news from Heidi
+          <img src="{{ settings.HOSTNAME }}{% static 'images/heidi.png' %}" alt="Heidi"
+              width="25" style="position: absolute; right: -2.5em; top: -.25rem;">
+        </label>
       </div>
 
-    <div>
-      <input name="allow_newsletters" id="allow_newsletters" type="hidden" value="true">
-      <label for="allow_newsletters_visual" style="display: inline-block; cursor: pointer;">
-
-        <input name="allow_newsletters_visual" id="allow_newsletters_visual"
-               type="checkbox" style="width: auto" checked="true"
-               onchange="document.getElementById('allow_newsletters').value=document.getElementById('allow_newsletters_visual').checked">
-        Get the latest news from Heidi
-        <img src="{{ settings.HOSTNAME }}{% static 'images/heidi.png' %}" alt="Heidi"
-             width="25" style="display: inline; margin: 0; position: relative; top: 5px; left: 0px">
-
-      </label>
-    </div>
-
-    {% if form.non_field_errors %}
-      {% for error in form.non_field_errors %}
-        <p class="error">
-          {{ error }}
-        </p>
-      {% endfor %}
-    {% endif %}
-    <p><button type="submit" aria-label="Create Account" class="ls-button ls-button_look_primary">Create Account</button></p>
-  </form>
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          <p class="error">
+            {{ error }}
+          </p>
+        {% endfor %}
+      {% endif %}
+      <p><button type="submit" aria-label="Create Account" class="ls-button ls-button_look_primary">Create Account</button></p>
+    </form>
+  </div>
+  <div class="text-wrapper">
+    <p class="">Already have an account?</p>
+    <a href="{{ settings.HOSTNAME }}/user/login">Log in</a>
+  </div>
 
 {% endblock %}

@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1169: LEAP-1165: LEAP-1177 Fix security issues (#6013)",
-  "commit": "119bb236f05d94ff92ec79e0dae15bd625a3ebbf",
-  "date": "2024-06-20T15:39:45.000Z",
+  "message": "feat: OPTIC-757: Label Studio App Redesign (#5892)",
+  "commit": "53101fffb1ab714a231c8ce96c32fa5cd93aa0ea",
+  "date": "2024-06-24T16:41:58.000Z",
   "branch": "develop"
 }

@@ -43,7 +43,7 @@
 
 /* Styles for dedicated error page */
 body > .ls-global-error {
-  font: 16px Roboto;
+  font-size: 16px;
   max-width: 600px;
   margin: 0 auto;
 }

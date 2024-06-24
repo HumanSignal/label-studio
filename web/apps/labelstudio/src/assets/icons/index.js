@@ -31,3 +31,4 @@ export { ReactComponent as IconPredictions } from "./predictions.svg";
 export { ReactComponent as IconEmptyPredictions } from "./empty-predictions.svg";
 export { ReactComponent as IconSpark } from "./spark.svg";
 export { ReactComponent as IconModel } from "./model.svg";
+export { ReactComponent as IconModels } from "./models.svg";

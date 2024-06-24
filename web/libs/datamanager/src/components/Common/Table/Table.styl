@@ -83,7 +83,7 @@
     min-width fit-content
     position relative
     cursor pointer
-    background-color #fff
+    background-color var(--sand_0)
 
     &_disabled,
     &_loading
@@ -91,13 +91,13 @@
       pointer-events none
 
     &_even:not(&_selected)
-      background-color #fafafa
+      background-color var(--sand_100)
 
     &_selected
-      background-color #e3f1ff
+      background-color var(--grape_0)
 
     &:not(&_selected):hover
-      background-color #f3f9ff
+      background-color var(--grape_0)
 
     &_highlighted:not(&_selected)::after
       top 0

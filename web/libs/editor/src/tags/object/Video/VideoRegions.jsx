@@ -16,7 +16,7 @@ const SelectionRect = (props) => {
   return (
     <>
       <Rect {...props} strokeWidth={2} stroke="#fff" />
-      <Rect {...props} fill={chroma("#0099FF").alpha(0.1).css()} strokeWidth={2} stroke="#0099FF" dash={[2, 2]} />
+      <Rect {...props} fill={chroma("#617ADA").alpha(0.1).css()} strokeWidth={2} stroke="#617ADA" dash={[2, 2]} />
     </>
   );
 };
