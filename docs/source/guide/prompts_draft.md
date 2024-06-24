@@ -1,17 +1,17 @@
 ---
-title: Draft a prompt
-short: Draft a prompt
+title: Draft and run prompts
+short: Draft and run prompts
 tier: enterprise
 type: guide
 order: 0
 order_enterprise: 231
-meta_title: Draft a prompt
+meta_title: Draft your Prompt
 meta_description: Create and evaluate an LLM prompt
 section: Prompts
 date: 2024-06-12 14:09:09
 ---
 
-With your [Prompts model created](prompts_model), you can begin drafting prompts to generate predictions or . 
+With your [Prompt created](prompts_create), you can begin drafting your prompt content to run against baseline tasks.
 
 ## Draft a prompt and generate predictions
 
@@ -33,8 +33,10 @@ With your [Prompts model created](prompts_model), you can begin drafting prompts
 4. Click **Save**. 
 5. Click **Evaluate**. 
 
-!!! note
-    When you click **Evaluate**, you will create predictions for each task in the baseline you selected task. When you return to the project, you will see this reflected in your tasks. You can see how many predictions a task has using the **Predictions** column in the Data Manager. 
+!!! warning
+    When you click **Evaluate**, you will create predictions for each task in the baseline you selected and overwrite any previous predictions you generated with this prompt. 
+    
+    Evaluating your Prompts can result in multiple predictions on your tasks: if you have multiple Prompts for one Project, or if you click both **Evaluate** and **Get Predictions for All Tasks from a Prompt**, you will see multiple predictions for tasks in the Data Manager. 
 
 <br><br>
 <video src="../images/prompts/prompts.mp4" controls="controls" style="max-width: 800px;" class="gif-border" />

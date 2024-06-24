@@ -32,15 +32,17 @@ Once complete, you can return to the project and open the Data Manager. Use the 
 
 ## Remove predictions
 
-If you prematurely generated predictions or want to use a new prompt, simply select all tasks and select **Actions > Delete Predictions**. To only remove predictions from certain models or model versions, use the **Predictions** page in the project settings. 
+If you prematurely generated predictions or want to use a new prompt, simply select all tasks and select **Actions > Delete Predictions**. To only remove predictions from certain models or model versions, use [the **Predictions** page in the project settings](project_settings_lse#Predictions). 
 
 ## Create annotations from predictions
 
-Once you have your predictions in place, you still need to convert them to annotations. You can review predictions by opening tasks. The predictions are listed under the model name and are grayed out: 
+Once you have your predictions in place, you might still want to convert them to annotations (depending on your workflow and your desired outcome). 
+
+You can review predictions by opening tasks. The predictions are listed under the model name and are grayed out: 
 
 ![Screenshot of the prediction preview](/images/prompts/prediction.png)
 
 
 From the Data Manager, select all the tasks you want to label and then select **Actions > Create Annotations from Predictions**. You are asked to select the model and version you want to use. 
 
-![Gif of the of create annotations action](/images/prompts/create_annotations_1.png)
+![Gif of the of create annotations action](/images/prompts/create_annotations_1.gif)

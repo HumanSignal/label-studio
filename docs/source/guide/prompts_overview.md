@@ -47,7 +47,7 @@ By utilizing AI to handle the bulk of the annotation work, you can significantly
     * [Blog - What's a ground truth dataset?](https://humansignal.com/blog/what-s-a-ground-truth-dataset/)
 3. Go to the Prompts page and create a new model. If you haven't already, you will also need to add an OpenAI API key.
 
-    * [Create a model](prompts_model)
+    * [Create a Prompt](prompts_create)
     * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
 4. Write a prompt and evaluate it against your ground truth dataset. 
 
@@ -80,7 +80,7 @@ Additionally, this workflow provides a scalable solution for continuously expand
     * [Sync data from external storage](storage)
 2. Go to the Prompts page and create a new model. If you haven't already, you will also need to add an OpenAI API key.
 
-    * [Create a model](prompts_model)
+    * [Create a Prompt](prompts_create)
     * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
 3. Write a prompt and run it against your task samples. 
 
@@ -116,7 +116,7 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
     * [Blog - What's a ground truth dataset?](https://humansignal.com/blog/what-s-a-ground-truth-dataset/)
 3. Go to the Prompts page and create a new model. If you haven't already, you will also need to add an OpenAI API key.
 
-    * [Create a model](prompts_model)
+    * [Create a Prompt](prompts_create)
     * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
 4. Write a prompt and evaluate it against your ground truth dataset. 
 
