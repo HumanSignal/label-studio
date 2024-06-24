@@ -3,11 +3,12 @@ const { I } = inject();
 module.exports = {
   _sideBarLocator: locate(".lsf-sidebar-tabs"),
   _regionGroupButton: locate(".lsf-radio-group__button"),
-  _regionsCounterLocator: locate(".lsf-entities__counter"),
-  _regionLocator: locate(".lsf-region-item"),
-  _regionSelectedLocator: locate('[data-testid="regionitem:selected=true"]'),
-  _regionUnselectedLocator: locate('[data-testid="regionitem:selected=false"]'),
-  _selectedRegionsLocator: locate(".lsf-entity"),
+  _regionsCounterLocator: locate(".lsf-panel-tabs__counter"),
+  _regionLocator: locate(".lsf-tree-treenode"),
+  _hiddenRegionLocator: locate(".lsf-tree-treenode.lsf-tree__node_hidden"),
+  _regionSelectedLocator: locate('.lsf-tree-treenode-selected'),
+  _regionUnselectedLocator: locate('.lsf-tree-treenode:not(.lsf-tree-treenode-selected)'),
+  _selectedRegionsLocator: locate(".lsf-detailed-region"),
   seeRegions(count) {
     if (count) {
       I.seeElement(this._regionsCounterLocator.withText(`${count}`));
@@ -60,12 +61,10 @@ module.exports = {
     I.click(this._regionLocator.withText(`${text}`));
   },
   hideRegion(text) {
-    I.click(this._regionLocator.withText(`${text}`).find(".lsf-region-item__toggle_active"));
+    I.click(this._regionLocator.withText(`${text}`).find(".lsf-outliner-item__control_type_visibility"));
   },
   showRegion(text) {
-    I.click(
-      this._regionLocator.withText(`${text}`).find(".lsf-region-item__toggle:not(.lsf-region-item__toggle_active)"),
-    );
+    I.click(this._hiddenRegionLocator.withText(`${text}`).find(".lsf-outliner-item__control_type_visibility"));
   },
   selectTool(tool) {
     I.click(`[aria-label=${tool}-tool]`);

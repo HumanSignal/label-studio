@@ -82,7 +82,7 @@ const newResult = {
   value: { start: 233, end: 237, text: "come", labels: ["Words"] },
 };
 
-Scenario("NERText", async ({ I, AtTopbar }) => {
+Scenario("NERText", async ({ I, AtSidebar, AtTopbar }) => {
   const params = {
     annotations: [{ id: "TestCmpl", result: results }],
     config: configSimple,
@@ -137,7 +137,7 @@ Scenario("NERText", async ({ I, AtTopbar }) => {
   // @todo this hotkey doesn't work. why?
   // I.pressKey('R')
   I.wait(5);
-  I.click(locate("li").withText("Alice"));
+  AtSidebar.clickRegion("Alice");
   I.click("Create Relation");
   I.click(locate(".htx-highlight").withText("come"));
   I.wait(1);

@@ -39,7 +39,7 @@ module.exports.FFlagMatrix = function (flags, scenarios) {
  * @param {Function} scenario
  **/
 module.exports.FFlagScenario = function (scenarioName, scenario) {
-  if (!this.flags) throw new Error("FFlagMatrix must wrap calls to FFlagScenario");
+  if (!this.flags) throw new Error("FFlagScenario calls must be wrapped into FFlagMatrix");
 
   const variant = ` :: ${Object.entries(this.flags)
     .map(([flag, state]) => `${flag}=${state}`)

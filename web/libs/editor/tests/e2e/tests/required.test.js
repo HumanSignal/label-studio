@@ -130,7 +130,7 @@ Scenario("Check required param", async ({ I }) => {
   I.see('Checkbox "second" is required');
 });
 
-Scenario("Check required param in complex config", async ({ I }) => {
+Scenario("Check required param in complex config", async ({ I, AtSidebar }) => {
   const params = { annotations, config: complex, data: { text } };
 
   const waitForError = (name) => {
@@ -179,7 +179,7 @@ Scenario("Check required param in complex config", async ({ I }) => {
 
   I.click("Me neither");
   // select labeled region
-  I.click(locate("li").withText("have"));
+  AtSidebar.clickRegion("have");
   I.see("Valid");
   I.updateAnnotation();
   I.dontSee("Valid");
@@ -189,7 +189,7 @@ Scenario("Check required param in complex config", async ({ I }) => {
   waitForError("choice-description");
   I.fillField("choice-description", "test text");
   // select labeled region
-  I.click(locate("li").withText("have"));
+  AtSidebar.clickRegion("have");
   I.see("Valid");
   I.updateAnnotation();
   I.dontSee("Valid");

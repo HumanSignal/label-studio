@@ -76,6 +76,8 @@ Scenario(
     };
 
     for (const [incorrect, error] of checks.incorrect) {
+      // it needs sometime after previous validation
+      I.wait(1);
       I.fillField("input[type=date]", formatDateValue(incorrect, format));
       I.updateAnnotation();
       I.see("is not valid");
@@ -125,11 +127,11 @@ Scenario(
 
     I.say("Fill all per-region date fields and check it's all good");
     regions.forEach((region) => {
-      I.click(locate("li").withText(region.text));
+      AtSidebar.clickRegion(region.text);
       I.fillField("input[name=date-date]", formatDateValue(region.dateValue, format));
     });
 
-    I.click(locate("li").withText(regions[0].text));
+    AtSidebar.clickRegion(regions[0].text);
     // less than min
     I.selectOption("select[name=year-year]", "1999");
     assert.strictEqual("", await I.grabValueFrom("select[name=year-year]"));
@@ -142,7 +144,7 @@ Scenario(
     I.pressKey("Escape");
 
     regions.forEach((region) => {
-      I.click(locate("li").withText(region.text));
+      AtSidebar.clickRegion(region.text);
       I.selectOption("select[name=year-year]", region.year);
     });
 
@@ -151,7 +153,7 @@ Scenario(
     I.dontSee("is required");
 
     regions.forEach((region) => {
-      I.click(locate("li").withText(region.text));
+      AtSidebar.clickRegion(region.text);
       // important to see that per-regions change their values
       I.seeInField("input[name=date-date]", region.dateValue);
       I.seeInField("select[name=year-year]", region.year);
