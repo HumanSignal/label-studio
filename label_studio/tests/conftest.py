@@ -495,7 +495,6 @@ def setup_project(client, project_template, do_auth=True):
     org = Organization.create_organization(created_by=user, title=user.first_name)
     user.active_organization = org
     user.save()
-
     if do_auth:
 
         assert signin(client, email, password).status_code == 302

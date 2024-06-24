@@ -1271,7 +1271,7 @@ stages:
     status_code: 400
 
 ---
-test_name: test_import_from_azure_spi_storage
+test_name: test_import_from_azurespi_storage
 strict: false
 marks:
 - usefixtures:
@@ -1286,7 +1286,7 @@ stages:
       is_published: true
       label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
         toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
-      title: test_azure_spi_storage
+      title: test_azurespi_storage
     method: POST
     url: '{django_live_url}/api/projects'
   response:
@@ -1294,12 +1294,13 @@ stages:
       json:
         project_pk: id
     status_code: 201
+
 - name: stage
   request:
     data:
-      container: pytest-azure_spi-images
+      container: pytest-azure-images
       project: '{project_pk}'
-      title: Testing Azure_spi storage (bucket from conftest.py)
+      title: Testing Azure SPI storage (bucket from conftest.py)
       use_blob_urls: true
     method: POST
     url: '{django_live_url}/api/storages/azure_spi'
@@ -1314,63 +1315,63 @@ stages:
     url: '{django_live_url}/api/storages/azure_spi/{storage_pk}/sync'
   response:
     json:
-      last_sync_count: 3
+      last_sync_count: 0
     status_code: 200
-# - name: stage
-#   request:
-#     method: GET
-#     url: '{django_live_url}/api/projects/{project_pk}/next'
-#   response:
-#     json:
-#       data:
-#         image_url: !re_match "https://testing.blob.core.windows.net/pytest-azure_spi-images/.+"
-#     status_code: 200
-# - name: stage
-#   request:
-#     data:
-#       project: '{project_pk}'
-#     method: GET
-#     url: '{django_live_url}/api/storages'
-#   response:
-#     status_code: 200
-# - name: stage
-#   request:
-#     headers:
-#       content-type: application/json
-#     json:
-#       presign: false
-#     method: PATCH
-#     url: '{django_live_url}/api/storages/azure_spi/{storage_pk}'
-#   response:
-#     status_code: 200
-# - name: stage
-#   request:
-#     data:
-#       project: '{project_pk}'
-#     method: GET
-#     url: '{django_live_url}/api/storages'
-#   response:
-#     status_code: 200
-# - name: Patch storage with synchronizable false
-#   request:
-#     headers:
-#       content-type: application/json
-#     json:
-#       synchronizable: false
-#     method: PATCH
-#     url: '{django_live_url}/api/storages/azure_spi/{storage_pk}'
-#   response:
-#     status_code: 200
-#     json:
-#       status: "completed"
-#       traceback: null
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        image_url: !re_match "https://testing.blob.core.windows.net/pytest-azurespi-images/.+"
+    status_code: 200
+- name: stage
+  request:
+    data:
+      project: '{project_pk}'
+    method: GET
+    url: '{django_live_url}/api/storages'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      presign: false
+    method: PATCH
+    url: '{django_live_url}/api/storages/azure_spi/{storage_pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    data:
+      project: '{project_pk}'
+    method: GET
+    url: '{django_live_url}/api/storages'
+  response:
+    status_code: 200
+- name: Patch storage with synchronizable false
+  request:
+    headers:
+      content-type: application/json
+    json:
+      synchronizable: false
+    method: PATCH
+    url: '{django_live_url}/api/storages/azure_spi/{storage_pk}'
+  response:
+    status_code: 200
+    json:
+      status: "completed"
+      traceback: null
 
-# - name: Try to Sync Azure_spi storage with synchronizable false
-#   request:
-#     method: POST
-#     url: '{django_live_url}/api/storages/azure_spi/{storage_pk}/sync'
-#   response:
-#     status_code: 400
+- name: Try to Sync Azure_spi storage with synchronizable false
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/azure_spi/{storage_pk}/sync'
+  response:
+    status_code: 400
 
 ---
 test_name: test_export_azure_storage

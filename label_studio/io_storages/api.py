@@ -112,7 +112,6 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
         return ImportStorageClass.objects.all()
 
     def post(self, request, *args, **kwargs):
-        import pdb; pdb.set_trace()
         storage = self.get_object()
         # check connectivity & access, raise an exception if not satisfied
         if not storage.synchronizable:

@@ -120,7 +120,6 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
             yield file.name
 
     def get_data(self, key):
-        import pdb; pdb.set_trace()
         if self.use_blob_urls:
             data_key = settings.DATA_UNDEFINED_NAME
             return {data_key: f'{self.url_scheme}://{self.container}/{key}'}

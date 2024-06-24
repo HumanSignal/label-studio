@@ -32,7 +32,7 @@ from io_storages.base_models import (
     ProjectStorageMixin,
 )
 from tasks.models import Annotation
-from .utils import set_secured, get_secured
+# from .utils import set_secured, get_secured
 from string import Template
 # from .utils import get_secured,set_secured
 
@@ -120,7 +120,7 @@ class AzureServicePrincipalStorageMixin(models.Model):
         account_url = self.get_account_url()
         # credential = ClientSecretCredential(self.tenant_id,self.client_id,get_secured(self.client_secret))
         credential = ClientSecretCredential(self.tenant_id, self.client_id, self.client_secret)
-        blobservice_client = BlobServiceClient(account_url,credential=credential)
+        blobservice_client = BlobServiceClient(account_url, credential=credential)
         return blobservice_client
 
     @property

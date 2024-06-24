@@ -23,7 +23,6 @@ class AzureBlobImportStorageSerializer(ImportStorageSerializer):
         return result
 
     def validate(self, data):
-        import pdb; pdb.set_trace()
         data = super(AzureBlobImportStorageSerializer, self).validate(data)
         storage = self.instance
         if storage:

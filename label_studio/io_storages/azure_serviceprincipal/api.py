@@ -41,7 +41,7 @@ from .openapi_schema import (
         x_fern_sdk_method_name='list',
         x_fern_audiences=['public'],
         operation_summary='Get all import storage',
-        operation_description='Get list of all Azure import storage connections.',
+        operation_description='Get list of all Azure SPI import storage connections.',
         manual_parameters=[
             openapi.Parameter(
                 name='project',
@@ -60,7 +60,7 @@ from .openapi_schema import (
         x_fern_sdk_method_name='create',
         x_fern_audiences=['public'],
         operation_summary='Create new storage',
-        operation_description='Get new Azure import storage',
+        operation_description='Get new Azure SPI import storage',
         request_body=_azure_serviceprincipal_import_storage_schema,
     ),
 )
@@ -77,7 +77,7 @@ class AzureServicePrincipalImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='get',
         x_fern_audiences=['public'],
         operation_summary='Get import storage',
-        operation_description='Get a specific Azure import storage connection.',
+        operation_description='Get a specific Azure SPI import storage connection.',
         request_body=no_body,
     ),
 )
@@ -89,7 +89,7 @@ class AzureServicePrincipalImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='update',
         x_fern_audiences=['public'],
         operation_summary='Update import storage',
-        operation_description='Update a specific Azure import storage connection.',
+        operation_description='Update a specific Azure SPI import storage connection.',
         request_body=_azure_serviceprincipal_import_storage_schema,
     ),
 )
@@ -101,7 +101,7 @@ class AzureServicePrincipalImportStorageListAPI(ImportStorageListAPI):
         x_fern_sdk_method_name='delete',
         x_fern_audiences=['public'],
         operation_summary='Delete import storage',
-        operation_description='Delete a specific Azure import storage connection.',
+        operation_description='Delete a specific Azure SPI import storage connection.',
         request_body=no_body,
     ),
 )
@@ -118,7 +118,7 @@ class AzureServicePrincipalImportStorageDetailAPI(ImportStorageDetailAPI):
         x_fern_sdk_method_name='sync',
         x_fern_audiences=['public'],
         operation_summary='Sync import storage',
-        operation_description='Sync tasks from an Azure import storage connection.',
+        operation_description='Sync tasks from an Azure SPI import storage connection.',
         manual_parameters=[
             openapi.Parameter(
                 name='id',
@@ -142,7 +142,7 @@ class AzureServicePrincipalImportStorageSyncAPI(ImportStorageSyncAPI):
         x_fern_sdk_method_name='sync',
         x_fern_audiences=['public'],
         operation_summary='Sync export storage',
-        operation_description='Sync tasks from an Azure export storage connection.',
+        operation_description='Sync tasks from an Azure SPI export storage connection.',
         request_body=no_body,
     ),
 )
@@ -158,7 +158,7 @@ class AzureServicePrincipalExportStorageSyncAPI(ExportStorageSyncAPI):
         x_fern_sdk_method_name='validate',
         x_fern_audiences=['public'],
         operation_summary='Validate import storage',
-        operation_description='Validate a specific Azure import storage connection.',
+        operation_description='Validate a specific Azure SPI import storage connection.',
         request_body=_azure_serviceprincipal_import_storage_schema_with_id,
         # expecting empty response
         responses={200: openapi.Response(description='OK')},
@@ -176,7 +176,7 @@ class AzureServicePrincipalImportStorageValidateAPI(ImportStorageValidateAPI):
         x_fern_sdk_method_name='validate',
         x_fern_audiences=['public'],
         operation_summary='Validate export storage',
-        operation_description='Validate a specific Azure export storage connection.',
+        operation_description='Validate a specific Azure SPI export storage connection.',
         request_body=_azure_serviceprincipal_export_storage_schema_with_id,
         # expecting empty response
         responses={200: openapi.Response(description='OK')},
@@ -194,7 +194,7 @@ class AzureServicePrincipalExportStorageValidateAPI(ExportStorageValidateAPI):
         x_fern_sdk_method_name='list',
         x_fern_audiences=['public'],
         operation_summary='Get all export storage',
-        operation_description='Get a list of all Azure export storage connections.',
+        operation_description='Get a list of all Azure SPI export storage connections.',
         manual_parameters=[
             openapi.Parameter(
                 name='project',
@@ -215,7 +215,7 @@ class AzureServicePrincipalExportStorageValidateAPI(ExportStorageValidateAPI):
         x_fern_sdk_method_name='create',
         x_fern_audiences=['public'],
         operation_summary='Create export storage',
-        operation_description='Create a new Azure export storage connection to store annotations.',
+        operation_description='Create a new Azure SPI export storage connection to store annotations.',
         request_body=_azure_serviceprincipal_export_storage_schema,
     ),
 )
@@ -232,7 +232,7 @@ class AzureServicePrincipalExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='get',
         x_fern_audiences=['public'],
         operation_summary='Get export storage',
-        operation_description='Get a specific Azure export storage connection.',
+        operation_description='Get a specific Azure SPI export storage connection.',
         request_body=no_body,
     ),
 )
@@ -244,7 +244,7 @@ class AzureServicePrincipalExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='update',
         x_fern_audiences=['public'],
         operation_summary='Update export storage',
-        operation_description='Update a specific Azure export storage connection.',
+        operation_description='Update a specific Azure SPI export storage connection.',
         request_body=_azure_serviceprincipal_export_storage_schema,
 
     ),
@@ -257,7 +257,7 @@ class AzureServicePrincipalExportStorageListAPI(ExportStorageListAPI):
         x_fern_sdk_method_name='delete',
         x_fern_audiences=['public'],
         operation_summary='Delete export storage',
-        operation_description='Delete a specific Azure export storage connection.',
+        operation_description='Delete a specific Azure SPI export storage connection.',
         request_body=no_body,
     ),
 )

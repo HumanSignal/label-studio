@@ -265,23 +265,18 @@ def azure_client_sp_mock():
         def download_blob(self, key):
             return DummyAzureBlob(self.name, key)
 
-    class DummyAzureClient:
+    class DummyBlobServiceClient:
         def get_container_client(self, container_name):
             return DummyAzureContainer(container_name)
 
-    class MockClientSecretCredential(ClientSecretCredential):
-        def __init__(self, tenant_id, client_id, client_secret):
-            # You can add any necessary initialization logic here
-            super().__init__(tenant_id, client_id, client_secret)
+    # class MockClientSecretCredential():
+    #     def get_token(self, *scopes, **kwargs):
+    #         # Customize the token retrieval behavior here if needed
+    #         return 'token'
 
-        def get_token(self, *scopes, **kwargs):
-            # Customize the token retrieval behavior here if needed
-            return 'token'
-
-    with mock.patch.object(models.ClientSecretCredential, '__init__', return_value=MockClientSecretCredential()):
-        with mock.patch.object(models.BlobServiceClient, '__init__', return_value=DummyAzureClient()):
-            with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
-                yield
+    with mock.patch.object(models.AzureServicePrincipalImportStorage, 'blobservice_client', return_value='hello'):
+        with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
+            yield
 
 
 @contextmanager
@@ -357,11 +352,11 @@ def make_annotator(config, project, login=False, client=None):
     user.save()
 
     create_business(user)
-
     if login:
         Organization.create_organization(created_by=user, title=user.first_name)
 
         if client is None:
+
             client = Client()
         signin_status_code = signin(client, config['email'], '12345').status_code
         assert signin_status_code == 302, f'Sign-in status code: {signin_status_code}'
