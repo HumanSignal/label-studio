@@ -38,7 +38,7 @@ const addHoverClasses = (side?: Side, dropTarget?: Element) => {
 const Tab = ({
   name,
   rootRef,
-  tabTitle: tabText,
+  tabTitle,
   tabIndex,
   panelKey,
   viewLength,
@@ -164,13 +164,13 @@ const Tab = ({
       mod={{ active: locked ? tabIndex === breakPointActiveTab : active }}
     >
       {!locked && <Elem name="icon" tag={IconOutlinerDrag} width={8} />}
-      {tabText}
+      {tabTitle}
     </Elem>
   );
 
   return (
     <Block name="panel-tabs">
-      <Elem name="draggable-tab" id={`${tabText}-draggable`} ref={tabRef}>
+      <Elem name="draggable-tab" id={`${name}-draggable`} ref={tabRef}>
         <Label />
       </Elem>
       <Elem
@@ -201,17 +201,20 @@ export const Tabs = (props: BaseProps) => {
         <Elem name="tabs-row">
           {props.panelViews.map((view, index) => {
             const { component: Component } = view;
+            const title = view.titleComponent
+              ? <view.titleComponent regions={props.regions} />
+              : view.title;
 
             return (
-              <Elem name="tab-container" key={`${view.title}-${index}-tab`} mod={{ active: view.active }}>
+              <Elem name="tab-container" key={`${view.name}-${index}-tab`} mod={{ active: view.active }}>
                 <Tab
                   name={view.name}
                   rootRef={props.root}
-                  key={`${view.title}-tab`}
+                  key={`${view.name}-tab`}
                   panelKey={props.name}
                   tabIndex={index}
                   active={view.active}
-                  tabTitle={view.title}
+                  tabTitle={title}
                   panelWidth={props.width}
                   viewLength={props.panelViews.length}
                   locked={props.locked}
@@ -223,7 +226,7 @@ export const Tabs = (props: BaseProps) => {
                   setBreakPointActiveTab={props.setBreakPointActiveTab}
                 >
                   <Elem name="content">
-                    <Component key={`${view.title}-${index}-ghost`} {...props} name={"outliner"} />
+                    <Component key={`${view.name}-${index}-ghost`} {...props} name={"outliner"} />
                   </Elem>
                 </Tab>
               </Elem>
