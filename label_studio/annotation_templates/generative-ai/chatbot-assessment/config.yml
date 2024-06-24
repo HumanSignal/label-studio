@@ -44,7 +44,7 @@ config: |
       <View className="text-block">
         <Paragraphs name="dialogue" value="$messages" layout="dialogue" nameKey="role" textKey="content" />
       </View>
-      <View className="assessment-item-container">
+      <View className="assessment-items-container">
         <Header value="Overall quality Likert scale; 1-7" size="8" />
         <View className="assessment-item">
           <Rating name="likert_scale" maxRating="7" />
