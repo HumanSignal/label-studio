@@ -12,7 +12,7 @@ date: 2024-05-15 14:30:14
 ---
 
 
-Use Prompts to evaluate and refine your LLM prompts, and then generate predictions to automate your labeling process. 
+Use Prompts to evaluate and refine your LLM prompts and then generate predictions to automate your labeling process. 
 
 All you need to get started is an OpenAI API key and a project. 
 
@@ -40,12 +40,14 @@ By utilizing AI to handle the bulk of the annotation work, you can significantly
 
     * [Create a project](setup_project)
     * [Sync data from external storage](storage)
-2. Annotate a subset of tasks, marking as many as possible as ground truth annotation. The more ground truths you have in your dataset, the more accurate your prompt evaluation results will be. 
+2. Annotate a subset of tasks, marking as many as possible as ground truth annotations. The more ground truths you have in your dataset, the more accurate your prompt evaluation results will be. 
+
+    If you want to skip this step, see the [bootstrapping use case](#Bootstrapping-projects-with-prompts) outlined below. 
 
     * [Labeling guide](labeling)
     * [Define ground truth annotations for a project](quality#Define-ground-truth-annotations-for-a-project)
     * [Blog - What's a ground truth dataset?](https://humansignal.com/blog/what-s-a-ground-truth-dataset/)
-3. Go to the Prompts page and create a new model. If you haven't already, you will also need to add an OpenAI API key.
+3. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an OpenAI API key.
 
     * [Create a Prompt](prompts_create)
     * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
@@ -78,7 +80,7 @@ Additionally, this workflow provides a scalable solution for continuously expand
 
     * [Create a project](setup_project)
     * [Sync data from external storage](storage)
-2. Go to the Prompts page and create a new model. If you haven't already, you will also need to add an OpenAI API key.
+2. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an OpenAI API key.
 
     * [Create a Prompt](prompts_create)
     * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
@@ -89,13 +91,13 @@ Additionally, this workflow provides a scalable solution for continuously expand
 When you run your prompt, you create predictions for the selected sample (this can be a portion of the project tasks or all tasks). From here you have several options:
 
 * Continue to work on your prompt and generate new predictions each time you run it against your sample. 
-* Return to the project and begin reviewing your predictions. If you convert your predictions into annotations, you can use subject matter experts to begin reviewing and accepting the annotations. 
+* Return to the project and begin reviewing your predictions. If you convert your predictions into annotations, you can use subject matter experts and annotators to begin interacting with those the annotations. 
 * As you review the annotations, you can identify ground truths. With a ground truth dataset, you can further refine your prompt using its accuracy score. 
 
 
 ### Prompt evaluation and fine-tuning
 
-As you evaluate your prompt against the ground truth annotations, we return an accuracy score for each version of your prompt. You can use this to iterate your prompt versions for [clarity, specificity, and context](prompts_draft#Drafting-effective-prompts). 
+As you evaluate your prompt against the ground truth annotations, you will be given an accuracy score for each version of your prompt. You can use this to iterate your prompt versions for [clarity, specificity, and context](prompts_draft#Drafting-effective-prompts). 
 
 ![Screenshot of accuracy score](/images/prompts/accuracy_score.png)
 
@@ -109,12 +111,12 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
 
     * [Create a project](setup_project)
     * [Sync data from external storage](storage)
-2. Annotate a subset of tasks, marking as many as possible as ground truth annotation. The more ground truths you have in your dataset, the more accurate your prompt evaluation results will be. 
+2. Annotate a subset of tasks, marking as many as possible as ground truth annotations. The more ground truths you have in your dataset, the more accurate your prompt evaluation results will be. 
 
     * [Labeling guide](labeling)
     * [Define ground truth annotations for a project](quality#Define-ground-truth-annotations-for-a-project)
     * [Blog - What's a ground truth dataset?](https://humansignal.com/blog/what-s-a-ground-truth-dataset/)
-3. Go to the Prompts page and create a new model. If you haven't already, you will also need to add an OpenAI API key.
+3. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an OpenAI API key.
 
     * [Create a Prompt](prompts_create)
     * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)

@@ -14,7 +14,9 @@ date: 2024-06-13 21:54:22
 You can continue to save and evaluate your prompts until you reach your desired level of accuracy. When your prompt is ready, you can use it to generate predictions for all tasks within your project. 
 
 !!! note
-    Each time you click **Evaluate**, you generate a prediction for the tasks with ground truth annotation. Because you can have multiple models connected to the same project, this might result in multiple predictions for tasks. 
+    When you click **Evaluate**, you will create predictions for each task in the baseline you selected and overwrite any previous predictions you generated with this prompt. 
+    
+    Evaluating your Prompts can result in multiple predictions on your tasks: if you have multiple Prompts for one Project, or if you click both **Evaluate** and **Get Predictions for All Tasks from a Prompt**, you will see multiple predictions for tasks in the Data Manager. 
 
 
 ## Generate predictions for all tasks
