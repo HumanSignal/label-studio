@@ -26,7 +26,7 @@ from io_storages.base_models import (
 )
 from tasks.models import Annotation
 from string import Template
-from .utils import get_secured,set_secured
+# from .utils import get_secured,set_secured
 
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)
@@ -56,16 +56,17 @@ class AzureServicePrincipalStorageMixin(models.Model):
         # A function to create a key if necessary...
         def create_key():
             delegation_key_expiry_time = datetime.now() + timedelta(days=1)
-            blob_service_client = self.blobservice_client        
+            blob_service_client = self.blobservice_client
             user_delegation_key = blob_service_client.get_user_delegation_key(
                 key_start_time=datetime.now(),
                 key_expiry_time=delegation_key_expiry_time
             )
             logger.info('User Delegation Key : Regenerated...')
             # We create a serialized version...
-            self.user_delegation_key = set_secured(json.dumps(vars(user_delegation_key)))
+            self.user_delegation_key = json.dumps(vars(user_delegation_key))
+            # self.user_delegation_key = set_secured(json.dumps(vars(user_delegation_key)))
             self.save(update_fields=['user_delegation_key'])
-    
+
             return user_delegation_key
 
         if not self.user_delegation_key:
@@ -74,7 +75,8 @@ class AzureServicePrincipalStorageMixin(models.Model):
             key = UserDelegationKey()
             #TODO : Chiffrer la user_delegation_key en base.
             #TODO : Utiliser une variable d'env pour la clef de chiffrement.
-            db_key = get_secured(self.user_delegation_key)
+            db_key = self.user_delegation_key
+            # db_key = get_secured(self.user_delegation_key)
             key_dict = json.loads(db_key)
             for prop,val in key_dict.items():
                 setattr(key,prop,val)
@@ -85,14 +87,15 @@ class AzureServicePrincipalStorageMixin(models.Model):
                 # Key too old, we recreate it...
                 key = create_key()
         return key
-    
+
     @property
     def blobservice_client(self)->BlobServiceClient:
         account_url = self.get_account_url()
-        credential = ClientSecretCredential(self.tenant_id,self.client_id,get_secured(self.client_secret))
+        # credential = ClientSecretCredential(self.tenant_id,self.client_id,get_secured(self.client_secret))
+        credential = ClientSecretCredential(self.tenant_id, self.client_id, self.client_secret)
         blobservice_client = BlobServiceClient(account_url,credential=credential)
         return blobservice_client
-    
+
     @property
     def container_client(self)->ContainerClient:
         blobservice_client = self.blobservice_client
@@ -162,7 +165,7 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
                     can_resolve=True
                     break
         return can_resolve
-             
+
     def get_sas_token(self,blob_name:str):
         expiry = datetime.utcnow() + timedelta(minutes=self.presign_ttl)
         sas_token = generate_blob_sas(
