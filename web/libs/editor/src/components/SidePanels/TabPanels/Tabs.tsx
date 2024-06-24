@@ -201,9 +201,7 @@ export const Tabs = (props: BaseProps) => {
         <Elem name="tabs-row">
           {props.panelViews.map((view, index) => {
             const { component: Component } = view;
-            const title = view.titleComponent
-              ? <view.titleComponent regions={props.regions} />
-              : view.title;
+            const title = view.titleComponent ? <view.titleComponent regions={props.regions} /> : view.title;
 
             return (
               <Elem name="tab-container" key={`${view.name}-${index}-tab`} mod={{ active: view.active }}>

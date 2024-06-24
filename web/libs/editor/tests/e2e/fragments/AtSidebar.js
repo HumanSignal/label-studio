@@ -6,8 +6,8 @@ module.exports = {
   _regionsCounterLocator: locate(".lsf-panel-tabs__counter"),
   _regionLocator: locate(".lsf-tree-treenode"),
   _hiddenRegionLocator: locate(".lsf-tree-treenode.lsf-tree__node_hidden"),
-  _regionSelectedLocator: locate('.lsf-tree-treenode-selected'),
-  _regionUnselectedLocator: locate('.lsf-tree-treenode:not(.lsf-tree-treenode-selected)'),
+  _regionSelectedLocator: locate(".lsf-tree-treenode-selected"),
+  _regionUnselectedLocator: locate(".lsf-tree-treenode:not(.lsf-tree-treenode-selected)"),
   _selectedRegionsLocator: locate(".lsf-detailed-region"),
   seeRegions(count) {
     if (count) {
