@@ -213,7 +213,7 @@ export const AnnotationButton = observer(
               {entity.draftId > 0 && (
                 <Tooltip title={"Draft"}>
                   <Elem name="icon" mod={{ draft: true }}>
-                    <IconDraftCreated2 color="#0099FF" />
+                    <IconDraftCreated2 color="#617ADA" />
                   </Elem>
                 </Tooltip>
               )}

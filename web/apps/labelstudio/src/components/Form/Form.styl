@@ -12,6 +12,7 @@
 
     &:not(:first-child)
       margin-top 12px
+      border-top 1px solid var(--sand_300)
 
   &__submit
     display flex
@@ -48,8 +49,8 @@
   &:not(&_ghost):focus,
   &_focused
     outline none
-    box-shadow 0px 0px 0px 6px rgba($accent_color, 0.2), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba($accent_color, 0.2)
-    border-color rgba($accent_color, 0.2)
+    box-shadow 0px 0px 0px 6px var(--grape_100), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba($accent_color, 0.2)
+    border-color var(--grape_100)
 
 .form-indicator
   font-weight 500
@@ -59,4 +60,4 @@
       &_success
         color #59aa05
       &_fail
-        color $danger_color
+        color var(--danger_color)

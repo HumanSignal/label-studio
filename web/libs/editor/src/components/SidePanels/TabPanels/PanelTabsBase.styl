@@ -1,8 +1,8 @@
 .tabs-panel
   --header-height 24px
   --header-border-radius 0
-  --header-background #e1e0e2
-  --icon-color #898098
+  --header-background var(--sand_200)
+  --icon-color var(--sand_500)
 
   height 100%
   z-index 10
@@ -13,8 +13,8 @@
     padding 4px
 
     &:hover
-      --icon-color #096DD9
-      --header-background #d8e7f9
+      --icon-color var(--grape_500)
+      --header-background var(--grape_0)
 
   &__header-right,
   &__header-left
@@ -54,7 +54,7 @@
       margin 0
 
     &:hover
-      --icon-color #096DD9
+      --icon-color var(--grape_500)
       --header-background #d8e5f5
 
   &__shield
@@ -259,7 +259,7 @@
       height 6px
       display none
       position absolute
-      background-color $accent_color
+      background-color var(--grape_500)
       border-radius 100%
 
     &[data-resize=grouped-top]::before
@@ -303,12 +303,11 @@
 
     &:hover::before, 
     &_drag::before
-      background-color $accent_color
+      background-color var(--grape_500)
       content ''
       width calc(100% + 50px)
       height 3px
       position absolute
-      background-color $accent_color
       border-radius 3px
       transform translate(0, -50%)
       cursor ns-resize
@@ -318,12 +317,11 @@
   &_dragBottom::after
     position absolute
     z-index 100
-    background-color $accent_color
     content ''
     width 100%
     height 6px
     position absolute
-    background-color $accent_color
+    background-color var(--grape_500)
     border-radius 6px
   &_dragBottom::after
     bottom 0
