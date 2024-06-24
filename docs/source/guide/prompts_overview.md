@@ -123,22 +123,6 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
     * [Draft a prompt](prompt_draft)
 5. Continue iterating and refining your prompt until you reach an acceptable accuracy score. 
 
-## Model types
-
-### Text classification 
-
-At present, the Prompts feature only supports single-label text classification labeling tasks.  
-
-Text classification is the process of assigning predefined categories or labels to segments of text based on their content. This involves analyzing the text and determining which category or label best describes its subject, sentiment, or purpose. The goal is to organize and categorize textual data in a way that makes it easier to analyze, search, and utilize. 
-
-Text classification labeling tasks are fundamental in many applications, enabling efficient data organization, improving searchability, and providing valuable insights through data analysis. Some examples include:
-
-* **Spam Detection**: Classifying emails as "spam" or "ham" (not spam). 
-* **Sentiment Analysis**: Categorizing user reviews as "positive," "negative," or "neutral."
-* **Topic Categorization**: Assigning articles to categories like "politics," "sports," "technology," etc.
-* **Support Ticket Classification**: Labeling customer support tickets based on the issue type, such as "billing," "technical support," or "account management."
-* **Content Moderation**: Identifying and labeling inappropriate content on social media platforms, such as "offensive language," "hate speech," or "harassment."
-
 
 ## Features, requirements, and constraints
 

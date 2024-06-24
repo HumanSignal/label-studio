@@ -38,7 +38,7 @@ From the Prompts page, click **Create Model** in the upper right and then comple
 | --- | --- |
 | Name | Enter a name for the prompt model. |
 | Description | Enter a description for the prompt model.  |
-| Type | Select the model type. At this time, we only support [text classification](prompts_overview#Text-classification). |
+| Type | Select the model type. At this time, we only support [text classification](#Text-classification). |
 | Target Project| Select the project you want to use. The projects listed will only include text-based projects to which you have access. If you are in the Manager role, you need to be added to the project to have access. <br><br>If you don't see a project listed, then you do not have any eligible projects available. This is likely because the project is set up for multiple selection (e.g. `choice="multiple"`), doesn't have text data (e.g. it only includes data types that aren't supported such as image, audio, video), or you do not have access to the project.   |
 | Model Classes | This list is automatically generated from the labeling configuration of the target project. |
 
@@ -46,4 +46,19 @@ From the Prompts page, click **Create Model** in the upper right and then comple
 
 ![Screenshot of the create model page](/images/prompts/model_create.png)
 
+## Model types
+
+### Text classification 
+
+At present, the Prompts feature only supports single-label text classification labeling tasks.  
+
+Text classification is the process of assigning predefined categories or labels to segments of text based on their content. This involves analyzing the text and determining which category or label best describes its subject, sentiment, or purpose. The goal is to organize and categorize textual data in a way that makes it easier to analyze, search, and utilize. 
+
+Text classification labeling tasks are fundamental in many applications, enabling efficient data organization, improving searchability, and providing valuable insights through data analysis. Some examples include:
+
+* **Spam Detection**: Classifying emails as "spam" or "ham" (not spam). 
+* **Sentiment Analysis**: Categorizing user reviews as "positive," "negative," or "neutral."
+* **Topic Categorization**: Assigning articles to categories like "politics," "sports," "technology," etc.
+* **Support Ticket Classification**: Labeling customer support tickets based on the issue type, such as "billing," "technical support," or "account management."
+* **Content Moderation**: Identifying and labeling inappropriate content on social media platforms, such as "offensive language," "hate speech," or "harassment."
 
