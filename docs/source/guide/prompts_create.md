@@ -1,12 +1,12 @@
 ---
-title: Create a Prompts model
-short: Create a Prompts model
+title: Create a Prompt
+short: Create a Prompt
 tier: enterprise
 type: guide
 order: 0
 order_enterprise: 228
-meta_title: Create a Prompts model
-meta_description: How to create a Prompts model
+meta_title: Create a Prompt
+meta_description: How to create a Prompt
 section: Prompts
 date: 2024-06-11 16:53:16
 ---
@@ -18,7 +18,7 @@ date: 2024-06-11 16:53:16
 * A project that meets the following criteria:
   * Text-based data set (meaning you are annotating text and not image or video files). 
   * The labeling configuration for the project must be set up to use single-class classification (`choice="single"`). 
-  * (Optional, depending on your [use case](prompts_overview#Use-cases) and if you want to evaluate for accuracy for your prompt) At least one task with a [ground truth annotation](quality#Define-ground-truth-annotations-for-a-project). 
+  * (Optional, depending on your [use case](prompts_overview#Use-cases) and if you want to evaluate the accuracy of your prompt) - At least one task with a [ground truth annotation](quality#Define-ground-truth-annotations-for-a-project). 
 
 ## API key
 
@@ -28,29 +28,29 @@ Once added, it is automatically used for all new Prompts.
 
 To remove the key, click **API Keys** in the upper right of the Prompts page. You'll have the option to remove the key and add a new one. 
 
-## Create a model
+## Create a Prompt
 
-From the Prompts page, click **Create Model** in the upper right and then complete the following fields:
+From the Prompts page, click **Create Prompt** in the upper right and then complete the following fields:
 
 <div class="noheader rowheader">
 
 | | |
 | --- | --- |
-| Name | Enter a name for the prompt model. |
-| Description | Enter a description for the prompt model.  |
+| Name | Enter a name for the Prompt. |
+| Description | Enter a description for the Prompt.  |
 | Type | Select the model type. At this time, we only support [text classification](#Text-classification). |
 | Target Project| Select the project you want to use. The projects listed will only include text-based projects to which you have access. If you are in the Manager role, you need to be added to the project to have access. <br><br>If you don't see a project listed, then you do not have any eligible projects available. This is likely because the project is set up for multiple selection (e.g. `choice="multiple"`), doesn't have text data (e.g. it only includes data types that aren't supported such as image, audio, video), or you do not have access to the project.   |
-| Model Classes | This list is automatically generated from the labeling configuration of the target project. |
+| Classes | This list is automatically generated from the labeling configuration of the target project. |
 
 </div>
 
 ![Screenshot of the create model page](/images/prompts/model_create.png)
 
-## Model types
+## Types
 
 ### Text classification 
 
-At present, the Prompts feature only supports single-label text classification labeling tasks.  
+At present, Prompts only supports single-label text classification labeling tasks.  
 
 Text classification is the process of assigning predefined categories or labels to segments of text based on their content. This involves analyzing the text and determining which category or label best describes its subject, sentiment, or purpose. The goal is to organize and categorize textual data in a way that makes it easier to analyze, search, and utilize. 
 
