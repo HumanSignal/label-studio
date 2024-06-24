@@ -363,7 +363,7 @@ class ImportStorage(Storage):
         TODO: deprecate this function and transform it to "pipeline" version  _scan_and_create_links_v2,
         TODO: it must be compatible with opensource, so old version is needed as well
         """
-
+        # set in progress status for storage info
         self.info_set_in_progress()
 
         tasks_existed = tasks_created = 0
@@ -395,6 +395,7 @@ class ImportStorage(Storage):
                     f'(images, audio, text, etc.), edit storage settings and enable '
                     f'"Treat every bucket object as a source file"'
                 )
+
             task = self.add_task(data, self.project, maximum_annotations, max_inner_id, self, key, link_class)
             max_inner_id += 1
 
