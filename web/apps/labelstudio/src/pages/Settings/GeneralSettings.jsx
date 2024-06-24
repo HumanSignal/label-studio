@@ -34,7 +34,12 @@ export const GeneralSettings = () => {
             <Form.Row columnCount={1} rowGap="16px">
               <Input name="title" label="Project Name" labelProps={{ large: true }} />
 
-              <TextArea name="description" label="Description" labelProps={{ large: true }} style={{ minHeight: 128 }} />
+              <TextArea
+                name="description"
+                label="Description"
+                labelProps={{ large: true }}
+                style={{ minHeight: 128 }}
+              />
               {isFF(FF_LSDV_E_297) && (
                 <Block name="workspace-placeholder">
                   <Elem name="badge-wrapper">

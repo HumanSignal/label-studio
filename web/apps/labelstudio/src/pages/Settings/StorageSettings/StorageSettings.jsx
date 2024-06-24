@@ -17,7 +17,8 @@ export const StorageSettings = () => {
       <Elem name={"wrapper"}>
         <h1>Cloud Storage</h1>
         <Description style={{ marginTop: 0 }}>
-          Use cloud or database storage as the source for your labeling tasks or the target of your completed annotations.
+          Use cloud or database storage as the source for your labeling tasks or the target of your completed
+          annotations.
         </Description>
 
         <Columns count={2} gap="40px" size="320px" className={rootClass}>

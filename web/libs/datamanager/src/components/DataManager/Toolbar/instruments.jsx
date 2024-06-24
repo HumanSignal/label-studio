@@ -78,7 +78,7 @@ export const instruments = {
       iconProps.style = {
         marginRight: 3,
       };
-      iconProps.color = "#566fcf"; 
+      iconProps.color = "#566fcf";
     }
     return (
       <FieldsButton
