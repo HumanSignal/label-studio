@@ -60,16 +60,16 @@ By utilizing AI to handle the bulk of the annotation work, you can significantly
 
 ### Bootstrapping projects with prompts
 
-In this use case, you do not need a ground truth annotation set. You can use Prompts to generate predictions for tasks, but you cannot return accuracy scores for the predictions it generates. 
+In this use case, you do not need a ground truth annotation set. You can use Prompts to generate predictions for tasks without returning accuracy scores for the predictions it generates. 
 
-This use case is ideal for organizations looking to kickstart new initiatives without the initial burden of creating extensive ground truth annotations, allowing you to start analyzing and utilizing you data immediately. This is particularly beneficial for projects with tight timelines or limited resources.
+This use case is ideal for organizations looking to kickstart new initiatives without the initial burden of creating extensive ground truth annotations, allowing you to start analyzing and utilizing your data immediately. This is particularly beneficial for projects with tight timelines or limited resources.
 
 By generating predictions and converting them into annotations, you can also quickly build a labeled dataset, which can then be refined and improved over time with the help of subject matter experts. This approach accelerates the project initiation phase, enabling faster experimentation and iteration. 
 
 Additionally, this workflow provides a scalable solution for continuously expanding datasets, ensuring that new data can be integrated and labeled efficiently as the project evolves.
 
 !!! note
-    You can still follow this use case even if you already have ground truth annotations. You will have the option to select task sample without taking ground truth data into consideration. 
+    You can still follow this use case even if you already have ground truth annotations. You will have the option to select a task sample set without taking ground truth data into consideration. 
 
 
 #### Workflow
