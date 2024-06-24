@@ -11,7 +11,7 @@ section: Prompts
 date: 2024-06-12 14:09:09
 ---
 
-With your [model created](prompts_model), you can begin drafting prompts. 
+With your [Prompts model created](prompts_model), you can begin drafting prompts to generate predictions or . 
 
 ## Draft a prompt and generate predictions
 
@@ -19,17 +19,29 @@ With your [model created](prompts_model), you can begin drafting prompts.
 1. Select your base model. For a description of all OpenAI models, see [OpenAI's models overview](https://platform.openai.com/docs/models/models-overview).
 2. In the **Prompt** field, enter your prompt. Keep in mind the following:
     * You must include the text class. (In the demo below, this is the `review` class.) Click the text class name to insert it into the prompt. 
-    * Although not strictly required, you should provide definitions for each class. 
-3. Click **Save**. 
-4. Click **Evaluate**. 
+    * Although not strictly required, you should provide definitions for each class to ensure prediction accuracy and to help [add context](#Add-context). 
+3. Select your baseline:
+   * **All Project Tasks** - Generate predictions for all tasks in the project. Depending on the size of your project, this might take some time to process. This does not generate an accuracy score for the prompt. 
+   
+        See the [Bootstrapping projects with prompts](prompts_overview#Bootstrapping-projects-with-Prompts) use case.
+   * **Sample Tasks** - Generate predictions for the first 20 tasks in the project. This does not generate an accuracy score for the prompt. 
+   
+        See the [Bootstrapping projects with prompts](prompts_overview#Bootstrapping-projects-with-Prompts) use case.
+   * **Ground Truths** - Generate predictions and a prompt accuracy score for all tasks with ground truth annotations. This option is only available if your project has ground truth annotations. 
+   
+        See the [Auto-labeling with Prompts](prompts_overview#Auto-labeling-with-Prompts) use case and the [Prompt evaluation and fine-tuning](prompts_overview#Prompt-evaluation-and-fine-tuning). 
+4. Click **Save**. 
+5. Click **Evaluate**. 
 
 !!! note
-    When you click **Evaluate**, you will create predictions for each ground truth task. When you return to the project, you will see this reflected in the project. You can see how many predictions a task has using the **Predictions** column in the Data Manager. 
+    When you click **Evaluate**, you will create predictions for each task in the baseline you selected task. When you return to the project, you will see this reflected in your tasks. You can see how many predictions a task has using the **Predictions** column in the Data Manager. 
 
 <br><br>
 <video src="../images/prompts/prompts.mp4" controls="controls" style="max-width: 800px;" class="gif-border" />
 
 ## Drafting effective prompts
+
+For a comprehensive guide to drafting prompts, see [The Prompt Report: A Systematic Survey of Prompting Techniques](https://arxiv.org/abs/2406.06608). 
 
 ### Text placement
 
