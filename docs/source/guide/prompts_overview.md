@@ -85,7 +85,6 @@ Additionally, this workflow provides a scalable solution for continuously expand
     * [Create a Prompt](prompts_create)
     * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
 3. Write a prompt and run it against your task samples. 
-
     * [Draft a prompt](prompt_draft)
   
 When you run your prompt, you create predictions for the selected sample (this can be a portion of the project tasks or all tasks). From here you have several options:
@@ -94,6 +93,7 @@ When you run your prompt, you create predictions for the selected sample (this c
 * Return to the project and begin reviewing your predictions. If you convert your predictions into annotations, you can use subject matter experts and annotators to begin interacting with those the annotations. 
 * As you review the annotations, you can identify ground truths. With a ground truth dataset, you can further refine your prompt using its accuracy score. 
 
+![Diagram of boostrap workflow](/images/prompts/boostrap-diagram.png)
 
 ### Prompt evaluation and fine-tuning
 
@@ -125,6 +125,7 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
     * [Draft a prompt](prompt_draft)
 5. Continue iterating and refining your prompt until you reach an acceptable accuracy score. 
 
+![Diagram of fine-tuning workflow](/images/prompts/tuning-diagram.png)
 
 ## Features, requirements, and constraints
 
