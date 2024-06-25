@@ -574,9 +574,8 @@ export default types
         entity.sendUserGenerate();
       }
       handleSubmittingFlag(async () => {
-        await self.waitForDraftSubmission();
-
         if (isFF(FF_CUSTOM_SCRIPT)) {
+          await self.waitForDraftSubmission();
           const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
           if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
