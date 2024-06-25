@@ -142,12 +142,12 @@ Label Studio is available as open source software as well as an [Enterprise clo
     <td colspan="3"><b>Prompts (Beta)</b></td>
   </tr>
    <tr>
-    <td><a href="https://docs.humansignal.com/guide/prompts_overview">Fully automated data labeling using GenAI</a></td>
+    <td><a href="https://docs.humansignal.com/guide/prompts_overview">Fully automated data labeling using GenAI.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="https://docs.humansignal.com/guide/prompts_draft">Evaluate and fine-tune LLM prompts against a ground truth dataset</a></td>
+    <td><a href="https://docs.humansignal.com/guide/prompts_draft">Evaluate and fine-tune LLM prompts against a ground truth dataset.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
