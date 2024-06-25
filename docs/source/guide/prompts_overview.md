@@ -1,6 +1,6 @@
 ---
-title: Prompts overview - Beta 🧪
-short: Prompts overview
+title: Prompts overview and use cases- Beta 🧪
+short: Overview and use cases
 tier: enterprise
 type: guide
 order: 0
