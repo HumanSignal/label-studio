@@ -1,5 +1,6 @@
 import { getRoot } from "mobx-state-tree";
 import { AnnotationPreview } from "../Common/AnnotationPreview/AnnotationPreview";
+import { Block } from "../../utils/bem";
 
 export const ImageDataGroup = (column) => {
   const {
@@ -10,9 +11,9 @@ export const ImageDataGroup = (column) => {
   const root = getRoot(original);
 
   return original.total_annotations === 0 || !root.showPreviews ? (
-    <div>
-      <img src={value} width="100%" height={ImageDataGroup.height} alt="" />
-    </div>
+    <Block name="grid-image-wrapper">
+      <img src={value} width="auto" height={ImageDataGroup.height} alt="" />
+    </Block>
   ) : (
     <AnnotationPreview
       task={original}

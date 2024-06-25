@@ -1,214 +1,254 @@
-// @import "./theme.css";
-body {
-  --blue-1: #E6F7FF;
-  --blue-6: #1890FF;
-  --blue-9: #003A8C;
-  --blue-10: #002766;
-  --blue-6-15: rgba(24, 144, 255, 0.15);
+.upload_page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 
-  --red-6: #F5222D;
+  &__error {
+    color: var(--red_7);
+    padding: 0 32px;
+  }
 
-  --gray-2: #FAFAFA;
-  --gray-2-0: rgba(250, 250, 250, 0); /* for correct gradient */
-  --gray-5: #D9D9D9;
-  --gray-6: #BFBFBF;
-  --gray-8: #9D9D9D;
-  --gray-9: #8C8C8C;
+  button {
+    line-height: 1em;
+  }
 
-  --theme-error: var(--red-6);
-  --theme-text: #171819;
-  --theme-white: white;
-  --theme-accent: var(--blue-6);
-  --theme-bg: white; // var(--gray-2)
-}
+  & > header {
+    font-size: 14px;
+    padding: 24px 32px;
+    background: white;
+
+    display: flex;
+    align-items: center;
+
+    &.overlay {
+      box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &__url-form {
+    display: flex;
+
+    input {
+      border: 1px solid var(--sand_300);
+      line-height: 1em;
+      width: 320px;
+      border-radius: 5px 0 0 5px;
+    }
+
+    button {
+      margin-left: -1px;
+      border-radius: 0 5px 5px 0;
+      background: var(--grape_500);
+      color: var(--sand_0);
+      cursor: pointer;
+    }
+
+    &+span {
+      margin: 0 16px;
+      color: var(--sand_600);
+    }
+  }
+
+  &__status {
+    margin-left: auto;
+    font-weight: 500;
+  }
+
+  & > main {
+    flex: 1;
+    overflow-y: auto;
 
 
-body {
-  background: #fff;
-}
 
-
-.upload_page
-  flex: 1
-  min-height: 0
-  display: flex
-  flex-direction: column
-  &__error
-    color: $red_7
-    padding: 0 32px
-  button
-    line-height: 1em
-  > header
-    font-size: 14px
-    padding: 24px 32px
-    background: white
-    // border-bottom: 1px solid rgba(0, 0, 0, 0.05)
-    display: flex
-    align-items: center
-    &.overlay
-      box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1)
-  &__url-form
-    display: flex
-    input
-      line-height: 1em
-      width: 320px
-      border-radius: 5px 0 0 5px
-    button
-      margin-left: -1px
-      border-radius: 0 5px 5px 0
-    & + span
-      margin: 0 16px
-      color: $grey_7
-  &__status
-    margin-left: auto
-    font-weight: 500
-  > main
-    flex: 1
-    overflow-y: auto
-    // display shadow only when user scrolls the list
-    // to achieve this we draw fixed shadow (funny, but this is `scroll` attachment)
-    // and draw scrolled overlay (local) which uncovers that shadow smoothly
-    background: linear-gradient(white 30%, rgba(255,255,255,0)), // shadow cover
-      linear-gradient(rgba(0, 0, 0, 0.1), white 100%) // shadow itself
+    background: linear-gradient(white 30%, rgba(255, 255, 255, 0)),
+      linear-gradient(rgba(0, 0, 0, 0.1), white 100%);
     background-repeat: no-repeat;
     background-color: white;
     background-size: 100% 20px, 100% 5px;
     background-attachment: local, scroll;
+  }
 
-  table
-    td
-      padding: 8px 32px 8px 0
-  &__file-status
-    background: $green_4
-    border: 1px solid $green_6
-    width: 160px
-    height: 6px
-    display: block
-    &_uploading
-      border: 1px solid $accent_color
-      background-color: $accent_color
-      background-repeat: repeat
-      background-position: 40px
-      background-size: 37px 100%
-      animation: status-uploading 1s linear infinite
-      background-image: repeating-linear-gradient(
-        -63.43deg,
-        rgba(#fff, 0.2) 1px,
-        #efefef 2px,
-        #efefef 6px,
-        rgba(#fff, 0.2) 7px,
-        rgba(#fff, 0.2) 12px
-      )
-  &__spinner
-    position: absolute
-    left: 0
-    right: 0
-    top: 0
-    width: 100%
-    height: 100%
-    z-index: 1
-    background: rgba(white, 0.5)
+  table {
+    td {
+      padding: 8px 32px 8px 0;
+    }
+  }
 
-  &__upload-button
-    display: flex
-    align-items: center
-    padding: 8px
-  &__upload-icon
-    opacity: 0.5
-    height: 16px
-    margin-right: 8px
-  &__info-icon
-    margin-right: 8px
-    vertical-align: -5px
-    height: 20px
+  &__file-status {
+    background: var(--kale_400);
+    border: 1px solid var(--kale_400);
+    border-radius: 4px;
+    width: 160px;
+    height: 6px;
+    display: block;
 
-  &__csv-handling
-    margin: 0 auto
-    &_hidden
-      display: none
-    &_highlighted
-      position: relative
-      z-index: 12
-      background: white
-      padding: 4px 8px
-      border-radius: 8px
-    label
-      margin-left: 8px
-      cursor: pointer
-  &__csv-splash
-    background: rgba(0,0,0,0.2)
-    position: absolute
-    left: 0
-    right: 0
-    top: 0
-    bottom: 0
-    z-index: 10
-    border-radius: 5px
-    pointer-events: none
+    &_uploading {
+      border: 1px solid var(--grape_500);
+      background-color: var(--grape_500);
+      background-repeat: repeat;
+      background-position: 40px;
+      background-size: 37px 100%;
+      animation: status-uploading 1s linear infinite;
+      background-image: repeating-linear-gradient(-63.43deg,
+          rgba(255, 255, 255, 0.2) 1px, #efefef 2px, #efefef 6px,
+          rgba(255, 255, 255, 0.2) 7px,
+          rgba(255, 255, 255, 0.2) 12px);
+    }
+  }
 
-/* Common */
+  &__spinner {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: rgba(white, 0.5);
+  }
 
-body {
-  background: var(--theme-bg);
+  &__upload-button {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid var(--grape_500);
+    background: var(--grape_0);
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  &__upload-icon {
+    height: 16px;
+    margin-right: 8px;
+  }
+
+  &__info-icon {
+    margin-right: 8px;
+    vertical-align: -5px;
+    height: 20px;
+  }
+
+  &__csv-handling {
+    margin: 0 auto;
+
+    &_hidden {
+      display: none;
+    }
+
+    &_highlighted {
+      position: relative;
+      z-index: 12;
+      background: white;
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+
+    label {
+      margin-left: 8px;
+      cursor: pointer;
+    }
+  }
+
+  &__csv-splash {
+    background: rgba(0, 0, 0, 0.2);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 10;
+    border-radius: 5px;
+    pointer-events: none;
+  }
 }
 
 /* Import files via dropzone */
+.dropzone {
+  padding: 32px;
+  margin: 0;
+  min-height: 100%;
+  position: relative;
 
-.dropzone
-  padding: 32px
-  margin: 0
-  min-height: 100%
-  position: relative
+  a{
+    color: var(--grape_600);
+    text-decoration: underline;
+    &:hover{
+      color: var(--grape_700);
+    }
+  }
 
-  &_hovered
-    opacity: 0.5
-    &::before
-      content: ""
-      position: absolute
-      left: 8px
-      right: 8px
-      top: 8px
-      bottom: 8px
-      border: 2px dashed rgba(24, 144, 255, 0.5)
-      border-radius: 10px
-      pointer-events: none
-  &_hovered &__content
-    opacity: 1
+  &_hovered {
+    opacity: 0.5;
 
-  &__icon
-    height: 64px
+    &::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 8px;
+      bottom: 8px;
+      border: 2px dashed rgba(24, 144, 255, 0.5);
+      border-radius: 10px;
+      pointer-events: none;
+    }
+  }
 
-  &__content
-    display: flex
-    flex-direction: column
-    align-items: center
-    opacity: 0.7
+  &_hovered &__content {
+    opacity: 1;
+  }
 
-    > *:not(:first-child)
-      margin-top: 32px
+  &__icon {
+    height: 64px;
+  }
 
-    header
-      font-size: 24px
-      line-height: 32px
-      font-weight: 800
-      text-align: center
+  label {
+    display: flex;
+    justify-content: center;
+  }
 
-    dl
-      display: grid
-      grid-template: auto / auto auto
-      font-size: 12px
-      line-height: 20px
-      gap: 0 30px
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    background: var(--grape_0);
+    border: 1px dashed var(--grape_500);
+    padding: 2rem;
+    width: 40rem;
+    border-radius: 8px;
 
-      dd
-        font-weight: 900
+    & > *:not(:first-child) {
+      margin-top: 32px;
+    }
+
+    header {
+      font-size: 24px;
+      line-height: 32px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    dl {
+      display: grid;
+      grid-template: auto / auto auto;
+      font-size: 12px;
+      line-height: 20px;
+      gap: 0 30px;
+
+      dd {
+        font-weight: 900;
+      }
 
       dt:last-of-type,
-      dd:last-of-type
-        margin-top: 20px
+      dd:last-of-type {
+        margin-top: 20px;
+      }
+    }
+  }
+}
 
 /* Loading */
-
 .loading {
   display: flex;
   flex-direction: column;
@@ -223,9 +263,59 @@ body {
   margin-bottom: 24px;
 }
 
+
+@-webkit-keyframes reveal {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+
+@-moz-keyframes reveal {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+
+@-ms-keyframes reveal {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+
+@-o-keyframes reveal {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+
 @keyframes reveal {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 #import-tasks .loading p {
@@ -241,9 +331,57 @@ body {
   z-index: 1;
 }
 
-@keyframes status-uploading
-  0%
-    background-position: 0 0
 
-  100%
-    background-position: 37px 0
+@-webkit-keyframes status-uploading {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}
+
+
+@-moz-keyframes status-uploading {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}
+
+
+@-ms-keyframes status-uploading {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}
+
+
+@-o-keyframes status-uploading {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}
+
+
+@keyframes status-uploading {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}

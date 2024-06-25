@@ -7,7 +7,7 @@
   border-radius 12px
   position relative
   cursor pointer
-  color var(--toggle-color, $accent_color)
+  color var(--toggle-color, var(--grape_500))
   transition box-shadow 80ms ease
   background linear-gradient(0deg, rgba(#000, 0.05), rgba(#000, 0.05)), #FFFFFF
   box-shadow inset 0px 1px 0px rgba(#000, 0.05), inset 0px 0px 0px 1px rgba(#000, 0.05)
@@ -46,7 +46,7 @@
       width 16px
       height 16px
       background currentColor
-      box-shadow 0px 5px 10px rgba($accent_color, 0.3), inset 0px -1px 0px rgba(0, 0, 0, 0.1)
+      box-shadow 0px 5px 10px var(--grape_100), inset 0px -1px 0px rgba(0, 0, 0, 0.1)
 
   &_disabled
     box-shadow none

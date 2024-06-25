@@ -1,17 +1,22 @@
 .description
-  font-size 16px
-  color #000
-  opacity 0.6
+  color var(--sand_600)
+  line-height: 140%
+
+  & a
+    color var(--grape_500)
+    text-decoration underline
+    &:hover
+      text-decoration none
 
   &_size
     &_small
-      font-size 12px
+      font-size .75rem
 
     &_medium
-      font-size 16px
+      font-size .875rem
 
     &_large
-      font-size 22px
+      font-size 1.125rem
 
   &:not(&_noOffset)&_size
     &_small

@@ -6,18 +6,28 @@
   flex-direction column
   list-style-type none
 
+  ul, li
+    display block
+    list-style-type none
+
+  li
+    margin .5rem
+
+  li + li
+    margin-top 0
+
   &__item
-    height 48px
+    height 32px
     display flex
     cursor pointer
-    padding 0 13px
+    padding 0 12px
     border-radius 3px
     align-items center
     box-sizing border-box
-    color rgba(0,0,0,0.6)
-    font-size 16px
-    font-family Roboto
+    color var(--sand_600)
+    font-size 14px
     white-space nowrap
+    user-select none
 
     &-icon
       display block
@@ -28,25 +38,25 @@
       align-items center
       justify-content center
 
-    &_look
-      &_danger
-        color #DD0000
-
     &:not(&_look_danger):hover
-      color #000
-
-    &:not(&_active):hover
-      background-color rgba(0, 0, 0, 0.04)
+      color var(--grape_700)
+      background-color var(--grape_0)
 
     &_active
-      color #000
-      background-color rgba(0, 0, 0, 0.08)
+      color var(--grape_700)
+      background-color var(--grape_0)
 
-    &_active:not(.sidebar__pin)
+    &_active:not(.sidebar__pin):not(&_clickable)
       pointer-events none
 
     &:hover &-icon, &_active &-icon
       opacity 1
+    
+    &_look
+      &_danger
+        color var(--danger_color)
+        &:hover
+          background-color var(--red_1)
 
   &__spacer
     flex 1
