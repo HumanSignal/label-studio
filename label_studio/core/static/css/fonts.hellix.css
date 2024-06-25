@@ -1,0 +1,15 @@
+@font-face {
+  font-family: "Hellix";
+  src: url("/static/fonts/Hellix-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hellix";
+  src: url("/static/fonts/Hellix-SemiBold.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}

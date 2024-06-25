@@ -1,6 +1,6 @@
 {
-  "message": "chore: Change the audio url for tests to a local one to avoid connection issues which cause test flakes (#6009)",
-  "commit": "ef63bed38664eedd12399ae13d5087a7a2285e33",
-  "date": "2024-06-18T17:48:40.000Z",
+  "message": "feat: OPTIC-757: Label Studio App Redesign (#5892)",
+  "commit": "53101fffb1ab714a231c8ce96c32fa5cd93aa0ea",
+  "date": "2024-06-24T16:41:58.000Z",
   "branch": "develop"
 }

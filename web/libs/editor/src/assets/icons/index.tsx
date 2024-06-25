@@ -99,6 +99,7 @@ export { ReactComponent as IconSortDown } from "./sort-down.svg";
 export { ReactComponent as IconSortDownNew } from "./sort-down-new.svg";
 export { ReactComponent as IconFilter } from "./filter.svg";
 export { ReactComponent as IconDelete } from "./delete.svg";
+export { ReactComponent as IconModels } from "./models.svg";
 
 export { ReactComponent as IconArrowLeft } from "./arrow-left.svg";
 export { ReactComponent as IconArrowLeftSmall } from "./arrow-left-small.svg";

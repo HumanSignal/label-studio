@@ -3,6 +3,7 @@
 import logging
 import re
 from datetime import datetime
+from typing import ClassVar
 
 import ujson as json
 from core.feature_flags import flag_set
@@ -39,20 +40,20 @@ DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 
 class _Operator(BaseModel):
-    EQUAL = 'equal'
-    NOT_EQUAL = 'not_equal'
-    LESS = 'less'
-    GREATER = 'greater'
-    LESS_OR_EQUAL = 'less_or_equal'
-    GREATER_OR_EQUAL = 'greater_or_equal'
-    IN = 'in'
-    NOT_IN = 'not_in'
-    IN_LIST = 'in_list'
-    NOT_IN_LIST = 'not_in_list'
-    EMPTY = 'empty'
-    CONTAINS = 'contains'
-    NOT_CONTAINS = 'not_contains'
-    REGEX = 'regex'
+    EQUAL: ClassVar[str] = 'equal'
+    NOT_EQUAL: ClassVar[str] = 'not_equal'
+    LESS: ClassVar[str] = 'less'
+    GREATER: ClassVar[str] = 'greater'
+    LESS_OR_EQUAL: ClassVar[str] = 'less_or_equal'
+    GREATER_OR_EQUAL: ClassVar[str] = 'greater_or_equal'
+    IN: ClassVar[str] = 'in'
+    NOT_IN: ClassVar[str] = 'not_in'
+    IN_LIST: ClassVar[str] = 'in_list'
+    NOT_IN_LIST: ClassVar[str] = 'not_in_list'
+    EMPTY: ClassVar[str] = 'empty'
+    CONTAINS: ClassVar[str] = 'contains'
+    NOT_CONTAINS: ClassVar[str] = 'not_contains'
+    REGEX: ClassVar[str] = 'regex'
 
 
 Operator = _Operator()
