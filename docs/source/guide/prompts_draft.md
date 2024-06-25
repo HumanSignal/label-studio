@@ -31,19 +31,19 @@ With your [Prompt created](prompts_create), you can begin drafting your prompt c
    
         See the [Auto-labeling with Prompts](prompts_overview#Auto-labeling-with-Prompts) use case and the [Prompt evaluation and fine-tuning](prompts_overview#Prompt-evaluation-and-fine-tuning). 
 4. Click **Save**. 
-5. Click **Evaluate**. 
+5. Click **Evaluate** (if running against a ground truth baseline) or **Run**. 
 
 !!! warning
-    When you click **Evaluate**, you will create predictions for each task in the baseline you selected and overwrite any previous predictions you generated with this prompt. 
+    When you click **Evaluate** or **Run**, you will create predictions for each task in the baseline you selected and overwrite any previous predictions you generated with this prompt. 
     
-    Evaluating your Prompts can result in multiple predictions on your tasks: if you have multiple Prompts for one Project, or if you click both **Evaluate** and **Get Predictions for All Tasks from a Prompt**, you will see multiple predictions for tasks in the Data Manager. 
+    Evaluating your Prompts can result in multiple predictions on your tasks: if you have multiple Prompts for one Project, or if you click both **Evaluate**/**Run** and **Get Predictions for All Tasks from a Prompt**, you will see multiple predictions for tasks in the Data Manager. 
 
 <br><br>
 <video src="../images/prompts/prompts.mp4" controls="controls" style="max-width: 800px;" class="gif-border" />
 
 ## Drafting effective prompts
 
-For a comprehensive guide to drafting prompts, see [The Prompt Report: A Systematic Survey of Prompting Techniques](https://arxiv.org/abs/2406.06608). 
+For a comprehensive guide to drafting prompts, see [The Prompt Report: A Systematic Survey of Prompting Techniques](https://arxiv.org/abs/2406.06608) or OpenAI's guide to [Prompt Engineering](https://platform.openai.com/docs/guides/prompt-engineering). 
 
 ### Text placement
 
