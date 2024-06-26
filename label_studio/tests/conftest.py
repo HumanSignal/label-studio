@@ -319,10 +319,12 @@ def azure_client():
     with azure_client_mock():
         yield
 
+
 @pytest.fixture(autouse=True)
 def azure_client_sp():
     with azure_client_sp_mock():
         yield
+
 
 @pytest.fixture(autouse=True)
 def redis_client():

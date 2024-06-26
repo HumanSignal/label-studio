@@ -49,7 +49,6 @@ class AzureServicePrincipalStorageMixin(models.Model):
         _('use_blob_urls'), default=False, help_text='Interpret objects as BLOBs and generate URLs'
     )
 
-
     account_name = models.TextField(_('account_name'), null=True, blank=True, help_text='Azure Blob account name')
     container = models.TextField(_('container'), null=True, blank=True, help_text='Azure blob container')
     tenant_id = models.TextField(_('tenant_id'), null=True, blank=True, help_text='Azure Tenant ID')
@@ -74,6 +73,7 @@ class AzureServicePrincipalStorageMixin(models.Model):
 
     def get_account_tenant_id(self):
         return str(self.tenant_id) if self.tenant_id else get_env('AZURE_TENANT_ID')
+
     @property
     def delegation_key(self) -> UserDelegationKey:
         key = UserDelegationKey()
@@ -108,7 +108,11 @@ class AzureServicePrincipalStorageMixin(models.Model):
     @property
     def blobservice_client(self) -> BlobServiceClient:
         account_url = self.get_account_url()
-        credential = ClientSecretCredential(tenant_id=self.get_account_tenant_id(), client_id=self.get_account_client_id(), client_secret=self.get_account_client_secret())
+        credential = ClientSecretCredential(
+            tenant_id=self.get_account_tenant_id(),
+            client_id=self.get_account_client_id(),
+            client_secret=self.get_account_client_secret(),
+        )
         blobservice_client = BlobServiceClient(account_url, credential=credential)
         return blobservice_client
 
@@ -117,7 +121,6 @@ class AzureServicePrincipalStorageMixin(models.Model):
         blobservice_client = self.blobservice_client
         container_client = blobservice_client.get_container_client((str(self.container)))
         return container_client
-
 
     def get_account_url(self):
         account_name = self.get_account_name()
@@ -180,7 +183,7 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
                     break
         return can_resolve
 
-    def get_sas_token(self,blob_name:str):
+    def get_sas_token(self, blob_name: str):
         expiry = datetime.utcnow() + timedelta(minutes=self.presign_ttl)
         sas_token = generate_blob_sas(
             account_name=self.get_account_name(),

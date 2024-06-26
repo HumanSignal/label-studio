@@ -14,6 +14,7 @@ class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
     type = serializers.ReadOnlyField(default='azure_spi')
     presign = serializers.BooleanField(required=False, default=True)
     secure_fields = ['client_secret']
+
     class Meta:
         model = AzureServicePrincipalImportStorage
         fields = '__all__'

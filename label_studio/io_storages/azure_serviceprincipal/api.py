@@ -203,7 +203,6 @@ class AzureServicePrincipalExportStorageValidateAPI(ExportStorageValidateAPI):
             ),
         ],
         request_body=no_body,
-
     ),
 )
 @method_decorator(
@@ -245,7 +244,6 @@ class AzureServicePrincipalExportStorageListAPI(ExportStorageListAPI):
         operation_summary='Update export storage',
         operation_description='Update a specific Azure SPI export storage connection.',
         request_body=_azure_serviceprincipal_export_storage_schema,
-
     ),
 )
 @method_decorator(
