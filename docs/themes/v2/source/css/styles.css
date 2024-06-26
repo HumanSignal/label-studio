@@ -1244,6 +1244,11 @@ ul {
   }
 }
 
+.page-rightsidebar .toc {
+  max-height: calc(100vh - 20em);
+  overflow: auto;
+}
+
 .toc-enterprise-cta {
   margin-top: 2em;
   padding: 1.5em 2em;
@@ -2672,10 +2677,9 @@ code.hljs {
 }
 
 .gif-border {
-    border: 1px #f1f1f1 solid;
+  border: 1px #f1f1f1 solid;
 }
 
 .no-border {
-    border: unset !important;
+  border: unset !important;
 }
-

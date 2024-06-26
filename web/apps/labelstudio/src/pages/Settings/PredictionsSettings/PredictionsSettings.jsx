@@ -3,7 +3,7 @@ import { Description } from "../../../components/Description/Description";
 import { Divider } from "../../../components/Divider/Divider";
 import { EmptyState } from "../../../components/EmptyState/EmptyState";
 import { Caption } from "../../../components/Caption/Caption";
-import { IconEmptyPredictions } from "../../../assets/icons";
+import { IconPredictions } from "../../../assets/icons";
 import { useAPI } from "../../../providers/ApiProvider";
 import { ProjectContext } from "../../../providers/ProjectProvider";
 import { Spinner } from "../../../components/Spinner/Spinner";
@@ -60,7 +60,7 @@ export const PredictionsSettings = () => {
 
         {loaded && versions.length === 0 && (
           <EmptyState
-            icon={<IconEmptyPredictions />}
+            icon={<IconPredictions />}
             title="No predictions yet uploaded"
             description="Predictions could be used to prelabel the data, or validate the model. You can upload and select predictions from multiple model versions. You can also connect live models in the Model tab."
             footer={
