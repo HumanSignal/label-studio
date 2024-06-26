@@ -524,6 +524,19 @@ export default types
       });
     }
 
+    function waitForDraftSubmission() {
+      return new Promise((resolve) => {
+        if (!self.annotationStore.selected.isDraftSaving) resolve();
+
+        const checkInterval = setInterval(() => {
+          if (!self.annotationStore.selected.isDraftSaving) {
+            clearInterval(checkInterval);
+            resolve();
+          }
+        }, 100);
+      });
+    }
+
     // Set `isSubmitting` flag to block [Submit] and related buttons during request
     // to prevent from sending duplicating requests.
     // Better to return request's Promise from SDK to make this work perfect.
@@ -562,6 +575,7 @@ export default types
       }
       handleSubmittingFlag(async () => {
         if (isFF(FF_CUSTOM_SCRIPT)) {
+          await self.waitForDraftSubmission();
           const allowedToSave = await getEnv(self).events.invoke("beforeSaveAnnotation", self, entity, { event });
           if (allowedToSave && allowedToSave.some((x) => x === false)) return;
 
@@ -937,6 +951,7 @@ export default types
       unskipTask,
       setTaskHistory,
       submitDraft,
+      waitForDraftSubmission,
       submitAnnotation,
       updateAnnotation,
       acceptAnnotation,
