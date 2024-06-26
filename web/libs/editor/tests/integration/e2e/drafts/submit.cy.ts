@@ -16,7 +16,7 @@ describe("Annotation submitting process", () => {
     });
     // here will be stored an order of completed saving action
     // it consists of strings: "draft" and "submit"
-    const callLogs: RESPONSE_TYPE[] = [];
+    const callApi = cy.spy().as("callApi");
 
     LabelStudio.params()
       .data({
@@ -37,13 +37,13 @@ describe("Annotation submitting process", () => {
 
           // this emulates server response delay
           setTimeout(() => {
-            callLogs.push(RESPONSE_TYPE.DRAFT);
+            callApi(RESPONSE_TYPE.DRAFT);
             resolve(void 0);
           }, RESPONSE_DELAY);
         });
       })
       .withEventListener("submitAnnotation", () => {
-        callLogs.push(RESPONSE_TYPE.SUBMIT);
+        callApi(RESPONSE_TYPE.SUBMIT);
       })
       .init();
 
@@ -59,8 +59,10 @@ describe("Annotation submitting process", () => {
     cy.wait(WAITING_FOR_EVENTS_DELAY);
 
     // Check order
-    cy.window().then(async (win) => {
-      expect(callLogs).to.deep.equal([RESPONSE_TYPE.DRAFT, RESPONSE_TYPE.SUBMIT]);
+    cy.window().then((win) => {
+      expect(callApi).to.be.calledTwice;
+      expect(callApi.firstCall).to.be.calledWith(RESPONSE_TYPE.DRAFT);
+      expect(callApi.secondCall).to.be.calledWith(RESPONSE_TYPE.SUBMIT);
     });
   });
 });
