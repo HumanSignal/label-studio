@@ -366,7 +366,6 @@ stages:
     json:
       last_sync_count: 3
     status_code: 200
-
 ---
 test_name: test_import_from_gcs_storage
 strict: false
