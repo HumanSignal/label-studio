@@ -1319,15 +1319,6 @@ stages:
     status_code: 200
 - name: stage
   request:
-    method: GET
-    url: '{django_live_url}/api/projects/{project_pk}/next'
-  response:
-    json:
-      data:
-        image_url: !re_match "https://testing.blob.core.windows.net/pytest-azurespi-images/.+"
-    status_code: 200
-- name: stage
-  request:
     data:
       project: '{project_pk}'
     method: GET

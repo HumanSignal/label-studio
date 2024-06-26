@@ -269,14 +269,10 @@ def azure_client_sp_mock():
         def get_container_client(self, container_name):
             return DummyAzureContainer(container_name)
 
-    # class MockClientSecretCredential():
-    #     def get_token(self, *scopes, **kwargs):
-    #         # Customize the token retrieval behavior here if needed
-    #         return 'token'
-
-    with mock.patch.object(models.AzureServicePrincipalImportStorage, 'blobservice_client', return_value='hello'):
+    with mock.patch.object(models.AzureServicePrincipalStorageMixin, 'blobservice_client', return_value=DummyBlobServiceClient()):
         with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
             yield
+
 
 
 @contextmanager
