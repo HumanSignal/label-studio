@@ -31,14 +31,14 @@ describe("Annotation submitting process", () => {
       // To have "new" annotation we need to use userGenerate
       .withAnnotation({ userGenerate: true, result: [] })
       .withEventListener("submitDraft", () => {
-        return new Promise((resolve) => {
+        return new Promise<void>((resolve) => {
           // initialize saving annotation exactly when request of saving draft should be sent to the server
           ToolBar.submitBtn.click();
 
           // this emulates server response delay
           setTimeout(() => {
             callApi(RESPONSE_TYPE.DRAFT);
-            resolve(void 0);
+            resolve();
           }, RESPONSE_DELAY);
         });
       })
