@@ -2,9 +2,7 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from drf_yasg.utils import no_body, swagger_auto_schema
-
 from io_storages.api import (
     ExportStorageDetailAPI,
     ExportStorageFormLayoutAPI,
@@ -32,6 +30,7 @@ from .openapi_schema import (
     _azure_serviceprincipal_import_storage_schema,
     _azure_serviceprincipal_import_storage_schema_with_id,
 )
+
 
 @method_decorator(
     name='get',

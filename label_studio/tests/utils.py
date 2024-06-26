@@ -22,8 +22,6 @@ from organizations.models import Organization
 from projects.models import Project
 from tasks.serializers import TaskWithAnnotationsSerializer
 from users.models import User
-from unittest import mock
-from azure.identity import ClientSecretCredential
 
 try:
     from businesses.models import BillingPlan, Business

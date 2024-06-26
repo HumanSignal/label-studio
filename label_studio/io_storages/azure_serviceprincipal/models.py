@@ -1,6 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import os
 import json
 import logging
 import re
@@ -32,7 +31,7 @@ from io_storages.base_models import (
     ProjectStorageMixin,
 )
 from tasks.models import Annotation
-from string import Template
+
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)
 
