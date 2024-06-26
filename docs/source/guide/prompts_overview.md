@@ -11,6 +11,7 @@ section: Prompts
 date: 2024-05-15 14:30:14
 ---
 
+<div class="admonition todo"><p class="admonition-title">Beta Release</p><p>This feature is currently in beta. To enable Prompts, contact your customer success manager or email <a href="mailto:cs@humansignal.com">cs@humansignal.com</a>.</p></div>
 
 Use Prompts to evaluate and refine your LLM prompts and then generate predictions to automate your labeling process. 
 
