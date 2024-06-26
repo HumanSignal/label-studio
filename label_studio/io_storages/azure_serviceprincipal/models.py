@@ -32,10 +32,7 @@ from io_storages.base_models import (
     ProjectStorageMixin,
 )
 from tasks.models import Annotation
-# from .utils import set_secured, get_secured
 from string import Template
-# from .utils import get_secured,set_secured
-
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)
 
@@ -91,7 +88,6 @@ class AzureServicePrincipalStorageMixin(models.Model):
             logger.info('User Delegation Key : Regenerated...')
             # We create a serialized version...
             self.user_delegation_key = json.dumps(vars(user_delegation_key))
-            # self.user_delegation_key = set_secured(json.dumps(vars(user_delegation_key)))
             self.save(update_fields=['user_delegation_key'])
 
             return user_delegation_key
@@ -100,26 +96,20 @@ class AzureServicePrincipalStorageMixin(models.Model):
             key = create_key()
         else:
             key = UserDelegationKey()
-            #TODO : Chiffrer la user_delegation_key en base.
-            #TODO : Utiliser une variable d'env pour la clef de chiffrement.
             db_key = self.user_delegation_key
-            # db_key = get_secured(self.user_delegation_key)
             key_dict = json.loads(db_key)
             for prop, val in key_dict.items():
                 setattr(key, prop, val)
-            # We check if the key is expired or not...
             now = datetime.now(tz=timezone.utc)
             key_expiration = datetime.strptime(key.signed_expiry, '%Y-%m-%dT%H:%M:%S%z')
             if now + timedelta(hours=1) > key_expiration:
-                # Key too old, we recreate it...
                 key = create_key()
         return key
 
     @property
     def blobservice_client(self) -> BlobServiceClient:
         account_url = self.get_account_url()
-        # credential = ClientSecretCredential(self.tenant_id,self.client_id,get_secured(self.client_secret))
-        credential = ClientSecretCredential(self.tenant_id, self.client_id, self.client_secret)
+        credential = ClientSecretCredential(tenant_id=self.get_account_tenant_id(), client_id=self.get_account_client_id(), client_secret=self.get_account_client_secret())
         blobservice_client = BlobServiceClient(account_url, credential=credential)
         return blobservice_client
 
