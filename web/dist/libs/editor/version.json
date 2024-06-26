@@ -1,6 +1,6 @@
 {
-  "message": "feat: OPTIC-757: Label Studio App Redesign (#5892)",
-  "commit": "53101fffb1ab714a231c8ce96c32fa5cd93aa0ea",
-  "date": "2024-06-24T16:41:58.000Z",
+  "message": "fix: LEAP-453: Fix annotation and draft being requested at the same time (#6005)",
+  "commit": "88a45a78857840dc149593334a669c952e78d064",
+  "date": "2024-06-26T15:07:31.000Z",
   "branch": "develop"
 }
