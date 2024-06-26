@@ -7,7 +7,7 @@
   border-radius 8px
   background #FAFAFA
   box-sizing border-box
-  box-shadow 0 0 0 1px $black_15 inset
+  box-shadow 0 0 0 1px var(--sand_300) inset
   transition box-shadow 80ms ease
 
   &_disabled
@@ -28,7 +28,7 @@
     align-items center
     justify-content center
     transition all 80ms ease
-    box-shadow 0px 1px 0px $black_10, 0px 0px 0px 1px $black_2, 0px 5px 10px $black_15
+    box-shadow 0px 1px 0px var(--sand_300), 0px 0px 0px 1px var(--sand_100), 0px 5px 10px var(--sand_300)
 
     &_disabled
       box-shadow none
@@ -38,7 +38,7 @@
 
     &:active
       background #fcfcfc
-      box-shadow 0px 1px 0px $black_10, 0px 0px 0px 1px $black_2, 0px 2px 2px $black_15
+      box-shadow 0px 1px 0px var(--sand_300), 0px 0px 0px 1px var(--sand_100), 0px 5px 10px var(--sand_300)
 
     &:active, &:hover
       color $accent_color

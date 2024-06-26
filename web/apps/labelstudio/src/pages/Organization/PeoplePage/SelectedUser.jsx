@@ -37,11 +37,11 @@ export const SelectedUser = ({ user, onClose }) => {
 
       <Elem name="header">
         <Userpic user={user} style={{ width: 64, height: 64, fontSize: 28 }} />
-
-        {fullName && <Elem name="full-name">{fullName}</Elem>}
-
-        <Elem tag="p" name="email">
-          {user.email}
+        <Elem name="info-wrapper">
+          {fullName && <Elem name="full-name">{fullName}</Elem>}
+          <Elem tag="p" name="email">
+            {user.email}
+          </Elem>
         </Elem>
       </Elem>
 

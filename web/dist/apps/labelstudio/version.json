@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1169: LEAP-1165: LEAP-1177 Fix security issues (#6013)",
-  "commit": "119bb236f05d94ff92ec79e0dae15bd625a3ebbf",
-  "date": "2024-06-20T15:39:45.000Z",
+  "message": "fix: LEAP-453: Fix annotation and draft being requested at the same time (#6005)",
+  "commit": "88a45a78857840dc149593334a669c952e78d064",
+  "date": "2024-06-26T15:07:31.000Z",
   "branch": "develop"
 }

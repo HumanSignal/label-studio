@@ -335,7 +335,7 @@ def ml_backend_for_test_predict(ml_backend):
     # ML backend with single prediction per task
     register_ml_backend_mock(
         ml_backend,
-        url='http://localhost:9092',
+        url='http://test.ml.backend.for.sdk.com:9092',
         predictions={
             'results': [
                 {
@@ -351,7 +351,7 @@ def ml_backend_for_test_predict(ml_backend):
     # ML backend with multiple predictions per task
     register_ml_backend_mock(
         ml_backend,
-        url='http://localhost:9093',
+        url='http://test.ml.backend.for.sdk.com:9093',
         predictions={
             'results': [
                 [

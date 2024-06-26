@@ -309,11 +309,11 @@ const HistoryIcon: FC<{ type: HistoryItemType }> = ({ type }) => {
   const icon = useMemo(() => {
     switch (type) {
       case "submitted":
-        return <IconAnnotationSubmitted style={{ color: "#0099FF" }} />;
+        return <IconAnnotationSubmitted style={{ color: "#617ADA" }} />;
       case "updated":
-        return <IconAnnotationSubmitted style={{ color: "#0099FF" }} />;
+        return <IconAnnotationSubmitted style={{ color: "#617ADA" }} />;
       case "draft_created":
-        return <IconDraftCreated style={{ color: "#0099FF" }} />;
+        return <IconDraftCreated style={{ color: "#617ADA" }} />;
       case "accepted":
         return <IconAnnotationAccepted style={{ color: "#2AA000" }} />;
       case "rejected":
