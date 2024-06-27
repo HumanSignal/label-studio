@@ -1,5 +1,5 @@
 import { Choices, LabelStudio, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_DEV_3873, FF_REVIEWER_FLOW } from "../../../../src/utils/feature-flags";
+import { FF_CUSTOM_SCRIPT, FF_DEV_3873, FF_REVIEWER_FLOW } from "../../../../src/utils/feature-flags";
 
 enum RESPONSE_TYPE {
   DRAFT = "draft",
@@ -13,6 +13,7 @@ describe("Annotation submitting process", () => {
     LabelStudio.addFeatureFlagsOnPageLoad({
       [FF_DEV_3873]: true,
       [FF_REVIEWER_FLOW]: true,
+      [FF_CUSTOM_SCRIPT]: true,
     });
     // here will be stored an order of completed saving action
     // it consists of strings: "draft" and "submit"
