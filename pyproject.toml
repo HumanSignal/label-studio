@@ -175,7 +175,7 @@ drf-generators = "0.3.0"
 htmlmin = "0.1.12"
 jsonschema = "3.2.0"
 lockfile = ">=0.12.0"
-lxml = ">=4.2.5"
+lxml = {extras = ["html-clean"], version = "^5.2.2"}
 defusedxml = ">=0.7.1"
 numpy = "^1.24.3"
 ordered-set = "4.0.2"
