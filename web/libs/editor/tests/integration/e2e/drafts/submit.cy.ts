@@ -31,6 +31,9 @@ describe("Annotation submitting process", () => {
 </View>`)
       // To have "new" annotation we need to use userGenerate
       .withAnnotation({ userGenerate: true, result: [] })
+      .withEventListener("submitAnnotation", () => {
+        callApi(RESPONSE_TYPE.SUBMIT);
+      })
       .withEventListener("submitDraft", () => {
         return new Promise<void>((resolve) => {
           // initialize saving annotation exactly when request of saving draft should be sent to the server
@@ -42,9 +45,6 @@ describe("Annotation submitting process", () => {
             resolve();
           }, RESPONSE_DELAY);
         });
-      })
-      .withEventListener("submitAnnotation", () => {
-        callApi(RESPONSE_TYPE.SUBMIT);
       })
       .init();
 
