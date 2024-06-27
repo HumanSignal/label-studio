@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import json
 import logging
 import threading
@@ -29,22 +29,16 @@ UID_REGEX = re.compile(r"^\d+\.\d+\.\d+$")
 
 
 class ApertureDBStorageMixin(models.Model):
-    hostname = models.TextField(_('hostname'), null=True, blank=True, 
-                                help_text='ApertureDB host name')
-    port = models.PositiveIntegerField(_('port'), null=True, blank=True,
-                                       help_text='ApertureDB host port')
-    username = models.TextField(_('username'),null=True, blank=True, 
-                                help_text='ApertureDB user name')
-    password = models.TextField(_('password'), null=True, blank=True, 
-                                help_text='ApertureDB user password')
-    token = models.TextField(_('token'), null=True, blank=True, 
-                             help_text='ApertureDB user token')
-    use_ssl = models.BooleanField(_('use_ssl'), default=True,
-                                  help_text='Use SSL when communicating with ApertureDB')
+    hostname = models.TextField(_("hostname"), null=True, blank=True, help_text="ApertureDB host name")
+    port = models.PositiveIntegerField(_("port"), null=True, blank=True, help_text="ApertureDB host port")
+    username = models.TextField(_("username"), null=True, blank=True, help_text="ApertureDB user name")
+    password = models.TextField(_("password"), null=True, blank=True, help_text="ApertureDB user password")
+    token = models.TextField(_("token"), null=True, blank=True, help_text="ApertureDB user token")
+    use_ssl = models.BooleanField(_("use_ssl"), default=True, help_text="Use SSL when communicating with ApertureDB")
     _db_lock = threading.Lock()
     _db = None
 
-    secure_fields = ['password', 'token']
+    secure_fields = ["password", "token"]
 
     def _response_status(self, response):
         if isinstance(response, list):
@@ -61,10 +55,12 @@ class ApertureDBStorageMixin(models.Model):
                 if self._db is None:
                     self._db = Connector.Connector(
                         str(self.hostname),
-                        self.port, user=str(self.username),
+                        self.port,
+                        user=str(self.username),
                         password=str(self.password) if self.password else "",
                         token=str(self.token) if self.token else "",
-                        use_ssl=self.use_ssl)
+                        use_ssl=self.use_ssl,
+                    )
         return self._db
 
     def validate_connection(self, client=None):
@@ -81,20 +77,30 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
     url_scheme = "none"
 
     constraints = models.TextField(
-        _('constraints'),
-        blank=True, null=True,
-        help_text='ApertureDB FindImage constraints (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)')
-    
-    predictions = models.BooleanField(_('predictions'), default=False,
-                                  help_text='Load bounding box predictions from ApertureDB?')
-    
+        _("constraints"),
+        blank=True,
+        null=True,
+        help_text="ApertureDB FindImage constraints (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)",
+    )
+
+    predictions = models.BooleanField(
+        _("predictions"), default=False, help_text="Load bounding box predictions from ApertureDB?"
+    )
+
     pred_constraints = models.TextField(
-        _('constraints'),
-        blank=True, null=True,
-        help_text='ApertureDB constraints on bounding box predictions (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)')
-    
-    limit = models.PositiveIntegerField(_('limit'), null=True, blank=True,
-                                       help_text='Maximum number of tasks')
+        _("constraints"),
+        blank=True,
+        null=True,
+        help_text="ApertureDB constraints on bounding box predictions (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)",
+    )
+
+    limit = models.PositiveIntegerField(_("limit"), null=True, blank=True, help_text="Maximum number of tasks")
+
+    as_format_jpg = models.BooleanField(
+        _("as_format_jpg"),
+        default=False,
+        help_text="Convert images to JPEG format when loading from ApertureDB",
+    )
 
     def iterkeys(self):
         db = self.get_connection()
@@ -107,17 +113,17 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
             "uniqueids": True,
             "blobs": False,
             "limit": batch,
-            "constraints": constraints | {
-                "width": [">", 0],
-                "height": [">", 0]
-            }
+            "constraints": constraints | {"width": [">", 0], "height": [">", 0]},
         }
         if self.constraints:
             find_images["constraints"] = json.loads(str(self.constraints))
 
         while (not self.limit) or (offset < self.limit):
             find_images["offset"] = offset
-            res, _, = db.query([{"FindImage": find_images}])
+            (
+                res,
+                _,
+            ) = db.query([{"FindImage": find_images}])
             if self._response_status(res) != 0:
                 raise ValueError(f"Failed to query images: {db.get_last_response_str()}")
             fe_result = res[0]["FindImage"]
@@ -131,73 +137,74 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
     def _adb_to_rectanglelabels(img, bboxen):
         width = img["width"]
         height = img["height"]
-        return [{
-            "result": [{
-                "from_name": "label",
-                "to_name": "image",
-                "id": str(bbx["LS_id"] if bbx["LS_id"] is not None else bbx["_uniqueid"]),
-                "type": "rectanglelabels",
-                "original_width": width,
-                "original_height": height,
-                "image_rotation": 0,
-                "value": {
-                    "rotation": 0,
-                    "x": 100 * bbx["_coordinates"]["x"] / width,
-                    "y": 100 * bbx["_coordinates"]["y"] / height,
-                    "width": 100 * bbx["_coordinates"]["width"] / width,
-                    "height": 100 * bbx["_coordinates"]["height"] / height,
-                    "rectanglelabels": [bbx["_label"]]
+        return (
+            [
+                {
+                    "result": [
+                        {
+                            "from_name": "label",
+                            "to_name": "image",
+                            "id": str(bbx["LS_id"] if bbx["LS_id"] is not None else bbx["_uniqueid"]),
+                            "type": "rectanglelabels",
+                            "original_width": width,
+                            "original_height": height,
+                            "image_rotation": 0,
+                            "value": {
+                                "rotation": 0,
+                                "x": 100 * bbx["_coordinates"]["x"] / width,
+                                "y": 100 * bbx["_coordinates"]["y"] / height,
+                                "width": 100 * bbx["_coordinates"]["width"] / width,
+                                "height": 100 * bbx["_coordinates"]["height"] / height,
+                                "rectanglelabels": [bbx["_label"]],
+                            },
+                        }
+                        for bbx in bboxen
+                    ]
                 }
-            } for bbx in bboxen]
-        }] if len(bboxen) > 0 else []
-        
+            ]
+            if len(bboxen) > 0
+            else []
+        )
+
     def _get_bbox_annotations(self, key, project_id):
         db = self.get_connection()
-        query = [{
-            "FindImage": {
-                "blobs": False,
-                "_ref": 1,
-                "results": {
-                    "list": ["width", "height"]
-                },
-                "constraints": {
-                    "width": [">", 0],
-                    "height": [">", 0],
-                    "_uniqueid": ["==", key]
+        query = [
+            {
+                "FindImage": {
+                    "blobs": False,
+                    "_ref": 1,
+                    "results": {"list": ["width", "height"]},
+                    "constraints": {"width": [">", 0], "height": [">", 0], "_uniqueid": ["==", key]},
                 }
-            }
-        },{
-            "FindEntity": {
-                "with_class": "LS_annotation",
-                "is_connected_to": {
-                    "ref": 1 
-                },
-                "constraints": {
-                    "LS_project_id": ["==", project_id]
-                },
-                "results": {
-                    "list": ["LS_data"]
+            },
+            {
+                "FindEntity": {
+                    "with_class": "LS_annotation",
+                    "is_connected_to": {"ref": 1},
+                    "constraints": {"LS_project_id": ["==", project_id]},
+                    "results": {"list": ["LS_data"]},
                 }
-            }
-        }]
+            },
+        ]
 
         if self.predictions:
             pred_constraints = json.loads(str(self.pred_constraints)) if self.pred_constraints else {}
-            query.append({
-                "FindBoundingBox": {
-                    "image_ref": 1,
-                    "blobs": False,
-                    "coordinates": True,
-                    "labels": True,
-                    "uniqueids": True,
-                    "results": {
-                        "list": ["LS_id"]
-                    },
-                    "constraints": pred_constraints | {
-                        "LS_id": ["==", None],
+            query.append(
+                {
+                    "FindBoundingBox": {
+                        "image_ref": 1,
+                        "blobs": False,
+                        "coordinates": True,
+                        "labels": True,
+                        "uniqueids": True,
+                        "results": {"list": ["LS_id"]},
+                        "constraints": pred_constraints
+                        | {
+                            "LS_id": ["==", None],
+                        },
                     }
                 }
-            })
+            )
 
         res, _ = db.query(query)
         status = self._response_status(res)
@@ -216,7 +223,6 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
                 preds = self._adb_to_rectanglelabels(img, bboxen)
         return anns, preds
 
-
     def get_data(self, key):
         data = {
             "data": {
@@ -233,14 +239,16 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
 
     def get_blob(self, uniqueid):
         db = self.get_connection()
-        req = [{
-            "FindImage": {
-                "blobs": True,
-                "constraints": {
-                    "_uniqueid": ["==", uniqueid]
-                },
+        req = [
+            {
+                "FindImage": {
+                    "blobs": True,
+                    "constraints": {"_uniqueid": ["==", uniqueid]},
+                }
             }
-        }]
+        ]
+        if self.as_format_jpg:
+            req[0]["FindImage"]["as_format"] = "jpg"
         res, blob = db.query(req)
 
         status = self._response_status(res)
@@ -254,7 +262,9 @@ class ApertureDBImportStorageBase(ApertureDBStorageMixin, ImportStorage):
         try:
             return self._scan_and_create_links(ApertureDBImportStorageLink)
         except Exception as e:
-            logger.warning(f"Unhandled exception during ApertureDBImportStorage sync:  {''.join(traceback.format_exception(e))}")
+            logger.warning(
+                f"Unhandled exception during ApertureDBImportStorage sync:  {''.join(traceback.format_exception(e))}"
+            )
             raise e
 
     class Meta:
@@ -266,13 +276,13 @@ class ApertureDBImportStorage(ProjectStorageMixin, ApertureDBImportStorageBase):
         abstract = False
 
 
-class AnnotationBBox():
+class AnnotationBBox:
     @staticmethod
     def _get(obj, key, description="rectangle annotation"):
         if not isinstance(obj, dict):
             raise ValueError(f"{description} must be a dict")
         if not key in obj:
-            raise ValueError(f"{description} must include \"{key}\"")
+            raise ValueError(f'{description} must include "{key}"')
         return obj[key]
 
     def __init__(self, ann):
@@ -293,14 +303,14 @@ class AnnotationBBox():
         if len(self.labels) > 1:
             raise ValueError(f"rectangle annotation can have at most one label: {','.join(self.labels)}")
         self.text = val["text"] if "text" in val else []
-    
+
     @staticmethod
     def _attr_must_match(a, b, attr):
         a_val = a[attr] if isinstance(a, dict) else getattr(a, attr)
         b_val = b[attr] if isinstance(b, dict) else getattr(b, attr)
         if a_val != b_val:
             raise ValueError(f"Annotations have mismatched {attr}: {a_val} != {b_val}")
-    
+
     def merge(self, other):
         if not isinstance(other, AnnotationBBox):
             other = AnnotationBBox(other)
@@ -317,16 +327,16 @@ class AnnotationBBox():
 
 
 class ApertureDBExportStorage(ApertureDBStorageMixin, ExportStorage):
-
     def save_annotation(self, annotation):
         db = self.get_connection()
-        logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}...')
+        logger.debug(f"Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}...")
         ser_annotation = self._get_serialized_data(annotation)
 
         bbox_map = {}
         regions = annotation.result if isinstance(annotation.result, list) else [annotation.result]
         for ann in regions:
-            if not "type" in ann: continue
+            if not "type" in ann:
+                continue
 
             if ann["id"] in bbox_map:
                 bbox_map[ann["id"]].merge(ann)
@@ -339,136 +349,115 @@ class ApertureDBExportStorage(ApertureDBStorageMixin, ExportStorage):
             img_id = re.split("key=", img_url)[-1]
 
         ann_id = str(annotation.id)
-        query = [{
-            "FindImage": {
-                "blobs": False,
-                "constraints": {
-                    "_uniqueid": ["==", img_id]
-                },
-                "results": {
-                    "count": True
-                },
-                "_ref": 1,
-            }
-        },{
-            "AddEntity": {
-                "class": "LS_annotation",
-                "if_not_found": {
-                    "LS_id": ["==", ann_id]
-                },
-                "properties": {
-                    "LS_id": ann_id,
-                },
-                "connect": {
-                    "ref": 1,
-                    "class": "LS_annotation_image",
-                },
-                "_ref": 2
-            }
-        },{
-            "UpdateEntity": {
-                "ref": 2,
-                "properties": {
-                    "LS_created_at": { "_date": annotation.created_at.isoformat() },
-                    "LS_project_title": annotation.project.title,
-                    "LS_project_id": annotation.project.id,
-                    "LS_completed_by": annotation.completed_by.email if annotation.completed_by else "",
-                    "LS_updated_at": { "_date": annotation.updated_at.isoformat() },
-                    "LS_updated_by": annotation.updated_by.email if annotation.updated_by else "",
-                    "LS_data": json.dumps(ser_annotation)
+        query = [
+            {
+                "FindImage": {
+                    "blobs": False,
+                    "constraints": {"_uniqueid": ["==", img_id]},
+                    "results": {"count": True},
+                    "_ref": 1,
                 }
-            }
-        }]
+            },
+            {
+                "AddEntity": {
+                    "class": "LS_annotation",
+                    "if_not_found": {"LS_id": ["==", ann_id]},
+                    "properties": {
+                        "LS_id": ann_id,
+                    },
+                    "connect": {
+                        "ref": 1,
+                        "class": "LS_annotation_image",
+                    },
+                    "_ref": 2,
+                }
+            },
+            {
+                "UpdateEntity": {
+                    "ref": 2,
+                    "properties": {
+                        "LS_created_at": {"_date": annotation.created_at.isoformat()},
+                        "LS_project_title": annotation.project.title,
+                        "LS_project_id": annotation.project.id,
+                        "LS_completed_by": annotation.completed_by.email if annotation.completed_by else "",
+                        "LS_updated_at": {"_date": annotation.updated_at.isoformat()},
+                        "LS_updated_by": annotation.updated_by.email if annotation.updated_by else "",
+                        "LS_data": json.dumps(ser_annotation),
+                    },
+                }
+            },
+        ]
 
         ref = 3
         for id, bbox in bbox_map.items():
-            query.extend([{
-                "AddBoundingBox": {
-                    "image_ref": 1,
-                    "_ref": ref,
-                    "rectangle": bbox.rect,
-                    "properties": {
-                        "LS_id": id
-                    },
-                    "if_not_found": {
-                        "any": {
-                            "LS_id": ["==", id],
-                            "_uniqueid": ["==", id if UID_REGEX.match(id) else "0.0.0"]
+            query.extend(
+                [
+                    {
+                        "AddBoundingBox": {
+                            "image_ref": 1,
+                            "_ref": ref,
+                            "rectangle": bbox.rect,
+                            "properties": {"LS_id": id},
+                            "if_not_found": {
+                                "LS_id": ["==", id],
+                            },
                         }
-                    }
-                }
-            },{
-                "UpdateBoundingBox": {
-                    "ref": ref,
-                    "rectangle": bbox.rect,
-                    "label": bbox.labels[0] if len(bbox.labels) > 0 else "",
-                    "properties": {
-                        "LS_text": json.dumps(bbox.text),
-                        "LS_annotation": ann_id,
-                        "LS_label": json.dumps(bbox.labels)
-                    }
-                }
-            },{
-                "AddConnection": {
-                    "class": "LS_annotation_region",
-                    "src": 2,
-                    "dst": ref,
-                    "if_not_found": {}
-                }
-            }])
+                    },
+                    {
+                        "UpdateBoundingBox": {
+                            "ref": ref,
+                            "rectangle": bbox.rect,
+                            "label": bbox.labels[0] if len(bbox.labels) > 0 else "",
+                            "properties": {
+                                "LS_text": json.dumps(bbox.text),
+                                "LS_annotation": ann_id,
+                                "LS_label": json.dumps(bbox.labels),
+                            },
+                        }
+                    },
+                    {"AddConnection": {"class": "LS_annotation_region", "src": 2, "dst": ref, "if_not_found": {}}},
+                ]
+            )
             ref += 1
-        
+
         res, _ = db.query(query)
         status = self._response_status(res)
-        if (status not in (0,2)):
+        if status not in (0, 2):
             raise ValueError(f"Error saving annotation data to ApertureDB : {db.get_last_response_str()}")
 
     def delete_annotation(self, annotation):
         db = self.get_connection()
-        logger.debug(f'Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}...')
+        logger.debug(f"Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}...")
 
         ann_id = str(annotation.id)
-        query = [{
-            "FindEntity": {
-                "with_class": "LS_annotation",
-                "constraints": {
-                    "LS_id": ["==", ann_id]
-                },
-                "_ref": 1
-            }
-        },{
-            "FindBoundingBox": {
-                "is_connected_to": {
-                    "ref": 1,
-                    "connection_class": "LS_annotation_region"
-                },
-                "_ref": 2
-            }
-        },{
-            "DeleteBoundingBox": {
-                "ref": 2
-            }
-        },{
-            "DeleteEntity": {
-                "ref": 1
-            }
-        }]
-        
+        query = [
+            {"FindEntity": {"with_class": "LS_annotation", "constraints": {"LS_id": ["==", ann_id]}, "_ref": 1}},
+            {
+                "FindBoundingBox": {
+                    "is_connected_to": {"ref": 1, "connection_class": "LS_annotation_region"},
+                    "_ref": 2,
+                }
+            },
+            {"DeleteBoundingBox": {"ref": 2}},
+            {"DeleteEntity": {"ref": 1}},
+        ]
+
         res, _ = db.query(query)
         status = self._response_status(res)
-        if (status not in (0,2)):
+        if status not in (0, 2):
             raise ValueError(f"Error deleting annotation data from ApertureDB : {db.get_last_response_str()}")
 
 
 def async_aperturedb_annotation_operation(annotation, operation):
     project = annotation.project
-    if hasattr(project, 'io_storages_aperturedbexportstorages'):
+    if hasattr(project, "io_storages_aperturedbexportstorages"):
         for storage in project.io_storages_aperturedbexportstorages.all():
-            logger.debug(f'{operation} {annotation} in ApertureDB storage {storage}')
+            logger.debug(f"{operation} {annotation} in ApertureDB storage {storage}")
             getattr(storage, operation)(annotation)
 
+
 def enqueue_aperturedb_annotation_operation(annotation, operation):
-    storages = getattr(annotation.project, 'io_storages_aperturedbexportstorages', None)
+    storages = getattr(annotation.project, "io_storages_aperturedbexportstorages", None)
     if storages and storages.exists():  # avoid excess jobs in rq
         start_job_async_or_sync(async_aperturedb_annotation_operation, annotation, operation)
 
@@ -481,13 +470,11 @@ def export_annotation_to_aperturedb_storages(sender, instance, **kwargs):
 @receiver(pre_delete, sender=Annotation)
 def delete_annotation_from_aperturedb_storages(sender, instance, **kwargs):
     enqueue_aperturedb_annotation_operation(instance, "delete_annotation")
-        
+
 
 class ApertureDBImportStorageLink(ImportStorageLink):
-    storage = models.ForeignKey(ApertureDBImportStorage,
-                                on_delete=models.CASCADE, related_name='links')
+    storage = models.ForeignKey(ApertureDBImportStorage, on_delete=models.CASCADE, related_name="links")
 
 
 class ApertureDBExportStorageLink(ExportStorageLink):
-    storage = models.ForeignKey(ApertureDBExportStorage,
-                                on_delete=models.CASCADE, related_name='links')
+    storage = models.ForeignKey(ApertureDBExportStorage, on_delete=models.CASCADE, related_name="links")

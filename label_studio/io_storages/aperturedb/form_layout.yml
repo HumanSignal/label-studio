@@ -39,6 +39,9 @@ ImportStorage:
         label: Image Constraints (optional)
         description: ApertureDB FindImage constraints (see https://docs.aperturedata.io/query_language/Reference/shared_command_parameters/constraints)
       - type: toggle
+        name: as_format_jpg
+        label: Conversion Images to JPEG
+      - type: toggle
         name: predictions
         label: Include Bounding Box Predictions
       - type: textarea
