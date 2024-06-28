@@ -39,10 +39,16 @@ From the Prompts page, click **Create Prompt** in the upper right and then compl
 | Name | Enter a name for the Prompt. |
 | Description | Enter a description for the Prompt.  |
 | Type | Select the Prompt model type. At this time, we only support [text classification](#Text-classification). |
-| Target Project| Select the project you want to use. The projects listed will only include text-based projects to which you have access. If you are in the Manager role, you need to be added to the project to have access. <br><br>If you don't see a project listed, then you do not have any eligible projects available. This is likely because the project is set up for multiple selection (e.g. `choice="multiple"`), doesn't have text data (e.g. it only includes data types that aren't supported such as image, audio, video), or you do not have access to the project.   |
+| Target Project| Select the project you want to use. If you don't have any eligible projects, you will see an error message. <br><br>See the note below.  |
 | Classes | This list is automatically generated from the labeling configuration of the target project. |
 
 </div>
+
+!!! note Eligible projects
+    Target projects must meet the following criteria:
+    * The labeling configuration for the project must use single class classification (e.g. `choice="single"`). 
+    * The project must include text data (e.g. it cannot only include unsupported data types such as image, audio, video).
+    * You must have access to the project. If you are in the Manager role, you need to be added to the project to have access. 
 
 ![Screenshot of the create model page](/images/prompts/model_create.png)
 
