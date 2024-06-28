@@ -51,7 +51,7 @@
           <% if(locals.component === "nav") { %>
             <button>
               <%- p.page.section || tocHeaderFileName %>
-              <% if(p.page.section === "Curate Datasets" || tocHeaderFileName === "Curate Datasets") {%>
+              <% if(p.page.section === "Curate Datasets" || p.page.section === "Prompts" || tocHeaderFileName === "Curate Datasets" || tocHeaderFileName === "Prompts") {%>
                 <svg width="41" height="16" viewBox="0 0 41 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g clip-path="url(#clip0_47_53391)">
                   <path d="M37 0H4C1.79086 0 0 1.79086 0 4V12C0 14.2091 1.79086 16 4 16H37C39.2091 16 41 14.2091 41 12V4C41 1.79086 39.2091 0 37 0Z" fill="url(#paint0_linear_47_53391)"/>
@@ -77,7 +77,7 @@
           <% } else { %>
             <div class="toc-section-heading">
               <%- partial("component/text", {text: p.page.section || tocHeaderFileName, size: "Eyebrow", tag: "h3"}) %>
-              <% if(p.page.section === "Curate Datasets" || tocHeaderFileName === "Curate Datasets") {%>
+              <% if(p.page.section === "Curate Datasets" || tocHeaderFileName === "Curate Datasets" || p.page.section === "Prompts" || tocHeaderFileName === "Prompts") {%>
                 <svg width="41" height="16" viewBox="0 0 41 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g clip-path="url(#clip0_47_5339)">
                   <path d="M37 0H4C1.79086 0 0 1.79086 0 4V12C0 14.2091 1.79086 16 4 16H37C39.2091 16 41 14.2091 41 12V4C41 1.79086 39.2091 0 37 0Z" fill="url(#paint0_linear_47_5339)"/>
