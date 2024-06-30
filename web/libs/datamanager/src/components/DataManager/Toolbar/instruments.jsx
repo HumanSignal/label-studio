@@ -78,12 +78,12 @@ export const instruments = {
       iconProps.style = {
         marginRight: 3,
       };
-      iconProps.color = "#1F1F1F";
+      iconProps.color = "#566fcf";
     }
     return (
       <FieldsButton
         wrapper={FieldsButton.Checkbox}
-        trailingIcon={<Icon {...iconProps} icon={isNewUI ? FaChevronDown : FaCaretDown} />}
+        trailingIcon={<Icon {...iconProps} icon={isNewUI ? FaChevronDown : FaChevronDown} />}
         title={"Columns"}
         size={size}
         style={style}

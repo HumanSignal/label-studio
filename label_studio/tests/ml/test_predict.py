@@ -32,7 +32,7 @@ def test_get_single_prediction_on_task(business_client, ml_backend_for_test_pred
         data={
             'project': project.id,
             'title': 'ModelSingle',
-            'url': 'http://localhost:9092',
+            'url': 'http://test.ml.backend.for.sdk.com:9092',
         },
     )
     assert response.status_code == 201
@@ -74,7 +74,7 @@ def test_get_multiple_predictions_on_task(business_client, ml_backend_for_test_p
         data={
             'project': project.id,
             'title': 'ModelA',
-            'url': 'http://localhost:9093',
+            'url': 'http://test.ml.backend.for.sdk.com:9093',
         },
     )
     assert response.status_code == 201

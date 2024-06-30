@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1169: LEAP-1165: LEAP-1177 Fix security issues (#6013)",
-  "commit": "119bb236f05d94ff92ec79e0dae15bd625a3ebbf",
-  "date": "2024-06-20T15:39:45.000Z",
+  "message": "chore: LEAP-1192: Remove feat_front_dev_4008_quick_task_open_short (#6034)",
+  "commit": "f25918268078c50d1e2d822c6ccbace2d2a8e959",
+  "date": "2024-06-27T11:42:33.000Z",
   "branch": "develop"
 }

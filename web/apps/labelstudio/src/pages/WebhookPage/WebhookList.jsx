@@ -31,6 +31,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
 
   return (
     <Block name="webhook">
+      <h1>Webhooks</h1>
       <Elem name="controls">
         <Button onClick={onAddWebhook}>Add Webhook</Button>
       </Elem>

@@ -5,7 +5,8 @@
 
   &__wrapper
     border-radius 4px
-    box-shadow 0 0 0 1px rgba(0, 0, 0, 0.15) inset
+    border 1px solid var(--sand_300)
+    background var(--sand_0)
 
   &__loading
     width 100%
@@ -33,10 +34,10 @@
     display flex
     position relative
     align-items center
-    font 16px/normal 'Roboto'
 
+  &__field
     &.last-activity
-      color rgba(#000, 0.4)
+      color var(--sand_600)
 
   &__column
     font-weight 500
@@ -62,11 +63,11 @@
     display flex
 
     &:nth-child(odd):not(&_active)
-      background-color rgba(0, 0, 0, 0.03)
+      background-color var(--sand_100)
 
     &_active
       position relative
-      background-color #fff
+      background-color var(--sand_0)
 
       &::before,
       &::after
@@ -79,9 +80,9 @@
 
       &::after
         z-index 1
-        background-color #fff
+        background-color var(--sand_0)
         width calc(100% + 22px)
-        box-shadow inset 2px 0 0 #000, 1px 0 0 1px rgba(0, 0, 0, 0.15) inset
+        box-shadow inset 2px 0 0 var(--grape_500), 1px 0 0 1px var(--sand_300) inset
 
       &::before
         z-index 0

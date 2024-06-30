@@ -166,7 +166,7 @@ export const ActionsButton = injector(
               <FaChevronDown size="12" style={{ marginLeft: 4, marginRight: -7 }} />
             )
           ) : (
-            <FaAngleDown size="16" style={{ marginLeft: 4 }} color="#0077FF" />
+            <FaAngleDown size="16" style={{ marginLeft: 4 }} color="#566fcf" />
           )}
         </Button>
       </Dropdown.Trigger>
