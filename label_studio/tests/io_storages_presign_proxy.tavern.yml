@@ -921,7 +921,7 @@ stages:
     url: '{django_live_url}/api/storages/azure_spi/{storage_pk}/sync'
   response:
     json:
-      last_sync_count: 0
+      last_sync_count: 3
     status_code: 200
 - name: stage
   request:

@@ -22,7 +22,6 @@ from organizations.models import Organization
 from projects.models import Project
 from tasks.serializers import TaskWithAnnotationsSerializer
 from users.models import User
-
 try:
     from businesses.models import BillingPlan, Business
 except ImportError:
@@ -212,7 +211,6 @@ def azure_client_mock():
 @contextmanager
 def azure_client_sp_mock():
     from collections import namedtuple
-
     from io_storages.azure_serviceprincipal import models
 
     File = namedtuple('File', ['name'])
@@ -264,15 +262,23 @@ def azure_client_sp_mock():
             return DummyAzureBlob(self.name, key)
 
     class DummyBlobServiceClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
         def get_container_client(self, container_name):
             return DummyAzureContainer(container_name)
 
-    with mock.patch.object(
-        models.AzureServicePrincipalStorageMixin, 'blobservice_client', return_value=DummyBlobServiceClient()
-    ):
-        with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
-            yield
+    class DummyClientSecretCredential:
+        def __init__(self, *args, **kwargs):
+            pass
 
+        def get_token(self):
+            return 'token'
+
+    with mock.patch.object(models, 'ClientSecretCredential' , DummyClientSecretCredential):
+        with mock.patch.object(models, 'BlobServiceClient' , DummyBlobServiceClient):
+            with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
+                yield
 
 @contextmanager
 def redis_client_mock():
