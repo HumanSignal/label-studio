@@ -12,6 +12,7 @@ from tasks.models import Annotation, Prediction
 
 logger = logging.getLogger(__name__)
 
+
 def validate_string_list(value):
     if not value:
         raise ValidationError('list should not be empty')
@@ -173,16 +174,18 @@ class ModelRun(models.Model):
         it will not take affect. The only relationship like this that currently exists
         is in Annotation.parent_prediction, which we are handling here
         """
+        print('starting to delete predictions', flush=True)
         predictions = Prediction.objects.filter(model_run=self.id)
         prediction_ids = [p.id for p in predictions]
         Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
         try:
+            print('trying to delete PredictionStats before deleting predictions', flush=True)
             from label_studio_enterprise.stats.models import PredictionStats
 
             prediction_stats_to_be_deleted = PredictionStats.objects.filter(prediction_to_id__in=prediction_ids)
             prediction_stats_to_be_deleted.delete()
         except Exception as e:
-            logger.info(f"PredictionStats model does not exist , exception:{e}")
+            logger.info(f'PredictionStats model does not exist , exception:{e}')
         predictions._raw_delete(predictions.db)
 
     def delete(self, *args, **kwargs):
