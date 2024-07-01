@@ -57,6 +57,9 @@ markdown:
   breaks: false
   smartLists: true
   smartypants: true
+marked:
+  gfm: true
+  breaks: false
 index_generator:
   path: ''
   per_page: 10
