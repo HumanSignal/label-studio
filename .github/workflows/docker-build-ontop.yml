@@ -91,7 +91,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Push Docker image
-        uses: docker/build-push-action@v6.1.0
+        uses: docker/build-push-action@v6.2.0
         id: docker_build_and_push
         with:
           context: .
