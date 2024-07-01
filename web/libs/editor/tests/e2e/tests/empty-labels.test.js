@@ -111,8 +111,13 @@ examples.forEach((example) => {
     I.amOnPage("/");
     LabelStudio.init(params);
     AtTopbar.see("Update");
-    AtSidebar.dontSeeRegions(regionsCount);
-    AtSidebar.dontSeeRegions();
+    // only one example here produces actual regions — when per-regions are used
+    if (title.includes("per-region")) {
+      AtSidebar.seeRegions(regionsCount);
+    } else {
+      AtSidebar.dontSeeRegions(regionsCount);
+      AtSidebar.dontSeeRegions();
+    }
   });
 });
 
@@ -120,7 +125,7 @@ const SINGLE_TYPE = "single";
 const MULTIPLE_TYPE = "multiple";
 
 [SINGLE_TYPE, MULTIPLE_TYPE].forEach((type) => {
-  Scenario(`Making labels empty -> choice="${type}"`, async ({ I, LabelStudio, AtSidebar, AtAudioView, AtLabels }) => {
+  Scenario(`Making labels empty -> choice="${type}"`, async ({ I, LabelStudio, AtSidebar, AtOutliner, AtAudioView, AtLabels }) => {
     async function expectSelectedLabels(expectedNum) {
       const selectedLabelsNum = await I.grabNumberOfVisibleElements(AtLabels.locateSelected());
 
@@ -134,7 +139,7 @@ const MULTIPLE_TYPE = "multiple";
       await expectSelectedLabels(expectSelectedNum);
       I.pressKey(["u"]);
       await expectSelectedLabels(0);
-      I.click(locate(".lsf-region-item"));
+      AtOutliner.clickRegion(1);
       await expectSelectedLabels(expectSelectedNum);
     }
     async function clickLabelWithSelectedExpection(labelNumber, expectSelectedNum) {
@@ -165,7 +170,7 @@ const MULTIPLE_TYPE = "multiple";
     await AtAudioView.waitForAudio();
     AtSidebar.seeRegions(regionsCount);
 
-    I.click(locate(".lsf-region-item"));
+    AtOutliner.clickRegion(1);
     AtLabels.clickLabel("1");
 
     const restored = await LabelStudio.serialize();

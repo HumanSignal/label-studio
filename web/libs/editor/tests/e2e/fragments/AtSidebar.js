@@ -15,8 +15,6 @@ module.exports = {
   dontSeeRegions(count) {
     if (count) {
       I.dontSeeElement(this._regionsCounterLocator.withText(`${count}`));
-    } else if (count === +count) {
-      I.seeElement(this._regionGroupButton.withDescendant(this._regionsCounterLocator));
     } else {
       I.seeElement(this._regionsCounterLocator.withText("0"));
     }
