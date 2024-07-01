@@ -57,13 +57,14 @@ You can also check out an older branch version in the GitHub repository:
 ```sh
 git clone https://github.com/HumanSignal/label-studio-sdk.git
 cd label-studio-sdk
-git checkout previous-version
+git fetch origin
+git checkout release/0.0.34
 ```
 
 Or you can simply modify you code to change the import stream as follows:
 
 ```python
-from label_studio_sdk import Client
+from label_studio_sdk._legacy import Client
 from label_studio_sdk.data_manager import Filters, Column, Operator, Type
 from label_studio_sdk._legacy import Project
 ```
