@@ -44,6 +44,7 @@ export const CurrentTask = observer(({ store }) => {
   // @todo some interface?
   let canPostpone =
     !isDefined(store.annotationStore.selected.pk) &&
+    store.hasInterface("skip") &&
     !store.canGoNextTask &&
     !store.hasInterface("review") &&
     store.hasInterface("postpone");
@@ -90,6 +91,7 @@ export const CurrentTask = observer(({ store }) => {
             <Elem
               tag={Button}
               name="prevnext"
+              data-testid="next-task"
               mod={{
                 next: true,
                 disabled: !store.canGoNextTask && !canPostpone,
