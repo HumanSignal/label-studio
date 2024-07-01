@@ -173,6 +173,12 @@ class ModelRun(models.Model):
         predictions = Prediction.objects.filter(model_run=self.id)
         prediction_ids = [p.id for p in predictions]
         Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
+        try:
+            from label_studio_enterprise.stats.models import PredictionStats
+            prediction_stats_to_be_deleted = PredictionStats.objects.filter(prediction_to_id__in=prediction_ids)
+            prediction_stats_to_be_deleted.delete()
+        except:
+            pass
         predictions._raw_delete(predictions.db)
 
     def delete(self, *args, **kwargs):
