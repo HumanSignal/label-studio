@@ -359,7 +359,7 @@ Data sync initializes immediately after creating the dataset. Depending on how m
 
 
 
-## Datasets using Microsoft Azure - Azure Accoutn Keys
+## Datasets using Microsoft Azure - Azure Account Keys
 
 Requirements:
 
