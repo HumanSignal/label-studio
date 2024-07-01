@@ -115,8 +115,7 @@ examples.forEach((example) => {
     if (title.includes("per-region")) {
       AtSidebar.seeRegions(regionsCount);
     } else {
-      AtSidebar.dontSeeRegions(regionsCount);
-      AtSidebar.dontSeeRegions();
+      AtSidebar.seeRegions(0);
     }
   });
 });

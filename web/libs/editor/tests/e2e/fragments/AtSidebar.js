@@ -12,13 +12,6 @@ module.exports = {
   seeRegions(count) {
     I.seeElement(this._regionsCounterLocator.withText(`${count}`));
   },
-  dontSeeRegions(count) {
-    if (count) {
-      I.dontSeeElement(this._regionsCounterLocator.withText(`${count}`));
-    } else {
-      I.seeElement(this._regionsCounterLocator.withText("0"));
-    }
-  },
   seeRelations(count) {
     I.see(`Relations (${count})`, this._sideBarLocator);
   },
