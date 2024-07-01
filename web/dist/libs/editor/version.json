@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-453: Fix annotation and draft being requested at the same time (#6005)",
-  "commit": "88a45a78857840dc149593334a669c952e78d064",
-  "date": "2024-06-26T15:07:31.000Z",
+  "message": "chore: LEAP-1192: Remove feat_front_dev_4008_quick_task_open_short (#6034)",
+  "commit": "f25918268078c50d1e2d822c6ccbace2d2a8e959",
+  "date": "2024-06-27T11:42:33.000Z",
   "branch": "develop"
 }

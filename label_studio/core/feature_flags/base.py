@@ -49,9 +49,14 @@ else:
     # Production usage
     if hasattr(settings, 'REDIS_LOCATION'):
         logger.debug(f'Set LaunchDarkly config with Redis feature store at {settings.REDIS_LOCATION}')
-        store = Redis.new_feature_store(
-            url=settings.REDIS_LOCATION, prefix='feature-flags', caching=CacheConfig(expiration=30)
-        )
+        store_kwargs = {
+            'url': settings.REDIS_LOCATION,
+            'prefix': 'feature-flags',
+            'caching': CacheConfig(expiration=30),
+        }
+        if settings.REDIS_LOCATION.startswith('rediss'):
+            store_kwargs['redis_opts'] = settings.REDIS_SSL_SETTINGS
+        store = Redis.new_feature_store(**store_kwargs)
         ldclient.set_config(
             Config(settings.FEATURE_FLAGS_API_KEY, feature_store=store, http=HTTPConfig(connect_timeout=5))
         )
