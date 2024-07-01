@@ -181,8 +181,8 @@ class ModelRun(models.Model):
 
             prediction_stats_to_be_deleted = PredictionStats.objects.filter(prediction_to_id__in=prediction_ids)
             prediction_stats_to_be_deleted.delete()
-        except: # noqa
-            logger.info("PredictionStats model does not exist")
+        except Exception as e:
+            logger.info(f"PredictionStats model does not exist , exception:{e}")
         predictions._raw_delete(predictions.db)
 
     def delete(self, *args, **kwargs):
