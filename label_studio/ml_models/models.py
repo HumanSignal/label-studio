@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+import logging
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -8,6 +10,7 @@ from projects.models import Project
 from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation, Prediction
 
+logger = logging.getLogger(__name__)
 
 def validate_string_list(value):
     if not value:
@@ -175,10 +178,11 @@ class ModelRun(models.Model):
         Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
         try:
             from label_studio_enterprise.stats.models import PredictionStats
+
             prediction_stats_to_be_deleted = PredictionStats.objects.filter(prediction_to_id__in=prediction_ids)
             prediction_stats_to_be_deleted.delete()
         except:
-            pass
+            logger.info("PredictionStats model does not exist")
         predictions._raw_delete(predictions.db)
 
     def delete(self, *args, **kwargs):
