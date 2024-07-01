@@ -103,7 +103,6 @@ Scenario("NERText", async ({ I, AtSidebar, AtTopbar }) => {
   assert.deepEqual(result, results);
 
   // Create a new annotation to create the same result from scratch
-  I.click('[aria-label="Annotations List Toggle"]');
   I.click('[aria-label="Create Annotation"]');
 
   I.pressKey("2");
@@ -119,7 +118,7 @@ Scenario("NERText", async ({ I, AtSidebar, AtTopbar }) => {
   assert.deepEqual(result, [newResult]);
 
   // delete this new annotation
-  AtTopbar.clickAria("Delete");
+  AtTopbar.clickAria("Delete Annotation");
   I.click("Proceed"); // approve
 
   I.pressKey("1");

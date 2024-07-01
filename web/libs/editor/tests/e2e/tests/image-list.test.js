@@ -226,7 +226,7 @@ Scenario("Image list exports correct data", async ({ I, LabelStudio, AtImageView
   await LabelStudio.resultsNotChanged(result);
 });
 
-Scenario("Regions are not changes when duplicating an annotation", async ({ I, LabelStudio, AtImageView }) => {
+Scenario("Regions are not changes when duplicating an annotation", async ({ I, LabelStudio, AtImageView, AtTopbar }) => {
   const params = {
     config: rectConfig,
     data,
@@ -240,7 +240,7 @@ Scenario("Regions are not changes when duplicating an annotation", async ({ I, L
   await AtImageView.lookForStage();
 
   I.say("Attempting to duplicate an annotaion");
-  I.click('[aria-label="Copy Annotation"]');
+  AtTopbar.clickAria("Duplicate Annotation");
 
   await AtImageView.waitForImage();
   await AtImageView.lookForStage();

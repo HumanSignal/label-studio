@@ -10,12 +10,7 @@ module.exports = {
   _regionUnselectedLocator: locate(".lsf-tree-treenode:not(.lsf-tree-treenode-selected)"),
   _selectedRegionsLocator: locate(".lsf-detailed-region"),
   seeRegions(count) {
-    if (count) {
-      I.seeElement(this._regionsCounterLocator.withText(`${count}`));
-    } else {
-      I.seeElement(this._regionGroupButton.withText("Regions"));
-      I.dontSeeElement(this._regionGroupButton.withDescendant(this._regionsCounterLocator));
-    }
+    I.seeElement(this._regionsCounterLocator.withText(`${count}`));
   },
   dontSeeRegions(count) {
     if (count) {
@@ -23,7 +18,7 @@ module.exports = {
     } else if (count === +count) {
       I.seeElement(this._regionGroupButton.withDescendant(this._regionsCounterLocator));
     } else {
-      I.dontSee("Regions", this._sideBarLocator);
+      I.seeElement(this._regionsCounterLocator.withText("0"));
     }
   },
   seeRelations(count) {

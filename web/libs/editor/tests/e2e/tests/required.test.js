@@ -100,7 +100,6 @@ Scenario("Check required param", async ({ I }) => {
   I.executeScript(initLabelStudio, params);
 
   // Add new Annotation to be able to submit it
-  I.click('[aria-label="Annotations List Toggle"]');
   I.click('[aria-label="Create Annotation"]');
   I.submitAnnotation();
   waitForError("validation-label");
@@ -122,7 +121,6 @@ Scenario("Check required param", async ({ I }) => {
   I.executeScript(initLabelStudio, params);
   // Page is reloaded, there are no new annotation from prev steps
   I.dontSee("New annotation");
-  I.click('[aria-label="Annotations List Toggle"]');
   I.click('[aria-label="Create Annotation"]');
   I.click("Valid");
   I.submitAnnotation();
@@ -194,7 +192,6 @@ Scenario("Check required param in complex config", async ({ I, AtSidebar }) => {
   I.updateAnnotation();
   I.dontSee("Valid");
 
-  I.click('[aria-label="Annotations List Toggle"]');
   I.click('[aria-label="Create Annotation"]');
   I.submitAnnotation();
   waitForError("common-description");
@@ -218,7 +215,6 @@ Scenario("Check required param with visibleWhen='choice-unselected'", async ({ I
   LabelStudio.init(params);
 
   // Add new Annotation to be able to submit it
-  I.click('[aria-label="Annotations List Toggle"]');
   I.click('[aria-label="Create Annotation"]');
 
   // Select one from each choices groups, except the one with visibleWhen condition
@@ -239,7 +235,6 @@ Scenario("Check required param with visibleWhen='choice-unselected'", async ({ I
   LabelStudio.init(params);
   // LabelStudio is reloaded, there are no new annotation from prev steps
   I.dontSee("New annotation");
-  I.click('[aria-label="Annotations List Toggle"]');
   I.click('[aria-label="Create Annotation"]');
 
   // Select all required options we have

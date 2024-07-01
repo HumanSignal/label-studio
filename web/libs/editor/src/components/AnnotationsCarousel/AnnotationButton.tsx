@@ -145,7 +145,7 @@ export const AnnotationButton = observer(
             </Elem>
           )}
           {showDuplicateAnnotation && (
-            <Elem name="option" mod={{ duplicate: true }} onClick={duplicateAnnotation}>
+            <Elem name="option" aria-label="Duplicate Annotation" mod={{ duplicate: true }} onClick={duplicateAnnotation}>
               <Elem name="icon">
                 <IconDuplicate width={20} height={24} />
               </Elem>
@@ -155,7 +155,7 @@ export const AnnotationButton = observer(
           {capabilities.enableAnnotationDelete && !isPrediction && (
             <>
               <Elem name="seperator" />
-              <Elem name="option" mod={{ delete: true }} onClick={deleteAnnotation}>
+              <Elem name="option" aria-label="Delete Annotation" mod={{ delete: true }} onClick={deleteAnnotation}>
                 <Elem name="icon">
                   <IconTrashRect width={14} height={18} />
                 </Elem>{" "}
