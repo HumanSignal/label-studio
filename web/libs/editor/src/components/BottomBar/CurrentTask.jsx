@@ -23,47 +23,49 @@ export const CurrentTask = observer(({ store }) => {
     store.hasInterface("postpone");
 
   return (
-    <Block name="current-task" mod={{ "with-history": historyEnabled }}>
-      <Elem name="task-id">
-        {store.task.id ?? guidGenerator()}
-        {historyEnabled &&
-          (isFF(FF_TASK_COUNT_FIX) ? (
-            <Elem name="task-count">
-              {store.queuePosition} of {store.queueTotal}
-            </Elem>
-          ) : (
-            <Elem name="task-count">
-              {currentIndex} of {store.taskHistory.length}
-            </Elem>
-          ))}
-      </Elem>
-      {historyEnabled && (
-        <Elem name="history-controls">
-          <Elem
-            tag={Button}
-            name="prevnext"
-            mod={{ prev: true, disabled: !store.canGoPrevTask }}
-            type="link"
-            disabled={!historyEnabled || !store.canGoPrevTask}
-            onClick={store.prevTask}
-            style={{ background: "none", backgroundColor: "none" }}
-          />
-          <Elem
-            tag={Button}
-            name="prevnext"
-            data-testid="next-task"
-            mod={{
-              next: true,
-              disabled: !store.canGoNextTask && !canPostpone,
-              postpone: !store.canGoNextTask && canPostpone,
-            }}
-            type="link"
-            disabled={!store.canGoNextTask && !canPostpone}
-            onClick={store.canGoNextTask ? store.nextTask : store.postponeTask}
-            style={{ background: "none", backgroundColor: "none" }}
-          />
+    <Elem name="section">
+      <Block name="current-task" mod={{ "with-history": historyEnabled }}>
+        <Elem name="task-id">
+          {store.task.id ?? guidGenerator()}
+          {historyEnabled &&
+            (isFF(FF_TASK_COUNT_FIX) ? (
+              <Elem name="task-count">
+                {store.queuePosition} of {store.queueTotal}
+              </Elem>
+            ) : (
+              <Elem name="task-count">
+                {currentIndex} of {store.taskHistory.length}
+              </Elem>
+            ))}
         </Elem>
-      )}
-    </Block>
+        {historyEnabled && (
+          <Elem name="history-controls">
+            <Elem
+              tag={Button}
+              name="prevnext"
+              mod={{ prev: true, disabled: !store.canGoPrevTask }}
+              type="link"
+              disabled={!historyEnabled || !store.canGoPrevTask}
+              onClick={store.prevTask}
+              style={{ background: "none", backgroundColor: "none" }}
+            />
+            <Elem
+              tag={Button}
+              name="prevnext"
+              data-testid="next-task"
+              mod={{
+                next: true,
+                disabled: !store.canGoNextTask && !canPostpone,
+                postpone: !store.canGoNextTask && canPostpone,
+              }}
+              type="link"
+              disabled={!store.canGoNextTask && !canPostpone}
+              onClick={store.canGoNextTask ? store.nextTask : store.postponeTask}
+              style={{ background: "none", backgroundColor: "none" }}
+            />
+          </Elem>
+        )}
+      </Block>
+    </Elem>
   );
 });
