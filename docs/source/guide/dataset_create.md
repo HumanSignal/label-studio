@@ -359,10 +359,11 @@ Data sync initializes immediately after creating the dataset. Depending on how m
 
 
 
-## Datasets using Microsoft Azure 
+## Datasets using Microsoft Azure - Azure Accoutn Keys
 
 Requirements:
 
+- Your data is saved as blobs in an Azure storage account. We do not currently support Azure Data Lake. For authenticating to Azure storage with a service principal, go to [Go to Azure Service Principal section](#datasets-using-microsoft-azure---azure-service-principal).
 - Your data is saved as blobs in an Azure storage account. We do not currently support Azure Data Lake.
 - You have access to retrieve the [storage account access key](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage). 
 - Your storage container has CORS configured properly. Configuring CORS allows you to view the data in Label Studio. When CORS is not configured, you are only able to view links to the data. 
@@ -448,5 +449,103 @@ When you create a storage account, Azure automatically generates two keys that w
     ![Select dataset column](/images/data_discovery/dataset_column_azure.png)
 
 6. Click **Create Dataset**. 
+
+Data sync initializes immediately after creating the dataset. Depending on how much data you have, syncing might take several minutes to complete.
+
+ Datasets using Microsoft Azure  - Service Principal
+
+Requirements:
+
+- For authenticating to Azure storage with a service principal.
+- Your data is saved as blobs in an Azure storage account.
+- You have granted Contributor access [RBACs](https://learn.microsoft.com/en-us/azure/role-based-access-control/overview) to a service pricipal.
+- Your storage container has CORS configured properly. Configuring CORS allows you to view the data in Label Studio. When CORS is not configured, you are only able to view links to the data.
+
+{% details <b>Configure CORS for the Azure storage account</b> %}
+
+
+Configure CORS at the storage account level.
+
+1. In the Azure portal, navigate to the page for the storage account.
+2. From the menu on the left, scroll down to **Settings > Resource sharing (CORS)**.
+3. Under **Blob service** add the following rule:
+
+   * **Allowed origins:** `*`
+   * **Allowed methods:** `GET`
+   * **Allowed headers:** `*`
+   * **Exposed headers:** `Access-Control-Allow-Origin`
+   * **Max age:** `3600`
+
+4. Click **Save**.
+
+![Screenshot of the Azure portal page for configuring CORS](/images/azure-storage-cors.png)
+
+
+{% enddetails %}
+
+{% details <b>Retrieve the Azure storage access key</b> %}
+
+
+###### Create a Service Principal
+
+1. Create a service principal via Azure docs [How to Create a Service Principal](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal).
+
+###### Create a Service Principal Secret (Client Secret)
+1. Create a new client secret by following the steps below
+2. Browse to Identity > Applications > App registrations, then select your application.
+3. Select Certificates & secrets.
+4. Select Client secrets, and then select New client secret.
+Provide a description of the secret, and a duration.
+5. Select Add.
+
+###### Create the Contributor Role Based Access Cotnrol
+
+When you create a storage account, assign a Contributor role to your service principal - read more about [role assignment steps](https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-steps),
+
+
+### Create a dataset from an Azure blob storage container
+
+1. From Label Studio, navigate to the Datasets page and click **Create Dataset**.
+
+    ![Create a dataset action](/images/data_discovery/dataset_create.png)
+
+2. Complete the following fields and then click **Next**:
+
+    <div class="noheader rowheader">
+
+    | | |
+    | --- | --- |
+    | Name | Enter a name for the dataset. |
+    | Description | Enter a brief description for the dataset.  |
+    | Source | Select Microsoft Azure. |
+
+    </div>
+
+3. Complete the following fields:
+
+    <div class="noheader rowheader">
+
+    | | |
+    | --- | --- |
+    | Container Name | Enter the name of a container within the Azure storage account. |
+    | Container Prefix | Enter the folder name within the container that you would like to use.  For example, `data-set-1` or `data-set-1/subfolder-2`.  |
+    | File Name Filter | Use glob format to filter which file types to sync. For example, to sync all JPG files, enter `*jpg`. To sync all JPG and PNG files, enter `**/**+(jpg\|png)`.<br><br>At this time, we support the following file types: .jpg, .jpeg, .png, .txt, .text |
+    | Account Name |  Enter the name of the Azure storage account. |
+    | Client Secret | Enter the access key for the Azure storage account (see [Create a Service Principal Secret (Client Secret) section](#create-a-service-principal-secret-client-secret) above). |
+    | Treat every bucket object as a source file | **Enabled** - Each object in the bucket will be imported as a separate record in the dataset.<br>You should leave this option enabled if you are importing a bucket of unstructured data files such as JPG, PNG, or TXT. <br><br>**Disabled** - Disable this option if you are importing structured data, such as JSON or CSV files.<br><br>**NOTE:** At this time, we only support unstructured data. Structured data support is coming soon.  |
+    | Use pre-signed URLs | If your tasks contain `azure-spi://…` links, they must be pre-signed in order to be displayed in the browser. |
+    | Expiration minutes | Adjust the counter for how many minutes the pre-signed URLs are valid. |
+
+    </div>
+
+4. Click **Check Connection** to verify your credentials. If your connection is valid, click **Next**.
+
+    ![Check Dataset connection](/images/data_discovery/dataset_check_connection_azure.png)
+
+5. Provide a name for your dataset column and select a data type. The data type that you select tells Label Studio how to store your data in a way that is [searchable](dataset_search).
+
+    ![Select dataset column](/images/data_discovery/dataset_column_azure.png)
+
+6. Click **Create Dataset**.
 
 Data sync initializes immediately after creating the dataset. Depending on how much data you have, syncing might take several minutes to complete.
