@@ -18,8 +18,8 @@
       padding 5px
       width 100%
       display flex
-      background #f9f9f9
-      justify-content space-betwee
+      background var(--sand_0)
+      justify-content space-between
 
     &-content
       width 100%
@@ -27,7 +27,7 @@
       cursor pointer
       overflow hidden
       position relative
-      border-radius 2px
+      border-radius 8px
       background none
 
       &::after
@@ -36,10 +36,10 @@
         right 0
         bottom 0
         content ""
-        border-radius 2px
         position absolute
         pointer-events none
-        box-shadow 0 0 0 1px rgba(0,0,0,0.2) inset
+        border-radius 8px
+        border 1px solid var(--sand_300)
 
     &_selected &-content
       background-color #eff7ff
@@ -50,3 +50,7 @@
 
   .skeletonLoader
     padding 5px
+
+  & .grid-image-wrapper
+      text-align center
+      background var(--sand_100)

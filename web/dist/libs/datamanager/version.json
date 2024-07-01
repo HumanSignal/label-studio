@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1169: LEAP-1165: LEAP-1177 Fix security issues (#6013)",
-  "commit": "119bb236f05d94ff92ec79e0dae15bd625a3ebbf",
-  "date": "2024-06-20T15:39:45.000Z",
+  "message": "test: LEAP-1141: Add test for concurrent saving annotation and draft (#6022)",
+  "commit": "9dc93d0c5bb0f4a36ada5a2cdf500cca20decc4f",
+  "date": "2024-07-01T13:39:36.000Z",
   "branch": "develop"
 }

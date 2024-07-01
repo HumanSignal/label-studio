@@ -170,7 +170,7 @@ Scenario("Rich text content consistency", async ({ I, LabelStudio, AtOutliner, A
   LabelStudio.init({
     config: `<View>
     <Labels name="label" toName="html">
-        <Label value="Highlight" background="#0099ff" />
+        <Label value="Highlight" background="#617ADA" />
     </Labels>
     <HyperText name="html" value="$html" />
 </View>`,

@@ -188,7 +188,7 @@ export const TabColumn = types
         default:
           return null;
         case "total_annotations":
-          return <LsAnnotation width="20" height="20" style={{ color: "#0099FF" }} />;
+          return <LsAnnotation width="20" height="20" style={{ color: "#617ADA" }} />;
         case "cancelled_annotations":
           return <LsBanSquare width="20" height="20" style={{ color: "#DD0000" }} />;
         case "total_predictions":

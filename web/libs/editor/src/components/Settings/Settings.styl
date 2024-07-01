@@ -1,7 +1,6 @@
 
 $settings__title
-  color #1F1F1F
-  font-family Roboto
+  font-family 'Figtree', sans-serif
   font-size 16px
   font-weight 500
   line-height 24px
@@ -39,7 +38,7 @@ $settings__title
     height 16px
     display inline-flex
     align-items center
-    background #FFFFFF
+    background var(--sand_0)
     border-radius 2px
     font-weight bold
     font-size 12px
@@ -60,17 +59,23 @@ $settings__title
     border-top 2px solid rgba(#000, 0.05)
 
 .settings-modal
-  --modal-button-text-color-active #40A9FF
-  --toggle-color #1890FF
+  --modal-button-text-color-active var(--primary_link)
+  --toggle-color var(--primary_link)
   --modal-border-radius 8px
   --modal-padding 24px
 
   width 100% !important
   max-width 568px !important
 
+  .ant-pagination-item-active
+    border-color var(--primary_link)
+  .ant-pagination-item-active a
+    color var(--primary_link)
   :global(.ant-tabs-tab .ant-tabs-tab-btn)
     @extends $settings__title
     text-shadow none
+  :global(.ant-tabs-ink-bar)
+    background var(--primary_link)
   :global(.ant-modal-close)
     top: 28px
     right: var(--modal-padding)
@@ -83,6 +88,8 @@ $settings__title
     color var(--modal-button-text-color-active)
   :global(.ant-tabs-tab)
     padding calc(var(--modal-padding) / 4) var(--modal-padding) !important
+    :hover
+      color var(--primary_link)
   :global(.ant-tabs-tab + .ant-tabs-tab)
     margin-left 0 !important
   :global(.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn)
@@ -96,10 +103,8 @@ $settings__title
     padding var(--modal-padding) !important
     border none !important
   :global(.ant-modal-title)
-    color #1F1F1F
-    font-family Roboto
     font-size 24px
-    font-weight 400
+    font-weight 500
     line-height 32px
     letter-spacing 0
     text-align left
@@ -109,8 +114,8 @@ $settings__title
     align-items center
     justify-content center
     padding-inline 4px
-    color #030852
-    background-color #D6E4FF
+    color var(--grape_700)
+    background-color var(--grape_0)
     border-radius 2px
     height 20px
     font-size 11px

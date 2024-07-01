@@ -1,39 +1,48 @@
 .empty-state-default
-  maxWidth: 680px
-  background #FAFAFA
-  border 1px solid rgba(137, 128, 152, 0.16)
-  padding 40px 25px
-  font: 16px Roboto;
-  border-radius 8px
+  max-width 40rem
+  background var(--grape_0)
+  border 1px solid var(--grape_500)
+  padding 2rem
+  border-radius .5rem
   display: flex
   flex-direction: column
   justify-content: center
   align-items: center
 
   &__icon
-    margin-bottom: 10px
+    margin-bottom: .75rem;
+    background: var(--grape_100);
+    padding: .5rem;
+    display: flex;
+    border-radius: 2rem;
+    & svg path
+      fill: var(--grape_500);
 
   &__action
-    margin-bottom: 25px
+    margin-bottom: 1.25rem
 
   &__title
-    font-size: 22px;
-    font-weight: meidum;
-    color: #000
-    margin-bottom: 20px
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--sand_900)
+    margin-bottom: 1rem
 
   &__description
     font-size: 1rem
-    color: #1f1f1f
-    margin-bottom: 20px
+    color: var(--sand_900)
+    margin-bottom: 1rem
     text-align: center
     line-height: 1.5em
 
   &__footer
     font-size: .75rem
-    color: #434343
+    color: var(--sand_900)
     text-align: center
     line-height: 1.5em
 
   &__footer a
-    color #176CEB
+    color var(--grape_700)
+    text-decoration underline
+
+    &:hover
+      text-decoration none

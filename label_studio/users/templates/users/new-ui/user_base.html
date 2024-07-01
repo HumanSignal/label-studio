@@ -5,6 +5,7 @@
 
 
 {% block head %}
+<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/fonts.hellix.css' %}"/>
 <link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/login.css' %}"/>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129877673-1" nonce="{{request.csp_nonce}}"></script>
@@ -19,8 +20,7 @@ gtag('config', 'UA-129877673-1');
 {% block content %}
 <div class="login_page_new_ui">
   <div class="left">
-    <h2>Welcome</h2>
-    <img src="{{ settings.HOSTNAME }}{% static 'images/label_studio_logo.svg' %}" height="93"  alt="Label Studio Logo"/>
+    <img src="{{ settings.HOSTNAME }}{% static 'icons/logo-black.svg' %}" height="64"  alt="Label Studio Logo"/>
     <h3>A full-fledged open source solution for data labeling</h3>
 
     {% include 'users/new-ui/user_tips.html' %}
@@ -31,12 +31,6 @@ gtag('config', 'UA-129877673-1');
     </div>
   </div>
   <div class="right">
-    <div class="toggle">
-        {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
-        <a href="{{ settings.HOSTNAME }}/user/signup" class="{% if 'signup' in request.path %}active{% endif %}">Sign up</a>
-        <a href="{{ settings.HOSTNAME }}/user/login" class="{% if 'login' in request.path %}active{% endif %}">Log in</a>
-        {% endif %}
-    </div>
     {% block user_content %}
   </div>
 </div>
