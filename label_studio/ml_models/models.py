@@ -178,12 +178,10 @@ class ModelRun(models.Model):
         predictions = Prediction.objects.filter(model_run=self.id)
         prediction_ids = [p.id for p in predictions]
         Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
+        # to delete all depencies where predictions are foreign keys.
         try:
-            print('trying to delete PredictionStats before deleting predictions', flush=True)
             from stats.models import PredictionStats
 
-            print('import done', flush=True)
-            print('prediction_ids', prediction_ids)
             prediction_stats_to_be_deleted = PredictionStats.objects.filter(prediction_to__in=prediction_ids)
             prediction_stats_to_be_deleted.delete()
         except Exception as e:
