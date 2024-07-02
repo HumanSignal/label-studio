@@ -182,7 +182,9 @@ class ModelRun(models.Model):
             print('trying to delete PredictionStats before deleting predictions', flush=True)
             from stats.models import PredictionStats
 
-            prediction_stats_to_be_deleted = PredictionStats.objects.filter(prediction_to_id__in=prediction_ids)
+            print('import done', flush=True)
+            print('prediction_ids', prediction_ids)
+            prediction_stats_to_be_deleted = PredictionStats.objects.filter(prediction_to__in=prediction_ids)
             prediction_stats_to_be_deleted.delete()
         except Exception as e:
             logger.info(f'PredictionStats model does not exist , exception:{e}')
