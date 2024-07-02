@@ -180,7 +180,7 @@ class ModelRun(models.Model):
         Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
         try:
             print('trying to delete PredictionStats before deleting predictions', flush=True)
-            from label_studio_enterprise.stats.models import PredictionStats
+            from stats.models import PredictionStats
 
             prediction_stats_to_be_deleted = PredictionStats.objects.filter(prediction_to_id__in=prediction_ids)
             prediction_stats_to_be_deleted.delete()
