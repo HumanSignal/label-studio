@@ -1,9 +1,20 @@
 import { render } from "@testing-library/react";
 import { CurrentTask } from "../CurrentTask";
-import { BlockContext, cn } from "../../../utils/bem.ts"; // import the context from bem.ts
+import { BlockContext, cn } from "../../../utils/bem.ts";
+import { FF_LEAP_1173 } from "../../../utils/feature-flags";
+import { mockFF } from "../../../../__mocks__/global";
+
+const ff = mockFF();
 
 describe("CurrentTask", () => {
   let store: any;
+
+  beforeAll(() => {
+    ff.setup();
+    ff.set({
+      [FF_LEAP_1173]: true,
+    });
+  });
 
   beforeEach(() => {
     // Initialize your store with default values
