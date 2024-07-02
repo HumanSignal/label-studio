@@ -1,3 +1,4 @@
+
 .modal
   --transition-duration 100ms
 
@@ -5,13 +6,17 @@
   left 0
   width 100%
   height 100%
-  z-index 10000
+  z-index 2000
   display flex
   position fixed
   align-items center
   justify-content center
   background-color rgba(#000, 0.3)
   will-change opacity
+  overflow hidden
+  
+  &_optimize &__wrapper
+    will-change transform
 
   &__wrapper
     width 100%
@@ -19,7 +24,6 @@
     padding 40px 0
     overflow auto
     box-sizing border-box
-    will-change transform
 
   &__content
     width 400px
@@ -29,32 +33,34 @@
     display flex
     flex-direction column
     background-color var(--sand_0)
-    border-radius 5px
+    border-radius .5rem
     box-shadow 0 10px 30px rgba(#000, 0.3)
     display flex
     flex-direction column
+    overflow hidden
 
   &__header
     display flex
     min-height 40px
     align-items center
     justify-content space-between
-    padding 16px 32px
+    padding 1rem 2rem
     box-sizing content-box
 
     &_divided
-      border-bottom 1px solid rgba(0, 0, 0, 0.05)
+      border-bottom 1px solid var(--sand_300)
 
   &__title
     margin 0
     margin-right auto
-    font-size 20px
+    font-size 1.75rem
     font-weight 500
 
   &__body
     flex 1
-    padding 0 40px 32px
-    white-space: pre-wrap;
+    padding 0 2rem 2rem
+    min-height 0
+    line-height 140%
 
     &_bare
       padding 0
@@ -63,23 +69,25 @@
       flex-direction column
 
   &__footer
-    padding 16px 32px
+    padding 1rem 1.5rem
     text-align center
     font-size 14px
     line-height 22px
+
     & a
-      color var(--primary_link)
+      color var(--grape_600)
       text-decoration underline
       &:hover
-        text-decoration none
-        color var(--primary_link)
+        color var(--grape_700)
 
     &:not(&_bare)
       background var(--sand_100)
-      box-shadow inset 0px 1px 0px rgba(0, 0, 0, 0.05)
+      box-shadow inset 0px 1px 0px var(--sand_300)
 
   &__close
     --button-color var(--primary_link)
+    border none
+    --icon-size 16px
 
   &_fullscreen &__content
     width calc(100vw - 80px)

@@ -36,16 +36,13 @@ export const AnnotationSettings = () => {
           >
             <Form.Row columnCount={1}>
               <Elem name={"header"}>Labeling Instructions</Elem>
+              <div style={{ color: "var(--sand_600)", fontSize: ".875rem" }}>
+                <p style={{ marginBottom: "0" }}>Write instructions to help users complete labeling tasks.</p>
+                <p style={{ marginTop: ".5rem" }}>The instruction field supports HTML markup and it allows use of images, iframes (pdf).</p>
+              </div>
               <div>
                 <Toggle label="Show before labeling" name="show_instruction" />
               </div>
-              <div style={{ color: "var(--sand_600)" }}>
-                <p>Write instructions to help users complete labeling tasks.</p>
-                <p>The instruction field supports HTML markup and it allows use of images, iframes (pdf).</p>
-              </div>
-            </Form.Row>
-
-            <Form.Row columnCount={1}>
               <TextArea name="expert_instruction" style={{ minHeight: 128, maxWidth: "520px" }} />
             </Form.Row>
 

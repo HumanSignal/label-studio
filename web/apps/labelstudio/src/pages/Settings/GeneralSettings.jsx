@@ -32,12 +32,11 @@ export const GeneralSettings = () => {
         <Block name="settings-wrapper">
           <Form action="updateProject" formData={{ ...project }} params={{ pk: project.id }} onSubmit={updateProject}>
             <Form.Row columnCount={1} rowGap="16px">
-              <Input name="title" label="Project Name" labelProps={{ large: true }} />
+              <Input name="title" label="Project Name" />
 
               <TextArea
                 name="description"
                 label="Description"
-                labelProps={{ large: true }}
                 style={{ minHeight: 128 }}
               />
               {isFF(FF_LSDV_E_297) && (
