@@ -174,11 +174,10 @@ class ModelRun(models.Model):
         it will not take affect. The only relationship like this that currently exists
         is in Annotation.parent_prediction, which we are handling here
         """
-        print('starting to delete predictions', flush=True)
         predictions = Prediction.objects.filter(model_run=self.id)
         prediction_ids = [p.id for p in predictions]
-        Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
         # to delete all depencies where predictions are foreign keys.
+        Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
         try:
             from stats.models import PredictionStats
 
