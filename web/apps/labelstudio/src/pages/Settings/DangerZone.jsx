@@ -96,9 +96,7 @@ export const DangerZone = () => {
   return (
     <div className={cn("simple-settings")}>
       <h1>Danger Zone</h1>
-      <Label
-        description="Perform these actions at your own risk. Actions you take on this page can't be reverted. Make sure your data is backed up."
-      />
+      <Label description="Perform these actions at your own risk. Actions you take on this page can't be reverted. Make sure your data is backed up." />
 
       {project.id ? (
         <div style={{ marginTop: 16 }}>

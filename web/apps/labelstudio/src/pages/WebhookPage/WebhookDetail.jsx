@@ -147,7 +147,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                     <Label text="Headers" large />
                     <Button
                       type="button"
-                      onClick={onAddHeaderClick} 
+                      onClick={onAddHeaderClick}
                       className={rootClass.elem("headers-add")}
                       icon={<LsPlus />}
                     />

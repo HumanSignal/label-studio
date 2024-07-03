@@ -73,7 +73,8 @@ export const TipsCollection: Record<string, Tip[]> = {
     },
     {
       title: "Labeling for GenAI",
-      content: "Label Studio has templates available for supervised LLM fine-tuning, RAG retrieval ranking, RLHF, chatbot evaluation, and more.",
+      content:
+        "Label Studio has templates available for supervised LLM fine-tuning, RAG retrieval ranking, RLHF, chatbot evaluation, and more.",
       closable: true,
       link: {
         label: "Explore templates",
