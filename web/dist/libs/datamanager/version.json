@@ -1,6 +1,6 @@
 {
-  "message": "test: LEAP-1141: Add test for concurrent saving annotation and draft (#6022)",
-  "commit": "9dc93d0c5bb0f4a36ada5a2cdf500cca20decc4f",
-  "date": "2024-07-01T13:39:36.000Z",
+  "message": "feat: LEAP-1173: Disable the postpone option if the skip interface isn't set (#6048)",
+  "commit": "470b83bb7ddcbf47a82bfb73f2d4f906c387c204",
+  "date": "2024-07-03T15:35:13.000Z",
   "branch": "develop"
 }
