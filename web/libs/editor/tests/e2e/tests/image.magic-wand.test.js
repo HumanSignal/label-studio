@@ -59,7 +59,7 @@ async function assertMagicWandPixel(I, x, y, assertValue, rgbArray, msg) {
   assert.equal(hasPixel, assertValue, msg);
 }
 
-Scenario(
+Scenario.only(
   "Make sure the magic wand works in a variety of scenarios",
   async ({ I, LabelStudio, AtImageView, AtSidebar }) => {
     const params = {
@@ -97,7 +97,7 @@ Scenario(
 
     I.say("Ensuring repeated magic wands back to back with same class collapsed into single region");
     AtSidebar.seeRegions(1);
-    AtSidebar.see("Cloud");
+    AtSidebar.seeRegion("Cloud");
 
     // Force all the magic wand regions to be a consistent color with no opacity to make testing
     // magic wand pixel colors more robust.
@@ -188,7 +188,7 @@ Scenario(
 
     I.say("Ensuring new cloud shadow magic wand region gets added to sidebar");
     AtSidebar.seeRegions(2);
-    AtSidebar.see("Cloud Shadow");
+    AtSidebar.seeRegion("Cloud Shadow");
 
     I.say("Ensuring cloud shadow magic wand pixels are correctly filled color");
     await I.executeScript(setKonvaLayersOpacity, [1.0]);
@@ -213,8 +213,8 @@ Scenario(
     I.say("Changing class of existing selected region to Haze should change it to new class");
     I.pressKey("3");
     AtSidebar.seeRegions(2);
-    AtSidebar.dontSee("Cloud Shadow");
-    AtSidebar.see("Haze");
+    AtSidebar.dontSeeRegion("Cloud Shadow");
+    AtSidebar.seeRegion("Haze");
     await I.executeScript(setKonvaLayersOpacity, [1.0]);
     await assertMagicWandPixel(I, 350, 360, true, HAZE.rgbArray, "Center area should have magic wand haze class");
   },

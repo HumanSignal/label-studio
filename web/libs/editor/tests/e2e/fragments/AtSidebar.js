@@ -34,11 +34,11 @@ module.exports = {
   locateSelectedRegion(locator) {
     return locate(this._regionSelectedLocator).find(locator);
   },
-  see(text) {
-    I.see(text, this._sideBarLocator);
+  seeRegion(text) {
+    I.seeElement(locate(this._regionLocator).withText(text));
   },
-  dontSee(text) {
-    I.dontSee(text, this._sideBarLocator);
+  dontSeeRegion(text) {
+    I.dontSeeElement(locate(this._regionLocator).withText(text));
   },
   seeElement(locator) {
     I.seeElement(this.locate(locator));
