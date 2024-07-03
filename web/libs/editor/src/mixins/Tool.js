@@ -93,6 +93,13 @@ const ToolMixin = types
 
       if (typeof self[fn] !== "undefined") self[fn].call(self, ev, args);
     },
+
+    shouldSkipInteractions(e) {
+      const isCtrlPressed = e.evt && (e.evt.metaKey || e.evt.ctrlKey);
+      const hasSelection = self.control.annotation.hasSelection;
+
+      return isCtrlPressed && !hasSelection;
+    },
   }));
 
 export default types.compose(ToolMixin, AnnotationMixin);
