@@ -3,6 +3,7 @@ const { I } = inject();
 module.exports = {
   _topbarLocator: locate({ css: ".lsf-topbar" }),
   _bottombarLocator: locate({ css: ".lsf-bottombar" }),
+  _dropdownLocator: locate({ css: ".lsf-dropdown" }),
   _annotationsList: locate({ css: ".lsf-annotations-carousel" }),
   _annotationsListItemSelector: ".lsf-annotation-button",
   _annotationContextMenuLocator: ".lsf-annotation-button__contextMenu",
@@ -26,7 +27,8 @@ module.exports = {
   },
   clickAria(label) {
     I.click(this.locate(this._annotationContextMenuLocator));
-    I.click(`[aria-label="${label}"]`, this._topbarLocator);
+    // new dropdown is detached from the main content
+    I.click(`[aria-label="${label}"]`, this._dropdownLocator);
   },
   click(locator) {
     I.click(this.locate(locator));
