@@ -176,7 +176,7 @@ class ModelRun(models.Model):
         """
         predictions = Prediction.objects.filter(model_run=self.id)
         prediction_ids = [p.id for p in predictions]
-        # to delete all depencies where predictions are foreign keys.
+        # to delete all dependencies where predictions are foreign keys.
         Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
         try:
             from stats.models import PredictionStats
