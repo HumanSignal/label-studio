@@ -12,7 +12,7 @@ meta_description: Compare the features of Label Studio Community Edition with th
 
 Label Studio is available as open source software as well as an [Enterprise cloud service](https://humansignal.com/). The Enterprise version offers enhanced security (SSO, RBAC, SOC2), team management, analytics and reporting, and uptime and support SLAs. A [free trial is available](https://humansignal.com/free-trial) to get started quickly and explore the enterprise cloud product.
 
-<a class="Button" href="https://humansignal.com/free-trial" target="_blank" style="margin-bottom: 2em;">Free Enterprise Trial</a>
+<a class="Button" href="https://humansignal.com/goenterprise/" target="_blank" style="margin-bottom: 2em;">Learn About Enterprise</a>
 
 <table>
 <thead>

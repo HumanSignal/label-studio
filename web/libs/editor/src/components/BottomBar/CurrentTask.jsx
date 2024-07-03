@@ -4,7 +4,7 @@ import { Button } from "../../common/Button/Button";
 import { Block, Elem } from "../../utils/bem";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
-import { FF_TASK_COUNT_FIX, isFF } from "../../common/Tooltip/Tooltip";
+import { FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
 import "./CurrentTask.styl";
 
 export const CurrentTask = observer(({ store }) => {
@@ -13,10 +13,12 @@ export const CurrentTask = observer(({ store }) => {
   }, [store.taskHistory]);
 
   const historyEnabled = store.hasInterface("topbar:prevnext");
+
   // @todo some interface?
   const canPostpone =
     !isDefined(store.annotationStore.selected.pk) &&
     !store.canGoNextTask &&
+    (!isFF(FF_LEAP_1173) || store.hasInterface("skip")) &&
     !store.hasInterface("review") &&
     store.hasInterface("postpone");
 
@@ -50,6 +52,7 @@ export const CurrentTask = observer(({ store }) => {
             <Elem
               tag={Button}
               name="prevnext"
+              data-testid="next-task"
               mod={{
                 next: true,
                 disabled: !store.canGoNextTask && !canPostpone,
