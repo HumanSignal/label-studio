@@ -59,7 +59,7 @@ async function assertMagicWandPixel(I, x, y, assertValue, rgbArray, msg) {
   assert.equal(hasPixel, assertValue, msg);
 }
 
-Scenario.only(
+Scenario(
   "Make sure the magic wand works in a variety of scenarios",
   async ({ I, LabelStudio, AtImageView, AtSidebar }) => {
     const params = {
