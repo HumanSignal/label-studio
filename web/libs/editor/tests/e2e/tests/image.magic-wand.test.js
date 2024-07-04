@@ -92,8 +92,8 @@ Scenario.only(
     AtSidebar.seeRegions(0);
 
     I.say("Magic wanding clouds with cloud class in upper left of image");
-    await doDrawingAction(I, { msg: "Fill in clouds upper left", fromX: 258, fromY: 214, toX: 650, toY: 650 });
-    await doDrawingAction(I, { msg: "Fill in clouds lower left", fromX: 337, fromY: 777, toX: 650, toY: 650 });
+    await doDrawingAction(I, { msg: "Fill in clouds upper left", fromX: 258, fromY: 208, toX: 650, toY: 644 });
+    await doDrawingAction(I, { msg: "Fill in clouds lower left", fromX: 337, fromY: 771, toX: 650, toY: 644 });
 
     I.say("Ensuring repeated magic wands back to back with same class collapsed into single region");
     AtSidebar.seeRegions(1);
