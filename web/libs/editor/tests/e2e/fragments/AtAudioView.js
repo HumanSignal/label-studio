@@ -30,7 +30,7 @@ module.exports = {
   _stageBbox: { x: 0, y: 0, width: 0, height: 0 },
 
   async lookForStage() {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     const bbox = await I.grabElementBoundingRect(this._stageSelector);
 
     this._stageBbox = bbox;
@@ -52,7 +52,7 @@ module.exports = {
    * @param shiftX {number}
    */
   dragAudioElement(x, shiftX, shouldRelease = true) {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     I.moveMouse(this._stageBbox.x + x, this._stageBbox.y + this._stageBbox.height / 2);
     I.pressMouseDown();
     I.moveMouse(this._stageBbox.x + x + shiftX, this._stageBbox.y + this._stageBbox.height / 2, 3);
@@ -71,7 +71,7 @@ module.exports = {
    */
   clickAt(x, y) {
     y = y !== undefined ? y : this._stageBbox.height / 2;
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     I.clickAt(this._stageBbox.x + x, this._stageBbox.y + y);
     I.wait(1); // We gotta  wait here because clicks on the canvas are not processed immediately
   },
@@ -197,7 +197,7 @@ module.exports = {
   async zoomToPoint(deltaY, atPoint = { x: 0.5, y: 0.5 }) {
     const { x = 0.5, y = 0.5 } = atPoint;
 
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
 
     const stageBBox = await I.grabElementBoundingRect(this._stageSelector);
 

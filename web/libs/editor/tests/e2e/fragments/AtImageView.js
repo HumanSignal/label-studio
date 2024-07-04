@@ -47,7 +47,7 @@ module.exports = {
   },
 
   async lookForStage() {
-    await I.scrollPageToTop();
+    await I.executeScript(Helpers.scrollToTop);
 
     this._stageBBox = await this.grabStageBBox();
   },
@@ -226,7 +226,7 @@ module.exports = {
    * @param shiftY
    */
   drawByDrag(x, y, shiftX, shiftY) {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     I.moveMouse(this.stageBBox().x + x, this.stageBBox().y + y);
     I.pressMouseDown();
     I.moveMouse(this.stageBBox().x + x + shiftX, this.stageBBox().y + y + shiftY, 3);
@@ -243,7 +243,7 @@ module.exports = {
     const lastPoint = points[points.length - 1];
     const prevPoints = points.slice(0, points.length - 1);
 
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
 
     if (prevPoints.length) {
       for (const point of prevPoints) {
@@ -264,7 +264,7 @@ module.exports = {
    * @param {number} parameter - parameter for mode
    */
   drawThroughPoints(points, mode = "steps", parameter = 1) {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     const calcSteps = {
       steps: () => parameter,
       rate: (p1, p2) => Math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2) / parameter,
@@ -282,16 +282,16 @@ module.exports = {
     I.pressMouseUp();
   },
   clickAt(x, y) {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     I.clickAt(this.stageBBox().x + x, this.stageBBox().y + y);
     I.wait(1); // We gotta  wait here because clicks on the canvas are not processed immediately
   },
   dblClickAt(x, y) {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     I.dblClickAt(this.stageBBox().x + x, this.stageBBox().y + y);
   },
   drawByClick(x, y) {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     this.clickAt(x, y);
   },
   async clickOnRegion(regionIndex) {

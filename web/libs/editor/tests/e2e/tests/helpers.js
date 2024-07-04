@@ -167,6 +167,13 @@ const createAddEventListenerScript = (eventName, callback) => {
 };
 
 /**
+ * Scrollable container is not document but this .lsf-main-view, so scroll it
+ */
+const scrollToTop = () => {
+  document.querySelector('.lsf-main-view').scrollIntoView();
+}
+
+/**
  * Wait for the main Image object to be loaded
  */
 const waitForImage = () => {
@@ -870,6 +877,7 @@ module.exports = {
   waitForObjectsReady,
   delay,
 
+  scrollToTop,
   getSizeConvertor,
   convertToFixed,
 
