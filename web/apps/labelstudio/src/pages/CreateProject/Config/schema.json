@@ -72,10 +72,7 @@
       "splitchannels": {
         "name": "splitchannels",
         "description": "Display multiple audio channels separately, if the audio file has more than one channel. (**NOTE: Requires more memory to operate.**)",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -114,59 +111,40 @@
       "valueType": {
         "name": "valueType",
         "description": "Whether the text is stored directly in uploaded data or needs to be loaded from a URL",
-        "type": [
-          "url",
-          "text"
-        ],
+        "type": ["url", "text"],
         "required": false,
         "default": "text"
       },
       "inline": {
         "name": "inline",
         "description": "Whether to embed HTML directly in Label Studio or use an iframe",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "saveTextResult": {
         "name": "saveTextResult",
         "description": "Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url`",
-        "type": [
-          "yes",
-          "no"
-        ],
+        "type": ["yes", "no"],
         "required": false
       },
       "encoding": {
         "name": "encoding",
         "description": "How to decode values from encoded strings",
-        "type": [
-          "none",
-          "base64",
-          "base64unicode"
-        ],
+        "type": ["none", "base64", "base64unicode"],
         "required": false
       },
       "selectionEnabled": {
         "name": "selectionEnabled",
         "description": "Enable or disable selection",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
       "clickableLinks": {
         "name": "clickableLinks",
         "description": "Whether to allow opening resources from links in the hypertext markup.",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -179,21 +157,13 @@
       "showLabels": {
         "name": "showLabels",
         "description": "Whether or not to show labels next to the region; unset (by default) — use editor settings; true/false — override settings",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "granularity": {
         "name": "granularity",
         "description": "Control region selection granularity",
-        "type": [
-          "symbol",
-          "word",
-          "sentence",
-          "paragraph"
-        ],
+        "type": ["symbol", "word", "sentence", "paragraph"],
         "required": false
       }
     }
@@ -217,10 +187,7 @@
       "smoothing": {
         "name": "smoothing",
         "description": "Enable smoothing, by default it uses user settings",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "width": {
@@ -240,20 +207,14 @@
       "zoom": {
         "name": "zoom",
         "description": "Enable zooming an image with the mouse wheel",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "negativeZoom": {
         "name": "negativeZoom",
         "description": "Enable zooming out an image",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -267,10 +228,7 @@
       "grid": {
         "name": "grid",
         "description": "Whether to show a grid",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -291,50 +249,35 @@
       "zoomControl": {
         "name": "zoomControl",
         "description": "Show zoom controls in toolbar",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "brightnessControl": {
         "name": "brightnessControl",
         "description": "Show brightness control in toolbar",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "contrastControl": {
         "name": "contrastControl",
         "description": "Show contrast control in toolbar",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "rotateControl": {
         "name": "rotateControl",
         "description": "Show rotate control in toolbar",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "crosshair": {
         "name": "crosshair",
         "description": "Show crosshair cursor",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -417,10 +360,7 @@
       "valueType": {
         "name": "valueType",
         "description": "Whether the data is stored directly in uploaded JSON data or needs to be loaded from a URL",
-        "type": [
-          "json",
-          "url"
-        ],
+        "type": ["json", "url"],
         "required": false,
         "default": "json"
       },
@@ -439,30 +379,21 @@
       "showPlayer": {
         "name": "showPlayer",
         "description": "Whether to show audio player above the paragraphs. Ignored if sync object is audio",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "saveTextResult": {
         "name": "saveTextResult",
         "description": "Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url`",
-        "type": [
-          "no",
-          "yes"
-        ],
+        "type": ["no", "yes"],
         "required": false,
         "default": "yes"
       },
       "layout": {
         "name": "layout",
         "description": "Whether to use a dialogue-style layout or not",
-        "type": [
-          "none",
-          "dialogue"
-        ],
+        "type": ["none", "dialogue"],
         "required": false,
         "default": "none"
       },
@@ -483,10 +414,7 @@
       "contextScroll": {
         "name": "contextScroll",
         "description": "Turn on contextual scroll mode",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       }
@@ -529,39 +457,26 @@
       "valueType": {
         "name": "valueType",
         "description": "Whether the text is stored directly in uploaded data or needs to be loaded from a URL",
-        "type": [
-          "url",
-          "text"
-        ],
+        "type": ["url", "text"],
         "required": false,
         "default": "text"
       },
       "saveTextResult": {
         "name": "saveTextResult",
         "description": "Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url`",
-        "type": [
-          "yes",
-          "no"
-        ],
+        "type": ["yes", "no"],
         "required": false
       },
       "encoding": {
         "name": "encoding",
         "description": "How to decode values from encoded strings",
-        "type": [
-          "none",
-          "base64",
-          "base64unicode"
-        ],
+        "type": ["none", "base64", "base64unicode"],
         "required": false
       },
       "selectionEnabled": {
         "name": "selectionEnabled",
         "description": "Enable or disable selection",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
@@ -574,21 +489,13 @@
       "showLabels": {
         "name": "showLabels",
         "description": "Whether or not to show labels next to the region; unset (by default) — use editor settings; true/false — override settings",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "granularity": {
         "name": "granularity",
         "description": "Control region selection granularity",
-        "type": [
-          "symbol",
-          "word",
-          "sentence",
-          "paragraph"
-        ],
+        "type": ["symbol", "word", "sentence", "paragraph"],
         "required": false
       }
     }
@@ -612,10 +519,7 @@
       "valueType": {
         "name": "valueType",
         "description": "Format of time series data provided. If set to \"url\" then Label Studio loads value references inside `value` key, otherwise it expects JSON.",
-        "type": [
-          "url",
-          "json"
-        ],
+        "type": ["url", "json"],
         "required": false,
         "default": "url"
       },
@@ -666,10 +570,7 @@
       "fixedScale": {
         "name": "fixedScale",
         "description": "Whether to scale y-axis to the maximum to fit all the values. If false, current view scales to fit only the displayed values.",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       }
@@ -765,10 +666,7 @@
       "fixedScale": {
         "name": "fixedScale",
         "description": "if false current view scales to fit only displayed values; if given overwrites TimeSeries' fixedScale",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -805,10 +703,7 @@
       "muted": {
         "name": "muted",
         "description": "muted video",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -840,10 +735,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether the data labeler can select one or multiple labels",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       },
@@ -856,29 +748,20 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
       "smart": {
         "name": "smart",
         "description": "Show smart tool for interactive pre-annotations",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "smartOnly": {
         "name": "smartOnly",
         "description": "Only show smart tool for interactive pre-annotations",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -902,10 +785,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether the data labeler can select one or multiple labels",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       },
@@ -918,10 +798,7 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       }
@@ -940,10 +817,7 @@
       "selected": {
         "name": "selected",
         "description": "Specify whether to preselect this choice on the labeling interface",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "alias": {
@@ -997,31 +871,21 @@
       "choice": {
         "name": "choice",
         "description": "Single or multi-class classification",
-        "type": [
-          "single",
-          "single-radio",
-          "multiple"
-        ],
+        "type": ["single", "single-radio", "multiple"],
         "required": false,
         "default": "single"
       },
       "showInline": {
         "name": "showInline",
         "description": "Show choices in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "required": {
         "name": "required",
         "description": "Validate whether a choice has been selected",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -1034,11 +898,7 @@
       "visibleWhen": {
         "name": "visibleWhen",
         "description": "Control visibility of the choices.",
-        "type": [
-          "region-selected",
-          "choice-selected",
-          "no-region-selected"
-        ],
+        "type": ["region-selected", "choice-selected", "no-region-selected"],
         "required": false
       },
       "whenTagName": {
@@ -1062,19 +922,13 @@
       "perRegion": {
         "name": "perRegion",
         "description": "Use this tag to select a choice for a specific region instead of the entire task",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "perItem": {
         "name": "perItem",
         "description": "Use this tag to select a choice for a specific item inside the object instead of the whole object[^FF_LSDV_4583]",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "value": {
@@ -1086,10 +940,7 @@
       "allowNested": {
         "name": "allowNested",
         "description": "Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one.",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -1137,10 +988,7 @@
       "required": {
         "name": "required",
         "description": "Whether datetime is required or not",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -1153,19 +1001,13 @@
       "perRegion": {
         "name": "perRegion",
         "description": "Use this option to label regions instead of the whole object",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "perItem": {
         "name": "perItem",
         "description": "Use this option to label items inside the object instead of the whole object[^FF_LSDV_4583]",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -1216,29 +1058,20 @@
       "canRotate": {
         "name": "canRotate",
         "description": "Show or hide rotation control",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
       "smart": {
         "name": "smart",
         "description": "Show smart tool for interactive pre-annotations",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "smartOnly": {
         "name": "smartOnly",
         "description": "Only show smart tool for interactive pre-annotations",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -1262,10 +1095,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       },
@@ -1278,10 +1108,7 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
@@ -1314,10 +1141,7 @@
       "canRotate": {
         "name": "canRotate",
         "description": "Show or hide rotation option",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       }
@@ -1342,10 +1166,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure if you can select one or multiple labels",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       },
@@ -1358,10 +1179,7 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       }
@@ -1414,19 +1232,13 @@
       "smart": {
         "name": "smart",
         "description": "Show smart tool for interactive pre-annotations",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "smartOnly": {
         "name": "smartOnly",
         "description": "Only show smart tool for interactive pre-annotations",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -1450,10 +1262,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       },
@@ -1466,10 +1275,7 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
@@ -1502,10 +1308,7 @@
       "selected": {
         "name": "selected",
         "description": "Whether to preselect this label",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -1536,10 +1339,7 @@
       "showAlias": {
         "name": "showAlias",
         "description": "Whether to show alias inside label text",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -1574,10 +1374,7 @@
       "granularity": {
         "name": "granularity",
         "description": "Set control based on symbol or word selection (only for Text)",
-        "type": [
-          "symbol",
-          "word"
-        ],
+        "type": ["symbol", "word"],
         "required": false
       },
       "html": {
@@ -1607,10 +1404,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels for a region",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       },
@@ -1623,10 +1417,7 @@
       "showInline": {
         "name": "showInline",
         "description": "Whether to show labels in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
@@ -1754,10 +1545,7 @@
       "required": {
         "name": "required",
         "description": "Whether to require number validation",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -1770,28 +1558,19 @@
       "perRegion": {
         "name": "perRegion",
         "description": "Use this tag to classify specific regions instead of the whole object",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "perItem": {
         "name": "perItem",
         "description": "Use this tag to classify specific items inside the object instead of the whole object[^FF_LSDV_4583]",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "slider": {
         "name": "slider",
         "description": "Use slider look instead of input; use min and max to add your constraints",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       }
@@ -1840,10 +1619,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       },
@@ -1856,10 +1632,7 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       }
@@ -1912,40 +1685,27 @@
       "pointSize": {
         "name": "pointSize",
         "description": "Size of polygon handle points",
-        "type": [
-          "small",
-          "medium",
-          "large"
-        ],
+        "type": ["small", "medium", "large"],
         "required": false,
         "default": "small"
       },
       "pointStyle": {
         "name": "pointStyle",
         "description": "Style of points",
-        "type": [
-          "rectangle",
-          "circle"
-        ],
+        "type": ["rectangle", "circle"],
         "required": false,
         "default": "circle"
       },
       "smart": {
         "name": "smart",
         "description": "Show smart tool for interactive pre-annotations",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "smartOnly": {
         "name": "smartOnly",
         "description": "Only show smart tool for interactive pre-annotations",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -1969,10 +1729,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       },
@@ -1985,10 +1742,7 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
@@ -2021,21 +1775,14 @@
       "pointSize": {
         "name": "pointSize",
         "description": "Size of polygon handle points",
-        "type": [
-          "small",
-          "medium",
-          "large"
-        ],
+        "type": ["small", "medium", "large"],
         "required": false,
         "default": "medium"
       },
       "pointStyle": {
         "name": "pointStyle",
         "description": "Style of points",
-        "type": [
-          "rectangle",
-          "circle"
-        ],
+        "type": ["rectangle", "circle"],
         "required": false,
         "default": "rectangle"
       }
@@ -2092,23 +1839,14 @@
       "size": {
         "name": "size",
         "description": "Rating icon size",
-        "type": [
-          "small",
-          "medium",
-          "large"
-        ],
+        "type": ["small", "medium", "large"],
         "required": false,
         "default": "medium"
       },
       "icon": {
         "name": "icon",
         "description": "Rating icon",
-        "type": [
-          "star",
-          "heart",
-          "fire",
-          "smile"
-        ],
+        "type": ["star", "heart", "fire", "smile"],
         "required": false,
         "default": "star"
       },
@@ -2121,10 +1859,7 @@
       "required": {
         "name": "required",
         "description": "Whether rating validation is required",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -2137,19 +1872,13 @@
       "perRegion": {
         "name": "perRegion",
         "description": "Use this tag to rate regions instead of the whole object",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "perItem": {
         "name": "perItem",
         "description": "Use this tag to rate items inside the object instead of the whole object[^FF_LSDV_4583]",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -2200,29 +1929,20 @@
       "canRotate": {
         "name": "canRotate",
         "description": "Whether to show or hide rotation control",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
       "smart": {
         "name": "smart",
         "description": "Show smart tool for interactive pre-annotations",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "smartOnly": {
         "name": "smartOnly",
         "description": "Only show smart tool for interactive pre-annotations",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -2246,10 +1966,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       },
@@ -2262,10 +1979,7 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
@@ -2298,10 +2012,7 @@
       "canRotate": {
         "name": "canRotate",
         "description": "Show or hide rotation control",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       }
@@ -2332,10 +2043,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       }
@@ -2391,20 +2099,14 @@
       "leafsOnly": {
         "name": "leafsOnly",
         "description": "Allow annotators to select only leaf nodes of taxonomy",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "showFullPath": {
         "name": "showFullPath",
         "description": "Whether to show the full path of selected items",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -2436,10 +2138,7 @@
       "required": {
         "name": "required",
         "description": "Whether taxonomy validation is required",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -2458,19 +2157,13 @@
       "perRegion": {
         "name": "perRegion",
         "description": "Use this tag to classify specific regions instead of the whole object",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "perItem": {
         "name": "perItem",
         "description": "Use this tag to classify specific items inside the object instead of the whole object[^FF_LSDV_4583]",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -2518,30 +2211,21 @@
       "editable": {
         "name": "editable",
         "description": "Whether to display an editable textarea",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "skipDuplicates": {
         "name": "skipDuplicates",
         "description": "Prevent duplicates in textarea inputs[^FF_LSDV_4659][^FF_LSDV_4712] (see example below)",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
       "transcription": {
         "name": "transcription",
         "description": "If false, always show editor",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -2554,10 +2238,7 @@
       "required": {
         "name": "required",
         "description": "Validate whether content in textarea is required",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       },
@@ -2570,28 +2251,19 @@
       "showSubmitButton": {
         "name": "showSubmitButton",
         "description": "Whether to show or hide the submit button. By default it shows when there are more than one rows of text, such as in textarea mode.",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "perRegion": {
         "name": "perRegion",
         "description": "Use this tag to label regions instead of whole objects",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       },
       "perItem": {
         "name": "perItem",
         "description": "Use this tag to label items inside objects instead of whole objects[^FF_LSDV_4583]",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false
       }
     }
@@ -2615,10 +2287,7 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": [
-          "single",
-          "multiple"
-        ],
+        "type": ["single", "multiple"],
         "required": false,
         "default": "single"
       },
@@ -2631,10 +2300,7 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
@@ -2693,10 +2359,7 @@
       "accordion": {
         "name": "accordion",
         "description": "Works as an accordion",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": true
       },
@@ -2767,10 +2430,7 @@
       "underline": {
         "name": "underline",
         "description": "Whether to underline the header",
-        "type": [
-          "true",
-          "false"
-        ],
+        "type": ["true", "false"],
         "required": false,
         "default": false
       }
@@ -2800,10 +2460,7 @@
     "attrs": {
       "display": {
         "name": "display",
-        "type": [
-          "block",
-          "inline"
-        ],
+        "type": ["block", "inline"],
         "required": true
       },
       "style": {
@@ -2821,11 +2478,7 @@
       "visibleWhen": {
         "name": "visibleWhen",
         "description": "Show the contents of a view when condition is true",
-        "type": [
-          "region-selected",
-          "choice-selected",
-          "no-region-selected"
-        ],
+        "type": ["region-selected", "choice-selected", "no-region-selected"],
         "required": false
       },
       "whenTagName": {

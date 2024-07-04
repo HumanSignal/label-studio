@@ -14,6 +14,13 @@ makemigrations-dev:
 shell-dev:
 	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio python label_studio/manage.py shell_plus
 
+docker-run-dev:
+	docker-compose up --build
+
+docker-migrate-dev:
+	docker-compose run app python3 /label-studio/label_studio/manage.py migrate
+
+
 # Install modules
 frontend-setup:
 	cd web && yarn install --frozen-lockfile;
@@ -30,6 +37,9 @@ frontend-watch:
 # Build production-ready optimized bundle
 frontend-build: frontend-setup
 	cd web && yarn run build
+
+frontend-storybook-serve: frontend-setup
+	cd web && yarn run ui:serve
 
 # Run tests
 test:
@@ -67,3 +77,7 @@ fmt-check-all:
 # Configure pre-push hook using pre-commit
 configure-hooks:
 	pre-commit install --hook-type pre-push
+
+# Generate swagger.json
+generate-swagger:
+	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio python label_studio/manage.py generate_swagger swagger.json

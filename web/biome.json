@@ -1,0 +1,88 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.7.1/schema.json",
+  "organizeImports": {
+    "enabled": false
+  },
+  "files": {
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      "**/tsconfig*",
+      "libs/editor/examples/**/*.json",
+      "libs/editor/src/examples/**/annotations/1.json",
+      "apps/labelstudio-e2e/**"
+    ],
+    "maxSize": 3670016
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "develop"
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "noAutofocus": "off",
+        "noRedundantAlt": "off",
+        "noSvgWithoutTitle": "off",
+        "useAltText": "off",
+        "useButtonType": "off",
+        "useKeyWithClickEvents": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noAssignInExpressions": "off",
+        "noGlobalIsNan": "off",
+        "noArrayIndexKey": "off",
+        "noAsyncPromiseExecutor": "off",
+        "noConfusingVoidType": "off",
+        "noImplicitAnyLet": "off",
+        "noShadowRestrictedNames": "off",
+        "useDefaultSwitchClauseLast": "off",
+        "useGetterReturn": "off"
+      },
+      "complexity": {
+        "noForEach": "off",
+        "noUselessFragments": "off",
+        "noUselessSwitchCase": "off",
+        "useOptionalChain": "off",
+        "noBannedTypes": "off",
+        "noStaticOnlyClass": "off",
+        "noUselessFragments": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off",
+        "noChildrenProp": "off",
+        "noConstantCondition": "off",
+        "noInnerDeclarations": "off",
+        "useJsxKeyInIterable": "off",
+        "noInvalidUseBeforeDeclaration": "off"
+      },
+      "performance": {
+        "noAccumulatingSpread": "off",
+        "noDelete": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off",
+        "useDefaultParameterLast": "off",
+        "useNodejsImportProtocol": "off",
+        "noArguments": "off",
+        "noCommaOperator": "off",
+        "noParameterAssign": "off",
+        "noUselessElse": "off"
+      },
+      "nursery": {},
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      }
+    }
+  }
+}

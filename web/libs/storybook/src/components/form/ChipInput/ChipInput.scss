@@ -1,0 +1,93 @@
+@import "../../../assets/styles/base.scss";
+
+.chip-input {
+  position: relative;
+  overflow: auto;
+  min-height: 38px;
+  border: 1px solid var(--surface-outline-outline-dark, #8C8C8C);
+  background-color: var(--gray-2);
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 4px 12px;
+
+  &.isError {
+    border-color: rgba(207, 19, 34, 0.16);
+  }
+
+  &.isError &__placeholder {
+    color: var(--red_7);
+  }
+
+  &:focus-within {
+    box-shadow: 0 0 0 4px var(--primary-highlight, #CFE1F4);
+  }
+
+  &__input {
+    display: inline-block;
+    width: 20px;
+    height: 28px;
+
+    input {
+      border: 0 none;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: none;
+
+      &:focus-visible {
+        outline: 0 none;
+      }
+    }
+  }
+
+  &__chip {
+    border: 1px solid var(--primary-outline, #B2D0F0);
+    border-radius: 2px;
+    background-color: #DFEAF6;
+    display: inline-flex;
+    align-items: center;
+    font-size: 11px;
+    padding: 4px 8px;
+    margin: 2px 4px; // margin-right: 4px;
+    color: var(--primary-on-container);
+    cursor: default;
+  }
+
+  &__remove {
+    display: inline-flex;
+    width: 16px;
+    height: 16px;
+    border: none;
+    background: none;
+    margin-left: 4px;
+    justify-content: center;
+    align-items: center;
+    padding: 3px;
+    cursor: pointer;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      color: #3B8FDC;
+      display: block;
+    }
+  }
+
+  &__close {
+    color: var(--blue-10);
+    width: 10px;
+    display: flex;
+  }
+
+  &__placeholder {
+    font-size: 16px;
+    line-height: 24px;
+    color: #898098;
+    pointer-events: none;
+    vertical-align: middle;
+  }
+
+  &:focus-within &__placeholder {
+    display: none;
+  }
+}

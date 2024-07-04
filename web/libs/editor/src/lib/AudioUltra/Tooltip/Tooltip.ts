@@ -1,10 +1,10 @@
-import { nanoid } from 'nanoid';
-import { FontWeight } from '../Common/Style';
-import { rgba, RgbaColorArray } from '../Common/Color';
+import { nanoid } from "nanoid";
+import type { FontWeight } from "../Common/Style";
+import { rgba, type RgbaColorArray } from "../Common/Color";
 
 export interface TooltipOptions {
-  color?: string|RgbaColorArray;
-  backgroundColor?: string|RgbaColorArray;
+  color?: string | RgbaColorArray;
+  backgroundColor?: string | RgbaColorArray;
   fontSize?: number;
   fontWeight?: FontWeight;
   paddingInline?: number;
@@ -13,16 +13,15 @@ export interface TooltipOptions {
 }
 
 export class Tooltip {
-  id = 'tooltip';
+  id = "tooltip";
   visible = false;
-  color = rgba('#fff');
-  fontWeight = '500' as FontWeight;
-  backgroundColor = rgba('#000');
+  color = rgba("#fff");
+  fontWeight = "500" as FontWeight;
+  backgroundColor = rgba("#000");
   fontSize = 16;
   paddingInline = 8;
   paddingBlock = 4;
   borderRadius = 4;
-
 
   constructor(options?: TooltipOptions) {
     this.id = `tooltip-${nanoid()}`;
@@ -38,12 +37,12 @@ export class Tooltip {
 
   initialize() {
     if (document.getElementById(this.id)) return;
-    const span = document.createElement('span');
+    const span = document.createElement("span");
     const root = document.body;
 
     span.id = this.id;
-    span.style.display = 'none';
-    span.style.position = 'absolute';
+    span.style.display = "none";
+    span.style.position = "absolute";
     this.apply(span);
 
     root?.appendChild(span);
@@ -72,8 +71,8 @@ export class Tooltip {
     node.style.borderRadius = `${this.borderRadius}px`;
     node.style.fontSize = `${this.fontSize}px`;
     node.style.fontWeight = this.fontWeight;
-    node.style.zIndex = '9999';
-    node.style.pointerEvents = 'none';
+    node.style.zIndex = "9999";
+    node.style.pointerEvents = "none";
   }
 
   show(x: number, y: number, text?: string, center = true) {
@@ -82,7 +81,7 @@ export class Tooltip {
     this.visible = true;
 
     if (span && text) {
-      span.style.display = 'block';
+      span.style.display = "block";
       if (center) {
         span.style.left = `${x - span.clientWidth / 2}px`;
       } else {
@@ -102,7 +101,7 @@ export class Tooltip {
     this.visible = false;
 
     if (span) {
-      span.style.display = 'none';
+      span.style.display = "none";
     }
   }
 

@@ -1,6 +1,6 @@
-import Konva from 'konva';
+import Konva from "konva";
 
-const EVENTS_NAME = 'tr-konva';
+const EVENTS_NAME = "tr-konva";
 
 class LSTransformerOld extends Konva.Transformer {
   get _outerBack() {
@@ -8,7 +8,6 @@ class LSTransformerOld extends Konva.Transformer {
   }
 
   setNodes(nodes = []) {
-
     super.setNodes(nodes);
 
     if (this._outerBack) {
@@ -18,7 +17,7 @@ class LSTransformerOld extends Konva.Transformer {
   }
 
   detach() {
-    this._outerBack?.off('.' + EVENTS_NAME);
+    this._outerBack?.off(`.${EVENTS_NAME}`);
     super.detach();
   }
 
@@ -37,17 +36,20 @@ class LSTransformerOld extends Konva.Transformer {
         y: backAbsScale.y / trAbsScale.y,
       };
 
-      outerBack.setAttrs({
-        x: (x - this.getStage().getAttr('x')) * scale.x,
-        y: (y - this.getStage().getAttr('y')) * scale.y,
-        width: width * scale.x,
-        height: height * scale.y,
-        rotation,
-      }).getLayer().batchDraw();
+      outerBack
+        .setAttrs({
+          x: (x - this.getStage().getAttr("x")) * scale.x,
+          y: (y - this.getStage().getAttr("y")) * scale.y,
+          width: width * scale.x,
+          height: height * scale.y,
+          rotation,
+        })
+        .getLayer()
+        .batchDraw();
     }
   }
 }
 
-Konva['LSTransformerOld'] = LSTransformerOld;
+Konva.LSTransformerOld = LSTransformerOld;
 
-export default 'LSTransformerOld';
+export default "LSTransformerOld";

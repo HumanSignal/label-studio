@@ -138,7 +138,7 @@
     },
     "feat_front_dev_4008_quick_task_open_short": {
       "key": "feat_front_dev_4008_quick_task_open_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -160,7 +160,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "feat_front_lsdv_4583_multi_image_segmentation_short": {
@@ -298,33 +298,6 @@
       "version": 4,
       "deleted": false
     },
-    "ff_back_2214_annotation_result_12052022_short": {
-      "key": "ff_back_2214_annotation_result_12052022_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "5f5213fc08bc4d339e92666c0feba9a2",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 5,
-      "deleted": false
-    },
     "ff_back_2884_comments_notifications_02092022_short": {
       "key": "ff_back_2884_comments_notifications_02092022_short",
       "on": false,
@@ -408,7 +381,7 @@
     },
     "ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long": {
       "key": "ff_back_dev_1417_start_training_mlbackend_webhooks_250122_long",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -430,7 +403,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "ff_back_dev_1948_reviewed_status_16052022_short": {
@@ -703,33 +676,6 @@
       "version": 5,
       "deleted": false
     },
-    "ff_dev_2100_preselected_choices_250422_short": {
-      "key": "ff_dev_2100_preselected_choices_250422_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "69a6f1fe281248f3a3ed671fc3848be5",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 5,
-      "deleted": false
-    },
     "ff_dev_2128_html_in_labels_150422_short": {
       "key": "ff_dev_2128_html_in_labels_150422_short",
       "on": true,
@@ -755,33 +701,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 4,
-      "deleted": false
-    },
-    "ff_dev_2497_disable_smoothing_010622_short": {
-      "key": "ff_dev_2497_disable_smoothing_010622_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "135611090f5c40789eac4722ede07236",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
       "deleted": false
     },
     "ff_feat_front_DEV_2576_undo_key_points_polygon_short": {
@@ -863,33 +782,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 5,
-      "deleted": false
-    },
-    "ff_front_1593_rejection_comment_040222_short": {
-      "key": "ff_front_1593_rejection_comment_040222_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "7787311c9fe345a0a8adda6e5bda13dd",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
       "deleted": false
     },
     "ff_front_DEV_1507_stuck_userpic_210122_short": {
@@ -1024,34 +916,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 6,
-      "deleted": false
-    },
-    "ff_front_dev_1470_dm_pagination_010422_short": {
-      "key": "ff_front_dev_1470_dm_pagination_010422_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "15f3942824e14cbea3fa221c8d879766",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 7,
       "deleted": false
     },
     "ff_front_dev_1480_created_on_in_review_180122_short": {
@@ -1133,33 +998,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 5,
-      "deleted": false
-    },
-    "ff_front_dev_1555_auto_annotations_not_visible": {
-      "key": "ff_front_dev_1555_auto_annotations_not_visible",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "e33ace0905bd4e0fa8ebe6330c0c1683",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
       "deleted": false
     },
     "ff_front_dev_1564_dev_1565_shortcuts_focus_and_cursor_010222_short": {
@@ -1324,33 +1162,6 @@
       "version": 9,
       "deleted": false
     },
-    "ff_front_dev_1731_ocr_editable_and_readonly_230222_short": {
-      "key": "ff_front_dev_1731_ocr_editable_and_readonly_230222_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "7f2d239c285443d898c89d0194bfed9f",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 4,
-      "deleted": false
-    },
     "ff_front_dev_2132_rotating_bounding_box": {
       "key": "ff_front_dev_2132_rotating_bounding_box",
       "on": true,
@@ -1403,33 +1214,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 6,
-      "deleted": false
-    },
-    "ff_front_dev_2244_nested_choices_des_107_160522_short": {
-      "key": "ff_front_dev_2244_nested_choices_des_107_160522_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "d62dfadc297f48afbdac3edd8baa4620",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 4,
       "deleted": false
     },
     "ff_front_dev_2290_draft_in_annotation_history_short": {
@@ -1540,33 +1324,6 @@
       "version": 4,
       "deleted": false
     },
-    "ff_front_dev_2458_comments_for_skip_250522_short": {
-      "key": "ff_front_dev_2458_comments_for_skip_250522_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "3485dcd6bc3542a5b5a9db200bc7adf2",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "ff_front_dev_2575_projects_list_performance_280622_short": {
       "key": "ff_front_dev_2575_projects_list_performance_280622_short",
       "on": true,
@@ -1592,33 +1349,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 3,
-      "deleted": false
-    },
-    "ff_front_dev_2629_pinned_projects_150622_short": {
-      "key": "ff_front_dev_2629_pinned_projects_150622_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "e254bbf17e33439a8f0030132e5a10ea",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 4,
       "deleted": false
     },
     "ff_front_dev_2669_paragraph_author_filter_210622_short": {
@@ -1675,33 +1405,6 @@
       "version": 2,
       "deleted": false
     },
-    "ff_front_dev_2702_project_duplication_290622_short": {
-      "key": "ff_front_dev_2702_project_duplication_290622_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "1ac307b4ef774a9d92fbfea3a31c7a95",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "ff_front_dev_2715_audio_3_280722_short": {
       "key": "ff_front_dev_2715_audio_3_280722_short",
       "on": true,
@@ -1727,33 +1430,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 4,
-      "deleted": false
-    },
-    "fflag-feat-back-lops-154-datasets-export-candidates": {
-      "key": "fflag-feat-back-lops-154-datasets-export-candidates",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "c7583c6c5e104b56945c4a9c0c0bcdc1",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
       "deleted": false
     },
     "fflag-feat-dev-2887-comments-ui-editor-short": {
@@ -1808,60 +1484,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 5,
-      "deleted": false
-    },
-    "fflag-feat-dia-407-accept-multiple-search-queries-short": {
-      "key": "fflag-feat-dia-407-accept-multiple-search-queries-short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "4be5602f9f9445b2bfc21a8bad9d8392",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
-    "fflag-feat-front-dev-2395-consistent-working-area-for-all-image-sizes": {
-      "key": "fflag-feat-front-dev-2395-consistent-working-area-for-all-image-sizes",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "5af82f9d73f646fc9bcf8d2fa5448040",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
       "deleted": false
     },
     "fflag-feat-front-dev-2866-free-trial-invite-short": {
@@ -1945,60 +1567,6 @@
       "version": 2,
       "deleted": false
     },
-    "fflag-feat-frontend-dev-2504-image-enhancements-zoom-center": {
-      "key": "fflag-feat-frontend-dev-2504-image-enhancements-zoom-center",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "b97be295fba443718a7f89ad97890124",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
-    "fflag_feat_all_dev_3121_analytics_dashboards_short": {
-      "key": "fflag_feat_all_dev_3121_analytics_dashboards_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": true,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "47296a0c96064688855244f12a8b7bc2",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 5,
-      "deleted": false
-    },
     "fflag_feat_all_dia_13_structured_data_support_short": {
       "key": "fflag_feat_all_dia_13_structured_data_support_short",
       "on": false,
@@ -2024,6 +1592,114 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 3,
+      "deleted": false
+    },
+    "fflag_feat_all_dia_835_prompter_workflow_long": {
+      "key": "fflag_feat_all_dia_835_prompter_workflow_long",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "efa1b3e7ae7e4b5fa37657178a5b233e",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 4,
+      "deleted": false
+    },
+    "fflag_feat_all_leap_1026_export_ann_history_short": {
+      "key": "fflag_feat_all_leap_1026_export_ann_history_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "240ac0042bda416bbc5dfdc37f9d2437",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 4,
+      "deleted": false
+    },
+    "fflag_feat_all_leap_1081_reviewer_flow_updates": {
+      "key": "fflag_feat_all_leap_1081_reviewer_flow_updates",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "e2b43ff7cff547c1b68bf2539a0782a1",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 5,
+      "deleted": false
+    },
+    "fflag_feat_all_leap_883_custom_script_270524_short": {
+      "key": "fflag_feat_all_leap_883_custom_script_270524_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "6c077db957b14df68a3790866fec95d2",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 7,
       "deleted": false
     },
     "fflag_feat_all_lops_315_temp_datasets_limitations_short": {
@@ -2094,33 +1770,6 @@
       "version": 4,
       "deleted": false
     },
-    "fflag_feat_all_lops_milvus_migration_short": {
-      "key": "fflag_feat_all_lops_milvus_migration_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "18f4eadf7a24460884e81d657808a33f",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
     "fflag_feat_all_lsdv_4915_async_task_import_13042023_short": {
       "key": "fflag_feat_all_lsdv_4915_async_task_import_13042023_short",
       "on": false,
@@ -2148,9 +1797,9 @@
       "version": 2,
       "deleted": false
     },
-    "fflag_feat_all_lsdv_4945_api_requests_with_pagination_20042023_short": {
-      "key": "fflag_feat_all_lsdv_4945_api_requests_with_pagination_20042023_short",
-      "on": false,
+    "fflag_feat_all_lsdv_e_294_llm_annotations_180723_long": {
+      "key": "fflag_feat_all_lsdv_e_294_llm_annotations_180723_long",
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -2168,38 +1817,11 @@
         "usingEnvironmentId": false
       },
       "clientSide": false,
-      "salt": "f364a37eb68848eaa526057aaf3a7c03",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
-    "fflag_feat_all_lsdv_e_294_llm_annotations_180723_long": {
-      "key": "fflag_feat_all_lsdv_e_294_llm_annotations_180723_long",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 1
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
       "salt": "640d40057d9f408587c8996ac2d3710c",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 7,
+      "version": 8,
       "deleted": false
     },
     "fflag_feat_all_lsdv_e_295_project_level_roles_via_saml_scim_ldap_short": {
@@ -2256,6 +1878,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_all_optic_520_annotator_report_short": {
+      "key": "fflag_feat_all_optic_520_annotator_report_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "44d91ccbbe2d49608400584056a90597",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_back_dev_3756_queue_enrollment_min_short": {
       "key": "fflag_feat_back_dev_3756_queue_enrollment_min_short",
       "on": false,
@@ -2277,60 +1926,6 @@
       },
       "clientSide": false,
       "salt": "081f810caa714e5cab227bb557c798a2",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
-    "fflag_feat_back_dev_3792_add_sync_update_is_labeled_301122_short": {
-      "key": "fflag_feat_back_dev_3792_add_sync_update_is_labeled_301122_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": true,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "8f3a58ec95674ae98f55c86f656d9ea5",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
-    "fflag_feat_back_dev_3792_next_task_data_fix_long": {
-      "key": "fflag_feat_back_dev_3792_next_task_data_fix_long",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "429613ef63e94613b85e3e1c9c6e6daf",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
@@ -2445,6 +2040,60 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_back_optic_428_scim_multi_mapping": {
+      "key": "fflag_feat_back_optic_428_scim_multi_mapping",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "361255f1f8a445b285c66737152783cb",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 7,
+      "deleted": false
+    },
+    "fflag_feat_back_optic_506_changing_scim_group_mapping_setting_removes_users_from_lse_group": {
+      "key": "fflag_feat_back_optic_506_changing_scim_group_mapping_setting_removes_users_from_lse_group",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "4c333ad4c9984038b5d92d8ef86159a6",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short": {
       "key": "fflag_feat_dev_2755_regions_list_grouped_by_labels_with_ordered_collapse_short",
       "on": false,
@@ -2553,33 +2202,6 @@
       "version": 3,
       "deleted": false
     },
-    "fflag_feat_front_dev_2758_adjustable_draggable_spans_short": {
-      "key": "fflag_feat_front_dev_2758_adjustable_draggable_spans_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "f128121e72184209aba4b2968883c5c0",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 4,
-      "deleted": false
-    },
     "fflag_feat_front_dev_2984_dm_draggable_columns_short": {
       "key": "fflag_feat_front_dev_2984_dm_draggable_columns_short",
       "on": true,
@@ -2661,33 +2283,6 @@
       "version": 3,
       "deleted": false
     },
-    "fflag_feat_front_dev_3143_explore_page_short": {
-      "key": "fflag_feat_front_dev_3143_explore_page_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "5c0576098bf34c6eb80724bd102198bf",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
     "fflag_feat_front_dev_3873_labeling_ui_improvements_short": {
       "key": "fflag_feat_front_dev_3873_labeling_ui_improvements_short",
       "on": true,
@@ -2742,6 +2337,33 @@
       "version": 4,
       "deleted": false
     },
+    "fflag_feat_front_leap_1173_disable_postpone_skip_short": {
+      "key": "fflag_feat_front_leap_1173_disable_postpone_skip_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "23ef99b0cc8a4a3c99a09e47268cabd6",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_front_leap_187_video_seek_on_select_short": {
       "key": "fflag_feat_front_leap_187_video_seek_on_select_short",
       "on": true,
@@ -2769,8 +2391,8 @@
       "version": 3,
       "deleted": false
     },
-    "fflag_feat_front_leap_e_1_monorepo_migration_short": {
-      "key": "fflag_feat_front_leap_e_1_monorepo_migration_short",
+    "fflag_feat_front_leap_482_self_serve_short": {
+      "key": "fflag_feat_front_leap_482_self_serve_short",
       "on": false,
       "prerequisites": [],
       "targets": [],
@@ -2789,65 +2411,11 @@
         "usingEnvironmentId": false
       },
       "clientSide": false,
-      "salt": "a168e182efab4d8582e178d73419bdba",
+      "salt": "775b9819acb6465baae3d091647ef9b4",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
-    "fflag_feat_front_leap_e_4_streams_refinements_long": {
-      "key": "fflag_feat_front_leap_e_4_streams_refinements_long",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "df2508abf0544036b23870b66e60b1b3",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
-    "fflag_feat_front_lops_12_label_ops_ui_short": {
-      "key": "fflag_feat_front_lops_12_label_ops_ui_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "1e169996a3bc445bafeb1f60ded2c87e",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 4,
       "deleted": false
     },
     "fflag_feat_front_lops_134_find_similarity_29082023_short": {
@@ -2875,33 +2443,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 3,
-      "deleted": false
-    },
-    "fflag_feat_front_lops_75_pretty_select_short": {
-      "key": "fflag_feat_front_lops_75_pretty_select_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "8a02a151f48749b0b04ca753b85bb9a3",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
       "deleted": false
     },
     "fflag_feat_front_lops_86_datasets_storage_edit_short": {
@@ -3117,7 +2658,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_feat_front_lsdv_4659_skipduplicates_060323_short": {
@@ -3417,6 +2958,33 @@
       "version": 4,
       "deleted": false
     },
+    "fflag_feat_front_optic_767_annotator_project_multiselect_short": {
+      "key": "fflag_feat_front_optic_767_annotator_project_multiselect_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "bdc3dbe4886b4e34a39856f59ad5e71a",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_front_prod_281_project_list_search_19072023_short": {
       "key": "fflag_feat_front_prod_281_project_list_search_19072023_short",
       "on": false,
@@ -3549,7 +3117,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_feat_optic_198_multi_select_users_short": {
@@ -3577,33 +3145,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 3,
-      "deleted": false
-    },
-    "fflag_feat_optic_261_improved_organization_member_filter_count_short": {
-      "key": "fflag_feat_optic_261_improved_organization_member_filter_count_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "a81c546a7bd74411882fa5ac45fdf8fc",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 4,
       "deleted": false
     },
     "fflag_feat_optic_2_ensure_draft_saved_short": {
@@ -3660,6 +3201,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_optic_650_target_storage_task_format_long": {
+      "key": "fflag_feat_optic_650_target_storage_task_format_long",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "91ce1d8a88364b879d17d679d50360b4",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_optic_67_drag_and_drop_charts": {
       "key": "fflag_feat_optic_67_drag_and_drop_charts",
       "on": false,
@@ -3685,6 +3253,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 2,
+      "deleted": false
+    },
+    "fflag_fix_all_leap_877_annotator_membership_api_03042024_short": {
+      "key": "fflag_fix_all_leap_877_annotator_membership_api_03042024_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "f04c36c72422448ba39bc3cc00622b31",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short": {
@@ -3984,33 +3579,6 @@
       "version": 2,
       "deleted": false
     },
-    "fflag_fix_back_leap_217_show_tasks_with_comments_30112023_short": {
-      "key": "fflag_fix_back_leap_217_show_tasks_with_comments_30112023_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "f9c5bc70f76545c9aac866bc3de30020",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
     "fflag_fix_back_leap_24_tasks_api_optimization_05092023_short": {
       "key": "fflag_fix_back_leap_24_tasks_api_optimization_05092023_short",
       "on": false,
@@ -4036,6 +3604,60 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 3,
+      "deleted": false
+    },
+    "fflag_fix_back_leap_612_explore_review_09042024_short": {
+      "key": "fflag_fix_back_leap_612_explore_review_09042024_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "a39035a36ba447c5a8089446f649ae94",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_fix_back_leap_667_api_tasks_reviews_short": {
+      "key": "fflag_fix_back_leap_667_api_tasks_reviews_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "3e8a84c42d3248a8ae8041f7c194238b",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
       "deleted": false
     },
     "fflag_fix_back_lsdv_1044_check_annotations_24012023_short": {
@@ -4117,33 +3739,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 2,
-      "deleted": false
-    },
-    "fflag_fix_back_lsdv_4568_import_csv_links_03032023_short": {
-      "key": "fflag_fix_back_lsdv_4568_import_csv_links_03032023_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "4d6e875af4b3453a827a94db5eb8a88d",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
       "deleted": false
     },
     "fflag_fix_back_lsdv_4604_excess_sql_queries_in_api_short": {
@@ -4281,87 +3876,6 @@
       "version": 3,
       "deleted": false
     },
-    "fflag_fix_back_lsdv_5289_prevent_db_deadlocks_16062023_short": {
-      "key": "fflag_fix_back_lsdv_5289_prevent_db_deadlocks_16062023_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "74d4b77678674f86a790871913190289",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
-    "fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short": {
-      "key": "fflag_fix_back_lsdv_5289_run_bulk_updates_in_transactions_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 1
-      },
-      "offVariation": 0,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "4775bd37b64b4470924d6a686537120f",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
-    "fflag_fix_back_lsdv_5361_members_dashboard_page_timeouts": {
-      "key": "fflag_fix_back_lsdv_5361_members_dashboard_page_timeouts",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "9484d71f2a3e41618df0806245c7a662",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "fflag_fix_back_lsdv_5410_temporary_disable_auto_inference_jobs_short": {
       "key": "fflag_fix_back_lsdv_5410_temporary_disable_auto_inference_jobs_short",
       "on": false,
@@ -4414,60 +3928,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 5,
-      "deleted": false
-    },
-    "fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short": {
-      "key": "fflag_fix_back_optic_183_datamanager_filter_placeholder_keyed_task_data_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "afe4d20eb5564b57a5b6fe4eb1b270d7",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
-    "fflag_fix_back_optic_287_aggregate_query_for_groundtruth_per_user_short": {
-      "key": "fflag_fix_back_optic_287_aggregate_query_for_groundtruth_per_user_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "d30058aa1b7e4947994f0d726d9ae6ff",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
       "deleted": false
     },
     "fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short": {
@@ -4713,33 +4173,6 @@
       "version": 3,
       "deleted": false
     },
-    "fflag_fix_front_dev_3706_undo_with_ml_backend_081122_short": {
-      "key": "fflag_fix_front_dev_3706_undo_with_ml_backend_081122_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": true,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "51e7f7c0201b43b285020eed2f2cec2a",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
     "fflag_fix_front_dev_3730_shortcuts_initial_input_22122022_short": {
       "key": "fflag_fix_front_dev_3730_shortcuts_initial_input_22122022_short",
       "on": true,
@@ -4941,6 +4374,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 7,
+      "deleted": false
+    },
+    "fflag_fix_front_leap_443_select_annotation_once": {
+      "key": "fflag_fix_front_leap_443_select_annotation_once",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "7fa01b9222564e5b9e3c415d48effd01",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_front_lsdv_4600_lead_time_27072023_short": {
@@ -5159,60 +4619,6 @@
       "version": 3,
       "deleted": false
     },
-    "fflag_fix_front_lsdv_5177_image_regions_in_history_260523_short": {
-      "key": "fflag_fix_front_lsdv_5177_image_regions_in_history_260523_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "5259badf1d824326ab87bb22d10fe1cd",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
-    "fflag_fix_front_lsdv_5177_save_draft_on_task_switch_250523_short": {
-      "key": "fflag_fix_front_lsdv_5177_save_draft_on_task_switch_250523_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "e2c9111f6e934b6d8934d177e96cb88d",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
     "fflag_fix_front_lsdv_5248_double_click_delay_280823_short": {
       "key": "fflag_fix_front_lsdv_5248_double_click_delay_280823_short",
       "on": true,
@@ -5240,9 +4646,9 @@
       "version": 5,
       "deleted": false
     },
-    "fflag_fix_front_lsdv_5436_dashboard_members_page_async_24072023_short": {
-      "key": "fflag_fix_front_lsdv_5436_dashboard_members_page_async_24072023_short",
-      "on": false,
+    "fflag_fix_leap_246_multi_object_hotkeys_160124_short": {
+      "key": "fflag_fix_leap_246_multi_object_hotkeys_160124_short",
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -5260,7 +4666,7 @@
         "usingEnvironmentId": false
       },
       "clientSide": false,
-      "salt": "6e13d0416e9840f6af5e005142db542e",
+      "salt": "800fcd0d7d4541349fef5f59174d58b5",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
@@ -5321,6 +4727,114 @@
       "version": 5,
       "deleted": false
     },
+    "fflag_fix_optic_214_extra_blank_dashboard_charts_short": {
+      "key": "fflag_fix_optic_214_extra_blank_dashboard_charts_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "eedc4fd2b3624c4680c31864f07ef37c",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_fix_optic_391_tasks_outside_low_agreement_project_counts_short": {
+      "key": "fflag_fix_optic_391_tasks_outside_low_agreement_project_counts_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "98f119d83a38497884bb16f1b57156d2",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_front_dia_1150_ddisco_sneak_preview": {
+      "key": "fflag_front_dia_1150_ddisco_sneak_preview",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "6965c0995db048378c3513804fd02682",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
+    "fflag_front_feat_dia_1134_prompter_sneak_preview_promo_page_short": {
+      "key": "fflag_front_feat_dia_1134_prompter_sneak_preview_promo_page_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "7da74f9989784eac8760e2485f816a95",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation": {
       "key": "fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation",
       "on": true,
@@ -5346,33 +4860,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 5,
-      "deleted": false
-    },
-    "fix-backend-dev-3134-exclude-deactivated-users": {
-      "key": "fix-backend-dev-3134-exclude-deactivated-users",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "d203e56950164c6da0f0b483b8d68cc6",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 4,
       "deleted": false
     },
     "fix_back_dev_3351_ml_validation_error_extension_short": {

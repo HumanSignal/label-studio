@@ -9,40 +9,41 @@ export const simpleConfig = `
 `;
 
 export const simpleImageData = {
-  image: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg',
+  image:
+    "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
 };
 
 export const simpleResult = [
   {
-    id: 'Dx_aB91ISN',
-    source: '$image',
-    from_name: 'tag',
-    to_name: 'img',
-    type: 'rectanglelabels',
-    origin: 'manual',
+    id: "Dx_aB91ISN",
+    source: "$image",
+    from_name: "tag",
+    to_name: "img",
+    type: "rectanglelabels",
+    origin: "manual",
     value: {
       height: 20,
       rotation: 0,
       width: 20,
       x: 40,
       y: 40,
-      rectanglelabels: ['Label 1'],
+      rectanglelabels: ["Label 1"],
     },
   },
   {
-    id: 'Dx_aB91INs',
-    source: '$image',
-    from_name: 'tag',
-    to_name: 'img',
-    type: 'rectanglelabels',
-    origin: 'manual',
+    id: "Dx_aB91INs",
+    source: "$image",
+    from_name: "tag",
+    to_name: "img",
+    type: "rectanglelabels",
+    origin: "manual",
     value: {
       height: 90,
       rotation: 0,
       width: 90,
       x: 5,
       y: 5,
-      rectanglelabels: ['Label 2'],
+      rectanglelabels: ["Label 2"],
     },
   },
 ];

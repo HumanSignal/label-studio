@@ -267,7 +267,6 @@ button.blinking-status.blink::after {
 
 .users th,
 .users td {
-  font: 16px/normal 'Roboto';
   color: black;
 }
 

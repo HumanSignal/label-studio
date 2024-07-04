@@ -11,7 +11,7 @@ on:
         type: string
 
 env:
-  GIT_GITLEAKS_VERSION: 8.16.3
+  GIT_GITLEAKS_VERSION: 8.18.2
   ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
 
 jobs:
@@ -19,11 +19,11 @@ jobs:
     name: "Gitleaks"
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Configure gitleaks binary cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /usr/local/bin/gitleaks
           key: gitleaks-${{ env.GIT_GITLEAKS_VERSION }}

@@ -1,11 +1,9 @@
-
-
 class NumberHelper {
   private get _baseRootSelector() {
-    return '.lsf-number';
+    return ".lsf-number";
   }
 
-  private _rootSelector: string
+  private _rootSelector: string;
 
   constructor(rootSelector) {
     this._rootSelector = rootSelector.replace(/^\&/, this._baseRootSelector);
@@ -16,8 +14,7 @@ class NumberHelper {
   }
 
   get input() {
-    return this.root
-      .find('[type="number"]');
+    return this.root.find('[type="number"]');
   }
 
   type(text: string) {
@@ -25,16 +22,13 @@ class NumberHelper {
   }
 
   hasValue(value: string) {
-    this.input.should('have.value', value);
+    this.input.should("have.value", value);
   }
 }
 
-const Number = new NumberHelper('&:eq(0)');
+const Number = new NumberHelper("&:eq(0)");
 const useNumber = (rootSelector: string) => {
   return new NumberHelper(rootSelector);
 };
 
-export {
-  Number,
-  useNumber
-};
+export { Number, useNumber };

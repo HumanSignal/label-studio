@@ -1,4 +1,4 @@
-Feature('Audio WebAudio Decoder');
+Feature("Audio WebAudio Decoder");
 
 const config = `
 <View>
@@ -35,64 +35,64 @@ const configSpeech = `
         <Choice value="Positive"/>
         <Choice value="Neutral"/>
         <Choice value="Negative"/>
-    </Choices>                               
+    </Choices>
   </View>
 `;
 
 const data = {
-  url: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+  url: "/public/files/barradeen-emotional.mp3",
 };
 
 const annotations = [
   {
-    from_name: 'choice',
-    id: 'hIj6zg57SY',
-    to_name: 'audio',
-    type: 'choices',
-    origin: 'manual',
+    from_name: "choice",
+    id: "hIj6zg57SY",
+    to_name: "audio",
+    type: "choices",
+    origin: "manual",
     value: {
-      choices: ['Lo-Fi'],
+      choices: ["Lo-Fi"],
     },
   },
   {
-    from_name: 'label',
-    id: 'JhxupEJWlW',
-    to_name: 'audio',
+    from_name: "label",
+    id: "JhxupEJWlW",
+    to_name: "audio",
     original_length: 98.719925,
-    type: 'labels',
-    origin: 'manual',
+    type: "labels",
+    origin: "manual",
     value: {
       channel: 1,
       end: 59.39854733358493,
-      labels: ['Other'],
+      labels: ["Other"],
       start: 55.747572792986325,
     },
   },
 ];
 
-const params = { annotations: [{ id: 'test', result: annotations }], config, data };
-const paramsSpeech = { annotations: [{ id: 'test', result: [] }], config: configSpeech, data };
+const params = { annotations: [{ id: "test", result: annotations }], config, data };
+const paramsSpeech = { annotations: [{ id: "test", result: [] }], config: configSpeech, data };
 
-Scenario('Check if regions are selected', async function({ I, LabelStudio, AtAudioView, AtSidebar }) {
+Scenario("Check if regions are selected", async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
   LabelStudio.setFeatureFlags({
     ff_front_dev_2715_audio_3_280722_short: true,
   });
-  I.amOnPage('/');
+  I.amOnPage("/");
 
   LabelStudio.init(params);
 
   await AtAudioView.waitForAudio();
 
-  I.waitForDetached('loading-progress-bar', 10);
+  I.waitForDetached("loading-progress-bar", 30);
 
   await AtAudioView.lookForStage();
 
   AtSidebar.seeRegions(1);
 
   // creating a new region
-  I.pressKey('1');
+  I.pressKey("1");
   AtAudioView.dragAudioElement(160, 80);
-  I.pressKey('u');
+  I.pressKey("u");
 
   AtSidebar.seeRegions(2);
 
@@ -106,97 +106,100 @@ Scenario('Check if regions are selected', async function({ I, LabelStudio, AtAud
   AtSidebar.dontSeeSelectedRegion();
 });
 
-Scenario('Check if multiple regions are working changing labels', async function({ I, LabelStudio, AtAudioView, AtSidebar }) {
+Scenario(
+  "Check if multiple regions are working changing labels",
+  async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
+    LabelStudio.setFeatureFlags({
+      ff_front_dev_2715_audio_3_280722_short: true,
+    });
+    I.amOnPage("/");
+
+    LabelStudio.init(paramsSpeech);
+
+    await AtAudioView.waitForAudio();
+
+    I.waitForDetached("loading-progress-bar", 30);
+
+    await AtAudioView.lookForStage();
+
+    for (let i = 0; i < 20; i++) {
+      // creating a new region
+      I.pressKey("1");
+      AtAudioView.dragAudioElement(40 * i + 10, 30);
+      AtAudioView.clickAt(40 * i + 20);
+      I.pressKey("2");
+      I.pressKey("1");
+      I.pressKey("u");
+    }
+
+    AtSidebar.seeRegions(20);
+
+    for (let i = 0; i < 20; i++) {
+      // creating a new region
+      AtAudioView.clickAt(40 * i + 20);
+      AtSidebar.seeSelectedRegion();
+      I.pressKey("u");
+    }
+
+    AtSidebar.seeRegions(20);
+
+    I.pressKey("u");
+
+    AtSidebar.dontSeeSelectedRegion();
+  },
+);
+
+Scenario("Can select a region below a hidden region", async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
   LabelStudio.setFeatureFlags({
     ff_front_dev_2715_audio_3_280722_short: true,
   });
-  I.amOnPage('/');
+  I.amOnPage("/");
 
   LabelStudio.init(paramsSpeech);
 
   await AtAudioView.waitForAudio();
 
-  I.waitForDetached('loading-progress-bar', 10);
-
-  await AtAudioView.lookForStage();
-
-  for (let i = 0; i < 20; i++) {
-    // creating a new region
-    I.pressKey('1');
-    AtAudioView.dragAudioElement((40 * i) + 10, 30);
-    AtAudioView.clickAt((40 * i) + 20);
-    I.pressKey('2');
-    I.pressKey('1');
-    I.pressKey('u');
-  }
-
-  AtSidebar.seeRegions(20);
-
-  for (let i = 0; i < 20; i++) {
-    // creating a new region
-    AtAudioView.clickAt((40 * i) + 20);
-    AtSidebar.seeSelectedRegion();
-    I.pressKey('u');
-  }
-
-  AtSidebar.seeRegions(20);
-
-  I.pressKey('u');
-
-  AtSidebar.dontSeeSelectedRegion();
-});
-
-Scenario('Can select a region below a hidden region', async function({ I, LabelStudio, AtAudioView, AtSidebar }) {
-  LabelStudio.setFeatureFlags({
-    ff_front_dev_2715_audio_3_280722_short: true,
-  });
-  I.amOnPage('/');
-
-  LabelStudio.init(paramsSpeech);
-
-  await AtAudioView.waitForAudio();
-
-  I.waitForDetached('loading-progress-bar', 10);
+  I.waitForDetached("loading-progress-bar", 30);
 
   await AtAudioView.lookForStage();
 
   // create a new region
-  I.pressKey('1');
+  I.pressKey("1");
   AtAudioView.dragAudioElement(50, 80);
-  I.pressKey('u');
+  I.pressKey("u");
 
   AtSidebar.seeRegions(1);
 
   // create a new region above the first one
-  I.pressKey('2');
+  I.pressKey("2");
   AtAudioView.dragAudioElement(49, 81);
-  I.pressKey('u');
+  I.pressKey("u");
 
   AtSidebar.seeRegions(2);
 
   // click on the top-most region visible to select it
   AtAudioView.clickAt(50);
-  AtSidebar.seeSelectedRegion('Noise');
+  AtSidebar.seeSelectedRegion("Noise");
 
   // hide the region
-  AtSidebar.hideRegion('Noise');
+  AtSidebar.hideRegion("Noise");
 
   // click on the region below the hidden one to select it
   AtAudioView.clickAt(50);
-  AtSidebar.seeSelectedRegion('Speech');
+  AtSidebar.seeSelectedRegion("Speech");
 });
 
-Scenario('Delete region by pressing delete hotkey', async function({ I, LabelStudio, AtAudioView, AtSidebar }) {
+Scenario("Delete region by pressing delete hotkey", async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
   LabelStudio.setFeatureFlags({
     ff_front_dev_2715_audio_3_280722_short: true,
   });
-  I.amOnPage('/');
+  I.amOnPage("/");
 
   LabelStudio.init(params);
 
   await AtAudioView.waitForAudio();
 
-  I.waitForDetached('loading-progress-bar', 10);
+  I.waitForDetached("loading-progress-bar", 30);
 
   await AtAudioView.lookForStage();
 
@@ -205,37 +208,36 @@ Scenario('Delete region by pressing delete hotkey', async function({ I, LabelStu
   // creating a new region
   AtAudioView.dragAudioElement(160, 80);
 
-  I.pressKey('Delete');
+  I.pressKey("Delete");
 
-  I.pressKey('1');
+  I.pressKey("1");
 
   AtSidebar.seeRegions(1);
 });
 
-Scenario('Check if there are ghost regions', async function({ I, LabelStudio, AtAudioView, AtSidebar }) {
+Scenario("Check if there are ghost regions", async ({ I, LabelStudio, AtAudioView, AtSidebar }) => {
   LabelStudio.setFeatureFlags({
     ff_front_dev_2715_audio_3_280722_short: true,
   });
-  I.amOnPage('/');
+  I.amOnPage("/");
 
   LabelStudio.init(paramsSpeech);
 
   await AtAudioView.waitForAudio();
 
-  I.waitForDetached('loading-progress-bar', 10);
+  I.waitForDetached("loading-progress-bar", 30);
 
   await AtAudioView.lookForStage();
 
   // creating a new region
-  I.pressKey('1');
+  I.pressKey("1");
   AtAudioView.dragAudioElement(300, 80);
-  I.pressKey('u');
-
+  I.pressKey("u");
 
   // creating a ghost region
-  I.pressKey('1');
+  I.pressKey("1");
   AtAudioView.dragAudioElement(160, 80, false);
-  I.pressKey('1');
+  I.pressKey("1");
   I.wait(1);
   I.pressMouseUp();
   I.wait(1);
@@ -247,9 +249,8 @@ Scenario('Check if there are ghost regions', async function({ I, LabelStudio, At
   // trying to select the ghost region, if there is no ghost region, the region will keep selected
   // as ghost region is not selectable and impossible to change the label, the created region will be deselected if there is a ghost region created.
   AtAudioView.clickAt(170);
-  I.pressKey('2');
+  I.pressKey("2");
   AtSidebar.seeSelectedRegion();
 
   AtSidebar.seeRegions(2);
 });
-

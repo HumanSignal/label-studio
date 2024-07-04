@@ -4,10 +4,9 @@
  * @param {Array<string>} flags
  * @param {Function} scenarios
  **/
-module.exports.FFlagMatrix = function(flags, scenarios) {
-
+module.exports.FFlagMatrix = function (flags, scenarios) {
   // create a matrix of all possible flag combinations
-  let length = (flags.length ** 2);
+  let length = flags.length ** 2;
 
   if (length === 1) length = 2;
 
@@ -39,10 +38,12 @@ module.exports.FFlagMatrix = function(flags, scenarios) {
  * @param {string} scenarioName
  * @param {Function} scenario
  **/
-module.exports.FFlagScenario = function(scenarioName, scenario) {
-  if (!this.flags) throw new Error('FFlagMatrix must wrap calls to FFlagScenario');
+module.exports.FFlagScenario = function (scenarioName, scenario) {
+  if (!this.flags) throw new Error("FFlagMatrix must wrap calls to FFlagScenario");
 
-  const variant = ` :: ${Object.entries(this.flags).map(([flag, state]) => `${flag}=${state}`).join(',')}`;
+  const variant = ` :: ${Object.entries(this.flags)
+    .map(([flag, state]) => `${flag}=${state}`)
+    .join(",")}`;
 
   Scenario(scenarioName + variant, scenario);
 };

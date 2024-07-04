@@ -1,22 +1,32 @@
-# syntax=docker/dockerfile:1.3
-FROM --platform=${BUILDPLATFORM} node:18 AS frontend-builder
+# syntax=docker/dockerfile:1
+ARG NODE_VERSION=18
 
-ENV NPM_CACHE_LOCATION=$HOME/.cache/yarn/v6 \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    NX_REJECT_UNKNOWN_LOCAL_CACHE=0
+################################ Stage: frontend-builder (build frontend assets)
+FROM --platform=${BUILDPLATFORM} node:${NODE_VERSION} AS frontend-builder
+ENV BUILD_NO_SERVER=true \
+    BUILD_NO_HASH=true \
+    BUILD_NO_CHUNKS=true \
+    BUILD_MODULE=true \
+    YARN_CACHE_FOLDER=/root/web/.yarn \
+    NODE_ENV=production
 
 WORKDIR /label-studio/web
-
-COPY --chown=1001:0 web .
-COPY --chown=1001:0 pyproject.toml /label-studio
 
 # Fix Docker Arm64 Build
 RUN yarn config set registry https://registry.npmjs.org/
 RUN yarn config set network-timeout 1200000 # HTTP timeout used when downloading packages, set to 20 minutes
 
-RUN --mount=type=cache,target=$NPM_CACHE_LOCATION,uid=1001,gid=0 \
-    yarn install --frozen-lockfile \
-    && yarn run build
+COPY web/package.json .
+COPY web/yarn.lock .
+COPY web/tools tools
+RUN --mount=type=cache,target=${YARN_CACHE_FOLDER},sharing=locked \
+    yarn install --prefer-offline --no-progress --pure-lockfile --frozen-lockfile --ignore-engines --non-interactive --production=false
+
+COPY web .
+COPY pyproject.toml ../pyproject.toml
+RUN --mount=type=cache,target=${YARN_CACHE_FOLDER},sharing=locked \
+    --mount=type=bind,source=.git,target=../.git \
+    yarn run build && yarn version:libs
 
 FROM ubuntu:22.04
 
@@ -24,6 +34,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     LS_DIR=/label-studio \
     PIP_CACHE_DIR=$HOME/.cache \
     POETRY_CACHE_DIR=$HOME/.poetry-cache \
+    POETRY_VIRTUALENVS_CREATE=false \
     DJANGO_SETTINGS_MODULE=core.settings.label_studio \
     LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data \
     OPT_DIR=/opt/heartex/instance-data/etc \
@@ -68,18 +79,20 @@ COPY --chown=1001:0 label_studio/__init__.py ./label_studio/__init__.py
 # the system python. This includes label-studio itself. For caching purposes,
 # do this before copying the rest of the source code.
 RUN --mount=type=cache,target=$POETRY_CACHE_DIR \
-    poetry check --lock && POETRY_VIRTUALENVS_CREATE=false poetry install
+    poetry check --lock && poetry install
 
-COPY --chown=1001:0 . .
+COPY --chown=1001:0 LICENSE LICENSE
+COPY --chown=1001:0 licenses licenses
+COPY --chown=1001:0 label_studio label_studio
+COPY --chown=1001:0 deploy deploy
 
-RUN rm -rf ./label_studio/web
-COPY --chown=1001:0 --from=frontend-builder /label-studio/web/dist ./label_studio/web/dist
+COPY --chown=1001:0 --from=frontend-builder /label-studio/web/dist $LS_DIR/web/dist
 
 RUN python3 label_studio/manage.py collectstatic --no-input && \
     chown -R 1001:0 $LS_DIR && \
     chmod -R g=u $LS_DIR
 
-ENV HOME=/label-studio
+ENV HOME=$LS_DIR
 
 EXPOSE 8080
 

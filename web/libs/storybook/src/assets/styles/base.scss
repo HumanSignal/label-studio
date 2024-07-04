@@ -1,0 +1,31 @@
+body {
+  --blue-1: #e6f7ff;
+  --blue-6: #1890ff;
+  --blue-9: #003a8c;
+  --blue-10: #002766;
+  --blue-6-15: rgba(24, 144, 255, 0.15);
+
+  --red-6: #f5222d;
+  --red-7: #CF1322;
+
+  --gray-2: #fafafa;
+  /* for correct gradient */
+  --gray-2-0: rgba(250, 250, 250, 0);
+
+  --gray-5: #d9d9d9;
+  --gray-6: #bfbfbf;
+  --gray-8: #9d9d9d;
+  --gray-9: #8c8c8c;
+
+  --theme-error: var(--red_7);
+  --theme-text: #171819;
+  --theme-white: white;
+  --theme-accent: var(--blue-6);
+  --theme-bg: white;
+
+  --primary-on-container: #052861;
+  --primary-outline: #b2d0f0;
+  --primary-highlight: #CFE1F4;
+
+  --surface-outline-outline-dark: #8C8C8C;
+}

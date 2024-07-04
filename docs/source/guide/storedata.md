@@ -1,12 +1,12 @@
 ---
-title: Database setup 
+title: Set up the database 
 type: guide
 tier: opensource
-order: 80
+order: 84
 order_enterprise: 0
 meta_title: Database Storage Setup
 meta_description: Configure the database storage used by Label Studio to ensure performant and scalable data and configuration storage.
-section: "Install"
+section: "Install & Setup"
 ---
 
 Label Studio uses a database to store project data and configuration information.
@@ -91,7 +91,7 @@ You can remove your MinIO installation by removing the containers and the associ
 This operation is destructive and will remove all data stored in MinIO.
 ```bash
 docker-compose -f docker-compose.minio.yml down --volumes
-````
+```
 
 
 ## Data persistence

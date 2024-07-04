@@ -1,5 +1,5 @@
-import Registry from '../Registry';
-import messages from '../../utils/messages';
+import Registry from "../Registry";
+import messages from "../../utils/messages";
 
 export const errorBuilder = {
   /**
@@ -9,7 +9,7 @@ export const errorBuilder = {
     return {
       modelName,
       field,
-      error: 'ERR_REQUIRED',
+      error: "ERR_REQUIRED",
     };
   },
 
@@ -21,7 +21,7 @@ export const errorBuilder = {
       modelName,
       field,
       value,
-      error: 'ERR_UNKNOWN_TAG',
+      error: "ERR_UNKNOWN_TAG",
     };
   },
 
@@ -33,7 +33,7 @@ export const errorBuilder = {
       modelName,
       field,
       value,
-      error: 'ERR_TAG_NOT_FOUND',
+      error: "ERR_TAG_NOT_FOUND",
     };
   },
 
@@ -46,7 +46,7 @@ export const errorBuilder = {
       field,
       value,
       validType,
-      error: 'ERR_TAG_UNSUPPORTED',
+      error: "ERR_TAG_UNSUPPORTED",
     };
   },
 
@@ -59,7 +59,7 @@ export const errorBuilder = {
       field,
       value,
       validType,
-      error: 'ERR_PARENT_TAG_UNEXPECTED',
+      error: "ERR_PARENT_TAG_UNEXPECTED",
     };
   },
 
@@ -72,35 +72,35 @@ export const errorBuilder = {
       field,
       value,
       validType,
-      error: 'ERR_BAD_TYPE',
+      error: "ERR_BAD_TYPE",
     };
   },
 
   internalError(error) {
     return {
-      error: 'ERR_INTERNAL',
+      error: "ERR_INTERNAL",
       value: String(error).substr(0, 1000),
       field: String(error.code),
-      modelName: '',
+      modelName: "",
     };
   },
 
   generalError(error) {
     return {
-      error: 'ERR_GENERAL',
+      error: "ERR_GENERAL",
       value: String(error).substr(0, 1000),
       field: String(error.code),
-      modelName: '',
+      modelName: "",
     };
   },
 
   loadingError(error, url, attrWithUrl, message = messages.ERR_LOADING_HTTP) {
-    console.log('ERR', error, error.code);
+    console.log("ERR", error, error.code);
     return {
-      error: 'ERR_GENERAL',
+      error: "ERR_GENERAL",
       value: message({ attr: attrWithUrl, error: String(error), url }),
       field: attrWithUrl,
-      modelName: '',
+      modelName: "",
     };
   },
 };
@@ -114,12 +114,12 @@ const getTypeDescription = (type, withNullType = true) => {
   const description = type
     .describe()
     .match(/([a-z0-9?|]+)/gi)
-    .join('')
-    .split('|');
+    .join("")
+    .split("|");
 
   // Remove optional null
   if (withNullType === false) {
-    const index = description.indexOf('null?');
+    const index = description.indexOf("null?");
 
     if (index >= 0) description.splice(index, 1);
   }
@@ -135,11 +135,10 @@ const getTypeDescription = (type, withNullType = true) => {
  * @param {object[]} result
  * @returns {object[]}
  */
-const flattenTree = (tree, parent = null, parentParentTypes = ['view'], result) => {
+const flattenTree = (tree, parent = null, parentParentTypes = ["view"], result) => {
   if (!tree.children) return [];
 
-  const children = tree.type === 'pagedview' ? tree.children.slice(0, 1) : tree.children;
-
+  const children = tree.type === "pagedview" ? tree.children.slice(0, 1) : tree.children;
 
   for (const child of children) {
     /* Create a child without children and
@@ -151,7 +150,7 @@ const flattenTree = (tree, parent = null, parentParentTypes = ['view'], result) 
 
     result.push(flatChild);
 
-    if (child.children instanceof Array) {
+    if (Array.isArray(child.children)) {
       flattenTree(child, child, parentTypes, result);
     }
   }
@@ -169,7 +168,7 @@ const validateNameTag = (child, model) => {
 
   // HyperText can be used for mark-up, without name, so name is optional type there
   if (name && !name.optionalValues && child.name === undefined) {
-    return errorBuilder.required(model.name, 'name');
+    return errorBuilder.required(model.name, "name");
   }
 
   return null;
@@ -188,18 +187,18 @@ const validateToNameTag = (element, model, flatTree) => {
 
   if (!element.toname) return null;
 
-  const names = element.toname.split(','); // for pairwise
+  const names = element.toname.split(","); // for pairwise
 
   for (const name of names) {
     // Find referenced tag in the tree
-    const controlledTag = flatTree.find(item => item.name === name);
+    const controlledTag = flatTree.find((item) => item.name === name);
 
     if (controlledTag === undefined) {
-      return errorBuilder.tagNotFound(model.name, 'toname', name);
+      return errorBuilder.tagNotFound(model.name, "toname", name);
     }
 
     if (controlledTags && controlledTags.validate(controlledTag.tagName).length) {
-      return errorBuilder.tagUnsupported(model.name, 'toname', controlledTag.tagName, controlledTags);
+      return errorBuilder.tagUnsupported(model.name, "toname", controlledTag.tagName, controlledTags);
     }
   }
 
@@ -216,10 +215,30 @@ const validateToNameTag = (element, model, flatTree) => {
 const validateParentTag = (element, model) => {
   const parentTypes = model.properties.parentTypes?.value;
 
-  if (!parentTypes || element.parentTypes.find(elementParentType => parentTypes.find(type => elementParentType === type.toLowerCase()))) {
+  if (
+    !parentTypes ||
+    element.parentTypes.find((elementParentType) =>
+      parentTypes.find((type) => elementParentType === type.toLowerCase()),
+    )
+  ) {
     return null;
   }
-  return errorBuilder.parentTagUnexpected(model.name, 'parent', element.tagName, model.properties.parentTypes);
+  return errorBuilder.parentTagUnexpected(model.name, "parent", element.tagName, model.properties.parentTypes);
+};
+
+/**
+ * Validates if visual tags have name attribute
+ * @param {Object} element
+ */
+const validateVisualTags = (element) => {
+  const visualTags = ["Collapse", "Filter", "Header", "Style", "View"];
+  const { tagName } = element;
+
+  if (visualTags.includes(tagName) && element.name) {
+    return errorBuilder.generalError(`Attribute <b>name</b> is not allowed for tag <b>${tagName}</b>.`);
+  }
+
+  return null;
 };
 
 /**
@@ -256,8 +275,12 @@ const validatePerRegion = (child) => {
 
   // PerItem and PerRegion are incompatible but PerRegion is more prioritized mode
   if (child.perregion && child.peritem) {
-    validationResult.push(errorBuilder.generalError('Attribute <b>perItem</b> is incompatible with attribute <b>perRegion</b>. ' +
-      'They define two different modes. However <b>perRegion</b> works fine even with multi-item mode of object tags.'));
+    validationResult.push(
+      errorBuilder.generalError(
+        "Attribute <b>perItem</b> is incompatible with attribute <b>perRegion</b>. " +
+          "They define two different modes. However <b>perRegion</b> works fine even with multi-item mode of object tags.",
+      ),
+    );
   }
 
   return validationResult;
@@ -267,7 +290,7 @@ const validatePerRegion = (child) => {
  * Convert MST type to a human-readable string
  * @param {import("mobx-state-tree").IType} type
  */
-const humanizeTypeName = type => {
+const humanizeTypeName = (type) => {
   return type ? getTypeDescription(type, false) : null;
 };
 
@@ -280,7 +303,7 @@ export class ConfigValidator {
     const flatTree = [];
 
     flattenTree(root, null, [], flatTree);
-    const propertiesToSkip = ['id', 'children', 'name', 'toname', 'controlledTags', 'parentTypes'];
+    const propertiesToSkip = ["id", "children", "name", "toname", "controlledTags", "parentTypes"];
     const validationResult = [];
 
     for (const child of flatTree) {
@@ -310,7 +333,7 @@ export class ConfigValidator {
     }
 
     if (validationResult.length) {
-      return validationResult.map(error => ({
+      return validationResult.map((error) => ({
         ...error,
         validType: humanizeTypeName(error.validType),
       }));

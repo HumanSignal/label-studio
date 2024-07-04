@@ -137,6 +137,11 @@ stages:
         link: 'https://labelstud.io/guide/export.html#YOLO'
         tags: ['image segmentation', 'object detection']
         name: 'YOLO'
+      - title: 'YOLOv8 OBB'
+        description: 'Popular TXT format is created for each image file. Each txt file contains annotations for the corresponding image file. The YOLO OBB format designates bounding boxes by their four corner points with coordinates normalized between 0 and 1, so it is possible to export rotated objects.'
+        link: 'https://labelstud.io/guide/export.html#YOLO'
+        tags: ['image segmentation', 'object detection']
+        name: 'YOLO_OBB'
       - title: 'CONLL2003'
         description: 'Popular format used for the CoNLL-2003 named entity recognition challenge.'
         link: 'https://labelstud.io/guide/export.html#CONLL2003'

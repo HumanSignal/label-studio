@@ -32,6 +32,17 @@ def project_webhook(configured_project):
     )
 
 
+@pytest.fixture
+def ml_start_training_webhook(configured_project):
+    organization = configured_project.organization
+    uri = 'http://0.0.0.0:9090/webhook'
+    return Webhook.objects.create(
+        organization=organization,
+        project=configured_project,
+        url=uri,
+    )
+
+
 @pytest.mark.django_db
 def test_run_webhook(setup_project_dialog, organization_webhook):
     webhook = organization_webhook
@@ -390,3 +401,42 @@ def test_webhooks_for_tasks_from_storages(configured_project, business_client, o
     assert r.json()['action'] == WebhookAction.TASKS_CREATED
     assert 'tasks' in r.json()
     assert 'project' in r.json()
+
+
+@pytest.mark.django_db
+def test_start_training_webhook(setup_project_dialog, ml_start_training_webhook, business_client):
+    """
+    1. Setup: The test uses the project_webhook fixture, which assumes that a webhook
+    is already configured for the project.
+    2. Mocking the POST Request: The requests_mock.Mocker is used to mock
+    the POST request to the webhook URL. This is where you expect the START_TRAINING action to be sent.
+    3. Making the Request: The test makes a POST request to the /api/ml/{id}/train endpoint.
+
+    Assertions:
+        - The response status code is checked to ensure the request was successful.
+        - It verifies that exactly one request was made to the webhook URL.
+        - It checks that the request method was POST.
+        - The request URL and the JSON payload are validated against expected values.
+    """
+    from ml.models import MLBackend
+
+    webhook = ml_start_training_webhook
+    project = webhook.project
+    ml = MLBackend.objects.create(project=project, url='http://0.0.0.0:9090')
+
+    # Mock the POST request to the ML backend train endpoint
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
+        response = business_client.post(
+            f'/api/ml/{ml.id}/train',
+            data=json.dumps({'action': 'START_TRAINING'}),
+            content_type='application/json',
+        )
+
+    assert response.status_code == 200
+    request_history = m.request_history
+    assert len(request_history) == 1
+    assert request_history[0].method == 'POST'
+    assert request_history[0].url == webhook.url
+    assert 'project' in request_history[0].json()
+    assert request_history[0].json()['action'] == 'START_TRAINING'

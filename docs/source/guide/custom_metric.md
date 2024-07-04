@@ -4,10 +4,10 @@ short: Custom agreement metric
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 265
+order_enterprise: 310
 meta_title: Add a Custom Agreement Metric for Labeling
 meta_description: Label Studio Enterprise documentation about how to add a custom agreement metric to use for assessing annotator agreement or the quality of your annotation and prediction results for data labeling and machine learning projects.
-section: "Quality control"
+section: "Review & Measure Quality"
 
 ---
 
@@ -114,7 +114,7 @@ Set up a custom agreement metric for a specific project in Label Studio Enterpri
 4. Write or paste code defining a custom agreement metric in the text box. 
 5. Click **Save & Deploy**.
 
-For information on troubleshooting custom metrics, see [Troubleshoot agreements](quality_troubleshoot). 
+For information on troubleshooting custom metrics, see [Troubleshooting Agreements & Quality Control](https://support.humansignal.com/hc/en-us/sections/23700954373261-Agreements-Quality-Control) in the HumanSignal support center.
 
 ## Set up permissions for a private cloud custom agreement metric
 

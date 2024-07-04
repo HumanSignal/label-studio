@@ -32,13 +32,6 @@
         }
       }
     },
-    "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/datamanager/**/*.{ts,tsx,js,jsx}"]
-      }
-    },
     "unit": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
@@ -51,6 +44,13 @@
           "ci": true,
           "codeCoverage": true
         }
+      }
+    },
+    "version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/datamanager",
+        "command": "node ../../tools/version/version.mjs"
       }
     }
   }

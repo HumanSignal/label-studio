@@ -1,12 +1,12 @@
-import { ComputeWorker } from '../Common/Worker';
+import { ComputeWorker } from "../Common/Worker";
 
 export function splitChannels({
   value,
   channelCount,
 }: {
-  value: Float32Array,
-  channelCount: number,
-}) : Float32Array[] {
+  value: Float32Array;
+  channelCount: number;
+}): Float32Array[] {
   const channels: Float32Array[] = [];
 
   // Create new Float32Array for each channel

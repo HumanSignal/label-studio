@@ -4,22 +4,20 @@
     "mac": "command+b",
     "description": "Back for one second"
   },
-  "audio:playpause": {
-
-  },
-  "ts:grow-left":{
+  "audio:playpause": {},
+  "ts:grow-left": {
     "key": "left",
     "description": "Increase region to the left"
   },
-  "ts:grow-right":{
+  "ts:grow-right": {
     "key": "right",
     "description": "Increase region to the right"
   },
-  "ts:shrink-left":{
+  "ts:shrink-left": {
     "key": "alt+left",
     "description": "Decrease region on the left"
   },
-  "ts:shrink-right":{
+  "ts:shrink-right": {
     "key": "alt+right",
     "description": "Decrease region on the right"
   },
@@ -168,11 +166,13 @@
     "description": "Previous Page"
   },
   "image:prev": {
-    "key": "ctrl+a",
+    "key": "ctrl+left",
+    "mac": "command+left",
     "description": "Previous Image"
   },
   "image:next": {
-    "key": "ctrl+d",
+    "key": "ctrl+right",
+    "mac": "command+right",
     "description": "Next Image"
   }
 }

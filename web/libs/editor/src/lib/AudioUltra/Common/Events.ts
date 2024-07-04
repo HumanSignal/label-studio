@@ -1,6 +1,6 @@
-import { Destructable } from './Destructable';
+import { Destructable } from "./Destructable";
 
-type AnyFunction = (...args: any[]) => any
+type AnyFunction = (...args: any[]) => any;
 
 type ToFunction<T> = T extends AnyFunction ? T : never;
 
@@ -26,11 +26,11 @@ export class Events<ET, ETS extends keyof ET = keyof ET> extends Destructable {
   invoke<T extends ETS, ETF = ET[T]>(eventName: T, args?: Parameters<ToFunction<ETF>>) {
     const events = this.getSubscriptions(eventName);
 
-    events.forEach(evt => evt(...(args ?? [])));
+    events.forEach((evt) => evt(...(args ?? [])));
   }
 
   removeAllListeners() {
-    this.subscriptions.forEach(sub => sub.clear());
+    this.subscriptions.forEach((sub) => sub.clear());
     this.subscriptions.clear();
   }
 

@@ -1,0 +1,55 @@
+.auto-accept
+  height 44px
+  display flex
+  align-items center
+  box-sizing border-box
+  background-color #fff
+  margin-left: 16px;
+
+  &__wrapper
+    width 100%
+
+    &_loading
+      // toggle will not be disabled, because it's usable even when loading
+      opacity: 0.5;
+
+  &__info
+    font-size: 16px;
+
+  &__action
+    padding 0
+    margin 0
+    margin 2px
+    width 28px
+    height 28px
+    display flex
+    align-items center
+    justify-content center
+    border-radius 100%
+    color rgba(#000, 0.6)
+    background-color rgba(#000, 0.1)
+
+    &_type
+      &_accept svg
+        width 15px
+        height 10px
+
+      &_reject svg
+        width 12.5px
+        height 12.5px
+
+  &__spinner
+    width 16px
+    height 16px
+    border-radius 100%;
+    box-sizing border-box
+    border 2px solid #FFD666
+    border-right-color transparent
+    animation waiting-spin 1s linear infinite
+
+@keyframes waiting-spin
+  0%
+    transform rotate(0deg)
+
+  100%
+    transform rotate(360deg)

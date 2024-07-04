@@ -102,6 +102,67 @@ stages:
 
 
 ---
+test_name: change_project_model_version_to_non_existent
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- id: create_task
+  type: ref
+- name: change_project_model_to_non_existent
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+    data:
+      model_version: "test"
+  response:
+    status_code: 400
+- id: create_prediction
+  name: create_prediction
+  request:
+    json:
+      result:
+        - value:
+            choices:
+            - Negative
+          id: qpQHs3Yy4K
+          from_name: sentiment
+          to_name: text
+          type: choices
+          model_version: "test"
+      model_version: "test"
+      task: '{task_pk}'
+    method: POST
+    url: '{django_live_url}/api/predictions'
+  response:
+    save:
+      json:
+        prediction_pk: id
+    status_code: 201
+- name: change_project_model_to_existent
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+    data:
+      model_version: "test"
+  response:
+    status_code: 200
+- name: change_project_model_to_null
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+    data:
+      model_version: null
+  response:
+    status_code: 200
+
+
+---
 test_name: create_prediction_minified_format
 strict: false
 marks:

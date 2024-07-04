@@ -1,4 +1,4 @@
-import { MutableRefObject, useEffect } from 'react';
+import { type MutableRefObject, useEffect } from "react";
 
 interface Handlers<T extends HTMLElement = HTMLElement, D = any> {
   elementRef: MutableRefObject<T | undefined>;
@@ -30,20 +30,20 @@ export const useDrag = <EL extends HTMLElement = HTMLElement, D = any>(options: 
       };
 
       const onMouseUp = (e: MouseEvent) => {
-        document.removeEventListener('mousemove', onMouseMove, eventOptions);
-        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener("mousemove", onMouseMove, eventOptions);
+        document.removeEventListener("mouseup", onMouseUp);
         options.onMouseUp?.(e, result);
       };
 
-      document.addEventListener('mousemove', onMouseMove, eventOptions);
-      document.addEventListener('mouseup', onMouseUp);
+      document.addEventListener("mousemove", onMouseMove, eventOptions);
+      document.addEventListener("mouseup", onMouseUp);
     };
 
-    element?.addEventListener('mousedown', onMouseDown);
+    element?.addEventListener("mousedown", onMouseDown);
 
     return () => {
       options.onUnmount?.();
-      element?.removeEventListener('mousedown', onMouseDown);
+      element?.removeEventListener("mousedown", onMouseDown);
     };
   }, deps);
 };

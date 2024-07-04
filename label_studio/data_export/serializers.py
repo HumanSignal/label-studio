@@ -4,8 +4,8 @@ from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func
 from data_export.models import DataExport
 from django.conf import settings
-from label_studio_tools.core.label_config import is_video_object_tracking
-from label_studio_tools.postprocessing.video import extract_key_frames
+from label_studio_sdk._extensions.label_studio_tools.core.label_config import is_video_object_tracking
+from label_studio_sdk._extensions.label_studio_tools.postprocessing.video import extract_key_frames
 from ml.mixins import InteractiveMixin
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
@@ -155,6 +155,9 @@ class SerializationOptionsSerializer(serializers.Serializer):
 
     drafts = SerializationOption(required=False, help_text='JSON dict with parameters')
     predictions = SerializationOption(required=False, help_text='JSON dict with parameters')
+    include_annotation_history = serializers.BooleanField(
+        default=False, help_text='Include annotation history', required=False
+    )
     annotations__completed_by = SerializationOption(required=False, help_text='JSON dict with parameters')
     interpolate_key_frames = serializers.BooleanField(
         default=settings.INTERPOLATE_KEY_FRAMES, help_text='Interpolate video key frames', required=False
