@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
 
+import logging
+
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -7,6 +9,8 @@ from ml_model_providers.models import ModelProviderConnection
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation, Prediction
+
+logger = logging.getLogger(__name__)
 
 
 def validate_string_list(value):
@@ -172,7 +176,15 @@ class ModelRun(models.Model):
         """
         predictions = Prediction.objects.filter(model_run=self.id)
         prediction_ids = [p.id for p in predictions]
+        # to delete all dependencies where predictions are foreign keys.
         Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
+        try:
+            from stats.models import PredictionStats
+
+            prediction_stats_to_be_deleted = PredictionStats.objects.filter(prediction_to__in=prediction_ids)
+            prediction_stats_to_be_deleted.delete()
+        except Exception as e:
+            logger.info(f'PredictionStats model does not exist , exception:{e}')
         predictions._raw_delete(predictions.db)
 
     def delete(self, *args, **kwargs):

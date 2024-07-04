@@ -587,7 +587,12 @@ In the Label Studio UI, do the following to set up the connection:
 4. In the dialog box that appears, select **Local Files** as the storage type.
 5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
 6. Specify an **Absolute local path** to the directory with your files. The local path must be an absolute path and include the `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` value. 
-   For example, if `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then your local path must be `/home/user/dataset1`. For more about that environment variable, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).    
+
+    For example, if `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then your local path must be `/home/user/dataset1`. For more about that environment variable, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).  
+
+!!! note
+    If you are using Windows, ensure that you use backslashes when entering your **Absolute local path**.  
+
 7. (Optional) In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
 8. (Optional) Toggle **Treat every bucket object as a source file**. 
    - Enable this option if you want to create Label Studio tasks from media files automatically, such as JPG, MP3, or similar file types. Use this option for labeling configurations with one source tag.

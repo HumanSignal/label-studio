@@ -1,6 +1,6 @@
 {
-  "message": "chore: LEAP-1192: Remove feat_front_dev_4008_quick_task_open_short (#6034)",
-  "commit": "f25918268078c50d1e2d822c6ccbace2d2a8e959",
-  "date": "2024-06-27T11:42:33.000Z",
+  "message": "feat: LEAP-1173: Disable the postpone option if the skip interface isn't set (#6048)",
+  "commit": "470b83bb7ddcbf47a82bfb73f2d4f906c387c204",
+  "date": "2024-07-03T15:35:13.000Z",
   "branch": "develop"
 }
