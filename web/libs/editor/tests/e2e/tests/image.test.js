@@ -65,7 +65,7 @@ const annotationWithPerRegion = {
 const image =
   "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
 
-Scenario("Check Rect region for Image", async ({ I, AtImageView, AtSidebar }) => {
+Scenario("Check Rect region for Image", async ({ I, AtImageView, AtOutliner, AtSidebar }) => {
   const params = {
     config,
     data: { image },
@@ -80,16 +80,16 @@ Scenario("Check Rect region for Image", async ({ I, AtImageView, AtSidebar }) =>
   I.executeScript(waitForImage);
   AtSidebar.seeRegions(1);
   // select first and only region
-  I.click(locate('[aria-label="region"]'));
-  I.see("Labels:");
+  AtOutliner.clickRegion(1);
+  AtOutliner.seeSelectedRegion();
 
   // click on region's rect on the canvas
   AtImageView.clickAt(330, 80);
   I.wait(1);
-  I.dontSee("Labels:");
+  AtOutliner.dontSeeSelectedRegion();
 });
 
-Scenario("Image with perRegion tags", async ({ I, AtImageView, AtSidebar }) => {
+Scenario("Image with perRegion tags", async ({ I, AtImageView, AtOutliner, AtSidebar }) => {
   let result;
   const params = {
     config: perRegionConfig,
@@ -104,8 +104,8 @@ Scenario("Image with perRegion tags", async ({ I, AtImageView, AtSidebar }) => {
   I.executeScript(waitForImage);
   AtSidebar.seeRegions(1);
   // select first and only region
-  I.click(locate('[aria-label="region"]'));
-  I.see("Labels:");
+  AtOutliner.clickRegion(1);
+  AtOutliner.seeSelectedRegion();
 
   // check that there is deserialized text for this region; and without doubles
   I.seeNumberOfElements(locate("mark").withText("blah"), 1);
