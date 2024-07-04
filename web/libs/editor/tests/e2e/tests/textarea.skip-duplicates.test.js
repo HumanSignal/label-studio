@@ -225,7 +225,7 @@ Scenario("Independent skip duplicate values", async ({ I, LabelStudio, AtSidebar
   Modals.dontSeeWarning(SKIP_DUPLICATES_ERROR);
 });
 
-Scenario("Skip duplicate values on editing", async ({ I, LabelStudio, AtOutliner, Modals }) => {
+Scenario("Skip duplicate values on editing", async ({ I, LabelStudio, AtOutliner, AtSidebar, Modals }) => {
   I.amOnPage("/");
   LabelStudio.setFeatureFlags({
     ff_front_1170_outliner_030222_short: true,
@@ -264,7 +264,7 @@ Scenario("Skip duplicate values on editing", async ({ I, LabelStudio, AtOutliner
     ],
   });
   LabelStudio.waitForObjectsReady();
-  AtOutliner.seeRegions(2);
+  AtSidebar.seeRegions(2);
 
   I.say("Check perText Textarea regions editing");
   I.say("Create some random values in perText Textarea");

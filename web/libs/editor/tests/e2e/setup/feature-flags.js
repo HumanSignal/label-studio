@@ -13,4 +13,5 @@ module.exports = {
   fflag_feat_front_lsdv_4620_outliner_optimization_310723_short: true,
   fflag_fix_front_lsdv_5248_double_click_delay_280823_short: true,
   fflag_fix_front_leap_32_zoom_perf_190923_short: true,
+  fflag_feat_front_dev_3873_labeling_ui_improvements_short: true,
 };

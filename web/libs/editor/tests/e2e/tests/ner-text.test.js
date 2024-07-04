@@ -82,7 +82,7 @@ const newResult = {
   value: { start: 233, end: 237, text: "come", labels: ["Words"] },
 };
 
-Scenario("NERText", async ({ I, AtTopbar }) => {
+Scenario("NERText", async ({ I, AtSidebar, AtTopbar }) => {
   const params = {
     annotations: [{ id: "TestCmpl", result: results }],
     config: configSimple,
@@ -103,7 +103,6 @@ Scenario("NERText", async ({ I, AtTopbar }) => {
   assert.deepEqual(result, results);
 
   // Create a new annotation to create the same result from scratch
-  I.click('[aria-label="Annotations List Toggle"]');
   I.click('[aria-label="Create Annotation"]');
 
   I.pressKey("2");
@@ -119,7 +118,7 @@ Scenario("NERText", async ({ I, AtTopbar }) => {
   assert.deepEqual(result, [newResult]);
 
   // delete this new annotation
-  AtTopbar.clickAria("Delete");
+  AtTopbar.clickAria("Delete Annotation");
   I.click("Proceed"); // approve
 
   I.pressKey("1");
@@ -137,7 +136,7 @@ Scenario("NERText", async ({ I, AtTopbar }) => {
   // @todo this hotkey doesn't work. why?
   // I.pressKey('R')
   I.wait(5);
-  I.click(locate("li").withText("Alice"));
+  AtSidebar.clickRegion("Alice");
   I.click("Create Relation");
   I.click(locate(".htx-highlight").withText("come"));
   I.wait(1);

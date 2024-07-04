@@ -4,7 +4,7 @@ import { DEFAULT_PANEL_HEIGHT, DEFAULT_PANEL_MAX_HEIGHT, DEFAULT_PANEL_WIDTH } f
 export type TabProps = {
   name: string;
   rootRef: MutableRefObject<HTMLDivElement | undefined>;
-  tabTitle: string;
+  tabTitle: ReactNode;
   panelKey: string;
   tabIndex: number;
   active: boolean;
@@ -34,6 +34,7 @@ export interface ViewportSize {
 export interface PanelView {
   title: string;
   name: string;
+  titleComponent?: FC<any>;
   component: FC<any>;
   active: boolean;
 }

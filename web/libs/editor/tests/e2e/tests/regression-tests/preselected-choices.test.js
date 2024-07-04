@@ -37,7 +37,7 @@ Scenario("Make a duplicate of annotation with preselected choices", async ({ I, 
   I.amOnPage("/");
   LabelStudio.init(params);
   // Try to create copy of current annotation
-  AtTopbar.click('[aria-label="Copy Annotation"]');
+  AtTopbar.clickAria("Duplicate Annotation");
   const duplicateResult = await LabelStudio.serialize();
 
   // Make sure there are no results other than the copied ones
@@ -45,7 +45,6 @@ Scenario("Make a duplicate of annotation with preselected choices", async ({ I, 
   assert.deepStrictEqual(duplicateResult[0].value.choices, ["Option 2"]);
 
   // Create new annotation
-  I.click('[aria-label="Annotations List Toggle"]');
   I.click('[aria-label="Create Annotation"]');
   const annotationWithPresetValues = await LabelStudio.serialize();
 
@@ -78,14 +77,13 @@ Scenario("Make a duplicate of empty annotation with preselected choices", async 
   I.amOnPage("/");
   LabelStudio.init(params);
   // Try to create copy of current annotation
-  AtTopbar.click('[aria-label="Copy Annotation"]');
+  AtTopbar.clickAria("Duplicate Annotation");
   const duplicateResult = await LabelStudio.serialize();
 
   // Make sure there are no preselected results
   assert.deepStrictEqual(duplicateResult.length, 0);
 
   // Create new annotation
-  I.click('[aria-label="Annotations List Toggle"]');
   I.click('[aria-label="Create Annotation"]');
   const annotationWithPresetValues = await LabelStudio.serialize();
 

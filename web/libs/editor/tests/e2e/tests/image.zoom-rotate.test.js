@@ -273,9 +273,8 @@ const compareSize = async (I, AtImageView, message1, message2) => {
 
 Data(layoutVariations).Scenario(
   "Rotation in the two columns template",
-  async ({ I, LabelStudio, AtImageView, AtSidebar, AtSettings, current }) => {
+  async ({ I, LabelStudio, AtImageView, AtSidebar, current }) => {
     I.amOnPage("/");
-    let isVerticalLayout = false;
 
     const { config, inline, reversed } = current;
 
@@ -322,14 +321,6 @@ Data(layoutVariations).Scenario(
     AtSidebar.seeRegions(1);
 
     await compareSize(I, AtImageView, "Dimensions must be equal in landscape", "landscape, rotated");
-
-    I.say("Change to vertcal layout");
-    AtSettings.open();
-    isVerticalLayout = !isVerticalLayout;
-    AtSettings.setLayoutSettings({
-      [AtSettings.LAYOUT_SETTINGS.VERTICAL_LAYOUT]: isVerticalLayout,
-    });
-    AtSettings.close();
 
     AtSidebar.seeRegions(1);
     await compareSize(I, AtImageView, "Dimensions must be equal in portrait", "portrait");

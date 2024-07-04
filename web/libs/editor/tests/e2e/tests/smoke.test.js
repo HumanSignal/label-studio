@@ -96,7 +96,7 @@ examples.slice(1).forEach((example) =>
         );
       }
       // Click on annotation copy button
-      AtTopbar.click('[aria-label="Copy Annotation"]');
+      AtTopbar.clickAria("Duplicate Annotation");
 
       // Check if new annotation exists
       AtTopbar.seeAnnotationAt(2);

@@ -1,3 +1,5 @@
+// @deprecated Repeater is not recommended to use
+
 import React, { useCallback, useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";
@@ -7,7 +9,6 @@ import Types from "../../core/Types";
 import Tree from "../../core/Tree";
 import { Pagination } from "../../common/Pagination/Pagination";
 import { Hotkey } from "../../core/Hotkey";
-import { FF_DEV_1170, isFF } from "../../utils/feature-flags";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 
 const Model = types.model({
@@ -143,11 +144,7 @@ const HtxPagedView = observer(({ item }) => {
   }, [item.annotation.lastSelectedRegion]);
 
   useEffect(() => {
-    if (isFF(FF_DEV_1170)) {
-      document.querySelector(".lsf-sidepanels__content")?.scrollTo(0, 0);
-    } else {
-      document.querySelector("#label-studio-dm")?.scrollTo(0, 0);
-    }
+    document.querySelector(".lsf-sidepanels__content")?.scrollTo(0, 0);
 
     setTimeout(() => {
       hotkeys.addNamed("repeater:next-page", () => {

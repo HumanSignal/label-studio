@@ -56,7 +56,6 @@ Scenario("Dnd at the outliner after switching annotations", async ({ I, LabelStu
   await AtOutliner.dragAndDropRegion(7, 3);
 
   I.say("Switch annotation");
-  AtTopbar.openAnnotaions();
   AtTopbar.selectAnnotationAt(2);
   AtOutliner.seeRegions(10);
 

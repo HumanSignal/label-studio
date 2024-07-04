@@ -1,18 +1,18 @@
 import { inject, observer } from "mobx-react";
 import type { FC } from "react";
+
 import { Block, Elem } from "../../../utils/bem";
 import { FF_DEV_2290, isFF } from "../../../utils/feature-flags";
 import { Comments as CommentsComponent } from "../../Comments/Comments";
 import { AnnotationHistory } from "../../CurrentEntity/AnnotationHistory";
+import { DraftPanel } from "../../DraftPanel/DraftPanel";
 import { PanelBase, type PanelProps } from "../PanelBase";
-import "./DetailsPanel.styl";
 import { RegionDetailsMain, RegionDetailsMeta } from "./RegionDetails";
 import { RegionItem } from "./RegionItem";
 import { Relations as RelationsComponent } from "./Relations";
-// eslint-disable-next-line
-// @ts-ignore
-import { DraftPanel } from "../../DraftPanel/DraftPanel";
 import { RelationsControls } from "./RelationsControls";
+
+import "./DetailsPanel.styl";
 
 interface DetailsPanelProps extends PanelProps {
   regions: any;
@@ -26,16 +26,6 @@ const DetailsPanelComponent: FC<DetailsPanelProps> = ({ currentEntity, regions, 
     <PanelBase {...props} currentEntity={currentEntity} name="details" title="Details">
       <Content selection={selectedRegions} currentEntity={currentEntity} />
     </PanelBase>
-  );
-};
-
-const DetailsComponent: FC<DetailsPanelProps> = ({ currentEntity, regions }) => {
-  const selectedRegions = regions.selection;
-
-  return (
-    <Block name="details-tab">
-      <Content selection={selectedRegions} currentEntity={currentEntity} />
-    </Block>
   );
 };
 
@@ -196,5 +186,4 @@ export const Comments = CommentsTab;
 export const History = HistoryTab;
 export const Relations = RelationsTab;
 export const Info = InfoTab;
-export const Details = observer(DetailsComponent);
 export const DetailsPanel = observer(DetailsPanelComponent);

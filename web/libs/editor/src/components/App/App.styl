@@ -14,9 +14,6 @@
   flex-direction column
   background-color var(--main-bg-color)
 
-  &__auto_height
-    height: auto
-
   &_fullscreen
     position absolute
     background white
@@ -32,26 +29,22 @@
 
 .wrapper
   flex 1
+  // view all and new UI have only one children, so no grid required
+  // most probably we dont need a grid here at all
   display grid
-  grid-template-columns calc(100% - 320px) 320px
+  grid-template-columns 100%
   grid-template-rows 1fr
   align-items stretch
   max-width 100%
   height calc(100% - var(--topbar-height))
 
-  // view all and new UI have only one children, so no grid required
-  &_view_all
-  &_outliner
-    grid-template-columns 100%
-    
-    & .menu 
-      padding-bottom 8px
+  --bottombar-height 48px
 
   &_bsp
     display block
-  
-  &_showingBottomBar
-    --bottombar-height 48px
+
+  & .menu
+    padding-bottom 8px
 
 .main-view
   flex 1

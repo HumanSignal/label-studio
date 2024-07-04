@@ -1,5 +1,7 @@
 const { I } = inject();
 
+const Helpers = require("../tests/helpers");
+
 module.exports = {
   _rootSelector: ".htx-timeseries",
   _channelSelector: ".htx-timeseries-channel .overlay",
@@ -20,7 +22,7 @@ module.exports = {
   EAST: "east",
 
   async lookForStage() {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     const bbox = await I.grabElementBoundingRect(this._channelStageSelector);
 
     this._stageBBox = bbox;
@@ -53,7 +55,7 @@ module.exports = {
    * await AtTimeSeries.selectOverviewRange(.25, .75);
    */
   async selectOverviewRange(from, to) {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     const overviewBBox = await I.grabElementBoundingRect(this._overviewSelector);
 
     I.moveMouse(overviewBBox.x + overviewBBox.width * from, overviewBBox.y + overviewBBox.height / 2);
@@ -68,7 +70,7 @@ module.exports = {
    * @returns {Promise<void>}
    */
   async clickOverview(where) {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     const overviewBBox = await I.grabElementBoundingRect(this._overviewSelector);
 
     I.clickAt(overviewBBox.x + overviewBBox.width * where, overviewBBox.y + overviewBBox.height / 2);
@@ -85,7 +87,7 @@ module.exports = {
    * await AtTimeSeries.moveHandle(.5, AtTimeSeries.WEST);
    */
   async moveHandle(where, which = this.WEST) {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     const handlerBBox = await I.grabElementBoundingRect(this[`_${which}HandleSelector`]);
     const overviewBBox = await I.grabElementBoundingRect(this._overviewSelector);
 
@@ -113,7 +115,7 @@ module.exports = {
   async zoomByMouse(deltaY, atPoint) {
     const { x = 0.5, y = 0.5 } = atPoint;
 
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     const channelBBox = await I.grabElementBoundingRect(this._channelSelector);
 
     I.moveMouse(channelBBox.x + channelBBox.width * x, channelBBox.y + channelBBox.height * y);
@@ -136,7 +138,7 @@ module.exports = {
   async moveMouseOverChannel(atPoint) {
     const { x = 0.5, y = 0.5 } = atPoint;
 
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     const channelBBox = await I.grabElementBoundingRect(this._channelSelector);
 
     I.moveMouse(channelBBox.x + channelBBox.width * x, channelBBox.y + channelBBox.height * y);
@@ -151,7 +153,7 @@ module.exports = {
    * @param shiftX
    */
   drawByDrag(x, shiftX) {
-    I.scrollPageToTop();
+    I.executeScript(Helpers.scrollToTop);
     I.moveMouse(this._stageBBox.x + x, this._stageBBox.y + this._stageBBox.height / 2);
     I.pressMouseDown();
     I.moveMouse(this._stageBBox.x + x + shiftX, this._stageBBox.y + this._stageBBox.height / 2, 3);

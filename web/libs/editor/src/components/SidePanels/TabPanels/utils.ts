@@ -21,6 +21,7 @@ import {
   type StoredPanelState,
   type ViewportSize,
 } from "./types";
+import { RegionsCount } from "./RegionsCount";
 
 export const determineLeftOrRight = (event: any, droppableElement?: ReactNode) => {
   const element = droppableElement || (event.target as HTMLElement);
@@ -119,7 +120,7 @@ export const stateRemovePanelEmptyViews = (state: Record<string, PanelBBox> | nu
   return newState;
 };
 
-export const panelComponents: { [key: string]: FC<PanelProps> } = {
+export const panelComponents = {
   regions: OutlinerComponent as FC<PanelProps>,
   history: History as FC<PanelProps>,
   relations: Relations as FC<PanelProps>,
@@ -131,6 +132,8 @@ const panelViews = [
   {
     name: "regions",
     title: "Regions",
+    // enrich Regions panel title to display the number of regions
+    titleComponent: RegionsCount,
     component: panelComponents.regions as FC<PanelProps>,
     active: true,
   },
@@ -296,8 +299,15 @@ export const restoreComponentsToState = (panelData: Record<string, PanelBBox>) =
   Object.keys(updatedPanels).forEach((panelName) => {
     const panel = updatedPanels[panelName];
 
+    // restore component and title from the original panelViews
     panel.panelViews.forEach((view: { name: string; component: FC<PanelProps> }) => {
-      view.component = panelComponents[view.name];
+      const originalView = panelViews.find((v) => v.name === view.name);
+
+      if (!originalView) return;
+
+      const { component, title, titleComponent } = originalView;
+
+      Object.assign(view, { component, title, titleComponent });
     });
   });
 

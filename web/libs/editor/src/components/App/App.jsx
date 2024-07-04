@@ -25,7 +25,7 @@ import "../../tags/visual";
 import { Space } from "../../common/Space/Space";
 import { Button } from "../../common/Button/Button";
 import { Block, Elem } from "../../utils/bem";
-import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
+import { FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
@@ -35,7 +35,6 @@ import { isDefined, sortAnnotations } from "../../utils/utilities";
  * Components
  */
 import { Annotation } from "./Annotation";
-import { AnnotationTab } from "../AnnotationTab/AnnotationTab";
 import { BottomBar } from "../BottomBar/BottomBar";
 import Debug from "../Debug";
 import Grid from "./Grid";
@@ -43,7 +42,6 @@ import { InstructionsModal } from "../InstructionsModal/InstructionsModal";
 import { RelationsOverlay } from "../RelationsOverlay/RelationsOverlay";
 import Segment from "../Segment/Segment";
 import Settings from "../Settings/Settings";
-import { SidebarTabs } from "../SidebarTabs/SidebarTabs";
 import { SidePanels } from "../SidePanels/SidePanels";
 import { SideTabsPanels } from "../SidePanels/TabPanels/SideTabsPanels";
 import { TopBar } from "../TopBar/TopBar";
@@ -219,13 +217,12 @@ class App extends Component {
       </Block>
     );
 
-    const outlinerEnabled = isFF(FF_DEV_1170);
     const newUIEnabled = isFF(FF_DEV_3873);
 
     return (
       <Block
         name="editor"
-        mod={{ fullscreen: settings.fullscreen, _auto_height: !outlinerEnabled }}
+        mod={{ fullscreen: settings.fullscreen }}
         ref={isFF(FF_LSDV_4620_3_ML) ? reactCleaner(this) : null}
       >
         <Settings store={store} />
@@ -254,47 +251,28 @@ class App extends Component {
             mod={{
               viewAll: viewingAll,
               bsp: settings.bottomSidePanel,
-              outliner: outlinerEnabled,
               showingBottomBar: newUIEnabled,
             }}
           >
-            {outlinerEnabled ? (
-              newUIEnabled ? (
-                <SideTabsPanels
-                  panelsHidden={viewingAll}
-                  currentEntity={as.selectedHistory ?? as.selected}
-                  regions={as.selected.regionStore}
-                  showComments={store.hasInterface("annotations:comments")}
-                  focusTab={store.commentStore.tooltipMessage ? "comments" : null}
-                >
-                  {mainContent}
-                  {store.hasInterface("topbar") && <BottomBar store={store} />}
-                </SideTabsPanels>
-              ) : (
-                <SidePanels
-                  panelsHidden={viewingAll}
-                  currentEntity={as.selectedHistory ?? as.selected}
-                  regions={as.selected.regionStore}
-                >
-                  {mainContent}
-                </SidePanels>
-              )
-            ) : (
-              <>
+            {newUIEnabled ? (
+              <SideTabsPanels
+                panelsHidden={viewingAll}
+                currentEntity={as.selectedHistory ?? as.selected}
+                regions={as.selected.regionStore}
+                showComments={store.hasInterface("annotations:comments")}
+                focusTab={store.commentStore.tooltipMessage ? "comments" : null}
+              >
                 {mainContent}
-
-                {viewingAll === false && (
-                  <Block name="menu" mod={{ bsp: settings.bottomSidePanel }}>
-                    {store.hasInterface("side-column") && (
-                      <SidebarTabs>
-                        <AnnotationTab store={store} />
-                      </SidebarTabs>
-                    )}
-                  </Block>
-                )}
-
-                {newUIEnabled && store.hasInterface("topbar") && <BottomBar store={store} />}
-              </>
+                {store.hasInterface("topbar") && <BottomBar store={store} />}
+              </SideTabsPanels>
+            ) : (
+              <SidePanels
+                panelsHidden={viewingAll}
+                currentEntity={as.selectedHistory ?? as.selected}
+                regions={as.selected.regionStore}
+              >
+                {mainContent}
+              </SidePanels>
             )}
           </Block>
         </Provider>

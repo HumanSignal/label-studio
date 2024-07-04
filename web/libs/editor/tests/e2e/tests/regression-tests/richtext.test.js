@@ -64,8 +64,8 @@ Scenario("Exactly 1 word", async ({ I, LabelStudio, AtSidebar, AtRichText }) => 
   AtSidebar.seeRegions(0);
   I.pressKey("1");
   AtRichText.dblClickOnWord("Somé");
-  AtSidebar.see("Somé");
-  AtSidebar.dontSee("Somé wórds");
+  AtSidebar.seeRegion("Somé");
+  AtSidebar.dontSeeRegion("Somé wórds");
   // The potential errors should be caught by `errorsCollector` plugin
 });
 
@@ -84,10 +84,10 @@ Scenario("Trim spaces around the word", async ({ I, LabelStudio, AtSidebar, AtRi
   AtSidebar.seeRegions(0);
   I.pressKey("1");
   AtRichText.dblClickOnWord("four");
-  AtSidebar.see("four");
+  AtSidebar.seeRegion("four");
   I.pressKey("1");
   await AtRichText.selectTextByGlobalOffset(3, 8);
-  AtSidebar.see("two");
+  AtSidebar.seeRegion("two");
   const result = await LabelStudio.serialize();
 
   assert.strictEqual(result[0].value.text, "four");
@@ -110,7 +110,7 @@ Scenario("Trim spaces with BRs", async ({ I, LabelStudio, AtSidebar, AtRichText 
   AtSidebar.seeRegions(0);
   I.pressKey("1");
   await AtRichText.selectTextByGlobalOffset(5, 14);
-  AtSidebar.see("BRs");
+  AtSidebar.seeRegion("BRs");
   const result = await LabelStudio.serialize();
 
   assert.strictEqual(result[0].value.text, "BRs");
@@ -132,7 +132,7 @@ Scenario("Overlap checks", async ({ I, LabelStudio, AtSidebar, AtRichText }) => 
   AtSidebar.seeRegions(0);
   I.pressKey("1");
   await AtRichText.selectTextByGlobalOffset(0, 4);
-  AtSidebar.see("Half");
+  AtSidebar.seeRegion("Half");
   I.pressKey("1");
   await AtRichText.selectTextByGlobalOffset(4, 8);
   I.seeNumberOfElements(AtRichText.locate("span.htx-highlight"), 2);
@@ -155,7 +155,7 @@ Scenario("Non-standard characters in words", async ({ I, LabelStudio, AtSidebar,
   I.pressKey("1");
   await AtRichText.selectTextByGlobalOffset(0, 5);
   AtSidebar.seeRegions(1);
-  AtSidebar.see("Somé");
+  AtSidebar.seeRegion("Somé");
   // The potential errors should be caught by `errorsCollector` plugin
 });
 
@@ -175,8 +175,8 @@ Scenario("Should not select words from next line", async ({ I, LabelStudio, AtSi
   I.pressKey("1");
   AtRichText.setSelection(AtRichText.locateText(), 0, AtRichText.locateRoot(), 2);
   AtSidebar.seeRegions(1);
-  AtSidebar.see("Оne");
-  AtSidebar.dontSee("line");
+  AtSidebar.seeRegion("Оne");
+  AtSidebar.dontSeeRegion("line");
   // The potential errors should be caught by `errorsCollector` plugin
 });
 

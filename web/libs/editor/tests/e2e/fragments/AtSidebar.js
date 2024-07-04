@@ -3,27 +3,14 @@ const { I } = inject();
 module.exports = {
   _sideBarLocator: locate(".lsf-sidebar-tabs"),
   _regionGroupButton: locate(".lsf-radio-group__button"),
-  _regionsCounterLocator: locate(".lsf-entities__counter"),
-  _regionLocator: locate(".lsf-region-item"),
-  _regionSelectedLocator: locate('[data-testid="regionitem:selected=true"]'),
-  _regionUnselectedLocator: locate('[data-testid="regionitem:selected=false"]'),
-  _selectedRegionsLocator: locate(".lsf-entity"),
+  _regionsCounterLocator: locate(".lsf-panel-tabs__counter"),
+  _regionLocator: locate(".lsf-tree-treenode"),
+  _hiddenRegionLocator: locate(".lsf-tree-treenode.lsf-tree__node_hidden"),
+  _regionSelectedLocator: locate(".lsf-tree-treenode-selected"),
+  _regionUnselectedLocator: locate(".lsf-tree-treenode:not(.lsf-tree-treenode-selected)"),
+  _selectedRegionsLocator: locate(".lsf-detailed-region"),
   seeRegions(count) {
-    if (count) {
-      I.seeElement(this._regionsCounterLocator.withText(`${count}`));
-    } else {
-      I.seeElement(this._regionGroupButton.withText("Regions"));
-      I.dontSeeElement(this._regionGroupButton.withDescendant(this._regionsCounterLocator));
-    }
-  },
-  dontSeeRegions(count) {
-    if (count) {
-      I.dontSeeElement(this._regionsCounterLocator.withText(`${count}`));
-    } else if (count === +count) {
-      I.seeElement(this._regionGroupButton.withDescendant(this._regionsCounterLocator));
-    } else {
-      I.dontSee("Regions", this._sideBarLocator);
-    }
+    I.seeElement(this._regionsCounterLocator.withText(`${count}`));
   },
   seeRelations(count) {
     I.see(`Relations (${count})`, this._sideBarLocator);
@@ -47,11 +34,11 @@ module.exports = {
   locateSelectedRegion(locator) {
     return locate(this._regionSelectedLocator).find(locator);
   },
-  see(text) {
-    I.see(text, this._sideBarLocator);
+  seeRegion(text) {
+    I.seeElement(locate(this._regionLocator).withText(text));
   },
-  dontSee(text) {
-    I.dontSee(text, this._sideBarLocator);
+  dontSeeRegion(text) {
+    I.dontSeeElement(locate(this._regionLocator).withText(text));
   },
   seeElement(locator) {
     I.seeElement(this.locate(locator));
@@ -60,12 +47,10 @@ module.exports = {
     I.click(this._regionLocator.withText(`${text}`));
   },
   hideRegion(text) {
-    I.click(this._regionLocator.withText(`${text}`).find(".lsf-region-item__toggle_active"));
+    I.click(this._regionLocator.withText(`${text}`).find(".lsf-outliner-item__control_type_visibility"));
   },
   showRegion(text) {
-    I.click(
-      this._regionLocator.withText(`${text}`).find(".lsf-region-item__toggle:not(.lsf-region-item__toggle_active)"),
-    );
+    I.click(this._hiddenRegionLocator.withText(`${text}`).find(".lsf-outliner-item__control_type_visibility"));
   },
   selectTool(tool) {
     I.click(`[aria-label=${tool}-tool]`);
