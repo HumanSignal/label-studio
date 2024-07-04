@@ -14,6 +14,10 @@ def test_start_and_get_project(django_live_url, business_client):
     assert project
     assert project.title == 'New Project'
 
+    ls.projects.update(id=project.id, title='Updated Project')
+    project = ls.projects.get(id=p.id)
+    assert project.title == 'Updated Project'
+
 
 def test_delete_project(django_live_url, business_client):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)

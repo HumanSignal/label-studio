@@ -370,7 +370,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         x_fern_audiences=['public'],
         operation_summary='Update project',
         operation_description='Update the project settings for a specific project.',
-        request_body=ProjectSerializer,
+        request_body=_project_schema,
     ),
 )
 class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):

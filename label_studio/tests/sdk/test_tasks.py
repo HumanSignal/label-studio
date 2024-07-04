@@ -6,7 +6,8 @@ from label_studio.tests.sdk.common import LABEL_CONFIG_AND_TASKS
 
 pytestmark = pytest.mark.django_db
 from label_studio_sdk.client import LabelStudio
-from tests.sdk.utils import sdk_logs
+
+from label_studio.tests.sdk.utils import sdk_logs
 
 
 def test_task_CRUD(django_live_url, business_client):
