@@ -152,10 +152,12 @@ export default types
     filter: types.maybeNull(types.array(types.safeReference(AllRegionsType)), null),
 
     view: types.optional(
-      types.enumeration(["regions", "labels"]),
-      window.localStorage.getItem(localStorageKeys.view) ?? "regions",
+      types.enumeration(['regions', 'labels']),
+      window.localStorage.getItem(localStorageKeys.view) ?? 'regions',
     ),
     selection: types.optional(SelectionMap, {}),
+    _showRegionBoundingBoxes: types.optional(types.boolean, false),
+    _showRegionHitBoxes: types.optional(types.boolean, false)
   })
   .views((self) => {
     let lastClickedItem;
@@ -422,9 +424,29 @@ export default types
       get persistantView() {
         return window.localStorage.getItem(localStorageKeys.view) ?? self.view;
       },
+
+      get showRegionBoundingBoxes() {
+        if (!self.annotation.store.settings.enableRegionBoxes) return false;
+        return self._showRegionBoundingBoxes;
+      },
+
+      get showRegionHitBoxes() {
+        if (!self.annotation.store.settings.enableRegionBoxes) return false;
+        return self._showRegionHitBoxes;
+      }
     };
   })
   .actions((self) => ({
+    setRegionBoundingBoxes(value) {
+      if (!self.annotation.store.settings.enableRegionBoxes) return;
+      self._showRegionBoundingBoxes = value;
+    },
+
+    setRegionHitBoxes(value) {
+      if (!self.annotation.store.settings.enableRegionBoxes) return;
+      self._showRegionHitBoxes = value;
+    },
+
     addRegion(region) {
       self.regions.push(region);
       getEnv(self).events.invoke("entityCreate", region);
@@ -596,10 +618,12 @@ export default types
     },
     highlight(area) {
       self.selection.highlight(area);
+      self.updateRegionVisibility();
     },
 
     clearSelection() {
       self.selection.clear();
+      self.updateRegionVisibility();
     },
 
     selectRegionsByIds(ids) {
@@ -616,5 +640,23 @@ export default types
       } else {
         self.selection.unselect(region);
       }
+      self.updateRegionVisibility();
     },
-  }));
+
+    updateRegionVisibility () {
+      // Region visibility while annotating.
+
+      const hidingIsAllowed = self.annotation.store.settings.hideNonActiveRegions;
+      const hasSelection = self.selectedIds.length > 0;
+
+      self.filteredRegions.forEach(area => {
+        const isActive = self.selectedIds.includes(area.id);
+        // Toggle area.
+        if ( (hidingIsAllowed && (isActive === area.hidden && hasSelection)) ||
+          (!hidingIsAllowed && area.hidden) ||
+          (!hasSelection && area.hidden) ) {
+          area.toggleHidden();
+        }
+      });
+    }
+}));

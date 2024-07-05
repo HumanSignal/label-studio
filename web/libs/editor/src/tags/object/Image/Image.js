@@ -915,7 +915,9 @@ const Model = types
       if (val) {
         let zoomScale = self.currentZoom;
 
-        zoomScale = val > 0 ? zoomScale * self.zoomBy : zoomScale / self.zoomBy;
+        // Invert value for handling zoom.
+        const zoomDirection = self.store.settings.enableInvertedZoom ? -1.0 : 1.0;
+        zoomScale = val * zoomDirection > 0 ? zoomScale * self.zoomBy : zoomScale / self.zoomBy;
         if (self.negativezoom !== true && zoomScale <= 1) {
           self.setZoom(1);
           self.setZoomPosition(0, 0);
@@ -1145,7 +1147,6 @@ const Model = types
 
       const x = self.canvasToInternalX(canvasX);
       const y = self.canvasToInternalY(canvasY);
-
       self.getToolsManager().event(name, ev.evt || ev, x, y, canvasX, canvasY);
     },
   }));

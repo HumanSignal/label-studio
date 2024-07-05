@@ -303,6 +303,7 @@ const RegionsMixin = types
           }, timeout);
         }
       },
+
     };
   });
 

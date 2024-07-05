@@ -93,6 +93,7 @@ const BaseTool = types
 
       makeDynamic() {
         self.dynamic = true;
+        self.shortcut = '';  // Reset shortcut key for smart tools.
       },
     };
   });

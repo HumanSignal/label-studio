@@ -369,6 +369,7 @@ const Result = types
     toggleHidden() {
       self.hidden = !self.hidden;
     },
+
   }));
 
 export default types.compose("Result", Result, AnnotationMixin);

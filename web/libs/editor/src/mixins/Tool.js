@@ -56,6 +56,11 @@ const ToolMixin = types
       return self.control.annotation.highlightedNode;
     },
 
+    get hasAnyAnnotation () {
+      // Return if there are any annotation labels.
+      return self.control.annotation.regionStore.filteredRegions.length > 0;
+    },
+
     get extraShortcuts() {
       return {};
     },

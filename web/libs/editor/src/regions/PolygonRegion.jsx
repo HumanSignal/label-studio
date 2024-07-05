@@ -182,6 +182,7 @@ const Model = types
       },
 
       addPoint(x, y) {
+        console.log('adding point to poly')
         if (self.closed) return;
 
         const point = self.control?.getSnappedPoint({ x, y });

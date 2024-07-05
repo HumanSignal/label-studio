@@ -27,5 +27,5 @@ export {
   Rotate,
   Zoom,
   MagicWand,
-  Selection,
+  Selection
 };

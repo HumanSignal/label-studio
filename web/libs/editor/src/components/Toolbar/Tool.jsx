@@ -1,6 +1,6 @@
 import { Block, Elem } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
-import { useContext, useEffect, useMemo, useState } from "react";
+import {useContext, useEffect, useMemo, useRef, useState} from "react";
 import { Fragment } from "react";
 import { Hotkey } from "../../core/Hotkey";
 import { ToolbarContext } from "./ToolbarContext";
@@ -58,6 +58,23 @@ export const Tool = ({
     );
   }, [shortcut]);
 
+
+  const onClickRef = useRef(onClick);  // Ref callback
+
+  useMemo(() => onClickRef.current = onClick, [onClick]);
+
+  const shortcutCallback = useMemo(() => {
+    return () => {
+      if (!tool?.disabled && !tool?.annotation?.isDrawing) {
+        if (tool?.unselectRegionOnToolChange) {
+          tool.annotation.unselectAreas();
+        }
+        onClickRef.current?.();
+      }
+    }
+  }, [tool?.annotation]);
+
+
   useEffect(() => {
     const removeShortcut = () => {
       if (currentShortcut && hotkeys.hasKey(currentShortcut)) {
@@ -68,24 +85,13 @@ export const Tool = ({
     removeShortcut();
     currentShortcut = shortcut;
     if (shortcut && !hotkeys.hasKey(shortcut)) {
-      hotkeys.addKey(
-        shortcut,
-        () => {
-          if (!tool?.disabled && !tool?.annotation?.isDrawing) {
-            if (tool?.unselectRegionOnToolChange) {
-              tool.annotation.unselectAreas();
-            }
-            onClick?.();
-          }
-        },
-        label,
-      );
+      hotkeys.addKey(shortcut, shortcutCallback, label);
     }
 
     return () => {
       removeShortcut();
     };
-  }, [shortcut, tool?.annotation]);
+  }, [shortcut, shortcutCallback]);
 
   useEffect(() => {
     const removeShortcuts = () => {

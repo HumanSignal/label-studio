@@ -2,32 +2,13 @@ import React from "react";
 import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";
 
-import BaseTool from "./Base";
-import ToolMixin from "../mixins/Tool";
-import Canvas from "../utils/canvas";
-import { clamp, findClosestParent } from "../utils/utilities";
-import { DrawingTool } from "../mixins/DrawingTool";
-import { Tool } from "../components/Toolbar/Tool";
-import { Range } from "../common/Range/Range";
-import { NodeViews } from "../components/Node/Node";
-import { FF_DEV_3666, FF_DEV_4081, isFF } from "../utils/feature-flags";
+import { findClosestParent } from '../utils/utilities';
+import { Tool } from '../components/Toolbar/Tool';
+import { NodeViews } from '../components/Node/Node';
+import { FF_DEV_3666, FF_DEV_4081, isFF } from '../utils/feature-flags';
+import {getLocalActiveBrushOpacity, getLocalStrokeWidth, StrokeTool} from "../mixins/StrokeTool";
 
-const MIN_SIZE = 1;
-const MAX_SIZE = 50;
 
-const IconDot = ({ size }) => {
-  return (
-    <span
-      style={{
-        display: "block",
-        width: size,
-        height: size,
-        background: "rgba(0, 0, 0, 0.25)",
-        borderRadius: "100%",
-      }}
-    />
-  );
-};
 
 const ToolView = observer(({ item }) => {
   return (
@@ -40,6 +21,7 @@ const ToolView = observer(({ item }) => {
       icon={item.iconClass}
       tool={item}
       onClick={() => {
+        item.setLastAnnotationIfNull();  // Set last annotation if none is set.
         if (item.selected) return;
 
         item.manager.selectTool(item, true);
@@ -50,10 +32,12 @@ const ToolView = observer(({ item }) => {
 });
 
 const _Tool = types
-  .model("BrushTool", {
-    strokeWidth: types.optional(types.number, 15),
-    group: "segmentation",
-    shortcut: "B",
+  .model('BrushTool', {
+    controlKey: 'brush-size',
+    strokeWidth: getLocalStrokeWidth('brush-size', 15),
+    activeBrushOpacity: getLocalActiveBrushOpacity('brush-size'),
+    group: 'segmentation',
+    shortcut: 'B',
     smart: true,
     unselectRegionOnToolChange: !isFF(FF_DEV_4081),
   })
@@ -72,46 +56,15 @@ const _Tool = types
         stateTypes: "brushlabels",
         controlTagTypes: ["brushlabels", "brush"],
       };
-    },
-    get controls() {
-      return [
-        <Range
-          key="brush-size"
-          value={self.strokeWidth}
-          min={MIN_SIZE}
-          max={MAX_SIZE}
-          reverse
-          align="vertical"
-          minIcon={<IconDot size={8} />}
-          maxIcon={<IconDot size={16} />}
-          onChange={(value) => {
-            self.setStroke(value);
-          }}
-        />,
-      ];
-    },
-    get extraShortcuts() {
-      return {
-        "[": [
-          "Decrease size",
-          () => {
-            self.setStroke(clamp(self.strokeWidth - 5, MIN_SIZE, MAX_SIZE));
-          },
-        ],
-        "]": [
-          "Increase size",
-          () => {
-            self.setStroke(clamp(self.strokeWidth + 5, MIN_SIZE, MAX_SIZE));
-          },
-        ],
-      };
-    },
+    }
+
   }))
   .actions((self) => {
     let brush;
     let isFirstBrushStroke;
 
     return {
+
       commitDrawingRegion() {
         const { currentArea, control, obj } = self;
         const source = currentArea.toJSON();
@@ -126,26 +79,8 @@ const _Tool = types
         return newArea;
       },
 
-      updateCursor() {
-        if (!self.selected || !self.obj?.stageRef) return;
-        const val = self.strokeWidth;
-        const stage = self.obj.stageRef;
-        const base64 = Canvas.brushSizeCircle(val);
-        const cursor = ["url('", base64, "')", " ", Math.floor(val / 2) + 4, " ", Math.floor(val / 2) + 4, ", auto"];
-
-        stage.container().style.cursor = cursor.join("");
-      },
-
-      setStroke(val) {
-        self.strokeWidth = val;
-      },
-
-      afterUpdateSelected() {
-        self.updateCursor();
-      },
-
-      addPoint(x, y) {
-        brush.addPoint(Math.floor(x), Math.floor(y));
+      addPoint (x, y) {
+        brush.addPoint(x, y);
       },
 
       mouseupEv(ev, _, [x, y]) {
@@ -154,6 +89,7 @@ const _Tool = types
         self.mode = "viewing";
         brush.setDrawing(false);
         brush.endPath();
+        self.updateRegionOpacity(brush, false);  // Update the region opacity when brush ends.
         if (isFirstBrushStroke) {
           setTimeout(() => {
             const newBrush = self.commitDrawingRegion();
@@ -169,7 +105,8 @@ const _Tool = types
       },
 
       mousemoveEv(ev, _, [x, y]) {
-        if (self.mode !== "drawing") return;
+        self.requestCursorUpdate();
+        if (self.mode !== 'drawing') return;
         if (
           !findClosestParent(
             ev.target,
@@ -182,7 +119,7 @@ const _Tool = types
         self.addPoint(x, y);
       },
 
-      mousedownEv(ev, _, [x, y]) {
+      mousedownEv(ev, _, [x, y], canvas) {
         if (
           !findClosestParent(
             ev.target,
@@ -211,7 +148,7 @@ const _Tool = types
             type: "add",
             strokeWidth: self.strokeWidth || c.strokeWidth,
           });
-
+          self.updateRegionOpacity(brush, true);  // Update the region opacity when brush starts.
           self.addPoint(x, y);
         } else {
           if (isFF(FF_DEV_3666) && !self.canStartDrawing()) return;
@@ -229,13 +166,13 @@ const _Tool = types
             type: "add",
             strokeWidth: self.strokeWidth || c.strokeWidth,
           });
-
+          self.updateRegionOpacity(brush, true);  // Update the region opacity when brush starts.
           self.addPoint(x, y);
         }
       },
     };
   });
 
-const Brush = types.compose(_Tool.name, ToolMixin, BaseTool, DrawingTool, _Tool);
+const Brush = types.compose(_Tool.name, StrokeTool, _Tool);
 
 export { Brush };

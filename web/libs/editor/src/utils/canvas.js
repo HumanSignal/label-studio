@@ -4,6 +4,11 @@ import Constants from "../core/Constants";
 
 import * as Colors from "./colors";
 import { FF_LSDV_4583, isFF } from "./feature-flags";
+import {SceneCanvas} from "konva/lib/Canvas";
+
+
+// Maximum icon size before it will no longer be seen
+const MAX_ICON_SIZE = 128;
 
 /**
  * Given a single channel UInt8 image data mask with non-zero values indicating the
@@ -172,6 +177,40 @@ function RLE2Region(item, { color = Constants.FILL_COLOR } = {}) {
   return new_image;
 }
 
+
+/**
+ * Create a image bit map where all pixels are converted to the provided mask colour.
+ *
+ * @param image
+ * @param size
+ * @param offset
+ * @param maskColour
+ * @return {Promise}
+ * @constructor
+ */
+function ImageToMaskBitmap(image, size, offset, maskColour) {
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = size.width;
+  canvas.height = size.height;
+
+  ctx.drawImage(image, 0, 0, size.width, size.height);
+
+  const imageData = ctx.getImageData(offset.x, offset.y, size.width, size.height);
+
+  for (let i = imageData.data.length / 4 - 1; i >= 0; i--) {
+    if (imageData.data[i * 4 + 3] > 0) {
+      for (let k = 0; k < 3; k++) {
+        imageData.data[i * 4 + k] = maskColour[k];
+      }
+    }
+  }
+
+  return createImageBitmap(imageData);
+}
+
+
 /**
  * Exports region using canvas. Doesn't require Konva#Stage access
  * @param {Region} region Brush region
@@ -262,6 +301,67 @@ function exportRLE(region) {
   return encode(imageData, imageData.length);
 }
 
+
+/**
+ * Modify the layer to fix konva canvas scaling issue where sometimes the pixel ratio multiplied by the
+ * current image entity width becomes smaller than the expected output width. Causing it to floored to the next valid
+ * integer which throws off the RLE conversion.
+ *
+ * Taken from https://github.com/konvajs/konva/blob/master/src/Node.ts
+ *
+ * @param layer
+ * @param config
+ */
+function getCanvasBySize (layer, config) {
+  config = config || {};
+
+  const box = layer.getClientRect();
+
+  const stage = layer.getStage(),
+    x = config.x !== undefined ? config.x : Math.floor(box.x),
+    y = config.y !== undefined ? config.y : Math.floor(box.y),
+    pixelRatio = config.pixelRatio || 1,
+    canvas = new SceneCanvas({
+      width:
+        config.width || Math.ceil(box.width) || (stage ? stage.width() : 0),
+      height:
+        config.height ||
+        Math.ceil(box.height) ||
+        (stage ? stage.height() : 0),
+      pixelRatio: pixelRatio,
+    }),
+    context = canvas.getContext();
+
+  const bufferCanvas = new SceneCanvas({
+    // width and height already multiplied by pixelRatio
+    // so we need to revert that
+    // also increase size by x nd y offset to make sure content fits canvas
+    width: canvas.width / canvas.pixelRatio + Math.abs(x),
+    height: canvas.height / canvas.pixelRatio + Math.abs(y),
+    pixelRatio: canvas.pixelRatio,
+  });
+
+  if (config.scale) {
+    // Scale the canvas after creation to keep pixel ratio of 1.
+    canvas.getContext().scale(config.scale.width, config.scale.height);
+    bufferCanvas.getContext().scale(config.scale.width, config.scale.height);
+  }
+
+  if (config.imageSmoothingEnabled === false) {
+    context._context.imageSmoothingEnabled = false;
+  }
+  context.save();
+
+  if (x || y) {
+    context.translate(-1 * x, -1 * y);
+  }
+
+  layer.drawScene(canvas, undefined, bufferCanvas);
+  context.restore();
+
+  return canvas._canvas;
+}
+
 /**
  * Given a brush region return the RLE encoded array.
  * @param {BrushRegion} region BrushRegtion to turn into RLE array.
@@ -277,7 +377,6 @@ function Region2RLE(region) {
   const nh = region.currentImageEntity.naturalHeight;
   const stage = region.object?.stageRef;
   const parent = region.parent;
-
   if (!stage) {
     console.error(`Stage not found for area #${region.cleanId}`);
     return;
@@ -316,10 +415,13 @@ function Region2RLE(region) {
     .setOffsetY(0)
     .setRotation(0);
   stage.drawScene();
-  // resize to original size
-  const canvas = layer.toCanvas({ pixelRatio: nw / region.currentImageEntity.stageWidth });
-  const ctx = canvas.getContext("2d");
 
+  const scale = {
+    width: nw / region.currentImageEntity.stageWidth,
+    height: nh / region.currentImageEntity.stageHeight
+  }
+  const canvas = getCanvasBySize(layer, {width: nw, height: nw, scale})
+  const ctx = canvas.getContext('2d');
   // get the resulting raw data and encode into RLE format
   const data = ctx.getImageData(0, 0, nw, nh);
 
@@ -341,37 +443,46 @@ function Region2RLE(region) {
   const rle = encode(data.data, data.data.length);
 
   !isVisible && layer.hide();
-
   return rle;
 }
 
 function brushSizeCircle(size) {
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
   const canvasPadding = 8;
-  const canvasOffset = 4;
-  const canvasSize = size * 4 + canvasPadding;
-  const circlePos = size / 2 + canvasOffset;
-  const circleRadius = size / 2;
+  let canvasSize = size + canvasPadding;
+  let dashes = 0;
+
+  if (canvasSize > MAX_ICON_SIZE) {
+    dashes = Math.floor(Math.max(16, canvasSize - MAX_ICON_SIZE) / 2);
+    canvasSize = MAX_ICON_SIZE;
+  }
+
+  const circleRadius = (canvasSize - canvasPadding) / 2;
 
   canvas.width = canvasSize;
   canvas.height = canvasSize;
 
-  ctx.beginPath();
-  ctx.arc(circlePos, circlePos, circleRadius, 0, 2 * Math.PI, false);
+  const lineWidth = 2;
 
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = "black";
-  ctx.stroke();
+  const arcStep = 2 * Math.PI / (dashes + 1);
 
-  ctx.beginPath();
-  ctx.arc(circlePos, circlePos, circleRadius, 0, 2 * Math.PI, false);
+  for (let i = 0; i < dashes + 1; i++) {
+    const startAngle = i * arcStep;
+    const endAngle = startAngle + (dashes > 0 ? (arcStep / 2) : arcStep);
 
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "white";
-  ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(circleRadius, circleRadius, circleRadius, startAngle, endAngle, false);
 
-  return canvas.toDataURL();
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = 'white';
+    ctx.stroke();
+  }
+  return {
+    base64: canvas.toDataURL(),
+    x: circleRadius,
+    y: circleRadius
+  }
 }
 
 /**
@@ -563,6 +674,7 @@ function checkEndian() {
 export default {
   Region2RLE,
   RLE2Region,
+  ImageToMaskBitmap,
   mask2DataURL,
   maskDataURL2Image,
   brushSizeCircle,

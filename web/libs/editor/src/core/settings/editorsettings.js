@@ -36,6 +36,15 @@ export default {
     onChangeEvent: "toggleShowLabels",
     defaultValue: false,
   },
+  'enableRegionBoxes': {
+    'newUI': {
+      'title': 'Enable or disable visual boxes for regions',
+      'description': 'Toggle the visual bounding boxes for the regions'
+    },
+    'description': 'Enable or disable visual boxes for regions',
+    'onChangeEvent': 'toggleRegionBoxes',
+    'defaultValue': false
+  },
   continuousLabeling: {
     newUI: {
       title: "Keep label selected after creating a region",
@@ -52,6 +61,42 @@ export default {
     },
     description: "Select regions after creating",
     onChangeEvent: "toggleSelectAfterCreate",
+    defaultValue: false,
+  },
+  hideNonActiveRegions: {
+    newUI: {
+      title: "Hide non active regions.",
+      description: "Hides all non active regions when selecting any regions.",
+    },
+    description: "Hides non active regions.",
+    onChangeEvent: "toggleHideNonSelectedRegions",
+    defaultValue: false,
+  },
+  enableActiveRegionOpacity: {
+    newUI: {
+      title: "Enable active region opacity",
+      description: "When using the eraser or brush the opacity can be set to help visual aid",
+    },
+    description: "Enable active region opacity",
+    onChangeEvent: "toggleActiveRegionOpacity",
+    defaultValue: false,
+  },
+  hideAutoAnnotationTooltip: {
+    newUI: {
+      title: "Hide the auto annotation tooltip",
+      description: "When auto annotation is enabled, this will hide the tooltip.",
+    },
+    description: "Hide the auto annotation tooltip",
+    onChangeEvent: "toggleAutoAnnotationTooltip",
+    defaultValue: false,
+  },
+  enableInvertedZoom: {
+    newUI: {
+      title: "Invert the zoom direction",
+      description: "When enabled, the zoom direction is inverted.",
+    },
+    description: "Invert the zoom direction",
+    onChangeEvent: "toggleInvertedZoom",
     defaultValue: false,
   },
   showLineNumbers: {
