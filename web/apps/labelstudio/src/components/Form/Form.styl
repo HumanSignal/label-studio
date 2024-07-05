@@ -7,12 +7,14 @@
     justify-items stretch
     justify-content space-between
     grid-template-columns repeat(var(--column-count, 5), 1fr)
-    grid-column-gap 16px
-    grid-row-gap var(--row-gap, 16px)
+    grid-column-gap 8px
+    grid-row-gap var(--row-gap, 8px)
 
     &:not(:first-child)
       margin-top 12px
-      border-top 1px solid var(--sand_300)
+    
+    & description
+      font-size .875rem
 
   &__submit
     display flex

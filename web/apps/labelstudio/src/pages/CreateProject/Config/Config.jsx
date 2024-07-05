@@ -458,6 +458,7 @@ const Configurator = ({
   return (
     <div className={configClass}>
       <div className={configClass.elem("container")}>
+        <h1>Labeling Interface</h1>
         <header>
           <button onClick={onBrowse}>Browse Templates</button>
           <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />

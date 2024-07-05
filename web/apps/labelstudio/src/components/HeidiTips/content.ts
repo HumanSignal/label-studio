@@ -32,14 +32,14 @@ export const TipsCollection: Record<string, Tip[]> = {
     {
       title: "Did you know?",
       content:
-        "Users with the Manager role can supervise a set of projects by assigning them to workspaces in Label Studio Enterprise.",
+        "In the Enterprise platform, admins can view annotator performance dashboards to optimize resource allocation, improve team management, and inform compensation.",
       closable: true,
       link: {
         label: "Learn more",
-        url: "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise",
+        url: "https://docs.humansignal.com/guide/dashboard_annotator",
         params: {
           experiment: "project_creation_tip",
-          treatment: "supervise_projects",
+          treatment: "annotator_dashboard",
         },
       },
     },
@@ -72,15 +72,16 @@ export const TipsCollection: Record<string, Tip[]> = {
       },
     },
     {
-      title: "Did you know?",
-      content: "You can label tasks with collaborators by setting the minimum number of annotations to more than one. ",
+      title: "Labeling for GenAI",
+      content:
+        "Label Studio has templates available for supervised LLM fine-tuning, RAG retrieval ranking, RLHF, chatbot evaluation, and more.",
       closable: true,
       link: {
-        label: "Learn more",
-        url: "https://labelstud.io/guide/labeling#Label-with-collaborators",
+        label: "Explore templates",
+        url: "https://labelstud.io/templates/gallery_generative_ai",
         params: {
           experiment: "project_creation_tip",
-          treatment: "label_with_collaborators",
+          treatment: "genai_templates",
         },
       },
     },
@@ -114,16 +115,16 @@ export const TipsCollection: Record<string, Tip[]> = {
       },
     },
     {
-      title: "Want to improve your labeling team’s efficiency?",
+      title: "Source data faster",
       content:
-        "Gain insight into your annotators’ productivity with project performance dashboards in Label Studio Enterprise.",
+        "Use semantic search, similarity search, and filters to curate optimal datasets and automatically assign labeling tasks in the Enterprise platform.",
       closable: true,
       link: {
         label: "Learn more",
-        url: "https://docs.humansignal.com/guide/dashboards",
+        url: "https://docs.humansignal.com/guide/dataset_overview",
         params: {
           experiment: "organization_page_tip",
-          treatment: "project_performance",
+          treatment: "data_discovery",
         },
       },
     },
@@ -172,16 +173,16 @@ export const TipsCollection: Record<string, Tip[]> = {
   ],
   projectSettings: [
     {
-      title: "Did you know?",
+      title: "Save time with Auto-Labeling",
       content:
-        "You can automatically label and sort tasks by prediction score to maximize labeling efficiency in Label Studio Enterprise.",
+        "Use automation to instantly label large-scale datasets without sacrificing quality in the Enterprise platform.",
       closable: true,
       link: {
         label: "Learn more",
-        url: "https://docs.humansignal.com/guide/active_learning.html#Set-up-task-sampling-with-prediction-scores",
+        url: "https://docs.humansignal.com/guide/prompts_overview#Auto-labeling-with-Prompts",
         params: {
           experiment: "project_settings_tip",
-          treatment: "prediction_score",
+          treatment: "auto_labeling",
         },
       },
     },
@@ -200,16 +201,16 @@ export const TipsCollection: Record<string, Tip[]> = {
       },
     },
     {
-      title: "Did you know?",
+      title: "Evaluate GenAI models",
       content:
-        "You can minimize the number of tasks to be labeled by setting up an automated active learning loop in Label Studio Enterprise.",
+        "Combine automation plus human supervision to evaluate and ensure LLM quality in the Enterprise platform.",
       closable: true,
       link: {
         label: "Learn more",
-        url: "https://docs.humansignal.com/guide/active_learning",
+        url: "https://humansignal.com/evals/",
         params: {
           experiment: "project_settings_tip",
-          treatment: "active_learning",
+          treatment: "evals",
         },
       },
     },
