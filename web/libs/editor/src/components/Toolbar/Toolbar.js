@@ -113,7 +113,7 @@ const SmartTools = observer(({ tools = {} }) => {
           if (!hasSelected) {
             const tool = tools[selectedIndex];
             tool.manager.selectTool(tool, true);
-             return;  // Reset current tool.
+            return;  // Reset current tool.
           }
 
           let nextIndex = selectedIndex + 1;

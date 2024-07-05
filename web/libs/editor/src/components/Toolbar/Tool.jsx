@@ -1,6 +1,6 @@
 import { Block, Elem } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
-import { useContext, useEffect, useMemo, useState } from "react";
+import {useContext, useEffect, useMemo, useRef, useState} from "react";
 import { Fragment } from "react";
 import { Hotkey } from "../../core/Hotkey";
 import { ToolbarContext } from "./ToolbarContext";

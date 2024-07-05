@@ -5,8 +5,10 @@ import Constants from "../core/Constants";
 import * as Colors from "./colors";
 import { FF_LSDV_4583, isFF } from "./feature-flags";
 import {SceneCanvas} from "konva/lib/Canvas";
-import {colorToRGBAArray} from "./colors";
 
+
+// Maximum icon size before it will no longer be seen
+const MAX_ICON_SIZE = 128;
 
 /**
  * Given a single channel UInt8 image data mask with non-zero values indicating the
@@ -444,14 +446,19 @@ function Region2RLE(region) {
   return rle;
 }
 
-function brushSizeCircle(size, dashes = 0) {
+function brushSizeCircle(size) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   const canvasPadding = 8;
-  const canvasOffset = 4;
-  const canvasSize = size * 4 + canvasPadding;
-  const circlePos = size / 2 + canvasOffset;
-  const circleRadius = size / 2;
+  let canvasSize = size + canvasPadding;
+  let dashes = 0;
+
+  if (canvasSize > MAX_ICON_SIZE) {
+    dashes = Math.floor(Math.max(16, canvasSize - MAX_ICON_SIZE) / 2);
+    canvasSize = MAX_ICON_SIZE;
+  }
+
+  const circleRadius = (canvasSize - canvasPadding) / 2;
 
   canvas.width = canvasSize;
   canvas.height = canvasSize;
@@ -465,14 +472,17 @@ function brushSizeCircle(size, dashes = 0) {
     const endAngle = startAngle + (dashes > 0 ? (arcStep / 2) : arcStep);
 
     ctx.beginPath();
-    ctx.arc(size / 2, size / 2, (size / 2), startAngle, endAngle, false);
+    ctx.arc(circleRadius, circleRadius, circleRadius, startAngle, endAngle, false);
 
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = 'white';
     ctx.stroke();
   }
-
-  return canvas.toDataURL();
+  return {
+    base64: canvas.toDataURL(),
+    x: circleRadius,
+    y: circleRadius
+  }
 }
 
 /**

@@ -158,7 +158,7 @@ const _Tool = types
     }
 
   }))
-  .actions(self => {
+  .actions((self) => {
     return {
 
       updateCursor() {
@@ -167,15 +167,9 @@ const _Tool = types
         if (self.obj?.zoomScale) {
           val *= self.obj.zoomScale;  // Multiply val by zoom scale.
         }
-        let dashes = 0;
-        if (val > MAX_CURSOR_SIZE) {
-          // Cap value at 120 for cursor pixels.
-          dashes = Math.floor(Math.max(16, val - MAX_CURSOR_SIZE) / 2);
-          val = MAX_CURSOR_SIZE;
-        }
         const stage = self.obj.stageRef;
-        const base64 = Canvas.brushSizeCircle(val, dashes);
-        const cursor = ['url(\'', base64, '\')', ' ', Math.floor(val / 2), ' ', Math.floor(val / 2), ', auto'];
+        const icon = Canvas.brushSizeCircle(val);
+        const cursor = ['url(\'', icon.base64, '\')', ' ', icon.x, ' ',icon.y, ', auto'];
         stage.container().style.cursor = cursor.join('');
       },
 
