@@ -5,6 +5,7 @@
   display: flex;
   justify-content: space-between;
   flex-direction: column;
+  width: 42rem;
 
   & h1{
     margin-bottom: .5rem;
@@ -41,6 +42,7 @@
 
     & a {
       color: var(--grape_600);
+      text-decoration: underline;
     }
   }
 
@@ -109,6 +111,7 @@
   &__item-url {
     max-width: 370px;
     overflow: hidden;
+    white-space: nowrap;
     text-overflow: ellipsis;
     cursor: pointer;
     font-weight: 500;
@@ -190,6 +193,7 @@
   }
 
   &__headers-add {
+    border none
     & span {
       color: var(--grape_500) !important;
     }
@@ -205,6 +209,7 @@
     height: 32px;
     width: 32px;
     padding: 0px 0px !important;
+    border none
   }
 
   &__controls {
