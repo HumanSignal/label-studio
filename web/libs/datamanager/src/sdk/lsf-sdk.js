@@ -141,6 +141,7 @@ export class LSFWrapper {
     }
     if (isFF(FF_DEV_2887)) {
       interfaces.push("annotations:comments");
+      interfaces.push("comments:resolve-any");
     }
 
     console.group("Interfaces");
