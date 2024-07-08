@@ -173,7 +173,7 @@ class MLBackend(LabelStudioMLBase)
   def predict(tasks):
     task = tasks[0]
     locaL_path = get_local_path(task['data']['image'], task_id=task['id'])
-    with open(locaL_path, 'r') as f:
+    with open(local_path, 'r') as f:
       f.read()
 ```
 
