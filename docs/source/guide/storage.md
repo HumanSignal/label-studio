@@ -558,12 +558,12 @@ In the Label Studio UI, do the following to set up the connection:
 8. Click **Add Storage**.
 9. Repeat these steps for **Target Storage** to sync completed data annotations to a container.
 
-After adding the storage, click **Sync** to collect tasks from the container, or make an API call to [sync import storage](/api#operation/api_storages_azure_sync_create).
+After adding the storage, click **Sync** to collect tasks from the container, or make an API call to [sync import storage](/api#operation/api_storages_azure_spi_sync_create).
 
 ### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API.
-- See [Create new import storage](/api#operation/api_storages_azure_create) then [sync the import storage](/api#operation/api_storages_azure_sync_create).
-- See [Create export storage](/api#operation/api_storages_export_azure_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_azure_sync_create).
+- See [Create new import storage](/api#operation/api_storages_azure_spi_create) then [sync the import storage](/api#operation/api_storages_azure_spi_sync_create).
+- See [Create export storage](/api#operation/api_storages_export_azure_spi_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_azure_spi_sync_create).
 
 ## Redis database
 
