@@ -364,6 +364,7 @@ Data sync initializes immediately after creating the dataset. Depending on how m
 Requirements:
 
 - Your data is saved as blobs in an Azure storage account. We do not currently support Azure Data Lake. For authenticating to Azure storage with a service principal, go to [Go to Azure Service Principal section](#datasets-using-microsoft-azure---azure-service-principal).
+- Your data is saved as blobs in an Azure storage account. We do not currently support Azure Data Lake.
 - You have access to retrieve the [storage account access key](https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage).
 - Your storage container has CORS configured properly. Configuring CORS allows you to view the data in Label Studio. When CORS is not configured, you are only able to view links to the data.
 
@@ -538,7 +539,7 @@ When you create a storage account, assign a Contributor role to your service pri
 
     </div>
 
-4. Click **Check Connection** to verify your credentials. If your connection is valid, click **Next**.
+4. Click **Check Connection** to verify your credentials. If your connection is valid, click **Next**.
 
     ![Check Dataset connection](/images/data_discovery/dataset_check_connection_azure.png)
 
