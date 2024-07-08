@@ -1324,7 +1324,7 @@ stages:
   response:
     json:
       data:
-        image_url: !re_match 'azure_spi://pytest-azure-images/.+'
+        image_url: !re_match 'https://testing.blob.core.windows.net/pytest-azure-images/.+'
     status_code: 200
 - name: stage
   request:
