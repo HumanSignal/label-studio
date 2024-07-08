@@ -37,8 +37,7 @@ logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(l
 
 AZURE_ACCOUNT_URL_TEMPLATE = Template('https://${account_name}.blob.core.windows.net')
 AZURE_SIGNED_URL_TEMPLATE = Template('${account_url}/${container_name}/${blob_name}?${sas_token}')
-AZURE_URL_PATTERN = r'https?://(?P<account_name>.*).blob.core.windows.net/(?P<container_name>[^/]+)/(?P<blob_name>.+)?(?P<sas_token>.*)'
-
+AZURE_URL_PATTERN = r'azure-spi://(?P<container_name>[^/]+)/(?P<blob_name>.+)'
 
 class AzureServicePrincipalStorageMixin(models.Model):
     prefix = models.TextField(_('prefix'), null=True, blank=True, help_text='Azure blob prefix name')
@@ -166,28 +165,12 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
         _('presign_ttl'), default=1, help_text='Presigned URLs TTL (in minutes)'
     )
 
-    def can_resolve_url(self, url):
-        can_resolve = False
-        if isinstance(url, str):
-            match = re.match(AZURE_URL_PATTERN, url)
-            if match:
-                # To match, we need to ensure account_name and container_name matches.
-                url_account_name = match.group('account_name')
-                url_container_name = match.group('container_name')
-                if self.account_name == url_account_name and self.container == url_container_name:
-                    can_resolve = True
-        if isinstance(url, list):
-            for sub_url in url:
-                if self.can_resolve_url(sub_url):
-                    can_resolve = True
-                    break
-        return can_resolve
+    def get_sas_token(self, container_name: str, blob_name: str):
+        expiry = datetime.now() + timedelta(minutes=self.presign_ttl)
 
-    def get_sas_token(self, blob_name: str):
-        expiry = datetime.utcnow() + timedelta(minutes=self.presign_ttl)
         sas_token = generate_blob_sas(
             account_name=self.get_account_name(),
-            container_name=self.container,
+            container_name=container_name,
             blob_name=blob_name,
             user_delegation_key=self.delegation_key,
             permission=BlobSasPermissions(read=True),
@@ -230,9 +213,10 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
     def generate_http_url(self, url):
         match = re.match(AZURE_URL_PATTERN, url)
         if match:
-            match_dict = match.groupdict()
-            sas_token = self.get_sas_token(match_dict['blob_name'])
-            url = f"{self.get_account_url()}/{self.container}/{match_dict['blob_name']}?{sas_token}"
+            container_name = match.group('container_name')
+            blob_name = match.group('blob_name')
+            sas_token = self.get_sas_token(container_name=container_name, blob_name=blob_name)
+            url = f"{self.get_account_url()}/{container_name}/{blob_name}?{sas_token}"
         return url
 
     def get_blob_metadata(self, key) -> dict:
