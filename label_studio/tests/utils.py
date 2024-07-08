@@ -264,7 +264,6 @@ def azure_client_sp_mock():
         def download_blob(self, key):
             return DummyAzureBlob(self.name, key)
 
-
     class MockUserDelegationKey:
         def __init__(self, **kwargs):
             self.signedOid = kwargs.get('signedOid', 'sample_signed_oid')
@@ -289,7 +288,6 @@ def azure_client_sp_mock():
         def get_user_delegation_key(self, key_start_time, key_expiry_time):
             return MockUserDelegationKey()
 
-
     class DummyClientSecretCredential:
         def __init__(self, *args, **kwargs):
             pass
@@ -297,10 +295,11 @@ def azure_client_sp_mock():
         def get_token(self):
             return 'token'
 
-    with mock.patch.object(models, 'ClientSecretCredential' , DummyClientSecretCredential):
-        with mock.patch.object(models, 'BlobServiceClient' , DummyBlobServiceClient):
+    with mock.patch.object(models, 'ClientSecretCredential', DummyClientSecretCredential):
+        with mock.patch.object(models, 'BlobServiceClient', DummyBlobServiceClient):
             with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
                 yield
+
 
 @contextmanager
 def redis_client_mock():

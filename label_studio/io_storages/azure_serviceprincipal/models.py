@@ -38,6 +38,7 @@ AZURE_ACCOUNT_URL_TEMPLATE = Template('https://${account_name}.blob.core.windows
 AZURE_SIGNED_URL_TEMPLATE = Template('${account_url}/${container_name}/${blob_name}?${sas_token}')
 AZURE_URL_PATTERN = r'azure_spi://(?P<container_name>[^/]+)/(?P<blob_name>.+)'
 
+
 class AzureServicePrincipalStorageMixin(models.Model):
     prefix = models.TextField(_('prefix'), null=True, blank=True, help_text='Azure blob prefix name')
     regex_filter = models.TextField(
@@ -216,9 +217,8 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
             container_name = match.group('container_name')
             blob_name = match.group('blob_name')
             sas_token = self.get_sas_token(container_name=container_name, blob_name=blob_name)
-            url = f"{self.get_account_url()}/{container_name}/{blob_name}?{sas_token}"
+            url = f'{self.get_account_url()}/{container_name}/{blob_name}?{sas_token}'
         return url
-
 
     def get_blob_metadata(self, key) -> dict:
         blob = self.container_client.get_blob_client(key)
