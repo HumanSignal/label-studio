@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('io_storages', '0017_auto_20240509_2317'),
+        ('io_storages', '0016_add_aws_sse_kms_key'),
         ('io_storages', '0018_azureserviceprincipalstoragemixin_user_delegation_key'),
     ]
 
