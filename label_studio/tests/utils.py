@@ -4,10 +4,10 @@ import os.path
 import re
 import tempfile
 from contextlib import contextmanager
+from datetime import datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
-from datetime import datetime, timedelta
 
 import pytest
 import requests
@@ -23,6 +23,7 @@ from organizations.models import Organization
 from projects.models import Project
 from tasks.serializers import TaskWithAnnotationsSerializer
 from users.models import User
+
 try:
     from businesses.models import BillingPlan, Business
 except ImportError:
@@ -212,6 +213,7 @@ def azure_client_mock():
 @contextmanager
 def azure_client_sp_mock():
     from collections import namedtuple
+
     from io_storages.azure_serviceprincipal import models
 
     File = namedtuple('File', ['name'])

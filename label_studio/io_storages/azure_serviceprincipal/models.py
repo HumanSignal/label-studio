@@ -5,7 +5,6 @@ import logging
 import re
 from datetime import datetime, timedelta, timezone
 from string import Template
-from urllib.parse import urlparse
 
 from azure.core.exceptions import ResourceNotFoundError
 from azure.identity import ClientSecretCredential
