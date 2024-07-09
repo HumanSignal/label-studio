@@ -40,6 +40,8 @@ Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
 ```bash
 docker pull heartexlabs/label-studio:latest
+mkdir -p mydata/label-studio/data
+chown -R 1001:root mydata
 docker run -it -p 8080:8080 -v $(pwd)/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
 You can find all the generated assets, including SQLite3 database storage `label_studio.sqlite3` and uploaded files, in the `./mydata` directory.
