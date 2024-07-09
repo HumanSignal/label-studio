@@ -10,7 +10,6 @@ from io_storages.serializers import ExportStorageSerializer, ImportStorageSerial
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from .utils import set_secured
 
 
 class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
