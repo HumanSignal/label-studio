@@ -29,6 +29,8 @@ from io_storages.base_models import (
     ImportStorageLink,
     ProjectStorageMixin,
 )
+from io_storages.azure_serviceprincipal.utils import get_secured, set_secured
+
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
@@ -86,7 +88,7 @@ class AzureServicePrincipalStorageMixin(models.Model):
             )
             logger.info('User Delegation Key : Regenerated...')
             # We create a serialized version...
-            self.user_delegation_key = json.dumps(vars(user_delegation_key))
+            self.user_delegation_key = set_secured(json.dumps(vars(user_delegation_key)))
             self.save(update_fields=['user_delegation_key'])
 
             return user_delegation_key
@@ -95,7 +97,9 @@ class AzureServicePrincipalStorageMixin(models.Model):
             key = create_key()
         else:
             key = UserDelegationKey()
-            db_key = self.user_delegation_key
+            # TODO: Encrypt the user_delegation_key in the database.
+            # TODO: Use an environment variable for the encryption key.
+            db_key = get_secured(self.user_delegation_key)
             key_dict = json.loads(db_key)
             for prop, val in key_dict.items():
                 setattr(key, prop, val)
@@ -111,7 +115,7 @@ class AzureServicePrincipalStorageMixin(models.Model):
         credential = ClientSecretCredential(
             tenant_id=self.get_account_tenant_id(),
             client_id=self.get_account_client_id(),
-            client_secret=self.get_account_client_secret(),
+            client_secret=get_secured(self.get_account_client_secret()),
         )
         blobservice_client = BlobServiceClient(account_url, credential=credential)
         return blobservice_client
