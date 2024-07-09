@@ -163,8 +163,6 @@ class AzureServicePrincipalStorageMixin(models.Model):
 
 class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, ImportStorage):
     url_scheme = 'azure_spi'
-    import pdb; pdb.set_trace()
-
     presign = models.BooleanField(_('presign'), default=True, help_text='Generate presigned URLs')
     presign_ttl = models.PositiveSmallIntegerField(
         _('presign_ttl'), default=1, help_text='Presigned URLs TTL (in minutes)'
@@ -172,8 +170,6 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
 
     def get_sas_token(self, container_name: str, blob_name: str):
         expiry = datetime.now() + timedelta(minutes=self.presign_ttl)
-        import pdb; pdb.set_trace()
-
         sas_token = generate_blob_sas(
             account_name=self.get_account_name(),
             container_name=container_name,
@@ -182,7 +178,6 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
             permission=BlobSasPermissions(read=True),
             expiry=expiry,
         )
-        import pdb; pdb.set_trace()
         return sas_token
 
     def iterkeys(self):
@@ -201,7 +196,6 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
             yield file.name
 
     def get_data(self, key):
-        import pdb; pdb.set_trace()
         if self.use_blob_urls:
             data_key = settings.DATA_UNDEFINED_NAME
             return {data_key: f'{self.url_scheme}://{self.container}/{key}'}
@@ -219,8 +213,6 @@ class AzureServicePrincipalImportStorageBase(AzureServicePrincipalStorageMixin, 
         return self._scan_and_create_links(AzureServicePrincipalImportStorageLink)
 
     def generate_http_url(self, url):
-        import pdb; pdb.set_trace()
-
         match = re.match(AZURE_URL_PATTERN, url)
         if match:
             container_name = match.group('container_name')

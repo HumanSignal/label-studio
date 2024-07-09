@@ -16,10 +16,9 @@ class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
     presign = serializers.BooleanField(required=False, default=True)
     is_secured = False
     secure_fields = ['client_secret']
-    import pdb; pdb.set_trace()
+
     @property
     def data(self):
-        import pdb; pdb.set_trace()
         data = super().data
         if not self.is_secured:
             # In case we access data, we need it to be secured.
