@@ -5,10 +5,10 @@ from io_storages.azure_serviceprincipal.models import (
     AzureServicePrincipalExportStorage,
     AzureServicePrincipalImportStorage,
 )
+from io_storages.azure_serviceprincipal.utils import set_secured
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from io_storages.azure_serviceprincipal.utils import set_secured
 
 
 class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
@@ -16,9 +16,10 @@ class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
     presign = serializers.BooleanField(required=False, default=True)
     is_secured = False
     secure_fields = ['client_secret']
-
+    import pdb; pdb.set_trace()
     @property
     def data(self):
+        import pdb; pdb.set_trace()
         data = super().data
         if not self.is_secured:
             # In case we access data, we need it to be secured.

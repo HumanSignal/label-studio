@@ -1,5 +1,6 @@
 import logging
 import os
+
 from cryptography.fernet import Fernet
 
 key = os.getenv('ENCRYPT_KEY', 'CEcJNMyffg-wHysgcW0xaYleNQt9o2LExxsEgB7GkD8=')
