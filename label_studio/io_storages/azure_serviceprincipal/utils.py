@@ -18,6 +18,6 @@ def get_secured(value):
 
 def set_secured(value):
     if value is not None:
-        # we decrypt the value
+        # we encrypt the value
         value = secret_encrypter.encrypt(str(value).encode()).decode()
     return value

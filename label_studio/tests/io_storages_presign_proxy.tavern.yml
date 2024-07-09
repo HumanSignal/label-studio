@@ -921,7 +921,16 @@ stages:
     url: '{django_live_url}/api/storages/azure_spi/{storage_pk}/sync'
   response:
     json:
-      last_sync_count: 0
+      last_sync_count: 3
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=YXp1cmVfc3BpOi8vcHl0ZXN0LWF6dXJlX3NwaS1pbWFnZXMvYWJj"
     status_code: 200
 - name: stage
   request:

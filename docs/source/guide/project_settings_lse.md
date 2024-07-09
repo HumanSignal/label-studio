@@ -148,7 +148,7 @@ Configure additional settings for annotators.
 | **Show Skip button**         | Use this to show or hide the **Skip** action for annotators. |
 | **Allow empty annotations** | This determines whether annotators can submit a task without making any annotations on it. If enabled, annotators can submit a task even if they haven't added any labels or regions, resulting in an empty annotation. |
 | **Show the Data Manager to annotators** | When disabled, annotators can only enter the label stream. When enabled, annotators can access the Data Manager, where they can select which tasks to complete from the Data Manager list. <br /><br />However, some information is still hidden from annotators and they can only view a subset of the Data Manager columns. For example, they cannot see columns such as Annotators, Agreement, Reviewers, and more. |
-| **Reveal pre-annotations interactively** | When enabled, pre-annotations are not automatically displayed to an annotator. Instead, annotators can choose when to reveal these pre-annotations as they work on the task, providing them with the opportunity to first assess the image or text without the influence of the model's predictions. |
+| **Reveal pre-annotations interactively** | When enabled, pre-annotation regions (such as bounding boxes or text spans) are not automatically displayed to the annotator. Instead, annotators can draw a selection rectangle to reveal pre-annotation regions within that area. This allows annotators to first review the image or text without being influenced by the model’s predictions. Pre-annotation regions must have the attribute `"hidden": true`. <br /><br />This feature is particularly useful when there are multiple low-confidence regions that you prefer not to display all at once to avoid clutter. |
 | **Annotators must leave a comment on skip** | When enabled, annotators are required to leave a comment when skipping a task. |
 
 </dd>
@@ -157,7 +157,7 @@ Configure additional settings for annotators.
 
 <dd>
 
-If you have an ML backend or model connected, you can use this setting to determine whether tasks should be pre-labeled using predictions from the model. For more information, see [Integrate Label Studio into your machine learning pipeline](ml). 
+If you have an ML backend or model connected, or if you're using [Prompts](prompts_overview) to generate predictions, you can use this setting to determine whether tasks should be pre-labeled using predictions. For more information, see [Integrate Label Studio into your machine learning pipeline](ml) and [Generate predictions from a prompt](prompts_predictions). 
 
 Use the drop-down menu to select the predictions source. For example, you can select a [connected model](#Model) or a set of [predictions](#Predictions). 
 
@@ -479,7 +479,11 @@ And the following actions are available from the overflow menu next to a connect
 
 ## Predictions
 
-From here you can view predictions that have been imported or generated when executing the **Batch Predictions** action from the Data Manager. For more information on using predictions, see [Import pre-annotated data into Label Studio](predictions). 
+From here you can view predictions that have been imported, generated with [Prompts](prompts_predictions), or generated when executing the **Batch Predictions** action from the Data Manager. For more information on using predictions, see [Import pre-annotated data into Label Studio](predictions). 
+
+To remove predictions from the project, click the overflow menu next to the predictions set and select **Delete**.  
+
+To determine which predictions are show to annotators, use the [**Annotation > Live Predictions** section](#Annotation). 
 
 ## Cloud storage
 

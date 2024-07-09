@@ -124,8 +124,8 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
               }
             }}
           >
-            <Form.Row style={{ marginBottom: "40px" }} columnCount={1}>
-              <Label text="Payload URL" style={{ marginLeft: "-16px" }} large />
+            <Form.Row columnCount={1}>
+              <Label text="Payload URL" large />
               <Space className={rootClass.elem("url-space")}>
                 <Input name="url" className={rootClass.elem("url-input")} placeholder="URL" />
                 <Space align="end" className={rootClass.elem("activator")}>
@@ -140,7 +140,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                 </Space>
               </Space>
             </Form.Row>
-            <Form.Row style={{ marginBottom: "40px" }} columnCount={1}>
+            <Form.Row columnCount={1}>
               <div className={rootClass.elem("headers")}>
                 <div className={rootClass.elem("headers-content")}>
                   <Space spread className={rootClass.elem("headers-control")}>
@@ -183,7 +183,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                 </div>
               </div>
             </Form.Row>
-            <Block name="webhook-payload" style={{ marginBottom: "40px" }}>
+            <Block name="webhook-payload">
               <Elem name="title">
                 <Label text="Payload" large />
               </Elem>
@@ -253,7 +253,7 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectA
                     })
                   }
                 >
-                  Delete Webhook...
+                  Delete Webhook
                 </Button>
               )}
               <div className={rootClass.elem("status")}>

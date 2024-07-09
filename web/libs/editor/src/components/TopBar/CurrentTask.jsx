@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
 import { Button } from "../../common/Button/Button";
 import { Block, Elem } from "../../utils/bem";
-import { FF_DEV_3873, FF_DEV_4174, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
+import { FF_DEV_3873, FF_DEV_4174, FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import "./CurrentTask.styl";
@@ -44,6 +44,7 @@ export const CurrentTask = observer(({ store }) => {
   // @todo some interface?
   let canPostpone =
     !isDefined(store.annotationStore.selected.pk) &&
+    (!isFF(FF_LEAP_1173) || store.hasInterface("skip")) &&
     !store.canGoNextTask &&
     !store.hasInterface("review") &&
     store.hasInterface("postpone");
@@ -90,6 +91,7 @@ export const CurrentTask = observer(({ store }) => {
             <Elem
               tag={Button}
               name="prevnext"
+              data-testid="next-task"
               mod={{
                 next: true,
                 disabled: !store.canGoNextTask && !canPostpone,

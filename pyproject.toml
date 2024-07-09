@@ -184,7 +184,7 @@ psycopg2-binary = "2.9.9"
 pydantic = ">=2.7.3"
 python-dateutil = ">=2.8.1"
 pytz = "~=2022.1"
-requests = "2.31.0"
+requests = "~=2.32.3"
 urllib3 = "^1.26.18"
 rq = "1.10.1"
 rules = "2.2"
@@ -205,6 +205,7 @@ openai = "^1.10.0"
 # Humansignal repo dependencies
 
 label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/a84e7633a7335dc1235d2576f8b31fe8bfd66835.zip"}
+cryptography = "^42.0.8"
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"

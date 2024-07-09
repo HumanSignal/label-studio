@@ -35,12 +35,6 @@ export const FF_DEV_3873 = "fflag_feat_front_dev_3873_labeling_ui_improvements_s
 export const FF_DEV_3734 = "fflag_fix_front_dev_3734_hide_task_counter_131222_short";
 
 /**
- * When navigating through tasks using shift+up/down hotkeys, select task automatically
- * @link https://app.launchdarkly.com/default/production/features/feat_front_dev_4008_quick_task_open_short
- */
-export const FF_DEV_4008 = "feat_front_dev_4008_quick_task_open_short";
-
-/**
  * Support for Datasets functionality.
  */
 export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";

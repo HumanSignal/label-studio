@@ -4,6 +4,7 @@ import os.path
 import re
 import tempfile
 from contextlib import contextmanager
+from datetime import datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from unittest import mock
@@ -263,15 +264,41 @@ def azure_client_sp_mock():
         def download_blob(self, key):
             return DummyAzureBlob(self.name, key)
 
+    class MockUserDelegationKey:
+        def __init__(self, **kwargs):
+            self.signedOid = kwargs.get('signedOid', 'sample_signed_oid')
+            self.signedTid = kwargs.get('signedTid', 'sample_signed_tid')
+            self.signedStart = kwargs.get('signedStart', (datetime.now() - timedelta(days=1)).isoformat())
+            self.signedExpiry = kwargs.get('signedExpiry', (datetime.now() + timedelta(days=1)).isoformat())
+            self.signedService = kwargs.get('signedService', 'b')
+            self.signedVersion = kwargs.get('signedVersion', '2021-04-10')
+            self.value = kwargs.get('value', 'sample_value')
+
+        def __iter__(self):
+            for attr in self.__dict__:
+                yield attr, self.__dict__[attr]
+
     class DummyBlobServiceClient:
+        def __init__(self, *args, **kwargs):
+            pass
+
         def get_container_client(self, container_name):
             return DummyAzureContainer(container_name)
 
-    with mock.patch.object(
-        models.AzureServicePrincipalStorageMixin, 'blobservice_client', return_value=DummyBlobServiceClient()
-    ):
-        with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
-            yield
+        def get_user_delegation_key(self, key_start_time, key_expiry_time):
+            return MockUserDelegationKey()
+
+    class DummyClientSecretCredential:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def get_token(self):
+            return 'token'
+
+    with mock.patch.object(models, 'ClientSecretCredential', DummyClientSecretCredential):
+        with mock.patch.object(models, 'BlobServiceClient', DummyBlobServiceClient):
+            with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
+                yield
 
 
 @contextmanager

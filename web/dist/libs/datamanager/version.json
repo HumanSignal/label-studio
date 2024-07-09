@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-453: Fix annotation and draft being requested at the same time (#6005)",
-  "commit": "88a45a78857840dc149593334a669c952e78d064",
-  "date": "2024-06-26T15:07:31.000Z",
+  "message": "fix: OPTIC-849: style updates and tooltip edits (#6055)",
+  "commit": "3cbd9b76db0cb5c27438d3a99b662216d7fe0995",
+  "date": "2024-07-05T21:16:50.000Z",
   "branch": "develop"
 }

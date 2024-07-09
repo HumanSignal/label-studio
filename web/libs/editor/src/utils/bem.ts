@@ -117,7 +117,7 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
   return finalClass.map(attachNamespace).join(" ");
 };
 
-const BlockContext = createContext<CN | null>(null);
+export const BlockContext = createContext<CN | null>(null);
 
 export const cn = (block: string, options: CNOptions = {}): CN => {
   const { elem, mix, mod } = options ?? {};
