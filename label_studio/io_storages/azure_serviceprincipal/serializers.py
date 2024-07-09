@@ -29,16 +29,6 @@ class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
         self.is_secured = True
         return data
 
-    @property
-    def data(self):
-        data = super().data
-        if not self.is_secured:
-            # In case we access data, we need it to be secured.
-            for secure_field in self.secure_fields:
-                data[secure_field] = set_secured(data.get(secure_field))
-        self.is_secured = True
-        return data
-
     class Meta:
         model = AzureServicePrincipalImportStorage
         fields = '__all__'
