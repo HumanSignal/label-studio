@@ -11,7 +11,6 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 
-
 class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
     type = serializers.ReadOnlyField(default='azure_spi')
     presign = serializers.BooleanField(required=False, default=True)
