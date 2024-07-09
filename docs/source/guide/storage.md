@@ -512,7 +512,8 @@ You must set two environment variables in Label Studio to connect to Azure Blob 
 - `AZURE_CLIENT_ID` to specify the client id for the service principal.
 - `AZURE_TENANT_ID` to specify the tenant id for the service principal.
 - `AZURE_CLIENT_SECRET` to specify the secret id for the service principal.
-
+You can also set
+- `ENCRYPT_KEY` to specify a encryption key.
 
 Configure the specific Azure Blob container that you want Label Studio to use in the UI. In most cases involving CORS issues, the GET permission (*/GET/*/Access-Control-Allow-Origin/3600) is necessary within the Resource Sharing tab:
 
