@@ -32,6 +32,8 @@ from io_storages.base_models import (
 )
 from tasks.models import Annotation
 
+from .utils import get_secured, set_secured
+
 logger = logging.getLogger(__name__)
 logging.getLogger('azure.core.pipeline.policies.http_logging_policy').setLevel(logging.WARNING)
 
