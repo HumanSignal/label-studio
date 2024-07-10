@@ -1,14 +1,11 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import os
+
 from io_storages.azure_serviceprincipal.models import (
     AzureServicePrincipalExportStorage,
     AzureServicePrincipalImportStorage,
-    AzureServicePrincipalStorageMixin,
-    AzureServicePrincipalImportStorageBase
 )
-from core.utils.params import get_env
-
 from io_storages.azure_serviceprincipal.utils import set_secured
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from rest_framework import serializers
@@ -24,12 +21,11 @@ class AzureServicePrincipalImportStorageSerializer(ImportStorageSerializer):
     def get_account_client_secret(self, data=None):
         # fetch value from UI input if provided
         if data:
-            if data.get("client_secret", None):
+            if data.get('client_secret', None):
                 self.is_secured = True
-                return data.get("client_secret")
+                return data.get('client_secret')
         self.is_secured = False
-        return os.getenv("AZURE_CLIENT_SECRET")
-
+        return os.getenv('AZURE_CLIENT_SECRET')
 
     @property
     def data(self):
@@ -79,15 +75,14 @@ class AzureServicePrincipalExportStorageSerializer(ExportStorageSerializer):
     is_secured = False
     secure_fields = ['client_secret']
 
-
     def get_account_client_secret(self, data=None):
         # fetch value from UI input if provided
         if data:
-            if data.get("client_secret", None):
+            if data.get('client_secret', None):
                 self.is_secured = True
-                return data.get("client_secret")
+                return data.get('client_secret')
         self.is_secured = False
-        return os.getenv("AZURE_CLIENT_SECRET")
+        return os.getenv('AZURE_CLIENT_SECRET')
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
