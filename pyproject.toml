@@ -104,7 +104,7 @@ target-version = ['py38']
 [tool.poetry]
 
 name = "label-studio"
-version = "1.12.2.dev0"
+version = "1.13.1.dev0"
 description = "Label Studio annotation tool"
 authors = [
     "Heartex <hello@heartex.ai>",
