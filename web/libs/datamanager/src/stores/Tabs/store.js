@@ -333,6 +333,14 @@ export const TabStore = types
       return view;
     }),
 
+    updateViewOrder: (source, destination) => {
+      // Detach the view from the original position
+      const [removed] = self.views.splice(source, 1);
+      const sn = getSnapshot(removed);
+
+      // Insert the view at the new position
+      self.views.splice(destination, 0, sn);
+    },
     duplicateView: flow(function* (view) {
       const sn = getSnapshot(view);
 

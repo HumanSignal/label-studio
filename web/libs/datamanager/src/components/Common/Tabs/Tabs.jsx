@@ -7,12 +7,13 @@ import { Icon } from "../Icon/Icon";
 import Input from "../Input/Input";
 import "./Tabs.styl";
 import { TabsMenu } from "./TabsMenu";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
 const TabsContext = createContext();
 
-export const Tabs = ({ children, activeTab, onChange, onAdd, tabBarExtraContent, allowedActions, addIcon }) => {
+export const Tabs = ({ children, activeTab, onChange, onAdd, onDragEnd, tabBarExtraContent, allowedActions, addIcon }) => {
   const [selectedTab, setSelectedTab] = useState(activeTab);
 
   const switchTab = useCallback((tab) => {
@@ -37,8 +38,20 @@ export const Tabs = ({ children, activeTab, onChange, onAdd, tabBarExtraContent,
     <TabsContext.Provider value={contextValue}>
       <Block name="tabs">
         <Elem name="list">
-          {children}
-
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="droppable" direction="horizontal">
+              {(provided) => (
+                <Elem
+                  ref={provided.innerRef}
+                  name={'droppable'}
+                  {...provided.droppableProps}
+                >
+                  {children}
+                  {provided.placeholder}
+                </Elem>
+              )}
+            </Droppable>
+          </DragDropContext>
           {allowedActions.add !== false && <Elem tag={Button} name="add" type="text" onClick={onAdd} icon={addIcon} />}
         </Elem>
         <Elem name="extra">{tabBarExtraContent}</Elem>
