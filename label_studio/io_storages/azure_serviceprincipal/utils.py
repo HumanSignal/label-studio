@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_secured(value):
+    # testing
     if value is not None:
         # we decrypt the value
         value = secret_encrypter.decrypt(str(value).encode()).decode()
@@ -17,6 +18,7 @@ def get_secured(value):
 
 
 def set_secured(value):
+
     if value is not None:
         # we encrypt the value
         value = secret_encrypter.encrypt(str(value).encode()).decode()

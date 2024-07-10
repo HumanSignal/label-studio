@@ -69,7 +69,12 @@ class AzureServicePrincipalStorageMixin(models.Model):
         return str(self.client_id) if self.client_id else get_env('AZURE_CLIENT_ID')
 
     def get_account_client_secret(self):
-        return str(self.client_secret) if self.client_secret else get_env('AZURE_CLIENT_SECRET')
+        # fetch decrypted value from database
+        if self.client_secret:
+            return get_secured(str(self.client_secret))
+        else:
+            # fetch not encrypted value from env var
+            return get_env('AZURE_CLIENT_SECRET')
 
     def get_account_tenant_id(self):
         return str(self.tenant_id) if self.tenant_id else get_env('AZURE_TENANT_ID')
@@ -82,6 +87,7 @@ class AzureServicePrincipalStorageMixin(models.Model):
 
             delegation_key_expiry_time = datetime.now() + timedelta(days=1)
             blob_service_client = self.blobservice_client
+
             user_delegation_key = blob_service_client.get_user_delegation_key(
                 key_start_time=datetime.now(), key_expiry_time=delegation_key_expiry_time
             )
@@ -110,11 +116,12 @@ class AzureServicePrincipalStorageMixin(models.Model):
 
     @property
     def blobservice_client(self) -> BlobServiceClient:
+
         account_url = self.get_account_url()
         credential = ClientSecretCredential(
             tenant_id=self.get_account_tenant_id(),
             client_id=self.get_account_client_id(),
-            client_secret=get_secured(self.get_account_client_secret()),
+            client_secret=self.get_account_client_secret(),
         )
         blobservice_client = BlobServiceClient(account_url, credential=credential)
         return blobservice_client
