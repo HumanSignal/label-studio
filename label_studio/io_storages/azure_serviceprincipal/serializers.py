@@ -101,11 +101,6 @@ class AzureServicePrincipalExportStorageSerializer(ExportStorageSerializer):
 
     def validate(self, data):
         # We care about encrypting only secure fields
-        # DO SOMETHING BEFORE GETTING FROM get_account_client_secret
-        # Get and Set from `data` as best option!
-        # set self.client_secret?
-
-
         data[self.secure_fields[0]] = set_secured(self.get_account_client_secret(data=data))
         self.is_secured = True
         data = super(AzureServicePrincipalExportStorageSerializer, self).validate(data)
