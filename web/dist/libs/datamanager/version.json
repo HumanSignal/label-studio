@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-849: style updates and tooltip edits (#6055)",
-  "commit": "3cbd9b76db0cb5c27438d3a99b662216d7fe0995",
-  "date": "2024-07-05T21:16:50.000Z",
+  "message": "fix: OPTIC-875,OPTIC-876,OPTIC-877,OPTIC-878,OPTIC-879: Visual conflicts due to design updates (#6078)",
+  "commit": "965207b1908d57f67c4648eb8e4e8c0d7803107f",
+  "date": "2024-07-11T12:36:33.000Z",
   "branch": "develop"
 }
