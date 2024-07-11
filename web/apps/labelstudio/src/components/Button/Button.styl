@@ -17,6 +17,7 @@
   --button-margin-left 0
   --button-margin-right 0
   --button-border 1px solid var(--button-color)
+  --button-gap 6px
 
   border var(--button-border)
   cursor pointer
@@ -35,6 +36,7 @@
   height var(--button-height)
   min-width var(--button-min-width)
   padding var(--button-padding)
+  gap var(--button-gap)
   align-items var(--button-content-align)
   justify-content var(--button-content-justify)
   margin-left var(--button-margin-left)
@@ -86,13 +88,11 @@
     width var(--icon-size)
     height var(--icon-size)
     align-items center
-    padding-right .75rem
 
     &:only-child
       flex 1
       --button-content-align center
       --button-content-justify center
-      padding-left .75rem
 
     svg
       width 100%
@@ -106,11 +106,8 @@
       --button-content-justify flex-end
 
   &_type
-    &_text
-      padding 0
-
     &_text, &_link
-      padding 0
+      --button-padding 0
       min-width 0
       --button-background-color none
       border none
