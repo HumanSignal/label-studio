@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1209: Make displaying of resolve comment button dependent on interfaces (#6067)",
-  "commit": "bd1fdf6787fbea0246f6a669f371388593092c1e",
-  "date": "2024-07-12T16:51:01.000Z",
+  "message": "fix: OPTIC-884: Incorrect block style name for prediction card (#6089)",
+  "commit": "515fb3eb7fb5ce1835cf7adbb8be6bc60a0d735b",
+  "date": "2024-07-12T17:04:03.000Z",
   "branch": "develop"
 }
