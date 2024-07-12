@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-883: Export data modal footer not visible when scrollable (#6085)",
-  "commit": "0026d23eefeb48c2389859809ce0bf84bb5d3a0e",
-  "date": "2024-07-12T13:57:07.000Z",
+  "message": "fix: LEAP-1209: Make displaying of resolve comment button dependent on interfaces (#6067)",
+  "commit": "bd1fdf6787fbea0246f6a669f371388593092c1e",
+  "date": "2024-07-12T16:51:01.000Z",
   "branch": "develop"
 }
