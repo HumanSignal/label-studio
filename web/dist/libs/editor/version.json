@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-875,OPTIC-876,OPTIC-877,OPTIC-878,OPTIC-879: Visual conflicts due to design updates (#6078)",
-  "commit": "965207b1908d57f67c4648eb8e4e8c0d7803107f",
-  "date": "2024-07-11T12:36:33.000Z",
+  "message": "fix: OPTIC-882: Docs Icon has visual artifact on DataManager (#6084)",
+  "commit": "726fe48adeed947208f5795785af407529d976ee",
+  "date": "2024-07-12T13:42:09.000Z",
   "branch": "develop"
 }
