@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-882: Docs Icon has visual artifact on DataManager (#6084)",
-  "commit": "726fe48adeed947208f5795785af407529d976ee",
-  "date": "2024-07-12T13:42:09.000Z",
+  "message": "fix: OPTIC-883: Export data modal footer not visible when scrollable (#6085)",
+  "commit": "0026d23eefeb48c2389859809ce0bf84bb5d3a0e",
+  "date": "2024-07-12T13:57:07.000Z",
   "branch": "develop"
 }
