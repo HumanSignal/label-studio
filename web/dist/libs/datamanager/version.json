@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-875,OPTIC-876,OPTIC-877,OPTIC-878,OPTIC-879: Visual conflicts due to design updates (#6081)",
-  "commit": "4dfc63a3aa5abd84d0bcfb72e1f370687dec4bc7",
-  "date": "2024-07-11T12:53:08.000Z",
+  "message": "fix: OPTIC-882,OPTIC-883: Redesign visual issues with release 1.13.0 (#6088)",
+  "commit": "2ed0aee8ccd1e4c8d89ea19a25d4e4863d219a47",
+  "date": "2024-07-12T14:11:47.000Z",
   "branch": "ls-release/1.13.0"
 }
