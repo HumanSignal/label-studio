@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-882,OPTIC-883: Redesign visual issues with release 1.13.0 (#6088)",
-  "commit": "2ed0aee8ccd1e4c8d89ea19a25d4e4863d219a47",
-  "date": "2024-07-12T14:11:47.000Z",
+  "message": "fix: OPTIC-884: Incorrect block style name for prediction card (#6089) (#6090)",
+  "commit": "914a74b688392cde9f30ac840e43b50091858adf",
+  "date": "2024-07-12T17:14:54.000Z",
   "branch": "ls-release/1.13.0"
 }
