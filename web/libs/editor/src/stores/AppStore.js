@@ -372,10 +372,10 @@ export default types
       }
 
       /**
-       * Hotkey for next annotation
+       * Hotkey for next task
        */
       if (self.hasInterface('submit', 'update', 'review')) {
-        hotkeys.addNamed('annotation:next', () => {
+        hotkeys.addNamed('task:next', () => {
           const annotationStore = self.annotationStore;
 
           if (annotationStore.viewingAll) return;
@@ -384,10 +384,10 @@ export default types
         });
       }
       /**
-       * Hotkey for previous annotation
+       * Hotkey for previous task
        */
       if (self.hasInterface('submit', 'update', 'review')) {
-        hotkeys.addNamed('annotation:previous', () => {
+        hotkeys.addNamed('task:previous', () => {
           const annotationStore = self.annotationStore;
 
           if (annotationStore.viewingAll) return;
