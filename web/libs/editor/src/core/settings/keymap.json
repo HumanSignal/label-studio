@@ -4,9 +4,7 @@
     "mac": "command+b",
     "description": "Back for one second"
   },
-  "audio:playpause": {
-
-  },
+  "audio:playpause": {},
   "ts:grow-left": {
     "key": "left",
     "description": "Increase region to the left"
@@ -45,15 +43,15 @@
     "mac": "alt+enter",
     "description": "Skip task"
   },
-  "annotation:next": {
+  "task:next": {
     "key": "ctrl+right",
     "mac": "command+right",
-    "description": "Next annotation"
+    "description": "Next task"
   },
-  "annotation:previous": {
+  "task:previous": {
     "key": "ctrl+left",
     "mac": "command+left",
-    "description": "Previous annotation"
+    "description": "Previous task"
   },
   "annotation:undo": {
     "key": "ctrl+z",

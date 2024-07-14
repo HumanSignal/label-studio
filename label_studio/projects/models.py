@@ -26,13 +26,14 @@ from core.utils.common import (
     load_func,
     merge_labels_counters,
 )
+from core.utils.db import fast_first
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from django.conf import settings
 from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.db import models, transaction
-from django.db.models import Avg, BooleanField, Case, Count, JSONField, Q, Sum, Value, When
+from django.db.models import Avg, BooleanField, Case, Count, JSONField, Max, Q, Sum, Value, When
 from django.utils.translation import gettext_lazy as _
-from label_studio_tools.core.label_config import parse_config
+from label_studio_sdk._extensions.label_studio_tools.core.label_config import parse_config
 from labels_manager.models import Label
 from projects.functions import (
     annotate_finished_task_number,
@@ -58,9 +59,6 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectManager(models.Manager):
-    def for_user(self, user):
-        return self.filter(organization=user.active_organization)
-
     COUNTER_FIELDS = [
         'task_number',
         'finished_task_number',
@@ -72,21 +70,26 @@ class ProjectManager(models.Manager):
         'skipped_annotations_number',
     ]
 
+    ANNOTATED_FIELDS = {
+        'task_number': annotate_task_number,
+        'finished_task_number': annotate_finished_task_number,
+        'total_predictions_number': annotate_total_predictions_number,
+        'total_annotations_number': annotate_total_annotations_number,
+        'num_tasks_with_annotations': annotate_num_tasks_with_annotations,
+        'useful_annotation_number': annotate_useful_annotation_number,
+        'ground_truth_number': annotate_ground_truth_number,
+        'skipped_annotations_number': annotate_skipped_annotations_number,
+    }
+
+    def for_user(self, user):
+        return self.filter(organization=user.active_organization)
+
     def with_counts(self, fields=None):
         return self.with_counts_annotate(self, fields=fields)
 
     @staticmethod
     def with_counts_annotate(queryset, fields=None):
-        available_fields = {
-            'task_number': annotate_task_number,
-            'finished_task_number': annotate_finished_task_number,
-            'total_predictions_number': annotate_total_predictions_number,
-            'total_annotations_number': annotate_total_annotations_number,
-            'num_tasks_with_annotations': annotate_num_tasks_with_annotations,
-            'useful_annotation_number': annotate_useful_annotation_number,
-            'ground_truth_number': annotate_ground_truth_number,
-            'skipped_annotations_number': annotate_skipped_annotations_number,
-        }
+        available_fields = ProjectManager.ANNOTATED_FIELDS
         if fields is None:
             to_annotate = available_fields
         else:
@@ -176,6 +179,9 @@ class Project(ProjectMixin, models.Model):
     show_collab_predictions = models.BooleanField(
         _('show predictions to annotator'), default=True, help_text='If set, the annotator can view model predictions'
     )
+
+    # evaluate is the wrong word here. correct should be retrieve_predictions_automatically
+    # deprecated
     evaluate_predictions_automatically = models.BooleanField(
         _('evaluate predictions automatically'),
         default=False,
@@ -217,9 +223,18 @@ class Project(ProjectMixin, models.Model):
         'and the first label Car should be twice more important than Airplaine, then you have to need the specify: '
         "{'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplaine': 0.5}, 'overall': 0.33}",
     )
+
+    # Welcome reader! You might be wondering how `model_version` is
+    # set and used; let's explain. `model_version` can either be set
+    # to the prediction `model_version` associated with the
+    # `tasks.Prediction` model, or to the ML backend title. Yes,
+    # understandably, this can be confusing. However, this appears to
+    # be the best approach we currently have for improving the
+    # experience while maintaining backward compatibility.
     model_version = models.TextField(
         _('model version'), blank=True, null=True, default='', help_text='Machine learning model version'
     )
+
     data_types = JSONField(_('data_types'), default=dict, null=True)
 
     is_draft = models.BooleanField(
@@ -276,18 +291,19 @@ class Project(ProjectMixin, models.Model):
     def num_tasks(self):
         return self.tasks.count()
 
-    def get_current_predictions(self):
-        if flag_set(
-            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
-            user='auto',
-        ):
-            return Prediction.objects.filter(Q(project=self.id) & Q(model_version=self.model_version))
-        else:
-            return Prediction.objects.filter(Q(task__project=self.id) & Q(model_version=self.model_version))
+    @property
+    def ml_backend(self):
+        return fast_first(self.ml_backends.all())
 
     @property
-    def num_predictions(self):
-        return self.get_current_predictions().count()
+    def should_retrieve_predictions(self):
+        """Returns true if the model was set to be used"""
+        if self.show_collab_predictions:
+            ml = self.ml_backend
+            if ml:
+                return ml.title == self.model_version
+
+        return False
 
     @property
     def num_annotations(self):
@@ -644,16 +660,40 @@ class Project(ProjectMixin, models.Model):
     def _label_config_has_changed(self):
         return self.label_config != self.__original_label_config
 
-    def delete_predictions(self):
-        if flag_set(
-            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
-            user='auto',
-        ):
-            predictions = Prediction.objects.filter(project=self)
-        else:
-            predictions = Prediction.objects.filter(task__project=self)
-        count = predictions.count()
-        predictions.delete()
+    def should_none_model_version(self, model_version):
+        """
+        Returns True if the model version provided matches the object's model version,
+        or no model version is set for the object but model version exists in ML backend.
+        """
+        return self.model_version == model_version or self.ml_backend_in_model_version
+
+    def delete_predictions(self, model_version=None):
+        """
+        Deletes the predictions based on the provided model version.
+        If no model version is provided, it deletes all the predictions for this project.
+
+        :param model_version: Identifier of the model version (default is None)
+        :type model_version: str, optional
+        :return: Dictionary with count of deleted predictions
+        :rtype: dict
+        """
+        params = {'project': self}
+
+        if model_version:
+            params.update({'model_version': model_version})
+
+        predictions = Prediction.objects.filter(**params)
+
+        with transaction.atomic():
+            # If we are deleting specific model_version then we need
+            # to remove that from the project
+            if self.should_none_model_version(model_version):
+                self.model_version = None
+                self.save(update_fields=['model_version'])
+
+            _, deleted_map = predictions.delete()
+
+        count = deleted_map.get('tasks.Prediction', 0)
         return {'deleted_predictions': count}
 
     def get_updated_weights(self):
@@ -862,13 +902,12 @@ class Project(ProjectMixin, models.Model):
                 result[field] = value
         return result
 
-    def get_model_versions(self, with_counters=False):
+    def get_model_versions(self, with_counters=False, extended=False):
         """
-        Get model_versions from project predictions
-        :param with_counters: With count of predictions for each version
-        :return:
-        Dict or list
-        {model_version: count_predictions}, [model_versions]
+        Get model_versions from project predictions.
+        :param with_counters: Boolean, if True, counts predictions for each version. Default is False.
+        :param extended: Boolean, if True, returns additional information. Default is False.
+        :return: Dict or list containing model versions and their count predictions.
         """
         if flag_set(
             'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
@@ -878,19 +917,60 @@ class Project(ProjectMixin, models.Model):
         else:
             predictions = Prediction.objects.filter(task__project=self)
         # model_versions = set(predictions.values_list('model_version', flat=True).distinct())
-        model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
-        output = {r['model_version']: r['count'] for r in model_versions}
-        if self.model_version is not None and self.model_version not in output:
-            output[self.model_version] = 0
-        if with_counters:
-            return output
+
+        if extended:
+            model_versions = list(
+                predictions.values('model_version').annotate(count=Count('model_version'), latest=Max('created_at'))
+            )
+
+            # remove the load from the DB side and sort in here
+            model_versions.sort(key=lambda x: x['latest'], reverse=True)
+
+            return model_versions
         else:
-            return list(output)
+            # TODO this needs to be removed at some point
+            model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
+            output = {r['model_version']: r['count'] for r in model_versions}
+
+            # Ensure that self.model_version exists in output
+            if self.model_version and self.model_version not in output:
+                output[self.model_version] = 0
+
+            # Return as per requirement
+            return output if with_counters else list(output.keys())
+
+    def get_ml_backends(self, *args, **kwargs):
+        from ml.models import MLBackend
+
+        return MLBackend.objects.filter(project=self, **kwargs)
+
+    def has_ml_backend(self, *args, **kwargs):
+        return self.get_ml_backends(**kwargs).exists()
+
+    @property
+    def ml_backend_in_model_version(self):
+        """
+        Returns True if the ml_backend title matches this model version.
+        If this model version is not set, Returns False
+        """
+        return bool(self.model_version and self.has_ml_backend(title=self.model_version))
+
+    def update_ml_backends_state(self):
+        """
+        Updates the state of all ml_backends associated with this instance.
+
+        :return: List of updated MLBackend instances.
+        """
+        ml_backends = self.get_ml_backends()
+        for mlb in ml_backends:
+            mlb.update_state()
+
+        return ml_backends
 
     def get_active_ml_backends(self):
-        from ml.models import MLBackend, MLBackendState
+        from ml.models import MLBackendState
 
-        return MLBackend.objects.filter(project=self, state=MLBackendState.CONNECTED)
+        return self.get_ml_backends(state=MLBackendState.CONNECTED)
 
     def get_all_storage_objects(self, type_='import'):
         from io_storages.models import get_storage_classes
@@ -1200,37 +1280,43 @@ class ProjectSummary(models.Model):
         self.save(update_fields=['created_annotations', 'created_labels'])
 
     def remove_created_annotations_and_labels(self, annotations):
-        created_annotations = dict(self.created_annotations)
-        labels = dict(self.created_labels)
-        for annotation in annotations:
-            results = get_attr_or_item(annotation, 'result') or []
-            if not isinstance(results, list):
-                continue
+        # we are going to remove all annotations, so we'll reset the corresponding fields on the summary
+        remove_all_annotations = self.project.annotations.count() == len(annotations)
+        created_annotations, created_labels = (
+            ({}, {}) if remove_all_annotations else (dict(self.created_annotations), dict(self.created_labels))
+        )
 
-            for result in results:
-                # reduce annotation counters
-                key = self._get_annotation_key(result)
-                if key in created_annotations:
-                    created_annotations[key] -= 1
-                    if created_annotations[key] == 0:
-                        created_annotations.pop(key)
-
-                # reduce labels counters
-                from_name = result.get('from_name', None)
-                if from_name not in labels:
+        if not remove_all_annotations:
+            for annotation in annotations:
+                results = get_attr_or_item(annotation, 'result') or []
+                if not isinstance(results, list):
                     continue
-                for label in self._get_labels(result):
-                    label = str(label)
-                    if label in labels[from_name]:
-                        labels[from_name][label] -= 1
-                        if labels[from_name][label] == 0:
-                            labels[from_name].pop(label)
-                if not labels[from_name]:
-                    labels.pop(from_name)
+
+                for result in results:
+                    # reduce annotation counters
+                    key = self._get_annotation_key(result)
+                    if key in created_annotations:
+                        created_annotations[key] -= 1
+                        if created_annotations[key] == 0:
+                            created_annotations.pop(key)
+
+                    # reduce labels counters
+                    from_name = result.get('from_name', None)
+                    if from_name not in created_labels:
+                        continue
+                    for label in self._get_labels(result):
+                        label = str(label)
+                        if label in created_labels[from_name]:
+                            created_labels[from_name][label] -= 1
+                            if created_labels[from_name][label] == 0:
+                                created_labels[from_name].pop(label)
+                    if not created_labels[from_name]:
+                        created_labels.pop(from_name)
+
         logger.debug(f'summary.created_annotations = {created_annotations}')
-        logger.debug(f'summary.created_labels = {labels}')
+        logger.debug(f'summary.created_labels = {created_labels}')
         self.created_annotations = created_annotations
-        self.created_labels = labels
+        self.created_labels = created_labels
         self.save(update_fields=['created_annotations', 'created_labels'])
 
     def update_created_labels_drafts(self, drafts):
@@ -1257,25 +1343,29 @@ class ProjectSummary(models.Model):
         self.save(update_fields=['created_labels_drafts'])
 
     def remove_created_drafts_and_labels(self, drafts):
-        labels = dict(self.created_labels_drafts)
-        for draft in drafts:
-            results = get_attr_or_item(draft, 'result') or []
-            if not isinstance(results, list):
-                continue
+        # we are going to remove all drafts, so we'll reset the corresponding field on the summary
+        remove_all_drafts = AnnotationDraft.objects.filter(task__project=self.project).count() == len(drafts)
+        labels = {} if remove_all_drafts else dict(self.created_labels_drafts)
 
-            for result in results:
-                # reduce labels counters
-                from_name = result.get('from_name', None)
-                if from_name not in labels:
+        if not remove_all_drafts:
+            for draft in drafts:
+                results = get_attr_or_item(draft, 'result') or []
+                if not isinstance(results, list):
                     continue
-                for label in self._get_labels(result):
-                    label = str(label)
-                    if label in labels[from_name]:
-                        labels[from_name][label] -= 1
-                        if labels[from_name][label] == 0:
-                            labels[from_name].pop(label)
-                if not labels[from_name]:
-                    labels.pop(from_name)
+
+                for result in results:
+                    # reduce labels counters
+                    from_name = result.get('from_name', None)
+                    if from_name not in labels:
+                        continue
+                    for label in self._get_labels(result):
+                        label = str(label)
+                        if label in labels[from_name]:
+                            labels[from_name][label] -= 1
+                            if labels[from_name][label] == 0:
+                                labels[from_name].pop(label)
+                    if not labels[from_name]:
+                        labels.pop(from_name)
         logger.debug(f'summary.created_labels_drafts = {labels}')
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])

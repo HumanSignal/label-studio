@@ -161,6 +161,29 @@ def test_config_validation_for_choices_workaround(business_client, project_id):
 
 
 @pytest.mark.django_db
+def test_config_validation_for_missing_to_name_in_number_tag_fails(business_client, project_id):
+    """
+    Validate Number tag with missing to_name fails (see LEAP-245)
+    """
+    payload = {
+        'label_config': (
+            '<View>'
+            '<Text name="question" value="$question" granularity="word"/>'
+            '<Number name="number" to="question" required="true" />'
+            '</View>'
+        )
+    }
+    response = business_client.patch(
+        f'/api/projects/{project_id}',
+        data=json.dumps(payload),
+        content_type='application/json',
+    )
+    assert response.status_code == 400
+    response_data = response.json()
+    assert "'toName' is a required property" in response_data['validation_errors']['label_config'][0]
+
+
+@pytest.mark.django_db
 def test_parse_wrong_xml(business_client, project_id):
     # Change label config to Repeater
     payload = {

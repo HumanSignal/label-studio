@@ -1,13 +1,12 @@
-import Helper from '@codeceptjs/helper';
+import Helper from "@codeceptjs/helper";
 
 class Annotations extends Helper {
-
   get _playwright() {
     return this.helpers.Playwright;
   }
 
   _locateButton(text) {
-    return locate('button').withText(text);
+    return locate("button").withText(text);
   }
 
   async _clickButton(text) {
@@ -18,16 +17,16 @@ class Annotations extends Helper {
   }
 
   async submitAnnotation() {
-    await this._clickButton('Submit');
+    await this._clickButton("Submit");
   }
 
   async updateAnnotation() {
-    await this._clickButton('Update');
+    await this._clickButton("Update");
   }
 
   async seeAnnotationSubmitted() {
-    await this._playwright.dontSeeElement(this._locateButton('Submit'));
-    await this._playwright.seeElement(this._locateButton('Update'));
+    await this._playwright.dontSeeElement(this._locateButton("Submit"));
+    await this._playwright.seeElement(this._locateButton("Update"));
   }
 }
 

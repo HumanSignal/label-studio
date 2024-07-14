@@ -7,19 +7,23 @@
     grid-auto-flow rows
 
   &__footer
-    margin 0 -40px -32px
+    margin 0 -32px -32px
     padding 32px 40px 32px
     position sticky
     bottom -40px
-    background-color #fff
+    background-color var(--sand_0)
     border-radius 5px
 
 .formats
-  color rgba(#000, 0.7)
+  color var(--sand_700)
   font-size 16px
 
   &__list
     margin 10px -7px
+
+  & a
+    color var(--primary_link)
+    text-decoration underline
 
   &__item
     padding 10px 9px 10px 38px
@@ -32,11 +36,12 @@
       pointer-events all
 
     &_active:hover:not(&_selected)
-      background-color #efefef
+      background-color var(--grape_0)
 
     &_selected
       pointer-events none
-      background-color rgba($accent_color, 0.1)
+      background-color var(--grape_0)
+      border 1px solid var(--grape_500)
 
     &:not(&_active)
       opacity 0.3

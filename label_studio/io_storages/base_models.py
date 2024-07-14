@@ -521,11 +521,17 @@ class ExportStorage(Storage, ProjectStorageMixin):
     )
 
     def _get_serialized_data(self, annotation):
-        if settings.FUTURE_SAVE_TASK_TO_STORAGE:
+        user = self.project.organization.created_by
+        flag = flag_set(
+            'fflag_feat_optic_650_target_storage_task_format_long', user=user, override_system_default=False
+        )
+        if settings.FUTURE_SAVE_TASK_TO_STORAGE or flag:
             # export task with annotations
             # TODO: we have to rewrite save_all_annotations, because this func will be called for each annotation
             # TODO: instead of each task, however, we have to call it only once per task
-            return ExportDataSerializer(annotation.task).data
+            expand = ['annotations.reviews', 'annotations.completed_by']
+            context = {'project': self.project}
+            return ExportDataSerializer(annotation.task, context=context, expand=expand).data
         else:
             serializer_class = load_func(settings.STORAGE_ANNOTATION_SERIALIZER)
             # deprecated functionality - save only annotation
@@ -538,10 +544,12 @@ class ExportStorage(Storage, ProjectStorageMixin):
         annotation_exported = 0
         total_annotations = Annotation.objects.filter(project=self.project).count()
         self.info_set_in_progress()
+        self.cached_user = self.project.organization.created_by
 
         for annotation in Annotation.objects.filter(project=self.project).iterator(
             chunk_size=settings.STORAGE_EXPORT_CHUNK_SIZE
         ):
+            annotation.cached_user = self.cached_user
             self.save_annotation(annotation)
 
             # update progress counters
@@ -612,9 +620,18 @@ class ExportStorageLink(models.Model):
 
     @staticmethod
     def get_key(annotation):
-        if settings.FUTURE_SAVE_TASK_TO_STORAGE:
-            return str(annotation.task.id) + '.json' if settings.FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT else ''
-        return str(annotation.id)
+        # get user who created the organization explicitly using filter/values_list to avoid prefetching
+        user = getattr(annotation, 'cached_user', None)
+        # when signal for annotation save is called, user is not cached
+        if user is None:
+            user = annotation.project.organization.created_by
+        flag = flag_set('fflag_feat_optic_650_target_storage_task_format_long', user=user)
+
+        if settings.FUTURE_SAVE_TASK_TO_STORAGE or flag:
+            ext = '.json' if settings.FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT or flag else ''
+            return str(annotation.task.id) + ext
+        else:
+            return str(annotation.id)
 
     @property
     def key(self):

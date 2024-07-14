@@ -31,11 +31,11 @@
 
     &::before
       content ""
-      width 10px
-      height 10px
+      width 16px
+      height 16px
       border-radius 100%
       transition all 120ms ease
-      background rgba(#000, 0.12)
+      background var(--sand_400)
       box-shadow 0px 5px 10px rgba(#000, 0.15), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.05)
 
   &_checked &__indicator
@@ -44,8 +44,8 @@
     &::before
       width 16px
       height 16px
-      background $accent_color
-      box-shadow 0px 5px 10px rgba($accent_color, 0.3), inset 0px -1px 0px rgba(0, 0, 0, 0.1)
+      background var(--grape_500)
+      box-shadow 0px 5px 10px var(--grape_100), inset 0px -1px 0px rgba(0, 0, 0, 0.1)
 
   &_disabled &__indicator
     transition none

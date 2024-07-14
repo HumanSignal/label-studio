@@ -20,7 +20,7 @@
 
     .submit
       border-radius 4px
-      background #09F
+      background var(--grape_500)
       box-shadow 0px 4px 4px 0px rgba(0, 0, 0, 0.25)
       display flex
       width 160px
@@ -36,6 +36,7 @@
       letter-spacing 0.15px
       flex-direction row-reverse
       padding 0
+      cursor pointer
 
       &_disabled 
         color: rgba(255,255,255,0.8);
@@ -105,21 +106,18 @@
   display flex
   align-items center
   align-self stretch
-  color #1F1F1F
+  color var(--sand_900)
   text-overflow ellipsis
   white-space nowrap
-  font-family Roboto
   font-size 16px
   font-style normal
   font-weight 400
   line-height 24px 
-  letter-spacing 0.5px
   box-shadow: 0px 1px 3px 1px rgba(38, 38, 38, 0.15), 0px 1px 2px 0px rgba(38, 38, 38, 0.30);
 
   &:hover:before 
     content ''
     z-index auto
-    background #00f
     width calc(100% - 16px)
     height calc(100% - 16px)
     position absolute
@@ -128,5 +126,5 @@
     margin 8px
     border-radius 4px
     opacity 0.08
-    background rgb(9 109 217)
+    background var(--grape_500)
     pointer-events none

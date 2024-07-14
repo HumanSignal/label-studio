@@ -19,50 +19,50 @@ const config = `
 `;
 
 const data = {
-  url: 'https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3',
+  url: "/public/files/barradeen-emotional.mp3",
 };
 
 const result = [
   {
-    from_name: 'label',
-    id: 'SsGrpVgy_C',
-    to_name: 'audio',
+    from_name: "label",
+    id: "SsGrpVgy_C",
+    to_name: "audio",
     original_length: 98.719925,
-    type: 'labels',
-    origin: 'manual',
+    type: "labels",
+    origin: "manual",
     value: {
       channel: 0,
       end: 28.50568583621215,
-      labels: ['Beat'],
+      labels: ["Beat"],
       start: 12.778410892095105,
     },
   },
   {
-    from_name: 'label',
-    id: 'JhxupEJWlW',
-    to_name: 'audio',
+    from_name: "label",
+    id: "JhxupEJWlW",
+    to_name: "audio",
     original_length: 98.719925,
-    type: 'labels',
-    origin: 'manual',
+    type: "labels",
+    origin: "manual",
     value: {
       channel: 1,
       end: 59.39854733358493,
-      labels: ['Other'],
+      labels: ["Other"],
       start: 55.747572792986325,
     },
   },
   {
-    from_name: 'choice',
-    id: 'hIj6zg57SY',
-    to_name: 'audio',
-    type: 'choices',
-    origin: 'manual',
+    from_name: "choice",
+    id: "hIj6zg57SY",
+    to_name: "audio",
+    type: "choices",
+    origin: "manual",
     value: {
-      choices: ['Lo-Fi'],
+      choices: ["Lo-Fi"],
     },
   },
 ];
 
-const title = 'Audio regions';
+const title = "Audio regions";
 
 module.exports = { config, data, result, title };

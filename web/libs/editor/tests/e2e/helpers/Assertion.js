@@ -1,6 +1,6 @@
-const Helpers = require('../tests/helpers');
-const assert = require('assert');
-const Helper = require('@codeceptjs/helper');
+const Helpers = require("../tests/helpers");
+const assert = require("assert");
+const Helper = require("@codeceptjs/helper");
 
 // used in Audio/Video/Paragraphs sync
 const TIME_DIFF_THRESHOLD = 0.3;
@@ -26,7 +26,7 @@ class AssertionHelper extends Helper {
    * @param {number} time2
    * @param {string} [message] for assertion
    */
-  assertTimesInSync(time1, time2, message = '') {
+  assertTimesInSync(time1, time2, message = "") {
     assert.equal(Math.abs(time1 - time2) < TIME_DIFF_THRESHOLD, true, message);
   }
 }

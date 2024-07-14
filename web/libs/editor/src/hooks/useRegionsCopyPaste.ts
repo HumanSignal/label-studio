@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 export const useRegionsCopyPaste = (entity: any) => {
   useEffect(() => {
@@ -7,8 +7,8 @@ export const useRegionsCopyPaste = (entity: any) => {
       if ((el as Node).nodeType !== Node.ELEMENT_NODE) return false;
 
       const element = el as HTMLElement;
-      const tabIndex = parseInt(element.getAttribute('tabindex') ?? '', 10);
-      const isFocusable = element.matches('a, button, input, textarea, select, details, [tabindex], [contenteditable]');
+      const tabIndex = Number.parseInt(element.getAttribute("tabindex") ?? "", 10);
+      const isFocusable = element.matches("a, button, input, textarea, select, details, [tabindex], [contenteditable]");
 
       return isFocusable || tabIndex > -1;
     };
@@ -27,13 +27,13 @@ export const useRegionsCopyPaste = (entity: any) => {
       const { clipboardData } = ev;
       const results = entity.serializedSelection;
 
-      clipboardData?.setData('application/json', JSON.stringify(results));
+      clipboardData?.setData("application/json", JSON.stringify(results));
       ev.preventDefault();
     };
 
     const pasteFromClipboard = (ev: ClipboardEvent) => {
       const { clipboardData } = ev;
-      const data = clipboardData?.getData('application/json');
+      const data = clipboardData?.getData("application/json");
 
       try {
         const results = (data ? JSON.parse(data) : []).map((res: any) => {
@@ -67,13 +67,13 @@ export const useRegionsCopyPaste = (entity: any) => {
       entity.deleteSelectedRegions();
     };
 
-    window.addEventListener('copy', copyHandler);
-    window.addEventListener('paste', pasteHandler);
-    window.addEventListener('cut', cutHandler);
+    window.addEventListener("copy", copyHandler);
+    window.addEventListener("paste", pasteHandler);
+    window.addEventListener("cut", cutHandler);
     return () => {
-      window.removeEventListener('copy', copyHandler);
-      window.removeEventListener('paste', pasteHandler);
-      window.removeEventListener('cut', cutHandler);
+      window.removeEventListener("copy", copyHandler);
+      window.removeEventListener("paste", pasteHandler);
+      window.removeEventListener("cut", cutHandler);
     };
   }, [entity.pk ?? entity.id]);
 };

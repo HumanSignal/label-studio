@@ -1,12 +1,12 @@
-import { types } from 'mobx-state-tree';
+import { types } from "mobx-state-tree";
 
-import Registry from '../../core/Registry';
-import ControlBase from './Base';
-import { customTypes } from '../../core/CustomTypes';
-import { AnnotationMixin } from '../../mixins/AnnotationMixin';
-import SeparatedControlMixin from '../../mixins/SeparatedControlMixin';
-import { ToolManagerMixin } from '../../mixins/ToolManagerMixin';
-import { FF_DEV_4081, isFF } from '../../utils/feature-flags';
+import Registry from "../../core/Registry";
+import ControlBase from "./Base";
+import { customTypes } from "../../core/CustomTypes";
+import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import SeparatedControlMixin from "../../mixins/SeparatedControlMixin";
+import { ToolManagerMixin } from "../../mixins/ToolManagerMixin";
+import { FF_DEV_4081, isFF } from "../../utils/feature-flags";
 
 /**
  * The `Magicwand` tag makes it possible to click in a region of an image a user is doing segmentation
@@ -23,14 +23,6 @@ import { FF_DEV_4081, isFF } from '../../utils/feature-flags';
  *
  * ![Animated GIF showing Magic Wand clicking on cloud and dragging, automatically segmenting and selecting
  * pixels to create a mask](../images/magicwand_example.gif)
- *
- * ### Feature Flag
- *
- * The Magic Wand is currently turned off by default behind a feature flag. If you want to turn it on, you
- * must enable it by either:
- * - Setting an environment variable when starting the Label Studio server, either by starting up the
- *   server with `fflag_feat_front_dev_4081_magic_wand_tool=1 label-studio`, or manually finding the flag
- * `flag_feat_front_dev_4081_magic_wand_tool` and setting it to true.
  *
  * ### CORS Configuration
  *
@@ -98,17 +90,17 @@ import { FF_DEV_4081, isFF } from '../../utils/feature-flags';
 
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
-  opacity: types.optional(customTypes.range(), '0.6'),
-  blurradius: types.optional(types.string, '5'),
-  defaultthreshold: types.optional(types.string, '15'),
+  opacity: types.optional(customTypes.range(), "0.6"),
+  blurradius: types.optional(types.string, "5"),
+  defaultthreshold: types.optional(types.string, "15"),
 });
 
 const Model = types
   .model({
-    type: 'magicwand',
-    removeDuplicatesNamed: 'Erase',
+    type: "magicwand",
+    removeDuplicatesNamed: "Erase",
   })
-  .views(self => ({
+  .views((self) => ({
     get hasStates() {
       const states = self.states();
 
@@ -116,10 +108,11 @@ const Model = types
     },
   }))
   .volatile(() => ({
-    toolNames: ['MagicWand', 'Erase'],
+    toolNames: ["MagicWand", "Erase"],
   }));
 
-const MagicWandModel = types.compose('MagicWandModel',
+const MagicWandModel = types.compose(
+  "MagicWandModel",
   ControlBase,
   AnnotationMixin,
   SeparatedControlMixin,
@@ -132,6 +125,6 @@ const HtxView = () => {
   return null;
 };
 
-isFF(FF_DEV_4081) && Registry.addTag('magicwand', MagicWandModel, HtxView);
+isFF(FF_DEV_4081) && Registry.addTag("magicwand", MagicWandModel, HtxView);
 
 export { HtxView, MagicWandModel };

@@ -15,6 +15,8 @@ import os
 import re
 from datetime import timedelta
 
+from django.core.exceptions import ImproperlyConfigured
+
 from label_studio.core.utils.params import get_bool_env, get_env_list
 
 formatter = 'standard'
@@ -101,6 +103,13 @@ if HOSTNAME:
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
                 logger.info('=> Django URL prefix is set to: %s', FORCE_SCRIPT_NAME)
+
+DOMAIN_FROM_REQUEST = get_bool_env('DOMAIN_FROM_REQUEST', False)
+
+if DOMAIN_FROM_REQUEST:
+    # in this mode HOSTNAME can be only subpath
+    if HOSTNAME and not HOSTNAME.startswith('/'):
+        raise ImproperlyConfigured('LABEL_STUDIO_HOST must be a subpath if DOMAIN_FROM_REQUEST is True')
 
 INTERNAL_PORT = '8080'
 
@@ -212,6 +221,8 @@ INSTALLED_APPS = [
     'ml',
     'webhooks',
     'labels_manager',
+    'ml_models',
+    'ml_model_providers',
 ]
 
 MIDDLEWARE = [
@@ -221,6 +232,7 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware',
     'core.middleware.DisableCSRF',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'core.middleware.XApiKeySupportMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
@@ -264,7 +276,7 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = get_env_list('ALLOWED_HOSTS', default=['*'])
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
@@ -333,6 +345,13 @@ RQ_QUEUES = {
     },
 }
 
+# specify the list of the extensions that are allowed to be presented in auto generated OpenAPI schema
+# for example, by specifying in swagger_auto_schema(..., x_fern_sdk_group_name='projects') we can group endpoints
+# /api/projects/:
+#   get:
+#     x-fern-sdk-group-name: projects
+X_VENDOR_OPENAPI_EXTENSIONS = ['x-fern']
+
 # Swagger: automatic API documentation
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -350,14 +369,16 @@ SWAGGER_SETTINGS = {
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
     'OPERATIONS_SORTER': 'alpha',
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'core.utils.openapi_extensions.XVendorExtensionsAutoSchema',
+    'DEFAULT_INFO': 'core.urls.open_api_info',
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
-SENTRY_RATE = float(get_env('SENTRY_RATE', 0.25))
+SENTRY_RATE = float(get_env('SENTRY_RATE', 0.02))
 SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.opensource')
 SENTRY_REDIS_ENABLED = False
 FRONTEND_SENTRY_DSN = get_env('FRONTEND_SENTRY_DSN', None)
-FRONTEND_SENTRY_RATE = get_env('FRONTEND_SENTRY_RATE', 0.1)
+FRONTEND_SENTRY_RATE = get_env('FRONTEND_SENTRY_RATE', 0.01)
 FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'stage.opensource')
 
 ROOT_URLCONF = 'core.urls'
@@ -530,6 +551,8 @@ DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
 USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'projects.mixins.ProjectMixin'
 TASK_MIXIN = 'tasks.mixins.TaskMixin'
+LSE_PROJECT = None
+GET_TASKS_AGREEMENT_QUERYSET = None
 ANNOTATION_MIXIN = 'tasks.mixins.AnnotationMixin'
 ORGANIZATION_MIXIN = 'organizations.mixins.OrganizationMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
@@ -541,6 +564,8 @@ STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerial
 TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
 INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
+STORAGE_PERMISSION = 'io_storages.permissions.StoragePermission'
+PROJECT_IMPORT_PERMISSION = 'projects.permissions.ProjectImportPermission'
 DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
 
 
@@ -594,8 +619,8 @@ FEATURE_FLAGS_OFFLINE = get_bool_env('FEATURE_FLAGS_OFFLINE', True)
 # default value for feature flags (if not overridden by environment or client)
 FEATURE_FLAGS_DEFAULT_VALUE = False
 
-# Whether to send analytics telemetry data
-COLLECT_ANALYTICS = get_bool_env('collect_analytics', True)
+# Whether to send analytics telemetry data. Fall back to old lowercase name for legacy compatibility.
+COLLECT_ANALYTICS = get_bool_env('COLLECT_ANALYTICS', get_bool_env('collect_analytics', True))
 
 # Strip harmful content from SVG files by default
 SVG_SECURITY_CLEANUP = get_bool_env('SVG_SECURITY_CLEANUP', False)
@@ -723,3 +748,15 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
 
 CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE = get_env('CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE', 10000)
 CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT = get_env('CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT', 60)
+
+CONTEXTLOG_SYNC = False
+TEST_ENVIRONMENT = get_bool_env('TEST_ENVIRONMENT', False)
+DEBUG_CONTEXTLOG = get_bool_env('DEBUG_CONTEXTLOG', False)
+
+_REDIS_SSL_CERTS_REQS = get_env('REDIS_SSL_CERTS_REQS', 'required')
+REDIS_SSL_SETTINGS = {
+    'ssl_cert_reqs': None if _REDIS_SSL_CERTS_REQS.lower() == 'none' else _REDIS_SSL_CERTS_REQS,
+    'ssl_ca_certs': get_env('REDIS_SSL_CA_CERTS', None),
+    'ssl_keyfile': get_env('REDIS_SSL_KEYFILE', None),
+    'ssl_certfile': get_env('REDIS_SSL_CERTFILE', None),
+}

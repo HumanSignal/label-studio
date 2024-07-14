@@ -1,196 +1,232 @@
-.webhook-wrap
-    flex 1
-    width 100%
-    height 100%
-    display flex
-    justify-content space-between
-    flex-direction column
+.webhook-wrap {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  width: 42rem;
 
-    &__content
-        flex 1
+  & h1{
+    margin-bottom: .5rem;
+  }
 
-    &__footer
-        box-sizing: content-box !important
-        flex none
-        width 100%
-        height 112px - 24px
-        background rgba(0, 0, 0, 0.03)
-        border 1px rgba(0, 0, 0, 0.05) solid
-        margin-bottom: -40px
-        margin-left: -42px
-        padding-left: 40px
-        padding-right: 40px
-        
-        display: flex
-        align-items: top
-        padding-top: 24px
+  &__content {
+    flex: 1;
+    margin: 2rem;
+    width: 42rem;
+  }
 
-    &__footer-text
-        width: 680px
-        color: rgba(0, 0, 0, 0.6)
-        & p
-            margin: 0
-            margin-bottom: 6px
-        & a
-            color: #0099FF
+  &__footer {
+    box-sizing: content-box !important;
+    flex: none;
+    width: 100%;
+    height: 112px - 24px;
+    background: var(--sand_100);
+    border: 1px var(--sand_300) solid;
+    margin-left: -2px;
+    display: flex;
+    align-items: top;
+    padding-top: 24px;
+  }
 
-    &__footer-icon
-        margin: 0px 24px
+  &__footer-text {
+    width: 42rem;
+    font-size: .875rem;
+    color: var(--sand_600);
 
-.webhook
-    &__title
-        font-weight 500
-        margin-bottom 24px
+    & p {
+      margin: 0;
+      margin-bottom: 6px;
+    }
 
-    &__title-base
-        color rgba(0, 0, 0, 0.6)
-        cursor pointer
+    & a {
+      color: var(--grape_600);
+      text-decoration: underline;
+    }
+  }
 
-    &__controls
-        display flex
-        justify-content space-between
-        margin-bottom 32px
+  &__footer-icon {
+    margin: 0px 24px;
+  }
+}
 
-    &__content
-        display grid
-        grid-template-columns 1fr 1fr
-        grid-template-rows min-content
-        align-items flex-start
-        grid-gap 20px
+.webhook {
+  &__title {
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
 
-.webhook-delete-modal
-    &__width-button
-        width 170px
+  &__title-base {
+    color: var(--sand_600);
+    cursor: pointer;
+  }
 
-    &__modal-text
-        margin-bottom 32px
+  &__controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+}
 
-.webhook-list
-    &__item
-        display grid
-        grid-template-columns 58px 394px 240px 196px
-        width 58px + 394px + 240px + 196px + 12px
-        margin-left -12px
-        padding-left 12px
-        align-items center
-        height 48px
-        font-size 16px
+.webhook-delete-modal {
+  &__width-button {
+    width: 170px;
+  }
 
-        &:hover
-            background-color #FAFAFA
+  &__modal-text {
+    margin-bottom: 32px;
+  }
+}
 
-        &:hover ^[0]__item-control
-            display flex !important
-            justify-content space-between
+.webhook-list {
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .5rem;
+    font-size: 16px;
+    border: 1px solid var(--sand_300);
+    border-radius: .5rem;
 
-    &__item-url
-        color black
-        max-width 370px
-        overflow hidden
-        text-overflow ellipsis
-        cursor pointer
+    &:hover {
+      background-color: var(--sand_100);
+    }
 
-    &__item-date
-        color rgba(0, 0, 0, 0.4)
+    &:hover .webhook-list__item-control {
+      display: flex !important;
+      justify-content: space-between;
+    }
+  }
 
-    &__item-control
-        display none
+  &__item + &__item{
+    margin-top: 1rem;
+  }
 
-.webhook-form
-    &__form-row
-        paddingLeft 16
+  &__url-wrap {
+    display: flex;
+    align-items: center;
+  }
 
-    &__form-toggle
-        justify-content flex-end
+  &__item-url {
+    max-width: 370px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    font-weight: 500;
+    margin-left: .5rem;
+  }
 
-.webhook-detail
-    &__width-button
-        width 170px
+  &__item-date {
+    color: var(--sand_600);
+    font-size: .875rem;
+    margin-top: .25rem;
+  }
 
-    &__black-text
-        color black
+  &__item-control {
+    display: none;
+    & button + button{
+      margin-left: .5rem;
+    }
+  }
+}
 
-    &__activator
-        width 135px
+.webhook-form {
+  &__form-row {
+    paddingLeft: 16;
+  }
 
-    &__url-space
-        grid-template-columns auto 135px
+  &__form-toggle {
+    justify-content: flex-end;
+  }
+}
 
-    &__url-input
-        align-self stretch
-        width auto
+.webhook-detail {
+  
+  &__width-button {
+    width: 170px;
+  }
 
-    &__form-label
-        padding-left 0px
+  &__black-text {
+    color: black;
+  }
 
-    &__form-row
-        margin-bottom 24px
+  &__activator {
+    width: 135px;
+  }
 
-    &__delete-button
-        width 170px
-        margin-right auto
+  &__url-space {
+    grid-template-columns: auto 135px;
+  }
 
-    &__cancel-button
-        margin-right 16px
-        width 170px
+  &__url-input {
+    align-self: stretch;
+    width: auto;
+  }
 
-    &__status
-        margin-right 16px
+  &__form-label {
+    padding-left: 0px;
+  }
 
-    &__save-button
-        width 170px
+  &__form-row {
+    margin-bottom: 24px;
+  }
 
-    &__headers
-        background #FAFAFA
-        border-radius 3px
+  &__delete-button {
+    margin-right: auto;
+  }
 
-    &__headers-control
-        height 40px
+  &__cancel-button {
+    margin-right: 1rem;
+  }
 
-    &__headers-add
-        & span
-            color #0099FF !important
+  &__status {
+    margin-right: 16px;
+  }
 
-        height 32px
-        width 32px
-        padding 0px !important
-        margin-right 12px
+  &__headers {
+    border: 1px solid var(--sand_300);
+    padding: 1rem;
+    border-radius: .5rem;
+    margin-bottom: 1rem;
+  }
 
-    &__headers-row
-        grid-template-columns 1fr 1fr 28px
-        margin 8px 16px 8px 16px
+  &__headers-add {
+    border none
+    & span {
+      color: var(--grape_500) !important;
+    }
+    padding: 0px !important;
+  }
 
-        &:last-child
-            margin-bottom 24px
+  &__headers-row {
+    grid-template-columns: 1fr 1fr 40px;
+    margin: .5rem 0;
+  }
 
-    &__headers-remove
-        height 32px
-        width 32px
-        padding 0px 0px !important
+  &__headers-remove {
+    height: 32px;
+    width: 32px;
+    padding: 0px 0px !important;
+    border none
+  }
 
-    &__headers-input
-        height 32px
-        min-height 32px
-        background white
+  &__controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+}
 
-    &__controls
-        display flex
-        justify-content flex-end
-        align-items center
-        margin-bottom: 32px
+.webhook-payload {
+  border: 1px solid var(--sand_300);
+  padding: 1rem;
+  border-radius: .5rem;
+  margin-bottom: 1rem;
 
-.webhook-payload
-    background #FAFAFA
-    border-radius 3px
-
-    &__title
-        padding 8px 0px
-
-        &_black
-            color black
-
-    &__content
-        padding 8px 16px
-
-    &__content-row
-        margin-bottom 16px
+  &__content-row {
+    margin: .5rem 0;
+  }
+}

@@ -1,5 +1,5 @@
-const Helper = require('@codeceptjs/helper');
-const ElementNotFound = require('codeceptjs/lib/helper/errors/ElementNotFound');
+const Helper = require("@codeceptjs/helper");
+const ElementNotFound = require("codeceptjs/lib/helper/errors/ElementNotFound");
 
 function assertElementExists(res, locator, prefix, suffix) {
   if (!res || res.length === 0) {
@@ -26,7 +26,7 @@ class PlaywrightAddon extends Helper {
     const cssValues = await this.grabCssPropertyFromAllPseudo(locator, cssProperty, pseudoElement);
 
     assertElementExists(cssValues, locator);
-    this.helpers.Playwright.debugSection('CSS', cssValues[0]);
+    this.helpers.Playwright.debugSection("CSS", cssValues[0]);
     return cssValues[0];
   }
 
@@ -47,10 +47,15 @@ class PlaywrightAddon extends Helper {
     const els = await this.helpers.Playwright._locate(locator);
 
     this.helpers.Playwright.debug(`Matched ${els.length} elements`);
-    return await Promise.all(els.map(el => el.$eval('xpath=.', (el, {
-      cssProperty,
-      pseudoElement,
-    }) => getComputedStyle(el, pseudoElement).getPropertyValue(cssProperty), { cssProperty, pseudoElement })));
+    return await Promise.all(
+      els.map((el) =>
+        el.$eval(
+          "xpath=.",
+          (el, { cssProperty, pseudoElement }) => getComputedStyle(el, pseudoElement).getPropertyValue(cssProperty),
+          { cssProperty, pseudoElement },
+        ),
+      ),
+    );
   }
 }
 

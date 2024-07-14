@@ -1,176 +1,245 @@
 .button
-  --button-color #000
-  height 40px
-  border none
+  --button-color var(--grape_500)
+  --button-background-color var(--sand_0)
+  --button-background-image none
+  --button-shadow inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15)
+  --button-content-align center
+  --button-content-justify center
+  --button-events all
+  --button-extra-color var(--grape_100)
+  --button-height 40px
+  --button-width auto
+  --button-min-width 0
+  --icon-size 16px
+  --button-padding 0 16px
+  --button-radius 5px
+  --button-font-size var(--font-size-400)
+  --button-margin-left 0
+  --button-margin-right 0
+  --button-border 1px solid var(--button-color)
+  --button-gap 6px
+
+  border var(--button-border)
   cursor pointer
-  padding 0 16px
   outline none
   display inline-flex
-  background-color #fff
-  align-items center
-  border-radius 5px
   text-align center
-  text-decoration none
   transition all 100ms ease
-  justify-content center
+  position relative
+  box-sizing border-box
   color var(--button-color) !important
-  box-shadow inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15)
-
+  font-size var(--button-font-size)
+  font-family var(--font-family)
   font-weight 500
-  font-size 16px
+  line-height var(--font-line-height-medium)
+  width var(--button-width)
+  height var(--button-height)
+  min-width var(--button-min-width)
+  padding var(--button-padding)
+  gap var(--button-gap)
+  align-items var(--button-content-align)
+  justify-content var(--button-content-justify)
+  margin-left var(--button-margin-left)
+  margin-right var(--button-margin-right)
+  background-color var(--button-background-color)
+  background-image var(--button-background-image)
+  pointer-events var(--button-events)
+  border-radius var(--button-radius)
+  text-decoration none
 
-  &:hover:not(:disabled):not(&_waiting):not(&_type_text):not(&_type_link)
-    color var(--button-color)
-    box-shadow 0px 2px 4px rgba(#000, 0.05), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.2)
+  &:hover:not(:disabled):not(&_waiting):not(&_look_danger):not(&_look_destructive):not(&_look_primary)
+    --button-color var(--grape_700)
+    --button-background-color var(--grape_0)
 
   &:active
     color var(--button-color)
-    background linear-gradient(0deg, rgba(#000, 0.02), rgba(#000, 0.02)), #FFFFFF
-    box-shadow inset 0px 1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.2)
+    --button-background-image linear-gradient(0deg, rgba(#000, 0.02), rgba(#000, 0.02)), var(--sand_0)
 
   &:focus
     outline none
-    box-shadow 0px 0px 0px 6px rgba($accent_color, 0.2), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba($accent_color, 0.2)
+    box-shadow 0px 0px 0px 4px var(--grape_100)
 
   &_waiting,
-  &:disabled
-    --button-color rgba(#000, 0.5)
-    background-color #efefef
+  &:disabled,
+  &_disabled
+    --button-color var(--sand_500)
+    --button-background-color var(--sand_200)
+    --button-events none
+    border none
+    & svg
+      color var(--sand_500) !important
+      & path
+        stroke var(--sand_500)
 
   &__extra
-    font-size 14px
-    line-height 16px
+    --button-font-size var(--font-size-300)
+    line-height var(--font-line-height-small)
     display flex
-    color rgba(#000, 0.4)
+    color var(--button-extra-color)
     align-items center
     margin-left 7px
     margin-right -7px
 
+  &__label
+    padding 0 var(--spacing-small, 8px)
 
   &__icon
     display flex
-    width 16px
-    height 16px
+    width var(--icon-size)
+    height var(--icon-size)
     align-items center
-
-    &:not(:only-child)
-      margin-right 12px
 
     &:only-child
       flex 1
-      align-items center
-      justify-content center
+      --button-content-align center
+      --button-content-justify center
 
     svg
       width 100%
       height 100%
 
+  &_align
+    &_left
+      --button-content-justify flex-start
+
+    &_right
+      --button-content-justify flex-end
+
   &_type
-    &_text
-      padding 0
-
     &_text, &_link
-      padding 0
+      --button-padding 0
       min-width 0
-      box-shadow none
-      background none
-      background-color none
-
-      &:hover
-        box-shadow none
+      --button-background-color none
+      border none
 
     &_link
-      --button-color $accent_color
-      text-decoration underline
+      --button-color var(--primary_link)
 
   &_look
     &_primary
-      --button-color #fff
-      background-color $accent_color
-      box-shadow none
-      box-shadow inset 0px -1px 0px rgba(#000, 0.1)
+      --button-color var(--sand_0)
+      --button-background-color var(--primary_link)
+      --button-border none
 
-      &:disabled
-        --button-color rgba(#fff, 0.8)
-        background-color #BBBBBB
-
-      &:hover:not(:disabled)
-        background linear-gradient(0deg, rgba(#fff, 0.1), rgba(#fff, 0.1)), $accent_color
-        box-shadow 0px 2px 4px rgba($accent_color, 0.3), inset 0px -1px 0px rgba(#000, 0.1)
+      &:hover:not(:disabled):not(&_waiting)
+        --button-background-color var(--grape_700)
+        --button-color var(--sand_0)
 
       &:active:not(:disabled)
-        background linear-gradient(0deg, rgba(#000, 0.04), rgba(#000, 0.04)), $accent_color
-        box-shadow inset 0px 1px 0px rgba(#000, 0.1)
+        --button-background-color var(--primary_link)
 
       &:focus:not(:disabled)
-        box-shadow 0px 0px 0px 6px rgba($accent_color, 0.2), inset 0px -1px 0px rgba(#000, 0.1)
+        box-shadow 0px 0px 0px 4px var(--grape_100)
 
     &_danger
-      --button-color $danger_color
+      --button-color var(--danger_color)
+      &:hover:not(:disabled):not(&_waiting)
+        --button-color var(--danger_color)
+        border-color: var(--danger_color)
+        background var(--red_1)
 
     &_destructive
-      --button-color #fff
-      background-color $danger_color
+      --button-color var(--sand_0)
+      --button-background-color $danger_color
+
+      &:hover:not(:disabled):not(&_waiting)
+        --button-color var(--danger_color)
+        border-color: var(--danger_color)
+        background var(--red_1)
+
+      &:active
+        --button-background--color var(--red_10)
+
+    &_ghost
+      --button-color var(--sand_0)
+      border none
+      --button-background-color transparent
 
   &_look_danger:disabled,
-  &_look_danger&_waiting
-    --button-color rgba($danger_color, 0.5)
+  &_look_danger&_waiting,
+  &_look_danger&_disabled
+    --button-color var(--sand_500)
 
   &_look_destructive:disabled,
-  &_look_destructive&_waiting
+  &_look_destructive&_waiting,
+  &_look_destructive&_disabled
     --button-color rgba(#fff, 0.5)
-    background-color $danger_color
+    --button-background-color var(--danger_color)
+
+  &_look_primary:disabled,
+  &_look_primary&_disabled
+    --button-color var(--sand_500)
+    --button-background-color var(--sand_200)
+    border none
+
+  &_look_primary&_waiting
+    --button-color var(--sand_0)
 
   &_size
     &_compact
-      height 36px
-      font-size 14px
+      --button-height 36px
+      --icon-size 16px
+      --button-font-size var(--font-size-300)
 
     &_medium
-      height 32px
-      font-size 14px
+      --button-height 32px
+      --icon-size 16px
+      --button-font-size var(--font-size-300)
 
     &_small
-      height 24px
-      font-size 12px
-      padding 0 10px
+      --button-height 24px
+      --icon-size 12px
+      --button-font-size var(--font-size-200)
+      --button-padding 0 10px
 
     &_large
-      height 40px
-      font-size 16px
+      --button-height 40px
+      --icon-size 28px
+      --button-font-size var(--font-size-400)
 
   &_size_small &__extra
-    margin-left 5px
-    margin-right -5px
+    --button-margin-left 5px
+    --button-margin-right -5px
 
   &_size_medium &__extra
-    margin-left 7px
-    margin-right -7px
+    --button-margin-left 7px
+    --button-margin-right -7px
 
   &_size_compact &__extra
-    margin-left 7px
-    margin-right -7px
+    --button-margin-left 7px
+    --button-margin-right -7px
 
   &_size_large &__extra
-    margin-left 10px
-    margin-right -10px
+    --button-margin-left 10px
+    --button-margin-right -10px
+
+  &_withIcon:not(&_type_link) &_noContent
+    border none
+
+  &_withIcon:not(&_type_link):not(&_noContent)
+    --button-padding 0 14px
+
+  &_withIcon&_size_small:not(&_noContent)
+    --button-padding 0 10px
 
   &_withIcon
-    justify-content space-between
+    --button-content-justify space-between
 
   &_withIcon:not(&_type_link)
-    padding 0 14px
+    --button-padding 0 14px
+
+  &_withIcon:not(&_type_link):not(:disabled)
+    // border 1px solid var(--grape_100)
 
   &_withIcon&_size_small
-    padding 0 10px
+    --button-padding 0 10px
 
   &_waiting
     pointer-events none
     background-repeat repeat
     background-position 40px
     background-size 37px 100%
-    animation button-waiting 1s linear infinite
-    background-image repeating-linear-gradient(
+    --button-background-image repeating-linear-gradient(
       -63.43deg,
       rgba(#fff, 0.2) 1px,
       #efefef 2px,
@@ -178,10 +247,11 @@
       rgba(#fff, 0.2) 7px,
       rgba(#fff, 0.2) 12px
     )
-    background-color #fff
+    --button-background-color var(--sand_0)
+    animation button-waiting 1s linear infinite
 
   &_waiting&_look_primary
-    background-image repeating-linear-gradient(
+    --button-background-image repeating-linear-gradient(
       -63.43deg,
       rgba(#fff, 0.2) 1px,
       transparent 2px,
@@ -189,30 +259,36 @@
       rgba(#fff, 0.2) 7px,
       rgba(#fff, 0.2) 12px
     )
-    background-color $accent_color
+    --button-background-color var(--primary_link)
+
 
   &_size_small &__icon
     width 12px
 
     &:not(:only-child)
-      margin-right 8px
+      --button-margin-right 8px
+
+  &_noContent
+    --button-min-width var(--button-height)
+    --button-padding 0
+    border none
 
 .button-group
   display flex
 
   &:not(&_collapsed)
     .button + .button
-      margin-left 16px
+      --button-margin-left 16px
 
   &_collapsed
     .button:first-child
-      border-radius 5px 0 0 5px
+      --button-radius 5px 0 0 5px
 
     .button:last-child
-      border-radius 0 5px 5px 0
+      --button-radius 0 5px 5px 0
 
     .button:not(:first-child):not(:last-child)
-      border-radius 0
+      --button-radius 0
 
 @keyframes button-waiting
   0%

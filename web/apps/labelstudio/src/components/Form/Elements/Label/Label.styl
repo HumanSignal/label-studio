@@ -2,25 +2,24 @@
   margin-bottom 0
 
   &__text
-    padding 0 16px
     height 22px
     display flex
-    margin-bottom 4px
+    margin-bottom 0
     font-size 14px
-    line-height 22px
-    justify-content space-between
+    line-height 120%
 
   &__description
-    margin-top 5px
-    font-size 14px
-    line-height 22px
-    color $black_40
+    font-size .875rem
+    color var(--sand_600)
+    font-weight 400
+    line-height 140%
 
     a
-      color #096DD9
+      color var(--grape_500)
+      text-decoration underline
 
       &:hover
-        text-decoration underline
+        text-decoration none
 
   &__field
     line-height 0
@@ -31,9 +30,7 @@
 
   &_size_large &__text
     font-weight 500
-    font-size 16px
-    line-height 22px
-    margin-bottom 8px
+    font-size .875rem
 
   &_flat &__text
     padding 0
@@ -43,37 +40,60 @@
 
   &[data-required] &__text::after
     content "Required"
-    color $black_20
+    font-size .825rem
+    color var(--sand_500)
+    margin-left .325rem
 
   &_large &__text
-    font-size 16px
+    font-size 1.25rem
     font-weight 500
-    margin-bottom 8px
+
+  &_placement_right,
+  &_placement_left
+      display grid
+      gap 8px
+      row-gap 0
 
   &_placement_right
-    display inline-flex
-    flex-direction row-reverse
+    grid-template-areas "field label" "field description"
+    grid-template-columns auto 1fr
 
   &_placement_left
-    display inline-flex
+    grid-template-areas "label field" "description field"
+    grid-template-columns 1fr auto
+
+  &_placement_left:not(&_withDescription)
+    grid-template-areas "label field"
+
+  &_placement_right:not(&_withDescription)
+    grid-template-areas "field label"
 
   &_empty &__text,
   &_placement_right &__text
   &_placement_left &__text
+    grid-area label
     margin-bottom 0
-    font-size 16px
     line-height 22px
     height auto
     align-items center
+    font-weight 500
 
   &_placement_right:not(&_withDescription) &__field
   &_placement_left:not(&_withDescription) &__field
+    grid-area field
     display flex
     align-items center
 
-  &_placement_right&_withDescription &__field
-  &_placement_left&_withDescription &__field
-    margin-top 5px
+  &_placement_right &__description,
+  &_placement_left &__description
+    grid-area description
 
-    input[type=radio]
-      margin-top 0
+  &_placement_right&_withDescription &__field
+    input[type="radio"]
+      margin 4px 0 0 0
+
+label
+  font-weight 500
+  font-size .875rem
+  margin-bottom: 4px;
+  display: block;

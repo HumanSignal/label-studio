@@ -297,9 +297,23 @@ def get_prepare_params(request, project):
 
         selected = data.get('selectedItems', {'all': True, 'excluded': []})
         if not isinstance(selected, dict):
-            raise DataManagerException(
-                'selectedItems must be dict: {"all": [true|false], ' '"excluded | included": [...task_ids...]}'
-            )
+            if isinstance(selected, str):
+                # try to parse JSON string
+                try:
+                    selected = json.loads(selected)
+                except Exception as e:
+                    logger.error(f'Error parsing selectedItems: {e}')
+                    raise DataManagerException(
+                        'selectedItems must be JSON encoded string for dict: {"all": [true|false], '
+                        '"excluded | included": [...task_ids...]}. '
+                        f'Found: {selected}'
+                    )
+            else:
+                raise DataManagerException(
+                    'selectedItems must be dict: {"all": [true|false], '
+                    '"excluded | included": [...task_ids...]}. '
+                    f'Found type: {type(selected)} with value: {selected}'
+                )
         filters = data.get('filters', None)
         ordering = data.get('ordering', [])
         prepare_params = PrepareParams(
@@ -315,15 +329,20 @@ def get_prepared_queryset(request, project):
 
 
 def evaluate_predictions(tasks):
-    """Call ML backend for prediction evaluation of the task queryset"""
+    """
+    Call the given ML backend to retrieve predictions with the task queryset as an input.
+    If backend is not specified, we'll assume the tasks' project only has one associated
+    ML backend, and use that backend.
+    """
     if not tasks:
         return
 
     project = tasks[0].project
 
-    for ml_backend in project.ml_backends.all():
-        # tasks = tasks.filter(~Q(predictions__model_version=ml_backend.model_version))
-        ml_backend.predict_tasks(tasks)
+    backend = project.ml_backend
+
+    if backend:
+        return backend.predict_tasks(tasks=tasks)
 
 
 def filters_ordering_selected_items_exist(data):

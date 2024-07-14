@@ -1,16 +1,15 @@
 .radio-group
   --radius 8px
-  --height 32px
+
   --padding 4px
   --font-size 16px
   --button-padding 0 10px
   --button-checked-shadow 0px 1px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.02), 0px 5px 10px rgba(0, 0, 0, 0.15)
 
-  height var(--height)
   border-radius var(--radius)
   padding var(--padding)
-  background linear-gradient(0deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)), #FFFFFF
-  box-shadow inset 0px 1px 0px rgba(0, 0, 0, 0.05), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.05)
+  background var(--sand_100)
+  border 1px solid var(--sand_300)
   box-sizing border-box
 
   &__buttons
@@ -18,6 +17,42 @@
     display grid
     grid-auto-columns 1fr
     grid-auto-flow column
+
+    ~/_simple &
+      all unset
+      display inline-block
+      margin-bottom 16px
+      margin-top 8px
+
+    ~/_horizontal &
+      display grid
+      grid-auto-columns min-content
+      column-gap 16px
+      align-items center
+      grid-auto-flow column
+      margin 0
+  
+  & .label__text
+    font-weight: 500;
+    &:before{
+      content: '';
+      background: var(--sand_0);
+      border-radius: 100%;
+      border: 1px solid var(--sand_300);
+      display: inline-block;
+      width: 1.4em;
+      height: 1.4em;
+      position: relative;
+      top: -10px;
+      margin-right: .25rem; 
+      vertical-align: top;
+      cursor: pointer;
+      text-align: center;
+      transition: all 200ms ease;
+    }
+  
+  & input[type=radio]
+    display: none;
 
   &__button
     display flex
@@ -35,12 +70,30 @@
 
     &_checked
       opacity 1
-      background-color #fff
+      background-color var(--sand_0)
       box-shadow: var(--button-checked-shadow)
+      & .label__text
+        &:before{
+          background-color: var(--sand_0);
+          box-shadow: inset 0 0 0 4px var(--grape_500);
+        }
 
     &_disabled
-      opacity 0.3
       cursor not-allowed
+      & .label__text
+        font-weight: 500;
+        &:before{
+          background var(--sand_200)
+        }
+
+    ~/_simple &
+      all unset
+      display block
+      margin-bottom .5rem !important
+
+    ~/_horizontal &
+      margin 0
+
 
   &__input
     top 0
@@ -68,15 +121,7 @@
       --button-checked-shadow 0px 1px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.02), 0px 2px 4px rgba(0, 0, 0, 0.15)
 
   &_simple
-    all unset
-    display block
+    --height auto
 
-  &_simple &__buttons
     all unset
     display block
-    margin-bottom 16px
-
-  &_simple &__button
-    all unset
-    display block
-    margin-bottom 16px

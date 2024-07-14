@@ -1,16 +1,19 @@
 ---
 title: Frontend reference
-short: Frontend reference
+short: Frontend
 type: guide
 tier: all
-order: 430
-order_enterprise: 530
+order: 416 
+order_enterprise: 416
 meta_title: Frontend Library Reference
 meta_description: Reference documentation for implementing the Label Studio frontend into your own machine learning or data science application workflows.
-section: "Integration and Development"
+section: "Integrate & Extend"
 ---
 
 Label Studio frontend (LSF) includes several UI options and callbacks that you can use when implementing the frontend with a custom labeling backend, or when customizing the Label Studio interface.
+
+!!! attention
+    As of [Label Studio 1.11.0](https://github.com/HumanSignal/label-studio/releases/tag/1.11.0), the Label Studio frontend has been deprecated as a separate library and is no longer supported as a standalone distribution. For information about using the frontend library within Label Studio, see [the README](https://github.com/HumanSignal/label-studio/blob/develop/web/libs/editor/README.md). 
 
 ## Updates to LSF in version 1.0.0
 
@@ -282,6 +285,18 @@ Draft is sent to the server.
 
 This events group contains events related to the annotation.
 
+### `beforeSaveAnnotation`
+Annotation is going to be saved as the result of the `submit` or `update` action. 
+Returning `false` from this event will prevent saving the annotation.
+
+| Argument         | Type     | Description                                                                                  |
+|------------------|----------|----------------------------------------------------------------------------------------------|
+| `labelStudio`    | `Object` | Instance of Label Studio                                                                     |
+| `annotation`     | `Object` | Current annotation                                                                           |
+| `payload`        | `Object` | Additional information                                                                       |
+| `payload.event`  | `string` | Indicates which event is about to be executed (`submitAnnotation`, `updateAnnotation`, etc.) |
+
+
 ### `submitAnnotation`
 
 Annotation is submitted.
@@ -304,10 +319,13 @@ Annotation is updated.
 
 Annotation is selected.
 
-| Argument      | Type     | Description              |
-| ------------- | -------- | ------------------------ |
-| `labelStudio` | `Object` | Instance of Label Studio |
-| `annotation`  | `Object` | Current annotation       |
+| Argument              | Type      | Description                                   |
+|-----------------------|-----------|-----------------------------------------------|
+| `annotation`          | `Object`  | Current annotation                            |
+| `previousAnnotation`  | `Object`  | Previous annotation                           |
+| `payload`             | `Object?` | Additional information                        |
+| `payload.fromViewAll` | `boolean` | `true` if ViewAll has just been switched off  |
+
 
 ### `deleteAnnotation`
 
@@ -329,6 +347,15 @@ Annotation is set as Ground Truth (the star button clicked).
 | `params`         | `Object`  |                                  |
 | `params.isDirty` | `Boolean` | `true` if annotation was changed |
 | `params.entity`  | `Object`  | Current annotation               |
+
+### `selectHistory`
+Step in the annotation history is selected.
+
+| Argument      | Type     | Description                 |
+|---------------|----------|-----------------------------|
+| `labelStudio` | `Object` | Instance of Label Studio    |
+| `annotation`  | `Object` | Current annotation          |
+| `historyItem` | `Object` | Current history item        |
 
 #### Region events
 

@@ -1,0 +1,90 @@
+name: "yarn e2e"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
+env:
+  NODE: "18"
+  FRONTEND_MONOREPO_DIR: "web"
+
+jobs:
+  main:
+    name: "yarn e2e"
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name 'robot-ci-heartex'
+          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      - name: Install e2e dependencies
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/tests/e2e
+        run: yarn install
+
+      - name: Run LSO server
+        id: run-lso-server
+        run: |
+          container_id=$(docker run --rm -d -p 8080:8080 heartexlabs/label-studio:develop)
+          echo "container_id=${container_id}" >> $GITHUB_OUTPUT
+
+      - name: Run LSF server
+        id: run-lsf-server
+        timeout-minutes: 1
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        env:
+          NODE_ENV: production
+          BUILD_NO_MINIMIZATION: true
+        run: |
+          set -xeuo pipefail
+
+          yarn lsf:serve &
+          pid=$!
+          echo "pid=${pid}" >> $GITHUB_OUTPUT
+
+          while ! curl -s -o /dev/null -L "http://localhost:3000"; do
+            echo "=> Waiting for service to become available"
+            sleep 2s
+          done
+
+      - name: Run tests
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        env:
+          HEADLESS: true
+        run: |
+          yarn test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e output
+          path: "web/libs/editor/tests/e2e/output"
+
+      - name: Kill LSO server
+        if: always()
+        continue-on-error: true
+        run: docker rm -f "${{ steps.run-lso-server.outputs.container_id }}"
+
+      - name: Kill LSF server
+        if: always()
+        continue-on-error: true
+        run: kill -9 "${{ steps.run-lsf-server.outputs.pid }}"

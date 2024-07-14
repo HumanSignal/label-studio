@@ -1,11 +1,11 @@
 const { I } = inject();
 
 module.exports = {
-  _rootSelector: '.htx-timeseries',
-  _channelSelector: '.htx-timeseries-channel .overlay',
-  _overviewSelector: '.htx-timeseries-overview .overlay',
-  _westHandleSelector: '.htx-timeseries-overview .handle--w',
-  _eastHandleSelector: '.htx-timeseries-overview .handle--e',
+  _rootSelector: ".htx-timeseries",
+  _channelSelector: ".htx-timeseries-channel .overlay",
+  _overviewSelector: ".htx-timeseries-overview .overlay",
+  _westHandleSelector: ".htx-timeseries-overview .handle--w",
+  _eastHandleSelector: ".htx-timeseries-overview .handle--e",
   _stickSelector: '[text-anchor="start"]',
 
   get _channelStageSelector() {
@@ -16,8 +16,8 @@ module.exports = {
   },
   _stageBBox: { x: 0, y: 0, width: 0, height: 0 },
 
-  WEST: 'west',
-  EAST: 'east',
+  WEST: "west",
+  EAST: "east",
 
   async lookForStage() {
     I.scrollPageToTop();
@@ -39,7 +39,7 @@ module.exports = {
    */
   grabStickTime() {
     // xPath cannot find `text` tag so we exchange it with `*`
-    return I.grabTextFrom(locate(this._channelStickSelector).find('*').at(2));
+    return I.grabTextFrom(locate(this._channelStickSelector).find("*").at(2));
   },
 
   /**
@@ -117,9 +117,9 @@ module.exports = {
     const channelBBox = await I.grabElementBoundingRect(this._channelSelector);
 
     I.moveMouse(channelBBox.x + channelBBox.width * x, channelBBox.y + channelBBox.height * y);
-    I.pressKeyDown('Control');
+    I.pressKeyDown("Control");
     I.mouseWheel({ deltaY });
-    I.pressKeyUp('Control');
+    I.pressKeyUp("Control");
   },
 
   /**
@@ -150,7 +150,7 @@ module.exports = {
    * @param x
    * @param shiftX
    */
-  drawByDrag(x,shiftX) {
+  drawByDrag(x, shiftX) {
     I.scrollPageToTop();
     I.moveMouse(this._stageBBox.x + x, this._stageBBox.y + this._stageBBox.height / 2);
     I.pressMouseDown();

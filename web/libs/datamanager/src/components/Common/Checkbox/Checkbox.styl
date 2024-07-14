@@ -61,7 +61,6 @@ $check-icon = "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vi
     bottom 4px
     right 4px
     border-radius 2px
-    background-color #009afe
 
   &__check
     &_checked::before
@@ -76,7 +75,7 @@ $check-icon = "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vi
     align-items center
 
   &:hover &__check
-    background-color #efefef
+    background-color var(--grape_100)
 
   &__input:checked + &__check::before
     opacity 1

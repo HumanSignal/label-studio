@@ -1,24 +1,22 @@
 ---
-title: Quickstart
-short: Quickstart
+title: Quick start
+short: Quick start
 tier: opensource
 type: guide
-order: 7
+order: 50
 order_enterprise: 0
-meta_title: Quickstart guide for Label Studio
-meta_description: Quickstart guide for installing Label Studio and creating a new project. 
-section: "Get started"
+meta_title: Quick start guide for Label Studio
+meta_description: Quick start guide for installing Label Studio and creating a new project. 
+section: "Install & Setup"
 date: 2023-11-27 13:34:32
 ---
 
 1. Install Label Studio:
-
 ```bash
 pip install label-studio
 ```
 
 2. Start Label Studio
-
 ```bash
 label-studio start
 ```

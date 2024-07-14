@@ -15,10 +15,10 @@ jobs:
     outputs:
       error-msg: ${{ steps.check-membership.outputs.error }}
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Add Workflow link to command comment
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
@@ -75,7 +75,7 @@ jobs:
           
           case "${{ needs.build-docker.result }}" in
             success)
-              echo "comment=Docker image was pushed with the tag `${{ needs.build-docker.outputs.build_version }}`" >> $GITHUB_OUTPUT
+              echo "comment=Docker image was pushed with the tag \`${{ needs.build-docker.outputs.build_version }}\`" >> $GITHUB_OUTPUT
               echo "reaction=+1" >> $GITHUB_OUTPUT
               ;;
             skipped)
@@ -93,7 +93,7 @@ jobs:
           esac
 
       - name: Add reaction to command comment
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
@@ -108,7 +108,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - name: Update comment
-        uses: peter-evans/create-or-update-comment@v3
+        uses: peter-evans/create-or-update-comment@v4
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}

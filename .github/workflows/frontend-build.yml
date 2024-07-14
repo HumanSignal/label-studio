@@ -4,20 +4,48 @@ on:
   workflow_call:
     inputs:
       ref:
-        required: true
         type: string
+        required: true
+      build_static:
+        type: boolean
+        required: false
+        default: true
+      generate_version_files:
+        type: boolean
+        required: false
+        default: true
+      generate_doc_tags_files:
+        type: boolean
+        required: false
+        default: true
   workflow_dispatch:
     inputs:
       ref:
         description: "Ref"
-        required: true
         type: string
+        required: true
+      build_static:
+        description: "Build Frontend static"
+        type: boolean
+        required: false
+        default: true
+      generate_version_files:
+        description: "Generate version files"
+        type: boolean
+        required: false
+        default: true
+      generate_doc_tags_files:
+        description: "Generate docs tags files"
+        type: boolean
+        required: false
+        default: true
+
 
 env:
-  NODE: 18
-  CACHE_NAME_PREFIX: v1
-  FRONTEND_MONOREPO_DIR: web
+  NODE: "18"
+  FRONTEND_MONOREPO_DIR: "web"
   FRONTEND_BUILD_COMMIT_MESSAGE: "ci: Build frontend"
+  DOCS_TARGET_DIR: "docs/source/tags"
 
 jobs:
   build:
@@ -25,7 +53,7 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Configure git
         shell: bash
@@ -40,35 +68,36 @@ jobs:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.ref }}
 
-      - uses: actions/setup-node@v4
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
         with:
           node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
 
-      - name: Upgrade Yarn
-        run: npm install -g yarn@1.22
+      - name: "Build"
+        if: inputs.build_static
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn build
 
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - name: "Generate version files"
+        if: inputs.generate_version_files
+        continue-on-error: true
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn version:libs
 
-      - name: Configure yarn cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-${{ hashFiles('**/yarn.lock') }}
+      - name: "Generate docs tags files"
+        if: inputs.generate_doc_tags_files
+        continue-on-error: true
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn docs
 
-      - name: Print Yarn cache size
-        run: du -d 0 -h ${{ steps.yarn-cache-dir-path.outputs.dir }}
-
-      - name: "Monorepo: Build"
-        run: |
-          yarn install --frozen-lockfile
-          yarn build
-        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
-
-      - name: Commit and Push
+      - name: "Commit and Push"
+        env:
+          COMMIT_MESSAGE: "${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}"
+          WORKFLOW_LINK: "Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
           git add "${{ env.FRONTEND_MONOREPO_DIR }}" || true
+          git add "${{ env.DOCS_TARGET_DIR }}" || true
           git status -s
-          git commit -m '${{ env.FRONTEND_BUILD_COMMIT_MESSAGE }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}' || true
+          git commit -m "${COMMIT_MESSAGE}" -m "${WORKFLOW_LINK}" || true
           git push origin HEAD

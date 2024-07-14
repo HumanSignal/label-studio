@@ -4,16 +4,19 @@
 # Except:
 !deploy/docker-entrypoint.d/**
 !deploy/docker-entrypoint.sh
-!deploy/requirements-mw.txt
-!deploy/requirements-test.txt
-!deploy/requirements.txt
 !deploy/heroku_run.sh
 !deploy/uwsgi.ini
 !deploy/default.conf
 !label_studio/**
 label_studio/frontend
-!web/**
-!setup.py
+
+# FRONTEND
+!web
+!.git
+# Re-ignore node_modules and nx cache
+**/node_modules
+**/.nx
+
 !README.md
 !licenses/**
 !LICENSE

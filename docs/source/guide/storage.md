@@ -1,13 +1,13 @@
 ---
 title: Sync data from external storage
-short: Cloud storage setup 
+short: Add project storage 
 type: guide
 tier: all
-order: 265
-order_enterprise: 165
+order: 151
+order_enterprise: 151
 meta_title: Cloud and External Storage Integration
 meta_description: "Label Studio Documentation for integrating Amazon AWS S3, Google Cloud Storage, Microsoft Azure, Redis, and local file directories with Label Studio."
-section: "Import and Export"
+section: "Import & Export"
 
 ---
 
@@ -18,9 +18,17 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Google Cloud Storage](#Google-Cloud-Storage)
 - [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
 - [Redis database](#Redis-database)
-- [Local storage](#Local-storage) <div class="enterprise-only">(for On-premise only)</div>
+- [Local storage](#Local-storage) <div class="enterprise-only">(for On-prem only)</div>
 
-If something goes wrong, check the [troubleshooting section](#Troubleshoot-CORS-and-access-problems). 
+## Troubleshooting
+
+When working with an external cloud storage connection, keep the following in mind:
+
+* Label Studio doesn’t import the data stored in the bucket, but instead creates *references* to the objects. Therefore, you must have full access control on the data to be synced and shown on the labeling screen.
+* Sync operations with external buckets only goes one way. It either creates tasks from objects on the bucket (Source storage) or pushes annotations to the output bucket (Target storage). Changing something on the bucket side doesn’t guarantee consistency in results.
+* We recommend using a separate bucket folder for each Label Studio project.
+
+For more troubleshooting information, see [Troubleshooting Import, Export, & Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center. 
 
 ## How external storage connections and sync work
 
@@ -28,7 +36,7 @@ You can add source storage connections to sync data from an external source to a
 
 ### Source storage
 
-Label Studio does not automatically sync data from source storage. If you upload new data to a connected cloud storage bucket, sync the storage connection using the UI to add the new labeling tasks to Label Studio without restarting. You can also use the API to set up or sync storage connections. See [Label Studio API](/api) and locate the relevant storage connection type. 
+Label Studio does not automatically sync data from source storage. If you upload new data to a connected cloud storage bucket, sync the storage connection using the UI to add the new labeling tasks to Label Studio without restarting. You can also use the API to set up or sync storage connections. See [Label Studio API](https://api.labelstud.io/api-reference/introduction/getting-started) and locate the relevant storage connection type. 
 
 Task data synced from cloud storage is not stored in Label Studio. Instead, the data is accessed using a URL. You can also secure access to cloud storage using cloud storage credentials. For details, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
@@ -242,7 +250,7 @@ After you [configure access to your S3 bucket](#Configure-access-to-your-S3-buck
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. Click **Add Storage**.
 
-After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_s3_sync_create).
+After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](https://api.labelstud.io/api-reference/api-reference/import-storage/s-3/sync).
 
 ### Set up target storage connection in the Label Studio UI
 After you [configure access to your S3 bucket](#Configure-access-to-your-S3-bucket), do the following to set up Amazon S3 as a target storage connection:
@@ -262,7 +270,7 @@ After you [configure access to your S3 bucket](#Configure-access-to-your-S3-buck
     - <div class="enterprise-only">(Optional) Enable **Can delete objects from storage** if you want to delete annotations stored in the S3 bucket when they are deleted in Label Studio. The storage credentials associated with the bucket must include the ability to delete bucket objects. Leave disabled to not take any action on annotations if they are deleted in Label Studio. </div>
 8. Click **Add Storage**.
 
-After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync export storage](/api#operation/api_storages_export_s3_sync_create).
+After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync export storage](https://api.labelstud.io/api-reference/api-reference/export-storage/s-3/sync).
 
 <div class="enterprise-only">
 
@@ -370,7 +378,7 @@ In the Label Studio UI, do the following to set up the connection:
     - Adjust the counter for how many minutes the pre-signed URLs are valid.
 8. Click **Add Storage**.
 
-After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](https://app.heartex.com/docs/api#operation/api_storages_s3s_sync_create).
+After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](https://api.labelstud.io/api-reference/api-reference/import-storage/s-3/sync).
 
 #### Create a target storage connection to S3 in the Label Studio UI
 In the Label Studio UI, do the following to set up a target storage connection to save annotations in an S3 bucket with IAM role access set up:
@@ -389,7 +397,7 @@ In the Label Studio UI, do the following to set up a target storage connection t
     - (Optional) Enable **Can delete objects from storage** if you want to delete annotations stored in the S3 bucket when they are deleted in Label Studio. The storage credentials associated with the bucket must include the ability to delete bucket objects. Leave disabled to not take any action on annotations if they are deleted in Label Studio.
 8. Click **Add Storage**.
 
-After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync export storage](https://app.heartex.com/docs/api#operation/api_storages_export_s3s_sync_create).
+After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync export storage](https://api.labelstud.io/api-reference/introduction/getting-started).
 
 </div>
 
@@ -500,6 +508,29 @@ Currently, this configuration is only supported if you host the Redis database i
 
 Label Studio does not manage the Redis database for you. See the [Redis Quick Start](https://redis.io/topics/quickstart) for details about hosting and managing your own Redis database. Because Redis is an in-memory database, data saved in Redis does not persist. To make sure you don't lose data, set up [Redis persistence](https://redis.io/topics/persistence) or use another method to persist the data, such as using Redis in the cloud with [Microsoft Azure](https://azure.microsoft.com/en-us/services/cache/) or [Amazon AWS](https://aws.amazon.com/redis/).
 
+### Task format for Source Redis Storage
+
+Label Studio only supports string values for Redis databases, which should represent Label Studio tasks in JSON format. 
+
+For example:
+
+```
+'ls-task-1': '{"image": "http://example.com/1.jpg"}'
+'ls-task-2': '{"image": "http://example.com/2.jpg"}'
+...
+```
+
+```
+> redis-cli -n 1
+127.0.0.1:6379[1]> SET ls-task-1 '{"image": "http://example.com/1.jpg"}'
+OK
+127.0.0.1:6379[1]> GET ls-task-1
+"{\"image\": \"http://example.com/1.jpg\"}"
+127.0.0.1:6379[1]> TYPE ls-task-1
+string
+```
+
+
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
 
@@ -556,7 +587,12 @@ In the Label Studio UI, do the following to set up the connection:
 4. In the dialog box that appears, select **Local Files** as the storage type.
 5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
 6. Specify an **Absolute local path** to the directory with your files. The local path must be an absolute path and include the `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` value. 
-   For example, if `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then your local path must be `/home/user/dataset1`. For more about that environment variable, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).    
+
+    For example, if `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then your local path must be `/home/user/dataset1`. For more about that environment variable, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).  
+
+!!! note
+    If you are using Windows, ensure that you use backslashes when entering your **Absolute local path**.  
+
 7. (Optional) In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
 8. (Optional) Toggle **Treat every bucket object as a source file**. 
    - Enable this option if you want to create Label Studio tasks from media files automatically, such as JPG, MP3, or similar file types. Use this option for labeling configurations with one source tag.
@@ -626,4 +662,4 @@ If you're using Label Studio in Docker, you need to mount the local directory th
 
 ### Troubleshooting cloud storage
 
-See [Troubleshoot import and export issues](import_troubleshoot#Troubleshoot-cloud-storage).
+See [Troubleshooting Import, Export, and Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center. 

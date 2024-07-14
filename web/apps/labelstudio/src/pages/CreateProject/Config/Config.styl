@@ -37,7 +37,7 @@ styled_scroll()
   // 20px from header's breadcrumbs
   padding: 16px (16px - $scroll_width) 16px 20px;
   overflow-y: scroll;
-  background-color #fff
+  background-color var(--sand_0)
 
   &::-webkit-scrollbar
     width: $scroll_width
@@ -59,7 +59,7 @@ styled_scroll()
       padding-left: 8px
       font-weight: 500
       border: none
-      color: #1890FF
+      color: var(--grape_500)
       background: none
       width: 100%
       text-align: left
@@ -114,7 +114,7 @@ styled_scroll()
     box-sizing: content-box
     &_active
     &:hover
-      box-shadow: 0px 0px 0 2px #1890ff
+      box-shadow: 0px 0px 0 2px var(--primary_link)
     &:hover
       opacity: 0.9
 
@@ -132,11 +132,13 @@ styled_scroll()
   footer
   .modal__footer
     grid-column: 1 / span 2
-    padding: 16px 40px
+    padding: 16px 32px
     font-size: 14px
-    background: rgba(0, 0, 0, 0.03)
+    background: var(--sand_100)
     box-shadow: inset 0px 1px 0px rgba(0, 0, 0, 0.05)
     text-align: center
+    & a
+      color var(--primary_link)
   &__info-icon
     margin-right: 8px
     vertical-align: -5px
@@ -158,7 +160,7 @@ styled_scroll()
   margin: 0;
 }
 .wizard h1 {
-  font-size: 1.4rem;
+  font-size: 1.75rem;
   width: 100%;
   display: flex;
 }
@@ -200,6 +202,8 @@ styled_scroll()
   // to prevent blinking on mode switching
   line-height: 21px
   margin-top: -6px
+  & a
+    color var(--primary_link)
 
 .configure__container > header .toggle-items {
   margin-left: auto;
@@ -219,7 +223,7 @@ styled_scroll()
   flex-direction: column;
 .wizard .configure__visual
   > *
-    border-top: 1px solid $black_10
+    border-top: 1px solid var(--sand_300)
     padding-top: 16px
     margin-bottom: 16px
 .wizard .configure__object
@@ -370,15 +374,15 @@ styled_scroll()
     line-height: 1.2em
     padding: 4px 8px
     border-radius: 4px
-    border: 1px solid $black_10
+    border: 1px solid var(--sand_300)
 
 .wizard .configure__preview
   flex-grow: 10
   min-width: 500px
   padding: 16px 16px 0
   overflow-y: auto
-  border-left: 1px solid $black_10
-  background-color: $grey_2
+  border-left: 1px solid var(--sand_300)
+  background-color: var(--sand_100)
   display flex
   flex-direction column
   styled_scroll()
