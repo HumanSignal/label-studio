@@ -1,20 +1,24 @@
 import pytest
 from label_studio_sdk.client import LabelStudio
 from label_studio_sdk.label_interface import LabelInterface
-from label_studio_sdk.label_interface.create import choices
-from label_studio_sdk.label_interface.objects import AnnotationValue, PredictionValue, TaskValue
 
 
 @pytest.mark.django_db
 def test_batch_predictions_single_prediction_per_task(django_live_url, business_client, ml_backend_for_test_predict):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
-    label_config = LabelInterface.create({
-        'text': ('Text', {'name': 'text', 'value': '$text'}, ()),
-        'label': ('Choices', {'name': 'label', 'toName': 'text', 'choice': 'single'}, (
-            ('Choice', {'value': 'label_A'}, ()),
-            ('Choice', {'value': 'label_B'}, ()),
-        )),
-    })
+    label_config = LabelInterface.create(
+        {
+            'text': ('Text', {'name': 'text', 'value': '$text'}, ()),
+            'label': (
+                'Choices',
+                {'name': 'label', 'toName': 'text', 'choice': 'single'},
+                (
+                    ('Choice', {'value': 'label_A'}, ()),
+                    ('Choice', {'value': 'label_B'}, ()),
+                ),
+            ),
+        }
+    )
     p = ls.projects.create(
         title='New Project',
         label_config=label_config,
@@ -90,14 +94,16 @@ def test_batch_predictions_multiple_predictions_per_task(
     django_live_url, business_client, ml_backend_for_test_predict
 ):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
-    li = LabelInterface("""
+    li = LabelInterface(
+        """
             <View>
               <Text name="text" value="$text"/>
               <Choices name="label" toName="text" choice="single">
                 <Choice value="label_A"></Choice>
                 <Choice value="label_B"></Choice>
               </Choices>
-            </View>""")
+            </View>"""
+    )
     p = ls.projects.create(
         title='New Project',
         label_config=li._config,

@@ -8,11 +8,8 @@ pytestmark = pytest.mark.django_db
 from label_studio_sdk.client import LabelStudio
 from label_studio_sdk.data_manager import Column, Filters, Operator, Type
 from label_studio_sdk.label_interface import LabelInterface
-from label_studio_sdk.label_interface.create import choices
-from label_studio_sdk.label_interface.objects import AnnotationValue, PredictionValue, TaskValue
 from label_studio_sdk.label_interface.create import labels
-from label_studio_sdk.label_interface.object_tags import TextTag
-from label_studio_sdk.label_interface.control_tags import ChoicesTag, ChoicesValue
+from label_studio_sdk.label_interface.objects import AnnotationValue, TaskValue
 
 
 def test_annotations_CRUD(django_live_url, business_client):
@@ -29,8 +26,7 @@ def test_annotations_CRUD(django_live_url, business_client):
     task_id = task.id
     tag_name = 'sentiment_class'
     annotation_data = AnnotationValue(
-        result=[li.get_control(tag_name).label(['Positive'])],
-        completed_by=business_client.user.id
+        result=[li.get_control(tag_name).label(['Positive'])], completed_by=business_client.user.id
     ).model_dump()
     new_annotation = ls.annotations.create(task_id, result=annotation_data['result'])
     assert (annotation_id := new_annotation.id)
@@ -65,10 +61,12 @@ def test_annotations_CRUD(django_live_url, business_client):
 def test_annotation_marks_task_as_labeled(django_live_url, business_client):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
 
-    label_config = LabelInterface.create({
-        'image1': 'Image',
-        'bbox': labels(['Car', 'Truck', 'Van'], tag_type='RectangleLabels'),
-    })
+    label_config = LabelInterface.create(
+        {
+            'image1': 'Image',
+            'bbox': labels(['Car', 'Truck', 'Van'], tag_type='RectangleLabels'),
+        }
+    )
 
     p = ls.projects.create(
         title='New Project',
@@ -76,8 +74,8 @@ def test_annotation_marks_task_as_labeled(django_live_url, business_client):
     )
 
     task_data = [
-        TaskValue(data={'image1': "https://example.com/image.jpg"}),
-        TaskValue(data={'image1': "https://example.com/image2.jpg"}),
+        TaskValue(data={'image1': 'https://example.com/image.jpg'}),
+        TaskValue(data={'image1': 'https://example.com/image2.jpg'}),
     ]
     ls.projects.import_tasks(id=p.id, request=[task.model_dump() for task in task_data])
 
@@ -105,7 +103,7 @@ def test_annotation_marks_task_as_labeled(django_live_url, business_client):
     li = project.get_label_interface()
     annotation_data = AnnotationValue(
         result=[li.get_control('bbox').label(['Car'], x=10, y=20, width=100, height=100)],
-        completed_by=business_client.user.id
+        completed_by=business_client.user.id,
     ).model_dump()
 
     annotation = ls.annotations.create(id=task_id, result=annotation_data['result'])
@@ -120,4 +118,11 @@ def test_annotation_marks_task_as_labeled(django_live_url, business_client):
     assert labeled_tasks[0].annotations[0]['result'][0]['from_name'] == 'bbox'
     assert labeled_tasks[0].annotations[0]['result'][0]['to_name'] == 'image1'
     assert labeled_tasks[0].annotations[0]['result'][0]['type'] == 'rectanglelabels'
-    assert labeled_tasks[0].annotations[0]['result'][0]['value'] == {'rectanglelabels': ['Car'], 'x': 10, 'y': 20, 'width': 100, 'height': 100, 'rotation': 0}
+    assert labeled_tasks[0].annotations[0]['result'][0]['value'] == {
+        'rectanglelabels': ['Car'],
+        'x': 10,
+        'y': 20,
+        'width': 100,
+        'height': 100,
+        'rotation': 0,
+    }

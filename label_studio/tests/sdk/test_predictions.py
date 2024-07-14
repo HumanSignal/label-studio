@@ -5,7 +5,7 @@ from label_studio.tests.sdk.common import LABEL_CONFIG_AND_TASKS
 pytestmark = pytest.mark.django_db
 from label_studio_sdk.client import LabelStudio
 from label_studio_sdk.label_interface import LabelInterface
-from label_studio_sdk.label_interface.objects import AnnotationValue, PredictionValue, TaskValue
+from label_studio_sdk.label_interface.objects import PredictionValue, TaskValue
 
 
 def test_predictions_CRUD(django_live_url, business_client):
@@ -34,15 +34,15 @@ def test_predictions_CRUD(django_live_url, business_client):
 
     # create another prediction
     pv = PredictionValue(
-        result=[li.get_control('sentiment_class').label(['Neutral']), li.get_control('sentiment_class').label(['Negative'])],
+        result=[
+            li.get_control('sentiment_class').label(['Neutral']),
+            li.get_control('sentiment_class').label(['Negative']),
+        ],
         score=0.8,
         model_version='1.0.1',
     )
 
-    another_prediction = ls.predictions.create(
-        task=task.id,
-        **pv.model_dump()
-    )
+    another_prediction = ls.predictions.create(task=task.id, **pv.model_dump())
 
     # check that there are two predictions
     predictions = ls.predictions.list(task=task.id)
@@ -87,7 +87,7 @@ def test_create_predictions_with_import(django_live_url, business_client):
                 score=0.95,
                 model_version='3.4.5',
             )
-        ]
+        ],
     )
     task2 = TaskValue(
         data={'my_text': 'Goodbye Label Studio'},
@@ -97,15 +97,12 @@ def test_create_predictions_with_import(django_live_url, business_client):
                 score=0.85,
                 model_version='3.4.5',
             )
-        ]
+        ],
     )
 
     ls.projects.import_tasks(
         id=p.id,
-        request=[
-            task1.model_dump(),
-            task2.model_dump()
-        ],
+        request=[task1.model_dump(), task2.model_dump()],
     )
 
     # check for new predictions
