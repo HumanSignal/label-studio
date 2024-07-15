@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-849: style updates and tooltip edits (#6055)",
-  "commit": "3cbd9b76db0cb5c27438d3a99b662216d7fe0995",
-  "date": "2024-07-05T21:16:50.000Z",
+  "message": "fix: OPTIC-884: Incorrect block style name for prediction card (#6089)",
+  "commit": "515fb3eb7fb5ce1835cf7adbb8be6bc60a0d735b",
+  "date": "2024-07-12T17:04:03.000Z",
   "branch": "develop"
 }

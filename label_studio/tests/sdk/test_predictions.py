@@ -4,20 +4,26 @@ from label_studio.tests.sdk.common import LABEL_CONFIG_AND_TASKS
 
 pytestmark = pytest.mark.django_db
 from label_studio_sdk.client import LabelStudio
+from label_studio_sdk.label_interface import LabelInterface
+from label_studio_sdk.label_interface.objects import PredictionValue, TaskValue
 
 
 def test_predictions_CRUD(django_live_url, business_client):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
-    p = ls.projects.create(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
+    li = LabelInterface(LABEL_CONFIG_AND_TASKS['label_config'])
+    p = ls.projects.create(title='New Project', label_config=li.config)
 
     task = ls.tasks.create(project=p.id, data={'my_text': 'Test task'})
 
     # create a prediction
-    prediction = ls.predictions.create(
-        task=task.id,
-        result=[{'from_name': 'label', 'to_name': 'my_text', 'type': 'choices', 'value': {'choices': ['Positive']}}],
+    pv = PredictionValue(
+        result=[li.get_control('sentiment_class').label(['Positive'])],
         score=0.9,
         model_version='1.0.0',
+    )
+    prediction = ls.predictions.create(
+        task=task.id,
+        **pv.model_dump(),
     )
 
     # get a prediction
@@ -27,15 +33,16 @@ def test_predictions_CRUD(django_live_url, business_client):
     assert prediction.model_version == '1.0.0'
 
     # create another prediction
-    another_prediction = ls.predictions.create(
-        task=task.id,
+    pv = PredictionValue(
         result=[
-            {'from_name': 'label', 'to_name': 'my_text', 'type': 'choices', 'value': {'choices': ['Neutral']}},
-            {'from_name': 'label', 'to_name': 'my_text', 'type': 'choices', 'value': {'choices': ['Negative']}},
+            li.get_control('sentiment_class').label(['Neutral']),
+            li.get_control('sentiment_class').label(['Negative']),
         ],
         score=0.8,
         model_version='1.0.1',
     )
+
+    another_prediction = ls.predictions.create(task=task.id, **pv.model_dump())
 
     # check that there are two predictions
     predictions = ls.predictions.list(task=task.id)
@@ -50,7 +57,8 @@ def test_predictions_CRUD(django_live_url, business_client):
 
 def test_create_predictions_with_import(django_live_url, business_client):
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
-    p = ls.projects.create(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
+    li = LabelInterface(LABEL_CONFIG_AND_TASKS['label_config'])
+    p = ls.projects.create(title='New Project', label_config=li.config)
 
     # import tasks with predictions
     ls.projects.import_tasks(
@@ -71,44 +79,30 @@ def test_create_predictions_with_import(django_live_url, business_client):
     assert len(task_ids) == 3
 
     # import more tasks in extended format
+    task1 = TaskValue(
+        data={'my_text': 'Hello world'},
+        predictions=[
+            PredictionValue(
+                result=[li.get_control('sentiment_class').label(['Positive'])],
+                score=0.95,
+                model_version='3.4.5',
+            )
+        ],
+    )
+    task2 = TaskValue(
+        data={'my_text': 'Goodbye Label Studio'},
+        predictions=[
+            PredictionValue(
+                result=[li.get_control('sentiment_class').label(['Negative'])],
+                score=0.85,
+                model_version='3.4.5',
+            )
+        ],
+    )
+
     ls.projects.import_tasks(
         id=p.id,
-        request=[
-            {
-                'data': {'my_text': 'Hello world'},
-                'predictions': [
-                    {
-                        'result': [
-                            {
-                                'from_name': 'label',
-                                'to_name': 'my_text',
-                                'type': 'choices',
-                                'value': {'choices': ['Positive']},
-                            }
-                        ],
-                        'score': 0.95,
-                        'model_version': '3.4.5',
-                    }
-                ],
-            },
-            {
-                'data': {'my_text': 'Goodbye Label Studio'},
-                'predictions': [
-                    {
-                        'result': [
-                            {
-                                'from_name': 'label',
-                                'to_name': 'my_text',
-                                'type': 'choices',
-                                'value': {'choices': ['Negative']},
-                            }
-                        ],
-                        'score': 0.85,
-                        'model_version': '3.4.5',
-                    }
-                ],
-            },
-        ],
+        request=[task1.model_dump(), task2.model_dump()],
     )
 
     # check for new predictions
