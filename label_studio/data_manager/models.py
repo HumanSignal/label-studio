@@ -24,6 +24,7 @@ class ViewBaseModel(models.Model):
 
     class Meta:
         ordering = ['order']
+        indexes = [models.Index(fields=['project', 'order'])]
         abstract = True
 
 
