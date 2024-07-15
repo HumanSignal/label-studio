@@ -1,6 +1,6 @@
 {
-  "message": "test: LEAP-1141: Add test for concurrent saving annotation and draft (#6022)",
-  "commit": "9dc93d0c5bb0f4a36ada5a2cdf500cca20decc4f",
-  "date": "2024-07-01T13:39:36.000Z",
+  "message": "fix: OPTIC-884: Incorrect block style name for prediction card (#6089)",
+  "commit": "515fb3eb7fb5ce1835cf7adbb8be6bc60a0d735b",
+  "date": "2024-07-12T17:04:03.000Z",
   "branch": "develop"
 }
