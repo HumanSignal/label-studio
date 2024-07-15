@@ -74,6 +74,7 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
 
   const clickHandler = useCallback(
     (e) => {
+      if (e.target.tagName === "A") return;
       e.preventDefault();
       e.stopPropagation();
       if (disabled) return;
