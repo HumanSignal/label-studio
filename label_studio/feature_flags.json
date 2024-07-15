@@ -592,7 +592,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "ff_dev_2007_dev_2008_dynamic_tag_children_250322_short": {
@@ -3603,7 +3603,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 3,
+      "version": 4,
       "deleted": false
     },
     "fflag_fix_back_leap_612_explore_review_09042024_short": {
@@ -4779,33 +4779,6 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 3,
-      "deleted": false
-    },
-    "fflag_front_feat_dia_1134_prompter_sneak_preview_promo_page_short": {
-      "key": "fflag_front_feat_dia_1134_prompter_sneak_preview_promo_page_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "7da74f9989784eac8760e2485f816a95",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
       "deleted": false
     },
     "fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation": {

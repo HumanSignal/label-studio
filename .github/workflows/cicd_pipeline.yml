@@ -357,10 +357,24 @@ jobs:
         run: |
           pip3 install -r .github/helpers/gh_changelog_generator/requirements.txt
 
+      - name: Get previous GitHub ref
+        id: previous-tag
+        env:
+          RELEASE_BRANCH: "${{ github.ref_name }}"
+        run: |
+          set -eux
+
+          version="${RELEASE_BRANCH/#ls-release\//}"
+
+          previous_tag=$(git tag --sort=-committerdate | head -n1)
+
+          echo "previous_tag_name=tags/${previous_tag}" >> $GITHUB_OUTPUT          
+
       - name: Generate release changelog
         id: changelog_md
         env:
           RELEASE_VERSION: "${{ steps.create-draft-release.outputs.tag_name }}"
+          PREVIOUS_REF: "${{ steps.previous-tag.outputs.previous_tag_name }}"
           CURRENT_REF: "${{ github.event.after }}"
           GH_REPO: "${{ github.repository }}"
           GH_TOKEN: "${{ secrets.GIT_PAT }}"
@@ -375,11 +389,6 @@ jobs:
           OUTPUT_FILE_JSON: "${{ github.workspace }}/output.json"
           WORKFLOW_RUN_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |
-          set -eux
-
-          previous_tag=$(git tag --sort=-committerdate | head -n1)
-
-          export PREVIOUS_REF="tags/${previous_tag}"
           python3 .github/helpers/gh_changelog_generator/gh_changelog_generator.py
 
           echo "changelog_msg_b64=$(cat '${{ env.OUTPUT_FILE_MD }}' | base64 -w 0)" >> $GITHUB_OUTPUT
@@ -417,6 +426,19 @@ jobs:
             core.setOutput("id", release.id);
             core.setOutput("tag_name", release.tag_name);
             core.setOutput("html_url", release.html_url);
+
+      - name: Set Jira fix version
+        uses: ./.github/actions-hub/actions/jira-set-fix-version
+        continue-on-error: true
+        with:
+          github_token: "${{ secrets.GIT_PAT }}"
+          github_repository: "${{ github.repository }}"
+          github_previous_ref: "${{ steps.previous-tag.outputs.previous_tag_name }}"
+          github_current_ref: "${{ github.event.after }}"
+          jira_server: "${{ vars.JIRA_SERVER }}"
+          jira_username: "${{ secrets.JIRA_USERNAME }}"
+          jira_token: "${{ secrets.JIRA_TOKEN }}"
+          jira_fix_version: "LSO/${{ steps.create-draft-release.outputs.tag_name }}"
 
   build-pypi:
     name: "Build"

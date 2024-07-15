@@ -50,6 +50,23 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
+      - name: Check user's membership
+        uses: actions/github-script@v7
+        id: actor-membership
+        env:
+          ACTOR: ${{ github.actor }}
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const actor = process.env.ACTOR;
+            const { data: membership } = await github.rest.orgs.getMembershipForUser({
+              org: owner,
+              username: actor,
+            });
+            core.setOutput("state", membership.state);
+            core.setOutput("active", membership.state == "active");
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -97,7 +114,7 @@ jobs:
           context: .
           file: ${{ inputs.dockerfile_path }}
           platforms: linux/amd64,linux/arm64
-          push: true
+          push: ${{ steps.actor-membership.outputs.active }}
           tags: ${{ steps.calculate-docker-tags.outputs.docker-tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
