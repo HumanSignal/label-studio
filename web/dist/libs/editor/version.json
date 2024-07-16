@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-884: Incorrect block style name for prediction card (#6089) (#6090)",
-  "commit": "914a74b688392cde9f30ac840e43b50091858adf",
-  "date": "2024-07-12T17:14:54.000Z",
+  "message": "fix: OPTIC-885: Links not clickable from within Radio Button (#6097) (#6102)",
+  "commit": "d8a37cbf7e9896364e2d32faa2cf51f715f83371",
+  "date": "2024-07-16T13:15:17.000Z",
   "branch": "ls-release/1.13.0"
 }
