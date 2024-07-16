@@ -74,6 +74,9 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
 
   const clickHandler = useCallback(
     (e) => {
+      // TODO: Find a better way to prevent the click event from being triggered by the child element
+      // that works beyond just the anchor tag. Otherwise there will be problems with other components/elements.
+      if (e.target.tagName === "A") return;
       e.preventDefault();
       e.stopPropagation();
       if (disabled) return;
