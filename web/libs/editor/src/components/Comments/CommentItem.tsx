@@ -29,6 +29,7 @@ interface Comment {
     setConfirmMode: (confirmMode: boolean) => void;
     setEditMode: (isGoingIntoEditMode: boolean) => void;
     toggleResolve: () => void;
+    canResolveAny: boolean;
   };
   listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
 }
@@ -50,10 +51,12 @@ export const CommentItem: FC<any> = observer(
       setConfirmMode,
       setEditMode,
       toggleResolve,
+      canResolveAny,
     },
     listComments,
   }: Comment) => {
     const currentUser = window.APP_SETTINGS?.user;
+    const isCreator = currentUser?.id === createdBy.id;
     const [currentComment, setCurrentComment] = useState(initialComment);
 
     if (isDeleted) return null;
@@ -133,12 +136,12 @@ export const CommentItem: FC<any> = observer(
               e.preventDefault();
             }}
           >
-            {isPersisted && (
+            {isPersisted && (isCreator || canResolveAny) && (
               <Dropdown.Trigger
                 content={
                   <Menu size="auto">
                     <Menu.Item onClick={toggleResolve}>{resolved ? "Unresolve" : "Resolve"}</Menu.Item>
-                    {currentUser?.id === createdBy.id && (
+                    {isCreator && (
                       <>
                         <Menu.Item
                           onClick={() => {

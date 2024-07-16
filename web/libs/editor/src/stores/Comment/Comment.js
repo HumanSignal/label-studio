@@ -1,4 +1,4 @@
-import { flow, getEnv, types } from "mobx-state-tree";
+import { flow, getEnv, getRoot, types } from "mobx-state-tree";
 import Utils from "../../utils";
 import { camelizeKeys } from "../../utils/utilities";
 import { UserExtended } from "../UserStore";
@@ -25,6 +25,10 @@ export const Comment = types
     },
     get isPersisted() {
       return self.id > 0;
+    },
+    get canResolveAny() {
+      const p = getRoot(self);
+      return p.interfaces.includes("comments:resolve-any");
     },
   }))
   .actions((self) => {
