@@ -65,6 +65,7 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
 
     waveform.current?.load();
 
+    // @todo it doesn't update it often enough
     const updateBeforeRegionDraw = (regions: Regions) => {
       const regionColor = item.getRegionColor();
       const regionLabels = item.activeState?.selectedValues();

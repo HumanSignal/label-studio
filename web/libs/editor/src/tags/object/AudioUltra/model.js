@@ -162,7 +162,8 @@ export const AudioModel = types.compose(
       get activeLabel() {
         const state = self.activeState;
 
-        return state?.selectedValues()?.[0];
+        // in order to track changes to all labels and to keep the value a primitive we serialize to string
+        return JSON.stringify(state?.selectedValues());
       },
     }))
     ////// Sync actions
@@ -277,7 +278,14 @@ export const AudioModel = types.compose(
               const labels = activeState?.selectedValues();
 
               selectedRegions.forEach((r) => {
-                r.update({ color: selectedColor, labels: labels ?? [] });
+                let regionLabels = [...(labels ?? [])];
+                if (regionLabels.length) {
+                  const region = self.findRegionByWsRegion(r);
+                  if (region) {
+                    regionLabels[0] = `${region.region_index}:${regionLabels[0]}`;
+                  }
+                }
+                r.update({ color: selectedColor, labels: regionLabels });
 
                 const region = r.isRegion ? self.updateRegion(r) : self.addRegion(r);
 
@@ -432,9 +440,17 @@ export const AudioModel = types.compose(
           }
 
           const control = self.activeState;
-          const labels = { [control.valueType]: control.selectedValues() };
-          const r = self.annotation.createResult(wsRegion, labels, control, self);
-          const updatedRegion = wsRegion.convertToRegion(labels.labels);
+          const labels = control.selectedValues();
+          const r = self.annotation.createResult(wsRegion, { [control.valueType]: labels }, control, self);
+          const indexedLabels = labels.length && r.region_index
+            ? [`${r.region_index}:${labels[0]}`, ...labels.slice(1)]
+            : labels
+          // let regionLabels = [...(labels ?? [])];
+          // if (regionLabels.length > 1) {
+          //   const region = self.findRegionByWsRegion(r);
+          //   regionLabels[0] = `${region.region_index}:${regionLabels[0]}`;
+          // }
+          const updatedRegion = wsRegion.convertToRegion(indexedLabels);
 
           r._ws_region = updatedRegion;
           r.updateColor();
@@ -455,7 +471,9 @@ export const AudioModel = types.compose(
 
           const options = region.wsRegionOptions();
 
-          options.labels = region.labels?.length ? region.labels : undefined;
+          options.labels = region.labels?.length && region.region_index
+            ? [`${region.region_index}:${region.labels[0]}`, ...region.labels.slice(1)]
+            : region.labels;
 
           const r = self._ws.addRegion(options, false);
 
@@ -467,7 +485,9 @@ export const AudioModel = types.compose(
 
           const options = region.wsRegionOptions();
 
-          options.labels = region.labels?.length ? region.labels : undefined;
+          options.labels = region.labels?.length && region.region_index
+            ? [`${region.region_index}:${region.labels[0]}`, ...region.labels.slice(1)]
+            : region.labels;
 
           self._ws.updateRegion(options, false);
         },

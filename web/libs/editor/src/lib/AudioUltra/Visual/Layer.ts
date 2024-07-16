@@ -202,7 +202,7 @@ export class Layer extends Events<LayerEvents> {
 
   fitText(text: string, x: number, y: number, maxWidth: number) {
     if (!this.context) return;
-    const finalWidth = maxWidth / this.pixelRatio;
+    const finalWidth = maxWidth;
     const ellipsisWidth = this.measureText("...").width;
     let textWidth = this.measureText(text).width;
     let finalText = text;
