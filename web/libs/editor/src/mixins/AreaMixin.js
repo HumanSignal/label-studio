@@ -163,9 +163,11 @@ export const AreaMixinBase = types
   }))
   .actions((self) => ({
     setCurrentIndex(index) {
-      self.region_index = index;
-      // update text regions
-      self.updateAppearenceFromState?.();
+      if (self.region_index !== index) {
+        self.region_index = index;
+        // update text regions
+        self.updateAppearenceFromState?.();
+      }
     },
     beforeDestroy() {
       self.results.forEach((r) => destroy(r));
