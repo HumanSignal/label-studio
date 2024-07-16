@@ -4,6 +4,7 @@ import { createBrowserHistory } from "history";
 import React from "react";
 import { render } from "react-dom";
 import { Router } from "react-router-dom";
+import { LEAVE_BLOCKER_KEY, leaveBlockerCallback } from "../components/LeaveBlocker/LeaveBlocker";
 import { initSentry } from "../config/Sentry";
 import { ApiProvider } from "../providers/ApiProvider";
 import { AppStoreProvider } from "../providers/AppStoreProvider";
@@ -25,10 +26,17 @@ const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
 const browserHistory = createBrowserHistory({
   basename: baseURL.pathname || "/",
   getUserConfirmation: (message, callback) => {
+    browserHistory.isBlocking = true;
+    const callbackWrapper = (...args) => {
+      browserHistory.isBlocking = false;
+      callback(...args);
+    };
     if (isFF(FF_OPTIC_2) && message === DRAFT_GUARD_KEY) {
-      draftGuardCallback.current = callback;
+      draftGuardCallback.current = callbackWrapper;
+    } else if (message === LEAVE_BLOCKER_KEY) {
+      leaveBlockerCallback.current = callbackWrapper;
     } else {
-      callback(window.confirm(message));
+      callbackWrapper(window.confirm(message));
     }
   },
 });
