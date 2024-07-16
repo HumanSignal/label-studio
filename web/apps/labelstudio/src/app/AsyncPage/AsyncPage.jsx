@@ -234,6 +234,8 @@ export const AsyncPage = ({ children }) => {
   }, []);
 
   const onPopState = useCallback(() => {
+    // Prevent false positive triggers in case of blocking page transitions
+    if (history.isBlocking) return;
     const newLocation = locationWithoutHash();
     const isSameLocation = newLocation === currentLocation;
 
