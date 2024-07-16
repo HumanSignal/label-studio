@@ -87,10 +87,12 @@ type UnsavedChangesProps = {
  * @param onSave - function that should be called to save changes
  */
 export const UnsavedChanges = ({ hasChanges, onSave }: UnsavedChangesProps) => {
+  const daveHandlerRef = useRef(onSave);
+  daveHandlerRef.current = onSave;
   const blockHandler = useCallback(
     async ({ continueCallback, cancelCallback }: LeaveBlockerCallbacks) => {
       const wrappedOnSave = async () => {
-        const result = await onSave();
+        const result = await daveHandlerRef.current?.();
         if (result === true) {
           continueCallback && setTimeout(continueCallback, 0);
         } else {
