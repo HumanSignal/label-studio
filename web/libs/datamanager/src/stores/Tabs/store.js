@@ -348,9 +348,7 @@ export const TabStore = types
         }),
       };
 
-      const tabData = yield getRoot(self).apiCall("orderTab", {}, idList);
-
-      console.log(tabData);
+      getRoot(self).apiCall("orderTab", {}, { body: idList } );
     }),
     duplicateView: flow(function* (view) {
       const sn = getSnapshot(view);

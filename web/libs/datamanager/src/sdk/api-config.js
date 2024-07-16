@@ -33,8 +33,8 @@ export const APIConfig = {
     },
 
     orderTab: {
-      path: "/views/order",
-      method: "put",
+      path: "/views/order/",
+      method: "post",
     },
 
     /** Delete particular tab (DELETE) */
