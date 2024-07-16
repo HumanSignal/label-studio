@@ -169,13 +169,13 @@ class ViewAPI(viewsets.ModelViewSet):
         return Response(status=204)
 
     @swagger_auto_schema(
-        method='put',
+        method='post',
         tags=['Data Manager'],
         operation_summary='Update order of views',
         operation_description='Update the order field of views based on the provided list of view IDs',
         request_body=ViewOrderSerializer,
     )
-    @action(detail=False, methods=['put'], url_path='order')
+    @action(detail=False, methods=['post'], url_path='order')
     def update_order(self, request):
         serializer = ViewOrderSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

@@ -227,7 +227,7 @@ def test_update_views_order(business_client, project_id):
 
     # Update the order of views
     new_order = {'project': project_id, 'ids': [view_ids[2], view_ids[0], view_ids[1]]}
-    response = business_client.put(
+    response = business_client.post(
         '/api/dm/views/order/',
         data=json.dumps(new_order),
         content_type='application/json',
