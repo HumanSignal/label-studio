@@ -333,14 +333,25 @@ export const TabStore = types
       return view;
     }),
 
-    updateViewOrder: (source, destination) => {
+    updateViewOrder: flow(function* (source, destination) {
       // Detach the view from the original position
       const [removed] = self.views.splice(source, 1);
       const sn = getSnapshot(removed);
 
       // Insert the view at the new position
       self.views.splice(destination, 0, sn);
-    },
+
+      const idList = {
+        project: getRoot(self).project.id,
+        ids: self.views.map((obj) => {
+          return obj.id;
+        }),
+      };
+
+      const tabData = yield getRoot(self).apiCall("orderTab", {}, idList);
+
+      console.log(tabData);
+    }),
     duplicateView: flow(function* (view) {
       const sn = getSnapshot(view);
 
