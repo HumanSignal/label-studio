@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-884: Incorrect block style name for prediction card (#6089)",
-  "commit": "515fb3eb7fb5ce1835cf7adbb8be6bc60a0d735b",
-  "date": "2024-07-12T17:04:03.000Z",
+  "message": "fix: LEAP-1240: Prevent resizing of already loaded images due to original dimensions in results (#6101)",
+  "commit": "d1b4486b66a6374f8a34b78a40f91270f281b606",
+  "date": "2024-07-17T13:10:41.000Z",
   "branch": "develop"
 }
