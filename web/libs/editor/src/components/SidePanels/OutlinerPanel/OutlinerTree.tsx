@@ -243,7 +243,7 @@ const useDataTree = ({ regions, rootClass, footer }: any) => {
     // to render in other places as well, so indices will be consistent across the app.
     // Also `item` here can be a tool or a label when we use groupping, so only add idx to regions.
     // In this component we render (idx + 1), so we store it outside as (idx + 1) as well.
-    item.setCurrentIndex?.(idx + 1);
+    item.setRegionIndex?.(idx + 1);
 
     return {
       idx,

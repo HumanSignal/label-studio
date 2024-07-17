@@ -162,7 +162,7 @@ export const AreaMixinBase = types
     region_index: null,
   }))
   .actions((self) => ({
-    setCurrentIndex(index) {
+    setRegionIndex(index) {
       if (self.region_index !== index) {
         self.region_index = index;
         // update text regions
