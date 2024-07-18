@@ -22,6 +22,7 @@ import { FF_OPTIC_2, FF_UNSAVED_CHANGES, isFF } from "../utils/feature-flags";
 import { ToastProvider, ToastViewport } from "../components/Toast/Toast";
 
 const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
+export const UNBLOCK_HISTORY_MESSAGE = "UNBLOCK_HISTORY";
 
 const browserHistory = createBrowserHistory({
   basename: baseURL.pathname || "/",
@@ -30,9 +31,10 @@ const browserHistory = createBrowserHistory({
     // we need to have some flag that can be checked for preventing related actions
     // `isBlocking` flag is used for this purpose
     browserHistory.isBlocking = true;
-    const callbackWrapper = (...args) => {
+    const callbackWrapper = (result) => {
       browserHistory.isBlocking = false;
-      callback(...args);
+      callback(result);
+      window.postMessage({ source: "label-studio", payload: UNBLOCK_HISTORY_MESSAGE });
     };
     if (isFF(FF_OPTIC_2) && message === DRAFT_GUARD_KEY) {
       draftGuardCallback.current = callbackWrapper;

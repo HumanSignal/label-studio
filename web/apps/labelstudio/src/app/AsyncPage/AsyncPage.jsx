@@ -5,6 +5,7 @@ import { modal } from "../../components/Modal/Modal";
 import { ConfigContext } from "../../providers/ConfigProvider";
 import { absoluteURL, removePrefix } from "../../utils/helpers";
 import { clearScriptsCache, isScriptValid, reInsertScripts, replaceScript } from "../../utils/scripts";
+import { UNBLOCK_HISTORY_MESSAGE } from "../App";
 
 const pageCache = new Map();
 
@@ -245,14 +246,24 @@ export const AsyncPage = ({ children }) => {
     }
   }, []);
 
+  // Fallback in case of blocked transitions
+  const onMessage = useCallback((event) => {
+    if (event.origin !== window.origin) return;
+    if (event.data?.source !== "label-studio") return;
+    if (event.data?.payload !== UNBLOCK_HISTORY_MESSAGE) return;
+    onPopState();
+  }, []);
+
   // useEffect(onPopState, [location]);
 
   useEffect(() => {
     document.addEventListener("click", onLinkClick, { capture: true });
     window.addEventListener("popstate", onPopState);
+    window.addEventListener("message", onMessage);
     return () => {
       document.removeEventListener("click", onLinkClick, { capture: true });
       window.removeEventListener("popstate", onPopState);
+      window.removeEventListener("message", onMessage);
     };
   }, []);
 
