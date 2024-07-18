@@ -80,4 +80,4 @@ class ModelProviderConnection(models.Model):
                 ],
             )
         else:
-            raise Exception(f'{self.provider} is not a supported provider')
+            raise NotImplementedError(f'Verification of API key for provider {self.provider} is not implemented')
