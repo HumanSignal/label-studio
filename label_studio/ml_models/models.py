@@ -5,7 +5,7 @@ import logging
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from ml_model_providers.models import ModelProviderConnection
+from ml_model_providers.models import ModelProviderConnection, ModelProviders
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation, Prediction
@@ -76,8 +76,8 @@ class ModelVersion(models.Model):
 class ThirdPartyModelVersion(ModelVersion):
     provider = models.CharField(
         max_length=255,
-        choices=ModelProviderConnection.ModelProviders.choices,
-        default=ModelProviderConnection.ModelProviders.OPENAI,
+        choices=ModelProviders.choices,
+        default=ModelProviders.OPENAI,
         help_text='The model provider to use e.g. OpenAI',
     )
 
