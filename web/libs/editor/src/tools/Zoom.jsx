@@ -82,6 +82,9 @@ const _Tool = types
     },
   }))
   .actions((self) => ({
+    /**
+     * Indicates that zoom tool can't interact with regions at all
+     */
     shouldSkipInteractions() {
       return true;
     },
