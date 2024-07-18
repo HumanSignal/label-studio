@@ -30,9 +30,9 @@ export const unsavedChangesModal = ({
   const saveAndLeave = async () => {
     modalInstance?.update({ footer: getFooter(true) });
     await onSave?.();
-    modalInstance?.update({ footer: getFooter(false) });
     modalInstance?.close();
   };
+  // It must be a function to be able to rerender the modal correctly
   const getFooter = (waiting: boolean) => {
     return (
       <Space align="end">
@@ -73,6 +73,7 @@ export const unsavedChangesModal = ({
     allowClose: true,
     footer: getFooter(false),
     style: { width: 512 },
+    unique: "UNSAVED_CHANGES_MODAL",
   });
 };
 
@@ -87,28 +88,26 @@ type UnsavedChangesProps = {
  * @param onSave - function that should be called to save changes
  */
 export const UnsavedChanges = ({ hasChanges, onSave }: UnsavedChangesProps) => {
-  const daveHandlerRef = useRef(onSave);
-  daveHandlerRef.current = onSave;
-  const blockHandler = useCallback(
-    async ({ continueCallback, cancelCallback }: LeaveBlockerCallbacks) => {
-      const wrappedOnSave = async () => {
-        const result = await daveHandlerRef.current?.();
-        if (result === true) {
-          continueCallback && setTimeout(continueCallback, 0);
-        } else {
-          // We consider that user tries to save changes, but as long as there are some errors,
-          // we just close the modal to allow user to see and fix them
-          cancelCallback?.();
-        }
-      };
+  const saveHandlerRef = useRef(onSave);
+  saveHandlerRef.current = onSave;
+  const blockHandler = useCallback(async ({ continueCallback, cancelCallback }: LeaveBlockerCallbacks) => {
+    const wrappedOnSave = async () => {
+      const result = await saveHandlerRef.current?.();
+      if (result === true) {
+        continueCallback && setTimeout(continueCallback, 0);
+      } else {
+        // We consider that user tries to save changes, but as long as there are some errors,
+        // we just close the modal to allow user to see and fix them
+        cancelCallback?.();
+      }
+    };
 
-      unsavedChangesModal({
-        onSave: wrappedOnSave,
-        onCancel: cancelCallback,
-        onDiscard: continueCallback,
-      });
-    },
-    [onSave],
-  );
+    unsavedChangesModal({
+      onSave: wrappedOnSave,
+      onCancel: cancelCallback,
+      onDiscard: continueCallback,
+    });
+  }, []);
+
   return <LeaveBlocker active={hasChanges} onBlock={blockHandler} />;
 };

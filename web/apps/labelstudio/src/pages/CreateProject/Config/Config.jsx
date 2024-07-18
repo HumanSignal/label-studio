@@ -11,6 +11,7 @@ import { Form } from "../../../components/Form";
 import { useAPI } from "../../../providers/ApiProvider";
 import { Block, cn, Elem } from "../../../utils/bem";
 import { Palette } from "../../../utils/colors";
+import { FF_UNSAVED_CHANGES, isFF } from "../../../utils/feature-flags";
 import { colorNames } from "./colors";
 import "./Config.styl";
 import { Preview } from "./Preview";
@@ -461,7 +462,7 @@ const Configurator = ({
   return (
     <div className={configClass}>
       <div className={configClass.elem("container")}>
-        <h1>Labeling Interface</h1>
+        <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
         <header>
           <button data-leave={true} onClick={onBrowse}>
             Browse Templates
@@ -526,7 +527,7 @@ const Configurator = ({
             <Button look="primary" size="compact" style={{ width: 120 }} onClick={onSave} waiting={waiting}>
               {waiting ? "Saving..." : "Save"}
             </Button>
-            <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />
+            {isFF(FF_UNSAVED_CHANGES) && <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />}
           </Form.Actions>
         )}
       </div>
@@ -550,6 +551,7 @@ export const ConfigPage = ({
   onValidate,
   disableSaveButton,
   show = true,
+  hasChanges,
 }) => {
   const [config, _setConfig] = React.useState("");
   const [mode, setMode] = React.useState("list"); // view | list
@@ -557,7 +559,6 @@ export const ConfigPage = ({
   const [selectedRecipe, setSelectedRecipe] = React.useState(null);
   const [template, setCurrentTemplate] = React.useState(null);
   const api = useAPI();
-  const hasChanges = config !== project.label_config;
 
   const setConfig = React.useCallback(
     (config) => {

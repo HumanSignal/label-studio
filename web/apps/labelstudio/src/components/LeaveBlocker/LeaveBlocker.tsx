@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef } from "react";
 import { useHistory } from "react-router";
 
 /**
- * Callbacks for the leave blocker
  * @param continueCallback - callback to call when the user wants to leave the page
  * @param cancelCallback - callback to call when the user wants to stay on the page
  */
@@ -94,14 +93,13 @@ export const LeaveBlocker = ({ active = true, onBeforeBlock, onBlock }: LeaveBlo
 
   useEffect(() => {
     let unsubcribe: Function | null = null;
-    const shouldSkipBlock = false;
 
     window.addEventListener("beforeunload", beforeUnloadHandler);
     window.addEventListener("click", beforeLeaveClickHandler, { capture: true });
     unsubcribe = history.block(() => {
       if (!isActive.current) return;
       const shouldBlock = onBeforeBlock ? onBeforeBlock() : true;
-      if (!shouldBlock || shouldSkipBlock) {
+      if (!shouldBlock) {
         return;
       }
 

@@ -18,7 +18,7 @@ import "./App.styl";
 import { AsyncPage } from "./AsyncPage/AsyncPage";
 import ErrorBoundary from "./ErrorBoundary";
 import { RootPage } from "./RootPage";
-import { FF_OPTIC_2, isFF } from "../utils/feature-flags";
+import { FF_OPTIC_2, FF_UNSAVED_CHANGES, isFF } from "../utils/feature-flags";
 import { ToastProvider, ToastViewport } from "../components/Toast/Toast";
 
 const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
@@ -26,6 +26,9 @@ const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
 const browserHistory = createBrowserHistory({
   basename: baseURL.pathname || "/",
   getUserConfirmation: (message, callback) => {
+    // `history.block` doesn't block events, so in the case of listeners,
+    // we need to have some flag that can be checked for preventing related actions
+    // `isBlocking` flag is used for this purpose
     browserHistory.isBlocking = true;
     const callbackWrapper = (...args) => {
       browserHistory.isBlocking = false;
@@ -33,7 +36,7 @@ const browserHistory = createBrowserHistory({
     };
     if (isFF(FF_OPTIC_2) && message === DRAFT_GUARD_KEY) {
       draftGuardCallback.current = callbackWrapper;
-    } else if (message === LEAVE_BLOCKER_KEY) {
+    } else if (isFF(FF_UNSAVED_CHANGES) && message === LEAVE_BLOCKER_KEY) {
       leaveBlockerCallback.current = callbackWrapper;
     } else {
       callbackWrapper(window.confirm(message));
