@@ -268,14 +268,6 @@ const Model = types
       return self.getToolsManager().findSelectedTool()?.useTransformer === true;
     },
 
-    // this will detect that we use drawing tool and there is no selection
-    // that means that we are ready for "drawing over other regions" mode
-    get allowedDrawingThroughRegion() {
-      const isDrawingTool = self.getToolsManager().findSelectedTool()?.isDrawingTool === true;
-      const hasSelection = self.annotation.regionStore.hasSelection;
-      return !hasSelection && isDrawingTool;
-    },
-
     get stageTranslate() {
       const { stageWidth: width, stageHeight: height } = self;
 

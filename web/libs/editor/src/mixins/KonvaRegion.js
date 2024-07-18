@@ -126,10 +126,6 @@ export const KonvaRegionMixin = types
         }
 
         const selectAction = () => {
-          const allowedDrawingThroughRegion = self.object.allowedDrawingThroughRegion;
-          // Prevent selecting interactions with an existing region
-          // If we have intention to draw a new region instead
-          if (additiveMode && allowedDrawingThroughRegion) return;
           self._selectArea(additiveMode);
           deferredSelectId = null;
         };
@@ -140,7 +136,7 @@ export const KonvaRegionMixin = types
           annotation.regionStore.unselectAll();
         } else {
           if (isFF(FF_DBLCLICK_DELAY)) {
-            selectAction();
+            self._selectArea(additiveMode);
           } else {
             // Skip double click emulation when there is nothing to focus
             if (!self.perRegionFocusTarget) {
