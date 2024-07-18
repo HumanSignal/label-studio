@@ -34,7 +34,7 @@ const browserHistory = createBrowserHistory({
     const callbackWrapper = (result) => {
       browserHistory.isBlocking = false;
       callback(result);
-      window.postMessage({ source: "label-studio", payload: UNBLOCK_HISTORY_MESSAGE });
+      isFF(FF_UNSAVED_CHANGES) && window.postMessage({ source: "label-studio", payload: UNBLOCK_HISTORY_MESSAGE });
     };
     if (isFF(FF_OPTIC_2) && message === DRAFT_GUARD_KEY) {
       draftGuardCallback.current = callbackWrapper;
