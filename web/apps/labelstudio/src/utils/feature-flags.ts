@@ -38,7 +38,7 @@ export const FF_DIA_835 = "fflag_feat_all_dia_835_prompter_workflow_long";
 /**
  * It adds an unsaved changes warning and fix some caching problems on a saving project
  */
-export const FF_UNSAVED_CHANGES = "fflag_feat_front_leap_1164_unsaved_changes_180724";
+export const FF_UNSAVED_CHANGES = "fflag_feat_front_leap_1198_unsaved_changes_180724";
 
 export function isFF(id: string) {
   return isFlagEnabled(id, FEATURE_FLAGS, window.APP_SETTINGS?.feature_flags_default_value === true);
