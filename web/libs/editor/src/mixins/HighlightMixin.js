@@ -272,7 +272,10 @@ export const HighlightMixin = types
     },
 
     getLabels() {
-      return (self.labeling?.selectedLabels ?? []).map((label) => label.value).join(",");
+      const index = self.region_index;
+      const text = (self.labeling?.selectedLabels ?? []).map((label) => label.value).join(",");
+
+      return [index, text].filter(Boolean).join(":");
     },
 
     getLabelColor() {

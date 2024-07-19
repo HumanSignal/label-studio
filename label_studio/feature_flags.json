@@ -2364,6 +2364,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_feat_front_leap_1198_unsaved_changes_180724": {
+      "key": "fflag_feat_front_leap_1198_unsaved_changes_180724",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "fd634284baf64b30aae8a7fcfb13db18",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_front_leap_187_video_seek_on_select_short": {
       "key": "fflag_feat_front_leap_187_video_seek_on_select_short",
       "on": true,

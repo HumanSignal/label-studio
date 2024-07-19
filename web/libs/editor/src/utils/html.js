@@ -26,9 +26,10 @@ function toggleLabelsAndScores(show) {
 const labelWithCSS = (() => {
   const cache = {};
 
-  return (node, { labels, score }) => {
+  return (node, { index, labels, score }) => {
     const labelsStr = labels ? labels.join(",") : "";
-    const clsName = Checkers.hashCode(labelsStr + score);
+    const labelText = [index, labelsStr].filter(Boolean).join(":");
+    const clsName = Checkers.hashCode(labelText + score);
 
     let cssCls = `htx-label-${clsName}`;
 
@@ -38,7 +39,7 @@ const labelWithCSS = (() => {
 
     node.setAttribute("data-labels", labelsStr);
 
-    const resSVG = Canvas.labelToSVG({ label: labelsStr, score });
+    const resSVG = Canvas.labelToSVG({ label: labelText, score });
     const svgURL = `url(${resSVG})`;
 
     createClass(`.${cssCls}:after`, `content:${svgURL}`);
