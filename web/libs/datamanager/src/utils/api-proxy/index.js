@@ -9,7 +9,7 @@
  * }} EndpointConfig
  */
 
-import { formDataToJPO, replaceBigIntegersFromJsonString } from "../helpers";
+import { formDataToJPO, parseJson } from "../helpers";
 import statusCodes from "./status-codes.json";
 
 /**
@@ -242,9 +242,7 @@ export class APIProxy {
           try {
             const responseData =
               rawResponse.status !== 204
-                ? JSON.parse(
-                    replaceBigIntegersFromJsonString(this.alwaysExpectJSON ? responseText : responseText || "{}"),
-                  )
+                ? parseJson(this.alwaysExpectJSON ? responseText : responseText || "{}")
                 : { ok: true };
 
             if (methodSettings.convert instanceof Function) {
