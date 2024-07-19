@@ -4,7 +4,7 @@ import { Block, Elem } from "../../../utils/bem";
 import { filename } from "../../../utils/helpers";
 import { Space } from "../Space/Space";
 import { Spinner } from "../Spinner";
-import "./MediaPlayer.styl";
+import "./MediaPlayer.scss";
 import { MediaSeeker } from "./MediaSeeker";
 import { Duration } from "./Duration";
 import { forwardRef } from "react";

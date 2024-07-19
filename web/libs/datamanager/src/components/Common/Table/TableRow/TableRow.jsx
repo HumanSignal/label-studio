@@ -6,7 +6,7 @@ import { normalizeCellAlias } from "../../../CellViews";
 import { SkeletonLoader } from "../../SkeletonLoader";
 import { TableContext, TableElem } from "../TableContext";
 import { getProperty, getStyle } from "../utils";
-import "./TableRow.styl";
+import "./TableRow.scss";
 
 const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) => {
   const { Header: _, Cell, id, ...col } = colInput;

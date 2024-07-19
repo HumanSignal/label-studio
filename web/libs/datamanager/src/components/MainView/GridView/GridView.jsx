@@ -8,7 +8,7 @@ import { Checkbox } from "../../Common/Checkbox/Checkbox";
 import { Space } from "../../Common/Space/Space";
 import { getProperty, prepareColumns } from "../../Common/Table/utils";
 import * as DataGroups from "../../DataGroups";
-import "./GridView.styl";
+import "./GridView.scss";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { SkeletonLoader } from "../../Common/SkeletonLoader";
 

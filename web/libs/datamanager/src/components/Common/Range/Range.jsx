@@ -3,7 +3,7 @@ import { Block, Elem } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import { clamp } from "../../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
-import "./Range.styl";
+import "./Range.scss";
 
 const arrayReverse = (array, reverse = false) => {
   return reverse ? [...array].reverse() : array;

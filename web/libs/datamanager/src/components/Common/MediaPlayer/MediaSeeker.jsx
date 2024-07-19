@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Block, cn, Elem } from "../../../utils/bem";
-import "./MediaSeeker.styl";
+import "./MediaSeeker.scss";
 
 export const MediaSeeker = ({ currentTime, duration, buffer, onSeekStart, onSeekEnd, onChange, video }) => {
   /** @type {import("react").RefObject<HTMLElement>} */

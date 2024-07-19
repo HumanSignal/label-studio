@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Block, Elem } from "../../../utils/bem";
 import { Tooltip } from "../Tooltip/Tooltip";
-import "./Userpic.styl";
+import "./Userpic.scss";
 
 const FALLBACK_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";

@@ -12,7 +12,7 @@ import { Tag } from "../../Tag/Tag";
 import { TableCell, TableCellContent } from "../TableCell/TableCell";
 import { TableContext, TableElem } from "../TableContext";
 import { getStyle } from "../utils";
-import "./TableHead.styl";
+import "./TableHead.scss";
 import { FF_DEV_2984, FF_DEV_3873, isFF } from "../../../../utils/feature-flags";
 import { getRoot } from "mobx-state-tree";
 
