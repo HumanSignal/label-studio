@@ -1,13 +1,13 @@
 body {
-  --black: #000
+  --black: #000;
   --accent_color: #566FCF;
-  --danger_color: #d00
+  --danger_color: #d00;
 
-  --black_2: rgba(var(--black), 0.02)
-  --black_10: rgba(var(--black), 0.1)
-  --black_15: rgba(var(--black), 0.15)
-  --black_20: rgba(var(--black), 0.20)
-  --black_40: rgba(var(--black), 0.40)
+  --black_2: rgba(var(--black), 0.02);
+  --black_10: rgba(var(--black), 0.1);
+  --black_15: rgba(var(--black), 0.15);
+  --black_20: rgba(var(--black), 0.20);
+  --black_40: rgba(var(--black), 0.40);
 }
 .root {
   height: 100%;
