@@ -4,7 +4,7 @@ describe("helpers", () => {
   const originalMaxSafeInteger = Number.MAX_SAFE_INTEGER;
 
   beforeEach(() => {
-    // Mock Number.MAX_SAFE_INTEGER to a smaller value for testing purposes
+    // Mock Number.MAX_SAFE_INTEGER to a smaller value for testing purposes as NodeJS supports larger integers than Web.
     Object.defineProperty(Number, "MAX_SAFE_INTEGER", {
       value: 9007199254740991,
     });
