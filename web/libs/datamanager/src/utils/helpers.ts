@@ -12,6 +12,19 @@ export const formDataToJPO = (formData: FormData) => {
   return formData;
 };
 
+/**
+ * Convert only big integers that are still integers within the json string
+ * to avoid JS number precision issues when displaying them in the UI.
+ * This is a workaround for the fact that JSON.parse does not support big integers and will
+ * immediately convert them to numbers (losing precision).
+ *
+ * ex. { "id": 12345678901234567890 } => { "id": "12345678901234567890" }
+ *     { "id": -12345678901234567890 } => { "id": "-12345678901234567890" }
+ **/
+export const replaceBigIntegersFromJsonString = (jsonString: string) => {
+  return jsonString.replace(/:\s*(-?\d{16,})/g, (_, p1) => `: "${p1}"`);
+};
+
 export const objectToMap = <T extends Record<string, any>>(object: T) => {
   return new Map(Object.entries(object ?? {}));
 };
