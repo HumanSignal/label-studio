@@ -14,9 +14,9 @@ export const formDataToJPO = (formData: FormData) => {
 
 /**
  * Parse a JSON string and convert big integers to strings.
- * We convert only big integers that are still integers within the json string
+ * We convert only big integers that are still integers within the JSON string
  * to avoid JS number precision issues when displaying them in the UI.
- * This is a workaround for the fact that JSON.parse does not support big integers and will
+ * This is a workaround for the fact that JSON.parse does not directly support big integers and will
  * immediately convert them to numbers (losing precision).
  *
  * ex. { "id": 12345678901234567890 } => { "id": "12345678901234567890" }
