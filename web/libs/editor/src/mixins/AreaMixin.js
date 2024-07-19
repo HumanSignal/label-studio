@@ -92,12 +92,15 @@ export const AreaMixinBase = types
       return Array.from(self.labeling?.mainValue ?? []);
     },
 
+    // used only in labels on regions for Image and Video tags
     getLabelText(joinstr) {
+      const index = self.region_index;
       const label = self.labeling;
       const text = self.texting?.mainValue?.[0]?.replace(/\n\r|\n/, " ");
       const labelNames = label?.getSelectedString(joinstr);
       const labelText = [];
 
+      if (index) labelText.push(String(index));
       if (labelNames) labelText.push(labelNames);
       if (text) labelText.push(text);
       return labelText.join(": ");
@@ -155,9 +158,17 @@ export const AreaMixinBase = types
     },
   }))
   .volatile(() => ({
-    // selected: false,
+    // index of the region in the regions tree (Outliner); will be updated on any order change
+    region_index: null,
   }))
   .actions((self) => ({
+    setRegionIndex(index) {
+      if (self.region_index !== index) {
+        self.region_index = index;
+        // update text regions
+        self.updateAppearenceFromState?.();
+      }
+    },
     beforeDestroy() {
       self.results.forEach((r) => destroy(r));
     },
