@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-849: style updates and tooltip edits (#6055)",
-  "commit": "3cbd9b76db0cb5c27438d3a99b662216d7fe0995",
-  "date": "2024-07-05T21:16:50.000Z",
+  "message": "fix: LEAP-1240: Prevent resizing of already loaded images due to original dimensions in results (#6101)",
+  "commit": "d1b4486b66a6374f8a34b78a40f91270f281b606",
+  "date": "2024-07-17T13:10:41.000Z",
   "branch": "develop"
 }
