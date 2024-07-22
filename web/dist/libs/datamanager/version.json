@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-765: TypeError: Cannot read properties of null (reading 'getBoundingClientRect') (#6109)",
-  "commit": "edc7968633820d82530de9ebec252e583f9cba83",
-  "date": "2024-07-22T14:11:17.000Z",
+  "message": "fix: OPTIC-683: Detect and convert large integers automatically in API responses before parsing as JSON to retain precision (#6111)",
+  "commit": "f323e6a87b463dae8cbcc71f93dad02d28f5357d",
+  "date": "2024-07-22T14:44:25.000Z",
   "branch": "develop"
 }
