@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { FaEllipsisV } from "react-icons/fa";
 import { BemWithSpecifiContext } from "../../../utils/bem";
 import { Button } from "../Button/Button";
@@ -7,13 +8,21 @@ import { Icon } from "../Icon/Icon";
 import Input from "../Input/Input";
 import "./Tabs.styl";
 import { TabsMenu } from "./TabsMenu";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
 const TabsContext = createContext();
 
-export const Tabs = ({ children, activeTab, onChange, onAdd, onDragEnd, tabBarExtraContent, allowedActions, addIcon }) => {
+export const Tabs = ({
+  children,
+  activeTab,
+  onChange,
+  onAdd,
+  onDragEnd,
+  tabBarExtraContent,
+  allowedActions,
+  addIcon,
+}) => {
   const [selectedTab, setSelectedTab] = useState(activeTab);
 
   const switchTab = useCallback((tab) => {
@@ -41,11 +50,7 @@ export const Tabs = ({ children, activeTab, onChange, onAdd, onDragEnd, tabBarEx
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable" direction="horizontal">
               {(provided) => (
-                <Elem
-                  ref={provided.innerRef}
-                  name={'droppable'}
-                  {...provided.droppableProps}
-                >
+                <Elem ref={provided.innerRef} name={"droppable"} {...provided.droppableProps}>
                   {children}
                   {provided.placeholder}
                 </Elem>
