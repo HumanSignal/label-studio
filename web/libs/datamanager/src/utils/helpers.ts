@@ -15,7 +15,7 @@ export const formDataToJPO = (formData: FormData) => {
 /**
  * Hydrate JSON values that are large integers to strings.
  */
-export const jsonReviverWithBigInt = (_key: any, value: any, context: any) => {
+export const jsonReviverWithBigInt = (_key: any, value: any, context?: any) => {
   if (typeof value === "number" && context?.source !== undefined && Math.abs(value) > Number.MAX_SAFE_INTEGER) {
     // If the number would overflow the JS number precision, retain it to a string
     // from the original source string.
