@@ -105,20 +105,25 @@ const Model = types
       return self.isLoaded && self._isReady;
     },
 
+    // we are displaying label for either data-label OR data-index
     get styles() {
       return `
       .htx-highlight {
         cursor: pointer;
         border: 1px dashed transparent;
       }
+      .htx-highlight[data-index]::after,
       .htx-highlight[data-label]::after {
         padding: 2px 2px;
         font-size: 9.5px;
         font-weight: bold;
         font-family: Monaco;
         vertical-align: super;
-        content: attr(data-label);
+        content: attr(data-index) ":" attr(data-label);
         line-height: 0;
+      }
+      .htx-highlight[data-index]:not([data-label])::after {
+        content: attr(data-index);
       }
       .htx-highlight.${STATE_CLASS_MODS.highlighted} {
         position: relative;
