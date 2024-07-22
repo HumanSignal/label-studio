@@ -12,6 +12,34 @@ export const formDataToJPO = (formData: FormData) => {
   return formData;
 };
 
+/**
+ * Hydrate JSON values that are large integers to strings.
+ */
+export const jsonReviverWithBigInt = (_key: any, value: any, context?: any) => {
+  if (typeof value === "number" && context?.source !== undefined && Math.abs(value) > Number.MAX_SAFE_INTEGER) {
+    // If the number would overflow the JS number precision, retain it to a string
+    // from the original source string.
+    // Leaving as a string and not a BigInt to avoid issues with JSON.stringify or other cases downstream.
+    return context.source;
+  }
+  return value;
+};
+/**
+ * Parse a JSON string and convert big integers to strings.
+ * We convert only big integers that are still integers within the JSON string
+ * to avoid JS number precision issues when displaying them in the UI.
+ * This is a workaround for the fact that JSON.parse does not directly support big integers and will
+ * immediately convert them to numbers (losing precision).
+ *
+ * ex. { "id": 12345678901234567890 } => { "id": "12345678901234567890" }
+ *     { "id": -12345678901234567890 } => { "id": "-12345678901234567890" }
+ *     { "meta": { "id": 12345678901234567890 } } => { "meta": { "id": "12345678901234567890" } }
+ *     { "meta": { "id": -12345678901234567890 } } => { "meta": { "id": "-12345678901234567890" } }
+ **/
+export const parseJson = <T = any>(jsonString: string): T => {
+  return JSON.parse(jsonString, jsonReviverWithBigInt) as T;
+};
+
 export const objectToMap = <T extends Record<string, any>>(object: T) => {
   return new Map(Object.entries(object ?? {}));
 };
