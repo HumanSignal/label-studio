@@ -287,8 +287,8 @@ Scenario("Displaying label in the region", async ({ I, LabelStudio, AtOutliner, 
   LabelStudio.waitForObjectsReady();
   AtOutliner.seeRegions(2);
 
-  await checkLabelVisibility(locate(".htx-highlight").at(1), '"Region"', true);
-  await checkLabelVisibility(locate(".htx-highlight").at(2), "none", true);
+  await checkLabelVisibility(locate(".htx-highlight").at(1), '"1:Region"', true);
+  await checkLabelVisibility(locate(".htx-highlight").at(2), '"2"', true);
 
   I.say("Hide labels in settings");
   AtSettings.open();
@@ -297,6 +297,6 @@ Scenario("Displaying label in the region", async ({ I, LabelStudio, AtOutliner, 
   });
   AtSettings.close();
   I.say("Make sure that label is hidden");
-  await checkLabelVisibility(locate(".htx-highlight").at(1), '"Region"', false);
-  await checkLabelVisibility(locate(".htx-highlight").at(2), "none", false);
+  await checkLabelVisibility(locate(".htx-highlight").at(1), '"1:Region"', false);
+  await checkLabelVisibility(locate(".htx-highlight").at(2), '"2"', false);
 });

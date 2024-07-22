@@ -238,6 +238,14 @@ const useDataTree = ({ regions, rootClass, footer }: any) => {
       }
     })();
 
+    // The only source of truth for region indices is here, where they are coming from different
+    // RegionStore methods and just rendered a second later; so we store them in a region
+    // to render in other places as well, so indices will be consistent across the app.
+    // Also `item` here can be a tool or a label when we use groupping, so only add idx to regions.
+    // It can even be undefined for group titles in Labels mode.
+    // Later in this file we render (idx + 1), so we will set it as (idx + 1) to incapsulate this logic.
+    item?.setRegionIndex?.(idx + 1);
+
     return {
       idx,
       key: id,
