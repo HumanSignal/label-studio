@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1151: Show region indices on regions (#6103)",
-  "commit": "40a62f6904734edfd4f08cff8eef9c9224a2b8b6",
-  "date": "2024-07-19T15:13:37.000Z",
+  "message": "fix: OPTIC-765: TypeError: Cannot read properties of null (reading 'getBoundingClientRect') (#6109)",
+  "commit": "edc7968633820d82530de9ebec252e583f9cba83",
+  "date": "2024-07-22T14:11:17.000Z",
   "branch": "develop"
 }
