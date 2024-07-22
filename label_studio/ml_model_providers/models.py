@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 class ModelProviders(models.TextChoices):
     OPENAI = 'OpenAI', _('OpenAI')
-    AZURE = 'Azure', _('Azure')
+    AZURE_OPENAI = 'AzureOpenAI', _('AzureOpenAI')
 
 
 class ModelProviderConnectionScopes(models.TextChoices):
@@ -63,7 +63,7 @@ class ModelProviderConnection(models.Model):
         if self.provider == ModelProviders.OPENAI:
             client = openai.OpenAI(api_key=self.api_key)
             client.models.list()
-        elif self.provider == ModelProviders.AZURE:
+        elif self.provider == ModelProviders.AZURE_OPENAI:
             client = openai.AzureOpenAI(
                 azure_endpoint=self.endpoint,
                 azure_deployment=self.deployment_name,
