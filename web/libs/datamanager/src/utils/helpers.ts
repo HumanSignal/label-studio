@@ -37,7 +37,6 @@ export const jsonReviverWithBigInt = (_key: any, value: any, context?: any) => {
  *     { "meta": { "id": -12345678901234567890 } } => { "meta": { "id": "-12345678901234567890" } }
  **/
 export const parseJson = <T = any>(jsonString: string): T => {
-  // @ts-ignore The types were complaining about the signature which I believe is due to the NodeJS types of JSON.parse getting in the way
   return JSON.parse(jsonString, jsonReviverWithBigInt) as T;
 };
 
