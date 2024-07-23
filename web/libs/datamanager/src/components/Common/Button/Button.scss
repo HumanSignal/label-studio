@@ -154,13 +154,13 @@
       box-shadow: inset 0px -1px 0px var(--black_10);
 
       &:disabled {
-        --button-color: rgba(#fff, 0.8);
+        --button-color: rgba(var(--white-raw), 0.8);
         background-color: #BBBBBB;
       }
 
       &:hover {
         color: var(--button-color);
-        background: linear-gradient(0deg, rgba(#fff, 0.1), rgba(#fff, 0.1)), var(--accent_color);
+        background: linear-gradient(0deg, rgba(var(--white-raw), 0.1), rgba(var(--white-raw), 0.1)), var(--accent_color);
         box-shadow: 0px 2px 4px rgba(var(--accent_color), 0.3), inset 0px -1px 0px var(--black_10);
       }
 
@@ -187,7 +187,7 @@
 
   &_look_destructive:disabled,
   &_look_destructive.button_waiting {
-    --button-color: rgba(#fff, 0.5);
+    --button-color: rgba(var(--white-raw), 0.5);
     background-color: var(--danger_color);
   }
 
@@ -257,18 +257,18 @@
     background-size: 37px 100%;
     animation: button-waiting 1s linear infinite;
     background-image: repeating-linear-gradient(-63.43deg,
-        rgba(#fff, 0.2) 1px, #efefef 2px, #efefef 6px,
-        rgba(#fff, 0.2) 7px,
-        rgba(#fff, 0.2) 12px);
+        rgba(var(--white-raw), 0.2) 1px, #efefef 2px, #efefef 6px,
+        rgba(var(--white-raw), 0.2) 7px,
+        rgba(var(--white-raw), 0.2) 12px);
 
     background-color: #fff;
   }
 
   &_waiting.button_look_primary {
     background-image: repeating-linear-gradient(-63.43deg,
-        rgba(#fff, 0.2) 1px, transparent 2px, transparent 6px,
-        rgba(#fff, 0.2) 7px,
-        rgba(#fff, 0.2) 12px);
+        rgba(var(--white-raw), 0.2) 1px, transparent 2px, transparent 6px,
+        rgba(var(--white-raw), 0.2) 7px,
+        rgba(var(--white-raw), 0.2) 12px);
 
     background-color: var(--accent_color);
   }

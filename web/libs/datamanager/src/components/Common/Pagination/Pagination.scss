@@ -47,9 +47,9 @@
       pointer-events: none;
       animation: button-waiting 1s linear infinite;
       background-image: repeating-linear-gradient(-63.43deg,
-          rgba(#fff, 0.2) 1px, #efefef 2px, #efefef 6px,
-          rgba(#fff, 0.2) 7px,
-          rgba(#fff, 0.2) 12px);
+          rgba(var(--white-raw), 0.2) 1px, #efefef 2px, #efefef 6px,
+          rgba(var(--white-raw), 0.2) 7px,
+          rgba(var(--white-raw), 0.2) 12px);
     }
   }
 
