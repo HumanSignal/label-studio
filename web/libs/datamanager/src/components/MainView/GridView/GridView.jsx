@@ -134,7 +134,7 @@ export const GridView = observer(({ data, view, loadMore, fields, onChange, hidd
   );
 
   return (
-    <Block name="grid-view" style={{ flex: 1, "--column-count": `${columnCount}n` }}>
+    <Block name="grid-view" mod={{ columnCount }}>
       <Elem tag={AutoSizer} name="resize">
         {({ width, height }) => (
           <InfiniteLoader

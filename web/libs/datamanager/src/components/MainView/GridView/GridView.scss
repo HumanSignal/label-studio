@@ -1,6 +1,6 @@
 
 .grid-view {
-  --column-count: 4;
+  flex: 1;
 
   &__resize {
     width: 100%;
@@ -10,20 +10,21 @@
     padding: 0 0 16px;
   }
 
+  &_columnCount {
+    @for $i from 1 to 15 {
+      &_#{ $i } {
+        & .grid-view__cell:nth-child(#{$i}n) {
+          padding-right: 0;
+        }
+      }
+    }
+  }
+
   &__cell {
     padding: 16px 16px 0 0;
     box-sizing: border-box;
     
-    @mixin nthChild($columnCount) {
-      &:nth-child(4n) {
-        padding-right: 0;
-      }
-    }
     
-    @include nthChild(4n);
-    // &:nth-child(4) {
-    //   padding-right: 0;
-    // }
 
     &-header {
       padding: 5px;
