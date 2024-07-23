@@ -1124,7 +1124,7 @@ export const Annotation = types
 
           const imageEntity = tag.findImageEntity(obj.item_index ?? 0);
 
-          if (!imageEntity) return;
+          if (!imageEntity || imageEntity.imageLoaded) return;
 
           imageEntity.setNaturalWidth(obj.original_width);
           imageEntity.setNaturalHeight(obj.original_height);

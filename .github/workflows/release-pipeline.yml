@@ -43,6 +43,31 @@ jobs:
       ref: ${{ github.ref_name }}
     secrets: inherit
 
+  jira_set_fix_version:
+    name: "Set Jira fix version"
+    needs:
+      - promote_docker_image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Checkout Actions Hub
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: HumanSignal/actions-hub
+          path: ./.github/actions-hub
+
+      - name: Set Jira fix version
+        uses: ./.github/actions-hub/actions/jira-set-fix-version
+        continue-on-error: true
+        with:
+          jira_server: "${{ vars.JIRA_SERVER }}"
+          jira_username: "${{ secrets.JIRA_USERNAME }}"
+          jira_token: "${{ secrets.JIRA_TOKEN }}"
+          jira_fix_version: "LSO/${{ github.ref_name }}"
+          jira_fix_version_released: true
+
   build-pypi:
     name: "Build"
     permissions:
