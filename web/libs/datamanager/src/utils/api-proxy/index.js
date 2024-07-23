@@ -9,7 +9,7 @@
  * }} EndpointConfig
  */
 
-import { formDataToJPO } from "../helpers";
+import { formDataToJPO, parseJson } from "../helpers";
 import statusCodes from "./status-codes.json";
 
 /**

@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-885: Links not clickable from within Radio Button (#6097)",
-  "commit": "564e6aa921ff2b864788a28dc2279a46f8d77a7f",
-  "date": "2024-07-16T13:06:17.000Z",
+  "message": "chore: bump socket.io-parser from 3.3.3 to 3.3.4 in /web (#6120)",
+  "commit": "062121b2269ca596690a8b1f2d43e971ea18594e",
+  "date": "2024-07-23T03:30:47.000Z",
   "branch": "develop"
 }
