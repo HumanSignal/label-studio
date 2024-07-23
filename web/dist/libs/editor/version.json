@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1151: Show region indices on regions (#6103)",
-  "commit": "40a62f6904734edfd4f08cff8eef9c9224a2b8b6",
-  "date": "2024-07-19T15:13:37.000Z",
+  "message": "chore: bump socket.io-parser from 3.3.3 to 3.3.4 in /web (#6120)",
+  "commit": "062121b2269ca596690a8b1f2d43e971ea18594e",
+  "date": "2024-07-23T03:30:47.000Z",
   "branch": "develop"
 }
