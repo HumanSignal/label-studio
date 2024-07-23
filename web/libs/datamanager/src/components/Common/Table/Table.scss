@@ -15,7 +15,7 @@
     width: 45px;
     margin: -1px;
     box-shadow: none;
-    border-left: 1px solid rgba(#000, 0.1);
+    border-left: 1px solid var(--black_10);
   }
 
   &__button-new&__button-new {
@@ -34,7 +34,7 @@
     }
 
     &:active {
-      background: linear-gradient(0deg, rgba(#000, 0.02), rgba(#000, 0.02)), #FFFFFF;
+      background: linear-gradient(0deg, var(--black_2), var(--black_2)), #FFFFFF;
       box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
     }
   }

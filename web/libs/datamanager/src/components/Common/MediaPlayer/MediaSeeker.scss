@@ -3,7 +3,7 @@
   width: 100%;
   position: relative;
   border-radius: 0 0 4px 4px;
-  background-color: rgba(#000, 0.05);
+  background-color: var(--black_5);
 
   &__wrapper {
     width: 100%;
@@ -45,6 +45,6 @@
     z-index: 1;
     height: 100%;
     position: absolute;
-    background-color: rgba(#000, 0.05);
+    background-color: var(--black_5);
   }
 }

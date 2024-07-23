@@ -14,7 +14,7 @@
   transition: all 100ms ease;
   justify-content: center;
   color: var(--button-color);
-  box-shadow: inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15);
+  box-shadow: inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15);
 
   font-weight: 500;
   font-size: 14px;
@@ -67,24 +67,24 @@
   }
 
   &:hover {
-    box-shadow: 0px 2px 4px rgba(#000, 0.05), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.2);
+    box-shadow: 0px 2px 4px var(--black_5), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_20);
   }
 
   &:active {
-    background: linear-gradient(0deg, rgba(#000, 0.02), rgba(#000, 0.02)), #FFFFFF;
-    box-shadow: inset 0px 1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.2);
+    background: linear-gradient(0deg, var(--black_2), var(--black_2)), #FFFFFF;
+    box-shadow: inset 0px 1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_20);
   }
 
   &:focus {
     outline: none;
-    box-shadow: 0px 0px 0px 6px rgba(var(--accent_color), 0.2), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba(var(--accent_color), 0.2);
+    box-shadow: 0px 0px 0px 6px rgba(var(--accent_color), 0.2), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15), inset 0px 0px 0px 1px rgba(var(--accent_color), 0.2);
   }
 
   &__extra {
     font-size: 14px;
     line-height: 16px;
     display: flex;
-    color: rgba(#000, 0.4);
+    color: var(--black_40);
     align-items: center;
     margin-left: 7px;
     margin-right: -7px;
@@ -151,7 +151,7 @@
       --button-color: #fff;
       background-color: var(--grape_500);
       box-shadow: none;
-      box-shadow: inset 0px -1px 0px rgba(#000, 0.1);
+      box-shadow: inset 0px -1px 0px var(--black_10);
 
       &:disabled {
         --button-color: rgba(#fff, 0.8);
@@ -161,17 +161,17 @@
       &:hover {
         color: var(--button-color);
         background: linear-gradient(0deg, rgba(#fff, 0.1), rgba(#fff, 0.1)), var(--accent_color);
-        box-shadow: 0px 2px 4px rgba(var(--accent_color), 0.3), inset 0px -1px 0px rgba(#000, 0.1);
+        box-shadow: 0px 2px 4px rgba(var(--accent_color), 0.3), inset 0px -1px 0px var(--black_10);
       }
 
       &:active {
         color: var(--button-color);
-        background: linear-gradient(0deg, rgba(#000, 0.04), rgba(#000, 0.04)), var(--accent_color);
-        box-shadow: inset 0px 1px 0px rgba(#000, 0.1);
+        background: linear-gradient(0deg, var(--black_4), var(--black_4)), var(--accent_color);
+        box-shadow: inset 0px 1px 0px var(--black_10);
       }
 
       &:focus {
-        box-shadow: 0px 0px 0px 6px rgba(var(--accent_color), 0.2), inset 0px -1px 0px rgba(#000, 0.1);
+        box-shadow: 0px 0px 0px 6px rgba(var(--accent_color), 0.2), inset 0px -1px 0px var(--black_10);
       }
     }
 

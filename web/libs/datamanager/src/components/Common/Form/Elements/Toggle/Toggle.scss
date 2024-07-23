@@ -8,8 +8,8 @@
   position: relative;
   cursor: pointer;
   transition: box-shadow 80ms ease;
-  background: linear-gradient(0deg, rgba(#000, 0.05), rgba(#000, 0.05)), #FFFFFF;
-  box-shadow: inset 0px 1px 0px rgba(#000, 0.05), inset 0px 0px 0px 1px rgba(#000, 0.05);
+  background: linear-gradient(0deg, var(--black_5), var(--black_5)), #FFFFFF;
+  box-shadow: inset 0px 1px 0px var(--black_5), inset 0px 0px 0px 1px var(--black_5);
 
   &__input {
     top: 0;
@@ -37,7 +37,7 @@
       border-radius: 100%;
       transition: all 120ms ease;
       background: rgba(#000, 0.12);
-      box-shadow: 0px 5px 10px rgba(#000, 0.15), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.05);
+      box-shadow: 0px 5px 10px var(--black_15), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_5);
     }
   }
 

@@ -26,7 +26,7 @@
 
   &__label {
     padding-right: 16px;
-    color: rgba(#000, 0.4);
+    color: var(--black_40);
     font-size: var(--font-size);
     line-height: var(--line-height);
 
@@ -56,7 +56,7 @@
   &__divider {
     width: 1px;
     height: 30px;
-    background-color: rgba(#000, 0.1);
+    background-color: var(--black_10);
 
     .pagination_size_small & {
       height: 20px;

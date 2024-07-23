@@ -35,7 +35,7 @@
       box-shadow: none;
       background: none;
       pointer-events: none;
-      color: rgba(#000, 0.2);
+      color: var(--black_20);
     }
 
     &:active {
