@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-683: Detect and convert large integers automatically in API responses before parsing as JSON to retain precision (#6111)",
-  "commit": "f323e6a87b463dae8cbcc71f93dad02d28f5357d",
-  "date": "2024-07-22T14:44:25.000Z",
+  "message": "chore: bump socket.io-parser from 3.3.2 to 3.3.4 in /web/libs/editor/tests/e2e (#6119)",
+  "commit": "bfbf240e798ab112d178f2ab809571b6a79a3df7",
+  "date": "2024-07-23T02:51:06.000Z",
   "branch": "develop"
 }
