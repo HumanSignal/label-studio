@@ -107,7 +107,7 @@ const TabsSwitch = switchInjector(
                     tab.save();
                   }}
                   onDuplicate={() => views.duplicateView(tab)}
-                  onClose={() => tab.parent.deleteView(tab)}
+                  onClose={() => views.deleteView(tab)}
                   onSave={() => tab.virtual && tab.saveVirtual()}
                   active={tab.key === selectedKey}
                   editable={tab.editable}

@@ -50,7 +50,7 @@ export const Tabs = ({
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable" direction="horizontal">
               {(provided) => (
-                <Elem ref={provided.innerRef} name={"droppable"} {...provided.droppableProps}>
+                <Elem ref={provided.innerRef} name="droppable" {...provided.droppableProps}>
                   {children}
                   {provided.placeholder}
                 </Elem>
