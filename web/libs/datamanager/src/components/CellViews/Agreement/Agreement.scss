@@ -1,7 +1,7 @@
 .agreement {
   &__score {
     &_zero {
-      color: #000;
+      color: var(--black);
     }
 
     &_low {
