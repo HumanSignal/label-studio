@@ -48,7 +48,7 @@
       width: 16px;
       height: 16px;
       background: var(--accent_color);
-      box-shadow: 0px 5px 10px rgba(var(--accent_color), 0.3), inset 0px -1px 0px var(--black_10);
+      box-shadow: 0px 5px 10px rgba(var(--accent_color-raw), 0.3), inset 0px -1px 0px var(--black_10);
     }
   }
 

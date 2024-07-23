@@ -51,7 +51,7 @@
 
     &_checked {
       opacity: 1;
-      background-color: #fff;
+      background-color: var(--white);
       box-shadow: var(--button-checked-shadow);
     }
 

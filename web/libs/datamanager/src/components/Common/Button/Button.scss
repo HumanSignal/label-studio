@@ -6,7 +6,7 @@
   padding: 0 15px;
   outline: none;
   display: inline-flex;
-  background-color: #fff;
+  background-color: var(--white);
   align-items: center;
   border-radius: 5px;
   text-align: center;
@@ -77,7 +77,7 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0px 0px 0px 6px rgba(var(--accent_color), 0.2), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15), inset 0px 0px 0px 1px rgba(var(--accent_color), 0.2);
+    box-shadow: 0px 0px 0px 6px rgba(var(--accent_color-raw), 0.2), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15), inset 0px 0px 0px 1px rgba(var(--accent_color-raw), 0.2);
   }
 
   &__extra {
@@ -148,7 +148,7 @@
 
   &_look {
     &_primary {
-      --button-color: #fff;
+      --button-color: var(--white);
       background-color: var(--grape_500);
       box-shadow: none;
       box-shadow: inset 0px -1px 0px var(--black_10);
@@ -161,7 +161,7 @@
       &:hover {
         color: var(--button-color);
         background: linear-gradient(0deg, rgba(var(--white-raw), 0.1), rgba(var(--white-raw), 0.1)), var(--accent_color);
-        box-shadow: 0px 2px 4px rgba(var(--accent_color), 0.3), inset 0px -1px 0px var(--black_10);
+        box-shadow: 0px 2px 4px rgba(var(--accent_color-raw), 0.3), inset 0px -1px 0px var(--black_10);
       }
 
       &:active {
@@ -171,7 +171,7 @@
       }
 
       &:focus {
-        box-shadow: 0px 0px 0px 6px rgba(var(--accent_color), 0.2), inset 0px -1px 0px var(--black_10);
+        box-shadow: 0px 0px 0px 6px rgba(var(--accent_color-raw), 0.2), inset 0px -1px 0px var(--black_10);
       }
     }
 
@@ -180,7 +180,7 @@
     }
 
     &_destructive {
-      --button-color: #fff;
+      --button-color: var(--white);
       background-color: var(--danger_color);
     }
   }
@@ -261,7 +261,7 @@
         rgba(var(--white-raw), 0.2) 7px,
         rgba(var(--white-raw), 0.2) 12px);
 
-    background-color: #fff;
+    background-color: var(--white);
   }
 
   &_waiting.button_look_primary {

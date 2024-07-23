@@ -55,7 +55,7 @@
 
     &_selected &-content {
       background-color: #eff7ff;
-      box-shadow: 0 0 2px 2px rgba(var(--accent_color), 0.44);
+      box-shadow: 0 0 2px 2px rgba(var(--accent_color-raw), 0.44);
 
       &::after {
         box-shadow: 0 0 0 1px rgba(26, 144, 255, 0.6) inset;

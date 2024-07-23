@@ -66,7 +66,7 @@
   &__indicator {
     border-radius: 8px;
     position: absolute;
-    background-color: rgba(var(--accent_color), 0.5);
+    background-color: rgba(var(--accent_color-raw), 0.5);
 
     .range_align_horizontal & {
       top: 0;

@@ -21,7 +21,7 @@
     height: 100%;
     z-index: 2;
     position: relative;
-    background-color: rgba(var(--accent_color), 0.8);
+    background-color: rgba(var(--accent_color-raw), 0.8);
     transition: background-color 80ms ease;
   }
 

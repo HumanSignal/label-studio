@@ -10,7 +10,7 @@
     z-index: 1000;
     height: 28px;
     width: 28px;
-    background-color: #fff;
+    background-color: var(--white);
     box-shadow: 0 2px 5px 0 var(--black_20);
     margin: 6.5px 20px;
     border-radius: 4px;
@@ -34,7 +34,7 @@
   display: flex;
   flex-direction: column;
   overflow: auto;
-  background-color: #fff;
+  background-color: var(--white);
 
   &_fit {
     width: max-content;
@@ -95,7 +95,7 @@
       z-index: 50;
       position: absolute;
       pointer-events: none;
-      box-shadow: 0 0 0 1px rgba(var(--accent_color), 0.8) inset;
+      box-shadow: 0 0 0 1px rgba(var(--accent_color-raw), 0.8) inset;
     }
   }
 

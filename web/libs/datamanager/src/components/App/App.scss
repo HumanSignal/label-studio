@@ -1,10 +1,12 @@
 body {
   --black-raw: 0, 0, 0;
   --white-raw: 255, 255, 255;
+  --accent_color-raw: 86, 111, 207;
+  --danger_color-raw: 221, 0, 0;
   --black: rgb(var(--black-raw));
   --white: rgb(var(--white-raw));
-  --accent_color: #566FCF;
-  --danger_color: #d00;
+  --accent_color: rgb(var(--accent_color-raw));
+  --danger_color: rgb(var(--danger_color-raw));
 
   --black_2:  rgba(var(--black-raw), 0.02);
   --black_4:  rgba(var(--black-raw), 0.04);

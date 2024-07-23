@@ -40,7 +40,7 @@
     height: 100%;
     align-items: center;
     border-radius: var(--border-radius, 5px);
-    background: #fff;
+    background: var(--white);
     box-shadow: inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15);
 
     .pagination_waiting & {
