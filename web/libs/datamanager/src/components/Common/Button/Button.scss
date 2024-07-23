@@ -1,5 +1,5 @@
 .button {
-  --button-color: #000;
+  --button-color: var(--black);
   height: 32px;
   border: none;
   cursor: pointer;
@@ -61,7 +61,7 @@
   &_disabled,
   &:disabled,
   &[disabled] {
-    --button-color: rgba(#000, 0.5);
+    --button-color: rgba(var(--black), 0.5);
     pointer-events: none;
     background-color: #efefef;
   }

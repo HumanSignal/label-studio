@@ -11,7 +11,7 @@
   padding: 4px 10px;
   position: absolute;
   pointer-events: none;
-  background-color: #000;
+  background-color: var(--black);
   border-radius: 3px;
 
   &::before {
@@ -22,7 +22,7 @@
     height: 10px;
     display: block;
     position: absolute;
-    background-color: #000;
+    background-color: var(--black);
     transform: translate(-50%, 50%) rotate(45deg);
   }
 
