@@ -61,7 +61,7 @@
   &_disabled,
   &:disabled,
   &[disabled] {
-    --button-color: rgba(var(--black), 0.5);
+    --button-color: rgba(var(--black-raw), 0.5);
     pointer-events: none;
     background-color: #efefef;
   }

@@ -10,7 +10,7 @@
   position: absolute;
   align-items: center;
   justify-content: center;
-  background-color: rgba(var(--black), 0.3);
+  background-color: rgba(var(--black-raw), 0.3);
   will-change: opacity;
 
   &__wrapper {
@@ -29,7 +29,7 @@
     margin: 0 auto;
     background-color: #fff;
     border-radius: 5px;
-    box-shadow: 0 10px 30px rgba(var(--black), 0.3);
+    box-shadow: 0 10px 30px rgba(var(--black-raw), 0.3);
   }
 
   &__header {

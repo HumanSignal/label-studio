@@ -1,15 +1,16 @@
 body {
-  --black: #000;
+  --black-raw: 0, 0, 0;
+  --black: rgb(var(--black-raw));
   --accent_color: #566FCF;
   --danger_color: #d00;
 
-  --black_2: rgba(var(--black), 0.02);
-  --black_4: rgba(var(--black), 0.04);
-  --black_5: rgba(var(--black), 0.05);
-  --black_10: rgba(var(--black), 0.1);
-  --black_15: rgba(var(--black), 0.15);
-  --black_20: rgba(var(--black), 0.20);
-  --black_40: rgba(var(--black), 0.40);
+  --black_2:  rgba(var(--black-raw), 0.02);
+  --black_4:  rgba(var(--black-raw), 0.04);
+  --black_5:  rgba(var(--black-raw), 0.05);
+  --black_10: rgba(var(--black-raw), 0.1);
+  --black_15: rgba(var(--black-raw), 0.15);
+  --black_20: rgba(var(--black-raw), 0.20);
+  --black_40: rgba(var(--black-raw), 0.40);
 }
 .root {
   height: 100%;
