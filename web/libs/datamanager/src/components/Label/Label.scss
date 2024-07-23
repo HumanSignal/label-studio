@@ -84,7 +84,7 @@
     flex-direction: column;
     overflow-y: auto;
 
-    &>div {
+    & > div {
       --main-bg-color: #FAFAFA;
 
       flex: 1;
