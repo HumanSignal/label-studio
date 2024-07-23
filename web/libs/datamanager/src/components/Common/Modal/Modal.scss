@@ -41,7 +41,7 @@
     box-sizing: content-box;
 
     &_divided {
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      border-bottom: 1px solid var(--black_5);
     }
   }
 
@@ -65,7 +65,7 @@
   &__footer {
     padding: 16px 32px;
     background: rgba(0, 0, 0, 0.03);
-    box-shadow: inset 0px 1px 0px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0px 1px 0px var(--black_5);
     text-align: center;
     font-size: 14px;
     line-height: 22px;

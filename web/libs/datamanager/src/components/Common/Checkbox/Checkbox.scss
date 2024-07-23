@@ -36,7 +36,7 @@
     position: relative;
     display: inline-block;
     transition: all 80ms ease;
-    box-shadow: inset 0px -1px 0px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15);
   }
 
   &__check::before,

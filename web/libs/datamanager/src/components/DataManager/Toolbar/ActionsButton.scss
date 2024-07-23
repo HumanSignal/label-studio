@@ -71,7 +71,7 @@
 
     &:hover {
       color: #000;
-      background-color: rgba(0, 0, 0, 0.04);
+      background-color: var(--black_4);
     }
   }
 
@@ -80,12 +80,12 @@
   }
 
   &_disabled {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: var(--black_4);
     color: rgba(0, 0, 0, 0.25);
     cursor: initial;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.04) !important;
+      background-color: var(--black_4) !important;
       color: rgba(0, 0, 0, 0.25) !important;
       cursor: initial;
     }

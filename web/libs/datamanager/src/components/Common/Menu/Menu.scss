@@ -80,7 +80,7 @@
   &__divider {
     height: 1px;
     margin: 8px 0;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: var(--black_10);
   }
 
   &_size_compact &__item {

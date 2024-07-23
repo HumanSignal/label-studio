@@ -11,7 +11,7 @@
     height: 28px;
     width: 28px;
     background-color: #fff;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px 0 var(--black_20);
     margin: 6.5px 20px;
     border-radius: 4px;
 
@@ -23,7 +23,7 @@
 
     &:active {
       background: linear-gradient(0deg, var(--black_2), var(--black_2)), #FFFFFF;
-      box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 5px 0 var(--black_20);
     }
   }
 }

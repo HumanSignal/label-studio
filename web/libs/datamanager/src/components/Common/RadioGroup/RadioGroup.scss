@@ -4,13 +4,13 @@
   --padding: 4px;
   --font-size: 16px;
   --button-padding: 0 10px;
-  --button-checked-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.02), 0px 5px 10px rgba(0, 0, 0, 0.15);
+  --button-checked-shadow: 0px 1px 0px var(--black_10), 0px 0px 0px 1px var(--black_2), 0px 5px 10px var(--black_15);
 
   height: var(--height);
   border-radius: var(--radius);
   padding: var(--padding);
-  background: linear-gradient(0deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)), #FFFFFF;
-  box-shadow: inset 0px 1px 0px rgba(0, 0, 0, 0.05), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(0deg, var(--black_5), var(--black_5)), #FFFFFF;
+  box-shadow: inset 0px 1px 0px var(--black_5), inset 0px 0px 0px 1px var(--black_5);
 
   &__buttons {
     height: calc(var(--height) - calc(var(--padding) * 2));
@@ -67,7 +67,7 @@
       --padding: 2px;
       --font-size: 12px;
       --button-padding: 0 5px;
-      --button-checked-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.02), 0px 2px 4px rgba(0, 0, 0, 0.15);
+      --button-checked-shadow: 0px 1px 0px var(--black_10), 0px 0px 0px 1px var(--black_2), 0px 2px 4px var(--black_15);
     }
   }
 

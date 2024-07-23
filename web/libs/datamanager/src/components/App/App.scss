@@ -4,6 +4,8 @@ body {
   --danger_color: #d00;
 
   --black_2: rgba(var(--black), 0.02);
+  --black_4: rgba(var(--black), 0.04);
+  --black_5: rgba(var(--black), 0.05);
   --black_10: rgba(var(--black), 0.1);
   --black_15: rgba(var(--black), 0.15);
   --black_20: rgba(var(--black), 0.20);
@@ -92,7 +94,7 @@ body {
     content: "";
     position: absolute;
     height: 4px;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15), transparent);
+    background: linear-gradient(to bottom, var(--black_15), transparent);
   }
 }
 
