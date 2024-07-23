@@ -119,7 +119,7 @@ const Model = types
         font-weight: bold;
         font-family: Monaco;
         vertical-align: super;
-        content: attr(data-index) ":" attr(data-label);
+        content: attr(data-label);
         line-height: 0;
       }
       .htx-highlight[data-index]:not([data-label])::after {
