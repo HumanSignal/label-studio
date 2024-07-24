@@ -31,7 +31,6 @@
       "recommended": true,
       "a11y": {
         "noAutofocus": "off",
-        "useButtonType": "off",
         "useKeyWithClickEvents": "off"
       },
       "suspicious": {
