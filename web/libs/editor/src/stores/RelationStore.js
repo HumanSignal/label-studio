@@ -127,9 +127,8 @@ const RelationStore = types
       if (!self.relations) return [];
       if (self.order === "asc") {
         return self.relations.slice();
-      } else {
-        return self.relations.slice().reverse();
       }
+      return self.relations.slice().reverse();
     },
     get isAllHidden() {
       return !self.relations.find((rl) => !rl.visible);

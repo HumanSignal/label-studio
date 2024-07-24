@@ -198,7 +198,8 @@ const RegionsMixin = types
        */
       unselectRegion(tryToKeepStates = false) {
         console.log("UNSELECT REGION", "you should not be here");
-        // eslint-disable-next-line no-constant-condition
+
+        // biome-ignore lint/correctness/noConstantCondition:
         if (1) return;
         const annotation = self.annotation;
         const parent = self.parent;
