@@ -306,6 +306,18 @@
         "decorators": ""
     },
     {
+        "url": "/api/dm/views/order/",
+        "module": "data_manager.api.ViewAPI",
+        "name": "data_manager:api:view-update-order",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/views/order\\.<format>/",
+        "module": "data_manager.api.ViewAPI",
+        "name": "data_manager:api:view-update-order",
+        "decorators": ""
+    },
+    {
         "url": "/api/dm/views/<pk>/",
         "module": "data_manager.api.ViewAPI",
         "name": "data_manager:api:view-detail",
