@@ -208,3 +208,36 @@ def test_views_ordered_by_id(business_client, project_id):
 
     ids = [view['id'] for view in data]
     assert ids == sorted(ids)
+
+
+def test_update_views_order(business_client, project_id):
+    # Create views
+    views = [{'view_data': 1}, {'view_data': 2}, {'view_data': 3}]
+
+    view_ids = []
+    for view in views:
+        payload = dict(project=project_id, data=view)
+        response = business_client.post(
+            '/api/dm/views/',
+            data=json.dumps(payload),
+            content_type='application/json',
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        view_ids.append(response.json()['id'])
+
+    # Update the order of views
+    new_order = {'project': project_id, 'ids': [view_ids[2], view_ids[0], view_ids[1]]}
+    response = business_client.post(
+        '/api/dm/views/order/',
+        data=json.dumps(new_order),
+        content_type='application/json',
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    # Verify the new order
+    response = business_client.get('/api/dm/views/')
+    data = response.json()
+    assert response.status_code == status.HTTP_200_OK
+
+    returned_ids = [view['id'] for view in data]
+    assert returned_ids == new_order['ids']
