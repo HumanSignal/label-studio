@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1199: Add drag and drop functionality on DM tabs (#6079)",
-  "commit": "ab1fe0a1e4ee6f2700fd3b7c574d1dd0ca71489d",
-  "date": "2024-07-24T13:44:28.000Z",
+  "message": "ci: enable some rules in biome (#5903)",
+  "commit": "69f4e0eba8d3f01b0c866aa370044f7e392c1a87",
+  "date": "2024-07-24T14:36:15.000Z",
   "branch": "develop"
 }
