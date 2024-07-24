@@ -241,17 +241,16 @@ const applyTextGranularity = (selection, granularity) => {
     switch (granularity) {
       case "word":
         boundarySelection(selection, "word");
-        return;
+        break;
       case "sentence":
         boundarySelection(selection, "sentenceboundary");
-        return;
+        break;
       case "paragraph":
         boundarySelection(selection, "paragraphboundary");
-        return;
-      case "charater":
-      case "symbol":
+        break;
       default:
-        return;
+        // Handles "charater", "symbol", and any other unspecified granularities
+        break;
     }
   } catch {
     console.warn("Probably, you're using browser that doesn't support granularity.");

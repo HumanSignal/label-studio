@@ -46,7 +46,6 @@
       },
       "complexity": {
         "noForEach": "off",
-        "noUselessSwitchCase": "off",
         "useOptionalChain": "off",
         "noBannedTypes": "off",
         "noStaticOnlyClass": "off",
