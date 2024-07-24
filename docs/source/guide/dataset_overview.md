@@ -13,8 +13,6 @@ date: 2023-11-10 15:23:18
 
 > Streamline your data preparation process using Data Discovery in Label Studio. 
 
-<div class="admonition todo"><p class="admonition-title">Beta Release</p><p>This feature is currently in beta. To enable Data Discovery, contact your customer success manager or email <a href="mailto:cs@humansignal.com">cs@humansignal.com</a>.</p></div>
-
 In machine learning, the quality and relevance of the data used for training directly affects model performance. However, sifting through extensive unstructured datasets to find relevant items can be cumbersome and time-consuming. 
 
 Label Studio's Data Discovery simplifies this by allowing users to perform targeted, [AI-powered searches](dataset_search) within their data. This is incredibly beneficial for projects where specific data subsets are required for training specialized models.
