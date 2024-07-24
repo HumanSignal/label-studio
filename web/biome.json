@@ -42,7 +42,6 @@
         "noConfusingVoidType": "off",
         "noImplicitAnyLet": "off",
         "noShadowRestrictedNames": "off",
-        "useDefaultSwitchClauseLast": "off",
         "useGetterReturn": "off"
       },
       "complexity": {
