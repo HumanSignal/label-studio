@@ -31,7 +31,6 @@
       "recommended": true,
       "a11y": {
         "noAutofocus": "off",
-        "noRedundantAlt": "off",
         "useButtonType": "off",
         "useKeyWithClickEvents": "off"
       },
