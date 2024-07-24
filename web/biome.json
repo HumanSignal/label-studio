@@ -64,7 +64,6 @@
         "noNonNullAssertion": "off",
         "useDefaultParameterLast": "off",
         "useNodejsImportProtocol": "off",
-        "noCommaOperator": "off",
         "noParameterAssign": "off"
       },
       "nursery": {},
