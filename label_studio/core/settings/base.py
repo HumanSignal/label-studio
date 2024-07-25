@@ -400,6 +400,7 @@ STATIC_URL = '/static/'
 #    STATIC_URL = FORCE_SCRIPT_NAME + STATIC_URL
 logger.info(f'=> Static URL is set to: {STATIC_URL}')
 
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_build')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_FINDERS = (
@@ -532,6 +533,7 @@ IO_STORAGES_IMPORT_LINK_NAMES = [
     'io_storages_s3importstoragelink',
     'io_storages_gcsimportstoragelink',
     'io_storages_azureblobimportstoragelink',
+    'io_storages_azureserviceprincipalimportstoragelink',
     'io_storages_localfilesimportstoragelink',
     'io_storages_redisimportstoragelink',
 ]
@@ -678,6 +680,17 @@ if get_env('STORAGE_TYPE') == 'azure':
     DEFAULT_FILE_STORAGE = 'core.storage.CustomAzureStorage'
     AZURE_ACCOUNT_NAME = get_env('STORAGE_AZURE_ACCOUNT_NAME')
     AZURE_ACCOUNT_KEY = get_env('STORAGE_AZURE_ACCOUNT_KEY')
+    AZURE_CONTAINER = get_env('STORAGE_AZURE_CONTAINER_NAME')
+    AZURE_URL_EXPIRATION_SECS = int(get_env('STORAGE_AZURE_URL_EXPIRATION_SECS', '86400'))
+    AZURE_LOCATION = get_env('STORAGE_AZURE_FOLDER', default='')
+
+if get_env('STORAGE_TYPE') == 'azure_spi':
+    CLOUD_FILE_STORAGE_ENABLED = True
+    DEFAULT_FILE_STORAGE = 'core.storage.CustomAzureStorage'
+    AZURE_ACCOUNT_NAME = get_env('STORAGE_AZURE_ACCOUNT_NAME')
+    AZURE_CLIENT_ID = get_env('STORAGE_AZURE_CLIENT_ID')
+    AZURE_CLIENT_SECRET = get_env('STORAGE_AZURE_CLIENT_SECRET')
+    AZURE_TENANT_ID = get_env('STORAGE_AZURE_TENANT_ID')
     AZURE_CONTAINER = get_env('STORAGE_AZURE_CONTAINER_NAME')
     AZURE_URL_EXPIRATION_SECS = int(get_env('STORAGE_AZURE_URL_EXPIRATION_SECS', '86400'))
     AZURE_LOCATION = get_env('STORAGE_AZURE_FOLDER', default='')

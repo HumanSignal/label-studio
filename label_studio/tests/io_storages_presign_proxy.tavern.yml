@@ -507,7 +507,9 @@ stages:
       - name: gcs
         title: Google Cloud Storage
       - name: azure
-        title: Microsoft Azure
+        title: Microsoft Azure - AccountKey
+      - name: azure_spi
+        title: Microsoft Azure - Service Principal
       - name: redis
         title: Redis
       - name: localfiles
@@ -524,7 +526,9 @@ stages:
       - name: gcs
         title: Google Cloud Storage
       - name: azure
-        title: Microsoft Azure
+        title: Microsoft Azure - AccountKey
+      - name: azure_spi
+        title: Microsoft Azure - Service Principal
       - name: redis
         title: Redis
       - name: localfiles
@@ -871,6 +875,90 @@ stages:
   response:
     status_code: 200
 
+
+
+---
+test_name: test_import_from_azure_spi_storage
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      is_published: true
+      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
+        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      title: test_azure_spi_storage
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    data:
+      container: pytest-azure_spi-images
+      project: '{project_pk}'
+      title: Testing azure_spi storage (bucket from conftest.py)
+      use_blob_urls: true
+    method: POST
+    url: '{django_live_url}/api/storages/azure_spi'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/azure_spi/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 3
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        image_url: !re_match "/tasks/\\d+/presign/\\?fileuri=YXp1cmVfc3BpOi8vcHl0ZXN0LWF6dXJlX3NwaS1pbWFnZXMvYWJj"
+    status_code: 200
+- name: stage
+  request:
+    data:
+      project: '{project_pk}'
+    method: GET
+    url: '{django_live_url}/api/storages'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      presign: false
+    method: PATCH
+    url: '{django_live_url}/api/storages/azure_spi/{storage_pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    data:
+      project: '{project_pk}'
+    method: GET
+    url: '{django_live_url}/api/storages'
+  response:
+    status_code: 200
+
 ---
 test_name: test_export_azure_storage
 strict: false
@@ -916,6 +1004,88 @@ stages:
       title: New title
     method: PATCH
     url: '{django_live_url}/api/storages/export/azure/{storage_pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      data:
+        image_url: http://test.heartex.com/my_super_image.jpg
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/tasks'
+  response:
+    save:
+      json:
+        task_pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      lead_time: 12.34
+      result:
+      - from_name: label
+        to_name: image
+        type: choices
+        value:
+          choices:
+          - pos
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_pk}/annotations'
+  response:
+    save:
+      json:
+        annotation_pk: id
+    status_code: 201
+
+---
+test_name: test_export_azure_spi_storage
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short_on
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      is_published: true
+      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
+        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      title: test_export_azure_spi_storage
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    data:
+      bucket: pytest-export-azure_spi-bucket
+      project: '{project_pk}'
+      title: Testing Export azure_spi storage (bucket from conftest.py)
+    method: POST
+    url: '{django_live_url}/api/storages/export/azure_spi'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      title: New title
+    method: PATCH
+    url: '{django_live_url}/api/storages/export/azure_spi/{storage_pk}'
   response:
     status_code: 200
 - name: stage

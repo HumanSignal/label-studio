@@ -16,7 +16,8 @@ Integrate popular cloud and external storage systems with Label Studio to collec
 Set up the following cloud and other storage systems with Label Studio:
 - [Amazon S3](#Amazon-S3)
 - [Google Cloud Storage](#Google-Cloud-Storage)
-- [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
+- [Microsoft Azure Blob storage - Account Key](#Microsoft-Azure-Blob-storag-Account-Key)
+- [Microsoft Azure Blob storage - Service Principal](#Microsoft-Azure-Blob-storage-Service-Principal)
 - [Redis database](#Redis-database)
 - [Local storage](#Local-storage) <div class="enterprise-only">(for On-prem only)</div>
 
@@ -461,7 +462,7 @@ You can also create a storage connection using the Label Studio API.
 - See [Create new import storage](/api#operation/api_storages_gcs_create) then [sync the import storage](/api#operation/api_storages_gcs_sync_create). 
 - See [Create export storage](/api#operation/api_storages_export_gcs_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_gcs_sync_create).
 
-##  Microsoft Azure Blob storage
+##  Microsoft Azure Blob storage - Account Key
 
 Connect your [Microsoft Azure Blob storage](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) container with Label Studio. For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
 
@@ -499,6 +500,69 @@ After adding the storage, click **Sync** to collect tasks from the container, or
 You can also create a storage connection using the Label Studio API. 
 - See [Create new import storage](/api#operation/api_storages_azure_create) then [sync the import storage](/api#operation/api_storages_azure_sync_create). 
 - See [Create export storage](/api#operation/api_storages_export_azure_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_azure_sync_create).
+
+
+##  Microsoft Azure Blob storage - Service Principal
+
+You can connect your [Microsoft Azure Blob storage](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) container with Label Studio with a service principal authentication. Service Principal can provide more granular Access Controls for your organization. For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
+
+### Prerequisites
+You must set two environment variables in Label Studio to connect to Azure Blob storage:
+- `AZURE_BLOB_ACCOUNT_NAME` to specify the name of the storage account.
+- `AZURE_CLIENT_ID` to specify the client id for the service principal.
+- `AZURE_TENANT_ID` to specify the tenant id for the service principal.
+- `AZURE_CLIENT_SECRET` to specify the secret id for the service principal.
+
+
+Configure the specific Azure Blob container that you want Label Studio to use in the UI. In most cases involving CORS issues, the GET permission (*/GET/*/Access-Control-Allow-Origin/3600) is necessary within the Resource Sharing tab:
+
+<img src="/images/azure-storage-cors.png" class="gif-border">
+
+
+###### Create a Service Principal
+
+1. Create a service principal via Azure docs [How to Create a Service Principal](https://learn.microsoft.com/en-us/entra/identity-platform/howto-create-service-principal-portal).
+
+###### Create a Service Principal Secret (Client Secret)
+1. Create a new client secret by following the steps below
+2. Browse to Identity > Applications > App registrations, then select your application.
+3. Select Certificates & secrets.
+4. Select Client secrets, and then select New client secret.
+Provide a description of the secret, and a duration.
+5. Select Add.
+
+###### Create the Contributor Role Based Access Cotnrol
+
+When you create a storage account, assign a Contributor role to your service principal - read more about [role assignment steps](https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-steps).
+
+
+### Set up connection in the Label Studio UI
+In the Label Studio UI, do the following to set up the connection:
+
+1. Open Label Studio in your web browser.
+2. For a specific project, open **Settings > Cloud Storage**.
+3. Click **Add Source Storage**.
+4. In the dialog box that appears, select **Microsoft Azure** as the storage type.
+5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
+6. Specify the name of the Azure Blob container, and if relevant, the container prefix to specify an internal folder or container.
+7. Adjust the remaining optional parameters:
+    - In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
+    - In the **Account Name** field, specify the account name for the Azure storage. You can also set this field as an environment variable,`AZURE_BLOB_ACCOUNT_NAME`.
+    - In the **Client ID** field, specify the Client ID of the service principal to access the storage account. You can also set this field as an environment variable,`AZURE_CLIENT_ID`.
+    - In the **Tenant ID** field, specify the Tenant ID of the service principal to access the storage account. You can also set this field as an environment variable,`AZURE_TENANT_ID`.
+    - In the **Client Secret** field, specify the Client Secret of the service principal to access the storage account. You can also set this field as an environment variable,`AZURE_CLIENT_SECRET`.
+    - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling, for example `azure-spi://container-name/image.jpg`. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file.
+    - Choose whether to disable **Use pre-signed URLs**, or [shared access signatures](https://docs.microsoft.com/en-us/rest/api/storageservices/delegate-access-with-shared-access-signature). If your tasks contain azure-spi://... links, they must be pre-signed in order to be displayed in the browser.
+    - Adjust the counter for how many minutes the shared access signatures are valid.
+8. Click **Add Storage**.
+9. Repeat these steps for **Target Storage** to sync completed data annotations to a container.
+
+After adding the storage, click **Sync** to collect tasks from the container, or make an API call to [sync import storage](/api#operation/api_storages_azure_spi_sync_create).
+
+### Add storage with the Label Studio API
+You can also create a storage connection using the Label Studio API.
+- See [Create new import storage](/api#operation/api_storages_azure_spi_create) then [sync the import storage](/api#operation/api_storages_azure_spi_sync_create).
+- See [Create export storage](/api#operation/api_storages_export_azure_spi_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_azure_spi_sync_create).
 
 ## Redis database
 

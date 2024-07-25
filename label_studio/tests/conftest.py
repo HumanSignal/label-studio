@@ -36,6 +36,7 @@ except ImportError:
 
 from .utils import (
     azure_client_mock,
+    azure_client_sp_mock,
     create_business,
     gcs_client_mock,
     import_from_url_mock,
@@ -91,6 +92,15 @@ def azure_credentials():
     """Mocked Azure credentials"""
     os.environ['AZURE_BLOB_ACCOUNT_NAME'] = 'testing'
     os.environ['AZURE_BLOB_ACCOUNT_KEY'] = 'testing'
+
+
+@pytest.fixture(autouse=True)
+def azure_sp_credentials():
+    """Mocked Azure Service Principal authentication credentials"""
+    os.environ['AZURE_CLIENT_ID'] = 'testing'
+    os.environ['AZURE_CLIENT_SECRET'] = 'testing'
+    os.environ['AZURE_TENANT_ID'] = 'testing'
+    os.environ['AZURE_BLOB_ACCOUNT_NAME'] = 'testing'
 
 
 @pytest.fixture(scope='function')
@@ -307,6 +317,12 @@ def gcs_client():
 @pytest.fixture(autouse=True)
 def azure_client():
     with azure_client_mock():
+        yield
+
+
+@pytest.fixture(autouse=True)
+def azure_client_sp():
+    with azure_client_sp_mock():
         yield
 
 
