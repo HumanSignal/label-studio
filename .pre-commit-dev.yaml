@@ -16,3 +16,11 @@ repos:
         args: [--config-path, ./web]
         additional_dependencies: ["@biomejs/biome@1.7.1"]
         files: ^web/.*
+-   repo: local
+    hooks:
+      - id: stylelint
+        name: stylelint
+        entry: bash -c 'cd web && npx stylelint **/*.scss --fix'
+        language: node
+        types: [scss]
+        files: ^.*\.scss$
