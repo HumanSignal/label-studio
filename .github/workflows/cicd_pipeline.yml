@@ -126,6 +126,15 @@ jobs:
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
 
+  stylelint:
+    name: "Linter"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.frontend == 'true'
+    uses: ./.github/workflows/stylelint.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+
   build-frontend-docs:
     name: "Build"
     needs:
@@ -494,6 +503,7 @@ jobs:
       - ruff
       - blue
       - biome
+      - stylelint
       - pytest
       - migrations
       - build-docker
@@ -505,7 +515,7 @@ jobs:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: gitleaks, bandit, ruff, blue, biome, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e
+          allowed-skips: gitleaks, bandit, ruff, blue, biome, stylelint, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e
           jobs: ${{ toJSON(needs) }}
 
   dependabot-auto-merge:
