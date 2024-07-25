@@ -20,6 +20,7 @@
 .taxonomy > span > svg {
   transform: rotate(-180deg);
 }
+
 .taxonomy_open > span > svg {
   transform: none;
 }
@@ -31,7 +32,7 @@
 
   div {
     margin: 0 2px 4px 0;
-    background: hsl(0, 0%, 95%);
+    background: hsl(0deg 0% 95%);
     padding: 0; // all the right space should be a clickable button, so no padding
     border-radius: 4px;
     display: flex;
@@ -124,6 +125,7 @@
 
 .taxonomy__item {
   display: flex;
+
   &:focus-within {
     background: #eee;
   }
@@ -189,13 +191,16 @@
     cursor: pointer;
     text-align: center;
   }
+
   .taxonomy__item &_count:not(:last-child) {
     position: absolute;
   }
+
   .taxonomy__item:hover &_count:not(:last-child) {
     visibility: hidden;
     display: none;
   }
+
   .taxonomy__item:hover &_actions {
     visibility: visible;
     display: block;
@@ -246,7 +251,7 @@
     font: inherit;
     font-style: italic;
     color: #09f;
-    background: rgba(0, 0, 0, 0.03);
+    background: rgb(0 0 0 / 3%);
   }
 }
 

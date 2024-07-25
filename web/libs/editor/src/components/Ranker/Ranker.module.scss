@@ -1,6 +1,7 @@
 .board {
   --ranker-gap: 8px;
-  --ranker-border-color: rgba(34, 36, 38, 0.15);
+  --ranker-border-color: rgb(34 36 38 / 15%);
+
   display: flex;
   justify-content: space-evenly;
   width: 100%;
@@ -43,12 +44,15 @@
     &.expanded button span::after {
       content: '△';
     }
+
     &.expanded button:hover span::after {
       content: '▲';
     }
+
     &.collapsed button span::after {
       content: '▽';
     }
+
     &.collapsed button:hover span::after {
       content: '▼';
     }
@@ -69,6 +73,7 @@
 .itemLine {
   margin: 0;
 }
+
 .itemTitle {
   margin: 0;
   display: flex;
@@ -83,13 +88,16 @@
   content: '△';
   margin-left: auto;
 }
+
 .item.expanded > .itemTitle:hover::after {
   content: '▲';
 }
+
 .item.collapsed > .itemTitle::after {
   content: '▽';
   margin-left: auto;
 }
+
 .item.collapsed > .itemTitle:hover::after {
   content: '▼';
 }

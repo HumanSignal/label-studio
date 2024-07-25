@@ -1,0 +1,16 @@
+{
+  "extends": "stylelint-config-standard-scss",
+  "rules": {
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "block-no-empty": null,
+    "number-max-precision": null,
+    "selector-pseudo-class-no-unknown": null,
+    "no-descending-specificity": null,
+    "keyframes-name-pattern": null,
+    "no-empty-source": null,
+    "scss/dollar-variable-pattern": null,
+    "scss/double-slash-comment-whitespace-inside": null,
+    "scss/no-global-function-names": null
+  }
+}

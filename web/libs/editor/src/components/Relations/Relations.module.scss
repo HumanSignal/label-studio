@@ -35,10 +35,10 @@
   position: relative;
   background: #fff;
   padding: 1em;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid rgb(0 0 0 / 20%);
   border-radius: 0.2rem;
 
-  &:before {
+  &::before {
     position: absolute;
     top: 0;
     left: 0;
@@ -46,7 +46,7 @@
     margin: 0 auto;
     height: 100%;
     width: 1px;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgb(0 0 0 / 5%);
     content: "";
   }
 

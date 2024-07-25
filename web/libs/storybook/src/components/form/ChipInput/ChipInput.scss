@@ -1,4 +1,4 @@
-@import "../../../assets/styles/base.scss";
+@import "../../../assets/styles/base";
 
 .chip-input {
   position: relative;
@@ -11,7 +11,7 @@
   padding: 4px 12px;
 
   &.isError {
-    border-color: rgba(207, 19, 34, 0.16);
+    border-color: rgb(207 19 34 / 16%);
   }
 
   &.isError &__placeholder {

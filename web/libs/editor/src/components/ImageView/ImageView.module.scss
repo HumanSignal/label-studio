@@ -2,7 +2,7 @@
   display: flex;
   flex-flow: column;
   align-items: center;
-  border: 1px solid rgba(34, 36, 38, 0.15);
+  border: 1px solid rgb(34 36 38 / 15%);
   border-radius: 0.28571429rem;
   width: fit-content;
   padding: 0.5em;
@@ -37,17 +37,14 @@
 .loading {
   z-index: 10;
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   width: auto;
   height: auto;
   display: flex;
   flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
-  background: rgba(125,125,125,.15);
+  background: rgb(125 125 125 / 15%);
   font-size: 24px;
 }
 
@@ -57,26 +54,33 @@
 
 .image_position {
   position: absolute;
+
   &__top {
     top: 0;
   }
+
   &__middle {
     top: 50%;
     transform: translateY(-50%);
+
     &.image_position__center {
       transform: translate(-50%, -50%);
     }
   }
+
   &__bottom {
     bottom: 0;
   }
+
   &__left {
     left: 0;
   }
+
   &__center {
     left: 50%;
     transform: translateX(-50%);
   }
+
   &__right {
     right: 0;
   }
@@ -95,14 +99,17 @@
     overflow: hidden;
     height: 0;
   }
+
   .frame_height {
     width: 100%;
   }
+
   .filler {
     max-width: 100%;
     position: relative;
     overflow: hidden;
   }
+
   .overlay {
     position: absolute;
     top: 0;

@@ -1,10 +1,10 @@
 @mixin respond($breakpoint) {
-  @if ($breakpoint == "phone") {
-    @media (max-width: 760px) {
+  @if $breakpoint == "phone" {
+    @media (width <= 760px) {
       @content;
     }
-  } @else if ($breakpoint == "tablet") {
-    @media (max-width: 1200px) {
+  } @else if $breakpoint == "tablet" {
+    @media (width <= 1200px) {
       @content;
     }
   }
