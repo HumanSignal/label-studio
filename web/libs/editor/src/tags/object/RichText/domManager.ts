@@ -54,7 +54,7 @@ class DDTextElement {
     const content = this.getContent(start, end);
 
     if (newNode.textContent) {
-      newNode.textContent = newNode.textContent.substring(start - this.start, end - this.start);
+      newNode.textContent = [...newNode.textContent].slice(start - this.start, end - this.start).join("");
     }
 
     return new DDTextElement(newNode, start, end, content);
@@ -334,6 +334,7 @@ class DomData {
   private elements: Array<DDStaticElement | DDDynamicBlock | DDExtraText> = [];
   private endPos: number;
   private displayedText = "";
+  private displayedCharacters: string[] = [];
   private displayedTextPos = 0;
 
   constructor() {
@@ -351,6 +352,20 @@ class DomData {
 
   setDisplayedText(displayedText: string) {
     this.displayedText = displayedText;
+    this.displayedCharacters = [...displayedText];
+  }
+
+  convertCodePointsLengthToTextOffset(from: number, to: number) {
+    return this.displayedCharacters.slice(from, to).join("").length;
+  }
+
+  convertTextOffsetToCodePointsLength(offset: number, globalRange: [number, number]) {
+    const [start, end] = globalRange;
+    const text = this.displayedCharacters.slice(start, end).join("");
+    const textSubstring = text.substring(0, offset);
+    const codePoints = [...textSubstring].length;
+
+    return start + codePoints;
   }
 
   addStaticElement(currentNode: HTMLElement, path: Path) {
@@ -443,13 +458,43 @@ class DomData {
     return this.findTextBlock(pos, avoid)?.findTextElement(pos, avoid);
   }
 
-  findElementByPath(path: string) {
+  findElementByPath(path: string): DDStaticElement | DDDynamicBlock | undefined {
     for (const el of this.elements) {
       if (typeof el !== "string" && el.path === path) {
         return el;
       }
     }
     return undefined;
+  }
+
+  getNextElement(element: DDStaticElement | DDDynamicBlock): DDStaticElement | DDDynamicBlock | undefined {
+    let idx = this.elements.indexOf(element);
+
+    while (
+      !(this.elements[idx + 1] instanceof DDStaticElement) ||
+      !(this.elements[idx + 1] instanceof DDDynamicBlock)
+    ) {
+      idx++;
+      if (idx >= this.elements.length - 1) {
+        return void 0;
+      }
+    }
+
+    return this.elements[idx + 1] as DDStaticElement | DDDynamicBlock;
+  }
+
+  getEndOf(element: DDStaticElement | DDDynamicBlock | DDSpanElement | DDTextElement) {
+    if (element instanceof DDSpanElement || element instanceof DDTextElement) {
+      return element.end;
+    }
+
+    const nextElement = this.getNextElement(element);
+
+    if (nextElement) {
+      return nextElement.start;
+    }
+
+    return this.endPos;
   }
 
   findElementByNode(node: Node) {
@@ -727,7 +772,10 @@ export default class DomManager {
       return undefined;
     }
 
-    return [startOffset + startEl.start, endOffset + endEl.start];
+    return [
+      this.domData.convertTextOffsetToCodePointsLength(startOffset, [startEl.start, this.domData.getEndOf(startEl)]),
+      this.domData.convertTextOffsetToCodePointsLength(endOffset, [endEl.start, this.domData.getEndOf(endEl)]),
+    ];
   }
 
   globalOffsetsToRelativeOffsets(start: number, end: number) {
@@ -737,9 +785,9 @@ export default class DomManager {
     if (startElement && endElement) {
       return {
         start: startElement.path,
-        startOffset: start - startElement.start,
+        startOffset: this.domData.convertCodePointsLengthToTextOffset(startElement.start, start),
         end: endElement.path,
-        endOffset: end - endElement.start,
+        endOffset: this.domData.convertCodePointsLengthToTextOffset(endElement.start, end),
       };
     }
 
@@ -753,8 +801,13 @@ export default class DomManager {
     if (!startEl || !endEl) {
       return undefined;
     }
-
-    return [range.startOffset + startEl.start, range.endOffset + endEl.start];
+    return [
+      this.domData.convertTextOffsetToCodePointsLength(range.startOffset, [
+        startEl.start,
+        this.domData.getEndOf(startEl),
+      ]),
+      this.domData.convertTextOffsetToCodePointsLength(range.endOffset, [endEl.start, this.domData.getEndOf(endEl)]),
+    ];
   }
 
   getText(start: number, end: number) {
