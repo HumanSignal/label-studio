@@ -241,17 +241,16 @@ const applyTextGranularity = (selection, granularity) => {
     switch (granularity) {
       case "word":
         boundarySelection(selection, "word");
-        return;
+        break;
       case "sentence":
         boundarySelection(selection, "sentenceboundary");
-        return;
+        break;
       case "paragraph":
         boundarySelection(selection, "paragraphboundary");
-        return;
-      case "charater":
-      case "symbol":
+        break;
       default:
-        return;
+        // Handles "charater", "symbol", and any other unspecified granularities
+        break;
     }
   } catch {
     console.warn("Probably, you're using browser that doesn't support granularity.");
@@ -344,9 +343,9 @@ const fixRange = (range) => {
 /**
  * Highlight given Range
  * @param {Range} range
- * @param {{label: string, classNames: string[]}} param1
+ * @param {{label: string, index?: number, classNames: string[]}} param1
  */
-export const highlightRange = (range, { label, classNames }) => {
+export const highlightRange = (range, { index, label, classNames }) => {
   const { startContainer, endContainer, commonAncestorContainer } = range;
   const { startOffset, endOffset } = range;
   const highlights = [];
@@ -380,7 +379,10 @@ export const highlightRange = (range, { label, classNames }) => {
 
   const lastLabel = highlights[highlights.length - 1];
 
-  if (lastLabel) lastLabel.setAttribute("data-label", label ?? "");
+  if (lastLabel) {
+    lastLabel.setAttribute("data-label", label ?? "");
+    lastLabel.setAttribute("data-index", index ? String(index) : "");
+  }
 
   return highlights;
 };
@@ -455,6 +457,7 @@ export const highlightRangePart = (container, startOffset, endOffset, classNames
  * @param {string[]} classNames
  * @param {object} cssStyles
  * @param {string} [label]
+ * @todo all 2 usages of this method don't even get the label
  */
 export const wrapWithSpan = (node, classNames, label) => {
   const highlight = node.ownerDocument.createElement("span");
@@ -469,9 +472,9 @@ export const wrapWithSpan = (node, classNames, label) => {
 /**
  * Apply classes and styles to a span. Optionally add or remove label
  * @param {HTMLSpanElement} spanNode
- * @param {{classNames?: string[], cssStyles?: {}, label?: string}} param1
+ * @param {{classNames?: string[], index?: number, label?: string}} param1
  */
-export const applySpanStyles = (spanNode, { classNames, label }) => {
+export const applySpanStyles = (spanNode, { classNames, index, label }) => {
   if (classNames) {
     spanNode.className = "";
     spanNode.classList.add(...classNames);
@@ -480,6 +483,7 @@ export const applySpanStyles = (spanNode, { classNames, label }) => {
   // label is array, string or null, so check for length
   if (!label?.length) spanNode.removeAttribute("data-label");
   else spanNode.setAttribute("data-label", label);
+  spanNode.setAttribute("data-index", index ? String(index) : "");
 };
 
 /**

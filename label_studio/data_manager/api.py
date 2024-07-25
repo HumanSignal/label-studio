@@ -12,7 +12,12 @@ from data_manager.functions import evaluate_predictions, get_prepare_params, get
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.models import View
 from data_manager.prepare_params import filters_schema, ordering_schema, prepare_params_schema
-from data_manager.serializers import DataManagerTaskSerializer, ViewResetSerializer, ViewSerializer
+from data_manager.serializers import (
+    DataManagerTaskSerializer,
+    ViewOrderSerializer,
+    ViewResetSerializer,
+    ViewSerializer,
+)
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
@@ -163,8 +168,39 @@ class ViewAPI(viewsets.ModelViewSet):
         queryset.all().delete()
         return Response(status=204)
 
+    @swagger_auto_schema(
+        method='post',
+        tags=['Data Manager'],
+        operation_summary='Update order of views',
+        operation_description='Update the order field of views based on the provided list of view IDs',
+        request_body=ViewOrderSerializer,
+    )
+    @action(detail=False, methods=['post'], url_path='order')
+    def update_order(self, request):
+        serializer = ViewOrderSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        project_id = serializer.validated_data['project']
+        view_ids = serializer.validated_data['ids']
+
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=project_id)
+
+        queryset = self.filter_queryset(self.get_queryset()).filter(project=project)
+        views = list(queryset.filter(id__in=view_ids))
+
+        # Update the order field for each view
+        view_dict = {view.id: view for view in views}
+        for order, view_id in enumerate(view_ids):
+            if view_id in view_dict:
+                view_dict[view_id].order = order
+
+        # Bulk update views
+        View.objects.bulk_update(views, ['order'])
+
+        return Response(status=200)
+
     def get_queryset(self):
-        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('id')
+        return View.objects.filter(project__organization=self.request.user.active_organization).order_by('order', 'id')
 
 
 class TaskPagination(PageNumberPagination):

@@ -566,6 +566,7 @@ export const AppStore = types
       const result = yield self.API[methodName](requestParams, {
         headers: requestHeaders,
         body: requestBody.body ?? requestBody,
+        options,
       });
 
       if (isAllowCancel) {

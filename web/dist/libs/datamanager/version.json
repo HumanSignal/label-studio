@@ -1,6 +1,6 @@
 {
-  "message": "chore: bump socket.io-parser from 3.3.3 to 3.3.4 in /web (#6120)",
-  "commit": "062121b2269ca596690a8b1f2d43e971ea18594e",
-  "date": "2024-07-23T03:30:47.000Z",
+  "message": "docs: OPTIC-753: Updating README.md to reflect information pertaining to linting of frontend code (#6131)",
+  "commit": "ae575fea2bbf5c92c27ab3325b36210120854331",
+  "date": "2024-07-25T16:41:18.000Z",
   "branch": "develop"
 }

@@ -20,7 +20,6 @@ const LabelOnBbox = ({
   text,
   score,
   showLabels,
-  showScore = showLabels,
   rotation = 0,
   zoomScale = 1,
   color,
@@ -33,12 +32,11 @@ const LabelOnBbox = ({
 }) => {
   const fontSize = 13;
   const height = 20;
-  const ss = showScore && score;
   const scale = 1 / zoomScale;
   const [textEl, setTextEl] = useState();
   const paddingLeft = 20;
   const paddingRight = 5;
-  const scoreSpace = ss ? 34 : 0;
+  const scoreSpace = score ? 34 : 0;
   const horizontalPaddings = paddingLeft + paddingRight;
   const textMaxWidth = Math.max(0, maxWidth * zoomScale - horizontalPaddings - scoreSpace);
   const isSticking = !!textMaxWidth;
@@ -95,9 +93,11 @@ const LabelOnBbox = ({
     [adjacent, isSticking, maxWidth],
   );
 
+  if (!showLabels) return null;
+
   return (
     <Group strokeScaleEnabled={false} x={x} y={y} rotation={rotation}>
-      {ss && (
+      {!!score && (
         <Label
           y={-height * scale}
           scaleX={scale}
@@ -117,54 +117,47 @@ const LabelOnBbox = ({
           />
         </Label>
       )}
-      {showLabels && (
-        <>
-          <Label
-            x={paddingLeft * scale + scoreSpace * scale}
-            y={-height * scale}
-            scaleX={scale}
-            scaleY={scale}
-            onClick={onClickLabel}
-            onMouseEnter={onClickLabel ? onMouseEnterLabel : null}
-            onMouseLeave={onClickLabel ? onMouseLeaveLabel : null}
-            listening={!suggestion}
-          >
-            <Tag fill={color} cornerRadius={4} sceneFunc={tagSceneFunc} offsetX={paddingLeft} />
-            <Text
-              ref={setTextEl}
-              text={text}
-              fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif"
-              fontSize={fontSize}
-              lineHeight={(1 / fontSize) * height}
-              height={height}
-              width={width}
-              wrap="none"
-              ellipsis="true"
-              fill={Constants.SHOW_LABEL_FILL}
-              padding={0}
-            />
-          </Label>
-          <Path
-            x={2 * scale + scoreSpace * scale}
-            y={2 * scale - height * scale}
-            scaleX={scale}
-            scaleY={scale}
-            fill={Constants.SHOW_LABEL_FILL}
-            data={isTexting ? OCR_PATH : TAG_PATH}
-          />
-        </>
-      )}
+      <Label
+        x={paddingLeft * scale + scoreSpace * scale}
+        y={-height * scale}
+        scaleX={scale}
+        scaleY={scale}
+        onClick={onClickLabel}
+        onMouseEnter={onClickLabel ? onMouseEnterLabel : null}
+        onMouseLeave={onClickLabel ? onMouseLeaveLabel : null}
+        listening={!suggestion}
+      >
+        <Tag fill={color} cornerRadius={4} sceneFunc={tagSceneFunc} offsetX={paddingLeft} />
+        <Text
+          ref={setTextEl}
+          text={text}
+          fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif"
+          fontSize={fontSize}
+          lineHeight={(1 / fontSize) * height}
+          height={height}
+          width={width}
+          wrap="none"
+          ellipsis="true"
+          fill={Constants.SHOW_LABEL_FILL}
+          padding={0}
+        />
+      </Label>
+      <Path
+        x={2 * scale + scoreSpace * scale}
+        y={2 * scale - height * scale}
+        scaleX={scale}
+        scaleY={scale}
+        fill={Constants.SHOW_LABEL_FILL}
+        data={isTexting ? OCR_PATH : TAG_PATH}
+      />
     </Group>
   );
 };
 
 const LabelOnEllipse = observer(({ item, color, strokewidth }) => {
-  const isLabeling = !!item.labeling;
   const isTexting = !!item.texting;
   const labelText = item.getLabelText(",");
   const obj = item.parent;
-
-  if (!isLabeling && !isTexting) return null;
   const zoomScale = item.parent.zoomScale || 1;
 
   return (
@@ -175,7 +168,6 @@ const LabelOnEllipse = observer(({ item, color, strokewidth }) => {
       text={labelText}
       score={item.score}
       showLabels={getRoot(item).settings.showLabels}
-      showScore={getRoot(item).settings.showLabels}
       zoomScale={item.parent.zoomScale}
       color={color}
       onClickLabel={item.onClickLabel}
@@ -184,12 +176,9 @@ const LabelOnEllipse = observer(({ item, color, strokewidth }) => {
 });
 
 const LabelOnRect = observer(({ item, color, strokewidth }) => {
-  const isLabeling = !!item.labeling;
   const isTexting = !!item.texting;
   const labelText = item.getLabelText(",");
   const obj = item.parent;
-
-  if (!isLabeling && !isTexting) return null;
   const zoomScale = item.parent.zoomScale || 1;
 
   return (
@@ -200,7 +189,6 @@ const LabelOnRect = observer(({ item, color, strokewidth }) => {
       text={labelText}
       score={item.score}
       showLabels={getRoot(item).settings.showLabels}
-      showScore={getRoot(item).settings.showLabels}
       zoomScale={item.parent.zoomScale}
       rotation={item.rotation}
       color={color}
@@ -212,12 +200,8 @@ const LabelOnRect = observer(({ item, color, strokewidth }) => {
 });
 
 const LabelOnPolygon = observer(({ item, color }) => {
-  const isLabeling = !!item.labeling;
   const isTexting = !!item.texting;
   const labelText = item.getLabelText(",");
-
-  if (!isLabeling && !isTexting) return null;
-
   const bbox = item.bboxCoordsCanvas;
 
   if (!bbox) return null;
@@ -226,7 +210,7 @@ const LabelOnPolygon = observer(({ item, color }) => {
 
   return (
     <Fragment>
-      {settings && (settings.showLabels || settings.showScore) && (
+      {settings.showLabels && (
         <Rect
           x={bbox.left}
           y={bbox.top}
@@ -245,8 +229,7 @@ const LabelOnPolygon = observer(({ item, color }) => {
         isTexting={isTexting}
         text={labelText}
         score={item.score}
-        showLabels={settings && settings.showLabels}
-        showScore={settings && settings.showScore}
+        showLabels={settings.showLabels}
         zoomScale={item.parent.zoomScale}
         color={color}
         onClickLabel={item.onClickLabel}
@@ -258,17 +241,14 @@ const LabelOnPolygon = observer(({ item, color }) => {
 const LabelOnMask = observer(({ item, color }) => {
   const settings = getRoot(item).settings;
 
-  if (settings && !settings.showLabels && !settings.showScore) return null;
+  if (!settings.showLabels) return null;
 
-  const isLabeling = !!item.labeling;
   const isTexting = !!item.texting;
   const labelText = item.getLabelText(",");
-
-  if (!isLabeling && !isTexting) return null;
-
   const bbox = item.bboxCoordsCanvas;
 
   if (!bbox) return null;
+
   return (
     <Group name="region-label">
       <Rect
@@ -288,8 +268,7 @@ const LabelOnMask = observer(({ item, color }) => {
         isTexting={isTexting}
         text={labelText}
         score={item.score}
-        showLabels={getRoot(item).settings.showLabels}
-        showScore={settings && settings.showScore}
+        showLabels={settings.showLabels}
         zoomScale={item.parent.zoomScale}
         color={color}
         onClickLabel={item.onClickLabel}
@@ -299,11 +278,8 @@ const LabelOnMask = observer(({ item, color }) => {
 });
 
 const LabelOnKP = observer(({ item, color }) => {
-  const isLabeling = !!item.labeling;
   const isTexting = !!item.texting;
   const labelText = item.getLabelText(",");
-
-  if (!isLabeling && !isTexting) return null;
 
   return (
     <LabelOnBbox
@@ -314,7 +290,6 @@ const LabelOnKP = observer(({ item, color }) => {
       text={labelText}
       score={item.score}
       showLabels={getRoot(item).settings.showLabels}
-      showScore={getRoot(item).settings.showScore}
       zoomScale={item.parent.zoomScale}
       color={color}
       onClickLabel={item.onClickLabel}
@@ -323,11 +298,8 @@ const LabelOnKP = observer(({ item, color }) => {
 });
 
 const LabelOnVideoBbox = observer(({ reg, box, color, scale, strokeWidth, adjacent = false }) => {
-  const isLabeling = !!reg.labeling;
   const isTexting = !!reg.texting;
   const labelText = reg.getLabelText(",");
-
-  if (!isLabeling && !isTexting) return null;
 
   return (
     <LabelOnBbox

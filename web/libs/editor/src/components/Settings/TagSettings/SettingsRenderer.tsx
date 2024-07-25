@@ -41,7 +41,8 @@ const SettingsField: FC<{
   }
 
   if (value.type !== "boolean") {
-    (props.type = value.type), (props.value = store.settings[name]);
+    props.type = value.type;
+    props.value = store.settings[name];
     props.placeholder = value.description;
   }
 
