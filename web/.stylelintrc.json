@@ -5,7 +5,6 @@
     "custom-property-pattern": null,
     "selector-pseudo-class-no-unknown": null,
     "no-descending-specificity": null,
-    "scss/double-slash-comment-whitespace-inside": null,
     "scss/no-global-function-names": null
   }
 }

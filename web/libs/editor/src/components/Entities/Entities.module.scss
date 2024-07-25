@@ -80,7 +80,7 @@
   }
 
   &.selected {
-    //noinspection CssInvalidFunction
+    // noinspection CssInvalidFunction
     box-shadow: 0 0 0 4px var(--labelBgColor, rgb(0 0 0 / 20%));
   }
 
