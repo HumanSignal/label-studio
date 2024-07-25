@@ -35,34 +35,12 @@
   padding: 2px;
 }
 
-// .htx-no-highlight {
-//     display: none;
-// }
-
 .htx-no-label::after {
   display: none;
 }
 
-.htx-highlight {
-  // border: 1px dashed #00aeff;
-}
-
-.htx-highlight-last {
-  // position: relative;
-}
-
 .htx-highlight-last::after {
   margin-left: 2px;
-
-  // top: -0.3em;
-  // margin-right: 2px;
-  // position: relative;
-  // color: #1f104d;
-  // font-size: 75%;
-  // font-weight: bold;
-}
-
-.htx-highlight-vertical::after {
 }
 
 .htx-yoyo::after {
