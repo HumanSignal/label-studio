@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1265: Display index on regions with empty labels (#6117)",
-  "commit": "6d30eadde17a7b8ba5723e90f2135b19b3c55029",
-  "date": "2024-07-25T14:49:47.000Z",
+  "message": "docs: OPTIC-753: Updating README.md to reflect information pertaining to linting of frontend code (#6131)",
+  "commit": "ae575fea2bbf5c92c27ab3325b36210120854331",
+  "date": "2024-07-25T16:41:18.000Z",
   "branch": "develop"
 }
