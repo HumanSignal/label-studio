@@ -42,7 +42,8 @@ const Select = ({
               ref={ref}
               value={value}
               onChange={(e) => {
-                setValue(e.target.value), props.onChange?.(e);
+                setValue(e.target.value);
+                props.onChange?.(e);
               }}
               className={rootClass.elem("list")}
             >

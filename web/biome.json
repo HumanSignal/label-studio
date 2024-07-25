@@ -31,8 +31,6 @@
       "recommended": true,
       "a11y": {
         "noAutofocus": "off",
-        "noRedundantAlt": "off",
-        "useButtonType": "off",
         "useKeyWithClickEvents": "off"
       },
       "suspicious": {
@@ -44,12 +42,10 @@
         "noConfusingVoidType": "off",
         "noImplicitAnyLet": "off",
         "noShadowRestrictedNames": "off",
-        "useDefaultSwitchClauseLast": "off",
         "useGetterReturn": "off"
       },
       "complexity": {
         "noForEach": "off",
-        "noUselessSwitchCase": "off",
         "useOptionalChain": "off",
         "noBannedTypes": "off",
         "noStaticOnlyClass": "off",
@@ -68,7 +64,6 @@
         "noNonNullAssertion": "off",
         "useDefaultParameterLast": "off",
         "useNodejsImportProtocol": "off",
-        "noCommaOperator": "off",
         "noParameterAssign": "off"
       },
       "nursery": {},
