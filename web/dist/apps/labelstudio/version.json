@@ -1,6 +1,6 @@
 {
-  "message": "ci: enable some rules in biome (#5903)",
-  "commit": "69f4e0eba8d3f01b0c866aa370044f7e392c1a87",
-  "date": "2024-07-24T14:36:15.000Z",
+  "message": "ci: enable some rules in biome  (#6128)",
+  "commit": "b1fff9814ecabfbdb067246b2b665337ed010022",
+  "date": "2024-07-25T13:57:57.000Z",
   "branch": "develop"
 }
