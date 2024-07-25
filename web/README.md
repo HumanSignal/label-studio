@@ -53,7 +53,7 @@ Datamanager is an advanced tool specifically for data exploration within Label S
 This project uses python `pre-commit` hooks to ensure code quality. To install the hooks, run `make configure-hooks` in the project root directory.
 This will install the hooks and run them on every pre-push to ensure pull requests will be aligned with linting for both python and javascript/typescript code.
 
-If for any reason you need to format or lint using the same `pre-commit` hooks directly, you can run `make fmt` or `make check` respectively from the project root directory.
+If for any reason you need to format or lint using the same `pre-commit` hooks directly, you can run `make fmt` or `make fmt-check` respectively from the project root directory.
 
 ## Ecosystem
 
