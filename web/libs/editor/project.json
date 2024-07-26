@@ -5,7 +5,7 @@
   "projectType": "library",
   "tags": [],
   "targets": {
-    "buildt": {
+    "build": {
       "executor": "@nx/webpack:webpack",
       "defaultConfiguration": "production",
       "options": {
