@@ -113,17 +113,16 @@ const Model = types
     },
 
     removeKeypoint(frame) {
-      self.sequence = self.sequence.filter((closestKeypoint) => closestKeypoint.frame !== frame);
+      self.sequence = self.sequence.filter((keypoint) => keypoint.frame !== frame);
     },
 
     isInLifespan(targetFrame) {
-      const closestKeypoint = self.closestKeypoint(targetFrame);
+      const closestKeypoint = self.closestKeypoint(targetFrame, true);
 
       if (closestKeypoint) {
-        const { enabled, frame } = closestKeypoint;
-
-        if (frame === targetFrame && !enabled) return true;
-        return enabled;
+        // keyframes always have a value
+        if (closestKeypoint.frame === targetFrame) return true;
+        return closestKeypoint.enabled;
       }
       return false;
     },
