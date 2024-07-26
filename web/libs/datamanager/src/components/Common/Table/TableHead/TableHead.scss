@@ -4,7 +4,6 @@
   height: 50px;
   z-index: 1;
   font-weight: 500;
-  position: sticky;
   overflow: visible;
   background-color: var(--white);
   min-width: fit-content;
@@ -29,6 +28,7 @@
 
   &__draggable {
     --scale: 1;
+
     transform: scale(var(--scale));
     cursor: move;
   }

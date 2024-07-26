@@ -36,15 +36,20 @@
     position: relative;
     display: inline-block;
     transition: all 80ms ease;
-    box-shadow: inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15);
+    box-shadow: inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15);
+
+    &_checked::before {
+      opacity: 1;
+    }
+
+    &_indeterminate::after {
+      opacity: 1;
+    }
   }
 
   &__check::before,
   &__check::after {
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    inset: 0;
     display: block;
     content: '';
     opacity: 0;
@@ -59,21 +64,8 @@
   }
 
   &__check::after {
-    top: 4px;
-    left: 4px;
-    bottom: 4px;
-    right: 4px;
+    inset: 4px;
     border-radius: 2px;
-  }
-
-  &__check {
-    &_checked::before {
-      opacity: 1;
-    }
-
-    &_indeterminate::after {
-      opacity: 1;
-    }
   }
 
   &__label {

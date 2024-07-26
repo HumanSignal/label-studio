@@ -30,7 +30,7 @@
   &.before-disappear {
     transition-property: opacity, transform;
     transition-duration: var(--menu-animation-duration);
-    transition-iming-function: var(--menu-animation-curve);
+    transition-timing-function: var(--menu-animation-curve);
   }
 
   &.before-appear {

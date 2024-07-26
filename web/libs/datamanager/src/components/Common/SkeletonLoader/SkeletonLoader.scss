@@ -1,7 +1,8 @@
 .skeletonLoader {
-  --skeleton-light-color: linear-gradient(0deg, rgba(9, 109, 217, 0.05), rgba(9, 109, 217, 0.05)), #FAFAFA;
-  --skeleton-dark-color: linear-gradient(0deg, rgba(9, 109, 217, 0.14), rgba(9, 109, 217, 0.14)), #FAFAFA;
+  --skeleton-light-color: linear-gradient(0deg, rgb(9 109 217 / 5%), rgb(9 109 217 / 5%)), #FAFAFA;
+  --skeleton-dark-color: linear-gradient(0deg, rgb(9 109 217 / 14%), rgb(9 109 217 / 14%)), #FAFAFA;
   --skeleton-gap: 4px;
+
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -17,6 +18,7 @@
   &__line {
     --line-width: 60%;
     --line-height: 16px;
+
     height: var(--line-height);
     width: var(--line-width);
     min-width: 20px;
@@ -32,12 +34,13 @@
 
   &__gap {
     --height: 8px;
+
     height: var(--height);
   }
 }
 
 
-@-webkit-keyframes skeleton-animation {
+@keyframes skeleton-animation {
   0% {
     background: var(--skeleton-light-color);
     opacity: 1;
@@ -54,7 +57,7 @@
 }
 
 
-@-moz-keyframes skeleton-animation {
+@keyframes skeleton-animation {
   0% {
     background: var(--skeleton-light-color);
     opacity: 1;
@@ -71,7 +74,7 @@
 }
 
 
-@-ms-keyframes skeleton-animation {
+@keyframes skeleton-animation {
   0% {
     background: var(--skeleton-light-color);
     opacity: 1;
@@ -88,7 +91,7 @@
 }
 
 
-@-o-keyframes skeleton-animation {
+@keyframes skeleton-animation {
   0% {
     background: var(--skeleton-light-color);
     opacity: 1;

@@ -59,10 +59,7 @@
 }
 
 .offscreen-lsf.visible {
-  bottom: auto;
-  right: auto;
-  top: 0;
-  left: 0;
+  inset: 0 auto auto 0;
   opacity: 1;
 }
 

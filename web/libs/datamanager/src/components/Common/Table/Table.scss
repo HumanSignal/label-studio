@@ -34,7 +34,7 @@
     }
 
     &:active {
-      background: linear-gradient(0deg, var(--black_2), var(--black_2)), #FFFFFF;
+      background: linear-gradient(0deg, var(--black_2), var(--black_2)), #FFF;
       box-shadow: 0 0 5px 0 var(--black_20);
     }
   }
@@ -123,7 +123,7 @@
       z-index: 50;
       position: absolute;
       pointer-events: none;
-      box-shadow: 0 0 0 1px rgba(var(--accent_color-raw), 0.8) inset;
+      box-shadow: 0 0 0 1px rgb(var(--accent_color-raw) 0.8) inset;
     }
   }
 

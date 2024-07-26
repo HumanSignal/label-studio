@@ -28,6 +28,7 @@
   &__draggable {
     --translatex: 0;
     --translatey: 0;
+
     transform: translate(var(--translatex), var(--translatey));
     cursor: move;
   }
