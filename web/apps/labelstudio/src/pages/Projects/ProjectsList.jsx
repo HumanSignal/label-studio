@@ -7,6 +7,8 @@ import { Button, Dropdown, Menu, Pagination, Userpic } from "../../components";
 import { Block, Elem } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
 
+const DEFAULT_CARD_COLORS = ["#FFFFFF", "#FDFDFC"];
+
 export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
   return (
     <>
@@ -48,7 +50,7 @@ export const EmptyProjectsList = ({ openModal }) => {
 
 const ProjectCard = ({ project }) => {
   const color = useMemo(() => {
-    return project.color === "#FFFFFF" ? null : project.color;
+    return DEFAULT_CARD_COLORS.includes(project.color) ? null : project.color;
   }, [project]);
 
   const projectColors = useMemo(() => {
