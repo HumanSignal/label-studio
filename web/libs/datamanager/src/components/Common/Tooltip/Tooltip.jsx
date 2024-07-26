@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { Block, Elem } from "../../../utils/bem";
 import { alignElements } from "../../../utils/dom";
 import { aroundTransition } from "../../../utils/transition";
-import "./Tooltip.styl";
+import "./Tooltip.scss";
 
 export const Tooltip = forwardRef(({ title, children, defaultVisible, disabled, style }, ref) => {
   const child = Children.only(children);

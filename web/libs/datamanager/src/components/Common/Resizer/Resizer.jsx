@@ -1,6 +1,6 @@
 import React from "react";
 import { Block, Elem } from "../../../utils/bem";
-import "./Resizer.styl";
+import "./Resizer.scss";
 
 const calculateWidth = (width, minWidth, maxWidth, initialX, currentX) => {
   const offset = currentX - initialX;

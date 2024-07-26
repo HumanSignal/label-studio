@@ -13,7 +13,7 @@ import { shallowEqualArrays } from "shallow-equal";
 import { BemWithSpecifiContext } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import { Dropdown } from "../Dropdown/Dropdown";
-import "./Select.styl";
+import "./Select.scss";
 
 const SelectContext = createContext();
 const { Block, Elem } = BemWithSpecifiContext();

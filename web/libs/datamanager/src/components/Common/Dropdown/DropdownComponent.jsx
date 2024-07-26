@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Block, cn } from "../../../utils/bem";
 import { alignElements } from "../../../utils/dom";
 import { aroundTransition } from "../../../utils/transition";
-import "./Dropdown.styl";
+import "./Dropdown.scss";
 import { DropdownContext } from "./DropdownContext";
 import { DropdownTrigger } from "./DropdownTrigger";
 

@@ -6,7 +6,7 @@ import { Button } from "../Button/Button";
 import { Dropdown } from "../Dropdown/DropdownComponent";
 import { Icon } from "../Icon/Icon";
 import Input from "../Input/Input";
-import "./Tabs.styl";
+import "./Tabs.scss";
 import { TabsMenu } from "./TabsMenu";
 
 const { Block, Elem } = BemWithSpecifiContext();

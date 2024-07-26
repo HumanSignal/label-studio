@@ -1,6 +1,0 @@
-{
-  "message": "fix: OPTIC-954: Project card default color change broke the text color (#6123)",
-  "commit": "8b878bbb978e3c0e7dd2cfba7132f45a242ed034",
-  "date": "2024-07-26T13:53:49.000Z",
-  "branch": "develop"
-}

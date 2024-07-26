@@ -9,7 +9,7 @@ import { Spinner } from "../Common/Spinner";
 import { Tabs, TabsItem } from "../Common/Tabs/Tabs";
 import { FiltersSidebar } from "../Filters/FiltersSidebar/FilterSidebar";
 import { DataView } from "../MainView";
-import "./DataManager.styl";
+import "./DataManager.scss";
 import { Toolbar } from "./Toolbar/Toolbar";
 
 const injector = inject(({ store }) => {

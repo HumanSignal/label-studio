@@ -10,7 +10,7 @@ import { Icon } from "../Common/Icon/Icon";
 import { Resizer } from "../Common/Resizer/Resizer";
 import { Space } from "../Common/Space/Space";
 import { DataView } from "../MainView";
-import "./Label.styl";
+import "./Label.scss";
 
 const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
   return (
