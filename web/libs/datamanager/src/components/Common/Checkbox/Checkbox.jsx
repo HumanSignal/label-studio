@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "../../../utils/bem";
-import "./Checkbox.styl";
+import "./Checkbox.scss";
 
 export const Checkbox = ({ checked, indeterminate, style, onChange, children, ...props }) => {
   const rootClass = cn("checkbox");

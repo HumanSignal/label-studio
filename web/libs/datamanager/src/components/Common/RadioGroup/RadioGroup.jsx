@@ -1,7 +1,7 @@
 import React from "react";
 import { Block, Elem } from "../../../utils/bem";
 import { FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
-import "./RadioGroup.styl";
+import "./RadioGroup.scss";
 
 const RadioContext = React.createContext();
 

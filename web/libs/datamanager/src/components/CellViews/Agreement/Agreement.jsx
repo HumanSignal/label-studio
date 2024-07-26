@@ -1,6 +1,6 @@
 import { Block, Elem } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
-import "./Agreement.styl";
+import "./Agreement.scss";
 
 const agreement = (p) => {
   if (!isDefined(p)) return "zero";

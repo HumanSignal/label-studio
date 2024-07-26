@@ -93,6 +93,20 @@ const ToolMixin = types
 
       if (typeof self[fn] !== "undefined") self[fn].call(self, ev, args);
     },
+
+    /**
+     * Indicates will the tool interact with the regions or not
+     * It doesn't affect interactions with the canvas (zooming, drawing, etc.)
+     * Some tools might override this method (at least MoveTool and ZoomTool)
+     * @param e
+     * @returns {boolean}
+     */
+    shouldSkipInteractions(e) {
+      const isCtrlPressed = e.evt && (e.evt.metaKey || e.evt.ctrlKey);
+      const hasSelection = self.control.annotation.hasSelection;
+
+      return !!isCtrlPressed && !hasSelection;
+    },
   }));
 
 export default types.compose(ToolMixin, AnnotationMixin);

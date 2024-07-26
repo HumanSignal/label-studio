@@ -20,7 +20,7 @@
     "build": "NODE_ENV=production nx run-many --target=build --configuration=production",
     "version:libs": "nx run-many --target=version",
     "docs": "nx run-many --target=docs",
-    "watch": "nx run-many --target=build --configuration=production --watch",
+    "watch": "nx run-many --target=build --watch",
     "test:e2e": "yarn ls:e2e && yarn lsf:e2e",
     "test:integration": "yarn lsf:integration",
     "test:unit": "nx run-many --target=unit",
