@@ -20,6 +20,7 @@ import {
   IconRectangleToolSmart,
   IconText,
   IconWarning,
+  LsChevron,
 } from "../../assets/icons";
 import { NodeView } from "./NodeView";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
@@ -78,6 +79,12 @@ const NodeViews = {
     icon: IconRectangleTool,
     altIcon: IconRectangleToolSmart,
     getContent: (node) => <span style={{ color: "#5a5a5a" }}>from {node.sequence[0]?.frame} frame</span>,
+  }),
+
+  VideoClassificationModel: NodeView({
+    name: "Video",
+    icon: (...args: any) => <LsChevron {...args} style={{ rotate: "180deg" }} />,
+    getContent: (node) => <span>{node.label}</span>,
   }),
 
   PolygonRegionModel: NodeView({

@@ -236,6 +236,9 @@ const useDataTree = ({ regions, rootClass, footer }: any) => {
       if (type.includes("tool")) {
         return item.value;
       }
+      if (type === "videoclassification") {
+        return item.label;
+      }
     })();
 
     // The only source of truth for region indices is here, where they are coming from different
