@@ -3,8 +3,13 @@
   "rules": {
     "selector-class-pattern": null,
     "custom-property-pattern": null,
-    "selector-pseudo-class-no-unknown": null,
     "no-descending-specificity": null,
-    "scss/no-global-function-names": null
+    "scss/no-global-function-names": null,
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": ["global"]
+      }
+    ]
   }
 }
