@@ -108,6 +108,8 @@ module.exports = composePlugins(
       shared: [
         "react",
         "react-dom",
+        "react-router",
+        "react-router-dom",
         "mobx",
         "mobx-react",
         "mobx-state-tree",
@@ -116,8 +118,6 @@ module.exports = composePlugins(
         "nanoid",
         "react-beautiful-dnd",
         "react-icons",
-        "react-router",
-        "react-router-dom",
         "react-virtualized-auto-sizer",
         "react-window",
         "sanitize-html",
@@ -129,10 +129,12 @@ module.exports = composePlugins(
       },
       datamanager: {
         import: path.resolve(__dirname, "libs/datamanager/src/index.js"),
+        chunkLoading: "import",
         dependOn: "shared",
       },
       editor: {
         import: path.resolve(__dirname, "libs/editor/src/index.js"),
+        chunkLoading: "import",
         dependOn: "shared",
       },
     };
@@ -146,6 +148,7 @@ module.exports = composePlugins(
 
     config.optimization = {
       splitChunks: false,
+      runtimeChunk: "single",
     };
 
     config.resolve.fallback = {

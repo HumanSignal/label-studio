@@ -19,6 +19,8 @@ import { FF_OPTIC_2, isFF } from "../../utils/feature-flags";
 
 import "./DataManager.styl";
 
+const dependencies = [import("@humansignal/datamanager"), import("@humansignal/editor")];
+
 const initializeDataManager = async (root, props, params) => {
   if (!window.LabelStudio) throw Error("Label Studio Frontend doesn't exist on the page");
   if (!root && root.dataset.dmInitialized) return;
@@ -66,6 +68,7 @@ export const DataManagerPage = ({ ...props }) => {
   const { project } = useProject();
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
+  const [loading, setLoading] = useState(!window.DataManager || !window.LabelStudio);
   const dataManagerRef = useRef();
   const projectId = project?.id;
 
@@ -169,12 +172,14 @@ export const DataManagerPage = ({ ...props }) => {
   }, [dataManagerRef]);
 
   useEffect(() => {
-    init();
+    Promise.all(dependencies)
+      .then(() => setLoading(false))
+      .then(init);
 
     return () => destroyDM();
   }, [root, init]);
 
-  if (!window.DataManager || !window.LabelStudio) {
+  if (loading) {
     return (
       <div
         style={{

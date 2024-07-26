@@ -22,12 +22,8 @@
   <link href="{{settings.HOSTNAME}}/static/fonts/roboto/roboto.css" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
 
-  <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
-  <script src="{{settings.HOSTNAME}}{% static 'js/helpers.js' %}"></script>
-
   {% block app-scripts %}
   {% endblock %}
-
 
   <script
    src="https://browser.sentry-cdn.com/5.17.0/bundle.min.js"
@@ -43,7 +39,6 @@
   {% endblock %}
 
   {% block head-toast %}
-    <script src="{{settings.HOSTNAME}}{% static 'js/Toast.min.js' %}"></script>
     <link href="{{settings.HOSTNAME}}{% static 'css/Toast.min.css' %}" rel="stylesheet">
   {% endblock %}
 
@@ -77,6 +72,9 @@
 <template id="context-menu-right">
   {% block context_menu_right %}{% endblock %}
 </template>
+
+{% block global-js %}
+{% endblock %}
 
 <script id="app-settings" nonce="{{request.csp_nonce}}">
   window.APP_SETTINGS = Object.assign({
@@ -113,10 +111,14 @@
 </script>
 
 {% block app-js %}
+<script src="{{settings.HOSTNAME}}/react-app/shared.js?v={{ versions.backend.commit }}"></script>
 <script src="{{settings.HOSTNAME}}/react-app/main.js?v={{ versions.backend.commit }}"></script>
 {% endblock %}
 
-<div id="dynamic-content">
+{% block bottomjs %}
+  <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
+  <script src="{{settings.HOSTNAME}}{% static 'js/helpers.js' %}"></script>
+  <script src="{{settings.HOSTNAME}}{% static 'js/Toast.min.js' %}"></script>
   <script nonce="{{request.csp_nonce}}">
       applyCsrf();
 
@@ -124,10 +126,9 @@
            $(this).closest('.message').transition('fade');
       });
   </script>
+{% endblock %}
 
-  {% block bottomjs %}
-  {% endblock %}
-
+<div id="dynamic-content">
   {% block storage-persistence %}
   <script nonce="{{request.csp_nonce}}">
     {# storage persistence #}
