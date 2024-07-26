@@ -1,11 +1,11 @@
-import styles from './ui.module.scss';
+import styles from "./ui.module.scss";
 
 /* eslint-disable-next-line */
-export interface UiProps {}
+export type UiProps = {};
 
 export function Ui(props: UiProps) {
   return (
-    <div className={styles['container']}>
+    <div className={styles.container}>
       <h1>Welcome to Ui!</h1>
     </div>
   );

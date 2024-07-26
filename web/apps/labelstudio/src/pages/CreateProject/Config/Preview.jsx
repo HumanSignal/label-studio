@@ -46,47 +46,44 @@ export const Preview = ({ config, data, error, loading, project }) => {
     return config ?? EMPTY_CONFIG;
   }, [config]);
 
-  const initLabelStudio = useCallback(
-    (config, task) => {
-      if (!task.data) return;
+  const initLabelStudio = useCallback((config, task) => {
+    if (!task.data) return;
 
-      console.info("Initializing LSF preview", { config, task });
+    console.info("Initializing LSF preview", { config, task });
 
-      try {
-        const lsf = new window.LabelStudio(rootRef.current, {
-          config,
-          task,
-          interfaces: ["side-column", "annotations:comments", "comments:resolve-any"],
-          // with SharedStore we should use more late event
-          [isFF(FF_DEV_3617) ? "onStorageInitialized" : "onLabelStudioLoad"](LS) {
-            LS.settings.bottomSidePanel = true;
+    try {
+      const lsf = new window.LabelStudio(rootRef.current, {
+        config,
+        task,
+        interfaces: ["side-column", "annotations:comments", "comments:resolve-any"],
+        // with SharedStore we should use more late event
+        [isFF(FF_DEV_3617) ? "onStorageInitialized" : "onLabelStudioLoad"](LS) {
+          LS.settings.bottomSidePanel = true;
 
-            const initAnnotation = () => {
-              const as = LS.annotationStore;
-              const c = as.createAnnotation();
+          const initAnnotation = () => {
+            const as = LS.annotationStore;
+            const c = as.createAnnotation();
 
-              as.selectAnnotation(c.id);
-            };
+            as.selectAnnotation(c.id);
+          };
 
-            if (isFF(FF_DEV_3617)) {
-              // and even then we need to wait a little even after the store is initialized
-              setTimeout(initAnnotation);
-            } else {
-              initAnnotation();
-            }
-          },
-        });
+          if (isFF(FF_DEV_3617)) {
+            // and even then we need to wait a little even after the store is initialized
+            setTimeout(initAnnotation);
+          } else {
+            initAnnotation();
+          }
+        },
+      });
 
-        lsf.on("presignUrlForProject", onPresignUrlForProject);
+      lsf.on("presignUrlForProject", onPresignUrlForProject);
 
-        return lsf;
-      } catch (err) {
-        console.error(err);
-        return null;
-      }
-    },
-    [],
-  );
+      return lsf;
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
     const opacity = loading || error ? 0.6 : 1;
@@ -106,7 +103,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
         // there is can be weird error from LSF, but we can just skip it for now
         try {
           lsf.current.destroy();
-        } catch (e) { }
+        } catch (e) {}
         lsf.current = null;
       }
     };

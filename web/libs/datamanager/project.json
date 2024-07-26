@@ -34,9 +34,7 @@
     },
     "unit": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
         "jestConfig": "libs/datamanager/jest.config.ts",
         "passWithNoTests": true

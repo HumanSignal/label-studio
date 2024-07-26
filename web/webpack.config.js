@@ -104,6 +104,38 @@ module.exports = composePlugins(
   (config) => {
     // Update the webpack config as needed here.
     // e.g. `config.plugins.push(new MyPlugin())`
+    config.entry = {
+      shared: [
+        "react",
+        "react-dom",
+        "mobx",
+        "mobx-react",
+        "mobx-state-tree",
+        "chroma-js",
+        "history",
+        "nanoid",
+        "react-beautiful-dnd",
+        "react-icons",
+        "react-router",
+        "react-router-dom",
+        "react-virtualized-auto-sizer",
+        "react-window",
+        "sanitize-html",
+        "strman",
+      ],
+      main: {
+        import: path.resolve(__dirname, "apps/labelstudio/src/main.tsx"),
+        dependOn: "shared",
+      },
+      datamanager: {
+        import: path.resolve(__dirname, "libs/datamanager/src/index.js"),
+        dependOn: "shared",
+      },
+      editor: {
+        import: path.resolve(__dirname, "libs/editor/src/index.js"),
+        dependOn: "shared",
+      },
+    };
 
     config.output = {
       ...config.output,
