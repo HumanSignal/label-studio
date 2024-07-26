@@ -5,6 +5,7 @@
   "scripts": {
     "ui:serve": "nx storybook storybook",
     "ui:test:component": "nx run storybook:test-component",
+    "lint": "biome check --apply .",
     "ls:watch": "nx run labelstudio:build:development --watch",
     "ls:unit": "nx run labelstudio:unit",
     "ls:e2e": "nx run labelstudio-e2e:e2e",

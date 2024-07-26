@@ -287,7 +287,7 @@ export const Annotation = types
     },
 
     get hasSelection() {
-      return self.regionStore.selection.hasSelection;
+      return self.regionStore.hasSelection;
     },
     get selectionSize() {
       return self.regionStore.selection.size;
