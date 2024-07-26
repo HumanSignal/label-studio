@@ -10,6 +10,7 @@ import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
 const ClassificationBase = types
   .model("ClassificationBase", {
     isClassificationTag: true,
+    perframe: false,
   })
   .extend((self) => {
     /* Validation */
