@@ -155,9 +155,6 @@ const Model = types
 
       return { items, columns, itemIds };
     },
-    get result() {
-      return self.annotation?.results.find((r) => r.from_name === self);
-    },
   }))
   .actions((self) => ({
     createResult(data) {

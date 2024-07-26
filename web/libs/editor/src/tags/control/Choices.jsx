@@ -116,6 +116,8 @@ const Model = types
   })
   .views((self) => ({
     get shouldBeUnselected() {
+      // perFrame are always multi-choice
+      if (self.perframe) return true;
       return self.choice === "single" || self.choice === "single-radio";
     },
 

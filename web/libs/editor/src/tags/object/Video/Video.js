@@ -209,13 +209,65 @@ const Model = types
         perFrameClassifications.forEach((tag) => tag.updateFromResult(values));
       },
 
-      addRegion(data) {
-        const control = self.videoControl() ?? self.control();
+      /**
+       * Update the region, associated with `tag` and `value` to reflect the action in control.
+       * For Choices it will add keypoint when we select checkbox and remove when we unselect.
+       * @todo this is specific solution for per-frame Choices, it will need corrections to support other types.
+       * @todo for example `selected` might be changed for broader semantics like whether to add value or to remove.
+       * @todo or `value` might be stored in sequence, not right after it.
+       * @param {object} controlTag the tag to manage regions from
+       * @param {*} value value for current region
+       * @param {boolean} selected are we creating keypoints, because value was just added? or removing?
+       */
+      updatePerFrameRegion(controlTag, value, selected) {
+        const video = controlTag.toNameTag;
+        const resultType = controlTag.resultType;
+        // for Choices we have one result/region per one choice, so pick the relevant one
+        const perFrameResult = self.annotation.results.find((r) =>
+          r.from_name === controlTag && String(r.value[resultType]) === String(value)
+        );
+        let region = perFrameResult?.area;
+
+        if (selected) {
+          // 1. we need to add keypoint or create a region if we are adding
+          if (region) {
+            region.addKeypoint(video.frame);
+          } else {
+            region = video.addRegion(
+              { enabled: false },
+              { [resultType]: value },
+              controlTag,
+            );
+          }
+        } else {
+          // basically it's impossible case, because we can remove value only if we have one;
+          // and we can have value only when region exists. but checking just in case.
+          if (!region) return;
+          // 2. we need to remove keypoint (and even a region) if we are removing
+          const closestKeypoint = region.closestKeypoint(video.frame);
+          if (closestKeypoint.frame === video.frame) {
+            region.removeKeypoint(video.frame);
+            if (!region.sequence.length) {
+              region.deleteRegion();
+            }
+          } else {
+            region.toggleLifespan(video.frame);
+          }
+        }
+
+        // always select the region if possible to do move action afterwards
+        if (region?.sequence.length) self.annotation.selectArea(region);
+      },
+
+      addRegion(data, resultValue = {}, anotherControl = null) {
+        const control = anotherControl ?? self.videoControl() ?? self.control();
 
         const sequence = [
           {
+            // @todo maybe better not to allow to override frame?
             frame: self.frame,
             enabled: true,
+            // @todo too specific property
             rotation: 0,
             ...data,
           },
@@ -226,7 +278,7 @@ const Model = types
           return;
         }
 
-        const area = self.annotation.createResult({ sequence }, {}, control, self);
+        const area = self.annotation.createResult({ ...resultValue, sequence }, resultValue, control, self);
 
         // add labels
         self.activeStates().forEach((state) => {

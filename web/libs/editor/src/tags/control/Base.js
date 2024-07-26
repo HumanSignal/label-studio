@@ -48,7 +48,7 @@ const ControlBase = types
     },
 
     get result() {
-      return self.annotation.results.find((r) => r.from_name === self);
+      return self.annotation?.results.find((r) => r.from_name === self);
     },
 
     getSnappedPoint(point) {

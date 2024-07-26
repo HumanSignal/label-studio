@@ -140,6 +140,12 @@ const Model = types
 
       self.setSelected(!selected);
 
+      if (choices.perframe) {
+        const video = choices.toNameTag;
+        video.updatePerFrameRegion(choices, [self.resultValue], !selected);
+        return;
+      }
+
       choices.updateResult?.();
     },
 
