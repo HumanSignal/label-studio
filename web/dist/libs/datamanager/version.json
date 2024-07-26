@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1191: Fix drawing tools scenarios with ctrl pressed (#6056)",
-  "commit": "0d980a21cc5b2200b777de91ff59991fedf70292",
-  "date": "2024-07-25T21:23:34.000Z",
+  "message": "fix: OPTIC-954: Project card default color change broke the text color (#6123)",
+  "commit": "8b878bbb978e3c0e7dd2cfba7132f45a242ed034",
+  "date": "2024-07-26T13:53:49.000Z",
   "branch": "develop"
 }
