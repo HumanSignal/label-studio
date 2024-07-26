@@ -105,7 +105,7 @@ const SelectionMap = types
         for (const [controlName, value] of Object.entries(valuesFromControls)) {
           const control = controlsByName[controlName];
 
-          control.updateFromResult?.(value);
+          !control.perframe && control.updateFromResult?.(value);
         }
       },
       unselect(region) {

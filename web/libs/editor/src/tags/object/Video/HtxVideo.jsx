@@ -443,6 +443,10 @@ const HtxVideoView = ({ item, store }) => {
     [],
   );
 
+  useEffect(() => {
+    item.updatePerFrameViews();
+  }, [position]);
+
   const regions = item.regs.map((reg) => {
     const color = reg.style?.fillcolor ?? reg.tag?.fillcolor ?? defaultStyle.fillcolor;
     const label = reg.labels.join(", ") || "Empty";

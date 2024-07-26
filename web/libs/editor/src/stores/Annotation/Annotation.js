@@ -88,7 +88,10 @@ const hotkeys = Hotkey("Annotations", "Annotations");
 function omitValueFields(value) {
   const newValue = { ...value };
 
-  Result.properties.value.propertyNames.forEach((propName) => {
+  // @todo temporarily limit the list of fields to fix just an original issue
+  // @todo and don't break video frame classification, which uses choices
+  // Result.properties.value.propertyNames.forEach((propName) => {
+  ["text"].forEach((propName) => {
     delete newValue[propName];
   });
   return newValue;

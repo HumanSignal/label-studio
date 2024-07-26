@@ -197,6 +197,18 @@ const Model = types
         }
       },
 
+      /**
+       * Update per frame classifications view; analogue for `updateFromResult()` but with data for current frame
+       */
+      updatePerFrameViews() {
+        const perFrameClassifications = self.annotationStore.toNames.get(self.name).filter(t => t.perframe);
+        const regions = self.regs.filter(reg => reg.choices && reg.isInLifespan(self.frame));
+        // @todo `choices` are too specific
+        const values = regions.map(reg => reg.choices).flat();
+
+        perFrameClassifications.forEach((tag) => tag.updateFromResult(values));
+      },
+
       addRegion(data) {
         const control = self.videoControl() ?? self.control();
 

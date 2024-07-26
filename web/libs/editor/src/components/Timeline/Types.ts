@@ -8,7 +8,7 @@ export type TimelineControls = Partial<Record<keyof typeof Controls, boolean>> &
 };
 
 export interface TimelineProps<D extends ViewTypes = "frames"> {
-  regions: any[];
+  regions: TimelineRegion[];
   length: number;
   position: number;
   mode: D;
