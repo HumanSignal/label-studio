@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-885: Links not clickable from within Radio Button (#6097) (#6102)",
-  "commit": "d8a37cbf7e9896364e2d32faa2cf51f715f83371",
-  "date": "2024-07-16T13:15:17.000Z",
+  "message": "fix: OPTIC-954: Project card default color change broke the text color (#6123) (#6138)",
+  "commit": "a7fa27016d8aaebca049482bd9d559bcf5da10a9",
+  "date": "2024-07-26T13:59:21.000Z",
   "branch": "ls-release/1.13.0"
 }
