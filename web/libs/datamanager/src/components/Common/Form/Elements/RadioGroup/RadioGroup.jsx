@@ -87,7 +87,7 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
   }, [props.checked]);
 
   return (
-    <Elem name="button-dm" mod={{ checked, disabled }} onClickCapture={clickHandler}>
+    <Elem name="button" mod={{ checked, disabled }} onClickCapture={clickHandler}>
       {isSimple ? (
         <Label placement="right" text={label} description={description}>
           <input type="radio" value={value} checked={checked} readOnly style={{ pointerEvents: "none" }} />

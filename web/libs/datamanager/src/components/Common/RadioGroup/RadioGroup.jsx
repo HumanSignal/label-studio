@@ -29,9 +29,9 @@ const RadioButton = ({ value, disabled, children }) => {
   const checked = value === currentValue;
 
   return (
-    <Elem tag="label" name="button-dm" mod={{ checked, disabled }}>
+    <Elem tag="label" name="button" mod={{ checked, disabled }}>
       <Elem
-        name="input-dm"
+        name="input"
         tag="input"
         type="radio"
         value={value}
