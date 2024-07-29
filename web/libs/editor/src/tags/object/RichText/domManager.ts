@@ -8,6 +8,17 @@ const CF = "\r";
 type DDExtraText = string;
 
 /**
+ * Array of all characters and dummy placeholders
+ *
+ * Content is a way to store information about the displayed text
+ * and be able to restore global offsets and relative offsets in the same time.
+ * All hidden characters as "/n" or spaces at the start/end are stored as "" (dummy)
+ * but we keep in mind that it is a character with `length` == 1,
+ * and it affects both global and relative offsets
+ */
+type Content = string[];
+
+/**
  * Normalize text for displaying it.
  * It replaces all line breaks with '\n' symbol.
  * This is a variant used historically, but it converts \r\n to \n\n which might be not correct
@@ -21,11 +32,10 @@ class DDTextElement {
   public node: Text;
   public start: number;
   public end: number;
-  // array of all characters and dummy placeholders
-  public content: string[];
+  public content: Content;
   public path?: string;
 
-  constructor(node: Text, start: number, end: number, content: string[], path?: string) {
+  constructor(node: Text, start: number, end: number, content: Content, path?: string) {
     this.node = node;
     this.start = start;
     this.end = end;
@@ -302,15 +312,45 @@ class DDSpanElement extends DDBlock {
 
 class DDDynamicBlock extends DDBlock {
   public path: string;
+  public content: Content = [];
 
   constructor(start: number, path: string) {
     super(start);
     this.path = path;
   }
 
-  addTextNode(textNode: Text, start: number, end: number, content: string[], path: string) {
+  addTextNode(textNode: Text, start: number, end: number, content: Content, path: string) {
+    // There might be only one text node per DDDynamicBlock
+    this.content = content;
     this.children.push(new DDTextElement(textNode, start, end, content, path));
     this.end = end;
+  }
+
+  getRelativeOffsetByGlobal(offset: number) {
+    return (
+      this.content
+        .slice(0, offset - this.start)
+        //restore the size of skipped symbols (mostly /n) to 1 to get the correct text offset
+        .map((ch) => (ch === "" ? " " : ch))
+        .join("").length
+    );
+  }
+
+  getGlobalOffsetByRelative(offset: number) {
+    let counter = offset;
+    const len =
+      offset === 0
+        ? 0
+        : 1 +
+          this.content.findIndex((ch) => {
+            if (ch === "") {
+              counter--;
+            } else {
+              counter -= ch.length;
+            }
+            return counter <= 0;
+          });
+    return this.start + len;
   }
 }
 
@@ -334,7 +374,6 @@ class DomData {
   private elements: Array<DDStaticElement | DDDynamicBlock | DDExtraText> = [];
   private endPos: number;
   private displayedText = "";
-  private displayedCharacters: string[] = [];
   private displayedTextPos = 0;
 
   constructor() {
@@ -352,20 +391,6 @@ class DomData {
 
   setDisplayedText(displayedText: string) {
     this.displayedText = displayedText;
-    this.displayedCharacters = [...displayedText];
-  }
-
-  convertCodePointsLengthToTextOffset(from: number, to: number) {
-    return this.displayedCharacters.slice(from, to).join("").length;
-  }
-
-  convertTextOffsetToCodePointsLength(offset: number, globalRange: [number, number]) {
-    const [start, end] = globalRange;
-    const text = this.displayedCharacters.slice(start, end).join("");
-    const textSubstring = text.substring(0, offset);
-    const codePoints = [...textSubstring].length;
-
-    return start + codePoints;
   }
 
   addStaticElement(currentNode: HTMLElement, path: Path) {
@@ -765,17 +790,21 @@ export default class DomManager {
   }
 
   relativeOffsetsToGlobalOffsets(start: string, startOffset: number, end: string, endOffset: number) {
-    const startEl = this.domData.findElementByPath(start);
-    const endEl = this.domData.findElementByPath(end);
+    let startEl = this.domData.findElementByPath(start);
+    let endEl = this.domData.findElementByPath(end);
 
     if (!startEl || !endEl) {
       return undefined;
     }
+    if (!(startEl instanceof DDDynamicBlock)) {
+      startEl = this.domData.findTextBlock(startEl.start, "end") as DDDynamicBlock;
+    }
+    if (!(endEl instanceof DDDynamicBlock)) {
+      // It really should be "end" and not "start" as we are looking for the exact container by the start position
+      endEl = this.domData.findTextBlock(endEl.start, "end") as DDDynamicBlock;
+    }
 
-    return [
-      this.domData.convertTextOffsetToCodePointsLength(startOffset, [startEl.start, this.domData.getEndOf(startEl)]),
-      this.domData.convertTextOffsetToCodePointsLength(endOffset, [endEl.start, this.domData.getEndOf(endEl)]),
-    ];
+    return [startEl.getGlobalOffsetByRelative(startOffset), endEl.getGlobalOffsetByRelative(endOffset)];
   }
 
   globalOffsetsToRelativeOffsets(start: number, end: number) {
@@ -785,9 +814,9 @@ export default class DomManager {
     if (startElement && endElement) {
       return {
         start: startElement.path,
-        startOffset: this.domData.convertCodePointsLengthToTextOffset(startElement.start, start),
+        startOffset: startElement.getRelativeOffsetByGlobal(start),
         end: endElement.path,
-        endOffset: this.domData.convertCodePointsLengthToTextOffset(endElement.start, end),
+        endOffset: endElement.getRelativeOffsetByGlobal(end),
       };
     }
 
@@ -801,12 +830,14 @@ export default class DomManager {
     if (!startEl || !endEl) {
       return undefined;
     }
+
+    const startBlock = this.domData.findTextBlock(startEl.start, "end") as DDDynamicBlock;
+    // It really should be "end" and not "start" as we are looking for the exact container by the start position
+    const endBlock = this.domData.findTextBlock(endEl.start, "end") as DDDynamicBlock;
+
     return [
-      this.domData.convertTextOffsetToCodePointsLength(range.startOffset, [
-        startEl.start,
-        this.domData.getEndOf(startEl),
-      ]),
-      this.domData.convertTextOffsetToCodePointsLength(range.endOffset, [endEl.start, this.domData.getEndOf(endEl)]),
+      startBlock.getGlobalOffsetByRelative(range.startOffset),
+      endBlock.getGlobalOffsetByRelative(range.endOffset),
     ];
   }
 
