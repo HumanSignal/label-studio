@@ -1,6 +1,6 @@
 import React from "react";
 import { Block } from "../../../utils/bem";
-import "./Icon.styl";
+import "./Icon.scss";
 
 export const Icon = React.forwardRef(({ icon, ...props }, ref) => {
   return (

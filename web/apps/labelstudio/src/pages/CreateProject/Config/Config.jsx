@@ -70,6 +70,7 @@ const Label = ({ label, template, color }) => {
           strokeLinecap="square"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <title>Delete label</title>
           <path d="M2 12L12 2" />
           <path d="M12 12L2 2" />
         </svg>
@@ -464,7 +465,7 @@ const Configurator = ({
       <div className={configClass.elem("container")}>
         <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
         <header>
-          <button data-leave={true} onClick={onBrowse}>
+          <button type="button" data-leave={true} onClick={onBrowse}>
             Browse Templates
           </button>
           <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />

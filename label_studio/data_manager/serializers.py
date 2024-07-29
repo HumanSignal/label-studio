@@ -486,3 +486,10 @@ class SelectedItemsSerializer(serializers.Serializer):
 
 class ViewResetSerializer(serializers.Serializer):
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
+
+
+class ViewOrderSerializer(serializers.Serializer):
+    project = serializers.IntegerField()
+    ids = serializers.ListField(
+        child=serializers.IntegerField(), allow_empty=False, help_text='A list of view IDs in the desired order.'
+    )

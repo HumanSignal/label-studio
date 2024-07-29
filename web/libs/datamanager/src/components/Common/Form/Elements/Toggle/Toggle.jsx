@@ -2,7 +2,7 @@ import { forwardRef, useEffect, useMemo, useState } from "react";
 import { cn } from "../../../../../utils/bem";
 import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";
-import "./Toggle.styl";
+import "./Toggle.scss";
 
 const Toggle = forwardRef(
   (

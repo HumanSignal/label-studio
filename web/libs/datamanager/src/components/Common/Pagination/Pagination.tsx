@@ -11,7 +11,7 @@ import {
 import { Block, Elem } from "../../../utils/bem";
 import { clamp, isDefined } from "../../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
-import "./Pagination.styl";
+import "./Pagination.scss";
 import { useUpdateEffect } from "../../../hooks/useUpdateEffect";
 import { Select } from "../Form/Elements";
 

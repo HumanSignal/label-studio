@@ -2,7 +2,7 @@ import { cn } from "../../../../../utils/bem";
 import { FF_LOPS_E_10, isFF } from "../../../../../utils/feature-flags";
 import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";
-import "./Input.styl";
+import "./Input.scss";
 
 const Input = ({ label, className, validate, required, skip, labelProps, ghost, ...props }) => {
   const mods = {

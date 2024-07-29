@@ -339,6 +339,7 @@ export const ImportPage = ({
         </form>
         <span>or</span>
         <button
+          type="button"
           onClick={() => document.getElementById("file-input").click()}
           className={importClass.elem("upload-button")}
         >

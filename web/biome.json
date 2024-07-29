@@ -31,10 +31,6 @@
       "recommended": true,
       "a11y": {
         "noAutofocus": "off",
-        "noRedundantAlt": "off",
-        "noSvgWithoutTitle": "off",
-        "useAltText": "off",
-        "useButtonType": "off",
         "useKeyWithClickEvents": "off"
       },
       "suspicious": {
@@ -46,13 +42,10 @@
         "noConfusingVoidType": "off",
         "noImplicitAnyLet": "off",
         "noShadowRestrictedNames": "off",
-        "useDefaultSwitchClauseLast": "off",
         "useGetterReturn": "off"
       },
       "complexity": {
         "noForEach": "off",
-        "noUselessFragments": "off",
-        "noUselessSwitchCase": "off",
         "useOptionalChain": "off",
         "noBannedTypes": "off",
         "noStaticOnlyClass": "off",
@@ -61,10 +54,7 @@
       "correctness": {
         "useExhaustiveDependencies": "off",
         "noChildrenProp": "off",
-        "noConstantCondition": "off",
-        "noInnerDeclarations": "off",
-        "useJsxKeyInIterable": "off",
-        "noInvalidUseBeforeDeclaration": "off"
+        "useJsxKeyInIterable": "off"
       },
       "performance": {
         "noAccumulatingSpread": "off",
@@ -74,10 +64,7 @@
         "noNonNullAssertion": "off",
         "useDefaultParameterLast": "off",
         "useNodejsImportProtocol": "off",
-        "noArguments": "off",
-        "noCommaOperator": "off",
-        "noParameterAssign": "off",
-        "noUselessElse": "off"
+        "noParameterAssign": "off"
       },
       "nursery": {},
       "security": {
