@@ -448,9 +448,11 @@ class DomData {
     const contentLength = content.length;
     let displayedTextLength = text.length;
 
-    if (pos === -1) {
+    // When `pos - this.displayedTextPos > 1` it most probably means
+    // that `text` is too simple (f.e. " ") and it possible to find its duplicates not at the right place.
+    if (pos === -1 || pos - this.displayedTextPos > 1) {
       // text doesn't match any parts of displayedText
-      // that means that it contains some \n or other symbols that are trimmed by browser
+      // it means that it contains some \n or other symbols that are trimmed by browser
 
       // calc the offsets of the part of displayedText that matches the text in terms of displayed symbols
       const { fromIdx, toIdx, content: newContent } = this.findProjectionOnDisplayedText(text);
@@ -496,7 +498,7 @@ class DomData {
     let idx = this.elements.indexOf(element);
 
     while (
-      !(this.elements[idx + 1] instanceof DDStaticElement) ||
+      !(this.elements[idx + 1] instanceof DDStaticElement) &&
       !(this.elements[idx + 1] instanceof DDDynamicBlock)
     ) {
       idx++;
@@ -574,11 +576,7 @@ class DomData {
   collectBlocks(start: number, end: number) {
     const startIdx = this.indexOfTextBlock(start, "end");
     const endIdx = Math.max(this.indexOfTextBlock(end, "start"), startIdx);
-    const blocks: DDDynamicBlock[] = this.elements
-      .slice(startIdx, endIdx + 1)
-      .filter((el) => el instanceof DDDynamicBlock) as DDDynamicBlock[];
-
-    return blocks;
+    return this.elements.slice(startIdx, endIdx + 1).filter((el) => el instanceof DDDynamicBlock) as DDDynamicBlock[];
   }
 
   createSpans(start: number, end: number) {
