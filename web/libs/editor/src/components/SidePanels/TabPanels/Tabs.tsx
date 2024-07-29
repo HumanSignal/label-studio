@@ -197,7 +197,7 @@ export const Tabs = (props: BaseProps) => {
 
   return (
     <>
-      <Block name="tabs" mix={isFF(FF_OUTLINER_OPTIM) ? "ff_outliner_optim" : void 0}>
+      <Block name="tabs-lsf" mix={isFF(FF_OUTLINER_OPTIM) ? "ff_outliner_optim" : void 0}>
         <Elem name="tabs-row">
           {props.panelViews.map((view, index) => {
             const { component: Component } = view;

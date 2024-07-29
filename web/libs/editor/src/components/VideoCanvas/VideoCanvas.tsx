@@ -517,7 +517,7 @@ export const VideoCanvas = memo(
       <Block ref={rootRef} name="video-canvas">
         {loading && (
           <Elem name="loading">
-            <Block name="spinner" />
+            <Block name="spinner-lsf" />
           </Elem>
         )}
         <Elem
