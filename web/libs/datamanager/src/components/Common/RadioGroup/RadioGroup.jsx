@@ -17,7 +17,7 @@ export const RadioGroup = ({ size, value, onChange, children, ...rest }) => {
         onChange: onRadioChange,
       }}
     >
-      <Block name="radio-group" mod={{ size, newUI: isFF(FF_LOPS_E_10) }} {...rest}>
+      <Block name="radio-group-dm" mod={{ size, newUI: isFF(FF_LOPS_E_10) }} {...rest}>
         <Elem name="buttons">{children}</Elem>
       </Block>
     </RadioContext.Provider>
@@ -29,9 +29,9 @@ const RadioButton = ({ value, disabled, children }) => {
   const checked = value === currentValue;
 
   return (
-    <Elem tag="label" name="button" mod={{ checked, disabled }}>
+    <Elem tag="label" name="button-dm" mod={{ checked, disabled }}>
       <Elem
-        name="input"
+        name="input-dm"
         tag="input"
         type="radio"
         value={value}

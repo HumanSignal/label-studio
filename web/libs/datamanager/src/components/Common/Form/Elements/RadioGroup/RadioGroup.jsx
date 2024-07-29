@@ -51,7 +51,7 @@ export const RadioGroup = ({
             isSimple: simple === true,
           }}
         >
-          <Block name="radio-group" mod={{ size, simple, horizontal }} mix={className}>
+          <Block name="radio-group-dm" mod={{ size, simple, horizontal }} mix={className}>
             <input ref={ref} name={props.name} type="hidden" defaultValue={currentValue} />
             <Elem name="buttons">{children}</Elem>
           </Block>
@@ -87,7 +87,7 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
   }, [props.checked]);
 
   return (
-    <Elem name="button" mod={{ checked, disabled }} onClickCapture={clickHandler}>
+    <Elem name="button-dm" mod={{ checked, disabled }} onClickCapture={clickHandler}>
       {isSimple ? (
         <Label placement="right" text={label} description={description}>
           <input type="radio" value={value} checked={checked} readOnly style={{ pointerEvents: "none" }} />
