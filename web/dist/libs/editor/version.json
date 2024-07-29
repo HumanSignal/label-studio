@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-552: Hide the comments tab on preview (#6132)",
-  "commit": "aa073905a082341ddbee85fe4abd2a7acc01559b",
-  "date": "2024-07-29T13:32:19.000Z",
+  "message": "refactor: OPTIC-931: Remove Stale Feature Flag - ff_back_1614_rejecte… (#6136)",
+  "commit": "33b9aa604e46568f1ed22cd336c943239051df68",
+  "date": "2024-07-29T20:56:28.000Z",
   "branch": "develop"
 }
