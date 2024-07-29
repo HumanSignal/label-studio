@@ -39,7 +39,7 @@ export const Label = React.forwardRef(
       <Block
         tag="span"
         ref={ref}
-        name="label"
+        name="label-lsf"
         mod={{ empty, hidden, selected, clickable: !!onClick, margins }}
         mix={className}
         style={styles}
