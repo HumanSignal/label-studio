@@ -167,7 +167,7 @@ jobs:
             core.setOutput("ubi-tags", ubiTags.join(','));
 
       - name: Build and push ubi
-        uses: docker/build-push-action@v6.4.1
+        uses: docker/build-push-action@v6.5.0
         id: docker_build_and_push_ubi
         with:
           context: .
