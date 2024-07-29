@@ -1,11 +1,11 @@
 export const keymap = {
   "dm.focus-previous": {
     title: "Focus previous task",
-    shortcut: "shift+up",
+    shortcut: "ctrl+left",
   },
   "dm.focus-next": {
     title: "Focus previous task",
-    shortcut: "shift+down",
+    shortcut: "ctrl+right",
   },
   "dm.close-labeling": {
     title: "Focus previous task",

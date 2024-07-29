@@ -374,7 +374,7 @@ export default types
       /**
        * Hotkey for next task
        */
-      if (self.hasInterface('submit', 'update', 'review')) {
+      if (self.hasInterface("skip", "review")) {
         hotkeys.addNamed('task:next', () => {
           const annotationStore = self.annotationStore;
 
@@ -386,7 +386,7 @@ export default types
       /**
        * Hotkey for previous task
        */
-      if (self.hasInterface('submit', 'update', 'review')) {
+      if (self.hasInterface("skip", "review")) {
         hotkeys.addNamed('task:previous', () => {
           const annotationStore = self.annotationStore;
 
