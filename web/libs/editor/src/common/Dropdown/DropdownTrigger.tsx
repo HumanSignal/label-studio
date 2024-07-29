@@ -106,7 +106,7 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
             setMinIndex(Math.max(minIndex, getMinIndex(triggerRef.current)));
           }
         },
-        className: cn("dropdown").elem("trigger").mix(props.className),
+        className: cn("dropdown-lsf").elem("trigger").mix(props.className),
         onClickCapture: handleToggle,
       };
     }, [triggerEL, triggerRef, props.className, handleToggle]);
