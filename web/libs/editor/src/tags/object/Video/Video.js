@@ -240,18 +240,27 @@ const Model = types
             );
           }
         } else {
+          // 2. we need to cut lifespan at current frame so that the segment,
+          // starting from the current frame to the next keyframe, is removed.
+
+          let closestKeypoint = region?.closestKeypoint(video.frame, true);
           // basically it's impossible case, because we can remove value only if we have one;
           // and we can have value only when region exists. but checking just in case.
-          if (!region) return;
-          // 2. we need to remove keypoint (and even a region) if we are removing
-          const closestKeypoint = region.closestKeypoint(video.frame);
+          if (!region || !closestKeypoint) return;
           if (closestKeypoint.frame === video.frame) {
             region.removeKeypoint(video.frame);
             if (!region.sequence.length) {
               region.deleteRegion();
+              return;
             }
-          } else {
-            region.toggleLifespan(video.frame);
+            closestKeypoint = region.closestKeypoint(closestKeypoint.frame - 1, true);
+          }
+
+          if (closestKeypoint.enabled) {
+            if (closestKeypoint.frame !== video.frame - 1) {
+              region.addKeypoint(video.frame - 1);
+            }
+            region.toggleLifespan(video.frame - 1);
           }
         }
 
