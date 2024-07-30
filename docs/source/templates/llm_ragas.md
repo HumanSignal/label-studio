@@ -83,7 +83,7 @@ Use the following labeling configuration for your project:
     />
   	<View className="ragas" >
     <View style="display: flex;">
-      <Header style="padding-right: 1em;" value="RAGAS evaluation (averaged, 0 to 100):"/><Number name="float_eval" toName="context" defaultValue="0" />
+      <Header style="padding-right: 1em;" value="Ragas evaluation (averaged, 0 to 100):"/><Number name="float_eval" toName="context" defaultValue="0" />
     </View>
     <TextArea name="ragas"
               toName="context"
@@ -91,7 +91,7 @@ Use the following labeling configuration for your project:
               maxSubmissions="1"
               showSubmitButton="false"
               smart="false"
-              placeholder="RAGAS evaluation will appear here..."
+              placeholder="Ragas evaluation will appear here..."
     />
   	</View>
     <View className="evaluation" >
