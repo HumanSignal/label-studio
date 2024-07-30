@@ -1,8 +1,8 @@
 ---
-title: Build a RAG System
+title: RAG Retrieval
 type: templates
-category: LLM Prompts
-cat: llm-prompts
+category: LLM Fine-tuning
+cat: llm-fine-tuning
 order: 906
 is_new: t
 meta_title: Create a ranked dataset for building a RAG system for LLMs with Label Studio

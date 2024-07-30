@@ -1,8 +1,8 @@
 ---
 title: Evaluate RAG with Human Feedback
 type: templates
-category: LLM Evals
-cat: llm-evals
+category: LLM Evaluations
+cat: llm-evaluations
 order: 965
 is_new: t
 meta_description: Evaluate the contextual relevancy of retrieved documents and rate the LLM response. 

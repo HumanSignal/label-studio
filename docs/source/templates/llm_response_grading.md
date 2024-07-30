@@ -1,8 +1,8 @@
 ---
 title: Response Grading
 type: templates
-category: LLM Evals
-cat: llm-evals
+category: LLM Evaluations
+cat: llm-evaluations
 order: 955
 is_new: t
 meta_description:  Assigning a grade to LLM responses based on how well it meets your internal guidelines. 

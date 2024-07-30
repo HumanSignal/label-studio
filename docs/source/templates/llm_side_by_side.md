@@ -1,8 +1,8 @@
 ---
 title: Side-by-Side LLM Output Comparison
 type: templates
-category: LLM Evals
-cat: llm-evals
+category: LLM Evaluations
+cat: llm-evaluations
 order: 960
 is_new: t
 meta_description: Evaluate a side-by-side comparison of two LLM responses. 

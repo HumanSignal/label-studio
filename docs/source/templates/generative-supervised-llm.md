@@ -1,8 +1,8 @@
 ---
 title: Supervised LLM Fine-Tuning
 type: templates
-category: LLM Prompts
-cat: llm-prompts
+category: LLM Fine-tuning
+cat: llm-fine-tuning
 order: 903
 is_new: t
 meta_title: Create dataset for supervised LLM fine-tuning

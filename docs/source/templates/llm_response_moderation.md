@@ -1,8 +1,8 @@
 ---
 title: Response Moderation
 type: templates
-category: LLM Evals
-cat: llm-evals
+category: LLM Evaluations
+cat: llm-evaluations
 order: 950
 is_new: t
 meta_description: Apply content moderation to a single LLM response. 

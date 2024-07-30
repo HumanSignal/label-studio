@@ -1,8 +1,8 @@
 ---
 title: Human Preferences collection for RLHF
 type: templates
-category: LLM Prompts
-cat: llm-prompts
+category: LLM Fine-tuning
+cat: llm-fine-tuning
 order: 904
 is_new: t
 meta_title: Create Dataset for Human Preferences Collection for RLHF

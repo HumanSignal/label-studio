@@ -1,8 +1,8 @@
 ---
 title: Evaluate RAG with RAGAS
 type: templates
-category: LLM Evals
-cat: llm-evals
+category: LLM Evaluations
+cat: llm-evaluations
 order: 970
 is_new: t
 meta_description: Use RAGAS metrics to evaluation LLM responses. 
