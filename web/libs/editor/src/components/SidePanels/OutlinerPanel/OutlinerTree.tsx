@@ -47,7 +47,7 @@ interface OutlinerTreeProps {
 }
 
 const OutlinerTreeComponent: FC<OutlinerTreeProps> = ({ regions, footer }) => {
-  const rootClass = cn("tree");
+  const rootClass = cn("tree-lsf");
   const regionsTree = useDataTree({
     regions,
     rootClass,
