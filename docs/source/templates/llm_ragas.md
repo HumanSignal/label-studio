@@ -1,31 +1,35 @@
 ---
-title: Evaluate RAG with RAGAS
+title: Evaluate RAG with Ragas
 type: templates
 category: LLM Evaluations
 cat: llm-evaluations
 order: 970
 is_new: t
-meta_description: Use RAGAS metrics to evaluation LLM responses. 
+meta_description: Use Ragas metrics to evaluation LLM responses. 
 date: 2024-07-26 14:49:57
 ---
 
 <img src="/images/templates/evaluate-rag-automated-metrics.png" alt="" class="gif-border" />
 
-You can use this template when working with the RAG quickstart ML backend. NEED TO LINK AFTER MERGE
+This template uses the [Ragas](https://docs.ragas.io/en/stable/) framework to evaluate your RAG pipeline. When given a prompt, it will use Ragas and OpenAI to return the following:
 
-The RAGAS ML backend connects Label Studio to [OpenAI](https://platform.openai.com/), allowing you to interact with chat and embedding models. 
+* An LLM-generated response to the prompt (the ML backend example uses OpenAI). 
+* A Ragas score for faithfulness and accuracy.
+* An LLM-generated evaluation of the response. 
+* A comprehensive overview of precisely which documents were used for context. 
 
-It supports question answering and evaluation using RAG, given a list of questions as tasks, and a folder containing documentation (for example, a `/docs` path within a Github repository that has been cloned on your computer).
+## Prerequisites
 
-The labeling interface includes the following elements:
+This template requires an ML backend to work. Follow the instructions outlined in [RAG Quickstart Labeling](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/rag_quickstart) to connect the ML backend to your project. 
 
-- A question that is provided to the LLM. This is defined in `text` field of your source JSON. 
-- Additional instructions to pass to the AI. You can input these instructions in a text field in Label Studio to pass to OpenAI.  
-- 
+You will need an OpenAI API key and a directory with documentation files to use as context. 
+
+!!! info Tip
+    If you are just looking to experiment with this template and the ML backend, you can clone the [Label Studio repository](https://github.com/HumanSignal/label-studio) and use the `label-studio\docs` directory as your context. 
 
 ## Configure the labeling interface
 
-[Create a project](/guide/setup_project) with the following labeling configuration. Once you have created the project, you will need to connect the ML backend. (LIIIINK)
+Use the following labeling configuration for your project:
 
 ```xml
 <View>
@@ -117,7 +121,17 @@ The labeling interface includes the following elements:
 </View>
 ```
 
+This configuration includes the following elements:
+
+* `<View>` - All labeling configurations must include a base `View` tag. In this configuration, the `View` tag is used to configure the display of blocks, similar to the div tag in HTML. It helps in organizing the layout of the labeling interface.
+* `<Style>` - The `Style` tag is used to define CSS styles that apply to the elements within the `View`. In this configuration, it sets styles for various classes various sections of the labeling interface layout. 
+* `<Header>` - The `Header` tag is used to display a header or title within the labeling interface. The text of the header is defined in the `value` parameter. 
+* `<TextArea>` -  The `TextArea` tag provides a field where you can enter text. In this case, most of the text fields will be auto-completed by the ML backend. There is one field where you can provide additional instructions to the LLM (for example, by asking it to format the answer as a list). Press **Shift + Enter** to submit your instructions. 
+
+
 ## Input data
+
+Using the configuration above, you would want to structure your input data to have a `text` element. This is the LLM prompt. For example:
 
 ```json
 [
@@ -135,3 +149,10 @@ The labeling interface includes the following elements:
   }
 ]
 ```
+
+## Related tags
+
+- [View](/tags/view.html)
+- [Style](/tags/style.html)
+- [TextArea](/tags/textarea.html)
+- [Header](/tags/header.html)
