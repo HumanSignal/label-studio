@@ -77,6 +77,11 @@ const optimizer = () => {
     result.minimizer = undefined;
   }
 
+  if (process.env.MODE === "standalone") {
+    result.runtimeChunk = false;
+    result.splitChunks = { cacheGroups: { default: false } };
+  }
+
   return result;
 };
 
@@ -90,44 +95,46 @@ module.exports = composePlugins(
   }),
   withReact({ svgr: true }),
   (config) => {
-    config.entry = {
-      main: {
-        import: path.resolve(__dirname, "apps/labelstudio/src/main.tsx"),
-      },
-    };
+    // LS entrypoint
+    if (process.env.MODE !== "standalone") {
+      config.entry = {
+        main: {
+          import: path.resolve(__dirname, "apps/labelstudio/src/main.tsx"),
+        },
+      };
+      config.output = {
+        ...config.output,
+        uniqueName: "labelstudio",
+        publicPath: "auto",
+        scriptType: "text/javascript",
+      };
 
-    config.output = {
-      ...config.output,
-      uniqueName: "labelstudio",
-      publicPath: "auto",
-      scriptType: "text/javascript",
-    };
-
-    config.optimization = {
-      runtimeChunk: "single",
-      sideEffects: true,
-      splitChunks: {
-        cacheGroups: {
-          commonVendor: {
-            test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|mobx|mobx-react|mobx-react-lite|mobx-state-tree)[\\/]/,
-            name: "vendor",
-            chunks: "all",
-          },
-          defaultVendors: {
-            test: /[\\/]node_modules[\\/]/,
-            priority: -10,
-            reuseExistingChunk: true,
-            chunks: "async",
-          },
-          default: {
-            minChunks: 2,
-            priority: -20,
-            reuseExistingChunk: true,
-            chunks: "async",
+      config.optimization = {
+        runtimeChunk: "single",
+        sideEffects: true,
+        splitChunks: {
+          cacheGroups: {
+            commonVendor: {
+              test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|mobx|mobx-react|mobx-react-lite|mobx-state-tree)[\\/]/,
+              name: "vendor",
+              chunks: "all",
+            },
+            defaultVendors: {
+              test: /[\\/]node_modules[\\/]/,
+              priority: -10,
+              reuseExistingChunk: true,
+              chunks: "async",
+            },
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true,
+              chunks: "async",
+            },
           },
         },
-      },
-    };
+      };
+    }
 
     config.resolve.fallback = {
       fs: false,
