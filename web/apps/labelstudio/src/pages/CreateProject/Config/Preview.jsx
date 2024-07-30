@@ -54,13 +54,11 @@ export const Preview = ({ config, data, error, loading, project }) => {
 
     await resolvingEditor;
 
-    console.info("Initializing LSF preview", { config, task });
-
     try {
       const lsf = new window.LabelStudio(rootRef.current, {
         config,
         task,
-        interfaces: ["side-column", "annotations:comments", "comments:resolve-any"],
+        interfaces: ["side-column"],
         // with SharedStore we should use more late event
         [isFF(FF_DEV_3617) ? "onStorageInitialized" : "onLabelStudioLoad"](LS) {
           LS.settings.bottomSidePanel = true;
