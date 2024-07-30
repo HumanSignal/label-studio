@@ -9,7 +9,7 @@ meta_title: Create a ranked dataset for text-to-image models with Label Studio
 meta_description: Template for creating a ranked dataset for text-to-image models with Label Studio for your machine learning and data science projects.
 ---
 
-<img src="/images/templates/visual-ranker.png" alt="" class="gif-border" max-width="700px"/>
+<img src="/images/templates/visual-ranker.png" alt="" class="gif-border" width="700px"/>
 
 The template provides the workflow to rank the quality of the text-to-image models responses, like Dall-E, Midjourney, Stable Diffusion etc.
 

@@ -9,7 +9,7 @@ meta_description: Evaluate the contextual relevancy of retrieved documents and r
 date: 2024-07-26 14:49:29
 ---
 
-<img src="/images/templates/evaluate-rag-human-feedback.png" alt="" class="gif-border" max-width="700px"/>
+<img src="/images/templates/evaluate-rag-human-feedback.png" alt="" class="gif-border" width="700px"/>
 
 When dealing with RAG (Retrieval-Augmented Generation) pipeline, your goal is not only evaluating a single LLM response, but also incorporating various assessments of the retrieved documents like contextual and answer relevancy and faithfulness.
 

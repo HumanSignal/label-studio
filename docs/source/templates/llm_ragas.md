@@ -9,7 +9,7 @@ meta_description: Use Ragas metrics to evaluation LLM responses.
 date: 2024-07-26 14:49:57
 ---
 
-<img src="/images/templates/evaluate-rag-automated-metrics.png" alt="" class="gif-border" max-width="700px"/>
+<img src="/images/templates/evaluate-rag-automated-metrics.png" alt="" class="gif-border" width="700px"/>
 
 This template uses the [Ragas](https://docs.ragas.io/en/stable/) framework to evaluate your RAG pipeline. When given a prompt, it will use Ragas and OpenAI to return the following:
 
