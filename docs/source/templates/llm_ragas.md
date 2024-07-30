@@ -14,7 +14,7 @@ date: 2024-07-26 14:49:57
 This template uses the [Ragas](https://docs.ragas.io/en/stable/) framework to evaluate your RAG pipeline. When given a prompt, it will use Ragas and OpenAI to return the following:
 
 * An LLM-generated response to the prompt (the ML backend example uses OpenAI). 
-* A Ragas score for faithfulness and accuracy.
+* Ragas scores for [faithfulness](https://docs.ragas.io/en/latest/concepts/metrics/faithfulness.html) and [answer relevancy](https://docs.ragas.io/en/latest/concepts/metrics/answer_relevance.html).
 * An LLM-generated evaluation of the response. 
 * A comprehensive overview of precisely which documents were used for context. 
 
