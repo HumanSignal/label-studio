@@ -534,7 +534,7 @@ const HtxVideoView = ({ item, store }) => {
             allowFullscreen={false}
             fullscreen={isFullScreen}
             defaultStepSize={16}
-            disableView={!supportsRegions}
+            disableView={!supportsRegions && !item.perFrameControl}
             framerate={item.framerate}
             controls={{ FramesControl: true }}
             customControls={[

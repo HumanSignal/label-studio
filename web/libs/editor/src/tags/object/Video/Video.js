@@ -75,6 +75,10 @@ const Model = types
       return self.ref.current?.position ?? 1;
     },
 
+    get perFrameControl() {
+      return self.annotation.toNames.get(self.name)?.find((s) => s.perframe);
+    },
+
     control() {
       return self.annotation.toNames.get(self.name)?.find((s) => !s.type.endsWith("labels"));
     },
