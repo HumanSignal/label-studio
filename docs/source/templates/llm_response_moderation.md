@@ -1,5 +1,5 @@
 ---
-title: Response Moderation
+title: LLM Response Moderation
 type: templates
 category: LLM Evaluations
 cat: llm-evaluations

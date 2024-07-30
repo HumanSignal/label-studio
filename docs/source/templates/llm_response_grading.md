@@ -1,5 +1,5 @@
 ---
-title: Response Grading
+title: LLM Response Grading
 type: templates
 category: LLM Evaluations
 cat: llm-evaluations
