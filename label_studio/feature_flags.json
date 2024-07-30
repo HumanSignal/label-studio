@@ -4432,7 +4432,7 @@
     },
     "fflag_fix_front_lsdv_4620_memory_leaks_100723_short": {
       "key": "fflag_fix_front_lsdv_4620_memory_leaks_100723_short",
-      "on": true,
+      "on": false,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
