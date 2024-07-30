@@ -64,7 +64,6 @@ STALE_FEATURE_FLAGS = {
     'ff_dev_2007_dev_2008_dynamic_tag_children_250322_short': True,
     'ff_front_dev_1598_empty_toname_240222_short': True,
     'ff_front_dev_1372_visible_when_choice_unselected_11022022_short': True,
-    'ff_back_1614_rejected_queue_17022022_short': True,
     'ff_front_dev_1621_interactive_mode_150222_short': True,
     'ff_front_DEV_1507_stuck_userpic_210122_short': True,
     'ff_front_dev_1566_shortcuts_in_results_010222_short': True,

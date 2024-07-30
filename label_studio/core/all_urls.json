@@ -24,18 +24,6 @@
         "decorators": ""
     },
     {
-        "url": "/label-studio-frontend/<path>",
-        "module": "core.utils.static_serve.serve",
-        "name": "",
-        "decorators": ""
-    },
-    {
-        "url": "/dm/<path>",
-        "module": "core.utils.static_serve.serve",
-        "name": "",
-        "decorators": ""
-    },
-    {
         "url": "/react-app/<path>",
         "module": "core.utils.static_serve.serve",
         "name": "",
