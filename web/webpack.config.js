@@ -55,19 +55,10 @@ const plugins = [
   new EnvironmentPlugin(LOCAL_ENV),
 ];
 
-if (process.env.MODE !== "standalone") {
-  plugins.push(
-    new optimize.LimitChunkCountPlugin({
-      maxChunks: 1,
-    }),
-  );
-}
-
 const optimizer = () => {
   const result = {
     minimize: true,
     minimizer: [],
-    runtimeChunk: true,
   };
 
   if (DEFAULT_NODE_ENV === "production") {
@@ -86,9 +77,6 @@ const optimizer = () => {
     result.minimizer = undefined;
   }
 
-  result.runtimeChunk = false;
-  result.splitChunks = { cacheGroups: { default: false } };
-
   return result;
 };
 
@@ -102,40 +90,9 @@ module.exports = composePlugins(
   }),
   withReact({ svgr: true }),
   (config) => {
-    // Update the webpack config as needed here.
-    // e.g. `config.plugins.push(new MyPlugin())`
     config.entry = {
-      shared: [
-        "react",
-        "react-dom",
-        "react-router",
-        "react-router-dom",
-        "mobx",
-        "mobx-react",
-        "mobx-state-tree",
-        "chroma-js",
-        "history",
-        "nanoid",
-        "react-beautiful-dnd",
-        "react-icons",
-        "react-virtualized-auto-sizer",
-        "react-window",
-        "sanitize-html",
-        "strman",
-      ],
       main: {
         import: path.resolve(__dirname, "apps/labelstudio/src/main.tsx"),
-        dependOn: "shared",
-      },
-      datamanager: {
-        import: path.resolve(__dirname, "libs/datamanager/src/index.js"),
-        chunkLoading: "import",
-        dependOn: "shared",
-      },
-      editor: {
-        import: path.resolve(__dirname, "libs/editor/src/index.js"),
-        chunkLoading: "import",
-        dependOn: "shared",
       },
     };
 
@@ -147,8 +104,29 @@ module.exports = composePlugins(
     };
 
     config.optimization = {
-      splitChunks: false,
       runtimeChunk: "single",
+      sideEffects: true,
+      splitChunks: {
+        cacheGroups: {
+          commonVendor: {
+            test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|mobx|mobx-react|mobx-react-lite|mobx-state-tree)[\\/]/,
+            name: "vendor",
+            chunks: "all",
+          },
+          defaultVendors: {
+            test: /[\\/]node_modules[\\/]/,
+            priority: -10,
+            reuseExistingChunk: true,
+            chunks: "async",
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+            chunks: "async",
+          },
+        },
+      },
     };
 
     config.resolve.fallback = {

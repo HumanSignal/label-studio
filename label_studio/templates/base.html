@@ -16,10 +16,14 @@
   <meta name="msapplication-navbutton-color" content="#272727">  <!-- Windows Phone -->
   <meta name="apple-mobile-web-app-status-bar-style" content="#272727">  <!-- iOS Safari -->
 
+  <!-- Preload fonts -->
+  <link rel="preload" href="{{settings.HOSTNAME}}{% static 'fonts/Figtree-Regular.ttf' %}" type="font" crossorigin="anonymous">
+  <link rel="preload" href="{{settings.HOSTNAME}}{% static 'fonts/Figtree-SemiBold.ttf' %}" type="font" crossorigin="anonymous">
+
+  <!-- CSS -->
   <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
   <link href="{{settings.HOSTNAME}}{% static 'css/uikit.css' %}" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}{% static 'css/main.css' %}" rel="stylesheet">
-  <link href="{{settings.HOSTNAME}}/static/fonts/roboto/roboto.css" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
 
   {% block app-scripts %}
@@ -111,7 +115,21 @@
 </script>
 
 {% block app-js %}
-<script src="{{settings.HOSTNAME}}/react-app/shared.js?v={{ versions.backend.commit }}"></script>
+<script src="{{settings.HOSTNAME}}/react-app/runtime.js?v={{ versions.backend.commit }}"></script>
+{#
+  NOTE: purposely setting this to not cache as we do not intend this to change frequently
+  If for any reason we need to invalidate the cache, we can do so by changing the version number.
+  The libs which are contained here which if updated require this version to also be updated are:
+  - react
+  - react-dom
+  - react-router
+  - react-router-dom
+  - mobx
+  - mobx-react
+  - mobx-react-lite
+  - mobx-state-tree
+#}
+<script src="{{settings.HOSTNAME}}/react-app/vendor.js?v=1"></script>
 <script src="{{settings.HOSTNAME}}/react-app/main.js?v={{ versions.backend.commit }}"></script>
 {% endblock %}
 

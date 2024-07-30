@@ -19,7 +19,7 @@ import { FF_OPTIC_2, isFF } from "../../utils/feature-flags";
 
 import "./DataManager.styl";
 
-const dependencies = [import("@humansignal/datamanager"), import("@humansignal/editor")];
+const loadDependencies = () => [import("@humansignal/datamanager"), import("@humansignal/editor")];
 
 const initializeDataManager = async (root, props, params) => {
   if (!window.LabelStudio) throw Error("Label Studio Frontend doesn't exist on the page");
@@ -60,6 +60,7 @@ const buildLink = (path, params) => {
 };
 
 export const DataManagerPage = ({ ...props }) => {
+  const [dependencies] = useState(loadDependencies);
   const toast = useContext(ToastContext);
   const root = useRef();
   const params = useParams();
