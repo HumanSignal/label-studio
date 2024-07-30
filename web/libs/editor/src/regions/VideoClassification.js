@@ -7,6 +7,8 @@ const Model = types
   .model("VideoClassificationModel", {
     type: "videoclassification",
     choices: types.array(types.string),
+    classification: true,
+    perFrame: true,
   })
   .views((self) => ({
     get label() {

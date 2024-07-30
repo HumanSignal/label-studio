@@ -71,6 +71,12 @@ const Model = types
       return getRoot(self);
     },
 
+    // override default logic to display perFrame classifications
+    get regs() {
+      const isVideoRegion = (r) => r.object === self && (!r.classification || r.perFrame);
+      return self.annotation?.regions.filter(isVideoRegion) || [];
+    },
+
     get currentFrame() {
       return self.ref.current?.position ?? 1;
     },
