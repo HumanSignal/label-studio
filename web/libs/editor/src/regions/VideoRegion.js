@@ -85,7 +85,7 @@ const Model = types
       }
     },
 
-    addKeypoint(frame) {
+    addKeypoint(frame, customEnabled) {
       const sequence = Array.from(self.sequence);
       const closestKeypoint = self.closestKeypoint(frame);
       const newKeypoint = {
@@ -94,7 +94,7 @@ const Model = types
             x: 0,
             y: 0,
           }),
-        enabled: closestKeypoint?.enabled ?? true,
+        enabled: customEnabled ?? closestKeypoint?.enabled ?? true,
         frame,
       };
 

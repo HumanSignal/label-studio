@@ -241,10 +241,10 @@ const Model = types
         if (selected) {
           // 1. we need to add keypoint or create a region if we are adding
           if (region) {
-            region.addKeypoint(video.frame);
+            region.addKeypoint(video.frame, true);
           } else {
             region = video.addRegion(
-              { enabled: false },
+              { enabled: true },
               { [resultType]: value },
               controlTag,
             );
@@ -266,7 +266,7 @@ const Model = types
             closestKeypoint = region.closestKeypoint(closestKeypoint.frame - 1, true);
           }
 
-          if (closestKeypoint.enabled) {
+          if (closestKeypoint?.enabled) {
             if (closestKeypoint.frame !== video.frame - 1) {
               region.addKeypoint(video.frame - 1);
             }

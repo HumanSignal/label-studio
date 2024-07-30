@@ -41,8 +41,8 @@ const Model = types
         self.object.updatePerFrameViews();
       },
 
-      addKeypoint(frame) {
-        Super.addKeypoint(frame);
+      addKeypoint(frame, customEnabled) {
+        Super.addKeypoint(frame, customEnabled);
 
         self.object.updatePerFrameViews();
       },
