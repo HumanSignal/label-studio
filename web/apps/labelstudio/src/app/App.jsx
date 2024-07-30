@@ -26,6 +26,7 @@ export const UNBLOCK_HISTORY_MESSAGE = "UNBLOCK_HISTORY";
 
 const browserHistory = createBrowserHistory({
   basename: baseURL.pathname || "/",
+  // callback is an async way to confirm or decline going to another page in the context of routing. It accepts `true` or `false`
   getUserConfirmation: (message, callback) => {
     // `history.block` doesn't block events, so in the case of listeners,
     // we need to have some flag that can be checked for preventing related actions
