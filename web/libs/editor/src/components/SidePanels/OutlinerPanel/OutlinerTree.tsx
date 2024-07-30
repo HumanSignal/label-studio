@@ -109,7 +109,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
   }, []);
   const eventHandlers = useEventHandlers();
   const selectedKeys = regions.selection.keys;
-  const rootClass = cn("tree");
+  const rootClass = cn("tree-lsf");
   let expandedKeys = undefined;
   let onExpand = undefined;
   // It works only for 'label' mode yet.
@@ -173,7 +173,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
           defaultExpandParent={!isPersistCollapseEnabled}
           autoExpandParent
           checkable={false}
-          prefixCls="ls-tree-lsf"
+          prefixCls={rootClass.toClassName()}
           className={rootClass.toClassName()}
           treeData={regionsTree}
           selectedKeys={selectedKeys}
