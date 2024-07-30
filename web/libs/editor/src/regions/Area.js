@@ -60,7 +60,7 @@ const Area = types.union(
 
       // @todo the simpliest way for now to detect correct video region type
       if (tag.type === "video") {
-        if (sn.value.choices || sn.choices) return VideoClassificationModel;
+        if (sn.choices || sn.value?.choices) return VideoClassificationModel;
         return VideoRectangleRegionModel;
       }
 
