@@ -9,7 +9,7 @@ meta_description: Evaluate a side-by-side comparison of two LLM responses.
 date: 2024-07-26 14:48:48
 ---
 
-<img src="/images/templates/side-by-side-comparison.png" alt="" class="gif-border" />
+<img src="/images/templates/side-by-side-comparison.png" alt="" class="gif-border" max-width="700px"/>
 
 Sometimes you need to compare two different model responses or compare the model response with a ground truth. In this template, two options are presented side by side, and then you click to select the one that matches your criteria. 
 

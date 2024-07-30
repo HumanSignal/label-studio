@@ -9,7 +9,7 @@ meta_title: Create a ranked dataset for building a RAG system for LLMs with Labe
 meta_description: Create a ranked dataset for building a RAG system for LLMs with Label Studio for your machine learning and data science projects.
 ---
 
-<img src="/images/templates/llm-ranker.png" alt="" class="gif-border" />
+<img src="/images/templates/llm-ranker.png" alt="" class="gif-border" max-width="700px" />
 
 This template provides you with a workflow to rank the quality of a large language model (LLM) responses.
 

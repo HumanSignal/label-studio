@@ -9,7 +9,7 @@ meta_description:  Assigning a grade to LLM responses based on how well it meets
 date: 2024-07-26 14:48:00
 ---
 
-<img src="/images/templates/response-grading.png" alt="" class="gif-border" />
+<img src="/images/templates/response-grading.png" alt="" class="gif-border" max-width="700px"/>
 
 Sometimes it is useful to assign a grade to the LLM response based on the quality of the generated text.
 
