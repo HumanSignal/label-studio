@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Spinner } from "../../../components";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_3617, isFF } from "../../../utils/feature-flags";
@@ -9,8 +9,11 @@ import { useAPI } from "../../../providers/ApiProvider";
 
 const configClass = cn("configure");
 
+const loadDependencies = async () => import("@humansignal/editor");
+
 export const Preview = ({ config, data, error, loading, project }) => {
   const lsf = useRef(null);
+  const [resolvingEditor] = useState(loadDependencies);
   const rootRef = useRef();
   const api = useAPI();
 
@@ -46,8 +49,10 @@ export const Preview = ({ config, data, error, loading, project }) => {
     return config ?? EMPTY_CONFIG;
   }, [config]);
 
-  const initLabelStudio = useCallback((config, task) => {
+  const initLabelStudio = useCallback(async (config, task) => {
     if (!task.data) return;
+
+    await resolvingEditor;
 
     console.info("Initializing LSF preview", { config, task });
 
@@ -94,7 +99,9 @@ export const Preview = ({ config, data, error, loading, project }) => {
 
   useEffect(() => {
     if (!lsf.current) {
-      lsf.current = initLabelStudio(currentConfig, currentTask);
+      initLabelStudio(currentConfig, currentTask).then((ls) => {
+        lsf.current = ls;
+      });
     }
 
     return () => {
