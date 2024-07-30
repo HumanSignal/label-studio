@@ -114,18 +114,18 @@ const checkScrollToSelectedPersists = (I, label, outliner) => {
 
 const checkPaginateToSelectedPersists = (I, label, page, outliner) => {
   checkScrollToSelectedPersists(I, label, outliner);
-  I.seeElement(locate(".lsf-pagination__page-indicator").withText(`${page}`));
+  I.seeElement(locate(".lsf-pagination-lsf__page-indicator").withText(`${page}`));
 };
 
 const checkPaginationButtons = (I) => {
-  I.click(locate(".lsf-pagination__btn_arrow-left-double"));
-  I.seeElement(locate(".lsf-pagination__page-indicator").withText("1"));
+  I.click(locate(".lsf-pagination-lsf__btn_arrow-left-double"));
+  I.seeElement(locate(".lsf-pagination-lsf__page-indicator").withText("1"));
 
-  I.click(locate(".lsf-pagination__btn_arrow-right"));
-  I.seeElement(locate(".lsf-pagination__page-indicator").withText("2"));
+  I.click(locate(".lsf-pagination-lsf__btn_arrow-right"));
+  I.seeElement(locate(".lsf-pagination-lsf__page-indicator").withText("2"));
 
-  I.click(locate(".lsf-pagination__btn_arrow-right"));
-  I.seeElement(locate(".lsf-pagination__page-indicator").withText("3"));
+  I.click(locate(".lsf-pagination-lsf__btn_arrow-right"));
+  I.seeElement(locate(".lsf-pagination-lsf__page-indicator").withText("3"));
 };
 
 const checkSubmit = (I) => {
