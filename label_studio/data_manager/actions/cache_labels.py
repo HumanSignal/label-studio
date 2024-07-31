@@ -54,7 +54,7 @@ def extract_labels(annotation, control_tag):
     labels = []
     for region in annotation.result:
         # find regions with specific control tag name or just all regions if control tag is None
-        if control_tag is None or region['from_name'] == control_tag and 'value' in region:
+        if (control_tag is None or region['from_name'] == control_tag) and 'value' in region:
             # scan value for a field with list of strings,
             # as bonus it will work with textareas too
             for key in region['value']:
