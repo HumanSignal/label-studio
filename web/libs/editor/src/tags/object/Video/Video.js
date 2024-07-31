@@ -248,6 +248,7 @@ const Model = types
               { [resultType]: value },
               controlTag,
             );
+            video.updatePerFrameViews();
           }
         } else {
           // 2. we need to cut lifespan at current frame so that the segment,
