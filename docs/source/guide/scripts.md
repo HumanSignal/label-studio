@@ -168,11 +168,7 @@ An array of all real regions (excludes classifications).
 
 Array of all results. 
 
-Note that this returns a large object with keys of all possible result types, but only one result type has an actual value. The value of this key is populated by the `valueType` of the related control tag, which is typically the same as the `type` for the result. To access this value directly, use `result.mainValue`. 
-
-It's also important to note that for each `r` in `results`, `r.value` is the object with keys of all possible result types. There are also other keys in `r`. For example:
-
-![Screenshot of results object](/images/project/scripts_results.png)
+Note that this returns an array of objects with keys of all possible result types, but only one result type has an actual value. To access this value directly, use `result.mainValue` (which works as a shortcut for `r[control.valueType]`).
 
 ### Labels
 
