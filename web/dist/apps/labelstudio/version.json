@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-954: Project card default color change broke the text color (#6123) (#6138)",
-  "commit": "a7fa27016d8aaebca049482bd9d559bcf5da10a9",
-  "date": "2024-07-26T13:59:21.000Z",
+  "message": "chore: use published version of LS SDK instead of archive link",
+  "commit": "53f09fd7ad833315f165acb02717ec33bcb75e63",
+  "date": "2024-07-31T13:38:00.000Z",
   "branch": "ls-release/1.13.0"
 }
