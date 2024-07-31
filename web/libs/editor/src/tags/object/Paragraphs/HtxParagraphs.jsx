@@ -19,7 +19,8 @@ if (isFF(FF_LSDV_4711)) audioDefaultProps.crossOrigin = "anonymous";
 
 class HtxParagraphsView extends Component {
   _regionSpanSelector = ".htx-highlight";
-  mainContent = cn("main-content");
+  mainContent = cn("main-content").toClassName();
+  mainViewAnnotation = cn("main-view").elem("annotation").toClassName();
 
   constructor(props) {
     super(props);
@@ -486,11 +487,10 @@ class HtxParagraphsView extends Component {
   _handleScrollContainerHeight = () => {
     requestAnimationFrame(() => {
       const container = this.myRef.current;
-      const mainContentView = document.querySelector(this.mainContent.toClassName());
-      const mainViewAnnotation = cn("main-view").elem("annotation");
+      const mainContentView = document.querySelector(this.mainContent);
       const mainRect = mainContentView.getBoundingClientRect();
       const visibleHeight = document.documentElement.clientHeight - mainRect.top;
-      const annotationView = document.querySelector(mainViewAnnotation.toClassName());
+      const annotationView = document.querySelector(this.mainViewAnnotation);
       const totalVisibleSpace = Math.floor(
         visibleHeight < mainRect.height ? visibleHeight : mainContentView?.offsetHeight || 0,
       );
@@ -513,12 +513,12 @@ class HtxParagraphsView extends Component {
 
   componentDidMount() {
     if (isFF(FF_LSDV_E_278) && this.props.item.contextscroll)
-      this._resizeObserver.observe(document.querySelector(this.mainContent.toClassName()));
+      this._resizeObserver.observe(document.querySelector(this.mainContent));
     this._handleUpdate();
   }
 
   componentWillUnmount() {
-    const target = document.querySelector(this.mainContent.toClassName());
+    const target = document.querySelector(this.mainContent);
 
     if (target) this._resizeObserver?.unobserve(target);
     this._resizeObserver?.disconnect();
