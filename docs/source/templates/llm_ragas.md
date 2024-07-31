@@ -20,7 +20,7 @@ This template uses the [Ragas](https://docs.ragas.io/en/stable/) framework to ev
 
 ## Prerequisites
 
-This template requires an ML backend to work. Follow the instructions outlined in [RAG Quickstart Labeling](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/rag_quickstart) to connect the ML backend to your project. 
+This template requires an ML backend to work. Follow the instructions outlined in [RAG Quickstart Labeling](https://github.com/HumanSignal/label-studio-ml-backend/tree/agi-builders-workshop-rag/label_studio_ml/examples/rag_quickstart) to connect the ML backend to your project. 
 
 You will need an OpenAI API key and a directory with documentation files to use as context. 
 
