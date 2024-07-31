@@ -19,8 +19,8 @@ if (isFF(FF_LSDV_4711)) audioDefaultProps.crossOrigin = "anonymous";
 
 class HtxParagraphsView extends Component {
   _regionSpanSelector = ".htx-highlight";
-  mainContent = cn("main-content").toClassName();
-  mainViewAnnotation = cn("main-view").elem("annotation").toClassName();
+  mainContent = `.${cn("main-content").toClassName()}`;
+  mainViewAnnotation = `.${cn("main-view").elem("annotation").toClassName()}`;
 
   constructor(props) {
     super(props);
