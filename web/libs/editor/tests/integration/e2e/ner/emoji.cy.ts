@@ -313,4 +313,26 @@ describe("NER - Emoji - Text", () => {
       });
     });
   });
+
+  it.only('Heuristic edge case', () => {
+    LabelStudio.addFeatureFlagsOnPageLoad({
+      [FF_LSDV_4620_3]: true,
+    })
+    LabelStudio.params().config(simpleHyperTextConfig).data({text:"<p>🐱\nmeans cat</p>"}).withResult([]).init();
+    LabelStudio.waitForObjectsReady();
+    Labels.select("region");
+    RichText.selectText("means");
+    RichText.hasRegionWithText("means");
+
+    LabelStudio.serialize().then((results) => {
+      const resultValue = results[0].value;
+      expect(resultValue.start).to.eq("/p[1]/text()[1]");
+      expect(resultValue.end).to.eq("/p[1]/text()[1]");
+      expect(resultValue.globalOffsets.start).to.eq(2);
+      expect(resultValue.globalOffsets.end).to.eq(7);
+      expect(resultValue.startOffset).to.eq(3);
+      expect(resultValue.endOffset).to.eq(8);
+      expect(resultValue.text).to.eq("means");
+    })
+  })
 });

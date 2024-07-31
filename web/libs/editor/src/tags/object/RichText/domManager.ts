@@ -419,11 +419,11 @@ class DomData {
       fromIdx++;
     }
     let toIdx = fromIdx;
-
     for (const char of text) {
-      if (displayedText[toIdx] === char || (displayedText[toIdx] === " " && char === LF)) {
-        contentParts.push(displayedText[toIdx]);
-        toIdx++;
+      const displayedChar = displayedText.substring(toIdx, toIdx + char.length);
+      if (displayedChar === char || (displayedChar === " " && char === LF)) {
+        contentParts.push(displayedChar);
+        toIdx+=char.length;
       } else {
         contentParts.push("");
       }
