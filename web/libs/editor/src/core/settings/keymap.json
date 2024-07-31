@@ -125,6 +125,14 @@
     "key": "alt+right",
     "description": "Go one step forward"
   },
+  "video:toggle-keyframe": {
+    "key": "k",
+    "description": "Toggle keyframe"
+  },
+  "video:toggle-lifespan": {
+    "key": "l",
+    "description": "Toggle lifespan"
+  },
   "video:keyframe-backward": {
     "key": "ctrl+alt+left",
     "description": "Go to previous keyframe"
