@@ -109,7 +109,7 @@ const annotations = [
 
 const checkScrollToSelectedPersists = (I, label, outliner) => {
   I.click(locate(`.lsf-${outliner ? "outliner" : "region"}-item__title`).withText(label));
-  I.waitForVisible(locate(".lsf-label_selected").withText(label));
+  I.waitForVisible(locate(".lsf-label-lsf_selected").withText(label));
 };
 
 const checkPaginateToSelectedPersists = (I, label, page, outliner) => {
