@@ -12,9 +12,10 @@ type DDExtraText = string;
  *
  * Content is a way to store information about the displayed text
  * and be able to restore global offsets and relative offsets in the same time.
- * All hidden characters as "/n" or spaces at the start/end are stored as "" (dummy)
+ * All hidden characters as "\n" or spaces at the start/end are stored as "" (dummy)
  * but we keep in mind that it is a character with `length` == 1,
- * and it affects both global and relative offsets
+ * and it affects both global and relative offsets.
+ * @see ./domManager.md
  */
 type Content = string[];
 
@@ -330,7 +331,7 @@ class DDDynamicBlock extends DDBlock {
     return (
       this.content
         .slice(0, offset - this.start)
-        //restore the size of skipped symbols (mostly /n) to 1 to get the correct text offset
+        //restore the size of skipped symbols (mostly \n) to 1 to get the correct text offset
         .map((ch) => (ch === "" ? " " : ch))
         .join("").length
     );
