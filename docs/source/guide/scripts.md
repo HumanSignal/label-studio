@@ -149,7 +149,7 @@ For more information on how annotations are stored and formatted, see [How Label
 ### Regions
 
 !!! note
-    These are used within `Htx.annotationStore.selected`. For example, `.regions` would be specified as `Htx.annotationStore.selected.regions`. For an example of this in use, see [Bulk text labeling with regex](script_examples#Bulk-text-labeling-with-regex). 
+    These are used within `Htx.annotationStore.selected`. For example, `.regions` would be specified as `Htx.annotationStore.selected.regions`. For an example of this in use, see [Bulk creation and deletion operations with keyboard shortcut](script_examples#Bulk-creation-and-deletion-operations-with-keyboard-shortcut). 
 
 
 ##### `.areas` 
