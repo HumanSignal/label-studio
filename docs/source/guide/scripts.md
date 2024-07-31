@@ -144,14 +144,13 @@ The following implementation details may be useful when creating your own custom
 !!! note
     While these details are relatively stable, we make no guarantees that they will not change in the future. 
 
+For more information on how annotations are stored and formatted, see [How Label Studio saves results in annotations](task_format#How-Label-Studio-saves-results-in-annotations). 
 
 ### Regions
 
 !!! note
-    These are used within `Htx.annotationStore.selected`. For example, `.regions` would be specified as `Htx.annotationStore.selected.regions`. For an example of this in use, see [HyperText video and time series sync](script_examples#HyperText-video-and-time-series-sync), [Bulk text labeling with regex](script_examples#Bulk-text-labeling-with-regex), and [Bulk creation and deletion operations with keyboard shortcut](script_examples#bulk-creation-and-deletion-operations-with-keyboard-shortcut). 
+    These are used within `Htx.annotationStore.selected`. For example, `.regions` would be specified as `Htx.annotationStore.selected.regions`. For an example of this in use, see [Bulk text labeling with regex](script_examples#Bulk-text-labeling-with-regex). 
 
-
-For more information on how regions are stored and formatted, see [How Label Studio saves results in annotations](task_format#How-Label-Studio-saves-results-in-annotations). 
 
 ##### `.areas` 
 

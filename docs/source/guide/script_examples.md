@@ -505,6 +505,10 @@ LSI.on('entityCreate', region => {
 **Related LSI instance methods:**
 
 * [on(eventName, handler)](scripts#on-eventName-handler)
+
+**Related frontend APIs:**
+
+* [regions](scripts#regions)
   
 **Related frontend events:**
 
