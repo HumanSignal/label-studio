@@ -9,6 +9,7 @@ import { Pagination } from "../../common/Pagination/Pagination";
 import { Hotkey } from "../../core/Hotkey";
 import { FF_DEV_1170, isFF } from "../../utils/feature-flags";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import { cn } from "../../utils/bem";
 
 const Model = types.model({
   id: types.identifier,
@@ -144,7 +145,8 @@ const HtxPagedView = observer(({ item }) => {
 
   useEffect(() => {
     if (isFF(FF_DEV_1170)) {
-      document.querySelector(".lsf-sidepanels__content")?.scrollTo(0, 0);
+      const sidePanelsContent = cn("sidepanels").elem("content");
+      document.querySelector(sidePanelsContent.toClassName())?.scrollTo(0, 0);
     } else {
       document.querySelector("#label-studio-dm")?.scrollTo(0, 0);
     }

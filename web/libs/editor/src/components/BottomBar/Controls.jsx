@@ -223,7 +223,7 @@ export const Controls = controlsInjector(
                   mod={{ has_icon: useExitOption, disabled: isDisabled }}
                   onClick={async (event) => {
                     const trigger = cn("dropdown-lsf").elem("trigger");
-                    if (event.target.classList.contains(trigger.getClassName())) return;
+                    if (event.target.classList.contains(trigger.toClassName())) return;
                     const selected = store.annotationStore?.selected;
 
                     selected?.submissionInProgress();
@@ -264,7 +264,8 @@ export const Controls = controlsInjector(
                 look={look}
                 mod={{ has_icon: useExitOption, disabled: isUpdateDisabled }}
                 onClick={async (event) => {
-                  if (event.target.classList.contains("lsf-dropdown__trigger")) return;
+                  const trigger = cn("dropdown-lsf").elem("trigger");
+                  if (event.target.classList.contains(trigger.toClassName())) return;
                   const selected = store.annotationStore?.selected;
 
                   selected?.submissionInProgress();
