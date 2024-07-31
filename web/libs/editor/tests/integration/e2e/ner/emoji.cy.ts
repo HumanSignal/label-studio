@@ -314,7 +314,7 @@ describe("NER - Emoji - Text", () => {
     });
   });
 
-  it.only('Heuristic edge case', () => {
+  it('Heuristic edge case', () => {
     LabelStudio.addFeatureFlagsOnPageLoad({
       [FF_LSDV_4620_3]: true,
     })
