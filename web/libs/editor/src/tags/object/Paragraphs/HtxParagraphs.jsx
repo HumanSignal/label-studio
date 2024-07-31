@@ -14,12 +14,12 @@ import { Tooltip } from "../../../common/Tooltip/Tooltip";
 import { cn } from "../../../utils/bem";
 
 const audioDefaultProps = {};
-const mainContent = cn("main-content");
 
 if (isFF(FF_LSDV_4711)) audioDefaultProps.crossOrigin = "anonymous";
 
 class HtxParagraphsView extends Component {
   _regionSpanSelector = ".htx-highlight";
+  mainContent = cn("main-content");
 
   constructor(props) {
     super(props);
@@ -486,7 +486,7 @@ class HtxParagraphsView extends Component {
   _handleScrollContainerHeight = () => {
     requestAnimationFrame(() => {
       const container = this.myRef.current;
-      const mainContentView = document.querySelector(mainContent.toClassName());
+      const mainContentView = document.querySelector(this.mainContent.toClassName());
       const mainViewAnnotation = cn("main-view").elem("annotation");
       const mainRect = mainContentView.getBoundingClientRect();
       const visibleHeight = document.documentElement.clientHeight - mainRect.top;
@@ -513,12 +513,12 @@ class HtxParagraphsView extends Component {
 
   componentDidMount() {
     if (isFF(FF_LSDV_E_278) && this.props.item.contextscroll)
-      this._resizeObserver.observe(document.querySelector(mainContent.toClassName()));
+      this._resizeObserver.observe(document.querySelector(this.mainContent.toClassName()));
     this._handleUpdate();
   }
 
   componentWillUnmount() {
-    const target = document.querySelector(mainContent.toClassName());
+    const target = document.querySelector(this.mainContent.toClassName());
 
     if (target) this._resizeObserver?.unobserve(target);
     this._resizeObserver?.disconnect();
