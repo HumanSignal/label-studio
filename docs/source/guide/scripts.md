@@ -115,7 +115,7 @@ For a list of all available events, see our [Frontend reference](frontend_refere
 | Parameter &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | Type     | Description          |
 |--------------------------|--------------------|--------------------------|
 | `eventName` | string | A case-sensitive string representing the event type to listen for.                  |
-| `handler`  | function | Allows a browser to check the fetched script to ensure that the code is never loaded if the source has been manipulated.  |
+| `handler`  | function | A function that will be called when the event is triggered. This function can take arguments depending on the event.  |
 
 
 ##### `get dataObj`
