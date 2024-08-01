@@ -60,7 +60,7 @@ For example:
 * [View](/tags/view.html)
 * [Text](/tags/text.html)
 * [Choices](/tags/choices.html)
-* [Choices](/tags/choice.html)
+* [Choice](/tags/choice.html)
 
 #### Data
 
@@ -151,7 +151,7 @@ LSI.on("beforeSaveAnnotation", (store, ann) => {
 ```json
 [
   {
-    "audio": "<https://data.heartex.net/librispeech/dev-clean/3536/8226/3536-8226-0024.flac.wav>"
+    "audio": "https://data.heartex.net/librispeech/dev-clean/3536/8226/3536-8226-0024.flac.wav"
   }
 ]
 ```
@@ -165,71 +165,77 @@ This script ensures that the video playback is synchronized with the selected ti
 
 ```javascript
 function updateVideoSync(v, r, t) {
-//v is the video object.
+  //v is the video object.
 
-//r is an array with two elements describing the timeSeries selection start & end: [start,end].
+  //r is an array with two elements describing the timeSeries selection start & end: [start,end].
 
-// t is the timestamp data from the time series.
+  // t is the timestamp data from the time series.
 
-var sTrim = parseInt(document.getElementsByName('videoStart')[0].value) / 1000;
-var eTrim = parseInt(document.getElementsByName('videoEnd')[0].value) / 1000;
-var videoSyncChoice = document.getElementById('videoSyncChoice');
-var trimmedDuration = v.duration - (sTrim + eTrim);
-var tsPointFactor = 1;
-switch (videoSyncChoice.value) {
-case "end":
-tsPointFactor = (r()[1] - t[0]) / (t.slice(-1)[0] - t[0]); break;
-case "midpoint":
-tsPointFactor = ((r()[0] / 2 + r()[1] / 2) - t[0]) / (t.slice(-1)[0] - t[0]); break;
-default:
-//start:
-tsPointFactor = (r()[0] - t[0]) / (t.slice(-1)[0] - t[0]);
+  var sTrim = parseInt(document.getElementsByName('videoStart')[0].value) / 1000;
+  var eTrim = parseInt(document.getElementsByName('videoEnd')[0].value) / 1000;
+  var videoSyncChoice = document.getElementById('videoSyncChoice');
+  var trimmedDuration = v.duration - (sTrim + eTrim);
+  var tsPointFactor = 1;
+  switch (videoSyncChoice.value) {
+    case "end":
+      tsPointFactor = (r()[1] - t[0]) / (t.slice(-1)[0] - t[0]);
+      break;
+    case "midpoint":
+      tsPointFactor = ((r()[0] / 2 + r()[1] / 2) - t[0]) / (t.slice(-1)[0] - t[0]);
+      break;
+    default:
+      //start:
+      tsPointFactor = (r()[0] - t[0]) / (t.slice(-1)[0] - t[0]);
+  }
+  console.log("tsPointFactor");
+  console.log(tsPointFactor);
+  console.log("updating currentTime to:");
+  console.log(sTrim + trimmedDuration * tsPointFactor);
+  v.currentTime = sTrim + trimmedDuration * tsPointFactor
 }
-console.log("tsPointFactor");
-console.log(tsPointFactor);
-console.log("updating currentTime to:");
-console.log(sTrim + trimmedDuration * tsPointFactor);
-v.currentTime = sTrim + trimmedDuration * tsPointFactor
-}
+
 function onVideoSyncChoice() {
-updateVideoSync(v, r, t);
+  updateVideoSync(v, r, t);
 }
-setTimeout(function () {
-console.log('Started the function WOOOWOOO');
-//the videoSyncChoice element is used as singleton to ensure tht script is only run once!.
+setTimeout(function() {
+      console.log('Started the function WOOOWOOO');
+      //the videoSyncChoice element is used as singleton to ensure tht script is only run once!.
 
-var videoSyncChoice = document.getElementById('videoSyncChoice');
-if (videoSyncChoice === null) {
-v = document.getElementsByTagName('video')[0];
-//setup video sync for modifications to the video trim parameters:
-document.getElementsByName('videoStart')[0].onchange = function () { v.currentTime = parseInt(document.getElementsByName('videoStart')[0].value) / 1000; };
-document.getElementsByName('videoEnd')[0].onchange = function () { v.currentTime = v.duration - parseInt(document.getElementsByName('videoEnd')[0].value) / 1000; };
-//create and Insert the sync choice element after the video.
+      var videoSyncChoice = document.getElementById('videoSyncChoice');
+      if (videoSyncChoice === null) {
+        v = document.getElementsByTagName('video')[0];
+        //setup video sync for modifications to the video trim parameters:
+        document.getElementsByName('videoStart')[0].onchange = function() {
+          v.currentTime = parseInt(document.getElementsByName('videoStart')[0].value) / 1000;
+        };
+        document.getElementsByName('videoEnd')[0].onchange = function() {
+          v.currentTime = v.duration - parseInt(document.getElementsByName('videoEnd')[0].value) / 1000;
+        };
+        //create and Insert the sync choice element after the video.
 
-videoSyncChoice = document.createElement('select');
-[videoSyncChoice.id](http://videosyncchoice.id/) = "videoSyncChoice";
-videoSyncChoice.onchange = onVideoSyncChoice;
-videoSyncChoice.innerHTML = '<option value="start">Sync Video to selection range start</option><option value="midpoint">Sync Video to selection range mid point</option><option value="end">Sync Video to selection range end</option>'
-v.parentElement.appendChild(videoSyncChoice);
-}
-//Setup the sync with the timeline selection:
-//console.log](https://console.log/)(Htx.annotationStore.selected.names);
-console.log("******** array sizes *******");
-console.log(t.length);
-console.log(v.duration);
-ts = Htx.annotationStore.selected.names.get('ts');
-console.log(ts.data);
-t = ts.data.timestamp;
-w = parseInt(t.length * (20 / v.duration));
-console.log(w);
-l = t.length - w;
-ts.updateTR([t[0], t[w]], 1.001);
-r = $ => ts.brushRange.map(n => (+n).toFixed(2));
-_ = r();
-updateVideoSync(v, r, t);
-setInterval($ => r().some((n, i) => n !== *[i]) && (* = r()) && (updateVideoSync(v, r, t)), 300);
-console.log('video is loaded, starting to sync with time series');
-}, 2000);
+        videoSyncChoice = document.createElement('select');
+        [videoSyncChoice.id](http: //videosyncchoice.id/) = "videoSyncChoice";
+          videoSyncChoice.onchange = onVideoSyncChoice; videoSyncChoice.innerHTML = '<option value="start">Sync Video to selection range start</option><option value="midpoint">Sync Video to selection range mid point</option><option value="end">Sync Video to selection range end</option>'
+          v.parentElement.appendChild(videoSyncChoice);
+        }
+        //Setup the sync with the timeline selection:
+        //console.log](https://console.log/)(Htx.annotationStore.selected.names);
+        console.log("******** array sizes *******");
+        console.log(t.length);
+        console.log(v.duration);
+        ts = Htx.annotationStore.selected.names.get('ts');
+        console.log(ts.data);
+        t = ts.data.timestamp;
+        w = parseInt(t.length * (20 / v.duration));
+        console.log(w);
+        l = t.length - w;
+        ts.updateTR([t[0], t[w]], 1.001);
+        r = $ => ts.brushRange.map(n => (+n).toFixed(2));
+        _ = r();
+        updateVideoSync(v, r, t);
+        setInterval($ => r().some((n, i) => n !== * [i]) && ( * = r()) && (updateVideoSync(v, r, t)), 300);
+        console.log('video is loaded, starting to sync with time series');
+      }, 2000);
 ```
 
 #### Labeling config
@@ -265,36 +271,20 @@ console.log('video is loaded, starting to sync with time series');
                 whenTagName="gesture_type_choice" whenChoiceValue="Fabulab">
 					<TimeSeriesLabels name="fabulab_gestures" toName='ts' choice='multiple'
                     showinline="true">
-						<Label value="fabulab_UP" background="#FFA39E" />
+						<Label value="fabulab_Up" background="#FFA39E" />
 						<Label value="fabulab_Down" background="#D4380D" />
-						<Label value="fabulab_left" background="#FFC069" />
-						<Label value="fabulab_right" background="#AD8B00" />
-						<Label value="fabulab_1" background="#D3F261" />
-						<Label value="fabulab_2" background="#389E0D" />
-						<Label value="fabulab_3" background="#5CDBD3" />
-						<Label value="fabulab_4" background="#096DD9" />
-						<Label value="fabulab_5" background="#ADC6FF" />
-						<Label value="fabulab_6" background="#9254DE" />
+						<Label value="fabulab_Left" background="#FFC069" />
+						<Label value="fabulab_Right" background="#AD8B00" />
 					</TimeSeriesLabels>
 				</View>
 				<View style="flex: 50%; margin-left: 1em" visibleWhen="choice-selected"
                 whenTagName="gesture_type_choice" whenChoiceValue="Regular">
 					<Filter name='filter' toname='tricks' />
 					<TimeSeriesLabels name="tricks" toName="ts" choice="multiple" showinline="true">
-						<Label value="turn_CW" background="#38D4FF" />
-						<Label value="turn_CCW" background="#38FFD4" />
-						<Label value="Tap" background="#FFC069" />
-						<Label value="Fire" background="#FFA39E" />
-						<Label value="2D" background="#D4380D" />
-						<Label value="3D" background="#FFC069" />
 						<Label value="Jump" background="#AD8B00" />
 						<Label value="Impact" background="#D3F261" />
-						<Label value="Reload" background="#389E0D" />
-						<Label value="Shake" background="#0a38f0" />
-						<Label value="Button" background="#ef9eff" />
 						<Label value="FreeFall" background="#0bf99e" />
 						<Label value="Flip" background="#0bf99e" />
-						<Label value="walk" background="#8accf4" />
 					</TimeSeriesLabels>
 				</View>
 			</View>
@@ -305,9 +295,6 @@ console.log('video is loaded, starting to sync with time series');
 				<Channel column='x' legend='x' />
 				<Channel column='y' legend='y' />
 				<Channel column='z' legend='z' />
-				<Channel column='filterX' legend='filterX' />
-				<Channel column='filterY' legend='filterY' />
-				<Channel column='filterZ' legend='filterZ' />
 				<Channel column="AccMagnitude" legend='AccMagnitude' />
 				<Channel column="Shake" legend='Shake' />
 			</TimeSeries>
