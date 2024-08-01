@@ -351,7 +351,7 @@ This script automatically applies the same label to all matching text spans. For
 #### Labeling config
 
 ```xml
- <View>
+<View>
   <Labels name="label" toName="text">
     <Label value="PER" background="red"/>
     <Label value="ORG" background="darkorange"/>
@@ -390,103 +390,103 @@ This script adds bulk operations for creating and deleting regions (annotations)
 
 ```javascript
  // Track the state of the shift key
-let isShiftKeyPressed = false;
+ let isShiftKeyPressed = false;
 
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Shift') {
-    isShiftKeyPressed = true;
-  }
-});
+ window.addEventListener('keydown', (e) => {
+   if (e.key === 'Shift') {
+     isShiftKeyPressed = true;
+   }
+ });
 
-window.addEventListener('keyup', (e) => {
-  if (e.key === 'Shift') {
-    isShiftKeyPressed = false;
-  }
-});
-
-
-LSI.on('entityDelete', region => {
-  if (!isShiftKeyPressed) return; // Only proceed if the shift key is pressed
-
-  if (window.BULK_REGIONS) return;
-  window.BULK_REGIONS = true;
-  setTimeout(() => window.BULK_REGIONS = false, 1000);
-
-  // console.log('matches', region.object._value.matchAll(region.text));
-  // console.log(region)
-
-  const existingEntities = Htx.annotationStore.selected.regions;
-  //console.log(existingEntities)
-  const regionsToDelete = existingEntities.filter(entity => {
-    const deletedText = region.text.toLowerCase().replace("\\\\n", " ")
-    const otherText = entity.text.toLowerCase().replace("\\\\n", " ")
-    console.log(deletedText)
-    console.log(otherText)
-    return deletedText === otherText && region.labels[0] === entity.labels[0]
-  });
-
-  //console.log(regionsToDelete)
-
-  regionsToDelete.forEach(r => {
-    Htx.annotationStore.selected.deleteRegion(r);
-  });
-
-  Htx.annotationStore.selected.updateObjects();
-});
+ window.addEventListener('keyup', (e) => {
+   if (e.key === 'Shift') {
+     isShiftKeyPressed = false;
+   }
+ });
 
 
-LSI.on('entityCreate', region => {
-  if (!isShiftKeyPressed) return; // Only proceed if the shift key is pressed
+ LSI.on('entityDelete', region => {
+   if (!isShiftKeyPressed) return; // Only proceed if the shift key is pressed
 
-  if (window.BULK_REGIONS) return;
-  window.BULK_REGIONS = true;
-  setTimeout(() => window.BULK_REGIONS = false, 1000);
+   if (window.BULK_REGIONS) return;
+   window.BULK_REGIONS = true;
+   setTimeout(() => window.BULK_REGIONS = false, 1000);
 
-  //console.log('matches', region.object._value.matchAll(region.text));
+   // console.log('matches', region.object._value.matchAll(region.text));
+   // console.log(region)
 
-  const existingEntities = Htx.annotationStore.selected.regions;
+   const existingEntities = Htx.annotationStore.selected.regions;
+   //console.log(existingEntities)
+   const regionsToDelete = existingEntities.filter(entity => {
+     const deletedText = region.text.toLowerCase().replace("\\\\n", " ")
+     const otherText = entity.text.toLowerCase().replace("\\\\n", " ")
+     console.log(deletedText)
+     console.log(otherText)
+     return deletedText === otherText && region.labels[0] === entity.labels[0]
+   });
 
-  setTimeout(() => {
-    // prevent tagging a single character
-    if (region.text.length < 2) return;
-    regexp = new RegExp(region.text.replace("\\\\n", "\\\\s+").replace(" ", "\\\\s+"), "gi")
-    const matches = Array.from(region.object._value.matchAll(regexp));
-    matches.forEach(m => {
-      if (m.index === region.startOffset) return;
+   //console.log(regionsToDelete)
 
-      const startOffset = m.index;
-      const endOffset = m.index + region.text.length;
+   regionsToDelete.forEach(r => {
+     Htx.annotationStore.selected.deleteRegion(r);
+   });
+
+   Htx.annotationStore.selected.updateObjects();
+ });
 
 
-      // Check for existing entities with overlapping start and end offset
-      let isDuplicate = false;
-      // could be made faster with binary search
-      for (const entity of existingEntities) {
-        if (startOffset <= entity.globalOffsets.end && entity.globalOffsets.start <= endOffset) {
-          isDuplicate = true;
-          break;
-        }
-      }
+ LSI.on('entityCreate', region => {
+   if (!isShiftKeyPressed) return; // Only proceed if the shift key is pressed
 
-      if (!isDuplicate) {
-        Htx.annotationStore.selected.createResult(
-          {
-            text: region.text,
-            start: "/span[1]/text()[1]",
-            startOffset: startOffset,
-            end: "/span[1]/text()[1]",
-            endOffset: endOffset
-          },
-          { labels: [...region.labeling.value.labels] },
-          region.labeling.from_name,
-          region.object
-        );
-      }
-    });
+   if (window.BULK_REGIONS) return;
+   window.BULK_REGIONS = true;
+   setTimeout(() => window.BULK_REGIONS = false, 1000);
+
+   //console.log('matches', region.object._value.matchAll(region.text));
+
+   const existingEntities = Htx.annotationStore.selected.regions;
+
+   setTimeout(() => {
+     // prevent tagging a single character
+     if (region.text.length < 2) return;
+     regexp = new RegExp(region.text.replace("\\\\n", "\\\\s+").replace(" ", "\\\\s+"), "gi")
+     const matches = Array.from(region.object._value.matchAll(regexp));
+     matches.forEach(m => {
+       if (m.index === region.startOffset) return;
+
+       const startOffset = m.index;
+       const endOffset = m.index + region.text.length;
+
+
+       // Check for existing entities with overlapping start and end offset
+       let isDuplicate = false;
+       // could be made faster with binary search
+       for (const entity of existingEntities) {
+         if (startOffset <= entity.globalOffsets.end && entity.globalOffsets.start <= endOffset) {
+           isDuplicate = true;
+           break;
+         }
+       }
+
+       if (!isDuplicate) {
+         Htx.annotationStore.selected.createResult({
+             text: region.text,
+             start: "/span[1]/text()[1]",
+             startOffset: startOffset,
+             end: "/span[1]/text()[1]",
+             endOffset: endOffset
+           }, {
+             labels: [...region.labeling.value.labels]
+           },
+           region.labeling.from_name,
+           region.object
+         );
+       }
+     });
 
      Htx.annotationStore.selected.updateObjects();
-  }, 100);
-});
+   }, 100);
+ });
 ```
 
 **Related LSI instance methods:**
@@ -507,28 +507,17 @@ LSI.on('entityCreate', region => {
 #### Labeling config
 
 ```xml
- <View>
-  <!--
-  <Header>
-    Document Categories
-  </Header>
-  <View style="position: sticky; top: 0; height: 100; overflow: auto;">
-     <Choices name="category" toName="text" choice="single-radio" showInLine="true" required="true">
-      <Choice value="VAN-US"/>
-      <Choice value="VAN-CAD"/>
-      <Choice value="Unknown"/>
-    </Choices>
-  </View>
-  -->
+<View>
   <Header>
     Labels
   </Header>
  <View style="padding: 0em 1em; background: #f1f1f1; margin-right: 1em; border-radius: 3px">
-  <View style="position: sticky; top: 0; height: 250px; overflow: auto;">
-    <Filter name="filter" toName="label" hotkey="shift+f" minlength="0" placeholder="Filter"/>
+  <View style="position: sticky; top: 0; height: 50px; overflow: auto;">
     <Labels name="label" toName="text">
-      <Label value="general:fund_name" background="#3a1381"/>
-      <Label value="general:fund_name_abbreviation" background="#FFA39E"/>
+      <Label value="type_1" background="#3a1381"/>
+      <Label value="type_2" background="#FFA39E"/>
+      <Label value="type_3" background="#46ae19"/>
+      <Label value="type_4" background="#8ab1c1"/>
      </Labels>
         </View>
   </View>
@@ -536,7 +525,7 @@ LSI.on('entityCreate', region => {
     Document
   </Header>
   <View style="height: 600px; overflow: auto;">
-    <Text name="text" value="$text_url" valueType="url" saveTextResult="yes"/>
+    <Text name="text" value="$text"/>
   </View>
 </View>
 ```
@@ -546,7 +535,6 @@ LSI.on('entityCreate', region => {
 * [View](/tags/view.html)
 * [Text](/tags/text.html)
 * [Header](/tags/header.html)
-* [Filter](/tags/filter.html)
 * [Labels](/tags/labels.html)
 
 ## Check that TextArea text is valid JSON 
