@@ -27,6 +27,7 @@ import { Button } from "../../common/Button/Button";
 import { Block, Elem } from "../../utils/bem";
 import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
+import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined, sortAnnotations } from "../../utils/utilities";
 
@@ -222,7 +223,11 @@ class App extends Component {
     const newUIEnabled = isFF(FF_DEV_3873);
 
     return (
-      <Block name="editor" mod={{ fullscreen: settings.fullscreen, _auto_height: !outlinerEnabled }}>
+      <Block
+        name="editor"
+        mod={{ fullscreen: settings.fullscreen, _auto_height: !outlinerEnabled }}
+        ref={isFF(FF_LSDV_4620_3_ML) ? reactCleaner(this) : null}
+      >
         <Settings store={store} />
         <Provider store={store}>
           {newUIEnabled ? (
