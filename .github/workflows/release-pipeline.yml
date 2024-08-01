@@ -65,7 +65,7 @@ jobs:
           jira_server: "${{ vars.JIRA_SERVER }}"
           jira_username: "${{ secrets.JIRA_USERNAME }}"
           jira_token: "${{ secrets.JIRA_TOKEN }}"
-          jira_fix_version: "LSO/${{ github.ref_name }}"
+          jira_fix_version: "LS OpenSource/${{ github.ref_name }}"
           jira_fix_version_released: true
 
   build-pypi:
