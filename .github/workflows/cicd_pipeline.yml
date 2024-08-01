@@ -438,7 +438,7 @@ jobs:
           jira_server: "${{ vars.JIRA_SERVER }}"
           jira_username: "${{ secrets.JIRA_USERNAME }}"
           jira_token: "${{ secrets.JIRA_TOKEN }}"
-          jira_fix_version: "LSO/${{ steps.create-draft-release.outputs.tag_name }}"
+          jira_fix_version: "LS OpenSource/${{ steps.create-draft-release.outputs.tag_name }}"
 
   build-pypi:
     name: "Build"
