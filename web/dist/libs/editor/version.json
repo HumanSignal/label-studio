@@ -1,6 +1,6 @@
 {
-  "message": "refactor: OPTIC-931: Remove Stale Feature Flag - ff_back_1614_rejecte… (#6136)",
-  "commit": "33b9aa604e46568f1ed22cd336c943239051df68",
-  "date": "2024-07-29T20:56:28.000Z",
+  "message": "fix: LEAP-762: Fix offsets in domManager for emojis (#6135)",
+  "commit": "8d8a7fce72b808d00f94cc10b49669121d186c1f",
+  "date": "2024-08-01T03:08:02.000Z",
   "branch": "develop"
 }
