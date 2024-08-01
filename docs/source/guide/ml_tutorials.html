@@ -1,52 +1,38 @@
 ---
 cards:
 - categories:
-  - Natural Language Processing
-  - Named Entity Recognition
-  - Flair
+  - Computer Vision
+  - Optical Character Recognition
+  - EasyOCR
   hide_frontmatter_title: true
   hide_menu: true
-  image: /tutorials/flair.png
-  meta_description: Tutorial on how to use Label Studio and Flair for faster NER labeling
-  meta_title: Use Flair with Label Studio
-  order: 75
+  image: /tutorials/easyocr.png
+  meta_description: The EasyOCR model connection integrates the capabilities of EasyOCR
+    with Label Studio to assist in machine learning labeling tasks involving Optical
+    Character Recognition (OCR).
+  meta_title: EasyOCR model connection for transcribing text in images
+  order: 40
   tier: all
-  title: NER labeling with Flair
+  title: Transcribe text from images with EasyOCR
   type: guide
-  url: /tutorials/flair.html
+  url: /tutorials/easyocr.html
 - categories:
   - Computer Vision
-  - Image Annotation
   - Object Detection
-  - Zero-shot Image Segmentation
-  - Grounding DINO
-  - Segment Anything Model
+  - Image Annotation
+  - OpenMMLab
+  - MMDetection
   hide_frontmatter_title: true
   hide_menu: true
-  image: /tutorials/grounding-dino.png
-  meta_description: Label Studio tutorial for using Grounding DINO for zero-shot object
-    detection in images
-  meta_title: Image segmentation in Label Studio using a Grounding DINO backend
-  order: 15
+  image: /tutorials/openmmlab.png
+  meta_description: This is a tutorial on how to use the example MMDetection model
+    backend with Label Studio for image segmentation tasks.
+  meta_title: Object detection in images with Label Studio and MMDetection
+  order: 65
   tier: all
-  title: Zero-shot object detection and image segmentation with Grounding DINO
+  title: Object detection with bounding boxes using MMDetection
   type: guide
-  url: /tutorials/grounding_dino.html
-- categories:
-  - Natural Language Processing
-  - Named Entity Recognition
-  - SpaCy
-  hide_frontmatter_title: true
-  hide_menu: true
-  image: /tutorials/spacy.png
-  meta_description: Tutorial on how to use Label Studio and spaCy for faster NER and
-    POS labeling
-  meta_title: Use spaCy models with Label Studio
-  order: 70
-  tier: all
-  title: spaCy models for NER
-  type: guide
-  url: /tutorials/spacy.html
+  url: /tutorials/mmdetection-3.html
 - categories:
   - Computer Vision
   - Optical Character Recognition
@@ -62,21 +48,6 @@ cards:
   title: Interactive bounding boxes OCR with Tesseract
   type: guide
   url: /tutorials/tesseract.html
-- categories:
-  - Natural Language Processing
-  - Named Entity Recognition
-  - Interactive matching
-  hide_frontmatter_title: true
-  hide_menu: true
-  image: /tutorials/interactive-substring-matching.png
-  meta_description: Use the interactive substring matching model for labeling NER
-    tasks in Label Studio
-  meta_title: Interactive substring matching for NER tasks
-  order: 30
-  tier: all
-  title: Interactive substring matching for NER tasks
-  type: guide
-  url: /tutorials/interactive_substring_matching.html
 - categories:
   - Audio/Speech Processing
   - Automatic Speech Recognition
@@ -111,23 +82,6 @@ cards:
   type: guide
   url: /tutorials/langchain_search_agent.html
 - categories:
-  - Computer Vision
-  - Object Detection
-  - Image Annotation
-  - OpenMMLab
-  - MMDetection
-  hide_frontmatter_title: true
-  hide_menu: true
-  image: /tutorials/openmmlab.png
-  meta_description: This is a tutorial on how to use the example MMDetection model
-    backend with Label Studio for image segmentation tasks.
-  meta_title: Object detection in images with Label Studio and MMDetection
-  order: 65
-  tier: all
-  title: Object detection with bounding boxes using MMDetection
-  type: guide
-  url: /tutorials/mmdetection-3.html
-- categories:
   - Natural Language Processing
   - Named Entity Recognition
   - Hugging Face
@@ -142,6 +96,39 @@ cards:
   title: Hugging Face NER
   type: guide
   url: /tutorials/huggingface_ner.html
+- categories:
+  - Generative AI
+  - Large Language Model
+  - Text Generation
+  - Hugging Face
+  hide_frontmatter_title: true
+  hide_menu: true
+  image: /tutorials/hf-llm.png
+  meta_description: This tutorial explains how to run Hugging Face Large Language
+    model backend in Label Studio. Hugging Face Large Language Model Backend is a
+    machine learning backend designed to work with Label Studio, providing a custom
+    model for text generation.
+  meta_title: Label Studio tutorial to run Hugging Face Large Language Model backend
+  order: 20
+  tier: all
+  title: Hugging Face Large Language Model (LLM)
+  type: guide
+  url: /tutorials/huggingface_llm.html
+- categories:
+  - Natural Language Processing
+  - Text Classification
+  - Scikit-learn
+  hide_frontmatter_title: true
+  hide_menu: true
+  image: /tutorials/scikit-learn.png
+  meta_description: Tutorial on how to use an example ML backend for Label Studio
+    with Scikit-learn logistic regression
+  meta_title: Sklearn Text Classifier model for Label Studio
+  order: 50
+  tier: all
+  title: Sklearn Text Classifier model
+  type: guide
+  url: /tutorials/sklearn_text_classifier.html
 - categories:
   - Natural Language Processing
   - Text Classification
@@ -178,57 +165,18 @@ cards:
   url: /tutorials/segment_anything_model.html
 - categories:
   - Natural Language Processing
-  - Text Classification
-  - Scikit-learn
+  - Named Entity Recognition
+  - Flair
   hide_frontmatter_title: true
   hide_menu: true
-  image: /tutorials/scikit-learn.png
-  meta_description: Tutorial on how to use an example ML backend for Label Studio
-    with Scikit-learn logistic regression
-  meta_title: Sklearn Text Classifier model for Label Studio
-  order: 50
+  image: /tutorials/flair.png
+  meta_description: Tutorial on how to use Label Studio and Flair for faster NER labeling
+  meta_title: Use Flair with Label Studio
+  order: 75
   tier: all
-  title: Sklearn Text Classifier model
+  title: NER labeling with Flair
   type: guide
-  url: /tutorials/sklearn_text_classifier.html
-- categories:
-  - Generative AI
-  - Large Language Model
-  - OpenAI
-  - Azure
-  - Ollama
-  - ChatGPT
-  hide_frontmatter_title: true
-  hide_menu: true
-  image: /tutorials/llm-interactive.png
-  meta_description: Label Studio tutorial for interactive LLM labeling with OpenAI,
-    Azure, or Ollama
-  meta_title: Interactive LLM labeling with OpenAI, Azure, or Ollama
-  order: 5
-  tier: all
-  title: Interactive LLM labeling with GPT
-  type: guide
-  url: /tutorials/llm_interactive.html
-- categories:
-  - Generative AI
-  - Large Language Model
-  - Text Generation
-  - Hugging Face
-  hide_frontmatter_title: true
-  hide_menu: true
-  image: /tutorials/hf-llm.png
-  meta_description: This tutorial explains how to run Hugging Face Large Language
-    model backend in Label Studio. Hugging Face Large Language Model Backend is a
-    machine learning backend designed to work with Label Studio, providing a custom
-    model for text generation.
-  meta_title: Label Studio tutorial to run Hugging Face Large Language Model backend
-  order: 20
-  tier: all
-  title: Hugging Face Large Language Model (LLM)
-  type: guide
-  url: /tutorials/huggingface_llm.html
-- title: segment_anything_2
-  url: /tutorials/segment_anything_2.html
+  url: /tutorials/flair.html
 - categories:
   - Natural Language Processing
   - Named Entity Recognition
@@ -247,21 +195,73 @@ cards:
   type: guide
   url: /tutorials/gliner.html
 - categories:
-  - Computer Vision
-  - Optical Character Recognition
-  - EasyOCR
+  - Generative AI
+  - Large Language Model
+  - OpenAI
+  - Azure
+  - Ollama
+  - ChatGPT
   hide_frontmatter_title: true
   hide_menu: true
-  image: /tutorials/easyocr.png
-  meta_description: The EasyOCR model connection integrates the capabilities of EasyOCR
-    with Label Studio to assist in machine learning labeling tasks involving Optical
-    Character Recognition (OCR).
-  meta_title: EasyOCR model connection for transcribing text in images
-  order: 40
+  image: /tutorials/llm-interactive.png
+  meta_description: Label Studio tutorial for interactive LLM labeling with OpenAI,
+    Azure, or Ollama
+  meta_title: Interactive LLM labeling with OpenAI, Azure, or Ollama
+  order: 5
   tier: all
-  title: Transcribe text from images with EasyOCR
+  title: Interactive LLM labeling with GPT
   type: guide
-  url: /tutorials/easyocr.html
+  url: /tutorials/llm_interactive.html
+- title: segment_anything_2
+  url: /tutorials/segment_anything_2.html
+- categories:
+  - Natural Language Processing
+  - Named Entity Recognition
+  - Interactive matching
+  hide_frontmatter_title: true
+  hide_menu: true
+  image: /tutorials/interactive-substring-matching.png
+  meta_description: Use the interactive substring matching model for labeling NER
+    tasks in Label Studio
+  meta_title: Interactive substring matching for NER tasks
+  order: 30
+  tier: all
+  title: Interactive substring matching for NER tasks
+  type: guide
+  url: /tutorials/interactive_substring_matching.html
+- categories:
+  - Computer Vision
+  - Image Annotation
+  - Object Detection
+  - Zero-shot Image Segmentation
+  - Grounding DINO
+  - Segment Anything Model
+  hide_frontmatter_title: true
+  hide_menu: true
+  image: /tutorials/grounding-dino.png
+  meta_description: Label Studio tutorial for using Grounding DINO for zero-shot object
+    detection in images
+  meta_title: Image segmentation in Label Studio using a Grounding DINO backend
+  order: 15
+  tier: all
+  title: Zero-shot object detection and image segmentation with Grounding DINO
+  type: guide
+  url: /tutorials/grounding_dino.html
+- categories:
+  - Natural Language Processing
+  - Named Entity Recognition
+  - SpaCy
+  hide_frontmatter_title: true
+  hide_menu: true
+  image: /tutorials/spacy.png
+  meta_description: Tutorial on how to use Label Studio and spaCy for faster NER and
+    POS labeling
+  meta_title: Use spaCy models with Label Studio
+  order: 70
+  tier: all
+  title: spaCy models for NER
+  type: guide
+  url: /tutorials/spacy.html
 layout: templates
 meta_description: Tutorial documentation for setting up a machine learning model with
   predictions using PyTorch, GPT2, Sci-kit learn, and other popular frameworks.

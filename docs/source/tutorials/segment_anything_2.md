@@ -21,12 +21,14 @@ pip install -r requirements.txt
 2. Download [`segment-anything-2` repo](https://github.com/facebookresearch/segment-anything-2) into the root directory. Install SegmentAnything model and download checkpoints using [the official Meta documentation](https://github.com/facebookresearch/segment-anything-2?tab=readme-ov-file#installation)
 
 
-3. Then you can start the ML backend:
+3. Then you can start the ML backend on the default port `9090`:
 
 ```bash
 cd ../
 label-studio-ml start ./segment_anything_2
 ```
+
+4. Connect running ML backend server to Label Studio: go to your project `Settings -> Machine Learning -> Add Model` and specify `http://localhost:9090` as a URL. Read more in the official [Label Studio documentation](https://labelstud.io/guide/ml#Connect-the-model-to-Label-Studio).
 
 ## Running with Docker (coming soon)
 
