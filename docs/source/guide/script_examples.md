@@ -264,11 +264,7 @@ This script adds bulk operations for creating and deleting regions (annotations)
    window.BULK_REGIONS = true;
    setTimeout(() => window.BULK_REGIONS = false, 1000);
 
-   // console.log('matches', region.object._value.matchAll(region.text));
-   // console.log(region)
-
    const existingEntities = Htx.annotationStore.selected.regions;
-   //console.log(existingEntities)
    const regionsToDelete = existingEntities.filter(entity => {
      const deletedText = region.text.toLowerCase().replace("\\\\n", " ")
      const otherText = entity.text.toLowerCase().replace("\\\\n", " ")
@@ -276,8 +272,6 @@ This script adds bulk operations for creating and deleting regions (annotations)
      console.log(otherText)
      return deletedText === otherText && region.labels[0] === entity.labels[0]
    });
-
-   //console.log(regionsToDelete)
 
    regionsToDelete.forEach(r => {
      Htx.annotationStore.selected.deleteRegion(r);
@@ -288,18 +282,16 @@ This script adds bulk operations for creating and deleting regions (annotations)
 
 
  LSI.on('entityCreate', region => {
-   if (!isShiftKeyPressed) return; // Only proceed if the shift key is pressed
+   if (!isShiftKeyPressed) return; 
 
    if (window.BULK_REGIONS) return;
    window.BULK_REGIONS = true;
    setTimeout(() => window.BULK_REGIONS = false, 1000);
 
-   //console.log('matches', region.object._value.matchAll(region.text));
-
    const existingEntities = Htx.annotationStore.selected.regions;
 
    setTimeout(() => {
-     // prevent tagging a single character
+     // Prevent tagging a single character
      if (region.text.length < 2) return;
      regexp = new RegExp(region.text.replace("\\\\n", "\\\\s+").replace(" ", "\\\\s+"), "gi")
      const matches = Array.from(region.object._value.matchAll(regexp));
@@ -309,10 +301,8 @@ This script adds bulk operations for creating and deleting regions (annotations)
        const startOffset = m.index;
        const endOffset = m.index + region.text.length;
 
-
        // Check for existing entities with overlapping start and end offset
        let isDuplicate = false;
-       // could be made faster with binary search
        for (const entity of existingEntities) {
          if (startOffset <= entity.globalOffsets.end && entity.globalOffsets.start <= endOffset) {
            isDuplicate = true;
