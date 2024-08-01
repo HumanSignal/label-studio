@@ -84,6 +84,7 @@ export interface TimelineRegion {
   visible: boolean;
   selected: boolean;
   sequence: TimelineRegionKeyframe[];
+  perframe?: boolean;
 }
 
 export interface TimelineRegionKeyframe {

@@ -462,8 +462,9 @@ const HtxVideoView = ({ item, store }) => {
       visible: !reg.hidden,
       selected: reg.selected || reg.inSelection,
       sequence,
+      perframe: reg.type === "videoclassification",
     };
-  });
+  }).sort((a, b) => b.perframe - a.perframe);
 
   return (
     <ObjectTag item={item}>
