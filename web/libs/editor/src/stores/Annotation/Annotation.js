@@ -1189,7 +1189,7 @@ export const Annotation = types
         // May be null but null is also valid key in this case
         const itemIndex = a.item_index;
 
-        if (a.classification) {
+        if (a.classification && !a.results[0].from_name.perframe) {
           if (classificationAreasByControlName[controlName]?.[itemIndex]) {
             duplicateAreaIds.push(classificationAreasByControlName[controlName][itemIndex]);
           }
