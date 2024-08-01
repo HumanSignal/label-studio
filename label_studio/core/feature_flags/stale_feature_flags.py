@@ -7,7 +7,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_back_leap_24_tasks_api_optimization_05092023_short': False,
     'fflag_feat_optic_2_ensure_draft_saved_short': True,
     'fflag_fix_front_lsdv_5248_double_click_delay_280823_short': True,
-    'fflag_feat_front_prod_e_111_annotator_workflow_control_short': True,
     'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation': True,
     'fflag_feat_front_lsdv_4620_outliner_optimization_310723_short': True,
     'fflag_fix_front_lsdv_4600_lead_time_27072023_short': False,
