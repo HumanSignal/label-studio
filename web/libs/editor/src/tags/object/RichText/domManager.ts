@@ -424,7 +424,7 @@ class DomData {
       const displayedChar = displayedText.substring(toIdx, toIdx + char.length);
       if (displayedChar === char || (displayedChar === " " && char === LF)) {
         contentParts.push(displayedChar);
-        toIdx+=char.length;
+        toIdx += char.length;
       } else {
         contentParts.push("");
       }
