@@ -1,8 +1,26 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Button } from "../../../components";
 import { LeaveBlocker, type LeaveBlockerCallbacks } from "../../../components/LeaveBlocker/LeaveBlocker";
 import { modal } from "../../../components/Modal/Modal";
 import { Space } from "../../../components/Space/Space";
+
+type SaveAndLeaveButtonProps = {
+  onSave: () => void;
+  text?: string;
+};
+const SaveAndLeaveButton = ({ onSave, text = "Save and Leave" }: SaveAndLeaveButtonProps) => {
+  const [saving, setSaving] = useState(false);
+  const saveHandler = useCallback(async () => {
+    setSaving(true);
+    await onSave();
+    setSaving(false);
+  }, [onSave]);
+  return (
+    <Button onClick={saveHandler} size="compact" look="primary" waiting={saving}>
+      {text}
+    </Button>
+  );
+};
 
 type UnsavedChangesModalProps = {
   onSave: () => void;
@@ -28,13 +46,15 @@ export const unsavedChangesModal = ({
 }: UnsavedChangesModalProps) => {
   let modalInstance: any = undefined;
   const saveAndLeave = async () => {
-    modalInstance?.update({ footer: getFooter(true) });
     await onSave?.();
     modalInstance?.close();
   };
-  // It must be a function to be able to rerender the modal correctly
-  const getFooter = (waiting: boolean) => {
-    return (
+  modalInstance = modal({
+    ...props,
+    title,
+    body: () => <>{body}</>,
+    allowClose: true,
+    footer: (
       <Space align="end">
         <Button
           onClick={() => {
@@ -60,18 +80,9 @@ export const unsavedChangesModal = ({
           </Button>
         )}
 
-        <Button waiting={waiting} onClick={saveAndLeave} size="compact" look={"primary"}>
-          {okText ?? "Save and leave"}
-        </Button>
+        <SaveAndLeaveButton onSave={saveAndLeave} text={okText} />
       </Space>
-    );
-  };
-  modalInstance = modal({
-    ...props,
-    title,
-    body,
-    allowClose: true,
-    footer: getFooter(false),
+    ),
     style: { width: 512 },
     unique: "UNSAVED_CHANGES_MODAL",
   });
