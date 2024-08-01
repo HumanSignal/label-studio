@@ -21,6 +21,9 @@ Use [Plotly](https://plotly.com/) to insert charts and graphs into your labeling
 
 Plotly should be loaded first from CDN: https://cdn.plot.ly/plotly-2.26.0.min.js. For security reasons, it's better to use a hash for script integrity. 
 
+
+![Screenshot of Plotly graph in Label Studio](/images/project/plotly.png)
+
 #### Script
 
 ```javascript
@@ -89,6 +92,8 @@ In this example, the script checks to ensure that the annotation does not includ
 
 The following script displays a modal if a user tries to submit an annotation with the word “hate” added to any audio transcription. 
 
+![Screenshot of custom validation modal in Label Studio](/images/project/script_validation.png)
+
 #### Script
 
 ```javascript
@@ -156,166 +161,11 @@ LSI.on("beforeSaveAnnotation", (store, ann) => {
 ]
 ```
 
-
-## HyperText video and time series sync
-
-This script ensures that the video playback is synchronized with the selected time range in the time series data, allowing for precise annotation and review.
-
-#### Script
-
-```javascript
-function updateVideoSync(v, r, t) {
-  //v is the video object.
-
-  //r is an array with two elements describing the timeSeries selection start & end: [start,end].
-
-  // t is the timestamp data from the time series.
-
-  var sTrim = parseInt(document.getElementsByName('videoStart')[0].value) / 1000;
-  var eTrim = parseInt(document.getElementsByName('videoEnd')[0].value) / 1000;
-  var videoSyncChoice = document.getElementById('videoSyncChoice');
-  var trimmedDuration = v.duration - (sTrim + eTrim);
-  var tsPointFactor = 1;
-  switch (videoSyncChoice.value) {
-    case "end":
-      tsPointFactor = (r()[1] - t[0]) / (t.slice(-1)[0] - t[0]);
-      break;
-    case "midpoint":
-      tsPointFactor = ((r()[0] / 2 + r()[1] / 2) - t[0]) / (t.slice(-1)[0] - t[0]);
-      break;
-    default:
-      //start:
-      tsPointFactor = (r()[0] - t[0]) / (t.slice(-1)[0] - t[0]);
-  }
-  console.log("tsPointFactor");
-  console.log(tsPointFactor);
-  console.log("updating currentTime to:");
-  console.log(sTrim + trimmedDuration * tsPointFactor);
-  v.currentTime = sTrim + trimmedDuration * tsPointFactor
-}
-
-function onVideoSyncChoice() {
-  updateVideoSync(v, r, t);
-}
-setTimeout(function() {
-      console.log('Started the function WOOOWOOO');
-      //the videoSyncChoice element is used as singleton to ensure tht script is only run once!.
-
-      var videoSyncChoice = document.getElementById('videoSyncChoice');
-      if (videoSyncChoice === null) {
-        v = document.getElementsByTagName('video')[0];
-        //setup video sync for modifications to the video trim parameters:
-        document.getElementsByName('videoStart')[0].onchange = function() {
-          v.currentTime = parseInt(document.getElementsByName('videoStart')[0].value) / 1000;
-        };
-        document.getElementsByName('videoEnd')[0].onchange = function() {
-          v.currentTime = v.duration - parseInt(document.getElementsByName('videoEnd')[0].value) / 1000;
-        };
-        //create and Insert the sync choice element after the video.
-
-        videoSyncChoice = document.createElement('select');
-        [videoSyncChoice.id](http: //videosyncchoice.id/) = "videoSyncChoice";
-          videoSyncChoice.onchange = onVideoSyncChoice; videoSyncChoice.innerHTML = '<option value="start">Sync Video to selection range start</option><option value="midpoint">Sync Video to selection range mid point</option><option value="end">Sync Video to selection range end</option>'
-          v.parentElement.appendChild(videoSyncChoice);
-        }
-        //Setup the sync with the timeline selection:
-        //console.log](https://console.log/)(Htx.annotationStore.selected.names);
-        console.log("******** array sizes *******");
-        console.log(t.length);
-        console.log(v.duration);
-        ts = Htx.annotationStore.selected.names.get('ts');
-        console.log(ts.data);
-        t = ts.data.timestamp;
-        w = parseInt(t.length * (20 / v.duration));
-        console.log(w);
-        l = t.length - w;
-        ts.updateTR([t[0], t[w]], 1.001);
-        r = $ => ts.brushRange.map(n => (+n).toFixed(2));
-        _ = r();
-        updateVideoSync(v, r, t);
-        setInterval($ => r().some((n, i) => n !== * [i]) && ( * = r()) && (updateVideoSync(v, r, t)), 300);
-        console.log('video is loaded, starting to sync with time series');
-      }, 2000);
-```
-
-#### Labeling config
-
-```xml
-<View>
-	<View style="display: flex;">
-		<View style="flex: 50%">
-			<Header value="Gesture annotations" />
-			<Header value="Filename: $filename" />
-			<Header value="UUID: $UUID" />
-			<View>
-				<HyperText name="video" value="$video" inline="true" sync="video"/>
-				<View style="display: flex; justify-content: space-between">
-					<View style="width: 49%">
-						<Header value="Trim start [ms]:"/>
-						<Number name="videoStart" toName="ts" step="50" defaultValue="0"/>
-					</View>
-					<View>
-						<Header value="Trim end [ms]:"/>
-						<Number name="videoEnd" toName="ts" step="50" defaultValue="0"/>
-					</View>
-				</View>
-			</View>
-		</View>
-		<View style="flex: 50%; margin-left: 1em">
-			<Choices name="gesture_type_choice" toName="ts" choice="single-radio">
-				<Choice alias="R" value="Regular" />
-				<Choice alias="F" value="Fabulab" />
-			</Choices>
-			<View style="display: flex;">
-				<View style="flex: 50%" visibleWhen="choice-selected"
-                whenTagName="gesture_type_choice" whenChoiceValue="Fabulab">
-					<TimeSeriesLabels name="fabulab_gestures" toName='ts' choice='multiple'
-                    showinline="true">
-						<Label value="fabulab_Up" background="#FFA39E" />
-						<Label value="fabulab_Down" background="#D4380D" />
-						<Label value="fabulab_Left" background="#FFC069" />
-						<Label value="fabulab_Right" background="#AD8B00" />
-					</TimeSeriesLabels>
-				</View>
-				<View style="flex: 50%; margin-left: 1em" visibleWhen="choice-selected"
-                whenTagName="gesture_type_choice" whenChoiceValue="Regular">
-					<Filter name='filter' toname='tricks' />
-					<TimeSeriesLabels name="tricks" toName="ts" choice="multiple" showinline="true">
-						<Label value="Jump" background="#AD8B00" />
-						<Label value="Impact" background="#D3F261" />
-						<Label value="FreeFall" background="#0bf99e" />
-						<Label value="Flip" background="#0bf99e" />
-					</TimeSeriesLabels>
-				</View>
-			</View>
-			<!--<Audio name="audio" value="$audio" sync="video" speed="false" height="150" />
-        -->
-			<TimeSeries name="ts" valueType="url" value="$csv" timeColumn="timestamp" sync="video"
-            overviewChannels='AccMagnitude'>
-				<Channel column='x' legend='x' />
-				<Channel column='y' legend='y' />
-				<Channel column='z' legend='z' />
-				<Channel column="AccMagnitude" legend='AccMagnitude' />
-				<Channel column="Shake" legend='Shake' />
-			</TimeSeries>
-		</View>
-	</View>
-</View>
-```
-
-**Related tags:**
-
-* [View](/tags/view.html)
-* [Header](/tags/header.html)
-* [HyperText](/tags/hypertext.html)
-* [Choices](/tags/choices.html)
-* [TimeSeriesLabels](/tags/timeserieslabels.html)
-* [TimeSeries](/tags/timeseries.html)
-* [Filter](/tags/filter.html)
-
 ## Bulk text labeling with regex
 
 This script automatically applies the same label to all matching text spans. For example, if you apply the `PER` label to the text span `Smith`, this script will automatically find all instances of `Smith` in the text and apply the `PER` label to them. 
+
+![Screenshot of bulk text labeling](/images/project/autolabeling.gif)
 
 #### Script
 
@@ -385,6 +235,8 @@ This script adds bulk operations for creating and deleting regions (annotations)
     - The script also prevents tagging of single characters to avoid unnecessary annotations.
 4. **Debouncing Bulk Operations**
     - To prevent rapid consecutive bulk operations, the script uses a debouncing mechanism with a timeout of 1 second. This ensures that bulk operations are not triggered too frequently.
+
+![Screenshot of bulk actions with keyboard shortcut](/images/project/bulk_actions.gif)
 
 #### Script
 
@@ -537,20 +389,22 @@ This script adds bulk operations for creating and deleting regions (annotations)
 * [Header](/tags/header.html)
 * [Labels](/tags/labels.html)
 
-## Check that TextArea text is valid JSON 
+## Check that TextArea input is valid JSON 
 
 This script parses the contexts of a TextArea field to check for valid JSON. If the JSON is invalid, it shows an error and prevents the annotation from being saved.
+
+![Screenshot of JSON error message](/images/project/script_json.png)
 
 #### Script
 
 ```javascript
  LSI.on("beforeSaveAnnotation", (store, annotation) => {
-  const textAreaResult = annotation.results.find(r => r.type === 'textarea' && r.from_name === 'answer');
+  const textAreaResult = annotation.results.find(r => r.type === 'textarea' && r.from_name.name === 'answer');
   if (textAreaResult) {
     try {
       JSON.parse(textAreaResult.value.text[0]);
     } catch (e) {
-      Htx.showModal("Invalid JSON format. Please correct the JSON and try again: ${textAreaResult.value.text[0]}", "error");
+      Htx.showModal("Invalid JSON format. Please correct the JSON and try again.", "error");
       return false;
     }
   }
@@ -570,33 +424,29 @@ This script parses the contexts of a TextArea field to check for valid JSON. If 
 #### Labeling config
 
 ```xml
- <View>
-  <View><Filter toName="label_rectangles" minlength="0" name="filter"/>
-  <RectangleLabels name="label_rectangles" toName="image" canRotate="false" smart="true">
-    <View>
-      <Label value="table" background="Blue"/>
-      <Label value="cell" hotkey="2" background="Red"/>
-      <Label value="column" hotkey="3" background="Green"/>
-      <Label value="row" background="Purple"/>
-      <Label value="page_number" hotkey="5" background="Teal"/>
-    </View>
-
-    </View>
-  <Label value="currency-exchange-rate-table" background="#0627ac"/><Label value="administrative-fees-table" background="#2d8dd7"/><Label value="fair-value-estimation-reconciliation" background="#3700ff"/><Label value="service-distribution-fees-table" background="#130548"/><Label value="sub-transfer-agent-fees-table" background="#0b08a0"/></RectangleLabels></View>
+<View>
   <View>
-        <Image name="image" value="$image" zoomBy="1.07" width="1700px"/>
+    <Filter toName="label_rectangles" minlength="0" name="filter"/>
+    <RectangleLabels name="label_rectangles" toName="image" canRotate="false" smart="true">
+      <Label value="table" background="Blue"/>
+      <Label value="cell" background="Red"/>
+      <Label value="column" background="Green"/>
+      <Label value="row" background="Purple"/>
+    </RectangleLabels>
+  </View>
+  <View>
+    <Image name="image" value="$image" />
   </View>
   <View style=".htx-text { white-space: pre-wrap; }">
-    <TextArea name="parsed_row_json" toName="image"
+    <TextArea name="answer" toName="image"
               editable="true"
               perRegion="true"
               required="false"
               maxSubmissions="1"
               rows="10"
               placeholder="Parsed Row JSON"
-              displayMode="tag"
-              />
-   </View>
+              displayMode="tag"/>
+  </View>
 </View>
 ```
 
