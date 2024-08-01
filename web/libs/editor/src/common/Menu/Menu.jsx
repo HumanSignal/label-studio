@@ -37,7 +37,7 @@ export const Menu = forwardRef(
         <Block
           ref={ref}
           tag="ul"
-          name="menu"
+          name="menu-lsf"
           mod={{ size, collapsed }}
           mix={className}
           style={style}
