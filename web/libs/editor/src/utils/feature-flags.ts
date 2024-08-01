@@ -313,11 +313,6 @@ export const FF_TASK_COUNT_FIX = "fflag_fix_all_optic_79_task_count_is_wrong_sho
  */
 export const FF_PROD_E_111 = "fflag_feat_front_prod_e_111_annotator_workflow_control_short";
 
-/**
- * Adding a property snap to Polygon, PolygonLabels, KeyPoint and KeyPoinLabels to snap points to image pixel when user sets snap="pixel".
- */
-export const FF_SNAP_TO_PIXEL = "fflag_feat_front_lsdv_5518_snap_to_pixel_130923_short";
-
 /** Fix taxonomy items init with DEV-3617 FF on; this allows to correctly preselect items on init */
 export const FF_TAXONOMY_SELECTED = "fflag_fix_front_leap_149_taxonomy_selected_true_short";
 
