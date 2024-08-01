@@ -19,7 +19,7 @@ export const MenuItem = ({
   ...rest
 }) => {
   const { selected, allowClickSelected } = React.useContext(MenuContext);
-  const rootClass = cn("menu", { elem: "item" });
+  const rootClass = cn("menu-lsf", { elem: "item" });
   const isActive = (() => {
     const pathname = window.location.pathname.replace(/\/$/, "");
     const url = to ?? href;
