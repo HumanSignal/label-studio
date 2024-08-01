@@ -314,11 +314,11 @@ describe("NER - Emoji - Text", () => {
     });
   });
 
-  it('Heuristic edge case', () => {
+  it("Heuristic edge case", () => {
     LabelStudio.addFeatureFlagsOnPageLoad({
       [FF_LSDV_4620_3]: true,
-    })
-    LabelStudio.params().config(simpleHyperTextConfig).data({text:"<p>🐱\nmeans cat</p>"}).withResult([]).init();
+    });
+    LabelStudio.params().config(simpleHyperTextConfig).data({ text: "<p>🐱\nmeans cat</p>" }).withResult([]).init();
     LabelStudio.waitForObjectsReady();
     Labels.select("region");
     RichText.selectText("means");
@@ -333,6 +333,6 @@ describe("NER - Emoji - Text", () => {
       expect(resultValue.startOffset).to.eq(3);
       expect(resultValue.endOffset).to.eq(8);
       expect(resultValue.text).to.eq("means");
-    })
-  })
+    });
+  });
 });
