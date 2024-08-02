@@ -3,7 +3,6 @@ This guide describes the simplest way to start using **SegmentAnything 2** with 
 ## Using SAM2 with Label Studio (tutorial)
 [![Connecting SAM2 Model to Label Studio for Image Annotation ](https://img.youtube.com/vi/FTg8P8z4RgY/0.jpg)](https://www.youtube.com/watch?v=FTg8P8z4RgY)
 
-
 Note that as of 8/1/2024, SAM2 only runs on GPU.
 
 ## Running from source
