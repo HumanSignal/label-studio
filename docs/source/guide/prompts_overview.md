@@ -1,5 +1,5 @@
 ---
-title: Prompts overview and use cases- Beta 🧪
+title: Prompts overview and use cases
 short: Overview and use cases
 tier: enterprise
 type: guide
@@ -10,8 +10,6 @@ meta_description: An overview of the Prompts feature on the HumanSignal platform
 section: Prompts
 date: 2024-05-15 14:30:14
 ---
-
-<div class="admonition todo"><p class="admonition-title">Beta Release</p><p>This feature is currently in beta. To enable Prompts, contact your customer success manager or email <a href="mailto:cs@humansignal.com">cs@humansignal.com</a>.</p></div>
 
 Use Prompts to evaluate and refine your LLM prompts and then generate predictions to automate your labeling process. 
 
@@ -94,7 +92,7 @@ When you run your prompt, you create predictions for the selected sample (this c
 * Return to the project and begin reviewing your predictions. If you convert your predictions into annotations, you can use subject matter experts and annotators to begin interacting with those the annotations. 
 * As you review the annotations, you can identify ground truths. With a ground truth dataset, you can further refine your prompt using its accuracy score. 
 
-![Diagram of boostrap workflow](/images/prompts/boostrap-diagram.png)
+![Diagram of bootstrap workflow](/images/prompts/boostrap-diagram.png)
 
 ### Prompt evaluation and fine-tuning
 
