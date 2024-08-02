@@ -11,8 +11,17 @@ section: "Integrate & Extend"
 
 ---
 
+<div class="enterprise-only">
+
+The [**Label Studio Python SDK**](https://labelstud.io/sdk/index.html) allows you to seamlessly integrate Label Studio into your data science and machine learning pipelines.
+
+</div>
+
+<div class="opensource-only">
 
 The [**Label Studio Python SDK**](https://api.labelstud.io/api-reference/introduction/getting-started) allows you to seamlessly integrate Label Studio into your data science and machine learning pipelines.
+
+</div>
 
 The SDK provides a set of predefined classes and methods to interact with the Label Studio API directly from your Python scripts, making it easier to manage projects, import tasks, and handle annotations. 
 
