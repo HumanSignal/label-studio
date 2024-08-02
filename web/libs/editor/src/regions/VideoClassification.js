@@ -28,11 +28,24 @@ const Model = types
       toggleLifespan: self.toggleLifespan,
       addKeypoint: self.addKeypoint,
       removeKeypoint: self.removeKeypoint,
+      serialize: self.serialize,
     };
 
     return {
       updateShape() {
         return;
+      },
+
+      serialize() {
+        const result = Super.serialize();
+
+        // `rotation` doesn't make any sense in classification, so we remove it
+        // @todo rewrite to only add `rotation` in regions where it makes sense
+        result.value.sequence = result.value.sequence.map(({ rotation, ...keyframe }) => {
+          return keyframe;
+        });
+
+        return result;
       },
 
       toggleLifespan(frame) {
