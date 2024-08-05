@@ -12,7 +12,7 @@ import { Tag } from "../../Tag/Tag";
 import { TableCell, TableCellContent } from "../TableCell/TableCell";
 import { TableContext, TableElem } from "../TableContext";
 import { getStyle } from "../utils";
-import "./TableHead.styl";
+import "./TableHead.scss";
 import { FF_DEV_2984, FF_DEV_3873, isFF } from "../../../../utils/feature-flags";
 import { getRoot } from "mobx-state-tree";
 
@@ -212,7 +212,12 @@ export const TableHead = observer(
 
         useEffect(() => {
           ref.current?.addEventListener("mousedown", (event) => {
-            if (event.target.className.includes("handle")) event.preventDefault();
+            const className = event.target.className;
+
+            // This element could be an SVG element where className is an object, not a string.
+            if (className?.includes?.("handle")) {
+              event.preventDefault();
+            }
           });
         }, []);
 

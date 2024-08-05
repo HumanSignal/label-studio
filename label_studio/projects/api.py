@@ -92,6 +92,91 @@ _task_data_schema = openapi.Schema(
     example={'id': 1, 'my_image_url': '/static/samples/kittens.jpg'},
 )
 
+_project_schema = openapi.Schema(
+    title='Project',
+    description='Project',
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'title': openapi.Schema(
+            title='title',
+            description='Project title',
+            type=openapi.TYPE_STRING,
+            example='My project',
+        ),
+        'description': openapi.Schema(
+            title='description',
+            description='Project description',
+            type=openapi.TYPE_STRING,
+            example='My first project',
+        ),
+        'label_config': openapi.Schema(
+            title='label_config',
+            description='Label config in XML format',
+            type=openapi.TYPE_STRING,
+            example='<View>[...]</View>',
+        ),
+        'expert_instruction': openapi.Schema(
+            title='expert_instruction',
+            description='Labeling instructions to show to the user',
+            type=openapi.TYPE_STRING,
+            example='Label all cats',
+        ),
+        'show_instruction': openapi.Schema(
+            title='show_instruction',
+            description='Show labeling instructions',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'show_skip_button': openapi.Schema(
+            title='show_skip_button',
+            description='Show skip button',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'enable_empty_annotation': openapi.Schema(
+            title='enable_empty_annotation',
+            description='Allow empty annotations',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'show_annotation_history': openapi.Schema(
+            title='show_annotation_history',
+            description='Show annotation history',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'reveal_preannotations_interactively': openapi.Schema(
+            title='reveal_preannotations_interactively',
+            description='Reveal preannotations interactively. If set to True, predictions will be shown to the user only after selecting the area of interest',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'show_collab_predictions': openapi.Schema(
+            title='show_collab_predictions',
+            description='Show predictions to annotators',
+            type=openapi.TYPE_BOOLEAN,
+        ),
+        'maximum_annotations': openapi.Schema(
+            title='maximum_annotations',
+            description='Maximum annotations per task',
+            type=openapi.TYPE_INTEGER,
+        ),
+        'color': openapi.Schema(
+            title='color',
+            description='Project color in HEX format',
+            type=openapi.TYPE_STRING,
+            default='#FFFFFF',
+        ),
+        'control_weights': openapi.Schema(
+            title='control_weights',
+            description='Dict of weights for each control tag in metric calculation. Each control tag (e.g. label or choice) will '
+            'have its own key in control weight dict with weight for each label and overall weight. '
+            'For example, if a bounding box annotation with a control tag named my_bbox should be included with 0.33 weight in agreement calculation, '
+            'and the first label Car should be twice as important as Airplane, then you need to specify: '
+            "{'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplane': 0.5}, 'overall': 0.33}",
+            type=openapi.TYPE_OBJECT,
+            example={
+                'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplaine': 0.5}, 'overall': 0.33}
+            },
+        ),
+    },
+)
+
 
 class ProjectListPagination(PageNumberPagination):
     page_size = 30
@@ -107,6 +192,13 @@ class ProjectFilterSet(FilterSet):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
+        x_fern_pagination={
+            'offset': '$request.page',
+            'results': '$response.results',
+        },
         operation_summary='List your projects',
         operation_description="""
     Return a list of the projects that you've created.
@@ -127,16 +219,20 @@ class ProjectFilterSet(FilterSet):
     decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Create new project',
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_description="""
     Create a project and set up the labeling interface in Label Studio using the API.
 
     ```bash
     curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
-    --data '{{"label_config": "<View>[...]</View>"}}'
+    --data '{{"title": "My project", "label_config": "<View></View>"}}'
     ```
     """.format(
             settings.HOSTNAME or 'https://localhost:8080'
         ),
+        request_body=_project_schema,
     ),
 )
 class ProjectListAPI(generics.ListCreateAPIView):
@@ -189,14 +285,78 @@ class ProjectListAPI(generics.ListCreateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
         operation_summary='Get project by ID',
         operation_description='Retrieve information about a project by project ID.',
+        responses={
+            '200': openapi.Response(
+                description='Project information',
+                schema=ProjectSerializer,
+                examples={
+                    'application/json': {
+                        'id': 1,
+                        'title': 'My project',
+                        'description': 'My first project',
+                        'label_config': '<View>[...]</View>',
+                        'expert_instruction': 'Label all cats',
+                        'show_instruction': True,
+                        'show_skip_button': True,
+                        'enable_empty_annotation': True,
+                        'show_annotation_history': True,
+                        'organization': 1,
+                        'color': '#FF0000',
+                        'maximum_annotations': 1,
+                        'is_published': True,
+                        'model_version': '1.0.0',
+                        'is_draft': False,
+                        'created_by': {
+                            'id': 1,
+                            'first_name': 'Jo',
+                            'last_name': 'Doe',
+                            'email': 'manager@humansignal.com',
+                        },
+                        'created_at': '2023-08-24T14:15:22Z',
+                        'min_annotations_to_start_training': 0,
+                        'start_training_on_annotation_update': True,
+                        'show_collab_predictions': True,
+                        'num_tasks_with_annotations': 10,
+                        'task_number': 100,
+                        'useful_annotation_number': 10,
+                        'ground_truth_number': 5,
+                        'skipped_annotations_number': 0,
+                        'total_annotations_number': 10,
+                        'total_predictions_number': 0,
+                        'sampling': 'Sequential sampling',
+                        'show_ground_truth_first': True,
+                        'show_overlap_first': True,
+                        'overlap_cohort_percentage': 100,
+                        'task_data_login': 'user',
+                        'task_data_password': 'secret',
+                        'control_weights': {},
+                        'parsed_label_config': '{"tag": {...}}',
+                        'evaluate_predictions_automatically': False,
+                        'config_has_control_tags': True,
+                        'skip_queue': 'REQUEUE_FOR_ME',
+                        'reveal_preannotations_interactively': True,
+                        'pinned_at': '2023-08-24T14:15:22Z',
+                        'finished_task_number': 10,
+                        'queue_total': 10,
+                        'queue_done': 100,
+                    }
+                },
+            )
+        },
     ),
 )
 @method_decorator(
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
         operation_summary='Delete project',
         operation_description='Delete a project by specified project ID.',
     ),
@@ -205,9 +365,12 @@ class ProjectListAPI(generics.ListCreateAPIView):
     name='patch',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
         operation_summary='Update project',
         operation_description='Update the project settings for a specific project.',
-        request_body=ProjectSerializer,
+        request_body=_project_schema,
     ),
 )
 class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
@@ -268,6 +431,9 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
     decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Get next task to label',
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='next_task',
+        x_fern_audiences=['public'],
         operation_description="""
     Get the next task for labeling. If you enable Machine Learning in
     your project, the response might include a "predictions"
@@ -322,6 +488,7 @@ class LabelStreamHistoryAPI(generics.RetrieveAPIView):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_audiences=['internal'],
         operation_summary='Validate label config',
         operation_description='Validate an arbitrary labeling configuration.',
         responses={204: 'Validation success'},
@@ -355,6 +522,9 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
         tags=['Projects'],
         operation_id='api_projects_validate_label_config',
         operation_summary='Validate project label config',
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='validate_config',
+        x_fern_audiences=['public'],
         operation_description="""
         Determine whether the label configuration for a specific project is valid.
         """,
@@ -434,6 +604,9 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='tasks',
+        x_fern_sdk_method_name='create_many_status',
+        x_fern_audiences=['public'],
         operation_summary='Get project import info',
         operation_description='Return data related to async project import operation',
         manual_parameters=[
@@ -459,6 +632,7 @@ class ProjectImportAPI(generics.RetrieveAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_audiences=['internal'],
         operation_summary='Get project reimport info',
         operation_description='Return data related to async project reimport operation',
         manual_parameters=[
@@ -484,6 +658,9 @@ class ProjectReimportAPI(generics.RetrieveAPIView):
     name='delete',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_sdk_group_name='projects',
+        x_fern_sdk_method_name='delete_all_tasks',
+        x_fern_audiences=['public'],
         operation_summary='Delete all tasks',
         operation_description='Delete all tasks from a specific project.',
         manual_parameters=[
@@ -494,12 +671,14 @@ class ProjectReimportAPI(generics.RetrieveAPIView):
                 description='A unique integer value identifying this project.',
             ),
         ],
+        responses={204: 'Tasks deleted'},
     ),
 )
 @method_decorator(
     name='get',
     decorator=swagger_auto_schema(
         tags=['Projects'],
+        x_fern_audiences=['internal'],  # TODO: deprecate this endpoint in favor of tasks:tasks-list
         operation_summary='List project tasks',
         operation_description="""
             Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
@@ -555,7 +734,7 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
         Task.delete_tasks_without_signals(Task.objects.filter(project=project))
         project.summary.reset()
         emit_webhooks_for_instance(request.user.active_organization, None, WebhookAction.TASKS_DELETED, task_ids)
-        return Response(data={'tasks': task_ids}, status=204)
+        return Response(status=204)
 
     def get(self, *args, **kwargs):
         return super(ProjectTaskListAPI, self).get(*args, **kwargs)

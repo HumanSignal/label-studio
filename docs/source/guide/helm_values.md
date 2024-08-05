@@ -262,6 +262,8 @@ Parameters specific to the `rqworkers` service of your Label Studio Enterprise d
 | `rqworker.rbac.rules`                            | Custom RBAC rules to set for rqworker service		                                                 | `[]`                                   |
 | `rqworker.cmdWrapper`                            | Additional commands to run prior to starting App. Useful to run wrappers before startup command | `""`                                   |
 
+<div class="enterprise-only">
+
 ## Label Studio Enterprise parameters
 
 | Parameter                                 | Description                                                                        | Default   |
@@ -269,6 +271,8 @@ Parameters specific to the `rqworkers` service of your Label Studio Enterprise d
 | `enterprise.enabled`                      | Enable Enterprise features                                                         | `false`   |
 | `enterprise.enterpriseLicense.secretName` | Name of an existing secret holding the Label Studio Enterprise license information | `""`      |
 | `enterprise.enterpriseLicense.secretKey`  | Key of an existing secret holding the enterprise license information               | `license` |
+
+</div>
 
 ## Sub-charts parameters
 
@@ -310,16 +314,3 @@ global:
     If you are deploying to a production environment, you should set `SSRF_PROTECTION_ENABLED: true`. See [Secure Label Studio](security#Enable-SSRF-protection-for-production-environments). 
 
 
-## The `global.featureFlags` usage
-
-The `global.featureFlags` section can be used to set feature flags of Label Studio.
-
-Any key value put under this section translates to environment variables used to control Label Studio's feature flags configuration. Every key should start from `ff_` or `fflag_` in lower case.
-
-An example:
-
-```yaml
-global:
-  featureFlags:
-    fflag_enable_some_cool_feature_short: true
-```

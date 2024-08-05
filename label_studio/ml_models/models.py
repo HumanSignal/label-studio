@@ -1,13 +1,16 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
+import logging
 
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from ml_model_providers.models import ModelProviderConnection
+from ml_model_providers.models import ModelProviders
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation, Prediction
+
+logger = logging.getLogger(__name__)
 
 
 def validate_string_list(value):
@@ -20,7 +23,6 @@ def validate_string_list(value):
 
 
 class ModelInterface(models.Model):
-
     title = models.CharField(_('title'), max_length=500, null=False, blank=False, help_text='Model name')
 
     description = models.TextField(_('description'), null=True, blank=True, help_text='Model description')
@@ -72,11 +74,10 @@ class ModelVersion(models.Model):
 
 
 class ThirdPartyModelVersion(ModelVersion):
-
     provider = models.CharField(
         max_length=255,
-        choices=ModelProviderConnection.ModelProviders.choices,
-        default=ModelProviderConnection.ModelProviders.OPENAI,
+        choices=ModelProviders.choices,
+        default=ModelProviders.OPENAI,
         help_text='The model provider to use e.g. OpenAI',
     )
 
@@ -110,6 +111,7 @@ class ModelRun(models.Model):
     class ProjectSubset(models.TextChoices):
         ALL = 'All', _('All')
         HASGT = 'HasGT', _('HasGT')
+        SAMPLE = 'Sample', _('Sample')
 
     class FileType(models.TextChoices):
         INPUT = 'Input', _('Input')
@@ -149,6 +151,12 @@ class ModelRun(models.Model):
         help_text='Job ID for inference job for a ModelRun e.g. Adala job ID',
     )
 
+    total_predictions = models.IntegerField(_('total predictions'), default=0)
+
+    total_correct_predictions = models.IntegerField(_('total correct predictions'), default=0)
+
+    total_tasks = models.IntegerField(_('total tasks'), default=0)
+
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
     triggered_at = models.DateTimeField(_('triggered at'), null=True, default=None)
@@ -156,19 +164,6 @@ class ModelRun(models.Model):
     predictions_updated_at = models.DateTimeField(_('predictions updated at'), null=True, default=None)
 
     completed_at = models.DateTimeField(_('completed at'), null=True, default=None)
-
-    # todo may need to clean up in future
-    @property
-    def input_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/input.csv'
-
-    @property
-    def output_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/output.csv'
-
-    @property
-    def error_file_name(self):
-        return f'{self.project.id}_{self.model_version.pk}_{self.pk}/error.csv'
 
     def delete_predictions(self):
         """
@@ -181,7 +176,15 @@ class ModelRun(models.Model):
         """
         predictions = Prediction.objects.filter(model_run=self.id)
         prediction_ids = [p.id for p in predictions]
+        # to delete all dependencies where predictions are foreign keys.
         Annotation.objects.filter(parent_prediction__in=prediction_ids).update(parent_prediction=None)
+        try:
+            from stats.models import PredictionStats
+
+            prediction_stats_to_be_deleted = PredictionStats.objects.filter(prediction_to__in=prediction_ids)
+            prediction_stats_to_be_deleted.delete()
+        except Exception as e:
+            logger.info(f'PredictionStats model does not exist , exception:{e}')
         predictions._raw_delete(predictions.db)
 
     def delete(self, *args, **kwargs):

@@ -1,8 +1,35 @@
+.simple-settings
+  width: 42rem;
+
+.simple-settings,.annotation-settings,.general-settings,.storage-settings,.webhook
+  & h1{
+    margin-bottom: .5rem;
+    font-weight: 500;
+    margin-top: 0;
+    font-size: 1.75rem;
+  }
+
+.settings-wrapper
+  --column-count: 1;
+  border: 1px solid var(--sand_300);
+  border-radius: .5rem;
+  padding: 1.5rem;
+  width: 40rem;
+  & + .settings-wrapper, & + .form-wrapper{
+    margin-top: 1.5rem;
+  }
+
+  & h3
+    margin 0 0 .5rem
+    font-weight 500
+
+  &__header  
+    font-weight 500
+    font-size 1.5rem
+    margin-bottom 0
+
 .general-settings
   display flex
-
-  &__wrapper
-    width 488px
 
   .heidy-tip
     margin 0 0 0 40px
@@ -14,7 +41,7 @@
 
   .radio-group__buttons
     .label__content
-        padding 0 16px
+        padding 0 4px
 
 .workspace-placeholder
   &__badge-wrapper
@@ -23,12 +50,12 @@
     line-height normal
 
   &__title
-    font-size 16px
-    color #3a3a3a
+    font-size .875rem
+    color var(--sand_900)
     font-weight 500
 
 .settings-caption
-  color #1F1F1F;
+  color var(--sand_700)
   font-size 12px;
   font-style normal;
   font-weight 400;
@@ -36,7 +63,7 @@
   letter-spacing 0.4px;
 
   a
-    color #09F;
+    color var(--primary_link)
     font-size 12px;
     font-style normal;
     font-weight 500;
@@ -55,7 +82,7 @@
     margin 0
 
     a
-      color #09F;
+      color var(--primary_link)
       font-size 14px;
       font-style normal;
       font-weight 500;
@@ -96,8 +123,3 @@
 
   &__wrapper
     width 488px
-
-  &__header  
-    font-weight 500
-    font-size 16px
-    margin-bottom 0

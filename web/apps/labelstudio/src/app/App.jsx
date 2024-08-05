@@ -4,6 +4,7 @@ import { createBrowserHistory } from "history";
 import React from "react";
 import { render } from "react-dom";
 import { Router } from "react-router-dom";
+import { LEAVE_BLOCKER_KEY, leaveBlockerCallback } from "../components/LeaveBlocker/LeaveBlocker";
 import { initSentry } from "../config/Sentry";
 import { ApiProvider } from "../providers/ApiProvider";
 import { AppStoreProvider } from "../providers/AppStoreProvider";
@@ -17,18 +18,31 @@ import "./App.styl";
 import { AsyncPage } from "./AsyncPage/AsyncPage";
 import ErrorBoundary from "./ErrorBoundary";
 import { RootPage } from "./RootPage";
-import { FF_OPTIC_2, isFF } from "../utils/feature-flags";
+import { FF_OPTIC_2, FF_UNSAVED_CHANGES, isFF } from "../utils/feature-flags";
 import { ToastProvider, ToastViewport } from "../components/Toast/Toast";
 
 const baseURL = new URL(APP_SETTINGS.hostname || location.origin);
+export const UNBLOCK_HISTORY_MESSAGE = "UNBLOCK_HISTORY";
 
 const browserHistory = createBrowserHistory({
   basename: baseURL.pathname || "/",
+  // callback is an async way to confirm or decline going to another page in the context of routing. It accepts `true` or `false`
   getUserConfirmation: (message, callback) => {
+    // `history.block` doesn't block events, so in the case of listeners,
+    // we need to have some flag that can be checked for preventing related actions
+    // `isBlocking` flag is used for this purpose
+    browserHistory.isBlocking = true;
+    const callbackWrapper = (result) => {
+      browserHistory.isBlocking = false;
+      callback(result);
+      isFF(FF_UNSAVED_CHANGES) && window.postMessage({ source: "label-studio", payload: UNBLOCK_HISTORY_MESSAGE });
+    };
     if (isFF(FF_OPTIC_2) && message === DRAFT_GUARD_KEY) {
-      draftGuardCallback.current = callback;
+      draftGuardCallback.current = callbackWrapper;
+    } else if (isFF(FF_UNSAVED_CHANGES) && message === LEAVE_BLOCKER_KEY) {
+      leaveBlockerCallback.current = callbackWrapper;
     } else {
-      callback(window.confirm(message));
+      callbackWrapper(window.confirm(message));
     }
   },
 });

@@ -33,7 +33,7 @@ from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.db import models, transaction
 from django.db.models import Avg, BooleanField, Case, Count, JSONField, Max, Q, Sum, Value, When
 from django.utils.translation import gettext_lazy as _
-from label_studio_tools.core.label_config import parse_config
+from label_studio_sdk._extensions.label_studio_tools.core.label_config import parse_config
 from labels_manager.models import Label
 from projects.functions import (
     annotate_finished_task_number,

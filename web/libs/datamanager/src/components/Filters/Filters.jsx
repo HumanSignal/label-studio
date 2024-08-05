@@ -6,7 +6,7 @@ import { Button } from "../Common/Button/Button";
 import { Icon } from "../Common/Icon/Icon";
 import { Tooltip } from "../Common/Tooltip/Tooltip";
 import { FilterLine } from "./FilterLine/FilterLine";
-import "./Filters.styl";
+import "./Filters.scss";
 
 const injector = inject(({ store }) => ({
   store,

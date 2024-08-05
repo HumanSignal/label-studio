@@ -4,6 +4,7 @@ Before(({ LabelStudio }) => {
   LabelStudio.setFeatureFlags({
     ff_front_1170_outliner_030222_short: true,
     fflag_feat_front_lsdv_4620_richtext_opimization_060423_short: true,
+    fflag_feat_front_dev_3873_labeling_ui_improvements_short: true,
   });
 });
 
@@ -90,13 +91,86 @@ Scenario("Creating, removing and restoring regions", async ({ I, LabelStudio, At
   });
 });
 
+Scenario("Region should load after change between annotation tabs", async ({ I, LabelStudio }) => {
+  I.amOnPage("/");
+
+  LabelStudio.init({
+    config: `<View>
+    <Labels name="label" toName="html">
+        <Label value="Highlight" background="rgb(225,180,0)" />
+    </Labels>
+    <HyperText name="html" value="$html" />
+</View>`,
+    data: {
+      html: "<div>Hello world!</div>",
+    },
+    annotations: [
+      {
+        id: "1234",
+        result: [
+          {
+            id: "Highlight_1",
+            from_name: "label",
+            to_name: "html",
+            type: "labels",
+            value: {
+              start: "/div[1]",
+              startOffset: 0,
+              end: "/div[1]",
+              endOffset: 5,
+              labels: ["Highlight"],
+            },
+          },
+        ],
+      },
+      {
+        id: "1235",
+        result: [
+          {
+            id: "Highlight_2",
+            from_name: "label",
+            to_name: "html",
+            type: "labels",
+            value: {
+              start: "/div[1]",
+              startOffset: 6,
+              end: "/div[1]",
+              endOffset: 11,
+              labels: ["Highlight"],
+            },
+          },
+        ],
+      },
+    ],
+  });
+
+  LabelStudio.waitForObjectsReady();
+
+  // select second annotation
+  I.click(".lsf-annotation-button:nth-child(2)");
+  // select first annotation
+  I.click(".lsf-annotation-button:nth-child(1)");
+  // select second annotation again
+  I.click(".lsf-annotation-button:nth-child(2)");
+  // check if region is visible
+  within({ frame: ".lsf-richtext__iframe" }, () => {
+    I.seeElement(locate(".htx-highlight").withText("Hello"));
+  });
+  // select first annotation again
+  I.click(".lsf-annotation-button:nth-child(1)");
+  // check if region is visible
+  within({ frame: ".lsf-richtext__iframe" }, () => {
+    I.seeElement(locate(".htx-highlight").withText("world"));
+  });
+});
+
 Scenario("Rich text content consistency", async ({ I, LabelStudio, AtOutliner, AtRichText }) => {
   I.amOnPage("/");
 
   LabelStudio.init({
     config: `<View>
     <Labels name="label" toName="html">
-        <Label value="Highlight" background="#0099ff" />
+        <Label value="Highlight" background="#617ADA" />
     </Labels>
     <HyperText name="html" value="$html" />
 </View>`,

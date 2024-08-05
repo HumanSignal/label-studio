@@ -4,7 +4,7 @@ import { taskToLSFormat } from "../../../sdk/lsf-utils";
 import { Block } from "../../../utils/bem";
 import { FF_LSDV_4711, isFF } from "../../../utils/feature-flags";
 import { Spinner } from "../Spinner";
-import "./AnnotationPreview.styl";
+import "./AnnotationPreview.scss";
 
 const imgDefaultProps = {};
 

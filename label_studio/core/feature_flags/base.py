@@ -11,6 +11,8 @@ from label_studio.core.current_request import get_current_request
 from label_studio.core.utils.io import find_node
 from label_studio.core.utils.params import get_all_env_with_prefix, get_bool_env
 
+from .stale_feature_flags import STALE_FEATURE_FLAGS
+
 logger = logging.getLogger(__name__)
 
 
@@ -47,9 +49,14 @@ else:
     # Production usage
     if hasattr(settings, 'REDIS_LOCATION'):
         logger.debug(f'Set LaunchDarkly config with Redis feature store at {settings.REDIS_LOCATION}')
-        store = Redis.new_feature_store(
-            url=settings.REDIS_LOCATION, prefix='feature-flags', caching=CacheConfig(expiration=30)
-        )
+        store_kwargs = {
+            'url': settings.REDIS_LOCATION,
+            'prefix': 'feature-flags',
+            'caching': CacheConfig(expiration=30),
+        }
+        if settings.REDIS_LOCATION.startswith('rediss'):
+            store_kwargs['redis_opts'] = settings.REDIS_SSL_SETTINGS
+        store = Redis.new_feature_store(**store_kwargs)
         ldclient.set_config(
             Config(settings.FEATURE_FLAGS_API_KEY, feature_store=store, http=HTTPConfig(connect_timeout=5))
         )
@@ -82,7 +89,16 @@ def flag_set(feature_flag, user=None, override_system_default=None):
         run_old_code()
     ```
     `override_default` is used to override any system defaults in place in case no files or LD API flags provided
+
+    stale_feature_flags will be checked to confirm if the feature flags are still active
+
+    stale feature flags are considered "deprecated" and should not be changeable in any circumstance.
+    They are an intermediary step before code references to the flag being removed completely.
     """
+
+    if feature_flag in STALE_FEATURE_FLAGS:
+        return STALE_FEATURE_FLAGS[feature_flag]
+
     if user is None:
         user = AnonymousUser
     elif user == 'auto':
@@ -105,6 +121,7 @@ def flag_set(feature_flag, user=None, override_system_default=None):
 def all_flags(user):
     """Return the output of this method in API response, to bootstrap client-side flags.
     More on https://docs.launchdarkly.com/sdk/features/bootstrapping#javascript
+    stale_feature_flags will override any client configuration
     """
     user_dict = _get_user_repr(user)
     logger.debug(f'Resolve all flags state for user {user_dict}')
@@ -119,4 +136,8 @@ def all_flags(user):
 
     for env_flag_name, env_flag_on in env_ff.items():
         flags[env_flag_name] = env_flag_on
+
+    for feature_flag, value in STALE_FEATURE_FLAGS.items():
+        flags[feature_flag] = value
+
     return flags

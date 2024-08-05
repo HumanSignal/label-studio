@@ -7,11 +7,14 @@
     justify-items stretch
     justify-content space-between
     grid-template-columns repeat(var(--column-count, 5), 1fr)
-    grid-column-gap 16px
-    grid-row-gap var(--row-gap, 16px)
+    grid-column-gap 8px
+    grid-row-gap var(--row-gap, 8px)
 
     &:not(:first-child)
       margin-top 12px
+    
+    & description
+      font-size .875rem
 
   &__submit
     display flex
@@ -48,8 +51,8 @@
   &:not(&_ghost):focus,
   &_focused
     outline none
-    box-shadow 0px 0px 0px 6px rgba($accent_color, 0.2), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba($accent_color, 0.2)
-    border-color rgba($accent_color, 0.2)
+    box-shadow 0px 0px 0px 6px var(--grape_100), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba($accent_color, 0.2)
+    border-color var(--grape_100)
 
 .form-indicator
   font-weight 500
@@ -59,4 +62,4 @@
       &_success
         color #59aa05
       &_fail
-        color $danger_color
+        color var(--danger_color)

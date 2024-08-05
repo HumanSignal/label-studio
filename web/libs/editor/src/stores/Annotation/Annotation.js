@@ -21,6 +21,7 @@ import {
   FF_LSDV_4583,
   FF_LSDV_4832,
   FF_LSDV_4988,
+  FF_REVIEWER_FLOW,
   isFF,
 } from "../../utils/feature-flags";
 import { delay, isDefined } from "../../utils/utilities";
@@ -286,7 +287,7 @@ export const Annotation = types
     },
 
     get hasSelection() {
-      return self.regionStore.selection.hasSelection;
+      return self.regionStore.hasSelection;
     },
     get selectionSize() {
       return self.regionStore.selection.size;
@@ -339,6 +340,25 @@ export const Annotation = types
         }
       : {},
   )
+  .views((self) => ({
+    // experiment to display review buttons in Quick View
+    get canBeReviewed() {
+      const store = self.store;
+
+      return (
+        isFF(FF_REVIEWER_FLOW) &&
+        // not a current user — we can only review others' annotations
+        self.user?.email &&
+        store.user?.email !== self.user?.email &&
+        // we have this only in LSE
+        getEnv(self).events.hasEvent("acceptAnnotation") &&
+        // Quick View — we don't have View All in Label Stream
+        store.hasInterface("annotations:view-all") &&
+        // annotation was submitted already
+        !isNaN(self.pk)
+      );
+    },
+  }))
   .actions((self) => ({
     reinitHistory(force = true) {
       self.history.reinit(force);
@@ -1104,7 +1124,7 @@ export const Annotation = types
 
           const imageEntity = tag.findImageEntity(obj.item_index ?? 0);
 
-          if (!imageEntity) return;
+          if (!imageEntity || imageEntity.imageLoaded) return;
 
           imageEntity.setNaturalWidth(obj.original_width);
           imageEntity.setNaturalHeight(obj.original_height);

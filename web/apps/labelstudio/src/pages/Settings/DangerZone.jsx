@@ -7,6 +7,7 @@ import { Space } from "../../components/Space/Space";
 import { Spinner } from "../../components/Spinner/Spinner";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
+import { cn } from "../../utils/bem";
 
 export const DangerZone = () => {
   const { project } = useProject();
@@ -93,22 +94,20 @@ export const DangerZone = () => {
   );
 
   return (
-    <div style={{ width: 480 }}>
-      <Label
-        text="Delete Annotations, Tasks, or Project"
-        description="Perform these actions at your own risk. Actions you take on this page can't be reverted. Make sure your data is backed up."
-        style={{ display: "block", width: 415 }}
-      />
+    <div className={cn("simple-settings")}>
+      <h1>Danger Zone</h1>
+      <Label description="Perform these actions at your own risk. Actions you take on this page can't be reverted. Make sure your data is backed up." />
 
       {project.id ? (
-        <Space direction="vertical" spread style={{ marginTop: 32 }}>
+        <div style={{ marginTop: 16 }}>
           {buttons.map((btn) => {
             const waiting = processing === btn.type;
             const disabled = btn.disabled || (processing && !waiting);
 
             return (
               btn.disabled !== true && (
-                <div>
+                <div className={cn("settings-wrapper")}>
+                  <h3>{btn.label}</h3>
                   {btn.help && <Label description={btn.help} style={{ width: 600, display: "block" }} />}
                   <Button
                     key={btn.type}
@@ -116,7 +115,7 @@ export const DangerZone = () => {
                     disabled={disabled}
                     waiting={waiting}
                     onClick={handleOnClick(btn.type)}
-                    style={{ marginLeft: 16, marginTop: 10 }}
+                    style={{ marginTop: 16 }}
                   >
                     {btn.label}
                   </Button>
@@ -124,7 +123,7 @@ export const DangerZone = () => {
               )
             );
           })}
-        </Space>
+        </div>
       ) : (
         <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
           <Spinner size={32} />

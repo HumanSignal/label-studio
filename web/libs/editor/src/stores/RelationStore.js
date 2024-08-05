@@ -5,6 +5,10 @@ import Tree, { TRAVERSE_SKIP } from "../core/Tree";
 import Area from "../regions/Area";
 import { isDefined } from "../utils/utilities";
 
+const localStorageKeys = {
+  order: "relations:order",
+};
+
 /**
  * Relation between two different nodes
  */
@@ -102,6 +106,10 @@ const Relation = types
 const RelationStore = types
   .model("RelationStore", {
     relations: types.array(Relation),
+    order: types.optional(
+      types.enumeration(["asc", "desc"]),
+      window.localStorage.getItem(localStorageKeys.order) ?? "asc",
+    ),
   })
   .volatile(() => ({
     showConnections: true,
@@ -114,6 +122,16 @@ const RelationStore = types
     },
     get size() {
       return self.relations.length;
+    },
+    get orderedRelations() {
+      if (!self.relations) return [];
+      if (self.order === "asc") {
+        return self.relations.slice();
+      }
+      return self.relations.slice().reverse();
+    },
+    get isAllHidden() {
+      return !self.relations.find((rl) => !rl.visible);
     },
     get values() {
       return self.control?.values ?? [];
@@ -210,6 +228,21 @@ const RelationStore = types
 
     toggleConnections() {
       self.showConnections = !self.showConnections;
+    },
+
+    toggleOrder() {
+      self.order = self.order === "asc" ? "desc" : "asc";
+      window.localStorage.setItem(localStorageKeys.order, self.order);
+    },
+
+    toggleAllVisibility() {
+      const shouldBeHidden = !self.isAllHidden;
+
+      self.relations.forEach((rl) => {
+        if (rl.visible !== shouldBeHidden) {
+          rl.toggleVisibility();
+        }
+      });
     },
 
     setHighlight(relation) {

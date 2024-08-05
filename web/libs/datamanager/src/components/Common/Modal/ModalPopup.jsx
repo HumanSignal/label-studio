@@ -5,7 +5,7 @@ import { BemWithSpecifiContext, cn } from "../../../utils/bem";
 import { aroundTransition } from "../../../utils/transition";
 import { Button } from "../Button/Button";
 import { Icon } from "../Icon/Icon";
-import "./Modal.styl";
+import "./Modal.scss";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
@@ -81,7 +81,7 @@ export class Modal extends React.Component {
                     tag={Button}
                     name="close"
                     type="text"
-                    icon={<Icon size="18" color="#0099FF" icon={FaTimes} />}
+                    icon={<Icon size="18" color="#617ADA" icon={FaTimes} />}
                   />
                 )}
               </Modal.Header>

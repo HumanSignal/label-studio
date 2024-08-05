@@ -2,11 +2,12 @@ export interface Meta {
   headers: Map<string, string>;
   status: number;
   url: string;
+  ok: boolean;
 }
 
-export interface WrappedResponse<T> extends T {
+export type WrappedResponse<T = unknown> = T & {
   $meta: Meta;
-}
+};
 
 export type Unwrap<P> = P extends WrappedResponse<infer T> ? T : never;
 

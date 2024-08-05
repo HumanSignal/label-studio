@@ -5,7 +5,7 @@ import { Description } from "../../../components/Description/Description";
 import { Form, Label, Toggle } from "../../../components/Form";
 import { modal } from "../../../components/Modal/Modal";
 import { EmptyState } from "../../../components/EmptyState/EmptyState";
-import { IconEmptyPredictions } from "../../../assets/icons";
+import { IconModels } from "../../../assets/icons";
 import { useAPI } from "../../../providers/ApiProvider";
 import { ProjectContext } from "../../../providers/ProjectProvider";
 import { MachineLearningList } from "./MachineLearningList";
@@ -101,7 +101,7 @@ export const MachineLearningSettings = () => {
         {loading && <Spinner size={32} />}
         {loaded && backends.length === 0 && (
           <EmptyState
-            icon={<IconEmptyPredictions />}
+            icon={<IconModels />}
             title="Let’s connect your first model"
             description="Connect a machine learning model to generate predictions. These predictions can be compared side by side, used for efficient pre‒labeling and, to aid in active learning, directing users to the most impactful labeling tasks."
             action={
@@ -157,7 +157,7 @@ export const MachineLearningSettings = () => {
             <Form.Row columnCount={1}>
               <Label text="Configuration" large />
 
-              <div style={{ paddingLeft: 16 }}>
+              <div>
                 <Toggle
                   label="Start model training on annotation submission"
                   description="This option will send a request to /train with information about annotations. You can use this to enable an Active Learning loop. You can also manually start training through model menu in its card."

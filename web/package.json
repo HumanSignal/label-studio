@@ -5,6 +5,7 @@
   "scripts": {
     "ui:serve": "nx storybook storybook",
     "ui:test:component": "nx run storybook:test-component",
+    "lint": "biome check --apply .",
     "ls:watch": "nx run labelstudio:build:development --watch",
     "ls:unit": "nx run labelstudio:unit",
     "ls:e2e": "nx run labelstudio-e2e:e2e",
@@ -19,7 +20,7 @@
     "build": "NODE_ENV=production nx run-many --target=build --configuration=production",
     "version:libs": "nx run-many --target=version",
     "docs": "nx run-many --target=docs",
-    "watch": "nx run-many --target=build --configuration=production --watch",
+    "watch": "nx run-many --target=build --watch",
     "test:e2e": "yarn ls:e2e && yarn lsf:e2e",
     "test:integration": "yarn lsf:integration",
     "test:unit": "nx run-many --target=unit",
@@ -173,7 +174,6 @@
     "loader-utils": "^3.2.1",
     "mini-css-extract-plugin": "^2.7.6",
     "nx": "17.0.3",
-    "nx-cloud": "16.5.2",
     "pixelmatch": "^5.3.0",
     "postcss": "^8.4.6",
     "postcss-loader": "^7.3.3",
@@ -194,7 +194,7 @@
     "tslib": "^2.3.0",
     "typescript": "4.8.3",
     "url-loader": "^4.1.1",
-    "vite": "^5.0.12",
+    "vite": "^5.0.13",
     "vite-plugin-svgr": "^4.2.0",
     "webpack": "^5.77.0",
     "webpack-cli": "^5.0.1",
@@ -202,42 +202,21 @@
     "yargs": "^17.7.1"
   },
   "resolutions": {
-    "jpeg-js": "0.4.4",
-    "d3-color": "3.1.0",
-    "merge": "2.1.1",
-    "diff": "3.5.0",
-    "follow-redirects": "^1.15.6",
-    "xml2js": "0.5.0",
-    "axios": "1.6.0",
-    "@cypress/request": "3.0.0",
-    "debug": "4.3.1",
-    "webpack-dev-middleware": ">=5.3.4",
     "@babel/traverse": "^7.24.1",
-    "ip": ">=2.0.1"
-  },
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-react",
-        {
-          "runtime": "automatic"
-        }
-      ],
-      "@babel/preset-typescript",
-      [
-        "@babel/preset-env",
-        {
-          "targets": {
-            "browsers": ["last 2 Chrome versions"]
-          }
-        }
-      ]
-    ],
-    "plugins": [
-      "@babel/plugin-proposal-class-properties",
-      "@babel/plugin-proposal-optional-chaining",
-      "@babel/plugin-proposal-nullish-coalescing-operator"
-    ]
+    "@cypress/request": "3.0.0",
+    "axios": "1.6.0",
+    "d3-color": "3.1.0",
+    "debug": "4.3.1",
+    "diff": "3.5.0",
+    "ejs": "3.1.10",
+    "express": ">=4.19.2",
+    "follow-redirects": "^1.15.6",
+    "ip": ">=2.0.1",
+    "jpeg-js": "0.4.4",
+    "merge": "2.1.1",
+    "webpack-dev-middleware": ">=5.3.4",
+    "ws": ">=7.5.10",
+    "xml2js": "0.5.0"
   },
   "copyFiles": [
     {

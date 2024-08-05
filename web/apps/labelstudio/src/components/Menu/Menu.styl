@@ -7,18 +7,19 @@
   list-style-type none
   max-width: 100%
   box-sizing: border-box
+  background var(--sand_0)
+  border-radius: 4px;
 
   &__item
     height 48px
     display flex
     cursor pointer
     padding 0 13px
-    border-radius 3px
+    border-radius .5rem
     align-items center
     box-sizing border-box
-    color rgba(0,0,0,0.6)
-    font-size 16px
-    font-family Roboto
+    color var(--sand_600)
+    font-size 1rem
     white-space nowrap
     text-decoration none
     cursor pointer
@@ -30,26 +31,45 @@
       display flex
       align-items center
       justify-content center
+      width 24px
 
+    &-beta
+      background-color var(--plum_500)
+      color var(--plum_0)
+      font-size 12px
+      font-style normal
+      font-weight 500
+      line-height 16px
+      margin-left 8px
+      padding 2px 8px
+      border-radius 12px
     &_look
       &_danger
-        color #DD0000
+        color var(--red_7)
 
     &:not(&_look_danger):hover
-      color #000
+      color var(--sand_900)
 
     &:not(&_active):hover
-      background-color rgba(0, 0, 0, 0.04)
+      color var(--grape_700)
+      background var(--grape_0)
 
     &_active
-      color #000
-      background-color rgba(0, 0, 0, 0.08)
+      color var(--sand_900)
+      background-color var(--sand_200)
+      font-weight 500
 
     &_active:not(.sidebar__pin)
       pointer-events none
 
     &:hover &-icon, &_active &-icon
       opacity 1
+
+  &__item_dangerous
+    color var(--red_7)
+    &:hover
+      color var(--red_7) !important
+      background-color var(--red_1) !important
 
   &__spacer
     flex 1
@@ -58,8 +78,12 @@
     height 1px
     margin 8px 0
     background-color rgba(0, 0, 0, 0.1)
+  
+  &_size_compact
+    background var(--sand_0)
 
-  &_size_compact &__item
+  &_size_compact &__item,
+  &_size_medium &__item
     height 32px
     font-size 16px
 
@@ -69,27 +93,33 @@
     padding 0 10px
 
   &_collapsed
-    padding 0
+    padding .5rem
 
   &_collapsed ^[0]
     &__item
-      border-radius 0
+      border-radius .25rem
 
   &_contextual
     box-shadow 0px 1px 2px rgba(38, 38, 38, 0.3), 0px 1px 3px 1px rgba(38, 38, 38, 0.15)
     border-radius 4px
 
+  &__item
+    &_dangerous
+      color #CF1322
+      &:hover
+        color #CF1322
+        background-color rgba(207, 19, 34, 0.08)
+
   &_contextual &__item
     height 32px
     padding 16px 8px
-    margin 4px 8px
     display flex
     align-items center
     justify-content space-between
     border-radius 4px
     cursor pointer
     &:hover
-      background-color rgba(65, 60, 74, 0.08)
+      background-color var(--grape_0)
     &_dangerous
       color #CF1322
       &:hover
@@ -97,16 +127,17 @@
         background-color rgba(207, 19, 34, 0.08)
 
   &:first-child
-    padding-top 4px
+    padding-top 8px
 
   &:last-child
-    padding-bottom 4px
+    padding-bottom 8px
+    background var(--sand_100)
 
 .menu-group
   &__title
     padding 4px 10px
     font-size 14px
-    color rgba(#000, 0.6)
+    color var(--sand_600)
 
   &__list
     padding 0

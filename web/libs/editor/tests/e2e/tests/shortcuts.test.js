@@ -23,7 +23,7 @@ const configParams = new DataTable(["inline"]);
   configParams.add([inline]);
 });
 
-const AUDIO_URL = "https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3";
+const AUDIO_URL = "/public/files/barradeen-emotional.mp3";
 
 const TEXT_SELECTOR = "[name='text']";
 

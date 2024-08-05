@@ -1244,6 +1244,11 @@ ul {
   }
 }
 
+.page-rightsidebar .toc {
+  max-height: calc(100vh - 20em);
+  overflow: auto;
+}
+
 .toc-enterprise-cta {
   margin-top: 2em;
   padding: 1.5em 2em;
@@ -1383,6 +1388,7 @@ ul {
   height: auto;
   margin: 1em 0;
   display: block;
+  border: 1px #f1f1f1 solid;
 }
 
 .content-markdown hr {
@@ -1757,7 +1763,7 @@ details+details {
 }
 
 /******
-Footer 
+Footer
 ******/
 
 .Footer {
@@ -2668,4 +2674,12 @@ code.hljs {
   .page-header nav .page-header-main-nav {
     border-color: var(--color-gray-700);
   }
+}
+
+.gif-border {
+  border: 1px #f1f1f1 solid;
+}
+
+.no-border {
+  border: unset !important;
 }

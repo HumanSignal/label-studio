@@ -1,8 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+from typing import Dict, List
 
-from core.utils.common import conditional_atomic, db_is_not_sqlite, load_func, safe_float
+from core.utils.common import conditional_atomic, db_is_not_sqlite, load_func
 from django.conf import settings
 from django.db import models, transaction
 from django.db.models import Count, JSONField, Q
@@ -11,7 +12,6 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from ml.api_connector import PREDICT_URL, TIMEOUT_PREDICT, MLApi
 from projects.models import Project
-from tasks.models import Prediction
 from tasks.serializers import PredictionSerializer, TaskSimpleSerializer
 from webhooks.serializers import Webhook, WebhookSerializer
 
@@ -258,6 +258,87 @@ class MLBackend(models.Model):
             },
         }
 
+    def _get_predictions_from_ml_backend_one_by_one(
+        self, serialized_tasks: List[Dict], current_responses: List[Dict]
+    ) -> List[Dict]:
+        """
+        This is helper method to get predictions from ML backend one by one
+        in case when tasks length doesn't match responses length
+        Note: don't use this function outside of this class
+        """
+
+        if len(current_responses) == 1:
+            # In case ML backend doesn't support batch of tasks, do it one by one
+            # TODO: remove this block after all ML backends will support batch processing
+            logger.warning(
+                f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
+                f'switched to one-by-one task retrieval'
+            )
+            predictions = []
+            for serialized_task in serialized_tasks:
+                # get predictions per task
+                predictions.extend(self._get_predictions_from_ml_backend([serialized_task]))
+
+            return predictions
+        else:
+            # complete failure - likely ML backend skipped some tasks, we can't match them
+            logger.error(
+                f'Number of tasks and responses are not equal: '
+                f'{len(serialized_tasks)} tasks != {len(current_responses)} responses. '
+                f'Returning empty predictions.'
+            )
+            return []
+
+    def _get_predictions_from_ml_backend(self, serialized_tasks: List[Dict]) -> List[Dict]:
+        result = self.api.make_predictions(serialized_tasks, self.project)
+
+        # response validation
+        if result.is_error:
+            logger.error(f'Error occurred: {result.error_message}')
+            return []
+        elif not isinstance(result.response, dict) or 'results' not in result.response:
+            logger.error(f'ML backend returns an incorrect response, it must be a dict: {result.response}')
+            return []
+        elif not isinstance(result.response['results'], list) or len(result.response['results']) == 0:
+            logger.error(
+                'ML backend returns an incorrect response, results field must be a list with at least one item'
+            )
+            return []
+
+        responses = result.response['results']
+
+        predictions = []
+        if len(serialized_tasks) != len(responses):
+            # Number of tasks and responses are not equal
+            # It can happen if ML backend doesn't support batch processing but only process one task at a time
+            # In the future versions, we may better consider this as an error and deprecate this code branch
+            return self._get_predictions_from_ml_backend_one_by_one(serialized_tasks, responses)
+
+        # ML backend supports batch processing
+        for task, response in zip(serialized_tasks, responses):
+            if isinstance(response, dict):
+                # ML backend can return single prediction per task or multiple predictions
+                response = [response]
+
+            # get all predictions per task
+            for r in response:
+                if 'result' not in r:
+                    logger.error(
+                        f"ML backend returns an incorrect prediction, it should be a dict with the 'result' field:"
+                        f' {r}'
+                    )
+                    continue
+                predictions.append(
+                    {
+                        'task': task['id'],
+                        'result': r['result'],
+                        'score': r.get('score'),
+                        'model_version': r.get('model_version', self.model_version),
+                        'project': task['project'],
+                    }
+                )
+        return predictions
+
     def predict_tasks(self, tasks):
         model_version = self.update_state()
         if self.not_ready:
@@ -277,99 +358,12 @@ class MLBackend(models.Model):
             logger.debug(f'All tasks already have prediction from model version={self.model_version}')
             return model_version
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
-        ml_api_result = self.api.make_predictions(tasks_ser, self.project)
-        if ml_api_result.is_error:
-            logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
-            return
-
-        if not (isinstance(ml_api_result.response, dict) and 'results' in ml_api_result.response):
-            logger.info(f'ML backend returns an incorrect response, it should be a dict: {ml_api_result.response}')
-            return
-
-        responses = ml_api_result.response['results']
-
-        if len(responses) == 0:
-            logger.warning(f'ML backend returned empty prediction for project {self}')
-            return
-
-        # ML Backend doesn't support batch of tasks, do it one by one
-        elif len(responses) == 1 and len(tasks) != 1:
-            logger.warning(
-                f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
-                f'switched to one-by-one task retrieval'
-            )
-            instances = [self.predict_one_task(task, model_version=model_version) for task in tasks]
-            return instances
-
-        # wrong result number
-        elif len(responses) != len(tasks_ser):
-            logger.warning(f'ML backend returned response number {len(responses)} != task number {len(tasks_ser)}')
-
-        predictions = []
-        for task, response in zip(tasks_ser, responses):
-            if 'result' not in response:
-                logger.info(
-                    f"ML backend returns an incorrect prediction, it should be a dict with the 'result' field:"
-                    f' {response}'
-                )
-                return
-            predictions.append(
-                {
-                    'task': task['id'],
-                    'result': response['result'],
-                    'score': response.get('score'),
-                    'model_version': response.get('model_version', self.model_version),
-                }
-            )
+        predictions = self._get_predictions_from_ml_backend(tasks_ser)
         with conditional_atomic(predicate=db_is_not_sqlite):
             prediction_ser = PredictionSerializer(data=predictions, many=True)
             prediction_ser.is_valid(raise_exception=True)
             instances = prediction_ser.save()
         return instances
-
-    def predict_one_task(self, task, model_version):
-        if not model_version:
-            self.update_state()
-            if self.not_ready:
-                logger.debug(f'ML backend {self} is not ready to predict {task}')
-                return
-
-        if task.predictions.filter(model_version=self.model_version).exists():
-            # prediction already exists
-            logger.info(
-                f'Skip creating prediction with ML backend {self} for task {task}: model version '
-                f'{self.model_version} is up-to-date'
-            )
-            return
-        ml_api = self.api
-
-        task_ser = TaskSimpleSerializer(task).data
-        ml_api_result = ml_api.make_predictions([task_ser], self.project)
-        if ml_api_result.is_error:
-            logger.info(f'Prediction not created for project {self}: {ml_api_result.error_message}')
-            return
-        results = ml_api_result.response['results']
-        if len(results) == 0:
-            logger.error(f'ML backend returned empty prediction for project {self.id}', extra={'sentry_skip': True})
-            return
-        prediction_response = results[0]
-        task_id = task_ser['id']
-        r = prediction_response['result']
-        score = prediction_response.get('score')
-        with conditional_atomic(predicate=db_is_not_sqlite):
-            prediction = Prediction.objects.create(
-                result=r,
-                score=safe_float(score),
-                model_version=self.model_version,
-                task_id=task_id,
-                project=task.project,
-                cluster=prediction_response.get('cluster'),
-                neighbors=prediction_response.get('neighbors'),
-                mislabeling=safe_float(prediction_response.get('mislabeling', 0)),
-            )
-            logger.debug(f'Prediction {prediction} created')
-
-        return prediction
 
     def interactive_annotating(self, task, context=None, user=None):
         result = {}

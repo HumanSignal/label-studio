@@ -9,6 +9,7 @@ const listClass = cn("templates-list");
 
 const Arrow = () => (
   <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <title>Arrow Icon</title>
     <path opacity="0.9" d="M2 10L6 6L2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="square" />
   </svg>
 );
@@ -23,7 +24,7 @@ const TemplatesInGroup = ({ templates, group, onSelectRecipe }) => {
     <ul>
       {picked.map((recipe) => (
         <li key={recipe.title} onClick={() => onSelectRecipe(recipe)} className={listClass.elem("template")}>
-          <img src={recipe.image} />
+          <img src={recipe.image} alt={""} />
           <h3>{recipe.title}</h3>
         </li>
       ))}

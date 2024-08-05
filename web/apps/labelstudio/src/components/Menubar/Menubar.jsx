@@ -132,7 +132,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
         <div className={menubarClass}>
           <Dropdown.Trigger dropdown={menuDropdownRef} closeOnClickOutside={!sidebarPinned}>
             <div className={`${menubarClass.elem("trigger")} main-menu-trigger`}>
-              <img src={absoluteURL("/static/icons/logo-black.svg")} alt="Label Studio Logo" height="22" />
+              <img src={absoluteURL("/static/icons/logo.svg")} alt="Label Studio Logo" height="22" />
               <Hamburger opened={sidebarOpened} />
             </div>
           </Dropdown.Trigger>
@@ -191,11 +191,16 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
 
                 <VersionNotifier showNewVersion />
 
-                <Menu.Item label="API" href="/docs/api" icon={<IconTerminal />} target="_blank" />
+                <Menu.Item
+                  label="API"
+                  href="https://api.labelstud.io/api-reference/introduction/getting-started"
+                  icon={<IconTerminal />}
+                  target="_blank"
+                />
                 <Menu.Item label="Docs" href="https://labelstud.io/guide" icon={<IconBook />} target="_blank" />
                 <Menu.Item
                   label="GitHub"
-                  href="https://github.com/heartexlabs/label-studio"
+                  href="https://github.com/HumanSignal/label-studio"
                   icon={<LsGitHub />}
                   target="_blank"
                   rel="noreferrer"

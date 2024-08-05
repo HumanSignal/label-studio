@@ -7,6 +7,8 @@ import { Button, Dropdown, Menu, Pagination, Userpic } from "../../components";
 import { Block, Elem } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
 
+const DEFAULT_CARD_COLORS = ["#FFFFFF", "#FDFDFC"];
+
 export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
   return (
     <>
@@ -36,9 +38,9 @@ export const EmptyProjectsList = ({ openModal }) => {
     <Block name="empty-projects-page">
       <Elem name="heidi" tag="img" src={absoluteURL("/static/images/opossum_looking.png")} />
       <Elem name="header" tag="h1">
-        Heidi doesn’t see any projects here
+        Heidi doesn’t see any projects here!
       </Elem>
-      <p>Create one and start labeling your data</p>
+      <p>Create one and start labeling your data.</p>
       <Elem name="action" tag={Button} onClick={openModal} look="primary">
         Create Project
       </Elem>
@@ -48,7 +50,7 @@ export const EmptyProjectsList = ({ openModal }) => {
 
 const ProjectCard = ({ project }) => {
   const color = useMemo(() => {
-    return project.color === "#FFFFFF" ? null : project.color;
+    return DEFAULT_CARD_COLORS.includes(project.color) ? null : project.color;
   }, [project]);
 
   const projectColors = useMemo(() => {

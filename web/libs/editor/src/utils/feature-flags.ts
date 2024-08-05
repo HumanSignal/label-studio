@@ -337,6 +337,19 @@ export const FF_SAFE_TEXT = "fflag_fix_leap_466_text_sanitization";
 
 export const FF_MULTI_OBJECT_HOTKEYS = "fflag_fix_leap_246_multi_object_hotkeys_160124_short";
 
+/**
+ * It changes the reviewer flow to be more user-friendly and intuitive.
+ */
+export const FF_REVIEWER_FLOW = "fflag_feat_all_leap_1081_reviewer_flow_updates";
+
+export const FF_CUSTOM_SCRIPT = "fflag_feat_all_leap_883_custom_script_270524_short";
+
+/**
+ * Disable the postpone option if the skip interface isn't set
+ * @link https://app.launchdarkly.com/projects/default/flags/fflag_feat_front_leap_1173_disable_postpone_skip_short
+ */
+export const FF_LEAP_1173 = "fflag_feat_front_leap_1173_disable_postpone_skip_short";
+
 Object.assign(window, {
   APP_SETTINGS: {
     ...(window.APP_SETTINGS ?? {}),

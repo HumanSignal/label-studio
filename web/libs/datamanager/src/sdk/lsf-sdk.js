@@ -136,11 +136,14 @@ export class LSFWrapper {
     if (this.datamanager.hasInterface("autoAnnotation")) {
       interfaces.push("auto-annotation");
     }
-    if (this.interfacesModifier) {
-      interfaces = this.interfacesModifier(interfaces, this.labelStream);
-    }
+
     if (isFF(FF_DEV_2887)) {
       interfaces.push("annotations:comments");
+      interfaces.push("comments:resolve-any");
+    }
+
+    if (this.interfacesModifier) {
+      interfaces = this.interfacesModifier(interfaces, this.labelStream);
     }
 
     console.group("Interfaces");
@@ -215,6 +218,8 @@ export class LSFWrapper {
       if (isFF(FF_DEV_2887)) {
         new CommentsSdk(this.lsfInstance, this.datamanager);
       }
+
+      this.datamanager.invoke("lsfInit", this, this.lsfInstance);
     } catch (err) {
       console.error("Failed to initialize LabelStudio", settings);
       console.error(err);

@@ -8,7 +8,7 @@ import { Dropdown } from "../../Common/Dropdown/DropdownComponent";
 import Form from "../../Common/Form/Form";
 import { Menu } from "../../Common/Menu/Menu";
 import { Modal } from "../../Common/Modal/ModalPopup";
-import "./ActionsButton.styl";
+import "./ActionsButton.scss";
 
 const isFFLOPSE3 = isFF(FF_LOPS_E_3);
 const isNewUI = isFF(FF_LOPS_E_10);
@@ -166,7 +166,7 @@ export const ActionsButton = injector(
               <FaChevronDown size="12" style={{ marginLeft: 4, marginRight: -7 }} />
             )
           ) : (
-            <FaAngleDown size="16" style={{ marginLeft: 4 }} color="#0077FF" />
+            <FaAngleDown size="16" style={{ marginLeft: 4 }} color="#566fcf" />
           )}
         </Button>
       </Dropdown.Trigger>

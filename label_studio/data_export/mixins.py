@@ -24,7 +24,7 @@ from django.db import transaction
 from django.db.models import Prefetch
 from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
-from label_studio_converter import Converter
+from label_studio_sdk.converter import Converter
 from tasks.models import Annotation, Task
 
 ONLY = 'only'
@@ -179,6 +179,7 @@ class ExportMixin:
 
         logger.debug('Run get_task_queryset')
 
+        start = datetime.now()
         with transaction.atomic():
             # TODO: make counters from queryset
             # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
@@ -211,6 +212,10 @@ class ExportMixin:
                 self.counters['task_number'] += len(tasks)
                 for task in serializer.data:
                     yield task
+        duration = datetime.now() - start
+        logger.info(
+            f'{self.counters["task_number"]} tasks from project {self.project_id} exported in {duration.total_seconds():.2f} seconds'
+        )
 
     def update_export_serializer_option(self, base_export_serializer_option, annotation_ids):
         return base_export_serializer_option

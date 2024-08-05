@@ -1,44 +1,51 @@
-.prediction-card
-  width 100%
-  padding 15px
-  border-radius 5px
-  background #FAFAFA
-  border 1px solid rgba(137, 128, 152, 0.16)
+.prediction-card {
+  width: 100%;
+  padding: 15px;
+  border-radius: 5px;
+  background: var(--sand_100);
+  border: 1px solid var(--sand_300);
+  display: flex;
+  justify-content: space-between;
 
-  display flex
-  justify-content space-between
+  &__meta {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 20px;
+    color: var(--sand_600);
+    margin-top: 7px;
+  }
 
-  &__meta
-    display flex
-    flex-flow row wrap
-    gap 20px
-    color #898098
-    margin-top 7px
+  &__group {
+    display: flex;
+    align-items: center;
+  }
 
-  &__group
-    display flex
-    align-items center
+  &__header {
+    display: flex;
+    height: 48px;
+    padding: 0 15px;
+    align-items: center;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 18px;
+    justify-content: space-between;
+    box-shadow: 0 1px 0 0 var(--sand_300);
+  }
 
-  &__header
-    display flex
-    height 48px
-    padding 0 15px
-    align-items center
-    font-weight 500
-    font-size 16px
-    line-height 18px
-    justify-content space-between
-    box-shadow 0 1px 0 0 rgba(#000, 0.1)
+  &__title {
+    font-weight: 500;
 
-  &__title
-    font-weight 500
+    &-content {
+      display: flex;
+      align-items: center;
+    }
+  }
 
-    &-content
-      display flex
-      align-items center
+  &__content {
+    padding: 15px;
+  }
 
-  &__content
-    padding 15px
-
-  &:not(:first-child)
-    margin-top 24px
+  &:not(:first-child) {
+    margin-top: 24px;
+  }
+}

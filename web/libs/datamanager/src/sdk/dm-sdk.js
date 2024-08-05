@@ -443,6 +443,7 @@ export class DataManager {
   }
 
   destroyLSF() {
+    this.invoke("beforeLsfDestroy", this, this.lsf?.lsfInstance);
     this.lsf?.destroy();
     this.lsf = undefined;
   }

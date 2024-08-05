@@ -346,6 +346,13 @@ RQ_QUEUES = {
     },
 }
 
+# specify the list of the extensions that are allowed to be presented in auto generated OpenAPI schema
+# for example, by specifying in swagger_auto_schema(..., x_fern_sdk_group_name='projects') we can group endpoints
+# /api/projects/:
+#   get:
+#     x-fern-sdk-group-name: projects
+X_VENDOR_OPENAPI_EXTENSIONS = ['x-fern']
+
 # Swagger: automatic API documentation
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -363,14 +370,16 @@ SWAGGER_SETTINGS = {
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
     'OPERATIONS_SORTER': 'alpha',
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'core.utils.openapi_extensions.XVendorExtensionsAutoSchema',
+    'DEFAULT_INFO': 'core.urls.open_api_info',
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
-SENTRY_RATE = float(get_env('SENTRY_RATE', 0.25))
+SENTRY_RATE = float(get_env('SENTRY_RATE', 0.02))
 SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.opensource')
 SENTRY_REDIS_ENABLED = False
 FRONTEND_SENTRY_DSN = get_env('FRONTEND_SENTRY_DSN', None)
-FRONTEND_SENTRY_RATE = get_env('FRONTEND_SENTRY_RATE', 0.1)
+FRONTEND_SENTRY_RATE = get_env('FRONTEND_SENTRY_RATE', 0.01)
 FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'stage.opensource')
 
 ROOT_URLCONF = 'core.urls'
@@ -744,3 +753,13 @@ CLOUD_STORAGE_CHECK_FOR_RECORDS_TIMEOUT = get_env('CLOUD_STORAGE_CHECK_FOR_RECOR
 CONTEXTLOG_SYNC = False
 TEST_ENVIRONMENT = get_bool_env('TEST_ENVIRONMENT', False)
 DEBUG_CONTEXTLOG = get_bool_env('DEBUG_CONTEXTLOG', False)
+
+_REDIS_SSL_CERTS_REQS = get_env('REDIS_SSL_CERTS_REQS', 'required')
+REDIS_SSL_SETTINGS = {
+    'ssl_cert_reqs': None if _REDIS_SSL_CERTS_REQS.lower() == 'none' else _REDIS_SSL_CERTS_REQS,
+    'ssl_ca_certs': get_env('REDIS_SSL_CA_CERTS', None),
+    'ssl_keyfile': get_env('REDIS_SSL_KEYFILE', None),
+    'ssl_certfile': get_env('REDIS_SSL_CERTFILE', None),
+}
+
+OPENAI_API_VERSION = get_env('OPENAI_API_VERSION', '2024-06-01')

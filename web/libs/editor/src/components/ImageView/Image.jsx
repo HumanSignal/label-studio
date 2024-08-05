@@ -89,6 +89,7 @@ const ImageRenderer = observer(
       return { ...style, visibility: isLoaded ? "visible" : "hidden" };
     }, [imageTransform, isLoaded]);
 
+    // biome-ignore lint/a11y/noRedundantAlt: The use of this component justifies this alt text
     return <img {...imgDefaultProps} ref={ref} alt="image" src={src} onLoad={onLoad} style={imageStyles} />;
   }),
 );

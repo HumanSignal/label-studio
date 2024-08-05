@@ -11,6 +11,7 @@ import { Form } from "../../../components/Form";
 import { useAPI } from "../../../providers/ApiProvider";
 import { Block, cn, Elem } from "../../../utils/bem";
 import { Palette } from "../../../utils/colors";
+import { FF_UNSAVED_CHANGES, isFF } from "../../../utils/feature-flags";
 import { colorNames } from "./colors";
 import "./Config.styl";
 import { Preview } from "./Preview";
@@ -20,6 +21,7 @@ import { TemplatesList } from "./TemplatesList";
 import "./codemirror.css";
 import "./config-hint";
 import tags from "./schema.json";
+import { UnsavedChanges } from "./UnsavedChanges";
 
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
@@ -68,6 +70,7 @@ const Label = ({ label, template, color }) => {
           strokeLinecap="square"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <title>Delete label</title>
           <path d="M2 12L12 2" />
           <path d="M12 12L2 2" />
         </svg>
@@ -323,6 +326,7 @@ const Configurator = ({
   onValidate,
   disableSaveButton,
   warning,
+  hasChanges,
 }) => {
   const [configure, setConfigure] = React.useState(isEmptyConfig(config) ? "code" : "visual");
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
@@ -421,6 +425,7 @@ const Configurator = ({
     } else {
       setError(res);
     }
+    return res;
   };
 
   function completeAfter(cm, pred) {
@@ -458,8 +463,11 @@ const Configurator = ({
   return (
     <div className={configClass}>
       <div className={configClass.elem("container")}>
+        <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
         <header>
-          <button onClick={onBrowse}>Browse Templates</button>
+          <button type="button" data-leave={true} onClick={onBrowse}>
+            Browse Templates
+          </button>
           <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
         </header>
         <div className={configClass.elem("editor")}>
@@ -520,6 +528,7 @@ const Configurator = ({
             <Button look="primary" size="compact" style={{ width: 120 }} onClick={onSave} waiting={waiting}>
               {waiting ? "Saving..." : "Save"}
             </Button>
+            {isFF(FF_UNSAVED_CHANGES) && <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />}
           </Form.Actions>
         )}
       </div>
@@ -543,6 +552,7 @@ export const ConfigPage = ({
   onValidate,
   disableSaveButton,
   show = true,
+  hasChanges,
 }) => {
   const [config, _setConfig] = React.useState("");
   const [mode, setMode] = React.useState("list"); // view | list
@@ -643,6 +653,7 @@ export const ConfigPage = ({
           disableSaveButton={disableSaveButton}
           onSaveClick={onSaveClick}
           warning={warning}
+          hasChanges={hasChanges}
         />
       )}
     </div>
