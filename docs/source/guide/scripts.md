@@ -44,6 +44,8 @@ Custom scripts allow you to enhance and tailor your labeling interface and workf
 
     Examples: Feedback loops for annotators, conditional routing/assignment, progressive sampling, notifications regarding project progress. 
 
+For examples of how some of these use cases can be implemented, see [Custom script examples](script_examples). 
+
 ## How custom scripts work
 
 Custom scripts are authored in JavaScript and are project-specific. They are limited to specific tasks and the annotation workflow and cannot, for example, be used to create new pages or otherwise extend the core functionality of Label Studio. 
@@ -76,9 +78,9 @@ Note the following:
 
 ### Security notes, constraints, and limitations
 
-Custom scripts are a powerful tool to help you fully customize your labeling workflow. However, in doing so you are running arbitrary JavaScript code on each annotator’s machine, which comes with certain risks. Because arbitrary JS can be written and run with this tool, so we can give no guarantees of safety or appropriateness. 
+Custom scripts are a powerful tool to help you fully customize your labeling workflow. In doing so you are running arbitrary JavaScript code on each annotator’s machine, which comes with certain risks. 
 
-For this reason, you must opt-in before enabling custom scripts for your organization, and we urge you to use this feature with caution. 
+Because of this, you must opt-in before enabling custom scripts for your organization, and we urge you to use this feature with caution.
 
 To enable custom scripts for your organization, you cannot have members that are in multiple organizations. This is enforced through application logic and is necessary for data security. The most common reason for this is when users have accounts in an expired free trial, but can also happen if you are using multiple organizations for project management or if you have an initial proof of concept or testing org. 
 
