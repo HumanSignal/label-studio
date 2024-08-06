@@ -3,7 +3,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_all_dia_13_structured_data_support_short': False,
     'fflag_feat_front_optic_66_lazy_chart_evaluation_19092023_short': False,
     'fflag_feat_front_leap_187_video_seek_on_select_short': True,
-    'fflag_feat_front_lsdv_5518_snap_to_pixel_130923_short': True,
     'fflag_fix_back_leap_24_tasks_api_optimization_05092023_short': False,
     'fflag_feat_optic_2_ensure_draft_saved_short': True,
     'fflag_fix_front_lsdv_5248_double_click_delay_280823_short': True,

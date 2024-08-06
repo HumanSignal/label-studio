@@ -1,5 +1,5 @@
 import { getRoot, types } from "mobx-state-tree";
-import { FF_DEV_3391, FF_SNAP_TO_PIXEL, isFF } from "../../utils/feature-flags";
+import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
 import { BaseTag } from "../TagBase";
 import { SNAP_TO_PIXEL_MODE } from "../../components/ImageView/Image";
 
@@ -52,13 +52,12 @@ const ControlBase = types
     },
 
     getSnappedPoint(point) {
-      if (!isFF(FF_SNAP_TO_PIXEL)) return point;
-
       if (self.snap === "pixel") {
         return self.toNameTag.snapPointToPixel(point, self.snapMode);
       }
       return point;
     },
+
     get smartEnabled() {
       const smart = self.smart ?? false;
       const autoAnnotation = getRoot(self)?.autoAnnotation ?? false;
