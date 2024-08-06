@@ -104,7 +104,7 @@ Allows loading additional external scripts
 The method is asynchronous, so you can wait for the script to load before performing the main actions. For example:
 
 ```javascript
-await LSI.import('<https://cdn.plot.ly/plotly-2.26.0.min.js>', 'sha384-xuh4dD2xC9BZ4qOrUrLt8psbgevXF2v+K+FrXxV4MlJHnWKgnaKoh74vd/6Ik8uF');
+await LSI.import('https://cdn.plot.ly/plotly-2.26.0.min.js', 'sha384-xuh4dD2xC9BZ4qOrUrLt8psbgevXF2v+K+FrXxV4MlJHnWKgnaKoh74vd/6Ik8uF');
 console.log("Plotly is ready");
 ```
 
