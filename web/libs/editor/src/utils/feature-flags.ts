@@ -297,10 +297,6 @@ export const FF_TAXONOMY_LABELING = "fflag_feat_front_lsdv_5452_taxonomy_labelin
  */
 
 export const FF_TASK_COUNT_FIX = "fflag_fix_all_optic_79_task_count_is_wrong_short";
-/**
- * Annotator workflow control for lead time calculation
- */
-export const FF_PROD_E_111 = "fflag_feat_front_prod_e_111_annotator_workflow_control_short";
 
 /**
  * Adding a property snap to Polygon, PolygonLabels, KeyPoint and KeyPoinLabels to snap points to image pixel when user sets snap="pixel".
