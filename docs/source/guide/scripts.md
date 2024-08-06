@@ -92,7 +92,7 @@ LSI simplifies access to some data and can perform special actions that only mak
 
 ### Instance methods
 
-##### `import(url, integrity)`
+##### `LSI.import(url, integrity)`
 
 Allows loading additional external scripts
 
@@ -108,9 +108,9 @@ await LSI.import('https://cdn.plot.ly/plotly-2.26.0.min.js', 'sha384-xuh4dD2xC9B
 console.log("Plotly is ready");
 ```
 
-##### `on(eventName, handler)`
+##### `LSI.on(eventName, handler)`
 
-Subscription to listen to events related to the Label Studio Frontend. All handlers added within the framework of this method will be unsubscribed when switching to another annotation.
+Subscription to listen to events related to the Label Studio Frontend. Handlers attached/subscribed using this method will be unsubscribed when switching to another annotation. Any handlers inside this method should be secured manually.
 
 For a list of all available events, see our [Frontend reference](frontend_reference#Available-events).
 
@@ -120,21 +120,21 @@ For a list of all available events, see our [Frontend reference](frontend_refere
 | `handler`  | function | A function that will be called when the event is triggered. This function can take arguments depending on the event.  |
 
 
-##### `get dataObj`
+##### `LSI.dataObj`
 
 Alias to `.task.data`. This is the core data structure for a task, and includes the original data that needs to be annotated.
 
-##### `get task`
+##### `LSI.task`
 
 A getter that returns information about current task:
 * `id` - ID of the task. 
 * `data` - Object representing task data. 
 
-##### `get annotation`
+##### `LSI.annotation`
 
 A getter that returns the currently selected annotation.
 
-##### `get regions`
+##### `LSI.regions`
 
 A getter that returns all regions of the current annotation.
 

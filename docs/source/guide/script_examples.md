@@ -92,6 +92,8 @@ In this example, the script checks to ensure that the annotation does not includ
 
 The following script displays a modal if a user tries to submit an annotation with the word “hate” added to any audio transcription. 
 
+Note that this is a "soft" block, meaning that the user can dismiss the modal and still proceed. For an example of a "hard" block, see [Check that TextArea input is valid JSON](#Check-that-TextArea-input-is-valid-JSON) below. 
+
 ![Screenshot of custom validation modal in Label Studio](/images/project/script_validation.png)
 
 #### Script
@@ -382,6 +384,8 @@ This script adds bulk operations for creating and deleting regions (annotations)
 ## Check that TextArea input is valid JSON 
 
 This script parses the contexts of a TextArea field to check for valid JSON. If the JSON is invalid, it shows an error and prevents the annotation from being saved.
+
+This is an example of a "hard" block, meaning that the user must resolve the issue before they can proceed. For an example of a "soft" block, see [Custom validation](#Custom-validation) above. 
 
 ![Screenshot of JSON error message](/images/project/script_json.png)
 
