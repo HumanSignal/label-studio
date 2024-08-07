@@ -539,8 +539,8 @@ class Task(TaskMixin, models.Model):
         return result
 
 
-pre_bulk_create = Signal() # providing args 'objs' and 'batch_size'
-post_bulk_create = Signal() # providing args 'objs' and 'batch_size'
+pre_bulk_create = Signal()   # providing args 'objs' and 'batch_size'
+post_bulk_create = Signal()   # providing args 'objs' and 'batch_size'
 
 
 class AnnotationManager(models.Manager):

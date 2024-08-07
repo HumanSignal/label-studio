@@ -49,16 +49,6 @@ class HttpSmartRedirectResponse(HttpResponsePermanentRedirect):
     pass
 
 
-class PrintRequestMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        print(f'{request.method=} {request.path=} {request.headers.items()=}')
-        response = self.get_response(request)
-        return response
-
-
 class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
     """This class converts HttpSmartRedirectResponse to the common response
     of Django view, without redirect. This is necessary to match status_codes
@@ -106,6 +96,14 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
             response = self.handler.get_response(request)
 
         return response
+
+    def should_redirect_with_slash(self, request):
+        """
+        Override the original method to keep global APPEND_SLASH setting false
+        """
+        if not request.path_info.endswith('/'):
+            return True
+        return False
 
 
 class SetSessionUIDMiddleware(CommonMiddleware):
