@@ -1,7 +1,7 @@
 .prediction-card {
   width: 100%;
-  padding: 15px;
-  border-radius: 5px;
+  padding: 1rem;
+  border-radius: 4px;
   background: var(--sand_100);
   border: 1px solid var(--sand_300);
   display: flex;
@@ -10,7 +10,7 @@
   &__meta {
     display: flex;
     flex-flow: row wrap;
-    gap: 20px;
+    gap: 20px; 
     color: var(--sand_600);
     margin-top: 7px;
   }
@@ -39,10 +39,11 @@
       display: flex;
       align-items: center;
     }
+    
   }
 
   &__content {
-    padding: 15px;
+    padding: 1rem;
   }
 
   &:not(:first-child) {

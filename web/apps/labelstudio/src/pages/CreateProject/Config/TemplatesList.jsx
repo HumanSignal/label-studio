@@ -2,7 +2,7 @@ import React from "react";
 import { Spinner } from "../../../components";
 import { useAPI } from "../../../providers/ApiProvider";
 import { cn } from "../../../utils/bem";
-import "./Config.styl";
+import "./Config.scss";
 import { IconInfo } from "../../../assets/icons";
 
 const listClass = cn("templates-list");

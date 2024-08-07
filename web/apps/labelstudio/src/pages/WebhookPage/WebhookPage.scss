@@ -7,8 +7,8 @@
   flex-direction: column;
   width: 42rem;
 
-  & h1{
-    margin-bottom: .5rem;
+  & h1 {
+    margin-bottom: 0.5rem;
   }
 
   &__content {
@@ -26,13 +26,12 @@
     border: 1px var(--sand_300) solid;
     margin-left: -2px;
     display: flex;
-    align-items: top;
     padding-top: 24px;
   }
 
   &__footer-text {
     width: 42rem;
-    font-size: .875rem;
+    font-size: 0.875rem;
     color: var(--sand_600);
 
     & p {
@@ -84,10 +83,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: .5rem;
+    padding: 0.5rem;
     font-size: 16px;
     border: 1px solid var(--sand_300);
-    border-radius: .5rem;
+    border-radius: 0.5rem;
 
     &:hover {
       background-color: var(--sand_100);
@@ -99,7 +98,7 @@
     }
   }
 
-  &__item + &__item{
+  &__item + &__item {
     margin-top: 1rem;
   }
 
@@ -115,26 +114,27 @@
     text-overflow: ellipsis;
     cursor: pointer;
     font-weight: 500;
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 
   &__item-date {
     color: var(--sand_600);
-    font-size: .875rem;
-    margin-top: .25rem;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
   }
 
   &__item-control {
     display: none;
-    & button + button{
-      margin-left: .5rem;
+
+    & button+button {
+      margin-left: 0.5rem;
     }
   }
 }
 
 .webhook-form {
   &__form-row {
-    paddingLeft: 16;
+    padding-left: 16;
   }
 
   &__form-toggle {
@@ -143,13 +143,12 @@
 }
 
 .webhook-detail {
-  
   &__width-button {
     width: 170px;
   }
 
   &__black-text {
-    color: black;
+    color: var(--sand_900);
   }
 
   &__activator {
@@ -188,28 +187,30 @@
   &__headers {
     border: 1px solid var(--sand_300);
     padding: 1rem;
-    border-radius: .5rem;
+    border-radius: 0.5rem;
     margin-bottom: 1rem;
   }
 
   &__headers-add {
-    border none
+    border: none;
+
     & span {
       color: var(--grape_500) !important;
     }
+
     padding: 0px !important;
   }
 
   &__headers-row {
     grid-template-columns: 1fr 1fr 40px;
-    margin: .5rem 0;
+    margin: 0.5rem 0;
   }
 
   &__headers-remove {
     height: 32px;
     width: 32px;
     padding: 0px 0px !important;
-    border none
+    border: none;
   }
 
   &__controls {
@@ -223,10 +224,10 @@
 .webhook-payload {
   border: 1px solid var(--sand_300);
   padding: 1rem;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   margin-bottom: 1rem;
 
   &__content-row {
-    margin: .5rem 0;
+    margin: 0.5rem 0;
   }
 }
