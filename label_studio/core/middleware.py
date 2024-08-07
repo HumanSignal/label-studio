@@ -97,6 +97,14 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
         return response
 
+    def should_redirect_with_slash(self, request):
+        """
+        Override the original method to keep global APPEND_SLASH setting false
+        """
+        if not request.path_info.endswith('/'):
+            return True
+        return False
+
 
 class SetSessionUIDMiddleware(CommonMiddleware):
     def process_request(self, request):
