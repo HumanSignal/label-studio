@@ -1,5 +1,11 @@
-<% const tier = theme.tier || "all" %> <% const isEnterpriseTheme = tier ===
-"enterprise" %>
+<% const tier = theme.tier || "all" %>
+<% const isEnterpriseTheme = tier === "enterprise" %>
+
+<% if (file_exists('partials/alert-enterprise.ejs') && isEnterpriseTheme) { %>
+  <%- partial('partials/alert-enterprise') %>
+<% } else if (file_exists('partials/alert.ejs')) { %>
+  <%- partial('partials/alert') %>
+<% } %>
 
 <header class="page-header">
   <div class="page-header-top-level">
