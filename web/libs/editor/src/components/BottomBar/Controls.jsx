@@ -41,7 +41,7 @@ export const Controls = controlsInjector(
     const isNotQuickView = store.hasInterface("topbar:prevnext");
     const historySelected = isDefined(store.annotationStore.selectedHistory);
     const { userGenerate, sentUserGenerate, versions, results, editable: annotationEditable } = annotation;
-    const dropdownTrigger = `.${cn("dropdown-lsf").elem("trigger").toClassName()}`;
+    const dropdownTrigger = cn("dropdown-lsf").elem("trigger").toClassName();
     const buttons = [];
 
     const [isInProgress, setIsInProgress] = useState(false);
@@ -263,7 +263,7 @@ export const Controls = controlsInjector(
               look={look}
               mod={{ has_icon: useExitOption, disabled: isUpdateDisabled }}
               onClick={async (event) => {
-                if (event.target.classList.contains("ls-dropdown-lsf__trigger")) return;
+                if (event.target.classList.contains(dropdownTrigger)) return;
                 const selected = store.annotationStore?.selected;
 
                 selected?.submissionInProgress();
