@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1198: Add labeling unsaved changes warning (#6100)",
-  "commit": "58c08332b5e235b712401bc16c6dee6426ede8a8",
-  "date": "2024-08-01T15:06:42.000Z",
+  "message": "refactor: OPTIC-910: Remove Stale Feature Flag - fflag_feat_front_lsdv_5518_snap_to_pixel_130923_short (#6158)",
+  "commit": "7869184f51e7ca59e576be7840d385ea066c00be",
+  "date": "2024-08-06T15:17:53.000Z",
   "branch": "develop"
 }

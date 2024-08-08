@@ -51,9 +51,6 @@ export const FF_DEV_2100 = "ff_dev_2100_clean_unnecessary_areas_140422_short";
 // Allow to use html inside <Label/> tags
 export const FF_DEV_2128 = "ff_dev_2128_html_in_labels_150422_short";
 
-// 3-point Rectangle tool to created rotated bboxes conveniently
-export const FF_DEV_2132 = "ff_front_dev_2132_rotating_bounding_box";
-
 // Show draft as the topmost item in annotation history
 export const FF_DEV_2290 = "ff_front_dev_2290_draft_in_annotation_history_short";
 

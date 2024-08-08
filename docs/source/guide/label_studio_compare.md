@@ -98,6 +98,11 @@ Label Studio is available as open source software as well as an [Enterprise clo
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/scripts">Use JavaScript to customize your labeling interface.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
 
   <tr>
     <td colspan="3"><b>Data Discovery (Beta)</b></td>
