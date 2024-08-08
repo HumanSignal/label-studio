@@ -3507,12 +3507,13 @@ files = [
 
 [[package]]
 name = "rules"
-version = "2.2"
+version = "3.4"
 description = "Awesome Django authorization, without the database"
 optional = false
 python-versions = "*"
 files = [
-    {file = "rules-2.2.tar.gz", hash = "sha256:9bae429f9d4f91a375402990da1541f9e093b0ac077221d57124d06eeeca4405"},
+    {file = "rules-3.4-py2.py3-none-any.whl", hash = "sha256:e906114d9b3cce73871213c6311b94cb26a5bc2c3b00aa2f13d3633a65447817"},
+    {file = "rules-3.4.tar.gz", hash = "sha256:c4702c1d60ca43e97d4dfced31e98274c652dea3c461105d8df6186d663e3212"},
 ]
 
 [[package]]
@@ -4020,4 +4021,4 @@ mysql = ["mysqlclient"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4"
-content-hash = "646a70b156a41d013e22f85fe227d3f795b0f41be60a25d813b1fd056353d415"
+content-hash = "165f1f6affcc61412d9623a028ff6edff0d67a2e614e4e337d74785b05d6f305"
