@@ -1,9 +1,9 @@
 <<<<<<< HEAD
 =======
 {
-  "message": "refactor: OPTIC-910: Remove Stale Feature Flag - fflag_feat_front_lsdv_5518_snap_to_pixel_130923_short (#6158)",
-  "commit": "7869184f51e7ca59e576be7840d385ea066c00be",
-  "date": "2024-08-06T15:17:53.000Z",
+  "message": "fix: LEAP-1358: Update config for relevant hasChanges value after prettifying (#6164)",
+  "commit": "82c6546cab0fc5837198e7870f3fd82d179c3128",
+  "date": "2024-08-08T18:56:04.000Z",
   "branch": "develop"
 }
 >>>>>>> develop
