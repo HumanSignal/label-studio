@@ -69,3 +69,5 @@ deploy/pgsql/certs/*
 1/*
 */*/1/*
 label_studio/tavern-output.json
+venv_archive/label_studio_env.tar.xz
+label_studio_env/
