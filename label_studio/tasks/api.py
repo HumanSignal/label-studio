@@ -804,7 +804,6 @@ class AnnotationConvertAPI(generics.RetrieveAPIView):
     def process_intermediate_state(self, annotation, draft):
         pass
 
-    @swagger_auto_schema(auto_schema=None)
     def post(self, request, *args, **kwargs):
         annotation = self.get_object()
         organization = annotation.project.organization
