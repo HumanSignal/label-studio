@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { generatePath, useHistory } from "react-router";
 import { NavLink } from "react-router-dom";
 import { Spinner } from "../../components";
@@ -60,7 +60,7 @@ const buildLink = (path, params) => {
 };
 
 export const DataManagerPage = ({ ...props }) => {
-  const [dependencies] = useState(loadDependencies);
+  const [dependencies] = useMemo(loadDependencies);
   const toast = useContext(ToastContext);
   const root = useRef();
   const params = useParams();
