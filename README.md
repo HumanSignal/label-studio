@@ -1,3 +1,51 @@
+# NLPSSC Version
+
+This is a [forked version](https://github.com/NLPSSC/nlpssc-label-studio.git) from the [label studio master branch](https://github.com/HumanSignal/label-studio).
+
+## Table of Contents
+
+- [NLPSSC Version](#nlpssc-version)
+  - [Table of Contents](#table-of-contents)
+  - [NLPSSC Environment Setup](#nlpssc-environment-setup)
+  - [What is Label Studio?](#what-is-label-studio)
+  - [Try out Label Studio](#try-out-label-studio)
+    - [Install locally with Docker](#install-locally-with-docker)
+      - [Override default Docker install](#override-default-docker-install)
+      - [Build a local image with Docker](#build-a-local-image-with-docker)
+    - [Run with Docker Compose](#run-with-docker-compose)
+    - [Install locally with pip](#install-locally-with-pip)
+    - [Install locally with Anaconda](#install-locally-with-anaconda)
+    - [Install for local development](#install-for-local-development)
+    - [Deploy in a cloud instance](#deploy-in-a-cloud-instance)
+      - [Apply frontend changes](#apply-frontend-changes)
+    - [Troubleshoot installation](#troubleshoot-installation)
+      - [Install dependencies on Windows](#install-dependencies-on-windows)
+      - [Run test suite](#run-test-suite)
+  - [What you get from Label Studio](#what-you-get-from-label-studio)
+  - [Included templates for labeling data in Label Studio](#included-templates-for-labeling-data-in-label-studio)
+  - [Set up machine learning models with Label Studio](#set-up-machine-learning-models-with-label-studio)
+  - [Integrate Label Studio with your existing tools](#integrate-label-studio-with-your-existing-tools)
+  - [Ecosystem](#ecosystem)
+  - [Roadmap](#roadmap)
+  - [Citation](#citation)
+  - [License](#license)
+
+
+
+
+## NLPSSC Environment Setup
+
+```shell
+conda create -p label_studio_env "python>=3.7, <=3.9"
+
+conda activate X:\_\NLPSSC\MIRROR-EHR\nlpssc-label-studio\label_studio_env
+
+python -m pip install -r X:\_\NLPSSC\MIRROR-EHR\nlpssc-label-studio\deploy\requirements.txt
+```
+
+-------------------------
+
+
 <img src="https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/ls_github_header.png"/>
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases)
@@ -11,11 +59,7 @@
 
 Label Studio is an open source data labeling tool. It lets you label data types like audio, text, images, videos, and time series with a simple and straightforward UI and export to various model formats. It can be used to prepare raw data or improve existing training data to get more accurate ML models.
 
-- [Try out Label Studio](#try-out-label-studio)
-- [What you get from Label Studio](#what-you-get-from-label-studio)
-- [Included templates for labeling data in Label Studio](#included-templates-for-labeling-data-in-label-studio)
-- [Set up machine learning models with Label Studio](#set-up-machine-learning-models-with-Label-Studio)
-- [Integrate Label Studio with your existing tools](#integrate-label-studio-with-your-existing-tools)
+
 
 ![Gif of Label Studio annotating different types of data](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/annotation_examples.gif)
 
