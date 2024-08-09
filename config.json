@@ -1,0 +1,6 @@
+{
+    "storage": {
+        "type": "local",
+        "path": "/.local_storage"
+    }
+}
