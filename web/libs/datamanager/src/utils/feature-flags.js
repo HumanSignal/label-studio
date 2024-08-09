@@ -90,7 +90,7 @@ export function isFF(id) {
   const override = {
     fflag_fix_front_lsdv_4620_memory_leaks_100723_short: false,
   };
-  if (APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
+  if (window?.APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
     return override[id];
   }
 
