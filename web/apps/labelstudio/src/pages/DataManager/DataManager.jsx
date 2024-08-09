@@ -60,7 +60,7 @@ const buildLink = (path, params) => {
 };
 
 export const DataManagerPage = ({ ...props }) => {
-  const [dependencies] = useMemo(loadDependencies);
+  const dependencies = useMemo(loadDependencies);
   const toast = useContext(ToastContext);
   const root = useRef();
   const params = useParams();

@@ -13,7 +13,7 @@ const loadDependencies = async () => import("@humansignal/editor");
 
 export const Preview = ({ config, data, error, loading, project }) => {
   const lsf = useRef(null);
-  const [resolvingEditor] = useMemo(loadDependencies);
+  const resolvingEditor = useMemo(loadDependencies);
   const rootRef = useRef();
   const api = useAPI();
 
