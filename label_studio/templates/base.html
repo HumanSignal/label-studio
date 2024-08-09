@@ -116,15 +116,6 @@
 {% comment %}
   NOTE: purposely setting this to not cache using backend commit as we do not intend this to change frequently.
   If for any reason we need to invalidate the cache, we can do so by changing the version number.
-  The libs which are contained here which if updated require this version to also be updated are:
-  - react
-  - react-dom
-  - react-router
-  - react-router-dom
-  - mobx
-  - mobx-react
-  - mobx-react-lite
-  - mobx-state-tree
 {% endcomment %}
 <script src="{{settings.HOSTNAME}}/react-app/vendor.js?v=1"></script>
 <script src="{{settings.HOSTNAME}}/react-app/main.js?v={{ versions.backend.commit }}"></script>
