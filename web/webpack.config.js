@@ -185,24 +185,6 @@ module.exports = composePlugins(
           }
         });
       }
-
-      // if (rule.test.toString().includes("styl")) {
-      //   const r = rule.oneOf.filter((r) => r.use && r.use.find((u) => u.loader && u.loader.includes("stylus-loader")));
-
-      //   r.forEach((_r) => {
-      //     const l = _r.use.filter((u) => u.loader && u.loader.includes("stylus-loader"));
-
-      //     l.forEach((_l) => {
-      //       _l.options = {
-      //         ..._l.options,
-      //         stylusOptions: {
-      //           ..._l.options.stylusOptions,
-      //           import: [path.resolve(__dirname, "apps/labelstudio/src/themes/default/variables.styl")],
-      //         },
-      //       };
-      //     });
-      //   });
-      // }
     });
 
     config.module.rules.push(
