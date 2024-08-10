@@ -11,6 +11,12 @@ status = 301
 force = true
 
 [[redirects]]
+from = "https://docs.humansignal.com/redirect/*"
+to = "https://docs.humansignal.com/:splat"
+status = 301
+force = true
+
+[[redirects]]
 from = "/guide/starter_cloud"
 to = "https://humansignal.com/platform/starter-cloud/manage"
 status = 301
