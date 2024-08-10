@@ -11,10 +11,11 @@ status = 301
 force = true
 
 [[redirects]]
-from = "https://docs.humansignal.com/redirect/*"
-to = "https://docs.humansignal.com/:splat"
+from = "/redirect/*"
+to = "/:splat"
 status = 301
 force = true
+query = { preserve = true }
 
 [[redirects]]
 from = "/guide/starter_cloud"
