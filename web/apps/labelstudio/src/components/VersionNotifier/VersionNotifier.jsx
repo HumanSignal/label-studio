@@ -43,7 +43,7 @@ export const VersionProvider = ({ children }) => {
 };
 
 export const VersionNotifier = ({ showNewVersion, showCurrentVersion }) => {
-  const url = "https://pypi.org/project/label-studio/#history";
+  const url = "https://labelstud.io/redirect/update";
   const { newVersion, updateTime, latestVersion, version } = useContext(VersionContext) ?? {};
 
   return newVersion && showNewVersion ? (
