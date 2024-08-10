@@ -11,8 +11,8 @@ status = 301
 force = true
 
 [[redirects]]
-from = "/redirect/*"
-to = "/:splat"
+from = "/redirect/guide/*"
+to = "/guide/:splat"
 status = 301
 force = true
 query = { preserve = true }
