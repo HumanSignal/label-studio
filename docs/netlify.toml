@@ -1,4 +1,10 @@
 [[redirects]]
+from = "/redirect/guide/*"
+to = "/guide/:splat"
+status = 301
+force = true
+
+[[redirects]]
 from = "https://heartex-docs.netlify.app/api/*"
 to = "https://app.heartex.com/docs/api/:splat"
 status = 301
@@ -9,13 +15,6 @@ from = "https://docs.humansignal.com/api/*"
 to = "https://app.heartex.com/docs/api/:splat"
 status = 301
 force = true
-
-[[redirects]]
-from = "/redirect/guide/*"
-to = "/guide/:splat"
-status = 301
-force = true
-query = { preserve = true }
 
 [[redirects]]
 from = "/guide/starter_cloud"
