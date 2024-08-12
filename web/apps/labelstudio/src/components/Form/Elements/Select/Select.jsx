@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { cn } from "../../../../utils/bem";
 import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";
-import "./Select.styl";
+import "./Select.scss";
 
 const SelectOption = ({ value, label, disabled = false, hidden = false, ...props }) => {
   return (

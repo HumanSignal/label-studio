@@ -1,83 +1,12 @@
-@-webkit-keyframes toast-enter-up {
+@keyframes toast-enter-up {
   from {
     opacity: 0;
     transform: translateY(100%);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}@-moz-keyframes toast-enter-up {
-  from {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}@-ms-keyframes toast-enter-up {
-  from {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}@-o-keyframes toast-enter-up {
-  from {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}@keyframes toast-enter-up {
-  from {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@-webkit-keyframes toast-leave-fade {
-  from {
-    opacity: 1;
-  }
   to {
-    opacity: 0;
-  }
-}
-
-@-moz-keyframes toast-leave-fade {
-  from {
     opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@-ms-keyframes toast-leave-fade {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@-o-keyframes toast-leave-fade {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
+    transform: translateY(0);
   }
 }
 
@@ -85,52 +14,9 @@
   from {
     opacity: 1;
   }
-  to {
-    opacity: 0;
-  }
-}
 
-@-webkit-keyframes toast-leave-down {
-  from {
-    opacity: 1;
-    transform: translateY(var(--radix-toast-swipe-end-y));
-  }
   to {
     opacity: 0;
-    transform: translateY(100%);
-  }
-}
-
-@-moz-keyframes toast-leave-down {
-  from {
-    opacity: 1;
-    transform: translateY(var(--radix-toast-swipe-end-y));
-  }
-  to {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-}
-
-@-ms-keyframes toast-leave-down {
-  from {
-    opacity: 1;
-    transform: translateY(var(--radix-toast-swipe-end-y));
-  }
-  to {
-    opacity: 0;
-    transform: translateY(100%);
-  }
-}
-
-@-o-keyframes toast-leave-down {
-  from {
-    opacity: 1;
-    transform: translateY(var(--radix-toast-swipe-end-y));
-  }
-  to {
-    opacity: 0;
-    transform: translateY(100%);
   }
 }
 
@@ -139,11 +25,14 @@
     opacity: 1;
     transform: translateY(var(--radix-toast-swipe-end-y));
   }
+
   to {
     opacity: 0;
     transform: translateY(100%);
   }
-}.toast-viewport {
+}
+
+.toast-viewport {
   --toast-spacing: 8px;
   position: fixed;
   display: flex;
@@ -151,53 +40,83 @@
   width: 100%;
   z-index: 9999;
   bottom: 24px;
-  pointer-events: none;& ol {
-    list-style: none;& li + li {
-      margin-top: var(8px);
+  pointer-events: none;
+
+  & ol {
+    list-style: none;
+
+    & li + li {
+      margin-top: var(--toast-spacing);
     }
-  }& ol:empty {
+  }
+
+  & ol:empty {
     display: none;
-  }& li {
+  }
+
+  & li {
     @media (prefers-reduced-motion: no-preference) {
-      will-change: opacity, transform;&[data-state="open"] {
+      will-change: opacity, transform;
+
+      &[data-state="open"] {
         animation: toast-enter-up 100ms ease-out forwards;
-      }&[data-state="closed"] {
+      }
+
+      &[data-state="closed"] {
         animation: toast-leave-fade 100ms ease-out forwards;
-      }&[data-swipe="move"] {
+      }
+
+      &[data-swipe="move"] {
         transform: translateY(var(--radix-toast-swipe-move-y));
-      }&[data-swipe="cancel"] {
+      }
+
+      &[data-swipe="cancel"] {
         transform: translateY(0);
-      }&[data-swipe="end"] {
+      }
+
+      &[data-swipe="end"] {
         animation: toast-leave-down 100ms ease-out forwards;
       }
     }
   }
-}.toast {
-  --background-color: #FAFAFA;
-  --border-color: rgba(137, 128, 152, 0.16);
+}
+
+.toast {
+  --text-color: var(--sand_900);
+  --background-color: var(--sand_100);
+  --border-color: var(--sand_300);
+  --hover-color: var(--sand_300);
   --padding: 8px 16px;
   display: flex;
   align-items: center;
   gap: 16px;
   border-radius: 4px;
   overflow: hidden;
-  border: 1px solid var(rgba(137, 128, 152, 0.16));
-  background-color: var(#FAFAFA);& > div, 
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  pointer-events: all;
+
+  & > div,
   &__content {
     font-size: 16px;
     letter-spacing: 0.5px;
     line-height: 24px;
     flex: 1;
-  }&__action, 
+  }
+
+  &__action,
   &__content {
     padding: var(8px 16px);
-  }&__action {
+  }
+
+  &__action {
     font-weight: 500;
     font-size: 16px;
     letter-spacing: 0.15px;
     line-height: 24px;
     border: none;
     border-radius: 0;
-    border-left: 1px solid var(rgba(137, 128, 152, 0.16));
+    border-left: 1px solid var(--border-color);
   }
 }

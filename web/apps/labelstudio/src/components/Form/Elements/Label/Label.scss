@@ -1,11 +1,15 @@
 .label {
-  margin-bottom: 0;&__text {
+  margin-bottom: 0;
+
+  &__text {
     height: 22px;
     display: flex;
     margin-bottom: 0;
     font-size: 14px;
     line-height: 120%;
-  }&__description {
+  }
+
+  &__description {
     font-size: 0.875rem;
     color: var(--sand_600);
     font-weight: 400;
@@ -13,47 +17,77 @@
 
     a {
       color: var(--grape_500);
-      text-decoration: underline;&:hover {
+      text-decoration: underline;
+
+      &:hover {
         text-decoration: none;
       }
     }
-  }&__field {
+  }
+
+  &__field {
     line-height: 0;
-  }&__label {
+  }
+
+  &__label {
     display: flex;
     align-items: center;
-  }&_size_large &__text {
+  }
+
+  &_size_large &__text {
     font-weight: 500;
     font-size: 0.875rem;
-  }&_flat &__text {
+  }
+
+  &_flat &__text {
     padding: 0;
-  }.input, .select, .textarea {
+  }
+
+  .input,
+  .select,
+  .textarea {
     width: 100%;
-  }&[data-required] &__text::after {
+  }
+
+  &[data-required] &__text::after {
     content: "Required";
     font-size: 0.825rem;
     color: var(--sand_500);
     margin-left: 0.325rem;
-  }&_large &__text {
+  }
+
+  &_large &__text {
     font-size: 1.25rem;
     font-weight: 500;
-  }&_placement_right, 
+  }
+
+  &_placement_right,
   &_placement_left {
     display: grid;
     gap: 8px;
     row-gap: 0;
-  }&_placement_right {
+  }
+
+  &_placement_right {
     grid-template-areas: "field label" "field description";
     grid-template-columns: auto 1fr;
-  }&_placement_left {
+  }
+
+  &_placement_left {
     grid-template-areas: "label field" "description field";
     grid-template-columns: 1fr auto;
-  }&_placement_left:not(&_withDescription) {
+  }
+
+  &_placement_left:not(.label_withDescription) {
     grid-template-areas: "label field";
-  }&_placement_right:not(&_withDescription) {
+  }
+
+  &_placement_right:not(.label_withDescription) {
     grid-template-areas: "field label";
-  }&_empty &__text, 
-  &_placement_right &__text, 
+  }
+
+  &_empty &__text,
+  &_placement_right &__text,
   &_placement_left &__text {
     grid-area: label;
     margin-bottom: 0;
@@ -61,15 +95,21 @@
     height: auto;
     align-items: center;
     font-weight: 500;
-  }&_placement_right:not(&_withDescription) &__field, 
-  &_placement_left:not(&_withDescription) &__field {
+  }
+
+  &_placement_right:not(.label_withDescription) &__field,
+  &_placement_left:not(.label_withDescription) &__field {
     grid-area: field;
     display: flex;
     align-items: center;
-  }&_placement_right &__description, 
+  }
+
+  &_placement_right &__description,
   &_placement_left &__description {
     grid-area: description;
-  }&_placement_right&_withDescription &__field {
+  }
+
+  &_placement_right.label_withDescription &__field {
     input[type="radio"] {
       margin: 4px 0 0 0;
     }
