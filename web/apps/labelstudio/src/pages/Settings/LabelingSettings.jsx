@@ -20,6 +20,8 @@ export const LabelingSettings = () => {
           });
 
           if (res?.$meta?.ok) {
+            // Backend can prettify the config, so we need to update it to have relevant hasChanges value
+            setConfig(res.label_config);
             return true;
           }
 
