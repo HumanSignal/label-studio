@@ -15,7 +15,7 @@ import { guidGenerator } from "../../core/Helpers";
 import ControlBase from "./Base";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import { Block } from "../../utils/bem";
-import "./Choices/Choises.styl";
+import "./Choices/Choices.scss";
 
 import "./Choice";
 import DynamicChildrenMixin from "../../mixins/DynamicChildrenMixin";
