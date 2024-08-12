@@ -47,7 +47,7 @@ services:
     command: label-studio-uwsgi
 
   db:
-    image: postgres:12.19
+    image: pgautoupgrade/pgautoupgrade:13-alpine
     hostname: db
     restart: unless-stopped
     # Optional: Enable TLS on PostgreSQL
