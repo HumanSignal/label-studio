@@ -2,7 +2,7 @@
   --button-color: var(--grape_500);
   --button-background-color: var(--sand_0);
   --button-background-image: none;
-  --button-shadow: inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15);
+  --button-shadow: inset 0px -1px 0px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15);
   --button-content-align: center;
   --button-content-justify: center;
   --button-events: all;
@@ -197,7 +197,7 @@
   &_look_destructive:disabled,
   &_look_destructive &_waiting,
   &_look_destructive &_disabled {
-    --button-color: rgba(#fff, 0.5);
+    --button-color: rgba(255, 255, 255, 0.5);
     --button-background-color: var(--danger_color);
   }
 

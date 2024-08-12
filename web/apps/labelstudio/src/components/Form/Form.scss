@@ -63,7 +63,7 @@
   &:not(&_ghost):focus,
   &_focused {
     outline: none;
-    box-shadow: 0px 0px 0px 6px var(--grape_100), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px var(--grape_100);
+    box-shadow: 0px 0px 0px 6px var(--grape_100), inset 0px -1px 0px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15), inset 0px 0px 0px 1px var(--grape_100);
     border-color: var(--grape_100);
   }
 }
