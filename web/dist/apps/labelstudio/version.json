@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1198: Add labeling unsaved changes warning (#6100)",
-  "commit": "58c08332b5e235b712401bc16c6dee6426ede8a8",
-  "date": "2024-08-01T15:06:42.000Z",
-  "branch": "develop"
+  "message": "fix: LEAP-1358: Update config for relevant hasChanges value after prettifying (#6164)",
+  "commit": "9a9bd31f37eff221728f9f01db9563f23a14ff88",
+  "date": "2024-08-08T18:56:04.000Z",
+  "branch": "ls-release/1.13.1"
 }
