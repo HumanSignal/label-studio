@@ -1,6 +1,0 @@
-{
-  "message": "fix: LEAP-1358: Update config for relevant hasChanges value after prettifying (#6164)",
-  "commit": "82c6546cab0fc5837198e7870f3fd82d179c3128",
-  "date": "2024-08-08T18:56:04.000Z",
-  "branch": "develop"
-}
