@@ -1,6 +1,6 @@
 {
-  "message": "refactor: OPTIC-910: Remove Stale Feature Flag - fflag_feat_front_lsdv_5518_snap_to_pixel_130923_short (#6158)",
-  "commit": "7869184f51e7ca59e576be7840d385ea066c00be",
-  "date": "2024-08-06T15:17:53.000Z",
+  "message": "fix: OPTIC-965: converting stylus files to scss (#6172)",
+  "commit": "ba725c830ffb29f7388b91b54fcab15eb21eb95c",
+  "date": "2024-08-12T12:59:11.000Z",
   "branch": "develop"
 }
