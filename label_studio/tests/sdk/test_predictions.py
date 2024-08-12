@@ -123,6 +123,7 @@ def test_create_predictions_with_import(django_live_url, business_client):
 
     # assert it raises label_studio_sdk.core.api_error.ApiError with validation_errors': {'model_version': ["Model version doesn't exist..." ]}
     from label_studio_sdk.core.api_error import ApiError
+
     with pytest.raises(ApiError) as e:
         ls.projects.update(id=p.id, model_version='3.4.6')
     assert e.value.status_code == 400

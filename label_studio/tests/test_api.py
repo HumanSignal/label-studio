@@ -73,14 +73,14 @@ def any_api_client(request, client_and_token, business_client):
                 'label_config': '<View><Text name="my_text" value="$text"/><View className="non-root"><Choices name="my_class" toName="my_text"><Choice value="pos"/><Choice value="neg"/></Choices></View></View>',
             },
             None,
-            201
+            201,
         ),
         # <Choices> with value attribute but without nested <Choice>
         # example from https://labelstud.io/templates/serp_ranking
         (
             {
                 'title': '111',
-                'label_config': '''
+                'label_config': """
                 <View>
   
   <Header value="Search request" size="5"/> 
@@ -137,11 +137,11 @@ def any_api_client(request, client_and_token, business_client):
   }
   </Style>
 </View>
-                ''',
+                """,
             },
             None,
-            201
-        )
+            201,
+        ),
     ],
 )
 @pytest.mark.django_db
