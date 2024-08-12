@@ -1748,7 +1748,7 @@ description = ""
 optional = false
 python-versions = "^3.8"
 files = [
-    {file = "468e7ba6e76a476648c5c2108b8b73999182fef5.zip", hash = "sha256:d5d95fb101bd0c901fb5903a74428c27e5792d53830f8a3f7d152aa0ce5d7d2d"},
+    {file = "624e7be327dac22e11b580ee2ddbb23def92a21d.zip", hash = "sha256:3271fc37f7a332ac8a9062042f9a8ccb124a5ebd79977713ce9f3636e91d4bf2"},
 ]
 
 [package.dependencies]
@@ -1757,7 +1757,7 @@ httpx = ">=0.21.2"
 ijson = ">=3.2.3"
 jsonschema = ">=4.23.0"
 lxml = ">=4.2.5"
-nltk = "3.6.7"
+nltk = ">=3.8.2,<4.0.0"
 numpy = "<2.0.0"
 pandas = ">=0.24.0"
 Pillow = ">=10.0.1"
@@ -1770,7 +1770,7 @@ xmljson = "0.2.1"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/468e7ba6e76a476648c5c2108b8b73999182fef5.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/624e7be327dac22e11b580ee2ddbb23def92a21d.zip"
 
 [[package]]
 name = "launchdarkly-server-sdk"
@@ -2136,13 +2136,13 @@ files = [
 
 [[package]]
 name = "nltk"
-version = "3.6.7"
+version = "3.8.2"
 description = "Natural Language Toolkit"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.8"
 files = [
-    {file = "nltk-3.6.7-py3-none-any.whl", hash = "sha256:22e97be5d6c784d93a52d17860515cc50c5cfcc620b1f5c3747765041255a01e"},
-    {file = "nltk-3.6.7.zip", hash = "sha256:51bf1aef5304740a708be7c8e683f7798f03dc5c7a7e7feb758be9e95f4585e3"},
+    {file = "nltk-3.8.2-py3-none-any.whl", hash = "sha256:bae044ae22ebe0b694a87c0012233373209f27d5c76d3572599c842740a62fe0"},
+    {file = "nltk-3.8.2.tar.gz", hash = "sha256:9c051aa981c6745894906d5c3aad27417f3d1c10d91eefca50382fc922966f31"},
 ]
 
 [package.dependencies]
@@ -4107,4 +4107,4 @@ mysql = ["mysqlclient"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4"
-content-hash = "82a2cc99de858e2b756c6fec9afbef98310fcbb8a1a1fb1ccaae80bf36d99f73"
+content-hash = "532464e2b04ff201c7581f76a2222ee62f663d0eb83f3b1e0b44e302b9b6b926"
