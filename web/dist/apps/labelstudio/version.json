@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1358: Update config for relevant hasChanges value after prettifying (#6164)",
-  "commit": "9a9bd31f37eff221728f9f01db9563f23a14ff88",
-  "date": "2024-08-08T18:56:04.000Z",
+  "message": "chore: LEAP-1365: bump nltk",
+  "commit": "daf689da0aa62e5c77365b2b928bef80eb041521",
+  "date": "2024-08-12T21:56:57.000Z",
   "branch": "ls-release/1.13.1"
 }
