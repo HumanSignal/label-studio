@@ -113,13 +113,13 @@
       }
 
       &:hover {
-        color: var(rgba(#fff, 0.8));
+        color: var(rgba(255, 255, 255, 0.8));
         background: linear-gradient(0deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1)), var(--primary_link);
         box-shadow: 0px 2px 4px var(--grape_100), inset 0px -1px 0px rgba(0, 0, 0, 0.1);
       }
 
       &:active {
-        color: var(rgba(#fff, 0.8));
+        color: var(rgba(255, 255, 255, 0.8));
         background: linear-gradient(0deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04)), var(--primary_link);
         box-shadow: inset 0px 1px 0px rgba(0, 0, 0, 0.1);
       }
@@ -170,7 +170,7 @@
     &_active {
       background: none;
       border-radius: 4px;
-      border: 1px solid #dfdfde;
+      border: 1px solid var(--sand_300);
       box-shadow: none;
       outline: none;
 

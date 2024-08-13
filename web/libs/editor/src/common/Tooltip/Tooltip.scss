@@ -84,7 +84,7 @@
     &_light {
       color: var(--sand_900);
       background-color: var(--sand_0);
-      box-shadow: 0 2px 15px rgba(#000, 0.2);
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
 
       &::before {
         background-color: var(--sand_0);
