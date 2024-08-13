@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 # skills are partitions of projects (label config + input columns + output columns) into categories of labeling tasks
-class Skill(models.TextChoices):
+class SkillNames(models.TextChoices):
     TEXT_CLASSIFICATION = 'TextClassification', _('TextClassification')
     NAMED_ENTITY_RECOGNITION = 'NamedEntityRecognition', _('NamedEntityRecognition')
 
@@ -45,7 +45,7 @@ class ModelInterface(models.Model):
         'organizations.Organization', on_delete=models.CASCADE, related_name='model_interfaces', null=True
     )
 
-    skill = models.CharField(max_length=255, choices=Skill.choices, default=Skill.TEXT_CLASSIFICATION)
+    skill_name = models.CharField(max_length=255, choices=SkillNames.choices, default=SkillNames.TEXT_CLASSIFICATION)
 
     input_fields = models.JSONField(default=list, validators=[validate_string_list])
 
