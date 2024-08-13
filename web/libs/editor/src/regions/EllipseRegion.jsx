@@ -178,6 +178,9 @@ const Model = types
     get canvasRadiusY() {
       return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.radiusY) : self.radiusY;
     },
+    get area() {
+      return Math.PI * self.radiusX * self.radiusY;
+    },
   }))
   .actions((self) => ({
     afterCreate() {
