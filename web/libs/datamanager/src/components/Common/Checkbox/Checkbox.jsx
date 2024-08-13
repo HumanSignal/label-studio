@@ -3,7 +3,7 @@ import { cn } from "../../../utils/bem";
 import "./Checkbox.scss";
 
 export const Checkbox = ({ checked, indeterminate, style, onChange, children, ...props }) => {
-  const rootClass = cn("checkbox");
+  const rootClass = cn("checkbox-dm");
   const checkboxRef = React.createRef();
   const withLabel = !!children;
 

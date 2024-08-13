@@ -39,5 +39,12 @@ export const FF_DIA_835 = "fflag_feat_all_dia_835_prompter_workflow_long";
 export const FF_UNSAVED_CHANGES = "fflag_feat_front_leap_1198_unsaved_changes_180724";
 
 export function isFF(id: string) {
+  // TODO: remove the override + if statement once LSE and LSO start building react the same way and fflag_fix_front_lsdv_4620_memory_leaks_100723_short is removed
+  const override: Record<string, boolean> = {
+    fflag_fix_front_lsdv_4620_memory_leaks_100723_short: false,
+  };
+  if (window?.APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
+    return override[id];
+  }
   return isFlagEnabled(id, FEATURE_FLAGS, window.APP_SETTINGS?.feature_flags_default_value === true);
 }

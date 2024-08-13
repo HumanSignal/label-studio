@@ -206,7 +206,7 @@ export const Select: SelectComponent<SelectProps> = ({
     <SelectContext.Provider value={context}>
       <Block
         ref={rootRef}
-        name="select"
+        name="select-lsf"
         mod={{ size, surface }}
         style={style}
         tabIndex={tabIndex}

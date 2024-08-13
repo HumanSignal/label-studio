@@ -135,7 +135,7 @@ export const Select = ({ value, defaultValue, size, children, onChange, style, m
 
   return (
     <SelectContext.Provider value={context}>
-      <Block ref={rootRef} name="select" mod={{ size }} style={style} tabIndex={tabIndex} onKeyDown={handleKeyboard}>
+      <Block ref={rootRef} name="select-dm" mod={{ size }} style={style} tabIndex={tabIndex} onKeyDown={handleKeyboard}>
         <Dropdown.Trigger
           ref={dropdown}
           style={{ maxHeight: 280, overflow: "auto" }}

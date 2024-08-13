@@ -10,7 +10,7 @@ export const ImageView = {
     return cy.get("img[alt=LS]");
   },
   get root() {
-    return this.image.closest(".lsf-object");
+    return this.image.closest(".lsf-object-lsf");
   },
   get drawingFrame() {
     return this.image.closest('[class^="frame--"]');
@@ -27,10 +27,10 @@ export const ImageView = {
     return this.root.get('[class^="pagination--"]');
   },
   get paginationPrevBtn() {
-    return this.pagination.get(".lsf-pagination__btn_arrow-left:not(.lsf-pagination__btn_arrow-left-double)");
+    return this.pagination.get(".lsf-pagination-lsf__btn_arrow-left:not(.lsf-pagination-lsf__btn_arrow-left-double)");
   },
   get paginationNextBtn() {
-    return this.pagination.get(".lsf-pagination__btn_arrow-right:not(.lsf-pagination__btn_arrow-right-double)");
+    return this.pagination.get(".lsf-pagination-lsf__btn_arrow-right:not(.lsf-pagination-lsf__btn_arrow-right-double)");
   },
   waitForImage() {
     cy.log("Make sure that the image is visible and loaded");

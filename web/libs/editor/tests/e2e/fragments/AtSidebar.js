@@ -2,7 +2,7 @@ const { I } = inject();
 
 module.exports = {
   _sideBarLocator: locate(".lsf-sidebar-tabs"),
-  _regionGroupButton: locate(".lsf-radio-group__button"),
+  _regionGroupButton: locate(".lsf-radio-group-lsf__button"),
   _regionsCounterLocator: locate(".lsf-entities__counter"),
   _regionLocator: locate(".lsf-region-item"),
   _regionSelectedLocator: locate('[data-testid="regionitem:selected=true"]'),

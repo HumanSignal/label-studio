@@ -51,7 +51,7 @@ export const RadioGroup = ({
             isSimple: simple === true,
           }}
         >
-          <Block name="radio-group" mod={{ size, simple, horizontal }} mix={className}>
+          <Block name="radio-group-dm" mod={{ size, simple, horizontal }} mix={className}>
             <input ref={ref} name={props.name} type="hidden" defaultValue={currentValue} />
             <Elem name="buttons">{children}</Elem>
           </Block>

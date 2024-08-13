@@ -128,7 +128,7 @@ describe("Image Regions scenario", () => {
 
     regions
       .each(($el) => {
-        if ($el.parent().hasClass("lsf-tree__node_hidden")) {
+        if ($el.parent().hasClass("lsf-tree-lsf__node_hidden")) {
           hiddenRegions++;
         }
       })
