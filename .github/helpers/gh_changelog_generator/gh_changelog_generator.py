@@ -1,12 +1,12 @@
 import json
 import os
 import re
+from urllib.parse import quote
 
 import jira
 import requests
 from github import Github
 from jira import JIRA
-from urllib.parse import quote
 
 COMMIT_PATTERN = re.compile(r'^(\w*):\s*(.*?)?:\s*(.*?)\s*(\(#(\d+)\))?$')
 
