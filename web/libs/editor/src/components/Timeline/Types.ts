@@ -84,6 +84,8 @@ export interface TimelineRegion {
   visible: boolean;
   selected: boolean;
   sequence: TimelineRegionKeyframe[];
+  /** is this timeline region with spans */
+  timeline?: boolean;
 }
 
 export interface TimelineRegionKeyframe {

@@ -17,7 +17,7 @@ export interface KeypointsProps {
 
 export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, renderable, onSelectRegion }) => {
   const { step, seekOffset, visibleWidth, length } = useContext(TimelineContext);
-  const { label, color, visible, sequence, selected } = region;
+  const { label, color, visible, sequence, selected, timeline } = region;
 
   const extraSteps = useMemo(() => {
     return Math.round(visibleWidth / 2);
@@ -68,7 +68,7 @@ export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, render
   );
 
   return (
-    <Block name="keypoints" style={styles} mod={{ selected }}>
+    <Block name="keypoints" style={styles} mod={{ selected, timeline }}>
       <Elem name="label" onClick={onSelectRegionHandler}>
         <Elem name="name">{label}</Elem>
         <Elem name="data">

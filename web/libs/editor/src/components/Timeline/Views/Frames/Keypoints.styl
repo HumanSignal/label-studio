@@ -53,6 +53,9 @@
     &_hidden
       opacity 0.3
 
+  &_timeline &__lifespan
+    height 20px
+
   &__point
     top 50%
     width 9px
@@ -62,6 +65,16 @@
     border-radius 2px
     transform translate3d(-50%, -50%, 0) rotate(45deg)
     background-color var(--point-color)
+
+  &_timeline &__point
+    width: 3px;
+    height: 20px;
+    transform: translate3d(-100%, -50%, 0);
+  &_timeline &__point:last-child
+    transform: translate3d(0, -50%, 0);
+  &_timeline &__point:first-child:last-child
+    width: 6px;
+    transform: translate3d(-50%, -50%, 0);
 
   &__actions
     display flex
