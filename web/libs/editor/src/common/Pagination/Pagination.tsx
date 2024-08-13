@@ -65,7 +65,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
     };
 
     return (
-      <Block name="pagination-lsf" mod={{ size, outline, align, noPadding }}>
+      <Block name="pagination" mod={{ size, outline, align, noPadding }}>
         <Elem name="navigation">
           <>
             <NavigationButton

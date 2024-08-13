@@ -71,7 +71,7 @@ export const KonvaRegionMixin = types
         const canvas = self.shapeRef?.parent?.canvas?._canvas;
         let viewport = canvas;
 
-        // `.ls-main-content` is the main scrollable container for LSF
+        // `.lsf-main-content` is the main scrollable container for LSF
         while (viewport && !viewport.scrollTop && !viewport.className.includes("main-content")) {
           viewport = viewport.parentElement;
         }

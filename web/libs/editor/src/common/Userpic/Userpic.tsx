@@ -94,7 +94,7 @@ export const Userpic = forwardRef<any, UserpicProps>(
     const stylesheet = { ...(style ?? {}), background, color: textColor };
 
     const userpic = (
-      <Block ref={ref} name="userpic-lsf" mix={className} mod={{ faded }} style={stylesheet} {...rest}>
+      <Block ref={ref} name="userpic" mix={className} mod={{ faded }} style={stylesheet} {...rest}>
         {children ? (
           children
         ) : (

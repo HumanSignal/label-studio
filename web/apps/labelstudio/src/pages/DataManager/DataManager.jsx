@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { generatePath, useHistory } from "react-router";
 import { NavLink } from "react-router-dom";
 import { Spinner } from "../../components";
@@ -6,6 +6,7 @@ import { Button } from "../../components/Button/Button";
 import { modal } from "../../components/Modal/Modal";
 import { Space } from "../../components/Space/Space";
 import { useAPI } from "../../providers/ApiProvider";
+import { useLibrary } from "../../providers/LibraryProvider";
 import { useProject } from "../../providers/ProjectProvider";
 import { useContextProps, useFixedLocation, useParams } from "../../providers/RoutesProvider";
 import { addAction, addCrumb, deleteAction, deleteCrumb } from "../../services/breadrumbs";
@@ -18,8 +19,6 @@ import { ToastContext } from "../../components/Toast/Toast";
 import { FF_OPTIC_2, isFF } from "../../utils/feature-flags";
 
 import "./DataManager.styl";
-
-const loadDependencies = () => [import("@humansignal/datamanager"), import("@humansignal/editor")];
 
 const initializeDataManager = async (root, props, params) => {
   if (!window.LabelStudio) throw Error("Label Studio Frontend doesn't exist on the page");
@@ -60,22 +59,22 @@ const buildLink = (path, params) => {
 };
 
 export const DataManagerPage = ({ ...props }) => {
-  const dependencies = useMemo(loadDependencies);
   const toast = useContext(ToastContext);
   const root = useRef();
   const params = useParams();
   const history = useHistory();
   const api = useAPI();
   const { project } = useProject();
+  const LabelStudio = useLibrary("lsf");
+  const DataManager = useLibrary("dm");
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
-  const [loading, setLoading] = useState(!window.DataManager || !window.LabelStudio);
   const dataManagerRef = useRef();
   const projectId = project?.id;
 
   const init = useCallback(async () => {
-    if (!window.LabelStudio) return;
-    if (!window.DataManager) return;
+    if (!LabelStudio) return;
+    if (!DataManager) return;
     if (!root.current) return;
     if (!project?.id) return;
     if (dataManagerRef.current) return;
@@ -163,7 +162,7 @@ export const DataManagerPage = ({ ...props }) => {
     }
 
     setContextProps({ dmRef: dataManager });
-  }, [projectId]);
+  }, [LabelStudio, DataManager, projectId]);
 
   const destroyDM = useCallback(() => {
     if (dataManagerRef.current) {
@@ -173,14 +172,12 @@ export const DataManagerPage = ({ ...props }) => {
   }, [dataManagerRef]);
 
   useEffect(() => {
-    Promise.all(dependencies)
-      .then(() => setLoading(false))
-      .then(init);
+    init();
 
     return () => destroyDM();
   }, [root, init]);
 
-  if (loading) {
+  if (!DataManager || !LabelStudio) {
     return (
       <div
         style={{

@@ -47,7 +47,7 @@ interface OutlinerTreeProps {
 }
 
 const OutlinerTreeComponent: FC<OutlinerTreeProps> = ({ regions, footer }) => {
-  const rootClass = cn("tree-lsf");
+  const rootClass = cn("tree");
   const regionsTree = useDataTree({
     regions,
     rootClass,
@@ -109,7 +109,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
   }, []);
   const eventHandlers = useEventHandlers();
   const selectedKeys = regions.selection.keys;
-  const rootClass = cn("tree-lsf");
+  const rootClass = cn("tree");
   let expandedKeys = undefined;
   let onExpand = undefined;
   // It works only for 'label' mode yet.
@@ -173,7 +173,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
           defaultExpandParent={!isPersistCollapseEnabled}
           autoExpandParent
           checkable={false}
-          prefixCls={rootClass.toClassName()}
+          prefixCls="lsf-tree"
           className={rootClass.toClassName()}
           treeData={regionsTree}
           selectedKeys={selectedKeys}

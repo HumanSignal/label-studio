@@ -31,6 +31,7 @@ const Webhook = () => {
     return undefined;
   }, [project, history]);
 
+  console.log(projectId, history.location.pathname);
   const fetchWebhooks = useCallback(async () => {
     if (projectId === null) {
       setWebhooks(null);
