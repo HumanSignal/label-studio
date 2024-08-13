@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-965: converting stylus files to scss (#6172)",
-  "commit": "ba725c830ffb29f7388b91b54fcab15eb21eb95c",
-  "date": "2024-08-12T12:59:11.000Z",
+  "message": "revert: OPTIC-945: Improve the bundling strategy and ship a single entrypoint with a common vendor chunk across all libs (#6198)",
+  "commit": "999715856d6e95bb743964bac18f1df69c3086e8",
+  "date": "2024-08-13T17:10:10.000Z",
   "branch": "develop"
 }
