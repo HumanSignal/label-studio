@@ -208,7 +208,7 @@ jobs:
           EOF
 
       - name: Build and Push Release Ubuntu Docker image
-        uses: docker/build-push-action@v6.5.0
+        uses: docker/build-push-action@v6.6.1
         id: docker_build
         with:
           context: ${{ steps.release_dockerfile.outputs.release_dir }}
