@@ -1010,6 +1010,13 @@ class FailedPrediction(models.Model):
         null=True,
         help_text='The type of error that caused prediction to fail'
     )
+    ml_backend_model = models.ForeignKey(
+        'ml.MLBackend',
+        on_delete=models.SET_NULL,
+        related_name='failed_predictions',
+        null=True,
+        help_text='An ML Backend instance that created the failed prediction.',
+    )
     model_version = models.TextField(
         _('model version'),
         default='',
@@ -1027,7 +1034,6 @@ class FailedPrediction(models.Model):
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='failed_predictions', null=True)
     task = models.ForeignKey('tasks.Task', on_delete=models.CASCADE, related_name='failed_predictions')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
 
 @receiver(post_delete, sender=Task)
