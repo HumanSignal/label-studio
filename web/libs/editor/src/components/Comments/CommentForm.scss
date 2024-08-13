@@ -1,0 +1,47 @@
+.comment-form {
+  --primary-action-color: var(--grape_500);
+  --primary-action-padding: 4px;
+  --primary-action-border-radius: 4px;
+  --primary-action-surface-color-hover: var(--grape_0);
+  --text-input-min-height: 40px;
+  --tooltip-text-color: var(--danger_color);
+
+  display: grid;
+  grid-template-columns: auto var(40px);
+  align-items: center;
+  gap: 4px;&__primary-action {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-shrink: 0;
+    flex-grow: 0;
+
+    button {
+      margin-top: 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      flex-grow: 0;
+      appearance: none;
+      border: none;
+      background-color: transparent;
+      color: var(var(--grape_500));
+      border-radius: var(4px);&:hover {
+        background-color: var(var(--grape_0));
+      }~/_inline & {
+        padding: 0;
+        height: calc(var(40px) - 8px);
+        width: calc(var(40px) - 8px);
+      }
+    }~/_inline & {
+      grid-row: 1 / 2;
+      grid-column: 2 / -1;
+    }
+  }&__tooltipMessage {
+    color: var(var(--danger_color));
+    font-size: 0.9em;
+  }
+}
