@@ -44,7 +44,7 @@ export interface DropdownProps {
 
 export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
   ({ animated = true, visible = false, ...props }, ref) => {
-    const rootName = cn("dropdown");
+    const rootName = cn("dropdown-lsf");
 
     const dropdown = useRef<HTMLElement>();
     const { triggerRef, minIndex } = useContext(DropdownContext) ?? {};
@@ -215,7 +215,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     const result = (
       <Block
         ref={dropdown}
-        name="dropdown"
+        name="dropdown-lsf"
         data-testid={props.dataTestId}
         mix={[props.className, visibilityClasses]}
         style={{

@@ -360,7 +360,7 @@ export const DataView = injector(
 
     // Render the UI for your table
     return (
-      <Block name="data-view" className="dm-content" style={{ pointerEvents: isLocked ? "none" : "auto" }}>
+      <Block name="data-view-dm" className="dm-content" style={{ pointerEvents: isLocked ? "none" : "auto" }}>
         {renderContent(content)}
       </Block>
     );

@@ -207,20 +207,6 @@ def paginator_help(objects_name, tag):
     )
 
 
-def find_editor_files():
-    """Find label studio files"""
-
-    # playground uses another LSF build
-    prefix = '/label-studio/'
-    editor_dir = settings.EDITOR_ROOT
-
-    # find editor files to include in html
-    editor_js = [prefix + f for f in os.listdir(editor_dir) if f.endswith('.js')]
-    editor_css = [prefix + f for f in os.listdir(editor_dir) if f.endswith('.css')]
-
-    return {'editor_js': editor_js, 'editor_css': editor_css}
-
-
 def string_is_url(url):
     try:
         url_validator(url)

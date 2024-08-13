@@ -68,4 +68,5 @@ STALE_FEATURE_FLAGS = {
     'ff_front_1170_outliner_030222_short': True,
     'ff_back_1587_email_notifications_310122_long': False,
     'ff_front_dev_1285_crosshair_wrong_zoom_140122_short': True,
+    'fflag_fix_front_lsdv_4620_memory_leaks_100723_short': False,
 }
