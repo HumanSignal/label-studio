@@ -1,4 +1,4 @@
-.radio-group-dm {
+.radio-group {
   --radius: 8px;
   --height: 32px;
   --padding: 4px;
@@ -19,13 +19,13 @@
     grid-auto-columns: 1fr;
     grid-auto-flow: column;
 
-    .radio-group-dm_simple .radio-group-dm__buttons & {
+    .radio-group_simple .radio-group__buttons & {
       all: unset;
       display: inline-block;
       margin-bottom: 16px;
     }
 
-    .radio-group-dm_horizontal .radio-group-dm__buttons & {
+    .radio-group_horizontal .radio-group__buttons & {
       display: grid;
       grid-auto-columns: min-content;
       column-gap: 16px;
@@ -60,13 +60,13 @@
       cursor: not-allowed;
     }
 
-    .radio-group-dm_simple & {
+    .radio-group_simple & {
       all: unset;
       display: block;
       margin-bottom: 16px;
     }
 
-    .radio-group-dm_horizontal & {
+    .radio-group_horizontal & {
       margin: 0;
     }
   }

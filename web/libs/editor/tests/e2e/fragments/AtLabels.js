@@ -1,8 +1,8 @@
 const { I } = inject();
 
 module.exports = {
-  _labelSelector: ".lsf-label-lsf",
-  _selectedSelector: ".lsf-label-lsf.lsf-label-lsf_selected",
+  _labelSelector: ".lsf-label",
+  _selectedSelector: ".lsf-label.lsf-label_selected",
   locateLabel(text) {
     return locate(this._labelSelector).withText(text);
   },
