@@ -362,7 +362,7 @@ class RichTextPieceView extends Component {
   render() {
     const { item } = this.props;
 
-    if (!item._value && item.value !== '') return null;
+    if (!item._value && item._value !== "") return null;
 
     let val = item._value || "";
     const newLineReplacement = "<br/>";
