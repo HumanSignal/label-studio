@@ -6,7 +6,8 @@
   flex-direction: column;
   list-style-type: none;
 
-  ul, li {
+  ul,
+  li {
     display: block;
     list-style-type: none;
   }
@@ -15,9 +16,11 @@
     margin: 0.5rem;
   }
 
-  li + li {
+  li+li {
     margin-top: 0;
-  }&__item {
+  }
+
+  &__item {
     height: 32px;
     display: flex;
     cursor: pointer;
@@ -28,7 +31,9 @@
     color: var(--sand_600);
     font-size: 14px;
     white-space: nowrap;
-    user-select: none;&-icon {
+    user-select: none;
+
+    &-icon {
       display: block;
       margin-right: 10px;
       object-fit: contain;
@@ -36,49 +41,80 @@
       display: flex;
       align-items: center;
       justify-content: center;
-    }&_look {
+    }
+
+    &_look {
       &_danger {
         color: var(--danger_color);
       }
-    }&:not(&_look_danger):hover {
+    }
+
+    &:not(.menu__item_look_danger):hover {
       color: var(--grape_700);
-    }&:not(&_active):hover {
+    }
+
+    &:not(.menu__item_active):hover {
       background-color: var(--grape_0);
-    }&_active {
+    }
+
+    &_active {
       color: var(--grape_700);
       background-color: var(--grape_0);
-    }&_active:not(.sidebar__pin):not(&_clickable) {
+    }
+
+    &_active:not(.sidebar__pin):not(.menu__item_clickable) {
       pointer-events: none;
-    }&:hover &-icon, &_active &-icon {
+    }
+
+    &:hover &-icon,
+    &_active &-icon {
       opacity: 1;
     }
-  }&__spacer {
+  }
+
+  &__spacer {
     flex: 1;
-  }&__divider {
+  }
+
+  &__divider {
     height: 1px;
     margin: 8px 0;
-    background-color: rgba(0, 0, 0, 0.1);
-  }&_size_compact &__item {
+    background-color: var(--sand_300);
+  }
+
+  &_size_compact &__item {
     height: 32px;
     font-size: 16px;
-  }&_size_auto &__item {
+  }
+
+  &_size_auto &__item {
     padding: 0 16px;
-  }&_size_auto {
+  }
+
+  &_size_auto {
     width: auto !important;
     min-width: initial !important;
-  }&_size_small &__item {
+  }
+
+  &_size_small &__item {
     height: 24px;
     font-size: 14px;
     padding: 0 10px;
-  }&_collapsed {
+  }
+
+  &_collapsed {
     padding: 0;
   }
-}.menu-group {
+}
+
+.menu-group {
   &__title {
     padding: 4px 10px;
     font-size: 14px;
-    color: rgba(#000, 0.6);
-  }&__list {
+    color: var(--sand_700);
+  }
+
+  &__list {
     padding: 0;
     margin-left: 10px;
     list-style-type: none;

@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { Block, Elem } from "../../utils/bem";
-import "./Label.styl";
+import "./Label.scss";
 
 export const Label = forwardRef(
   ({ text, children, required, placement, description, size, large, style, simple, flat }, ref) => {
