@@ -1,25 +1,27 @@
 ---
 title: Compare Community and Enterprise Features
-short: Enterprise vs Community
+short: Open Source vs Enterprise
 type: guide
 tier: all
-order: 20
-order_enterprise: 15
-section: "Get started"
+order: 28 
+order_enterprise: 28
+section: "Discover & Learn"
 meta_title: Label Studio Community and Enterprise Features
 meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects.
 ---
 
 Label Studio is available as open source software as well as an [Enterprise cloud service](https://humansignal.com/). The Enterprise version offers enhanced security (SSO, RBAC, SOC2), team management, analytics and reporting, and uptime and support SLAs. A [free trial is available](https://humansignal.com/free-trial) to get started quickly and explore the enterprise cloud product.
 
-<a class="Button" href="https://humansignal.com/free-trial" target="_blank" style="margin-bottom: 2em;">Free Enterprise Trial</a>
+<a class="Button" href="https://humansignal.com/goenterprise/" target="_blank" style="margin-bottom: 2em;">Learn About Enterprise</a>
 
 <table>
+<thead>
   <tr>
     <th>Functionality</th>
     <th>Community</th>
     <th>Enterprise</th>
   </tr>
+  </thead>
 
 <tr>
     <td colspan="3"><b>Data Management</b></td>
@@ -96,6 +98,11 @@ Label Studio is available as open source software as well as an [Enterprise clo
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/scripts">Use JavaScript to customize your labeling interface.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
 
   <tr>
     <td colspan="3"><b>Data Discovery (Beta)</b></td>
@@ -132,6 +139,25 @@ Label Studio is available as open source software as well as an [Enterprise clo
   </tr>
   <tr>
     <td><a href="https://docs.humansignal.com/guide/dataset_manage#Create-project-tasks-from-a-dataset">Send data subsets as tasks to new or existing Label Studio Enterprise projects for human or AI processing (annotation or review).</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+
+  <tr>
+    <td colspan="3"><b>Prompts (Beta)</b></td>
+  </tr>
+   <tr>
+    <td><a href="https://docs.humansignal.com/guide/prompts_overview">Fully automated data labeling using GenAI.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/prompts_draft">Evaluate and fine-tune LLM prompts against a ground truth dataset.</a></td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✔️</td>
+  </tr>
+  <tr>
+    <td><a href="https://docs.humansignal.com/guide/prompts_predictions">Bootstrap your labeling project using auto-generated predictions.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -242,3 +268,4 @@ Label Studio is available as open source software as well as an [Enterprise clo
     <td style="text-align:center">✔️</td>
   </tr>
 </table>
+

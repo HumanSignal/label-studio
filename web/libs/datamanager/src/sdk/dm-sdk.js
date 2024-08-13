@@ -33,7 +33,6 @@
  * interfaces: Dict<boolean>,
  * instruments: Dict<any>,
  * toolbar?: string,
- * panels?: Record<string, any>[]
  * spinner?: import("react").ReactNode
  * apiTransform?: Record<string, Record<string, Function>
  * tabControls?: { add?: boolean, delete?: boolean, edit?: boolean, duplicate?: boolean },
@@ -48,19 +47,18 @@ import { instruments } from "../components/DataManager/Toolbar/instruments";
 import { APIProxy } from "../utils/api-proxy";
 import { FF_LSDV_4620_3_ML, isFF } from "../utils/feature-flags";
 import { objectToMap } from "../utils/helpers";
-import { packJSON } from "../utils/packJSON";
+import { serializeJsonForUrl, deserializeJsonFromUrl } from "../utils/urlJSON";
 import { isDefined } from "../utils/utils";
 import { APIConfig } from "./api-config";
 import { createApp } from "./app-create";
 import { LSFWrapper } from "./lsf-sdk";
 import { taskToLSFormat } from "./lsf-utils";
 
-const DEFAULT_TOOLBAR = "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button view-toggle";
+const DEFAULT_TOOLBAR =
+  "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button view-toggle";
 
 const prepareInstruments = (instruments) => {
-  const result = Object
-    .entries(instruments)
-    .map(([name, builder]) => [name, builder({ inject, observer })]);
+  const result = Object.entries(instruments).map(([name, builder]) => [name, builder({ inject, observer })]);
 
   return objectToMap(Object.fromEntries(result));
 };
@@ -134,7 +132,7 @@ export class DataManager {
     delete: true,
     edit: true,
     duplicate: true,
-  }
+  };
 
   /** @type {"dm" | "labelops"} */
   type = "dm";
@@ -159,7 +157,6 @@ export class DataManager {
     this.showPreviews = config.showPreviews ?? false;
     this.polling = config.polling;
     this.toolbar = config.toolbar ?? DEFAULT_TOOLBAR;
-    this.panels = config.panels;
     this.spinner = config.spinner;
     this.spinnerSize = config.spinnerSize;
     this.instruments = prepareInstruments(config.instruments ?? {});
@@ -214,13 +211,7 @@ export class DataManager {
     this._projectId = value;
   }
 
-  apiConfig({
-    apiGateway,
-    apiEndpoints,
-    apiMockDisabled,
-    apiSharedParams,
-    apiHeaders,
-  }) {
+  apiConfig({ apiGateway, apiEndpoints, apiMockDisabled, apiSharedParams, apiHeaders }) {
     const config = Object.assign({}, APIConfig);
 
     config.gateway = apiGateway ?? config.gateway;
@@ -292,11 +283,14 @@ export class DataManager {
       return console.warn(`Can't override native instrument ${name}`);
     }
 
-    this.instruments.set(name, initializer({
-      store: this.store,
-      observer,
-      inject,
-    }));
+    this.instruments.set(
+      name,
+      initializer({
+        store: this.store,
+        observer,
+        inject,
+      }),
+    );
 
     this.store.updateInstruments();
   }
@@ -307,8 +301,8 @@ export class DataManager {
    * @param {Function} callback
    */
   on(eventName, callback) {
-    if (this.lsf && eventName.startsWith('lsf:')) {
-      const evt = toCamelCase(eventName.replace(/^lsf:/, ''));
+    if (this.lsf && eventName.startsWith("lsf:")) {
+      const evt = toCamelCase(eventName.replace(/^lsf:/, ""));
 
       this.lsf?.lsfInstance?.on(evt, callback);
     }
@@ -326,8 +320,8 @@ export class DataManager {
    * @param {Function?} callback
    */
   off(eventName, callback) {
-    if (this.lsf && eventName.startsWith('lsf:')) {
-      const evt = toCamelCase(eventName.replace(/^lsf:/, ''));
+    if (this.lsf && eventName.startsWith("lsf:")) {
+      const evt = toCamelCase(eventName.replace(/^lsf:/, ""));
 
       this.lsf?.lsfInstance?.off(evt, callback);
     }
@@ -342,13 +336,13 @@ export class DataManager {
   }
 
   removeAllListeners() {
-    const lsfEvents = Array.from(this.callbacks.keys()).filter(evt => evt.startsWith('lsf:'));
+    const lsfEvents = Array.from(this.callbacks.keys()).filter((evt) => evt.startsWith("lsf:"));
 
-    lsfEvents.forEach(evt => {
+    lsfEvents.forEach((evt) => {
       const callbacks = Array.from(this.getEventCallbacks(evt));
-      const eventName = toCamelCase(evt.replace(/^lsf:/, ''));
+      const eventName = toCamelCase(evt.replace(/^lsf:/, ""));
 
-      callbacks.forEach(clb => this.lsf?.lsfInstance?.off(eventName, clb));
+      callbacks.forEach((clb) => this.lsf?.lsfInstance?.off(eventName, clb));
     });
 
     this.callbacks.clear();
@@ -380,7 +374,7 @@ export class DataManager {
     this.mode = mode;
     this.store.setMode(mode);
 
-    if (modeChanged) this.invoke('modeChanged', this.mode);
+    if (modeChanged) this.invoke("modeChanged", this.mode);
   }
 
   /**
@@ -389,11 +383,9 @@ export class DataManager {
    * @param {any[]} args
    */
   async invoke(eventName, ...args) {
-    if (eventName.startsWith('lsf:')) return;
+    if (eventName.startsWith("lsf:")) return;
 
-    this.getEventCallbacks(eventName).forEach((callback) =>
-      callback.apply(this, args),
-    );
+    this.getEventCallbacks(eventName).forEach((callback) => callback.apply(this, args));
   }
 
   /**
@@ -407,7 +399,7 @@ export class DataManager {
   /** @private */
   async initApp() {
     this.store = await createApp(this.root, this);
-    this.invoke('ready', [this]);
+    this.invoke("ready", [this]);
   }
 
   initLSF(element) {
@@ -418,7 +410,7 @@ export class DataManager {
       task: this.store.taskStore.selected,
       preload: this.preload,
       // annotation: this.store.annotationStore.selected,
-      isLabelStream: this.mode === 'labelstream',
+      isLabelStream: this.mode === "labelstream",
     });
   }
 
@@ -431,12 +423,9 @@ export class DataManager {
   async startLabeling() {
     if (!this.lsf) return;
 
-    let [task, annotation] = [
-      this.store.taskStore.selected,
-      this.store.annotationStore.selected,
-    ];
+    const [task, annotation] = [this.store.taskStore.selected, this.store.annotationStore.selected];
 
-    const isLabelStream = this.mode === 'labelstream';
+    const isLabelStream = this.mode === "labelstream";
     const taskExists = isDefined(this.lsf.task) && isDefined(task);
     const taskSelected = this.lsf.task?.id === task?.id;
 
@@ -454,6 +443,7 @@ export class DataManager {
   }
 
   destroyLSF() {
+    this.invoke("beforeLsfDestroy", this, this.lsf?.lsfInstance);
     this.lsf?.destroy();
     this.lsf = undefined;
   }
@@ -493,9 +483,9 @@ export class DataManager {
   }
 
   get toolbarInstruments() {
-    const sections = this.toolbar.split("|").map(s => s.trim());
+    const sections = this.toolbar.split("|").map((s) => s.trim());
 
-    const instrumentsList = sections.map(section => {
+    const instrumentsList = sections.map((section) => {
       return section.split(" ").filter((instrument) => {
         const nativeInstrument = !!instruments[instrument];
         const customInstrument = !!this.instruments.has(instrument);
@@ -510,6 +500,6 @@ export class DataManager {
 
     return instrumentsList;
   }
-  static packJSON = packJSON;
-  static taskToLSFormat = taskToLSFormat
+  static urlJSON = { serializeJsonForUrl, deserializeJsonFromUrl };
+  static taskToLSFormat = taskToLSFormat;
 }

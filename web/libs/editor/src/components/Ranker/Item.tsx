@@ -1,11 +1,11 @@
-import { useContext, useMemo } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import { useContext, useMemo } from "react";
+import { Draggable } from "react-beautiful-dnd";
 
-import { sanitizeHtml } from '../../utils/html';
-import { InputItem } from './createData';
-import { CollapsedContext } from './Ranker';
+import { sanitizeHtml } from "../../utils/html";
+import type { InputItem } from "./createData";
+import { CollapsedContext } from "./Ranker";
 
-import styles from './Ranker.module.scss';
+import styles from "./Ranker.module.scss";
 
 interface ItemProps {
   item: InputItem;
@@ -21,29 +21,31 @@ const Item = (props: ItemProps) => {
   const { item, index, readonly } = props;
 
   // @todo document html parameter later after proper tests
-  const html = useMemo(() => item.html ? sanitizeHtml(item.html) : '', [item.html]);
+  const html = useMemo(() => (item.html ? sanitizeHtml(item.html) : ""), [item.html]);
   const [collapsible, collapsedMap, toggleCollapsed] = useContext(CollapsedContext);
   const collapsed = collapsedMap[item.id] ?? false;
-  const toggle = collapsible
-    ? () => toggleCollapsed(item.id, !collapsed)
-    : undefined;
-  const classNames = [styles.item, 'htx-ranker-item'];
+  const toggle = collapsible ? () => toggleCollapsed(item.id, !collapsed) : undefined;
+  const classNames = [styles.item, "htx-ranker-item"];
 
   if (collapsible) classNames.push(collapsed ? styles.collapsed : styles.expanded);
 
   return (
     <Draggable draggableId={item.id} index={index} isDragDisabled={readonly}>
-      {provided => {
+      {(provided) => {
         return (
           <div
             {...provided.draggableProps}
             {...provided.dragHandleProps}
             style={{ ...provided.draggableProps.style }}
-            className={classNames.join(' ')}
+            className={classNames.join(" ")}
             ref={provided.innerRef}
             data-ranker-id={item.id}
           >
-            {item.title && <h3 className={styles.itemTitle} onClick={toggle}>{item.title}</h3>}
+            {item.title && (
+              <h3 className={styles.itemTitle} onClick={toggle}>
+                {item.title}
+              </h3>
+            )}
             {item.body && <p className={styles.itemLine}>{item.body}</p>}
             {item.html && <p className={styles.itemLine} dangerouslySetInnerHTML={{ __html: html }} />}
             <p className={styles.itemLine}>{item.id}</p>

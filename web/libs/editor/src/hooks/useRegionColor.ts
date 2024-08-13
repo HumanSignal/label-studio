@@ -1,9 +1,9 @@
-import chroma from 'chroma-js';
-import { observe } from 'mobx';
-import { useContext, useEffect, useMemo, useState } from 'react';
-import { ImageViewContext } from '../components/ImageView/ImageViewContext';
-import Constants, { defaultStyle } from '../core/Constants';
-import { isDefined } from '../utils/utilities';
+import chroma from "chroma-js";
+import { observe } from "mobx";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { ImageViewContext } from "../components/ImageView/ImageViewContext";
+import Constants, { defaultStyle } from "../core/Constants";
+import { isDefined } from "../utils/utilities";
 
 const defaultStyles = {
   defaultOpacity: defaultStyle.opacity,
@@ -15,15 +15,15 @@ const defaultStyles = {
   defaultSuggestionWidth: Constants.SUGGESTION_STROKE_WIDTH,
 };
 
-type StyleOptions = (typeof defaultStyles) & {
-  region: any,
-  highlighted?: boolean,
-  shouldFill?: boolean,
-  suggestion?: boolean,
-  includeFill?: boolean,
-  useStrokeAsFill?: boolean,
-  sameStrokeWidthForSelected?: boolean,
-}
+type StyleOptions = typeof defaultStyles & {
+  region: any;
+  highlighted?: boolean;
+  shouldFill?: boolean;
+  suggestion?: boolean;
+  includeFill?: boolean;
+  useStrokeAsFill?: boolean;
+  sameStrokeWidthForSelected?: boolean;
+};
 
 export const getRegionStyles = ({
   region,
@@ -47,25 +47,23 @@ export const getRegionStyles = ({
   const fillopacity = style?.fillopacity;
   const opacity = isDefined(fillopacity) ? fillopacity : style?.opacity;
 
-  const fillColor = shouldFill ? (
-    chroma((useStrokeAsFill ? style?.strokecolor : style?.fillcolor) ?? defaultFillColor)
-      .darken(0.3)
-      .alpha(+(opacity ?? defaultOpacity ?? 0.5))
-      .css()
-  ) : null;
+  const fillColor = shouldFill
+    ? chroma((useStrokeAsFill ? style?.strokecolor : style?.fillcolor) ?? defaultFillColor)
+        .darken(0.3)
+        .alpha(+(opacity ?? defaultOpacity ?? 0.5))
+        .css()
+    : null;
 
-  const strokeColor = selected
-    ? defaultStrokeColorHighlighted
-    : chroma(style?.strokecolor ?? defaultStrokeColor).css();
+  const strokeColor = selected ? defaultStrokeColorHighlighted : chroma(style?.strokecolor ?? defaultStrokeColor).css();
 
   const strokeWidth = (() => {
     if (suggestion) {
       return defaultSuggestionWidth;
-    } else if (selected && !sameStrokeWidthForSelected) {
-      return defaultStrokeWidthHighlighted;
-    } else {
-      return +(style?.strokewidth ?? defaultStrokeWidth);
     }
+    if (selected && !sameStrokeWidthForSelected) {
+      return defaultStrokeWidthHighlighted;
+    }
+    return +(style?.strokewidth ?? defaultStrokeWidth);
   })();
 
   return {
@@ -74,7 +72,6 @@ export const getRegionStyles = ({
     strokeWidth,
   };
 };
-
 
 export const useRegionStyles = (region: any, options: Partial<StyleOptions> = {}) => {
   const { suggestion } = useContext(ImageViewContext) ?? {};
@@ -93,24 +90,28 @@ export const useRegionStyles = (region: any, options: Partial<StyleOptions> = {}
   }, [region, suggestion, options, highlighted, shouldFill]);
 
   useEffect(() => {
-    const disposeObserver = [
-      'highlighted',
-      'fill',
-    ].map(prop => {
+    const disposeObserver = ["highlighted", "fill"].map((prop) => {
       try {
-        return observe(region, prop, ({ newValue }) => {
-          switch (prop) {
-            case 'highlighted': return setHighlighted(newValue);
-            case 'fill': return setShouldFill(newValue);
-          }
-        }, true);
+        return observe(
+          region,
+          prop,
+          ({ newValue }) => {
+            switch (prop) {
+              case "highlighted":
+                return setHighlighted(newValue);
+              case "fill":
+                return setShouldFill(newValue);
+            }
+          },
+          true,
+        );
       } catch (e) {
         return () => {};
       }
     });
 
     return () => {
-      disposeObserver.forEach(dispose => dispose());
+      disposeObserver.forEach((dispose) => dispose());
     };
   }, [region]);
 

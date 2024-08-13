@@ -1,0 +1,75 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.7.1/schema.json",
+  "organizeImports": {
+    "enabled": false
+  },
+  "files": {
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      "**/tsconfig*",
+      "libs/editor/examples/**/*.json",
+      "libs/editor/src/examples/**/annotations/1.json",
+      "apps/labelstudio-e2e/**"
+    ],
+    "maxSize": 3670016
+  },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "develop"
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": {
+        "noAutofocus": "off",
+        "useKeyWithClickEvents": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noAssignInExpressions": "off",
+        "noGlobalIsNan": "off",
+        "noArrayIndexKey": "off",
+        "noAsyncPromiseExecutor": "off",
+        "noConfusingVoidType": "off",
+        "noImplicitAnyLet": "off",
+        "noShadowRestrictedNames": "off",
+        "useGetterReturn": "off"
+      },
+      "complexity": {
+        "noForEach": "off",
+        "useOptionalChain": "off",
+        "noBannedTypes": "off",
+        "noStaticOnlyClass": "off",
+        "noUselessFragments": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off",
+        "noChildrenProp": "off",
+        "useJsxKeyInIterable": "off"
+      },
+      "performance": {
+        "noAccumulatingSpread": "off",
+        "noDelete": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off",
+        "useDefaultParameterLast": "off",
+        "useNodejsImportProtocol": "off",
+        "noParameterAssign": "off"
+      },
+      "nursery": {},
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      }
+    }
+  }
+}

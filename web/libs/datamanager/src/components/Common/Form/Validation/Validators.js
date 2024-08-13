@@ -1,7 +1,6 @@
-import { isEmptyString } from '../../../../utils/helpers';
-import { isDefined } from '../../../../utils/utils';
-import './Validation.styl';
-
+import { isEmptyString } from "../../../../utils/helpers";
+import { isDefined } from "../../../../utils/utils";
+import "./Validation.scss";
 
 export const required = (fieldName, value) => {
   if (!isDefined(value) || isEmptyString(value)) {
@@ -10,7 +9,7 @@ export const required = (fieldName, value) => {
 };
 
 export const matchPattern = (pattern) => (fieldName, value) => {
-  pattern = (typeof pattern === 'string') ? new RegExp(pattern) : pattern;
+  pattern = typeof pattern === "string" ? new RegExp(pattern) : pattern;
 
   if (!isEmptyString(value) && value.match(pattern) === null) {
     return `${fieldName} must match the pattern ${pattern}`;

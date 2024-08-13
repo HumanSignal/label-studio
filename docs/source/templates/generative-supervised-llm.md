@@ -1,15 +1,15 @@
 ---
 title: Supervised LLM Fine-Tuning
 type: templates
-category: Generative AI
-cat: generative-ai
+category: LLM Fine-tuning
+cat: llm-fine-tuning
 order: 903
 is_new: t
 meta_title: Create dataset for supervised LLM fine-tuning
 meta_description: Template for creating dataset for supervised LLM fine-tuning with Label Studio for your machine learning and data science projects.
 ---
 
-## Overview
+<img src="/images/templates/generative-supervised-llm.png" alt="" class="gif-border" width="700px"/>
 
 This template is designed for you to get started with the process of supervised LLM fine-tuning.
 
@@ -76,7 +76,7 @@ Each JSON item will be rendered as a separate task in Label Studio to complete t
 *Need a hand getting started with Label Studio? Check out our [Zero to One Tutorial](https://labelstud.io/blog/zero-to-one-getting-started-with-label-studio/).*
 
 1. Create new project in Label Studio
-2. Go to `Settings > Labeling Interface > Browse Templates > Generative AI > Supervised LLM Fine-tuning`
+2. Go to **Settings > Labeling Interface > Browse Templates > Generative AI > Supervised LLM Fine-tuning**
 3. Save
 Alternatively, you can create a new project by using our Python SDK:
 

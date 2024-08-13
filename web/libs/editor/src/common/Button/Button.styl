@@ -1,4 +1,4 @@
-.button
+.button-lsf
   --button-color #000
   height 32px
   border none
@@ -20,7 +20,7 @@
   font-size 14px
 
   &_newUI
-    .button__extra
+    .button-lsf__extra
       margin-left 3px
 
   &_waiting,
@@ -40,7 +40,7 @@
 
   &:focus
     outline none
-    box-shadow 0px 0px 0px 6px rgba($accent_color, 0.2), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba($accent_color, 0.2)
+    box-shadow 0px 0px 0px 6px var(--grape_100), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px var(--grape_100)
 
   &__extra
     font-size 14px
@@ -80,13 +80,13 @@
         box-shadow none
 
     &_link, ^[0][href]
-      --button-color $accent_color
+      --button-color var(--primary_link)
       text-decoration underline
 
   &_look
     &_primary
       --button-color #fff
-      background-color $accent_color
+      background-color var(--primary_link)
       box-shadow none
       box-shadow inset 0px -1px 0px rgba(#000, 0.1)
 
@@ -96,28 +96,32 @@
 
       &:hover
         color var(--button-color)
-        background linear-gradient(0deg, rgba(#fff, 0.1), rgba(#fff, 0.1)), $accent_color
-        box-shadow 0px 2px 4px rgba($accent_color, 0.3), inset 0px -1px 0px rgba(#000, 0.1)
+        background linear-gradient(0deg, rgba(#fff, 0.1), rgba(#fff, 0.1)), var(--primary_link)
+        box-shadow 0px 2px 4px var(--grape_100), inset 0px -1px 0px rgba(#000, 0.1)
 
       &:active
         color var(--button-color)
-        background linear-gradient(0deg, rgba(#000, 0.04), rgba(#000, 0.04)), $accent_color
+        background linear-gradient(0deg, rgba(#000, 0.04), rgba(#000, 0.04)), var(--primary_link)
         box-shadow inset 0px 1px 0px rgba(#000, 0.1)
 
       &:focus
-        box-shadow 0px 0px 0px 6px rgba($accent_color, 0.2), inset 0px -1px 0px rgba(#000, 0.1)
+        box-shadow 0px 0px 0px 6px var(--grape_100), inset 0px -1px 0px rgba(#000, 0.1)
 
     &_danger
-      --button-color $danger_color
+      --button-color var(--danger_color)
 
     &_destructive
       --button-color #fff
-      background-color $danger_color
+      background-color var(--danger_color)
 
     &_outlined
       background none
-      padding 21px 54px
-      font-size 13px
+      padding 1.5rem 2rem
+      font-size .875rem
+      border: 1px solid var(--primary_link);
+      outline: none;
+      box-shadow: none;
+      color: var(--grape_700);
 
     &_alt
       --button-color #000
@@ -148,11 +152,11 @@
   &_look_destructive:disabled,
   &_look_destructive&_waiting
     --button-color rgba(#fff, 0.5)
-    background-color $danger_color
+    background-color var(--danger_color)
 
   &_danger&_look_alt,
   &_danger&_type_text
-    --button-color $danger_color
+    --button-color var(--danger_color)
 
     &:disabled
       --button-color rgba(0,0,0,.02)
@@ -232,7 +236,7 @@
       rgba(#fff, 0.2) 7px,
       rgba(#fff, 0.2) 12px
     )
-    background-color $accent_color
+    background-color var(--primary_link)
 
   &_size_small &__icon
     width 12px
@@ -240,21 +244,21 @@
     &:not(:only-child)
       margin-right 8px
 
-.button-group
+.button-group-lsf
   display flex
 
   &:not(&_collapsed)
-    .button + .button
+    .button-lsf + .button-lsf
       margin-left 16px
 
   &_collapsed
-    .button:first-child
+    .button-lsf:first-child
       border-radius 5px 0 0 5px
 
-    .button:last-child
+    .button-lsf:last-child
       border-radius 0 5px 5px 0
 
-    .button:not(:first-child):not(:last-child)
+    .button-lsf:not(:first-child):not(:last-child)
       border-radius 0
 
 @keyframes button-waiting

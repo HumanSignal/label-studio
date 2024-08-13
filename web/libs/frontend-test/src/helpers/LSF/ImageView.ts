@@ -1,57 +1,44 @@
-import TriggerOptions = Cypress.TriggerOptions
-import ObjectLike = Cypress.ObjectLike
-import ClickOptions = Cypress.ClickOptions
+import TriggerOptions = Cypress.TriggerOptions;
+import ObjectLike = Cypress.ObjectLike;
+import ClickOptions = Cypress.ClickOptions;
 
-type MouseInteractionOptions = Partial<TriggerOptions & ObjectLike & MouseEvent>
+type MouseInteractionOptions = Partial<TriggerOptions & ObjectLike & MouseEvent>;
 
 export const ImageView = {
   get image() {
-    cy.log('Get main image');
-    return cy
-      .get('img[alt=LS]');
+    cy.log("Get main image");
+    return cy.get("img[alt=LS]");
   },
   get root() {
-    return this.image
-      .closest('.lsf-object');
+    return this.image.closest(".lsf-object-lsf");
   },
   get drawingFrame() {
-    return this.image
-      .closest('[class^="frame--"]');
+    return this.image.closest('[class^="frame--"]');
   },
   get drawingArea() {
-    cy.log('Get Konva.js root');
-    return this.drawingFrame
-      .siblings()
-      .get('[class^="image-element--"] .konvajs-content');
+    cy.log("Get Konva.js root");
+    return this.drawingFrame.siblings().get('[class^="image-element--"] .konvajs-content');
   },
   get toolBar() {
-    cy.log('Get tool bar');
-    return this.root
-      .find('.lsf-toolbar');
+    cy.log("Get tool bar");
+    return this.root.find(".lsf-toolbar");
   },
   get pagination() {
-    return this.root
-      .get('[class^="pagination--"]');
+    return this.root.get('[class^="pagination--"]');
   },
   get paginationPrevBtn() {
-    return this.pagination
-      .get('.lsf-pagination__btn_arrow-left:not(.lsf-pagination__btn_arrow-left-double)');
+    return this.pagination.get(".lsf-pagination-lsf__btn_arrow-left:not(.lsf-pagination-lsf__btn_arrow-left-double)");
   },
   get paginationNextBtn() {
-    return this.pagination
-      .get('.lsf-pagination__btn_arrow-right:not(.lsf-pagination__btn_arrow-right-double)');
+    return this.pagination.get(".lsf-pagination-lsf__btn_arrow-right:not(.lsf-pagination-lsf__btn_arrow-right-double)");
   },
   waitForImage() {
-    cy.log('Make sure that the image is visible and loaded');
-    this.image
-      .should('be.visible')
-      .and((img) => {
-        return expect((img[0] as HTMLImageElement).naturalWidth).to.be.greaterThan(0);
-      });
+    cy.log("Make sure that the image is visible and loaded");
+    this.image.should("be.visible").and((img) => {
+      return expect((img[0] as HTMLImageElement).naturalWidth).to.be.greaterThan(0);
+    });
 
-    this.drawingArea
-      .get('canvas')
-      .should('be.visible');
+    this.drawingArea.get("canvas").should("be.visible");
   },
   /**
    * Clicks at the coordinates on the drawing area
@@ -60,9 +47,7 @@ export const ImageView = {
    */
   clickAt(x: number, y: number, options?: Partial<ClickOptions>) {
     cy.log(`Click at the image view at (${x}, ${y})`);
-    this.drawingArea
-      .scrollIntoView()
-      .click(x, y, options);
+    this.drawingArea.scrollIntoView().click(x, y, options);
   },
   /**
    * Clicks at the relative coordinates on the drawing area
@@ -70,7 +55,7 @@ export const ImageView = {
    * @param {number} y
    */
   clickAtRelative(x: number, y: number, options?: Partial<ClickOptions>) {
-    this.drawingFrame.then(el => {
+    this.drawingFrame.then((el) => {
       const bbox: DOMRect = el[0].getBoundingClientRect();
       const realX = x * bbox.width;
       const realY = y * bbox.height;
@@ -79,7 +64,7 @@ export const ImageView = {
     });
   },
   clickAtStageRelative(x: number, y: number, options?: Partial<ClickOptions>) {
-    this.drawingArea.then(el => {
+    this.drawingArea.then((el) => {
       const bbox: DOMRect = el[0].getBoundingClientRect();
       const realX = x * bbox.width;
       const realY = y * bbox.height;
@@ -99,9 +84,9 @@ export const ImageView = {
     cy.log(`Draw rectangle at (${x}, ${y}) of size ${width}x${height}`);
     this.drawingArea
       .scrollIntoView()
-      .trigger('mousedown', x, y, { eventConstructor: 'MouseEvent', buttons: 1, ...options })
-      .trigger('mousemove', x + width, y + height, { eventConstructor: 'MouseEvent', buttons: 1, ...options })
-      .trigger('mouseup', x + width, y + height, { eventConstructor: 'MouseEvent', buttons: 1, ...options });
+      .trigger("mousedown", x, y, { eventConstructor: "MouseEvent", buttons: 1, ...options })
+      .trigger("mousemove", x + width, y + height, { eventConstructor: "MouseEvent", buttons: 1, ...options })
+      .trigger("mouseup", x + width, y + height, { eventConstructor: "MouseEvent", buttons: 1, ...options });
   },
   /**
    * Draws the rectangle on the drawing area with coordinates and size relative to the drawing area.
@@ -112,7 +97,7 @@ export const ImageView = {
    * @param {number} height
    */
   drawRectRelative(x: number, y: number, width: number, height: number, options: MouseInteractionOptions = {}) {
-    this.drawingFrame.then(el => {
+    this.drawingFrame.then((el) => {
       const bbox: DOMRect = el[0].getBoundingClientRect();
       const realX = x * bbox.width;
       const realY = y * bbox.height;
@@ -120,6 +105,40 @@ export const ImageView = {
       const realHeight = height * bbox.height;
 
       this.drawRect(realX, realY, realWidth, realHeight, options);
+    });
+  },
+
+  /**
+   * Draws a polygon on the drawing area.
+   * @param {Array<[number, number]>} points
+   * @param {boolean} autoclose
+   * @param {MouseInteractionOptions} options
+   */
+  drawPolygon(points: [number, number][], autoclose, options: MouseInteractionOptions = {}) {
+    const drawingArea = this.drawingArea.scrollIntoView();
+    if (autoclose) {
+      points = [...points, points[0]];
+    }
+    points.forEach((point, index) => {
+      drawingArea
+        .trigger("mousemove", point[0], point[1], { eventConstructor: "MouseEvent", ...options })
+        .trigger("mousedown", point[0], point[1], { eventConstructor: "MouseEvent", buttons: 1, ...options })
+        .trigger("mouseup", point[0], point[1], { eventConstructor: "MouseEvent", buttons: 1, ...options });
+    });
+  },
+
+  /**
+   * Draws the polygon on the drawing area with coordinates relative to the drawing area.
+   * @param {Array<[number, number]>} points
+   * @param {boolean} autoclose
+   * @param {MouseInteractionOptions} options
+   */
+  drawPolygonRelative(points: [number, number][], autoclose, options: MouseInteractionOptions = {}) {
+    this.drawingFrame.then((el) => {
+      const bbox: DOMRect = el[0].getBoundingClientRect();
+      const realPoints = points.map(([x, y]) => [x * bbox.width, y * bbox.height]);
+
+      this.drawPolygon(realPoints, autoclose, options);
     });
   },
   /**
@@ -137,7 +156,7 @@ export const ImageView = {
    * @param treshold to compare image. It's a relation between original number of pixels vs changed number of pixels
    */
   canvasShouldChange(name: string, treshold = 0.1) {
-    return this.drawingArea.compareScreenshot(name, 'shouldChange', { treshold });
+    return this.drawingArea.compareScreenshot(name, "shouldChange", { treshold });
   },
 
   /**
@@ -147,45 +166,47 @@ export const ImageView = {
    * @param treshold to compare image. It's a relation between original number of pixels vs changed number of pixels
    */
   canvasShouldNotChange(name: string, treshold = 0.1) {
-    return this.drawingArea.compareScreenshot(name, 'shouldNotChange', { treshold });
+    return this.drawingArea.compareScreenshot(name, "shouldNotChange", { treshold });
   },
   selectRect3PointToolByHotkey() {
-    cy.get('body').type('{shift}{R}');
+    cy.get("body").type("{shift}{R}");
   },
   zoomInWithHotkey() {
-    cy.get('body').type('{ctrl}{+}');
+    cy.get("body").type("{ctrl}{+}");
   },
   zoomOutWithHotkey() {
-    cy.get('body').type('{ctrl}{-}');
+    cy.get("body").type("{ctrl}{-}");
   },
 
   selectRectangleToolByButton() {
     this.toolBar
       .find('[aria-label="rectangle-tool"]')
-      .should('be.visible')
+      .should("be.visible")
       .click()
-      .should('have.class', 'lsf-tool_active');
+      .should("have.class", "lsf-tool_active");
+  },
+
+  selectEllipseToolByButton() {
+    this.toolBar
+      .find('[aria-label="ellipse-tool"]')
+      .should("be.visible")
+      .click()
+      .should("have.class", "lsf-tool_active");
+  },
+
+  selectPolygonToolByButton() {
+    this.toolBar.find('[aria-label="polygon-tool"]').should("be.visible").click().should("have.class", "lsf-tool");
   },
 
   selectMoveToolByButton() {
-    this.toolBar
-      .find('[aria-label="move-tool"]')
-      .should('be.visible')
-      .click()
-      .should('have.class', 'lsf-tool_active');
+    this.toolBar.find('[aria-label="move-tool"]').should("be.visible").click().should("have.class", "lsf-tool_active");
   },
 
   rotateLeft() {
-    this.toolBar
-      .find('[aria-label="rotate-left"]')
-      .should('be.visible')
-      .click();
+    this.toolBar.find('[aria-label="rotate-left"]').should("be.visible").click();
   },
 
   rotateRight() {
-    this.toolBar
-      .find('[aria-label="rotate-right"]')
-      .should('be.visible')
-      .click();
+    this.toolBar.find('[aria-label="rotate-right"]').should("be.visible").click();
   },
 };

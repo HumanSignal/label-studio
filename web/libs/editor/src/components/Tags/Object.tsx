@@ -1,5 +1,6 @@
-import React, { CSSProperties, FC } from 'react';
-import { observer } from 'mobx-react';
+import React, { type CSSProperties, type FC } from "react";
+import { observer } from "mobx-react";
+import { cn } from "../../utils/bem";
 
 interface ObjectTagViewProps {
   item: any;
@@ -10,18 +11,13 @@ interface ObjectTagViewProps {
 /**
  * Object Tag Component
  */
-const ObjectTagView: FC<ObjectTagViewProps> = ({
-  item,
-  style,
-  className,
-  children,
-}) => {
-
+const ObjectTagView: FC<ObjectTagViewProps> = ({ item, style, className, children }) => {
   const moreProps = item.getProps && item.getProps();
+  const objectClassName = cn("object-lsf").toClassName();
 
   return (
     <div
-      className={['lsf-object', className].join(' ')}
+      className={[objectClassName, className].join(" ")}
       data-needs-update={item._needsUpdate}
       style={style}
       {...moreProps}

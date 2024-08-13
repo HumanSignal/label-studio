@@ -1,34 +1,35 @@
-import { observer } from 'mobx-react';
-import { FC, useState } from 'react';
-import { Tooltip } from 'antd';
-import { IconCheck, IconEllipsis } from '../../assets/icons';
-import { Space } from '../../common/Space/Space';
-import { Userpic } from '../../common/Userpic/Userpic';
-import { Dropdown } from '../../common/Dropdown/Dropdown';
-import { Menu } from '../../common/Menu/Menu';
-import { Block, Elem } from '../../utils/bem';
-import { humanDateDiff, userDisplayName } from '../../utils/utilities';
-import { CommentFormBase } from './CommentFormBase';
+import { observer } from "mobx-react";
+import { type FC, useState } from "react";
+import { Tooltip } from "antd";
+import { IconCheck, IconEllipsis } from "../../assets/icons";
+import { Space } from "../../common/Space/Space";
+import { Userpic } from "../../common/Userpic/Userpic";
+import { Dropdown } from "../../common/Dropdown/Dropdown";
+import { Menu } from "../../common/Menu/Menu";
+import { Block, Elem } from "../../utils/bem";
+import { humanDateDiff, userDisplayName } from "../../utils/utilities";
+import { CommentFormBase } from "./CommentFormBase";
 
-import './CommentItem.styl';
-import { Button } from '../../common/Button/Button';
+import "./CommentItem.styl";
+import { Button } from "../../common/Button/Button";
 
 interface Comment {
   comment: {
-    isEditMode: boolean,
-    isConfirmDelete: boolean,
-    createdAt: string,
-    updatedAt: string,
-    isPersisted: boolean,
-    isDeleted: boolean,
-    createdBy: any,
-    text: string,
-    isResolved: boolean,
-    updateComment: (comment: string) => void,
-    deleteComment: () => void,
-    setConfirmMode: (confirmMode: boolean) => void,
-    setEditMode: (isGoingIntoEditMode: boolean) => void,
-    toggleResolve: () => void,
+    isEditMode: boolean;
+    isConfirmDelete: boolean;
+    createdAt: string;
+    updatedAt: string;
+    isPersisted: boolean;
+    isDeleted: boolean;
+    createdBy: any;
+    text: string;
+    isResolved: boolean;
+    updateComment: (comment: string) => void;
+    deleteComment: () => void;
+    setConfirmMode: (confirmMode: boolean) => void;
+    setEditMode: (isGoingIntoEditMode: boolean) => void;
+    toggleResolve: () => void;
+    canResolveAny: boolean;
   };
   listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
 }
@@ -50,10 +51,12 @@ export const CommentItem: FC<any> = observer(
       setConfirmMode,
       setEditMode,
       toggleResolve,
+      canResolveAny,
     },
     listComments,
   }: Comment) => {
     const currentUser = window.APP_SETTINGS?.user;
+    const isCreator = currentUser?.id === createdBy.id;
     const [currentComment, setCurrentComment] = useState(initialComment);
 
     if (isDeleted) return null;
@@ -72,7 +75,7 @@ export const CommentItem: FC<any> = observer(
         return (
           <Elem name="date">
             <Tooltip placement="topRight" title={new Date(time).toLocaleString()}>
-              {`${isEdited ? 'updated' : ''} ${humanDateDiff(time)}`}
+              {`${isEdited ? "updated" : ""} ${humanDateDiff(time)}`}
             </Tooltip>
           </Elem>
         );
@@ -83,7 +86,7 @@ export const CommentItem: FC<any> = observer(
       <Block name="comment-item" mod={{ resolved }}>
         <Space spread size="medium" truncated>
           <Space size="small" truncated>
-            <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy}></Elem>
+            <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy} />
             <Elem name="name" tag="span">
               {userDisplayName(createdBy)}
             </Elem>
@@ -103,7 +106,7 @@ export const CommentItem: FC<any> = observer(
             {isEditMode ? (
               <CommentFormBase
                 value={currentComment}
-                onSubmit={async value => {
+                onSubmit={async (value) => {
                   await updateComment(value);
                   setCurrentComment(value);
                   await listComments({ suppressClearComments: true });
@@ -133,12 +136,12 @@ export const CommentItem: FC<any> = observer(
               e.preventDefault();
             }}
           >
-            {isPersisted && (
+            {isPersisted && (isCreator || canResolveAny) && (
               <Dropdown.Trigger
-                content={(
+                content={
                   <Menu size="auto">
-                    <Menu.Item onClick={toggleResolve}>{resolved ? 'Unresolve' : 'Resolve'}</Menu.Item>
-                    {currentUser?.id === createdBy.id && (
+                    <Menu.Item onClick={toggleResolve}>{resolved ? "Unresolve" : "Resolve"}</Menu.Item>
+                    {isCreator && (
                       <>
                         <Menu.Item
                           onClick={() => {
@@ -150,7 +153,7 @@ export const CommentItem: FC<any> = observer(
                             }
                           }}
                         >
-                          {isEditMode ? 'Cancel edit' : 'Edit'}
+                          {isEditMode ? "Cancel edit" : "Edit"}
                         </Menu.Item>
                         {!isConfirmDelete && (
                           <Menu.Item
@@ -164,7 +167,7 @@ export const CommentItem: FC<any> = observer(
                       </>
                     )}
                   </Menu>
-                )}
+                }
               >
                 <Button size="small" type="text" icon={<IconEllipsis />} />
               </Dropdown.Trigger>

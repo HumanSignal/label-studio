@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import xmljson
 from django.conf import settings
-from label_studio_tools.core import label_config
+from label_studio_sdk._extensions.label_studio_tools.core import label_config
 
 from label_studio.core.utils.exceptions import (
     LabelStudioValidationErrorSentryIgnored,
@@ -96,7 +96,10 @@ def validate_label_config(config_string):
     except (etree.ParseError, ValueError) as exc:
         raise LabelStudioValidationErrorSentryIgnored(str(exc))
     except jsonschema.exceptions.ValidationError as exc:
-        error_message = exc.context[-1].message if len(exc.context) else exc.message
+        # jsonschema4 validation error now includes all errors from "anyOf" subschemas
+        # check https://python-jsonschema.readthedocs.io/en/latest/errors/#jsonschema.exceptions.ValidationError.context
+        # we pick the first failed schema and show only its error message
+        error_message = exc.context[0].message if len(exc.context) else exc.message
         error_message = 'Validation failed on {}: {}'.format(
             '/'.join(map(str, exc.path)), error_message.replace('@', '')
         )

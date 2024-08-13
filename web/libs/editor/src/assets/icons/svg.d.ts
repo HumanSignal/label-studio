@@ -1,6 +1,6 @@
-type SvgrComponent = React.StatelessComponent<React.SVGAttributes<SVGElement>>
+type SvgrComponent = React.StatelessComponent<React.SVGAttributes<SVGElement>>;
 
-declare module '*.svg' {
+declare module "*.svg" {
   const value: SvgrComponent;
 
   export default value;

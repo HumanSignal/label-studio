@@ -1,11 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState } from "react";
 
-type ToggleHookReturn = [
-  boolean,
-  () => any,
-  () => any,
-  () => any,
-]
+type ToggleHookReturn = [boolean, () => any, () => any, () => any];
 
 /**
  * Handle boolean states conveniently
@@ -13,11 +8,10 @@ type ToggleHookReturn = [
  */
 export const useToggle = (defaultValue = false): ToggleHookReturn => {
   const [value, setValue] = useState(defaultValue);
-  const [setTrue, setFalse, toggleValue] = useMemo(() => [
-    setValue.bind(null, true),
-    setValue.bind(null, false),
-    () => setValue(value => !value),
-  ], []);
+  const [setTrue, setFalse, toggleValue] = useMemo(
+    () => [setValue.bind(null, true), setValue.bind(null, false), () => setValue((value) => !value)],
+    [],
+  );
 
   return [value, setTrue, setFalse, toggleValue];
 };

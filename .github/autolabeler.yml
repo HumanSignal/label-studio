@@ -15,6 +15,7 @@ autolabeler:
   - label: 'chore'
     title:
       - '/^chore:/'
+      - '/^chore(deps):/'
   - label: 'ci'
     title:
       - '/^ci:/'

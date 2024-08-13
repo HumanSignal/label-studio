@@ -9,9 +9,9 @@
 <div class="content-grid">
   <div class="content-markdown">
     <% if(page.type && page.parent !== undefined) { %>
-      <%- breadcrumb({pageType: page.type, parentPage: page.parent, currentPage: page.title }) %>
+      <%- breadcrumb({pageType: page.type, parentPage: page.parent, currentPage: page.title, parentPageExtension: page.parent_page_extension }) %>
     <% } %>
-    <% if (page.title.trim()) { %>
+    <% if (!page.hide_frontmatter_title && page.title.trim()) { %>
       <%- partial("component/heading", {text: page.title, size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
     <% } %>
     <%- formattedContent %>
@@ -20,12 +20,12 @@
     <% if (showToc) { %>
       <div class="toc">
         <%- partial("component/text", {text: "In this article", tag: "h3", size: "Eyebrow"}) %>
-        <%- toc(tocContent, {max_depth: 2, list_number: false, class: "toc-list"}) %>
+        <%- toc(tocContent, {max_depth: 3, list_number: false, class: "toc-list"}) %>
       </div>
     <% } %>
     <div class="toc-enterprise-cta">
-      <span class="toc-enterprise-cta-copy">Try Enterprise Cloud for free</span>
-      <%- partial("component/button", { url: "https://humansignal.com/free-trial", label: "Get Started", theme: "Tertiary" }) %>
+      <span class="toc-enterprise-cta-copy">Unlock more with Enterprise</span>
+      <%- partial("component/button", { url: "https://humansignal.com/contact-sales", label: "Get a Demo", theme: "Tertiary" }) %>
     </div>
   </div>
 </div>

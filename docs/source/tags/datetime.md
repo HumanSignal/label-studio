@@ -8,8 +8,6 @@ The DateTime tag adds date and time selection to the labeling interface. Use thi
 
 Use with the following data types: audio, image, HTML, paragraph, text, time series, video
 
-[^1]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality
-
 ### Parameters
 
 | Param | Type | Default | Description |
@@ -23,7 +21,7 @@ Use with the following data types: audio, image, HTML, paragraph, text, time ser
 | [required] | <code>boolean</code> | <code>false</code> | Whether datetime is required or not |
 | [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
 | [perRegion] | <code>boolean</code> |  | Use this option to label regions instead of the whole object |
-| [perItem] | <code>boolean</code> |  | Use this option to label items inside the object instead of the whole object[^1] |
+| [perItem] | <code>boolean</code> |  | Use this option to label items inside the object instead of the whole object |
 
 ### Example
 ```html

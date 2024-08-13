@@ -4,10 +4,10 @@ short: Add users
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 362
+order_enterprise: 369
 meta_title: Add and invite users to Label Studio
 meta_description: Overview of how you can add users to Label Studio Enterprise
-section: "Administration"
+section: "Manage Your Organization"
 parent: "manage_users"
 parent_enterprise: "manage_users"
 date: 2024-02-05 17:15:19

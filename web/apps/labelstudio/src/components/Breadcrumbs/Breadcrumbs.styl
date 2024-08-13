@@ -2,6 +2,22 @@
   height 100%
   display flex
   align-items center
+  margin-right 20px
+
+  &__label
+    display flex
+    gap 4px
+    align-items center
+  
+  &__beta
+    font-size 12px
+    font-style normal
+    font-weight 500
+    line-height 16px
+    color var(--plum_0)
+    padding 2px 8px
+    background-color var(--plum_500)
+    border-radius 12px
 
   &__list
     height 100%
@@ -12,7 +28,6 @@
     padding 0
 
   &__item
-    font-family Roboto
     font-size 16px
     line-height 22px
     position relative
@@ -28,12 +43,26 @@
 
       & > span,
       & > a
-        opacity 0.6
+        color var(--sand_600) !important
+
+    // cut off long project names, they can be only on the 2nd level of breadcrumbs
+    &:not(:nth-child(2))
+      flex-shrink 0
+
+    &:nth-child(2) span
+      overflow hidden
+      text-overflow ellipsis
+      white-space nowrap
+
+    &:only-child
+      pointer-events none
 
   &__item > span,
   &__item > a
-    color #000
     text-decoration none
+    color var(--sand_900)
+    &:hover
+      color var(--grape_500) !important
 
   &__item + &__item
     margin-left 30px
@@ -45,7 +74,7 @@
     content "/"
     height 16px
     display block
-    opacity 0.5
+    color var(--sand_600)
     position absolute
     transform translate3d(0, -50%, 0)
     text-align center

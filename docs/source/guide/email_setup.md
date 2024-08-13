@@ -4,9 +4,9 @@ short: Set up email backend
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 480
+order_enterprise: 90
 meta_title: Email backends in Label Studio 
-section: "Install"
+section: "Install & Setup"
 
 ---
 

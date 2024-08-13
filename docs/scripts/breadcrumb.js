@@ -3,8 +3,8 @@ var fs = require('hexo-fs');
 var fm = require('front-matter')
 
 module.exports = function(ctx) {
-  return function includeTag({pageType, parentPage, currentPage}) {
-    const parentFile = `${pageType}/${parentPage}.md`;
+  return function includeTag({pageType, parentPage, currentPage, parentPageExtension = "md"}) {
+    const parentFile = `${pageType}/${parentPage}.${parentPageExtension}`;
     var path = pathFn.join(ctx.source_dir, parentFile);
 
     // exit if path is not defined

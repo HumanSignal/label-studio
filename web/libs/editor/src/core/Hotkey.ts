@@ -1,32 +1,34 @@
-import keymaster from 'keymaster';
-import { inject } from 'mobx-react';
-import { observer } from 'mobx-react';
-import { createElement, Fragment } from 'react';
-import { Tooltip } from '../common/Tooltip/Tooltip';
-import Hint from '../components/Hint/Hint';
-import { Block, Elem } from '../utils/bem';
-import { FF_LSDV_1148, FF_MULTI_OBJECT_HOTKEYS, isFF } from '../utils/feature-flags';
-import { isDefined, isMacOS } from '../utils/utilities';
-import defaultKeymap from './settings/keymap.json';
+import keymaster from "keymaster";
+import { inject } from "mobx-react";
+import { observer } from "mobx-react";
+import { createElement, Fragment } from "react";
+import { Tooltip } from "../common/Tooltip/Tooltip";
+import Hint from "../components/Hint/Hint";
+import { Block, Elem } from "../utils/bem";
+import { FF_LSDV_1148, FF_MULTI_OBJECT_HOTKEYS, isFF } from "../utils/feature-flags";
+import { isDefined, isMacOS } from "../utils/utilities";
+import defaultKeymap from "./settings/keymap.json";
+
+type Keymap = typeof defaultKeymap;
 
 if (!isFF(FF_MULTI_OBJECT_HOTKEYS)) {
-  const prev = (defaultKeymap as Keymap)['image:prev'];
-  const next = (defaultKeymap as Keymap)['image:next'];
+  const prev = (defaultKeymap as Keymap)["image:prev"];
+  const next = (defaultKeymap as Keymap)["image:next"];
 
   if (prev) {
-    prev.key = prev.mac = 'ctrl+a';
+    prev.key = prev.mac = "ctrl+a";
   }
   if (next) {
-    next.key = next.mac = 'ctrl+d';
+    next.key = next.mac = "ctrl+d";
   }
 }
 
 // Validate keymap integrity
-const allowedKeympaKeys = ['key', 'mac', 'description', 'modifier', 'modifierDescription'];
+const allowedKeympaKeys = ["key", "mac", "description", "modifier", "modifierDescription"];
 
 const validateKeymap = (keymap: Keymap) => {
   Object.entries(keymap).forEach(([name, settings]) => {
-    Object.keys(settings).forEach(key => {
+    Object.keys(settings).forEach((key) => {
       if (!allowedKeympaKeys.includes(key)) {
         throw new Error(`Unknown keymap property ${key} for key ${name}`);
       }
@@ -37,33 +39,33 @@ const validateKeymap = (keymap: Keymap) => {
 validateKeymap(defaultKeymap);
 
 type HotkeyMap = {
-  [key: string]: keymaster.KeyHandler,
-}
+  [key: string]: keymaster.KeyHandler;
+};
 
 type HotkeyNamespace = {
-  description: string,
-  readonly keys: HotkeyMap,
-  readonly descriptions: [string, string][],
-}
+  description: string;
+  readonly keys: HotkeyMap;
+  readonly descriptions: [string, string][];
+};
 
 type HotKeyRef = {
-  readonly namespace: string,
-  readonly func: keymaster.KeyHandler,
-}
+  readonly namespace: string;
+  readonly func: keymaster.KeyHandler;
+};
 
 type HotKeyRefs = {
-  [key: string]: HotKeyRef[],
-}
+  [key: string]: HotKeyRef[];
+};
 
 type HotkeyScopes = {
-  [key: string]: HotKeyRefs,
-}
+  [key: string]: HotKeyRefs;
+};
 
-const DEFAULT_SCOPE = '__main__';
-const INPUT_SCOPE = '__input__';
+const DEFAULT_SCOPE = "__main__";
+const INPUT_SCOPE = "__input__";
 
 const _hotkeys_desc: { [key: string]: string } = {};
-const _namespaces: {[key: string]: HotkeyNamespace} = {};
+const _namespaces: { [key: string]: HotkeyNamespace } = {};
 const _destructors: (() => void)[] = [];
 const _scopes: HotkeyScopes = {
   [DEFAULT_SCOPE]: {},
@@ -74,11 +76,11 @@ const translateNumpad = (event: any) => {
   const numPadKeyCode = event.keyCode;
   const translatedToDigit = numPadKeyCode - 48;
 
-  document.dispatchEvent(new KeyboardEvent('keydown', { keyCode: translatedToDigit }));
+  document.dispatchEvent(new KeyboardEvent("keydown", { keyCode: translatedToDigit }));
 };
 
-keymaster.filter = function(event) {
-  if (keymaster.getScope() === '__none__') return false;
+keymaster.filter = (event) => {
+  if (keymaster.getScope() === "__none__") return false;
 
   const tag = (event.target || event.srcElement)?.tagName;
   const inNumberPadCodeRange = event.keyCode >= 96 && event.keyCode <= 105;
@@ -92,17 +94,14 @@ keymaster.filter = function(event) {
 };
 
 const ALIASES = {
-  'plus': '=', // "ctrl plus" is actually a "ctrl =" because shift is not used
-  'minus': '-',
+  plus: "=", // "ctrl plus" is actually a "ctrl =" because shift is not used
+  minus: "-",
   // Here is a magic trick. Keymaster doesn't work with comma correctly (it breaks down everything upon unbinding), but the key code for comma it expects is 188
   // And the magic is that '¼' has the same keycode. So we are going to trick keymaster to handle this in the right way.
-  ',': '¼',
+  ",": "¼",
 };
 
-export const Hotkey = (
-  namespace = 'global',
-  description = 'Hotkeys',
-) => {
+export const Hotkey = (namespace = "global", description = "Hotkeys") => {
   let _hotkeys_map: HotkeyMap = {};
 
   _namespaces[namespace] = _namespaces[namespace] ?? {
@@ -144,7 +143,7 @@ export const Hotkey = (
 
     if (!scope || !scope[keyName]) return;
 
-    scope[keyName] = scope[keyName].filter(hotKeyRef => {
+    scope[keyName] = scope[keyName].filter((hotKeyRef) => {
       return hotKeyRef.namespace !== namespace;
     });
   };
@@ -154,7 +153,7 @@ export const Hotkey = (
 
     if (!scope || !scope[keyName]) return;
 
-    scope[keyName].forEach(hotKeyRef => {
+    scope[keyName].forEach((hotKeyRef) => {
       keymaster(keyName, scopeName, hotKeyRef.func);
     });
   };
@@ -162,7 +161,7 @@ export const Hotkey = (
   const getKeys = (key: string) => {
     const tokenRegex = /((?:\w+\+)*(?:[^,]+|,)),?/g;
 
-    return [...key.replace(/\s/,'').matchAll(tokenRegex)].map(match => match[1]);
+    return [...key.replace(/\s/, "").matchAll(tokenRegex)].map((match) => match[1]);
   };
 
   const unbind = () => {
@@ -193,8 +192,13 @@ export const Hotkey = (
       const keys = getKeys(key);
 
       return keys
-        .map(k => k.split('+').map(k => ALIASES[k.trim()] ?? k).join('+'))
-        .join(',');
+        .map((k) =>
+          k
+            .split("+")
+            .map((k) => ALIASES[k.trim()] ?? k)
+            .join("+"),
+        )
+        .join(",");
     },
     /**
      * Add key
@@ -212,11 +216,11 @@ export const Hotkey = (
       if (desc) _hotkeys_desc[keyName] = desc;
 
       scope
-        .split(',')
-        .map(s => s.trim())
+        .split(",")
+        .map((s) => s.trim())
         .filter(Boolean)
-        .forEach(scope => {
-          const handler:keymaster.KeyHandler = (...args) => {
+        .forEach((scope) => {
+          const handler: keymaster.KeyHandler = (...args) => {
             const e = args[0];
 
             e.stopPropagation();
@@ -256,10 +260,10 @@ export const Hotkey = (
 
       if (this.hasKey(keyName)) {
         scope
-          .split(',')
-          .map(s => s.trim())
+          .split(",")
+          .map((s) => s.trim())
           .filter(Boolean)
-          .forEach(scope => {
+          .forEach((scope) => {
             if (isFF(FF_LSDV_1148)) {
               removeKeyHandlerRef(scope, key);
               keymaster.unbind(keyName, scope);
@@ -329,7 +333,6 @@ export const Hotkey = (
         if (hotkey.modifier) {
           this.overwriteKey(`${hotkey.modifier}+${shortcut}`, func, hotkey.modifierDescription, scope);
         }
-
       } else {
         throw new Error(`Unknown named hotkey ${name}`);
       }
@@ -375,13 +378,13 @@ export const Hotkey = (
      */
     makeComb() {
       const prefix = null;
-      const st = '1234567890qwetasdfgzxcvbyiopjklnm';
-      const combs = st.split('');
+      const st = "1234567890qwetasdfgzxcvbyiopjklnm";
+      const combs = st.split("");
 
       for (let i = 0; i <= combs.length; i++) {
         let comb;
 
-        if (prefix) comb = prefix + '+' + combs[i];
+        if (prefix) comb = `${prefix}+${combs[i]}`;
         else comb = combs[i];
 
         if (!{}.hasOwnProperty.call(_hotkeys_map, comb)) return comb;
@@ -404,9 +407,7 @@ Hotkey.setKeymap = (newKeymap: Keymap) => {
   Object.assign(Hotkey.keymap, newKeymap);
 };
 
-Hotkey.keysDescipritions = function() {
-  return _hotkeys_desc;
-};
+Hotkey.keysDescipritions = () => _hotkeys_desc;
 
 Hotkey.namespaces = () => {
   return _namespaces;
@@ -420,65 +421,83 @@ Hotkey.unbindAll = () => {
  * Set scope of hotkeys
  * @param {*} scope
  */
-Hotkey.setScope = function(scope: string) {
+Hotkey.setScope = (scope: string) => {
   keymaster.setScope(scope);
 };
 
 /**
  * @param {{name: keyof defaultKeymap}} param0
  */
-Hotkey.Tooltip = inject('store')(observer(({ store, name, children, ...props }: any) => {
-  const hotkey = Hotkey.keymap[name as string];
-  const enabled = store.settings.enableTooltips && store.settings.enableHotkeys;
+Hotkey.Tooltip = inject("store")(
+  observer(({ store, name, children, ...props }: any) => {
+    const hotkey = Hotkey.keymap[name as string];
+    const enabled = store.settings.enableTooltips && store.settings.enableHotkeys;
 
-  if (isDefined(hotkey)) {
-    const shortcut = isMacOS() ? hotkey.mac ?? hotkey.key : hotkey.key;
+    if (isDefined(hotkey)) {
+      const shortcut = isMacOS() ? hotkey.mac ?? hotkey.key : hotkey.key;
 
-    const description = props.title ?? hotkey.description;
-    const hotkeys: JSX.Element[] = [];
+      const description = props.title ?? hotkey.description;
+      const hotkeys: JSX.Element[] = [];
 
-    if (enabled) {
-      shortcut.split(',').forEach((combination) => {
-        const keys = combination
-          .split('+')
-          .map(key => createElement(Elem, {
-            tag: 'kbd',
-            name: 'key',
-          }, key));
+      if (enabled) {
+        shortcut.split(",").forEach((combination) => {
+          const keys = combination.split("+").map((key) =>
+            createElement(
+              Elem,
+              {
+                tag: "kbd",
+                name: "key",
+              },
+              key,
+            ),
+          );
 
-        hotkeys.push(createElement(Block, {
-          name: 'key-group',
-          tag: 'span',
-          style: { marginLeft: 5 },
-        }, ...keys));
-      });
+          hotkeys.push(
+            createElement(
+              Block,
+              {
+                name: "key-group",
+                tag: "span",
+                style: { marginLeft: 5 },
+              },
+              ...keys,
+            ),
+          );
+        });
+      }
+
+      return createElement(
+        Tooltip,
+        {
+          ...props,
+          theme: "light",
+          title: createElement(Fragment, {}, ...[description, ...hotkeys]),
+        },
+        children,
+      );
     }
 
-    return createElement(Tooltip, {
-      ...props,
-      theme: 'light',
-      title: createElement(Fragment, {}, ...[description,...hotkeys]),
-    }, children);
-  }
-
-  return children;
-}));
+    return children;
+  }),
+);
 
 /**
  * @param {{name: keyof typeof defaultKeymap}} param0
  */
-Hotkey.Hint = inject('store')(observer(({ store, name }: any) => {
-  const hotkey = Hotkey.keymap[name];
-  const enabled = store.settings.enableTooltips && store.settings.enableHotkeys;
+Hotkey.Hint = inject("store")(
+  observer(({ store, name }: any) => {
+    const hotkey = Hotkey.keymap[name];
+    const enabled = store.settings.enableTooltips && store.settings.enableHotkeys;
 
-  if (isDefined(hotkey) && enabled) {
-    const shortcut = isMacOS() ? hotkey.mac ?? hotkey.key : hotkey.key;
+    if (isDefined(hotkey) && enabled) {
+      const shortcut = isMacOS() ? hotkey.mac ?? hotkey.key : hotkey.key;
 
-    return createElement(Hint, {}, [shortcut]);
-  }
+      return createElement(Hint, {}, [shortcut]);
+    }
 
-  return null;
-}));
+    return null;
+  }),
+);
 
 export default {
   DEFAULT_SCOPE,

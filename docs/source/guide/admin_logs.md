@@ -4,10 +4,10 @@ short: Activity logs
 tier: enterprise
 type: guide
 order: 0
-order_enterprise: 356
+order_enterprise: 354
 meta_title: User activity logs in Label Studio
 meta_description: How to view user activity logs in Label Studio
-section: "Administration"
+section: "Manage Your Organization"
 date: 2024-02-05 16:40:16
 ---
 

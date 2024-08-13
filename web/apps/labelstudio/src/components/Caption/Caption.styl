@@ -1,12 +1,14 @@
 .caption
-  font 12px Roboto
   margin 8px 0
+  font-size .875rem
 
   a
-    color #09f
+    color var(--primary_link)
+    text-decoration underline
 
     &::before
       content " "
 
     &:hover
-      text-decoration underline
+      text-decoration none
+      color var(--primary_link)

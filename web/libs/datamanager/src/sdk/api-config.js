@@ -32,6 +32,11 @@ export const APIConfig = {
       method: "patch",
     },
 
+    orderTab: {
+      path: "/views/order/",
+      method: "post",
+    },
+
     /** Delete particular tab (DELETE) */
     deleteTab: {
       path: "/views/:tabID",
@@ -112,7 +117,6 @@ export const APIConfig = {
       path: "/../tasks/:taskID/drafts",
       method: "post",
     },
-
 
     /** Convert an annotation to draft */
     convertToDraft: {

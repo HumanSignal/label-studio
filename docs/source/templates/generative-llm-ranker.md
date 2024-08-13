@@ -1,17 +1,17 @@
 ---
-title: LLM Ranker
+title: RAG Retrieval
 type: templates
-category: Generative AI
-cat: generative-ai
+category: LLM Fine-tuning
+cat: llm-fine-tuning
 order: 906
 is_new: t
-meta_title: Create a Ranked Dataset for LLMs with Label Studio
-meta_description: Create a ranked dataset for LLMs with Label Studio for your machine learning and data science projects.
+meta_title: Create a ranked dataset for building a RAG system for LLMs with Label Studio
+meta_description: Create a ranked dataset for building a RAG system for LLMs with Label Studio for your machine learning and data science projects.
 ---
 
-## Overview
+<img src="/images/templates/llm-ranker.png" alt="" class="gif-border" width="700px" />
 
-This template provides you with a worklow to rank the quality of a large language model (LLM) responses.
+This template provides you with a workflow to rank the quality of a large language model (LLM) responses.
 
 Using this template will give you the ability to compare the quality of the responses from different LLMs,and rank the dynamic set of items with a handy drag-and-drop interface.
 
@@ -49,47 +49,70 @@ The `LLM Ranker` template includes the following labeling interface in XML forma
 
 ```xml
 <View>
-   <View style="display: flex; align-items: center; font-size: 1em;">
-      <View style="margin: 0.5em 0.5em 0 0;">
-        <Header name="task_header" value="Task: " style="font-size: 1em;"/>
-      </View>
-      <Text name="task" value="Drag and rank the given AI model responses based on their relevance to the prompt and the level of perceived bias."/>
-    </View>
-   <View style="display: flex; align-items: center; box-shadow: 2px 2px 5px #999; padding: 10px; border-radius: 5px; background-color: #E0E0E0; font-size: 1.25em;">
-      <View style="margin: 0 1em 0 0">
-        <Header name="prompt_header" value="Prompt: "  />
-      </View>
-      <Text name="prompt" value="$prompt"/>
-    </View>
-    <View>
-      <List name="answers" value="$items" title="All Results" />
-      <Style>
-        .htx-ranker-column {
-          background: #f8f8f8;
-          width: 50%;
-          padding: 20px;
-          border-radius: 3px;
-          box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.1);
-        }
-    
-        .htx-ranker-item {
-          background: #e0e0e0;
-          color: #333;
-          font-size: 16px;
-          width: 100%;
-          padding: 10px;
-          margin-bottom: 10px;
-          border-radius: 3px;
-          box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.1);
-        }
-        .htx-ranker-item p:last-child { display: none }
-      </Style>
-      <Ranker name="rank" toName="answers">
-    <Bucket name="relevant_results" title="Relevant Results" />
-    <Bucket name="biased_results" title="Biased Results" />
-  </Ranker> 
-    </View>
+  <Style>
+    .htx-text { white-space: pre-wrap; }
+    .search-query {
+    	font-size: 120%; 
+    	width: 800px;
+    	margin-bottom: 0.5em;
+    	border: 1px solid #eee;
+    	padding: 0 1em 1em 1em; 
+    	background: #fefefe; 
+    }
+    .question {
+    	font-size: 100%; 
+    	width: 800px;
+    	background: #fff !important;
+    	padding: 1em; 
+    }
+    .answer {
+    	font-size: 100%; 
+    	width: 800px;
+    	background: #fff !important;
+    	padding: 1em; 
+    }
+    .doc-body { 
+    	white-space: pre-wrap;   
+    	overflow-wrap: break-word;
+  		word-break: keep-all; 
+    }
+    .doc-footer { 
+    	font-size: 85%;
+    	overflow-wrap: break-word;
+  		word-break: keep-all; 
+    }
+    h3 + p + p { font-size: 85%; } /* doc id */
+  </Style>
+  
+  <View className="search-query">
+    <Header value="Search query"/>
+    <Text name="query" value="$query" />
   </View>
+  
+  <Collapse>
+    <Panel value="Full question">
+      <View className="question">
+        <Text name="question" value="$question" />
+      </View>
+    </Panel>
+  </Collapse>
+  
+  <Collapse>
+    <Panel value="Answer">
+      <View className="answer">
+        <Text name="answer" value="$answer" />
+      </View>
+    </Panel>
+  </Collapse>
+  
+  <View style="margin-top: 2em">
+    <List name="results" value="$similar_docs" title="Search results" />
+    <Ranker name="rank" toName="results">
+      <Bucket name="positives" title="Positives" />
+      <Bucket name="hard_negatives" title="Hard Negatives" />
+    </Ranker>
+  </View>
+</View>
 ```
 
 The configuration includes the following elements:
@@ -103,10 +126,11 @@ Items can be styled in Style tag by using `.htx-ranker-item` class.
 
 ## Starting your labeling project
 
-*Need a hand getting started with Label Studio? Check out our [Zero to One Tutorial](https://labelstud.io/blog/zero-to-one-getting-started-with-label-studio/).*
+!!! info Tip
+    Need a hand getting started with Label Studio? Check out our [Zero to One Tutorial](https://labelstud.io/blog/zero-to-one-getting-started-with-label-studio/).
 
 1. Create new project in Label Studio
-2. Go to `Settings > Labeling Interface > Browse Templates > Generative AI > LLM Ranker`
+2. Go to **Settings > Labeling Interface > Browse Templates > Generative AI > LLM Ranker**.
 3. Save the project
 
 Alternatively, you can create project by using our Python SDK:

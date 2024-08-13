@@ -1,36 +1,22 @@
 import { flow, getParent, getRoot, types } from "mobx-state-tree";
-import { toStudlyCaps } from "strman";
-import * as Filters from "../../components/Filters/types";
 import * as CellViews from "../../components/CellViews";
+import { normalizeCellAlias } from "../../components/CellViews";
+import * as Filters from "../../components/Filters/types";
 import { allowedFilterOperations } from "../../components/Filters/types/Utility";
 import { debounce } from "../../utils/debounce";
 import { isBlank, isDefined } from "../../utils/utils";
-import {
-  FilterValueRange,
-  FilterValueType,
-  TabFilterType
-} from "./tab_filter_type";
+import { FilterValueRange, FilterValueType, TabFilterType } from "./tab_filter_type";
 
-const operatorNames = Array.from(
-  new Set(
-    [].concat(...Object.values(Filters).map((f) => f.map((op) => op.key))),
-  ),
-);
+const operatorNames = Array.from(new Set([].concat(...Object.values(Filters).map((f) => f.map((op) => op.key)))));
 
 const Operators = types.enumeration(operatorNames);
 
 const getOperatorDefaultValue = (operator) => {
-  if (operatorNames.includes(operator)) {
-    switch (operator) {
-      default:
-        return null;
-
-      case "empty":
-        return false;
-    }
+  if (!operatorNames.includes(operator)) {
+    return null;
   }
 
-  return null;
+  return operator === "empty" ? false : null;
 };
 
 export const TabFilter = types
@@ -60,8 +46,7 @@ export const TabFilter = types
     },
 
     get componentValueType() {
-      return self.component?.find(({ key }) => key === self.operator)
-        ?.valueType;
+      return self.component?.find(({ key }) => key === self.operator)?.valueType;
     },
 
     get target() {
@@ -77,7 +62,8 @@ export const TabFilter = types
 
       if (!isDefined(value) || isBlank(value)) {
         return false;
-      } else if (FilterValueRange.is(value)) {
+      }
+      if (FilterValueRange.is(value)) {
         return isDefined(value.min) && isDefined(value.max);
       }
 
@@ -99,7 +85,7 @@ export const TabFilter = types
     get cellView() {
       const col = self.filter.field;
 
-      return CellViews[col.type] ?? CellViews[toStudlyCaps(col.alias)];
+      return CellViews[col.type] ?? CellViews[normalizeCellAlias(col.alias)];
     },
   }))
   .volatile(() => ({
@@ -168,7 +154,7 @@ export const TabFilter = types
       self.view.deleteFilter(self);
     },
 
-    save: flow(function * (force = false) {
+    save: flow(function* (force = false) {
       const isValid = self.isValidFilter;
 
       if (force !== true) {
@@ -189,9 +175,7 @@ export const TabFilter = types
     }),
 
     setDefaultValue() {
-      self.setValue(
-        getOperatorDefaultValue(self.operator) ?? self.filter.defaultValue,
-      );
+      self.setValue(getOperatorDefaultValue(self.operator) ?? self.filter.defaultValue);
     },
 
     setValueDelayed(value) {
@@ -210,6 +194,7 @@ export const TabFilter = types
     saveDelayed: debounce(() => {
       self.save();
     }, 300),
-  })).preProcessSnapshot((sn) => {
+  }))
+  .preProcessSnapshot((sn) => {
     return { ...sn, value: sn.value ?? null };
   });

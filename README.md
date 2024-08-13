@@ -28,6 +28,7 @@ Install Label Studio locally, or deploy it in a cloud instance. [Or, sign up for
 - [Install locally with Docker](#install-locally-with-docker)
 - [Run with Docker Compose (Label Studio + Nginx + PostgreSQL)](#run-with-docker-compose)
 - [Install locally with pip](#install-locally-with-pip)
+- [Install locally with poetry](#install-locally-with-poetry)
 - [Install locally with Anaconda](#install-locally-with-anaconda)
 - [Install for local development](#install-for-local-development)
 - [Deploy in a cloud instance](#deploy-in-a-cloud-instance)
@@ -88,6 +89,24 @@ pip install label-studio
 label-studio
 ```
 
+### Install locally with poetry
+
+```bash
+### install poetry
+pip install poetry
+
+### set poetry environment
+poetry new my-label-studio
+cd my-label-studio
+poetry add label-studio
+
+### activate poetry environment
+poetry shell
+
+### Start the server at http://localhost:8080
+label-studio
+```
+
 ### Install locally with Anaconda
 
 ```bash
@@ -99,11 +118,12 @@ pip install label-studio
 
 ### Install for local development
 
-You can run the latest Label Studio version locally without installing the package with pip. 
+You can run the latest Label Studio version locally without installing the package from pypi. 
 
 ```bash
 # Install all package dependencies
-pip install -e .
+pip install poetry
+poetry install
 # Run database migrations
 python label_studio/manage.py migrate
 python label_studio/manage.py collectstatic
@@ -124,12 +144,6 @@ You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google
 
 For information about updating the frontend, see [label-studio/web/README.md](https://github.com/HumanSignal/label-studio/blob/develop/web/README.md#usage-instructions).
 
-### Troubleshoot installation
-If you see any errors during installation, try to rerun the installation
-
-```bash
-pip install --ignore-installed label-studio
-```
 
 #### Install dependencies on Windows 
 To run Label Studio on Windows, download and install the following wheel packages from [Gohlke builds](https://www.lfd.uci.edu/~gohlke/pythonlibs) to ensure you're using the correct version of Python:
@@ -150,7 +164,7 @@ pip install label-studio
 To add the tests' dependencies to your local install:
 
 ```bash
-pip install -r deploy/requirements-test.txt
+poetry install --with test
 ```
 
 Alternatively, it is possible to run the unit tests from a Docker container in which the test dependencies are installed:
@@ -211,15 +225,13 @@ This lets you:
 
 You can use Label Studio as an independent part of your machine learning workflow or integrate the frontend or backend into your existing tools.  
 
-* Use the [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) as a separate React library. See more in the [Frontend Library documentation](https://labelstud.io/guide/frontend.html). 
-
 ## Ecosystem
 
 | Project | Description |
 |-|-|
 | label-studio | Server, distributed as a pip package |
-| [label-studio-frontend](https://github.com/heartexlabs/label-studio-frontend) | React and JavaScript frontend and can run standalone in a web browser or be embedded into your application. |  
-| [data-manager](https://github.com/heartexlabs/dm2) | React and JavaScript frontend for managing data. Includes the Label Studio Frontend. Relies on the label-studio server or a custom backend with the expected API methods. | 
+| [Frontend library](web/libs/editor/) | The Label Studio frontend library. This uses React to build the UI and mobx-state-tree for state management. |  
+| [Data Manager library](web/libs/datamanager/) | A library for the Data Manager, our data exploration tool. | 
 | [label-studio-converter](https://github.com/heartexlabs/label-studio-converter) | Encode labels in the format of your favorite machine learning library | 
 | [label-studio-transformers](https://github.com/heartexlabs/label-studio-transformers) | Transformers library connected and configured for use with Label Studio |
 

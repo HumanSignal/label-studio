@@ -1,7 +1,9 @@
-import BaseTimelinePlugin, { TimelinePluginParams as BaseTimelinePluginParams } from 'wavesurfer.js/src/plugin/timeline';
+import BaseTimelinePlugin, {
+  type TimelinePluginParams as BaseTimelinePluginParams,
+} from "wavesurfer.js/src/plugin/timeline";
 
 export interface TimelinePluginParams extends BaseTimelinePluginParams {
-  labelPlacement?: 'top' | 'right';
+  labelPlacement?: "top" | "right";
   notchHeight?: number;
 }
 
@@ -10,7 +12,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
   static create(params: TimelinePluginParams) {
     return {
-      name: 'timeline',
+      name: "timeline",
       deferInit: params && params.deferInit ? params.deferInit : false,
       params,
       instance: TimelinePlugin,
@@ -25,7 +27,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   get wrapperHeight() {
     const { fontSize, height, labelPadding, labelPlacement } = this.params as any;
 
-    if (labelPlacement === 'top') {
+    if (labelPlacement === "top") {
       return height;
     }
 
@@ -40,11 +42,11 @@ export class TimelinePlugin extends BaseTimelinePlugin {
         notchHeight: 8,
         fontSize: 12,
         labelPadding: 6,
-        labelPlacement: 'top',
+        labelPlacement: "top",
       },
       params,
     );
-    if (this.params.labelPlacement === 'top') {
+    if (this.params.labelPlacement === "top") {
       this.params.height = this.params.fontSize! + (this.params.height as number) + this.params.labelPadding! * 2;
     }
   }
@@ -53,36 +55,33 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     const wsParams = this.wavesurfer.params;
 
     if (this.container instanceof HTMLElement) {
-      this.container.innerHTML = '';
+      this.container.innerHTML = "";
 
-      (this.wrapper as any) = this.container.appendChild(
-        document.createElement('timeline'),
-      );
+      (this.wrapper as any) = this.container.appendChild(document.createElement("timeline"));
     }
     if (this.wrapper) {
       this.util.style(this.wrapper, {
-        display: 'block',
-        position: 'relative',
-        userSelect: 'none',
-        webkitUserSelect: 'none',
+        display: "block",
+        position: "relative",
+        userSelect: "none",
+        webkitUserSelect: "none",
         height: `${this.wrapperHeight}px`,
       });
 
       if (wsParams.fillParent || wsParams.scrollParent) {
         this.util.style(this.wrapper, {
-          width: '100%',
-          overflowX: 'hidden',
-          overflowY: 'hidden',
+          width: "100%",
+          overflowX: "hidden",
+          overflowY: "hidden",
         });
       }
 
-      this.wrapper.addEventListener('click', (this as any)._onWrapperClick);
+      this.wrapper.addEventListener("click", (this as any)._onWrapperClick);
     }
   }
 
   get duration() {
-    return this.params.duration ||
-            this.wavesurfer.backend.getDuration();
+    return this.params.duration || this.wavesurfer.backend.getDuration();
   }
 
   get width() {
@@ -100,14 +99,13 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     return baseFontSize * wsParams.pixelRatio;
   }
 
-
   intervalFnOrVal = (option: any, pixelsPerSecond: number) =>
-    typeof option === 'function' ? option(pixelsPerSecond) : option;
+    typeof option === "function" ? option(pixelsPerSecond) : option;
 
   updatePositioning(width: number, duration: number) {
     const baseOffset = (this.params as any).offset;
     const pixelsPerSecond = width / duration;
-    const totalSeconds = parseInt(duration as any, 10) + 1;
+    const totalSeconds = Number.parseInt(duration as any, 10) + 1;
     const timeInterval = this.intervalFnOrVal(this.params.timeInterval, pixelsPerSecond);
 
     let curPixel = pixelsPerSecond * (this.params as any).offset;
@@ -119,9 +117,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     this.positioning = [];
 
     // render until end in case we have a negative offset
-    const renderSeconds = (baseOffset < 0)
-      ? totalSeconds - baseOffset 
-      : totalSeconds;
+    const renderSeconds = baseOffset < 0 ? totalSeconds - baseOffset : totalSeconds;
 
     for (i = 0; i < renderSeconds / timeInterval; i++) {
       this.positioning.push([i, curSeconds, curPixel]);
@@ -133,24 +129,24 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   }
 
   renderPositions(cb: (i: number, sec: number, px: number) => void) {
-    this.positioning.forEach(pos => {
+    this.positioning.forEach((pos) => {
       cb(pos[0], pos[1], pos[2]);
     });
   }
 
   /**
-     * Fill a given text on the canvases
-     *
-     * @param {string} text Text to render
-     * @param {number} x X-position
-     * @param {number} y Y-position
-     */
-  fillText(text: string, x: number, y: number, align = '') {
+   * Fill a given text on the canvases
+   *
+   * @param {string} text Text to render
+   * @param {number} x X-position
+   * @param {number} y Y-position
+   */
+  fillText(text: string, x: number, y: number, align = "") {
     let textWidth: number;
     let xOffset = 0;
 
-    this.canvases.forEach(canvas => {
-      const context = canvas.getContext('2d');
+    this.canvases.forEach((canvas) => {
+      const context = canvas.getContext("2d");
 
       if (context) {
         const canvasWidth = context.canvas.width;
@@ -162,7 +158,7 @@ export class TimelinePlugin extends BaseTimelinePlugin {
         if (xOffset + canvasWidth > x && context) {
           textWidth = context.measureText(text).width;
 
-          if (align === 'center') {
+          if (align === "center") {
             x = x - textWidth / 2;
           }
           context.fillText(text, x - xOffset, y);
@@ -174,45 +170,41 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   }
 
   renderPrimaryLabels(pixelsPerSecond: number) {
+    const {
+      height: baseHeight,
+      notchHeight,
+      formatTimeCallback: formatTime,
+      primaryColor,
+      primaryFontColor,
+      labelPadding,
+      labelPlacement,
+    } = this.params;
 
-    const { height: baseHeight, notchHeight, formatTimeCallback: formatTime, primaryColor, primaryFontColor, labelPadding, labelPlacement } = this.params;
-
-    const primaryLabelInterval = this.intervalFnOrVal(
-      this.params.primaryLabelInterval,
-      pixelsPerSecond,
-    );
+    const primaryLabelInterval = this.intervalFnOrVal(this.params.primaryLabelInterval, pixelsPerSecond);
     const pxRatio = (this as any).pixelRatio;
-    const height = (labelPlacement === 'top' ? (notchHeight as number) : (baseHeight as number)) * pxRatio;
+    const height = (labelPlacement === "top" ? (notchHeight as number) : (baseHeight as number)) * pxRatio;
 
     this.setFonts(`${this.fontSize}px ${this.params.fontFamily}`);
 
     this.renderPositions((i, curSeconds, curPixel) => {
       if (i % primaryLabelInterval === 0) {
+        if (labelPlacement === "top") {
+          this.setFillStyles(primaryColor!);
+          this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
 
-        switch (labelPlacement) {
-          case 'top':
-            this.setFillStyles(primaryColor!);
-            this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
-
-            this.setFillStyles(primaryFontColor!);
-            this.fillText(
-              (formatTime as any)(curSeconds, pixelsPerSecond),
-              curPixel * pxRatio,
-              height + Math.ceil(labelPadding! * 1.5),
-              'center',
-            );
-            break;
-          case 'right':
-          default:
-            this.setFillStyles(primaryColor!);
-            this.fillRect(curPixel, 0, 1, height);
-            this.setFillStyles(primaryFontColor!);
-            this.fillText(
-              (formatTime as any)(curSeconds, pixelsPerSecond),
-              curPixel + labelPadding! * pxRatio,
-              height,
-            );
-            break;
+          this.setFillStyles(primaryFontColor!);
+          this.fillText(
+            (formatTime as any)(curSeconds, pixelsPerSecond),
+            curPixel * pxRatio,
+            height + Math.ceil(labelPadding! * 1.5),
+            "center",
+          );
+        } else {
+          // Handles "right" and any other values
+          this.setFillStyles(primaryColor!);
+          this.fillRect(curPixel, 0, 1, height);
+          this.setFillStyles(primaryFontColor!);
+          this.fillText((formatTime as any)(curSeconds, pixelsPerSecond), curPixel + labelPadding! * pxRatio, height);
         }
       }
     });
@@ -221,44 +213,41 @@ export class TimelinePlugin extends BaseTimelinePlugin {
   }
 
   renderSecondaryLabels(pixelsPerSecond: number, primaryLabelInterval: number) {
+    const {
+      height: baseHeight,
+      notchHeight,
+      formatTimeCallback: formatTime,
+      secondaryColor,
+      secondaryFontColor,
+      labelPadding,
+      labelPlacement,
+    } = this.params;
 
-    const { height: baseHeight, notchHeight, formatTimeCallback: formatTime, secondaryColor, secondaryFontColor, labelPadding, labelPlacement } = this.params;
-
-    const secondaryLabelInterval = this.intervalFnOrVal(
-      this.params.secondaryLabelInterval,
-      pixelsPerSecond,
-    );
+    const secondaryLabelInterval = this.intervalFnOrVal(this.params.secondaryLabelInterval, pixelsPerSecond);
     const pxRatio = (this as any).pixelRatio;
-    const height = (labelPlacement === 'top' ? (notchHeight as number) : (baseHeight as number)) * pxRatio;
+    const height = (labelPlacement === "top" ? (notchHeight as number) : (baseHeight as number)) * pxRatio;
 
     this.setFonts(`${this.fontSize}px ${this.params.fontFamily}`);
 
     this.renderPositions((i, curSeconds, curPixel) => {
       if (i % secondaryLabelInterval === 0 && i % primaryLabelInterval !== 0) {
-        switch (labelPlacement) {
-          case 'top':
-            this.setFillStyles(secondaryColor!);
-            this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
+        if (labelPlacement === "top") {
+          this.setFillStyles(secondaryColor!);
+          this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
 
-            this.setFillStyles(secondaryFontColor!);
-            this.fillText(
-              (formatTime as any)(curSeconds, pixelsPerSecond),
-              curPixel * pxRatio,
-              height + Math.ceil(labelPadding! * 1.5),
-              'center',
-            );
-            break;
-          case 'right':
-          default:
-            this.setFillStyles(secondaryColor!);
-            this.fillRect(curPixel, 0, 1, height);
-            this.setFillStyles(secondaryFontColor!);
-            this.fillText(
-              (formatTime as any)(curSeconds, pixelsPerSecond),
-              curPixel + labelPadding! * pxRatio,
-              height,
-            );
-            break;
+          this.setFillStyles(secondaryFontColor!);
+          this.fillText(
+            (formatTime as any)(curSeconds, pixelsPerSecond),
+            curPixel * pxRatio,
+            height + Math.ceil(labelPadding! * 1.5),
+            "center",
+          );
+        } else {
+          // Handles "right" and any other values
+          this.setFillStyles(secondaryColor!);
+          this.fillRect(curPixel, 0, 1, height);
+          this.setFillStyles(secondaryFontColor!);
+          this.fillText((formatTime as any)(curSeconds, pixelsPerSecond), curPixel + labelPadding! * pxRatio, height);
         }
       }
     });
@@ -271,27 +260,18 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
     const pxRatio = (this as any).pixelRatio;
 
-    const baseHeight = (labelPlacement === 'top' ? (notchHeight as number) : (_baseHeight as number));
-    const height =
-            (baseHeight as number) *
-            (notchPercentHeight! / 100) *
-            pxRatio;
+    const baseHeight = labelPlacement === "top" ? (notchHeight as number) : (_baseHeight as number);
+    const height = (baseHeight as number) * (notchPercentHeight! / 100) * pxRatio;
 
     this.setFillStyles(unlabeledNotchColor!);
 
     this.renderPositions((i, _, curPixel) => {
-      if (
-        i % secondaryLabelInterval !== 0 &&
-                i % primaryLabelInterval !== 0
-      ) {
-        switch (labelPlacement) {
-          case 'top':
-            this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
-            break;
-          case 'right':
-          default:
-            this.fillRect(curPixel, 0, 1, height);
-            break;
+      if (i % secondaryLabelInterval !== 0 && i % primaryLabelInterval !== 0) {
+        if (labelPlacement === "top") {
+          this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
+        } else {
+          // Handles "right" and any other value
+          this.fillRect(curPixel, 0, 1, height);
         }
       }
     });
@@ -301,7 +281,6 @@ export class TimelinePlugin extends BaseTimelinePlugin {
    * Render the timeline labels and notches
    */
   renderCanvases() {
-
     const duration = this.duration;
 
     if (duration <= 0) {
@@ -317,4 +296,3 @@ export class TimelinePlugin extends BaseTimelinePlugin {
     this.renderTertiaryNotches(primaryLabelInterval, secondaryLabelInterval);
   }
 }
-

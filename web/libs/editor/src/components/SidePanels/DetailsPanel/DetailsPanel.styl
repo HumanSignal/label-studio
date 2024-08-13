@@ -3,14 +3,13 @@
 .relations 
 .info
 .comments-panel
-  --details-section-border-color #E1E0E0
+  --details-section-border-color var(--sand_300)
   width: 100%
 
   &__section-tab
     width: 100%
 
     &-head
-      font-family "Roboto", Arial, sans-serif;
       font-weight 500;
       font-size 15px
 
@@ -31,7 +30,7 @@
       justify-content space-between
 
       span
-        opacity 0.6
+        color var(--sand_600)
         font-weight normal
 
 .region-actions
@@ -65,3 +64,16 @@
 .history 
   &__section-tab
     padding 8px
+
+.relations
+    &__view-control
+      display grid
+      grid-auto-flow column
+      grid-auto-columns min-content
+      align-items center
+      grid-column-gap 4px
+      text-wrap nowrap
+      padding 4px
+      font-family "Roboto", Arial, sans-serif
+      font-weight 500
+      font-size 15px

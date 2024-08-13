@@ -15,7 +15,7 @@ jobs:
   main:
     name: "yarn e2e"
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 60
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
@@ -51,13 +51,16 @@ jobs:
         id: run-lsf-server
         timeout-minutes: 1
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        env:
+          NODE_ENV: production
+          BUILD_NO_MINIMIZATION: true
         run: |
           set -xeuo pipefail
-          
+
           yarn lsf:serve &
           pid=$!
           echo "pid=${pid}" >> $GITHUB_OUTPUT
-          
+
           while ! curl -s -o /dev/null -L "http://localhost:3000"; do
             echo "=> Waiting for service to become available"
             sleep 2s
@@ -69,6 +72,12 @@ jobs:
           HEADLESS: true
         run: |
           yarn test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e output
+          path: "web/libs/editor/tests/e2e/output"
 
       - name: Kill LSO server
         if: always()

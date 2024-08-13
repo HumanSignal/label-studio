@@ -1,0 +1,15 @@
+.tabs-dm-content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+
+  &__tab {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    &_shrink {
+      width: calc(100% - 350px);
+    }
+  }
+}

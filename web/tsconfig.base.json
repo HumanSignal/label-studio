@@ -7,6 +7,7 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "resolveJsonModule": true,
     "importHelpers": true,
     "target": "esnext",
     "module": "esnext",
@@ -18,6 +19,12 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@humansignal/datamanager": [
+        "libs/datamanager/src/index.js"
+      ],
+      "@humansignal/editor": [
+        "libs/editor/src/index.js"
+      ],
       "@humansignal/frontend-test/*": [
         "libs/frontend-test/src/*"
       ],
@@ -27,11 +34,8 @@
       "@humansignal/storybook": [
         "libs/storybook/src/index.ts"
       ],
-      "@humansignal/ui/*": [
-        "libs/storybook/src/components/*"
-      ],
-      "@humansignal/utils/*": [
-        "libs/storybook/src/utils/*"
+      "@humansignal/ui": [
+        "libs/ui/src/index.ts"
       ]
     },
     "types": [

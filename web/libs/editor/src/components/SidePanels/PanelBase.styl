@@ -16,8 +16,8 @@
         background var(--header-background-new)
         color var(--icon-color)
         &:hover
-          --icon-color #096DD9
-          --header-background-new #d8e7f9
+          --icon-color var(--grape_500)
+          --header-background-new var(--grape_0)
           
     &.panel
       &_alignment
@@ -83,8 +83,8 @@
       margin 0
 
     &:hover
-      --icon-color #096DD9
-      --header-background rgba(#096DD9, 0.16)
+      --icon-color var(--grape_500)
+      --header-background var(--grape_0)
 
   &__header
     top 0
@@ -134,7 +134,7 @@
       display block
 
     &:hover
-      background-color rgba(#096DD9, 0.16)
+      background-color var(--grape_0)
 
   &:not(&_detached)&_hidden &__toggle
     pointer-events none
@@ -288,7 +288,7 @@
       height 6px
       display none
       position absolute
-      background-color $accent_color
+      background-color var(--grape_500)
       border-radius 100%
 
     &[data-resize=top]::before,

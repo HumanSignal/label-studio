@@ -20,9 +20,7 @@ export const any = <T>(boolArray: T[], check: (item: T) => boolean) => {
 };
 
 export const randomDate = (start: Date, end: Date) => {
-  return new Date(
-    start.getTime() + Math.random() * (end.getTime() - start.getTime()),
-  );
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 };
 
 export const groupBy = <T>(list: T[], group: (item: T) => string) => {
@@ -54,7 +52,7 @@ export const isDefined = <T>(value?: T): value is T => {
 export const isBlank = (value?: string) => {
   if (!isDefined(value)) return true;
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return value.trim().length === 0;
   }
 

@@ -1,6 +1,7 @@
-.input {
+.input-lsf {
   width: 100%;
   padding: 0.4em 1em;
+  border-width: 1px;
   display: block;
 }
 
@@ -15,7 +16,8 @@
 
 .delete {
   color: #1890ff;
-  padding-top: 0.5em;
+  // Typography.Paragraph has margin-bottom: 1em, so we have to compensate it to have icon in the middle
+  margin-top: -1em;
   padding-left: 1em;
   line-height: 1.8em;
 }
