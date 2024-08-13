@@ -45,6 +45,7 @@
   pointer-events: var(--button-events);
   border-radius: var(--button-radius);
   text-decoration: none;
+  gap: var(--button-gap);
 
   &:hover:not(:disabled):not(.button_waiting):not(.button_look_danger):not(.button_look_primary) {
     --button-color: var(--grape_700);
