@@ -56,7 +56,7 @@ See [here](https://github.com/IDEA-Research/GroundingDINO) for more details abou
 <View>
   <Image name="image" value="$image"/>
   <Style>
-    .lsf-main-content.lsf-requesting .prompt::before { content: ' loading...'; color: #808080; }
+    .ls-main-content.ls-requesting .prompt::before { content: ' loading...'; color: #808080; }
   </Style>
   <View className="prompt">
   <TextArea name="prompt" toName="image" editable="true" rows="2" maxSubmissions="1" showSubmitButton="true"/>

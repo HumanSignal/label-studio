@@ -34,7 +34,7 @@ Use the following labeling configuration for your project:
 ```xml
 <View>
     <Style>
-        .lsf-main-content.lsf-requesting .prompt::before { content: ' loading...'; color: #808080; }
+        .ls-main-content.ls-requesting .prompt::before { content: ' loading...'; color: #808080; }
         .text-container {
         background-color: white;
         border-radius: 10px;

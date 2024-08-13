@@ -48,7 +48,7 @@ config: |
       cursor: pointer;
       transition: all 0.3s ease;
     }
-    .lsf-richtext__line:hover {
+    .ls-richtext__line:hover {
       background: unset;
     }
     </Style>

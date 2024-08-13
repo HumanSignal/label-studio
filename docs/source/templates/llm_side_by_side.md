@@ -75,11 +75,11 @@ For a tutorial on how to use this template with the Label Studio SDK, see [Evalu
       transition: all 0.3s ease;
     }
 
-    .lsf-richtext__line:hover {
+    .ls-richtext__line:hover {
       background: unset;
     }
 
-    .answer-box .lsf-object {
+    .answer-box .ls-object-lsf {
       padding: 20px
     }
   </Style>
