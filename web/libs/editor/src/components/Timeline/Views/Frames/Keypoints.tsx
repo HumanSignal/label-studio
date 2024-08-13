@@ -36,7 +36,7 @@ export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, render
   const offset = start * step;
 
   const styles = useMemo(
-    (): CSSProperties => ({
+    () => ({
       "--offset": `${startOffset}px`,
       "--color": color,
       "--point-color": chroma(color).alpha(1).css(),
@@ -128,18 +128,9 @@ interface LifespanItemProps {
 
 const LifespanItem: FC<LifespanItemProps> = memo(
   ({ mainOffset, width, start, step, offset, enabled, visible, isLast, points }) => {
-    const left = useMemo(() => {
-      return mainOffset + offset + step / 2;
-    }, [mainOffset, offset, step]);
-
-    const right = useMemo(() => {
-      return isLast && enabled ? 0 : "auto";
-    }, [isLast, enabled]);
-
-    const finalWidth = useMemo(() => {
-      return isLast && enabled ? "auto" : width;
-    }, [isLast, enabled]);
-
+    const left = mainOffset + offset + step / 2;
+    const right = isLast && enabled ? 0 : "auto";
+    const finalWidth = isLast && enabled ? "auto" : width;
     const style = useMemo(() => {
       return { left, width: finalWidth, right };
     }, [left, right, finalWidth]);

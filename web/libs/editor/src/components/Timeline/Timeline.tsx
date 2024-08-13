@@ -3,7 +3,7 @@ import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { useLocalStorageState } from "../../hooks/useLocalStorageState";
 import { useMemoizedHandlers } from "../../hooks/useMemoizedHandlers";
 import { Block, Elem } from "../../utils/bem";
-import { clamp, isDefined } from "../../utils/utilities";
+import { clamp, fixMobxObserve, isDefined } from "../../utils/utilities";
 import { TimelineContextProvider } from "./Context";
 import { Controls } from "./Controls";
 import { Seeker } from "./Seeker";
@@ -171,6 +171,8 @@ const TimelineComponent: FC<TimelineProps> = ({
       )}
     </Elem>
   );
+
+  regions.map((reg) => fixMobxObserve(reg.sequence));
 
   const view = !viewCollapsed && !disableView && (
     <Elem name="view">
