@@ -48,6 +48,7 @@ const Result = types
       "brushlabels",
       "ellipselabels",
       "timeserieslabels",
+      "timelinelabels",
       "choices",
       "datetime",
       "number",
@@ -80,6 +81,7 @@ const Result = types
       ellipselabels: types.maybe(types.array(types.string)),
       brushlabels: types.maybe(types.array(types.string)),
       timeserieslabels: types.maybe(types.array(types.string)),
+      timelinelabels: types.maybe(types.array(types.string)), // new one
       taxonomy: types.frozen(), // array of arrays of strings
       sequence: types.frozen(),
     }),

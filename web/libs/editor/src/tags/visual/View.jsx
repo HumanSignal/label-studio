@@ -83,17 +83,14 @@ const Model = types.model({
     "textarea",
     "pairwise",
     "style",
-    "label",
     "relations",
     "filter",
-    "timeseries",
-    "timeserieslabels",
     "pagedview",
     "paragraphs",
     "paragraphlabels",
     "video",
     "videorectangle",
-    "ranker",
+    "timelinelabels",
   ]),
 });
 

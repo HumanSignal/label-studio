@@ -446,10 +446,8 @@ const HtxVideoView = ({ item, store }) => {
   const regions = item.regs.map((reg) => {
     const color = reg.style?.fillcolor ?? reg.tag?.fillcolor ?? defaultStyle.fillcolor;
     const label = reg.labels.join(", ") || "Empty";
-    const sequence = reg.sequence.map((s) => ({
-      frame: s.frame,
-      enabled: s.enabled,
-    }));
+    const timeline = reg.type.includes("timeline");
+    const sequence = reg.sequence;
 
     return {
       id: reg.cleanId,
@@ -458,8 +456,9 @@ const HtxVideoView = ({ item, store }) => {
       visible: !reg.hidden,
       selected: reg.selected || reg.inSelection,
       sequence,
+      timeline,
     };
-  });
+  }).reverse();
 
   return (
     <ObjectTag item={item}>
@@ -563,6 +562,7 @@ const HtxVideoView = ({ item, store }) => {
             onPause={handlePause}
             onFullscreenToggle={handleFullscreenToggle}
             onSelectRegion={handleSelectRegion}
+            onAddRegion={item.addRegion}
             onAction={handleAction}
           />
         )}

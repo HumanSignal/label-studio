@@ -76,11 +76,11 @@ const Model = types
     },
 
     control() {
-      return self.annotation.toNames.get(self.name)?.find((s) => !s.type.endsWith("labels"));
+      return self.annotation.toNames.get(self.name)?.find((s) => !s.type.endsWith("labels") && !s.isClassificationTag);
     },
 
     videoControl() {
-      return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("video"));
+      return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("video") || s.type.includes("timeline"));
     },
 
     states() {
@@ -199,22 +199,28 @@ const Model = types
 
       addRegion(data) {
         const control = self.videoControl() ?? self.control();
+        const isTimeline = control?.type.includes("timeline");
+        const value = {};
 
-        const sequence = [
-          {
+        if (!control) {
+          console.error("No video control is found");
+          return;
+        }
+
+        if (isTimeline) {
+          const frame = data.frame ?? self.frame;
+          value.ranges = [{ start: frame, end: frame }];
+        } else {
+          const keyframe = {
             frame: self.frame,
             enabled: true,
             rotation: 0,
             ...data,
-          },
-        ];
-
-        if (!control) {
-          console.error("NO CONTROL");
-          return;
+          };
+          value.sequence = [keyframe];
         }
 
-        const area = self.annotation.createResult({ sequence }, {}, control, self);
+        const area = self.annotation.createResult(value, {}, control, self, isTimeline);
 
         // add labels
         self.activeStates().forEach((state) => {

@@ -12,6 +12,7 @@ import { HyperTextLabelsModel } from "./HyperTextLabels";
 import { LabelsModel } from "./Labels/Labels";
 import { ParagraphLabelsModel } from "./ParagraphLabels";
 import { TimeSeriesLabelsModel } from "./TimeSeriesLabels";
+import { TimelineLabelsModel } from "./TimelineLabels";
 import { VideoRectangleModel } from "./VideoRectangle";
 
 import { BrushLabelsModel } from "./BrushLabels";
@@ -43,6 +44,7 @@ export {
   LabelsModel,
   ParagraphLabelsModel,
   TimeSeriesLabelsModel,
+  TimelineLabelsModel,
   VideoRectangleModel,
   BrushLabelsModel,
   BrushModel,

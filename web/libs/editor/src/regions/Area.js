@@ -11,6 +11,7 @@ import { PolygonRegionModel } from "./PolygonRegion";
 import { EllipseRegionModel } from "./EllipseRegion";
 import { RichTextRegionModel } from "./RichTextRegion";
 import { BrushRegionModel } from "./BrushRegion";
+import { TimelineRegionModel } from "./TimelineRegion";
 import { TimeSeriesRegionModel } from "./TimeSeriesRegion";
 import { ParagraphsRegionModel } from "./ParagraphsRegion";
 import { VideoRectangleRegionModel } from "./VideoRectangleRegion";
@@ -44,7 +45,9 @@ const Area = types.union(
       if (sn.$treenode) return sn.$treenode.type;
       if (
         !sn.points && // dirty hack to make it work with polygons, but may be the whole condition is not necessary at all
+        // `sequence` and `ranges` are used for video regions
         !sn.sequence &&
+        !sn.ranges &&
         sn.value &&
         Object.values(sn.value).length <= 1
       )
@@ -63,6 +66,7 @@ const Area = types.union(
   },
   AudioRegionModel,
   ParagraphsRegionModel,
+  TimelineRegionModel,
   TimeSeriesRegionModel,
   RectRegionModel,
   RichTextRegionModel,

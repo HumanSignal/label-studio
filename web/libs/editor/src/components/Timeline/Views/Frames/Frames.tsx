@@ -196,6 +196,9 @@ export const Frames: FC<TimelineViewProps> = ({
       const dimensions = scrollable.current!.getBoundingClientRect();
       const offsetLeft = dimensions.left;
       const rightLimit = dimensions.width - timelineStartOffset;
+      // @todo add a logic to handle region creation
+      const isDrawing = true;
+      let region: any;
 
       const getMouseToFrame = (e: MouseEvent | globalThis.MouseEvent) => {
         const mouseOffset = e.pageX - offsetLeft - timelineStartOffset;
@@ -204,16 +207,27 @@ export const Frames: FC<TimelineViewProps> = ({
       };
 
       const offset = getMouseToFrame(e);
+      const baseFrame = toSteps(offset, step) + 1;
 
       setIndicatorOffset(offset);
 
+      if (isDrawing) {
+        region = props.onAddRegion?.({ frame: baseFrame, enabled: false });
+      }
+
       const onMouseMove = (e: globalThis.MouseEvent) => {
         const offset = getMouseToFrame(e);
+        const frame = toSteps(offset, step) + 1;
 
         if (offset >= 0 && offset <= rightLimit) {
           setHoverEnabled(false);
           setRegionSelectionDisabled(true);
           setIndicatorOffset(offset);
+        }
+
+        if (region) {
+          const [start, end] = frame > baseFrame ? [baseFrame, frame] : [frame, baseFrame];
+          region.setSequence([{ frame: start, enabled: true }, { frame: end, enabled: false }]);
         }
       };
 
