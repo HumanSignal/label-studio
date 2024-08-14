@@ -2,7 +2,7 @@ import { type CSSProperties, type FC, type MouseEvent as RMouseEvent, useCallbac
 import { Block, Elem } from "../../utils/bem";
 import { clamp, isDefined } from "../../utils/utilities";
 import { useValueTracker } from "../Utils/useValueTracker";
-import "./Range.styl";
+import "./Range.scss";
 
 type RangeAlignment = "horizontal" | "vertical";
 
