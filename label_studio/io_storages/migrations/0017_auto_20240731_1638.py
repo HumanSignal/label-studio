@@ -22,30 +22,35 @@ def create_fk_sql(table_name, constraint_name, column_name, referenced_table, re
 
 tables = [
     {
+        "model_name": "azureblobexportstoragelink",
         "table_name": "io_storages_azureblobexportstoragelink",
         "index_name": "io_storages_azureblobexportstoragelink_annotation_id_6cc15c83",
         "fk_constraint": "io_storages_azureblo_annotation_id_6cc15c83_fk_task_comp",
         "column_name": "annotation_id"
     },
     {
+        "model_name": "gcsexportstoragelink",
         "table_name": "io_storages_gcsexportstoragelink",
         "index_name": "io_storages_gcsexportstoragelink_annotation_id_2df715a6",
         "fk_constraint": "io_storages_gcsexpor_annotation_id_2df715a6_fk_task_comp",
         "column_name": "annotation_id"
     },
     {
+        "model_name": "localfilesexportstoragelink",
         "table_name": "io_storages_localfilesexportstoragelink",
         "index_name": "io_storages_localfilesexportstoragelink_annotation_id_fc4f9825",
         "fk_constraint": "io_storages_localfil_annotation_id_fc4f9825_fk_task_comp",
         "column_name": "annotation_id"
     },
     {
+        "model_name": "redisexportstoragelink",
         "table_name": "io_storages_redisexportstoragelink",
         "index_name": "io_storages_redisexportstoragelink_annotation_id_8547e508",
         "fk_constraint": "io_storages_redisexp_annotation_id_8547e508_fk_task_comp",
         "column_name": "annotation_id"
     },
     {
+        "model_name": "s3exportstoragelink",
         "table_name": "io_storages_s3exportstoragelink",
         "index_name": "io_storages_s3exportstoragelink_annotation_id_729994fe",
         "fk_constraint": "io_storages_s3export_annotation_id_729994fe_fk_task_comp",
@@ -69,6 +74,15 @@ class Migration(migrations.Migration):
         fk_sql = create_fk_sql(table['table_name'], table['fk_constraint'], table['column_name'], "task_completion", "id")
 
         if IS_SQLITE:
+            operations.append(
+                migrations.AlterField(
+                    model_name=table['model_name'],
+                    name='annotation',
+                    field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                            related_name=table['table_name'],
+                                            to='tasks.annotation'),
+                ),
+            )
             continue
 
         operations.append(
