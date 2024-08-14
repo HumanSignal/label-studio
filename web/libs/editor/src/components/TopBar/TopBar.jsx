@@ -4,9 +4,10 @@ import { IconViewAll, LsPlus } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { Block, Elem } from "../../utils/bem";
-import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
+import { FF_BULK_ANNOTATION, FF_DEV_3873, isFF } from "../../utils/feature-flags";
 import { AnnotationsCarousel } from "../AnnotationsCarousel/AnnotationsCarousel";
 import { DynamicPreannotationsToggle } from "../AnnotationTab/DynamicPreannotationsToggle";
+import { CustomControls } from "../BottomBar/Controls";
 import { Actions } from "./Actions";
 import { Annotations } from "./Annotations";
 import { Controls } from "./Controls";
@@ -20,6 +21,9 @@ export const TopBar = observer(({ store }) => {
   const isPrediction = entity?.type === "prediction";
 
   const isViewAll = annotationStore?.viewingAll === true;
+  const isBulkMode = isFF(FF_BULK_ANNOTATION) && store.hasInterface("annotation:bulk");
+
+  if (isFF(FF_DEV_3873) && isBulkMode) return null;
 
   return store ? (
     <Block name="topbar" mod={{ newLabelingUI: isFF(FF_DEV_3873) }}>
@@ -77,8 +81,8 @@ export const TopBar = observer(({ store }) => {
       ) : (
         <>
           <Elem name="group">
-            <CurrentTask store={store} />
-            {!isViewAll && (
+            {!isBulkMode && <CurrentTask store={store} />}
+            {!isViewAll && !isBulkMode && (
               <Annotations store={store} annotationStore={store.annotationStore} commentStore={store.commentStore} />
             )}
             <Actions store={store} />
@@ -91,7 +95,11 @@ export const TopBar = observer(({ store }) => {
             )}
             {!isViewAll && store.hasInterface("controls") && (store.hasInterface("review") || !isPrediction) && (
               <Elem name="section" mod={{ flat: true }} style={{ width: 320, boxSizing: "border-box" }}>
-                <Controls annotation={entity} />
+                {isFF(FF_BULK_ANNOTATION) && store.hasInterface("controls:custom") ? (
+                  <CustomControls annotation={entity} />
+                ) : (
+                  <Controls annotation={entity} />
+                )}
               </Elem>
             )}
           </Elem>

@@ -285,7 +285,7 @@ class App extends Component {
                     {store.hasInterface("topbar") && <BottomBar store={store} />}
                   </>
                 )
-              ) : (
+              ) : shouldShowPanels ? (
                 <SidePanels
                   panelsHidden={viewingAll}
                   currentEntity={as.selectedHistory ?? as.selected}
@@ -293,6 +293,8 @@ class App extends Component {
                 >
                   {mainContent}
                 </SidePanels>
+              ) : (
+                <>{mainContent}</>
               )
             ) : (
               <>
