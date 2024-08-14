@@ -20,6 +20,19 @@ def create_index_sql(table_name, index_name, column_name):
 
 
 def create_fk_sql(table_name, constraint_name, column_name, referenced_table, referenced_column):
+    if IS_SQLITE:
+        return f"""
+            PRAGMA foreign_keys=off;
+            CREATE TABLE "{table_name}_new" (
+                -- Define your columns here,
+                FOREIGN KEY ("{column_name}") REFERENCES "{referenced_table}" ("{referenced_column}")
+            );
+            INSERT INTO "{table_name}_new" SELECT * FROM "{table_name}";
+            DROP TABLE "{table_name}";
+            ALTER TABLE "{table_name}_new" RENAME TO "{table_name}";
+            PRAGMA foreign_keys=on;
+        """
+
     return f"""
     ALTER TABLE "{table_name}" DROP CONSTRAINT IF EXISTS "{constraint_name}";
     ALTER TABLE "{table_name}" ADD CONSTRAINT "{constraint_name}" FOREIGN KEY ("{column_name}") REFERENCES "{referenced_table}" ("{referenced_column}") DEFERRABLE INITIALLY DEFERRED;
