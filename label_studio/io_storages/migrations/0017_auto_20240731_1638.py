@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                 migrations.AlterField(
                     model_name=table['model_name'],
                     name='annotation',
-                    field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                    field=models.ForeignKey(on_delete=models.deletion.CASCADE,
                                             related_name=table['table_name'],
                                             to='tasks.annotation'),
                 ),
