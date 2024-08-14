@@ -1,7 +1,7 @@
 import { createContext, type FC, type ReactNode, useContext, useState } from "react";
 import * as ToastPrimitive from "@radix-ui/react-toast";
 import { type BemComponent, Block, Elem } from "../../utils/bem";
-import "./Toast.styl";
+import "./Toast.scss";
 import { MessageToast } from "./MessageToast";
 
 export type ToastViewportProps = ToastPrimitive.ToastViewportProps & BemComponent;

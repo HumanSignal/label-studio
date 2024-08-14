@@ -2,7 +2,7 @@ import React from "react";
 import { Block, Elem } from "../../utils/bem";
 import { isDefined } from "../../utils/helpers";
 import { FormSubmissionContext } from "../Form/FormContext";
-import "./Button.styl";
+import "./Button.scss";
 
 export const Button = React.forwardRef(
   ({ children, type, extra, className, size, waiting, icon, tag, look, ...rest }, ref) => {

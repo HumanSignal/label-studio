@@ -609,7 +609,7 @@ class ImportStorageLink(models.Model):
 
 class ExportStorageLink(models.Model):
 
-    annotation = models.OneToOneField(
+    annotation = models.ForeignKey(
         'tasks.Annotation', on_delete=models.CASCADE, related_name='%(app_label)s_%(class)s'
     )
     object_exists = models.BooleanField(

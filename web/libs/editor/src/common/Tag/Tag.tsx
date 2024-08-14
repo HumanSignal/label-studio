@@ -2,7 +2,7 @@ import color from "chroma-js";
 import type { CSSProperties, FC } from "react";
 import { Block } from "../../utils/bem";
 import { colors } from "../../utils/namedColors";
-import "./Tag.styl";
+import "./Tag.scss";
 
 type ColorName = keyof typeof colors;
 
