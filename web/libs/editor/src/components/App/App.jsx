@@ -226,7 +226,7 @@ class App extends Component {
       </Block>
     );
 
-    const shouldShowPanels = isDefined(store) && (!isFF(FF_BULK_ANNOTATION) || !store.hasInterface("annotation:bulk"));
+    const isBulkMode = sFF(FF_BULK_ANNOTATION) && store.hasInterface("annotation:bulk");
     const outlinerEnabled = isFF(FF_DEV_1170);
     const newUIEnabled = isFF(FF_DEV_3873);
 
@@ -268,7 +268,7 @@ class App extends Component {
           >
             {outlinerEnabled ? (
               newUIEnabled ? (
-                shouldShowPanels ? (
+                !isBulkMode ? (
                   <SideTabsPanels
                     panelsHidden={viewingAll}
                     currentEntity={as.selectedHistory ?? as.selected}
@@ -285,7 +285,7 @@ class App extends Component {
                     {store.hasInterface("topbar") && <BottomBar store={store} />}
                   </>
                 )
-              ) : shouldShowPanels ? (
+              ) : !isBulkMode ? (
                 <SidePanels
                   panelsHidden={viewingAll}
                   currentEntity={as.selectedHistory ?? as.selected}
