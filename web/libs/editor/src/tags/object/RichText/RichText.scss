@@ -42,17 +42,19 @@
     font-size: 24px;
   }
 
+  &__line {
+    position: relative;
+    display: inline-block;
+    min-height: 1.2em;
+    padding-left: 8px;
+    cursor: auto;
+  }
+
   &__container[data-linenumbers=enabled] {
     padding-left: 3em;
     counter-reset: line-number;
 
     & .richtext__line {
-      position: relative;
-      display: inline-block;
-      min-height: 1.2em;
-      padding-left: 8px;
-      cursor: auto;
-
       &::before {
         counter-increment: line-number;
         content: counter(line-number);
