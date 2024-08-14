@@ -1008,7 +1008,7 @@ class FailedPrediction(models.Model):
 
     message = models.TextField(
         _('message'),
-        default='',
+        default=None,
         blank=True,
         null=True,
         help_text='The message explaining why generating this prediction failed',
