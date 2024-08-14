@@ -1,4 +1,4 @@
-.button-lsf
+.button
   --button-color #000
   height 32px
   border none
@@ -20,7 +20,7 @@
   font-size 14px
 
   &_newUI
-    .button-lsf__extra
+    .button__extra
       margin-left 3px
 
   &_waiting,
@@ -244,21 +244,21 @@
     &:not(:only-child)
       margin-right 8px
 
-.button-group-lsf
+.button-group
   display flex
 
   &:not(&_collapsed)
-    .button-lsf + .button-lsf
+    .button + .button
       margin-left 16px
 
   &_collapsed
-    .button-lsf:first-child
+    .button:first-child
       border-radius 5px 0 0 5px
 
-    .button-lsf:last-child
+    .button:last-child
       border-radius 0 5px 5px 0
 
-    .button-lsf:not(:first-child):not(:last-child)
+    .button:not(:first-child):not(:last-child)
       border-radius 0
 
 @keyframes button-waiting
