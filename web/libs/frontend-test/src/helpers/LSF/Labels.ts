@@ -1,6 +1,9 @@
 export const Labels = {
-  get labels() {
+  get root() {
     return cy.get(".lsf-labels");
+  },
+  get labels() {
+    return this.root;
   },
   get label() {
     return this.labels.get(".lsf-label-lsf");

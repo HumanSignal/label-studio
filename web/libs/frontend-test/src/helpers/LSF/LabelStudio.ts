@@ -1,3 +1,4 @@
+import { fixLSParams } from "@humansignal/frontend-test/helpers/utils/fixLSParams";
 import { expect } from "chai";
 
 type LSParams = Record<string, any>;
@@ -167,7 +168,7 @@ export const LabelStudio = {
 
     cy.visit("/").then((win) => {
       cy.log(`Default feature flags set ${JSON.stringify(win.APP_SETTINGS.feature_flags, null, "  ")}`);
-      const labelStudio = new win.LabelStudio("label-studio", win.LSF_CONFIG);
+      const labelStudio = new win.LabelStudio("label-studio", fixLSParams(win.LSF_CONFIG, win));
 
       if (win.LSF_CONFIG.eventListeners) {
         for (const [event, listener] of Object.entries(win.LSF_CONFIG.eventListeners)) {
