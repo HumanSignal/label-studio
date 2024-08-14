@@ -22,4 +22,13 @@ class Migration(migrations.Migration):
                 null=True,
             ),
         ),
+        # set existing ModelInterface objects to text classification
+        migrations.RunSQL(
+            sql=[
+                "ALTER TABLE ml_models_modelinterface ALTER COLUMN skill_name SET DEFAULT 'TextClassification';",
+            ],
+            reverse_sql=[
+                "ALTER TABLE ml_models_modelinterface ALTER COLUMN skill_name DROP DEFAULT;",
+            ]
+        ),
     ]
