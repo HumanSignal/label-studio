@@ -1,6 +1,6 @@
 {
-  "message": "revert: OPTIC-945: Improve the bundling strategy and ship a single entrypoint with a common vendor chunk across all libs (#6198)",
-  "commit": "999715856d6e95bb743964bac18f1df69c3086e8",
-  "date": "2024-08-13T17:10:10.000Z",
+  "message": "fix: OPTIC-978: converting stylus files to scss (#6177)",
+  "commit": "0495d21cc0cadac644b2defdd266004ab6fccef7",
+  "date": "2024-08-14T11:11:19.000Z",
   "branch": "develop"
 }

@@ -1,0 +1,64 @@
+.storage-settings {
+  max-width: 680px;
+
+  &__description {
+    font-size: 16px;
+    opacity: 0.6;
+    margin-bottom: 32px;
+  } 
+
+  &__controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  &__empty {
+    height: 100px;
+    display: flex;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--sand_600);
+  }
+
+  &__submit {
+    display: flex;
+    margin-top: 32px;
+    align-items: center;
+    justify-content: space-between;
+
+    & + .inline-error {
+      margin-top: 32px;
+    }
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    color: var(--danger_color);
+    font-size: 14px;
+    line-height: 22px;
+
+    &_valid {
+      color: var(--sand_600);
+    }
+  }
+
+  &__sync {
+    display: flex;
+    margin-top: 16px;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  &__sync-count {
+    margin-top: 14px;
+    line-height: 18px;
+    font-size: 14px;
+    opacity: 0.7;
+  }
+}
