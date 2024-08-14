@@ -2,7 +2,7 @@
 .choice {
   line-height: 40px;
 
-  &_leaf &_layout {
+  &_leaf.choice_layout {
 
     &_inline,
     &_horizontal {
