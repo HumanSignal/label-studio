@@ -10,7 +10,7 @@ import { Tooltip } from "../../../components/Tooltip/Tooltip";
 import { ApiContext } from "../../../providers/ApiProvider";
 import { Block, cn } from "../../../utils/bem";
 
-import "./MachineLearningList.styl";
+import "./MachineLearningList.scss";
 
 export const MachineLearningList = ({ backends, fetchBackends, onEdit, onTestRequest, onStartTraining }) => {
   const api = useContext(ApiContext);
