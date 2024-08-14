@@ -38,7 +38,7 @@ export const Relations = {
     this.hiddenRelations.should("have.length", count);
   },
   toggleCreation() {
-    cy.get(".lsf-region-actions__group_align_left > :nth-child(1) > .lsf-button-lsf__icon").click();
+    cy.get(".lsf-region-actions__group_align_left > :nth-child(1) > .lsf-button__icon").click();
   },
   toggleCreationWithHotkey() {
     // hotkey is alt + r

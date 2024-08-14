@@ -101,7 +101,7 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
     useHotkey(hotkey, rest.onClick as unknown as Keymaster.KeyHandler);
 
     const buttonBody = (
-      <Block name="button-lsf" mod={mods} mix={className} ref={ref} tag={finalTag} type={type} {...rest}>
+      <Block name="button" mod={mods} mix={className} ref={ref} tag={finalTag} type={type} {...rest}>
         <>
           {iconElem && (
             <Elem tag="span" name="icon">
@@ -138,7 +138,7 @@ Button.displayName = "Button";
 
 const Group: FC<ButtonGroupProps> = ({ className, children, collapsed }) => {
   return (
-    <Block name="button-group-lsf" mod={{ collapsed }} mix={className}>
+    <Block name="button-group" mod={{ collapsed }} mix={className}>
       {children}
     </Block>
   );

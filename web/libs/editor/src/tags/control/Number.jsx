@@ -14,7 +14,6 @@ import { ReadOnlyControlMixin } from "../../mixins/ReadOnlyMixin";
 import ClassificationBase from "./ClassificationBase";
 import PerItemMixin from "../../mixins/PerItem";
 import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
-import { cn } from "../../utils/bem";
 
 /**
  * The Number tag supports numeric classification. Use to classify tasks using numbers.
@@ -200,10 +199,9 @@ const HtxNumber = inject("store")(
     const visibleStyle = item.perRegionVisible() ? { display: "flex", alignItems: "center" } : { display: "none" };
     const sliderStyle = item.slider ? { padding: "9px 0px", border: 0 } : {};
     const disabled = item.isReadOnly();
-    const numberClassName = cn("number").toClassName();
 
     return (
-      <div className={numberClassName} style={visibleStyle}>
+      <div className="lsf-number" style={visibleStyle}>
         <input
           disabled={disabled}
           style={sliderStyle}

@@ -2,7 +2,6 @@ import insertAfter from "insert-after";
 import * as Checkers from "./utilities";
 import sanitizeHTML from "sanitize-html";
 import Canvas from "./canvas";
-import { cn } from "./bem";
 
 // fast way to change labels visibility for all text regions
 function toggleLabelsAndScores(show) {
@@ -17,11 +16,10 @@ function toggleLabelsAndScores(show) {
       else el.classList.add("htx-no-label");
     });
   };
-  const richtextClassName = cn("htx-richtext").toClassName();
 
   toggleInDocument(document);
   document
-    .querySelectorAll(`iframe.${richtextClassName}`)
+    .querySelectorAll("iframe.lsf-htx-richtext")
     .forEach((iframe) => toggleInDocument(iframe.contentWindow.document));
 }
 

@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Spinner } from "../../../components";
+import { useLibrary } from "../../../providers/LibraryProvider";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_3617, isFF } from "../../../utils/feature-flags";
 import "./Config.styl";
@@ -9,11 +10,9 @@ import { useAPI } from "../../../providers/ApiProvider";
 
 const configClass = cn("configure");
 
-const loadDependencies = async () => import("@humansignal/editor");
-
 export const Preview = ({ config, data, error, loading, project }) => {
+  const LabelStudio = useLibrary("lsf");
   const lsf = useRef(null);
-  const resolvingEditor = useMemo(loadDependencies);
   const rootRef = useRef();
   const api = useAPI();
 
@@ -49,44 +48,48 @@ export const Preview = ({ config, data, error, loading, project }) => {
     return config ?? EMPTY_CONFIG;
   }, [config]);
 
-  const initLabelStudio = useCallback(async (config, task) => {
-    if (!task.data) return;
+  const initLabelStudio = useCallback(
+    (config, task) => {
+      if (!LabelStudio) return;
+      if (!task.data) return;
 
-    await resolvingEditor;
+      console.info("Initializing LSF preview", { config, task });
 
-    try {
-      const lsf = new window.LabelStudio(rootRef.current, {
-        config,
-        task,
-        interfaces: ["side-column"],
-        // with SharedStore we should use more late event
-        [isFF(FF_DEV_3617) ? "onStorageInitialized" : "onLabelStudioLoad"](LS) {
-          LS.settings.bottomSidePanel = true;
+      try {
+        const lsf = new window.LabelStudio(rootRef.current, {
+          config,
+          task,
+          interfaces: ["side-column"],
+          // with SharedStore we should use more late event
+          [isFF(FF_DEV_3617) ? "onStorageInitialized" : "onLabelStudioLoad"](LS) {
+            LS.settings.bottomSidePanel = true;
 
-          const initAnnotation = () => {
-            const as = LS.annotationStore;
-            const c = as.createAnnotation();
+            const initAnnotation = () => {
+              const as = LS.annotationStore;
+              const c = as.createAnnotation();
 
-            as.selectAnnotation(c.id);
-          };
+              as.selectAnnotation(c.id);
+            };
 
-          if (isFF(FF_DEV_3617)) {
-            // and even then we need to wait a little even after the store is initialized
-            setTimeout(initAnnotation);
-          } else {
-            initAnnotation();
-          }
-        },
-      });
+            if (isFF(FF_DEV_3617)) {
+              // and even then we need to wait a little even after the store is initialized
+              setTimeout(initAnnotation);
+            } else {
+              initAnnotation();
+            }
+          },
+        });
 
-      lsf.on("presignUrlForProject", onPresignUrlForProject);
+        lsf.on("presignUrlForProject", onPresignUrlForProject);
 
-      return lsf;
-    } catch (err) {
-      console.error(err);
-      return null;
-    }
-  }, []);
+        return lsf;
+      } catch (err) {
+        console.error(err);
+        return null;
+      }
+    },
+    [LabelStudio],
+  );
 
   useEffect(() => {
     const opacity = loading || error ? 0.6 : 1;
@@ -97,9 +100,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
 
   useEffect(() => {
     if (!lsf.current) {
-      initLabelStudio(currentConfig, currentTask).then((ls) => {
-        lsf.current = ls;
-      });
+      lsf.current = initLabelStudio(currentConfig, currentTask);
     }
 
     return () => {

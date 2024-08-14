@@ -1,4 +1,5 @@
 import { ImageView, Labels, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
+import { FF_LSDV_E_278 } from "../../../../src/utils/feature-flags";
 
 const config = `
   <View>
@@ -246,7 +247,7 @@ describe("Filter outliner scenario", () => {
     cy.contains("There are 2 hidden regions").should("be.visible");
     cy.contains("Add Another Filter").click();
     cy.get('[data-testid="logic-dropdown"]').click();
-    cy.get(".lsf-select-lsf__list").contains("Or").click();
+    cy.get(".lsf-select__list").contains("Or").click();
 
     Sidebar.hasRegions(2);
   });
@@ -265,9 +266,9 @@ describe("Filter outliner scenario", () => {
     cy.contains("There are 2 hidden regions").should("be.visible");
     cy.contains("Add Another Filter").click();
     cy.get('[data-testid="logic-dropdown"]').click();
-    cy.get(".lsf-select-lsf__list").contains("Or").click();
+    cy.get(".lsf-select__list").contains("Or").click();
     cy.contains("Select value").click();
-    cy.get(".lsf-select__dropdown.lsf-visible > .lsf-select-lsf__list").contains("contains").click();
+    cy.get(".lsf-select__dropdown.lsf-visible > .lsf-select__list").contains("contains").click();
     cy.get('[data-testid="filter-input"]').eq(1).type("Planet");
     Sidebar.hasRegions(3);
     cy.get('[data-testid="delete-row-0"]').click();

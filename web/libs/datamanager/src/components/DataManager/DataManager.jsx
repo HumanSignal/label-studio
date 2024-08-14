@@ -125,7 +125,7 @@ const TabsSwitch = switchInjector(
 
 export const DataManager = injector(({ shrinkWidth }) => {
   return (
-    <Block name="tabs-dm-content">
+    <Block name="tabs-content">
       <Elem name="tab" mod={{ shrink: shrinkWidth }}>
         <Interface name="tabs">
           <TabsSwitch />

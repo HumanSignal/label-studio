@@ -6,10 +6,10 @@ export const Labels = {
     return this.root;
   },
   get label() {
-    return this.labels.get(".lsf-label-lsf");
+    return this.labels.get(".lsf-label");
   },
   get selectedLabel() {
-    return this.label.filter(".lsf-label-lsf_selected");
+    return this.label.filter(".lsf-label_selected");
   },
   select(labelName: string) {
     this.label.contains(labelName).click();

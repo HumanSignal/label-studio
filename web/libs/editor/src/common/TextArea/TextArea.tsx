@@ -39,7 +39,7 @@ export const TextArea: FC<TextAreaProps> = ({
 }) => {
   const inlineAction = !!onSubmit;
 
-  const rootClass = cn("textarea-lsf");
+  const rootClass = cn("textarea");
   const classList = [rootClass.mod({ inline: inlineAction, autosize: autoSize }), className].join(" ").trim();
 
   const autoGrowRef = useRef({

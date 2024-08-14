@@ -55,10 +55,19 @@ const plugins = [
   new EnvironmentPlugin(LOCAL_ENV),
 ];
 
+if (process.env.MODE !== "standalone") {
+  plugins.push(
+    new optimize.LimitChunkCountPlugin({
+      maxChunks: 1,
+    }),
+  );
+}
+
 const optimizer = () => {
   const result = {
     minimize: true,
     minimizer: [],
+    runtimeChunk: true,
   };
 
   if (DEFAULT_NODE_ENV === "production") {
@@ -77,10 +86,8 @@ const optimizer = () => {
     result.minimizer = undefined;
   }
 
-  if (process.env.MODE === "standalone") {
-    result.runtimeChunk = false;
-    result.splitChunks = { cacheGroups: { default: false } };
-  }
+  result.runtimeChunk = false;
+  result.splitChunks = { cacheGroups: { default: false } };
 
   return result;
 };
@@ -95,46 +102,19 @@ module.exports = composePlugins(
   }),
   withReact({ svgr: true }),
   (config) => {
-    // LS entrypoint
-    if (process.env.MODE !== "standalone") {
-      config.entry = {
-        main: {
-          import: path.resolve(__dirname, "apps/labelstudio/src/main.tsx"),
-        },
-      };
-      config.output = {
-        ...config.output,
-        uniqueName: "labelstudio",
-        publicPath: "auto",
-        scriptType: "text/javascript",
-      };
+    // Update the webpack config as needed here.
+    // e.g. `config.plugins.push(new MyPlugin())`
 
-      config.optimization = {
-        runtimeChunk: "single",
-        sideEffects: true,
-        splitChunks: {
-          cacheGroups: {
-            commonVendor: {
-              test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|mobx|mobx-react|mobx-react-lite|mobx-state-tree)[\\/]/,
-              name: "vendor",
-              chunks: "all",
-            },
-            defaultVendors: {
-              test: /[\\/]node_modules[\\/]/,
-              priority: -10,
-              reuseExistingChunk: true,
-              chunks: "async",
-            },
-            default: {
-              minChunks: 2,
-              priority: -20,
-              reuseExistingChunk: true,
-              chunks: "async",
-            },
-          },
-        },
-      };
-    }
+    config.output = {
+      ...config.output,
+      uniqueName: "labelstudio",
+      publicPath: "auto",
+      scriptType: "text/javascript",
+    };
+
+    config.optimization = {
+      splitChunks: false,
+    };
 
     config.resolve.fallback = {
       fs: false,
