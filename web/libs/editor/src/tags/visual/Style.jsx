@@ -62,11 +62,18 @@ import { sanitizeHtml } from "../../utils/html";
  * @param {string} `.<className>`  - Reference the className specified in the View tag to apply to a section of the labeling configuration.
  * @param {string} [CSS property]  - CSS property and value to apply.
  */
-const Model = types.model({
-  id: types.optional(types.identifier, guidGenerator),
-  type: "style",
-  value: types.optional(types.string, ""),
-});
+const Model = types
+  .model({
+    id: types.optional(types.identifier, guidGenerator),
+    type: "style",
+    value: types.optional(types.string, ""),
+  })
+  .views((self) => ({
+    // Indicates that it could exist without information about objects, taskData and regions
+    get isIndependent() {
+      return true;
+    },
+  }));
 const StyleModel = types.compose("StyleModel", Model);
 
 const HtxStyle = observer(({ item }) => {

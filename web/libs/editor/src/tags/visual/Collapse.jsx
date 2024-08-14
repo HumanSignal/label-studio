@@ -1,5 +1,5 @@
 import React from "react";
-import { types } from "mobx-state-tree";
+import { getRoot, types } from "mobx-state-tree";
 import { observer } from "mobx-react";
 import { Collapse } from "antd";
 
@@ -8,6 +8,7 @@ import Registry from "../../core/Registry";
 
 import Types from "../../core/Types";
 import Tree from "../../core/Tree";
+import { FF_BULK_ANNOTATION } from "../../utils/feature-flags";
 
 const { Panel } = Collapse;
 
@@ -23,68 +24,95 @@ const { Panel } = Collapse;
  * @param {boolean} [accordion=true]  - Works as an accordion
  * @param {string} [bordered=false]   - Shows border
  */
-const PanelModel = types.model({
-  type: "panel",
+const PanelModel = types
+  .model({
+    type: "panel",
 
-  _value: types.optional(types.string, ""),
-  value: types.optional(types.string, ""),
+    _value: types.optional(types.string, ""),
+    value: types.optional(types.string, ""),
 
-  children: Types.unionArray([
-    "view",
-    "header",
-    "labels",
-    "label",
-    "table",
-    "taxonomy",
-    "choices",
-    "choice",
-    "rating",
-    "ranker",
-    "rectangle",
-    "ellipse",
-    "polygon",
-    "keypoint",
-    "brush",
-    "rectanglelabels",
-    "ellipselabels",
-    "polygonlabels",
-    "keypointlabels",
-    "brushlabels",
-    "hypertextlabels",
-    "text",
-    "audio",
-    "image",
-    "hypertext",
-    "audioplus",
-    "list",
-    "dialog",
-    "textarea",
-    "pairwise",
-    "style",
-    "label",
-    "relations",
-    "filter",
-    "timeseries",
-    "timeserieslabels",
-    "paragraphs",
-    "paragraphlabels",
-  ]),
-});
+    children: Types.unionArray([
+      "view",
+      "header",
+      "labels",
+      "label",
+      "table",
+      "taxonomy",
+      "choices",
+      "choice",
+      "rating",
+      "ranker",
+      "rectangle",
+      "ellipse",
+      "polygon",
+      "keypoint",
+      "brush",
+      "rectanglelabels",
+      "ellipselabels",
+      "polygonlabels",
+      "keypointlabels",
+      "brushlabels",
+      "hypertextlabels",
+      "text",
+      "audio",
+      "image",
+      "hypertext",
+      "audioplus",
+      "list",
+      "dialog",
+      "textarea",
+      "pairwise",
+      "style",
+      "label",
+      "relations",
+      "filter",
+      "timeseries",
+      "timeserieslabels",
+      "paragraphs",
+      "paragraphlabels",
+    ]),
+  })
+  .views((self) => ({
+    // Indicates that it could exist without information about objects, taskData and regions
+    get isIndependent() {
+      // if value starts with $ it's related to the data but in case of Panel it's just affect title
+      // we may still want to show it even if there is no data
+      // if (self.value && self.value[0] === "$") return false;
 
-const Model = types.model({
-  type: "collapse",
+      // In other cases Panel can exist independent if it hase some independent children
+      return !!self.children?.some((c) => {
+        return c.isIndependent === true;
+      });
+    },
+  }));
 
-  size: types.optional(types.string, "4"),
-  style: types.maybeNull(types.string),
+const Model = types
+  .model({
+    type: "collapse",
 
-  _value: types.optional(types.string, ""),
-  value: types.optional(types.string, ""),
+    size: types.optional(types.string, "4"),
+    style: types.maybeNull(types.string),
 
-  bordered: types.optional(types.boolean, false),
-  accordion: types.optional(types.boolean, true),
+    _value: types.optional(types.string, ""),
+    value: types.optional(types.string, ""),
 
-  children: Types.unionArray(["panel"]),
-});
+    bordered: types.optional(types.boolean, false),
+    accordion: types.optional(types.boolean, true),
+
+    children: Types.unionArray(["panel"]),
+  })
+  .views((self) => ({
+    get store() {
+      return getRoot(self);
+    },
+    // Indicates that it could exist without information about objects, taskData and regions
+    get isIndependent() {
+      // It is independent if some panels in it are so
+      return !!self.children?.some((c) => {
+        return c.isIndependent === true;
+      });
+    },
+  }));
 
 const CollapseModel = types.compose("CollapseModel", Model, ProcessAttrsMixin);
 
@@ -92,7 +120,11 @@ const HtxCollapse = observer(({ item }) => {
   return (
     <Collapse bordered={item.bordered} accordion={item.accordion}>
       {item.children
-        .filter((i) => i.type === "panel")
+        .filter(
+          (i) =>
+            i.type === "panel" &&
+            ((!isFF(FF_BULK_ANNOTATION) && !item.store.hasInterface("bulk:annotation")) || i.isIndependent),
+        )
         .map((i) => (
           <Panel key={i._value} header={i._value}>
             {Tree.renderChildren(i, item.annotation)}

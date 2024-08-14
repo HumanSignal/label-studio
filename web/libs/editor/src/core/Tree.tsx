@@ -4,7 +4,7 @@ import type { IAnyComplexType, IAnyStateTreeNode } from "mobx-state-tree/dist/in
 
 import Registry from "./Registry";
 import { parseValue } from "../utils/data";
-import { FF_DEV_3391, isFF } from "../utils/feature-flags";
+import { FF_BULK_ANNOTATION, FF_DEV_3391, isFF } from "../utils/feature-flags";
 import { guidGenerator } from "../utils/unique";
 
 interface ConfigNodeBaseProps {
@@ -233,6 +233,10 @@ function renderItem(ref: IAnyStateTreeNode, annotation: IAnnotation, includeKey 
   const identifierAttribute = type.identifierAttribute;
   const typeName = type.name;
   const View = Registry.getViewByModel(typeName);
+
+  if (isFF(FF_BULK_ANNOTATION) && annotation?.store?.hasInterface("bulk:annotation") && el.isIndependent !== true) {
+    return null;
+  }
 
   if (!View) {
     throw new Error(`No view for model: ${typeName}`);
