@@ -4,7 +4,7 @@ class BottomBarHelper {
   }
 
   private _rootSelector: string;
-  private _controlsSelector = `.lsf-controls`;
+  private _controlsSelector = ".lsf-controls";
 
   constructor(rootSelector) {
     this._rootSelector = rootSelector.replace(/^\&/, this._baseRootSelector);
