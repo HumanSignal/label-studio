@@ -3,7 +3,7 @@ import React, { createContext, useCallback, useContext, useEffect, useReducer } 
 import { Link } from "react-router-dom";
 import { useAPI } from "../../providers/ApiProvider";
 import { Block, Elem } from "../../utils/bem";
-import "./VersionNotifier.styl";
+import "./VersionNotifier.scss";
 import { IconBell } from "../../assets/icons";
 
 const VersionContext = createContext();

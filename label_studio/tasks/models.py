@@ -499,7 +499,7 @@ class Task(TaskMixin, models.Model):
     def ensure_unique_groundtruth(self, annotation_id):
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, update_fields=None, **kwargs):
         if flag_set('ff_back_2070_inner_id_12052022_short', AnonymousUser):
             if self.inner_id == 0:
                 task = Task.objects.filter(project=self.project).order_by('-inner_id').first()
@@ -509,7 +509,10 @@ class Task(TaskMixin, models.Model):
 
                 # max_inner_id might be None in the old projects
                 self.inner_id = None if max_inner_id is None else (max_inner_id + 1)
-        super().save(*args, **kwargs)
+                if update_fields is not None:
+                    update_fields = {'inner_id'}.union(update_fields)
+
+        super().save(*args, update_fields=update_fields, **kwargs)
 
     @staticmethod
     def delete_tasks_without_signals(queryset):
@@ -536,8 +539,8 @@ class Task(TaskMixin, models.Model):
         return result
 
 
-pre_bulk_create = Signal(providing_args=['objs', 'batch_size'])
-post_bulk_create = Signal(providing_args=['objs', 'batch_size'])
+pre_bulk_create = Signal()   # providing args 'objs' and 'batch_size'
+post_bulk_create = Signal()   # providing args 'objs' and 'batch_size'
 
 
 class AnnotationManager(models.Manager):
@@ -724,11 +727,13 @@ class Annotation(AnnotationMixin, models.Model):
 
         self.task.save(update_fields=update_fields)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, update_fields=None, **kwargs):
         request = get_current_request()
         if request:
             self.updated_by = request.user
-        result = super().save(*args, **kwargs)
+            if update_fields is not None:
+                update_fields = {'updated_by'}.union(update_fields)
+        result = super().save(*args, update_fields=update_fields, **kwargs)
         self.update_task()
         return result
 
@@ -965,10 +970,12 @@ class Prediction(models.Model):
 
         self.task.save(update_fields=update_fields)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, update_fields=None, **kwargs):
         if self.project_id is None and self.task_id:
             logger.warning('project_id is not set for prediction, project_id being set in save method')
             self.project_id = Task.objects.only('project_id').get(pk=self.task_id).project_id
+            if update_fields is not None:
+                update_fields = {'project_id'}.union(update_fields)
 
         # "result" data can come in different forms - normalize them to JSON
         if flag_set(
@@ -978,9 +985,11 @@ class Prediction(models.Model):
             self.result = self.prepare_prediction_result(self.result, self.project)
         else:
             self.result = self.prepare_prediction_result(self.result, self.task.project)
+        if update_fields is not None:
+            update_fields = {'result'}.union(update_fields)
         # set updated_at field of task to now()
         self.update_task()
-        return super(Prediction, self).save(*args, **kwargs)
+        return super(Prediction, self).save(*args, update_fields=update_fields, **kwargs)
 
     def delete(self, *args, **kwargs):
         result = super().delete(*args, **kwargs)

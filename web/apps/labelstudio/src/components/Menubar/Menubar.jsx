@@ -22,9 +22,9 @@ import { Hamburger } from "../Hamburger/Hamburger";
 import { Menu } from "../Menu/Menu";
 import { Userpic } from "../Userpic/Userpic";
 import { VersionNotifier, VersionProvider } from "../VersionNotifier/VersionNotifier";
-import "./Menubar.styl";
-import "./MenuContent.styl";
-import "./MenuSidebar.styl";
+import "./Menubar.scss";
+import "./MenuContent.scss";
+import "./MenuSidebar.scss";
 import { ModelsPage } from "../../pages/Organization/Models/ModelsPage";
 import { FF_DIA_835, isFF } from "../../utils/feature-flags";
 

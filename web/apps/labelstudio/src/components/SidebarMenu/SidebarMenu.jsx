@@ -1,7 +1,7 @@
 import React from "react";
 import { cn } from "../../utils/bem";
 import { Menu } from "../Menu/Menu";
-import "./SidebarMenu.styl";
+import "./SidebarMenu.scss";
 
 export const SidebarMenu = ({ children, menu, path, menuItems }) => {
   const rootClass = cn("sidebar-menu");
