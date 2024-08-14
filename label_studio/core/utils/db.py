@@ -23,3 +23,10 @@ def fast_first(queryset: QuerySet[ModelType]) -> Optional[ModelType]:
     if result := queryset[:1]:
         return result[0]
     return None
+
+
+def fast_first_or_create(model, **model_params) -> Optional[ModelType]:
+    """Like get_or_create, but using fast_first instead of first()"""
+    if instance := fast_first(model.objects.filter(**model_params)):
+        return instance
+    return model.objects.create(**model_params)
