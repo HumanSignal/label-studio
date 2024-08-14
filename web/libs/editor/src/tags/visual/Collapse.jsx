@@ -117,7 +117,7 @@ const Model = types
 const CollapseModel = types.compose("CollapseModel", Model, ProcessAttrsMixin);
 
 const HtxCollapse = observer(({ item }) => {
-  const isBulkMode = isFF(FF_BULK_ANNOTATION) && item.store.hasInterface("bulk:annotation");
+  const isBulkMode = isFF(FF_BULK_ANNOTATION) && item.store.hasInterface("annotation:bulk");
 
   return (
     <Collapse bordered={item.bordered} accordion={item.accordion}>

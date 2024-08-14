@@ -234,7 +234,7 @@ function renderItem(ref: IAnyStateTreeNode, annotation: IAnnotation, includeKey 
   const typeName = type.name;
   const View = Registry.getViewByModel(typeName);
 
-  if (isFF(FF_BULK_ANNOTATION) && annotation?.store?.hasInterface("bulk:annotation") && el.isIndependent !== true) {
+  if (isFF(FF_BULK_ANNOTATION) && annotation?.store?.hasInterface("annotation:bulk") && el.isIndependent !== true) {
     return null;
   }
 

@@ -226,7 +226,7 @@ class App extends Component {
       </Block>
     );
 
-    const shouldShowPanels = isDefined(store) && (!isFF(FF_BULK_ANNOTATION) || !store.hasInterface("bulk:annotation"));
+    const shouldShowPanels = isDefined(store) && (!isFF(FF_BULK_ANNOTATION) || !store.hasInterface("annotation:bulk"));
     const outlinerEnabled = isFF(FF_DEV_1170);
     const newUIEnabled = isFF(FF_DEV_3873);
 

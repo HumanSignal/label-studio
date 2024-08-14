@@ -42,7 +42,7 @@ describe("Bulk mode", () => {
     });
     LabelStudio.params()
       .config(allTagsConfig)
-      .withInterface("bulk:annotation")
+      .withInterface("annotation:bulk")
       .data(allTagsSampleData)
       .withResult([])
       .init();
@@ -93,7 +93,7 @@ describe("Bulk mode", () => {
   it("should not show per-region classifications", () => {
     LabelStudio.params()
       .config(perRegionConfig)
-      .withInterface("bulk:annotation")
+      .withInterface("annotation:bulk")
       .data(allTagsSampleData)
       .withResult([])
       .init();
@@ -109,7 +109,7 @@ describe("Bulk mode", () => {
 
     LabelStudio.params()
       .config(perItemMIGConfig)
-      .withInterface("bulk:annotation")
+      .withInterface("annotation:bulk")
       .data(simpleMIGData)
       .withResult([])
       .init();
@@ -119,7 +119,7 @@ describe("Bulk mode", () => {
   });
 
   it("should not display dynamic things", () => {
-    LabelStudio.params().config(dynamicConfig).withInterface("bulk:annotation").data(dynamicData).withResult([]).init();
+    LabelStudio.params().config(dynamicConfig).withInterface("annotation:bulk").data(dynamicData).withResult([]).init();
 
     cy.log("Check that there is nothing to render");
     cy.get(".lsf-main-view__annotation div:eq(0)").should("be.empty");
