@@ -6,7 +6,7 @@ import { BemWithSpecifiContext } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
 import { Dropdown } from "../Dropdown/Dropdown";
 import { Menu } from "../Menu/Menu";
-import "./Breadcrumbs.styl";
+import "./Breadcrumbs.scss";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
