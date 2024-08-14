@@ -9,30 +9,12 @@ IS_SQLITE = settings.DJANGO_DB == settings.DJANGO_DB_SQLITE
 
 
 def create_index_sql(table_name, index_name, column_name):
-    if IS_SQLITE:
-        f"""
-        CREATE INDEX CONCURRENTLY "{index_name}" ON "{table_name}" ("{column_name}");
-        """
-
     return f"""
     CREATE INDEX CONCURRENTLY IF NOT EXISTS "{index_name}" ON "{table_name}" ("{column_name}");
     """
 
 
 def create_fk_sql(table_name, constraint_name, column_name, referenced_table, referenced_column):
-    if IS_SQLITE:
-        return f"""
-            PRAGMA foreign_keys=off;
-            CREATE TABLE "{table_name}_new" (
-                -- Define your columns here,
-                FOREIGN KEY ("{column_name}") REFERENCES "{referenced_table}" ("{referenced_column}")
-            );
-            INSERT INTO "{table_name}_new" SELECT * FROM "{table_name}";
-            DROP TABLE "{table_name}";
-            ALTER TABLE "{table_name}_new" RENAME TO "{table_name}";
-            PRAGMA foreign_keys=on;
-        """
-
     return f"""
     ALTER TABLE "{table_name}" DROP CONSTRAINT IF EXISTS "{constraint_name}";
     ALTER TABLE "{table_name}" ADD CONSTRAINT "{constraint_name}" FOREIGN KEY ("{column_name}") REFERENCES "{referenced_table}" ("{referenced_column}") DEFERRABLE INITIALLY DEFERRED;
@@ -85,6 +67,9 @@ class Migration(migrations.Migration):
     for table in tables:
         index_sql = create_index_sql(table['table_name'], table['index_name'], table['column_name'])
         fk_sql = create_fk_sql(table['table_name'], table['fk_constraint'], table['column_name'], "task_completion", "id")
+
+        if IS_SQLITE:
+            continue
 
         operations.append(
             migrations.RunSQL(
