@@ -117,14 +117,12 @@ const Model = types
 const CollapseModel = types.compose("CollapseModel", Model, ProcessAttrsMixin);
 
 const HtxCollapse = observer(({ item }) => {
+  const isBulkMode = isFF(FF_BULK_ANNOTATION) && item.store.hasInterface("bulk:annotation");
+
   return (
     <Collapse bordered={item.bordered} accordion={item.accordion}>
       {item.children
-        .filter(
-          (i) =>
-            i.type === "panel" &&
-            ((!isFF(FF_BULK_ANNOTATION) && !item.store.hasInterface("bulk:annotation")) || i.isIndependent),
-        )
+        .filter((i) => i.type === "panel" && (!isBulkMode || i.isIndependent))
         .map((i) => (
           <Panel key={i._value} header={i._value}>
             {Tree.renderChildren(i, item.annotation)}
