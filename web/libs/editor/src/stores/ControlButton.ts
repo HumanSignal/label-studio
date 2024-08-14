@@ -1,21 +1,6 @@
 import { applySnapshot, getSnapshot, types } from "mobx-state-tree";
+import { customTypes } from "../core/CustomTypes";
 import { guidGenerator } from "../utils/unique";
-
-export const rawCallbackType = types.custom<Function, Function>({
-  name: "rawCallback",
-  fromSnapshot(value: Function) {
-    return value;
-  },
-  toSnapshot(value: Function) {
-    return value;
-  },
-  getValidationMessage(value: Function) {
-    return "";
-  },
-  isTargetType(value: any) {
-    return typeof value === "function";
-  },
-});
 
 export const ControlButton = types
   .model("ControlButton", {
@@ -25,14 +10,10 @@ export const ControlButton = types
     tooltip: types.maybe(types.string),
     ariaLabel: types.maybe(types.string),
     disabled: types.maybe(types.boolean),
-    onClick: types.maybe(rawCallbackType),
+    onClick: types.maybe(customTypes.rawCallback),
   })
   .actions((self) => ({
     updateProps(newProps: Partial<typeof self>) {
       applySnapshot(self, Object.assign({}, getSnapshot(self), newProps));
     },
   }));
-
-const ArCB = types.model("ArCB", {
-  buttons: types.optional(types.array(ControlButton), []),
-});

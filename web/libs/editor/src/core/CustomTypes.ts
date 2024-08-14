@@ -50,7 +50,30 @@ const CSSColor = types.custom<any, string>({
   },
 });
 
+// This type is using to store a raw callback function in mobx-state-tree model.
+// It won't be serialized right. However, it is useful to allow passing a callback function as a prop
+// and be able to get a reaction on its change
+//
+// /!\ Avoid using this type in case you need serialization of the model it contains
+const RawCallback = types.custom<Function, Function>({
+  name: "rawCallback",
+  fromSnapshot(value: Function) {
+    return value;
+  },
+  toSnapshot(value: Function) {
+    return value;
+  },
+  getValidationMessage(value: Function) {
+    if (this.isTargetType(value)) return "";
+    return `Value ${value} is not a function.`;
+  },
+  isTargetType(value: any) {
+    return typeof value === "function";
+  },
+});
+
 export const customTypes = {
   range: Range,
   color: CSSColor,
+  rawCallback: RawCallback,
 };
