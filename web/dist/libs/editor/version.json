@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-988: Convert styl files to scss (#6194)",
-  "commit": "c0e114a1fef5afd58001a65a7c70b5a96ba7b90e",
-  "date": "2024-08-14T15:02:03.000Z",
+  "message": "fix: OPTIC-979: converting stylus files to scss (#6185)",
+  "commit": "e6977b3dd11e9073556ee26c9e440ca7bd5db444",
+  "date": "2024-08-14T15:51:53.000Z",
   "branch": "develop"
 }
