@@ -847,7 +847,7 @@ class AnnotationDraft(models.Model):
 
 
 class Prediction(models.Model):
-    """ML backend / prompts predictions"""
+    """ML backend / Prompts predictions"""
 
     result = JSONField('result', null=True, default=dict, help_text='Prediction result')
     score = models.FloatField(_('score'), default=None, help_text='Prediction score', null=True)
