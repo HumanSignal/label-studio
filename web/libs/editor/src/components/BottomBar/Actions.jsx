@@ -1,6 +1,7 @@
 import { IconInfoOutline, LsSettingsAlt } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
 import { Elem } from "../../utils/bem";
+import { FF_BULK_ANNOTATION } from "../../utils/feature-flags";
 import { EditingHistory } from "./HistoryActions";
 import { DynamicPreannotationsToggle } from "../AnnotationTab/DynamicPreannotationsToggle";
 import { AutoAcceptToggle } from "../AnnotationTab/AutoAcceptToggle";
@@ -12,6 +13,7 @@ export const Actions = ({ store }) => {
   const entity = annotationStore.selected;
   const isPrediction = entity?.type === "prediction";
   const isViewAll = annotationStore.viewingAll === true;
+  const isBulkMode = isFF(FF_BULK_ANNOTATION) && store.hasInterface("annotation:bulk");
 
   return (
     <Elem name="section">
@@ -47,7 +49,7 @@ export const Actions = ({ store }) => {
         />
       </Tooltip>
 
-      {store.hasInterface("ground-truth") && <GroundTruth entity={entity} />}
+      {store.hasInterface("ground-truth") && !isBulkMode && <GroundTruth entity={entity} />}
 
       {!isViewAll && (
         <Elem name="section">

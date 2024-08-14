@@ -54,7 +54,7 @@ export const TopBar = observer(({ store }) => {
                 icon={<LsPlus />}
                 className={"topbar__button"}
                 type="text"
-                aria-label="View All"
+                aria-label="Create an annotation"
                 onClick={(event) => {
                   event.preventDefault();
                   const created = store.annotationStore.createAnnotation();
