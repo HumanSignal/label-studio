@@ -1029,7 +1029,7 @@ class FailedPrediction(models.Model):
     )
     model_version = models.TextField(
         _('model version'),
-        default='',
+        default=None,
         blank=True,
         null=True,
         help_text='A string value that for model version that produced the failed prediction. Used in both live models and when uploading offline predictions.',
