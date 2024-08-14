@@ -1005,19 +1005,20 @@ class FailedPrediction(models.Model):
     """
     Class for storing failed prediction(s) for a task
     """
+
     message = models.TextField(
         _('message'),
         default='',
         blank=True,
         null=True,
-        help_text='The message explaining why generating this prediction failed'
+        help_text='The message explaining why generating this prediction failed',
     )
     error_type = models.CharField(
         _('error_type'),
         max_length=512,
         default=None,
         null=True,
-        help_text='The type of error that caused prediction to fail'
+        help_text='The type of error that caused prediction to fail',
     )
     ml_backend_model = models.ForeignKey(
         'ml.MLBackend',
@@ -1040,7 +1041,9 @@ class FailedPrediction(models.Model):
         null=True,
         help_text='A run of a ModelVersion that created the failed prediction.',
     )
-    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='failed_predictions', null=True)
+    project = models.ForeignKey(
+        'projects.Project', on_delete=models.CASCADE, related_name='failed_predictions', null=True
+    )
     task = models.ForeignKey('tasks.Task', on_delete=models.CASCADE, related_name='failed_predictions')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
