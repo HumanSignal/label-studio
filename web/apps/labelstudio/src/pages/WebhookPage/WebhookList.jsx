@@ -4,7 +4,7 @@ import { Button } from "../../components";
 import { Form, Input, Label, Toggle } from "../../components/Form";
 import { modal } from "../../components/Modal/Modal";
 import { Block, Elem } from "../../utils/bem";
-import "./WebhookPage.styl";
+import "./WebhookPage.scss";
 import { format } from "date-fns";
 import { useAPI } from "../../providers/ApiProvider";
 import { WebhookDeleteModal } from "./WebhookDeleteModal";

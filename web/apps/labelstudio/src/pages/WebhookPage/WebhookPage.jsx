@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAPI } from "../../providers/ApiProvider";
-import "./WebhookPage.styl";
+import "./WebhookPage.scss";
 
 import WebhookList from "./WebhookList";
 import WebhookDetail from "./WebhookDetail";
