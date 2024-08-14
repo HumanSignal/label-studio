@@ -35,6 +35,45 @@ const controlsInjector = inject(({ store }) => {
   };
 });
 
+const CustomControl = observer(({ button }) => {
+  const look = button.disabled ? "disabled" : button.look ?? "primary";
+  const [waiting, setWaiting] = useState(false);
+  const clickHandler = useCallback(
+    async (e) => {
+      setWaiting(true);
+      await button.onClick(e, button);
+      setWaiting(false);
+    },
+    [button, button.onClick],
+  );
+  return (
+    <ButtonTooltip key={button.key} title={button.tooltip}>
+      <Button
+        aria-label={button.ariaLabel}
+        disabled={button.disabled}
+        look={look}
+        onClick={clickHandler}
+        waiting={waiting}
+      >
+        {button.title}
+      </Button>
+    </ButtonTooltip>
+  );
+});
+
+export const CustomControls = controlsInjector(
+  observer(({ store }) => {
+    const buttons = store.controlButtons;
+    return (
+      <Block name="controls">
+        {buttons.map((button) => (
+          <CustomControl button={button} />
+        ))}
+      </Block>
+    );
+  }),
+);
+
 export const Controls = controlsInjector(
   observer(({ store, history, annotation }) => {
     const isReview = store.hasInterface("review") || annotation.canBeReviewed;

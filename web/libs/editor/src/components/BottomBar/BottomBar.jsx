@@ -1,9 +1,9 @@
 import { observer } from "mobx-react";
 import { Block, Elem } from "../../utils/bem";
 import { Actions } from "./Actions";
-import { Controls } from "./Controls";
+import { Controls, CustomControls } from "./Controls";
 import "./BottomBar.styl";
-import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
+import { FF_BULK_ANNOTATION, FF_DEV_3873, isFF } from "../../utils/feature-flags";
 
 export const BottomBar = observer(({ store }) => {
   const annotationStore = store.annotationStore;
@@ -20,7 +20,11 @@ export const BottomBar = observer(({ store }) => {
       <Elem name="group">
         {store.hasInterface("controls") && (store.hasInterface("review") || !isPrediction) && (
           <Elem name="section" mod={{ flat: true }}>
-            <Controls annotation={entity} />
+            {isFF(FF_BULK_ANNOTATION) && store.hasInterface("controls:custom") ? (
+              <CustomControls annotation={entity} />
+            ) : (
+              <Controls annotation={entity} />
+            )}
           </Elem>
         )}
       </Elem>

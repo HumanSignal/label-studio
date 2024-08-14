@@ -10,12 +10,14 @@ import Utils from "../utils";
 import { guidGenerator } from "../utils/unique";
 import { clamp, delay, isDefined } from "../utils/utilities";
 import AnnotationStore from "./Annotation/store";
+import { ControlButton } from "./ControlButton";
 import Project from "./ProjectStore";
 import Settings from "./SettingsStore";
 import Task from "./TaskStore";
 import { UserExtended } from "./UserStore";
 import { UserLabels } from "./UserLabels";
 import {
+  FF_BULK_ANNOTATION,
   FF_CUSTOM_SCRIPT,
   FF_DEV_1536,
   FF_LSDV_4620_3_ML,
@@ -158,6 +160,8 @@ export default types
     queueTotal: types.optional(types.number, 0),
 
     queuePosition: types.optional(types.number, 0),
+
+    ...(isFF(FF_BULK_ANNOTATION) ? { controlButtons: types.optional(types.array(ControlButton), []) } : {}),
   })
   .preProcessSnapshot((sn) => {
     // This should only be handled if the sn.user value is an object, and converted to a reference id for other
@@ -932,6 +936,10 @@ export default types
       self.setUsers(uniqBy([...newUsers, ...oldUsers], "id"));
     }
 
+    function setControls(controls) {
+      self.controlButtons = cast(controls);
+    }
+
     return {
       setFlags,
       addInterface,
@@ -965,6 +973,7 @@ export default types
       toggleComments,
       toggleSettings,
       toggleDescription,
+      setControls,
 
       setAutoAnnotation,
       setAutoAcceptSuggestions,
