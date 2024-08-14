@@ -460,6 +460,19 @@ const HtxVideoView = ({ item, store }) => {
     };
   }).reverse();
 
+  if (item.videoControl()?.selectedLabels?.length && !item.annotation.selectionSize && !item.drawingRegion) {
+    const label = item.videoControl().selectedLabels[0];
+    regions.unshift({
+      id: "new",
+      label: label.value,
+      color: label.background,
+      visible: true,
+      selected: true,
+      sequence: [],
+      timeline: true,
+    });
+  }
+
   return (
     <ObjectTag item={item}>
       <Block name="video-segmentation" ref={mainContentRef} mod={{ fullscreen: isFullScreen }}>

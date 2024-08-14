@@ -416,7 +416,7 @@ const KeypointsVirtual: FC<KeypointsVirtualProps> = ({ regions, startOffset, scr
   return (
     <Elem name="keypoints" style={{ height: regions.length * height }}>
       {regions.map((region, i) => {
-        return region.sequence.length > 0 ? (
+        return region.sequence.length > 0 || region.timeline ? (
           <Keypoints
             key={region.id}
             idx={i + 1}

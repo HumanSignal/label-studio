@@ -32,8 +32,8 @@ export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, render
   }, [seekOffset, visibleWidth, extraSteps, length]);
 
   const firtsPoint = sequence[0];
-  const start = firtsPoint.frame - 1;
-  const offset = start * step;
+  const start = firtsPoint ? firtsPoint.frame - 1 : 0;
+  const offset = firtsPoint ? start * step : startOffset;
 
   const styles = useMemo(
     () => ({
