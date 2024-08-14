@@ -4,7 +4,7 @@ import { LsCross } from "../../assets/icons";
 import { BemWithSpecifiContext, cn } from "../../utils/bem";
 import { aroundTransition } from "../../utils/transition";
 import { Button } from "../Button/Button";
-import "./Modal.styl";
+import "./Modal.scss";
 
 const { Block, Elem } = BemWithSpecifiContext();
 

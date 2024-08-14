@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "../../utils/bem";
-import "./Card.styl";
+import "./Card.scss";
 
 export const Card = ({ header, extra, children, style }) => {
   const rootClass = cn("card");
