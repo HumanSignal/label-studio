@@ -1,13 +1,21 @@
 .annotation-history {
-  margin: 0 0 8px;&_inline {
+  margin: 0 0 8px;
+
+  &_inline {
     padding: 0 8px;
-  }&__title {
+  }
+
+  &__title {
     margin-bottom: 8px;
-  }&__divider {
+  }
+
+  &__divider {
     height: 1px;
     position: relative;
     margin: 14px 0;
-    background-color: rgba(#000, 0.1);&::before {
+    background-color: rgba(#000, 0.1);
+
+    &::before {
       top: 0;
       left: 0;
       font-size: 12px;
@@ -19,58 +27,92 @@
       background-color: #fff;
     }
   }
-}.history-item {
+}
+
+.history-item {
   margin: 0;
   padding: 8px;
   cursor: default;
-  border-radius: 5px;&__date {
+  border-radius: 5px;
+
+  &__date {
     color: rgba(#000, 0.6);
-  }&:not(&_disabled) {
+  }
+
+  &:not(&_disabled) {
     cursor: pointer;
-  }&:hover:not(&_disabled) {
+  }
+
+  &:hover:not(&_disabled) {
     background-color: #f6f6f6;
-  }&_selected:not(&_disabled), 
+  }
+
+  &_selected:not(&_disabled),
   &_selected:hover:not(&_disabled) {
     background-color: #efefef;
-  }&__name, 
+  }
+
+  &__name,
   &__date {
     font-size: 14px;
-  }&__name {
+  }
+
+  &__name {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }&_disabled {
+  }
+
+  &_disabled {
     opacity: 0.6;
     border-radius: 5px;
     background-color: #fcfcfc;
-  }&__userpic {
+  }
+
+  &__userpic {
     width: 24px;
-    height: 24px;&_prediction {
+    height: 24px;
+
+    &_prediction {
       color: #944BFF;
       background-color: #E9DDF8;
       box-shadow: inset 0px 0px 0px 1px rgba(148, 75, 255, 0.15);
     }
-  }&__comment {
-    padding-top: 2px;&-content {
+  }
+
+  &__comment {
+    padding-top: 2px;
+
+    &-content {
       white-space: pre-wrap;
-      overflow-wrap: anywhere;&::before {
+      overflow-wrap: anywhere;
+
+      &::before {
         content: attr(data-reason);
       }
-    }&_collapsed &-content {
+    }
+
+    &_collapsed &-content {
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-  }&__history-icon {
+  }
+
+  &__history-icon {
     width: 24px;
     height: 24px;
-  }&__action {
+  }
+
+  &__action {
     padding-top: 6px;
     align-items: flex-start;
     grid-template-columns: 24px 1fr;
-  }&__spin {
+  }
+
+  &__spin {
     width: 10px;
     height: 10px;
     margin-right: 4px;
@@ -79,7 +121,9 @@
     border-radius: 100%;
     border-top-color: rgba(10, 87, 146, 0.3);
     animation: spin 1s linear infinite;
-  }&__dot {
+  }
+
+  &__dot {
     width: 10px;
     height: 10px;
     margin-right: 4px;
@@ -87,155 +131,191 @@
     background-color: rgba(#000, 0.4);
     border-radius: 100%;
     animation: pulse 1s linear infinite;
-  }&__saved {
+  }
+
+  &__saved {
     animation: disappear 0.3s 3s forwards;
     width: 12px;
     margin-right: 4px;
     color: green;
-  }&__collapse-comment {
+  }
+
+  &__collapse-comment {
     margin-top: 3px;
     color: var(--grape_500);
-  }&:not(&_inline) {
+  }
+
+  &:not(&_inline) {
     margin: 0 -10px;
   }
 }
 
-@-webkit-keyframes spin  {
-  0%  {
+@-webkit-keyframes spin {
+  0% {
     transform: rotate(0deg);
-  }100%  {
+  }
+
+  100% {
     transform: rotate(360deg);
   }
 }
 
-@-moz-keyframes spin  {
-  0%  {
+@-moz-keyframes spin {
+  0% {
     transform: rotate(0deg);
-  }100%  {
+  }
+
+  100% {
     transform: rotate(360deg);
   }
 }
 
-@-ms-keyframes spin  {
-  0%  {
+@-ms-keyframes spin {
+  0% {
     transform: rotate(0deg);
-  }100%  {
+  }
+
+  100% {
     transform: rotate(360deg);
   }
 }
 
-@-o-keyframes spin  {
-  0%  {
+@-o-keyframes spin {
+  0% {
     transform: rotate(0deg);
-  }100%  {
+  }
+
+  100% {
     transform: rotate(360deg);
   }
 }
 
-@keyframes spin  {
-  0%  {
+@keyframes spin {
+  0% {
     transform: rotate(0deg);
-  }100%  {
+  }
+
+  100% {
     transform: rotate(360deg);
   }
 }
 
 
 
-@-webkit-keyframes pulse  {
-  0%  {
+@-webkit-keyframes pulse {
+  0% {
     transform: scale(1);
-  }50%  {
+  }
+
+  50% {
     transform: scale(0.5);
   }
 }
 
 
 
-@-moz-keyframes pulse  {
-  0%  {
+@-moz-keyframes pulse {
+  0% {
     transform: scale(1);
-  }50%  {
+  }
+
+  50% {
     transform: scale(0.5);
   }
 }
 
 
 
-@-ms-keyframes pulse  {
-  0%  {
+@-ms-keyframes pulse {
+  0% {
     transform: scale(1);
-  }50%  {
+  }
+
+  50% {
     transform: scale(0.5);
   }
 }
 
 
 
-@-o-keyframes pulse  {
-  0%  {
+@-o-keyframes pulse {
+  0% {
     transform: scale(1);
-  }50%  {
+  }
+
+  50% {
     transform: scale(0.5);
   }
 }
 
 
 
-@keyframes pulse  {
-  0%  {
+@keyframes pulse {
+  0% {
     transform: scale(1);
-  }50%  {
+  }
+
+  50% {
     transform: scale(0.5);
   }
 }
 
 
 
-@-webkit-keyframes disappear  {
-  0%  {
+@-webkit-keyframes disappear {
+  0% {
     opacity: 1;
-  }100%  {
+  }
+
+  100% {
     opacity: 0;
   }
 }
 
 
 
-@-moz-keyframes disappear  {
-  0%  {
+@-moz-keyframes disappear {
+  0% {
     opacity: 1;
-  }100%  {
+  }
+
+  100% {
     opacity: 0;
   }
 }
 
 
 
-@-ms-keyframes disappear  {
-  0%  {
+@-ms-keyframes disappear {
+  0% {
     opacity: 1;
-  }100%  {
+  }
+
+  100% {
     opacity: 0;
   }
 }
 
 
 
-@-o-keyframes disappear  {
-  0%  {
+@-o-keyframes disappear {
+  0% {
     opacity: 1;
-  }100%  {
+  }
+
+  100% {
     opacity: 0;
   }
 }
 
 
 
-@keyframes disappear  {
-  0%  {
+@keyframes disappear {
+  0% {
     opacity: 1;
-  }100%  {
+  }
+
+  100% {
     opacity: 0;
   }
 }

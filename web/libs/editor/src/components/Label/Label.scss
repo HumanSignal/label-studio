@@ -1,6 +1,6 @@
 .label-lsf {
-  --color: #ccc;
-  --background: #e8e8e8;
+  --color: var(--sand_500);
+  --background: var(--sand_200);
 
   display: inline-flex;
   padding: 2px 8px;
@@ -9,35 +9,55 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 22px;
-  background-color: var(#e8e8e8);
-  color: #333;
+  background-color: var(--background);
+  color: var(--sand_900);
   border-left-style: solid;
   border-left-width: 4px;
-  border-left-color: var(#ccc);
+  border-left-color: var(--color);
   position: relative;
-  align-items: center;&_margins {
-    margin: 0 8px 8px 0;&:last-child {
+  align-items: center;
+
+  &_margins {
+    margin: 0 8px 8px 0;
+
+    &:last-child {
       margin: 0 0 8px 0;
     }
-  }&_empty {
+  }
+
+  &_empty {
     border-left-width: 0;
-  }&_hidden {
+  }
+
+  &_hidden {
     display: none;
-  }&_clickable {
+  }
+
+  &_clickable {
     cursor: pointer;
-  }&_solid {
-    background-color: var(#ccc);
-  }&_selected {
-    background-color: var(#ccc);
-    color: white;
-  }&_selected &__hotkey {
-    color: white;
-  }&__text {
+  }
+
+  &_solid {
+    background-color: var(--background);
+  }
+
+  &_selected {
+    background-color: var(--background);
+    color: var(--sand_0);
+  }
+
+  &_selected &__hotkey {
+    color: var(--sand_0);
+  }
+
+  &__text {
     position: relative;
     white-space: nowrap;
-  }&__hotkey {
+  }
+
+  &__hotkey {
     position: relative;
-    color: rgba(0, 0, 0, 0.4);
+    color: var(--sand_500);
     font-size: 13px;
     margin-left: 12px;
   }

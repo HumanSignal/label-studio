@@ -2,7 +2,9 @@
   --comments-padding: 0 16px 8px;
   --comments-spacing: 8px;
 
-  padding: var(0 16px 8px);& > * + *  {
-    margin-top: var(8px);
+  padding: var(--comments-padding);
+
+  & > * + * {
+    margin-top: var(--comments-spacing);
   }
 }

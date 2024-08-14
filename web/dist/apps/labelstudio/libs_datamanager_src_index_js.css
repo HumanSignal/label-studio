@@ -2603,7 +2603,7 @@ input.ls-form-input[type=range] {
   overflow-y: auto;
 }
 .ls-label-view__lsf-container > div {
-  --main-bg-color: #FAFAFA;
+  --main-bg-color: var(--sand_100);
   flex: 1;
   height: auto;
 }

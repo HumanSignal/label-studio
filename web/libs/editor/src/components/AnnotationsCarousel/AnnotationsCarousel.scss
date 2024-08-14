@@ -4,13 +4,17 @@
   height: 100%;
   align-items: center;
   min-width: 0;
-  flex: 1;&__container {
+  flex: 1;
+
+  &__container {
     display: flex;
     width: 100%;
     justify-content: space-between;
     overflow: hidden;
     height: 100%;
-  }&__carosel {
+  }
+
+  &__carosel {
     flex: 1;
     display: flex;
     gap: 2px;
@@ -19,7 +23,9 @@
     position: relative;
     transform: translateX(calc(-1 * var(0px)));
     transition: all 0.15s ease-in-out 0s;
-  }&__carousel-controls {
+  }
+
+  &__carousel-controls {
     position: absolute;
     right: 0;
     white-space: nowrap;
@@ -28,29 +34,43 @@
     display: flex;
     gap: 4px;
     padding-right: 4px;
-  }&__nav {
+  }
+
+  &__nav {
     padding: 0;
     height: 28px;
     width: 28px;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);&:hover {
-      background: #EBF3FC;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);
+
+    &:hover {
+      background: var(--grape_0);
       box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);
-    }&_disabled {
-      background: #F0EFF1;
+    }
+
+    &_disabled {
+      background: var(--sand_100);
 
       svg {
         opacity: 0.4;
-      }&:hover {
-        background: #F0EFF1;
+      }
+
+      &:hover {
+        background: var(--sand_200);
         filter: none;
       }
-    }.button-lsf {
+    }
+
+    .button-lsf {
       &:hover {
         filter: none;
-      }&__arrow {
+      }
+
+      &__arrow {
         &_left {
           transform: rotate(-90deg);
-        }&_right {
+        }
+
+        &_right {
           transform: rotate(90deg);
         }
       }

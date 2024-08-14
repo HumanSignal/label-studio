@@ -5068,7 +5068,7 @@ function warnError(msg) {
  */
 function isTypeCheckingEnabled() {
     return (devMode() ||
-        (typeof process !== "undefined" && ({"NX_CLI_SET":"true","NX_LOAD_DOT_ENV_FILES":"true","NX_WORKSPACE_ROOT":"/Users/carlybartel/Sites/label-studio/web","NX_TERMINAL_OUTPUT_PATH":"/Users/carlybartel/Sites/label-studio/web/.nx/cache/terminalOutputs/8138940477663731178","NX_STREAM_OUTPUT":"true","NX_TASK_TARGET_PROJECT":"labelstudio","NX_TASK_TARGET_TARGET":"build","NX_TASK_TARGET_CONFIGURATION":"development","NX_TASK_HASH":"8138940477663731178"}) && ({"NX_CLI_SET":"true","NX_LOAD_DOT_ENV_FILES":"true","NX_WORKSPACE_ROOT":"/Users/carlybartel/Sites/label-studio/web","NX_TERMINAL_OUTPUT_PATH":"/Users/carlybartel/Sites/label-studio/web/.nx/cache/terminalOutputs/8138940477663731178","NX_STREAM_OUTPUT":"true","NX_TASK_TARGET_PROJECT":"labelstudio","NX_TASK_TARGET_TARGET":"build","NX_TASK_TARGET_CONFIGURATION":"development","NX_TASK_HASH":"8138940477663731178"}).ENABLE_TYPE_CHECK === "true"));
+        (typeof process !== "undefined" && ({"NX_CLI_SET":"true","NX_LOAD_DOT_ENV_FILES":"true","NX_WORKSPACE_ROOT":"/Users/carlybartel/Sites/label-studio/web","NX_TERMINAL_OUTPUT_PATH":"/Users/carlybartel/Sites/label-studio/web/.nx/cache/terminalOutputs/1509641127112862086","NX_STREAM_OUTPUT":"true","NX_TASK_TARGET_PROJECT":"labelstudio","NX_TASK_TARGET_TARGET":"build","NX_TASK_TARGET_CONFIGURATION":"development","NX_TASK_HASH":"1509641127112862086"}) && ({"NX_CLI_SET":"true","NX_LOAD_DOT_ENV_FILES":"true","NX_WORKSPACE_ROOT":"/Users/carlybartel/Sites/label-studio/web","NX_TERMINAL_OUTPUT_PATH":"/Users/carlybartel/Sites/label-studio/web/.nx/cache/terminalOutputs/1509641127112862086","NX_STREAM_OUTPUT":"true","NX_TASK_TARGET_PROJECT":"labelstudio","NX_TASK_TARGET_TARGET":"build","NX_TASK_TARGET_CONFIGURATION":"development","NX_TASK_HASH":"1509641127112862086"}).ENABLE_TYPE_CHECK === "true"));
 }
 /**
  * @internal
@@ -8679,7 +8679,7 @@ function createDecoratorForEnhancer(enhancer) {
     });
     var res = 
     // Extra process checks, as this happens during module initialization
-    typeof process !== "undefined" && ({"NX_CLI_SET":"true","NX_LOAD_DOT_ENV_FILES":"true","NX_WORKSPACE_ROOT":"/Users/carlybartel/Sites/label-studio/web","NX_TERMINAL_OUTPUT_PATH":"/Users/carlybartel/Sites/label-studio/web/.nx/cache/terminalOutputs/8138940477663731178","NX_STREAM_OUTPUT":"true","NX_TASK_TARGET_PROJECT":"labelstudio","NX_TASK_TARGET_TARGET":"build","NX_TASK_TARGET_CONFIGURATION":"development","NX_TASK_HASH":"8138940477663731178"}) && "development" !== "production"
+    typeof process !== "undefined" && ({"NX_CLI_SET":"true","NX_LOAD_DOT_ENV_FILES":"true","NX_WORKSPACE_ROOT":"/Users/carlybartel/Sites/label-studio/web","NX_TERMINAL_OUTPUT_PATH":"/Users/carlybartel/Sites/label-studio/web/.nx/cache/terminalOutputs/1509641127112862086","NX_STREAM_OUTPUT":"true","NX_TASK_TARGET_PROJECT":"labelstudio","NX_TASK_TARGET_TARGET":"build","NX_TASK_TARGET_CONFIGURATION":"development","NX_TASK_HASH":"1509641127112862086"}) && "development" !== "production"
         ? function observableDecorator() {
             // This wrapper function is just to detect illegal decorator invocations, deprecate in a next version
             // and simply return the created prop decorator
@@ -12896,7 +12896,7 @@ catch (e) {
     function testCodeMinification() { }
     if (testCodeMinification.name !== "testCodeMinification" &&
         "development" !== "production" &&
-        typeof process !== 'undefined' && ({"NX_CLI_SET":"true","NX_LOAD_DOT_ENV_FILES":"true","NX_WORKSPACE_ROOT":"/Users/carlybartel/Sites/label-studio/web","NX_TERMINAL_OUTPUT_PATH":"/Users/carlybartel/Sites/label-studio/web/.nx/cache/terminalOutputs/8138940477663731178","NX_STREAM_OUTPUT":"true","NX_TASK_TARGET_PROJECT":"labelstudio","NX_TASK_TARGET_TARGET":"build","NX_TASK_TARGET_CONFIGURATION":"development","NX_TASK_HASH":"8138940477663731178"}).IGNORE_MOBX_MINIFY_WARNING !== "true") {
+        typeof process !== 'undefined' && ({"NX_CLI_SET":"true","NX_LOAD_DOT_ENV_FILES":"true","NX_WORKSPACE_ROOT":"/Users/carlybartel/Sites/label-studio/web","NX_TERMINAL_OUTPUT_PATH":"/Users/carlybartel/Sites/label-studio/web/.nx/cache/terminalOutputs/1509641127112862086","NX_STREAM_OUTPUT":"true","NX_TASK_TARGET_PROJECT":"labelstudio","NX_TASK_TARGET_TARGET":"build","NX_TASK_TARGET_CONFIGURATION":"development","NX_TASK_HASH":"1509641127112862086"}).IGNORE_MOBX_MINIFY_WARNING !== "true") {
         // trick so it doesn't get replaced
         var varName = ["process", "env", "NODE_ENV"].join(".");
         console.warn("[mobx] you are running a minified build, but '" + varName + "' was not set to 'production' in your bundler. This results in an unnecessarily large and slow bundle");

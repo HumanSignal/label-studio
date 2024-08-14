@@ -2,7 +2,7 @@ import React, { type FC, useCallback } from "react";
 import { observer } from "mobx-react";
 import { Block, Elem } from "../../../utils/bem";
 import { Button } from "../../../common/Button/Button";
-import "./RelationsControls.styl";
+import "./RelationsControls.scss";
 import { IconOutlinerEyeClosed, IconOutlinerEyeOpened, IconSortDownNew, IconSortUpNew } from "../../../assets/icons";
 
 const RelationsControlsComponent: FC<any> = ({ relationStore }) => {

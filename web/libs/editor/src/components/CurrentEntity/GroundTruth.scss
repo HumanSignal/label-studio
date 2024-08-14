@@ -1,19 +1,32 @@
 .ground-truth {
   &_size {
     &_md {
-      &, ~/__toggle, ~/__indicator {
+
+      &,
+      .ground-truth__toggle,
+      .ground-truth__indicator {
         width: 32px;
         height: 32px;
       }
     }
-  }&_disabled {
+  }
+
+  &_disabled {
     pointer-events: none;
-  }&__toggle {
+  }
+
+  &__toggle {
     padding: 0;
-  }&__indicator {
-    color: rgba(#000, 0.4);&_dark {
-      color: #000;
-    }&_active {
+  }
+
+  &__indicator {
+    color: var(--sand_400);
+
+    &_dark {
+      color: var(--sand_900);
+    }
+
+    &_active {
       color: var(--canteloupe_400);
 
       path {

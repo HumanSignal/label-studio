@@ -4,13 +4,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(#000, 0.05);
+  background: var(--sand_200);
   border-radius: 4px;
-
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
-  color: #000;
+  color: var(--sand_900);
   padding: 0 8px;
 
   span {

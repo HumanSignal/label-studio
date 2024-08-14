@@ -12,7 +12,7 @@ import { Button } from "../../common/Button/Button";
 import { Tag } from "../../common/Tag/Tag";
 import { Space } from "../../common/Space/Space";
 import { Block, Elem } from "../../utils/bem";
-import "./Entity.styl";
+import "./Entity.scss";
 import { PER_REGION_MODES } from "../../mixins/PerRegion";
 import { Hotkey } from "../../core/Hotkey";
 import { IconWarning } from "../../assets/icons";

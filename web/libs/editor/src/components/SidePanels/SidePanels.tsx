@@ -13,11 +13,11 @@ import {
   DEFAULT_PANEL_MAX_HEIGHT,
   DEFAULT_PANEL_MAX_WIDTH,
   DEFAULT_PANEL_WIDTH,
-  PANEL_HEADER_HEIGHT,
+  PANEL_HEADER_HEIGHT, 
   PANEL_HEADER_HEIGHT_PADDED,
 } from "./constants";
 import type { PanelProps } from "./PanelBase";
-import "./SidePanels.styl";
+import "./SidePanels.scss"; 
 import { SidePanelsContext } from "./SidePanelsContext";
 import { useRegionsCopyPaste } from "../../hooks/useRegionsCopyPaste";
 import { FF_DEV_3873, isFF } from "../../utils/feature-flags";

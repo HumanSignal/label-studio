@@ -1,6 +1,8 @@
 .timeline {
   user-select: none;
-  background-color: #fff;&__topbar {
+  background-color: var(--sand_0);
+
+  &__topbar {
     min-height: 48px;
     padding: 6px;
     display: grid;
@@ -8,9 +10,11 @@
     align-items: center;
     grid-auto-rows: min-content;
     grid-template-rows: 1fr;
-    border-top: 1px solid rgba(#000, 0.1);
-    border-bottom: 1px solid rgba(#000, 0.1);
+    border-top: 1px solid var(--sand_300);
+    border-bottom: 1px solid var(--sand_300);
   }
-}.audio {
+}
+
+.audio {
   min-width: 425px;
 }

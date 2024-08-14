@@ -4,27 +4,39 @@
     height: 24px;
     margin-right: 8px;
     flex-shrink: 0;
-  }&__head {
+  }
+
+  &__head {
     display: flex;
     margin: 8px 0;
     padding: 0 8px;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-  }&__title {
-    & + span {
-      color: #000;&:before {
+  }
+
+  &__title {
+    &+span {
+      color: #000;
+
+      &:before {
         opacity: 0.6;
         content: "ID ";
       }
     }
-  }&__title {
+  }
+
+  &__title {
     display: flex;
     align-items: flex-start;
     word-break: break-word;
-  }&__result {
+  }
+
+  &__result {
     padding: 0 8px;
-  }&__meta-text {
+  }
+
+  &__meta-text {
     width: calc(100% - 16px);
     border: 1px solid transparent;
     margin: 0 8px;
@@ -37,22 +49,28 @@
     transition-duration: 80ms;
     transition-timing-function: ease;
 
-    textarea&:hover {
-      border-color: #E5E5E5;
-      background-color: #fff;
-    }
+    // textarea&:hover {
+    //   border-color: #E5E5E5;
+    //   background-color: #fff;
+    // }
 
-    textarea&:focus {
-      background-color: #fff;
-      border-color: var(--grape_500);
-      box-shadow: 0 0 0 1px var(--grape_500);
-    }&:not(textarea) {
+    // textarea&:focus {
+    //   background-color: #fff;
+    //   border-color: var(--grape_500);
+    //   box-shadow: 0 0 0 1px var(--grape_500);
+    // }
+
+    &:not(textarea) {
       white-space: pre-wrap;
       word-break: break-all;
     }
-  }&_compact &__head {
+  }
+
+  &_compact &__head {
     margin: -5px 0;
-  }&__warning {
+  }
+
+  &__warning {
     box-sizing: border-box;
     display: flex;
     flex-direction: row;
@@ -66,15 +84,20 @@
     flex: none;
     order: 0;
     flex-grow: 1;
+
     svg {
       width: 20px;
       height: 17px;
       fill: var(--incomplete-warning-color, #FA8C16);
     }
   }
-}.region-meta {
+}
+
+.region-meta {
   &__content {
-    margin: 8px 0;&_type {
+    margin: 8px 0;
+
+    &_type {
       &_text {
         padding: 3px 6px;
         border-radius: 4px;
@@ -84,14 +107,20 @@
         word-break: break-all;
       }
     }
-  }&__result {
+  }
+
+  &__result {
     display: grid;
     grid-template-columns: auto 1fr;
     grid-column-gap: 10px;
-  }&__value {
+  }
+
+  &__value {
     p {
       padding: 0;
-      margin-bottom: 4px;&::before {
+      margin-bottom: 4px;
+
+      &::before {
         padding-right: 4px;
         display: inline-block;
         content: attr(data-counter);

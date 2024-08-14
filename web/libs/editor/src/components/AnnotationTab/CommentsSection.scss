@@ -1,5 +1,7 @@
 .comments-section {
-  border-top: 1px solid rgba(0, 0, 0, 0.1);&__header {
+  border-top: 1px solid var(--sand_300);
+
+  &__header {
     display: flex;
     height: 46px;
     justify-content: space-between;
@@ -8,7 +10,9 @@
     font-weight: 500;
     font-size: 16px;
     line-height: 22px;
-  }&__title {
+  }
+
+  &__title {
     flex: 1;
   }
 }

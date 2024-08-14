@@ -1,26 +1,40 @@
 .sidepanels {
   height: 100%;
   overflow: hidden;
-  position: relative;&_newLabelingUI {
+  position: relative;
+
+  &_newLabelingUI {
     .sidepanels {
-      --panel-border-color: rgba(137, 128, 152, 0.16);&__wrapper {
+      --panel-border-color: var(--sand_300);
+
+      &__wrapper {
         &_align_left {
-          border-right: 1px solid var(rgba(137, 128, 152, 0.16));
-        }&_align_right {
-          border-left: 1px solid var(rgba(137, 128, 152, 0.16));
+          border-right: 1px solid var(--panel-border-color);
+        }
+
+        &_align_right {
+          border-left: 1px solid var(--panel-border-color);
         }
       }
     }
-  }&__content {
+  }
+
+  &__content {
     height: 100%;
     position: relative;
     z-index: 1;
-    @include styled-scrollbars();& .main-content {
+    // @include styled-scrollbars();
+
+    & .main-content {
       overflow: auto;
       padding-bottom: calc(var(--bottombar-height) + 8px);
-    }&_resizing {
+    }
+
+    &_resizing {
       position: relative;
-      pointer-events: none;&::before {
+      pointer-events: none;
+
+      &::before {
         top: 0;
         left: 0;
         content: "";
@@ -30,17 +44,23 @@
         display: block;
         position: absolute;
       }
-    }~/_collapsed & {
-      flex: 1;
     }
-  }&__wrapper {
+
+    // ~/_collapsed & {
+    //   flex: 1;
+    // }
+  }
+
+  &__wrapper {
     --snap-rotation: 90deg;
     top: 0;
     z-index: 11;
     height: 100%;
     min-width: 10px;
     position: absolute;
-    pointer-events: none;&_snap::before {
+    pointer-events: none;
+
+    &_snap::before {
       top: 8px;
       left: 0;
       bottom: 8px;
@@ -50,29 +70,41 @@
       display: block;
       position: absolute;
       background: var(--grape_500);
-    }&_align_left&_snap::before {
-      border-radius: 0 4px 4px 0;
-    }&_align_right&_snap::before {
-      left: calc(100% - 6px);
-      border-radius: 4px 0 0 4px;
-    }&_align {
+    }
+
+    // &_align_left&_snap::before {
+    //   border-radius: 0 4px 4px 0;
+    // }
+
+    // &_align_right&_snap::before {
+    //   left: calc(100% - 6px);
+    //   border-radius: 4px 0 0 4px;
+    // }
+
+    &_align {
       &_left {
         left: 0;
         --snap-rotation: -90deg;
-      }&_right {
+      }
+
+      &_right {
         top: 0;
         right: 0;
         --snap-rotation: 90deg;
       }
-    }~/_collapsed & {
-      position: static;
-      width: 100%;
-      max-width: auto;
-      min-width: 100%;
-      flex-shrink: 0;
-      height: auto;
     }
-  }&_collapsed {
+
+    // ~/_collapsed & {
+    //   position: static;
+    //   width: 100%;
+    //   max-width: auto;
+    //   min-width: 100%;
+    //   flex-shrink: 0;
+    //   height: auto;
+    // }
+  }
+
+  &_collapsed {
     height: auto;
     overflow: visible;
     min-height: 100%;

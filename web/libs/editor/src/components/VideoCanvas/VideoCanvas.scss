@@ -5,13 +5,19 @@
 
   canvas {
     display: block;
-  }&__view canvas {
+  }
+
+  &__view canvas {
     width: 100%;
     height: 100%;
-  }&__toolbar {
+  }
+
+  &__toolbar {
     display: flex;
     justify-content: space-between;
-  }&__loading {
+  }
+
+  &__loading {
     top: 0;
     left: 0;
     width: 100%;
@@ -20,8 +26,10 @@
     position: absolute;
     align-items: center;
     justify-content: center;
-    background-color: rgba(#000, 0.05);
-  }&__buffering {
+    background-color: var(--sand_100);
+  }
+
+  &__buffering {
     left: 0;
     right: 0;
     bottom: 0;
@@ -30,97 +38,38 @@
     position: absolute;
     padding: 2px 7px;
     text-align: center;
-    background-color: #fff;
-    background-image: repeating-linear-gradient(90deg, #0084FF 0px, #80C2FF 120px, #0084FF 240px);
-
+    background-color: var(--sand_0);
+    background-image: repeating-linear-gradient(90deg, var(--grape_500) 0px, var(--grape_400) 120px, var(--grape_500) 240px);
     animation: buffering 1.2s linear infinite;
   }
-}.spinner-lsf {
+}
+
+.spinner-lsf {
   width: 40px;
   height: 40px;
   border-radius: 100%;
-  border: 2px solid rgb(235, 131, 12);
+  border: 2px solid var(--persimmon_400);
   border-right-color: transparent;
   border-bottom-color: transparent;
   animation: spin 1.2s linear infinite;
 }
 
-@-webkit-keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }100% {
-    transform: rotate(360deg);
-  }
-}
-
-@-moz-keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }100% {
-    transform: rotate(360deg);
-  }
-}
-
-@-ms-keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }100% {
-    transform: rotate(360deg);
-  }
-}
-
-@-o-keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }100% {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes spin {
   0% {
     transform: rotate(0deg);
-  }100% {
+  }
+
+  100% {
     transform: rotate(360deg);
-  }
-}
-
-@-webkit-keyframes buffering {
-  0% {
-    background-position: 0 0;
-  }100% {
-    background-position: 240px 0;
-  }
-}
-
-@-moz-keyframes buffering {
-  0% {
-    background-position: 0 0;
-  }100% {
-    background-position: 240px 0;
-  }
-}
-
-@-ms-keyframes buffering {
-  0% {
-    background-position: 0 0;
-  }100% {
-    background-position: 240px 0;
-  }
-}
-
-@-o-keyframes buffering {
-  0% {
-    background-position: 0 0;
-  }100% {
-    background-position: 240px 0;
   }
 }
 
 @keyframes buffering {
   0% {
     background-position: 0 0;
-  }100% {
+  }
+
+  100% {
     background-position: 240px 0;
   }
 }

@@ -2,16 +2,24 @@
   &__item {
     cursor: default;
     user-select: none;
-    padding: 0 8px;&_hidden {
+    padding: 0 8px;
+
+    &_hidden {
       opacity: 0.4;
-    }&:hover {
-      background-color: rgba(#000, 0.02);
     }
-  }&__content {
+
+    &:hover {
+      background-color: var(--sand_200);
+    }
+  }
+
+  &__content {
     display: flex;
     align-items: center;
     padding: 5px 0;
-  }&__direction {
+  }
+
+  &__direction {
     height: 100%;
     width: 100%;
     z-index: 1;
@@ -20,10 +28,14 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    color: rgba(#000, 0.4);&:hover {
-      color: rgba(#000, 0.8);
+    color: var(--sand_400);
+
+    &:hover {
+      color: var(--sand_900);
     }
-  }&__icon {
+  }
+
+  &__icon {
     width: 24px;
     min-height: 24px;
     display: flex;
@@ -31,13 +43,17 @@
     position: relative;
     align-items: center;
     justify-content: center;
-  }&__actions {
+  }
+
+  &__actions {
     flex: 1;
     display: grid;
     justify-content: flex-end;
     grid-auto-flow: column;
     grid-auto-columns: minmax(32px, min-content);
-  }&__action {
+  }
+
+  &__action {
     display: flex;
     height: 32px;
     width: 32px;
@@ -47,21 +63,31 @@
     svg {
       width: 18px;
       height: 18px;
-    }.button-lsf {
+    }
+
+    .button-lsf {
       width: 100%;
       height: 100%;
     }
   }
-}.region-meta {
+}
+
+.region-meta {
   margin: 8px 0;
-}.relation-meta {
+}
+
+.relation-meta {
   display: flex;
   padding-left: 64px;
   padding-bottom: 5px;
-  align-items: center;&__title {
+  align-items: center;
+
+  &__title {
     flex: none;
     padding-right: 8px;
-  }&__select {
+  }
+
+  &__select {
     flex: 1;
   }
 }
