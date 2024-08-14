@@ -45,7 +45,7 @@ class ModelInterface(models.Model):
         'organizations.Organization', on_delete=models.CASCADE, related_name='model_interfaces', null=True
     )
 
-    skill_name = models.CharField(max_length=255, choices=SkillNames.choices, default=SkillNames.TEXT_CLASSIFICATION)
+    skill_name = models.CharField(max_length=255, choices=SkillNames.choices, null=True)
 
     input_fields = models.JSONField(default=list, validators=[validate_string_list])
 
