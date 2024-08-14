@@ -68,7 +68,7 @@ export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, render
   );
 
   return (
-    <Block name="keypoints" style={styles} mod={{ selected, timeline }}>
+    <Block name="keypoints" style={styles} mod={{ selected, timeline }} data-id={region.id}>
       <Elem name="label" onClick={onSelectRegionHandler}>
         <Elem name="name">{label}</Elem>
         <Elem name="data">

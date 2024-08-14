@@ -39,6 +39,8 @@ export interface TimelineProps<D extends ViewTypes = "frames"> {
   onToggleVisibility?: (id: string, visibility: boolean) => void;
   onAddRegion?: (region: Record<string, any>) => any;
   onDeleteRegion?: (id: string) => void;
+  onStartDrawing?: (frame: number) => void;
+  onFinishDrawing?: () => void;
   onZoom?: (zoom: number) => void;
   onSelectRegion?: (event: MouseEvent<HTMLDivElement>, id: string, select?: boolean) => void;
   onAction?: (event: MouseEvent, action: string, data?: any) => void;
@@ -73,6 +75,8 @@ export interface TimelineViewProps {
   onAddRegion?: TimelineProps["onAddRegion"];
   onDeleteRegion?: TimelineProps["onDeleteRegion"];
   onSelectRegion?: TimelineProps["onSelectRegion"];
+  onStartDrawing?: TimelineProps["onStartDrawing"];
+  onFinishDrawing?: TimelineProps["onFinishDrawing"];
   onVolumeChange?: TimelineProps["onVolumeChange"];
   onSpeedChange?: TimelineProps["onSpeedChange"];
 }

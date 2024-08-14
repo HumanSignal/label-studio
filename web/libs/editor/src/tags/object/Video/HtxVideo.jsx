@@ -562,7 +562,8 @@ const HtxVideoView = ({ item, store }) => {
             onPause={handlePause}
             onFullscreenToggle={handleFullscreenToggle}
             onSelectRegion={handleSelectRegion}
-            onAddRegion={item.addRegion}
+            onStartDrawing={item.startDrawing}
+            onFinishDrawing={item.finishDrawing}
             onAction={handleAction}
           />
         )}

@@ -196,8 +196,10 @@ export const Frames: FC<TimelineViewProps> = ({
       const dimensions = scrollable.current!.getBoundingClientRect();
       const offsetLeft = dimensions.left;
       const rightLimit = dimensions.width - timelineStartOffset;
-      // @todo add a logic to handle region creation
-      const isDrawing = true;
+      // every region has `data-id` attribute, so looking for them
+      const target = (e.target as Element).closest('[data-id]') as HTMLElement | null;
+      // don't draw on region lines, only on the empty space or special new line
+      const isDrawing = target && (!target.className.includes('keypoints') || target.dataset?.id === "new");
       let region: any;
 
       const getMouseToFrame = (e: MouseEvent | globalThis.MouseEvent) => {
@@ -212,7 +214,7 @@ export const Frames: FC<TimelineViewProps> = ({
       setIndicatorOffset(offset);
 
       if (isDrawing) {
-        region = props.onAddRegion?.({ frame: baseFrame, enabled: false });
+        region = props.onStartDrawing?.(baseFrame);
       }
 
       const onMouseMove = (e: globalThis.MouseEvent) => {
@@ -234,6 +236,7 @@ export const Frames: FC<TimelineViewProps> = ({
       const onMouseUp = () => {
         setHoverEnabled(true);
         setRegionSelectionDisabled(false);
+        props.onFinishDrawing?.();
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
       };

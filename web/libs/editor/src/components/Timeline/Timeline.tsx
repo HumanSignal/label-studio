@@ -62,6 +62,8 @@ const TimelineComponent: FC<TimelineProps> = ({
     onAddRegion: props.onAddRegion,
     onDeleteRegion: props.onDeleteRegion,
     onSelectRegion: props.onSelectRegion,
+    onStartDrawing: props.onStartDrawing,
+    onFinishDrawing: props.onFinishDrawing,
     onAction: props.onAction,
     onFullscreenToggle: props.onFullscreenToggle,
     onSpeedChange: props.onSpeedChange,
@@ -199,6 +201,8 @@ const TimelineComponent: FC<TimelineProps> = ({
         onAddRegion={(reg) => handlers.onAddRegion?.(reg)}
         onDeleteRegion={(id) => handlers.onDeleteRegion?.(id)}
         onSelectRegion={(e, id, select) => handlers.onSelectRegion?.(e, id, select)}
+        onStartDrawing={(frame) => handlers.onStartDrawing?.(frame)}
+        onFinishDrawing={() => handlers.onFinishDrawing?.()}
         onSpeedChange={(speed) => handlers.onSpeedChange?.(speed)}
         onZoom={props.onZoom}
       />

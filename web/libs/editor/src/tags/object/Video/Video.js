@@ -65,6 +65,7 @@ const Model = types
     ref: React.createRef(),
     frame: 1,
     length: 1,
+    drawingRegion: null,
   }))
   .views((self) => ({
     get store() {
@@ -236,6 +237,14 @@ const Model = types
 
       findRegion(id) {
         return self.regs.find((reg) => reg.cleanId === id);
+      },
+
+      startDrawing(frame) {
+        return self.drawingRegion = self.addRegion({ frame, enabled: false });
+      },
+
+      finishDrawing() {
+        self.drawingRegion = null;
       },
     };
   });
