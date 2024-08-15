@@ -16,7 +16,7 @@
 
     &:hover,
     &-selected {
-      background-color: var(--selection-color, rgba(#000, 0.04));
+      background-color: var(--selection-color, var(--sand_100));
     }
 
     &:hover .outliner-item__controls {
@@ -24,7 +24,6 @@
     }
 
     &:hover .outliner-item__controls_newUI {
-
       .outliner-item__control_type_lock button,
       .outliner-item__control_type_visibility button {
         display: inline-flex !important;
@@ -107,7 +106,7 @@
     }
 
     &_isDrawing {
-      border-color: var(--incomplete-warning-color, #FA8C16);
+      border-color: var(--incomplete-warning-color, var(--canteloupe_400));
     }
   }
 }
@@ -132,26 +131,26 @@
     height: 18px;
     display: flex;
     font-size: 9px;
-    color: #fff;
+    color: var(--sand_0);
     margin-right: 4px;
     text-align: center;
     align-items: center;
     border-radius: 4px;
     justify-content: center;
-    background-color: var(--text-color, #000);
+    background-color: var(--text-color, var(--sand_900));
   }
 
   &__title {
     align-items: center;
     display: inline-flex;
     flex: 1;
-    color: var(--text-color, #000);
+    color: var(--text-color, var(--sand_900));
     min-width: 0;
   }
 
   &__text {
     margin-left: 5px;
-    color: #000;
+    color: var(--sand_900);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -230,10 +229,6 @@
   position: relative;
   padding: 0 0 8px 0;
 
-  // ~/_hidden & {
-  //   background: #fff;
-  // }
-
   &_empty {
     display: none;
   }
@@ -251,5 +246,11 @@
     right: 8px;
     opacity: 0.25;
     padding: 0;
+  }
+
+  &_hidden {
+    & .ocr{
+      background: var(--sand_0);
+    }
   }
 }

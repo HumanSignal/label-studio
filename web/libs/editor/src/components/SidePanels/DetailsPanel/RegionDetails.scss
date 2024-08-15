@@ -16,8 +16,8 @@
   }
 
   &__title {
-    &+span {
-      color: #000;
+    & + span {
+      color: var(--sand_900);
 
       &:before {
         opacity: 0.6;
@@ -44,21 +44,23 @@
     min-height: 64px;
     border-radius: 4px;
     outline: none;
-    background-color: rgba(#000, 0.05);
+    background-color: var(--sand_100);
     transition-property: background-color, border-color;
     transition-duration: 80ms;
     transition-timing-function: ease;
 
-    // textarea&:hover {
-    //   border-color: #E5E5E5;
-    //   background-color: #fff;
-    // }
+    &:hover {
+      textarea {
+        border-color: var(--sand_300);
+        background-color: var(--sand_0);
+      }
+    }
 
-    // textarea&:focus {
-    //   background-color: #fff;
-    //   border-color: var(--grape_500);
-    //   box-shadow: 0 0 0 1px var(--grape_500);
-    // }
+    &:focus {
+      background-color: var(--sand_0);
+      border-color: var(--grape_500);
+      box-shadow: 0 0 0 1px var(--grape_500);
+    }
 
     &:not(textarea) {
       white-space: pre-wrap;
@@ -77,8 +79,8 @@
     align-items: center;
     padding: 8px;
     gap: 8px;
-    background: rgba(255, 183, 122, 0.16);
-    border: 1px solid rgba(137, 128, 152, 0.16);
+    background: var(--canteloupe_0);
+    border: 1px solid var(--canteloupe_400);
     border-radius: 4px;
     margin: 0 16px 8px;
     flex: none;
@@ -88,7 +90,7 @@
     svg {
       width: 20px;
       height: 17px;
-      fill: var(--incomplete-warning-color, #FA8C16);
+      fill: var(--incomplete-warning-color, var(--canteloupe_500));
     }
   }
 }
@@ -101,7 +103,7 @@
       &_text {
         padding: 3px 6px;
         border-radius: 4px;
-        background-color: rgba(#000, 0.06);
+        background-color: var(--sand_100);
         white-space: pre-wrap;
         line-break: loose;
         word-break: break-all;

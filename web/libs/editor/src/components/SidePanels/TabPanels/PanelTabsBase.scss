@@ -1,3 +1,5 @@
+@import "../../../assets/styles/global.scss";
+
 .tabs-panel {
   --header-height: 24px;
   --header-border-radius: 0;
@@ -6,7 +8,7 @@
 
   height: 100%;
   z-index: 10;
-  background-color: #fff;
+  background-color: var(--sand_0);
   pointer-events: all;
 
   &__header {
@@ -29,27 +31,28 @@
   }
 
   &_alignment {
+    padding: 4px;
+
     &_left {
-      border-right: 1px solid rgba(#000, 0.1);
+      border-right: 1px solid var(--sand_300);
       --header-border-radius: 0 4px 4px 0;
     }
-
-    padding: 4px;
-
+    
     &_right {
-      border-left: 1px solid rgba(#000, 0.1);
+      border-left: 1px solid var(--sand_300);
       --header-border-radius: 4px 0 0 4px;
     }
-
-    padding: 4px;
   }
 
   &_detached {
     top: 0;
     left: 0;
     position: absolute;
-    border: 1px solid rgba(137, 128, 152, 0.16);
+    border: 1px solid var(--sand_300);
     box-shadow: 0px 6px 10px 4px rgba(38, 38, 38, 0.15), 0px 2px 3px rgba(38, 38, 38, 0.3);
+    & .tabs-panel_hidden {
+      margin: 0;
+    }
   }
 
   &_hidden {
@@ -58,15 +61,11 @@
     border: none;
     background: none;
     height: calc(100% - 16px);
-    --icon-color: #898098;
-
-    // ~/_detached & {
-    //   margin: 0;
-    // }
+    --icon-color: var(--sand_400);
 
     &:hover {
       --icon-color: var(--grape_500);
-      --header-background: #d8e5f5;
+      --header-background: var(--grape_0);
     }
   }
 
@@ -80,7 +79,7 @@
 
   &__header {
     top: 0;
-    height: var(24px);
+    height: var(--header-height);
     z-index: 2;
     display: flex;
     align-items: center;
@@ -88,13 +87,12 @@
     font-size: 13px;
     font-weight: 700;
     line-height: 16px;
-    color: rgba(#000, 0.5);
+    color: var(--sand_500);
     user-select: none;
     position: sticky;
     align-items: center;
     justify-content: space-between;
-    background-color: var(#d8e5f5);
-    color: var(var(--grape_500));
+    background-color: var(--header-background);
     padding: 4px;
     padding-left: 11px;
 
@@ -104,7 +102,7 @@
       justify-content: center;
       padding: 0;
       cursor: pointer;
-      --icon-color: #898098;
+      --icon-color: var(--sand_400);
 
       svg {
         transform: rotate(180deg);
@@ -119,7 +117,7 @@
     position: relative;
     align-items: center;
     justify-content: center;
-    color: var(#898098);
+    color: var(--icon-color);
     padding-left: 4px;
     
     svg {
@@ -131,7 +129,7 @@
       cursor: pointer;
 
       &::before {
-        color: #fff;
+        color: var(--sand_0);
         font-size: 16px;
         font-weight: 500;
         padding: 4px 16px;
@@ -139,14 +137,14 @@
         z-index: 100;
         white-space: nowrap;
         border-radius: 4px;
-        background-color: #262626;
+        background-color: var(--sand_900);
         content: attr(data-tooltip);
         left: 50%;
         transform: translate(-50%, -110%);
       }
     }
 
-    &:not(&_detached) {
+    &:not(.tabs-panel__toggle_detached) {
       &::before {
         left: 50%;
         top: calc(100% + 4px);
@@ -154,28 +152,28 @@
       }
     }
 
-    &:not(&_detached):not(&_alignment_right) {
+    &:not(.tabs-panel__toggle_detached):not(.tabs-panel__toggle_alignment_right) {
       &::before {
         left: 0;
         transform: translate(22%, -110%);
       }
     }
 
-    &:not(&_detached):not(&_alignment_left) {
+    &:not(.tabs-panel__toggle_detached):not(.tabs-panel__toggle_alignment_left) {
       &::before {
         left: 0;
         transform: translate(-105%, -28px);
       }
     }
 
-    &:not(&_detached):not(&_collapsed):not(&_alignment_right) {
+    &:not(.tabs-panel__toggle_detached):not(.tabs-panel__toggle_collapsed):not(.tabs-panel__toggle_alignment_right) {
       &::before {
         left: -58%;
         transform: translate(35%, -100%);
       }
     }
 
-    &:not(&_detached):not(&_collapsed):not(&_alignment_left) {
+    &:not(.tabs-panel__toggle_detached):not(.tabs-panel__toggle_collapsed):not(.tabs-panel__toggle_alignment_left) {
       &::before {
         left: 58%;
         transform: translate(-79%, 0);
@@ -187,7 +185,7 @@
     }
   }
 
-  &_hidden:not(&_detached) &__toggle {
+  &_hidden:not(.tabs-panel_detached) &__toggle {
     background-color: transparent;
   }
 
@@ -195,17 +193,17 @@
     width: 100%;
     height: 100%;
 
-    // ~/_resizing { 
-    //   pointer-events: none;
-    // }
+    & .tabs-panel_resizing { 
+      pointer-events: none;
+    }
   }
 
   &__body {
     z-index: 1;
     overflow: hidden;
-    height: calc(100% - var(24px));
+    height: calc(100% - var(--header-height));
     position: relative;
-    // @include styled-scrollbars();
+    @include styled-scrollbars();
     pointer-events: all;
   }
 
@@ -220,9 +218,9 @@
 
     &[data-resize=top],
     &[data-resize=bottom] {
-      left: calc(var(12px) / 2);
-      height: var(12px);
-      width: calc(100% - var(12px));
+      left: calc(var(--size) / 2);
+      height: var(--size);
+      width: calc(100% - var(--size));
       cursor: ns-resize;
     }
 
@@ -238,9 +236,9 @@
 
     &[data-resize=left],
     &[data-resize=right] {
-      top: calc(var(12px) / 2);
-      width: var(12px);
-      height: calc(100% - var(12px));
+      top: calc(var(--size) / 2);
+      width: var(--size);
+      height: calc(100% - var(--size));
       cursor: ew-resize;
     }
 
@@ -258,8 +256,8 @@
     &[data-resize=top-right],
     &[data-resize=bottom-left],
     &[data-resize=bottom-right] {
-      width: var(12px);
-      height: var(12px);
+      width: var(--size);
+      height: var(--size);
     }
 
     &[data-resize=top-left],
@@ -324,18 +322,18 @@
       top: 50%;
       height: var(2px);
       transform: translate(0, -50%);
-      width: calc(100% + var(12px));
-      left: calc(var(12px) / 2 * -1);
+      width: calc(100% + var(--size));
+      left: calc(var(--size) / 2 * -1);
     }
 
     &[data-resize=left]::before,
     &[data-resize=right]::before {
       top: 0;
       left: 50%;
-      width: var(2px);
+      width: var(--visual-size);
       transform: translate(-50%, 0);
-      height: calc(100% + var(12px));
-      top: calc(var(12px) / 2 * -1);
+      height: calc(100% + var(--size));
+      top: calc(var(--size) / 2 * -1);
     }
 
     &:hover::before,

@@ -1,3 +1,5 @@
+@import "../../../assets/styles/global.scss";
+
 .tabs-lsf {
   --tab-row-height: 33px;
   --tab-height: 32px;
@@ -9,11 +11,11 @@
 
   &__tabs-row {
     display: flex;
-    background: #f6f5f7;
-    border-bottom: 1px solid rgba(137, 128, 152, 0.16);
+    background: var(--sand_100);
+    border-bottom: 1px solid var(--sand_300);
 
     .ff_outliner_optim & {
-      height: var(33px);
+      height: var(--tab-row-height);
     }
   }
 
@@ -28,16 +30,16 @@
 
   &__contents {
     position: relative;
-    background: #fff;
+    background: var(--sand_0);
     height: 100%;
     position: relative;
     z-index: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    // @include styled-scrollbars();
+    @include styled-scrollbars();
 
     .ff_outliner_optim & {
-      height: calc(100% - var(33px));
+      height: calc(100% - var(--tab-row-height));
     }
 
     & .main-content {
@@ -59,10 +61,12 @@
       display: block;
       position: absolute;
     }
+  }
 
-    // ~/_collapsed & {
-    //   flex: 1;
-    // }
+  &_collapsed {
+    & .tabs-lsf__contents {
+      flex: 1;
+    }
   }
 
   &__drop-space-after {
@@ -74,7 +78,7 @@
         &::before {
           content: '';
           position: absolute;
-          background: #85cbfd;
+          background: var(--grape_400);
           width: 4px;
           height: 100%;
         }
@@ -93,13 +97,13 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 4px 24px 6px 24px;
-    height: var(32px);
+    height: var(--tab-height);
     width: 100%;
     font-weight: 500;
     font-size: 14px;
     line-height: 24px;
     letter-spacing: 0.15px;
-    border-color: rgba(65, 60, 74, 0.16);
+    border-color: var(--sand_300);
     margin: 0 2px;
     display: block;
     cursor: grab;
@@ -111,7 +115,7 @@
       border-width: 1px 1px 0px 1px;
       transform: translate(-1px, -1px);
       border-style: solid;
-      background: #fff;
+      background: var(--sand_0);
     }
 
     &:hover svg {
@@ -129,7 +133,7 @@
   }
 
   &__contents {
-    background: #fff;
+    background: var(--sand_0);
   }
 
   &__icon {
@@ -147,7 +151,7 @@
     content: '';
     position: absolute;
     left: 0;
-    background: #85cbfd;
+    background: var(--grape_400);
     width: 4px;
     height: 30px;
     transform: translateY(-4px);
@@ -159,7 +163,7 @@
     content: '';
     position: absolute;
     right: 0;
-    background: #85cbfd;
+    background: var(--grape_400);
     width: 4px;
     height: 30px;
     transform: translateY(-4px);
@@ -171,7 +175,7 @@
     content: '';
     transform: translate(-4px, 2px);
     position: absolute;
-    background: #85cbfd;
+    background: var(--grape_400);
     width: 4px;
     height: 30px;
   }
