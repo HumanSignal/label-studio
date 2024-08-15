@@ -1,6 +1,12 @@
 {
+<<<<<<< HEAD
   "message": "fix: OPTIC-945: Improve the bundling strategy and ship a single entrypoint with a common vendor chunk across all libs (#6152)",
   "commit": "8105d62fabce9cb9a4d20e2b3f9bce2825786f45",
   "date": "2024-08-13T13:39:02.000Z",
+=======
+  "message": "fix: OPTIC-966: converting stylus files to scss (#6187)",
+  "commit": "e535785c6a63529cd972e3e4438df6699ad61052",
+  "date": "2024-08-15T11:41:17.000Z",
+>>>>>>> develop
   "branch": "develop"
 }

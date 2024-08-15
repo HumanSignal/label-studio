@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { cn } from "../../utils/bem";
-import "./RadioGroup.styl";
+import "./RadioGroup.scss";
 
 const RadioContext = React.createContext();
 

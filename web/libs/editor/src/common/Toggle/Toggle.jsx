@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import { Block, cn, Elem } from "../../utils/bem";
 import { Label } from "../Label/Label";
-import "./Toggle.styl";
+import "./Toggle.scss";
 
 const Toggle = forwardRef(
   (

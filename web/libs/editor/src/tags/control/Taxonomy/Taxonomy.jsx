@@ -32,7 +32,7 @@ import {
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 
-import styles from "./Taxonomy.styl";
+import styles from "./Taxonomy.scss";
 import messages from "../../../utils/messages";
 import { errorBuilder } from "../../../core/DataValidator/ConfigValidator";
 

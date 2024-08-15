@@ -1432,6 +1432,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_all_dia_1312-i_create_an_ner_prompt_short": {
+      "key": "fflag_feat_all_dia_1312-i_create_an_ner_prompt_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "49bf111a4b1b4af38cacd350b423ba3c",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_all_dia_13_structured_data_support_short": {
       "key": "fflag_feat_all_dia_13_structured_data_support_short",
       "on": false,

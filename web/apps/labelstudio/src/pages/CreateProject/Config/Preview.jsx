@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Spinner } from "../../../components";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_3617, isFF } from "../../../utils/feature-flags";
-import "./Config.styl";
+import "./Config.scss";
 import { EMPTY_CONFIG } from "./Template";
 import { API_CONFIG } from "../../../config/ApiConfig";
 import { useAPI } from "../../../providers/ApiProvider";

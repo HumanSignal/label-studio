@@ -2,7 +2,7 @@ import React, { type ChangeEvent, type FC, forwardRef, type KeyboardEvent, useCa
 import { Hotkey } from "../../core/Hotkey";
 import { useHotkey } from "../../hooks/useHotkey";
 import { Block, Elem } from "../../utils/bem";
-import "./Pagination.styl";
+import "./Pagination.scss";
 
 interface PaginationProps {
   currentPage: number;
