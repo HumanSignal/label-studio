@@ -196,10 +196,14 @@ export const Frames: FC<TimelineViewProps> = ({
       const dimensions = scrollable.current!.getBoundingClientRect();
       const offsetLeft = dimensions.left;
       const rightLimit = dimensions.width - timelineStartOffset;
+      const target = (e.target as Element);
       // every region has `data-id` attribute, so looking for them
-      const target = (e.target as Element).closest('[data-id]') as HTMLElement | null;
+      const regionRow = target.closest('[data-id]') as HTMLElement | null;
       // don't draw on region lines, only on the empty space or special new line
-      const isDrawing = target && (!target.className.includes('keypoints') || target.dataset?.id === "new");
+      const isDrawing = !regionRow
+        || !target.className.includes('keypoints')
+        // and don't draw if user clicks on row label
+        || (regionRow.dataset?.id === "new" && !target.closest('[class*=__label]'));
       let region: any;
 
       const getMouseToFrame = (e: MouseEvent | globalThis.MouseEvent) => {
