@@ -852,7 +852,7 @@ class AnnotationDraft(models.Model):
 
 
 class Prediction(models.Model):
-    """ML backend predictions"""
+    """ML backend / Prompts predictions"""
 
     result = JSONField('result', null=True, default=dict, help_text='Prediction result')
     score = models.FloatField(_('score'), default=None, help_text='Prediction score', null=True)
@@ -999,6 +999,53 @@ class Prediction(models.Model):
 
     class Meta:
         db_table = 'prediction'
+
+
+class FailedPrediction(models.Model):
+    """
+    Class for storing failed prediction(s) for a task
+    """
+
+    message = models.TextField(
+        _('message'),
+        default=None,
+        blank=True,
+        null=True,
+        help_text='The message explaining why generating this prediction failed',
+    )
+    error_type = models.CharField(
+        _('error_type'),
+        max_length=512,
+        default=None,
+        null=True,
+        help_text='The type of error that caused prediction to fail',
+    )
+    ml_backend_model = models.ForeignKey(
+        'ml.MLBackend',
+        on_delete=models.SET_NULL,
+        related_name='failed_predictions',
+        null=True,
+        help_text='An ML Backend instance that created the failed prediction.',
+    )
+    model_version = models.TextField(
+        _('model version'),
+        default=None,
+        blank=True,
+        null=True,
+        help_text='A string value that for model version that produced the failed prediction. Used in both live models and when uploading offline predictions.',
+    )
+    model_run = models.ForeignKey(
+        'ml_models.ModelRun',
+        on_delete=models.CASCADE,
+        related_name='failed_predictions',
+        null=True,
+        help_text='A run of a ModelVersion that created the failed prediction.',
+    )
+    project = models.ForeignKey(
+        'projects.Project', on_delete=models.CASCADE, related_name='failed_predictions', null=True
+    )
+    task = models.ForeignKey('tasks.Task', on_delete=models.CASCADE, related_name='failed_predictions')
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
 
 
 @receiver(post_delete, sender=Task)
