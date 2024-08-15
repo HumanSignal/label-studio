@@ -8,7 +8,7 @@ import "./Keypoints.styl";
 import { type Lifespan, visualizeLifespans } from "./Utils";
 
 export interface KeypointsProps {
-  idx: number;
+  idx?: number;
   region: TimelineRegion;
   startOffset: number;
   renderable: boolean;

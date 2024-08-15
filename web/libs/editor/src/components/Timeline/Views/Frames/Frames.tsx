@@ -3,7 +3,7 @@ import { type FC, type MouseEvent, useCallback, useEffect, useMemo, useRef, useS
 import { useMemoizedHandlers } from "../../../../hooks/useMemoizedHandlers";
 import { Block, Elem } from "../../../../utils/bem";
 import { isDefined } from "../../../../utils/utilities";
-import type { TimelineViewProps } from "../../Types";
+import type { TimelineRegion, TimelineViewProps } from "../../Types";
 import "./Frames.styl";
 import { Keypoints } from "./Keypoints";
 
@@ -71,7 +71,7 @@ export const Frames: FC<TimelineViewProps> = ({
   }, [step]);
 
   const setScroll = useCallback(
-    ({ left, top }) => {
+    ({ left, top }: { left?: number, top?: number }) => {
       if (!length) return;
 
       setHoverOffset(null);
@@ -400,7 +400,7 @@ export const Frames: FC<TimelineViewProps> = ({
 };
 
 interface KeypointsVirtualProps {
-  regions: any[];
+  regions: TimelineRegion[];
   startOffset: number;
   scrollTop: number;
   disabled?: boolean;
@@ -423,7 +423,7 @@ const KeypointsVirtual: FC<KeypointsVirtualProps> = ({ regions, startOffset, scr
         return region.sequence.length > 0 || region.timeline ? (
           <Keypoints
             key={region.id}
-            idx={i + 1}
+            idx={region.index}
             region={region}
             startOffset={startOffset}
             onSelectRegion={disabled ? undefined : onSelectRegion}
