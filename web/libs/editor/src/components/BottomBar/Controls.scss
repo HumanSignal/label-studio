@@ -10,7 +10,7 @@
     padding-right: 8px;
     align-items: center;
 
-    .button-lsf {
+    & .button-lsf {
       width: 160px;
       height: 40px;
       font-size: 16px;
@@ -80,7 +80,6 @@
 
     &__skipped-info {
       display: flex;
-
       align-items: center;
       justify-content: center;
       font-weight: 500;

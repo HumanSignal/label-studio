@@ -78,7 +78,7 @@
   }
 
   &__actions {
-    .button_size_small {
+    & .button_size_small {
       flex-shrink: 0;
       padding: 0 !important;
       width: 32px !important;
@@ -89,7 +89,7 @@
       }
     }
 
-    .button__icon {
+    & .button__icon {
       padding: 0 !important;
       width: 20px !important;
       height: 20px !important;

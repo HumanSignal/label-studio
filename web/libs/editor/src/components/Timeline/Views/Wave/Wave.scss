@@ -75,11 +75,11 @@
   }
 
   &_with-playhead{
-    .wave__body{
+    & .wave__body{
       overflow: revert;
     }
 
-    .wave__cursor{
+    & .wave__cursor{
       pointer-events: auto;
       border-radius: 0;
       top: -4px;
@@ -96,7 +96,7 @@
   }
 
   &__wrapper_layout_stack{
-    .wave__body{
+    & .wave__body{
       width: 100%;
     }
   }
@@ -186,7 +186,7 @@
   }
 
   &__wrapper_edge_relaxed{
-    .wave__timeline{
+    & .wave__timeline{
       background-color: var(--sand_0);
     }
   }

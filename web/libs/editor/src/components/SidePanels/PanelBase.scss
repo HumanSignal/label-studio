@@ -66,7 +66,7 @@
       cursor: pointer;
       line-height: normal;
       justify-content: center;
-      border-radius: var(0);
+      border-radius: var(--header-border-radius);
     }
   }
 
@@ -160,7 +160,7 @@
     position: relative;
     align-items: center;
     justify-content: center;
-    color: var(var(--grape_500));
+    color: var(--grape_500);
 
     svg {
       display: block;
@@ -264,9 +264,9 @@
 
     &[data-resize=top],
     &[data-resize=bottom] {
-      left: calc(var(12px) / 2);
-      height: var(12px);
-      width: calc(100% - var(12px));
+      left: calc(var(--size) / 2);
+      height: var(--size);
+      width: calc(100% - var(--size));
       cursor: ns-resize;
     }
 
@@ -282,9 +282,9 @@
 
     &[data-resize=left],
     &[data-resize=right] {
-      top: calc(var(12px) / 2);
-      width: var(12px);
-      height: calc(100% - var(12px));
+      top: calc(var(--size) / 2);
+      width: var(--size);
+      height: calc(100% - var(--size));
       cursor: ew-resize;
     }
 
@@ -302,8 +302,8 @@
     &[data-resize=top-right],
     &[data-resize=bottom-left],
     &[data-resize=bottom-right] {
-      width: var(12px);
-      height: var(12px);
+      width: var(--size);
+      height: var(--size);
     }
 
     &[data-resize=top-left],
@@ -364,20 +364,20 @@
     &[data-resize=bottom]::before {
       left: 0;
       top: 50%;
-      height: var(2px);
+      height: var(--visual-size);
       transform: translate(0, -50%);
-      width: calc(100% + var(12px));
-      left: calc(var(12px) / 2 * -1);
+      width: calc(100% + var(--size));
+      left: calc(var(--size) / 2 * -1);
     }
 
     &[data-resize=left]::before,
     &[data-resize=right]::before {
       top: 0;
       left: 50%;
-      width: var(2px);
+      width: var(--visual-size);
       transform: translate(-50%, 0);
-      height: calc(100% + var(12px));
-      top: calc(var(12px) / 2 * -1);
+      height: calc(100% + var(--size));
+      top: calc(var(--size) / 2 * -1);
     }
 
     &:hover::before,

@@ -21,11 +21,11 @@
   }
 
   &_hidden {
-    .region-item__counter, .region-item__title, .region-item__score, .region-item__id, {
+    & .region-item__counter, .region-item__title, .region-item__score, .region-item__id, {
       opacity: 0.4;
     }
     
-    .region-item__desc {
+    & .region-item__desc {
       background: var(--sand_0);
     }
   }
