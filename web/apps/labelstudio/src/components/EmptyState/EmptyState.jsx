@@ -1,5 +1,5 @@
 import { Block, Elem } from "../../utils/bem";
-import "./EmptyState.styl";
+import "./EmptyState.scss";
 
 export const EmptyState = ({ icon, title, description, action, footer }) => {
   return (

@@ -42,6 +42,7 @@ class RichTextHelper {
       eventConstructor: "MouseEvent",
       buttons: 1,
     };
+    console.log("el", el);
     cy.wrap(el)
       .trigger("mousedown", x, y, eventOptions)
       .trigger("mousemove", x2, y2, eventOptions)

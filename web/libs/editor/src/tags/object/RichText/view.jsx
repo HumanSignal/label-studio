@@ -5,7 +5,7 @@ import * as xpath from "xpath-range";
 import { inject, observer } from "mobx-react";
 import Utils from "../../../utils";
 import { fixCodePointsInRange } from "../../../utils/selection-tools";
-import "./RichText.styl";
+import "./RichText.scss";
 import { isAlive } from "mobx-state-tree";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Block, cn, Elem } from "../../../utils/bem";
