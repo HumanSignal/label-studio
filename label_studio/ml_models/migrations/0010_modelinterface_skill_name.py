@@ -22,13 +22,12 @@ class Migration(migrations.Migration):
                 null=True,
             ),
         ),
-        # set existing ModelInterface objects to text classification
         migrations.RunSQL(
+            # set existing ModelInterface objects to text classification
             sql=[
-                "ALTER TABLE ml_models_modelinterface ALTER COLUMN skill_name SET DEFAULT 'TextClassification';",
+                "UPDATE ml_models_modelinterface SET skill_name = 'TextClassification' WHERE skill_name IS NULL;",
             ],
-            reverse_sql=[
-                "ALTER TABLE ml_models_modelinterface ALTER COLUMN skill_name DROP DEFAULT;",
-            ]
+            # statement above is not reversible, but doesn't matter because the column will be dropped, so do nothing
+            reverse_sql=[]
         ),
     ]
