@@ -17,6 +17,7 @@ from io_storages.base_models import (
     ProjectStorageMixin,
 )
 from io_storages.gcs.utils import GCS
+from io_storages.utils import storage_can_resolve_bucket_url
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
@@ -92,6 +93,9 @@ class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
             google_project_id=self.google_project_id,
             presign_ttl=self.presign_ttl,
         )
+
+    def can_resolve_url(self, url: str) -> bool:
+        return storage_can_resolve_bucket_url(self, url)
 
     def scan_and_create_links(self):
         return self._scan_and_create_links(GCSImportStorageLink)

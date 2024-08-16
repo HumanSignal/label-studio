@@ -22,6 +22,7 @@ from io_storages.base_models import (
     ImportStorageLink,
     ProjectStorageMixin,
 )
+from io_storages.utils import storage_can_resolve_bucket_url
 from tasks.models import Annotation
 
 from label_studio.io_storages.azure_blob.utils import AZURE
@@ -155,6 +156,9 @@ class AzureBlobImportStorageBase(AzureBlobStorageMixin, ImportStorage):
         return (
             'https://' + self.get_account_name() + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
         )
+
+    def can_resolve_url(self, url: str) -> bool:
+        return storage_can_resolve_bucket_url(self, url)
 
     def get_blob_metadata(self, key):
         return AZURE.get_blob_metadata(
