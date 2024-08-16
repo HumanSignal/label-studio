@@ -2,7 +2,7 @@ const { I } = inject();
 
 module.exports = {
   _labelSelector: ".lsf-label",
-  _selectedSelector: ".lsf-label.lsf-label-lsf_selected",
+  _selectedSelector: ".lsf-label.lsf-label_selected",
   locateLabel(text) {
     return locate(this._labelSelector).withText(text);
   },

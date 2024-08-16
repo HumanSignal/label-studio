@@ -120,8 +120,8 @@ Scenario("Image list with page navigation", async ({ I, AtImageView, LabelStudio
     annotations: [{ id: 1, result: [] }],
   };
 
-  const prevPageButton = locate(".lsf-pagination-lsf__btn.lsf-pagination-lsf__btn_arrow-left");
-  const nextPageButton = locate(".lsf-pagination-lsf__btn.lsf-pagination-lsf__btn_arrow-right");
+  const prevPageButton = locate(".lsf-pagination__btn.lsf-pagination__btn_arrow-left");
+  const nextPageButton = locate(".lsf-pagination__btn.lsf-pagination__btn_arrow-right");
 
   I.amOnPage("/");
   await LabelStudio.init(params);

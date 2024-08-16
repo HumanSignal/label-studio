@@ -69,14 +69,14 @@
     align-items: center;
   }
 
-  &_placement_right:not(.label-lsf_withDescription) &__field,
-  &_placement_left:not(.label-lsf_withDescription) &__field {
+  &_placement_right:not(.label_withDescription) &__field,
+  &_placement_left:not(.label_withDescription) &__field {
     display: flex;
     align-items: center;
   }
 
-  &_placement_right.label-lsf_withDescription &__field,
-  &_placement_left.label-lsf_withDescription &__field {
+  &_placement_right.label_withDescription &__field,
+  &_placement_left.label_withDescription &__field {
     margin-top: 5px;
   }
 }

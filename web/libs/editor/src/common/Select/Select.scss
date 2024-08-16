@@ -32,18 +32,18 @@
   }
 
   &__dropdown {
-    &:not(.dropdown-lsf__trigger) {
+    &:not(.dropdown__trigger) {
       max-height: 280px;
       overflow: auto;
 
-      .select-lsf__option {
+      .select__option {
         padding-inline: 12px;
       }
     }
   }
 
   &__dropdown_variant_rounded {
-    &:not(.dropdown-lsf__trigger) {
+    &:not(.dropdown__trigger) {
       border-radius: 4px;
       padding-bottom: 8px;
       margin-top: 4px;
@@ -84,7 +84,7 @@
     }
 
     &_selected:hover,
-    &_selected.select-lsf_focused {
+    &_selected.select_focused {
       background-color: var(--grape_0);
     }
   }

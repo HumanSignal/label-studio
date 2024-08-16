@@ -22,7 +22,7 @@ export const Sidebar = {
       if (isFFDEV1170) {
         return this.outliner
           .should("be.visible")
-          .get(".lsf-tree-lsf__node:not(.lsf-tree-lsf__node_type_footer) .lsf-tree-node-content-wrapper");
+          .get(".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper");
       }
 
       return this.legacySidebar.should("be.visible").get(".lsf-region-item");
@@ -35,7 +35,7 @@ export const Sidebar = {
     return this.findRegion(`:eq(${idx})`);
   },
   get hiddenRegions() {
-    return this.outliner.should("be.visible").get(".lsf-tree-lsf__node_hidden .lsf-tree-node-content-wrapper");
+    return this.outliner.should("be.visible").get(".lsf-tree__node_hidden .lsf-tree-node-content-wrapper");
   },
   hasRegions(value: number) {
     this.regions.should("have.length", value);

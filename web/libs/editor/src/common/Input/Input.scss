@@ -11,17 +11,17 @@
   transition: box-shadow 80ms ease;
 }
 
-.input-lsf_size_compact:not([type='checkbox']):not([type='radio']) {
+.input_size_compact:not([type='checkbox']):not([type='radio']) {
   height: 32px;
 }
 
-.input-lsf_size_small:not([type='checkbox']):not([type='radio']) {
+.input_size_small:not([type='checkbox']):not([type='radio']) {
   height: 24px;
   font-size: 12px;
   padding: 0 5px;
 }
 
-.input-lsf_size_large:not([type='checkbox']):not([type='radio']) {
+.input_size_large:not([type='checkbox']):not([type='radio']) {
   height: 40px;
   font-size: 16px;
 }

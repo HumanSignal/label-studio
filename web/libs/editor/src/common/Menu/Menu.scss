@@ -49,11 +49,11 @@
       }
     }
 
-    &:not(.menu-lsf__item_look_danger):hover {
+    &:not(.menu__item_look_danger):hover {
       color: var(--grape_700);
     }
 
-    &:not(.menu-lsf__item_active):hover {
+    &:not(.menu__item_active):hover {
       background-color: var(--grape_0);
     }
 
@@ -62,7 +62,7 @@
       background-color: var(--grape_0);
     }
 
-    &_active:not(.sidebar__pin):not(.menu-lsf__item_clickable) {
+    &_active:not(.sidebar__pin):not(.menu__item_clickable) {
       pointer-events: none;
     }
 
