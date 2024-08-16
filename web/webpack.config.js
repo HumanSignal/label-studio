@@ -15,17 +15,6 @@ const RELEASE = require("./release").getReleaseName();
 
 const css_prefix = "lsf-";
 
-// switch (process.env.LERNA_PACKAGE_NAME) {
-//   case "labelstudio":
-//     css_prefix = "lsf-";
-//     break;
-//   case "datamanager":
-//     css_prefix = "dm-";
-//     break;
-//   case "editor":
-//     css_prefix = "lsf-";
-// }
-
 const LOCAL_ENV = {
   NODE_ENV: "development",
   CSS_PREFIX: css_prefix,

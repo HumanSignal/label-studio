@@ -65,7 +65,12 @@ export default inject("store")(
       if (store.hasInterface("skip")) {
         skipButton = (
           <Tooltip title="Cancel (skip) task: [ Ctrl+Space ]" mouseEnterDelay={TOOLTIP_DELAY}>
-            <Button disabled={disabled} look="danger" onClick={store.skipTask} className={`${styles.skip} ${skipButtonClassName}`}>
+            <Button
+              disabled={disabled}
+              look="danger"
+              onClick={store.skipTask}
+              className={`${styles.skip} ${skipButtonClassName}`}
+            >
               Skip {buttons.skip}
             </Button>
           </Tooltip>
