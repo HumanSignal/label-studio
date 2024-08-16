@@ -11,7 +11,7 @@ import { Button } from "../Button/Button";
 import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
 import { Tooltip } from "../Tooltip/Tooltip";
-import "./Table.styl";
+import "./Table.scss";
 import { TableCheckboxCell } from "./TableCheckbox";
 import { TableBlock, TableContext, TableElem } from "./TableContext";
 import { TableHead } from "./TableHead/TableHead";

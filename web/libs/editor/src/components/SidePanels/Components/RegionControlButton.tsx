@@ -6,7 +6,8 @@ export const RegionControlButton: FC<ButtonProps> = ({ children, onClick, ...pro
     <Button
       {...props}
       onClick={(e) => {
-        e.stopPropagation(), onClick?.(e);
+        e.stopPropagation();
+        onClick?.(e);
       }}
       type="text"
       style={{ padding: 0, width: 24, height: 24, ...(props.style ?? {}) }}

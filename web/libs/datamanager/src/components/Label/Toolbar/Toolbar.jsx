@@ -18,7 +18,7 @@ import { Button } from "../../Common/Button/Button";
 import { Icon } from "../../Common/Icon/Icon";
 import { Space } from "../../Common/Space/Space";
 import { Tooltip } from "../../Common/Tooltip/Tooltip";
-import "./Toolbar.styl";
+import "./Toolbar.scss";
 
 const TOOLTIP_DELAY = 0.8;
 

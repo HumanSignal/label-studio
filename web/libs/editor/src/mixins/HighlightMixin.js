@@ -120,6 +120,7 @@ export const HighlightMixin = types
       self._stylesheet = stylesheet;
       self._spans = Utils.Selection.highlightRange(range, {
         classNames,
+        index: self.region_index,
         label: self.getLabels(),
       });
 
@@ -152,7 +153,7 @@ export const HighlightMixin = types
       if (self._hasSpans || (isFF(FF_LSDV_4620_3) && self._spans?.length)) {
         const lastSpan = self._spans[self._spans.length - 1];
 
-        Utils.Selection.applySpanStyles(lastSpan, { label: self.getLabels() });
+        Utils.Selection.applySpanStyles(lastSpan, { index: self.region_index, label: self.getLabels() });
       }
     },
 
@@ -189,7 +190,7 @@ export const HighlightMixin = types
       } else {
         self._stylesheet.setColor(self.getLabelColor());
       }
-      Utils.Selection.applySpanStyles(lastSpan, { label: self.getLabels() });
+      Utils.Selection.applySpanStyles(lastSpan, { index: self.region_index, label: self.getLabels() });
     },
 
     /**
@@ -364,6 +365,7 @@ const createSpanStylesheet = (document, identifier, color) => {
       cursor: var(${variables.cursor}, pointer);
       border: 1px dashed transparent;
     `,
+    // @todo this style was applied in old RichText only
     [`${className}[data-label]::after`]: `
       padding: 2px 2px;
       font-size: 9.5px;

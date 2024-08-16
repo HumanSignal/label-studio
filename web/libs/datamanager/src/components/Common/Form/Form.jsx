@@ -6,7 +6,7 @@ import { Button } from "../Button/Button";
 import { Oneof } from "../Oneof/Oneof";
 import { Space } from "../Space/Space";
 import { Counter, Input, Select, Toggle } from "./Elements";
-import "./Form.styl";
+import "./Form.scss";
 import {
   FormContext,
   FormResponseContext,

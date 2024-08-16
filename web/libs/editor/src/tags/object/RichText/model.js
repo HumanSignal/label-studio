@@ -105,12 +105,14 @@ const Model = types
       return self.isLoaded && self._isReady;
     },
 
+    // we are displaying label for either data-label OR data-index
     get styles() {
       return `
       .htx-highlight {
         cursor: pointer;
         border: 1px dashed transparent;
       }
+      .htx-highlight[data-index]::after,
       .htx-highlight[data-label]::after {
         padding: 2px 2px;
         font-size: 9.5px;
@@ -119,6 +121,9 @@ const Model = types
         vertical-align: super;
         content: attr(data-label);
         line-height: 0;
+      }
+      .htx-highlight[data-index]:not([data-label])::after {
+        content: attr(data-index);
       }
       .htx-highlight.${STATE_CLASS_MODS.highlighted} {
         position: relative;
@@ -332,30 +337,74 @@ const Model = types
         domManager?.removeStyles(ids);
       },
 
+      /**
+       * Converts global offsets to relative offsets.
+       *
+       * @param {Object} start - The start global offset in codepoints.
+       * @param {Object} end - The end global offset in codepoints.
+       * @returns {undefined|{start: string, startOffset: number, end: string, endOffset: number}} - The relative offsets.
+       */
       globalOffsetsToRelativeOffsets({ start, end }) {
         return domManager.globalOffsetsToRelativeOffsets(start, end);
       },
 
+      /**
+       * Calculates relative offsets to global offsets for a given range in the document.
+       *
+       * @param {Node} start - The starting node of the range.
+       * @param {number} startOffset - The offset within the starting node.
+       * @param {Node} end - The ending node of the range.
+       * @param {number} endOffset - The offset within the ending node.
+       * @return {undefined|[number,number]} - An array containing the calculated global offsets in codepoints in the form [startGlobalOffset, endGlobalOffset].
+       */
       relativeOffsetsToGlobalOffsets(start, startOffset, end, endOffset) {
         return domManager.relativeOffsetsToGlobalOffsets(start, startOffset, end, endOffset);
       },
 
+      /**
+       * Converts the given range to its global offset.
+       *
+       * @param {Range} range - The range to convert.
+       * @returns {[number, number]|undefined} - The global offsets of the range.
+       */
       rangeToGlobalOffset(range) {
         return domManager.rangeToGlobalOffset(range);
       },
 
-      createRangeByGlobalOffsets({ start, end }) {
-        return domManager.createRange(start, end);
-      },
-
+      /**
+       * Creates spans in the DOM for a given range of global offsets.
+       *
+       * @param {Object} offsets - The start and end offsets of the range.
+       * @param {number} offsets.start - The starting offset in codepoints.
+       * @param {number} offsets.end - The ending offset in codepoints.
+       *
+       * @returns {Array} - An array of DOM spans created for the range.
+       */
       createSpansByGlobalOffsets({ start, end }) {
         return domManager.createSpans(start, end);
       },
 
+      /**
+       * Removes spans from the given array based on the provided start and end global offsets.
+       *
+       * @param {Array} spans - The array of spans to be modified.
+       * @param {Object} offsets - The start and end global offsets.
+       * @param {number} offsets.start - The start global offset in codepoints.
+       * @param {number} offsets.end - The end global offset in codepoints.
+       * @returns {void} - Nothing is returned.
+       */
       removeSpansInGlobalOffsets(spans, { start, end }) {
         return domManager?.removeSpans(spans, start, end);
       },
 
+      /**
+       * Get text content at the position set by global offsets.
+       *
+       * @param {Object} offsets - The start and end global offsets.
+       * @param {number} offsets.start - The start global offset in codepoints.
+       * @param {number} offsets.end - The end global offset in codepoints.
+       * @returns {string} - The text content between the start and end offsets.
+       */
       getTextFromGlobalOffsets({ start, end }) {
         return domManager.getText(start, end);
       },

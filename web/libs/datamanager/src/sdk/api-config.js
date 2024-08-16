@@ -32,6 +32,11 @@ export const APIConfig = {
       method: "patch",
     },
 
+    orderTab: {
+      path: "/views/order/",
+      method: "post",
+    },
+
     /** Delete particular tab (DELETE) */
     deleteTab: {
       path: "/views/:tabID",

@@ -2,7 +2,7 @@ import { cn } from "../../../../../utils/bem";
 import { FormField } from "../../FormField";
 import { useValueTracker } from "../../Utils";
 import { default as Label } from "../Label/Label";
-import "./Select.styl";
+import "./Select.scss";
 
 const Select = ({
   label,
@@ -42,7 +42,8 @@ const Select = ({
               ref={ref}
               value={value}
               onChange={(e) => {
-                setValue(e.target.value), props.onChange?.(e);
+                setValue(e.target.value);
+                props.onChange?.(e);
               }}
               className={rootClass.elem("list")}
             >

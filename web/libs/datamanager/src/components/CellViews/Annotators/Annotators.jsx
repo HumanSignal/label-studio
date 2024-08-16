@@ -8,7 +8,7 @@ import { Tooltip } from "../../Common/Tooltip/Tooltip";
 import { Userpic } from "../../Common/Userpic/Userpic";
 import { Common } from "../../Filters/types";
 import { VariantSelect } from "../../Filters/types/List";
-import "./Annotators.styl";
+import "./Annotators.scss";
 
 export const Annotators = (cell) => {
   const { value, column, original: task } = cell;

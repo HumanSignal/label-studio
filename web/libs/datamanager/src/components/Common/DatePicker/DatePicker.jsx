@@ -8,8 +8,8 @@ import { isDefined } from "../../../utils/utils";
 import { Dropdown } from "../Dropdown/Dropdown";
 import { Icon } from "../Icon/Icon";
 import Input from "../Input/Input";
-import "./DatePicker.global.styl";
-import "./DatePicker.styl";
+import "./DatePicker.global.scss";
+import "./DatePicker.scss";
 
 const { Block, Elem } = BemWithSpecifiContext();
 

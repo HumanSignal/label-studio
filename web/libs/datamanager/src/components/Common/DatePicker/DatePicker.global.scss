@@ -1,0 +1,33 @@
+.react-datepicker {
+  border: none;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  max-height: 290px;
+
+  &__time {
+    flex: 1;
+    height: calc(100% - 84px);
+
+    &,
+    &-container,
+    &-box {
+      display: flex;
+    }
+
+    &-container,
+    &-box {
+      flex-direction: column;
+    }
+
+    &-list {
+      flex: 1;
+    }
+  }
+
+  &__day {
+    &--outside-month {
+      opacity: 0.5;
+    }
+  }
+}

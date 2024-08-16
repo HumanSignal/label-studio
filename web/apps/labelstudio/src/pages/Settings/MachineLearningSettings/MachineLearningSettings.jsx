@@ -13,7 +13,7 @@ import { CustomBackendForm } from "./Forms";
 import { TestRequest } from "./TestRequest";
 import { StartModelTraining } from "./StartModelTraining";
 import { Block, Elem } from "../../../utils/bem";
-import "./MachineLearningSettings.styl";
+import "./MachineLearningSettings.scss";
 
 export const MachineLearningSettings = () => {
   const api = useAPI();

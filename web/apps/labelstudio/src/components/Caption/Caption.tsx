@@ -1,6 +1,6 @@
 import type { FC, ReactElement } from "react";
 import { Block } from "../../utils/bem";
-import "./Caption.styl";
+import "./Caption.scss";
 
 export const Caption: FC<{ children: ReactElement }> = ({ children }) => {
   return (

@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1151: Show region indices on regions (#6103)",
-  "commit": "40a62f6904734edfd4f08cff8eef9c9224a2b8b6",
-  "date": "2024-07-19T15:13:37.000Z",
+  "message": "fix: OPTIC-966: converting stylus files to scss (#6187)",
+  "commit": "e535785c6a63529cd972e3e4438df6699ad61052",
+  "date": "2024-08-15T11:41:17.000Z",
   "branch": "develop"
 }

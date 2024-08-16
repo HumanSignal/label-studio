@@ -219,6 +219,7 @@ export class APIProxy {
           headers: new Map(Array.from(rawResponse.headers)),
           status: rawResponse.status,
           url: rawResponse.url,
+          ok: rawResponse.ok,
         };
 
         if (raw) return rawResponse;

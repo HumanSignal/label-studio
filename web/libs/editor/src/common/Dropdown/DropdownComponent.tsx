@@ -15,7 +15,7 @@ import { useFullscreen } from "../../hooks/useFullscreen";
 import { Block, cn } from "../../utils/bem";
 import { alignElements, type ElementAlignment } from "../../utils/dom";
 import { aroundTransition } from "../../utils/transition";
-import "./Dropdown.styl";
+import "./Dropdown.scss";
 import { DropdownContext } from "./DropdownContext";
 import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
 

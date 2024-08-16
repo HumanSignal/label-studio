@@ -2,7 +2,7 @@ import color from "chroma-js";
 import React from "react";
 import { Block } from "../../../utils/bem";
 import { colors } from "../../../utils/colors";
-import "./Tag.styl";
+import "./Tag.scss";
 
 const prepareColor = (colorString) => {
   const baseColor = color(colorString);

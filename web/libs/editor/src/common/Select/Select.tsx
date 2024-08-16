@@ -21,7 +21,7 @@ import { BemWithSpecifiContext, cn } from "../../utils/bem";
 import { shallowEqualArrays } from "shallow-equal";
 import { isDefined } from "../../utils/utilities";
 import { Dropdown } from "../Dropdown/Dropdown";
-import "./Select.styl";
+import "./Select.scss";
 import { FF_DEV_2669, isFF } from "../../utils/feature-flags";
 
 type FoundChild = ReactChild | ReactFragment | ReactPortal;

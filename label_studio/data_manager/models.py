@@ -9,6 +9,12 @@ from django.utils.translation import gettext_lazy as _
 class ViewBaseModel(models.Model):
     data = models.JSONField(_('data'), default=dict, null=True, help_text='Custom view data')
     ordering = models.JSONField(_('ordering'), default=dict, null=True, help_text='Ordering parameters')
+    order = models.IntegerField(
+        _('order'),
+        default=0,
+        null=True,
+        help_text='Position of the tab, starting at the left in data manager and increasing as the tabs go left to right',
+    )
     selected_items = models.JSONField(_('selected items'), default=dict, null=True, help_text='Selected items')
     filter_group = models.ForeignKey(
         'data_manager.FilterGroup', null=True, on_delete=models.SET_NULL, help_text='Groups of filters'
@@ -22,6 +28,8 @@ class ViewBaseModel(models.Model):
     )
 
     class Meta:
+        ordering = ['order']
+        indexes = [models.Index(fields=['project', 'order'])]
         abstract = True
 
 

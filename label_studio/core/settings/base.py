@@ -236,7 +236,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
-    'core.middleware.CommonMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
     'core.middleware.SetSessionUIDMiddleware',
     'core.middleware.ContextLogMiddleware',
@@ -760,3 +759,6 @@ REDIS_SSL_SETTINGS = {
     'ssl_keyfile': get_env('REDIS_SSL_KEYFILE', None),
     'ssl_certfile': get_env('REDIS_SSL_CERTFILE', None),
 }
+
+OPENAI_API_VERSION = get_env('OPENAI_API_VERSION', '2024-06-01')
+APPEND_SLASH = False

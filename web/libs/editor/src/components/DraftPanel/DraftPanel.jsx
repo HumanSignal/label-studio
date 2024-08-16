@@ -21,7 +21,7 @@ export const DraftPanel = observer(({ item }) => {
   return (
     <div className={panel}>
       <Tooltip placement="topLeft" title={item.draftSelected ? "switch to original result" : "switch to current draft"}>
-        <button onClick={() => item.toggleDraft()} className={panel.elem("toggle")}>
+        <button type="button" onClick={() => item.toggleDraft()} className={panel.elem("toggle")}>
           {item.draftSelected ? "draft" : "original"}
         </button>
       </Tooltip>

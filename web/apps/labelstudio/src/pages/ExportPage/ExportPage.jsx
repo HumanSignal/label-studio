@@ -8,7 +8,7 @@ import { useAPI } from "../../providers/ApiProvider";
 import { useFixedLocation, useParams } from "../../providers/RoutesProvider";
 import { BemWithSpecifiContext } from "../../utils/bem";
 import { isDefined } from "../../utils/helpers";
-import "./ExportPage.styl";
+import "./ExportPage.scss";
 
 // const formats = {
 //   json: 'JSON',

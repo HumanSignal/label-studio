@@ -4,7 +4,7 @@ import { Block, Elem } from "../../utils/bem";
 import { alignElements } from "../../utils/dom";
 import { isDefined } from "../../utils/helpers";
 import { aroundTransition } from "../../utils/transition";
-import "./Tooltip.styl";
+import "./Tooltip.scss";
 
 export const Tooltip = forwardRef(({ title, children, alignment, defaultVisible, disabled, style }, ref) => {
   if (!children || Array.isArray(children)) {

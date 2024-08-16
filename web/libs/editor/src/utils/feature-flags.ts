@@ -48,9 +48,6 @@ export const FF_DEV_2100 = "ff_dev_2100_clean_unnecessary_areas_140422_short";
 // Allow to use html inside <Label/> tags
 export const FF_DEV_2128 = "ff_dev_2128_html_in_labels_150422_short";
 
-// 3-point Rectangle tool to created rotated bboxes conveniently
-export const FF_DEV_2132 = "ff_front_dev_2132_rotating_bounding_box";
-
 // Show draft as the topmost item in annotation history
 export const FF_DEV_2290 = "ff_front_dev_2290_draft_in_annotation_history_short";
 
@@ -221,14 +218,6 @@ export const FF_LSDV_4620_3_ML = "fflag_fix_front_lsdv_4620_memory_leaks_100723_
 export const FF_OUTLINER_OPTIM = "fflag_feat_front_lsdv_4620_outliner_optimization_310723_short";
 
 /**
- * Fixes Rect3PointTool behaviour in relative coords mode.
- * It also fixes disappearing regions in degenerate cases.
- *
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4673_rect3point_relative_310523_short
- */
-export const FF_LSDV_4673 = "fflag_fix_front_lsdv_4673_rect3point_relative_310523_short";
-
-/**
  * Fixes how presigned urls are generated and accessed to remove possibility of CORS errors.
  */
 export const FF_LSDV_4711 = "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short";
@@ -308,15 +297,6 @@ export const FF_TAXONOMY_LABELING = "fflag_feat_front_lsdv_5452_taxonomy_labelin
  */
 
 export const FF_TASK_COUNT_FIX = "fflag_fix_all_optic_79_task_count_is_wrong_short";
-/**
- * Annotator workflow control for lead time calculation
- */
-export const FF_PROD_E_111 = "fflag_feat_front_prod_e_111_annotator_workflow_control_short";
-
-/**
- * Adding a property snap to Polygon, PolygonLabels, KeyPoint and KeyPoinLabels to snap points to image pixel when user sets snap="pixel".
- */
-export const FF_SNAP_TO_PIXEL = "fflag_feat_front_lsdv_5518_snap_to_pixel_130923_short";
 
 /** Fix taxonomy items init with DEV-3617 FF on; this allows to correctly preselect items on init */
 export const FF_TAXONOMY_SELECTED = "fflag_fix_front_leap_149_taxonomy_selected_true_short";
