@@ -67,7 +67,7 @@ The labeling interface must include:
 
 <View>
     <Style>
-        .ls-main-content.ls-requesting .prompt::before { content: ' loading...'; color: #808080; }
+        .lsf-main-content.lsf-requesting .prompt::before { content: ' loading...'; color: #808080; }
     </Style>
     <Text name="input" value="$text"/>
     <View className="prompt">

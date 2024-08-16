@@ -130,11 +130,11 @@ The `Human Preference collection for RLHF` template includes the following label
       transition: all 0.3s ease;
     }
 
-    .ls-richtext__line:hover {
+    .lsf-richtext__line:hover {
       background: unset;
     }
 
-    .answer-box .ls-object {
+    .answer-box .lsf-object {
       padding: 20px
     }
   </Style>

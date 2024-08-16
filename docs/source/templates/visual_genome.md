@@ -34,7 +34,7 @@ Use the [Visual Genome](https://visualgenome.org/) task to connect structured im
   </View>
   <Image name="image" value="$image"/>
   <Style>
-  .label-column .ls-labels {
+  .label-column .lsf-labels {
     display: flex;
     flex-direction: column;
     align-items: flex-start;

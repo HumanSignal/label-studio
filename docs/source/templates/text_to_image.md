@@ -29,7 +29,7 @@ Based on the natural language prompt, you can generate the set of images from wh
       box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
       text-align: center;
     }
-    .ch-title .ls-richtext__line:before {
+    .ch-title .lsf-richtext__line:before {
       display: none;
     }
     .highlight .ant-checkbox {

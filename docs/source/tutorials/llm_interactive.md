@@ -79,7 +79,7 @@ $ curl http://localhost:9090/health
 
 <View>
     <Style>
-        .ls-main-content.ls-requesting .prompt::before { content: ' loading...'; color: #808080; }
+        .lsf-main-content.lsf-requesting .prompt::before { content: ' loading...'; color: #808080; }
 
         .text-container {
         background-color: white;
@@ -162,7 +162,7 @@ $ curl http://localhost:9090/health
 
 <View>
     <Style>
-        .ls-main-content.ls-requesting .prompt::before { content: ' loading...'; color: #808080; }
+        .lsf-main-content.lsf-requesting .prompt::before { content: ' loading...'; color: #808080; }
     </Style>
     <!-- Input data -->
     <Text name="text" value="$text"/>
@@ -198,7 +198,7 @@ Representing ChatGPT-style interface with [`<Paragraphs>`](https://labelstud.io/
 
 <View>
     <Style>
-        .ls-main-content.ls-requesting .prompt::before { content: ' loading...'; color: #808080; }
+        .lsf-main-content.lsf-requesting .prompt::before { content: ' loading...'; color: #808080; }
     </Style>
     <Paragraphs name="chat" value="$dialogue" layout="dialogue" textKey="content" nameKey="role"/>
     <Header value="User prompt:"/>
@@ -238,7 +238,7 @@ Representing ChatGPT-style interface with [`<Paragraphs>`](https://labelstud.io/
 
 <View>
     <Style>
-        .ls-main-content.ls-requesting .prompt::before { content: ' loading...'; color: #808080; }
+        .lsf-main-content.lsf-requesting .prompt::before { content: ' loading...'; color: #808080; }
 
         .container {
         display: flex;

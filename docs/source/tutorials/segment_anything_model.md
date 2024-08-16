@@ -374,7 +374,7 @@ Base example:
     background-color: #f9f9f9;
     border-radius: 3px;
   }
-  .ls-labels {
+  .lsf-labels {
     margin: 5px 0 0 0; 
   }
   .image-container {
