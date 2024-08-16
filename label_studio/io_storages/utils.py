@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+from dataclasses import dataclass
 import logging
 import re
 
@@ -8,6 +9,11 @@ logger = logging.getLogger(__name__)
 # Put storage prefixes here
 uri_regex = r"([\"'])(?P<uri>(?P<storage>{})://[^\1=]*)\1"
 
+@dataclass
+class BucketURI:
+    bucket: str
+    path: str
+    scheme: str
 
 def get_uri_via_regex(data, prefixes=('s3', 'gs')):
     data = str(data).strip()
@@ -38,3 +44,16 @@ def get_uri_via_regex(data, prefixes=('s3', 'gs')):
             logger.warning("Can't parse task.data to match URI. Reason: Match is not found.")
             return None, None
     return r_match.group('uri'), r_match.group('storage')
+
+def parse_bucket_uri(uri: str | None) -> BucketURI | None:    
+    uri = uri and uri.strip()
+    if not uri:
+        return None
+
+    try:
+        scheme, rest = uri.split('://', 1)
+        bucket, path = rest.split('/', 1)
+    except ValueError:
+        return None
+
+    return BucketURI(bucket=bucket, path=path, scheme=scheme)
