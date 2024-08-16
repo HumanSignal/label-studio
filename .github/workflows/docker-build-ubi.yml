@@ -49,10 +49,10 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.4.0
+        uses: docker/setup-buildx-action@v3.6.1
 
       - name: Login to RedHat Registry
-        uses: docker/login-action@v3.2.0
+        uses: docker/login-action@v3.3.0
         with:
           registry: quay.io
           username: ${{ secrets.REDHAT_REGISTRY_LOGIN }}
@@ -167,7 +167,7 @@ jobs:
             core.setOutput("ubi-tags", ubiTags.join(','));
 
       - name: Build and push ubi
-        uses: docker/build-push-action@v6.4.1
+        uses: docker/build-push-action@v6.6.1
         id: docker_build_and_push_ubi
         with:
           context: .

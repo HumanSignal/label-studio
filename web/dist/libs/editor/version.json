@@ -1,6 +1,6 @@
 {
-  "message": "chore: OPTIC-866: Stylus to Sass conversion LS web/libs/datamanager/src/components/ (#6112)",
-  "commit": "8fbedaa6fdd00338da19c258a798b8799f0cd935",
-  "date": "2024-07-26T15:12:41.000Z",
+  "message": "fix: OPTIC-966: converting stylus files to scss (#6187)",
+  "commit": "e535785c6a63529cd972e3e4438df6699ad61052",
+  "date": "2024-08-15T11:41:17.000Z",
   "branch": "develop"
 }

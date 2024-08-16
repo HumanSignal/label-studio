@@ -9,6 +9,7 @@
       "feat: ",
       "docs: ",
       "chore: ",
+      "chore(deps): ",
       "ci: ",
       "perf: ",
       "refactor: ",

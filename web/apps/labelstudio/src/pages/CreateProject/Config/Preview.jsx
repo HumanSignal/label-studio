@@ -3,7 +3,7 @@ import { Spinner } from "../../../components";
 import { useLibrary } from "../../../providers/LibraryProvider";
 import { cn } from "../../../utils/bem";
 import { FF_DEV_3617, isFF } from "../../../utils/feature-flags";
-import "./Config.styl";
+import "./Config.scss";
 import { EMPTY_CONFIG } from "./Template";
 import { API_CONFIG } from "../../../config/ApiConfig";
 import { useAPI } from "../../../providers/ApiProvider";
@@ -59,7 +59,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
         const lsf = new window.LabelStudio(rootRef.current, {
           config,
           task,
-          interfaces: ["side-column", "annotations:comments", "comments:resolve-any"],
+          interfaces: ["side-column"],
           // with SharedStore we should use more late event
           [isFF(FF_DEV_3617) ? "onStorageInitialized" : "onLabelStudioLoad"](LS) {
             LS.settings.bottomSidePanel = true;

@@ -21,7 +21,7 @@ import { Block, Elem } from "../../../utils/bem";
 import { FF_DEV_2715, isFF } from "../../../utils/feature-flags";
 import ResizeObserver from "../../../utils/resize-observer";
 import { clamp, isDefined } from "../../../utils/utilities";
-import "./Video.styl";
+import "./Video.scss";
 import { VideoRegions } from "./VideoRegions";
 
 const isFFDev2715 = isFF(FF_DEV_2715);

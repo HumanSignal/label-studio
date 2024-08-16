@@ -1,6 +1,7 @@
 import type React from "react";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { shallowEqualObjects } from "shallow-equal";
+import { FF_UNSAVED_CHANGES, isFF } from "../utils/feature-flags";
 import { useAPI, type WrappedResponse } from "./ApiProvider";
 import { useAppStore } from "./AppStoreProvider";
 import { useParams } from "./RoutesProvider";
@@ -18,6 +19,10 @@ export const ProjectContext = createContext<Context>({} as Context);
 ProjectContext.displayName = "ProjectContext";
 
 const projectCache = new Map<number, APIProject>();
+
+type UpdateProjectOptions = {
+  returnErrors?: boolean;
+};
 
 export const ProjectProvider: React.FunctionComponent = ({ children }) => {
   const api = useAPI();
@@ -55,17 +60,26 @@ export const ProjectProvider: React.FunctionComponent = ({ children }) => {
   );
 
   const updateProject: Context["updateProject"] = useCallback(
-    async (fields: APIProject) => {
+    async (fields: APIProject, options?: UpdateProjectOptions) => {
       const result = await api.callApi<APIProject>("updateProject", {
         params: {
           pk: projectData.id,
         },
         body: fields,
+        errorFilter: options?.returnErrors ? undefined : () => true,
       });
 
-      if (result.$meta) {
-        setProjectData(result as unknown as APIProject);
-        updateStore({ project: result });
+      if (isFF(FF_UNSAVED_CHANGES)) {
+        if (result?.$meta?.ok) {
+          setProjectData(result as unknown as APIProject);
+          updateStore({ project: result });
+          projectCache.set(result.id, result);
+        }
+      } else {
+        if (result.$meta) {
+          setProjectData(result as unknown as APIProject);
+          updateStore({ project: result });
+        }
       }
 
       return result;

@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "../../utils/bem";
-import "./DescriptionList.styl";
+import "./DescriptionList.scss";
 import { IconInfoOutline } from "../../assets/icons";
 import { Tooltip } from "../../components/Tooltip/Tooltip";
 

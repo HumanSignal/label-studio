@@ -1,34 +1,54 @@
 import { useCallback, useMemo, useState } from "react";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
+import { FF_UNSAVED_CHANGES, isFF } from "../../utils/feature-flags";
 import { isEmptyString } from "../../utils/helpers";
 import { ConfigPage } from "../CreateProject/Config/Config";
 
 export const LabelingSettings = () => {
-  const { project, fetchProject } = useProject();
+  const { project, fetchProject, updateProject } = useProject();
   const [config, setConfig] = useState("");
   const [essentialDataChanged, setEssentialDataChanged] = useState(false);
+  const hasChanges = isFF(FF_UNSAVED_CHANGES) && config !== project.label_config;
   const api = useAPI();
 
-  const saveConfig = useCallback(async () => {
-    const res = await api.callApi("updateProjectRaw", {
-      params: {
-        pk: project.id,
-      },
-      body: {
-        label_config: config,
-      },
-    });
+  const saveConfig = useCallback(
+    isFF(FF_UNSAVED_CHANGES)
+      ? async () => {
+          const res = await updateProject({
+            label_config: config,
+          });
 
-    if (res.ok) {
-      return true;
-    }
+          if (res?.$meta?.ok) {
+            // Backend can prettify the config, so we need to update it to have relevant hasChanges value
+            setConfig(res.label_config);
+            return true;
+          }
 
-    const error = await res.json();
+          //error handling
+          return res.response;
+        }
+      : async () => {
+          const res = await api.callApi("updateProjectRaw", {
+            params: {
+              pk: project.id,
+            },
+            body: {
+              label_config: config,
+            },
+          });
 
-    fetchProject();
-    return error;
-  }, [project, config]);
+          if (res.ok) {
+            return true;
+          }
+
+          const error = await res.json();
+
+          fetchProject();
+          return error;
+        },
+    [project, config],
+  );
 
   const projectAlreadySetUp = useMemo(() => {
     if (project.label_config) {
@@ -64,6 +84,7 @@ export const LabelingSettings = () => {
       onUpdate={onUpdate}
       onSaveClick={onSave}
       onValidate={onValidate}
+      hasChanges={hasChanges}
     />
   );
 };

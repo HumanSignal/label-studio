@@ -1,7 +1,9 @@
 import json
 import os
 import re
+from urllib.parse import quote
 
+import jira
 import requests
 from github import Github
 from jira import JIRA
@@ -13,10 +15,11 @@ CURRENT_REF = os.getenv("CURRENT_REF").strip('\"')
 PREVIOUS_REF = os.getenv("PREVIOUS_REF").strip('\"')
 
 JIRA_SERVER = os.getenv("JIRA_SERVER", "https://heartex.atlassian.net").strip('\"')
-JIRA_USERNAME = os.getenv("JIRA_USERNAME").strip('\"')  # in email format, e.g username@domain.com
-JIRA_TOKEN = os.getenv("JIRA_TOKEN").strip('\"')  # https://id.atlassian.com/manage-profile/security/api-tokens
-JIRA_PROJECT = os.getenv("JIRA_PROJECT", "DEV").strip('\"')
+JIRA_USERNAME = os.getenv("JIRA_USERNAME").strip('\"')
+JIRA_TOKEN = os.getenv("JIRA_TOKEN").strip('\"')
 JIRA_RN_FIELD = os.getenv("JIRA_RN_FIELD", "customfield_10064").strip('\"')
+JIRA_PROJECTS = os.getenv("JIRA_PROJECTS", "PLT,LEAP,OPTIC,DIA").split(",")
+JIRA_RELEASE_PREFIX = os.getenv("JIRA_RELEASE_PREFIX", None).strip('\"')
 
 GH_REPO = os.getenv("GH_REPO", "").strip('\"')
 GH_TOKEN = os.getenv("GH_TOKEN").strip('\"')  # https://github.com/settings/tokens/new
@@ -153,7 +156,7 @@ def get_task(task_number: str, pr: int = None) -> JiraIssue or None:
     return None
 
 
-def get_jira_release(project: str, version: str):
+def get_jira_release(project: str, version: str) -> jira.client.Version or None:
     jira_project_versions = jira_client.project_versions(project=project)
     jira_sorted_project_versions = sorted(jira_project_versions, key=lambda x: x.name, reverse=True)
     return next((e for e in jira_sorted_project_versions if version in e.name), None)
@@ -260,7 +263,7 @@ def render_add_header_md(title: str, lines: list[str]) -> list[str]:
 
 def render_output_md(
         gh_release,
-        jira_release,
+        jira_releases_issues_jql_url,
         sorted_release_tasks: dict[str, list[JiraIssue]],
         missing_in_gh: list[JiraIssue],
         missing_in_tracker: list[JiraIssue],
@@ -288,10 +291,9 @@ def render_output_md(
     comment.append(
         f'This changelog was updated in response to a push of {CURRENT_REF} [Workflow run]({WORKFLOW_RUN_LINK})')
     comment.append('')
-    if jira_release:
-        comment.append(
-            f'[Jira Release {RELEASE_VERSION}]({JIRA_SERVER}/projects/{JIRA_PROJECT}/versions/'
-            f'{jira_release.id}/tab/release-report-all-issues)')
+
+    if jira_releases_issues_jql_url:
+        comment.append(f'[Jira Release {RELEASE_VERSION} Issues Filter]({jira_releases_issues_jql_url})')
     else:
         comment.append('Jira Release not found')
 
@@ -375,15 +377,21 @@ def main():
 
     gh_release_tasks = get_github_release_tasks(gh_release.commits)
 
-    jira_release = get_jira_release(JIRA_PROJECT, RELEASE_VERSION)
     jira_release_issues = []
-    if jira_release:
-        jira_release_issues = get_jira_release_issues(jira_release.projectId, jira_release.id)
-        print(
-            f"Jira Release {JIRA_SERVER}/projects/{JIRA_PROJECT}/versions/"
-            f"{jira_release.id}/tab/release-report-all-issues]")
-    else:
-        print("Jira Release not found")
+    jira_releases_urls = []
+    jira_releases_issues_jql_url = None
+
+    for jira_project in JIRA_PROJECTS:
+        jira_fix_version = f"{JIRA_RELEASE_PREFIX}/{RELEASE_VERSION}"
+        jira_release = get_jira_release(jira_project, jira_fix_version)
+        if jira_release:
+            jira_release_url = f"{JIRA_SERVER}/projects/{jira_project}/versions/{jira_release.id}"
+            jira_releases_urls.append(jira_release_url)
+            print(f"Found Jira Release {jira_release.name} in project {jira_project}: {jira_release_url}")
+            jira_release_issues = get_jira_release_issues(jira_release.projectId, jira_release.id)
+            jira_release_issues.extend(jira_release_issues)
+            issues_jql = quote(f"fixversion=\"{jira_fix_version}\" ORDER BY created DESC")
+            jira_releases_issues_jql_url = f"{JIRA_SERVER}/issues/?jql={issues_jql}"
 
     tracker_release_tasks = jira_release_issues
 
@@ -413,7 +421,7 @@ def main():
 
     output_md = render_output_md(
         gh_release,
-        jira_release,
+        jira_releases_issues_jql_url,
         sorted_release_tasks,
         missing_in_gh,
         missing_in_tracker,

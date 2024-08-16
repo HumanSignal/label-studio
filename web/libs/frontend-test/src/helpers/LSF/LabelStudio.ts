@@ -128,7 +128,7 @@ class LSParamsBuilder {
 
 export const LabelStudio = {
   /**
-   * Initializes LabelStudio intance with given configuration
+   * Initializes LabelStudio instance with given configuration
    */
   init(params: LSParams) {
     cy.log("Initialize LSF");

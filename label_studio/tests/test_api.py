@@ -66,6 +66,82 @@ def any_api_client(request, client_and_token, business_client):
         ),
         # empty label config
         ({'title': '111', 'label_config': None}, {'label_config': ['can only parse strings']}, 400),
+        # <Choices> surrounded by <View> -> OK
+        (
+            {
+                'title': '111',
+                'label_config': '<View><Text name="my_text" value="$text"/><View className="non-root"><Choices name="my_class" toName="my_text"><Choice value="pos"/><Choice value="neg"/></Choices></View></View>',
+            },
+            None,
+            201,
+        ),
+        # <Choices> with value attribute but without nested <Choice>
+        # example from https://labelstud.io/templates/serp_ranking
+        (
+            {
+                'title': '111',
+                'label_config': """
+                <View>
+  
+  <Header value="Search request" size="5"/> 
+  <Text name="text" value="$text"/>
+ 
+  <Header value="Generated responses" size="5"/> 
+  <View className="dynamic_choices">
+    <Choices name="dynamic_choices" toName="text" selection="checkbox" value="$options" layout="vertical" choice="multiple" allownested="true"/>
+  </View>
+  <View style="box-shadow: 2px 2px 5px #999; padding: 20px; margin-top: 1em; border-radius: 5px;">
+    <Header value="Search Quality"/>
+    <Rating name="relevance" toName="text"/>
+  </View>
+  <View style="box-shadow: 2px 2px 5px #999; padding: 15px 5px 10px 20px; margin-top: 1.5em; margin-bottom: 1.25em; border-radius: 5px; display: flex; align-items: center;">
+    <Header value="Labeling Confidence" style="font-size: 1.25em"/>
+    <View style="margin: 0 1em 0.5em 1.5em">
+      <Choices name="confidence" toName="text" choice="single" showInLine="true">
+        <Choice value="Low" html="&lt;img width='40' src='https://www.iconsdb.com/icons/preview/green/thumbs-up-xxl.png'/&gt;"/>
+        <Choice value="High" html="&lt;img width='40' src='https://www.iconsdb.com/icons/preview/red/thumbs-down-xxl.png'/&gt;"/>
+      </Choices>
+    </View>
+  </View>
+  
+  <Style>
+  .searchresultsarea {
+    margin-left: 10px;
+    font-family: 'Arial';
+  }
+  .searchresult {
+    margin-left: 8px;
+  }
+  .searchresult h2 {
+    font-size: 19px;
+    line-height: 18px;
+    font-weight: normal;
+    color: rgb(29, 1, 189);
+    margin-bottom: 0px;
+    margin-top: 25px;
+  }
+  .searchresult a {
+    font-size: 14px;
+    line-height: 14px;
+    color: green;
+    margin-bottom: 0px;
+  }
+  .searchresult button {
+    font-size: 10px;
+    line-height: 14px;
+    color: green;
+    margin-bottom: 0px;
+    padding: 0px;
+    border-width: 0px;
+    background-color: white;
+  }
+  </Style>
+</View>
+                """,
+            },
+            None,
+            201,
+        ),
     ],
 )
 @pytest.mark.django_db

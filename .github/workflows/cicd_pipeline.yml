@@ -368,7 +368,20 @@ jobs:
 
           previous_tag=$(git tag --sort=-committerdate | head -n1)
 
-          echo "previous_tag_name=tags/${previous_tag}" >> $GITHUB_OUTPUT          
+          echo "previous_tag_name=tags/${previous_tag}" >> $GITHUB_OUTPUT
+
+      - name: Set Jira fix version
+        uses: ./.github/actions-hub/actions/jira-set-fix-version
+        continue-on-error: true
+        with:
+          github_token: "${{ secrets.GIT_PAT }}"
+          github_repository: "${{ github.repository }}"
+          github_previous_ref: "${{ steps.previous-tag.outputs.previous_tag_name }}"
+          github_current_ref: "${{ github.event.after }}"
+          jira_server: "${{ vars.JIRA_SERVER }}"
+          jira_username: "${{ secrets.JIRA_USERNAME }}"
+          jira_token: "${{ secrets.JIRA_TOKEN }}"
+          jira_fix_version: "LS OpenSource/${{ steps.create-draft-release.outputs.tag_name }}"
 
       - name: Generate release changelog
         id: changelog_md
@@ -381,8 +394,7 @@ jobs:
           JIRA_SERVER: "${{ vars.JIRA_SERVER }}"
           JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
           JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
-          JIRA_PROJECT: "DEV"
-          JIRA_RN_FIELD: "customfield_10064"
+          JIRA_RELEASE_PREFIX: "LS OpenSource"
           LAUNCHDARKLY_SDK_KEY: "${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}"
           LAUNCHDARKLY_ENVIRONMENT: "community"
           OUTPUT_FILE_MD: "${{ github.workspace }}/output.md"
@@ -426,19 +438,6 @@ jobs:
             core.setOutput("id", release.id);
             core.setOutput("tag_name", release.tag_name);
             core.setOutput("html_url", release.html_url);
-
-      - name: Set Jira fix version
-        uses: ./.github/actions-hub/actions/jira-set-fix-version
-        continue-on-error: true
-        with:
-          github_token: "${{ secrets.GIT_PAT }}"
-          github_repository: "${{ github.repository }}"
-          github_previous_ref: "${{ steps.previous-tag.outputs.previous_tag_name }}"
-          github_current_ref: "${{ github.event.after }}"
-          jira_server: "${{ vars.JIRA_SERVER }}"
-          jira_username: "${{ secrets.JIRA_USERNAME }}"
-          jira_token: "${{ secrets.JIRA_TOKEN }}"
-          jira_fix_version: "LSO/${{ steps.create-draft-release.outputs.tag_name }}"
 
   build-pypi:
     name: "Build"

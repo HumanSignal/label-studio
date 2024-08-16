@@ -8,6 +8,18 @@ const CF = "\r";
 type DDExtraText = string;
 
 /**
+ * Array of all characters and dummy placeholders
+ *
+ * Content is a way to store information about the displayed text
+ * and be able to restore global offsets and relative offsets in the same time.
+ * All hidden characters as "\n" or spaces at the start/end are stored as "" (dummy)
+ * but we keep in mind that it is a character with `length` == 1,
+ * and it affects both global and relative offsets.
+ * @see ./domManager.md
+ */
+type Content = string[];
+
+/**
  * Normalize text for displaying it.
  * It replaces all line breaks with '\n' symbol.
  * This is a variant used historically, but it converts \r\n to \n\n which might be not correct
@@ -21,11 +33,10 @@ class DDTextElement {
   public node: Text;
   public start: number;
   public end: number;
-  // array of all characters and dummy placeholders
-  public content: string[];
+  public content: Content;
   public path?: string;
 
-  constructor(node: Text, start: number, end: number, content: string[], path?: string) {
+  constructor(node: Text, start: number, end: number, content: Content, path?: string) {
     this.node = node;
     this.start = start;
     this.end = end;
@@ -54,7 +65,7 @@ class DDTextElement {
     const content = this.getContent(start, end);
 
     if (newNode.textContent) {
-      newNode.textContent = newNode.textContent.substring(start - this.start, end - this.start);
+      newNode.textContent = [...newNode.textContent].slice(start - this.start, end - this.start).join("");
     }
 
     return new DDTextElement(newNode, start, end, content);
@@ -302,15 +313,45 @@ class DDSpanElement extends DDBlock {
 
 class DDDynamicBlock extends DDBlock {
   public path: string;
+  public content: Content = [];
 
   constructor(start: number, path: string) {
     super(start);
     this.path = path;
   }
 
-  addTextNode(textNode: Text, start: number, end: number, content: string[], path: string) {
+  addTextNode(textNode: Text, start: number, end: number, content: Content, path: string) {
+    // There might be only one text node per DDDynamicBlock
+    this.content = content;
     this.children.push(new DDTextElement(textNode, start, end, content, path));
     this.end = end;
+  }
+
+  getRelativeOffsetByGlobal(offset: number) {
+    return (
+      this.content
+        .slice(0, offset - this.start)
+        //restore the size of skipped symbols (mostly \n) to 1 to get the correct text offset
+        .map((ch) => (ch === "" ? " " : ch))
+        .join("").length
+    );
+  }
+
+  getGlobalOffsetByRelative(offset: number) {
+    let counter = offset;
+    const len =
+      offset === 0
+        ? 0
+        : 1 +
+          this.content.findIndex((ch) => {
+            if (ch === "") {
+              counter--;
+            } else {
+              counter -= ch.length;
+            }
+            return counter <= 0;
+          });
+    return this.start + len;
   }
 }
 
@@ -379,11 +420,11 @@ class DomData {
       fromIdx++;
     }
     let toIdx = fromIdx;
-
     for (const char of text) {
-      if (displayedText[toIdx] === char || (displayedText[toIdx] === " " && char === LF)) {
-        contentParts.push(displayedText[toIdx]);
-        toIdx++;
+      const displayedChar = displayedText.substring(toIdx, toIdx + char.length);
+      if (displayedChar === char || (displayedChar === " " && char === LF)) {
+        contentParts.push(displayedChar);
+        toIdx += char.length;
       } else {
         contentParts.push("");
       }
@@ -408,9 +449,11 @@ class DomData {
     const contentLength = content.length;
     let displayedTextLength = text.length;
 
-    if (pos === -1) {
+    // When `pos - this.displayedTextPos > 1` it most probably means
+    // that `text` is too simple (f.e. " ") and it possible to find its duplicates not at the right place.
+    if (pos === -1 || pos - this.displayedTextPos > 1) {
       // text doesn't match any parts of displayedText
-      // that means that it contains some \n or other symbols that are trimmed by browser
+      // it means that it contains some \n or other symbols that are trimmed by browser
 
       // calc the offsets of the part of displayedText that matches the text in terms of displayed symbols
       const { fromIdx, toIdx, content: newContent } = this.findProjectionOnDisplayedText(text);
@@ -443,13 +486,43 @@ class DomData {
     return this.findTextBlock(pos, avoid)?.findTextElement(pos, avoid);
   }
 
-  findElementByPath(path: string) {
+  findElementByPath(path: string): DDStaticElement | DDDynamicBlock | undefined {
     for (const el of this.elements) {
       if (typeof el !== "string" && el.path === path) {
         return el;
       }
     }
     return undefined;
+  }
+
+  getNextElement(element: DDStaticElement | DDDynamicBlock): DDStaticElement | DDDynamicBlock | undefined {
+    let idx = this.elements.indexOf(element);
+
+    while (
+      !(this.elements[idx + 1] instanceof DDStaticElement) &&
+      !(this.elements[idx + 1] instanceof DDDynamicBlock)
+    ) {
+      idx++;
+      if (idx >= this.elements.length - 1) {
+        return void 0;
+      }
+    }
+
+    return this.elements[idx + 1] as DDStaticElement | DDDynamicBlock;
+  }
+
+  getEndOf(element: DDStaticElement | DDDynamicBlock | DDSpanElement | DDTextElement) {
+    if (element instanceof DDSpanElement || element instanceof DDTextElement) {
+      return element.end;
+    }
+
+    const nextElement = this.getNextElement(element);
+
+    if (nextElement) {
+      return nextElement.start;
+    }
+
+    return this.endPos;
   }
 
   findElementByNode(node: Node) {
@@ -504,11 +577,7 @@ class DomData {
   collectBlocks(start: number, end: number) {
     const startIdx = this.indexOfTextBlock(start, "end");
     const endIdx = Math.max(this.indexOfTextBlock(end, "start"), startIdx);
-    const blocks: DDDynamicBlock[] = this.elements
-      .slice(startIdx, endIdx + 1)
-      .filter((el) => el instanceof DDDynamicBlock) as DDDynamicBlock[];
-
-    return blocks;
+    return this.elements.slice(startIdx, endIdx + 1).filter((el) => el instanceof DDDynamicBlock) as DDDynamicBlock[];
   }
 
   createSpans(start: number, end: number) {
@@ -720,14 +789,21 @@ export default class DomManager {
   }
 
   relativeOffsetsToGlobalOffsets(start: string, startOffset: number, end: string, endOffset: number) {
-    const startEl = this.domData.findElementByPath(start);
-    const endEl = this.domData.findElementByPath(end);
+    let startEl = this.domData.findElementByPath(start);
+    let endEl = this.domData.findElementByPath(end);
 
     if (!startEl || !endEl) {
       return undefined;
     }
+    if (!(startEl instanceof DDDynamicBlock)) {
+      startEl = this.domData.findTextBlock(startEl.start, "end") as DDDynamicBlock;
+    }
+    if (!(endEl instanceof DDDynamicBlock)) {
+      // It really should be "end" and not "start" as we are looking for the exact container by the start position
+      endEl = this.domData.findTextBlock(endEl.start, "end") as DDDynamicBlock;
+    }
 
-    return [startOffset + startEl.start, endOffset + endEl.start];
+    return [startEl.getGlobalOffsetByRelative(startOffset), endEl.getGlobalOffsetByRelative(endOffset)];
   }
 
   globalOffsetsToRelativeOffsets(start: number, end: number) {
@@ -737,9 +813,9 @@ export default class DomManager {
     if (startElement && endElement) {
       return {
         start: startElement.path,
-        startOffset: start - startElement.start,
+        startOffset: startElement.getRelativeOffsetByGlobal(start),
         end: endElement.path,
-        endOffset: end - endElement.start,
+        endOffset: endElement.getRelativeOffsetByGlobal(end),
       };
     }
 
@@ -754,7 +830,14 @@ export default class DomManager {
       return undefined;
     }
 
-    return [range.startOffset + startEl.start, range.endOffset + endEl.start];
+    const startBlock = this.domData.findTextBlock(startEl.start, "end") as DDDynamicBlock;
+    // It really should be "end" and not "start" as we are looking for the exact container by the start position
+    const endBlock = this.domData.findTextBlock(endEl.start, "end") as DDDynamicBlock;
+
+    return [
+      startBlock.getGlobalOffsetByRelative(range.startOffset),
+      endBlock.getGlobalOffsetByRelative(range.endOffset),
+    ];
   }
 
   getText(start: number, end: number) {

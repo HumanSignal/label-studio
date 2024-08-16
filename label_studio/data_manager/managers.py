@@ -11,7 +11,6 @@ from core.utils.db import fast_first
 from data_manager.prepare_params import ConjunctionEnum
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.contrib.postgres.fields.jsonb import KeyTextTransform
 from django.db import models
 from django.db.models import (
     Aggregate,
@@ -28,6 +27,7 @@ from django.db.models import (
     Value,
     When,
 )
+from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Coalesce, Concat
 from pydantic import BaseModel
 
