@@ -34,6 +34,7 @@
 
 .toast-viewport {
   --toast-spacing: 8px;
+
   position: fixed;
   display: flex;
   justify-content: center;
@@ -87,6 +88,7 @@
   --border-color: var(--sand_900);
   --hover-color: var(--sand_300);
   --padding: 8px 16px;
+
   display: flex;
   align-items: center;
   gap: 16px;

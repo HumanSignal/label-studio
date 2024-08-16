@@ -3,7 +3,7 @@
   --padding: 4px;
   --font-size: 16px;
   --button-padding: 0 10px;
-  --button-checked-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.02), 0px 5px 10px rgba(0, 0, 0, 0.15);
+  --button-checked-shadow: 0px 1px 0px rgb(0 0 0 / 10%), 0px 0px 0px 1px rgb(0 0 0 / 2%), 0px 5px 10px rgb(0 0 0 / 15%);
 
   border-radius: var(--radius);
   padding: var(--padding);
@@ -36,7 +36,7 @@
   & .label__text {
     font-weight: 500;
 
-    &:before {
+    &::before {
       content: '';
       background: var(--sand_0);
       border-radius: 100%;
@@ -54,7 +54,7 @@
     }
   }
 
-  & input[type=radio] {
+  & input[type="radio"] {
     display: none;
   }
 
@@ -78,7 +78,7 @@
       box-shadow: var(--button-checked-shadow);
 
       & .label__text {
-        &:before {
+        &::before {
           background-color: var(--sand_0);
           box-shadow: inset 0 0 0 4px var(--grape_500);
         }
@@ -127,12 +127,13 @@
       --padding: 2px;
       --font-size: 12px;
       --button-padding: 0 5px;
-      --button-checked-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.02), 0px 2px 4px rgba(0, 0, 0, 0.15);
+      --button-checked-shadow: 0px 1px 0px rgb(0 0 0 / 10%), 0px 0px 0px 1px rgb(0 0 0 / 2%), 0px 2px 4px rgb(0 0 0 / 15%);
     }
   }
 
   &_simple {
     --height: auto;
+
     all: unset;
     display: block;
   }

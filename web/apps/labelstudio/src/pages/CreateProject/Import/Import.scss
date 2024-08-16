@@ -17,12 +17,11 @@
     font-size: 14px;
     padding: 24px 32px;
     background: var(--sand_0);
-
     display: flex;
     align-items: center;
 
     &.overlay {
-      box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 5px 0 rgb(0 0 0 / 10%);
     }
   }
 
@@ -58,7 +57,7 @@
   & > main {
     flex: 1;
     overflow-y: auto;
-    background: linear-gradient(white 30%, rgba(255, 255, 255, 0)), linear-gradient(rgba(0, 0, 0, 0.1), white 100%);
+    background: linear-gradient(white 30%, rgb(255 255 255 / 0%)), linear-gradient(rgb(0 0 0 / 10%), white 100%);
     background-repeat: no-repeat;
     background-color: var(--sand_0);
     background-size: 100% 20px, 100% 5px;
@@ -87,9 +86,9 @@
       background-size: 37px 100%;
       animation: status-uploading 1s linear infinite;
       background-image: repeating-linear-gradient(-63.43deg,
-          rgba(255, 255, 255, 0.2) 1px, #efefef 2px, #efefef 6px,
-          rgba(255, 255, 255, 0.2) 7px,
-          rgba(255, 255, 255, 0.2) 12px);
+          rgb(255 255 255 / 20%) 1px, #efefef 2px, #efefef 6px,
+          rgb(255 255 255 / 20%) 7px,
+          rgb(255 255 255 / 20%) 12px);
     }
   }
 
@@ -101,7 +100,7 @@
     width: 100%;
     height: 100%;
     z-index: 1;
-    background: rgba(white, 0.5);
+    background: rgb(white 0.5);
   }
 
   &__upload-button {
@@ -149,10 +148,7 @@
   &__csv-splash {
     background: var(--sand_100);
     position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 10;
     border-radius: 5px;
     pointer-events: none;
@@ -181,10 +177,7 @@
     &::before {
       content: "";
       position: absolute;
-      left: 8px;
-      right: 8px;
-      top: 8px;
-      bottom: 8px;
+      inset: 8px;
       border: 2px dashed var(--grape_500);
       border-radius: 10px;
       pointer-events: none;

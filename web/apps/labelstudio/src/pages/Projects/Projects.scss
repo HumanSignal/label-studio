@@ -42,19 +42,19 @@
     box-sizing: border-box;
   }
 
-  @media (min-width: 1200px) {
+  @media (width >= 1200px) {
     &__list {
       grid-template-columns: repeat(3, 1fr);
     }
   }
 
-  @media (min-width: 1360px) {
+  @media (width >= 1360px) {
     &__list {
       grid-template-columns: repeat(4, 1fr);
     }
   }
 
-  @media (min-width: 1460px) {
+  @media (width >= 1460px) {
     &__list {
       grid-template-columns: repeat(5, 1fr);
     }
@@ -92,6 +92,7 @@
 
 .project-card {
   --text-color: var(--sand_900);
+
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -100,7 +101,7 @@
   border-radius: 0.5rem;
   overflow: hidden;
   color: var(--text-color);
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 5%);
 
   &__header {
     padding: 12px 16px;
@@ -113,6 +114,7 @@
     .button {
       margin-right: -10px;
       opacity: 0.5;
+
       --button-color: var(--text-color);
 
       &__icon {
@@ -157,6 +159,7 @@
 
     &-item {
       --icon-color: var(--sand_0);
+
       display: flex;
       align-items: center;
 
@@ -201,7 +204,7 @@
   &__info {
     display: flex;
     align-items: center;
-    padding: 16px 16px 10px 16px;
+    padding: 16px 16px 10px;
     justify-content: space-between;
   }
 
@@ -216,6 +219,7 @@
 
   &_colored {
     --text-color: var(--sand_0);
+
     background-color: var(--background-color);
     
     & .project-card__header {

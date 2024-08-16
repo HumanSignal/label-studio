@@ -39,15 +39,12 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
     position: relative;
     display: inline-block;
     transition: all 80ms ease;
-    box-shadow: inset 0px -1px 0px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 15%);
   }
 
   &__check::before,
   &__check::after {
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    inset: 0;
     display: block;
     content: '';
     opacity: 0;
@@ -62,10 +59,7 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
   }
 
   &__check::after {
-    top: 4px;
-    left: 4px;
-    bottom: 4px;
-    right: 4px;
+    inset: 4px;
     border-radius: 2px;
     background-color: var(--grape_500);
   }

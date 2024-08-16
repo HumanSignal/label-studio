@@ -10,7 +10,7 @@
   position: fixed;
   align-items: center;
   justify-content: center;
-  background-color: rgba(18, 17, 13, 0.3);
+  background-color: rgb(18 17 13 / 30%);
   will-change: opacity;
 
   &_optimize &__wrapper {
@@ -34,7 +34,7 @@
     flex-direction: column;
     background-color: var(--sand_0);
     border-radius: 0.5rem;
-    box-shadow: 0 10px 30px rgba(18, 17, 13, 0.3);
+    box-shadow: 0 10px 30px rgb(18 17 13 / 30%);
   }
 
   &__header {
@@ -88,13 +88,15 @@
 
     &:not(.modal__footer_bare) {
       background: var(--sand_100);
-      box-shadow: inset 0px 1px 0px var(--sand_300);
+      box-shadow: inset 0 1px 0 var(--sand_300);
     }
   }
 
   &__close {
     --button-color: var(--primary_link);
+
     border: none;
+
     --icon-size: 16px;
   }
 

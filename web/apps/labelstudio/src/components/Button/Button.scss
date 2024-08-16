@@ -2,7 +2,7 @@
   --button-color: var(--grape_500);
   --button-background-color: var(--sand_0);
   --button-background-image: none;
-  --button-shadow: inset 0px -1px 0px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15);
+  --button-shadow: inset 0px -1px 0px rgb(0 0 0 / 10%), inset 0px 0px 0px 1px rgb(0 0 0 / 15%);
   --button-content-align: center;
   --button-content-justify: center;
   --button-events: all;
@@ -47,19 +47,20 @@
   text-decoration: none;
   gap: var(--button-gap);
 
-  &:hover:not(:disabled):not(.button_waiting):not(.button_look_danger):not(.button_look_primary) {
+  &:hover:not(:disabled, .button_waiting, .button_look_danger, .button_look_primary) {
     --button-color: var(--grape_700);
     --button-background-color: var(--grape_0);
   }
 
   &:active {
     color: var(--button-color);
-    --button-background-image: linear-gradient(0deg, rgba(18, 17, 13, 0.02), rgba(18, 17, 13, 0.02)), var(--sand_0);
+
+    --button-background-image: linear-gradient(0deg, rgb(18 17 13 / 2%), rgb(18 17 13 / 2%)), var(--sand_0);
   }
 
   &:focus {
     outline: none;
-    box-shadow: 0px 0px 0px 4px var(--grape_100);
+    box-shadow: 0 0 0 4px var(--grape_100);
   }
 
   &_waiting,
@@ -68,6 +69,7 @@
     --button-color: var(--sand_500);
     --button-background-color: var(--sand_200);
     --button-events: none;
+
     border: none;
 
     & svg {
@@ -81,6 +83,7 @@
 
   &__extra {
     --button-font-size: var(--font-size-300);
+
     line-height: var(--font-line-height-small);
     display: flex;
     color: var(--button-extra-color);
@@ -101,6 +104,7 @@
 
     &:only-child {
       flex: 1;
+
       --button-content-align: center;
       --button-content-justify: center;
     }
@@ -122,12 +126,14 @@
   }
 
   &_type {
-
     &_text,
     &_link {
       --button-padding: 0;
+
       min-width: 0;
+
       --button-background-color: none;
+
       border: none;
     }
 
@@ -143,7 +149,7 @@
       --button-background-color: var(--primary_link);
       --button-border: none;
 
-      &:hover:not(:disabled):not(.button_waiting) {
+      &:hover:not(:disabled, .button_waiting) {
         --button-background-color: var(--grape_700);
         --button-color: var(--sand_0);
       }
@@ -153,15 +159,16 @@
       }
 
       &:focus:not(:disabled) {
-        box-shadow: 0px 0px 0px 4px var(--grape_100);
+        box-shadow: 0 0 0 4px var(--grape_100);
       }
     }
 
     &_danger {
       --button-color: var(--danger_color);
 
-      &:hover:not(:disabled):not(&_waiting) {
+      &:hover:not(:disabled, &_waiting) {
         --button-color: var(--danger_color);
+
         border-color: var(--danger_color);
         background: var(--red_1);
       }
@@ -171,8 +178,9 @@
       --button-color: var(--sand_0);
       --button-background-color: var(--danger_color);
 
-      &:hover:not(:disabled):not(.button_waiting) {
+      &:hover:not(:disabled, .button_waiting) {
         --button-color: var(--danger_color);
+
         border-color: var(--danger_color);
         background: var(--red_1);
       }
@@ -184,7 +192,9 @@
 
     &_ghost {
       --button-color: var(--sand_0);
+
       border: none;
+
       --button-background-color: transparent;
     }
   }
@@ -198,7 +208,7 @@
   &_look_destructive:disabled,
   &_look_destructive &_waiting,
   &_look_destructive &_disabled {
-    --button-color: rgba(255, 255, 255, 0.5);
+    --button-color: rgb(255 255 255 / 50%);
     --button-background-color: var(--danger_color);
   }
 
@@ -206,6 +216,7 @@
   &_look_primary.button_disabled {
     --button-color: var(--sand_500);
     --button-background-color: var(--sand_200);
+
     border: none;
   }
 
@@ -264,7 +275,7 @@
     border: none;
   }
 
-  &_withIcon:not(.button_type_link):not(.button_noContent) {
+  &_withIcon:not(.button_type_link, .button_noContent) {
     --button-padding: 0 14px;
   }
 
@@ -289,8 +300,10 @@
     background-repeat: repeat;
     background-position: 40px;
     background-size: 37px 100%;
+
     --button-background-image: var(--button-waiting-animation-bg);
     --button-background-color: var(--sand_0);
+
     animation: button-waiting 1s linear infinite;
   }
 
@@ -310,6 +323,7 @@
   &_noContent {
     --button-min-width: var(--button-height);
     --button-padding: 0;
+
     border: none;
   }
 }
@@ -332,7 +346,7 @@
       --button-radius: 0 5px 5px 0;
     }
 
-    .button:not(:first-child):not(:last-child) {
+    .button:not(:first-child, :last-child) {
       --button-radius: 0;
     }
   }

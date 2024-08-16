@@ -9,7 +9,7 @@
   position: absolute;
   box-sizing: border-box;
   background-color: var(--sand_0);
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 20px rgb(0 0 0 / 20%);
   will-change: transform, opacity;
 
   &_align {
