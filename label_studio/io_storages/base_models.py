@@ -231,7 +231,10 @@ class ImportStorage(Storage):
     def generate_http_url(self, url):
         raise NotImplementedError
 
-    def can_resolve_url(self, url):
+    def can_resolve_url(self, url: str) -> bool:
+        return self.can_resolve_scheme(url)
+
+    def can_resolve_scheme(self, url: str) -> bool:
         # TODO: later check to the full prefix like "url.startswith(self.path_full)"
         # Search of occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
         _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
