@@ -38,21 +38,7 @@
     display: flex;
     position: relative;
     align-items: center;
-  }
 
-  &__field {
-    &.last-activity {
-      color: var(--sand_600);
-    }
-  }
-
-  &__column {
-    font-weight: 500;
-    background: none;
-  }
-
-  &__field,
-  &__column {
     &.avatar {
       width: 28px;
       box-sizing: content-box;
@@ -69,6 +55,17 @@
     &.last-activity {
       width: 160px;
     }
+  }
+
+  &__field {
+    &.last-activity {
+      color: var(--sand_600);
+    }
+  }
+
+  &__column {
+    font-weight: 500;
+    background: none;
   }
 
   &__user {

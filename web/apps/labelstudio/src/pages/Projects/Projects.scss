@@ -13,6 +13,8 @@
   &__list {
     padding: 40px;
     display: grid;
+
+    // review in the pr this will fail in CI
     grid-autoflow: columns;
     box-sizing: border-box;
     grid-gap: 32px;
@@ -221,7 +223,7 @@
     --text-color: var(--sand_0);
 
     background-color: var(--background-color);
-    
+
     & .project-card__header {
       background-color: var(--header-color);
       box-shadow: none;

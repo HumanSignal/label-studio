@@ -74,14 +74,14 @@
     &_active &-icon {
       opacity: 1;
     }
-  }
 
-  &__item_dangerous {
-    color: var(--danger_color);
+    &_dangerous {
+      color: var(--danger_color);
 
-    &:hover {
-      color: var(--danger_color) !important;
-      background-color: var(--red_1) !important;
+      &:hover {
+        color: var(--danger_color) !important;
+        background-color: var(--red_1) !important;
+      }
     }
   }
 
@@ -122,17 +122,6 @@
   &_contextual {
     box-shadow: 0 1px 2px rgb(38 38 38 / 30%), 0 1px 3px 1px rgb(38 38 38 / 15%);
     border-radius: 4px;
-  }
-
-  &__item {
-    &_dangerous {
-      color: var(--danger_color);
-
-      &:hover {
-        color: var(--danger_color);
-        background-color: var(--red_1);
-      }
-    }
   }
 
   &_contextual &__item {

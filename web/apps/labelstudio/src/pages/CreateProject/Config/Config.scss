@@ -1,6 +1,6 @@
-$scroll_width: 5px;
+$scroll-width: 5px;
 
-@mixin styled_scroll() {
+@mixin styled-scroll() {
   &::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -43,12 +43,12 @@ $scroll_width: 5px;
 .wizard .configure__container {
   display: flex;
   flex-direction: column;
-  padding: 16px 16px - $scroll_width 16px 20px;
+  padding: 16px 16px - $scroll-width 16px 20px;
   overflow-y: scroll;
   background-color: var(--sand_0);
 
   &::-webkit-scrollbar {
-    width: $scroll_width;
+    width: $scroll-width;
   }
 
   &::-webkit-scrollbar-track {
@@ -246,7 +246,7 @@ $scroll_width: 5px;
   flex: 1;
   overflow-y: auto;
 
-  @include styled_scroll;
+  @include styled-scroll;
 }
 
 .configure__tags-link {
@@ -379,7 +379,7 @@ $scroll_width: 5px;
   align-items: stretch;
   flex: 1;
 
-  @include styled_scroll;
+  @include styled-scroll;
 
   .configure__label {
     display: flex;
@@ -518,7 +518,7 @@ $scroll_width: 5px;
   display: flex;
   flex-direction: column;
 
-  @include styled_scroll;
+  @include styled-scroll;
 
   h3 {
     margin: 8px 0 16px;
