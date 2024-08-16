@@ -235,8 +235,7 @@ class ImportStorage(Storage):
         return self.can_resolve_scheme(url)
 
     def can_resolve_scheme(self, url: str) -> bool:
-        # TODO: later check to the full prefix like "url.startswith(self.path_full)"
-        # Search of occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
+        # TODO: Search for occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
         _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
         if prefix == self.url_scheme:
             return True
