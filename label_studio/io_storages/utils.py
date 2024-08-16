@@ -57,3 +57,19 @@ def parse_bucket_uri(uri: str | None) -> BucketURI | None:
         return None
 
     return BucketURI(bucket=bucket, path=path, scheme=scheme)
+
+def storage_can_resolve_bucket_url(storage, url) -> bool:
+    if not storage.can_resolve_scheme(url):
+        return False
+
+    uri = parse_bucket_uri(url)
+    if not uri:
+        return False
+
+    if storage.bucket != uri.bucket:
+        return False
+    
+    if storage.prefix and not uri.path.startswith(storage.prefix):
+        return False
+    
+    return True
