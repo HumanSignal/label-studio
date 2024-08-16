@@ -79,7 +79,7 @@ For a tutorial on how to use this template with the Label Studio SDK, see [Evalu
       background: unset;
     }
 
-    .answer-box .ls-object-lsf {
+    .answer-box .ls-object {
       padding: 20px
     }
   </Style>

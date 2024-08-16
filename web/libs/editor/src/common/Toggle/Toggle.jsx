@@ -8,7 +8,7 @@ const Toggle = forwardRef(
     { className, label, labelProps, description, checked, defaultChecked, onChange, required, style, ...props },
     ref,
   ) => {
-    const rootClass = cn("toggle-lsf");
+    const rootClass = cn("toggle");
     const initialChecked = useMemo(() => defaultChecked ?? checked ?? false, [defaultChecked, checked]);
     const [isChecked, setIsChecked] = useState(defaultChecked ?? checked ?? false);
 
@@ -22,7 +22,7 @@ const Toggle = forwardRef(
     mods.disabled = props.disabled;
 
     const formField = (
-      <Block name="toggle-lsf" className={className} mod={mods} style={style}>
+      <Block name="toggle" className={className} mod={mods} style={style}>
         <input
           ref={ref}
           {...props}

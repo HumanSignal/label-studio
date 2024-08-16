@@ -69,7 +69,7 @@ export class Modal extends Component {
     const mixes = [this.transitionClass, this.props.className];
 
     const modalContent = (
-      <Block name="modal-lsf" ref={this.modalRef} mod={mods} mix={mixes} onClick={this.onClickOutside}>
+      <Block name="modal" ref={this.modalRef} mod={mods} mix={mixes} onClick={this.onClickOutside}>
         <Elem name="wrapper">
           <Elem name="content" style={this.props.style}>
             {!bare && (
@@ -93,7 +93,7 @@ export class Modal extends Component {
   }
 
   onClickOutside = (e) => {
-    const modalRootCN = cn("modal-lsf");
+    const modalRootCN = cn("modal");
     const { closeOnClickOutside } = this.props;
     const isInModal = this.modalRef.current.contains(e.target);
     const content = modalRootCN.elem("content").closest(e.target);

@@ -5,7 +5,7 @@ module.exports = {
   _rootSelector: ".lsf-outliner",
   _regionListSelector: ".lsf-outliner-tree",
   _regionListItemSelector: ".lsf-tree-lsf__node:not(.lsf-tree-lsf__node_type_footer)",
-  _regionListItemSelectedSelector: ".lsf-tree-lsf-node-selected",
+  _regionListItemSelectedSelector: ".lsf-tree-node-selected",
   _regionListItemIndex: ".lsf-outliner-item__index",
   _regionVesibilityActionButton: ".lsf-outliner-item__control_type_visibility button",
   locateOutliner() {

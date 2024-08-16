@@ -72,7 +72,7 @@ examples.slice(1).forEach((example) =>
         I.waitForVisible(".lsf-htx-richtext", 5);
       }
 
-      I.dontSeeElement(locate(".ls-errors"));
+      I.dontSeeElement(locate(".lsf-errors"));
 
       restored = await I.executeScript(serialize);
       assertWithTolerance(restored, result);
@@ -81,7 +81,7 @@ examples.slice(1).forEach((example) =>
         I.click(".ant-list-item");
         // I.click('Delete Entity') - it founds something by tooltip, but not a button
         // so click the bin button in entity's info block
-        I.click(".ls-entity-buttons span[aria-label=delete]");
+        I.click(".lsf-entity-buttons span[aria-label=delete]");
         AtSidebar.seeRegions(count - 1);
         I.click(".lsf-history-buttons__action[aria-label=Reset]");
         AtSidebar.seeRegions(count);

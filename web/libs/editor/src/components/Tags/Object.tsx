@@ -13,7 +13,7 @@ interface ObjectTagViewProps {
  */
 const ObjectTagView: FC<ObjectTagViewProps> = ({ item, style, className, children }) => {
   const moreProps = item.getProps && item.getProps();
-  const objectClassName = cn("object-lsf").toClassName();
+  const objectClassName = cn("object").toClassName();
 
   return (
     <div

@@ -45,7 +45,7 @@ const AppComponent = ({ app }) => {
             ) : (
               <DataManager />
             )}
-            <Block name={"offscreen-lsf"} />
+            <Block name={"offscreen"} />
           </Block>
         </SDKProvider>
       </Provider>

@@ -133,7 +133,7 @@ Scenario("Image list with page navigation", async ({ I, AtImageView, LabelStudio
   I.seeElement(`img[src="${data.images[0]}"]`);
 
   I.say("Pagination is visible");
-  I.seeElement(".lsf-pagination-lsf");
+  I.seeElement(".lsf-pagination");
 
   I.say("The number of pages is correct");
   I.see("1 of 4");
@@ -168,7 +168,7 @@ Scenario("Image list with hotkey navigation", async ({ I, AtImageView, LabelStud
   I.seeElement(`img[src="${data.images[0]}"]`);
 
   I.say("Pagination is visible");
-  I.seeElement(".lsf-pagination-lsf");
+  I.seeElement(".lsf-pagination");
 
   I.say("The number of pages is correct");
   I.see("1 of 4");

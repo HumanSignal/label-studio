@@ -134,7 +134,7 @@ The `Human Preference collection for RLHF` template includes the following label
       background: unset;
     }
 
-    .answer-box .ls-object-lsf {
+    .answer-box .ls-object {
       padding: 20px
     }
   </Style>

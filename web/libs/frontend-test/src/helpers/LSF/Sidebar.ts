@@ -22,7 +22,7 @@ export const Sidebar = {
       if (isFFDEV1170) {
         return this.outliner
           .should("be.visible")
-          .get(".lsf-tree-lsf__node:not(.lsf-tree-lsf__node_type_footer) .lsf-tree-lsf-node-content-wrapper");
+          .get(".lsf-tree-lsf__node:not(.lsf-tree-lsf__node_type_footer) .lsf-tree-node-content-wrapper");
       }
 
       return this.legacySidebar.should("be.visible").get(".lsf-region-item");
@@ -35,7 +35,7 @@ export const Sidebar = {
     return this.findRegion(`:eq(${idx})`);
   },
   get hiddenRegions() {
-    return this.outliner.should("be.visible").get(".lsf-tree-lsf__node_hidden .lsf-tree-lsf-node-content-wrapper");
+    return this.outliner.should("be.visible").get(".lsf-tree-lsf__node_hidden .lsf-tree-node-content-wrapper");
   },
   hasRegions(value: number) {
     this.regions.should("have.length", value);
@@ -44,10 +44,10 @@ export const Sidebar = {
     this.regions.should("not.exist");
   },
   hasSelectedRegions(value: number) {
-    this.regions.filter(".lsf-tree-lsf-node-selected").should("have.length", value);
+    this.regions.filter(".lsf-tree-node-selected").should("have.length", value);
   },
   hasSelectedRegion(idx: number) {
-    this.findRegionByIndex(idx).should("have.class", "lsf-tree-lsf-node-selected");
+    this.findRegionByIndex(idx).should("have.class", "lsf-tree-node-selected");
   },
   hasHiddenRegion(value: number) {
     this.hiddenRegions.should("have.length", value);

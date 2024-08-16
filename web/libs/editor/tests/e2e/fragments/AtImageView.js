@@ -11,7 +11,7 @@ module.exports = {
   _toolBarSelector: ".lsf-toolbar",
   _zoomPresetsSelector: '[title^="Zoom presets"]',
 
-  _rootSelector: '[class^="lsf-object-lsf wrapperComponent--"]',
+  _rootSelector: '[class^="lsf-object wrapperComponent--"]',
   _paginationSelector: '[class^="pagination--"]',
   _paginationPrevBtnSelector: ".lsf-pagination-lsf__btn_arrow-left:not(.lsf-pagination-lsf__btn_arrow-left-double)",
   _paginationNextBtnSelector: ".lsf-pagination-lsf__btn_arrow-right:not(.lsf-pagination-lsf__btn_arrow-right-double)",

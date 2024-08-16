@@ -13,18 +13,18 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const RELEASE = require("./release").getReleaseName();
 
-let css_prefix;
+const css_prefix = "lsf-";
 
-switch (process.env.LERNA_PACKAGE_NAME) {
-  case "labelstudio":
-    css_prefix = "ls-";
-    break;
-  case "datamanager":
-    css_prefix = "dm-";
-    break;
-  case "editor":
-    css_prefix = "lsf-";
-}
+// switch (process.env.LERNA_PACKAGE_NAME) {
+//   case "labelstudio":
+//     css_prefix = "lsf-";
+//     break;
+//   case "datamanager":
+//     css_prefix = "dm-";
+//     break;
+//   case "editor":
+//     css_prefix = "lsf-";
+// }
 
 const LOCAL_ENV = {
   NODE_ENV: "development",

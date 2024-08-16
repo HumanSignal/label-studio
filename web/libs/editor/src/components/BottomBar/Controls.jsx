@@ -41,7 +41,7 @@ export const Controls = controlsInjector(
     const isNotQuickView = store.hasInterface("topbar:prevnext");
     const historySelected = isDefined(store.annotationStore.selectedHistory);
     const { userGenerate, sentUserGenerate, versions, results, editable: annotationEditable } = annotation;
-    const dropdownTrigger = cn("dropdown-lsf").elem("trigger").toClassName();
+    const dropdownTrigger = cn("dropdown").elem("trigger").toClassName();
     const buttons = [];
 
     const [isInProgress, setIsInProgress] = useState(false);

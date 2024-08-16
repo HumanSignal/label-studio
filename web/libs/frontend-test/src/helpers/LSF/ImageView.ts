@@ -10,7 +10,7 @@ export const ImageView = {
     return cy.get("img[alt=LS]");
   },
   get root() {
-    return this.image.closest(".lsf-object-lsf");
+    return this.image.closest(".lsf-object");
   },
   get drawingFrame() {
     return this.image.closest('[class^="frame--"]');

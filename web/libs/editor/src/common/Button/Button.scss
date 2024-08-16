@@ -1,4 +1,4 @@
-.button-lsf {
+.button {
   --button-color: var(--sand_900);
   height: 32px;
   border: none;
@@ -20,7 +20,7 @@
   font-size: 14px;
 
   &_newUI {
-    .button-lsf__extra {
+    .button__extra {
       margin-left: 3px;
     }
   }
@@ -181,13 +181,13 @@
   }
 
   &_look_destructive:disabled,
-  &_look_destructive.button-lsf_waiting {
+  &_look_destructive.button_waiting {
     --button-color: rgba(255, 255, 255, 0.5);
     background-color: var(--danger_color);
   }
 
-  &_danger.button-lsf_look_alt,
-  &_danger.button-lsf_type_text {
+  &_danger.button_look_alt,
+  &_danger.button_type_text {
     --button-color: var(--danger_color);
 
     &:disabled {
@@ -250,11 +250,11 @@
     justify-content: space-between;
   }
 
-  &_withIcon:not(.button-lsf_type_link):not(&[href]) {
+  &_withIcon:not(.button_type_link):not(&[href]) {
     padding: 0 14px;
   }
 
-  &_withIcon.button-lsf_size_small {
+  &_withIcon.button_size_small {
     padding: 0 10px;
   }
 
@@ -268,7 +268,7 @@
     background-color: var(--sand_0);
   }
 
-  &_waiting.button-lsf_look_primary {
+  &_waiting.button_look_primary {
     background-image: var(--primary-button-waiting-animation-bg);
     background-color: var(--primary_link);
   }
@@ -282,25 +282,25 @@
   }
 }
 
-.button-group-lsf {
+.button-group {
   display: flex;
 
-  &:not(.button-group-lsf_collapsed) {
-    .button-lsf + .button-lsf {
+  &:not(.button-group_collapsed) {
+    .button + .button {
       margin-left: 16px;
     }
   }
 
   &_collapsed {
-    .button-lsf:first-child {
+    .button:first-child {
       border-radius: 5px 0 0 5px;
     }
 
-    .button-lsf:last-child {
+    .button:last-child {
       border-radius: 0 5px 5px 0;
     }
 
-    .button-lsf:not(:first-child):not(:last-child) {
+    .button:not(:first-child):not(:last-child) {
       border-radius: 0;
     }
   }

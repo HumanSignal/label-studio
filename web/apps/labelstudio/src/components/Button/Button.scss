@@ -1,4 +1,4 @@
-.button {
+.button-ls {
   --button-color: var(--grape_500);
   --button-background-color: var(--sand_0);
   --button-background-image: none;
@@ -314,25 +314,25 @@
   }
 }
 
-.button-group {
+.button-group-ls {
   display: flex;
 
-  &:not(.button-group_collapsed) {
-    .button + .button {
+  &:not(.button-group-ls_collapsed) {
+    .button-ls + .button-ls {
       --button-margin-left: 16px;
     }
   }
 
   &_collapsed {
-    .button:first-child {
+    .button-ls:first-child {
       --button-radius: 5px 0 0 5px;
     }
 
-    .button:last-child {
+    .button-ls:last-child {
       --button-radius: 0 5px 5px 0;
     }
 
-    .button:not(:first-child):not(:last-child) {
+    .button-ls:not(:first-child):not(:last-child) {
       --button-radius: 0;
     }
   }
