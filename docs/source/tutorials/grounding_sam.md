@@ -1,12 +1,12 @@
 ---
-title: Zero-shot object detection and image segmentation with Grounding DINO
+title: Zero-shot object detection and image segmentation with Grounding DINO and SAM
 type: guide
 tier: all
 order: 15
 hide_menu: true
 hide_frontmatter_title: true
-meta_title: Image segmentation in Label Studio using a Grounding DINO backend
-meta_description: Label Studio tutorial for using Grounding DINO for zero-shot object detection in images
+meta_title: Image segmentation in Label Studio using a Grounding DINO backend and SAM
+meta_description: Label Studio tutorial for using Grounding DINO and SAM for zero-shot object detection in images
 categories:
     - Computer Vision
     - Image Annotation
@@ -14,17 +14,13 @@ categories:
     - Zero-shot Image Segmentation
     - Grounding DINO
     - Segment Anything Model
-image: "/tutorials/grounding-dino.png"
+image: "/tutorials/grounding-sam.png"
 ---
-
-<!--
-
--->
 
 https://github.com/HumanSignal/label-studio-ml-backend/assets/106922533/d1d2f233-d7c0-40ac-ba6f-368c3c01fd36
 
 
-# Grounding DINO backend integration
+# Grounding DINO backend integration with SAM enabled
 
 This integration will allow you to:
 
