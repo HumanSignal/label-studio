@@ -282,7 +282,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 // extracted by mini-css-extract-plugin
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"menu-dm":"lsf-menu-dm","menu-dm__item":"lsf-menu-dm__item","menu-dm__item-icon":"lsf-menu-dm__item-icon","menu__item_look_danger":"lsf-menu__item_look_danger","menu-dm__item_active":"lsf-menu-dm__item_active","sidebar__pin":"lsf-sidebar__pin","menu__item_clickable":"lsf-menu__item_clickable","menu-dm__item_look_danger":"lsf-menu-dm__item_look_danger","menu-dm__spacer":"lsf-menu-dm__spacer","menu-dm__divider":"lsf-menu-dm__divider","menu-dm_size_compact":"lsf-menu-dm_size_compact","menu-dm_size_small":"lsf-menu-dm_size_small","menu-dm_collapsed":"lsf-menu-dm_collapsed","menu-group-dm__title":"lsf-menu-group-dm__title","menu-group-dm__list":"lsf-menu-group-dm__list"});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"menu-dm":"lsf-menu-dm","menu-dm__item":"lsf-menu-dm__item","menu-dm__item-icon":"lsf-menu-dm__item-icon","menu-dm__item_look_danger":"lsf-menu-dm__item_look_danger","menu-dm__item_active":"lsf-menu-dm__item_active","sidebar__pin":"lsf-sidebar__pin","menu-dm__item_clickable":"lsf-menu-dm__item_clickable","menu-dm__spacer":"lsf-menu-dm__spacer","menu-dm__divider":"lsf-menu-dm__divider","menu-dm_size_compact":"lsf-menu-dm_size_compact","menu-dm_size_small":"lsf-menu-dm_size_small","menu-dm_collapsed":"lsf-menu-dm_collapsed","menu-group-dm__title":"lsf-menu-group-dm__title","menu-group-dm__list":"lsf-menu-group-dm__list"});
 
 /***/ }),
 

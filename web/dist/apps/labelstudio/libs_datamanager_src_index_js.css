@@ -329,7 +329,7 @@
   align-items: center;
   justify-content: center;
 }
-.lsf-menu-dm__item:not(.lsf-menu__item_look_danger):hover {
+.lsf-menu-dm__item:not(.lsf-menu-dm__item_look_danger):hover {
   color: var(--grape_700);
   background-color: var(--grape_0);
 }
@@ -337,7 +337,7 @@
   color: var(--grape_700);
   background-color: var(--grape_0);
 }
-.lsf-menu-dm__item_active:not(.lsf-sidebar__pin):not(.lsf-menu__item_clickable) {
+.lsf-menu-dm__item_active:not(.lsf-sidebar__pin):not(.lsf-menu-dm__item_clickable) {
   pointer-events: none;
 }
 .lsf-menu-dm__item:hover .lsf-menu-dm__item-icon, .lsf-menu-dm__item_active .lsf-menu-dm__item-icon {

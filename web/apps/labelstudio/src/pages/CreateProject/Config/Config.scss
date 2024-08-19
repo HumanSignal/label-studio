@@ -516,7 +516,7 @@ $scroll_width: 5px;
   background-color: var(--sand_100);
   display: flex;
   flex-direction: column;
-  @include styled_scroll();
+  @include styled_scroll;
 
   h3 {
     margin: 8px 0 16px;
