@@ -1523,9 +1523,9 @@ h1+.admonition {
 
 /* enterprise */
 .content-markdown .admonition.error {
-  --color-border: var(--color-yellow-400);
+  --color-border: var(--color-purple-400);
   --color-title: var(--color-white);
-  --color-title-background: linear-gradient(109.47deg, #FFA663 0%, #FF7557 51.56%, #E37BD3 100%);
+  --color-title-background: linear-gradient(109.47deg, #E37BD3 0%, #FF7557 51.56%, #FFA663 100%);
   --color-background: var(--color-white);
 }
 
