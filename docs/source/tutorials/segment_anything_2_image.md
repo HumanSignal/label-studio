@@ -70,7 +70,7 @@ $ curl http://localhost:9090/
 3. Connect to the backend from Label Studio running on the same host: go to your project `Settings -> Machine Learning -> Add Model` and specify `http://localhost:9090` as a URL.
 
 
-# Configuration
+## Configuration
 Parameters can be set in `docker-compose.yml` before running the container.
 
 
@@ -84,6 +84,6 @@ The following common parameters are available:
 - `WORKERS` - specify the number of workers for the model server
 - `THREADS` - specify the number of threads for the model server
 
-# Customization
+## Customization
 
 The ML backend can be customized by adding your own models and logic inside the `./segment_anything_2` directory. 
