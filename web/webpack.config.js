@@ -15,16 +15,17 @@ const RELEASE = require("./release").getReleaseName();
 
 const css_prefix = "lsf-";
 
+const mode = process.env.BUILD_MODULE ? "production" : process.env.NODE_ENV || "development";
+
 const LOCAL_ENV = {
-  NODE_ENV: "development",
+  NODE_ENV: mode,
   CSS_PREFIX: css_prefix,
   RELEASE_NAME: RELEASE,
 };
 
 const devtool = process.env.NODE_ENV === "production" ? "source-map" : "cheap-module-source-map";
 
-const DEFAULT_NODE_ENV = process.env.BUILD_MODULE ? "production" : process.env.NODE_ENV || "development";
-const isDevelopment = DEFAULT_NODE_ENV !== "production";
+const isDevelopment = mode !== "production";
 const customDistDir = !!process.env.WORK_DIR;
 
 const BUILD = {
@@ -50,7 +51,7 @@ const optimizer = () => {
     minimizer: [],
   };
 
-  if (DEFAULT_NODE_ENV === "production") {
+  if (mode === "production") {
     result.minimizer.push(
       new TerserPlugin({
         parallel: true,
@@ -229,7 +230,7 @@ module.exports = composePlugins(
     // update the stylus loader to include an import of a global file
     return merge(config, {
       devtool,
-      mode: process.env.NODE_ENV || "development",
+      mode,
       plugins,
       optimization: optimizer(),
     });
