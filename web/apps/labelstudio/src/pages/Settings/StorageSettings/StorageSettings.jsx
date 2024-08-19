@@ -4,7 +4,7 @@ import { Description } from "../../../components/Description/Description";
 import { Block, cn } from "../../../utils/bem";
 import { Elem } from "../../../utils/bem";
 import { StorageSet } from "./StorageSet";
-import "./StorageSettings.styl";
+import "./StorageSettings.scss";
 import { isInLicense, LF_CLOUD_STORAGE_FOR_MANAGERS } from "../../../utils/license-flags";
 
 const isAllowCloudStorage = !isInLicense(LF_CLOUD_STORAGE_FOR_MANAGERS);

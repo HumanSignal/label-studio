@@ -14,7 +14,7 @@ import { MultiProvider } from "../providers/MultiProvider";
 import { ProjectProvider } from "../providers/ProjectProvider";
 import { RoutesProvider } from "../providers/RoutesProvider";
 import { DRAFT_GUARD_KEY, DraftGuard, draftGuardCallback } from "../components/DraftGuard/DraftGuard";
-import "./App.styl";
+import "./App.scss";
 import { AsyncPage } from "./AsyncPage/AsyncPage";
 import ErrorBoundary from "./ErrorBoundary";
 import { RootPage } from "./RootPage";

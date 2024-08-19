@@ -1,0 +1,37 @@
+.backend-card {
+  padding: 15px;
+  border-radius: 5px;
+  background: var(--sand_100);
+  border: 1px solid var(--sand_300);
+
+  &__title-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+  }
+
+  &__title {
+    margin-top: 15px;
+    margin-left: 2px;
+    font-weight: 500;
+  }
+
+  &__meta {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    gap: 20px;
+    color: var(--sand_600); 
+    margin-top: 5px;
+    margin-left: 2px;
+  }
+
+  &__group {
+    display: flex;
+    align-items: center;
+  }
+
+  &__menu {
+    align-items: top;
+  }
+}

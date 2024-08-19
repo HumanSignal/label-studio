@@ -5,7 +5,7 @@ import { RadioGroup } from "../../components/Form/Elements/RadioGroup/RadioGroup
 import { ProjectContext } from "../../providers/ProjectProvider";
 import { Block, cn, Elem } from "../../utils/bem";
 import { EnterpriseBadge } from "../../components/Badges/Enterprise";
-import "./settings.styl";
+import "./settings.scss";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { FF_LSDV_E_297, isFF } from "../../utils/feature-flags";
 import { createURL } from "../../components/HeidiTips/utils";

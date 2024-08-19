@@ -4,7 +4,7 @@ import { Block, Elem } from "../../../../utils/bem";
 import { Oneof } from "../../../Oneof/Oneof";
 import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";
-import "./Counter.styl";
+import "./Counter.scss";
 
 const allowedKeys = ["ArrowUp", "ArrowDown", "Backspace", "Delete", /[0-9]/];
 

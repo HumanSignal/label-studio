@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { LsCross } from "../../../assets/icons";
 import { Button, Userpic } from "../../../components";
 import { Block, Elem } from "../../../utils/bem";
-import "./SelectedUser.styl";
+import "./SelectedUser.scss";
 
 const UserProjectsLinks = ({ projects }) => {
   return (

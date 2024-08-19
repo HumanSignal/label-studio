@@ -169,7 +169,7 @@ jobs:
         with:
           channel-id: '${{ vars.SLACK_CH_RELEASE_TRAIN }}'
           slack-message: |
-            On or more steps of Label Studio OpenSource release pipeline got failed! <!subteam^${{ vars.SLACK_GR_DEVOPS }}>
+            One or more steps of Label Studio OpenSource release pipeline got failed! <!subteam^${{ vars.SLACK_GR_DEVOPS }}>
 
             ><https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|[Workflow run]>
         env:

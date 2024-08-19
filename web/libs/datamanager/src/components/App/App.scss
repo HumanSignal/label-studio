@@ -1,21 +1,3 @@
-body {
-  --black-raw: 0, 0, 0;
-  --white-raw: 255, 255, 255;
-  --accent_color-raw: 86, 111, 207;
-  --danger_color-raw: 221, 0, 0;
-  --black: rgb(var(--black-raw));
-  --white: rgb(var(--white-raw));
-  --accent_color: rgb(var(--accent_color-raw));
-  --danger_color: rgb(var(--danger_color-raw));
-
-  --black_2:  rgba(var(--black-raw), 0.02);
-  --black_4:  rgba(var(--black-raw), 0.04);
-  --black_5:  rgba(var(--black-raw), 0.05);
-  --black_10: rgba(var(--black-raw), 0.1);
-  --black_15: rgba(var(--black-raw), 0.15);
-  --black_20: rgba(var(--black-raw), 0.20);
-  --black_40: rgba(var(--black-raw), 0.40);
-}
 .root {
   height: 100%;
   box-sizing: border-box;

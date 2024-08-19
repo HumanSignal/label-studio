@@ -1,5 +1,5 @@
 import { Block } from "../../utils/bem";
-import "./Description.styl";
+import "./Description.scss";
 
 export const Description = ({ children, className, size = "medium", noOffset = false, ...rest }) => {
   return (

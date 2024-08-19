@@ -1,12 +1,11 @@
 import { ImageView, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
 import { rect3Config, simpleImageData } from "../../../data/image_segmentation/tools/rect3point";
-import { FF_DEV_2132, FF_DEV_3793 } from "../../../../../src/utils/feature-flags";
+import { FF_DEV_3793 } from "../../../../../src/utils/feature-flags";
 
 describe("Rect3Point tool", () => {
   beforeEach(() => {
     LabelStudio.addFeatureFlagsOnPageLoad({
       [FF_DEV_3793]: true,
-      [FF_DEV_2132]: true,
     });
   });
   it("Should be able to draw region with rotation 0", () => {
