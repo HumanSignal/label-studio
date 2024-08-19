@@ -1,6 +1,6 @@
 {
-  "message": "chore: LEAP-1365: bump nltk",
-  "commit": "daf689da0aa62e5c77365b2b928bef80eb041521",
-  "date": "2024-08-12T21:56:57.000Z",
+  "message": "chore: LEAP-1378: bump nltk to 3.9.1 to get off git tag version (#6220)",
+  "commit": "06f1e2b7436e8ad9a803e027e1a101b043ef201f",
+  "date": "2024-08-19T19:10:29.000Z",
   "branch": "ls-release/1.13.1"
 }
