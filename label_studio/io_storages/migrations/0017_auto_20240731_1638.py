@@ -13,7 +13,6 @@ def create_index_sql(table_name, index_name, column_name):
     CREATE INDEX CONCURRENTLY IF NOT EXISTS "{index_name}" ON "{table_name}" ("{column_name}");
     """
 
-
 def create_fk_sql(table_name, constraint_name, column_name, referenced_table, referenced_column):
     return f"""
     ALTER TABLE "{table_name}" DROP CONSTRAINT IF EXISTS "{constraint_name}";
@@ -88,12 +87,12 @@ class Migration(migrations.Migration):
         operations.append(
             migrations.RunSQL(
                 sql=index_sql,
-                reverse_sql=RunSQL.noop
+                reverse_sql=drop_index_sql
             )
         )
         operations.append(
             migrations.RunSQL(
                 sql=fk_sql,
-                reverse_sql=RunSQL.noop
+                reverse_sql=RunSQL.noop # Will not re-add the unique constraint on rollback because that could result in data loss
             )
         )
