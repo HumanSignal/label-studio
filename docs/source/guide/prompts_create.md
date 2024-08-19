@@ -22,7 +22,7 @@ date: 2024-06-11 16:53:16
 
 ## Model provider API keys
 
-You can specify one OpenAI API key and multiple Azure OpenAI keys per organization. Keys only need to be added once. 
+You can specify one OpenAI API key and/or multiple Azure OpenAI keys per organization. Keys only need to be added once. 
 
 Click **API Keys** in the top right of the Prompts page to open the **Model Provider API Keys** window:
 
@@ -46,7 +46,7 @@ Once added, all supported OpenAI models will appear in the base model options wh
 
 {% details <b>Use an Azure OpenAI key</b> %}
 
-Each Azure OpenAI key is tied to a specific deployment (OpenAI model). So if you want to use multiple models through Azure, you will need to add multiple keys. 
+Each Azure OpenAI key is tied to a specific deployment, and each deployment comprises a single OpenAI model. So if you want to use multiple models through Azure, you will need to create a deployment for each model and then add each key to Label Studio. 
 
 For a list of the Azure OpenAI models we support, see [Features, requirements, and constraints](prompts_overview#Features-requirements-and-constraints). 
 
