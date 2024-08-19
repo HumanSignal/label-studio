@@ -70,9 +70,6 @@ class Migration(migrations.Migration):
     operations = []
 
     for table in tables:
-        index_sql = create_index_sql(table['table_name'], table['index_name'], table['column_name'])
-        fk_sql = create_fk_sql(table['table_name'], table['fk_constraint'], table['column_name'], "task_completion", "id")
-
         if IS_SQLITE:
             operations.append(
                 migrations.AlterField(
@@ -84,6 +81,9 @@ class Migration(migrations.Migration):
                 ),
             )
             continue
+
+        index_sql = create_index_sql(table['table_name'], table['index_name'], table['column_name'])
+        fk_sql = create_fk_sql(table['table_name'], table['fk_constraint'], table['column_name'], "task_completion", "id")
 
         operations.append(
             migrations.RunSQL(
