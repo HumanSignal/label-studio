@@ -133,6 +133,7 @@ def get_operations():
             migrations.RunPython(forwards, backwards),
         ]
 
+    operations = []
     # Use standard migration for SQLITE
     for table in tables:
         operations.append(
