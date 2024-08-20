@@ -29,7 +29,7 @@ import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 import "./TextAreaRegionView";
 
-import "./TextArea.styl";
+import "./TextArea.scss";
 
 const { TextArea } = Input;
 
