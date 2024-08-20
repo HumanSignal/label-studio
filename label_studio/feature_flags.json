@@ -1432,6 +1432,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_all_dia_1312-i_create_an_ner_prompt_short": {
+      "key": "fflag_feat_all_dia_1312-i_create_an_ner_prompt_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "49bf111a4b1b4af38cacd350b423ba3c",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_all_dia_13_structured_data_support_short": {
       "key": "fflag_feat_all_dia_13_structured_data_support_short",
       "on": false,
@@ -1768,6 +1795,33 @@
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
       "version": 3,
+      "deleted": false
+    },
+    "fflag_feat_all_optic_991_dashboard_v2_short": {
+      "key": "fflag_feat_all_optic_991_dashboard_v2_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "8f0220b6594841d0837773d258eebf6a",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
       "deleted": false
     },
     "fflag_feat_back_dev_3756_queue_enrollment_min_short": {
@@ -4135,7 +4189,7 @@
     },
     "fflag_fix_front_lsdv_4620_memory_leaks_100723_short": {
       "key": "fflag_fix_front_lsdv_4620_memory_leaks_100723_short",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],

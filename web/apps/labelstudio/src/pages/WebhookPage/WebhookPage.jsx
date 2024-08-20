@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAPI } from "../../providers/ApiProvider";
-import "./WebhookPage.styl";
+import "./WebhookPage.scss";
 
 import WebhookList from "./WebhookList";
 import WebhookDetail from "./WebhookDetail";
@@ -31,6 +31,7 @@ const Webhook = () => {
     return undefined;
   }, [project, history]);
 
+  console.log(projectId, history.location.pathname);
   const fetchWebhooks = useCallback(async () => {
     if (projectId === null) {
       setWebhooks(null);

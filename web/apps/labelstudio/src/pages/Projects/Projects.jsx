@@ -12,7 +12,7 @@ import { FF_DEV_2575, isFF } from "../../utils/feature-flags";
 import { CreateProject } from "../CreateProject/CreateProject";
 import { DataManagerPage } from "../DataManager/DataManager";
 import { SettingsPage } from "../Settings";
-import "./Projects.styl";
+import "./Projects.scss";
 import { EmptyProjectsList, ProjectsList } from "./ProjectsList";
 
 const getCurrentPage = () => {

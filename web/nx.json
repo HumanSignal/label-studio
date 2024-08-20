@@ -9,6 +9,7 @@
   },
   "targetDefaults": {
     "build": {
+      "dependsOn": ["^build"],
       "inputs": ["production", "^production"]
     },
     "e2e": {
@@ -36,9 +37,7 @@
       "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
       "!{projectRoot}/.storybook/**/*",
-      "!{projectRoot}/tsconfig.storybook.json",
-      "!{projectRoot}/.eslintrc.json",
-      "!{projectRoot}/eslint.config.js"
+      "!{projectRoot}/tsconfig.storybook.json"
     ],
     "sharedGlobals": ["{workspaceRoot}/babel.config.json"]
   },

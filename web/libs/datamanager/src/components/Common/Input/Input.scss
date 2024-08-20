@@ -1,5 +1,5 @@
-.input-dm,
-.textarea-dm {
+.input,
+.textarea {
   height: 32px;
   width: 100%;
   background: #FAFAFA;
@@ -11,7 +11,7 @@
   transition: box-shadow 80ms ease;
 }
 
-.input-dm {
+.input {
   &_size {
     &_compact {
       height: 32px;
@@ -30,13 +30,13 @@
   }
 }
 
-.textarea-dm {
+.textarea {
   padding: 12px 16px;
   min-height: 50px;
 }
 
-.input-dm:focus,
-.textarea-dm:focus {
+.input:focus,
+.textarea:focus {
   outline: none;
   box-shadow: 0px 0px 0px 6px rgba(var(--accent_color-raw), 0.2), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15), inset 0px 0px 0px 1px rgba(var(--accent_color-raw), 0.2);
   border-color: rgba(var(--accent_color-raw), 0.2);

@@ -2,7 +2,7 @@ import color from "chroma-js";
 import type { CSSProperties, FC } from "react";
 import { Block } from "../../utils/bem";
 import { colors } from "../../utils/namedColors";
-import "./Tag.styl";
+import "./Tag.scss";
 
 type ColorName = keyof typeof colors;
 
@@ -46,7 +46,7 @@ export const Tag: FC<TagProps> = ({ className, style, size, color, solid = false
   const styles = { ...(style ?? {}), ...finalColor };
 
   return (
-    <Block tag="span" name="tag-lsf" mod={{ size }} mix={className} style={styles}>
+    <Block tag="span" name="tag" mod={{ size }} mix={className} style={styles}>
       {children}
     </Block>
   );

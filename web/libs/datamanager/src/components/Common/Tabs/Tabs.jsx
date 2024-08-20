@@ -45,7 +45,7 @@ export const Tabs = ({
 
   return (
     <TabsContext.Provider value={contextValue}>
-      <Block name="tabs-dm">
+      <Block name="tabs">
         <Elem name="list">
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="droppable" direction="horizontal">

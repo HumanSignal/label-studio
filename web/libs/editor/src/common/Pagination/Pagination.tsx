@@ -2,7 +2,7 @@ import React, { type ChangeEvent, type FC, forwardRef, type KeyboardEvent, useCa
 import { Hotkey } from "../../core/Hotkey";
 import { useHotkey } from "../../hooks/useHotkey";
 import { Block, Elem } from "../../utils/bem";
-import "./Pagination.styl";
+import "./Pagination.scss";
 
 interface PaginationProps {
   currentPage: number;
@@ -65,7 +65,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
     };
 
     return (
-      <Block name="pagination-lsf" mod={{ size, outline, align, noPadding }}>
+      <Block name="pagination" mod={{ size, outline, align, noPadding }}>
         <Elem name="navigation">
           <>
             <NavigationButton

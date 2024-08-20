@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "../../utils/bem";
-import "./Hamburger.styl";
+import "./Hamburger.scss";
 
 export const Hamburger = ({ opened, animated = true }) => {
   const root = cn("hamburger");

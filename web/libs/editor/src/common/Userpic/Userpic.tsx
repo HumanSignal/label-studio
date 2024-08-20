@@ -4,7 +4,7 @@ import { Block, Elem } from "../../utils/bem";
 import { FF_DEV_1507, isFF } from "../../utils/feature-flags";
 import { isDefined, userDisplayName } from "../../utils/utilities";
 import { Tooltip } from "../Tooltip/Tooltip";
-import "./Userpic.styl";
+import "./Userpic.scss";
 
 const FALLBACK_IMAGE =
   "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
@@ -94,7 +94,7 @@ export const Userpic = forwardRef<any, UserpicProps>(
     const stylesheet = { ...(style ?? {}), background, color: textColor };
 
     const userpic = (
-      <Block ref={ref} name="userpic-lsf" mix={className} mod={{ faded }} style={stylesheet} {...rest}>
+      <Block ref={ref} name="userpic" mix={className} mod={{ faded }} style={stylesheet} {...rest}>
         {children ? (
           children
         ) : (

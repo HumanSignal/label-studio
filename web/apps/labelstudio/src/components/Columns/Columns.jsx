@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "../../utils/bem";
-import "./Columns.styl";
+import "./Columns.scss";
 
 export const Columns = ({ children, count, size, gap }) => {
   /**@type {import('react').RefObject<HTMLElement>} */

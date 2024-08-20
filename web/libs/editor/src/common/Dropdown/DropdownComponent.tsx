@@ -15,7 +15,7 @@ import { useFullscreen } from "../../hooks/useFullscreen";
 import { Block, cn } from "../../utils/bem";
 import { alignElements, type ElementAlignment } from "../../utils/dom";
 import { aroundTransition } from "../../utils/transition";
-import "./Dropdown.styl";
+import "./Dropdown.scss";
 import { DropdownContext } from "./DropdownContext";
 import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
 
@@ -44,7 +44,7 @@ export interface DropdownProps {
 
 export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
   ({ animated = true, visible = false, ...props }, ref) => {
-    const rootName = cn("dropdown-lsf");
+    const rootName = cn("dropdown");
 
     const dropdown = useRef<HTMLElement>();
     const { triggerRef, minIndex } = useContext(DropdownContext) ?? {};
@@ -215,7 +215,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     const result = (
       <Block
         ref={dropdown}
-        name="dropdown-lsf"
+        name="dropdown"
         data-testid={props.dataTestId}
         mix={[props.className, visibilityClasses]}
         style={{

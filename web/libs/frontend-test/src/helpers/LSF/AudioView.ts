@@ -21,10 +21,10 @@ export const AudioView = {
     return cy.get('[data-testid="timebox-end-time"] > .lsf-time-box__input-time');
   },
   get configButton() {
-    return this.timelineControls.get(".lsf-audio-config > .lsf-button-lsf");
+    return this.timelineControls.get(".lsf-audio-config > .lsf-button");
   },
   get volumeButton() {
-    return this.timelineControls.get(".lsf-audio-control > .lsf-button-lsf");
+    return this.timelineControls.get(".lsf-audio-control > .lsf-button");
   },
   get loadingBar() {
     return this.root.get("loading-progress-bar", { timeout: 10000 });

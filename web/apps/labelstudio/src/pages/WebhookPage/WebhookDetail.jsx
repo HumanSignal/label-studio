@@ -5,7 +5,7 @@ import { Block, cn, Elem } from "../../utils/bem";
 import { cloneDeep } from "lodash";
 import { LsCross, LsPlus } from "../../assets/icons";
 import { useAPI } from "../../providers/ApiProvider";
-import "./WebhookPage.styl";
+import "./WebhookPage.scss";
 import { Space } from "../../components/Space/Space";
 import { useProject } from "../../providers/ProjectProvider";
 import { modal } from "../../components/Modal/Modal";

@@ -10,7 +10,7 @@ import { DropdownTrigger } from "./DropdownTrigger";
 let lastIndex = 1;
 
 export const Dropdown = React.forwardRef(({ animated = true, visible = false, ...props }, ref) => {
-  const rootName = cn("dropdown-dm");
+  const rootName = cn("dropdown");
 
   /**@type {import('react').RefObject<HTMLElement>} */
   const dropdown = React.useRef();
@@ -149,7 +149,7 @@ export const Dropdown = React.forwardRef(({ animated = true, visible = false, ..
   const result = (
     <Block
       ref={dropdown}
-      name="dropdown-dm"
+      name="dropdown"
       mix={[props.className, visibilityClasses]}
       style={compositeStyles}
       onClick={(e) => e.stopPropagation()}

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { IconOutlinerDrag } from "../../../assets/icons";
 import { useDrag } from "../../../hooks/useDrag";
-import { Block, cn, Elem } from "../../../utils/bem";
+import { Block, Elem } from "../../../utils/bem";
 import { DEFAULT_PANEL_HEIGHT } from "../constants";
 import "./Tabs.scss";
 import { type BaseProps, Side, type TabProps } from "./types";
@@ -11,9 +11,9 @@ import { FF_OUTLINER_OPTIM, isFF } from "../../../utils/feature-flags";
 const classAddedTabs: (Element | undefined)[] = [];
 
 enum DragOverHeightClasses {
-  tabLeft = "ls-drag_over_tab_left",
-  tabRight = "ls-drag_over_tab_right",
-  emptyTabSpace = "ls-drag_over_empty_tab_space",
+  tabLeft = "lsf-drag_over_tab_left",
+  tabRight = "lsf-drag_over_tab_right",
+  emptyTabSpace = "lsf-drag_over_empty_tab_space",
 }
 
 const removeHoverClasses = () => {
@@ -197,7 +197,7 @@ export const Tabs = (props: BaseProps) => {
 
   return (
     <>
-      <Block name="tabs-lsf" mix={isFF(FF_OUTLINER_OPTIM) ? "ff_outliner_optim" : void 0}>
+      <Block name="tabs" mix={isFF(FF_OUTLINER_OPTIM) ? "ff_outliner_optim" : void 0}>
         <Elem name="tabs-row">
           {props.panelViews.map((view, index) => {
             const { component: Component } = view;

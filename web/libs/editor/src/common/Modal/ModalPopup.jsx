@@ -4,7 +4,7 @@ import { LsRemove } from "../../assets/icons";
 import { BemWithSpecifiContext, cn } from "../../utils/bem";
 import { aroundTransition } from "../../utils/transition";
 import { Button } from "../Button/Button";
-import "./Modal.styl";
+import "./Modal.scss";
 
 const { Block, Elem } = BemWithSpecifiContext();
 
@@ -69,7 +69,7 @@ export class Modal extends Component {
     const mixes = [this.transitionClass, this.props.className];
 
     const modalContent = (
-      <Block name="modal-lsf" ref={this.modalRef} mod={mods} mix={mixes} onClick={this.onClickOutside}>
+      <Block name="modal" ref={this.modalRef} mod={mods} mix={mixes} onClick={this.onClickOutside}>
         <Elem name="wrapper">
           <Elem name="content" style={this.props.style}>
             {!bare && (
@@ -93,11 +93,10 @@ export class Modal extends Component {
   }
 
   onClickOutside = (e) => {
-    const modalRootCN = cn("modal-lsf");
     const { closeOnClickOutside } = this.props;
     const isInModal = this.modalRef.current.contains(e.target);
-    const content = modalRootCN.elem("content").closest(e.target);
-    const close = modalRootCN.elem("close").closest(e.target);
+    const content = cn("modal").elem("content").closest(e.target);
+    const close = cn("modal").elem("close").closest(e.target);
 
     if ((isInModal && close) || (content === null && closeOnClickOutside !== false)) {
       this.hide();

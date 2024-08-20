@@ -13,7 +13,7 @@ import { Block, cn, Elem } from "../../../utils/bem";
 import { Palette } from "../../../utils/colors";
 import { FF_UNSAVED_CHANGES, isFF } from "../../../utils/feature-flags";
 import { colorNames } from "./colors";
-import "./Config.styl";
+import "./Config.scss";
 import { Preview } from "./Preview";
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from "./Template";
 import { TemplatesList } from "./TemplatesList";

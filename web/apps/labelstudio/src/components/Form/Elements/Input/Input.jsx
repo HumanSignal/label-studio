@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "../../../../utils/bem";
 import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";
-import "./Input.styl";
+import "./Input.scss";
 
 const Input = ({ label, className, validate, required, skip, labelProps, ghost, ...props }) => {
   const classList = [cn("input").mod({ ghost }), className].join(" ").trim();

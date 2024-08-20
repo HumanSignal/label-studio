@@ -3,7 +3,7 @@ import { debounce } from "lodash";
 import { cn } from "../../utils/bem";
 import { isMacOS } from "../../utils/utilities";
 
-import "./TextArea.styl";
+import "./TextArea.scss";
 import mergeRefs from "../Utils/mergeRefs";
 
 export type TextAreaProps = {
@@ -39,7 +39,7 @@ export const TextArea: FC<TextAreaProps> = ({
 }) => {
   const inlineAction = !!onSubmit;
 
-  const rootClass = cn("textarea-lsf");
+  const rootClass = cn("textarea");
   const classList = [rootClass.mod({ inline: inlineAction, autosize: autoSize }), className].join(" ").trim();
 
   const autoGrowRef = useRef({
