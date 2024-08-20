@@ -1,24 +1,12 @@
-.column-selector {
-  top: 0;
-  right: 0;
-  width: 100%;
-  display: flex;
-  overflow: hidden;
+.columns__selector {
   position: absolute;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
   justify-content: flex-end;
+  top: 0;
 
-  &__button {
-    padding: 0;
-    z-index: 1000;
-    border-radius: 0;
-    height: 44px;
-    width: 45px;
-    margin: -1px;
-    box-shadow: none;
-    border-left: 1px solid var(--black_10);
-  }
-
-  &__button-new&__button-new {
+  &__button-new.columns__selector__button-new {
     z-index: 1000;
     height: 28px;
     width: 28px;
@@ -47,22 +35,6 @@
   flex-direction: column;
   overflow: auto;
   background-color: var(--white);
-
-  &__select-all {
-    &::after {
-      top: 50%;
-      right: 5px;
-      bottom: 0;
-      width: 1px;
-      height: 22px;
-      content: "";
-      z-index: 5;
-      display: block;
-      background: #bdbdbd;
-      transform: translateY(-50%);
-      position: absolute;
-    }
-  }
 
   &_fit {
     width: max-content;
