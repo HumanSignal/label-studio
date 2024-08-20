@@ -170,6 +170,10 @@ const HtxVideoView = ({ item, store }) => {
     return isDefined(item?.videoControl());
   }, [item]);
 
+  const supportsTimelineRegions = useMemo(() => {
+    return isDefined(item?.timelineControl());
+  }, [item]);
+
   useEffect(() => {
     const container = videoContainerRef.current;
 
@@ -461,8 +465,8 @@ const HtxVideoView = ({ item, store }) => {
     };
   }).reverse();
 
-  if (item.videoControl()?.selectedLabels?.length && !item.annotation.selectionSize && !item.drawingRegion) {
-    const label = item.videoControl().selectedLabels[0];
+  if (item.timelineControl()?.selectedLabels?.length && !item.annotation.selectionSize && !item.drawingRegion) {
+    const label = item.timelineControl().selectedLabels[0];
     regions.unshift({
       id: "new",
       label: label.value,
@@ -544,7 +548,7 @@ const HtxVideoView = ({ item, store }) => {
             allowFullscreen={false}
             fullscreen={isFullScreen}
             defaultStepSize={16}
-            disableView={!supportsRegions}
+            disableView={!supportsTimelineRegions && !supportsRegions}
             framerate={item.framerate}
             controls={{ FramesControl: true }}
             customControls={[

@@ -78,12 +78,12 @@ const Model = types
       return self.ref.current?.position ?? 1;
     },
 
-    control() {
-      return self.annotation.toNames.get(self.name)?.find((s) => !s.type.endsWith("labels") && !s.isClassificationTag);
+    timelineControl() {
+      return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("timeline"));
     },
 
     videoControl() {
-      return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("video") || s.type.includes("timeline"));
+      return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("video"));
     },
 
     states() {
@@ -201,7 +201,7 @@ const Model = types
       },
 
       addRegion(data) {
-        const control = self.videoControl() ?? self.control();
+        const control = self.videoControl() ?? self.timelineControl();
         const isTimeline = control?.type.includes("timeline");
         const value = {};
 
