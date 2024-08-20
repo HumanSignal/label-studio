@@ -167,11 +167,11 @@ const HtxVideoView = ({ item, store }) => {
   );
 
   const supportsRegions = useMemo(() => {
-    return isDefined(item?.videoControl());
+    return isDefined(item?.videoControl);
   }, [item]);
 
   const supportsTimelineRegions = useMemo(() => {
-    return isDefined(item?.timelineControl());
+    return isDefined(item?.timelineControl);
   }, [item]);
 
   useEffect(() => {
@@ -465,8 +465,8 @@ const HtxVideoView = ({ item, store }) => {
     };
   }).reverse();
 
-  if (item.timelineControl()?.selectedLabels?.length && !item.annotation.selectionSize && !item.drawingRegion) {
-    const label = item.timelineControl().selectedLabels[0];
+  if (item.timelineControl?.selectedLabels?.length && !item.annotation.selectionSize && !item.drawingRegion) {
+    const label = item.timelineControl.selectedLabels[0];
     regions.unshift({
       id: "new",
       label: label.value,

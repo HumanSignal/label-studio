@@ -78,11 +78,11 @@ const Model = types
       return self.ref.current?.position ?? 1;
     },
 
-    timelineControl() {
+    get timelineControl() {
       return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("timeline"));
     },
 
-    videoControl() {
+    get videoControl() {
       return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("video"));
     },
 
@@ -201,7 +201,7 @@ const Model = types
       },
 
       addRegion(data) {
-        const control = self.videoControl() ?? self.timelineControl();
+        const control = self.videoControl ?? self.timelineControl;
         const isTimeline = control?.type.includes("timeline");
         const value = {};
 
@@ -242,6 +242,7 @@ const Model = types
       },
 
       startDrawing(frame) {
+        if (!self.timelineControl) return;
         return self.drawingRegion = self.addRegion({ frame, enabled: false });
       },
 
