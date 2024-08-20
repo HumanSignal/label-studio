@@ -2,15 +2,15 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
+from django.db import connection
+IS_SQLITE = connection.vendor == 'sqlite'
 
 
-class Migration(migrations.Migration):
-
-    dependencies = [
-        ("tasks", "0047_merge_20240318_2210"),
-        ("projects", "0026_auto_20231103_0020"),
-        ("io_storages", "0017_auto_20240731_1638"),
-    ]
+def get_operations():
+    logger.info(f'IS_SQLITE: {IS_SQLITE}')
+    if not IS_SQLITE:
+        # These should be no-ops because these changes were applied in 0017
+        return []
 
     operations = [
         migrations.AlterField(
@@ -203,4 +203,15 @@ class Migration(migrations.Migration):
                 to="tasks.task",
             ),
         ),
+    ]
+
+    return operations
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ("tasks", "0047_merge_20240318_2210"),
+        ("projects", "0026_auto_20231103_0020"),
+        ("io_storages", "0017_auto_20240731_1638"),
     ]
