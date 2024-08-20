@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-IS_SQLITE = settings.DJANGO_DB == settings.DJANGO_DB_SQLITE
+IS_SQLITE = connection.vendor == 'sqlite'
 migration_name = '0017_auto_20240731_1638'
 
 def create_index_sql(table_name, index_name, column_name):
