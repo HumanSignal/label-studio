@@ -451,6 +451,7 @@ const HtxVideoView = ({ item, store }) => {
 
     return {
       id: reg.cleanId,
+      index: reg.region_index,
       label,
       color,
       visible: !reg.hidden,

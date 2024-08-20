@@ -85,6 +85,7 @@ export interface TimelineViewProps {
 
 export interface TimelineRegion {
   id: string;
+  index?: number;
   label: string;
   color: string;
   visible: boolean;
@@ -184,9 +185,9 @@ export interface TimelineControlsProps {
   onPause?: TimelineProps["onPause"];
   onFullScreenToggle: TimelineProps["onFullscreenToggle"];
   onVolumeChange: TimelineProps["onVolumeChange"];
-  onSpeedChange: TimelineProps["onSpeedChange"];
-  onZoom: TimelineProps["onZoom"];
-  onAmpChange: (amp: number) => void;
+  onSpeedChange?: TimelineProps["onSpeedChange"];
+  onZoom?: TimelineProps["onZoom"];
+  onAmpChange?: (amp: number) => void;
   toggleVisibility?: (layerName: string, isVisible: boolean) => void;
 }
 
