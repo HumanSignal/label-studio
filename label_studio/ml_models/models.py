@@ -13,6 +13,12 @@ from tasks.models import Annotation, FailedPrediction, Prediction
 logger = logging.getLogger(__name__)
 
 
+# skills are partitions of projects (label config + input columns + output columns) into categories of labeling tasks
+class SkillNames(models.TextChoices):
+    TEXT_CLASSIFICATION = 'TextClassification', _('TextClassification')
+    NAMED_ENTITY_RECOGNITION = 'NamedEntityRecognition', _('NamedEntityRecognition')
+
+
 def validate_string_list(value):
     if not value:
         raise ValidationError('list should not be empty')
@@ -38,6 +44,8 @@ class ModelInterface(models.Model):
     organization = models.ForeignKey(
         'organizations.Organization', on_delete=models.CASCADE, related_name='model_interfaces', null=True
     )
+
+    skill_name = models.CharField(max_length=255, choices=SkillNames.choices, null=True)
 
     input_fields = models.JSONField(default=list, validators=[validate_string_list])
 

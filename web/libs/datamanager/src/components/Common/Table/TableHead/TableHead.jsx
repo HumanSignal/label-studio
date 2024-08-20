@@ -13,7 +13,7 @@ import { TableCell, TableCellContent } from "../TableCell/TableCell";
 import { TableContext, TableElem } from "../TableContext";
 import { getStyle } from "../utils";
 import "./TableHead.scss";
-import { FF_DEV_2984, FF_DEV_3873, FF_LOPS_E_10, isFF } from "../../../../utils/feature-flags";
+import { FF_DEV_2984, FF_DEV_3873, isFF } from "../../../../utils/feature-flags";
 import { getRoot } from "mobx-state-tree";
 
 const { Block, Elem } = BemWithSpecifiContext();
@@ -31,23 +31,6 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => 
 
       return cellView && selectable && displayType;
     });
-
-  const styles = {
-    flex: 1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    background: "none",
-    fontSize: 14,
-  };
-
-  if (isFF(FF_LOPS_E_10)) {
-    styles.border = "0 none";
-    styles.fontWeight = 500;
-    styles.fontSize = 16;
-    styles.lineHeight = 24;
-    styles.letterSpacing = 0.15;
-  }
 
   return (
     <Dropdown.Trigger
@@ -76,7 +59,18 @@ const DropdownWrapper = observer(({ column, cellViews, children, onChange }) => 
         </Menu>
       }
     >
-      <Button type="text" size="small" style={styles}>
+      <Button
+        type="text"
+        size="small"
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          background: "none",
+          fontSize: 14,
+        }}
+      >
         {children}
       </Button>
     </Dropdown.Trigger>
@@ -270,7 +264,7 @@ export const TableHead = observer(
                     const curColumns = columns.filter((curCol) => curCol.id !== draggedCol);
                     const newIndex = curColumns.findIndex((curCol) => {
                       const colRefrence = colRefs.current[curCol.id];
-                      const mousePos = e.clientX + (ref?.current?.parentElement.scrollLeft ?? 0);
+                      const mousePos = e.clientX + (ref?.current?.parentElement?.parentElement.scrollLeft ?? 0);
                       const isGreaterThanPos = mousePos < colRefrence.offsetLeft + colRefrence.clientWidth / 2;
 
                       return isGreaterThanPos;
