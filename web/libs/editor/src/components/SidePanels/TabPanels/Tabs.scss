@@ -1,6 +1,6 @@
 @import "../../../assets/styles/global.scss";
 
-.tabs-lsf {
+.tabs {
   --tab-row-height: 33px;
   --tab-height: 32px;
   height: inherit;
@@ -64,7 +64,7 @@
   }
 
   &_collapsed {
-    & .tabs-lsf__contents {
+    & .tabs__contents {
       flex: 1;
     }
   }
