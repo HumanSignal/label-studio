@@ -145,6 +145,7 @@ def get_operations():
                                         to='tasks.annotation'),
             ),
         )
+    return operations
 
 
 class Migration(migrations.Migration):
