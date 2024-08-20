@@ -14,6 +14,10 @@ categories:
 image: "/tutorials/sam2-images.png"
 ---
 
+<!--
+
+-->
+
 # Using SAM2 with Label Studio for Image Annotation
 
 Segment Anything 2, or SAM 2, is a model released by Meta in July 2024. An update to the original Segment Anything Model, 
@@ -86,4 +90,4 @@ The following common parameters are available:
 
 ## Customization
 
-The ML backend can be customized by adding your own models and logic inside the `./segment_anything_2` directory. 
+The ML backend can be customized by adding your own models and logic inside the `./segment_anything_2` directory.
