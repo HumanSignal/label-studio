@@ -4,9 +4,15 @@ from django.conf import settings
 from django.db import migrations, models
 from django.db.migrations.operations.special import RunSQL
 from django.db.migrations.operations.base import Operation
+from django.db import connection
+from core.redis import start_job_async_or_sync
+from core.models import AsyncMigrationStatus
+import logging
+logger = logging.getLogger(__name__)
+
 
 IS_SQLITE = settings.DJANGO_DB == settings.DJANGO_DB_SQLITE
-
+migration_name = '0017_auto_20240731_1638'
 
 def create_index_sql(table_name, index_name, column_name):
     return f"""
@@ -17,6 +23,11 @@ def create_fk_sql(table_name, constraint_name, column_name, referenced_table, re
     return f"""
     ALTER TABLE "{table_name}" DROP CONSTRAINT IF EXISTS "{constraint_name}";
     ALTER TABLE "{table_name}" ADD CONSTRAINT "{constraint_name}" FOREIGN KEY ("{column_name}") REFERENCES "{referenced_table}" ("{referenced_column}") DEFERRABLE INITIALLY DEFERRED;
+    """
+
+def drop_index_sql(table_name, index_name, column_name):
+    return f"""
+    DROP INDEX CONCURRENTLY IF EXISTS "{index_name}";
     """
 
 tables = [
@@ -58,6 +69,83 @@ tables = [
 ]
 
 
+def forward_migration(migration_name):
+    migration = AsyncMigrationStatus.objects.create(
+        name=migration_name,
+        status=AsyncMigrationStatus.STATUS_STARTED,
+    )
+    logger.debug(
+        f'Start async migration {migration_name}'
+    )
+
+    # Get db cursor
+    cursor = connection.cursor()
+    for table in tables:
+        index_sql = create_index_sql(table['table_name'], table['index_name'], table['column_name'])
+        fk_sql = create_fk_sql(table['table_name'], table['fk_constraint'], table['column_name'], "task_completion",
+                               "id")
+
+        # Run index_sql
+        cursor.execute(index_sql)
+        cursor.execute(fk_sql)
+
+    migration.status = AsyncMigrationStatus.STATUS_FINISHED
+    migration.save()
+    logger.debug(
+        f'Async migration {migration_name} complete'
+    )
+
+def reverse_migration(migration_name):
+    migration = AsyncMigrationStatus.objects.create(
+        name=migration_name,
+        status=AsyncMigrationStatus.STATUS_STARTED,
+    )
+    logger.debug(
+        f'Start async migration {migration_name}'
+    )
+
+    # Get db cursor
+    cursor = connection.cursor()
+    for table in tables:
+        reverse_sql = drop_index_sql(table['table_name'], table['index_name'], table['column_name'])
+        # Run reverse_sql
+        cursor.execute(reverse_sql)
+
+    migration.status = AsyncMigrationStatus.STATUS_FINISHED
+    migration.save()
+    logger.debug(
+        f'Async migration {migration_name} complete'
+    )
+
+
+def forwards(apps, schema_editor):
+    # Dispatch migrations to rqworkers
+    start_job_async_or_sync(forward_migration, migration_name=migration_name)
+
+
+def backwards(apps, schema_editor):
+    start_job_async_or_sync(reverse_migration, migration_name=migration_name)
+
+
+def get_operations():
+    if not IS_SQLITE:
+        return [
+            migrations.RunPython(forwards, backwards),
+        ]
+
+    # Use standard migration for SQLITE
+    for table in tables:
+        operations.append(
+            migrations.AlterField(
+                model_name=table['model_name'],
+                name='annotation',
+                field=models.ForeignKey(on_delete=models.deletion.CASCADE,
+                                        related_name=table['table_name'],
+                                        to='tasks.annotation'),
+            ),
+        )
+
+
 class Migration(migrations.Migration):
     atomic = False
 
@@ -66,33 +154,5 @@ class Migration(migrations.Migration):
         ('io_storages', '0016_add_aws_sse_kms_key'),
     ]
 
-    operations = []
+    operations = get_operations()
 
-    for table in tables:
-        if IS_SQLITE:
-            operations.append(
-                migrations.AlterField(
-                    model_name=table['model_name'],
-                    name='annotation',
-                    field=models.ForeignKey(on_delete=models.deletion.CASCADE,
-                                            related_name=table['table_name'],
-                                            to='tasks.annotation'),
-                ),
-            )
-            continue
-
-        index_sql = create_index_sql(table['table_name'], table['index_name'], table['column_name'])
-        fk_sql = create_fk_sql(table['table_name'], table['fk_constraint'], table['column_name'], "task_completion", "id")
-
-        operations.append(
-            migrations.RunSQL(
-                sql=index_sql,
-                reverse_sql=drop_index_sql
-            )
-        )
-        operations.append(
-            migrations.RunSQL(
-                sql=fk_sql,
-                reverse_sql=RunSQL.noop # Will not re-add the unique constraint on rollback because that could result in data loss
-            )
-        )
