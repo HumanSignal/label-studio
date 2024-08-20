@@ -90,6 +90,8 @@ const Model = types
     // it uses sequence to be compatible with internal video timeline regions format
     setSequence(sequence) {
       const [start, end] = sequence;
+
+      self.parent.annotation.history.setReplaceNextUndoState();
       self.ranges = [{ start: start.frame, end: end.frame }];
     },
   }));
