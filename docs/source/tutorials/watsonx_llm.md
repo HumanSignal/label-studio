@@ -5,14 +5,18 @@ tier: all
 order: 15
 hide_menu: true
 hide_frontmatter_title: true
-meta_title: Using WatsonX with Label Studio
+meta_title: Integrate WatsonX with Label Studio
 categories:
-    - Generative AI
+    - Computer Vision
     - Large Language Model
     - WatsonX
 image: "/tutorials/watsonx.png"
 ---
- 
+
+<!--
+
+-->
+
 # Integrate WatsonX to Label Studio
 
 WatsonX offers a suite of machine learning tools, including access to many LLMs, prompt
@@ -32,6 +36,7 @@ For a video demonstration, see [Integrating Label Studio with IBM WatsonX](https
 ## Setting up your label_config
 For this project, we recommend you start with the labeling config as defined below, but you can always edit it or expand it to
 meet your needs! Crucially, there must be a `<TextArea>` tag for the model to insert its response into. 
+
 ```xml
     <View>
         <Style>

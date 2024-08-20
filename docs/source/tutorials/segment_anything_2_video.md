@@ -14,6 +14,10 @@ categories:
 image: "/tutorials/sam2-video.png"
 ---
 
+<!--
+
+-->
+
 # Using SAM2 with Label Studio for Video Annotation
 
 This guide describes the simplest way to start using **SegmentAnything 2** with Label Studio.
@@ -21,7 +25,7 @@ This guide describes the simplest way to start using **SegmentAnything 2** with 
 This repository is specifically for working with object tracking in videos. For working with images, 
 see the [segment_anything_2_image repository](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_2_image)
 
-![sam2](/tutorials/Sam2Video.gif)
+![sam2](./Sam2Video.gif)
 
 ## Running from source
 
@@ -51,10 +55,10 @@ Note that if you're running in a cloud server, you'll need to run on an exposed 
 5. Connect running ML backend server to Label Studio: go to your project `Settings -> Machine Learning -> Add Model` and specify `http://localhost:9090` as a URL. Read more in the official [Label Studio documentation](https://labelstud.io/guide/ml#Connect-the-model-to-Label-Studio).
  Again, if you're running in the cloud, you'll need to replace this localhost location with whatever the external ip address is of your container, along with the exposed port.
 
-## Labeling Config
+# Labeling Config
 For your project, you can use any labeling config with video properties. Here's a basic one to get you started!
 
-```xml
+```xml     
     <View>
          <Labels name="videoLabels" toName="video" allowEmpty="true">
            
@@ -77,6 +81,7 @@ For your project, you can use any labeling config with video properties. Here's 
 - No Docker support
 
 If you want to contribute to this repository to help with some of these limitations, you can submit a PR. 
-# Customization
 
-The ML backend can be customized by adding your own models and logic inside the `./segment_anything_2_video` directory. 
+## Customization
+
+The ML backend can be customized by adding your own models and logic inside the `./segment_anything_2_video` directory.
