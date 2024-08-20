@@ -87,7 +87,7 @@
     font-size: 13px;
     font-weight: 700;
     line-height: 16px;
-    color: var(--sand_500);
+    color: var(--sand_600);
     user-select: none;
     position: sticky;
     align-items: center;
@@ -119,11 +119,6 @@
     justify-content: center;
     color: var(--icon-color);
     padding-left: 4px;
-    
-    svg {
-      width: 16px;
-      height: 16px;
-    }
 
     &:hover {
       cursor: pointer;

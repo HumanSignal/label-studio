@@ -83,13 +83,13 @@
   }
 
   &_alignment_right {
-    & .tool_tooltip-body {
+    & .tool__tooltip-body {
       flex-direction: row-reverse;
     }
   }
 
   &_alignment_left {
-    & .tool_tooltip-body {
+    & .tool__tooltip-body {
       flex-direction: row;
     }
   }
