@@ -16,7 +16,11 @@ With your [Prompt created](prompts_create), you can begin drafting your prompt c
 ## Draft a prompt and generate predictions
 
 
-1. Select your base model. For a description of all OpenAI models, see [OpenAI's models overview](https://platform.openai.com/docs/models/models-overview).
+1. Select your base model. 
+
+    The models that appear depend on the [API keys](prompts_create#Model-provider-API-keys) that you have configured for your organization. If you have added an OpenAI key, then you will see all supported OpenAI models. If you have added Azure OpenAI keys, then you will see one model per each deployment that you have added. 
+    
+    For a description of all OpenAI models, see [OpenAI's models overview](https://platform.openai.com/docs/models/models-overview).
 2. In the **Prompt** field, enter your prompt. Keep in mind the following:
     * You must include the text class. (In the demo below, this is the `review` class.) Click the text class name to insert it into the prompt. 
     * Although not strictly required, you should provide definitions for each class to ensure prediction accuracy and to help [add context](#Add-context). 
