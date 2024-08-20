@@ -349,6 +349,7 @@ export const Frames: FC<TimelineViewProps> = ({
   }, [position, framesInView, step]);
 
   const styles = {
+    "--view-height": props.height ? `${props.height}px` : null,
     "--frame-size": `${step}px`,
     "--view-size": `${viewWidth}px`,
     "--offset": `${timelineStartOffset}px`,

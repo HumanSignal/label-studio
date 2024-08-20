@@ -41,6 +41,7 @@ import ObjectBase from "../Base";
  * @param {string} [sync] object name to sync with
  * @param {boolean} [muted=false] muted video
  * @param {number} [height=600] height of the video
+ * @param {number} [timelineHeight=64] height of the timeline with regions
  */
 
 const TagAttrs = types.model({
@@ -48,6 +49,7 @@ const TagAttrs = types.model({
   hotkey: types.maybeNull(types.string),
   framerate: types.optional(types.string, "24"),
   height: types.optional(types.string, "600"),
+  timelineheight: types.maybeNull(types.string),
   muted: false,
 });
 

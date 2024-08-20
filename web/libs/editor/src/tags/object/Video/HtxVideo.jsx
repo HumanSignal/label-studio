@@ -538,6 +538,7 @@ const HtxVideoView = ({ item, store }) => {
             length={videoLength}
             position={position}
             regions={regions}
+            height={item.timelineheight}
             altHopSize={store.settings.videoHopSize}
             allowFullscreen={false}
             fullscreen={isFullScreen}

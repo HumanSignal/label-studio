@@ -11,6 +11,7 @@ export interface TimelineProps<D extends ViewTypes = "frames"> {
   regions: any[];
   length: number;
   position: number;
+  height?: number;
   mode: D;
   framerate: number;
   playing: boolean;
@@ -60,6 +61,7 @@ export interface TimelineViewProps {
   speed?: number;
   volume?: number;
   regions: TimelineRegion[];
+  height?: number;
   leftOffset?: number;
   controls?: TimelineControls;
   onScroll: (position: number) => void;

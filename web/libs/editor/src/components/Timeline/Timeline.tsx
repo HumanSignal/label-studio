@@ -187,6 +187,7 @@ const TimelineComponent: FC<TimelineProps> = ({
         speed={speed}
         volume={props.volume}
         controls={props.controls}
+        height={props.height}
         position={currentPosition}
         offset={seekOffset}
         leftOffset={View.settings?.leftOffset}
