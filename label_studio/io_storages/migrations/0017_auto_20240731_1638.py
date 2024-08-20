@@ -128,6 +128,7 @@ def backwards(apps, schema_editor):
 
 
 def get_operations():
+    logger.info(f'IS_SQLITE: {IS_SQLITE}')
     if not IS_SQLITE:
         return [
             migrations.RunPython(forwards, backwards),
