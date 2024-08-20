@@ -6,11 +6,13 @@ from django.db import connection
 IS_SQLITE = connection.vendor == 'sqlite'
 
 
-def get_operations():
-    logger.info(f'IS_SQLITE: {IS_SQLITE}')
-    if not IS_SQLITE:
-        # These should be no-ops because these changes were applied in 0017
-        return []
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ("tasks", "0047_merge_20240318_2210"),
+        ("projects", "0026_auto_20231103_0020"),
+        ("io_storages", "0017_auto_20240731_1638"),
+    ]
 
     operations = [
         migrations.AlterField(
@@ -205,13 +207,17 @@ def get_operations():
         ),
     ]
 
-    return operations
+    def apply(self, project_state, schema_editor, collect_sql=False):
+        if not IS_SQLITE:
+            # Migration should be a no op after 0017 but we're forcing the no-op here because
+            # The migration thinks there's a difference
+            return project_state
 
+        return super().apply(project_state, schema_editor, collect_sql)
 
-class Migration(migrations.Migration):
+    def unapply(self, project_state, schema_editor, collect_sql=False):
+        if not IS_SQLITE:
+            # Same as above. Reverting a noop migration is noop
+            return project_state
 
-    dependencies = [
-        ("tasks", "0047_merge_20240318_2210"),
-        ("projects", "0026_auto_20231103_0020"),
-        ("io_storages", "0017_auto_20240731_1638"),
-    ]
+        return super().unapply(project_state, schema_editor, collect_sql)
