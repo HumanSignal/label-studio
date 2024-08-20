@@ -17,14 +17,10 @@ categories:
 image: "/tutorials/grounding-sam.png"
 ---
 
-<!--
-
--->
+# Grounding DINO backend integration with SAM enabled
 
 https://github.com/HumanSignal/label-studio-ml-backend/assets/106922533/d1d2f233-d7c0-40ac-ba6f-368c3c01fd36
 
-
-# Grounding DINO backend integration with SAM enabled
 
 This integration will allow you to:
 
