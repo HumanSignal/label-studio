@@ -179,7 +179,7 @@ export const HighlightMixin = types
      * Update region's appearance if the label was changed
      */
     updateAppearenceFromState() {
-      if (!self._spans) {
+      if (!self._spans?.length) {
         return;
       }
 

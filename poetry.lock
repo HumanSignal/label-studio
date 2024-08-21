@@ -1786,7 +1786,7 @@ httpx = ">=0.21.2"
 ijson = ">=3.2.3"
 jsonschema = ">=4.23.0"
 lxml = ">=4.2.5"
-nltk = ">=3.8.2,<4.0.0"
+nltk = ">=3.9.1,<4.0.0"
 numpy = "<2.0.0"
 pandas = ">=0.24.0"
 Pillow = ">=10.0.1"
@@ -2165,12 +2165,14 @@ files = [
 
 [[package]]
 name = "nltk"
-version = "3.8.2"
+version = "3.9.1"
 description = "Natural Language Toolkit"
 optional = false
 python-versions = ">=3.8"
-files = []
-develop = false
+files = [
+    {file = "nltk-3.9.1-py3-none-any.whl", hash = "sha256:4fa26829c5b00715afe3061398a8989dc643b92ce7dd93fb4585a70930d168a1"},
+    {file = "nltk-3.9.1.tar.gz", hash = "sha256:87d127bd3de4bd89a4f81265e5fa59cb1b199b27440175370f7417d2bc7ae868"},
+]
 
 [package.dependencies]
 click = "*"
@@ -2185,12 +2187,6 @@ machine-learning = ["numpy", "python-crfsuite", "scikit-learn", "scipy"]
 plot = ["matplotlib"]
 tgrep = ["pyparsing"]
 twitter = ["twython"]
-
-[package.source]
-type = "git"
-url = "https://github.com/nltk/nltk.git"
-reference = "3.8.2"
-resolved_reference = "0753ee5bb0096b4a4b3dd587e784ce07e7f34dab"
 
 [[package]]
 name = "nodeenv"
