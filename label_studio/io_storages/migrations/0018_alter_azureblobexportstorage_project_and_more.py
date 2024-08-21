@@ -208,12 +208,12 @@ class Migration(migrations.Migration):
     ]
 
     def apply(self, project_state, schema_editor, collect_sql=False):
-        if not IS_SQLITE:
+        if IS_SQLITE:
             # Migration should be a no op after 0017 but we're forcing the no-op here because
             # The migration thinks there's a difference
-            return project_state
+            return super().apply(project_state, schema_editor, collect_sql)
 
-        return super().apply(project_state, schema_editor, collect_sql)
+        return project_state
 
     def unapply(self, project_state, schema_editor, collect_sql=False):
         if not IS_SQLITE:
