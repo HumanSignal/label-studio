@@ -11,6 +11,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { Block, cn, Elem } from "../../../utils/bem";
 import { observe } from "mobx";
 import { FF_LSDV_4620_3, isFF } from "../../../utils/feature-flags";
+import { isDefined } from "../../../utils/utilities";
 
 const DBLCLICK_TIMEOUT = 450; // ms
 const DBLCLICK_RANGE = 5; // px
@@ -362,7 +363,7 @@ class RichTextPieceView extends Component {
   render() {
     const { item } = this.props;
 
-    if (!item._value) return null;
+    if (!isDefined(item._value)) return null;
 
     let val = item._value || "";
     const newLineReplacement = "<br/>";
