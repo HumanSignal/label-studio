@@ -208,11 +208,12 @@ class Migration(migrations.Migration):
     ]
 
     def apply(self, project_state, schema_editor, collect_sql=False):
-        if IS_SQLITE:
+        if IS_SQLITE and not settings.LSE_PROJECT:
             # Migration should be a no op after 0017 but we're forcing the no-op here because
             # The migration thinks there's a difference
+            logger.info('Trying to apply default migrations')
             return super().apply(project_state, schema_editor, collect_sql)
-
+        logger.info('Skipping migrations for LSE project or Postgres database')
         return project_state
 
     def unapply(self, project_state, schema_editor, collect_sql=False):
