@@ -1523,9 +1523,9 @@ h1+.admonition {
 
 /* enterprise */
 .content-markdown .admonition.error {
-  --color-border: var(--color-gray-900);
-  --color-title: var(--color-gray-900);
-  --color-title-background: var(--color-gray-100);
+  --color-border: var(--color-purple-400);
+  --color-title: var(--color-white);
+  --color-title-background: linear-gradient(109.47deg, #E37BD3 0%, #FF7557 51.56%, #FFA663 100%);
   --color-background: var(--color-white);
 }
 
@@ -2682,4 +2682,79 @@ code.hljs {
 
 .no-border {
   border: unset !important;
+}
+
+.Alert {
+  background-color: var(--color-gray-900);
+  text-transform: uppercase;
+  padding: 0.5em;
+  position: relative;
+  z-index: 2;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75em;
+}
+
+.AlertContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75em;
+  color: var(--color-white);
+  font-family: var(--font-family-monospace);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.Alert:hover .AlertText {
+  text-decoration: underline;
+}
+
+.Alert .Badge {
+  background-color: var(--color-purple-400);
+  display: flex;
+  align-items: center;
+  padding: 0.25em 0.5em;
+}
+
+.Alert svg {
+  display: none;
+}
+
+.page-tier-enterprise .Alert {
+  background-color: var(--color-blue-400);
+  transition: background .2s;
+}
+
+.page-tier-enterprise .Alert:hover {
+  background-color: var(--color-blue-500);
+}
+
+.page-tier-enterprise .Alert .Badge {
+  background-color: transparent;
+}
+
+.page-tier-enterprise .AlertContent {
+  font-family: var(--font-family-primary);
+  font-size: 0.9rem;
+  text-transform: none;
+  font-weight: 600;
+}
+
+.page-tier-enterprise .Alert:hover .AlertText {
+  text-decoration: none;
+}
+
+.page-tier-enterprise .Alert svg {
+  display: block;
+  width: 1em;
+  height: 1em;
+  transition: transform .2s;
+}
+
+.page-tier-enterprise .Alert:hover svg {
+  transform: translateX(2px);
 }

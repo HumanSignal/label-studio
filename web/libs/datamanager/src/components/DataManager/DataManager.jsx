@@ -1,5 +1,6 @@
 import { inject, observer } from "mobx-react";
-import React from "react";
+import React, { useCallback } from "react";
+import { Draggable } from "react-beautiful-dnd";
 import { LSPlus } from "../../assets/icons";
 import { Block, Elem } from "../../utils/bem";
 import { Interface } from "../Common/Interface";
@@ -8,7 +9,7 @@ import { Spinner } from "../Common/Spinner";
 import { Tabs, TabsItem } from "../Common/Tabs/Tabs";
 import { FiltersSidebar } from "../Filters/FiltersSidebar/FilterSidebar";
 import { DataView } from "../MainView";
-import "./DataManager.styl";
+import "./DataManager.scss";
 import { Toolbar } from "./Toolbar/Toolbar";
 
 const injector = inject(({ store }) => {
@@ -66,32 +67,56 @@ const TabsSwitch = switchInjector(
   observer(({ sdk, views, tabs, selectedKey }) => {
     const editable = sdk.tabControls;
 
+    const onDragEnd = useCallback((result) => {
+      if (!result.destination) {
+        return;
+      }
+
+      views.updateViewOrder(result.source.index, result.destination.index);
+    }, []);
+
     return (
       <Tabs
         activeTab={selectedKey}
         onAdd={() => views.addView({ reload: false })}
         onChange={(key) => views.setSelected(key)}
+        onDragEnd={onDragEnd}
         tabBarExtraContent={<ProjectSummary />}
         addIcon={<LSPlus />}
         allowedActions={editable}
       >
-        {tabs.map((tab) => (
-          <TabsItem
-            key={tab.key}
-            tab={tab.key}
-            title={tab.title}
-            onFinishEditing={(title) => {
-              tab.setTitle(title);
-              tab.save();
-            }}
-            onDuplicate={() => tab.parent.duplicateView(tab)}
-            onClose={() => tab.parent.deleteView(tab)}
-            onSave={() => tab.virtual && tab.saveVirtual()}
-            active={tab.key === selectedKey}
-            editable={tab.editable}
-            deletable={tab.deletable}
-            virtual={tab.virtual}
-          />
+        {tabs.map((tab, index) => (
+          <Draggable key={tab.key} draggableId={tab.key} index={index}>
+            {(provided, snapshot) => (
+              <Elem
+                name={"draggable"}
+                ref={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+                style={{
+                  background: snapshot.isDragging && "#ddd",
+                  ...provided.draggableProps.style,
+                }}
+              >
+                <TabsItem
+                  key={tab.key}
+                  tab={tab.key}
+                  title={tab.title}
+                  onFinishEditing={(title) => {
+                    tab.setTitle(title);
+                    tab.save();
+                  }}
+                  onDuplicate={() => views.duplicateView(tab)}
+                  onClose={() => views.deleteView(tab)}
+                  onSave={() => tab.virtual && tab.saveVirtual()}
+                  active={tab.key === selectedKey}
+                  editable={tab.editable}
+                  deletable={tab.deletable}
+                  virtual={tab.virtual}
+                />
+              </Elem>
+            )}
+          </Draggable>
         ))}
       </Tabs>
     );

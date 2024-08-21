@@ -11,11 +11,21 @@ def test_connect_and_sync_s3(django_live_url, business_client):
     p = ls.projects.create(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
 
     storage_resp = ls.import_storage.s3.create(
-        project=p.id, bucket='pytest-s3-images', regex_filter='.*', use_blob_urls=True
+        project=p.id, bucket='pytest-s3-images', regex_filter='.*', use_blob_urls=False
     )
 
     storage_id = storage_resp.id
-    ls.import_storage.s3.sync(id=storage_id)
+
+    storage = ls.import_storage.s3.get(id=storage_id)
+    assert storage.project == p.id
+    assert storage.bucket == 'pytest-s3-images'
+    assert storage.use_blob_urls is False
+    ls.import_storage.s3.update(id=storage_id, use_blob_urls=True)
+    storage = ls.import_storage.s3.get(id=storage_id)
+    assert storage.use_blob_urls is True
+
+    resp = ls.import_storage.s3.sync(id=storage_id)
+    assert resp.status in ('initialized', 'queued', 'completed')
 
     tasks = []
     for task in ls.tasks.list(project=p.id):

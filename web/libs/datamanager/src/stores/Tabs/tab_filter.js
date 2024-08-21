@@ -12,17 +12,11 @@ const operatorNames = Array.from(new Set([].concat(...Object.values(Filters).map
 const Operators = types.enumeration(operatorNames);
 
 const getOperatorDefaultValue = (operator) => {
-  if (operatorNames.includes(operator)) {
-    switch (operator) {
-      default:
-        return null;
-
-      case "empty":
-        return false;
-    }
+  if (!operatorNames.includes(operator)) {
+    return null;
   }
 
-  return null;
+  return operator === "empty" ? false : null;
 };
 
 export const TabFilter = types

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { Modal } from "../../../components/Modal/Modal";
 import { cn } from "../../../utils/bem";
 import { unique } from "../../../utils/helpers";
-import "./Import.styl";
+import "./Import.scss";
 import { IconError, IconInfo, IconUpload } from "../../../assets/icons";
 import { useAPI } from "../../../providers/ApiProvider";
 
@@ -339,6 +339,7 @@ export const ImportPage = ({
         </form>
         <span>or</span>
         <button
+          type="button"
           onClick={() => document.getElementById("file-input").click()}
           className={importClass.elem("upload-button")}
         >

@@ -31,6 +31,9 @@ const _Tool = types
     let isSelecting = false;
 
     return {
+      /**
+       * Indicates that move tool always interacts with regions
+       */
       shouldSkipInteractions() {
         return false;
       },

@@ -1,0 +1,58 @@
+.empty-state-default {
+  max-width: 40rem;
+  background: var(--grape_0);
+  border: 1px solid var(--grape_500);
+  padding: 2rem;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  &__icon {
+    margin-bottom: 0.75rem;
+    background: var(--grape_100);
+    padding: 0.5rem;
+    display: flex;
+    border-radius: 2rem;
+
+    & svg path {
+      fill: var(--grape_500);
+    }
+  }
+
+  &__action {
+    margin-bottom: 1.25rem;
+  }
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--sand_900);
+    margin-bottom: 1rem;
+  }
+
+  &__description {
+    font-size: 1rem;
+    color: var(--sand_900);
+    margin-bottom: 1rem;
+    text-align: center;
+    line-height: 1.5em;
+  }
+
+  &__footer {
+    font-size: 0.75rem;
+    color: var(--sand_900);
+    text-align: center;
+    line-height: 1.5em;
+  }
+
+  &__footer a {
+    color: var(--grape_700);
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}

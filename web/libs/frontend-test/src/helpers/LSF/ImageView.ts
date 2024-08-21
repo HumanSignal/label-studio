@@ -107,6 +107,40 @@ export const ImageView = {
       this.drawRect(realX, realY, realWidth, realHeight, options);
     });
   },
+
+  /**
+   * Draws a polygon on the drawing area.
+   * @param {Array<[number, number]>} points
+   * @param {boolean} autoclose
+   * @param {MouseInteractionOptions} options
+   */
+  drawPolygon(points: [number, number][], autoclose, options: MouseInteractionOptions = {}) {
+    const drawingArea = this.drawingArea.scrollIntoView();
+    if (autoclose) {
+      points = [...points, points[0]];
+    }
+    points.forEach((point, index) => {
+      drawingArea
+        .trigger("mousemove", point[0], point[1], { eventConstructor: "MouseEvent", ...options })
+        .trigger("mousedown", point[0], point[1], { eventConstructor: "MouseEvent", buttons: 1, ...options })
+        .trigger("mouseup", point[0], point[1], { eventConstructor: "MouseEvent", buttons: 1, ...options });
+    });
+  },
+
+  /**
+   * Draws the polygon on the drawing area with coordinates relative to the drawing area.
+   * @param {Array<[number, number]>} points
+   * @param {boolean} autoclose
+   * @param {MouseInteractionOptions} options
+   */
+  drawPolygonRelative(points: [number, number][], autoclose, options: MouseInteractionOptions = {}) {
+    this.drawingFrame.then((el) => {
+      const bbox: DOMRect = el[0].getBoundingClientRect();
+      const realPoints = points.map(([x, y]) => [x * bbox.width, y * bbox.height]);
+
+      this.drawPolygon(realPoints, autoclose, options);
+    });
+  },
   /**
    * Captures a screenshot of an element to compare later
    * @param {string} name name of the screenshot
@@ -150,6 +184,18 @@ export const ImageView = {
       .should("be.visible")
       .click()
       .should("have.class", "lsf-tool_active");
+  },
+
+  selectEllipseToolByButton() {
+    this.toolBar
+      .find('[aria-label="ellipse-tool"]')
+      .should("be.visible")
+      .click()
+      .should("have.class", "lsf-tool_active");
+  },
+
+  selectPolygonToolByButton() {
+    this.toolBar.find('[aria-label="polygon-tool"]').should("be.visible").click().should("have.class", "lsf-tool");
   },
 
   selectMoveToolByButton() {

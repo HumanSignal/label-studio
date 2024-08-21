@@ -4,9 +4,9 @@ import { Block } from "../../../../utils/bem";
 import { FF_LOPS_E_3, isFF } from "../../../../utils/feature-flags";
 import { normalizeCellAlias } from "../../../CellViews";
 import { SkeletonLoader } from "../../SkeletonLoader";
+import "./TableRow.scss";
 import { TableContext, TableElem } from "../TableContext";
 import { getProperty, getStyle } from "../utils";
-import "./TableRow.styl";
 
 const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) => {
   const { Header: _, Cell, id, ...col } = colInput;

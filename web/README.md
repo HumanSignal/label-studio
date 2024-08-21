@@ -31,14 +31,29 @@ Datamanager is an advanced tool specifically for data exploration within Label S
 ### Key Development and Build Commands
 - **Label Studio App:**
     - `yarn ls:watch`: Build the main Label Studio app continuously for development.
+    - `yarn ls:e2e`: Run end-to-end tests for the Label Studio app.
+    - `yarn ls:unit`: Run unit tests for the Label Studio app.
 - **Label Studio Frontend (Editor):**
     - `yarn lsf:watch`: Continuously build the frontend editor.
     - `yarn lsf:serve`: Run the frontend editor standalone.
+    - `yarn lsf:e2e`: Run end-to-end tests for the frontend editor.
+    - `yarn lsf:integration`: Run integration tests for the frontend editor.
+    - `yarn lsf:unit`: Run unit tests for the frontend editor.
 - **Datamanager**
     - `yarn dm:watch`: Continuously build Datamanager.
-- **General Build**
+    - `yarn dm:unit`: Run unit tests for Datamanager.
+- **General**
     - `yarn build`: Build all apps and libraries in the project.
+    - `yarn test:e2e`: Run end-to-end tests for all apps and libraries.
+    - `yarn test:integration`: Run integration tests for all apps and libraries.
+    - `yarn test:unit`: Run unit tests for all apps and libraries.
+    - `yarn lint`: Run biome linter across all files with autofix.
 
+### Git Hooks
+This project uses python `pre-commit` hooks to ensure code quality. To install the hooks, run `make configure-hooks` in the project root directory.
+This will install the hooks and run them on every pre-push to ensure pull requests will be aligned with linting for both python and javascript/typescript code.
+
+If for any reason you need to format or lint using the same `pre-commit` hooks directly, you can run `make fmt` or `make fmt-check` respectively from the project root directory.
 
 ## Ecosystem
 

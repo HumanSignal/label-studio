@@ -1,0 +1,36 @@
+.form-select {
+  position: relative;
+
+  &__list {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0 16px;
+    margin: 0;
+    border: none;
+    border-radius: 3px;
+    position: absolute;
+    background-color: transparent;
+    transition: box-shadow 80ms ease;
+    font-size: inherit;
+    border-right: 10px solid transparent;
+
+    .form-select_size_small & {
+      padding: 0 8px;
+    }
+  }
+
+  &_ghost {
+    margin-left: -10px;
+    border: 1px solid transparent;
+
+    & .form-select__list {
+      padding: 0 5px;
+    }
+
+    &:hover {
+      border: 1px solid var(--sand_300);
+    }
+  }
+}

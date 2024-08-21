@@ -2,7 +2,7 @@ import React, { cloneElement, forwardRef, useMemo } from "react";
 import { Block, Elem } from "../../../utils/bem";
 import { FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
 import { isDefined } from "../../../utils/utils";
-import "./Button.styl";
+import "./Button.scss";
 
 export const Button = forwardRef(
   ({ children, type, extra, className, href, size, waiting, icon, tag, look, ...rest }, ref) => {

@@ -443,7 +443,9 @@ const TaxonomyDropdown = ({ show, flatten, items, dropdownRef, isEditable }: Tax
             <UserLabelForm path={[]} onAddLabel={onAddLabel} onFinish={closeForm} />
           ) : isEditable ? (
             <div className={styles.taxonomy__add}>
-              <button onClick={addInside}>Add</button>
+              <button type="button" onClick={addInside}>
+                Add
+              </button>
             </div>
           ) : null}
         </div>

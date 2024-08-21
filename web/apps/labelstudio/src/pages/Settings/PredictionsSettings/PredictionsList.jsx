@@ -8,7 +8,7 @@ import { confirm } from "../../../components/Modal/Modal";
 import { ApiContext } from "../../../providers/ApiProvider";
 import { Block, cn } from "../../../utils/bem";
 
-import "./PredictionsList.styl";
+import "./PredictionsList.scss";
 
 export const PredictionsList = ({ project, versions, fetchVersions }) => {
   const api = useContext(ApiContext);

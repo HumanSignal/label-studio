@@ -50,7 +50,8 @@
         inputSelector: '#docsearch-input',
         appId,
         apiKey,
-        indexName
+        indexName,
+        algoliaOptions: { hitsPerPage: 10 },
       });
     
       const handleFocusSearch = (e) => {

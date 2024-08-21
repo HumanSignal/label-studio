@@ -188,26 +188,23 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
     this.renderPositions((i, curSeconds, curPixel) => {
       if (i % primaryLabelInterval === 0) {
-        switch (labelPlacement) {
-          case "top":
-            this.setFillStyles(primaryColor!);
-            this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
+        if (labelPlacement === "top") {
+          this.setFillStyles(primaryColor!);
+          this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
 
-            this.setFillStyles(primaryFontColor!);
-            this.fillText(
-              (formatTime as any)(curSeconds, pixelsPerSecond),
-              curPixel * pxRatio,
-              height + Math.ceil(labelPadding! * 1.5),
-              "center",
-            );
-            break;
-          case "right":
-          default:
-            this.setFillStyles(primaryColor!);
-            this.fillRect(curPixel, 0, 1, height);
-            this.setFillStyles(primaryFontColor!);
-            this.fillText((formatTime as any)(curSeconds, pixelsPerSecond), curPixel + labelPadding! * pxRatio, height);
-            break;
+          this.setFillStyles(primaryFontColor!);
+          this.fillText(
+            (formatTime as any)(curSeconds, pixelsPerSecond),
+            curPixel * pxRatio,
+            height + Math.ceil(labelPadding! * 1.5),
+            "center",
+          );
+        } else {
+          // Handles "right" and any other values
+          this.setFillStyles(primaryColor!);
+          this.fillRect(curPixel, 0, 1, height);
+          this.setFillStyles(primaryFontColor!);
+          this.fillText((formatTime as any)(curSeconds, pixelsPerSecond), curPixel + labelPadding! * pxRatio, height);
         }
       }
     });
@@ -234,26 +231,23 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
     this.renderPositions((i, curSeconds, curPixel) => {
       if (i % secondaryLabelInterval === 0 && i % primaryLabelInterval !== 0) {
-        switch (labelPlacement) {
-          case "top":
-            this.setFillStyles(secondaryColor!);
-            this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
+        if (labelPlacement === "top") {
+          this.setFillStyles(secondaryColor!);
+          this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
 
-            this.setFillStyles(secondaryFontColor!);
-            this.fillText(
-              (formatTime as any)(curSeconds, pixelsPerSecond),
-              curPixel * pxRatio,
-              height + Math.ceil(labelPadding! * 1.5),
-              "center",
-            );
-            break;
-          case "right":
-          default:
-            this.setFillStyles(secondaryColor!);
-            this.fillRect(curPixel, 0, 1, height);
-            this.setFillStyles(secondaryFontColor!);
-            this.fillText((formatTime as any)(curSeconds, pixelsPerSecond), curPixel + labelPadding! * pxRatio, height);
-            break;
+          this.setFillStyles(secondaryFontColor!);
+          this.fillText(
+            (formatTime as any)(curSeconds, pixelsPerSecond),
+            curPixel * pxRatio,
+            height + Math.ceil(labelPadding! * 1.5),
+            "center",
+          );
+        } else {
+          // Handles "right" and any other values
+          this.setFillStyles(secondaryColor!);
+          this.fillRect(curPixel, 0, 1, height);
+          this.setFillStyles(secondaryFontColor!);
+          this.fillText((formatTime as any)(curSeconds, pixelsPerSecond), curPixel + labelPadding! * pxRatio, height);
         }
       }
     });
@@ -273,14 +267,11 @@ export class TimelinePlugin extends BaseTimelinePlugin {
 
     this.renderPositions((i, _, curPixel) => {
       if (i % secondaryLabelInterval !== 0 && i % primaryLabelInterval !== 0) {
-        switch (labelPlacement) {
-          case "top":
-            this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
-            break;
-          case "right":
-          default:
-            this.fillRect(curPixel, 0, 1, height);
-            break;
+        if (labelPlacement === "top") {
+          this.fillRect(curPixel, this.wrapperHeight - height + 1, 1, height);
+        } else {
+          // Handles "right" and any other value
+          this.fillRect(curPixel, 0, 1, height);
         }
       }
     });

@@ -37,18 +37,6 @@ jobs:
             const submodules = [
               {
                 owner: owner,
-                repo: 'label-studio-frontend',
-                file_path: 'label_studio/frontend/dist/lsf/version.json',
-                regexp: /"commit": "(?<sha>[a-f0-9]{40})",/,
-              },
-              {
-                owner: owner,
-                repo: 'dm2',
-                file_path: 'label_studio/frontend/dist/dm/version.json',
-                regexp: /"commit": "(?<sha>[a-f0-9]{40})",/,
-              },
-              {
-                owner: owner,
                 repo: 'label-studio-sdk',
                 file_path: 'pyproject.toml',
                 regexp: /label-studio-sdk(\/archive|.git).*(?<sha>[a-f0-9]{40})/,

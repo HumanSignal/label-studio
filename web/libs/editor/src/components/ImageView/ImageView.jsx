@@ -689,7 +689,6 @@ export default observer(
       }
 
       item.freezeHistory();
-      item.setSkipInteractions(false);
 
       return this.triggerMouseUp(e, e.evt.offsetX, e.evt.offsetY);
     };

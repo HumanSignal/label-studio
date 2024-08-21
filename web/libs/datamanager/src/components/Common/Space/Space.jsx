@@ -1,6 +1,6 @@
 import React from "react";
 import { BemWithSpecifiContext } from "../../../utils/bem";
-import "./Space.styl";
+import "./Space.scss";
 
 const { Block } = BemWithSpecifiContext();
 

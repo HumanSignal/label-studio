@@ -28,7 +28,7 @@ const CollapsibleColumnTitle = ({ items, title }: { items: InputItem[]; title: s
   return (
     <h1 className={[styles.columnTitle, collapsed ? styles.collapsed : styles.expanded].join(" ")}>
       {title}
-      <button onClick={toggle}>
+      <button type="button" onClick={toggle}>
         <span />
       </button>
     </h1>

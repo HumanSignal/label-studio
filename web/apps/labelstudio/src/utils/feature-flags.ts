@@ -8,8 +8,6 @@ export const FF_DEV_1480 = "ff_front_dev_1480_created_on_in_review_180122_short"
 export const FF_DEV_1495 = "ff_front_dev_1495_avatar_mess_210122_short";
 // Notifications
 export const FF_DEV_1658 = "ff_front_dev_1658_notification_center_170222_short";
-// Add rejected icon on the cards
-export const FF_DEV_1614 = "ff_back_1614_rejected_queue_17022022_short";
 // Model version selector per model backend
 export const FF_DEV_1682 = "ff_front_dev_1682_model_version_dropdown_070622_short";
 // Project list performance improvements
@@ -34,6 +32,11 @@ export const FF_OPTIC_2 = "fflag_feat_optic_2_ensure_draft_saved_short";
  * Prompter workflow
  */
 export const FF_DIA_835 = "fflag_feat_all_dia_835_prompter_workflow_long";
+
+/**
+ * It adds an unsaved changes warning and fix some caching problems on a saving project
+ */
+export const FF_UNSAVED_CHANGES = "fflag_feat_front_leap_1198_unsaved_changes_180724";
 
 export function isFF(id: string) {
   return isFlagEnabled(id, FEATURE_FLAGS, window.APP_SETTINGS?.feature_flags_default_value === true);

@@ -12,7 +12,7 @@ import { Block, Elem } from "../../utils/bem";
 import { clamp, isDefined } from "../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
 import { Select } from "../Form/Elements";
-import "./Pagination.styl";
+import "./Pagination.scss";
 import { useUpdateEffect } from "../../utils/hooks";
 
 interface PaginationProps {

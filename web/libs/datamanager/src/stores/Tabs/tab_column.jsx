@@ -31,61 +31,37 @@ export const ViewColumnType = types.enumeration([
   "Unknown",
 ]);
 
-export const ViewColumnTypeShort = (type) => {
-  switch (type) {
-    default:
-    case "String":
-      return "str";
-    case "Number":
-      return "num";
-    case "Boolean":
-      return "bool";
-    case "Datetime":
-      return "date";
-    case "Image":
-      return "img";
-    case "Audio":
-      return "aud";
-    case "AudioPlus":
-      return "aud";
-    case "Video":
-      return "vid";
-    case "Text":
-      return "txt";
-    case "HyperText":
-      return "html";
-    case "TimeSeries":
-      return "ts";
-  }
+const typeShortMap = {
+  String: "str",
+  Number: "num",
+  Boolean: "bool",
+  Datetime: "date",
+  Image: "img",
+  Audio: "aud",
+  AudioPlus: "aud",
+  Video: "vid",
+  Text: "txt",
+  HyperText: "html",
+  TimeSeries: "ts",
 };
 
-export const ViewColumnTypeName = (type) => {
-  switch (type) {
-    default:
-    case "String":
-      return "String";
-    case "Number":
-      return "Number";
-    case "Boolean":
-      return "Boolean";
-    case "Datetime":
-      return "Date Time";
-    case "Image":
-      return "Image";
-    case "Audio":
-      return "Audio";
-    case "AudioPlus":
-      return "Audio";
-    case "Video":
-      return "Video";
-    case "Text":
-      return "Text";
-    case "HyperText":
-      return "Hyper Text";
-    case "TimeSeries":
-      return "Time Series";
-  }
+export const ViewColumnTypeShort = (type) => typeShortMap[type] || "str";
+
+const typeNameMap = {
+  String: "String",
+  Number: "Number",
+  Boolean: "Boolean",
+  Datetime: "Date Time",
+  Image: "Image",
+  Audio: "Audio",
+  AudioPlus: "Audio",
+  Video: "Video",
+  Text: "Text",
+  HyperText: "Hyper Text",
+  TimeSeries: "Time Series",
 };
+
+export const ViewColumnTypeName = (type) => typeNameMap[type] || "String";
 
 export const TabColumn = types
   .model("ViewColumn", {
@@ -185,8 +161,6 @@ export const TabColumn = types
 
     get icon() {
       switch (self.alias) {
-        default:
-          return null;
         case "total_annotations":
           return <LsAnnotation width="20" height="20" style={{ color: "#617ADA" }} />;
         case "cancelled_annotations":
@@ -203,6 +177,8 @@ export const TabColumn = types
           return <CommentCheck width="20" height="20" style={{ color: "#FFB700" }} />;
         case "unresolved_comment_count":
           return <CommentRed width="20" height="20" style={{ color: "#FFB700" }} />;
+        default:
+          return null;
       }
     },
 
