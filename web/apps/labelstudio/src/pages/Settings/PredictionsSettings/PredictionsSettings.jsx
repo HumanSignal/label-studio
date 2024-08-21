@@ -10,7 +10,7 @@ import { Spinner } from "../../../components/Spinner/Spinner";
 import { PredictionsList } from "./PredictionsList";
 import { Block, Elem } from "../../../utils/bem";
 import { Label } from "../../../components/Form";
-import "./PredictionsSettings.styl";
+import "./PredictionsSettings.scss";
 
 export const PredictionsSettings = () => {
   const api = useAPI();

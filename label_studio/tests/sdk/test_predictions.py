@@ -114,3 +114,17 @@ def test_create_predictions_with_import(django_live_url, business_client):
             task_ids.append(task.id)
 
     assert len(task_ids) == 5
+
+    # update project with model_version (RND-113)
+    assert p.model_version == ''
+    ls.projects.update(id=p.id, model_version='3.4.5')
+    project = ls.projects.get(id=p.id)
+    assert project.model_version == '3.4.5'
+
+    # assert it raises label_studio_sdk.core.api_error.ApiError with validation_errors': {'model_version': ["Model version doesn't exist..." ]}
+    from label_studio_sdk.core.api_error import ApiError
+
+    with pytest.raises(ApiError) as e:
+        ls.projects.update(id=p.id, model_version='3.4.6')
+    assert e.value.status_code == 400
+    assert e.value.body['validation_errors']['model_version'][0].startswith("Model version doesn't exist")

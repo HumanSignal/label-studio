@@ -1,0 +1,6 @@
+{
+  "message": "fix: LEAP-1363: View all is loading even when value is empty for RichText (#6190)",
+  "commit": "4f2ee16a2d3d4b24b4cf95ca34bc7b50a3edcc40",
+  "date": "2024-08-20T20:09:42.000Z",
+  "branch": "develop"
+}

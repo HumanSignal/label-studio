@@ -1,0 +1,111 @@
+.textarea-tag {
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &__form {
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &_hidden {
+      display: none;
+    }
+  }
+
+  &__item {
+    position: relative;
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    button {
+      width: auto !important;
+    }
+  }
+
+  &__input {
+    color: var(--sand_700);
+    background: transparent;
+    font-size: 16px;
+    line-height: 22px;
+    height: 22px;
+    padding: 0 24px 0 0;
+    margin-bottom: 0;
+
+    &.ant-input {
+      border: none;
+      box-shadow: none;
+      outline: none;
+    }
+  }
+
+  &__action {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    & :global(.anticon) {
+      margin: 0 !important;
+    }
+  }
+
+  &_outliner {
+    --border-color: var(--sand_300);
+  }
+
+  &_outliner &__item,
+  &_outliner &__form {
+    margin: 0 0 0 -8px;
+  }
+
+  &_outliner &__item + &__item,
+  &_outliner &__item + &__form,
+  &_outliner &__form + &__item,
+  &_outliner &__form + &__form {
+    margin-top: 8px;
+  }
+
+  &_outliner &__input {
+    display: block;
+    background: none;
+    font-size: 14px;
+    line-height: normal;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background-color: var(--sand_100);
+
+    .ff_outliner_optim & {
+      padding: 8px 20px 8px 8px;
+    }
+
+    &::placeholder {
+      color: var(--sand_500);
+    }
+  }
+
+  &_outliner &__input:focus {
+    background-color: var(--sand_0);
+    box-sizing: border-box;
+    border-color: var(--sand_300);
+    box-shadow: 0 0 0 3px var(--sand_300);
+  }
+
+  &_outliner &__action {
+    :not(.ff_outliner_optim) & {
+      margin: 4px;
+      margin-top: 5px;
+    }
+  }
+}
