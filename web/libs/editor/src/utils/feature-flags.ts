@@ -7,9 +7,6 @@ export const FF_DEV_1170 = "ff_front_1170_outliner_030222_short";
  */
 export const FF_DEV_1284 = "fflag_fix_front_dev_1284_auto_detect_undo_281022_short";
 
-// Fix crosshair working with zoom & rotation
-export const FF_DEV_1285 = "ff_front_dev_1285_crosshair_wrong_zoom_140122_short";
-
 export const FF_DEV_1442 = "ff_front_dev_1442_unselect_shape_on_click_outside_080622_short";
 
 // User labels for Taxonomy
