@@ -3,6 +3,8 @@
 from django.db import migrations, models
 import django.db.models.deletion
 from django.db import connection
+from django.conf import settings
+
 IS_SQLITE = connection.vendor == 'sqlite'
 
 
