@@ -66,6 +66,5 @@ STALE_FEATURE_FLAGS = {
     'ff_front_dev_1564_dev_1565_shortcuts_focus_and_cursor_010222_short': True,
     'ff_front_dev_1495_avatar_mess_210122_short': True,
     'ff_front_1170_outliner_030222_short': True,
-    'ff_back_1587_email_notifications_310122_long': False,
     'ff_front_dev_1285_crosshair_wrong_zoom_140122_short': True,
 }
