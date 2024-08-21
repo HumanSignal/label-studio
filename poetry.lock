@@ -713,14 +713,17 @@ testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)"]
 
 [[package]]
 name = "django-extensions"
-version = "3.1.0"
+version = "3.2.3"
 description = "Extensions for Django"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.6"
 files = [
-    {file = "django-extensions-3.1.0.tar.gz", hash = "sha256:7cd002495ff0a0e5eb6cdd6be759600905b4e4079232ea27618fc46bdd853651"},
-    {file = "django_extensions-3.1.0-py3-none-any.whl", hash = "sha256:c7f88625a53f631745d4f2bef9ec4dcb999ed59476393bdbbe99db8596778846"},
+    {file = "django-extensions-3.2.3.tar.gz", hash = "sha256:44d27919d04e23b3f40231c4ab7af4e61ce832ef46d610cc650d53e68328410a"},
+    {file = "django_extensions-3.2.3-py3-none-any.whl", hash = "sha256:9600b7562f79a92cbf1fde6403c04fee314608fefbb595502e34383ae8203401"},
 ]
+
+[package.dependencies]
+Django = ">=3.2"
 
 [[package]]
 name = "django-filter"
@@ -4136,4 +4139,4 @@ mysql = ["mysqlclient"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4"
-content-hash = "213045a5f2d4ed9667a31c3099b0aff2a6c883cb3498284f959fbeaa0ca2ff3b"
+content-hash = "1e469b538dc264b7e2a3de47567a39c9176d61df0125090f7237ca84f31d50f2"
