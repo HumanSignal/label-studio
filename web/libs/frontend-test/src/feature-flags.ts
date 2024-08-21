@@ -37,8 +37,6 @@ export const FF_DEV_1564_DEV_1565 = "ff_front_dev_1564_dev_1565_shortcuts_focus_
 /** @requires FF_DEV_1564_DEV_1565 */
 export const FF_DEV_1566 = "ff_front_dev_1566_shortcuts_in_results_010222_short";
 
-export const FF_DEV_1598 = "ff_front_dev_1598_empty_toname_240222_short";
-
 // Add an interactivity flag to the results to make some predictions' results be able to be automatically added to newly created annotations.
 export const FF_DEV_1621 = "ff_front_dev_1621_interactive_mode_150222_short";
 
