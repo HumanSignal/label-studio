@@ -21,7 +21,7 @@
     white-space: nowrap;
     padding-right: 70px;
     position: relative;
-    transform: translateX(calc(-1 * var(0px)));
+    transform: translateX(calc(-1 * var(--carousel-left)));
     transition: all 0.15s ease-in-out 0s;
   }
 
