@@ -45,7 +45,6 @@ export const Userpic = forwardRef<any, UserpicProps>(
     const [imgVisible, setImgVisible] = useState(false);
     const [nameVisible, setNameVisible] = useState(true);
 
-
     useEffect(() => {
       if (propsSrc !== finalSrc) {
         setFinalSrc(propsSrc);
@@ -53,7 +52,6 @@ export const Userpic = forwardRef<any, UserpicProps>(
         setNameVisible(true);
       }
     }, [propsSrc]);
-
 
     if (size) {
       style = Object.assign({ width: size, height: size, fontSize: size * 0.4 }, style);
