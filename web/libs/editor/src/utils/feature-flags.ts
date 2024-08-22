@@ -12,9 +12,6 @@ export const FF_DEV_1285 = "ff_front_dev_1285_crosshair_wrong_zoom_140122_short"
 
 export const FF_DEV_1442 = "ff_front_dev_1442_unselect_shape_on_click_outside_080622_short";
 
-// Fix stuck userpic
-export const FF_DEV_1507 = "ff_front_DEV_1507_stuck_userpic_210122_short";
-
 // User labels for Taxonomy
 export const FF_DEV_1536 = "ff_front_dev_1536_taxonomy_user_labels_150222_long";
 
