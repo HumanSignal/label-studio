@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-966: converting stylus files to scss (#6187)",
-  "commit": "e535785c6a63529cd972e3e4438df6699ad61052",
-  "date": "2024-08-15T11:41:17.000Z",
+  "message": "refactor: remove unused code (#6232)",
+  "commit": "56f3b054dff2be3bfef07c1d84748f957d6cb828",
+  "date": "2024-08-22T16:28:52.000Z",
   "branch": "develop"
 }
