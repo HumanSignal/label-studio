@@ -227,9 +227,6 @@ Scenario("Independent skip duplicate values", async ({ I, LabelStudio, AtSidebar
 
 Scenario("Skip duplicate values on editing", async ({ I, LabelStudio, AtOutliner, Modals }) => {
   I.amOnPage("/");
-  LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: true,
-  });
   LabelStudio.init({
     data: { letter: "Aa" },
     config: `<View>

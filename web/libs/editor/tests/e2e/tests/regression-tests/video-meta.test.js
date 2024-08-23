@@ -4,9 +4,6 @@ const VIDEO = "./public/files/opossum_intro.webm";
 
 Scenario("Filling meta in video regions", async ({ I, LabelStudio, AtVideoView, AtOutliner, AtDetails }) => {
   I.amOnPage("/");
-  LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: true,
-  });
   LabelStudio.init({
     config: `
 <View>

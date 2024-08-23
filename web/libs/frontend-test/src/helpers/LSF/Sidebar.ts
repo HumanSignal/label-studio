@@ -1,5 +1,4 @@
 import { LabelStudio } from "./LabelStudio";
-import { FF_DEV_1170 } from "../../feature-flags";
 
 export const Sidebar = {
   get outliner() {
@@ -18,15 +17,9 @@ export const Sidebar = {
     return this.toolBar.get('[aria-label="Show all regions"]');
   },
   get regions() {
-    return LabelStudio.getFeatureFlag(FF_DEV_1170).then((isFFDEV1170) => {
-      if (isFFDEV1170) {
-        return this.outliner
-          .should("be.visible")
-          .get(".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper");
-      }
-
-      return this.legacySidebar.should("be.visible").get(".lsf-region-item");
-    });
+    return this.outliner
+      .should("be.visible")
+      .get(".lsf-tree__node:not(.lsf-tree__node_type_footer) .lsf-tree-node-content-wrapper");
   },
   findRegion(selector: string) {
     return this.regions.filter(selector);

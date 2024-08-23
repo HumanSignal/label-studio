@@ -128,10 +128,6 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
 
   I.amOnPage("/");
 
-  LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: true,
-  });
-
   LabelStudio.init({
     config: `
 <View>
@@ -227,9 +223,6 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
 
 Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
   I.amOnPage("/");
-  LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: true,
-  });
   LabelStudio.init({
     config: `
 <View>

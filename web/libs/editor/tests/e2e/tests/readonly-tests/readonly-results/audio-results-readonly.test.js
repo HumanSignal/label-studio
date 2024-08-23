@@ -7,7 +7,6 @@ imageExamples.add([require("../../../examples/audio-regions"), 1]);
 Data(imageExamples).Scenario("Audio Readonly Regions", async ({ I, current, LabelStudio, AtOutliner, AtAudioView }) => {
   LabelStudio.setFeatureFlags({
     ff_front_dev_2715_audio_3_280722_short: true,
-    ff_front_1170_outliner_030222_short: true,
   });
 
   I.amOnPage("/");

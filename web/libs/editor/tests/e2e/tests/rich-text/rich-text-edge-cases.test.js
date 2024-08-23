@@ -2,12 +2,6 @@ const assert = require("assert");
 
 Feature("Richtext edge cases");
 
-Before(({ LabelStudio }) => {
-  LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: true,
-  });
-});
-
 const edgeCaseConfig = `<View>
     <Labels name="label" toName="html">
         <Label value="Highlight" background="rgb(255, 64, 182)" />
@@ -15,7 +9,7 @@ const edgeCaseConfig = `<View>
     <HyperText name="html" value="$html" />
 </View>`;
 const edgeCaseHtml = `<p>This
-is an <u><span>e</span><span>x</span><span>a</span><span>m</span><span>p</span><span>l</span><span>e</span></u><br/> of 
+is an <u><span>e</span><span>x</span><span>a</span><span>m</span><span>p</span><span>l</span><span>e</span></u><br/> of
 <abbr tytle="HyperText Markup Language"><b>HTML</b></abbr>
 </p>`;
 

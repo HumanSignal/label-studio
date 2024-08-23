@@ -1,6 +1,3 @@
-// Outliner + Details
-export const FF_DEV_1170 = "ff_front_1170_outliner_030222_short";
-
 /**
  * Fixing "Auto Detect" tool undo functionality and bugs with skipNextUndoState.
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_1284_auto_detect_undo_281022_short

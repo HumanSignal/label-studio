@@ -4,7 +4,6 @@ Feature("Richtext regions displaying");
 
 Before(({ LabelStudio }) => {
   LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: true,
     fflag_feat_front_lsdv_4620_richtext_opimization_060423_short: true,
   });
 });

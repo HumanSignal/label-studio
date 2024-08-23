@@ -163,9 +163,6 @@ const REGIONS = [
 Scenario(
   "Drawing multiple blank regions and then attaching labels",
   async ({ I, LabelStudio, AtImageView, AtSettings, AtLabels, AtOutliner }) => {
-    LabelStudio.setFeatureFlags({
-      ff_front_1170_outliner_030222_short: true,
-    });
     I.amOnPage("/");
     LabelStudio.init({ config: createConfig(), data });
     AtImageView.waitForImage();

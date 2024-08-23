@@ -251,7 +251,6 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
       async ({ I, LabelStudio, AtAudioView }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
-          ff_front_1170_outliner_030222_short: true,
           ...flags,
         });
 
@@ -292,7 +291,6 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
       async ({ I, LabelStudio, AtAudioView }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
-          ff_front_1170_outliner_030222_short: true,
           ...flags,
         });
 
@@ -339,7 +337,6 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
       async ({ I, LabelStudio, AtAudioView }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
-          ff_front_1170_outliner_030222_short: true,
           ...flags,
         });
 
@@ -382,7 +379,6 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
       async ({ I, LabelStudio, AtAudioView }) => {
         LabelStudio.setFeatureFlags({
           ff_front_dev_2715_audio_3_280722_short: true,
-          ff_front_1170_outliner_030222_short: true,
           ...flags,
         });
 

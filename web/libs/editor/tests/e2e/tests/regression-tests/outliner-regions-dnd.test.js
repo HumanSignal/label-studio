@@ -32,9 +32,6 @@ function generateResults(n) {
 
 Scenario("Dnd at the outliner after switching annotations", async ({ I, LabelStudio, AtOutliner, AtTopbar }) => {
   I.amOnPage("/");
-  LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: true,
-  });
   LabelStudio.init({
     annotations: [
       {

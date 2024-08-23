@@ -139,9 +139,6 @@ Scenario("Outliner Regions will paginate view window on region click and page ad
   const params = { config: configPagination, annotations, data };
 
   I.amOnPage("/");
-  LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: true,
-  });
   I.executeScript(initLabelStudio, params);
 
   annotations[0].result.forEach((result) => {
@@ -158,9 +155,6 @@ Scenario("Regions will paginate view window on region click and page advance", a
   const params = { config: configPagination, annotations, data };
 
   I.amOnPage("/");
-  LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: false,
-  });
   I.executeScript(initLabelStudio, params);
 
   annotations[0].result.forEach((result) => {
@@ -177,32 +171,12 @@ Scenario("Outliner Regions will scroll view window on region click", async ({ I,
   const params = { config: configScroll, annotations, data };
 
   I.amOnPage("/");
-  LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: true,
-  });
   I.executeScript(initLabelStudio, params);
 
   annotations[0].result.forEach((result) => {
     const label = result.value?.rectanglelabels[0];
 
     checkScrollToSelectedPersists(I, label, true);
-  });
-  checkSubmit(I);
-});
-
-Scenario("Regions will scroll view window on region click", async ({ I, LabelStudio }) => {
-  const params = { config: configScroll, annotations, data };
-
-  I.amOnPage("/");
-  LabelStudio.setFeatureFlags({
-    ff_front_1170_outliner_030222_short: false,
-  });
-  I.executeScript(initLabelStudio, params);
-
-  annotations[0].result.forEach((result) => {
-    const label = result.value?.rectanglelabels[0];
-
-    checkScrollToSelectedPersists(I, label, false);
   });
   checkSubmit(I);
 });
