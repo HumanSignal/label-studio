@@ -1,6 +1,6 @@
 {
-  "message": "refactor: OPTIC-989: Removed unused stylus files (#6188)",
-  "commit": "c8f81b7df137d1fac26d905799eb63cc41e21d0f",
-  "date": "2024-08-23T17:14:21.000Z",
+  "message": "refactor: OPTIC-930: Remove Stale Feature Flag - ff_dev_2007_dev_2008_dynamic_tag_children_250322_short (#6239)",
+  "commit": "d45831da63ee944d8973c3989330963fa494eadd",
+  "date": "2024-08-23T17:20:39.000Z",
   "branch": "develop"
 }
