@@ -70,8 +70,8 @@ const Model = types
      * }
      * @typedef {Object} TimelineRegionResult
      * @property {Object} value
-     * @property {object[]} value.ranges array of ranges, each range is an object with `start` and `end` properties; one range per region for now
-     * @property {string[]} [value.timelinelabels] regions are created only by `TimelineLabels`, and this label is listed here
+     * @property {object[]} value.ranges Array of ranges, each range is an object with `start` and `end` properties. One range per region.
+     * @property {string[]} [value.timelinelabels] Regions are created by `TimelineLabels`, and the corresponding label is listed here.
      */
 
     /**
