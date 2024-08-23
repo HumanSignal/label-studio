@@ -1,6 +1,6 @@
 {
-  "message": "refactor: OPTIC-987: convert styl to scss (#6228)",
-  "commit": "4caeef3091faffc24edbbe5b8b735ad95db00ec3",
-  "date": "2024-08-23T20:53:33.000Z",
+  "message": "ci: remove silent fail on docs build",
+  "commit": "b29b4f3604f5f440198abb43d36d9f13d7e111d7",
+  "date": "2024-08-23T22:10:15.000Z",
   "branch": "develop"
 }
