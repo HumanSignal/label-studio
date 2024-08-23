@@ -223,12 +223,24 @@ const Model = types
           value.sequence = [keyframe];
         }
 
-        const area = self.annotation.createResult(value, {}, control, self, isTimeline);
+        // @todo actually only one attached labeling tag is supported right now for both scenarios.
+        // `createResult()` might unselect all selected labels, so we can't just attach them after.
+        // RichText solved this with `cloneNode()`, but that's not a good way to go.
+        const labelTags = self.activeStates();
+        const labeling = {};
+        if (isTimeline) {
+          // that would be the TimelineLabels
+          const labels = labelTags[0];
+          labeling[labels.valueType] = labels.selectedValues();
+        }
+        const area = self.annotation.createResult(value, labeling, control, self);
 
-        // add labels
-        self.activeStates().forEach((state) => {
-          area.setValue(state);
-        });
+        if (!isTimeline) {
+          // add labels to the region, they are stored in separated results
+          labelTags.forEach(tag => {
+            area.setValue(tag);
+          });
+        }
 
         return area;
       },
