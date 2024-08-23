@@ -386,7 +386,6 @@ const Crosshair = memo(
     const dashStyle = [3, 3];
     const enableStrokeScale = false;
 
-
     if (ref) {
       ref.current = {
         updatePointer(newX, newY) {
@@ -1189,16 +1188,8 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
       {item.crosshair && (
         <Crosshair
           ref={crosshairRef}
-          width={
-            isFF(FF_ZOOM_OPTIM)
-              ? item.containerWidth
-              : item.stageWidth
-          }
-          height={
-            isFF(FF_ZOOM_OPTIM)
-              ? item.containerHeight
-              : item.stageHeight
-          }
+          width={isFF(FF_ZOOM_OPTIM) ? item.containerWidth : item.stageWidth}
+          height={isFF(FF_ZOOM_OPTIM) ? item.containerHeight : item.stageHeight}
         />
       )}
     </>
