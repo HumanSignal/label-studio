@@ -1,6 +1,6 @@
 import React from "react";
 import { Block, Elem } from "../../utils/bem";
-import "./SidebarTabs.styl";
+import "./SidebarTabs.scss";
 
 // @todo there was an idea of switchable tabs, but they were not used,
 // @todo so implementation was removed and the whole part of interface

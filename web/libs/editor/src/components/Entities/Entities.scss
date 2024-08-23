@@ -1,67 +1,68 @@
-.ls-menu {
-  .ant-tree {
-    padding: 16px 0;
-  }
+.entities {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--sand_300);
+  border-bottom: 1px solid var(--sand_300);
 
-  .ant-tree-node-content-wrapper {
-    // official flex sizing fix; here is for text-overflow in the tree nodes
-    min-width: 0;
-  }
-
-  .ant-tree .ant-tree-list-holder-inner {
-    padding: 0 16px;
-  }
-
-  .ant-tree .ant-tree-treenode {
-    position: relative;
-    padding: 0;
+  &__header {
+    font-size: 16px;
+    line-height: 22px;
+    color: var(--sand_600);
+    height: 46px;
+    display: flex;
     align-items: center;
+    padding: 12px 15px 12px 24px;
+    border-bottom: 1px solid var(--sand_300);
+  }
+
+  &__sort {
     display: flex;
-    flex-wrap: nowrap;
-    margin-bottom: 12px;
+    align-items: center;
   }
 
-  .ant-tree-draggable-icon {
-    width: 14px;
-    flex-shrink: 0;
+  &__sort-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    margin-right: 4px;
   }
 
-  .ant-tree .ant-tree-node-content-wrapper {
+  &__source {
+    padding: 0 15px;
+  }
+
+  &__counter {
+    color: var(--sand_500);
+  }
+
+  &__empty {
+    height: 32px;
+    display: flex;
+    padding: 0 15px;
+    align-items: center;
+  }
+
+  &__visibility {
+    padding: 0 !important;
+    width: 24px;
+
+    &_hidden {
+      opacity: 1;
+    }
+  }
+
+  &__regions,
+  &__labels {
     padding: 0;
   }
+}
 
-  .ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected,
-  .ant-tree .ant-tree-node-content-wrapper:hover {
-    background: none;
-  }
+:global(.ant-tree .ant-tree-node-content-wrapper) {
+  min-width: 0;
+}
 
-  .ant-tree .ant-tree-switcher {
-    width: 24px;
-    height: 32px;
-    text-align: center;
-    z-index: 100;
-    display: flex;
-    flex-flow: column;
-    justify-content: center;
-    transition: transform 0.3s cubic-bezier(0.78, 0.14, 0.15, 0.86);
-
-    &.ant-tree-switcher_close {
-      transform: scaleY(-1);
-    }
-  }
-
-  .ant-tree .ant-tree-indent-unit {
-    width: 16px;
-  }
-
-  .ant-tree .ant-tree-indent:empty {
-    & + .ant-tree-switcher {
-      margin-left: -12px;
-    }
-
-    & + .ant-tree-switcher.ant-tree-switcher-noop {
-      margin-left: 0;
-      display: none;
-    }
-  }
+:global(.ant-tree-draggable-icon) {
+  flex: 14px 0 0;
 }

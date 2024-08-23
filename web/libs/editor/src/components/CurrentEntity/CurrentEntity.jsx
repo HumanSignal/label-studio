@@ -5,7 +5,7 @@ import { FF_DEV_2290, isFF } from "../../utils/feature-flags";
 import { DraftPanel } from "../DraftPanel/DraftPanel";
 import { AnnotationHistory } from "./AnnotationHistory.tsx";
 import { useRegionsCopyPaste } from "../../hooks/useRegionsCopyPaste";
-import "./CurrentEntity.styl";
+import "./CurrentEntity.scss";
 
 const injector = inject("store");
 

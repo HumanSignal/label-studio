@@ -3,7 +3,7 @@ import { Tooltip } from "../../common/Tooltip/Tooltip";
 import Utils from "../../utils";
 import { cn } from "../../utils/bem";
 
-import "./DraftPanel.styl";
+import "./DraftPanel.scss";
 
 const panel = cn("draft-panel");
 

@@ -4,7 +4,7 @@ import { Block, Elem } from "../../../utils/bem";
 import { PanelBase, type PanelProps } from "../PanelBase";
 import { OutlinerTree } from "./OutlinerTree";
 import { ViewControls } from "./ViewControls";
-import "./OutlinerPanel.styl";
+import "./OutlinerPanel.scss";
 import { IconInfo } from "../../../assets/icons/outliner";
 import { FF_LSDV_4992, FF_OUTLINER_OPTIM, isFF } from "../../../utils/feature-flags";
 
