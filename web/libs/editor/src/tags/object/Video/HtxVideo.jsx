@@ -463,8 +463,12 @@ const HtxVideoView = ({ item, store }) => {
       sequence,
       timeline,
     };
-  }).reverse();
+  });
 
+  // new Timeline Regions are added at the top of timeline, so we have to reverse the order
+  if (item.timelineControl) regions.reverse();
+
+  // when label is selected and user is ready to draw a new region, we create a labeled empty line at the top
   if (item.timelineControl?.selectedLabels?.length && !item.annotation.selectionSize && !item.drawingRegion) {
     const label = item.timelineControl.selectedLabels[0];
     regions.unshift({
