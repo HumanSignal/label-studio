@@ -16,9 +16,9 @@ type DataType = {
 
 export const Controls: FC<TimelineExtraControls<Actions, DataType>> = ({ onAction }) => {
   const { position, regions } = useContext(TimelineContext);
-  const hasSelectedRegion = regions.some(({ selected }) => selected);
+  const hasSelectedRegion = regions.some(({ selected, timeline }) => selected && !timeline);
   const closestKeypoint = useMemo(() => {
-    const region = regions.find((r) => r.selected);
+    const region = regions.find((r) => r.selected && !r.timeline);
 
     return region?.sequence.filter(({ frame }) => frame <= position).slice(-1)[0];
   }, [regions, position]);
