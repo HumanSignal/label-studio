@@ -138,7 +138,7 @@ You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google
 [<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy?template=https://github.com/heartexlabs/label-studio/tree/heroku-persistent-pg)
 [<img src="https://aka.ms/deploytoazurebutton" height="30px">](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fheartexlabs%2Flabel-studio%2Fmaster%2Fazuredeploy.json)
 [<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
-
+[<img alt="Deploy to Elestio" src="https://elest.io/images/logos/deploy-to-elestio-btn.png" height="30">](https://elest.io/open-source/labelstudio)
 
 #### Apply frontend changes
 
