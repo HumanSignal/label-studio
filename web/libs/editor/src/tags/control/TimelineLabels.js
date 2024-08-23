@@ -8,12 +8,22 @@ import ControlBase from "./Base";
 import { HtxLabels, LabelsModel } from "./Labels/Labels";
 
 /**
- * TimelineLabels tag allows to classify parts of the video or even a single frames. It works in combination with the `<Video/>` tag.
+ * Use the TimelineLabels tag to classify video frames. This can be a single frame or a span of frames.
+ * 
+ * First, select a label and then click once to select a single frame. Click and drag to select multiple frames. 
+ * 
+ * To move forward and backward in the timeline without labeling, ensure that no labels are are selected before you click. 
+ * 
+ * [Screenshot of video with frame classification](../images/timelinelabels.png)
+ * 
+ * Use with the `<Video>` control tag.
+ * 
+ * !!! info Tip
+ *     You can increase the height of the timeline using the `timelineHeight` parameter on the `<Video>` tag. 
  *
- * Use with the following data types: video
  * @example
  * <View>
- *   <Header>Mark parts on the video:</Header>
+ *   <Header>Label frame spans:</Header>
  *   <Video name="video" value="$video" />
  *   <TimelineLabels name="timelineLabels" toName="video">
  *     <Label value="Nothing" background="#944BFF"/>
@@ -22,8 +32,8 @@ import { HtxLabels, LabelsModel } from "./Labels/Labels";
  * </View>
  * @name TimelineLabels
  * @regions TimelineRegion
- * @meta_title Video Tag for Video Labeling
- * @meta_description Customize Label Studio with the Video tag for basic video annotation tasks for machine learning and data science projects.
+ * @meta_title TimelineLabels tag
+ * @meta_description Classify video frames using TimelineLabels.
  * @param {string} name Name of the element
  * @param {string} toName Name of the video element
  */
