@@ -242,7 +242,9 @@ const Model = types
       },
 
       startDrawing(frame) {
-        if (!self.timelineControl) return;
+        const control = self.timelineControl;
+        // labels should be selected or allow to create region without labels
+        if (!control?.selectedLabels?.length && !control?.allowempty) return;
         return self.drawingRegion = self.addRegion({ frame, enabled: false });
       },
 
