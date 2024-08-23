@@ -8,24 +8,24 @@ import ControlBase from "./Base";
 import { HtxLabels, LabelsModel } from "./Labels/Labels";
 
 /**
- * @todo rewrite this
- * TimelineLabels tag brings Object Tracking capabilities to videos. It works in combination with the `<Video/>` and the `<Labels/>` tags.
+ * TimelineLabels tag allows to classify parts of the video or even a single frames. It works in combination with the `<Video/>` tag.
  *
  * Use with the following data types: video
  * @example
  * <View>
- *   <Header>Label states on the video:</Header>
+ *   <Header>Mark parts on the video:</Header>
  *   <Video name="video" value="$video" />
  *   <TimelineLabels name="timelineLabels" toName="video">
  *     <Label value="Nothing" background="#944BFF"/>
  *     <Label value="Movement" background="#98C84E"/>
- *   </Labels>
+ *   </TimelineLabels>
  * </View>
  * @name TimelineLabels
+ * @regions TimelineRegion
  * @meta_title Video Tag for Video Labeling
  * @meta_description Customize Label Studio with the Video tag for basic video annotation tasks for machine learning and data science projects.
  * @param {string} name Name of the element
- * @param {string} toName Name of the element to control (video)
+ * @param {string} toName Name of the video element
  */
 const TagAttrs = types.model({
   toname: types.maybeNull(types.string),

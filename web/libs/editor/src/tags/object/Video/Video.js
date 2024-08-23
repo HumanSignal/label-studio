@@ -40,7 +40,7 @@ import ObjectBase from "../Base";
  * @param {number} [frameRate=24] video frame rate per second; default is 24; can use task data like `$fps`
  * @param {string} [sync] object name to sync with
  * @param {boolean} [muted=false] muted video
- * @param {number} [height=600] height of the video
+ * @param {number} [height=600] height of the video player
  * @param {number} [timelineHeight=64] height of the timeline with regions
  */
 
