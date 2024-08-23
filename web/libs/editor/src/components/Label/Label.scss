@@ -38,16 +38,16 @@
   }
 
   &_solid {
-    background-color: var(--background);
+    background-color: var(--color);
   }
 
   &_selected {
-    background-color: var(--background);
-    color: var(--sand_0);
+    background-color: var(--color);
+    color: var(--white);
   }
 
   &_selected &__hotkey {
-    color: var(--sand_0);
+    color: var(--white);
   }
 
   &__text {
