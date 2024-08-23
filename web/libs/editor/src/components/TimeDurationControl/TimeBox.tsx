@@ -2,7 +2,7 @@ import React, { type FC, useCallback, useEffect, useState } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { MaskUtil } from "../../utils/InputMask";
 
-import "./TimeBox.styl";
+import "./TimeBox.scss";
 
 export interface TimerProps {
   sidepanel: boolean;

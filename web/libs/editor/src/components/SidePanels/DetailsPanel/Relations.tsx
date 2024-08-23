@@ -7,7 +7,7 @@ import { Block, Elem } from "../../../utils/bem";
 import { wrapArray } from "../../../utils/utilities";
 import { RegionItem } from "./RegionItem";
 import { Select } from "antd";
-import "./Relations.styl";
+import "./Relations.scss";
 
 const RealtionsComponent: FC<any> = ({ relationStore }) => {
   const relations = relationStore.orderedRelations;

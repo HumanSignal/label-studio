@@ -20,7 +20,7 @@ import { Space } from "../../common/Space/Space";
 import { Block, Elem } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 import { TimelineContext } from "./Context";
-import "./Controls.styl";
+import "./Controls.scss";
 import * as SideControls from "./SideControls";
 import type {
   TimelineControlsFormatterOptions,

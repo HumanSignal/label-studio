@@ -24,7 +24,7 @@ class PreviewGenerator {
     this.running = false;
     this.queue = [];
 
-    this.root = document.querySelector(".offscreen-lsf");
+    this.root = document.querySelector(".offscreen");
 
     this.lsf = new window.LabelStudio(this.root, {
       user: { id: 1 },

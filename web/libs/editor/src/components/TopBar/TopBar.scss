@@ -1,0 +1,55 @@
+.topbar {
+  height: var(--topbar-height);
+  width: 100%;
+  z-index: 101;
+  flex: none;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  background-color: var(--sand_0);
+  border-bottom: 1px solid var(--sand_300);
+  user-select: none;
+  position: sticky;
+  top: 0;
+
+  &__button {
+    &:hover {
+      background-color: var(--grape_0);
+    }
+  }
+
+  &__group {
+    display: flex;
+    align-items: stretch;
+  }
+
+  &__section {
+    display: flex;
+    padding: 0 8px;
+    align-items: center;
+    box-sizing: border-box;
+
+    &_flat {
+      padding: 0;
+    }
+
+    & + & {
+      border-left: 1px solid var(--sand_300);
+    }
+  }
+
+  &_newLabelingUI {
+    display: block;
+    background-color: var(--sand_0);
+    height: 42px;
+    border-bottom: 1px solid var(--sand_300);
+
+    & .topbar {
+      &__group {
+        height: 42px;
+        flex: 1;
+        align-items: center;
+      }
+    }
+  }
+}

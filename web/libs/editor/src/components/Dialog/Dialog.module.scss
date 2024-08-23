@@ -1,7 +1,7 @@
 .block {
   position: relative;
-  border: 1px solid #f2f3f4;
-  background-color: #f8f9f9;
+  border: 1px solid var(--sand_300);
+  background-color: var(--sand_100);
   border-radius: 5px;
   padding: 7px 20px;
   margin: 10px 0;
@@ -13,7 +13,7 @@
   }
 
   &_selected {
-    border: 2px solid #ff4d4f;
+    border: 2px solid var(--danger_color);
   }
 }
 
