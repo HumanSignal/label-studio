@@ -10,9 +10,9 @@ import { HtxLabels, LabelsModel } from "./Labels/Labels";
 /**
  * Use the TimelineLabels tag to classify video frames. This can be a single frame or a span of frames.
  * 
- * First, select a label and then click once to select a single frame. Click and drag to select multiple frames. 
+ * First, select a label and then click once to annotate a single frame. Click and drag to annotate multiple frames. 
  * 
- * To move forward and backward in the timeline without labeling, ensure that no labels are are selected before you click. 
+ * To move forward and backward in the timeline without labeling, ensure that no labels are selected before you click. 
  * 
  * ![Screenshot of video with frame classification](../images/timelinelabels.png)
  * 
@@ -23,7 +23,7 @@ import { HtxLabels, LabelsModel } from "./Labels/Labels";
  *
  * @example
  * <View>
- *   <Header>Label frame spans:</Header>
+ *   <Header>Label timeline spans:</Header>
  *   <Video name="video" value="$video" />
  *   <TimelineLabels name="timelineLabels" toName="video">
  *     <Label value="Nothing" background="#944BFF"/>
