@@ -1,9 +1,10 @@
-import { destroy, getParentOfType, getRoot, isAlive, types } from "mobx-state-tree";
+import { destroy, getParentOfType, getRoot, isAlive, onSnapshot, types } from "mobx-state-tree";
 
 import { guidGenerator } from "../core/Helpers";
 import Tree, { TRAVERSE_SKIP } from "../core/Tree";
 import Area from "../regions/Area";
 import { isDefined } from "../utils/utilities";
+
 
 const localStorageKeys = {
   order: "relations:order",
@@ -23,6 +24,8 @@ const Relation = types
 
     // labels
     labels: types.maybeNull(types.array(types.string)),
+    // description
+    description: types.optional(types.string, "")  
   })
   .volatile(() => ({
     showMeta: false,
@@ -45,6 +48,10 @@ const Relation = types
 
     get hasRelations() {
       return self.control?.children?.length > 0;
+    },
+
+    get getDescription() {
+       return self.description;
     },
 
     get shouldRender() {
@@ -96,10 +103,13 @@ const Relation = types
 
     toggleVisibility() {
       self.visible = !self.visible;
-    },
-
+    },  
+    
     setRelations(values) {
       self.labels = values;
+    },
+    setDescription(description) {
+      self.description = description;
     },
   }));
 
@@ -201,7 +211,6 @@ const RelationStore = types
       self.relations.forEach((rl) => destroy(rl));
       self.relations = [];
     },
-
     serialize() {
       return self.relations.map((r) => {
         const s = {
@@ -209,6 +218,7 @@ const RelationStore = types
           to_id: r.node2.cleanId,
           type: "relation",
           direction: r.direction,
+          description: r.description ?? "",
         };
 
         if (r.selectedValues) s.labels = r.selectedValues;
@@ -217,19 +227,19 @@ const RelationStore = types
       });
     },
 
-    deserializeRelation(node1, node2, direction, labels) {
+    deserializeRelation(node1, node2, direction, labels, description) {
       const rl = self.addRelation(node1, node2);
 
       if (!rl) return; // duplicated relation
 
       rl.direction = direction;
       rl.labels = labels;
+      rl.description = description ?? "";
     },
 
     toggleConnections() {
       self.showConnections = !self.showConnections;
     },
-
     toggleOrder() {
       self.order = self.order === "asc" ? "desc" : "asc";
       window.localStorage.setItem(localStorageKeys.order, self.order);
@@ -245,13 +255,16 @@ const RelationStore = types
       });
     },
 
+
     setHighlight(relation) {
       self._highlighted = relation.id;
     },
 
     removeHighlight() {
       self._highlighted = null;
-    },
+    },    
   }));
+
+  
 
 export default RelationStore;
