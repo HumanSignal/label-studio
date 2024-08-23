@@ -15,6 +15,23 @@ import ControlBase from "./Base";
  * The `RectangleLabels` tag creates labeled rectangles. Use to apply labels to bounding box semantic segmentation tasks.
  *
  * Use with the following data types: image.
+ * 
+ * ### Rotation
+ * Note that when you rotate rectangles, the anchor point is different depending on how you perform the rotation.  
+ * 
+ * **Rectangle rotation in Label Studio UI**
+ * 
+ * If you rotate using your mouse in the labeling interface, the rotation anchor point is the center of the rectangle. 
+ * 
+ * ![Diagram showing mouse rotation](../images/rectangle_ui_rotation.jpg)
+ * 
+ * **Rectangle rotation in the Label Studio database**
+ * 
+ * If you rotate by directly editing the rotation angle under the **Info** panel of the labeling interface, the rotation anchor point is the top left. 
+ * This is also how it is saved in the Label Studio database (regardless of how you performed the rotation). 
+ * 
+ * ![Diagram showing DB rotation](../images/rectangle_db_rotation.jpg)
+ * 
  * @example
  * <!--Basic labeling configuration for applying labels to rectangular bounding boxes on an image -->
  * <View>
