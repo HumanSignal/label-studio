@@ -1,6 +1,6 @@
 {
-  "message": "refactor: OPTIC-1029: Remove Stale Feature Flag - ff_front_dev_1285_crosshair_wrong_zoom_140122_short (#6234)",
-  "commit": "1838d964e02083395b0ba35146eb6ba80eb3cac9",
-  "date": "2024-08-23T15:39:16.000Z",
+  "message": "refactor: OPTIC-1032: Remove Stale Feature Flag - ff_front_dev_1621_interactive_mode_150222_short (#6237)",
+  "commit": "9cbadd8768f463131b53d3c1eebd5b3dd10750e9",
+  "date": "2024-08-23T15:58:29.000Z",
   "branch": "develop"
 }
