@@ -16,10 +16,6 @@
   flex-direction: column;
   background-color: var(--main-bg-color);
 
-  &__auto_height {
-    height: auto;
-  }
-
   &_fullscreen {
     position: absolute;
     background: var(--sand_0);
