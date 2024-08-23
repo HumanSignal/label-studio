@@ -1,7 +1,6 @@
 import chroma from "chroma-js";
 import { type CSSProperties, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Block, Elem } from "../../utils/bem";
-import { FF_DEV_1507, isFF } from "../../utils/feature-flags";
 import { isDefined, userDisplayName } from "../../utils/utilities";
 import { Tooltip } from "../Tooltip/Tooltip";
 import "./Userpic.scss";
@@ -46,15 +45,13 @@ export const Userpic = forwardRef<any, UserpicProps>(
     const [imgVisible, setImgVisible] = useState(false);
     const [nameVisible, setNameVisible] = useState(true);
 
-    if (isFF(FF_DEV_1507)) {
-      useEffect(() => {
-        if (propsSrc !== finalSrc) {
-          setFinalSrc(propsSrc);
-          setImgVisible(false);
-          setNameVisible(true);
-        }
-      }, [propsSrc]);
-    }
+    useEffect(() => {
+      if (propsSrc !== finalSrc) {
+        setFinalSrc(propsSrc);
+        setImgVisible(false);
+        setNameVisible(true);
+      }
+    }, [propsSrc]);
 
     if (size) {
       style = Object.assign({ width: size, height: size, fontSize: size * 0.4 }, style);
