@@ -12,7 +12,6 @@ import Result from "../../regions/Result";
 import Utils from "../../utils";
 import {
   FF_DEV_1284,
-  FF_DEV_1598,
   FF_DEV_2100,
   FF_DEV_2432,
   FF_DEV_3391,
@@ -236,9 +235,7 @@ export const Annotation = types
 
     get objects() {
       // Without correct validation toname may be null for control tags so we need to check isObjectTag instead of it
-      return Array.from(self.names.values()).filter(
-        isFF(FF_DEV_1598) ? (tag) => tag.isObjectTag : (tag) => !tag.toname,
-      );
+      return Array.from(self.names.values()).filter((tag) => tag.isObjectTag);
     },
 
     get regions() {
@@ -943,7 +940,7 @@ export const Annotation = types
 
     createResult(areaValue, resultValue, control, object, skipAfrerCreate = false) {
       // Without correct validation object may be null, but it it shouldn't be so in results - so we should find any
-      if (isFF(FF_DEV_1598) && !object && control.type === "textarea") {
+      if (!object && control.type === "textarea") {
         object = self.objects[0];
       }
       const objectTag = self.names.get(object.name ?? object);
