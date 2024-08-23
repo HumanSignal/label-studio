@@ -132,7 +132,7 @@ function insert_render_editor(config, modal, full) {
     const htmlTemplate = `
     <div class="playground-buttons">
       <button class="code-block-open-preview">Open Preview</button>
-      <a href="/playground?config=${encodeURI(code)}" target="_blank" rel="noreferrer noopener">Launch in Playground</a>
+      <a href="/playground?config=${encodeURIComponent(code)}" target="_blank" rel="noreferrer noopener">Launch in Playground</a>
     </div>
     `
     pre.insertAdjacentHTML("beforeend", htmlTemplate);
