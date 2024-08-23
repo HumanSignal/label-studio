@@ -1,6 +1,6 @@
 {
-  "message": "ci: remove silent fail on docs build",
-  "commit": "b29b4f3604f5f440198abb43d36d9f13d7e111d7",
-  "date": "2024-08-23T22:10:15.000Z",
+  "message": "ci: Fix RichText docs to unblock docs auto-generation (#6250)",
+  "commit": "bafc4d0d320f7230d14522d78c716b2836bd0c7e",
+  "date": "2024-08-23T22:49:05.000Z",
   "branch": "develop"
 }
