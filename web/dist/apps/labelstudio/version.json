@@ -1,6 +1,6 @@
 {
-  "message": "refactor: remove unused code (#6232)",
-  "commit": "56f3b054dff2be3bfef07c1d84748f957d6cb828",
-  "date": "2024-08-22T16:28:52.000Z",
+  "message": "refactor: OPTIC-1029: Remove Stale Feature Flag - ff_front_dev_1285_crosshair_wrong_zoom_140122_short (#6234)",
+  "commit": "1838d964e02083395b0ba35146eb6ba80eb3cac9",
+  "date": "2024-08-23T15:39:16.000Z",
   "branch": "develop"
 }
