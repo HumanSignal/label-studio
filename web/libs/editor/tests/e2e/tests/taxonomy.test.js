@@ -278,6 +278,7 @@ Scenario("Taxonomy read only in history", async ({ I, LabelStudio, AtTaxonomy })
 
   LabelStudio.setFeatureFlags({
     ff_front_1170_outliner_030222_short: false,
+    ff_front_1170_outliner_030222_short_test: false,
   });
   I.amOnPage("/");
   LabelStudio.init({
