@@ -39,9 +39,9 @@ import ControlBase from "./Base";
  * @param {string} [strokeColor]     - Stroke color in hexadecimal
  * @param {number} [strokeWidth=1]   - Width of stroke
  * @param {boolean} [canRotate=true] - Show or hide rotation control
- * 
+ *
  * <!-- Rotation section -->
- * 
+ *
  * ### Rotation
  * Note that when you rotate rectangles, the anchor point is different depending on how you perform the rotation.
  *
@@ -53,7 +53,7 @@ import ControlBase from "./Base";
  *
  * **Rectangle rotation in the Label Studio database**
  *
- * If you rotate by directly editing the rotation angle under the **Info** panel of the labeling interface, the rotation anchor point is the top left. 
+ * If you rotate by directly editing the rotation angle under the **Info** panel of the labeling interface, the rotation anchor point is the top left.
  * This is also how it is saved in the Label Studio database (regardless of how you performed the rotation).
  *
  * ![Diagram showing DB rotation](../images/rectangle_db_rotation.jpg)

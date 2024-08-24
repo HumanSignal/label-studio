@@ -11,6 +11,10 @@ import { ToolManagerMixin } from "../../mixins/ToolManagerMixin";
  * The `Rectangle` tag is used to add a rectangle (Bounding Box) to an image without selecting a label. This can be useful when you have only one label to assign to a rectangle.
  *
  * Use with the following data types: image.
+ *
+ * !!! note
+ *     When rotating rectangle, the anchor point in the database is different than the anchor point used when rotating with a mouse. For more information, see [Rotation](rectanglelabels#Rotation).
+ *
  * @example
  * <!--Basic labeling configuration for adding rectangular bounding box regions to an image -->
  * <View>
