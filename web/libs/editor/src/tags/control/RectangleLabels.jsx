@@ -43,7 +43,7 @@ import ControlBase from "./Base";
  * <!-- Rotation section -->
  * 
  * ### Rotation
- * Note that when you rotate rectangles, the anchor point is different depending on how you perform the rotation. 
+ * Note that when you rotate rectangles, the anchor point is different depending on how you perform the rotation.
  *
  * **Rectangle rotation in Label Studio UI**
  *
@@ -54,7 +54,7 @@ import ControlBase from "./Base";
  * **Rectangle rotation in the Label Studio database**
  *
  * If you rotate by directly editing the rotation angle under the **Info** panel of the labeling interface, the rotation anchor point is the top left. 
- * This is also how it is saved in the Label Studio database (regardless of how you performed the rotation). 
+ * This is also how it is saved in the Label Studio database (regardless of how you performed the rotation).
  *
  * ![Diagram showing DB rotation](../images/rectangle_db_rotation.jpg)
  */
