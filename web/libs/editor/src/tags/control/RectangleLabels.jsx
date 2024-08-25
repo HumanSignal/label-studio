@@ -40,8 +40,7 @@ import ControlBase from "./Base";
  * @param {number} [strokeWidth=1]   - Width of stroke
  * @param {boolean} [canRotate=true] - Show or hide rotation control
  *
- * <!-- Rotation section -->
- *
+ * @rotation
  * ### Rotation
  * Note that when you rotate rectangles, the anchor point is different depending on how you perform the rotation.
  *
