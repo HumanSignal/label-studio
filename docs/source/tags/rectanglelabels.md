@@ -23,7 +23,7 @@ Use with the following data types: image.
 | [fillColor] | <code>string</code> |  | Rectangle fill color in hexadecimal |
 | [strokeColor] | <code>string</code> |  | Stroke color in hexadecimal |
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of stroke |
-| [canRotate] | <code>boolean</code> | <code>true</code> | Show or hide rotation control <!-- Rotation section --> ### Rotation Note that when you rotate rectangles, the anchor point is different depending on how you perform the rotation. **Rectangle rotation in Label Studio UI** If you rotate using your mouse in the labeling interface, the rotation anchor point is the center of the rectangle. ![Diagram showing mouse rotation](../images/rectangle_ui_rotation.jpg) **Rectangle rotation in the Label Studio database** If you rotate by directly editing the rotation angle under the **Info** panel of the labeling interface, the rotation anchor point is the top left. This is also how it is saved in the Label Studio database (regardless of how you performed the rotation). ![Diagram showing DB rotation](../images/rectangle_db_rotation.jpg) |
+| [canRotate] | <code>boolean</code> | <code>true</code> | Show or hide rotation control |
 
 ### Sample Results JSON
 
