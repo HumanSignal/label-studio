@@ -16,7 +16,7 @@ If you want to perform object detection, you need to create a labeled dataset. U
 
 <i>Figure 1: Object detection with bounding boxes.</i>
 
-### Rotation
+## Rotation
 
 Note that when you rotate rectangles (bounding boxes), the anchor point is different depending on how you perform the rotation.
 
