@@ -56,6 +56,14 @@ export const TimeDurationControl: FC<TimerProps> = ({
         data-testid="timebox-end-time"
         inverted
       />
+      <TimeBox
+        sidepanel={isSidepanel}
+        readonly={true}
+        value={endTime - startTime}
+        onChange={()=> {}}
+        data-testid="timebox-duration-time"
+        inverted
+      />
     </Block>
   );
 };
