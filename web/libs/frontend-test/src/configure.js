@@ -27,6 +27,7 @@ export default function (configModifier, setupNodeEvents) {
     fixturesFolder: localPath("./fixtures"),
     trashAssetsBeforeRuns: false, // Kills ability to run in parallel, must be off
     videoUploadOnPasses: false,
+    numTestsKeptInMemory: 1,
     env: {
       coverage: COLLECT_COVERAGE,
     },

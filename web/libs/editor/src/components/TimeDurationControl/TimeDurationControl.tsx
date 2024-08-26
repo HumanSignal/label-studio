@@ -1,7 +1,7 @@
 import React, { type FC } from "react";
 import { Block } from "../../utils/bem";
 
-import "./TimeDurationControl.styl";
+import "./TimeDurationControl.scss";
 import { TimeBox } from "./TimeBox";
 
 export interface TimerProps {

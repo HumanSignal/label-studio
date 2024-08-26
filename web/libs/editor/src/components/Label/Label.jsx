@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { asVars } from "../../utils/styles";
 
-import "./Label.styl";
+import "./Label.scss";
 
 export const Label = React.forwardRef(
   (

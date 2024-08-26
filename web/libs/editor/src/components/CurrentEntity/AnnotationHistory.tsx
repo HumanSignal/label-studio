@@ -18,7 +18,7 @@ import { Space } from "../../common/Space/Space";
 import { Userpic } from "../../common/Userpic/Userpic";
 import { Block, Elem } from "../../utils/bem";
 import { humanDateDiff, userDisplayName } from "../../utils/utilities";
-import "./AnnotationHistory.styl";
+import "./AnnotationHistory.scss";
 import { when } from "mobx";
 
 type HistoryItemType =
