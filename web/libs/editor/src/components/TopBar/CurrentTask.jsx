@@ -6,7 +6,7 @@ import { Block, Elem } from "../../utils/bem";
 import { FF_DEV_3873, FF_DEV_4174, FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
-import "./CurrentTask.styl";
+import "./CurrentTask.scss";
 import { reaction } from "mobx";
 
 export const CurrentTask = observer(({ store }) => {

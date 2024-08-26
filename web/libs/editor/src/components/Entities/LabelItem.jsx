@@ -7,7 +7,7 @@ import { LsInvisible, LsVisible } from "../../assets/icons";
 import { Label } from "../Label/Label";
 import React from "react";
 import { asVars } from "../../utils/styles";
-import "./LabelItem.styl";
+import "./LabelItem.scss";
 
 export const LabelItem = observer(({ item, regions, regionStore }) => {
   const color = item.background;

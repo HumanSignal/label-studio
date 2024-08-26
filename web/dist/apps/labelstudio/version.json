@@ -1,6 +1,6 @@
 {
-  "message": "refactor: remove unused code (#6232)",
-  "commit": "56f3b054dff2be3bfef07c1d84748f957d6cb828",
-  "date": "2024-08-22T16:28:52.000Z",
+  "message": "ci: Fix RichText docs to unblock docs auto-generation (#6250)",
+  "commit": "bafc4d0d320f7230d14522d78c716b2836bd0c7e",
+  "date": "2024-08-23T22:49:05.000Z",
   "branch": "develop"
 }

@@ -5,7 +5,7 @@ import { Block, Elem } from "../../utils/bem";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import { FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
-import "./CurrentTask.styl";
+import "./CurrentTask.scss";
 
 export const CurrentTask = observer(({ store }) => {
   const currentIndex = useMemo(() => {

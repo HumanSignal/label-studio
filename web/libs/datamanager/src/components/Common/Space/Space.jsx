@@ -16,7 +16,7 @@ export const Space = ({
   ...rest
 }) => {
   return (
-    <Block name="space" mod={{ direction, size, spread, stretch, align }} mix={className} style={style} {...rest}>
+    <Block name="space-dm" mod={{ direction, size, spread, stretch, align }} mix={className} style={style} {...rest}>
       {children}
     </Block>
   );

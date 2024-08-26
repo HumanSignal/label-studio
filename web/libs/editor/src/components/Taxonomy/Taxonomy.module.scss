@@ -1,5 +1,5 @@
 .taxonomy {
-  border: 1px solid #d9d9d9;
+  border: 1px solid var(--sand_300);
   border-radius: 6px;
   padding: 4px 4px 0; // margin of last row of selected divs will work as padding
   width: max-content;
@@ -20,6 +20,7 @@
 .taxonomy > span > svg {
   transform: rotate(-180deg);
 }
+
 .taxonomy_open > span > svg {
   transform: none;
 }
@@ -31,7 +32,7 @@
 
   div {
     margin: 0 2px 4px 0;
-    background: hsl(0, 0%, 95%);
+    background: var(--sand_100);
     padding: 0; // all the right space should be a clickable button, so no padding
     border-radius: 4px;
     display: flex;
@@ -52,11 +53,11 @@
     line-height: 1;
     font-weight: 600;
     font-size: 20px;
-    color: #09f;
+    color: var(--primary_link);
     margin-left: -8px; // to align with the right edge of the text
 
     &:hover {
-      color: red;
+      color: var(--danger_color);
     }
   }
 }
@@ -64,11 +65,11 @@
 .taxonomy__dropdown {
   position: absolute;
   z-index: 10;
-  background: white;
+  background: var(--sand_0);
   border-radius: 6px;
   left: -1px;
-  border: 1px solid #e2e2e2;
-  box-shadow: 0 4px 10px rgb(0 0 0 / 12%);
+  border: 1px solid var(--sand_300);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .12);
 
   input[type="checkbox"] {
     margin-right: 4px;
@@ -87,19 +88,19 @@
 .taxonomy__search {
   width: 100%;
   border: none;
-  border-bottom: 1px solid #e2e2e2;
+  border-bottom: 1px solid var(--sand_300);
   border-radius: 3px 3px 0 0;
   padding: 6px 16px;
   margin-bottom: 4px;
-  box-shadow: 0 -2px 0 6px white; // white background over scrolled items
+  box-shadow: 0 -2px 0 6px var(--sand_0); // white background over scrolled items
   position: sticky;
   top: 0;
   z-index: 1;
 
   &:focus,
   &:focus-visible {
-    outline: 1px solid #09f;
-    border-bottom-color: #09f;
+    outline: 1px solid var(--primary_link);
+    border-bottom-color: var(--primary_link);
   }
 }
 
@@ -120,12 +121,15 @@
     padding-right: 8px;
     line-height: 2em;
   }
-};
+}
+
+;
 
 .taxonomy__item {
   display: flex;
+
   &:focus-within {
-    background: #eee;
+    background: var(--sand_200);
   }
 
   &_user,
@@ -134,7 +138,7 @@
   }
 
   &_session {
-    color: #09f;
+    color: var(--primary_link);
   }
 }
 
@@ -189,13 +193,16 @@
     cursor: pointer;
     text-align: center;
   }
+
   .taxonomy__item &_count:not(:last-child) {
     position: absolute;
   }
+
   .taxonomy__item:hover &_count:not(:last-child) {
     visibility: hidden;
     display: none;
   }
+
   .taxonomy__item:hover &_actions {
     visibility: visible;
     display: block;
@@ -245,12 +252,12 @@
     margin-right: 8px;
     font: inherit;
     font-style: italic;
-    color: #09f;
-    background: rgba(0, 0, 0, 0.03);
+    color: var(--primary_link);
+    background: var(--sand_100);
   }
 }
 
 .taxonomy__collapsable {
   cursor: pointer;
-  color: grey;
+  color: var(--sand_600);
 }
