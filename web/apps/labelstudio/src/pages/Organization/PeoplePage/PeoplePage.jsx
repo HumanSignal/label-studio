@@ -11,9 +11,9 @@ import { useConfig } from "../../../providers/ConfigProvider";
 import { Block, Elem } from "../../../utils/bem";
 import { FF_LSDV_E_297, isFF } from "../../../utils/feature-flags";
 import { copyText } from "../../../utils/helpers";
-import "./PeopleInvitation.styl";
+import "./PeopleInvitation.scss";
 import { PeopleList } from "./PeopleList";
-import "./PeoplePage.styl";
+import "./PeoplePage.scss";
 import { SelectedUser } from "./SelectedUser";
 
 const InvitationModal = ({ link }) => {

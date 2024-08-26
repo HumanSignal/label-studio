@@ -2,7 +2,7 @@ import type React from "react";
 import { type FC, useEffect, useRef, useState } from "react";
 import { Block, Elem } from "../../../utils/bem";
 
-import "./Slider.styl";
+import "./Slider.scss";
 import { Info } from "./Info";
 
 export interface SliderProps {

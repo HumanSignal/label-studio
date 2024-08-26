@@ -1,7 +1,7 @@
 import React, { forwardRef, useMemo } from "react";
 import { cn } from "../../utils/bem";
 import Label from "../Label/Label";
-import "./Input.styl";
+import "./Input.scss";
 
 const Input = forwardRef(({ label, className, required, labelProps, ghost, waiting, ...props }, ref) => {
   const rootClass = cn("input");

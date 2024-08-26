@@ -14,7 +14,7 @@ import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import { TagParentMixin } from "../../mixins/TagParentMixin";
 import { FF_DEV_3391, FF_PROD_309, isFF } from "../../utils/feature-flags";
 import { Block, Elem } from "../../utils/bem";
-import "./Choice/Choice.styl";
+import "./Choice/Choice.scss";
 import { LsChevron } from "../../assets/icons";
 import { HintTooltip } from "../../components/Taxonomy/Taxonomy";
 import { sanitizeHtml } from "../../utils/html";

@@ -2,7 +2,7 @@ import { Toast, ToastAction, type ToastProps } from "../../components/Toast/Toas
 import { LsCross } from "../../assets/icons";
 import type { FC } from "react";
 import { Block } from "../../utils/bem";
-import "./MessageToast.styl";
+import "./MessageToast.scss";
 
 export interface MessageToastProps extends ToastProps {
   children?: any;

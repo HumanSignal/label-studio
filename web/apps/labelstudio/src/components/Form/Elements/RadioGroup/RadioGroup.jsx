@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { Label } from "..";
 import { BemWithSpecifiContext } from "../../../../utils/bem";
 import { FormField } from "../../FormField";
-import "./RadioGroup.styl";
+import "./RadioGroup.scss";
 
 const RadioContext = createContext();
 const { Block, Elem } = BemWithSpecifiContext();

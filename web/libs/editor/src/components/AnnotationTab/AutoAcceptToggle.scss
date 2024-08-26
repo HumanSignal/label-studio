@@ -1,0 +1,66 @@
+.auto-accept {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  background-color: var(--sand_0);
+  margin-left: 16px;
+
+  &__wrapper {
+    width: 100%;
+
+    &_loading {
+      opacity: 0.5;
+    }
+  }
+
+  &__info {
+    font-size: 16px;
+  }
+
+  &__action {
+    padding: 0;
+    margin: 0;
+    margin: 2px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 100%;
+    color: var(--sand_700);
+    background-color: var(--sand_100);
+
+    &_type {
+      &_accept svg {
+        width: 15px;
+        height: 10px;
+      }
+
+      &_reject svg {
+        width: 12.5px;
+        height: 12.5px;
+      }
+    }
+  }
+
+  &__spinner {
+    width: 16px;
+    height: 16px;
+    border-radius: 100%;
+    box-sizing: border-box;
+    border: 2px solid var(--persimmon_400);
+    border-right-color: transparent;
+    animation: waiting-spin 1s linear infinite;
+  }
+}
+
+@keyframes waiting-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}

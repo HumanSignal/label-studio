@@ -58,7 +58,7 @@ import { TopBar } from "../TopBar/TopBar";
 /**
  * Styles
  */
-import "./App.styl";
+import "./App.scss";
 
 /**
  * App

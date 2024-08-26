@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 
 import { Hotkey } from "../../core/Hotkey";
 
-import "./Settings.styl";
+import "./Settings.scss";
 import { Block, Elem } from "../../utils/bem";
 import { triggerResizeEvent } from "../../utils/utilities";
 

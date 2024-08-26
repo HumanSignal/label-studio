@@ -9,7 +9,7 @@ import type { Regions } from "../../../lib/AudioUltra/Regions/Regions";
 import { Block } from "../../../utils/bem";
 import { ErrorMessage } from "../../../components/ErrorMessage/ErrorMessage";
 
-import "./view.styl";
+import "./view.scss";
 
 interface AudioUltraProps {
   item: any;

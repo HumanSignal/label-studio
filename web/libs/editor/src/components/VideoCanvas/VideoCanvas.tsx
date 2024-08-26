@@ -2,7 +2,7 @@ import { forwardRef, memo, type MutableRefObject, useCallback, useEffect, useMem
 import { Block, Elem } from "../../utils/bem";
 import { FF_LSDV_4711, isFF } from "../../utils/feature-flags";
 import { clamp, isDefined } from "../../utils/utilities";
-import "./VideoCanvas.styl";
+import "./VideoCanvas.scss";
 import { MAX_ZOOM, MIN_ZOOM } from "./VideoConstants";
 import { VirtualCanvas } from "./VirtualCanvas";
 import { VirtualVideo } from "./VirtualVideo";
