@@ -7,7 +7,7 @@ redis_title: &redis_title
 redis_params: &redis_params
   - type: text
     name: db
-    label: Database Number
+    label: Database Number (db)
     placeholder: 1
   - type: text
     name: path
