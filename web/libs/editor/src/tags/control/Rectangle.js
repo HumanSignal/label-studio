@@ -27,7 +27,7 @@ import { ToolManagerMixin } from "../../mixins/ToolManagerMixin";
  * @param {string=} [fillColor]           - Rectangle fill color in hexadecimal
  * @param {string=} [strokeColor=#f48a42] - Stroke color in hexadecimal
  * @param {number=} [strokeWidth=1]       - Width of the stroke
- * @param {boolean=} [canRotate=true]     - Whether to show or hide rotation control. Note that the anchor point in the database is different than the anchor point used when rotating with the rotation tool. For more information, see [Rotation](rectanglelabels#Rotation).
+ * @param {boolean=} [canRotate=true]     - Whether to show or hide rotation control. Note that the anchor point in the database is different than the anchor point used when rotating with the rotation tool. For more information, see [Rotation](/templates/image_bbox#Rotation).
  * @param {boolean} [smart]               - Show smart tool for interactive pre-annotations
  * @param {boolean} [smartOnly]           - Only show smart tool for interactive pre-annotations
  */
