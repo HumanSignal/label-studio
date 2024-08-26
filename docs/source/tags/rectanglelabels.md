@@ -10,22 +10,6 @@ The `RectangleLabels` tag creates labeled rectangles. Use to apply labels to bou
 
 Use with the following data types: image.
 
-#### Rotation
-Note that when you rotate rectangles, the anchor point is different depending on how you perform the rotation.
-
-**Rectangle rotation in Label Studio UI**
-
-If you rotate using your mouse in the labeling interface, the rotation anchor point is the center of the rectangle.
-
-![Diagram showing mouse rotation](../images/rectangle_ui_rotation.jpg)
-
-**Rectangle rotation in the Label Studio database**
-
-If you rotate by directly editing the rotation angle under the **Info** panel of the labeling interface, the rotation anchor point is the top left.
-This is also how it is saved in the Label Studio database (regardless of how you performed the rotation).
-
-![Diagram showing DB rotation](../images/rectangle_db_rotation.jpg)
-
 ### Parameters
 
 | Param | Type | Default | Description |
@@ -39,7 +23,7 @@ This is also how it is saved in the Label Studio database (regardless of how you
 | [fillColor] | <code>string</code> |  | Rectangle fill color in hexadecimal |
 | [strokeColor] | <code>string</code> |  | Stroke color in hexadecimal |
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of stroke |
-| [canRotate] | <code>boolean</code> | <code>true</code> | Show or hide rotation control |
+| [canRotate] | <code>boolean</code> | <code>true</code> | Show or hide rotation control. Note that the anchor point in the database is different than the anchor point used when rotating with the rotation tool. For more information, see [Rotation](/templates/image_bbox#Rotation). |
 
 ### Sample Results JSON
 
