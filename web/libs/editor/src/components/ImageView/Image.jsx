@@ -4,7 +4,7 @@ import { Block, Elem } from "../../utils/bem";
 import { FF_LSDV_4711, isFF } from "../../utils/feature-flags";
 import messages from "../../utils/messages";
 import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
-import "./Image.styl";
+import "./Image.scss";
 
 /**
  * Coordinates in relative mode belong to a data domain consisting of percentages in the range from 0 to 100

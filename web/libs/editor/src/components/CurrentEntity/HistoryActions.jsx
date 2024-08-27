@@ -3,7 +3,7 @@ import { LsRedo, LsRemove, LsUndo } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { Block, Elem } from "../../utils/bem";
-import "./HistoryActions.styl";
+import "./HistoryActions.scss";
 import { Hotkey } from "../../core/Hotkey";
 
 export const HistoryActions = observer(({ annotation }) => {

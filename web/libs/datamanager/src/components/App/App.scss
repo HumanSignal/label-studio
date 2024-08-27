@@ -47,7 +47,7 @@
   border: none !important;
 }
 
-.offscreen-lsf {
+.offscreen {
   bottom: 100%;
   right: 100%;
   opacity: 0;
@@ -58,7 +58,7 @@
   z-index: 100000;
 }
 
-.offscreen-lsf.visible {
+.offscreen.visible {
   bottom: auto;
   right: auto;
   top: 0;

@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { Userpic } from "../../common/Userpic/Userpic";
 import { Space } from "../../common/Space/Space";
 import { Block, Elem } from "../../utils/bem";
-import "./AnnotationTabs.styl";
+import "./AnnotationTabs.scss";
 import { IconBan, LsGrid, LsPlus, LsSparks, LsStar } from "../../assets/icons";
 
 export const EntityTab = observer(

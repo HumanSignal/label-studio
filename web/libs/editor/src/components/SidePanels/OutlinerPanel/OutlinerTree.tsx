@@ -25,7 +25,7 @@ import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
 import { RegionControlButton } from "../Components/RegionControlButton";
-import "./TreeView.styl";
+import "./TreeView.scss";
 import ResizeObserver from "../../../utils/resize-observer";
 import type { EventDataNode, Key } from "rc-tree/es/interface";
 

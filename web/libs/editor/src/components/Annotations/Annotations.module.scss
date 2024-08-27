@@ -6,7 +6,7 @@
 }
 
 .skipped {
-  color: #ff4d4f;
+  color: var(--danger_color);
   min-width: 2em;
 }
 
@@ -26,14 +26,14 @@
   cursor: pointer;
 
   &_selected {
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--sand_100);
   }
 }
 
 .title {
   display: flex;
   align-items: center;
-  color: #1890ff;
+  color: var(--primary_link);
   font-weight: bold;
 
   h3 {

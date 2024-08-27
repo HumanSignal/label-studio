@@ -11,7 +11,7 @@ import {
 import { Block, Elem } from "../../utils/bem";
 import { IconArrowLeft, IconArrowRight, IconOutlinerCollapse, IconOutlinerExpand } from "../../assets/icons";
 
-import "./PanelBase.styl";
+import "./PanelBase.scss";
 import type { PanelType } from "./SidePanels";
 import { useDrag } from "../../hooks/useDrag";
 import { clamp, isDefined } from "../../utils/utilities";
