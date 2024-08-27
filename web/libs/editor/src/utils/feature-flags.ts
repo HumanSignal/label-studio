@@ -12,13 +12,6 @@ export const FF_DEV_1442 = "ff_front_dev_1442_unselect_shape_on_click_outside_08
 // User labels for Taxonomy
 export const FF_DEV_1536 = "ff_front_dev_1536_taxonomy_user_labels_150222_long";
 
-// Fix shortcuts focus and cursor problems
-export const FF_DEV_1564_DEV_1565 = "ff_front_dev_1564_dev_1565_shortcuts_focus_and_cursor_010222_short";
-
-// Fix work of shortcuts in results
-/** @requires FF_DEV_1564_DEV_1565 */
-export const FF_DEV_1566 = "ff_front_dev_1566_shortcuts_in_results_010222_short";
-
 // New Audio 2.0 UI
 export const FF_DEV_1713 = "ff_front_DEV_1713_audio_ui_150222_short";
 

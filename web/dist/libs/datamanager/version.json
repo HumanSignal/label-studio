@@ -1,6 +1,6 @@
 {
-  "message": "ci: Fix RichText docs to unblock docs auto-generation (#6250)",
-  "commit": "bafc4d0d320f7230d14522d78c716b2836bd0c7e",
-  "date": "2024-08-23T22:49:05.000Z",
+  "message": "docs: DOC-239: Add information about rectangle rotation (#6248)",
+  "commit": "c738a68753387d9f743787a1ab98d952cbc8a493",
+  "date": "2024-08-27T19:53:38.000Z",
   "branch": "develop"
 }
