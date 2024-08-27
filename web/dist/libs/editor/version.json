@@ -1,6 +1,6 @@
 {
-  "message": "chore: OPTIC-990: Remove Stylus and supporting libraries (#6257)",
-  "commit": "79dd8eb40be318fd53d0a64a19d33914160049d1",
-  "date": "2024-08-27T11:27:24.000Z",
+  "message": "refactor: OPTIC 932 remove stale feature flags (#6260)",
+  "commit": "8e2da1d57a6a84aff29807b9dcf2f00667d45a70",
+  "date": "2024-08-27T14:24:14.000Z",
   "branch": "develop"
 }
