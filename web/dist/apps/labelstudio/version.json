@@ -1,6 +1,6 @@
 {
-  "message": "refactor: OPTIC 932 remove stale feature flags (#6260)",
-  "commit": "8e2da1d57a6a84aff29807b9dcf2f00667d45a70",
-  "date": "2024-08-27T14:24:14.000Z",
+  "message": "docs: DOC-239: Add information about rectangle rotation (#6248)",
+  "commit": "c738a68753387d9f743787a1ab98d952cbc8a493",
+  "date": "2024-08-27T19:53:38.000Z",
   "branch": "develop"
 }
