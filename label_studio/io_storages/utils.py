@@ -1,19 +1,21 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from dataclasses import dataclass
 import logging
 import re
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
 # Put storage prefixes here
 uri_regex = r"([\"'])(?P<uri>(?P<storage>{})://[^\1=]*)\1"
 
+
 @dataclass
 class BucketURI:
     bucket: str
     path: str
     scheme: str
+
 
 def get_uri_via_regex(data, prefixes=('s3', 'gs')):
     data = str(data).strip()
@@ -45,7 +47,8 @@ def get_uri_via_regex(data, prefixes=('s3', 'gs')):
             return None, None
     return r_match.group('uri'), r_match.group('storage')
 
-def parse_bucket_uri(uri: str | None) -> BucketURI | None:    
+
+def parse_bucket_uri(uri: str | None) -> BucketURI | None:
     uri = uri and uri.strip()
     if not uri:
         return None
@@ -58,6 +61,7 @@ def parse_bucket_uri(uri: str | None) -> BucketURI | None:
 
     return BucketURI(bucket=bucket, path=path, scheme=scheme)
 
+
 def storage_can_resolve_bucket_url(storage, url) -> bool:
     if not storage.can_resolve_scheme(url):
         return False
@@ -68,8 +72,8 @@ def storage_can_resolve_bucket_url(storage, url) -> bool:
 
     if storage.bucket != uri.bucket:
         return False
-    
+
     if storage.prefix and not uri.path.startswith(storage.prefix):
         return False
-    
+
     return True
