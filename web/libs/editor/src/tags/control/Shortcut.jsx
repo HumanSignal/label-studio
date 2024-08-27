@@ -8,7 +8,6 @@ import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
 import Registry from "../../core/Registry";
 import { guidGenerator } from "../../core/Helpers";
 import { Hotkey } from "../../core/Hotkey";
-import { FF_DEV_1564_DEV_1565, isFF } from "../../utils/feature-flags";
 import { customTypes } from "../../core/CustomTypes";
 import chroma from "chroma-js";
 
@@ -66,9 +65,7 @@ const Model = types
 
       if (textarea.onShortcut) {
         textarea.onShortcut(self.value);
-        if (isFF(FF_DEV_1564_DEV_1565)) {
-          textarea.returnFocus?.();
-        }
+        textarea.returnFocus?.();
       }
     },
 
@@ -78,9 +75,7 @@ const Model = types
       // fired on a wrong element
 
       if (textarea.name !== name && !name.startsWith(`${textarea.name}:`)) return;
-      if (isFF(FF_DEV_1564_DEV_1565)) {
-        event.preventDefault();
-      }
+      event.preventDefault();
       return self.onClick();
     },
   }));
@@ -100,10 +95,8 @@ const HtxShortcutView = inject("store")(
       <Tag
         data-shortcut={true}
         onClick={(e) => {
-          if (isFF(FF_DEV_1564_DEV_1565)) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
+          e.preventDefault();
+          e.stopPropagation();
           item.onClick();
           return false;
         }}

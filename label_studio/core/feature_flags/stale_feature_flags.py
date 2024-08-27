@@ -57,7 +57,6 @@ STALE_FEATURE_FLAGS = {
     'ff_dev_2100_clean_unnecessary_areas_140422_short': True,
     'ff_back_2070_inner_id_12052022_short': True,
     'ff_dev_2007_rework_choices_280322_short': True,
-    'ff_front_dev_1564_dev_1565_shortcuts_focus_and_cursor_010222_short': True,
     'ff_front_dev_1495_avatar_mess_210122_short': True,
     'ff_front_1170_outliner_030222_short': True,
 }
