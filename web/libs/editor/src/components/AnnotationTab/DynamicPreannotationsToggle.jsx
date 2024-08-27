@@ -4,7 +4,7 @@ import { Space } from "../../common/Space/Space";
 import Toggle from "../../common/Toggle/Toggle";
 import ToolsManager from "../../tools/Manager";
 import { Block, Elem } from "../../utils/bem";
-import "./DynamicPreannotationsToggle.styl";
+import "./DynamicPreannotationsToggle.scss";
 
 export const DynamicPreannotationsToggle = inject("store")(
   observer(({ store }) => {

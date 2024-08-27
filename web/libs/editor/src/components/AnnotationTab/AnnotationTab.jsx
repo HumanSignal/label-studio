@@ -6,7 +6,7 @@ import Entity from "../Entity/Entity";
 import Relations from "../Relations/Relations";
 import { Comments } from "../Comments/Comments";
 
-import "./CommentsSection.styl";
+import "./CommentsSection.scss";
 
 export const AnnotationTab = observer(({ store }) => {
   const as = store.annotationStore;

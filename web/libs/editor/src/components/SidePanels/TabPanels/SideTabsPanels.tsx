@@ -11,7 +11,7 @@ import {
   DEFAULT_PANEL_WIDTH,
   PANEL_HEADER_HEIGHT,
 } from "../constants";
-import "../SidePanels.styl";
+import "../SidePanels.scss";
 import { SidePanelsContext } from "../SidePanelsContext";
 import { useRegionsCopyPaste } from "../../../hooks/useRegionsCopyPaste";
 import { PanelTabsBase } from "./PanelTabsBase";

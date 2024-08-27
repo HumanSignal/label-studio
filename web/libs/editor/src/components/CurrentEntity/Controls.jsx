@@ -8,7 +8,7 @@ import { Block, Elem } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 import { IconBan } from "../../assets/icons";
 
-import "./Controls.styl";
+import "./Controls.scss";
 import { Hotkey } from "../../core/Hotkey";
 
 const TOOLTIP_DELAY = 0.8;

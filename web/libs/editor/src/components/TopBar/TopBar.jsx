@@ -12,7 +12,7 @@ import { Annotations } from "./Annotations";
 import { Controls } from "./Controls";
 import { CurrentTask } from "./CurrentTask";
 
-import "./TopBar.styl";
+import "./TopBar.scss";
 
 export const TopBar = observer(({ store }) => {
   const annotationStore = store.annotationStore;

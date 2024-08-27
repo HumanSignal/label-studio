@@ -5,7 +5,7 @@ import { FF_DEV_2290, isFF } from "../../../utils/feature-flags";
 import { Comments as CommentsComponent } from "../../Comments/Comments";
 import { AnnotationHistory } from "../../CurrentEntity/AnnotationHistory";
 import { PanelBase, type PanelProps } from "../PanelBase";
-import "./DetailsPanel.styl";
+import "./DetailsPanel.scss";
 import { RegionDetailsMain, RegionDetailsMeta } from "./RegionDetails";
 import { RegionItem } from "./RegionItem";
 import { Relations as RelationsComponent } from "./Relations";

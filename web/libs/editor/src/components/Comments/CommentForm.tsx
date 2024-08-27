@@ -2,7 +2,7 @@ import { type FC, type RefObject, useCallback, useEffect, useRef } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { ReactComponent as IconSend } from "../../assets/icons/send.svg";
 
-import "./CommentForm.styl";
+import "./CommentForm.scss";
 import { TextArea } from "../../common/TextArea/TextArea";
 import { observer } from "mobx-react";
 import { FF_DEV_3873, isFF } from "../../utils/feature-flags";

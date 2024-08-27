@@ -6,7 +6,7 @@ import { CommentsList } from "./CommentsList";
 import { useMounted } from "../../common/Utils/useMounted";
 import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
 
-import "./Comments.styl";
+import "./Comments.scss";
 
 export const Comments: FC<{ annotationStore: any; commentStore: any; cacheKey?: string }> = observer(
   ({ annotationStore, commentStore, cacheKey }) => {

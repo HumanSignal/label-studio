@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import { Block, Elem } from "../../utils/bem";
 import { Actions } from "./Actions";
 import { Controls } from "./Controls";
-import "./BottomBar.styl";
+import "./BottomBar.scss";
 import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
 
 export const BottomBar = observer(({ store }) => {

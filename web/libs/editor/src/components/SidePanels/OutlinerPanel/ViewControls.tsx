@@ -19,7 +19,7 @@ import { Dropdown } from "../../../common/Dropdown/Dropdown";
 import { Menu } from "../../../common/Menu/Menu";
 import { BemWithSpecifiContext } from "../../../utils/bem";
 import { SidePanelsContext } from "../SidePanelsContext";
-import "./ViewControls.styl";
+import "./ViewControls.scss";
 import { Filter } from "../../Filter/Filter";
 import { FF_DEV_3873, FF_LSDV_3025, FF_LSDV_4992, isFF } from "../../../utils/feature-flags";
 import { observer } from "mobx-react";

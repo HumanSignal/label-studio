@@ -7,7 +7,7 @@ import { Block, Elem } from "../../utils/bem";
 import { clamp, sortAnnotations } from "../../utils/utilities";
 import { AnnotationButton } from "./AnnotationButton";
 
-import "./AnnotationsCarousel.styl";
+import "./AnnotationsCarousel.scss";
 
 interface AnnotationsCarouselInterface {
   store: any;
