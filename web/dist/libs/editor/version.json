@@ -1,6 +1,6 @@
 {
-  "message": "ci: Fix RichText docs to unblock docs auto-generation (#6250)",
-  "commit": "bafc4d0d320f7230d14522d78c716b2836bd0c7e",
-  "date": "2024-08-23T22:49:05.000Z",
+  "message": "chore: OPTIC-990: Remove Stylus and supporting libraries (#6257)",
+  "commit": "79dd8eb40be318fd53d0a64a19d33914160049d1",
+  "date": "2024-08-27T11:27:24.000Z",
   "branch": "develop"
 }
