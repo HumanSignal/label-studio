@@ -161,7 +161,7 @@ module.exports = composePlugins(
         });
       }
 
-      if (rule.test.toString().match(/scss|sass|styl/) && !isCssModule) {
+      if (rule.test.toString().match(/scss|sass/) && !isCssModule) {
         const r = rule.oneOf.filter((r) => {
           // we don't need rules that don't have loaders
           if (!r.use) return false;
@@ -173,7 +173,7 @@ module.exports = composePlugins(
           if (testString.match(/module/)) return false;
 
           // we only target pre-processors that has 'css-loader included'
-          return testString.match(/scss|sass|styl/) && r.use.some((u) => u.loader && u.loader.includes("css-loader"));
+          return testString.match(/scss|sass/) && r.use.some((u) => u.loader && u.loader.includes("css-loader"));
         });
 
         r.forEach((_r) => {
@@ -227,7 +227,6 @@ module.exports = composePlugins(
       },
     );
 
-    // update the stylus loader to include an import of a global file
     return merge(config, {
       devtool,
       mode,
