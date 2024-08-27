@@ -11,8 +11,17 @@ section: "Integrate & Extend"
 
 ---
 
+<div class="enterprise-only">
+
+The [**Label Studio Python SDK**](https://labelstud.io/sdk/index.html) allows you to seamlessly integrate Label Studio into your data science and machine learning pipelines.
+
+</div>
+
+<div class="opensource-only">
 
 The [**Label Studio Python SDK**](https://api.labelstud.io/api-reference/introduction/getting-started) allows you to seamlessly integrate Label Studio into your data science and machine learning pipelines.
+
+</div>
 
 The SDK provides a set of predefined classes and methods to interact with the Label Studio API directly from your Python scripts, making it easier to manage projects, import tasks, and handle annotations. 
 
@@ -48,7 +57,17 @@ ls = LabelStudio(base_url=LABEL_STUDIO_URL, api_key=API_KEY)
 
 ## SDK versions and compatibility
 
+<div class="enterprise-only">
+
+In June 2024, we released SDK 1.0. 
+
+</div>
+
+<div class="opensource-only">
+
 In June 2024, we released SDK 1.0. The previous SDK (version <1) is deprecated and no longer supported. We recommend upgrading to [the latest version](https://github.com/HumanSignal/label-studio-sdk). 
+
+</div>
 
 If you still want to use the older version, you can install it using `pip install "label-studio-sdk<1"`. 
 
@@ -64,7 +83,7 @@ git checkout release/0.0.34
 Or you can simply modify you code to change the import stream as follows:
 
 ```python
-from label_studio_sdk._legacy import Client
+from label_studio_sdk import Client
 from label_studio_sdk.data_manager import Filters, Column, Operator, Type
 from label_studio_sdk._legacy import Project
 ```

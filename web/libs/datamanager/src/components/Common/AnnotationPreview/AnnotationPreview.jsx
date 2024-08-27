@@ -4,7 +4,7 @@ import { taskToLSFormat } from "../../../sdk/lsf-utils";
 import { Block } from "../../../utils/bem";
 import { FF_LSDV_4711, isFF } from "../../../utils/feature-flags";
 import { Spinner } from "../Spinner";
-import "./AnnotationPreview.styl";
+import "./AnnotationPreview.scss";
 
 const imgDefaultProps = {};
 
@@ -24,7 +24,7 @@ class PreviewGenerator {
     this.running = false;
     this.queue = [];
 
-    this.root = document.querySelector(".offscreen-lsf");
+    this.root = document.querySelector(".offscreen");
 
     this.lsf = new window.LabelStudio(this.root, {
       user: { id: 1 },

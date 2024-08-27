@@ -124,6 +124,11 @@ class RedisExportStorage(RedisStorageMixin, ExportStorage):
         # create link if everything ok
         RedisExportStorageLink.create(annotation, self)
 
+    def validate_connection(self, client=None):
+        if client is None:
+            client = self.get_client()
+        client.ping()
+
 
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_redis_storages(sender, instance, **kwargs):

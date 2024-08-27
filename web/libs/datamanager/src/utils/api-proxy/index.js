@@ -9,7 +9,7 @@
  * }} EndpointConfig
  */
 
-import { formDataToJPO } from "../helpers";
+import { formDataToJPO, parseJson } from "../helpers";
 import statusCodes from "./status-codes.json";
 
 /**
@@ -150,9 +150,10 @@ export class APIProxy {
    * @private
    */
   createApiCallExecutor(methodSettings, parentPath, raw = false) {
-    return async (urlParams, { headers, body } = {}) => {
+    return async (urlParams, { headers, body, options } = {}) => {
       let responseResult;
       let responseMeta;
+      const alwaysExpectJSON = options?.alwaysExpectJSON === undefined ? true : options.alwaysExpectJSON;
 
       try {
         const finalParams = {
@@ -242,7 +243,7 @@ export class APIProxy {
           try {
             const responseData =
               rawResponse.status !== 204
-                ? JSON.parse(this.alwaysExpectJSON ? responseText : responseText || "{}")
+                ? JSON.parse(this.alwaysExpectJSON && alwaysExpectJSON ? responseText : responseText || "{}")
                 : { ok: true };
 
             if (methodSettings.convert instanceof Function) {

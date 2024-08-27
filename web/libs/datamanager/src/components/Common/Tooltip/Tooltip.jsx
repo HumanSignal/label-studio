@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { Block, Elem } from "../../../utils/bem";
 import { alignElements } from "../../../utils/dom";
 import { aroundTransition } from "../../../utils/transition";
-import "./Tooltip.styl";
+import "./Tooltip.scss";
 
 export const Tooltip = forwardRef(({ title, children, defaultVisible, disabled, style }, ref) => {
   const child = Children.only(children);
@@ -15,11 +15,14 @@ export const Tooltip = forwardRef(({ title, children, defaultVisible, disabled, 
   const [align, setAlign] = useState("top-center");
 
   const calculatePosition = useCallback(() => {
+    // If the tooltip is not injected, we cannot yet calculate the position
+    // Without this check the alignElements function will throw an error if the async transition is not finished but the component is already unmounted
+    if (!triggerElement.current || !tooltipElement.current) return;
     const { left, top, align: resultAlign } = alignElements(triggerElement.current, tooltipElement.current, align, 10);
 
     setOffset({ left, top });
     setAlign(resultAlign);
-  }, [triggerElement.current, tooltipElement.current]);
+  }, []);
 
   const performAnimation = useCallback(
     (visible) => {
@@ -39,7 +42,7 @@ export const Tooltip = forwardRef(({ title, children, defaultVisible, disabled, 
         });
       }
     },
-    [injected, calculatePosition, tooltipElement],
+    [injected, calculatePosition],
   );
 
   const visibilityClasses = useMemo(() => {
@@ -72,7 +75,7 @@ export const Tooltip = forwardRef(({ title, children, defaultVisible, disabled, 
           <Elem name="body">{title}</Elem>
         </Block>
       ) : null,
-    [injected, offset, title, visibilityClasses, tooltipElement],
+    [injected, offset, title, visibilityClasses],
   );
 
   useEffect(() => {

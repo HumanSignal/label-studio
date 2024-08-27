@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { Block, cn } from "../../../utils/bem";
 import { useDropdown } from "../Dropdown/DropdownTrigger";
-import "./Menu.styl";
+import "./Menu.scss";
 import { MenuContext } from "./MenuContext";
 import { MenuItem } from "./MenuItem";
 

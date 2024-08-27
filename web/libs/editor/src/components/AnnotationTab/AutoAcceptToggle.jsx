@@ -6,7 +6,7 @@ import { Block, Elem } from "../../utils/bem";
 import { Space } from "../../common/Space/Space";
 import Toggle from "../../common/Toggle/Toggle";
 
-import "./AutoAcceptToggle.styl";
+import "./AutoAcceptToggle.scss";
 
 // we need to inject all of them to trigger rerender on changes to suggestions
 const injector = inject(({ store }) => {

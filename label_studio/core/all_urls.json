@@ -306,6 +306,18 @@
         "decorators": ""
     },
     {
+        "url": "/api/dm/views/order/",
+        "module": "data_manager.api.ViewAPI",
+        "name": "data_manager:api:view-update-order",
+        "decorators": ""
+    },
+    {
+        "url": "/api/dm/views/order\\.<format>/",
+        "module": "data_manager.api.ViewAPI",
+        "name": "data_manager:api:view-update-order",
+        "decorators": ""
+    },
+    {
         "url": "/api/dm/views/<pk>/",
         "module": "data_manager.api.ViewAPI",
         "name": "data_manager:api:view-detail",
@@ -324,7 +336,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/dm/\\.<format>/",
+        "url": "/api/dm/<drf_format_suffix:format>",
         "module": "rest_framework.routers.APIRootView",
         "name": "data_manager:api:api-root",
         "decorators": ""
@@ -462,7 +474,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/\\.<format>/",
+        "url": "/api/<drf_format_suffix:format>",
         "module": "rest_framework.routers.APIRootView",
         "name": "api-root",
         "decorators": ""
@@ -594,7 +606,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/\\.<format>/",
+        "url": "/api/<drf_format_suffix:format>",
         "module": "rest_framework.routers.APIRootView",
         "name": "tasks:api-predictions:api-root",
         "decorators": ""
@@ -943,7 +955,7 @@
     },
     {
         "url": "/api/ml/<int:pk>/predict/test",
-        "module": "ml.api.MLBackendPredictAPI",
+        "module": "ml.api.MLBackendPredictTestAPI",
         "name": "ml:api:ml-predict-test",
         "decorators": ""
     },
@@ -1032,7 +1044,7 @@
         "decorators": ""
     },
     {
-        "url": "/api/\\.<format>/",
+        "url": "/api/<drf_format_suffix:format>",
         "module": "rest_framework.routers.APIRootView",
         "name": "labels_manager:api-labels:api-root",
         "decorators": ""

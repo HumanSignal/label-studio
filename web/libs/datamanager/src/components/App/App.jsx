@@ -5,7 +5,7 @@ import { Block, Elem } from "../../utils/bem";
 import { Spinner } from "../Common/Spinner";
 import { DataManager } from "../DataManager/DataManager";
 import { Labeling } from "../Label/Label";
-import "./App.styl";
+import "./App.scss";
 
 class ErrorBoundary extends React.Component {
   state = {
@@ -45,7 +45,7 @@ const AppComponent = ({ app }) => {
             ) : (
               <DataManager />
             )}
-            <Block name={"offscreen-lsf"} />
+            <Block name={"offscreen"} />
           </Block>
         </SDKProvider>
       </Provider>

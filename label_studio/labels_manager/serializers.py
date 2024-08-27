@@ -1,11 +1,9 @@
 from django.conf import settings
 from django.db import transaction
-from organizations.models import Organization
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from users.models import User
 
 from .models import Label, LabelLink
 
@@ -88,8 +86,8 @@ class LabelListSerializer(serializers.ListSerializer):
 
 
 class LabelCreateSerializer(serializers.ModelSerializer):
-    created_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
-    organization = serializers.PrimaryKeyRelatedField(queryset=Organization.objects.all(), required=False)
+    created_by = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
+    organization = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
     from_name = serializers.CharField()
 

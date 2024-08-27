@@ -1,5 +1,5 @@
 import { Block } from "../../../utils/bem";
-import "./Badge.styl";
+import "./Badge.scss";
 
 export const Badge = ({ children, size, className, color, style }) => {
   return (

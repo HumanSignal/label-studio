@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "../../../utils/bem";
-import "./Input.styl";
+import "./Input.scss";
 
 const Input = React.forwardRef(({ className, size, ...props }, ref) => {
   const classList = cn("input").mod({ size }).mix(className);

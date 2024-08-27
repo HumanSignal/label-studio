@@ -13,7 +13,7 @@ import { CustomBackendForm } from "./Forms";
 import { TestRequest } from "./TestRequest";
 import { StartModelTraining } from "./StartModelTraining";
 import { Block, Elem } from "../../../utils/bem";
-import "./MachineLearningSettings.styl";
+import "./MachineLearningSettings.scss";
 
 export const MachineLearningSettings = () => {
   const api = useAPI();
@@ -157,7 +157,7 @@ export const MachineLearningSettings = () => {
             <Form.Row columnCount={1}>
               <Label text="Configuration" large />
 
-              <div style={{ paddingLeft: 16 }}>
+              <div>
                 <Toggle
                   label="Start model training on annotation submission"
                   description="This option will send a request to /train with information about annotations. You can use this to enable an Active Learning loop. You can also manually start training through model menu in its card."
