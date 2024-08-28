@@ -91,6 +91,7 @@ const Model = types
     setSequence(sequence) {
       const [start, end] = sequence;
 
+      // we need only one item in undo history, so we'll update current one during drawing
       self.parent.annotation.history.setReplaceNextUndoState();
       self.ranges = [{ start: start.frame, end: end.frame }];
     },
