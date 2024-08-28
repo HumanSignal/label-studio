@@ -107,7 +107,8 @@ export const TimeBox: FC<TimerProps> = ({
   );
 
   return label ? (
-    <Label text={label}>
+    <Label>
+      {label}
       {timeBoxContent}
     </Label>
   ) : (
