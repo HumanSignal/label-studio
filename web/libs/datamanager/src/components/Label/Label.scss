@@ -86,7 +86,7 @@
     overflow-y: auto;
 
     & > div {
-      --main-bg-color: #FAFAFA;
+      --main-bg-color: var(--sand_100);
 
       flex: 1;
       height: auto;

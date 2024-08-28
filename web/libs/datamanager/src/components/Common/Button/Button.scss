@@ -1,4 +1,4 @@
-.button {
+.button-dm {
   --button-color: var(--black);
 
   height: 32px;
@@ -24,13 +24,13 @@
     border: 1px solid rgb(65 60 74 / 16%);
     font-weight: 400;
 
-    &.button {
+    &.button-dm {
       &_withIcon {
         border: 0 none;
       }
     }
 
-    &:not(.button_withIcon) {
+    &:not(.button-dm_withIcon) {
       font-weight: 500;
 
       &.button {
@@ -44,7 +44,7 @@
       }
     }
 
-    &.dropdown {
+    &.dropdown-dm {
       &__trigger {
         font-weight: 400;
         background-color: #FAFAFA;
@@ -250,12 +250,12 @@
     justify-content: space-between;
   }
 
-  &_withIcon:not(.button_type_link),
+  &_withIcon:not(.button-dm_type_link),
   &_withIcon:not([href]) {
     padding: 0 14px;
   }
 
-  &_withIcon.button_size_small {
+  &_withIcon.button-dm_size_small {
     padding: 0 10px;
   }
 
@@ -272,7 +272,7 @@
     background-color: var(--white);
   }
 
-  &_waiting.button_look_primary {
+  &_waiting.button-dm_look_primary {
     background-image: repeating-linear-gradient(-63.43deg,
         rgb(var(--white-raw) 0.2) 1px, transparent 2px, transparent 6px,
         rgb(var(--white-raw) 0.2) 7px,
@@ -289,17 +289,17 @@
   }
 }
 
-.button-group {
+.button-group-dm {
   display: flex;
 
-  &:not(.button-group_collapsed) {
-    .button+.button {
+  &:not(.button-group-dm_collapsed) {
+    .button-dm + .button-dm {
       margin-left: 16px;
     }
   }
 
   &_collapsed {
-    .button {
+    .button-dm {
       &:first-child {
         border-radius: 5px 0 0 5px;
       }

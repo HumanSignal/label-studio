@@ -2,7 +2,7 @@ import { type FC, type MutableRefObject, useMemo, useRef, useState } from "react
 import { Block } from "../../../utils/bem";
 import { clamp } from "../../../utils/utilities";
 import type { TimelineSideControlProps } from "../Types";
-import "./FramesControl.styl";
+import "./FramesControl.scss";
 
 export const FramesControl: FC<TimelineSideControlProps> = ({ position = 0, length = 0, onPositionChange }) => {
   const [inputMode, setInputMode] = useState(false);

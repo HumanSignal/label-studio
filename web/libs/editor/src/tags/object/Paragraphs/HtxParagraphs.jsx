@@ -11,6 +11,7 @@ import { Phrases } from "./Phrases";
 import Toggle from "../../../common/Toggle/Toggle";
 import { IconHelp } from "../../../assets/icons";
 import { Tooltip } from "../../../common/Tooltip/Tooltip";
+import { cn } from "../../../utils/bem";
 
 const audioDefaultProps = {};
 
@@ -18,6 +19,8 @@ if (isFF(FF_LSDV_4711)) audioDefaultProps.crossOrigin = "anonymous";
 
 class HtxParagraphsView extends Component {
   _regionSpanSelector = ".htx-highlight";
+  mainContentSelector = `.${cn("main-content").toClassName()}`;
+  mainViewAnnotationSelector = `.${cn("main-view").elem("annotation").toClassName()}`;
 
   constructor(props) {
     super(props);
@@ -484,10 +487,10 @@ class HtxParagraphsView extends Component {
   _handleScrollContainerHeight = () => {
     requestAnimationFrame(() => {
       const container = this.myRef.current;
-      const mainContentView = document.querySelector(".lsf-main-content");
+      const mainContentView = document.querySelector(this.mainContentSelector);
       const mainRect = mainContentView.getBoundingClientRect();
       const visibleHeight = document.documentElement.clientHeight - mainRect.top;
-      const annotationView = document.querySelector(".lsf-main-view__annotation");
+      const annotationView = document.querySelector(this.mainViewAnnotationSelector);
       const totalVisibleSpace = Math.floor(
         visibleHeight < mainRect.height ? visibleHeight : mainContentView?.offsetHeight || 0,
       );
@@ -510,12 +513,12 @@ class HtxParagraphsView extends Component {
 
   componentDidMount() {
     if (isFF(FF_LSDV_E_278) && this.props.item.contextscroll)
-      this._resizeObserver.observe(document.querySelector(".lsf-main-content"));
+      this._resizeObserver.observe(document.querySelector(this.mainContentSelector));
     this._handleUpdate();
   }
 
   componentWillUnmount() {
-    const target = document.querySelector(".lsf-main-content");
+    const target = document.querySelector(this.mainContentSelector);
 
     if (target) this._resizeObserver?.unobserve(target);
     this._resizeObserver?.disconnect();
@@ -578,7 +581,7 @@ class HtxParagraphsView extends Component {
     if (isFF(FF_DEV_2669) && !item._value) return null;
 
     return (
-      <ObjectTag item={item} className={"lsf-paragraphs"}>
+      <ObjectTag item={item} className={cn("paragraphs").toClassName()}>
         {withAudio && (
           <audio
             {...audioDefaultProps}

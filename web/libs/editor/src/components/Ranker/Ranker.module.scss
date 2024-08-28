@@ -12,7 +12,7 @@
 .column {
   flex: 1;
   border: 1px solid var(--ranker-border-color);
-  background-color: white;
+  background-color: var(--sand_0);
   padding: var(--ranker-gap);
   border-radius: 2px;
   display: flex;
@@ -66,8 +66,8 @@
   margin: var(--ranker-gap) 0 0;
   padding: var(--ranker-gap);
   border-radius: 2px;
-  background-color: #f5f5f5;
-  color: black;
+  background-color: var(--sand_200);
+  color: var(--sand_900);
 }
 
 .itemLine {
@@ -80,11 +80,11 @@
   cursor: pointer;
 }
 
-.item.collapsed > *:not(.itemTitle) {
+.item.collapsed>*:not(.itemTitle) {
   display: none;
 }
 
-.item.expanded > .itemTitle::after {
+.item.expanded>.itemTitle::after {
   content: '△';
   margin-left: auto;
 }

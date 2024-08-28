@@ -1,4 +1,4 @@
-.form {
+.form-dm {
   width: 100%;
   display: block;
 
@@ -55,7 +55,7 @@
 }
 
 .form-input,
-.textarea,
+.textarea-dm,
 .counter,
 .form-select__list {
   &:not(&_ghost):focus,
@@ -66,7 +66,7 @@
   }
 }
 
-.form-indicator {
+.form-indicator-dm {
   font-weight: 500;
 
   &__item {

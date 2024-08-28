@@ -6,7 +6,7 @@
 }
 
 .skipped {
-  color: #ff4d4f;
+  color: var(--danger_color);
   min-width: 2em;
 }
 
@@ -33,7 +33,7 @@
 .title {
   display: flex;
   align-items: center;
-  color: #1890ff;
+  color: var(--primary_link);
   font-weight: bold;
 
   h3 {

@@ -36,7 +36,7 @@ $gap: 30px;
   height: 100%;
 
   &:hover {
-    background: #eee;
+    background: var(--sand_200);
   }
 }
 
@@ -52,7 +52,7 @@ $gap: 30px;
   background: #eee;
 
   h4 {
-    color: #1890ff;
+    color: var(--primary_link);
   }
 }
 

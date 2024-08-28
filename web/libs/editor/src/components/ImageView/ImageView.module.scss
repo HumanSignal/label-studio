@@ -148,11 +148,11 @@
     object-fit: cover;
 
     &:hover {
-      border-color: #1890ff66;
+      border-color: var(--grape_100);
     }
 
     &.active {
-      border-color: #1890ff;
+      border-color: var(--primary_link);
     }
   }
 }

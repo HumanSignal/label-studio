@@ -55,11 +55,11 @@
 }
 
 .rewrite {
-  background: #73d13d;
-  border-color: #73d13d;
+  background: var(--success_color);
+  border-color: var(--success_color);
 
   &:hover {
-    background: #95de64;
-    border-color: #95de64;
+    background: var(--kale_300);
+    border-color: var(--kale_300);
   }
 }

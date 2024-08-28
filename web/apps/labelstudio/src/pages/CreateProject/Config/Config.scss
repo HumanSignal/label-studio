@@ -12,7 +12,7 @@ $scroll-width: 5px;
   }
 }
 
-.ls-panel {
+.panel {
   display: none;
 }
 
@@ -228,7 +228,7 @@ $scroll-width: 5px;
   content: "Advanced! ";
 }
 
-.wizard a.button,
+.wizard a.button-ls,
 .wizard button,
 .wizard input[type="button"] {
   line-height: 1;
@@ -555,8 +555,11 @@ $scroll-width: 5px;
     max-width: 100%;
   }
 
-  :global(.lsf-main-view__annotation) {
-    padding: 0;
+  
+  .main-view {
+    &__annotation{
+      padding: 0;
+    }
   }
 }
 

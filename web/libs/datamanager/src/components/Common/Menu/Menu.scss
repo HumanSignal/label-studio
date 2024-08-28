@@ -1,4 +1,4 @@
-.menu {
+.menu-dm {
   flex: 1;
   margin: 0;
   padding: 8px;
@@ -42,7 +42,7 @@
       justify-content: center;
     }
 
-    &:not(.menu__item_look_danger):hover {
+    &:not(.menu-dm__item_look_danger):hover {
       color: var(--grape_700);
       background-color: var(--grape_0);
     }
@@ -98,7 +98,7 @@
   }
 }
 
-.menu-group {
+.menu-group-dm {
   &__title {
     padding: 4px 10px;
     font-size: 14px;

@@ -1,46 +1,16 @@
 // Outliner + Details
 export const FF_DEV_1170 = "ff_front_1170_outliner_030222_short";
 
-// Fix lag on first video playing start
-export const FF_DEV_1265 = "ff_front_dev_1265_video_start_lag_100322_short";
-
-// Fix video timeline expanding and collapsing in full screen mode
-export const FF_DEV_1270 = "ff_front_dev_1270_fullscreen_timeline_expand_090322_short";
-
 /**
  * Fixing "Auto Detect" tool undo functionality and bugs with skipNextUndoState.
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_1284_auto_detect_undo_281022_short
  */
 export const FF_DEV_1284 = "fflag_fix_front_dev_1284_auto_detect_undo_281022_short";
 
-// Fix crosshair working with zoom & rotation
-export const FF_DEV_1285 = "ff_front_dev_1285_crosshair_wrong_zoom_140122_short";
-
-// Add visibleWhen="choice-unselected" option
-export const FF_DEV_1372 = "ff_front_dev_1372_visible_when_choice_unselected_11022022_short";
-
 export const FF_DEV_1442 = "ff_front_dev_1442_unselect_shape_on_click_outside_080622_short";
-
-// Keep enabled state of video region on area transformations
-export const FF_DEV_1494 = "ff_front_dev_1494_keep_enabled_on_update_090322_short";
-
-// Fix stuck userpic
-export const FF_DEV_1507 = "ff_front_DEV_1507_stuck_userpic_210122_short";
 
 // User labels for Taxonomy
 export const FF_DEV_1536 = "ff_front_dev_1536_taxonomy_user_labels_150222_long";
-
-// Fix shortcuts focus and cursor problems
-export const FF_DEV_1564_DEV_1565 = "ff_front_dev_1564_dev_1565_shortcuts_focus_and_cursor_010222_short";
-
-// Fix work of shortcuts in results
-/** @requires FF_DEV_1564_DEV_1565 */
-export const FF_DEV_1566 = "ff_front_dev_1566_shortcuts_in_results_010222_short";
-
-export const FF_DEV_1598 = "ff_front_dev_1598_empty_toname_240222_short";
-
-// Add an interactivity flag to the results to make some predictions' results be able to be automatically added to newly created annotations.
-export const FF_DEV_1621 = "ff_front_dev_1621_interactive_mode_150222_short";
 
 // New Audio 2.0 UI
 export const FF_DEV_1713 = "ff_front_DEV_1713_audio_ui_150222_short";
@@ -167,11 +137,6 @@ export const FF_LSDV_4583_6 = "fflag_feat_front_lsdv_4583_6_images_preloading_sh
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_font_lsdv_1148_hotkeys_namespaces_01022023_short
  */
 export const FF_LSDV_3009 = "fflag_fix_font_lsdv_3009_draft_saving_stuck_130223_short";
-
-/**
- * Enables the ffmpeg audio decoder to be the default.
- */
-export const FF_LSDV_4701 = "fflag_feat_front_lsdv_4701_audio_default_decoder_ffmpeg_long";
 
 /**
  * Adding "skipDuplicates" parameter for <TextArea /> to preventing adding duplicate entries

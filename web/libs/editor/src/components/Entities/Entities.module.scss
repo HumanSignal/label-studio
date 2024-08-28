@@ -55,7 +55,7 @@
   flex-wrap: nowrap;
   position: relative;
   padding: 0;
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--sand_300);
   border-radius: 5px;
 
   & > *:not(:last-child),

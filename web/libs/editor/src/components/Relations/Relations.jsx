@@ -11,7 +11,7 @@ import globalStyles from "../../styles/global.module.scss";
 
 import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
 import { Block, Elem } from "../../utils/bem";
-import "./Relations.styl";
+import "./Relations.scss";
 
 const { Option } = Select;
 

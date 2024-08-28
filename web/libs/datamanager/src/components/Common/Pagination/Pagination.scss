@@ -1,4 +1,4 @@
-.pagination {
+.pagination-dm {
   --button-color: var(--accent_color);
   --border-radius: 5px;
   --height: 40px;
@@ -31,7 +31,7 @@
     font-size: var(--font-size);
     line-height: var(--line-height);
 
-    .pagination_size_small & {
+    .pagination-dm_size_small & {
       padding-right: 8px;
     }
   }
@@ -44,7 +44,7 @@
     background: var(--white);
     box-shadow: inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15);
 
-    .pagination_waiting & {
+    .pagination-dm_waiting & {
       pointer-events: none;
       animation: button-waiting 1s linear infinite;
       background-image: repeating-linear-gradient(-63.43deg,
@@ -59,7 +59,7 @@
     height: 30px;
     background-color: var(--black_10);
 
-    .pagination_size_small & {
+    .pagination-dm_size_small & {
       height: 20px;
     }
   }
@@ -73,11 +73,11 @@
     user-select: none;
     cursor: pointer;
 
-    .pagination_waiting & {
+    .pagination-dm_waiting & {
       opacity: 0.5;
     }
 
-    .pagination_size_small & {
+    .pagination-dm_size_small & {
       width: 24px;
     }
 
@@ -160,11 +160,11 @@
     background: #FAFAFA;
     margin: 1px 0;
 
-    .pagination_waiting & {
+    .pagination-dm_waiting & {
       opacity: 0.5;
     }
 
-    .pagination_size_small & {
+    .pagination-dm_size_small & {
       width: 70px;
     }
 
@@ -200,7 +200,7 @@
     min-width: 170px;
     padding-left: 16px;
 
-    .pagination_size_small & {
+    .pagination-dm_size_small & {
       padding-left: 8px;
       min-width: 130px;
     }

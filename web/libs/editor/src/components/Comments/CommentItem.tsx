@@ -10,7 +10,7 @@ import { Block, Elem } from "../../utils/bem";
 import { humanDateDiff, userDisplayName } from "../../utils/utilities";
 import { CommentFormBase } from "./CommentFormBase";
 
-import "./CommentItem.styl";
+import "./CommentItem.scss";
 import { Button } from "../../common/Button/Button";
 
 interface Comment {

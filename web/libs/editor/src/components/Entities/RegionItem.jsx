@@ -9,7 +9,7 @@ import Utils from "../../utils";
 
 import { Block, Elem } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
-import "./RegionItem.styl";
+import "./RegionItem.scss";
 import { Space } from "../../common/Space/Space";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { asVars } from "../../utils/styles";

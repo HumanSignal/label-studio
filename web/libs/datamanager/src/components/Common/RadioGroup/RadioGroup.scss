@@ -1,4 +1,4 @@
-.radio-group {
+.radio-group-dm {
   --radius: 8px;
   --height: 40px;
   --padding: 4px;
@@ -79,7 +79,7 @@
     background: rgb(240 238 242 / 8%);
     border: 1px solid rgb(65 60 74 / 16%);
 
-    .radio-group {
+    .radio-group-dm {
       &__buttons {
         gap: 8px;
       }
@@ -92,7 +92,7 @@
         height: calc(var(--height) - calc(var(--padding) * 2) - calc(var(--button-border-width) * 2));
         cursor: pointer;
 
-        .radio-group__input {
+        .radio-group-dm__input {
           cursor: pointer;
         }
 
@@ -102,7 +102,7 @@
           border-color: var(--grape_500);
           cursor: default;
 
-          .radio-group__input {
+          .radio-group-dm__input {
             cursor: default;
           }
         }

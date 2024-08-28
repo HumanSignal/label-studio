@@ -16,9 +16,25 @@ If you want to perform object detection, you need to create a labeled dataset. U
 
 <i>Figure 1: Object detection with bounding boxes.</i>
 
+## Rotation
+
+Note that when you rotate rectangles (bounding boxes), the anchor point is different depending on how you perform the rotation.
+
+**Bounding box rotation in Label Studio UI**
+
+If you rotate a bounding box using your mouse in the labeling interface, the rotation anchor point is the center of the rectangle.
+
+![Diagram showing mouse rotation](../images/rectangle_ui_rotation.jpg)
+
+**Bounding box rotation in the Label Studio results**
+
+If you rotate by directly editing the rotation angle under the **Info** panel of the labeling interface, the rotation anchor point is the top left. This is also how it is saved in the Label Studio results (regardless of how you performed the rotation).
+
+![Diagram showing result rotation](../images/rectangle_db_rotation.jpg)
+
 ## Create a rotated bounding box
 
-As an annotator, you can also create a rotated bounding box with the "three point click" or "two point click" feature to annotate images.  
+As an annotator, you can create a rotated bounding box with the "three point click" or "two point click" feature to annotate images.  
 
   - First point click - Starting point of the location to draw the bounding box.
   - Second point click - Define the rotation and width of the bounding box.
@@ -60,7 +76,6 @@ After the box has been completed it will remain in selected state, unless determ
     - Adjust it by moving the anchors or edges to the desired location on the canvas.
     - Determine that the orientation of the bounding box is effected.
     - See the orientation of the bounding box and determine the direction during the creation process.
-
 
 ## Interactive Template Preview
 

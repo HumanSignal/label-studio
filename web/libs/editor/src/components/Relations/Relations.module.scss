@@ -9,7 +9,7 @@
 }
 
 .selected {
-  background: #f1f1f1;
+  background: var(--sand_200);
 }
 
 .block {
@@ -26,14 +26,14 @@
 .header {
   font-size: 12px;
   font-weight: bold;
-  color: #666;
+  color: var(--sand_900);
 }
 
 .section {
   width: 100%;
   display: block;
   position: relative;
-  background: #fff;
+  background: var(--sand_0);
   padding: 1em;
   border: 1px solid rgb(0 0 0 / 20%);
   border-radius: 0.2rem;

@@ -1,7 +1,7 @@
 import type { CSSProperties, FC } from "react";
 import { Block } from "../../utils/bem";
 
-import "./Hint.styl";
+import "./Hint.scss";
 
 interface HintProps {
   copy?: string;

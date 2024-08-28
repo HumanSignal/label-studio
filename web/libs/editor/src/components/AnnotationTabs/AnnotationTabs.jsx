@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { Userpic } from "../../common/Userpic/Userpic";
 import { Space } from "../../common/Space/Space";
 import { Block, Elem } from "../../utils/bem";
-import "./AnnotationTabs.styl";
+import "./AnnotationTabs.scss";
 import { IconBan, LsGrid, LsPlus, LsSparks, LsStar } from "../../assets/icons";
 
 export const EntityTab = observer(
@@ -47,92 +47,4 @@ export const EntityTab = observer(
       );
     },
   ),
-);
-
-/** @deprecated this file is not used; only EntityTab is in use and can be moved out */
-export const AnnotationTabs = observer(
-  ({ store, showAnnotations = true, showPredictions = true, allowCreateNew = true, allowViewAll = true }) => {
-    const listRef = useRef();
-    const selectedRef = useRef();
-
-    const { annotationStore: as } = store;
-    const onAnnotationSelect = useCallback(
-      (entity, isPrediction) => {
-        if (!entity.selected) {
-          if (isPrediction) {
-            as.selectPrediction(entity.id);
-          } else {
-            as.selectAnnotation(entity.id);
-          }
-        }
-      },
-      [as],
-    );
-
-    const onCreateAnnotation = useCallback(() => {
-      const c = as.createAnnotation();
-
-      as.selectAnnotation(c.id);
-    }, [as]);
-
-    const onToggleVisibility = useCallback(() => {
-      as.toggleViewingAllAnnotations();
-    }, [as]);
-
-    const visible = showAnnotations || showPredictions;
-
-    const list = [];
-
-    if (showPredictions) list.push(...as.predictions);
-    if (showAnnotations) list.push(...as.annotations);
-
-    const tabsDisabled = !showPredictions && !showAnnotations && !allowViewAll && !allowCreateNew;
-
-    useEffect(() => {
-      if (selectedRef.current) {
-        const list = listRef.current;
-        const elem = selectedRef.current;
-        const xOffset = elem.offsetLeft + elem.clientWidth / 2 - list.clientWidth / 2;
-
-        list.scrollTo({
-          left: xOffset,
-          behavior: "smooth",
-        });
-      }
-    }, [store.annotationStore.selected, selectedRef, listRef]);
-
-    return visible && !tabsDisabled ? (
-      <Block
-        name="annotation-tabs"
-        mod={{ viewAll: allowViewAll, addNew: allowCreateNew }}
-        onMouseDown={(e) => e.stopPropagation()}
-      >
-        {allowCreateNew && (
-          <Elem tag="button" name="add" onClick={onCreateAnnotation}>
-            <LsPlus />
-          </Elem>
-        )}
-
-        <Elem name="list" ref={listRef}>
-          {list.map((entity) => (
-            <EntityTab
-              key={entity.id}
-              entity={entity}
-              selected={entity.selected}
-              onClick={onAnnotationSelect}
-              displayGroundTruth={store.hasInterface("ground-truth")}
-              prediction={entity.type === "prediction"}
-              ref={entity.selected ? selectedRef : undefined}
-            />
-          ))}
-        </Elem>
-
-        {allowViewAll && (
-          <Elem tag="button" name="all" mod={{ active: as.viewingAll }} onClick={onToggleVisibility}>
-            <LsGrid />
-          </Elem>
-        )}
-      </Block>
-    ) : null;
-  },
 );

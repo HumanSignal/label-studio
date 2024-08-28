@@ -192,6 +192,10 @@
 
   &__headers-add {
     border: none;
+    padding: 0px !important;
+    height: 32px;
+    width: 32px;
+    margin-right: 7px;
 
     & span {
       color: var(--grape_500) !important;

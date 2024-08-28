@@ -1,0 +1,37 @@
+.ground-truth {
+  &_size {
+    &_md {
+      &,
+      .ground-truth__toggle,
+      .ground-truth__indicator {
+        width: 32px;
+        height: 32px;
+      }
+    }
+  }
+
+  &_disabled {
+    pointer-events: none;
+  }
+
+  &__toggle {
+    padding: 0;
+  }
+
+  &__indicator {
+    color: var(--sand_400);
+
+    &_dark {
+      color: var(--sand_900);
+    }
+
+    &_active {
+      color: var(--canteloupe_400);
+
+      path {
+        fill-opacity: 1;
+        stroke-opacity: 1;
+      }
+    }
+  }
+}
