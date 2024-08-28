@@ -24,7 +24,7 @@
     & .region-item__counter, .region-item__title, .region-item__score, .region-item__id, {
       opacity: 0.4;
     }
-    
+
     & .region-item__desc {
       background: var(--sand_0);
     }
@@ -33,10 +33,13 @@
   &__id {
     display: flex;
     color: var(--labelColor);
+    width: 16px;
+    height: 16px;
 
     svg {
-      width: 24px;
-      height: 24px;
+      width: 100%;
+      height: 100%;
+      color: var(--sand_500);
     }
   }
 
@@ -78,17 +81,6 @@
 
   &__controls:empty + &__collapse {
     display: none;
-  }
-
-  &__id {
-    width: 16px;
-    height: 16px;
-
-    svg {
-      width: 100%;
-      height: 100%;
-      color: var(--sand_500);
-    }
   }
 
   &__prediction {

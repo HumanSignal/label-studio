@@ -1,10 +1,15 @@
-.settings__title {
+%settings-title {
   font-family: Figtree, sans-serif;
   font-size: 16px;
   font-weight: 500;
   line-height: 24px;
   letter-spacing: 0.15px;
   text-align: left;
+}
+
+
+.settings__title {
+  @extend %settings-title;
 }
 
 .settings {
@@ -28,7 +33,7 @@
     flex: 1;
 
     &__title {
-      @extend .settings__title;
+      @extend %settings-title;
 
       align-items: center;
       display: flex;
@@ -93,7 +98,7 @@
   }
 
   :global(.ant-tabs-tab .ant-tabs-tab-btn) {
-    @extend .settings__title;
+    @extend %settings-title;
 
     text-shadow: none;
   }

@@ -18,6 +18,14 @@
 
   &:hover {
     z-index: 100;
+
+    & .tool__tooltip {
+      display: block;
+    }
+
+    & .tool__tooltip-body {
+      color: var(--text-color-hover);
+    }
   }
 
   &__icon {
@@ -36,6 +44,14 @@
     & .tool__icon {
       opacity: 1;
     }
+
+    & .tool__label {
+      color: var(--text-color-hover);
+    }
+
+    & .tool__shortcut {
+      opacity: 1;
+    }
   }
 
   &_active > &__icon {
@@ -49,6 +65,9 @@
       background: var(--plum_200);
       box-shadow: inset 0 1px 0 var(--plum_0), inset 0 0 0 1px var(--plum_0);
     }
+
+    --text-color: var(--plum_200);
+    --text-color-hover: var(--plum_400);
   }
 
   &__tooltip {
@@ -82,13 +101,45 @@
   }
 
   &_alignment_right {
+    flex-direction: row-reverse;
+
     & .tool__tooltip-body {
+      flex-direction: row-reverse;
+    }
+
+    & .tool__controls {
+      padding-right: 10px;
+    }
+
+    & .tool__shortcut {
+      margin: 0 20px 0 0;
+    }
+
+    & .tool__label {
+      padding-left: 8px;
+      padding-right: 12px;
       flex-direction: row-reverse;
     }
   }
 
   &_alignment_left {
+    flex-direction: row;
+
     & .tool__tooltip-body {
+      flex-direction: row;
+    }
+
+    & .tool__controls-body{
+      padding-left: 10px;
+    }
+
+    & .tool__shortcut {
+      margin: 0 0 0 20px;
+    }
+
+    & .tool__label {
+      padding-left: 12px;
+      padding-right: 8px;
       flex-direction: row;
     }
   }
@@ -101,15 +152,15 @@
     & .tool__tooltip-body {
       color: var(--text-color-hover);
     }
-  }
 
-  &:hover {
-    & .tool__tooltip {
-      display: block;
+    & .tool_expanded {
+      border-radius: 5px;
+      background-color: var(--sand_100);
     }
 
-    & .tool__tooltip-body {
-      color: var(--text-color-hover);
+    .tool_smart {
+      border-radius: 5px;
+      background-color: var(--sand_100);
     }
   }
 
@@ -124,26 +175,6 @@
       border-radius: 5px;
       background-color: var(--sand_0);
       box-shadow: 0 0 0 1px rgb(0 0 0 / 5%), 0 5px 10px rgb(0 0 0 / 10%);
-    }
-  }
-
-  &_alignment_right {
-    & .tool__controls {
-      padding-right: 10px;
-    }
-
-    & .tool__shortcut {
-      margin: 0 20px 0 0;
-    }
-  }
-
-  &_alignment_left {
-    & .tool__controls-body{
-      padding-left: 10px;
-    }
-
-    & .tool__shortcut {
-      margin: 0 0 0 20px;
     }
   }
 
@@ -164,12 +195,6 @@
   &_expanded &_alignment_left {
     & .tool__shortcut {
       margin: 0 0 0 20px;
-    }
-  }
-
-  &_active, &:hover {
-    & .tool__shortcut {
-      opacity: 1;
     }
   }
 
@@ -197,60 +222,11 @@
     color: var(--text-color);
   }
 
-  &:hover, &_active {
-    & .tool__label {
-      color: var(--text-color-hover);
-    }
-  }
-
-  &_alignment_right {
-    & .tool__label {
-      padding-left: 8px;
-      padding-right: 12px;
-      flex-direction: row-reverse;
-    }
-  }
-
-  &_alignment_left {
-    & .tool__label {
-      padding-left: 12px;
-      padding-right: 8px;
-      flex-direction: row;
-    }
-  }
-
   &__smart {
     display: flex;
   }
 
   &_expanded {
     width: calc(100% - 8px);
-  } 
-
-  &_active {
-    & .tool_expanded {
-      border-radius: 5px;
-      background-color: var(--sand_100);
-    }
-  }
-
-  &_alignment_left {
-    flex-direction: row;
-  }
-
-  &_alignment_right {
-    flex-direction: row-reverse;
-  }
-
-  &_smart {
-    --text-color: var(--plum_200);
-    --text-color-hover: var(--plum_400);
-  }
-
-  &_active {
-    .tool_smart {
-      border-radius: 5px;
-      background-color: var(--sand_100);
-    }
   }
 }

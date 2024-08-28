@@ -54,6 +54,9 @@
     &_edge {
       &_relaxed {
         background-color: var(--sand_100);
+
+      & .wave__timeline{
+        background-color: var(--sand_0);
       }
     }
   }
@@ -128,10 +131,12 @@
   &__surfer {
     height: 88px;
 
+    // stylelint-disable-next-line selector-type-no-unknown
     & .wave_compact wave{
       overflow: revert !important;
     }
 
+    // stylelint-disable-next-line selector-type-no-unknown
     & .wave_compact showtitle{
       z-index: 10 !important;
 
@@ -142,6 +147,7 @@
       }
     }
 
+    // stylelint-disable-next-line selector-type-no-unknown
     showtitle div {
       left: 8px;
       padding: 0 8px;
@@ -187,10 +193,5 @@
       }
     }
   }
-
-  &__wrapper_edge_relaxed{
-    & .wave__timeline{
-      background-color: var(--sand_0);
-    }
   }
 }

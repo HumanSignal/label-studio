@@ -18,7 +18,7 @@
 
   &:hover {
     z-index: 100;
-  } 
+  }
 
   &__icon {
     width: 32px;
@@ -107,20 +107,50 @@
 
     &_alignment_right {
       padding-right: 10px;
+      flex-direction: row-reverse;
 
       & .tool_tooltip-body {
         flex-direction: row-reverse;
       }
+
+      & .tool__controls {
+        padding-right: 10px;
+      }
+
+      & .tool__shortcut {
+        margin: 0 20px 0 0;
+      }
+
+      & .tool__label {
+        padding-left: 8px;
+        padding-right: 12px;
+        flex-direction: row-reverse;
+      }
     }
-  
+
     &_alignment_left {
+      flex-direction: row;
       padding-left: 10px;
 
       & .tool_tooltip-body {
         flex-direction: row;
       }
+
+      & .tool__controls-body{
+        padding-left: 10px;
+      }
+
+      & .tool__shortcut {
+        margin: 0 0 0 20px;
+      }
+
+      & .tool__label {
+        padding-left: 12px;
+        padding-right: 8px;
+        flex-direction: row;
+      }
     }
-  
+
     &_active {
       & .tool__tooltip {
         display: none;
@@ -129,8 +159,18 @@
       & .tool__tooltip-body {
         color: var(--text-color-hover);
       }
+
+      & .tool_expanded {
+        border-radius: 5px;
+        background-color: var(--sand_100);
+      }
+
+      & .tool_smart {
+        border-radius: 5px;
+        background-color: var(--sand_100);
+      }
     }
-  
+
     &:hover {
       & .tool__tooltip {
         display: block;
@@ -154,25 +194,9 @@
       & .tool__shortcut {
         opacity: 1;
       }
-    }
 
-    &_alignment_right {
-      & .tool__controls {
-        padding-right: 10px;
-      }
-
-      & .tool__shortcut {
-        margin: 0 20px 0 0;
-      }
-    }
-  
-    &_alignment_left {
-      & .tool__controls-body{
-        padding-left: 10px;
-      }
-
-      & .tool__shortcut {
-        margin: 0 0 0 20px;
+      & .tool__label {
+        color: var(--text-color-hover);
       }
     }
 
@@ -181,7 +205,7 @@
         margin: 0 20px 0 0;
       }
     }
-  
+
     &_expanded &_alignment_left {
       & .tool__shortcut {
         margin: 0 0 0 20px;
@@ -209,28 +233,6 @@
       color: var(--text-color-hover);
     }
 
-    &:hover, &_active {
-      & .tool__label {
-        color: var(--text-color-hover);
-      }
-    }
-  
-    &_alignment_right {
-      & .tool__label {
-        padding-left: 8px;
-        padding-right: 12px;
-        flex-direction: row-reverse;
-      }
-    }
-  
-    &_alignment_left {
-      & .tool__label {
-        padding-left: 12px;
-        padding-right: 8px;
-        flex-direction: row;
-      }
-    }
-
     &__smart {
       display: flex;
     }
@@ -239,31 +241,9 @@
       width: calc(100% - 8px);
     }
 
-    &_active {
-      & .tool_expanded {
-        border-radius: 5px;
-        background-color: var(--sand_100);
-      }
-    }
-
-    &_alignment_left {
-      flex-direction: row;
-    }
-
-    &_alignment_right {
-      flex-direction: row-reverse;
-    }
-
     &_smart {
       --text-color: var(--plum_200);
       --text-color-hover: var(--plum_400);
-    }
-
-    &_active {
-      & .tool_smart {
-        border-radius: 5px;
-        background-color: var(--sand_100);
-      }
     }
   }
 }

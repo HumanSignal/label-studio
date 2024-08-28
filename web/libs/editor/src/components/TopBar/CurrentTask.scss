@@ -8,9 +8,11 @@
     height: 100%;
     display: grid;
     width: 220px;
-    grid-template-columns: 1fr min-content;
-    grid-template-areas: 'id buttons' 'id buttons';
-    grid-template-rows: 1fr 1fr;
+    grid-template:
+      "id buttons"
+      "id buttons"
+      1fr 1fr
+      / 1fr min-content;
   }
 
   &__task-id {

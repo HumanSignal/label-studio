@@ -16,6 +16,10 @@
   }
 
   &__title {
+    display: flex;
+    align-items: flex-start;
+    word-break: break-word;
+
     & + span {
       color: var(--sand_900);
 
@@ -24,12 +28,6 @@
         content: "ID ";
       }
     }
-  }
-
-  &__title {
-    display: flex;
-    align-items: flex-start;
-    word-break: break-word;
   }
 
   &__result {
