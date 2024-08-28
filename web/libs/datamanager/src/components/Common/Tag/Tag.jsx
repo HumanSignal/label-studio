@@ -30,7 +30,7 @@ export const Tag = ({ className, style, size, color, children }) => {
   const styles = { ...(style ?? {}), ...finalColor };
 
   return (
-    <Block tag="span" name="tag" mod={{ size }} mix={className} style={styles}>
+    <Block tag="span" name="tag-dm" mod={{ size }} mix={className} style={styles}>
       {children}
     </Block>
   );

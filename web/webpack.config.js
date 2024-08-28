@@ -13,29 +13,19 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const RELEASE = require("./release").getReleaseName();
 
-let css_prefix;
+const css_prefix = "lsf-";
 
-switch (process.env.LERNA_PACKAGE_NAME) {
-  case "labelstudio":
-    css_prefix = "ls-";
-    break;
-  case "datamanager":
-    css_prefix = "dm-";
-    break;
-  case "editor":
-    css_prefix = "lsf-";
-}
+const mode = process.env.BUILD_MODULE ? "production" : process.env.NODE_ENV || "development";
 
 const LOCAL_ENV = {
-  NODE_ENV: "development",
+  NODE_ENV: mode,
   CSS_PREFIX: css_prefix,
   RELEASE_NAME: RELEASE,
 };
 
 const devtool = process.env.NODE_ENV === "production" ? "source-map" : "cheap-module-source-map";
 
-const DEFAULT_NODE_ENV = process.env.BUILD_MODULE ? "production" : process.env.NODE_ENV || "development";
-const isDevelopment = DEFAULT_NODE_ENV !== "production";
+const isDevelopment = mode !== "production";
 const customDistDir = !!process.env.WORK_DIR;
 
 const BUILD = {
@@ -55,22 +45,13 @@ const plugins = [
   new EnvironmentPlugin(LOCAL_ENV),
 ];
 
-if (process.env.MODE !== "standalone") {
-  plugins.push(
-    new optimize.LimitChunkCountPlugin({
-      maxChunks: 1,
-    }),
-  );
-}
-
 const optimizer = () => {
   const result = {
     minimize: true,
     minimizer: [],
-    runtimeChunk: true,
   };
 
-  if (DEFAULT_NODE_ENV === "production") {
+  if (mode === "production") {
     result.minimizer.push(
       new TerserPlugin({
         parallel: true,
@@ -86,8 +67,10 @@ const optimizer = () => {
     result.minimizer = undefined;
   }
 
-  result.runtimeChunk = false;
-  result.splitChunks = { cacheGroups: { default: false } };
+  if (process.env.MODE === "standalone") {
+    result.runtimeChunk = false;
+    result.splitChunks = { cacheGroups: { default: false } };
+  }
 
   return result;
 };
@@ -102,19 +85,46 @@ module.exports = composePlugins(
   }),
   withReact({ svgr: true }),
   (config) => {
-    // Update the webpack config as needed here.
-    // e.g. `config.plugins.push(new MyPlugin())`
+    // LS entrypoint
+    if (process.env.MODE !== "standalone") {
+      config.entry = {
+        main: {
+          import: path.resolve(__dirname, "apps/labelstudio/src/main.tsx"),
+        },
+      };
+      config.output = {
+        ...config.output,
+        uniqueName: "labelstudio",
+        publicPath: "auto",
+        scriptType: "text/javascript",
+      };
 
-    config.output = {
-      ...config.output,
-      uniqueName: "labelstudio",
-      publicPath: "auto",
-      scriptType: "text/javascript",
-    };
-
-    config.optimization = {
-      splitChunks: false,
-    };
+      config.optimization = {
+        runtimeChunk: "single",
+        sideEffects: true,
+        splitChunks: {
+          cacheGroups: {
+            commonVendor: {
+              test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|mobx|mobx-react|mobx-react-lite|mobx-state-tree)[\\/]/,
+              name: "vendor",
+              chunks: "all",
+            },
+            defaultVendors: {
+              test: /[\\/]node_modules[\\/]/,
+              priority: -10,
+              reuseExistingChunk: true,
+              chunks: "async",
+            },
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true,
+              chunks: "async",
+            },
+          },
+        },
+      };
+    }
 
     config.resolve.fallback = {
       fs: false,
@@ -219,7 +229,7 @@ module.exports = composePlugins(
 
     return merge(config, {
       devtool,
-      mode: process.env.NODE_ENV || "development",
+      mode,
       plugins,
       optimization: optimizer(),
     });

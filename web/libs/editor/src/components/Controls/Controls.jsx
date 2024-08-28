@@ -11,6 +11,7 @@ import { DraftPanel } from "../Annotations/Annotations";
 import styles from "./Controls.module.scss";
 import { Button } from "../../common/Button/Button";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
+import { cn } from "../../utils/bem";
 
 const TOOLTIP_DELAY = 0.8;
 
@@ -32,9 +33,13 @@ export default inject("store")(
      * Task information
      */
     let taskInformation;
+    const taskInfoClassName = cn("task-info").toClassName();
+    const skipButtonClassName = cn("skip-btn").toClassName();
+    const submitButtonClassName = cn("submit-btn").toClassName();
+    const updateButtonClassName = cn("update-btn").toClassName();
 
     if (store.task) {
-      taskInformation = <h4 className={`${styles.task} ls-task-info`}>Task ID: {store.task.id}</h4>;
+      taskInformation = <h4 className={`${styles.task} ${taskInfoClassName}`}>Task ID: {store.task.id}</h4>;
     }
 
     /**
@@ -60,7 +65,12 @@ export default inject("store")(
       if (store.hasInterface("skip")) {
         skipButton = (
           <Tooltip title="Cancel (skip) task: [ Ctrl+Space ]" mouseEnterDelay={TOOLTIP_DELAY}>
-            <Button disabled={disabled} look="danger" onClick={store.skipTask} className={`${styles.skip} ls-skip-btn`}>
+            <Button
+              disabled={disabled}
+              look="danger"
+              onClick={store.skipTask}
+              className={`${styles.skip} ${skipButtonClassName}`}
+            >
               Skip {buttons.skip}
             </Button>
           </Tooltip>
@@ -75,7 +85,7 @@ export default inject("store")(
               look="primary"
               icon={<CheckOutlined />}
               onClick={store.submitAnnotation}
-              className={`${styles.submit} ls-submit-btn`}
+              className={`${styles.submit} ${submitButtonClassName}`}
             >
               Submit {buttons.submit}
             </Button>
@@ -91,7 +101,7 @@ export default inject("store")(
               look="primary"
               icon={<CheckCircleOutlined />}
               onClick={store.updateAnnotation}
-              className="ls-update-btn"
+              className={updateButtonClassName}
             >
               {sentUserGenerate || versions.result ? "Update" : "Submit"} {buttons.update}
             </Button>

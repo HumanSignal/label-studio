@@ -1,6 +1,18 @@
 {
-  "message": "docs: DOC-239: Add information about rectangle rotation (#6248)",
-  "commit": "c738a68753387d9f743787a1ab98d952cbc8a493",
-  "date": "2024-08-27T19:53:38.000Z",
+<<<<<<< HEAD
+<<<<<<< HEAD
+  "message": "fix: OPTIC-945: Improve the bundling strategy and ship a single entrypoint with a common vendor chunk across all libs (#6152)",
+  "commit": "8105d62fabce9cb9a4d20e2b3f9bce2825786f45",
+  "date": "2024-08-13T13:39:02.000Z",
+=======
+  "message": "fix: OPTIC-966: converting stylus files to scss (#6187)",
+  "commit": "e535785c6a63529cd972e3e4438df6699ad61052",
+  "date": "2024-08-15T11:41:17.000Z",
+>>>>>>> develop
+=======
+  "message": "refactor: optic 1024/clean code tableold (#6224)",
+  "commit": "da1cc5d7397d66f6a111c59cec84ba73bebd7629",
+  "date": "2024-08-20T15:59:21.000Z",
+>>>>>>> origin/develop
   "branch": "develop"
 }
