@@ -32,8 +32,8 @@ Use with the `<Video>` control tag.
 | Name | Type | Description |
 | --- | --- | --- |
 | value | <code>Object</code> |  |
-| value.ranges | <code>Array.&lt;object&gt;</code> | array of ranges, each range is an object with `start` and `end` properties; one range per region for now |
-| [value.timelinelabels] | <code>Array.&lt;string&gt;</code> | regions are created only by `TimelineLabels`, and this label is listed here |
+| value.ranges | <code>Array.&lt;object&gt;</code> | Array of ranges, each range is an object with `start` and `end` properties. One range per region. |
+| [value.timelinelabels] | <code>Array.&lt;string&gt;</code> | Regions are created by `TimelineLabels`, and the corresponding label is listed here. |
 
 ### Example JSON
 ```json
