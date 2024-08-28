@@ -46,6 +46,7 @@ export const TimeDurationControl: FC<TimerProps> = ({
         readonly={startTimeReadonly}
         value={_currentTime}
         onChange={handleChangeCurrentTime}
+        label="Start"
         data-testid="timebox-current-time"
       />
       <TimeBox
@@ -54,6 +55,7 @@ export const TimeDurationControl: FC<TimerProps> = ({
         value={endTime}
         onChange={handleChangeEndTime}
         data-testid="timebox-end-time"
+        label="End"
         inverted
       />
       <TimeBox
@@ -62,6 +64,7 @@ export const TimeDurationControl: FC<TimerProps> = ({
         value={endTime - startTime}
         onChange={()=> {}}
         data-testid="timebox-duration-time"
+        label="Duration"
         inverted
       />
     </Block>

@@ -1,6 +1,7 @@
 import React, { type FC, useCallback, useEffect, useState } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { MaskUtil } from "../../utils/InputMask";
+import { Label } from "../Label/Label";
 
 import "./TimeBox.styl";
 
@@ -10,6 +11,7 @@ export interface TimerProps {
   readonly?: boolean;
   inverted?: boolean;
   onChange: (value: number) => void;
+  label?: string;
 }
 
 export const TimeBox: FC<TimerProps> = ({
@@ -18,6 +20,7 @@ export const TimeBox: FC<TimerProps> = ({
   inverted = false,
   readonly = false,
   onChange,
+  label,
   ...props
 }) => {
   const inputRef = React.createRef<HTMLInputElement>();
@@ -97,9 +100,17 @@ export const TimeBox: FC<TimerProps> = ({
     );
   };
 
-  return (
+  const timeBoxContent = (
     <Block name="time-box" mod={{ inverted, sidepanel }} {...props}>
       {renderInputTime()}
     </Block>
+  );
+
+  return label ? (
+    <Label text={label}>
+      {timeBoxContent}
+    </Label>
+  ) : (
+    timeBoxContent
   );
 };
