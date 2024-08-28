@@ -60,7 +60,7 @@
     position: absolute;
     top: -20px;
     left: -12px;
-    opacity: 20%;
+    opacity: 0.2;
   }
 
   &__parent_icon {
@@ -80,6 +80,6 @@
 
   &__parent_text {
     color: var(--sand_900);
-    opacity: 40%;
+    opacity: 0.4;
   }
 }

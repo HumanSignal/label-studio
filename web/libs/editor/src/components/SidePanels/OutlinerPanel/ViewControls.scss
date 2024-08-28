@@ -10,7 +10,7 @@
   grid-auto-columns: min-content;
   grid-column-gap: 8px;
   background-color: var(--sand_0);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 10%);
 
   &__sort {
     display: flex;
@@ -82,11 +82,11 @@
       }
 
       &_type_text {
-        padding: 0px 2px !important;
+        padding: 0 2px !important;
       }
 
       &.dropdown__trigger {
-        padding: 0px 6px 0px 2px;
+        padding: 0 6px 0 2px;
       }
     }
   }

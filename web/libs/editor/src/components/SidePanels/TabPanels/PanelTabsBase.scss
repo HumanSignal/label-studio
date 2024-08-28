@@ -1,4 +1,4 @@
-@import "../../../assets/styles/global.scss";
+@import "../../../assets/styles/global";
 
 .tabs-panel {
   --header-height: 24px;
@@ -35,11 +35,13 @@
 
     &_left {
       border-right: 1px solid var(--sand_300);
+
       --header-border-radius: 0 4px 4px 0;
     }
     
     &_right {
       border-left: 1px solid var(--sand_300);
+
       --header-border-radius: 4px 0 0 4px;
     }
   }
@@ -49,7 +51,8 @@
     left: 0;
     position: absolute;
     border: 1px solid var(--sand_300);
-    box-shadow: 0px 6px 10px 4px rgba(38, 38, 38, 0.15), 0px 2px 3px rgba(38, 38, 38, 0.3);
+    box-shadow: 0 6px 10px 4px rgb(38 38 38 / 15%), 0 2px 3px rgb(38 38 38 / 30%);
+
     & .tabs-panel_hidden {
       margin: 0;
     }
@@ -61,6 +64,7 @@
     border: none;
     background: none;
     height: calc(100% - 16px);
+
     --icon-color: var(--sand_400);
 
     &:hover {
@@ -82,7 +86,6 @@
     height: var(--header-height);
     z-index: 2;
     display: flex;
-    align-items: center;
     cursor: move;
     font-size: 13px;
     font-weight: 700;
@@ -102,6 +105,7 @@
       justify-content: center;
       padding: 0;
       cursor: pointer;
+
       --icon-color: var(--sand_400);
 
       svg {
@@ -147,28 +151,28 @@
       }
     }
 
-    &:not(.tabs-panel__toggle_detached):not(.tabs-panel__toggle_alignment_right) {
+    &:not(.tabs-panel__toggle_detached, .tabs-panel__toggle_alignment_right) {
       &::before {
         left: 0;
         transform: translate(22%, -110%);
       }
     }
 
-    &:not(.tabs-panel__toggle_detached):not(.tabs-panel__toggle_alignment_left) {
+    &:not(.tabs-panel__toggle_detached, .tabs-panel__toggle_alignment_left) {
       &::before {
         left: 0;
         transform: translate(-105%, -28px);
       }
     }
 
-    &:not(.tabs-panel__toggle_detached):not(.tabs-panel__toggle_collapsed):not(.tabs-panel__toggle_alignment_right) {
+    &:not(.tabs-panel__toggle_detached, .tabs-panel__toggle_collapsed, .tabs-panel__toggle_alignment_right) {
       &::before {
         left: -58%;
         transform: translate(35%, -100%);
       }
     }
 
-    &:not(.tabs-panel__toggle_detached):not(.tabs-panel__toggle_collapsed):not(.tabs-panel__toggle_alignment_left) {
+    &:not(.tabs-panel__toggle_detached, .tabs-panel__toggle_collapsed, .tabs-panel__toggle_alignment_left) {
       &::before {
         left: 58%;
         transform: translate(-79%, 0);
@@ -198,7 +202,9 @@
     overflow: hidden;
     height: calc(100% - var(--header-height));
     position: relative;
-    @include styled-scrollbars();
+
+    @include styled-scrollbars;
+
     pointer-events: all;
   }
 
@@ -211,79 +217,79 @@
     background-color: transparent;
     user-select: none;
 
-    &[data-resize=top],
-    &[data-resize=bottom] {
+    &[data-resize="top"],
+    &[data-resize="bottom"] {
       left: calc(var(--size) / 2);
       height: var(--size);
       width: calc(100% - var(--size));
       cursor: ns-resize;
     }
 
-    &[data-resize=top] {
+    &[data-resize="top"] {
       top: 0;
       transform: translate(0, -50%);
     }
 
-    &[data-resize=bottom] {
+    &[data-resize="bottom"] {
       bottom: 0;
       transform: translate(0, 50%);
     }
 
-    &[data-resize=left],
-    &[data-resize=right] {
+    &[data-resize="left"],
+    &[data-resize="right"] {
       top: calc(var(--size) / 2);
       width: var(--size);
       height: calc(100% - var(--size));
       cursor: ew-resize;
     }
 
-    &[data-resize=left] {
+    &[data-resize="left"] {
       left: 0;
       transform: translate(-50%, 0);
     }
 
-    &[data-resize=right] {
+    &[data-resize="right"] {
       right: 0;
       transform: translate(50%, 0);
     }
 
-    &[data-resize=top-left],
-    &[data-resize=top-right],
-    &[data-resize=bottom-left],
-    &[data-resize=bottom-right] {
+    &[data-resize="top-left"],
+    &[data-resize="top-right"],
+    &[data-resize="bottom-left"],
+    &[data-resize="bottom-right"] {
       width: var(--size);
       height: var(--size);
     }
 
-    &[data-resize=top-left],
-    &[data-resize=top-right] {
+    &[data-resize="top-left"],
+    &[data-resize="top-right"] {
       top: 0;
     }
 
-    &[data-resize=bottom-left],
-    &[data-resize=bottom-right] {
+    &[data-resize="bottom-left"],
+    &[data-resize="bottom-right"] {
       bottom: 0;
     }
 
-    &[data-resize=top-left] {
+    &[data-resize="top-left"] {
       left: 0;
       transform: translate(-50%, -50%);
       cursor: nwse-resize;
     }
 
-    &[data-resize=top-right] {
+    &[data-resize="top-right"] {
       right: 0;
       transform: translate(50%, -50%);
       cursor: nesw-resize;
     }
 
-    &[data-resize=bottom-left] {
+    &[data-resize="bottom-left"] {
       left: 0;
       transform: translate(-50%, 50%);
       cursor: nesw-resize;
     }
 
-    &[data-resize=bottom-right] {
+    &[data-resize="bottom-right"] {
       right: 0;
       transform: translate(50%, 50%);
       cursor: nwse-resize;
@@ -302,18 +308,17 @@
       border-radius: 100%;
     }
 
-    &[data-resize=grouped-top]::before,
-    &[data-resize=top]::before,
-    &[data-resize=bottom]::before,
-    &[data-resize=left]::before,
-    &[data-resize=right]::before {
+    &[data-resize="grouped-top"]::before,
+    &[data-resize="top"]::before,
+    &[data-resize="bottom"]::before,
+    &[data-resize="left"]::before,
+    &[data-resize="right"]::before {
       border-radius: 20px;
     }
 
-    &[data-resize=grouped-top]::before,
-    &[data-resize=top]::before,
-    &[data-resize=bottom]::before {
-      left: 0;
+    &[data-resize="grouped-top"]::before,
+    &[data-resize="top"]::before,
+    &[data-resize="bottom"]::before {
       top: 50%;
       height: var(2px);
       transform: translate(0, -50%);
@@ -321,9 +326,8 @@
       left: calc(var(--size) / 2 * -1);
     }
 
-    &[data-resize=left]::before,
-    &[data-resize=right]::before {
-      top: 0;
+    &[data-resize="left"]::before,
+    &[data-resize="right"]::before {
       left: 50%;
       width: var(--visual-size);
       transform: translate(-50%, 0);
@@ -361,7 +365,6 @@
 
   &_dragTop::before,
   &_dragBottom::after {
-    position: absolute;
     z-index: 100;
     content: '';
     width: 100%;

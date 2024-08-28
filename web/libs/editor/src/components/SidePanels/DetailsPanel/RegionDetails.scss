@@ -19,7 +19,7 @@
     & + span {
       color: var(--sand_900);
 
-      &:before {
+      &::before {
         opacity: 0.6;
         content: "ID ";
       }

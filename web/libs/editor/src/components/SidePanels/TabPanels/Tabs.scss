@@ -1,8 +1,9 @@
-@import "../../../assets/styles/global.scss";
+@import "../../../assets/styles/global";
 
 .tabs {
   --tab-row-height: 33px;
   --tab-height: 32px;
+
   height: inherit;
 
   &.ff_outliner_optim {
@@ -29,14 +30,13 @@
   }
 
   &__contents {
-    position: relative;
     background: var(--sand_0);
     height: 100%;
     position: relative;
     z-index: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    @include styled-scrollbars();
+    overflow: hidden auto;
+
+    @include styled-scrollbars;
 
     .ff_outliner_optim & {
       height: calc(100% - var(--tab-row-height));
@@ -96,7 +96,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    padding: 4px 24px 6px 24px;
+    padding: 4px 24px 6px;
     height: var(--tab-height);
     width: 100%;
     font-weight: 500;
@@ -112,7 +112,7 @@
     &_active {
       overflow: visible;
       width: fit-content;
-      border-width: 1px 1px 0px 1px;
+      border-width: 1px 1px 0;
       transform: translate(-1px, -1px);
       border-style: solid;
       background: var(--sand_0);

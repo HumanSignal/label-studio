@@ -1,4 +1,4 @@
-@import "../../assets/styles/global.scss";
+@import "../../assets/styles/global";
 
 .sidepanels {
   height: 100%;
@@ -25,7 +25,8 @@
     height: 100%;
     position: relative;
     z-index: 1;
-    @include styled-scrollbars();
+
+    @include styled-scrollbars;
 
     & .main-content {
       overflow: auto;
@@ -51,6 +52,7 @@
 
   &__wrapper {
     --snap-rotation: 90deg;
+
     top: 0;
     z-index: 11;
     height: 100%;
@@ -82,12 +84,14 @@
     &_align {
       &_left {
         left: 0;
+
         --snap-rotation: -90deg;
       }
 
       &_right {
         top: 0;
         right: 0;
+
         --snap-rotation: 90deg;
       }
     }
@@ -99,6 +103,7 @@
     min-height: 100%;
     display: flex;
     flex-direction: column;
+
     & .sidepanels__wrapper {
       position: static;
       width: 100%;
@@ -107,6 +112,7 @@
       flex-shrink: 0;
       height: auto;
     }
+
     & .sidepanels__content {
       flex: 1;
     }

@@ -4,6 +4,7 @@
 .info,
 .comments-panel {
   --details-section-border-color: var(--sand_300);
+
   width: 100%;
 
   &__section-tab {
@@ -90,7 +91,7 @@
     grid-column-gap: 4px;
     text-wrap: nowrap;
     padding: 4px;
-    font-family: "Roboto", Arial, sans-serif;
+    font-family: Roboto, Arial, sans-serif;
     font-weight: 500;
     font-size: 15px;
   }

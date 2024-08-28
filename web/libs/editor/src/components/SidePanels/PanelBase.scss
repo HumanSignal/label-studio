@@ -1,4 +1,4 @@
-@import "../../assets/styles/global.scss";
+@import "../../assets/styles/global";
 
 .panel {
   --header-height: 24px;
@@ -54,6 +54,7 @@
           height: 100%;
           justify-content: space-between;
           padding: 0 4px;
+
           --header-border-radius: 0;
         }
       }
@@ -73,11 +74,13 @@
   &_alignment {
     &_left {
       border-right: 1px solid var(--sand_300);
+
       --header-border-radius: 0 4px 4px 0;
     }
 
     &_right {
       border-left: 1px solid var(--sand_300);
+
       --header-border-radius: 4px 0 0 4px;
     }
   }
@@ -87,7 +90,8 @@
     left: 0;
     position: absolute;
     border: 1px solid var(--sand_300);
-    box-shadow: 0px 6px 10px 4px rgba(38, 38, 38, 0.15), 0px 2px 3px rgba(38, 38, 38, 0.3);
+    box-shadow: 0 6px 10px 4px rgb(38 38 38 / 15%), 0 2px 3px rgb(38 38 38 / 30%);
+
     & .panel_hidden:not(.panel_detached) {
       margin: 0;
     }
@@ -219,7 +223,7 @@
     }
   }
 
-  &:not(.panel_hidden):not(.panel_detached) .panel__toggle {
+  &:not(.panel_hidden, .panel_detached) .panel__toggle {
     &::before {
       left: 50%;
       top: calc(100% + 4px);
@@ -246,11 +250,11 @@
 
   &__body {
     z-index: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden auto;
     height: calc(100% - var(--header-height));
     position: relative;
-    @include styled-scrollbars();
+
+    @include styled-scrollbars;
   }
 
   &__resizer {
@@ -262,79 +266,79 @@
     background-color: transparent;
     user-select: none;
 
-    &[data-resize=top],
-    &[data-resize=bottom] {
+    &[data-resize="top"],
+    &[data-resize="bottom"] {
       left: calc(var(--size) / 2);
       height: var(--size);
       width: calc(100% - var(--size));
       cursor: ns-resize;
     }
 
-    &[data-resize=top] {
+    &[data-resize="top"] {
       top: 0;
       transform: translate(0, -50%);
     }
 
-    &[data-resize=bottom] {
+    &[data-resize="bottom"] {
       bottom: 0;
       transform: translate(0, 50%);
     }
 
-    &[data-resize=left],
-    &[data-resize=right] {
+    &[data-resize="left"],
+    &[data-resize="right"] {
       top: calc(var(--size) / 2);
       width: var(--size);
       height: calc(100% - var(--size));
       cursor: ew-resize;
     }
 
-    &[data-resize=left] {
+    &[data-resize="left"] {
       left: 0;
       transform: translate(-50%, 0);
     }
 
-    &[data-resize=right] {
+    &[data-resize="right"] {
       right: 0;
       transform: translate(50%, 0);
     }
 
-    &[data-resize=top-left],
-    &[data-resize=top-right],
-    &[data-resize=bottom-left],
-    &[data-resize=bottom-right] {
+    &[data-resize="top-left"],
+    &[data-resize="top-right"],
+    &[data-resize="bottom-left"],
+    &[data-resize="bottom-right"] {
       width: var(--size);
       height: var(--size);
     }
 
-    &[data-resize=top-left],
-    &[data-resize=top-right] {
+    &[data-resize="top-left"],
+    &[data-resize="top-right"] {
       top: 0;
     }
 
-    &[data-resize=bottom-left],
-    &[data-resize=bottom-right] {
+    &[data-resize="bottom-left"],
+    &[data-resize="bottom-right"] {
       bottom: 0;
     }
 
-    &[data-resize=top-left] {
+    &[data-resize="top-left"] {
       left: 0;
       transform: translate(-50%, -50%);
       cursor: nwse-resize;
     }
 
-    &[data-resize=top-right] {
+    &[data-resize="top-right"] {
       right: 0;
       transform: translate(50%, -50%);
       cursor: nesw-resize;
     }
 
-    &[data-resize=bottom-left] {
+    &[data-resize="bottom-left"] {
       left: 0;
       transform: translate(-50%, 50%);
       cursor: nesw-resize;
     }
 
-    &[data-resize=bottom-right] {
+    &[data-resize="bottom-right"] {
       right: 0;
       transform: translate(50%, 50%);
       cursor: nwse-resize;
@@ -353,16 +357,15 @@
       border-radius: 100%;
     }
 
-    &[data-resize=top]::before,
-    &[data-resize=bottom]::before,
-    &[data-resize=left]::before,
-    &[data-resize=right]::before {
+    &[data-resize="top"]::before,
+    &[data-resize="bottom"]::before,
+    &[data-resize="left"]::before,
+    &[data-resize="right"]::before {
       border-radius: 20px;
     }
 
-    &[data-resize=top]::before,
-    &[data-resize=bottom]::before {
-      left: 0;
+    &[data-resize="top"]::before,
+    &[data-resize="bottom"]::before {
       top: 50%;
       height: var(--visual-size);
       transform: translate(0, -50%);
@@ -370,9 +373,8 @@
       left: calc(var(--size) / 2 * -1);
     }
 
-    &[data-resize=left]::before,
-    &[data-resize=right]::before {
-      top: 0;
+    &[data-resize="left"]::before,
+    &[data-resize="right"]::before {
       left: 50%;
       width: var(--visual-size);
       transform: translate(-50%, 0);

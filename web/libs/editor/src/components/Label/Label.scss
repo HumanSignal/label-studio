@@ -11,9 +11,7 @@
   line-height: 22px;
   background-color: var(--background);
   color: var(--sand_900);
-  border-left-style: solid;
-  border-left-width: 4px;
-  border-left-color: var(--color);
+  border-left: 4px solid var(--color);
   position: relative;
   align-items: center;
 
@@ -21,7 +19,7 @@
     margin: 0 8px 8px 0;
 
     &:last-child {
-      margin: 0 0 8px 0;
+      margin: 0 0 8px;
     }
   }
 

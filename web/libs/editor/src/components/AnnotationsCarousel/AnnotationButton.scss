@@ -2,7 +2,7 @@
   display: flex;
   padding: 4px 8px;
   border-radius: 4px 4px 0 0;
-  border-width: 1px 1px 0px 1px;
+  border-width: 1px 1px 0;
   border-style: solid;
   background-color: var(--sand_200);
   border-color: transparent;
@@ -178,7 +178,7 @@
 
 .AnnotationButtonContextMenu {
   border-radius: 4px;
-  box-shadow: 0px 1px 3px 1px #26262626, 0px 1px 2px 0px #2626264D;
+  box-shadow: 0 1px 3px 1px #26262626, 0 1px 2px 0 #2626264D;
 
   &__seperator {
     height: 1px;

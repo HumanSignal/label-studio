@@ -62,7 +62,6 @@
   }
 
   &-iconEle {
-    height: 24px;
     display: flex;
     flex: none;
     height: 32px;
@@ -227,7 +226,7 @@
 .ocr {
   background: none;
   position: relative;
-  padding: 0 0 8px 0;
+  padding: 0 0 8px;
 
   &_empty {
     display: none;

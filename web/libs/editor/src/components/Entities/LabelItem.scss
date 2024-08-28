@@ -1,5 +1,6 @@
 .list-item {
   --color: var(--sand_600);
+
   padding: 0 8px 0 0;
 
   &__title {
@@ -16,6 +17,5 @@
   &__visibility {
     padding: 0 !important;
     width: 24px;
-    padding: 24px;
   }
 }

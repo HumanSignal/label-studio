@@ -24,7 +24,7 @@
     .submit {
       border-radius: 4px;
       background: var(--grape_500);
-      box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 4px 4px 0 rgb(0 0 0 / 25%);
       display: flex;
       width: 160px;
       height: 40px;
@@ -42,7 +42,7 @@
       cursor: pointer;
 
       &_disabled {
-        color: rgba(255, 255, 255, 0.8);
+        color: rgb(255 255 255 / 80%);
         background-color: var(--sand_400);
       }
 
@@ -61,7 +61,7 @@
         justify-content: center;
         align-items: center;
         align-self: stretch;
-        border-left: 1px solid rgba(255, 255, 255, 0.16);
+        border-left: 1px solid rgb(255 255 255 / 16%);
 
         div {
           width: 100%;
@@ -130,9 +130,9 @@
   font-style: normal;
   font-weight: 400;
   line-height: 24px;
-  box-shadow: 0px 1px 3px 1px rgba(38, 38, 38, 0.15), 0px 1px 2px 0px rgba(38, 38, 38, 0.3);
+  box-shadow: 0 1px 3px 1px rgb(38 38 38 / 15%), 0 1px 2px 0 rgb(38 38 38 / 30%);
 
-  &:hover:before {
+  &:hover::before {
     content: '';
     z-index: auto;
     width: calc(100% - 16px);

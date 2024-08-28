@@ -1,4 +1,4 @@
-@import "../../../../assets/styles/global.scss";
+@import "../../../../assets/styles/global";
 
 .wave {
   --container-edge-padding: 24px;
@@ -25,6 +25,7 @@
     position: absolute;
     border-radius: 20px;
     box-shadow: 0 5px 20px var(--grape_100);
+
     @include waiting(var(--primary_link));
 
     span {
@@ -33,7 +34,7 @@
       font-size: 10px;
       font-weight: bold;
       border-radius: 10px;
-      background-color: rgba(255, 255, 255, 0.5);
+      background-color: rgb(255 255 255 / 50%);
     }
   }
 
@@ -84,6 +85,7 @@
       border-radius: 0;
       top: -4px;
       height: calc(100% + 4px);
+
       &::before{
         position: absolute;
         top: -16px;
@@ -132,6 +134,7 @@
 
     & .wave_compact showtitle{
       z-index: 10 !important;
+
       & > div{
         background-color: var(--sand_900);
         color: var(--sand_0);
@@ -145,7 +148,7 @@
       border-radius: 4px;
       position: relative;
       background-color: var(--sand_0);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 15px rgb(0 0 0 / 20%);
     }
   }
 

@@ -44,8 +44,7 @@
   &__prevnext {
     width: 32px;
     height: 32px;
-    align-self: center;
-    justify-self: center;
+    place-self: center center;
 
     &_newui {
       &:hover {
