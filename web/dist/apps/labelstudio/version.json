@@ -1,6 +1,6 @@
 {
-  "message": "docs: DOC-239: Add information about rectangle rotation (#6248)",
-  "commit": "c738a68753387d9f743787a1ab98d952cbc8a493",
-  "date": "2024-08-27T19:53:38.000Z",
+  "message": "chore(deps-dev): bump webpack from 5.89.0 to 5.94.0 in /web (#6275)",
+  "commit": "0c18573fbf7b5a7bcabd5bff678a760337c2dc51",
+  "date": "2024-08-28T13:34:36.000Z",
   "branch": "develop"
 }

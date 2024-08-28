@@ -70,7 +70,7 @@ export class Modal extends React.Component {
     const mixes = [this.transitionClass, this.props.className];
 
     const modalContent = (
-      <Block name="modal" ref={this.modalRef} mod={mods} mix={mixes} onClick={this.onClickOutside}>
+      <Block name="modal-dm" ref={this.modalRef} mod={mods} mix={mixes} onClick={this.onClickOutside}>
         <Elem name="wrapper">
           <Elem name="content" style={this.props.style}>
             {!bare && (
@@ -99,10 +99,11 @@ export class Modal extends React.Component {
   }
 
   onClickOutside = (e) => {
+    const modalClassCN = cn("modal-dm");
     const { closeOnClickOutside } = this.props;
     const isInModal = this.modalRef.current.contains(e.target);
-    const content = cn("modal").elem("content").closest(e.target);
-    const close = cn("modal").elem("close").closest(e.target);
+    const content = modalClassCN.elem("content").closest(e.target);
+    const close = modalClassCN.elem("close").closest(e.target);
 
     if ((isInModal && close) || (content === null && closeOnClickOutside !== false)) {
       this.hide();

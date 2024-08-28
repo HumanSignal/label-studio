@@ -57,7 +57,7 @@ export const DropdownTrigger = React.forwardRef(
       tag,
       key: "dd-trigger",
       ref: triggerRef,
-      className: cn("dropdown").elem("trigger").mix(props.className).mix(triggerEL.props.className),
+      className: cn("dropdown-dm").elem("trigger").mix(props.className).mix(triggerEL.props.className),
       onClickCapture: handleToggle,
     };
 
