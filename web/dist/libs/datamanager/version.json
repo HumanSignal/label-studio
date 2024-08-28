@@ -1,6 +1,6 @@
 {
-  "message": "docs: DOC-239: Add information about rectangle rotation (#6248)",
-  "commit": "c738a68753387d9f743787a1ab98d952cbc8a493",
-  "date": "2024-08-27T19:53:38.000Z",
+  "message": "fix: OPTIC-945: Improve the bundling strategy and ship a single entrypoint with a common vendor chunk across all libs - restore (#6199)",
+  "commit": "e9a075c37518faa574054fcd328c8bae7e221d12",
+  "date": "2024-08-28T13:00:29.000Z",
   "branch": "develop"
 }
