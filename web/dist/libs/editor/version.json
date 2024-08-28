@@ -1,6 +1,7 @@
 {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   "message": "fix: OPTIC-945: Improve the bundling strategy and ship a single entrypoint with a common vendor chunk across all libs (#6152)",
   "commit": "8105d62fabce9cb9a4d20e2b3f9bce2825786f45",
   "date": "2024-08-13T13:39:02.000Z",
@@ -13,6 +14,11 @@
   "message": "refactor: optic 1024/clean code tableold (#6224)",
   "commit": "da1cc5d7397d66f6a111c59cec84ba73bebd7629",
   "date": "2024-08-20T15:59:21.000Z",
+>>>>>>> origin/develop
+=======
+  "message": "chore(deps-dev): bump webpack from 5.89.0 to 5.94.0 in /web (#6275)",
+  "commit": "0c18573fbf7b5a7bcabd5bff678a760337c2dc51",
+  "date": "2024-08-28T13:34:36.000Z",
 >>>>>>> origin/develop
   "branch": "develop"
 }
