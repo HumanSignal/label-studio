@@ -4,7 +4,7 @@ import { useMemoizedHandlers } from "../../../../hooks/useMemoizedHandlers";
 import { Block, Elem } from "../../../../utils/bem";
 import { isDefined } from "../../../../utils/utilities";
 import type { TimelineViewProps } from "../../Types";
-import "./Frames.styl";
+import "./Frames.scss";
 import { Keypoints } from "./Keypoints";
 
 const toSteps = (num: number, step: number) => {

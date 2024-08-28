@@ -3,7 +3,7 @@ import { Block, Elem } from "../../utils/bem";
 import { MaskUtil } from "../../utils/InputMask";
 import { Label } from "../Label/Label";
 
-import "./TimeBox.styl";
+import "./TimeBox.scss";
 
 export interface TimerProps {
   sidepanel: boolean;

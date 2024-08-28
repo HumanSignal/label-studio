@@ -1,0 +1,253 @@
+.tool {
+  width: 32px;
+  height: 32px;
+  margin: 4px;
+  display: flex;
+  cursor: pointer;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  z-index: 1;
+  background: none;
+  border: none;
+  padding: 0;
+
+  --text-color: var(--sand_500);
+  --text-color-hover: var(--sand_900);
+
+  &:hover {
+    z-index: 100;
+  }
+
+  &__icon {
+    width: 32px;
+    height: 32px;
+    opacity: 0.5;
+    color: var(--text-color-hover);
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  &_active, &:hover {
+    & .tool__icon {
+      opacity: 1;
+    }
+  }
+
+  &_active > &__icon {
+    background: var(--sand_200);
+    box-shadow: inset 0px 1px 0px rgba(0, 0, 0, 0.05), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+  }
+
+  &_smart {
+    & .tool_active > .tool__icon {
+      background: var(--plum_200);
+      box-shadow: inset 0px 1px 0px var(--plum_0), inset 0px 0px 0px 1px var(--plum_0);
+    }
+  }
+
+  &__tooltip {
+    top: 50%;
+    display: none;
+    right: 100%;
+    font-size: 14px;
+    font-size: 14px;
+    font-weight: 500;
+    user-select: none;
+    position: absolute;
+    box-sizing: border-box;
+    padding-right: 10px;
+    transform: translate3d(0, -50%, 0);
+    pointer-events: none;
+
+    &-body {
+      display: flex;
+      height: 40px;
+      align-items: center;
+      border-radius: 5px;
+      white-space: nowrap;
+      padding: 0 14px;
+      color: var(--text-color);
+      background-color: var(--sand_0);
+      box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    &_controlled {
+      pointer-events: all;
+    }
+  }
+
+  &_alignment_right {
+    & .tool__tooltip-body {
+      flex-direction: row-reverse;
+    }
+  }
+
+  &_alignment_left {
+    & .tool__tooltip-body {
+      flex-direction: row;
+    }
+  }
+
+  &_active {
+    & .tool__tooltip {
+      display: none;
+    }
+    & .tool__tooltip-body {
+      color: var(--text-color-hover);
+    }
+  }
+
+  &:hover {
+    & .tool__tooltip {
+      display: block;
+    }
+    & .tool__tooltip-body {
+      color: var(--text-color-hover);
+    }
+  }
+
+  &__controls {
+    top: 50%;
+    right: 100%;
+    position: absolute;
+    transform: translate3d(0, -50%, 0);
+
+    &-body {
+      display: flex;
+      border-radius: 5px;
+      background-color: var(--sand_0);
+      box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.05), 0px 5px 10px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &_alignment_right {
+    & .tool__controls {
+      padding-right: 10px;
+    }
+    & .tool__shortcut {
+      margin: 0 20px 0 0;
+    }
+  }
+
+  &_alignment_left {
+    & .tool__controls-body{
+      padding-left: 10px;
+    }
+    & .tool__shortcut {
+      margin: 0 0 0 20px;
+    }
+  }
+
+  &__shortcut {
+    opacity: 0.6;
+    display: flex;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--sand_600);
+  }
+
+  &_expanded &_alignment_right {
+    & .tool__shortcut {
+      margin: 0 20px 0 0;
+    }
+  }
+
+  &_expanded &_alignment_left {
+    & .tool__shortcut {
+      margin: 0 0 0 20px;
+    }
+  }
+
+  &_active, &:hover {
+    & .tool__shortcut {
+      opacity: 1;
+    }
+  }
+
+  &__key {
+    padding: 0 4px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    background: var(--sand_0);
+    border-radius: 2px;
+    text-transform: uppercase;
+    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 0px rgba(0, 0, 0, 0.08);
+  }
+
+  &__key + &__key {
+    margin-left: 4px;
+  }
+
+  &__label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    justify-content: space-between;
+    color: var(--text-color);
+  }
+
+  &:hover, &_active {
+    & .tool__label {
+      color: var(--text-color-hover);
+    }
+  }
+
+  &_alignment_right {
+    & .tool__label {
+      padding-left: 8px;
+      padding-right: 12px;
+      flex-direction: row-reverse;
+    }
+  }
+
+  &_alignment_left {
+    & .tool__label {
+      padding-left: 12px;
+      padding-right: 8px;
+      flex-direction: row;
+    }
+  }
+
+  &__smart {
+    display: flex;
+  }
+
+  &_expanded {
+    width: calc(100% - 8px);
+  } 
+
+  &_active {
+    & .tool_expanded {
+      border-radius: 5px;
+      background-color: var(--sand_100);
+    }
+  }
+
+  &_alignment_left {
+    flex-direction: row;
+  }
+
+  &_alignment_right {
+    flex-direction: row-reverse;
+  }
+
+  &_smart {
+    --text-color: var(--plum_200);
+    --text-color-hover: var(--plum_400);
+  }
+
+  &_active {
+    .tool_smart {
+      border-radius: 5px;
+      background-color: var(--sand_100);
+    }
+  }
+}

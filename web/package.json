@@ -185,8 +185,6 @@
     "sinon": "^17.0.1",
     "source-map-loader": "^1.1.3",
     "style-loader": "^3.3.3",
-    "stylus": "^0.59.0",
-    "stylus-loader": "^5.0.0",
     "truncate-middle": "^1.0.6",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.2",

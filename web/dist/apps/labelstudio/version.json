@@ -1,6 +1,6 @@
 {
-  "message": "refactor: remove unused code (#6232)",
-  "commit": "56f3b054dff2be3bfef07c1d84748f957d6cb828",
-  "date": "2024-08-22T16:28:52.000Z",
+  "message": "docs: DOC-239: Add information about rectangle rotation (#6248)",
+  "commit": "c738a68753387d9f743787a1ab98d952cbc8a493",
+  "date": "2024-08-27T19:53:38.000Z",
   "branch": "develop"
 }

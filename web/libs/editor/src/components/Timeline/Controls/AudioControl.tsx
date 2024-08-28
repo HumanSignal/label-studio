@@ -2,7 +2,7 @@ import type React from "react";
 import { type FC, type MouseEvent, useEffect, useState } from "react";
 import { Block, Elem } from "../../../utils/bem";
 
-import "./AudioControl.styl";
+import "./AudioControl.scss";
 import { IconSoundConfig, IconSoundMutedConfig } from "../../../assets/icons/timeline";
 import { ControlButton } from "../Controls";
 import { Slider } from "./Slider";
