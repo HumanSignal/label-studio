@@ -13,7 +13,7 @@ import { Block, Elem } from "../../../../utils/bem";
 import { TimelineContext } from "../../Context";
 import type { TimelineContextValue, TimelineViewProps } from "../../Types";
 import WaveSurfer from "wavesurfer.js";
-import "./Wave.styl";
+import "./Wave.scss";
 import RegionsPlugin from "wavesurfer.js/src/plugin/regions";
 import TimelinePlugin from "wavesurfer.js/src/plugin/timeline";
 import { formatTimeCallback, secondaryLabelInterval, timeInterval } from "./Utils";

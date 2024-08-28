@@ -87,7 +87,6 @@ jobs:
 
       - name: "Generate docs tags files"
         if: inputs.generate_doc_tags_files
-        continue-on-error: true
         working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
         run: yarn docs
 

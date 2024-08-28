@@ -2,7 +2,7 @@ import { type FC, useContext, useEffect, useMemo, useRef, useState } from "react
 import { Block, Elem } from "../../../../utils/bem";
 import { isDefined } from "../../../../utils/utilities";
 import { visualizeLifespans } from "./Utils";
-import "./Minimap.styl";
+import "./Minimap.scss";
 import { TimelineContext } from "../../Context";
 
 export const Minimap: FC<any> = () => {

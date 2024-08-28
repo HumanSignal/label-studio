@@ -9,7 +9,7 @@ import Types from "../../core/Types";
 import { StoreExtender } from "../../mixins/SharedChoiceStore/extender";
 import { ViewModel } from "../../tags/visual";
 import Utils from "../../utils";
-import { FF_DEV_1621, FF_DEV_3034, FF_DEV_3391, FF_DEV_3617, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
+import { FF_DEV_3034, FF_DEV_3391, FF_DEV_3617, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { emailFromCreatedBy } from "../../utils/utilities";
 import { Annotation } from "./Annotation";
 import { HistoryItem } from "./HistoryItem";
@@ -375,7 +375,7 @@ const AnnotationStoreModel = types
     }
 
     function createAnnotation(options = { userGenerate: true }) {
-      const result = isFF(FF_DEV_1621) ? findNonInteractivePredictionResults() : [];
+      const result = findNonInteractivePredictionResults();
       const c = self.addAnnotation({ ...options, result });
 
       if (result && result.length) {

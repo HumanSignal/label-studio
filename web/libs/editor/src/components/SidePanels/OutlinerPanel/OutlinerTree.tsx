@@ -25,7 +25,7 @@ import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
 import { RegionControlButton } from "../Components/RegionControlButton";
-import "./TreeView.styl";
+import "./TreeView.scss";
 import ResizeObserver from "../../../utils/resize-observer";
 import type { EventDataNode, Key } from "rc-tree/es/interface";
 
@@ -173,7 +173,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
           defaultExpandParent={!isPersistCollapseEnabled}
           autoExpandParent
           checkable={false}
-          prefixCls="lsf-tree"
+          prefixCls={rootClass.toClassName()}
           className={rootClass.toClassName()}
           treeData={regionsTree}
           selectedKeys={selectedKeys}

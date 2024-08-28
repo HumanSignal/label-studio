@@ -15,6 +15,7 @@ import ControlBase from "./Base";
  * The `RectangleLabels` tag creates labeled rectangles. Use to apply labels to bounding box semantic segmentation tasks.
  *
  * Use with the following data types: image.
+ *
  * @example
  * <!--Basic labeling configuration for applying labels to rectangular bounding boxes on an image -->
  * <View>
@@ -37,7 +38,7 @@ import ControlBase from "./Base";
  * @param {string} [fillColor]       - Rectangle fill color in hexadecimal
  * @param {string} [strokeColor]     - Stroke color in hexadecimal
  * @param {number} [strokeWidth=1]   - Width of stroke
- * @param {boolean} [canRotate=true] - Show or hide rotation control
+ * @param {boolean} [canRotate=true] - Show or hide rotation control. Note that the anchor point in the results is different than the anchor point used when rotating with the rotation tool. For more information, see [Rotation](/templates/image_bbox#Rotation).
  */
 
 const Validation = types.model({

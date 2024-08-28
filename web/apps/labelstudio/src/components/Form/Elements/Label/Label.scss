@@ -1,4 +1,4 @@
-.label {
+.label-ls {
   margin-bottom: 0;
 
   &__text {
@@ -43,9 +43,9 @@
     padding: 0;
   }
 
-  .input,
-  .select,
-  .textarea {
+  .input-ls,
+  .select-ls,
+  .textarea-ls {
     width: 100%;
   }
 
@@ -78,11 +78,11 @@
     grid-template-columns: 1fr auto;
   }
 
-  &_placement_left:not(.label_withDescription) {
+  &_placement_left:not(.label-ls_withDescription) {
     grid-template-areas: "label field";
   }
 
-  &_placement_right:not(.label_withDescription) {
+  &_placement_right:not(.label-ls_withDescription) {
     grid-template-areas: "field label";
   }
 
@@ -97,8 +97,8 @@
     font-weight: 500;
   }
 
-  &_placement_right:not(.label_withDescription) &__field,
-  &_placement_left:not(.label_withDescription) &__field {
+  &_placement_right:not(.label-ls_withDescription) &__field,
+  &_placement_left:not(.label-ls_withDescription) &__field {
     grid-area: field;
     display: flex;
     align-items: center;
@@ -109,7 +109,7 @@
     grid-area: description;
   }
 
-  &_placement_right.label_withDescription &__field {
+  &_placement_right.label-ls_withDescription &__field {
     input[type="radio"] {
       margin: 4px 0 0 0;
     }

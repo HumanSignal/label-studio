@@ -78,7 +78,7 @@ const TagAttrs = types.model("RichTextModel", {
 const Model = types
   .model("RichTextModel", {
     type: "richtext",
-    _value: types.optional(types.string, ""),
+    _value: types.optional(types.maybeNull(types.string), null),
   })
   .views((self) => ({
     get hasStates() {

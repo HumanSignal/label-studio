@@ -24,7 +24,7 @@ import "../../tags/visual";
  */
 import { Space } from "../../common/Space/Space";
 import { Button } from "../../common/Button/Button";
-import { Block, Elem } from "../../utils/bem";
+import { Block, cn, Elem } from "../../utils/bem";
 import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
@@ -51,7 +51,7 @@ import { TopBar } from "../TopBar/TopBar";
 /**
  * Styles
  */
-import "./App.styl";
+import "./App.scss";
 
 /**
  * App
@@ -127,11 +127,12 @@ class App extends Component {
 
   _renderAll(obj) {
     if (obj.length === 1) return <Segment annotation={obj[0]}>{[Tree.renderItem(obj[0].root)]}</Segment>;
-
+    const renderAllClassName = cn("renderall").toClassName();
+    const fadeClassName = cn("fade").toClassName();
     return (
-      <div className="ls-renderall">
+      <div className={renderAllClassName}>
         {obj.map((c, i) => (
-          <div key={`all-${i}`} className="ls-fade">
+          <div key={`all-${i}`} className={fadeClassName}>
             <Segment annotation={c}>{[Tree.renderItem(c.root)]}</Segment>
           </div>
         ))}

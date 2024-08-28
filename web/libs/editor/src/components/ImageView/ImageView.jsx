@@ -22,7 +22,6 @@ import Constants from "../../core/Constants";
 import { fixRectToFit } from "../../utils/image";
 import {
   FF_DBLCLICK_DELAY,
-  FF_DEV_1285,
   FF_DEV_1442,
   FF_DEV_3077,
   FF_DEV_3793,
@@ -385,11 +384,7 @@ const Crosshair = memo(
     const [visible, setVisible] = useState(false);
     const strokeWidth = 1;
     const dashStyle = [3, 3];
-    let enableStrokeScale = true;
-
-    if (isFF(FF_DEV_1285)) {
-      enableStrokeScale = false;
-    }
+    const enableStrokeScale = false;
 
     if (ref) {
       ref.current = {
@@ -737,12 +732,7 @@ export default observer(
     updateCrosshair = (e) => {
       if (this.crosshairRef.current) {
         const { x, y } = e.currentTarget.getPointerPosition();
-
-        if (isFF(FF_DEV_1285)) {
-          this.crosshairRef.current.updatePointer(...this.props.item.fixZoomedCoords([x, y]));
-        } else {
-          this.crosshairRef.current.updatePointer(x, y);
-        }
+        this.crosshairRef.current.updatePointer(...this.props.item.fixZoomedCoords([x, y]));
       }
     };
 
@@ -1198,20 +1188,8 @@ const StageContent = observer(({ item, store, state, crosshairRef }) => {
       {item.crosshair && (
         <Crosshair
           ref={crosshairRef}
-          width={
-            isFF(FF_ZOOM_OPTIM)
-              ? item.containerWidth
-              : isFF(FF_DEV_1285)
-                ? item.stageWidth
-                : item.stageComponentSize.width
-          }
-          height={
-            isFF(FF_ZOOM_OPTIM)
-              ? item.containerHeight
-              : isFF(FF_DEV_1285)
-                ? item.stageHeight
-                : item.stageComponentSize.height
-          }
+          width={isFF(FF_ZOOM_OPTIM) ? item.containerWidth : item.stageWidth}
+          height={isFF(FF_ZOOM_OPTIM) ? item.containerHeight : item.stageHeight}
         />
       )}
     </>

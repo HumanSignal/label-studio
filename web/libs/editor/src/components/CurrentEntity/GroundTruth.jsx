@@ -4,7 +4,7 @@ import { Button } from "../../common/Button/Button";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { BemWithSpecifiContext } from "../../utils/bem";
 import { FF_DEV_3873, isFF } from "../../utils/feature-flags";
-import "./GroundTruth.styl";
+import "./GroundTruth.scss";
 
 const { Block, Elem } = BemWithSpecifiContext();
 

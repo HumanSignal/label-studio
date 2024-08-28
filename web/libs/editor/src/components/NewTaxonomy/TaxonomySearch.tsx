@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 
-import "./TaxonomySearch.styl";
+import "./TaxonomySearch.scss";
 import { Block } from "../../utils/bem";
 import type { AntTaxonomyItem } from "./NewTaxonomy";
 import { debounce } from "lodash";

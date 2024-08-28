@@ -1,6 +1,6 @@
-.input,
-.select,
-.textarea {
+.input-ls,
+.select-ls,
+.textarea-ls {
   height: 40px;
   min-height: 40px;
   background: var(--sand_0);
@@ -21,13 +21,13 @@
   }
 }
 
-input.input[type=radio] {
+input.input-ls[type=radio] {
   width: 16px;
   height: 16px;
   min-height: 0;
 }
 
-.textarea {
+.textarea-ls {
   padding: 12px 16px;
   min-height: 50px;
 }

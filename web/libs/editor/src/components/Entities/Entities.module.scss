@@ -54,16 +54,12 @@
   flex-wrap: nowrap;
   position: relative;
   padding: 0;
-  border: 1px solid #e5e5e5;
+  border: 1px solid var(--sand_300);
   border-radius: 5px;
 
   & > *:not(:last-child),
   & [role="img"] {
     margin-right: 6px;
-  }
-
-  &.flat {
-
   }
 
   & button.hidden,
@@ -83,7 +79,7 @@
 
   &.selected {
     //noinspection CssInvalidFunction
-    box-shadow: 0 0 0 4px var(--labelBgColor, rgba(0,0,0,0.2));
+    box-shadow: 0 0 0 4px var(--labelBgColor, var(--sand_300));
   }
 
   &_label {

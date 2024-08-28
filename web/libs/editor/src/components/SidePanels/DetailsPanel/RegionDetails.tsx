@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { type FC, useEffect, useMemo, useRef } from "react";
 import { Block, Elem, useBEM } from "../../../utils/bem";
 import { RegionEditor } from "./RegionEditor";
-import "./RegionDetails.styl";
+import "./RegionDetails.scss";
 
 const { Text } = Typography;
 
