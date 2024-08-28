@@ -116,7 +116,7 @@ const VideoRegionsPure = ({
 
       const fixedRegion = { x, y, width, height };
 
-      item.addRegion(fixedRegion);
+      item.addVideoRegion(fixedRegion);
       setNewRegion(null);
     }
   }, [isDrawing, workinAreaCoordinates, videoDimensions]);

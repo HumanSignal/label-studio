@@ -200,9 +200,8 @@ const Model = types
         }
       },
 
-      addRegion(data) {
-        const control = self.videoControl ?? self.timelineControl;
-        const isTimeline = control?.type.includes("timeline");
+      addVideoRegion(data) {
+        const control = self.videoControl;
         const value = {};
 
         if (!control) {
@@ -210,39 +209,44 @@ const Model = types
           return;
         }
 
-        if (isTimeline) {
-          const frame = data.frame ?? self.frame;
-          value.ranges = [{ start: frame, end: frame }];
-        } else {
-          const keyframe = {
+        const sequence = [
+          {
             frame: self.frame,
             enabled: true,
             rotation: 0,
             ...data,
-          };
-          value.sequence = [keyframe];
-        }
+          },
+        ];
 
-        // @todo actually only one attached labeling tag is supported right now for both scenarios.
-        // `createResult()` might unselect all selected labels, so we can't just attach them after.
-        // RichText solved this with `cloneNode()`, but that's not a good way to go.
-        const labelTags = self.activeStates();
-        const labeling = {};
-        if (isTimeline) {
-          // that would be the TimelineLabels
-          const labels = labelTags[0];
-          labeling[labels.valueType] = labels.selectedValues();
-        }
-        const area = self.annotation.createResult(value, labeling, control, self);
+        const area = self.annotation.createResult({ sequence }, {}, control, self);
 
-        if (!isTimeline) {
-          // add labels to the region, they are stored in separated results
-          labelTags.forEach(tag => {
-            area.setValue(tag);
-          });
-        }
+        // add labels
+        self.activeStates().forEach(tag => {
+          area.setValue(tag);
+        });
 
         return area;
+      },
+
+      addTimelineRegion(data) {
+        const control = self.timelineControl;
+
+        if (!control) {
+          console.error("No video timeline control is found");
+          return;
+        }
+
+        const frame = data.frame ?? self.frame;
+        const value = {
+          ranges: [{ start: frame, end: frame }],
+        };
+        // @todo only one attached labeling tag is supported right now :(
+        const labels = self.activeStates()?.[0];
+        const labeling = {
+          [labels.valueType]: labels.selectedValues(),
+        };
+
+        return self.annotation.createResult(value, labeling, control, self);
       },
 
       deleteRegion(id) {
@@ -257,7 +261,7 @@ const Model = types
         const control = self.timelineControl;
         // labels should be selected or allow to create region without labels
         if (!control?.selectedLabels?.length && !control?.allowempty) return;
-        return self.drawingRegion = self.addRegion({ frame, enabled: false });
+        return self.drawingRegion = self.addTimelineRegion({ frame, enabled: false });
       },
 
       finishDrawing() {
