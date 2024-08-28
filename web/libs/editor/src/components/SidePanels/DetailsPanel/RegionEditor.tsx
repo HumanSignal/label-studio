@@ -96,6 +96,8 @@ const RegionEditorComponent: FC<RegionEditorProps> = ({ region }) => {
           isSidepanel={true}
           onChangeStartTime={changeStartTimeHandler}
           onChangeEndTime={changeEndTimeHandler}
+          showLabels
+          showDuration
         />
       </Elem>
     );

@@ -22,6 +22,13 @@
     line-height: 0;
   }
 
+  &_size_small &__text {
+    font-size: 10px;
+    margin: 0;
+    height: 14px;
+    line-height: 14px;
+  }
+
   &_size_large &__text {
     font-weight: 500;
     font-size: 16px;
@@ -42,12 +49,6 @@
   &[data-required] &__text::after {
     content: "Required";
     color: var(--sand_500);
-  }
-
-  &_large &__text {
-    font-size: 16px;
-    font-weight: 500;
-    margin-bottom: 16px;
   }
 
   &_placement_right {

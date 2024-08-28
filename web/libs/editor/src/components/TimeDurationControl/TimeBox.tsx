@@ -1,7 +1,7 @@
 import React, { type FC, useCallback, useEffect, useState } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { MaskUtil } from "../../utils/InputMask";
-import { Label } from "../Label/Label";
+import Label from "../../common/Label/Label";
 
 import "./TimeBox.scss";
 
@@ -9,20 +9,11 @@ export interface TimerProps {
   sidepanel: boolean;
   value: number;
   readonly?: boolean;
-  inverted?: boolean;
   onChange: (value: number) => void;
   label?: string;
 }
 
-export const TimeBox: FC<TimerProps> = ({
-  sidepanel = false,
-  value,
-  inverted = false,
-  readonly = false,
-  onChange,
-  label,
-  ...props
-}) => {
+export const TimeBox: FC<TimerProps> = ({ sidepanel = false, value, readonly = false, onChange, label, ...props }) => {
   const inputRef = React.createRef<HTMLInputElement>();
   const [currentInputTime, setCurrentInputTime] = useState<string | number | undefined>(value);
 
@@ -101,14 +92,13 @@ export const TimeBox: FC<TimerProps> = ({
   };
 
   const timeBoxContent = (
-    <Block name="time-box" mod={{ inverted, sidepanel }} {...props}>
+    <Block name="time-box" mod={{ sidepanel }} {...props}>
       {renderInputTime()}
     </Block>
   );
 
   return label ? (
-    <Label>
-      {label}
+    <Label size="small" flat text={label}>
       {timeBoxContent}
     </Label>
   ) : (

@@ -15,6 +15,8 @@ export interface TimerProps {
   endTimeReadonly?: boolean;
   onChangeStartTime?: (value: number) => void;
   onChangeEndTime?: (value: number) => void;
+  showDuration?: boolean;
+  showLabels?: boolean;
 }
 
 export const TimeDurationControl: FC<TimerProps> = ({
@@ -28,6 +30,8 @@ export const TimeDurationControl: FC<TimerProps> = ({
   endTimeReadonly = false,
   onChangeStartTime,
   onChangeEndTime,
+  showDuration = false,
+  showLabels = false,
 }) => {
   const _currentTime = !currentTime ? startTime : currentTime;
 
@@ -46,7 +50,7 @@ export const TimeDurationControl: FC<TimerProps> = ({
         readonly={startTimeReadonly}
         value={_currentTime}
         onChange={handleChangeCurrentTime}
-        label="Start"
+        label={showLabels ? "Start" : undefined}
         data-testid="timebox-current-time"
       />
       <TimeBox
@@ -55,18 +59,18 @@ export const TimeDurationControl: FC<TimerProps> = ({
         value={endTime}
         onChange={handleChangeEndTime}
         data-testid="timebox-end-time"
-        label="End"
-        inverted
+        label={showLabels ? "End" : undefined}
       />
-      <TimeBox
-        sidepanel={isSidepanel}
-        readonly={true}
-        value={endTime - startTime}
-        onChange={()=> {}}
-        data-testid="timebox-duration-time"
-        label="Duration"
-        inverted
-      />
+      {showDuration && (
+        <TimeBox
+          sidepanel={isSidepanel}
+          readonly={true}
+          value={endTime - startTime}
+          onChange={() => {}}
+          data-testid="timebox-duration-time"
+          label={showLabels ? "Duration" : undefined}
+        />
+      )}
     </Block>
   );
 };

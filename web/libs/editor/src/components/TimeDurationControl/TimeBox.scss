@@ -1,17 +1,13 @@
 .time-box {
   width: 100px;
   height: 24px;
-  border-radius: 4px 0 0 4px;
+  border-radius: 4px;
   border: 1px solid var(--sand_300);
   font-size: 14px;
+  font-weight: 400;
 
   &_sidepanel {
     width: 100%;
-  }
-
-  &_inverted {
-    border-left: none;
-    border-radius: 0 4px 4px 0;
   }
 
   &__input-time {
