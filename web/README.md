@@ -19,17 +19,25 @@ Datamanager is an advanced tool specifically for data exploration within Label S
 - Execute `yarn install --frozen-lockfile` to install all necessary dependencies.
 
 2 - **Environment Configuration:**
+#### Development configuration for LabelStudio
+  - Create an `.env` file located in the root LabelStudio directory if one does not exist. If using docker, add these to the environment section of the `app:` service within a `docker-compose.override.yml` file.
+  - Make the following additions:
+    - `DJANGO_HOSTNAME`: Set this to your Django server instance. For example, `http://localhost:8080`.
+    - `FRONTEND_HOSTNAME`: Set this to where you would like to run the Hot Module Reload server to compile and serve development assets. For example, `http://localhost:8010`
+    - From the root of the LabelStudio project, rerun the app or docker compose service for it to take effect.
+    - In another terminal and from within the `web` directory, run the development server: `yarn ls:dev`
 #### Custom Configuration for DataManager:
 - If you need to customize the configuration specifically for DataManager, follow these steps:
   - Duplicate the `.env.example` file located in the DataManager directory and rename the copy to `.env`.
   - Make your desired changes in this new `.env` file. The key configurations to consider are:
-      - `NX_API_GATEWAY`: Set this to your API root. For example, `https://localhost:8080/api/dm`.
+      - `NX_API_GATEWAY`: Set this to your API root. For example, `http://localhost:8080/api/dm`.
       - `LS_ACCESS_TOKEN`: This is the access token for Label Studio, which can be obtained from your Label Studio account page.
 - This process allows you to have a customized configuration for DataManager, separate from the default settings in the .env.local files.
 
 ## Usage Instructions
 ### Key Development and Build Commands
 - **Label Studio App:**
+    - `yarn ls:dev`: Build the main Label Studio app with Hot Module Reload for development.
     - `yarn ls:watch`: Build the main Label Studio app continuously for development.
     - `yarn ls:e2e`: Run end-to-end tests for the Label Studio app.
     - `yarn ls:unit`: Run unit tests for the Label Studio app.

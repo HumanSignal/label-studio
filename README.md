@@ -142,7 +142,7 @@ You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google
 
 #### Apply frontend changes
 
-For information about updating the frontend, see [label-studio/web/README.md](https://github.com/HumanSignal/label-studio/blob/develop/web/README.md#usage-instructions).
+For information about updating the frontend, see [label-studio/web/README.md](https://github.com/HumanSignal/label-studio/blob/develop/web/README.md#installation-instructions).
 
 
 #### Install dependencies on Windows 

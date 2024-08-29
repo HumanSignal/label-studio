@@ -104,6 +104,8 @@ if HOSTNAME:
             if FORCE_SCRIPT_NAME:
                 logger.info('=> Django URL prefix is set to: %s', FORCE_SCRIPT_NAME)
 
+FRONTEND_HOSTNAME = get_env('FRONTEND_HOSTNAME', HOSTNAME)
+
 DOMAIN_FROM_REQUEST = get_bool_env('DOMAIN_FROM_REQUEST', False)
 
 if DOMAIN_FROM_REQUEST:
