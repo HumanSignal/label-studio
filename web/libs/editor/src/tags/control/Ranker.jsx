@@ -71,8 +71,8 @@ const ORIGINAL_ITEMS_KEY = "_";
  * @name Ranker
  * @meta_title Ranker Tag allows you to rank items in a List or, if Buckets are used, pick relevant items from a List
  * @meta_description Customize Label Studio by sorting results for machine learning and data science projects.
- * @param {string} name    Name of the element
- * @param {string} toName  List tag name to connect to
+ * @param {string} name   Name of the element
+ * @param {string} toName List tag name to connect to
  */
 const Model = types
   .model({
