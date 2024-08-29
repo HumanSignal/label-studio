@@ -1,4 +1,4 @@
-.spinner {
+.spinner-ls {
   --spinner-size: 50px;
   --corner-size: calc(var(--spinner-size) * 0.375);
   --spinner-duration: 2.5s;
@@ -19,7 +19,7 @@
     box-shadow: 0 0 0 calc(var(--spinner-size) * 0.0625) var(--persimmon_400) inset, 0 0 0 calc(var(--spinner-size) * 0.0625) var(--persimmon_400);
     will-change: transform, width, height;
 
-    &:not(.spinner__body_stopped) {
+    &:not(.spinner-ls__body_stopped) {
       animation: logo-spin var(--spinner-duration) ease infinite;
     }
 

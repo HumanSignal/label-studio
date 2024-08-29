@@ -134,11 +134,12 @@ class App extends Component {
 
   _renderAll(obj) {
     if (obj.length === 1) return <Segment annotation={obj[0]}>{[Tree.renderItem(obj[0].root)]}</Segment>;
-
+    const renderAllClassName = cn("renderall").toClassName();
+    const fadeClassName = cn("fade").toClassName();
     return (
-      <div className="ls-renderall">
+      <div className={renderAllClassName}>
         {obj.map((c, i) => (
-          <div key={`all-${i}`} className="ls-fade">
+          <div key={`all-${i}`} className={fadeClassName}>
             <Segment annotation={c}>{[Tree.renderItem(c.root)]}</Segment>
           </div>
         ))}

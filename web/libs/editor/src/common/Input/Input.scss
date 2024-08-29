@@ -1,5 +1,4 @@
-.input:not([type='checkbox']),
-.input:not([type='radio']),
+.input:not([type='checkbox']):not([type='radio']),
 .textarea {
   height: 32px;
   width: 100%;
@@ -12,20 +11,17 @@
   transition: box-shadow 80ms ease;
 }
 
-.input_size_compact:not([type='checkbox']),
-.input_size_compact:not([type='radio']) {
+.input_size_compact:not([type='checkbox']):not([type='radio']) {
   height: 32px;
 }
 
-.input_size_small:not([type='checkbox']),
-.input_size_small:not([type='radio']) {
+.input_size_small:not([type='checkbox']):not([type='radio']) {
   height: 24px;
   font-size: 12px;
   padding: 0 5px;
 }
 
-.input_size_large:not([type='checkbox']),
-.input_size_large:not([type='radio']) {
+.input_size_large:not([type='checkbox']):not([type='radio']) {
   height: 40px;
   font-size: 16px;
 }
@@ -35,8 +31,7 @@
   min-height: 50px;
 }
 
-.input:not([type='checkbox']):focus, 
-.input:not([type='radio']):focus,
+.input:not([type='checkbox']):not([type='radio']):focus,
 .textarea:focus {
   outline: none;
   box-shadow: 0px 0px 0px 6px var(--grape_100), inset 0px -1px 0px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15), inset 0px 0px 0px 1px var(--grape_100);

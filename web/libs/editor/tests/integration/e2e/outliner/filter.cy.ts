@@ -1,5 +1,4 @@
 import { ImageView, Labels, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_LSDV_E_278 } from "../../../../src/utils/feature-flags";
 
 const config = `
   <View>

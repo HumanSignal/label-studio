@@ -70,7 +70,7 @@ export default class Form extends Component {
       <MultiProvider providers={providers}>
         <form
           ref={this.formElement}
-          className={cn("form")}
+          className={cn("form-dm")}
           action={this.props.action}
           onSubmit={this.onFormSubmitted}
           onChange={this.onFormChanged}
@@ -360,7 +360,7 @@ export default class Form extends Component {
 }
 
 const ValidationRenderer = ({ validation }) => {
-  const rootClass = cn("form-validation");
+  const rootClass = cn("form-validation-dm");
 
   return (
     <div className={rootClass}>
@@ -390,7 +390,7 @@ Form.Row = ({ columnCount, rowGap, children, style, spread = false }) => {
   if (rowGap) styles["--row-gap"] = rowGap;
 
   return (
-    <div className={cn("form").elem("row").mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
+    <div className={cn("form-dm").elem("row").mod({ spread })} style={{ ...(style ?? {}), ...styles }}>
       {children}
     </div>
   );
@@ -475,7 +475,7 @@ Form.Builder = forwardRef(
 
     const renderColumns = (columns) => {
       return columns.map((col, index) => (
-        <div className={cn("form").elem("column")} key={index} style={{ width: col.width }}>
+        <div className={cn("form-dm").elem("column")} key={index} style={{ width: col.width }}>
           {renderFields(col.fields)}
         </div>
       ));
@@ -549,7 +549,7 @@ Form.Builder = forwardRef(
 Form.contextType = SDKContext;
 
 Form.Actions = ({ children, valid, extra, size }) => {
-  const rootClass = cn("form");
+  const rootClass = cn("form-dm");
 
   return (
     <div className={rootClass.elem("submit").mod({ size })}>
@@ -564,7 +564,7 @@ Form.Indicator = () => {
   const state = useContext(FormStateContext);
 
   return (
-    <Block name="form-indicator">
+    <Block name="form-indicator-dm">
       <Oneof value={state}>
         <Elem tag="span" mod={{ type: state }} name="item" case="success">
           Saved!
