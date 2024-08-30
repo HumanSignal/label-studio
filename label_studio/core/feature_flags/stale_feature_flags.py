@@ -22,7 +22,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_front_lsdv_4832_new_ranker_tag_120423_short': True,
     'fflag_feat_front_lsdv_4712_skipduplicates_editing_110423_short': True,
     'fflag_fix_back_lsdv_4929_limit_exports_10042023_short': True,
-    'fflag_feat_front_lsdv_3012_syncable_tags_070423_short': True,
     'fflag_feat_front_lsdv_4620_richtext_opimization_060423_short': True,
     'fflag_feat_front_lsdv_4661_full_uri_resolve_15032023_short': True,
     'fflag_fix_back_LSDV_4748_annotate_task_number_14032023_short': True,
