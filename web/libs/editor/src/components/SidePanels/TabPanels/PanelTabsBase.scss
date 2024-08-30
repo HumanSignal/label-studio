@@ -316,7 +316,7 @@
     &[data-resize="top"]::before,
     &[data-resize="bottom"]::before {
       top: 50%;
-      height: var(2px);
+      height: 2px;
       transform: translate(0, -50%);
       width: calc(100% + var(--size));
       left: calc(var(--size) / 2 * -1);
