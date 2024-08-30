@@ -256,7 +256,6 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMoveToolTransfor
     const Shape = shapes[shapeName];
 
     LabelStudio.setFeatureFlags({
-      ff_front_dev_2394_zoomed_transforms_260522_short: true,
       fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short: true,
       fflag_fix_front_dev_3793_relative_coords_short: true,
     });
