@@ -17,7 +17,6 @@ import {
   FF_LLM_EPIC,
   FF_LSDV_3009,
   FF_LSDV_4583,
-  FF_LSDV_4832,
   FF_LSDV_4988,
   FF_REVIEWER_FLOW,
   isFF,
@@ -510,7 +509,7 @@ export const Annotation = types
       let regions = Array.from(self.areas.values());
 
       // remove everything unconditionally
-      if (deleteReadOnly && isFF(FF_LSDV_4832)) {
+      if (deleteReadOnly) {
         self.unselectAll(true);
         self.setIsDrawing(false);
         self.relationStore.deleteAllRelations();

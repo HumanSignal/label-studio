@@ -199,11 +199,6 @@ export const FF_LSDV_4711 = "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_
 export const FF_LSDV_4712 = "fflag_feat_front_lsdv_4712_skipduplicates_editing_110423_short";
 
 /**
- * New Ranker tag; flag is used for `deleteAllRegions()` optimization
- */
-export const FF_LSDV_4832 = "fflag_feat_front_lsdv_4832_new_ranker_tag_120423_short";
-
-/**
  * Fixing issue with missed steps in timeseries with optimized data and zoom
  *
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4881_timeseties_points_missing_140423_short
