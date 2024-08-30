@@ -1,6 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import openai
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -9,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 class ModelProviders(models.TextChoices):
     OPENAI = 'OpenAI', _('OpenAI')
     AZURE_OPENAI = 'AzureOpenAI', _('AzureOpenAI')
+    CUSTOM = 'Custom', _('Custom')
 
 
 class ModelProviderConnectionScopes(models.TextChoices):
@@ -22,6 +22,8 @@ class ModelProviderConnection(models.Model):
     provider = models.CharField(max_length=255, choices=ModelProviders.choices, default=ModelProviders.OPENAI)
 
     api_key = models.TextField(_('api_key'), null=True, blank=True, help_text='Model provider API key')
+
+    auth_token = models.TextField(_('auth_token'), null=True, blank=True, help_text='Model provider Auth token')
 
     deployment_name = models.CharField(max_length=512, null=True, blank=True, help_text='Azure OpenAI deployment name')
 
@@ -59,29 +61,3 @@ class ModelProviderConnection(models.Model):
         return (
             user.is_administrator or user.is_owner or user.is_manager
         ) and user.active_organization_id == self.organization_id
-
-    def validate_api_key(self):
-        """
-        Checks if OpenAI API key provided is valid
-        """
-        if self.provider == ModelProviders.OPENAI:
-            client = openai.OpenAI(api_key=self.api_key)
-            client.models.list()
-        elif self.provider == ModelProviders.AZURE_OPENAI:
-            client = openai.AzureOpenAI(
-                azure_endpoint=self.endpoint,
-                azure_deployment=self.deployment_name,
-                api_key=self.api_key,
-                api_version=settings.OPENAI_API_VERSION,
-            )
-            client.chat.completions.create(
-                model=self.deployment_name,
-                messages=[
-                    {
-                        'role': 'user',
-                        'content': 'Hello, world!',
-                    },
-                ],
-            )
-        else:
-            raise NotImplementedError(f'Verification of API key for provider {self.provider} is not implemented')
