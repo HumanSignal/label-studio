@@ -302,8 +302,9 @@ export const Frames: FC<TimelineViewProps> = ({
 
     if (!isDefined(scroll) || framesInView < 1) return;
 
-    const firstFrame = toSteps(roundToStep(lastOffsetX.current, step), step);
-    const lastFrame = firstFrame + framesInView;
+    // offsets are zero based, but position is 1 based
+    const firstFrame = toSteps(roundToStep(lastOffsetX.current, step), step) + 1;
+    const lastFrame = firstFrame + framesInView - 1;
 
     const positionDelta = Math.abs(position - lastPosition.current);
 
@@ -313,19 +314,19 @@ export const Frames: FC<TimelineViewProps> = ({
     // this ensures the calculation of offset is kept correct.
     // This is needed because the position is not always a multiple of the step
     // and the offset used to calculate the position is always a multiple of the step.
-    if (positionDelta === 1 && position >= firstFrame && position <= lastFrame) {
-      // set to previous frame scroll
-      // if position is 0, then it will be set to 0
-      if (position <= firstFrame) {
+    if (positionDelta === 1 && (position < firstFrame || position > lastFrame)) {
+      // scroll to previous page if we are going outside of the current one
+      if (position < firstFrame) {
         const prevLeft = clamp((firstFrame - 1 - framesInView) * step, 0, scroll.scrollWidth - scroll.clientWidth);
 
         lastScrollPosition.current = roundToStep(prevLeft, step);
 
         setScroll({ left: prevLeft });
 
-        // set to next frame scroll
-        // if position is last frame, then it will be set to last frame scroll
+        // scroll to the next page if we are going outside of the current one
       } else if (position > lastFrame) {
+        // offsets are zero based, but position is 1 based,
+        // so technically that's +1 to go to the next page, but -1 to switch to offsets
         const nextLeft = clamp(lastFrame * step, 0, scroll.scrollWidth - scroll.clientWidth);
 
         lastScrollPosition.current = roundToStep(nextLeft, step);
@@ -339,12 +340,15 @@ export const Frames: FC<TimelineViewProps> = ({
     // Handle position change outside of the current scroll
     // This updates when the user clicks within the track to change the position
     // or when keyframe hops are used and the position is changed more than 1 frame
-    const scrollTo = roundToStep(position, framesInView);
+    const scrollTo = roundToStep(position - 1, framesInView);
+    // how far are we from the start of currently visible window
+    const diff = (position - 1) * step - lastScrollPosition.current;
 
-    if (lastScrollPosition.current !== scrollTo) {
+    if (diff > (framesInView - 1) * step || diff < 0) {
       setScroll({ left: scrollTo * step });
+      // frames
+      lastScrollPosition.current = scrollTo * step;
     }
-    lastScrollPosition.current = scrollTo;
   }, [position, framesInView, step]);
 
   const styles = {

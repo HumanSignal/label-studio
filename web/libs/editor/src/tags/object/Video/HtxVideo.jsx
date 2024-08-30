@@ -150,7 +150,7 @@ const HtxVideoView = ({ item, store }) => {
 
   const setPosition = useCallback(
     (value) => {
-      if (value !== position) {
+      if (value !== position && videoLength) {
         const nextPosition = clamp(value, 1, videoLength);
 
         _setPosition(nextPosition);
