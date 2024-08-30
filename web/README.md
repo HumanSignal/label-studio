@@ -20,12 +20,15 @@ Datamanager is an advanced tool specifically for data exploration within Label S
 
 2 - **Environment Configuration:**
 #### Development configuration for LabelStudio
-  - Create an `.env` file located in the root LabelStudio directory if one does not exist. If using docker, add these to the environment section of the `app:` service within a `docker-compose.override.yml` file.
+  - Create an `.env` file located in the root LabelStudio directory if one does not exist.
   - Make the following additions:
     - `DJANGO_HOSTNAME`: Set this to your Django server instance. For example, `http://localhost:8080`.
     - `FRONTEND_HOSTNAME`: Set this to where you would like to run the Hot Module Reload server to compile and serve development assets. For example, `http://localhost:8010`
-    - From the root of the LabelStudio project, rerun the app or docker compose service for it to take effect.
-    - In another terminal and from within the `web` directory, run the development server: `yarn ls:dev`
+  - If using docker:
+    - Either set the `app:` service to point to this `.env` file by providing a child key in your `docker-compose.override.yml` set: `env_file: .env`.
+    - OR, add these to the `environment:` section of the `app:` service within a `docker-compose.override.yml` file.
+  - From the root of the LabelStudio project, rerun the app or docker compose service for it to take effect.
+  - In another terminal and from within the `web` directory, run the development server: `yarn dev`
 #### Custom Configuration for DataManager:
 - If you need to customize the configuration specifically for DataManager, follow these steps:
   - Duplicate the `.env.example` file located in the DataManager directory and rename the copy to `.env`.

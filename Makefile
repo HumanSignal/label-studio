@@ -20,7 +20,6 @@ docker-run-dev:
 docker-migrate-dev:
 	docker-compose run app python3 /label-studio/label_studio/manage.py migrate
 
-
 # Install modules
 frontend-install:
 	cd web && yarn install --frozen-lockfile;
@@ -31,11 +30,6 @@ frontend-setup: frontend-install
 # Run frontend dev server in Hot Module Replacement mode
 frontend-dev:
 	cd web && yarn run dev
-
-# Keep it here for potential rollback
-## Fetch DM and LSF
-#frontend-fetch:
-#	cd label_studio/frontend && yarn run download:all;
 
 # Build frontend continuously on files changes
 frontend-watch:
