@@ -19,7 +19,7 @@ const isDevelopment = mode !== "production";
 const devtool = process.env.NODE_ENV === "production" ? "source-map" : "cheap-module-source-map";
 const FRONTEND_HOSTNAME = process.env.FRONTEND_HOSTNAME || "http://localhost:8010";
 const DJANGO_HOSTNAME = process.env.DJANGO_HOSTNAME || "http://localhost:8080";
-const HMR_PORT = +(new URL(FRONTEND_HOSTNAME).port);
+const HMR_PORT = +new URL(FRONTEND_HOSTNAME).port;
 
 const LOCAL_ENV = {
   NODE_ENV: mode,

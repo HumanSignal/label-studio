@@ -22,8 +22,15 @@ docker-migrate-dev:
 
 
 # Install modules
-frontend-setup:
+frontend-install:
 	cd web && yarn install --frozen-lockfile;
+
+# Alias for backward compatibility
+frontend-setup: frontend-install
+
+# Run frontend dev server in Hot Module Replacement mode
+frontend-dev:
+	cd web && yarn run dev
 
 # Keep it here for potential rollback
 ## Fetch DM and LSF
