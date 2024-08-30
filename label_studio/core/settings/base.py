@@ -135,6 +135,28 @@ if BASE_DATA_DIR is None:
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
+
+def get_postgresql_options():
+    env_name_to_option_name = {
+        "POSTGRE_SSL_MODE": "sslmode",
+        "POSTGRE_SSLCERT": "sslcert",
+        "POSTGRE_SSLKEY": "sslkey",
+        "POSTGRE_SSLROOTCERT": "sslrootcert",
+    }
+
+    options = {}
+
+    for env_name, option_name in env_name_to_option_name.items():
+        value = get_env(env_name)
+
+        if value is None:
+            continue
+
+        options[option_name] = value
+
+    return options
+
+
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DJANGO_DB_MYSQL = 'mysql'
@@ -151,6 +173,7 @@ DATABASES_ALL = {
         'NAME': get_env('POSTGRE_NAME', 'postgres'),
         'HOST': get_env('POSTGRE_HOST', 'localhost'),
         'PORT': int(get_env('POSTGRE_PORT', '5432')),
+        'OPTIONS': get_postgresql_options(),
     },
     DJANGO_DB_MYSQL: {
         'ENGINE': 'django.db.backends.mysql',
