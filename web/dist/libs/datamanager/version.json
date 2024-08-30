@@ -1,6 +1,6 @@
 {
-  "message": "ci: Fix RichText docs to unblock docs auto-generation (#6250)",
-  "commit": "bafc4d0d320f7230d14522d78c716b2836bd0c7e",
-  "date": "2024-08-23T22:49:05.000Z",
+  "message": "fix: OPTIC-960: Improve the bundling strategy and ship a single entrypoint with a common vendor chunk across all libs (#6163)",
+  "commit": "4aead5381e55dec90a64f7af543147ae8f43a246",
+  "date": "2024-08-30T16:04:34.000Z",
   "branch": "develop"
 }

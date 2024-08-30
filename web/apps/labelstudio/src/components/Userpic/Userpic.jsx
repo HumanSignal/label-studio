@@ -44,7 +44,7 @@ export const Userpic = forwardRef(({ username, size, src, user, className, showU
   }, [finalSrc]);
 
   const userpic = (
-    <Block ref={ref} name="userpic" mix={className} style={style} {...rest}>
+    <Block ref={ref} name="userpic-ls" mix={className} style={style} {...rest}>
       <Elem
         tag="img"
         name="avatar"

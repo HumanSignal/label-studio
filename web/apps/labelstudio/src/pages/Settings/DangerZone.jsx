@@ -106,7 +106,7 @@ export const DangerZone = () => {
 
             return (
               btn.disabled !== true && (
-                <div className={cn("settings-wrapper")}>
+                <div className={cn("settings-wrapper")} key={btn.type}>
                   <h3>{btn.label}</h3>
                   {btn.help && <Label description={btn.help} style={{ width: 600, display: "block" }} />}
                   <Button
