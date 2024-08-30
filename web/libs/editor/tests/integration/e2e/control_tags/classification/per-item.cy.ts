@@ -82,12 +82,11 @@ import {
   TEXTAREA_REQUIRED_WARNING,
 } from "../../../data/control_tags/per-item";
 import { ImageView } from "@humansignal/frontend-test/helpers/LSF";
-import { FF_DEV_2100, FF_LSDV_4583 } from "../../../../../src/utils/feature-flags";
+import { FF_LSDV_4583 } from "../../../../../src/utils/feature-flags";
 
 beforeEach(() => {
   LabelStudio.addFeatureFlagsOnPageLoad({
     [FF_LSDV_4583]: true,
-    [FF_DEV_2100]: true,
   });
 });
 
