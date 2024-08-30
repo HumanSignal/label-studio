@@ -34,7 +34,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_front_dev_4081_magic_wand_tool': True,
     'fflag_fix_front_dev_4075_taxonomy_overlap_281222_short': True,
     'fflag_fix_front_dev_3730_shortcuts_initial_input_22122022_short': True,
-    'fflag_fix_front_dev_3734_hide_task_counter_131222_short': False,
     'ff_back_dev_3865_filters_anno_171222_short': True,
     'fflag_feat_front_dev_3873_labeling_ui_improvements_short': True,
     'fflag_feat_back_dev_3756_queue_enrollment_min_short': False,
