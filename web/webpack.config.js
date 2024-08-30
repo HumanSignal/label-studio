@@ -4,7 +4,10 @@ const { composePlugins, withNx } = require("@nx/webpack");
 const { withReact } = require("@nx/react");
 const { merge } = require("webpack-merge");
 
-require("dotenv").config();
+require("dotenv").config({
+  // resolve the .env file in the root of the project ../
+  path: path.resolve(__dirname, "../.env"),
+});
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { EnvironmentPlugin, DefinePlugin, ProgressPlugin, optimize } = require("webpack");
