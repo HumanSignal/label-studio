@@ -8,7 +8,6 @@ import Types from "../../core/Types";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import SeparatedControlMixin from "../../mixins/SeparatedControlMixin";
 import { ToolManagerMixin } from "../../mixins/ToolManagerMixin";
-import { FF_DEV_2576, isFF } from "../../utils/feature-flags";
 
 const hotkeys = Hotkey("Polygons");
 
@@ -69,21 +68,17 @@ const Model = types
   .actions((self) => {
     return {
       initializeHotkeys() {
-        if (isFF(FF_DEV_2576)) {
-          hotkeys.addNamed("polygon:undo", () => {
-            if (self.annotation.isDrawing) self.annotation.undo();
-          });
-          hotkeys.addNamed("polygon:redo", () => {
-            if (self.annotation.isDrawing) self.annotation.redo();
-          });
-        }
+        hotkeys.addNamed("polygon:undo", () => {
+          if (self.annotation.isDrawing) self.annotation.undo();
+        });
+        hotkeys.addNamed("polygon:redo", () => {
+          if (self.annotation.isDrawing) self.annotation.redo();
+        });
       },
 
       disposeHotkeys() {
-        if (isFF(FF_DEV_2576)) {
-          hotkeys.removeNamed("polygon:undo");
-          hotkeys.removeNamed("polygon:redo");
-        }
+        hotkeys.removeNamed("polygon:undo");
+        hotkeys.removeNamed("polygon:redo");
       },
 
       afterCreate() {
