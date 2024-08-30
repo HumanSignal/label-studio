@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('organizations', '0008_auto_20201005_1552'),
+        ('organizations', '0001_squashed_0008_auto_20201005_1552'),
         # ('tasks', '0038_delete_storagelink'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         # ('organizations', '0004_auto_20200501_1751'),
