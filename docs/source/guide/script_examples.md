@@ -172,23 +172,44 @@ This script automatically applies the same label to all matching text spans. For
 #### Script
 
 ```javascript
- LSI.on('entityCreate', region => {
+LSI.on('entityCreate', region => {
   if (window.BULK_REGIONS) return;
   window.BULK_REGIONS = true;
+
+  const regionTextLength = region.text.length;
+  const regex = new RegExp(region.text, "gi");
+  const matches = Array.from(region.object._value.matchAll(regex));
+
   setTimeout(() => window.BULK_REGIONS = false, 1000);
-  console.log('matches', region.object._value.matchAll(region.text));
-  setTimeout(() => {
-    region.object._value.matchAll(new RegExp(region.text, "gi")).forEach(m => {
-      if (m.index === region.startOffset) return;
-      Htx.annotationStore.selected.createResult(
-        { text: region.text, start: "/span[1]/text()[1]", startOffset: m.index, end: "/span[1]/text()[1]", endOffset: m.index + region.text.length },
-        { labels: [...region.labeling.value.labels] },
-        region.labeling.from_name,
-        region.object,
-      )
-    })
-    Htx.annotationStore.selected.updateObjects()
-  }, 100);
+
+  if (matches.length > 1) {
+    const results = matches.reduce((acc, m) => {
+      if (m.index !== region.startOffset) {
+        acc.push({
+          id: String(Htx.annotationStore.selected.results.length + acc.length + 1),
+          from_name: region.labeling.from_name.name,
+          to_name: region.object.name,
+          type: "labels",
+          value: {
+            text: region.text,
+            start: "/span[1]/text()[1]",
+            startOffset: m.index,
+            end: "/span[1]/text()[1]",
+            endOffset: m.index + regionTextLength,
+            labels: [...region.labeling.value.labels], 
+          },
+          origin: "manual",
+        
+        });
+      }
+      return acc;
+    }, []);
+
+    if (results.length > 0) {
+      Htx.annotationStore.selected.deserializeResults(results);
+      Htx.annotationStore.selected.updateObjects();
+    }
+  }
 });
 ```
 

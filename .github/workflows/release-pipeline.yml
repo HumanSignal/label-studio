@@ -165,7 +165,7 @@ jobs:
     steps:
       - name: Send Notification to Slack
         id: slack_notify_ops_release
-        uses: slackapi/slack-github-action@v1.26
+        uses: slackapi/slack-github-action@v1.27
         with:
           channel-id: '${{ vars.SLACK_CH_RELEASE_TRAIN }}'
           slack-message: |
