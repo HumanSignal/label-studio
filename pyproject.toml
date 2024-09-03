@@ -202,7 +202,7 @@ openai = "^1.10.0"
 
 # Humansignal repo dependencies
 
-label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/9f3dfb6ae8b3d151c6d0f873be12b052c1e79b18.zip"}
+label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/61ffd1132ad566c730b5b9c753a062ec2118f721.zip"}
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"
