@@ -17,19 +17,13 @@ import ProcessAttrsMixin from "../../../mixins/ProcessAttrs";
 import { ReadOnlyControlMixin } from "../../../mixins/ReadOnlyMixin";
 import RequiredMixin from "../../../mixins/Required";
 import { HtxTextAreaRegion, TextAreaRegionModel } from "../../../regions/TextAreaRegion";
-import {
-  FF_DEV_1564_DEV_1565,
-  FF_DEV_3730,
-  FF_LEAD_TIME,
-  FF_LSDV_4583,
-  FF_LSDV_4659,
-  isFF,
-} from "../../../utils/feature-flags";
+import { FF_DEV_3730, FF_LEAD_TIME, FF_LSDV_4583, FF_LSDV_4659, isFF } from "../../../utils/feature-flags";
 import ControlBase from "../Base";
 import ClassificationBase from "../ClassificationBase";
 import "./TextAreaRegionView";
 
-import "./TextArea.styl";
+import "./TextArea.scss";
+import { cn } from "../../../utils/bem";
 
 const { TextArea } = Input;
 
@@ -304,33 +298,24 @@ const Model = types
       },
 
       onShortcut(value) {
-        if (isFF(FF_DEV_1564_DEV_1565)) {
-          if (!isAvailableElement(lastActiveElement, lastActiveElementModel)) {
-            if (isFF(FF_DEV_3730)) {
-              // Try to use main textarea element
-              const textareaElement =
-                self.textareaRef.current?.input || self.textareaRef.current?.resizableTextArea?.textArea;
+        if (!isAvailableElement(lastActiveElement, lastActiveElementModel)) {
+          if (isFF(FF_DEV_3730)) {
+            // Try to use main textarea element
+            const textareaElement =
+              self.textareaRef.current?.input || self.textareaRef.current?.resizableTextArea?.textArea;
 
-              if (isAvailableElement(textareaElement, self)) {
-                lastActiveElement = textareaElement;
-                lastActiveElementModel = self;
-              } else {
-                return;
-              }
+            if (isAvailableElement(textareaElement, self)) {
+              lastActiveElement = textareaElement;
+              lastActiveElementModel = self;
             } else {
               return;
             }
+          } else {
+            return;
           }
-          lastActiveElement.setRangeText(
-            value,
-            lastActiveElement.selectionStart,
-            lastActiveElement.selectionEnd,
-            "end",
-          );
-          lastActiveElementModel.setValue(lastActiveElement.value);
-        } else {
-          self.setValue(self._value + value);
         }
+        lastActiveElement.setRangeText(value, lastActiveElement.selectionStart, lastActiveElement.selectionEnd, "end");
+        lastActiveElementModel.setValue(lastActiveElement.value);
       },
 
       setLastFocusedElement(element, model = self) {
@@ -363,9 +348,7 @@ const HtxTextArea = observer(({ item }) => {
   const rows = Number.parseInt(item.rows);
   const onFocus = useCallback(
     (ev, model) => {
-      if (isFF(FF_DEV_1564_DEV_1565)) {
-        item.setLastFocusedElement(ev.target, model);
-      }
+      item.setLastFocusedElement(ev.target, model);
     },
     [item],
   );
@@ -413,13 +396,14 @@ const HtxTextArea = observer(({ item }) => {
 
   const showAddButton = !item.isReadOnly() && (item.showsubmitbutton ?? rows !== 1);
   const itemStyle = {};
+  const textareaClassName = cn("text-area").toClassName();
 
   if (showAddButton) itemStyle.marginBottom = 0;
 
   visibleStyle.marginTop = "4px";
 
   return item.displaymode === PER_REGION_MODES.TAG ? (
-    <div className="lsf-text-area" style={visibleStyle}>
+    <div className={textareaClassName} style={visibleStyle}>
       {Tree.renderChildren(item, item.annotation)}
 
       {item.showSubmit && (

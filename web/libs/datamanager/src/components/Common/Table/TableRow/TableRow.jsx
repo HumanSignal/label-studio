@@ -4,9 +4,9 @@ import { Block } from "../../../../utils/bem";
 import { FF_LOPS_E_3, isFF } from "../../../../utils/feature-flags";
 import { normalizeCellAlias } from "../../../CellViews";
 import { SkeletonLoader } from "../../SkeletonLoader";
+import "./TableRow.scss";
 import { TableContext, TableElem } from "../TableContext";
 import { getProperty, getStyle } from "../utils";
-import "./TableRow.scss";
 
 const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) => {
   const { Header: _, Cell, id, ...col } = colInput;
@@ -48,10 +48,6 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
 });
 
 export const TableRow = observer(({ data, even, style, wrapperStyle, onClick, stopInteractions, decoration }) => {
-  const classNames = ["table-row"];
-
-  if (data.isLoading) classNames.push("loading");
-
   const { columns, cellViews } = React.useContext(TableContext);
 
   const mods = {
@@ -64,7 +60,7 @@ export const TableRow = observer(({ data, even, style, wrapperStyle, onClick, st
 
   return (
     <TableElem name="row-wrapper" mod={mods} style={wrapperStyle} onClick={(e) => onClick?.(data, e)}>
-      <Block name="table-row" style={style} className={classNames.join(" ")}>
+      <Block name="table-row" style={style}>
         {columns.map((col) => {
           return <CellRenderer key={col.id} col={col} data={data} cellViews={cellViews} decoration={decoration} />;
         })}

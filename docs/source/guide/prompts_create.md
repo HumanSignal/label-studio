@@ -14,19 +14,70 @@ date: 2024-06-11 16:53:16
 
 ## Prerequisites
 
-* An OpenAI API key. 
+* An OpenAI API key or an Azure OpenAI key. 
 * A project that meets the following criteria:
   * Text-based data set (meaning you are annotating text and not image or video files). 
   * The labeling configuration for the project must be set up to use single-class classification (`choice="single"`). 
   * (Optional, depending on your [use case](prompts_overview#Use-cases) and if you want to evaluate the accuracy of your prompt): At least one task with a [ground truth annotation](quality#Define-ground-truth-annotations-for-a-project). 
 
-## API key
+## Model provider API keys
 
-You can only specify one OpenAI API key per organization, and it only needs to be added once. 
+You can specify one OpenAI API key and/or multiple Azure OpenAI keys per organization. Keys only need to be added once. 
 
-Once added, it is automatically used for all new Prompts. 
+Click **API Keys** in the top right of the Prompts page to open the **Model Provider API Keys** window:
+
+![Screenshot of the API keys modal](/images/prompts/model_keys.png)
+
+Once added, you will have the option to select from the base models associated with each API key as you configure your prompts:
+
+![Screenshot of the Base Models drop-down](/images/prompts/base_models.png)
 
 To remove the key, click **API Keys** in the upper right of the Prompts page. You'll have the option to remove the key and add a new one. 
+
+{% details <b>Use an OpenAI key</b> %}
+
+You can only have one OpenAI key per organization. For a list of the OpenAI models we support, see [Features, requirements, and constraints](prompts_overview#Features-requirements-and-constraints). 
+
+You can find your OpenAI API key on the [API key page](https://platform.openai.com/api-keys). 
+
+Once added, all supported OpenAI models will appear in the base model options when you configure your prompt.
+
+{% enddetails %}
+
+{% details <b>Use an Azure OpenAI key</b> %}
+
+Each Azure OpenAI key is tied to a specific deployment, and each deployment comprises a single OpenAI model. So if you want to use multiple models through Azure, you will need to create a deployment for each model and then add each key to Label Studio. 
+
+For a list of the Azure OpenAI models we support, see [Features, requirements, and constraints](prompts_overview#Features-requirements-and-constraints). 
+
+To use Azure OpenAI, you must first create the Azure OpenAI resource and then a model deployment:
+
+1. From the Azure portal, [create an Azure OpenAI resource](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal#create-a-resource). 
+
+!!! note
+    If you are restricting network access to your resource, you will need to add the following IP addresses when configuring network security:
+    
+    * 3.219.3.197
+    * 34.237.73.3
+    * 44.216.17.242
+
+
+2. From Azure OpenAI Studio, [create a deployment](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource?pivots=web-portal#deploy-a-model). This is a base model endpoint. 
+
+When adding the key to Label Studio, you are asked for the following information:
+
+| Field | Description|
+| --- | --- |
+| **Deployment** | The is the name of the deployment. By default, this is the same as the model name, but you can customize it when you create the deployment. If they are different, you must use the deployment name and not the underlying model name. |
+| **Endpoint** | This is the target URI provided by Azure.  |
+| **API key** | This is the key provided by Azure. |
+
+You can find all this information in the **Details** section of the deployment in Azure OpenAI Studio. 
+
+![Screenshot of the Azure deployment details](/images/prompts/azure_deployment.png)
+
+{% enddetails %}
+
 
 ## Create a Prompt
 

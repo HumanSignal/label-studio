@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
 import { IconOutlinerDrag } from "../../../assets/icons";
 import { useDrag } from "../../../hooks/useDrag";
-import { Block, Elem } from "../../../utils/bem";
+import { Block, cn, Elem } from "../../../utils/bem";
 import { DEFAULT_PANEL_HEIGHT } from "../constants";
-import "./Tabs.styl";
+import "./Tabs.scss";
 import { type BaseProps, Side, type TabProps } from "./types";
 import { determineDroppableArea, determineLeftOrRight } from "./utils";
 import { FF_OUTLINER_OPTIM, isFF } from "../../../utils/feature-flags";

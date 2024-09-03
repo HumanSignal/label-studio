@@ -217,7 +217,7 @@ export const Pagination: FC<PaginationProps> = forwardRef<any, PaginationProps>(
     }, []);
 
     return totalPages > 1 || alwaysVisible ? (
-      <Block name="pagination" mod={{ disabled, size, waiting }} style={props.style}>
+      <Block name="pagination-dm" mod={{ disabled, size, waiting }} style={props.style}>
         {props.label && isDefined(pageSize) && showTitle && (
           <Elem name="label">
             {props.label}: {visibleItems.start}-{visibleItems.end}

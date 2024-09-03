@@ -13,18 +13,18 @@
   border-top-color: #cecece !important;
 }
 
-.ls-renderall {
+.renderall {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
 }
 
-.ls-renderall > div {
+.renderall > div {
   width: 49%;
   margin-right: 1%;
 }
 
-.ls-fade {
+.fade {
   opacity: 1;
   animation-name: fadeInOpacity;
   animation-iteration-count: 1;

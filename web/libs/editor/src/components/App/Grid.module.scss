@@ -34,7 +34,7 @@ $gap: 30px;
   height: 100%;
 
   &:hover {
-    background: #eee;
+    background: var(--sand_200);
   }
 }
 
@@ -47,9 +47,9 @@ $gap: 30px;
 }
 
 .grid > div:global(.hover) {
-  background: #eee;
+  background: var(--sand_200);
   h4 {
-    color: #1890ff;
+    color: var(--primary_link);
   }
 }
 

@@ -11,8 +11,8 @@ import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { Button } from "../../common/Button/Button";
 import { Tag } from "../../common/Tag/Tag";
 import { Space } from "../../common/Space/Space";
-import { Block, Elem } from "../../utils/bem";
-import "./Entity.styl";
+import { Block, cn, Elem } from "../../utils/bem";
+import "./Entity.scss";
 import { PER_REGION_MODES } from "../../mixins/PerRegion";
 import { Hotkey } from "../../core/Hotkey";
 import { IconWarning } from "../../assets/icons";
@@ -121,6 +121,9 @@ export default observer(({ store, annotation }) => {
     </Hotkey.Tooltip>,
   );
 
+  const entityStatesClassName = cn("entity-states").toClassName();
+  const entityButtonsClassName = cn("entity-buttons").toClassName();
+
   return (
     <Block name="entity">
       <Elem name="info" tag={Space} spread>
@@ -135,7 +138,7 @@ export default observer(({ store, annotation }) => {
         </Elem>
         {!hasEditableNodes && <Badge count={"readonly"} style={{ backgroundColor: "#ccc" }} />}
       </Elem>
-      <div className={`${styles.statesblk} ls-entity-states`}>
+      <div className={`${styles.statesblk} ${entityStatesClassName}`}>
         {node?.score && (
           <Fragment>
             <Text>
@@ -168,7 +171,7 @@ export default observer(({ store, annotation }) => {
         </Elem>
       )}
 
-      <div className={`${styles.block} ls-entity-buttons`}>
+      <div className={`${styles.block} ${entityButtonsClassName}`}>
         <Space spread>
           <Space>{entityButtons}</Space>
 

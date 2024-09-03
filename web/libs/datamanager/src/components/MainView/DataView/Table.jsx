@@ -9,7 +9,7 @@ import * as CellViews from "../../CellViews";
 import { Icon } from "../../Common/Icon/Icon";
 import { ImportButton } from "../../Common/SDKButtons";
 import { Spinner } from "../../Common/Spinner";
-import { Table } from "../../Common/TableOld/Table";
+import { Table } from "../../Common/Table/Table";
 import { Tag } from "../../Common/Tag/Tag";
 import { Tooltip } from "../../Common/Tooltip/Tooltip";
 import { GridView } from "../GridView/GridView";
@@ -360,7 +360,7 @@ export const DataView = injector(
 
     // Render the UI for your table
     return (
-      <Block name="data-view" className="dm-content" style={{ pointerEvents: isLocked ? "none" : "auto" }}>
+      <Block name="data-view-dm" className="dm-content" style={{ pointerEvents: isLocked ? "none" : "auto" }}>
         {renderContent(content)}
       </Block>
     );

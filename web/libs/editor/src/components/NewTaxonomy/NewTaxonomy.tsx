@@ -4,7 +4,7 @@ import { type ReactNode, useCallback, useEffect, useRef, useState } from "react"
 
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 
-import "./NewTaxonomy.styl";
+import "./NewTaxonomy.scss";
 import { TaxonomySearch, type TaxonomySearchRef } from "./TaxonomySearch";
 
 type TaxonomyPath = string[];

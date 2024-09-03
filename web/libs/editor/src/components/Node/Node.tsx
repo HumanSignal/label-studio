@@ -3,7 +3,7 @@ import { getRoot, getType } from "mobx-state-tree";
 import { observer } from "mobx-react";
 import { ApartmentOutlined, AudioOutlined, LineChartOutlined, MessageOutlined } from "@ant-design/icons";
 
-import "./Node.styl";
+import "./Node.scss";
 import { Block, Elem } from "../../utils/bem";
 import {
   IconBrushTool,

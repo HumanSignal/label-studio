@@ -2,7 +2,7 @@ import React from "react";
 import { Block, Elem } from "../../utils/bem";
 import { isDefined } from "../../utils/helpers";
 import { FormSubmissionContext } from "../Form/FormContext";
-import "./Button.styl";
+import "./Button.scss";
 
 export const Button = React.forwardRef(
   ({ children, type, extra, className, size, waiting, icon, tag, look, ...rest }, ref) => {
@@ -47,7 +47,7 @@ export const Button = React.forwardRef(
     }, [icon, size]);
 
     return (
-      <Block name="button" mod={mods} mix={className} ref={ref} tag={finalTag} type={type} {...rest}>
+      <Block name="button-ls" mod={mods} mix={className} ref={ref} tag={finalTag} type={type} {...rest}>
         <>
           {iconElem && (
             <Elem tag="span" name="icon">
@@ -65,7 +65,7 @@ Button.displayName = "Button";
 
 Button.Group = ({ className, children, collapsed }) => {
   return (
-    <Block name="button-group" mod={{ collapsed }} mix={className}>
+    <Block name="button-group-ls" mod={{ collapsed }} mix={className}>
       {children}
     </Block>
   );

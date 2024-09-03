@@ -129,7 +129,7 @@ jobs:
           fi
 
       - name: Push Docker image
-        uses: docker/build-push-action@v6.6.1
+        uses: docker/build-push-action@v6.7.0
         id: docker_build_and_push
         with:
           context: .
@@ -177,7 +177,7 @@ jobs:
           GITHUB_RUN_ID: "${{ github.run_id }}"
           GITHUB_SHA: "${{ github.sha }}"
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_LSE_BOT_TOKEN }}
-        uses: slackapi/slack-github-action@v1.26
+        uses: slackapi/slack-github-action@v1.27
         with:
           channel-id: 'C01RJV08UJK'
           payload: "{\"text\": \":alert:<!subteam^${{ vars.SLACK_GR_DEVOPS }}>\\n*Branch: ${{ inputs.branch_name }}*\\n*Build status: <https://github.com/${{ env.GITHUB_REPOSITORY }}/actions/runs/${{ env.GITHUB_RUN_ID }}|FAILED>*\\n*Commit: <https://github.com/${{ env.GITHUB_REPOSITORY }}/commit/${{ steps.version.outputs.sha }}|${{ steps.version.outputs.sha }}>*\"}"

@@ -14,7 +14,7 @@ import { createPortal } from "react-dom";
 import { Block, Elem } from "../../utils/bem";
 import { aroundTransition } from "../../utils/transition";
 import { alignElements, type ElementAlignment } from "../../utils/dom";
-import "./Tooltip.styl";
+import "./Tooltip.scss";
 import { useFullscreen } from "../../hooks/useFullscreen";
 
 export interface TooltipProps {

@@ -6,6 +6,10 @@ redis_title: &redis_title
 # 2x2 grid
 redis_params: &redis_params
   - type: text
+    name: db
+    label: Database Number (db)
+    placeholder: 1
+  - type: text
     name: path
     label: Path
   - type: password

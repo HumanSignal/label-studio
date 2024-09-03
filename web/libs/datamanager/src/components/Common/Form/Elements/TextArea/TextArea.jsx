@@ -3,7 +3,7 @@ import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";
 
 const TextArea = ({ label, className, validate, required, skip, labelProps, ...props }) => {
-  const classList = [cn("textarea"), className].join(" ").trim();
+  const classList = [cn("textarea-dm"), className].join(" ").trim();
 
   const input = (
     <FormField label={label} name={props.name} validate={validate} required={required} skip={skip} {...props}>

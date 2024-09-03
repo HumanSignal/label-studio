@@ -4,7 +4,7 @@ import { Block, Elem } from "../../../../utils/bem";
 import { clamp } from "../../../../utils/utilities";
 import { TimelineContext } from "../../Context";
 import type { TimelineRegion } from "../../Types";
-import "./Keypoints.styl";
+import "./Keypoints.scss";
 import { type Lifespan, visualizeLifespans } from "./Utils";
 
 export interface KeypointsProps {

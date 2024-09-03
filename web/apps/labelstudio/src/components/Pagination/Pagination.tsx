@@ -12,7 +12,7 @@ import { Block, Elem } from "../../utils/bem";
 import { clamp, isDefined } from "../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
 import { Select } from "../Form/Elements";
-import "./Pagination.styl";
+import "./Pagination.scss";
 import { useUpdateEffect } from "../../utils/hooks";
 
 interface PaginationProps {
@@ -182,7 +182,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
     }, [props.urlParamName]);
 
     return totalPages > 1 ? (
-      <Block name="pagination" mod={{ disabled, size, waiting }} style={props.style}>
+      <Block name="pagination-ls" mod={{ disabled, size, waiting }} style={props.style}>
         {props.label && isDefined(pageSize) && (
           <Elem name="label">
             {props.label}: {visibleItems.start}-{visibleItems.end}

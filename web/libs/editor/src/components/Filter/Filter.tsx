@@ -5,7 +5,7 @@ import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../../common/Button/Button";
 import { IconFilter } from "../../assets/icons";
 
-import "./Filter.styl";
+import "./Filter.scss";
 import type { FilterInterface, FilterListInterface } from "./FilterInterfaces";
 import { FilterRow } from "./FilterRow";
 import { FilterItems } from "./filter-util";
