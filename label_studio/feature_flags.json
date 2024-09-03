@@ -1,6 +1,33 @@
 {
   "segments": {},
   "flags": {
+    "feat_all_dia_1310_interact_with_ner_predictions_from_prompts": {
+      "key": "feat_all_dia_1310_interact_with_ner_predictions_from_prompts",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "77cb4131f7ec4dd6aa67755b4d262e36",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "feat_all_optic_71_dashboard_multiple_labeling_group_support_v1_01092023_short": {
       "key": "feat_all_optic_71_dashboard_multiple_labeling_group_support_v1_01092023_short",
       "on": false,
@@ -1402,7 +1429,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_feat_all_leap_883_custom_script_270524_short": {

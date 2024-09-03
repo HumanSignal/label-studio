@@ -1,4 +1,4 @@
-.tabs {
+.tabs-dm {
   height: 36px;
   display: flex;
   align-items: stretch;
@@ -40,7 +40,7 @@
       background-color: var(--white);
       box-shadow: -0.5px 0 0 #D9D9D9 inset, 0.5px 0 0 #D9D9D9 inset;
 
-      & .tabs__item-right-button {
+      & .tabs-dm__item-right-button {
         display: flex;
       }
     }
@@ -49,11 +49,11 @@
       background: linear-gradient(180deg, rgba(243, 243, 243, 0) 0%, #F3F3F3 63.89%), repeating-linear-gradient(-45deg, var(--black_5), var(--black_5) 6px, transparent 6px, transparent 12px), #F3F3F3;
     }
 
-    &_virtual.tabs__item_active {
+    &_virtual.tabs-dm__item_active {
       background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 63.89%), repeating-linear-gradient(-45deg, var(--black_5), var(--black_5) 6px, transparent 6px, transparent 12px), var(--white);
     }
 
-    &_hover .tabs__item-right-button {
+    &_hover .tabs-dm__item-right-button {
       display: flex;
     }
   }

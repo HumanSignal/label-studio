@@ -59,4 +59,5 @@ STALE_FEATURE_FLAGS = {
     'ff_dev_2007_rework_choices_280322_short': True,
     'ff_front_dev_1495_avatar_mess_210122_short': True,
     'ff_front_1170_outliner_030222_short': True,
+    'fflag_fix_front_lsdv_4620_memory_leaks_100723_short': False,
 }

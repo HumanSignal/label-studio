@@ -1,6 +1,6 @@
 {
-  "message": "refactor: OPTIC 932 remove stale feature flags (#6260)",
-  "commit": "8e2da1d57a6a84aff29807b9dcf2f00667d45a70",
-  "date": "2024-08-27T14:24:14.000Z",
+  "message": "fix: OPTIC-960: Improve the bundling strategy and ship a single entrypoint with a common vendor chunk across all libs (#6163)",
+  "commit": "4aead5381e55dec90a64f7af543147ae8f43a246",
+  "date": "2024-08-30T16:04:34.000Z",
   "branch": "develop"
 }

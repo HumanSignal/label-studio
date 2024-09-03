@@ -3,7 +3,7 @@ import { cn } from "../../../../utils/bem";
 import "./Label.scss";
 
 const Label = ({ text, children, required, placement, description, size, large, style, simple, flat }) => {
-  const rootClass = cn("label");
+  const rootClass = cn("label-ls");
   const classList = [rootClass];
   const tagName = simple ? "div" : "label";
   const mods = {
