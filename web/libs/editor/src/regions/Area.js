@@ -62,7 +62,7 @@ const Area = types.union(
 
       // @todo dirty hack to distinguish two video types
       if (tag.type === "video") {
-        if (sn.sequence) return VideoRectangleRegionModel;
+        if (sn.sequence || sn.value?.sequence) return VideoRectangleRegionModel;
         return TimelineRegionModel;
       }
 
