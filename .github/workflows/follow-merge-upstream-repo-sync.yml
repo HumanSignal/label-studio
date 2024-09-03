@@ -9,10 +9,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.client_payload.branch_name }}
 
 env:
-  NODE: 18
-  CACHE_NAME_PREFIX: v1
   RELEASE_BRANCH_PREFIX: "ls-release/"
   DOCS_TARGET_DIR: "docs/source/tags/"
+  UPSTREAM_REPO_WORKDIR: "upstream"
 
 jobs:
   open:
@@ -67,6 +66,7 @@ jobs:
           token: ${{ secrets.GIT_PAT }}
           fetch-depth: 0
           ref: ${{ steps.get-branch.outputs.name }}
+          path: "${{ env.UPSTREAM_REPO_WORKDIR }}"
 
       - name: Git Configure
         uses: ./.github/actions-hub/actions/git-configure
@@ -84,47 +84,7 @@ jobs:
           base_branch: ${{ steps.get-branch.outputs.base_name }}
           head_branch: ${{ steps.get-branch.outputs.name }}
           our_files: "pyproject.toml poetry.lock web"
-
-# Frontend
-
-      - name: "Frontend: Checkout module"
-        if: steps.details.outputs.copy_src_path
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.client_payload.repo_name }}
-          path: tmp
-          token: ${{ secrets.GIT_PAT }}
-          fetch-depth: 1
-          ref: ${{ github.event.client_payload.commit_sha }}
-
-      - name: "Frontend: Commit and Push"
-        if: steps.details.outputs.copy_src_path
-        shell: bash
-        env:
-          COPY_SRC_PATH: ${{ steps.details.outputs.copy_src_path }}
-          COPY_SRC_PRESERVE_PATH: ${{ steps.details.outputs.copy_src_preserve_path }}
-        run: |
-          set -xeuo pipefail
-          
-          preserve_dir=$(mktemp -d)
-          if [ -n "${COPY_SRC_PRESERVE_PATH}" ] && [ -d "${COPY_SRC_PRESERVE_PATH}" ]; then
-            echo "Preserving ${COPY_SRC_PRESERVE_PATH}"
-            cp -r "${COPY_SRC_PRESERVE_PATH}" "${preserve_dir}"
-          fi 
-
-          rm -r "${COPY_SRC_PATH}" || true
-          mkdir -p "${COPY_SRC_PATH}"
-          cp -r tmp/src/* "${COPY_SRC_PATH}"
-
-          if [ -n "${COPY_SRC_PRESERVE_PATH}" ]; then
-            echo "Restoring preserved files"
-            cp -rf ${preserve_dir}/* "${COPY_SRC_PATH}"
-          fi 
-
-          git add "${COPY_SRC_PATH}"
-          git status -s
-          git commit --allow-empty -m '[submodules] Copy src ${{ github.event.client_payload.repo_name }}' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-          git push origin HEAD
+          working_directory: "${{ env.UPSTREAM_REPO_WORKDIR }}"
 
 # POETRY
 
@@ -135,6 +95,7 @@ jobs:
       - name: "Poetry: Commit and Push"
         if: steps.details.outputs.poetry
         shell: bash
+        working-directory: "${{ env.UPSTREAM_REPO_WORKDIR }}"
         run: |
           set -xeuo pipefail
 
@@ -144,49 +105,6 @@ jobs:
           git status -s
           git commit --allow-empty -m '[submodules] Bump ${{ github.event.client_payload.repo_name }} version' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
-
-# LSF Docs
-
-      - name: "LSF Docs: Setup nodejs"
-        uses: actions/setup-node@v4
-        if: steps.details.outputs.build_lsf_docs
-        with:
-          node-version: "${{ env.NODE }}"
-
-      - name: "LSF Docs: Cache node modules"
-        if: steps.details.outputs.build_lsf_docs
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: npm-${{ env.CACHE_NAME_PREFIX }}-${{ runner.os }}-node-${{ env.NODE }}-jsdoc-to-markdown
-
-      - name: "LSF Docs: Install NPM deps"
-        if: steps.details.outputs.build_lsf_docs
-        continue-on-error: true
-        working-directory: tmp/scripts
-        run: npm install -g jsdoc-to-markdown node-fetch
-
-      - name: "LSF Docs: Build"
-        id: lsf-docs-build
-        if: steps.details.outputs.build_lsf_docs
-        continue-on-error: true
-        working-directory: tmp/scripts
-        run: NODE_PATH=$(npm root -g) node create-docs.js
-
-      - name: "LSF Docs: Commit and Push"
-        if: steps.details.outputs.build_lsf_docs && steps.lsf-docs-build.conclusion == 'success'
-        continue-on-error: true
-        run: |
-          set -xeuo pipefail
-          docs_target_dir='${{ env.DOCS_TARGET_DIR }}'
-          find "${docs_target_dir}" ! -name 'index.md' -type f -exec rm -rf {} +
-          mkdir -p "${docs_target_dir}"
-          cp -Rf tmp/docs/* "${docs_target_dir}"
-          git status
-          git add "${docs_target_dir}"
-          git commit -m 'docs: LSF Update' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-          git push origin HEAD
-
 
       - name: Find or Create PR
         uses: ./.github/actions-hub/actions/github-find-or-create-pull-request
