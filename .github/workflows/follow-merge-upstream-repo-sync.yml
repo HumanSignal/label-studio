@@ -65,7 +65,7 @@ jobs:
         with:
           token: ${{ secrets.GIT_PAT }}
           fetch-depth: 0
-          ref: ${{ steps.get-branch.outputs.name }}
+          ref: ${{ steps.get-branch.outputs.branch_name }}
           path: "${{ env.UPSTREAM_REPO_WORKDIR }}"
 
       - name: Git Configure
@@ -82,7 +82,7 @@ jobs:
         uses: ./.github/actions-hub/actions/git-merge
         with:
           base_branch: ${{ steps.get-branch.outputs.base_name }}
-          head_branch: ${{ steps.get-branch.outputs.name }}
+          head_branch: ${{ steps.get-branch.outputs.branch_name }}
           our_files: "pyproject.toml poetry.lock web"
           working_directory: "${{ env.UPSTREAM_REPO_WORKDIR }}"
 
