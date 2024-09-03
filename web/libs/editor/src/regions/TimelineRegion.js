@@ -87,13 +87,15 @@ const Model = types
     isInLifespan(targetFrame) {
       return true;
     },
-    // it uses sequence to be compatible with internal video timeline regions format
-    setSequence(sequence) {
-      const [start, end] = sequence;
-
+    /**
+     * Set ranges for the region, for now only one frame,
+     * could be extended to multiple frames in a future in a form of (...ranges)
+     * @param {number[]} [start, end] Start and end frames
+     */
+    setRanges([start, end]) {
       // we need only one item in undo history, so we'll update current one during drawing
       self.parent.annotation.history.setReplaceNextUndoState();
-      self.ranges = [{ start: start.frame, end: end.frame }];
+      self.ranges = [{ start, end }];
     },
   }));
 

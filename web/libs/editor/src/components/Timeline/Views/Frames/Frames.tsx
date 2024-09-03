@@ -217,6 +217,7 @@ export const Frames: FC<TimelineViewProps> = ({
       setIndicatorOffset(offset);
 
       if (isDrawing) {
+        // always a timeline region
         region = props.onStartDrawing?.(baseFrame);
       }
 
@@ -232,7 +233,7 @@ export const Frames: FC<TimelineViewProps> = ({
 
         if (region) {
           const [start, end] = frame > baseFrame ? [baseFrame, frame] : [frame, baseFrame];
-          region.setSequence([{ frame: start, enabled: true }, { frame: end, enabled: false }]);
+          region.setRanges([start, end]);
         }
       };
 

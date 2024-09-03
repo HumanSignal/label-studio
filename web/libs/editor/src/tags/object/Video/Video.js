@@ -257,6 +257,7 @@ const Model = types
         return self.regs.find((reg) => reg.cleanId === id);
       },
 
+      /** Create a new timeline region at a given `frame` (only of labels are selected) */
       startDrawing(frame) {
         const control = self.timelineControl;
         // labels should be selected or allow to create region without labels

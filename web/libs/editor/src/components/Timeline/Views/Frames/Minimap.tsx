@@ -1,9 +1,9 @@
 import { type FC, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Block, Elem } from "../../../../utils/bem";
 import { isDefined } from "../../../../utils/utilities";
+import { TimelineContext } from "../../Context";
 import { visualizeLifespans } from "./Utils";
 import "./Minimap.scss";
-import { TimelineContext } from "../../Context";
 
 export const Minimap: FC<any> = () => {
   const { regions, length } = useContext(TimelineContext);
