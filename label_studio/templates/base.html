@@ -153,5 +153,13 @@
 
 </div>
 
+{% block white_label %}
+{% if request.user.active_organization.billing.white_label|safe %}
+<style>
+  /* white label styles */
+  {{ request.user.active_organization.billing.white_label|safe }}
+</style>
+{% endif %}
+{% endblock %}
 </body>
 </html>
