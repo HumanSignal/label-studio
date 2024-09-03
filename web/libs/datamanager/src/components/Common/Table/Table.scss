@@ -95,7 +95,7 @@
       z-index: 50;
       position: absolute;
       pointer-events: none;
-      box-shadow: 0 0 0 1px rgb(var(--accent_color-raw) 0.8) inset;
+      box-shadow: 0 0 0 1px rgb(var(--accent_color-raw) / 80%) inset;
     }
   }
 

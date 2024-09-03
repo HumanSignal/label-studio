@@ -102,7 +102,7 @@
   &__title {
     padding: 4px 10px;
     font-size: 14px;
-    color: rgba(var(--black-raw), 0.6);
+    color: rgb(var(--black-raw) / 60%);
   }
 
   &__list {

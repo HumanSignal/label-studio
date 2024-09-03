@@ -61,8 +61,8 @@
   &:not(&_ghost):focus,
   &_focused {
     outline: none;
-    box-shadow: 0 0 0 6px rgba(var(--accent_color-raw), 0.2), inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15), inset 0 0 0 1px rgba(var(--accent_color-raw), 0.2);
-    border-color: rgba(var(--accent_color-raw), 0.2);
+    box-shadow: 0 0 0 6px rgb(var(--accent_color-raw) / 20%), inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15), inset 0 0 0 1px rgb(var(--accent_color-raw) / 20%);
+    border-color: rgb(var(--accent_color-raw) / 20%);
   }
 }
 
