@@ -72,7 +72,10 @@
       "splitchannels": {
         "name": "splitchannels",
         "description": "Display multiple audio channels separately, if the audio file has more than one channel. (**NOTE: Requires more memory to operate.**)",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -111,40 +114,59 @@
       "valueType": {
         "name": "valueType",
         "description": "Whether the text is stored directly in uploaded data or needs to be loaded from a URL",
-        "type": ["url", "text"],
+        "type": [
+          "url",
+          "text"
+        ],
         "required": false,
         "default": "text"
       },
       "inline": {
         "name": "inline",
         "description": "Whether to embed HTML directly in Label Studio or use an iframe",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "saveTextResult": {
         "name": "saveTextResult",
         "description": "Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url`",
-        "type": ["yes", "no"],
+        "type": [
+          "yes",
+          "no"
+        ],
         "required": false
       },
       "encoding": {
         "name": "encoding",
         "description": "How to decode values from encoded strings",
-        "type": ["none", "base64", "base64unicode"],
+        "type": [
+          "none",
+          "base64",
+          "base64unicode"
+        ],
         "required": false
       },
       "selectionEnabled": {
         "name": "selectionEnabled",
         "description": "Enable or disable selection",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
       "clickableLinks": {
         "name": "clickableLinks",
         "description": "Whether to allow opening resources from links in the hypertext markup.",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -157,13 +179,21 @@
       "showLabels": {
         "name": "showLabels",
         "description": "Whether or not to show labels next to the region; unset (by default) — use editor settings; true/false — override settings",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "granularity": {
         "name": "granularity",
         "description": "Control region selection granularity",
-        "type": ["symbol", "word", "sentence", "paragraph"],
+        "type": [
+          "symbol",
+          "word",
+          "sentence",
+          "paragraph"
+        ],
         "required": false
       }
     }
@@ -184,10 +214,19 @@
         "type": "string",
         "required": true
       },
+      "valueList": {
+        "name": "valueList",
+        "description": "References a variable that holds a list of image URLs",
+        "type": "string",
+        "required": false
+      },
       "smoothing": {
         "name": "smoothing",
         "description": "Enable smoothing, by default it uses user settings",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "width": {
@@ -207,14 +246,20 @@
       "zoom": {
         "name": "zoom",
         "description": "Enable zooming an image with the mouse wheel",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "negativeZoom": {
         "name": "negativeZoom",
         "description": "Enable zooming out an image",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -228,7 +273,10 @@
       "grid": {
         "name": "grid",
         "description": "Whether to show a grid",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -249,69 +297,94 @@
       "zoomControl": {
         "name": "zoomControl",
         "description": "Show zoom controls in toolbar",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "brightnessControl": {
         "name": "brightnessControl",
         "description": "Show brightness control in toolbar",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "contrastControl": {
         "name": "contrastControl",
         "description": "Show contrast control in toolbar",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "rotateControl": {
         "name": "rotateControl",
         "description": "Show rotate control in toolbar",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "crosshair": {
         "name": "crosshair",
         "description": "Show crosshair cursor",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "horizontalAlignment": {
         "name": "horizontalAlignment",
-        "description": "Where to align image horizontally. Can be one of \"left\", \"center\" or \"right\"",
-        "type": "string",
+        "description": "Where to align image horizontally. Can be one of \"left\", \"center\", or \"right\"",
+        "type": [
+          "left",
+          "center",
+          "right"
+        ],
         "required": false,
         "default": "left"
       },
       "verticalAlignment": {
         "name": "verticalAlignment",
-        "description": "Where to align image vertically. Can be one of \"top\", \"center\" or \"bottom\"",
-        "type": "string",
+        "description": "Where to align image vertically. Can be one of \"top\", \"center\", or \"bottom\"",
+        "type": [
+          "top",
+          "center",
+          "bottom"
+        ],
         "required": false,
         "default": "top"
       },
       "defaultZoom": {
         "name": "defaultZoom",
-        "description": "Specify the initial zoom of the image within the viewport while preserving it’s ratio. Can be one of \"auto\", \"original\" or \"fit\"",
-        "type": "string",
+        "description": "Specify the initial zoom of the image within the viewport while preserving its ratio. Can be one of \"auto\", \"original\", or \"fit\"",
+        "type": [
+          "auto",
+          "original",
+          "fit"
+        ],
         "required": false,
         "default": "fit"
-      },
-      "valuelist": {
-        "name": "valuelist",
-        "description": "References a variable that holds a list of image URLs",
-        "type": "string",
-        "required": false
       },
       "crossOrigin": {
         "name": "crossOrigin",
         "description": "Configures CORS cross domain behavior for this image, either \"none\", \"anonymous\", or \"use-credentials\", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin).",
-        "type": "string",
+        "type": [
+          "none",
+          "anonymous",
+          "use-credentials"
+        ],
         "required": false,
         "default": "none"
       }
@@ -319,7 +392,7 @@
   },
   "List": {
     "name": "List",
-    "description": "The `List` tag is used to display a list of similar items like articles, search results, etc. Task data referred in `value` parameter should be an array of objects with `id`, `title`, and `body` fields.\nIt's much more lightweight than group of other tags like Text. And you can attach classification to provide additional data about this list.\nCan be used with `Ranker` tag to rank items or pick relevant items from a list.\nItems can be styled in `Style` tag by using `.htx-ranker-item` class.",
+    "description": "The `List` tag is used to display a list of similar items like articles, search results, etc. Task data in the `value` parameter should be an array of objects with `id`, `title`, `body`, and `html` fields.\n\nIt's much more lightweight to use `List` than to group other tags like Text. Also, you can attach classifications to provide additional data about this list.\n\nThe `List` tag can be used with the `Ranker` tag to rank items or pick relevant items from a list.\nItems can be styled in `Style` tag by using `.htx-ranker-item` class.",
     "attrs": {
       "name": {
         "name": "name",
@@ -360,7 +433,10 @@
       "valueType": {
         "name": "valueType",
         "description": "Whether the data is stored directly in uploaded JSON data or needs to be loaded from a URL",
-        "type": ["json", "url"],
+        "type": [
+          "json",
+          "url"
+        ],
         "required": false,
         "default": "json"
       },
@@ -379,21 +455,30 @@
       "showPlayer": {
         "name": "showPlayer",
         "description": "Whether to show audio player above the paragraphs. Ignored if sync object is audio",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "saveTextResult": {
         "name": "saveTextResult",
         "description": "Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url`",
-        "type": ["no", "yes"],
+        "type": [
+          "no",
+          "yes"
+        ],
         "required": false,
         "default": "yes"
       },
       "layout": {
         "name": "layout",
         "description": "Whether to use a dialogue-style layout or not",
-        "type": ["none", "dialogue"],
+        "type": [
+          "none",
+          "dialogue"
+        ],
         "required": false,
         "default": "none"
       },
@@ -414,7 +499,10 @@
       "contextScroll": {
         "name": "contextScroll",
         "description": "Turn on contextual scroll mode",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       }
@@ -440,7 +528,7 @@
   },
   "Text": {
     "name": "Text",
-    "description": "The `Text` tag shows text that can be labeled. Use to display any type of text on the labeling interface.\nYou can use `<Style>.htx-text{ white-space: pre-wrap; }</Style>` to preserve all spaces in the text, otherwise spaces are trimmed when displayed.\nEvery space in the text sample is counted when calculating result offsets, for example for NER labeling tasks.\n\nUse with the following data types: text.",
+    "description": "The `Text` tag shows text that can be labeled. Use to display any type of text on the labeling interface.\nYou can use `<Style>.htx-text{ white-space: pre-wrap; }</Style>` to preserve all spaces in the text, otherwise spaces are trimmed when displayed and saved in the results.\nEvery space in the text sample is counted when calculating result offsets, for example for NER labeling tasks.\n\nUse with the following data types: text.",
     "attrs": {
       "name": {
         "name": "name",
@@ -457,26 +545,39 @@
       "valueType": {
         "name": "valueType",
         "description": "Whether the text is stored directly in uploaded data or needs to be loaded from a URL",
-        "type": ["url", "text"],
+        "type": [
+          "url",
+          "text"
+        ],
         "required": false,
         "default": "text"
       },
       "saveTextResult": {
         "name": "saveTextResult",
         "description": "Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url`",
-        "type": ["yes", "no"],
+        "type": [
+          "yes",
+          "no"
+        ],
         "required": false
       },
       "encoding": {
         "name": "encoding",
         "description": "How to decode values from encoded strings",
-        "type": ["none", "base64", "base64unicode"],
+        "type": [
+          "none",
+          "base64",
+          "base64unicode"
+        ],
         "required": false
       },
       "selectionEnabled": {
         "name": "selectionEnabled",
         "description": "Enable or disable selection",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
@@ -489,13 +590,21 @@
       "showLabels": {
         "name": "showLabels",
         "description": "Whether or not to show labels next to the region; unset (by default) — use editor settings; true/false — override settings",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "granularity": {
         "name": "granularity",
         "description": "Control region selection granularity",
-        "type": ["symbol", "word", "sentence", "paragraph"],
+        "type": [
+          "symbol",
+          "word",
+          "sentence",
+          "paragraph"
+        ],
         "required": false
       }
     }
@@ -519,7 +628,10 @@
       "valueType": {
         "name": "valueType",
         "description": "Format of time series data provided. If set to \"url\" then Label Studio loads value references inside `value` key, otherwise it expects JSON.",
-        "type": ["url", "json"],
+        "type": [
+          "url",
+          "json"
+        ],
         "required": false,
         "default": "url"
       },
@@ -570,7 +682,10 @@
       "fixedScale": {
         "name": "fixedScale",
         "description": "Whether to scale y-axis to the maximum to fit all the values. If false, current view scales to fit only the displayed values.",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       }
@@ -666,7 +781,10 @@
       "fixedScale": {
         "name": "fixedScale",
         "description": "if false current view scales to fit only displayed values; if given overwrites TimeSeries' fixedScale",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       }
     }
@@ -703,7 +821,10 @@
       "muted": {
         "name": "muted",
         "description": "muted video",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -735,7 +856,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether the data labeler can select one or multiple labels",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
@@ -748,20 +872,29 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
       "smart": {
         "name": "smart",
         "description": "Show smart tool for interactive pre-annotations",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "smartOnly": {
         "name": "smartOnly",
         "description": "Only show smart tool for interactive pre-annotations",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       }
     }
@@ -785,7 +918,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether the data labeler can select one or multiple labels",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
@@ -798,7 +934,10 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       }
@@ -806,7 +945,7 @@
   },
   "Choice": {
     "name": "Choice",
-    "description": "The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.\n\n[^FF_DEV_2007]: `ff_dev_2007_rework_choices_280322_short` should be enabled to use `html` attribute\n[^FF_PROD_309]: The `hint` attribute works only when `fflag_feat_front_prod_309_choice_hint_080523_short` is enabled",
+    "description": "The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.",
     "attrs": {
       "value": {
         "name": "value",
@@ -817,7 +956,10 @@
       "selected": {
         "name": "selected",
         "description": "Specify whether to preselect this choice on the labeling interface",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "alias": {
@@ -840,13 +982,19 @@
       },
       "html": {
         "name": "html",
-        "description": "can be used to show enriched content[^FF_DEV_2007], it has higher priority than `value`, however `value` will be used in the exported result (should be properly escaped)",
+        "description": "Can be used to show enriched content, it has higher priority than `value`, however `value` will be used in the exported result (should be properly escaped)",
         "type": "string",
         "required": false
       },
       "hint": {
         "name": "hint",
-        "description": "Hint for choice on hover[^FF_PROD_309]",
+        "description": "Hint for choice on hover",
+        "type": "string",
+        "required": false
+      },
+      "color": {
+        "name": "color",
+        "description": "Color for Taxonomy item",
         "type": "string",
         "required": false
       }
@@ -854,7 +1002,7 @@
   },
   "Choices": {
     "name": "Choices",
-    "description": "The `Choices` tag is used to create a group of choices, with radio buttons or checkboxes. It can be used for single or multi-class classification. Also, it is used for advanced classification tasks where annotators can choose one or multiple answers.\n\nChoices can have dynamic value to load labels from task. This task data should contain a list of options to create underlying `<Choice>`s. All the parameters from options will be transferred to corresponding tags.\n\nThe `Choices` tag can be used with any data types.\n\n[^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality.\n[^FF_DEV_2007]: `ff_dev_2007_rework_choices_280322_short` should be enabled to use `html` attribute",
+    "description": "The `Choices` tag is used to create a group of choices, with radio buttons or checkboxes. It can be used for single or multi-class classification. Also, it is used for advanced classification tasks where annotators can choose one or multiple answers.\n\nChoices can have dynamic value to load labels from task. This task data should contain a list of options to create underlying `<Choice>`s. All the parameters from options will be transferred to corresponding tags.\n\nThe `Choices` tag can be used with any data types.",
     "attrs": {
       "name": {
         "name": "name",
@@ -871,21 +1019,31 @@
       "choice": {
         "name": "choice",
         "description": "Single or multi-class classification",
-        "type": ["single", "single-radio", "multiple"],
+        "type": [
+          "single",
+          "single-radio",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
       "showInline": {
         "name": "showInline",
         "description": "Show choices in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "required": {
         "name": "required",
         "description": "Validate whether a choice has been selected",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -897,8 +1055,13 @@
       },
       "visibleWhen": {
         "name": "visibleWhen",
-        "description": "Control visibility of the choices.",
-        "type": ["region-selected", "choice-selected", "no-region-selected"],
+        "description": "Control visibility of the choices. Can also be used with `when*` attributes below to narrow down visibility",
+        "type": [
+          "region-selected",
+          "no-region-selected",
+          "choice-selected",
+          "choice-unselected"
+        ],
         "required": false
       },
       "whenTagName": {
@@ -909,26 +1072,32 @@
       },
       "whenLabelValue": {
         "name": "whenLabelValue",
-        "description": "Narrow down visibility by label value",
+        "description": "Use with visibleWhen=\"region-selected\". Narrow down visibility by label value",
         "type": "string",
         "required": false
       },
       "whenChoiceValue": {
         "name": "whenChoiceValue",
-        "description": "Narrow down visibility by choice value",
+        "description": "Use with visibleWhen (\"choice-selected\" or \"choice-unselected\") and whenTagName, both are required. Narrow down visibility by choice value",
         "type": "string",
         "required": false
       },
       "perRegion": {
         "name": "perRegion",
         "description": "Use this tag to select a choice for a specific region instead of the entire task",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "perItem": {
         "name": "perItem",
-        "description": "Use this tag to select a choice for a specific item inside the object instead of the whole object[^FF_LSDV_4583]",
-        "type": ["true", "false"],
+        "description": "Use this tag to select a choice for a specific item inside the object instead of the whole object",
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "value": {
@@ -940,14 +1109,17 @@
       "allowNested": {
         "name": "allowNested",
         "description": "Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one.",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       }
     }
   },
   "DateTime": {
     "name": "DateTime",
-    "description": "The DateTime tag adds date and time selection to the labeling interface. Use this tag to add a date, timestamp, month, or year to an annotation.\n\nUse with the following data types: audio, image, HTML, paragraph, text, time series, video\n\n[^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality",
+    "description": "The DateTime tag adds date and time selection to the labeling interface. Use this tag to add a date, timestamp, month, or year to an annotation.\n\nUse with the following data types: audio, image, HTML, paragraph, text, time series, video",
     "attrs": {
       "name": {
         "name": "name",
@@ -988,7 +1160,10 @@
       "required": {
         "name": "required",
         "description": "Whether datetime is required or not",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -1001,13 +1176,19 @@
       "perRegion": {
         "name": "perRegion",
         "description": "Use this option to label regions instead of the whole object",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "perItem": {
         "name": "perItem",
-        "description": "Use this option to label items inside the object instead of the whole object[^FF_LSDV_4583]",
-        "type": ["true", "false"],
+        "description": "Use this option to label items inside the object instead of the whole object",
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       }
     }
@@ -1058,20 +1239,29 @@
       "canRotate": {
         "name": "canRotate",
         "description": "Show or hide rotation control",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
       "smart": {
         "name": "smart",
         "description": "Show smart tool for interactive pre-annotations",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "smartOnly": {
         "name": "smartOnly",
         "description": "Only show smart tool for interactive pre-annotations",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       }
     }
@@ -1095,7 +1285,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
@@ -1108,7 +1301,10 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
@@ -1141,7 +1337,10 @@
       "canRotate": {
         "name": "canRotate",
         "description": "Show or hide rotation option",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       }
@@ -1166,7 +1365,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure if you can select one or multiple labels",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
@@ -1179,7 +1381,10 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       }
@@ -1232,14 +1437,30 @@
       "smart": {
         "name": "smart",
         "description": "Show smart tool for interactive pre-annotations",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "smartOnly": {
         "name": "smartOnly",
         "description": "Only show smart tool for interactive pre-annotations",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap keypoint to image pixels",
+        "type": [
+          "pixel",
+          "none"
+        ],
+        "required": false,
+        "default": "none"
       }
     }
   },
@@ -1262,7 +1483,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
@@ -1275,7 +1499,10 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
@@ -1292,6 +1519,16 @@
         "type": "number",
         "required": false,
         "default": 1
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap keypoint to image pixels",
+        "type": [
+          "pixel",
+          "none"
+        ],
+        "required": false,
+        "default": "none"
       }
     }
   },
@@ -1308,7 +1545,10 @@
       "selected": {
         "name": "selected",
         "description": "Whether to preselect this label",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -1339,7 +1579,10 @@
       "showAlias": {
         "name": "showAlias",
         "description": "Whether to show alias inside label text",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -1374,13 +1617,22 @@
       "granularity": {
         "name": "granularity",
         "description": "Set control based on symbol or word selection (only for Text)",
-        "type": ["symbol", "word"],
+        "type": [
+          "symbol",
+          "word"
+        ],
         "required": false
       },
       "html": {
         "name": "html",
         "description": "HTML code is used to display label button instead of raw text provided by `value` (should be properly escaped)",
         "type": "string",
+        "required": false
+      },
+      "category": {
+        "name": "category",
+        "description": "Category is used in the export (in label-studio-converter lib) to make an order of labels for YOLO and COCO",
+        "type": "int",
         "required": false
       }
     }
@@ -1404,7 +1656,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels for a region",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
@@ -1417,7 +1672,10 @@
       "showInline": {
         "name": "showInline",
         "description": "Whether to show labels in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
@@ -1458,7 +1716,7 @@
   },
   "Magicwand": {
     "name": "Magicwand",
-    "description": "The `Magicwand` tag makes it possible to click in a region of an image a user is doing segmentation\nlabeling on, drag the mouse to dynamically change flood filling tolerance, then release the mouse button\nto get a new labeled area. It is particularly effective at segmentation labeling broad, diffuse, complex\nedged objects, such as clouds, cloud shadows, snow, etc. in earth observation applications or organic\nshapes in biomedical applications.\n\nUse with the following data types: image.\n\nZooming is supported for the Magic Wand, but it will not work on rotated images.\n\nExample of the Magic Wand in use:\n\n![Animated GIF showing Magic Wand clicking on cloud and dragging, automatically segmenting and selecting\npixels to create a mask](../images/magicwand_example.gif)\n\n### Feature Flag\n\nThe Magic Wand is currently turned off by default behind a feature flag. If you want to turn it on, you\nmust enable it by either:\n- Setting an environment variable when starting the Label Studio server, either by starting up the\n  server with `fflag_feat_front_dev_4081_magic_wand_tool=1 label-studio`, or manually finding the flag\n`flag_feat_front_dev_4081_magic_wand_tool` and setting it to true.\n\n### CORS Configuration\n\nThe Magic Wand requires pixel-level access to images that are being labelled in order to do its\nthresholding and flood filling. If you are hosting your images to label on a third-party domain,\nyou will need to enable CORS headers for the Magic Wand to work with cross domain HTTP `GET`\nrequests in order for the Magic Wand to be able to threshold the actual image pixel data. See the\n[Label Studio storage guide](../guide/storage.html#Troubleshoot-CORS-and-access-problems) for more\ndetails on configuring CORS.\n\n### `Image` Tag Configuration\n\nThe `Magicwand` tag is configured to work with an `Image` tag that it will operate on for labeling.\nIf you are storing an image cross-domain that the `Image` tag will reference, you will have to\ncorrectly setup the `crossOrigin` on the `Image` attribute. This attribute mimics the same\n`crossOrigin` attribute that a normal DOM `img` tag would\nhave ([reference])(https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin).\n\nIf the image is on a public server or Google/AWS/Azure bucket that is publicly readable\nwithout any authentication, you should set `crossOrigin` to `anonymous`.\n\nIf the image is on a server or a private cloud bucket that requires authentication of any\nkind (i.e. the request must have HTTP headers that prove authentication set along with the\nthird party request), then you should set `crossOrigin` to `use-credentials`. Note that Google's\ncloud buckets [do not support authenticated requests for CORS requests](https://cloud.google.com/storage/docs/cross-origin#additional_considerations),\nwhich  means you either need to make that Google bucket world readable to work with the Magic Wand, or\nuse Label Studio's signed URL support ([AWS](../guide/storage.html#Set-up-connection-in-the-Label-Studio-UI),\n[GCP](../guide/storage.html#Set-up-connection-in-the-Label-Studio-UI-1), and\n[Azure](../guide/storage.html#Set-up-connection-in-the-Label-Studio-UI-2)).\n\nIf the image is on the same host as your Label Studio instance, you can simply leave off the\n`crossOrigin` attribute or set it to `none`.",
+    "description": "The `Magicwand` tag makes it possible to click in a region of an image a user is doing segmentation\nlabeling on, drag the mouse to dynamically change flood filling tolerance, then release the mouse button\nto get a new labeled area. It is particularly effective at segmentation labeling broad, diffuse, complex\nedged objects, such as clouds, cloud shadows, snow, etc. in earth observation applications or organic\nshapes in biomedical applications.\n\nUse with the following data types: image.\n\nZooming is supported for the Magic Wand, but it will not work on rotated images.\n\nExample of the Magic Wand in use:\n\n![Animated GIF showing Magic Wand clicking on cloud and dragging, automatically segmenting and selecting\npixels to create a mask](../images/magicwand_example.gif)\n\n### CORS Configuration\n\nThe Magic Wand requires pixel-level access to images that are being labelled in order to do its\nthresholding and flood filling. If you are hosting your images to label on a third-party domain,\nyou will need to enable CORS headers for the Magic Wand to work with cross domain HTTP `GET`\nrequests in order for the Magic Wand to be able to threshold the actual image pixel data. See the\n[Label Studio storage guide](../guide/storage.html#Troubleshoot-CORS-and-access-problems) for more\ndetails on configuring CORS.\n\n### `Image` Tag Configuration\n\nThe `Magicwand` tag is configured to work with an `Image` tag that it will operate on for labeling.\nIf you are storing an image cross-domain that the `Image` tag will reference, you will have to\ncorrectly setup the `crossOrigin` on the `Image` attribute. This attribute mimics the same\n`crossOrigin` attribute that a normal DOM `img` tag would\nhave ([reference])(https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin).\n\nIf the image is on a public server or Google/AWS/Azure bucket that is publicly readable\nwithout any authentication, you should set `crossOrigin` to `anonymous`.\n\nIf the image is on a server or a private cloud bucket that requires authentication of any\nkind (i.e. the request must have HTTP headers that prove authentication set along with the\nthird party request), then you should set `crossOrigin` to `use-credentials`. Note that Google's\ncloud buckets [do not support authenticated requests for CORS requests](https://cloud.google.com/storage/docs/cross-origin#additional_considerations),\nwhich  means you either need to make that Google bucket world readable to work with the Magic Wand, or\nuse Label Studio's signed URL support ([AWS](../guide/storage.html#Set-up-connection-in-the-Label-Studio-UI),\n[GCP](../guide/storage.html#Set-up-connection-in-the-Label-Studio-UI-1), and\n[Azure](../guide/storage.html#Set-up-connection-in-the-Label-Studio-UI-2)).\n\nIf the image is on the same host as your Label Studio instance, you can simply leave off the\n`crossOrigin` attribute or set it to `none`.",
     "attrs": {
       "name": {
         "name": "name",
@@ -1497,7 +1755,7 @@
   },
   "Number": {
     "name": "Number",
-    "description": "The Number tag supports numeric classification. Use to classify tasks using numbers.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video\n\n[^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality",
+    "description": "The Number tag supports numeric classification. Use to classify tasks using numbers.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video",
     "attrs": {
       "name": {
         "name": "name",
@@ -1544,8 +1802,11 @@
       },
       "required": {
         "name": "required",
-        "description": "Whether to require number validation",
-        "type": ["true", "false"],
+        "description": "Whether number is required or not",
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -1558,19 +1819,28 @@
       "perRegion": {
         "name": "perRegion",
         "description": "Use this tag to classify specific regions instead of the whole object",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "perItem": {
         "name": "perItem",
-        "description": "Use this tag to classify specific items inside the object instead of the whole object[^FF_LSDV_4583]",
-        "type": ["true", "false"],
+        "description": "Use this tag to classify specific items inside the object instead of the whole object",
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "slider": {
         "name": "slider",
         "description": "Use slider look instead of input; use min and max to add your constraints",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       }
@@ -1619,7 +1889,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
@@ -1632,7 +1905,10 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       }
@@ -1685,28 +1961,51 @@
       "pointSize": {
         "name": "pointSize",
         "description": "Size of polygon handle points",
-        "type": ["small", "medium", "large"],
+        "type": [
+          "small",
+          "medium",
+          "large"
+        ],
         "required": false,
         "default": "small"
       },
       "pointStyle": {
         "name": "pointStyle",
         "description": "Style of points",
-        "type": ["rectangle", "circle"],
+        "type": [
+          "rectangle",
+          "circle"
+        ],
         "required": false,
         "default": "circle"
       },
       "smart": {
         "name": "smart",
         "description": "Show smart tool for interactive pre-annotations",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "smartOnly": {
         "name": "smartOnly",
         "description": "Only show smart tool for interactive pre-annotations",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap polygon to image pixels",
+        "type": [
+          "pixel",
+          "none"
+        ],
+        "required": false,
+        "default": "none"
       }
     }
   },
@@ -1729,7 +2028,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
@@ -1742,7 +2044,10 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
@@ -1775,16 +2080,33 @@
       "pointSize": {
         "name": "pointSize",
         "description": "Size of polygon handle points",
-        "type": ["small", "medium", "large"],
+        "type": [
+          "small",
+          "medium",
+          "large"
+        ],
         "required": false,
         "default": "medium"
       },
       "pointStyle": {
         "name": "pointStyle",
         "description": "Style of points",
-        "type": ["rectangle", "circle"],
+        "type": [
+          "rectangle",
+          "circle"
+        ],
         "required": false,
         "default": "rectangle"
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap polygon to image pixels",
+        "type": [
+          "pixel",
+          "none"
+        ],
+        "required": false,
+        "default": "none"
       }
     }
   },
@@ -1808,7 +2130,7 @@
   },
   "Rating": {
     "name": "Rating",
-    "description": "The `Rating` tag adds a rating selection to the labeling interface. Use for labeling tasks involving ratings.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.\n\n[^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality",
+    "description": "The `Rating` tag adds a rating selection to the labeling interface. Use for labeling tasks involving ratings.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.",
     "attrs": {
       "name": {
         "name": "name",
@@ -1839,14 +2161,23 @@
       "size": {
         "name": "size",
         "description": "Rating icon size",
-        "type": ["small", "medium", "large"],
+        "type": [
+          "small",
+          "medium",
+          "large"
+        ],
         "required": false,
         "default": "medium"
       },
       "icon": {
         "name": "icon",
         "description": "Rating icon",
-        "type": ["star", "heart", "fire", "smile"],
+        "type": [
+          "star",
+          "heart",
+          "fire",
+          "smile"
+        ],
         "required": false,
         "default": "star"
       },
@@ -1859,7 +2190,10 @@
       "required": {
         "name": "required",
         "description": "Whether rating validation is required",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -1872,13 +2206,19 @@
       "perRegion": {
         "name": "perRegion",
         "description": "Use this tag to rate regions instead of the whole object",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "perItem": {
         "name": "perItem",
-        "description": "Use this tag to rate items inside the object instead of the whole object[^FF_LSDV_4583]",
-        "type": ["true", "false"],
+        "description": "Use this tag to rate items inside the object instead of the whole object",
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       }
     }
@@ -1929,20 +2269,29 @@
       "canRotate": {
         "name": "canRotate",
         "description": "Whether to show or hide rotation control",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
       "smart": {
         "name": "smart",
         "description": "Show smart tool for interactive pre-annotations",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "smartOnly": {
         "name": "smartOnly",
         "description": "Only show smart tool for interactive pre-annotations",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       }
     }
@@ -1966,7 +2315,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
@@ -1979,7 +2331,10 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
@@ -2012,7 +2367,10 @@
       "canRotate": {
         "name": "canRotate",
         "description": "Show or hide rotation control",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       }
@@ -2043,7 +2401,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       }
@@ -2082,7 +2443,7 @@
   },
   "Taxonomy": {
     "name": "Taxonomy",
-    "description": "The `Taxonomy` tag is used to create one or more hierarchical classifications, storing both choice selections and their ancestors in the results. Use for nested classification tasks with the `Choice` tag.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.\n\n[^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality",
+    "description": "The `Taxonomy` tag is used to create one or more hierarchical classifications, storing both choice selections and their ancestors in the results. Use for nested classification tasks with the `Choice` tag.\n\nYou can define nested classifications using the `Choice` tag, or retrieve external classifications using the `apiUrl` parameter. For more information on these options, see the [Taxonomy template page](/templates/taxonomy).\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.",
     "attrs": {
       "name": {
         "name": "name",
@@ -2096,30 +2457,42 @@
         "type": "string",
         "required": true
       },
+      "apiUrl": {
+        "name": "apiUrl",
+        "description": "**Beta** -- Retrieve the taxonomy from a remote source. This can be a JSON-formatted file or a hierarchical data source read as an API. For more information, see the [Taxonomy template page](/templates/taxonomy)",
+        "type": "string",
+        "required": false
+      },
       "leafsOnly": {
         "name": "leafsOnly",
         "description": "Allow annotators to select only leaf nodes of taxonomy",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "showFullPath": {
         "name": "showFullPath",
         "description": "Whether to show the full path of selected items",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "pathSeparator": {
         "name": "pathSeparator",
-        "description": "Separator to show in the full path",
+        "description": "Separator to show in the full path (default is \" / \"). To avoid errors, ensure that your data does not include this separator",
         "type": "string",
         "required": false,
         "default": "/"
       },
       "maxUsages": {
         "name": "maxUsages",
-        "description": "Maximum number of times a choice can be selected per task",
+        "description": "Maximum number of times a choice can be selected per task or per region",
         "type": "number",
         "required": false
       },
@@ -2138,7 +2511,10 @@
       "required": {
         "name": "required",
         "description": "Whether taxonomy validation is required",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -2157,20 +2533,35 @@
       "perRegion": {
         "name": "perRegion",
         "description": "Use this tag to classify specific regions instead of the whole object",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "perItem": {
         "name": "perItem",
-        "description": "Use this tag to classify specific items inside the object instead of the whole object[^FF_LSDV_4583]",
-        "type": ["true", "false"],
+        "description": "Use this tag to classify specific items inside the object instead of the whole object",
+        "type": [
+          "true",
+          "false"
+        ],
+        "required": false
+      },
+      "legacy": {
+        "name": "legacy",
+        "description": "Use this tag to enable the legacy version of the Taxonomy tag. The legacy version supports the ability for annotators to add labels as needed. However, when true, the `apiUrl` parameter is not usable.",
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       }
     }
   },
   "TextArea": {
     "name": "TextArea",
-    "description": "The `TextArea` tag is used to display a text area for user input. Use for transcription, paraphrasing, or captioning tasks.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.\n\n[^FF_LSDV_4659]: `fflag_feat_front_lsdv_4659_skipduplicates_060323_short` should be enabled to use `skipDuplicates` attribute\n[^FF_LSDV_4712]: `fflag_feat_front_lsdv_4712_skipduplicates_editing_110423_short` should be enabled to keep submissions unique during editing existed results\n[^FF_LSDV_4583]: `fflag_feat_front_lsdv_4583_multi_image_segmentation_short` should be enabled for `perItem` functionality",
+    "description": "The `TextArea` tag is used to display a text area for user input. Use for transcription, paraphrasing, or captioning tasks.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.",
     "attrs": {
       "name": {
         "name": "name",
@@ -2211,23 +2602,42 @@
       "editable": {
         "name": "editable",
         "description": "Whether to display an editable textarea",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "skipDuplicates": {
         "name": "skipDuplicates",
-        "description": "Prevent duplicates in textarea inputs[^FF_LSDV_4659][^FF_LSDV_4712] (see example below)",
-        "type": ["true", "false"],
+        "description": "Prevent duplicates in textarea inputs",
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
       "transcription": {
         "name": "transcription",
         "description": "If false, always show editor",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
+      },
+      "displayMode": {
+        "name": "displayMode",
+        "description": "Display mode for the textarea; region-list shows it for every region in regions list",
+        "type": [
+          "tag",
+          "region-list"
+        ],
+        "required": false,
+        "default": "tag"
       },
       "rows": {
         "name": "rows",
@@ -2238,7 +2648,10 @@
       "required": {
         "name": "required",
         "description": "Validate whether content in textarea is required",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       },
@@ -2251,19 +2664,28 @@
       "showSubmitButton": {
         "name": "showSubmitButton",
         "description": "Whether to show or hide the submit button. By default it shows when there are more than one rows of text, such as in textarea mode.",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "perRegion": {
         "name": "perRegion",
         "description": "Use this tag to label regions instead of whole objects",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       },
       "perItem": {
         "name": "perItem",
-        "description": "Use this tag to label items inside objects instead of whole objects[^FF_LSDV_4583]",
-        "type": ["true", "false"],
+        "description": "Use this tag to label items inside objects instead of whole objects",
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false
       }
     }
@@ -2287,7 +2709,10 @@
       "choice": {
         "name": "choice",
         "description": "Configure whether you can select one or multiple labels",
-        "type": ["single", "multiple"],
+        "type": [
+          "single",
+          "multiple"
+        ],
         "required": false,
         "default": "single"
       },
@@ -2300,7 +2725,10 @@
       "showInline": {
         "name": "showInline",
         "description": "Show labels in the same visual line",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
@@ -2359,7 +2787,10 @@
       "accordion": {
         "name": "accordion",
         "description": "Works as an accordion",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": true
       },
@@ -2430,7 +2861,10 @@
       "underline": {
         "name": "underline",
         "description": "Whether to underline the header",
-        "type": ["true", "false"],
+        "type": [
+          "true",
+          "false"
+        ],
         "required": false,
         "default": false
       }
@@ -2460,7 +2894,10 @@
     "attrs": {
       "display": {
         "name": "display",
-        "type": ["block", "inline"],
+        "type": [
+          "block",
+          "inline"
+        ],
         "required": true
       },
       "style": {
@@ -2475,27 +2912,38 @@
         "type": "string",
         "required": false
       },
+      "idAttr": {
+        "name": "idAttr",
+        "description": "Unique ID attribute to use in CSS",
+        "type": "string",
+        "required": false
+      },
       "visibleWhen": {
         "name": "visibleWhen",
-        "description": "Show the contents of a view when condition is true",
-        "type": ["region-selected", "choice-selected", "no-region-selected"],
+        "description": "Control visibility of the content. Can also be used with `when*` attributes below to narrow down visibility",
+        "type": [
+          "region-selected",
+          "choice-selected",
+          "no-region-selected",
+          "choice-unselected"
+        ],
         "required": false
       },
       "whenTagName": {
         "name": "whenTagName",
-        "description": "Narrow down visibility by tag name. For regions, use the name of the object tag, for choices, use the name of the choices tag.",
+        "description": "Use with visibleWhen. Narrow down visibility by tag name. For regions, use the name of the object tag, for choices, use the name of the choices tag",
         "type": "string",
         "required": false
       },
       "whenLabelValue": {
         "name": "whenLabelValue",
-        "description": "Narrow down visibility by label value",
+        "description": "Use with visibleWhen=\"region-selected\". Narrow down visibility by label value",
         "type": "string",
         "required": false
       },
       "whenChoiceValue": {
         "name": "whenChoiceValue",
-        "description": "Narrow down visibility by choice value",
+        "description": "Use with visibleWhen (\"choice-selected\" or \"choice-unselected\") and whenTagName, both are required. Narrow down visibility by choice value",
         "type": "string",
         "required": false
       }
