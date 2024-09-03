@@ -1,6 +1,6 @@
 {
-  "message": "ci: Fix RichText docs to unblock docs auto-generation (#6250)",
-  "commit": "bafc4d0d320f7230d14522d78c716b2836bd0c7e",
-  "date": "2024-08-23T22:49:05.000Z",
+  "message": "refactor: optic 929: remove stale feature flags (#6284)",
+  "commit": "1c12b1740db5304aede5051fc78bd3dc2819b4c3",
+  "date": "2024-09-03T16:10:04.000Z",
   "branch": "develop"
 }

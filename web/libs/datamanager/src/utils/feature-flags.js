@@ -29,12 +29,6 @@ export const FF_DEV_3034 = "fflag-feat-dev-3034-comments-with-drafts-short";
 export const FF_DEV_3873 = "fflag_feat_front_dev_3873_labeling_ui_improvements_short";
 
 /**
- * Hide task counter because it's mostly irrelevant
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_dev_3734_hide_task_counter_131222_short
- */
-export const FF_DEV_3734 = "fflag_fix_front_dev_3734_hide_task_counter_131222_short";
-
-/**
  * Support for Datasets functionality.
  */
 export const FF_LOPS_E_3 = "fflag_feat_all_lops_e_3_datasets_short";
@@ -86,6 +80,13 @@ function getFeatureFlags() {
 
 export function isFF(id) {
   const featureFlags = getFeatureFlags();
+  // TODO: remove the override + if statement once LSE and LSO start building react the same way and fflag_fix_front_lsdv_4620_memory_leaks_100723_short is removed
+  const override = {
+    fflag_fix_front_lsdv_4620_memory_leaks_100723_short: false,
+  };
+  if (window?.APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
+    return override[id];
+  }
 
   if (id in featureFlags) {
     return featureFlags[id] === true;

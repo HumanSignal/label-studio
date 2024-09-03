@@ -1,0 +1,192 @@
+/* @license
+Papa Parse
+v5.4.1
+https://github.com/mholt/PapaParse
+License: MIT
+*/
+
+/*!
+ * index-of <https://github.com/jonschlinkert/index-of>
+ *
+ * Copyright (c) 2014-2015 Jon Schlinkert.
+ * Licensed under the MIT license.
+ */
+
+/*!
+ * wavesurfer.js 6.6.4 (2023-06-10)
+ * https://wavesurfer-js.org
+ * @license BSD-3-Clause
+ */
+
+/*!
+ * wavesurfer.js cursor plugin 6.6.4 (2023-06-10)
+ * https://wavesurfer-js.org
+ * @license BSD-3-Clause
+ */
+
+/*! ./absMax */
+
+/*! ./clamp */
+
+/*! ./drawer */
+
+/*! ./drawer.canvasentry */
+
+/*! ./drawer.multicanvas */
+
+/*! ./fetch */
+
+/*! ./frame */
+
+/*! ./get-id */
+
+/*! ./max */
+
+/*! ./mediaelement */
+
+/*! ./mediaelement-webaudio */
+
+/*! ./min */
+
+/*! ./observer */
+
+/*! ./orientation */
+
+/*! ./peakcache */
+
+/*! ./prevent-click */
+
+/*! ./request-animation-frame */
+
+/*! ./silence-mode */
+
+/*! ./style */
+
+/*! ./util */
+
+/*! ./util/get-id */
+
+/*! ./util/style */
+
+/*! ./webaudio */
+
+/*! debounce */
+
+/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
+
+/*!***********************!*\
+  !*** ./src/drawer.js ***!
+  \***********************/
+
+/*!*************************!*\
+  !*** ./src/util/max.js ***!
+  \*************************/
+
+/*!*************************!*\
+  !*** ./src/util/min.js ***!
+  \*************************/
+
+/*!*************************!*\
+  !*** ./src/webaudio.js ***!
+  \*************************/
+
+/*!**************************!*\
+  !*** ./src/peakcache.js ***!
+  \**************************/
+
+/*!***************************!*\
+  !*** ./src/util/clamp.js ***!
+  \***************************/
+
+/*!***************************!*\
+  !*** ./src/util/fetch.js ***!
+  \***************************/
+
+/*!***************************!*\
+  !*** ./src/util/frame.js ***!
+  \***************************/
+
+/*!***************************!*\
+  !*** ./src/util/index.js ***!
+  \***************************/
+
+/*!***************************!*\
+  !*** ./src/util/style.js ***!
+  \***************************/
+
+/*!***************************!*\
+  !*** ./src/wavesurfer.js ***!
+  \***************************/
+
+/*!****************************!*\
+  !*** ./src/util/absMax.js ***!
+  \****************************/
+
+/*!****************************!*\
+  !*** ./src/util/get-id.js ***!
+  \****************************/
+
+/*!*****************************!*\
+  !*** ./src/mediaelement.js ***!
+  \*****************************/
+
+/*!******************************!*\
+  !*** ./src/util/observer.js ***!
+  \******************************/
+
+/*!*********************************!*\
+  !*** ./src/util/orientation.js ***!
+  \*********************************/
+
+/*!**********************************!*\
+  !*** ./src/util/silence-mode.js ***!
+  \**********************************/
+
+/*!***********************************!*\
+  !*** ./src/drawer.canvasentry.js ***!
+  \***********************************/
+
+/*!***********************************!*\
+  !*** ./src/drawer.multicanvas.js ***!
+  \***********************************/
+
+/*!***********************************!*\
+  !*** ./src/util/prevent-click.js ***!
+  \***********************************/
+
+/*!************************************!*\
+  !*** ./src/plugin/cursor/index.js ***!
+  \************************************/
+
+/*!**************************************!*\
+  !*** ./src/mediaelement-webaudio.js ***!
+  \**************************************/
+
+/*!****************************************!*\
+  !*** ./node_modules/debounce/index.js ***!
+  \****************************************/
+
+/*!*********************************************!*\
+  !*** ./src/util/request-animation-frame.js ***!
+  \*********************************************/
+
+/*!Please JS v0.4.2, Jordan Checkman 2014, Checkman.io, MIT License, Have fun.*/
+
+/**
+ * @license React
+ * react-is.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/** @license React v0.26.2
+ * react-reconciler.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */

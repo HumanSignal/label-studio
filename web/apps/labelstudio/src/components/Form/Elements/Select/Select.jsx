@@ -13,7 +13,7 @@ const SelectOption = ({ value, label, disabled = false, hidden = false, ...props
 };
 
 const Select = ({ label, className, options, validate, required, skip, labelProps, groupProps, ghost, ...props }) => {
-  const rootClass = cn("select");
+  const rootClass = cn("select-ls");
   const initialValue = useMemo(() => props.value ?? "", [props.value]);
   const [value, setValue] = useState(initialValue);
 

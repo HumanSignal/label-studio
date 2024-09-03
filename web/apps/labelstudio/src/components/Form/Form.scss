@@ -55,10 +55,10 @@
   }
 }
 
-.input,
-.textarea,
+.input-ls,
+.textarea-ls,
 .counter,
-.select__list {
+.select-ls__list {
 
   &:not(&_ghost):focus,
   &_focused {

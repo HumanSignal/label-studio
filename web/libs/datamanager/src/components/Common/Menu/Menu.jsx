@@ -15,7 +15,7 @@ export const Menu = React.forwardRef(
 
     const clickHandler = useCallback(
       (e) => {
-        const elem = cn("menu").elem("item").closest(e.target);
+        const elem = cn("menu-dm").elem("item").closest(e.target);
 
         if (dropdown && elem && closeDropdownOnItemClick !== false) {
           dropdown.close();
@@ -33,7 +33,7 @@ export const Menu = React.forwardRef(
         <Block
           ref={ref}
           tag="ul"
-          name="menu"
+          name="menu-dm"
           mod={{ size, collapsed }}
           mix={className}
           style={style}
@@ -47,8 +47,8 @@ export const Menu = React.forwardRef(
 );
 
 Menu.Item = MenuItem;
-Menu.Spacer = () => <li className={cn("menu", { elem: "spacer" })} />;
-Menu.Divider = () => <li className={cn("menu", { elem: "divider" })} />;
+Menu.Spacer = () => <li className={cn("menu-dm", { elem: "spacer" })} />;
+Menu.Divider = () => <li className={cn("menu-dm", { elem: "divider" })} />;
 Menu.Builder = (url, menuItems) => {
   return (menuItems ?? []).map((item, index) => {
     if (item === "SPACER") return <Menu.Spacer key={index} />;
@@ -66,7 +66,7 @@ Menu.Builder = (url, menuItems) => {
 };
 
 Menu.Group = ({ children, title, className, style }) => {
-  const rootClass = cn("menu-group");
+  const rootClass = cn("menu-group-dm");
 
   return (
     <li className={rootClass.mix(className)} style={style}>

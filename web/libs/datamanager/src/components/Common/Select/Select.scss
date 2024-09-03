@@ -1,6 +1,6 @@
 @use 'sass:color';
 
-.select {
+.select-dm {
   height: 40px;
   background: #FAFAFA;
   font-size: 16px;
@@ -58,7 +58,7 @@
     }
 
     &_selected:hover,
-    &_selected.select__option_focused {
+    &_selected.select-dm__option_focused {
       background-color: hsl(var(--accent_color), 10%);
     }
   }

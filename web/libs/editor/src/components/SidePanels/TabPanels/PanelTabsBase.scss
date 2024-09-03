@@ -37,7 +37,7 @@
       border-right: 1px solid var(--sand_300);
       --header-border-radius: 0 4px 4px 0;
     }
-    
+
     &_right {
       border-left: 1px solid var(--sand_300);
       --header-border-radius: 4px 0 0 4px;
@@ -188,7 +188,7 @@
     width: 100%;
     height: 100%;
 
-    & .tabs-panel_resizing { 
+    & .tabs-panel_resizing {
       pointer-events: none;
     }
   }
@@ -315,7 +315,7 @@
     &[data-resize=bottom]::before {
       left: 0;
       top: 50%;
-      height: var(2px);
+      height: 2px;
       transform: translate(0, -50%);
       width: calc(100% + var(--size));
       left: calc(var(--size) / 2 * -1);

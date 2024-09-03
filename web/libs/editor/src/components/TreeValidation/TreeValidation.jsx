@@ -8,7 +8,7 @@ import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
 export const TreeValidation = inject("store")(
   observer(({ store, errors }) => {
     return (
-      <div className="ls-errors">
+      <div className="lsf-errors">
         {errors.map((error, index) => (
           <ErrorMessage key={`error-${index}`} error={getEnv(store).messages[error.error](error)} />
         ))}

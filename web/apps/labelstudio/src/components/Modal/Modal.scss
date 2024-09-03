@@ -105,12 +105,12 @@
 
   &_visible {
     opacity: 0;
-    transition: opacity var(100ms) ease;
+    transition: opacity 100ms ease;
   }
 
   &_visible &__wrapper {
     transform: scale(1.05);
-    transition: transform var(100ms) ease;
+    transition: transform 100ms ease;
   }
 
   &.visible {

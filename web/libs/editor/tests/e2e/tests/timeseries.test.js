@@ -28,7 +28,7 @@ const scenarios = {
     },
     assert(I) {
       I.waitForVisible(".htx-timeseries", 5);
-      I.dontSeeElement(locate(".ls-errors"));
+      I.dontSeeElement(locate(".lsf-errors"));
     },
   },
 
@@ -39,7 +39,7 @@ const scenarios = {
       two: [0, -20.140046051127193, 32.40194378594322],
     },
     assert(I) {
-      I.seeElement(locate(".ls-errors"));
+      I.seeElement(locate(".lsf-errors"));
     },
   },
 
@@ -50,7 +50,7 @@ const scenarios = {
       two: [0, -20.140046051127193, 32.40194378594322],
     },
     assert(I) {
-      I.seeElement(locate(".ls-errors"));
+      I.seeElement(locate(".lsf-errors"));
     },
   },
 
@@ -63,7 +63,7 @@ const scenarios = {
     },
     assert(I) {
       I.waitForVisible(".htx-timeseries", 5);
-      I.dontSeeElement(locate(".ls-errors"));
+      I.dontSeeElement(locate(".lsf-errors"));
     },
   },
 
@@ -75,7 +75,7 @@ const scenarios = {
       two: [0, -20.140046051127193, 32.40194378594322],
     },
     assert(I) {
-      I.seeElement(locate(".ls-errors"));
+      I.seeElement(locate(".lsf-errors"));
     },
   },
 
@@ -87,7 +87,7 @@ const scenarios = {
       two: [0, -20.140046051127193, 32.40194378594322],
     },
     assert(I) {
-      I.seeElement(locate(".ls-errors"));
+      I.seeElement(locate(".lsf-errors"));
     },
   },
 };
