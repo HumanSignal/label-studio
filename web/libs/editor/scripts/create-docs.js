@@ -50,7 +50,7 @@ const args = process.argv.slice(2);
 const outputDirArg = args[0] || `${__dirname}/../docs`;
 const outputDir = path.resolve(outputDirArg);
 // @todo more generic way to get schema dir?
-const outputSchemaDir = path.resolve(`${outputDir}/../../apps/labelstudio/src/pages/CreateProject/Config`);
+const outputSchemaDir = path.resolve(`${outputDir}/../../../web/apps/labelstudio/src/pages/CreateProject/Config`);
 
 // schema for CodeMirror autocomplete
 const schema = {};
