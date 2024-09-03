@@ -1,5 +1,4 @@
 @import "~antd/dist/antd.css";
-
 @import "./variables";
 @import "./mixins";
 @import "./functions";
@@ -40,7 +39,7 @@
 //     display: none;
 // }
 
-.htx-no-label:after {
+.htx-no-label::after {
   display: none;
 }
 
@@ -52,8 +51,9 @@
   // position: relative;
 }
 
-.htx-highlight-last:after {
+.htx-highlight-last::after {
   margin-left: 2px;
+
   // top: -0.3em;
   // margin-right: 2px;
   // position: relative;
@@ -62,10 +62,10 @@
   // font-weight: bold;
 }
 
-.htx-highlight-vertical:after {
+.htx-highlight-vertical::after {
 }
 
-.htx-yoyo:after {
+.htx-yoyo::after {
   content: "Yoyo";
 }
 
@@ -73,6 +73,7 @@
   0% {
     opacity: 0;
   }
+
   100% {
     opacity: 1;
   }
@@ -92,6 +93,7 @@
   color: initial;
   cursor: pointer;
 }
+
 // when node is disabled (when leafsOnly enabled) allow to collapse it by click anywhere
 // achieve this with enormously growing button to the right covering all the text
 .react-dropdown-tree-select .node.disabled > .toggle {
@@ -101,10 +103,12 @@
   z-index: 1;
   user-select: none;
 }
+
 .react-dropdown-tree-select .node.disabled > label {
   color: initial;
   cursor: default;
 }
+
 .react-dropdown-tree-select .node.disabled > label > input {
   opacity: 0;
 }

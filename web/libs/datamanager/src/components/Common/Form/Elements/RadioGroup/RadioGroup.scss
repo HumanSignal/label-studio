@@ -10,7 +10,7 @@
   border-radius: var(--radius);
   padding: var(--padding);
   background: var(--sand_100);
-  box-shadow: inset 0px 1px 0px var(--black_5), inset 0px 0px 0px 1px var(--black_5);
+  box-shadow: inset 0 1px 0 var(--black_5), inset 0 0 0 1px var(--black_5);
   box-sizing: border-box;
 
   &__buttons {
