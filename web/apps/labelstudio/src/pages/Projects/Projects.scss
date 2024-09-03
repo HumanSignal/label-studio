@@ -13,7 +13,6 @@
   &__list {
     padding: 40px;
     display: grid;
-    grid-autoflow: columns;
     box-sizing: border-box;
     grid-gap: 32px;
     grid-auto-rows: 1fr;
@@ -221,7 +220,7 @@
     --text-color: var(--sand_0);
 
     background-color: var(--background-color);
-    
+
     & .project-card__header {
       background-color: var(--header-color);
       box-shadow: none;
