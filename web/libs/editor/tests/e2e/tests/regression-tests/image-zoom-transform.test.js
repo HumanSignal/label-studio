@@ -21,6 +21,9 @@ Scenario(
 
     I.amOnPage("/");
 
+    LabelStudio.setFeatureFlags({
+      ff_front_dev_2394_zoomed_transforms_260522_short: true,
+    });
     LabelStudio.init(params);
     AtImageView.waitForImage();
     AtSidebar.seeRegions(0);
@@ -70,6 +73,10 @@ Scenario(
       config,
       data: { image: IMAGE },
     };
+
+    LabelStudio.setFeatureFlags({
+      ff_front_dev_2394_zoomed_transforms_260522_short: true,
+    });
 
     I.amOnPage("/");
     I.resizeWindow(wWidthSmall, wHeight);

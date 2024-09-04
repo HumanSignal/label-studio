@@ -23,6 +23,7 @@ Scenario("Play/pause of multiple synced audio stay in sync", async ({ I, LabelSt
   LabelStudio.setFeatureFlags({
     fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
     ff_front_dev_2715_audio_3_280722_short: true,
+    fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
   });
 
   I.amOnPage("/");
@@ -71,6 +72,7 @@ Scenario("Looping of multiple synced audio stay in sync", async ({ I, LabelStudi
   LabelStudio.setFeatureFlags({
     fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
     ff_front_dev_2715_audio_3_280722_short: true,
+    fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
   });
 
   I.amOnPage("/");
@@ -145,6 +147,7 @@ Scenario("Seeking of multiple synced audio stay in sync", async ({ I, LabelStudi
   LabelStudio.setFeatureFlags({
     fflag_feat_front_dev_2461_audio_paragraphs_seek_chunk_position_short: true,
     ff_front_dev_2715_audio_3_280722_short: true,
+    fflag_feat_front_lsdv_3012_syncable_tags_070423_short: true,
   });
 
   I.amOnPage("/");
