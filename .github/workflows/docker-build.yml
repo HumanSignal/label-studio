@@ -65,17 +65,19 @@ jobs:
           set -x
           sha="$(git rev-parse HEAD)"
           echo "sha=$sha" >> $GITHUB_OUTPUT
-          regexp='^ls-release\/(.*)$'; 
+           
+          pretty_branch_name="$(echo -n "${BRANCH_NAME#refs/heads/}" | sed 's#/#-#g' | sed 's#_#-#g'| sed 's#\.#-#g' | tr '[:upper:]' '[:lower:]')"
+          echo "pretty_branch_name=$pretty_branch_name" >> $GITHUB_OUTPUT
+
+          regexp='^ls-release\/(.*)$';
           if [[ "$BRANCH_NAME" =~ $regexp ]]; then
             image_version="${BASH_REMATCH[1]}rc${sha}"
           else
-            image_version=$BRANCH_NAME
+            image_version="${pretty_branch_name}"
           fi
           echo "image_version=${image_version}" >> $GITHUB_OUTPUT
           echo "ubi_image_version=ubi_${image_version}" >> $GITHUB_OUTPUT
           
-          pretty_branch_name="$(echo -n "${BRANCH_NAME#refs/heads/}" | sed 's#/#-#g' | sed 's#_#-#g'| sed 's#\.#-#g' | tr '[:upper:]' '[:lower:]')"
-          echo "pretty_branch_name=$pretty_branch_name" >> $GITHUB_OUTPUT
           current_time="$(date +'%Y%m%d.%H%M%S')"
           branch="-${pretty_branch_name}"
           short_sha="$(git rev-parse --short HEAD)"
