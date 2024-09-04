@@ -12,11 +12,13 @@ import Result from "../../regions/Result";
 import Utils from "../../utils";
 import {
   FF_DEV_1284,
+  FF_DEV_2100,
   FF_DEV_2432,
   FF_DEV_3391,
   FF_LLM_EPIC,
   FF_LSDV_3009,
   FF_LSDV_4583,
+  FF_LSDV_4832,
   FF_LSDV_4988,
   FF_REVIEWER_FLOW,
   isFF,
@@ -509,7 +511,7 @@ export const Annotation = types
       let regions = Array.from(self.areas.values());
 
       // remove everything unconditionally
-      if (deleteReadOnly) {
+      if (deleteReadOnly && isFF(FF_LSDV_4832)) {
         self.unselectAll(true);
         self.setIsDrawing(false);
         self.relationStore.deleteAllRelations();
@@ -1215,7 +1217,7 @@ export const Annotation = types
         });
 
         // It's not necessary, but it's calmer with this
-        self.cleanClassificationAreas();
+        if (isFF(FF_DEV_2100)) self.cleanClassificationAreas();
 
         !hidden &&
           self.results.filter((r) => r.area.classification).forEach((r) => r.from_name.updateFromResult?.(r.mainValue));
