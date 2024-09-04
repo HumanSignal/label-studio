@@ -99,7 +99,7 @@ From the Prompts page, click **Create Prompt** in the upper right and then compl
     Target projects must meet the following criteria:
     * The labeling configuration for the project must be compatible with the **Type** you selected above:
         * For text classification, this means that the labeling configuration for the project must use `Choice` tags and must be configured for single class classification (e.g. `choice="single"`). 
-        * For NER, his means that the labeling configuration for the project must use `Label` tags
+        * For NER, this means that the labeling configuration for the project must use `Label` tags
     * The project must include text data (e.g. it cannot only include unsupported data types such as image, audio, video).
     * You must have access to the project. If you are in the Manager role, you need to be added to the project to have access. 
 
