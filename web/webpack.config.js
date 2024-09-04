@@ -97,33 +97,31 @@ module.exports = composePlugins(
         scriptType: "text/javascript",
       };
 
-      if (mode === "production") {
-        config.optimization = {
-          runtimeChunk: "single",
-          sideEffects: true,
-          splitChunks: {
-            cacheGroups: {
-              commonVendor: {
-                test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|mobx|mobx-react|mobx-react-lite|mobx-state-tree)[\\/]/,
-                name: "vendor",
-                chunks: "all",
-              },
-              defaultVendors: {
-                test: /[\\/]node_modules[\\/]/,
-                priority: -10,
-                reuseExistingChunk: true,
-                chunks: "async",
-              },
-              default: {
-                minChunks: 2,
-                priority: -20,
-                reuseExistingChunk: true,
-                chunks: "async",
-              },
+      config.optimization = {
+        runtimeChunk: "single",
+        sideEffects: true,
+        splitChunks: {
+          cacheGroups: {
+            commonVendor: {
+              test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|mobx|mobx-react|mobx-react-lite|mobx-state-tree)[\\/]/,
+              name: "vendor",
+              chunks: "all",
+            },
+            defaultVendors: {
+              test: /[\\/]node_modules[\\/]/,
+              priority: -10,
+              reuseExistingChunk: true,
+              chunks: "async",
+            },
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true,
+              chunks: "async",
             },
           },
-        };
-      }
+        },
+      };
     }
 
     config.resolve.fallback = {
@@ -225,6 +223,13 @@ module.exports = composePlugins(
         },
       },
     );
+
+    if (isDevelopment) {
+      config.optimization = {
+        ...config.optimization,
+        moduleIds: "named",
+      };
+    }
 
     return merge(config, {
       devtool,
