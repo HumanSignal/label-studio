@@ -6,6 +6,7 @@
     "ui:serve": "nx storybook storybook",
     "ui:test:component": "nx run storybook:test-component",
     "lint": "biome check --apply .",
+    "lint-scss": "yarn stylelint '**/*.scss' --fix",
     "ls:watch": "nx run labelstudio:build:development --watch",
     "ls:build": "nx run labelstudio:build:production",
     "ls:unit": "nx run labelstudio:unit",
