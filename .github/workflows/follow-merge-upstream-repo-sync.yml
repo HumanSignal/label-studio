@@ -171,6 +171,17 @@ jobs:
               }
             }'
 
+      - name: Notify on failure
+        uses: ./.github/actions-hub/actions/github-create-comment
+        if: failure()
+        with:
+          github_token: ${{ secrets.GIT_PAT }}
+          repository: "${{ steps.fm.outputs.repo_name }}"
+          issue_number: "${{ steps.fm.outputs.pr_number }}"
+          body: |
+            Follow Merge downstrem workflow has failed.
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
 
   others:
     name: Other actions with PR
