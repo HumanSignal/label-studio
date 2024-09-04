@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "ui:serve": "nx storybook storybook",
+    "ui:serve": "FRONTEND_HOSTNAME=http://localhost:3000 nx storybook storybook",
     "ui:test:component": "nx run storybook:test-component",
     "lint": "biome check --apply .",
     "ls:dev": "nx run labelstudio:serve:development",
@@ -12,7 +12,7 @@
     "ls:unit": "nx run labelstudio:unit",
     "ls:e2e": "nx run labelstudio-e2e:e2e",
     "lsf:watch": "nx run editor:build:development --watch",
-    "lsf:serve": "MODE=standalone nx run editor:serve:development",
+    "lsf:serve": "FRONTEND_HOSTNAME=http://localhost:3000 MODE=standalone nx run editor:serve:development",
     "lsf:e2e": "cd libs/editor/tests/e2e && yarn test",
     "lsf:integration": "nx run editor:integration",
     "lsf:integration:watch": "nx run editor:integration --watch",
