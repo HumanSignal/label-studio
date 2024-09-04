@@ -28,6 +28,8 @@ frontend-install:
 frontend-setup: frontend-install
 
 # Run frontend dev server in Hot Module Replacement mode
+# For more information on HMR, see the "Environment Configuration" section in:
+# web/README.md
 frontend-dev:
 	cd web && yarn run dev
 

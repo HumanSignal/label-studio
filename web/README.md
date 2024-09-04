@@ -18,17 +18,23 @@ Datamanager is an advanced tool specifically for data exploration within Label S
 1 - **Dependencies Installation:**
 - Execute `yarn install --frozen-lockfile` to install all necessary dependencies.
 
-2 - **Environment Configuration:**
-#### Development configuration for LabelStudio
-  - Create an `.env` file located in the root LabelStudio directory if one does not exist.
-  - Make the following additions:
-    - `DJANGO_HOSTNAME`: Set this to your Django server instance. For example, `http://localhost:8080`.
-    - `FRONTEND_HOSTNAME`: Set this to where you would like to run the Hot Module Reload server to compile and serve development assets. For example, `http://localhost:8010`
-  - If using docker:
-    - Either set the `app:` service to point to this `.env` file by providing a child key in your `docker-compose.override.yml` set: `env_file: .env`.
-    - OR, add these to the `environment:` section of the `app:` service within a `docker-compose.override.yml` file.
-  - From the root of the LabelStudio project, rerun the app or docker compose service for it to take effect.
-  - In another terminal and from within the `web` directory, run the development server: `yarn dev`
+2 - **Environment Configuration (Optional for HMR):**
+- If you want to enable Hot Module Replacement (HMR), create an `.env` file in the root Label Studio directory.
+- Add the following configuration:
+  - `FRONTEND_HMR=true`: Enables Hot Module Replacement in Django.
+
+Optional configurations (defaults should work for most setups):
+  - `FRONTEND_HOSTNAME`: HMR server address (default: http://localhost:8010).
+  - `DJANGO_HOSTNAME`: Django server address (default: http://localhost:8080).
+
+If using Docker Compose with HMR:
+- Update the `env_file: .env` directive in `docker-compose.override.yml` under the app service.
+- Rerun the app or docker compose service from the project root for changes to take effect.
+
+To start the development server with HMR:
+- From the `web` directory: Run `yarn dev`
+- Or from the project root: Run `make frontend-dev`
+
 #### Custom Configuration for DataManager:
 - If you need to customize the configuration specifically for DataManager, follow these steps:
   - Duplicate the `.env.example` file located in the DataManager directory and rename the copy to `.env`.
