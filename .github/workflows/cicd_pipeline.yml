@@ -231,6 +231,13 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
 
+      - name: Checkout Actions Hub
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: HumanSignal/actions-hub
+          path: ./.github/actions-hub
+
       - name: Create release draft
         uses: actions/github-script@v7
         id: create-draft-release
@@ -346,16 +353,6 @@ jobs:
             core.setOutput("id", release.id);
             core.setOutput("tag_name", release.tag_name);
 
-      - uses: actions/cache@v4
-        name: Configure pip cache
-        id: pip-cache
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-gh-actions-${{ hashFiles('.github/helpers/gh_changelog_generator/requirements.txt') }}
-
-      - name: Install tools and dependencies
-        run: |
-          pip3 install -r .github/helpers/gh_changelog_generator/requirements.txt
 
       - name: Get previous GitHub ref
         id: previous-tag
@@ -385,35 +382,20 @@ jobs:
 
       - name: Generate release changelog
         id: changelog_md
-        env:
-          RELEASE_VERSION: "${{ steps.create-draft-release.outputs.tag_name }}"
-          PREVIOUS_REF: "${{ steps.previous-tag.outputs.previous_tag_name }}"
-          CURRENT_REF: "${{ github.event.after }}"
-          GH_REPO: "${{ github.repository }}"
-          GH_TOKEN: "${{ secrets.GIT_PAT }}"
-          JIRA_SERVER: "${{ vars.JIRA_SERVER }}"
-          JIRA_USERNAME: "${{ secrets.JIRA_USERNAME }}"
-          JIRA_TOKEN: "${{ secrets.JIRA_TOKEN }}"
-          JIRA_RELEASE_PREFIX: "LS OpenSource"
-          LAUNCHDARKLY_SDK_KEY: "${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}"
-          LAUNCHDARKLY_ENVIRONMENT: "community"
-          OUTPUT_FILE_MD: "${{ github.workspace }}/output.md"
-          OUTPUT_FILE_JSON: "${{ github.workspace }}/output.json"
-          WORKFLOW_RUN_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        run: |
-          python3 .github/helpers/gh_changelog_generator/gh_changelog_generator.py
-
-          echo "changelog_msg_b64=$(cat '${{ env.OUTPUT_FILE_MD }}' | base64 -w 0)" >> $GITHUB_OUTPUT
-
-          echo "CHANGELOG_MD<<CHANGELOG_MD_EOF" >> $GITHUB_ENV
-          cat '${{ env.OUTPUT_FILE_MD }}' >> $GITHUB_ENV
-          echo >> $GITHUB_ENV
-          echo "CHANGELOG_MD_EOF" >> $GITHUB_ENV
-
-          echo "CHANGELOG_JSON<<CHANGELOG_JSON_EOF" >> $GITHUB_ENV
-          cat '${{ env.OUTPUT_FILE_JSON }}' >> $GITHUB_ENV
-          echo >> $GITHUB_ENV
-          echo "CHANGELOG_JSON_EOF" >> $GITHUB_ENV
+        uses: ./.github/actions-hub/actions/github-generate-changelog
+        with:
+          release_version: "${{ steps.create-draft-release.outputs.tag_name }}"
+          previous_ref: "${{ steps.previous-tag.outputs.previous_tag_name }}"
+          current_ref: "${{ github.event.after }}"
+          github_token: "${{ secrets.GIT_PAT }}"
+          jira_server: "${{ vars.JIRA_SERVER }}"
+          jira_username: "${{ secrets.JIRA_USERNAME }}"
+          jira_token: "${{ secrets.JIRA_TOKEN }}"
+          jira_release_prefix: "LS OpenSource"
+          launchdarkly_sdk_key: "${{ secrets.LAUNCHDARKLY_COMMUNITY_SDK_KEY }}"
+          launchdarkly_environment: "community"
+          helm_chart_repo: "HumanSignal/charts"
+          helm_chart_path: "heartex/label-studio/Chart.yaml"
 
       - name: Update Draft Release
         uses: actions/github-script@v7
