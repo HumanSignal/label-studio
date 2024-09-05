@@ -62,6 +62,7 @@ jobs:
 
       - name: Checkout repo
         uses: actions/checkout@v4
+        if: steps.fm.outputs.repo_name && steps.fm.outputs.branch_name
         with:
           token: ${{ secrets.GIT_PAT }}
           fetch-depth: 0
@@ -170,6 +171,17 @@ jobs:
                 }
               }
             }'
+
+      - name: Notify on failure
+        uses: ./.github/actions-hub/actions/github-create-comment
+        if: failure()
+        with:
+          github_token: ${{ secrets.GIT_PAT }}
+          repository: "${{ steps.fm.outputs.repo_name }}"
+          issue_number: "${{ steps.fm.outputs.pr_number }}"
+          body: |
+            Follow Merge downstream workflow has been failed.
+            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
 
   others:

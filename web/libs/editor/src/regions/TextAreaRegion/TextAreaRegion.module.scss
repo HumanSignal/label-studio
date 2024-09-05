@@ -1,13 +1,10 @@
 .mark {
   cursor: pointer;
-
   background-color: #f6ffed;
   border: 1px solid #b7eb8f;
-
   border-radius: 5px;
   margin: 0;
   padding: 0.4em 1em;
-
   white-space: pre-line;
 
   &.selected {

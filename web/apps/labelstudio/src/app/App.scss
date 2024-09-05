@@ -1,4 +1,4 @@
-@import '../themes/default/variables.scss';
+@import '../themes/default/variables';
 
 body {
   --header-height: 48px;
@@ -6,8 +6,9 @@ body {
   --menu-animation-curve: cubic-bezier(0.21, 1.04, 0.68, 1);
   --menu-animation-start: -10px;
   --menu-sidebar-width: 240px;
+
   margin: 0;
-  font-family: 'Figtree', sans-serif;
+  font-family: Figtree, sans-serif;
 }
 
 .app-wrapper {
@@ -78,6 +79,6 @@ body {
     content: '';
     border-radius: 100%;
     background-color: var(--background);
-    box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15);
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 15%);
   }
 }

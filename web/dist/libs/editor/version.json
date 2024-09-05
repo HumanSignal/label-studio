@@ -1,6 +1,6 @@
 {
-  "message": "refactor: optic 929: remove stale feature flags (#6284)",
-  "commit": "1c12b1740db5304aede5051fc78bd3dc2819b4c3",
-  "date": "2024-09-03T16:10:04.000Z",
+  "message": "ci: OPTIC-1063: Adding linting to scss (#6134)",
+  "commit": "3dc2839cfbc19cc9479e2bf8c0d89542e6774e19",
+  "date": "2024-09-05T16:01:31.000Z",
   "branch": "develop"
 }
