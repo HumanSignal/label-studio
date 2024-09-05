@@ -248,7 +248,7 @@ module.exports = composePlugins(
               headers: { "Access-Control-Allow-Origin": "*" },
               static: {
                 directory: path.resolve(__dirname, "../label_studio/core/static/"),
-                publicPath: `/static/`,
+                publicPath: "/static/",
               },
               devMiddleware: {
                 publicPath: `${FRONTEND_HOSTNAME}/react-app/`,
