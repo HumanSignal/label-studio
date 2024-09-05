@@ -30,7 +30,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.files.storage import default_storage
 from django.db import OperationalError, models, transaction
-from django.db.models import JSONField, Q
+from django.db.models import JSONField, Q, CheckConstraint
 from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import Signal, receiver
 from django.urls import reverse
@@ -1046,6 +1046,96 @@ class FailedPrediction(models.Model):
     )
     task = models.ForeignKey('tasks.Task', on_delete=models.CASCADE, related_name='failed_predictions')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+
+
+class PredictionMeta(models.Model):
+    prediction = models.OneToOneField(
+        'Prediction',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='meta',
+        help_text=_('Reference to the associated prediction')
+    )
+    failed_prediction = models.OneToOneField(
+        'FailedPrediction',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='meta',
+        help_text=_('Reference to the associated failed prediction')
+    )
+    inference_time = models.FloatField(
+        _('inference time'),
+        null=True,
+        blank=True,
+        help_text=_('Time taken for inference in seconds')
+    )
+    prompt_tokens_count = models.IntegerField(
+        _('prompt tokens count'),
+        null=True,
+        blank=True,
+        help_text=_('Number of tokens in the prompt')
+    )
+    completion_tokens_count = models.IntegerField(
+        _('completion tokens count'),
+        null=True,
+        blank=True,
+        help_text=_('Number of tokens in the completion')
+    )
+    total_tokens_count = models.IntegerField(
+        _('total tokens count'),
+        null=True,
+        blank=True,
+        help_text=_('Total number of tokens')
+    )
+    prompt_cost = models.FloatField(
+        _('prompt cost'),
+        null=True,
+        blank=True,
+        help_text=_('Cost of the prompt')
+    )
+    completion_cost = models.FloatField(
+        _('completion cost'),
+        null=True,
+        blank=True,
+        help_text=_('Cost of the completion')
+    )
+    total_cost = models.FloatField(
+        _('total cost'),
+        null=True,
+        blank=True,
+        help_text=_('Total cost')
+    )
+    extra = models.JSONField(
+        _('extra'),
+        null=True,
+        blank=True,
+        help_text=_('Additional metadata in JSON format')
+    )
+
+    @classmethod
+    def get_successful_predictions_meta(cls):
+        return cls.objects.filter(prediction__isnull=False)
+
+    @classmethod
+    def get_failed_predictions_meta(cls):
+        return cls.objects.filter(failed_prediction__isnull=False)
+
+    class Meta:
+        db_table = 'prediction_meta'
+        verbose_name = _('Prediction Meta')
+        verbose_name_plural = _('Prediction Metas')
+        constraints = [
+            CheckConstraint(
+                # either prediction or failed_prediction should be not null
+                check=(
+                    (Q(prediction__isnull=False) & Q(failed_prediction__isnull=True)) |
+                    (Q(prediction__isnull=True) & Q(failed_prediction__isnull=False))
+                ),
+                name='prediction_or_failed_prediction_not_null'
+            )
+        ]
 
 
 @receiver(post_delete, sender=Task)
