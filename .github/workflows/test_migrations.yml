@@ -23,6 +23,7 @@ jobs:
       SENTRY_RATE: 0
       DJANGO_DB: default
       JSON_LOG: 0
+      CI: true
 
     services:
       postgres:
