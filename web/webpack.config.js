@@ -247,7 +247,8 @@ module.exports = composePlugins(
               // Allow cross-origin requests from Django
               headers: { "Access-Control-Allow-Origin": "*" },
               static: {
-                directory: path.resolve(__dirname, "dist/apps/labelstudio"),
+                directory: path.resolve(__dirname, "../label_studio/core/static/"),
+                publicPath: `/static/`,
               },
               devMiddleware: {
                 publicPath: `${FRONTEND_HOSTNAME}/react-app/`,
