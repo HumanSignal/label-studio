@@ -1,5 +1,5 @@
 @font-face {
-  font-family: "Figtree";
+  font-family: Figtree;
   src: url("/static/fonts/Figtree-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
@@ -8,7 +8,7 @@
 
 
 @font-face {
-  font-family: "Figtree";
+  font-family: Figtree;
   src: url("/static/fonts/Figtree-SemiBold.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
@@ -20,7 +20,6 @@ body {
   --font-weight-400: 400;
   --font-weight-500: 500;
   --font-weight-600: 600;
-
   --font-size-200: 12px;
   --font-size-300: 14px;
   --font-size-400: 16px;
