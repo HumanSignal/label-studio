@@ -25,7 +25,6 @@
   }
 
   &__context-item {
-
     &_left,
     &_right {
       height: 100%;
@@ -43,7 +42,7 @@
     min-width: 240px;
     max-width: 240px;
     box-sizing: border-box;
-    box-shadow: 1px 0 0 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 1px 0 0 0 rgb(0 0 0 / 10%);
   }
 
   &__user {

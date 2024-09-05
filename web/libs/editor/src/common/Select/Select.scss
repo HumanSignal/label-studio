@@ -1,5 +1,6 @@
 .select {
   --select-surface-color: var(--sand_0);
+
   height: 40px;
   background-color: var(--select-surface-color);
   font-size: 16px;
@@ -141,7 +142,7 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0px 0px 0px 6px var(--grape_100), inset 0px -1px 0px rgba(0, 0, 0, 0.1), inset 0px 0px 0px 1px rgba(0, 0, 0, 0.15), inset 0px 0px 0px 1px var(--grape_100);
+    box-shadow: 0 0 0 6px var(--grape_100), inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 15%), inset 0 0 0 1px var(--grape_100);
     border-color: var(--primary_link);
   }
 }
