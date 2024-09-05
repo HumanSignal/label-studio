@@ -17,7 +17,6 @@ class BucketURI:
     scheme: str
 
 
-def get_uri_via_regex(data, prefixes=('s3', 'gs')):
 def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[str | None, str | None]:
     data = str(data).strip()
     middle_check = False
@@ -49,8 +48,11 @@ def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[str | None, str | No
     return r_match.group('uri'), r_match.group('storage')
 
 
-def parse_bucket_uri(uri: str | None) -> BucketURI | None:
-    uri = uri and uri.strip()
+def parse_bucket_uri(value: object, storage) -> BucketURI | None:
+    if not value:
+        return None
+
+    uri, _ = get_uri_via_regex(value, prefixes=(storage.url_scheme,))
     if not uri:
         return None
 
@@ -67,7 +69,7 @@ def storage_can_resolve_bucket_url(storage, url) -> bool:
     if not storage.can_resolve_scheme(url):
         return False
 
-    uri = parse_bucket_uri(url)
+    uri = parse_bucket_uri(url, storage)
     if not uri:
         return False
 
