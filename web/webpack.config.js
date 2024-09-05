@@ -236,28 +236,31 @@ module.exports = composePlugins(
       mode,
       plugins,
       optimization: optimizer(),
-      devServer: {
-        // Port for the Webpack dev server
-        port: HMR_PORT,
-        // Enable HMR
-        hot: true,
-        // Allow cross-origin requests from Django
-        headers: { "Access-Control-Allow-Origin": "*" },
-        static: {
-          directory: path.resolve(__dirname, "dist/apps/labelstudio"),
-        },
-        devMiddleware: {
-          publicPath: `${FRONTEND_HOSTNAME}/react-app/`,
-        },
-        allowedHosts: "all", // Allow access from Django's server
-        proxy: [
-          {
-            router: {
-              "/api": `${DJANGO_HOSTNAME}/api`, // Proxy api requests to Django's server
+      devServer:
+        process.env.MODE === "standalone"
+          ? {}
+          : {
+              // Port for the Webpack dev server
+              port: HMR_PORT,
+              // Enable HMR
+              hot: true,
+              // Allow cross-origin requests from Django
+              headers: { "Access-Control-Allow-Origin": "*" },
+              static: {
+                directory: path.resolve(__dirname, "dist/apps/labelstudio"),
+              },
+              devMiddleware: {
+                publicPath: `${FRONTEND_HOSTNAME}/react-app/`,
+              },
+              allowedHosts: "all", // Allow access from Django's server
+              proxy: [
+                {
+                  router: {
+                    "/api": `${DJANGO_HOSTNAME}/api`, // Proxy api requests to Django's server
+                  },
+                },
+              ],
             },
-          },
-        ],
-      },
     });
   },
 );
