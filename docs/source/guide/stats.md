@@ -117,9 +117,54 @@ Performs the default evaluation function for each control tag. For example for `
 ### Exact matching
 
 For example, for two given annotations `x` and `y`, an agreement metric that performs a naive comparison of the results works like the following:
-- If both `x` and `y` are empty annotations, the agreement score is `1`.
-- If `x` and `y` share no similar points, the agreement score is `0`. 
-- If different labeling types are used in `x` and `y`, the partial agreement scores for each data labeling type are averaged.
+- If both annotations `x` and `y` are empty, the agreement score is `1`.
+- If the annotations share no similar regions, the agreement score is `0`.
+- If multiple regions are in the `x` and `y`, the partial agreement scores calculated for corresponding region pairs are averaged.
+
+#### Example 1
+
+```
+x:  choice1 => option1
+    choice2 => option2
+
+y:  choice1 => option1
+    choice2 => option2
+```    
+Agreement Calculation:
+
+Both annotations match exactly.
+Agreement(x, y) = 1.0 (100%).
+
+#### Example 2
+
+```
+x:  choice1 => option1
+    choice2 => option2
+
+y:  choice1 => option1
+    choice2 => option3
+```
+
+Agreement Calculation:
+
+choice1 matches, but choice2 does not.
+Agreement(x, y) = 0.5 (50%).
+
+#### Example 3
+
+```
+x:  choice1 => option1
+    choice2 => option2
+
+y:  choice1 => option3
+    choice2 => option4
+```
+
+Agreement Calculation:
+
+Neither choice1 nor choice2 matches.
+Agreement(x, y) = 0 (0%).
+
 
 ### Exact matching choices example
 For data labeling tasks where annotators select a choice, such as image or text classification, or data labeling tasks where annotators select a rating, you can select the `Exact matching choices` agreement metric. For this function, the agreement score for two given task annotations `x` and `y` is computed as follows:
