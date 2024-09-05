@@ -11,7 +11,7 @@ import "./Breadcrumbs.scss";
 const { Block, Elem } = BemWithSpecifiContext();
 
 export const Breadcrumbs = () => {
-  const config = useConfig();
+  const config = useConfig( );
   const reactBreadcrumbs = useBreadcrumbs();
   const findComponent = useFindRouteComponent();
   const [breadcrumbs, setBreadcrumbs] = useState(reactBreadcrumbs);
