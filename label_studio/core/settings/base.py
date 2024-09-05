@@ -226,7 +226,6 @@ INSTALLED_APPS = [
     'labels_manager',
     'ml_models',
     'ml_model_providers',
-    'django_migration_linter',
 ]
 
 MIDDLEWARE = [
@@ -767,8 +766,10 @@ REDIS_SSL_SETTINGS = {
 OPENAI_API_VERSION = get_env('OPENAI_API_VERSION', '2024-06-01')
 APPEND_SLASH = False
 
-MIGRATION_LINTER_OPTIONS = {
-    'no_cache': True,
-    'ignore_name': '0002_auto_20210304_1457',
-    'sql-analyser': 'postgresql',
-}
+if CI:
+    INSTALLED_APPS += ['django_migration_linter']
+    MIGRATION_LINTER_OPTIONS = {
+        'no_cache': True,
+        'ignore_name': '0002_auto_20210304_1457',
+        'sql-analyser': 'postgresql',
+    }
