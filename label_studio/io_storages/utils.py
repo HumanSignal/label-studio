@@ -18,6 +18,7 @@ class BucketURI:
 
 
 def get_uri_via_regex(data, prefixes=('s3', 'gs')):
+def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[str | None, str | None]:
     data = str(data).strip()
     middle_check = False
 
