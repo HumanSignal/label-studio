@@ -3,7 +3,7 @@
 
   height: 24px;
   display: flex;
-  background-color: transparent;
+  background-color: var(--hover);
 
   &__label {
     left: 0;
@@ -93,9 +93,12 @@
     display: flex;
   }
 
-  &:hover,
-  &_selected {
+  &:hover {
     --hover: rgba(0, 0, 0, 0.04);
+  }
+  &_selected,
+  &_selected:hover {
+    --hover: rgba(0, 0, 0, 0.08);
   }
 }
 
