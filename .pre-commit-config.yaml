@@ -23,6 +23,5 @@ repos:
         name: stylelint
         entry: bash -c 'cd web && npx stylelint **/*.scss --fix'
         language: node
-        types: [scss]
-        files: ^.*\.scss$
+        files: ^web/.*
 
