@@ -265,8 +265,8 @@ class ImportStorage(Storage):
         elif isinstance(uri, str):
             try:
                 # extract uri first from task data
-                extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
-                if not extracted_storage:
+                extracted_uri, _ = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
+                if not self.can_resolve_url(extracted_uri):
                     logger.debug(f'No storage info found for URI={uri}')
                     return
 
