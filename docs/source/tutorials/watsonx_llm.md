@@ -7,7 +7,7 @@ hide_menu: true
 hide_frontmatter_title: true
 meta_title: Integrate WatsonX with Label Studio
 categories:
-    - Computer Vision
+    - Generative AI
     - Large Language Model
     - WatsonX
 image: "/tutorials/watsonx.png"
