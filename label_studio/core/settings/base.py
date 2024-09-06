@@ -226,7 +226,6 @@ INSTALLED_APPS = [
     'labels_manager',
     'ml_models',
     'ml_model_providers',
-    'django_migration_linter'
 ]
 
 MIDDLEWARE = [
