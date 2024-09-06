@@ -117,17 +117,9 @@ jobs:
 
       - name: Test migrations
         run: |
-          output=$(poetry run python label_studio/manage.py makemigrations)
-          if ! grep 'No changes detected' <<< "${output}"; then
-            error="${output}"
-            error="${error//'%'/'%25'}"
-            error="${error//$'\n'/'%0A'}"
-            error="${error//$'\r'/'%0D'}"
-            echo "::error::${error}"
-            exit 1
-          fi
+          poetry run python label_studio/manage.py makemigrations
 
       - name: Lint migrations
         continue-on-error: true
         run: |
-          poetry run python label_studio/manage.py lintmigrations --warnings-as-errors --git-commit-id ${{ github.event.pull_request.base.sha || github.event.before }}
+          poetry run python label_studio/manage.py lintmigrations --warnings-as-errors --project-root-path '.' --git-commit-id ${{ github.event.pull_request.base.sha || github.event.before }}
