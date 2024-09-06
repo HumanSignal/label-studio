@@ -1,6 +1,7 @@
 .board {
   --ranker-gap: 8px;
-  --ranker-border-color: var(--sand_300);
+  --ranker-border-color: rgb(34 36 38 / 15%);
+
   display: flex;
   justify-content: space-evenly;
   width: 100%;
@@ -88,16 +89,16 @@
   margin-left: auto;
 }
 
-.item.expanded>.itemTitle:hover::after {
+.item.expanded > .itemTitle:hover::after {
   content: '▲';
 }
 
-.item.collapsed>.itemTitle::after {
+.item.collapsed > .itemTitle::after {
   content: '▽';
   margin-left: auto;
 }
 
-.item.collapsed>.itemTitle:hover::after {
+.item.collapsed > .itemTitle:hover::after {
   content: '▼';
 }
 

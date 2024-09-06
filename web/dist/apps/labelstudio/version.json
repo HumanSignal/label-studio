@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-960: Improve the bundling strategy and ship a single entrypoint with a common vendor chunk across all libs (#6163)",
-  "commit": "4aead5381e55dec90a64f7af543147ae8f43a246",
-  "date": "2024-08-30T16:04:34.000Z",
+  "message": "fix: OPTIC-1079: Converted Stylus to SCSS included invalid usages of some css variables follow up (#6326)",
+  "commit": "c092f282727171ebc69f6f18094ee2d8c74d496b",
+  "date": "2024-09-06T02:59:14.000Z",
   "branch": "develop"
 }

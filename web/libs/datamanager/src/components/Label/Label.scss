@@ -1,4 +1,4 @@
-@import "../../styles/waiting.scss";
+@import "../../styles/waiting";
 
 .label-view {
   height: 100%;
@@ -16,6 +16,7 @@
     border-radius: 4px;
     transform: translate(-50%, -50%);
     box-shadow: 0 5px 20px var(--black_20);
+
     @include waiting(var(--accent_color));
   }
 

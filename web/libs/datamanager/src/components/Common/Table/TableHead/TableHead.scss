@@ -4,7 +4,6 @@
   height: 50px;
   z-index: 150;
   font-weight: 500;
-  position: sticky;
   overflow: visible;
   background-color: var(--white);
   min-width: fit-content;
@@ -26,9 +25,9 @@
   }
 
   &__draggable {
-    --translatex: 0;
-    --translatey: 0;
-    transform: translate(var(--translatex), var(--translatey));
+    --scale: 1;
+
+    transform: scale(var(--scale));
     cursor: move;
   }
 }

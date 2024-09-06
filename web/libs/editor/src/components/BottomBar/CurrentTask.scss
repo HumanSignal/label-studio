@@ -5,12 +5,10 @@
   align-items: center;
 
   &_with-history {
-    height: 100%;
     display: grid;
+    grid-template: "id buttons" 1fr "id buttons" 1fr / 1fr min-content;
+    height: 100%;
     width: 220px;
-    grid-template-columns: 1fr min-content;
-    grid-template-areas: 'id buttons' 'id buttons';
-    grid-template-rows: 1fr 1fr;
   }
 
   &__task-id {
@@ -39,8 +37,7 @@
   &__prevnext {
     width: 32px;
     height: 32px;
-    align-self: center;
-    justify-self: center;
+    place-self: center center;
 
     &::before {
       top: 50%;
