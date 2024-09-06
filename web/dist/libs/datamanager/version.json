@@ -1,6 +1,6 @@
 {
-  "message": "ci: OPTIC-1063: Adding linting to scss (#6134)",
-  "commit": "3dc2839cfbc19cc9479e2bf8c0d89542e6774e19",
-  "date": "2024-09-05T16:01:31.000Z",
+  "message": "fix: OPTIC-1081: BigInteger support in Data Manager (#6328)",
+  "commit": "a2ef47a7e2c750f2a6c580b123c2f376a818dad2",
+  "date": "2024-09-06T13:44:04.000Z",
   "branch": "develop"
 }

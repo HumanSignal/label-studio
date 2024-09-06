@@ -16,7 +16,7 @@
     display: flex;
     padding: 0 8px;
     justify-content: space-between;
-    background: linear-gradient(0deg, var(transparent), var(transparent) 100%), linear-gradient(0deg, #FAFAFA, #FAFAFA 100%);
+    background: linear-gradient(0deg, var(--hover), var(--hover) 100%), linear-gradient(0deg, #FAFAFA, #FAFAFA 100%);
     box-shadow: 1px 0 0 rgb(0 0 0 / 5%);
   }
 

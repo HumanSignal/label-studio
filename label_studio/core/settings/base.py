@@ -135,6 +135,9 @@ if BASE_DATA_DIR is None:
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
 logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
+# This indicates whether the code is running in a Continuous Integration environment.
+CI = get_bool_env('CI', False)
+
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DJANGO_DB_MYSQL = 'mysql'
@@ -762,3 +765,11 @@ REDIS_SSL_SETTINGS = {
 
 OPENAI_API_VERSION = get_env('OPENAI_API_VERSION', '2024-06-01')
 APPEND_SLASH = False
+
+if CI:
+    INSTALLED_APPS += ['django_migration_linter']
+    MIGRATION_LINTER_OPTIONS = {
+        'no_cache': True,
+        'ignore_name': '0002_auto_20210304_1457',
+        'sql-analyser': 'postgresql',
+    }

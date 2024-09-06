@@ -99,7 +99,7 @@ When you're done, click **Save**.
 <div class="opensource-only">
 
 !!! error Enterprise
-    Workspaces are only available for Label Studio Enterprise users. Label Studio Enterprise also includes many additional configuration options for projects, such as role-based access control and workflow automation. For more information, see [Compare Community and Enterprise Features](label_studio_comparison). 
+    Workspaces are only available for Label Studio Enterprise users. Label Studio Enterprise also includes many additional configuration options for projects, such as role-based access control and workflow automation. For more information, see [Compare Community and Enterprise Features](label_studio_compare). 
 
 </div>
 

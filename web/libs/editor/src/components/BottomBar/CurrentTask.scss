@@ -5,14 +5,10 @@
   align-items: center;
 
   &_with-history {
-    height: 100%;
     display: grid;
+    grid-template: "id buttons" 1fr "id buttons" 1fr / 1fr min-content;
+    height: 100%;
     width: 220px;
-    grid-template:
-      "id buttons"
-      "id buttons"
-      1fr 1fr
-      / 1fr min-content;
   }
 
   &__task-id {
