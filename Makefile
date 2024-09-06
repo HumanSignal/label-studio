@@ -14,6 +14,19 @@ makemigrations-dev:
 shell-dev:
 	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio python label_studio/manage.py shell_plus
 
+env-dev-setup:
+	if [ ! -f .env ]; then
+		cp .env.development .env
+	fi
+
+docker-dev-override:
+	if [ ! -f docker-compose.override.yml ]; then
+		cp docker-compose.override.example.yml docker-compose.override.yml
+	fi
+
+# Configure Django dev server with Hot Module Replacement in docker
+docker-dev-setup: env-dev-setup docker-dev-override
+
 docker-run-dev:
 	docker-compose up --build
 
