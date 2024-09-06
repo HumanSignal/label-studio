@@ -94,7 +94,7 @@ class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
             presign_ttl=self.presign_ttl,
         )
 
-    def can_resolve_url(self, url: str) -> bool:
+    def can_resolve_url(self, url: str | None) -> bool:
         return storage_can_resolve_bucket_url(self, url)
 
     def scan_and_create_links(self):

@@ -176,7 +176,7 @@ class S3ImportStorageBase(S3StorageMixin, ImportStorage):
     def generate_http_url(self, url):
         return resolve_s3_url(url, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
 
-    def can_resolve_url(self, url: str) -> bool:
+    def can_resolve_url(self, url: str | None) -> bool:
         return storage_can_resolve_bucket_url(self, url)
 
     def get_blob_metadata(self, key):
