@@ -250,6 +250,438 @@ Or you can contribute to this repository and add training support for this ML ba
 
 <br>
 
+
+## Classification using `<Choices>`
+
+YOLO provides a classification model and Label Studio supports this with the `Choices` control tag.
+
+More info: https://docs.ultralytics.com/tasks/classify/
+
+https://github.com/user-attachments/assets/30c5ce43-2c89-4ddf-a77d-9d1d75ac3419
+
+
+### Labeling config
+
+```xml
+<View>
+  <Image name="image" value="$image"/>
+  <Choices name="choice" toName="image" model_score_threshold="0.25">
+    <Choice value="Airplane" predicted_values="aircraft_carrier,airliner,airship,warplane"/>
+    <Choice value="Car" predicted_values="limousine,minivan,jeep,sports_car,passenger_car,police_van"/>
+  </Choices>
+</View>
+```
+
+### Parameters
+
+| Parameter               | Type   | Default | Description                                                                                                                                                                                                                                                                                                                                                          |
+|-------------------------|--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives.                                                                                                                                                                               |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                                                                                                                                                                                                         |
+| `choice`                | string | single  | Possible values: `single`, `single-radio`, `multiple`. If you use `choice="single"` (default) you can select only one label. The ML backend will return the label with the highest confidence using argmax strategy. If you use `choice="multiple"` you can select multiple labels. The ML backend will return all labels with confidence above the `model_score_threshold`. |
+
+
+For example:
+```xml
+<Choices name="choice" toName="image" model_score_threshold="0.25" model_path="my_model.pt">
+```
+
+### Default model
+
+`yolov8n-cls.pt` is the default classification model.
+
+<br>
+
+-------------------
+
+<br>
+
+## Object detection using `RectangleLabels`
+
+YOLO models provide bounding box detection, also known as "object detection." 
+Label Studio supports this with the `RectangleLabels` control tag.
+
+YOLO OBB models are also supported.
+
+More info: https://docs.ultralytics.com/tasks/detect/
+
+https://github.com/user-attachments/assets/413b4650-422d-43dc-809d-51c08f0ad434
+
+
+### Labeling config
+
+```xml
+<View>
+  <Image name="image" value="$image"/>
+  <RectangleLabels name="label" toName="image" model_score_threshold="0.25" opacity="0.1">
+    <Label value="Person" background="red"/>
+    <Label value="Car" background="blue"/>
+  </RectangleLabels>
+</View>
+```
+
+### Parameters
+
+| Parameter               | Type   | Default | Description                                                                                                                                                                            |
+|-------------------------|--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives. |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                               |
+| `model_obb`             | bool   | False   | Enables Oriented Bounding Boxes (OBB) mode. Typically it uses `*-obb.pt` yolo models.                                                                                                  |
+
+For example:
+```xml
+<RectangleLabels name="label" toName="image" model_score_threshold="0.25" model_path="my_model.pt">
+```
+
+### Default model
+
+`yolov8m.pt` is the default object detection model.
+`yolov8n-obb.pt` is the default OBB object detection model.
+
+### Oriented Bounding Boxes (YOLO OBB)
+
+Oriented (rotated) bounding boxes will be generated automatically if you use an OBB model. 
+Specify `model_obb="true"` in the `RectangleLabels` tag to enable this mode:
+
+```xml
+<RectangleLabels name="label" toName="image" model_score_threshold="0.25" model_obb="true">
+```
+
+More info: https://docs.ultralytics.com/tasks/obb/
+
+<br>
+
+-------------------
+
+<br>
+
+## Segmentation using `PolygonLabels`
+
+YOLO models provide segmentation detection, also known as "instance segmentation." 
+Label Studio supports this with the `PolygonLabels` control tag.
+
+More info: https://docs.ultralytics.com/tasks/segment/
+
+![Yolo Polygons](./YoloPolygons.gif)
+
+https://github.com/user-attachments/assets/9b2447d3-392d-42be-bc7f-ef2b6c81d54c
+
+
+### Labeling config
+
+```xml
+<View>
+  <Image name="image" value="$image"/>
+  <PolygonLabels name="label" toName="image" model_score_threshold="0.25" opacity="0.1">
+    <Label value="Car" background="blue"/>
+    <Label value="Person" background="red"/>
+  </PolygonLabels>
+</View>
+```
+
+### Parameters
+
+| Parameter               | Type   | Default | Description                                                                                                                                                                            |
+|-------------------------|--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives. |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                               |
+
+For example:
+```xml
+<PolygonLabels name="label" toName="image" model_score_threshold="0.25" model_path="my_model.pt">
+```
+
+### Default model
+
+`yolov8n-seg.pt` is the default segmentation model.
+
+<br>
+
+-------------------
+
+<br>
+
+## Keypoint detection using `KeyPointLabels`
+
+YOLO models provide keypoint detection, also known as "pose estimation." 
+Label Studio supports this with the `KeyPointLabels` control tag.
+
+More info: [Ultralytics YOLO Keypoint Documentation](https://docs.ultralytics.com/tasks/pose/)
+
+![image](https://github.com/user-attachments/assets/72e32125-ba72-47b2-bc9d-a3269d199996)
+
+
+### Labeling config
+
+```xml
+<View>
+  <RectangleLabels name="keypoints_bbox" toName="image" model_skip="true">
+    <Label value="person"/>
+  </RectangleLabels>
+  
+  <KeyPointLabels name="keypoints" toName="image"
+    model_score_threshold="0.75" model_point_threshold="0.5" 
+    model_add_bboxes="true" model_point_size="1"
+    model_path="yolov8n-pose.pt"
+  >
+    <Label value="nose" predicted_values="person" model_index="1" background="red" />
+
+    <Label value="left_eye" predicted_values="person" model_index="2" background="yellow" />
+    <Label value="right_eye" predicted_values="person" model_index="3" background="yellow" />
+
+    <Label value="left_ear" predicted_values="person" model_index="4" background="purple" />
+    <Label value="right_ear" predicted_values="person" model_index="5" background="purple" />
+    
+    <View>
+      <Label value="left_shoulder" predicted_values="person" model_index="6" background="green" />
+      <Label value="left_elbow" predicted_values="person" model_index="8" background="green" />
+      <Label value="left_wrist" predicted_values="person" model_index="10" background="green" />
+
+      <Label value="right_shoulder" predicted_values="person" model_index="7" background="blue" />
+      <Label value="right_elbow" predicted_values="person" model_index="9" background="blue" />
+      <Label value="right_wrist" predicted_values="person" model_index="11" background="blue" />
+    </View>
+    
+    <View>
+      <Label value="left_hip" predicted_values="person" model_index="12" background="brown" />
+      <Label value="left_knee" predicted_values="person" model_index="14" background="brown" />
+      <Label value="left_ankle" predicted_values="person" model_index="16" background="brown" />
+
+      <Label value="right_hip" predicted_values="person" model_index="13" background="orange" />
+      <Label value="right_knee" predicted_values="person" model_index="15" background="orange" />
+      <Label value="right_ankle" predicted_values="person" model_index="17" background="orange" />
+    </View>
+  </KeyPointLabels>
+  
+  <Image name="image" value="$image" />
+</View>
+```
+
+### Parameters
+
+| Parameter               | Type   | Default | Description                                                                                                                                                                    |
+|-------------------------|--------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                       |
+| `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for bounding box detections. Keypoints that are related to the detected bbox with a confidence below this threshold will be disregarded. |
+| `model_point_threshold` | float  | 0.0     | Minimum confidence threshold for keypoints. Keypoints with confidence below this value will be ignored.                                                                        |
+| `model_add_bboxes`      | bool   | True    | Adds bounding boxes for detected keypoints. All keypoints will be grouped by parent bounding boxes on the region panel. See details in the tip below.                          |
+| `model_point_size`      | float  | 1       | Size of the keypoints in pixels. Just a visual parameter.                                                                                                                      |
+| `model_index`           | int    | None    | Index of the keypoint in the YOLO model output. It's used in `Label` tags only to build mapping between a Label and an output point.                                           |
+
+For example:
+
+```xml
+<KeyPointLabels name="keypoints" toName="image"
+                model_path="yolov8n-pose.pt"
+                model_score_threshold="0.25" model_point_threshold="0.5" 
+                model_add_bboxes="true" model_point_size="2">
+```
+
+### Default model
+
+`yolov8n-pose.pt` is the default keypoint detection model.
+
+### Grouping keypoints with bounding boxes
+
+When using keypoint detection, the ML backend groups keypoints by the bounding box (bbox) associated with each detected person or object. 
+You will see the grouping under the **Regions** panel on the right side of Label Studio. Note that you can drag and drop region items as necessary.
+
+The bounding boxes are added to the prediction results by default. You can enable or disable this behavior by setting `model_add_bboxes`:
+
+```xml
+<KeyPointLabels name="keypoints" toName="image" model_add_bboxes="false">
+```
+
+<details><summary>Tip: How to only keep keypoints and discard bounding boxes?</summary>
+
+To enable both keypoint detection and bounding box detection in the same task, you have to 
+1. set `model_add_bboxes="false"` in the `KeyPointLabels` tag,
+2. remove `RectangleLabels` tag.
+
+You can use this labeling configuration to get rid of bounding boxes and keep only keypoints:
+
+```xml
+<View>
+  <KeyPointLabels name="keypoints" toName="image"
+    model_score_threshold="0.75" model_point_threshold="0.5" 
+    model_path="yolov8n-pose.pt" model_point_size="1"
+    model_add_bboxes="false"              
+  >
+    <Label value="nose" predicted_values="person" model_index="1" background="red" />
+
+    <Label value="left_eye" predicted_values="person" model_index="2" background="yellow" />
+    <Label value="right_eye" predicted_values="person" model_index="3" background="yellow" />
+
+    <Label value="left_ear" predicted_values="person" model_index="4" background="purple" />
+    <Label value="right_ear" predicted_values="person" model_index="5" background="purple" />
+    
+    <View>
+      <Label value="left_shoulder" predicted_values="person" model_index="6" background="green" />
+      <Label value="left_elbow" predicted_values="person" model_index="8" background="green" />
+      <Label value="left_wrist" predicted_values="person" model_index="10" background="green" />
+
+      <Label value="right_shoulder" predicted_values="person" model_index="7" background="blue" />
+      <Label value="right_elbow" predicted_values="person" model_index="9" background="blue" />
+      <Label value="right_wrist" predicted_values="person" model_index="11" background="blue" />
+    </View>
+    
+    <View>
+      <Label value="left_hip" predicted_values="person" model_index="12" background="brown" />
+      <Label value="left_knee" predicted_values="person" model_index="14" background="brown" />
+      <Label value="left_ankle" predicted_values="person" model_index="16" background="brown" />
+
+      <Label value="right_hip" predicted_values="person" model_index="13" background="orange" />
+      <Label value="right_knee" predicted_values="person" model_index="15" background="orange" />
+      <Label value="right_ankle" predicted_values="person" model_index="17" background="orange" />
+    </View>
+  </KeyPointLabels>
+  <Image name="image" value="$image" />
+</View>
+```
+
+</details>
+
+### Point mapping
+
+For precise control, you can map keypoints to specific labels in your Label Studio configuration. 
+Each keypoint can be associated with a specific part of a person or object, 
+and you can define this mapping using the `model_index` and `predicted_values` attributes.
+
+```xml
+<Label value="left_eye" predicted_values="person" model_index="2" />
+<Label value="right_eye" predicted_values="person" model_index="3" />
+```
+
+This configuration ensures that the keypoints detected by the YOLO model are correctly labeled in the Label Studio interface.
+For pose detection models, the `model_index` attribute is used to map keypoints to specific parts of the body according to the YOLO model output:
+
+```
+0: Nose 1: Left Eye 2: Right Eye 3: Left Ear 4: Right Ear 
+5: Left Shoulder 6: Right Shoulder 7: Left Elbow 8: Right Elbow 9: Left Wrist 10: Right Wrist 
+11: Left Hip 12: Right Hip 13: Left Knee 14: Right Knee 15: Left Ankle 16: Right Ankle
+```
+
+### Recommendations
+
+- **Bounding Box Visualization**: Use the `model_add_bboxes` parameter to visualize the bounding box containing the keypoints. This is especially useful when dealing with multiple detected persons or objects.
+- **Threshold Adjustment**: Adjust the `model_score_threshold` and `model_point_threshold` parameters based on your dataset and the confidence level required for accurate keypoint detection.
+
+<br>
+
+-------------------
+
+<br>
+
+## Video object tracking using `VideoRectangle` 
+
+YOLO models provide object tracking, also known as "multi-object tracking."
+Label Studio supports this with the `VideoRectangle` + `Labels` control tags.
+
+More info: https://docs.ultralytics.com/modes/track/
+
+![Video Object Tracking](./YoloVideo.gif)
+
+
+https://github.com/user-attachments/assets/7b0d50e6-164a-4d66-87cf-df443b77f638
+
+
+
+### Labeling config
+
+```xml
+<View>
+    <Video name="video" value="$video"/>
+    <VideoRectangle name="box" toName="video" model_tracker="botsort" model_conf="0.25" model_iou="0.7" />
+    <Labels name="label" toName="video">
+      <Label value="Person" background="red"/>
+      <Label value="Car" background="blue"/>
+    </Labels>
+</View>
+```
+
+### Trackers
+
+https://docs.ultralytics.com/modes/track/?h=track#tracker-selection
+
+The best tracker to use with Ultralytics YOLO depends on your specific needs.
+
+
+The default tracker is [BoT-SORT](https://github.com/NirAharon/BoT-SORT), which is generally well-suited for most scenarios. 
+
+However, if you're looking for an alternative with different strengths, 
+[ByteTrack](https://github.com/ifzhang/ByteTrack) is another good choice that you can easily configure. 
+ByteTrack is known for its high performance in multi-object tracking, 
+especially in situations with varying object appearances and reappearances. 
+
+Both trackers can be customized using YAML configuration files to fit your specific use cases.
+
+You can specify the tracker in the control tag: 
+* `<VideoRectangle model_tracker="botsort">`
+* `<VideoRectangle model_tracker="bytetrack">`
+
+### Parameters for bounding boxes
+
+The tracker works with the object detection model (bounding boxes). 
+
+The first step is to detect bounding boxes, the second step is to track them (find the same boxes among frames). 
+These parameters are related to the first step - bounding box detection.
+
+Read more about these parameters: 
+https://docs.ultralytics.com/modes/track/?h=track#tracking-arguments
+
+| Parameter       | Type   | Default   | Description                                                                                                                                                                            |
+|-----------------|--------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `model_conf`    | float  | 0.25      | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives. |
+| `model_iou`     | float  | 0.7       | Intersection Over Union (IoU) threshold for Non-Maximum Suppression (NMS). Lower values result in fewer detections by eliminating overlapping boxes, useful for reducing duplicates.   |
+| `model_tracker` | string | `botsort` | Sets the tracker to use for multi-object tracking. Options include `botsort`, `bytetrack`, or a custom YAML file.                                                                      |
+| `model_path`    | string | None      | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                               |
+
+For example: 
+```xml
+<VideoRectangle name="label" toName="video" model_tracker="botsort" model_conf="0.25" model_iou="0.7" />  
+```
+
+### Parameters for trackers 
+
+For an example of tracker parameters, see https://github.com/ultralytics/ultralytics/tree/main/ultralytics/cfg/trackers. 
+
+The main parameter is `model_tracker` which can be set to 
+* `botsort` 
+* `bytetrack`
+* Or the name of any custom yaml file that you place into `models` directory (do not include the file extension `.yaml` when setting this parameter).  
+
+As long as they are available within the yaml file, you can specify tracker parameters directly from the labeling config. All parameters should be prefixed with `botsort_` or `bytetrack_`.
+
+For example: 
+```xml
+<VideoRectangle 
+    name="label" toName="video" 
+    model_tracker="botsort" 
+    botsort_track_low_thresh="0.1" botsort_track_high_thresh="0.2" 
+/>  
+```
+
+### Default model
+
+`yolov8n.pt` is the default object detection model. 
+
+### Recommendations
+
+* Video object tracking is a computationally intensive task. 
+Small models like `yolov8n.pt` are recommended for real-time tracking, however, they may not be as accurate as larger models.
+
+* Label Studio has timeout limits for ML backend requests. You can adjust the timeout in the Label Studio backend settings.
+
+<!-- TODO: https://github.com/HumanSignal/label-studio/pull/5414/files#diff-20432d8093df2c0400b0f41b004a6b772b856b985fa1f5fd1e1f909247c89fc6L30 -->
+
+* Or use the [CLI tool](#When-to-use-the-CLI) to run predictions asynchronously.
+
+<br>
+
+-------------------
+
+<br>
+
 ## Run the YOLO ML backend
 
 
