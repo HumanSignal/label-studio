@@ -6,6 +6,7 @@
     padding-right: 4px;
     align-items: center;
   }
+
   .title {
     flex: 1;
   }
@@ -68,6 +69,7 @@
     display: flex;
     align-items: flex-end;
     opacity: 0.8;
+
     span {
       margin-right: 0;
     }
@@ -78,8 +80,8 @@
   }
 
   &.selected {
-    //noinspection CssInvalidFunction
-    box-shadow: 0 0 0 4px var(--labelBgColor, var(--sand_300));
+    // noinspection CssInvalidFunction
+    box-shadow: 0 0 0 4px var(--labelBgColor, rgb(0 0 0 / 20%));
   }
 
   &_label {

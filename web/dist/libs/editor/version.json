@@ -1,6 +1,6 @@
 {
-  "message": "refactor: optic 929: remove stale feature flags (#6284)",
-  "commit": "1c12b1740db5304aede5051fc78bd3dc2819b4c3",
-  "date": "2024-09-03T16:10:04.000Z",
+  "message": "fix: OPTIC-1079: Converted Stylus to SCSS included invalid usages of some css variables follow up (#6326)",
+  "commit": "c092f282727171ebc69f6f18094ee2d8c74d496b",
+  "date": "2024-09-06T02:59:14.000Z",
   "branch": "develop"
 }

@@ -48,6 +48,7 @@ Datamanager is an advanced tool specifically for data exploration within Label S
     - `yarn test:integration`: Run integration tests for all apps and libraries.
     - `yarn test:unit`: Run unit tests for all apps and libraries.
     - `yarn lint`: Run biome linter across all files with autofix.
+    - `yarn lint-scss`: Run stylelint linter across all scss files with autofix.
 
 ### Git Hooks
 This project uses python `pre-commit` hooks to ensure code quality. To install the hooks, run `make configure-hooks` in the project root directory.
