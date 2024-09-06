@@ -586,6 +586,9 @@ stages:
               some: 'some text'
             - item2: gs://test-gs-bucket_JSON/manual.link.jpg
               some: 'some text'
+            # This link should not be resolved - no matching bucket
+            - item3: gs://bad-bucket/manual.link.jpg
+              some: 'some text'
       method: POST
       url: '{django_live_url}/api/projects/{project_pk}/import'
     response:
@@ -627,6 +630,9 @@ stages:
             - item1: !re_match "https://storage.googleapis.com/test-gs-bucket_JSON/manual.link.+"
               some: 'some text'
             - item2: !re_match "https://storage.googleapis.com/test-gs-bucket_JSON/manual.link.+"
+              some: 'some text'
+            # This link should remain unresolved - no matching bucket
+            - item3: !re_match "gs://bad-bucket/manual.link.+"
               some: 'some text'
       status_code: 200
 
