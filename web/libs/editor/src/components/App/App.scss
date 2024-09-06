@@ -1,4 +1,4 @@
-@import "../../assets/styles/global.scss";
+@import "../../assets/styles/global";
 
 .editor {
   --main-bg-color: var(--sand_100);
@@ -11,9 +11,8 @@
   min-width: 320px;
   margin: 0 auto;
   display: flex;
-  flex-wrap: nowrap;
+  flex-flow: column nowrap;
   align-items: stretch;
-  flex-direction: column;
   background-color: var(--main-bg-color);
 
   &__auto_height {
@@ -107,7 +106,7 @@
     font-weight: bold;
     font-size: 12px;
     text-transform: uppercase;
-    box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 1px 0px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 10%), 0 1px 0 rgb(0 0 0 / 8%);
   }
 
   &__key + &__key {

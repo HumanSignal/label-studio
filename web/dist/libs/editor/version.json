@@ -1,6 +1,6 @@
 {
-  "message": "refactor: optic 929: remove stale feature flags (#6284)",
-  "commit": "1c12b1740db5304aede5051fc78bd3dc2819b4c3",
-  "date": "2024-09-03T16:10:04.000Z",
+  "message": "fix: OPTIC-1081: BigInteger support in Data Manager (#6328)",
+  "commit": "a2ef47a7e2c750f2a6c580b123c2f376a818dad2",
+  "date": "2024-09-06T13:44:04.000Z",
   "branch": "develop"
 }

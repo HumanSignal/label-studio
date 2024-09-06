@@ -42,7 +42,7 @@ See [here](https://github.com/IDEA-Research/GroundingDINO) for more details abou
 
     Example:
    - `LABEL_STUDIO_HOST=http://123.456.7.8:8080`
-   - `LABEL_STUDIO_ACCESS_TOKEN=c9djf998eii2948ee9hh835nferkj959923`
+   - `LABEL_STUDIO_ACCESS_TOKEN=your-api-key`
 
 3. Run `docker compose up`
 4. Check the IP of your backend using `docker ps`. You will use this URL when connecting the backend to a Label Studio project. Usually this is `http://localhost:9090`.

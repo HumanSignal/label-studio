@@ -1,4 +1,4 @@
-$border-thin: 1px solid rgba(137, 128, 152, 0.16);
+$border-thin: 1px solid rgb(137 128 152 / 16%);
 
 .phrase {
   background: #e8ffd0;
@@ -18,17 +18,13 @@ $border-thin: 1px solid rgba(137, 128, 152, 0.16);
 .name {
   background: transparent !important;
   margin-right: 5px;
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Old versions of Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
+  -webkit-touch-callout: none;
   user-select: none; /* Non-prefixed version, currently */
 }
 
 .name span {
   background: transparent !important;
-  padding: 0px !important;
+  padding: 0 !important;
 }
 
 .text {
@@ -42,17 +38,13 @@ $border-thin: 1px solid rgba(137, 128, 152, 0.16);
   border-radius: 5px;
   padding: 5px;
   margin-right: 10px;
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Old versions of Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
+  -webkit-touch-callout: none;
   user-select: none; /* Non-prefixed version, currently */
 }
 
 .dialoguename span {
   background: white !important;
-  padding: 0px !important;
+  padding: 0 !important;
 }
 
 .dialoguetext {
@@ -63,8 +55,7 @@ $border-thin: 1px solid rgba(137, 128, 152, 0.16);
 
 .scroll_container {
   position: relative;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   counter-reset: phrase;
   border: $border-thin;
   padding: 8px;
@@ -122,11 +113,13 @@ $border-thin: 1px solid rgba(137, 128, 152, 0.16);
     font-size: 14px;
     line-height: 32px;
   }
+
   &__placeholder {
     font-weight: 400;
     font-size: 14px;
     line-height: 16px;
   }
+
   &__search {
     min-width: 318px;
 
@@ -135,13 +128,14 @@ $border-thin: 1px solid rgba(137, 128, 152, 0.16);
       height: 40px;
       padding: 0 12px;
       border: none;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+      border-bottom: 1px solid rgb(0 0 0 / 15%);
       font-size: 14px;
       line-height: 22px;
       background: #fafafa;
       outline: none;
     }
   }
+
   &__select {
     display: flex;
     align-items: center;
@@ -149,7 +143,7 @@ $border-thin: 1px solid rgba(137, 128, 152, 0.16);
 
     &__item {
       color: initial;
-      background-color: #ffffff;
+      background-color: #fff;
       display: inline-flex;
       font-weight: 400;
       font-size: 14px;
@@ -214,10 +208,10 @@ $border-thin: 1px solid rgba(137, 128, 152, 0.16);
   &:not(.collapsed) {
     background-color: var(--background-color);
     border-left: 4px solid var(--highlight-color);
-    border-top: 1px solid rgba(137, 128, 152, 0.16);
-    border-bottom: 1px solid rgba(137, 128, 152, 0.16);
-    border-right: 1px solid rgba(137, 128, 152, 0.16);
-    padding: 8px 12px 8px 12px;
+    border-top: 1px solid rgb(137 128 152 / 16%);
+    border-bottom: 1px solid rgb(137 128 152 / 16%);
+    border-right: 1px solid rgb(137 128 152 / 16%);
+    padding: 8px 12px;
   }
 
   .dialoguename {

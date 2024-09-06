@@ -21,10 +21,10 @@
     line-height: 19px;
     cursor: pointer;
     box-sizing: border-box;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 0 rgb(0 0 0 / 10%);
 
     &:not(:last-child) {
-      box-shadow: -1px 0 0 rgba(0, 0, 0, 0.1) inset, 0 1px 0 rgba(0, 0, 0, 0.1);
+      box-shadow: -1px 0 0 rgb(0 0 0 / 10%) inset, 0 1px 0 rgb(0 0 0 / 10%);
     }
 
     &_active {
@@ -33,7 +33,7 @@
       cursor: default;
 
       &:not(:last-child) {
-        box-shadow: -1px 0 0 rgba(0, 0, 0, 0.1) inset;
+        box-shadow: -1px 0 0 rgb(0 0 0 / 10%) inset;
       }
     }
   }

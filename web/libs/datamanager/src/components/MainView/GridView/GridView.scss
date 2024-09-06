@@ -23,6 +23,7 @@
   &__cell {
     padding: 16px 16px 0 0;
     box-sizing: border-box;
+
     &-header {
       padding: 5px;
       width: 100%;
@@ -41,10 +42,7 @@
       background: none;
 
       &::after {
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        inset: 0;
         content: "";
         position: absolute;
         pointer-events: none;
@@ -55,10 +53,10 @@
 
     &_selected &-content {
       background-color: #eff7ff;
-      box-shadow: 0 0 2px 2px rgba(var(--accent_color-raw), 0.44);
+      box-shadow: 0 0 2px 2px rgb(var(--accent_color-raw) 0.44);
 
       &::after {
-        box-shadow: 0 0 0 1px rgba(26, 144, 255, 0.6) inset;
+        box-shadow: 0 0 0 1px rgb(26 144 255 / 60%) inset;
       }
     }
   }

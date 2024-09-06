@@ -1,10 +1,10 @@
-@import "../../assets/styles/global.scss";
+@import "../../assets/styles/global";
 
 .block {
   position: relative;
   width: 100%;
-  padding: 1em 1em;
-  border-radius: 0.28571429rem;
+  padding: 1em;
+  border-radius: 0.2857rem;
   margin-bottom: 1em;
 
   @include respond("phone") {
