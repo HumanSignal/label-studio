@@ -73,7 +73,8 @@ def storage_can_resolve_bucket_url(storage, url) -> bool:
     if not uri:
         return False
 
-    if storage.bucket != uri.bucket:
+    storage_bucket: str | None = getattr(storage, 'bucket', None) or getattr(storage, 'container', None)
+    if storage_bucket != uri.bucket:
         return False
 
     if storage.prefix and not uri.path.startswith(storage.prefix):
