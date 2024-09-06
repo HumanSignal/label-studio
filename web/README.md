@@ -18,18 +18,35 @@ Datamanager is an advanced tool specifically for data exploration within Label S
 1 - **Dependencies Installation:**
 - Execute `yarn install --frozen-lockfile` to install all necessary dependencies.
 
-2 - **Environment Configuration:**
+2 - **Environment Configuration (Optional for HMR):**
+- If you want to enable Hot Module Replacement (HMR), create an `.env` file in the root Label Studio directory.
+- Add the following configuration:
+  - `FRONTEND_HMR=true`: Enables Hot Module Replacement in Django.
+
+Optional configurations (defaults should work for most setups):
+  - `FRONTEND_HOSTNAME`: HMR server address (default: http://localhost:8010).
+  - `DJANGO_HOSTNAME`: Django server address (default: http://localhost:8080).
+
+If using Docker Compose with HMR:
+- Update the `env_file: .env` directive in `docker-compose.override.yml` under the app service.
+- Rerun the app or docker compose service from the project root for changes to take effect.
+
+To start the development server with HMR:
+- From the `web` directory: Run `yarn dev`
+- Or from the project root: Run `make frontend-dev`
+
 #### Custom Configuration for DataManager:
 - If you need to customize the configuration specifically for DataManager, follow these steps:
   - Duplicate the `.env.example` file located in the DataManager directory and rename the copy to `.env`.
   - Make your desired changes in this new `.env` file. The key configurations to consider are:
-      - `NX_API_GATEWAY`: Set this to your API root. For example, `https://localhost:8080/api/dm`.
+      - `NX_API_GATEWAY`: Set this to your API root. For example, `http://localhost:8080/api/dm`.
       - `LS_ACCESS_TOKEN`: This is the access token for Label Studio, which can be obtained from your Label Studio account page.
 - This process allows you to have a customized configuration for DataManager, separate from the default settings in the .env.local files.
 
 ## Usage Instructions
 ### Key Development and Build Commands
 - **Label Studio App:**
+    - `yarn ls:dev`: Build the main Label Studio app with Hot Module Reload for development.
     - `yarn ls:watch`: Build the main Label Studio app continuously for development.
     - `yarn ls:e2e`: Run end-to-end tests for the Label Studio app.
     - `yarn ls:unit`: Run unit tests for the Label Studio app.
