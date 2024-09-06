@@ -27,10 +27,95 @@ SAM 2 for better image labeling with label studio.
 Click on the image below to watch our ML Evangelist Micaela Kaplan explain how to link SAM 2 to your Label Studio Project.
 You'll need to follow the instructions below to stand up an instance of SAM2 before you can link your model! 
 
-
 [![Connecting SAM2 Model to Label Studio for Image Annotation ](https://img.youtube.com/vi/FTg8P8z4RgY/0.jpg)](https://www.youtube.com/watch?v=FTg8P8z4RgY)
 
 Note that as of 8/1/2024, SAM2 only runs on GPU.
+
+## Labeling configuration
+
+The current implementation of the Label Studio SAM2 ML backend works using Interactive mode. The user-guided inputs are:
+- `KeypointLabels`
+- `RectangleLabels`
+
+And then SAM2 outputs `BrushLabels` as a result.
+
+This means all three control tags should be represented in your labeling configuration:
+
+```xml
+<View>
+<Style>
+  .main {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 20px;
+  }
+  .container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .column {
+    flex: 1;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  .column .title {
+    margin: 0;
+    color: #333;
+  }
+  .column .label {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 3px;
+  }
+  .image-container {
+    width: 100%;
+    height: 300px;
+    background-color: #ddd;
+    border-radius: 5px;
+  }
+</Style>
+<View className="main">
+  <View className="container">
+    <View className="column">
+      <View className="title">Choose Label</View>
+      <View className="label">
+        <BrushLabels name="tag" toName="image">
+          
+          
+        <Label value="defect" background="#FFA39E"/></BrushLabels>
+      </View>
+    </View>
+    <View className="column">
+      <View className="title">Use Keypoint</View>
+      <View className="label">
+        <KeyPointLabels name="tag2" toName="image" smart="true">
+          
+          
+        <Label value="defect" background="#250dd3"/></KeyPointLabels>
+      </View>
+    </View>
+    <View className="column">
+      <View className="title">Use Rectangle</View>
+      <View className="label">
+        <RectangleLabels name="tag3" toName="image" smart="true">
+          
+          
+        <Label value="defect" background="#FFC069"/></RectangleLabels>
+      </View>
+    </View>
+  </View>
+  <View className="image-container">
+    <Image name="image" value="$image" zoom="true" zoomControl="true"/>
+  </View>
+</View>
+</View>
+```
 
 ## Running from source
 
