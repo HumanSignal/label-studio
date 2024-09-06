@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-1081: BigInteger support in Data Manager (#6328)",
-  "commit": "a2ef47a7e2c750f2a6c580b123c2f376a818dad2",
-  "date": "2024-09-06T13:44:04.000Z",
+  "message": "chore: OPTIC-1060: Hot Module Reload support for frontend development (#6280)",
+  "commit": "c5696cd87c585322d3bdc378aa3f52e566624e3d",
+  "date": "2024-09-06T18:30:10.000Z",
   "branch": "develop"
 }
