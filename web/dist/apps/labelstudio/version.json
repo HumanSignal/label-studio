@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-1079: Converted Stylus to SCSS included invalid usages of some css variables follow up (#6326)",
-  "commit": "c092f282727171ebc69f6f18094ee2d8c74d496b",
-  "date": "2024-09-06T02:59:14.000Z",
+  "message": "fix: OPTIC-1081: BigInteger support in Data Manager (#6328)",
+  "commit": "a2ef47a7e2c750f2a6c580b123c2f376a818dad2",
+  "date": "2024-09-06T13:44:04.000Z",
   "branch": "develop"
 }
