@@ -42,7 +42,7 @@ def parse_readme_file(file_path: str) -> dict:
     with open(file_path, 'r') as f:
         content = f.read()
         
-    match = re.search(r"---(.*?)---", test_content, re.DOTALL)
+    match = re.search(r"---(.*?)---", content, re.DOTALL)
     header = match.group(1).strip()
     body = re.sub(r'^---\n(.*?)\n---\n', '', content, flags=re.DOTALL).strip()
     
@@ -80,7 +80,8 @@ def update_ml_tutorials_index(files_and_headers: List):
     with open(str(p), 'r') as f:
         content = f.read()
 
-    yaml_content = re.findall(r'^---\n(.*?)\n---\n', content, re.DOTALL)
+    match = re.search(r"---(.*?)---", content, re.DOTALL)
+    yaml_content = match.group(1).strip()
     # read in python dict
     data = yaml.load(yaml_content[0].strip(), Loader=yaml.FullLoader)
     data['cards'] = []
