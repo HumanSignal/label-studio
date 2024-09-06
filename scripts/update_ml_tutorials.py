@@ -41,11 +41,11 @@ def get_readme_files() -> List:
 def parse_readme_file(file_path: str) -> dict:
     with open(file_path, 'r') as f:
         content = f.read()
-
+        
     header = re.findall(r'^---\n(.*?)\n---', content, re.DOTALL)
-    body = re.sub(r'^---\n(.*?)\n---', '', content, flags=re.DOTALL)
-
-    return {'header': header[0].strip() if header else '', 'body': body.strip()}
+    body = re.sub(r'^---\n(.*?)\n---', '', content, flags=re.DOTALL).strip()
+    
+    return {'header': header[0].strip() if header else '', 'body': body}
 
 
 def create_tutorial_files():
@@ -79,7 +79,7 @@ def update_ml_tutorials_index(files_and_headers: List):
     with open(str(p), 'r') as f:
         content = f.read()
 
-    yaml_content = re.findall(r'---\n(.*?)\n---', content, re.DOTALL)
+    yaml_content = re.findall(r'^---\n(.*?)\n---', content, re.DOTALL)
     # read in python dict
     data = yaml.load(yaml_content[0].strip(), Loader=yaml.FullLoader)
     data['cards'] = []
