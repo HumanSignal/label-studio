@@ -1158,7 +1158,7 @@ stages:
   response:
     json:
       data:
-        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=czM6Ly9oeXBlcnRleHQtYnVja2V0L2ZpbGUgd2l0aCAvc3BhY2VzIGFuZCcgLyAnIC8gcXVvdGVzLmpwZw=="
+        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=czM6Ly9weXRlc3QtczMtanNvbnMtaHlwZXJ0ZXh0L2ZpbGUgd2l0aCAvc3BhY2VzIGFuZCcgLyAnIC8gcXVvdGVzLmpwZw=="
     status_code: 200
 ---
 # - Check that json blobs containing partially encoded contents resolve correctly from the bucket,
@@ -1222,7 +1222,7 @@ stages:
   response:
     json:
       data:
-        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=czM6Ly9oeXBlcnRleHQtYnVja2V0L2ZpbGUgd2l0aCAvc3BhY2VzIGFuZCcgLyAnIC8gJTJCcXVvdGVzJTNELmpwZw=="
+        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=czM6Ly9weXRlc3QtczMtanNvbi1wYXJ0aWFsbHktZW5jb2RlZC9maWxlIHdpdGggL3NwYWNlcyBhbmQnIC8gJyAvICUyQnF1b3RlcyUzRC5qcGc="
     status_code: 200
 ---
 # we don't fail when unexisted s3:// links occur in the list

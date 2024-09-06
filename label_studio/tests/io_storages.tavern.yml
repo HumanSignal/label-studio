@@ -1575,7 +1575,7 @@ stages:
   response:
     json:
       data:
-        text: !re_match "<a href=\"https://hypertext-bucket.s3.amazonaws.com/file%20with%20/spaces%20and%27%20/%20%27%20/%20quotes.jpg.+X-Amz-Security-Token=testing"
+        text: !re_match "<a href=\"https://pytest-s3-jsons-hypertext.s3.amazonaws.com/file%20with%20/spaces%20and%27%20/%20%27%20/%20quotes.jpg.+X-Amz-Security-Token=testing"
     status_code: 200
 
 ---
