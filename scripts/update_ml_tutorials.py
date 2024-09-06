@@ -42,7 +42,8 @@ def parse_readme_file(file_path: str) -> dict:
     with open(file_path, 'r') as f:
         content = f.read()
         
-    header = re.findall(r'^---\n(.*?)\n---\n', content, re.DOTALL)
+    match = re.search(r"---(.*?)---", test_content, re.DOTALL)
+    header = match.group(1).strip()
     body = re.sub(r'^---\n(.*?)\n---\n', '', content, flags=re.DOTALL).strip()
     
     return {'header': header[0].strip() if header else '', 'body': body}
