@@ -15,10 +15,6 @@ categories:
 image: "/tutorials/nvidia.png"
 ---
 
-<!--
-
--->
-
 # ASR with NeMo
 
 This example demonstrates how to use the [NeMo](https://github.com/NVIDIA/NeMo/blob/main/nemo/collections/asr/README.md) to perform ASR (Automatic Speech Recognition) in Label Studio.

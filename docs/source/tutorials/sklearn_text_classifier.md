@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/scikit-learn.png"
 ---
 
-<!--
-
--->
-
 # Sklearn Text Classifier model for Label Studio
 
 The Sklearn Text Classifier model is a custom machine learning backend for Label Studio. It uses a [Logistic Regression model from the Scikit-learn](https://scikit-learn.org/) library to classify text data. This model is particularly useful for text classification tasks in Label Studio, providing an efficient way to generate pre-annotations based on the model's predictions.

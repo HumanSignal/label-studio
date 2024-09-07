@@ -16,10 +16,6 @@ categories:
 image: "/tutorials/gliner.png"
 ---
 
-<!--
-
--->
-
 # Use GLiNER for NER annotation
 
 The GLiNER model is a BERT family model for generalist NER. We download the model from HuggingFace, but the original
