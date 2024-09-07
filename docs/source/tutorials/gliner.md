@@ -16,26 +16,6 @@ categories:
 image: "/tutorials/gliner.png"
 ---
 
-<!--
----
-title: Use GLiNER for NER annotation
-type: guide
-tier: all
-order: 37
-hide_menu: true
-hide_frontmatter_title: true
-meta_title: Use GLiNER for NER annotation
-meta_description: Tutorial on how to use GLiNER with your Label Studio project to complete NER tasks
-categories:
-    - Natural Language Processing
-    - Named Entity Recognition
-    - GLiNER
-    - BERT
-    - Hugging Face
-image: "/tutorials/gliner.png"
----
--->
-
 # Use GLiNER for NER annotation
 
 The GLiNER model is a BERT family model for generalist NER. We download the model from HuggingFace, but the original

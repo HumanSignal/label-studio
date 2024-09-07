@@ -14,24 +14,6 @@ categories:
 image: "/tutorials/flair.png"
 ---
 
-<!--
----
-title: NER labeling with Flair 
-type: guide
-tier: all
-order: 75
-hide_menu: true
-hide_frontmatter_title: true
-meta_title: Use Flair with Label Studio
-meta_description: Tutorial on how to use Label Studio and Flair for faster NER labeling 
-categories:
-    - Natural Language Processing
-    - Named Entity Recognition
-    - Flair
-image: "/tutorials/flair.png"
----
--->
-
 # Flair NER example
 
 This example demonstrates how to use Flair NER model with Label Studio.

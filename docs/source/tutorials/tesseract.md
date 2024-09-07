@@ -14,24 +14,6 @@ categories:
 image: "/tutorials/tesseract.png"
 ---
 
-<!--
----
-title: Interactive bounding boxes OCR with Tesseract 
-type: guide
-tier: all
-order: 55
-hide_menu: true
-hide_frontmatter_title: true
-meta_title: Interactive bounding boxes OCR in Label Studio with a Tesseract backend
-meta_description: Tutorial for how to use Label Studio and Tesseract to assist with your OCR projects
-categories:
-    - Computer Vision
-    - Optical Character Recognition
-    - Tesseract
-image: "/tutorials/tesseract.png"
----
--->
-
 # Interactive bounding boxes OCR using Tesseract
 
 Use an OCR engine for interactive ML-assisted labeling, facilitating faster 

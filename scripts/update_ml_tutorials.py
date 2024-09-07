@@ -22,50 +22,11 @@ The script does the following:
     - title: ...
     ---
 """
+
+import os
+import re
+import yaml
 import logging
-import os
-import re
-from pathlib import Path
-from typing import List
-
-import yaml
-
-ML_REPO_PATH = os.getenv('ML_REPO_PATH', '/ml')
-
-
-def get_readme_files() -> List:
-    p = Path(ML_REPO_PATH) / 'label_studio_ml' / 'examples'
-    return list(Path(p).rglob('README.md'))
-
-
-"""
-The script does the following:
-
-1. Downloads all README.md files in the label-studio-ml repository https://github.com/HumanSignal/label-studio-ml-backend by path label_studio_ml/examples/{model_name}/README.md
-2. Parses the README.md files to extract the following information:
-- HEADER: enclosed in `---` (e.g. `---\n Header Content \n---`)
-- BODY: The rest of the content after header
-3. For each `model_name` in the label-studio-ml repository, it creates a new file in the docs/source/tutorials copying the README.md content
-4. Additionally, it changes the file in docs/source/guide/ml_tutorials.html, adding HEADER as a new item in `cards` list:
-    ---
-    section: "Machine learning"
-    meta_title: Machine Learning Example Tutorials
-    meta_description: Tutorial documentation for setting up a machine learning model with predictions using PyTorch, GPT2, Sci-kit learn, and other popular frameworks.
-    layout: templates
-    cards:
-    - title: Create a simple ML backend
-      categories:
-      - image classification
-      - starter
-      image: "/tutorials/simple-image-classification.png"
-      url: "/tutorials/dummy_model.html"
-    - title: ...
-    ---
-"""
-
-import os
-import re
-import yaml
 from pathlib import Path
 from typing import List
 
@@ -85,7 +46,7 @@ def parse_readme_file(file_path: str) -> dict:
 
     match = re.search(r"---(.*?)---", content, re.DOTALL)
     header = match.group(1).strip() if match else ''
-    body = re.sub(r'^---\n(.*?)\n---\n', '', content, flags=re.DOTALL).strip()
+    body = content[content.find('-->') + 3:].strip()
 
     return {'header': header, 'body': body}
 

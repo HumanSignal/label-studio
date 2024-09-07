@@ -14,24 +14,6 @@ categories:
 image: "/tutorials/spacy.png"
 ---
 
-<!--
----
-title: spaCy models for NER 
-type: guide
-tier: all
-order: 70
-hide_menu: true
-hide_frontmatter_title: true
-meta_title: Use spaCy models with Label Studio
-meta_description: Tutorial on how to use Label Studio and spaCy for faster NER and POS labeling 
-categories:
-    - Natural Language Processing
-    - Named Entity Recognition
-    - SpaCy
-image: "/tutorials/spacy.png"
----
--->
-
 This ML backend provides a simple way to use [spaCy](https://spacy.io/) models for Named Entity Recognition (NER) and Part-of-Speech (POS) tagging.
 
 Current implementation includes the following models:

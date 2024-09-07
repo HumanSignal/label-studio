@@ -17,27 +17,6 @@ categories:
 image: "/tutorials/segment-anything.png"
 ---
 
-<!--
----
-title: Interactive annotation with Segment Anything Model
-type: guide
-tier: all
-order: 10
-hide_menu: true
-hide_frontmatter_title: true
-meta_title: Interactive annotation in Label Studio with Segment Anything Model (SAM)
-meta_description: Label Studio tutorial for labeling images with MobileSAM or ONNX SAM. 
-categories:
-    - Computer Vision
-    - Object Detection
-    - Image Annotation
-    - Segment Anything Model
-    - Facebook
-    - ONNX
-image: "/tutorials/segment-anything.png"
----
--->
-
 # Interactive annotation in Label Studio with Segment Anything Model
 
 https://github.com/shondle/label-studio-ml-backend/assets/106922533/42a8a535-167c-404a-96bd-c2e2382df99a
