@@ -36,7 +36,7 @@ ML_REPO_PATH = os.getenv('ML_REPO_PATH', '/ml/')
 
 def get_readme_files() -> List:
     p = Path(ML_REPO_PATH) / 'label_studio_ml' / 'examples'
-    return list(Path(p).rglob('README.md'))
+    return sorted(list(Path(p).rglob('README.md')))
 
 
 def parse_readme_file(file_path: str) -> dict:
