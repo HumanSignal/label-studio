@@ -25,28 +25,30 @@ The script does the following:
 
 import os
 import re
+import yaml
+import logging
 from pathlib import Path
 from typing import List
 
-import yaml
 
-ML_REPO_PATH = os.getenv('ML_REPO_PATH', 'label-studio-ml-backend/')
+ML_REPO_PATH = os.getenv('ML_REPO_PATH', '/ml/')
 
 
 def get_readme_files() -> List:
     p = Path(ML_REPO_PATH) / 'label_studio_ml' / 'examples'
-    return list(Path(p).rglob('README.md'))
+    return sorted(list(Path(p).rglob('README.md')))
 
 
 def parse_readme_file(file_path: str) -> dict:
+    print(file_path)
     with open(file_path, 'r') as f:
         content = f.read()
-        
+
     match = re.search(r"---(.*?)---", content, re.DOTALL)
-    header = match.group(1).strip()
-    body = re.sub(r'^---\n(.*?)\n---\n', '', content, flags=re.DOTALL).strip()
-    
-    return {'header': header[0].strip() if header else '', 'body': body}
+    header = match.group(1).strip() if match else ''
+    body = content[content.find('-->') + 3:].strip()
+
+    return {'header': header, 'body': body}
 
 
 def create_tutorial_files():
@@ -66,9 +68,10 @@ def create_tutorial_files():
                 f.write(parsed_content['header'])
                 f.write('\n---\n\n')
             f.write(parsed_content['body'])
-        files_and_headers.append(
-            {'model_name': model_name, 'header': yaml.load(parsed_content['header'], Loader=yaml.FullLoader)}
-        )
+        files_and_headers.append({
+            'model_name': model_name,
+            'header': yaml.load(parsed_content['header'], Loader=yaml.FullLoader)
+        })
 
     update_ml_tutorials_index(files_and_headers)
 
@@ -80,17 +83,22 @@ def update_ml_tutorials_index(files_and_headers: List):
     with open(str(p), 'r') as f:
         content = f.read()
 
-    match = re.search(r"---(.*?)---", content, re.DOTALL)
-    yaml_content = match.group(1).strip()
+    yaml_content = re.findall(r'---\n(.*?)\n---', content, re.DOTALL)
     # read in python dict
     data = yaml.load(yaml_content[0].strip(), Loader=yaml.FullLoader)
     data['cards'] = []
     print(data)
     for f in files_and_headers:
+        h = f['header']
+        if not isinstance(h, dict):
+            logging.error(f'No dict header found in {f} file. Skipping ...')
+            continue
         print('Processing', f['model_name'])
-        h = f['header'] or {}
-        card = {'title': h.get('title') or f['model_name'], 'url': f'/tutorials/{f["model_name"]}.html'}
-        card.update(f['header'] or {})
+        card = {
+            'title': h.get('title') or f['model_name'],
+            'url': f'/tutorials/{f["model_name"]}.html'
+        }
+        card.update(h)
         data['cards'].append(card)
 
     p = Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'guide' / 'ml_tutorials.html'
