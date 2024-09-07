@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: SAM2 with Images
 type: guide
 tier: all
@@ -13,9 +18,6 @@ categories:
     - Segment Anything Model
 image: "/tutorials/sam2-images.png"
 ---
-
-<!--
-
 -->
 
 # Using SAM2 with Label Studio for Image Annotation

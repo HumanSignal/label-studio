@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Hugging Face Large Language Model (LLM)
 type: guide
 tier: all
@@ -14,9 +19,6 @@ categories:
     - Hugging Face
 image: "/tutorials/hf-llm.png"
 ---
-
-<!--
-
 -->
 
 # Hugging Face Large Language Model backend

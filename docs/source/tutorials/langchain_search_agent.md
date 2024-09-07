@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: RAG with a Langchain search agent
 type: guide
 tier: all
@@ -15,9 +20,6 @@ categories:
     - Langchain
 image: "/tutorials/langchain.png"
 ---
-
-<!--
-
 -->
 
 

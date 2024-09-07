@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Object detection with bounding boxes using MMDetection
 type: guide
 tier: all
@@ -15,9 +20,6 @@ categories:
     - MMDetection
 image: "/tutorials/openmmlab.png"
 ---
-
-<!--
-
 -->
 
 # Object detection with bounding boxes using MMDetection
@@ -27,7 +29,7 @@ https://mmdetection.readthedocs.io/en/latest/
 This example demonstrates how to use the MMDetection model with Label Studio to annotate images with bounding boxes. 
 The model is based on the YOLOv3 architecture with a MobileNetV2 backbone and trained on the COCO dataset. 
 
-![screenshot.png](/tutorials/screenshot.png)
+![screenshot.png](screenshot.png)
 
 ## Quick usage
 

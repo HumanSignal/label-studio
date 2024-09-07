@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Interactive LLM labeling with GPT
 type: guide
 tier: all
@@ -16,9 +21,6 @@ categories:
     - ChatGPT
 image: "/tutorials/llm-interactive.png"
 ---
-
-<!--
-
 -->
 
 # Interactive LLM labeling

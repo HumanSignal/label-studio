@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Use GLiNER for NER annotation
 type: guide
 tier: all
@@ -15,9 +20,6 @@ categories:
     - Hugging Face
 image: "/tutorials/gliner.png"
 ---
-
-<!--
-
 -->
 
 # Use GLiNER for NER annotation

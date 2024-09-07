@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Automatic Speech Recognition with NVidia NeMo
 type: guide
 tier: all
@@ -14,9 +19,6 @@ categories:
     - NVidia
 image: "/tutorials/nvidia.png"
 ---
-
-<!--
-
 -->
 
 # ASR with NeMo

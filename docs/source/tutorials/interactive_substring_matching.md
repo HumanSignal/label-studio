@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Interactive substring matching for NER tasks
 type: guide
 tier: all
@@ -13,9 +18,6 @@ categories:
     - Interactive matching
 image: "/tutorials/interactive-substring-matching.png"
 ---
-
-<!--
-
 -->
 
 # Interactive substring matching

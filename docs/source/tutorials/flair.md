@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: NER labeling with Flair 
 type: guide
 tier: all
@@ -13,9 +18,6 @@ categories:
     - Flair
 image: "/tutorials/flair.png"
 ---
-
-<!--
-
 -->
 
 # Flair NER example

@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Classify text with a BERT model
 type: guide
 tier: all
@@ -14,9 +19,6 @@ categories:
     - Hugging Face
 image: "/tutorials/bert.png"
 ---
-
-<!--
-
 -->
 
 # BERT-based text classification

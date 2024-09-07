@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Transcribe text from images with EasyOCR
 type: guide
 tier: all
@@ -13,9 +18,6 @@ categories:
     - EasyOCR
 image: "/tutorials/easyocr.png"
 ---
-
-<!--
-
 -->
 
 # EasyOCR model connection

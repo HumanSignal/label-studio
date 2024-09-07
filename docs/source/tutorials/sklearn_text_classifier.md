@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Sklearn Text Classifier model
 type: guide
 tier: all
@@ -13,9 +18,6 @@ categories:
     - Scikit-learn
 image: "/tutorials/scikit-learn.png"
 ---
-
-<!--
-
 -->
 
 # Sklearn Text Classifier model for Label Studio

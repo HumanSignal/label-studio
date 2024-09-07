@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Hugging Face NER
 type: guide
 tier: all
@@ -13,9 +18,6 @@ categories:
     - Hugging Face
 image: "/tutorials/hf-ner.png"
 ---
-
-<!--
-
 -->
 
 # Hugging Face NER model with Label Studio

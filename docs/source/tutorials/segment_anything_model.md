@@ -1,4 +1,9 @@
 ---
+t
+---
+
+<!--
+---
 title: Interactive annotation with Segment Anything Model
 type: guide
 tier: all
@@ -16,9 +21,6 @@ categories:
     - ONNX
 image: "/tutorials/segment-anything.png"
 ---
-
-<!--
-
 -->
 
 # Interactive annotation in Label Studio with Segment Anything Model
