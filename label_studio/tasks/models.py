@@ -7,7 +7,8 @@ import numbers
 import os
 import random
 import uuid
-from typing import Any, Mapping, Optional, cast
+import traceback
+from typing import Any, Mapping, Optional, cast, Union
 from urllib.parse import urljoin
 
 import ujson as json
@@ -39,6 +40,7 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 from tasks.choices import ActionType
+from label_studio_sdk.label_interface.objects import PredictionValue
 
 logger = logging.getLogger(__name__)
 
@@ -997,6 +999,48 @@ class Prediction(models.Model):
         self.update_task()
         return result
 
+    @classmethod
+    def create_no_commit(cls, project, label_interface, task_id, data, model_version, model_run) -> Optional['Prediction']:
+        """
+        Creates a Prediction object from the given result data, without committing it to the database.
+        or returns None if it fails.
+
+        Args:
+            project: The Project object to associate with the Prediction object.
+            label_interface: The LabelInterface object to use to create regions from the result data.
+            data: The data to create the Prediction object with.
+                    Must contain keys that match control tags in labeling configuration
+                    Example:
+                        ```
+                        {
+                            'my_choices': 'positive',
+                            'my_textarea': 'generated document summary'
+                        }
+                        ```
+            task_id: The ID of the Task object to associate with the Prediction object.
+            model_version: The model version that produced the prediction.
+            model_run: The model run that created the prediction.
+        """
+        try:
+
+            # given the data receive, create annotation regions in LS format
+            # e.g. {"sentiment": "positive"} -> {"value": {"choices": ["positive"]}, "from_name": "", "to_name": "", ..}
+            pred = PredictionValue(result=label_interface.create_regions(data)).model_dump()
+
+            prediction = Prediction(
+                project=project,
+                task_id=int(task_id),
+                model_version=model_version,
+                model_run=model_run,
+                score=1.0,  # Setting to 1.0 for now as we don't get back a score
+                result=pred['result'],
+            )
+            return prediction
+        except Exception as exc:
+            # TODO: handle exceptions better
+            logger.error(f'Error creating prediction for task {task_id} with {data}: {exc}. '
+                         f'Traceback: {traceback.format_exc()}')
+
     class Meta:
         db_table = 'prediction'
 
@@ -1085,12 +1129,45 @@ class PredictionMeta(models.Model):
     extra = models.JSONField(_('extra'), null=True, blank=True, help_text=_('Additional metadata in JSON format'))
 
     @classmethod
-    def get_successful_predictions_meta(cls):
-        return cls.objects.filter(prediction__isnull=False)
+    def create_no_commit(cls, data, prediction: Union[Prediction, FailedPrediction]) -> Optional['PredictionMeta']:
+        """
+        Creates a PredictionMeta object from the given result data, without committing it to the database.
+        or returns None if it fails.
 
-    @classmethod
-    def get_failed_predictions_meta(cls):
-        return cls.objects.filter(failed_prediction__isnull=False)
+        Args:
+            data: The data to create the PredictionMeta object with.
+                  Example:
+                    {
+                        'total_cost_usd': 0.1,
+                        'prompt_cost_usd': 0.05,
+                        'completion_cost_usd': 0.05,
+                        'prompt_tokens': 10,
+                        'completion_tokens': 10,
+                        'inference_time': 0.1
+                    }
+            prediction: The Prediction or FailedPrediction object to associate with the PredictionMeta object.
+
+        Returns:
+            The PredictionMeta object created from the given data, or None if it fails.
+        """
+        try:
+            prediction_meta = PredictionMeta(
+                total_cost=data.get('total_cost_usd'),
+                prompt_cost=data.get('prompt_cost_usd'),
+                completion_cost=data.get('completion_cost_usd'),
+                prompt_tokens_count=data.get('prompt_tokens'),
+                completion_tokens_count=data.get('completion_tokens'),
+                total_tokens_count=data.get('prompt_tokens', 0) + data.get('completion_tokens', 0),
+                inference_time=data.get('inference_time')
+            )
+            if isinstance(prediction, Prediction):
+                prediction_meta.prediction = prediction
+            else:
+                prediction_meta.failed_prediction = prediction
+            logger.debug(f'Created prediction meta: {prediction_meta}')
+            return prediction_meta
+        except Exception as exc:
+            logger.error(f'Error creating prediction meta with {data}: {exc}. Traceback: {traceback.format_exc()}')
 
     class Meta:
         db_table = 'prediction_meta'
