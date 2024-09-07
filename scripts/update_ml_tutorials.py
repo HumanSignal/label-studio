@@ -22,7 +22,7 @@ The script does the following:
     - title: ...
     ---
 """
-
+import logging
 import os
 import re
 from pathlib import Path
@@ -70,7 +70,7 @@ from pathlib import Path
 from typing import List
 
 
-ML_REPO_PATH = os.getenv('ML_REPO_PATH', 'label-studio-ml-backend/')
+ML_REPO_PATH = os.getenv('ML_REPO_PATH', '/ml/')
 
 
 def get_readme_files() -> List:
@@ -128,69 +128,16 @@ def update_ml_tutorials_index(files_and_headers: List):
     data['cards'] = []
     print(data)
     for f in files_and_headers:
+        h = f['header']
+        if not isinstance(h, dict):
+            logging.error(f'No dict header found in {f} file. Skipping ...')
+            continue
         print('Processing', f['model_name'])
-        h = f['header'] or {}
         card = {
             'title': h.get('title') or f['model_name'],
             'url': f'/tutorials/{f["model_name"]}.html'
         }
-        card.update(f['header'] or {})
-        data['cards'].append(card)
-
-    p = Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'guide' / 'ml_tutorials.html'
-    print(f'Updating {str(p)} ... ')
-    with open(str(p), 'w') as f:
-        f.write('---\n')
-        f.write(yaml.dump(data))
-        f.write('---\n')
-
-
-create_tutorial_files()
-
-
-
-def create_tutorial_files():
-    readme_files = get_readme_files()
-
-    files_and_headers = []
-    for file in readme_files:
-        model_name = file.parts[-2]
-        tutorial_path = Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'tutorials' / f'{model_name}.md'
-        tutorial_dir = os.path.dirname(tutorial_path)
-        os.makedirs(tutorial_dir, exist_ok=True)
-
-        parsed_content = parse_readme_file(file)
-        with open(tutorial_path, 'w') as f:
-            if parsed_content['header']:
-                f.write('---\n')
-                f.write(parsed_content['header'])
-                f.write('\n---\n\n')
-            f.write(parsed_content['body'])
-        files_and_headers.append(
-            {'model_name': model_name, 'header': yaml.load(parsed_content['header'], Loader=yaml.FullLoader)}
-        )
-
-    update_ml_tutorials_index(files_and_headers)
-
-
-def update_ml_tutorials_index(files_and_headers: List):
-    # Navigate to '../docs/source/guide/ml_tutorials.html' relative to the current script
-    p = Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'guide' / 'ml_tutorials.html'
-    print(f'Reading file from {str(p)}')
-    with open(str(p), 'r') as f:
-        content = f.read()
-
-    yaml_content = re.findall(r'---\n(.*?)\n---', content, re.DOTALL)
-    # read in python dict
-    data = yaml.load(yaml_content[0].strip(), Loader=yaml.FullLoader)
-    data['cards'] = []
-    print(data)
-    for f in files_and_headers:
-        print('Processing', f['model_name'])
-        h = f['header'] or {}
-        print('------->\n\n\n', h)
-        card = {'title': h.get('title') or f['model_name'], 'url': f'/tutorials/{f["model_name"]}.html'}
-        card.update(f['header'] or {})
+        card.update(h)
         data['cards'].append(card)
 
     p = Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'guide' / 'ml_tutorials.html'

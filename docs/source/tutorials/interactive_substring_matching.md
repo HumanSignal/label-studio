@@ -1,5 +1,17 @@
 ---
-t
+title: Interactive substring matching for NER tasks
+type: guide
+tier: all
+order: 30
+hide_menu: true
+hide_frontmatter_title: true
+meta_title: Interactive substring matching for NER tasks
+meta_description: Use the interactive substring matching model for labeling NER tasks in Label Studio
+categories:
+    - Natural Language Processing
+    - Named Entity Recognition
+    - Interactive matching
+image: "/tutorials/interactive-substring-matching.png"
 ---
 
 <!--

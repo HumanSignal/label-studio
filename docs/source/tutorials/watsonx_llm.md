@@ -1,5 +1,16 @@
 ---
-t
+title: Integrate WatsonX with Label Studio
+type: guide
+tier: all
+order: 15
+hide_menu: true
+hide_frontmatter_title: true
+meta_title: Integrate WatsonX with Label Studio
+categories:
+    - Computer Vision
+    - Large Language Model
+    - WatsonX
+image: "/tutorials/watsonx.png"
 ---
 
 <!--

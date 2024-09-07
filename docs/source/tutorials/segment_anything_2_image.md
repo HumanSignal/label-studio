@@ -1,5 +1,17 @@
 ---
-t
+title: SAM2 with Images
+type: guide
+tier: all
+order: 15
+hide_menu: true
+hide_frontmatter_title: true
+meta_title: Using SAM2 with Label Studio for Image Annotation
+categories:
+    - Computer Vision
+    - Image Annotation
+    - Object Detection
+    - Segment Anything Model
+image: "/tutorials/sam2-images.png"
 ---
 
 <!--
