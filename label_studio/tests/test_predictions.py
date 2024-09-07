@@ -822,7 +822,7 @@ def test_interactive_annotating_with_drafts(business_client, configured_project)
 
 @pytest.mark.django_db
 def test_predictions_meta(business_client, configured_project):
-    from tasks.models import PredictionMeta, Prediction, FailedPrediction
+    from tasks.models import FailedPrediction, Prediction, PredictionMeta
 
     task = configured_project.tasks.first()
 
@@ -830,7 +830,11 @@ def test_predictions_meta(business_client, configured_project):
     prediction = Prediction.objects.create(
         task=task,
         project=task.project,
-        result={'result': [{'from_name': 'text_class', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['class_A']}}]},
+        result={
+            'result': [
+                {'from_name': 'text_class', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['class_A']}}
+            ]
+        },
         score=0.95,
         model_version='12345',
     )
@@ -863,6 +867,3 @@ def test_predictions_meta(business_client, configured_project):
     # assert it raises if no Prediction or FailedPrediction is provided
     with pytest.raises(Exception):
         PredictionMeta.objects.create()
-
-
-
