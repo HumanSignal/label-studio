@@ -22,6 +22,7 @@ const supportedExtensions = {
   html: ["html", "htm", "xml"],
   timeSeries: ["csv", "tsv"],
   common: ["csv", "tsv", "txt", "json"],
+  object3d: ["glb"],
 };
 const allSupportedExtensions = flatten(Object.values(supportedExtensions));
 
@@ -388,6 +389,8 @@ export const ImportPage = ({
                   <dd>{supportedExtensions.html.join(", ")}</dd>
                   <dt>Time Series</dt>
                   <dd>{supportedExtensions.timeSeries.join(", ")}</dd>
+                  <dt>Object 3D Formats</dt>
+                  <dd>{supportedExtensions.object3d.join(", ")}</dd>
                   <dt>Common Formats</dt>
                   <dd>{supportedExtensions.common.join(", ")}</dd>
                 </dl>

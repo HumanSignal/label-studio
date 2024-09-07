@@ -87,7 +87,8 @@ HOSTNAME = get_env('HOST', '')
 if HOSTNAME:
     if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
         logger.info(
-            '! HOST variable found in environment, but it must start with http:// or https://, ignore it: %s', HOSTNAME
+            '! HOST variable found in environment, but it must start with http:// or https://, ignore it: %s',
+            HOSTNAME,
         )
         HOSTNAME = ''
     else:
@@ -462,6 +463,7 @@ SUPPORTED_EXTENSIONS = set(
         '.mp4',
         '.webm',
         '.webp',
+        '.glb',
     ]
 )
 
@@ -760,7 +762,7 @@ DEBUG_CONTEXTLOG = get_bool_env('DEBUG_CONTEXTLOG', False)
 
 _REDIS_SSL_CERTS_REQS = get_env('REDIS_SSL_CERTS_REQS', 'required')
 REDIS_SSL_SETTINGS = {
-    'ssl_cert_reqs': None if _REDIS_SSL_CERTS_REQS.lower() == 'none' else _REDIS_SSL_CERTS_REQS,
+    'ssl_cert_reqs': (None if _REDIS_SSL_CERTS_REQS.lower() == 'none' else _REDIS_SSL_CERTS_REQS),
     'ssl_ca_certs': get_env('REDIS_SSL_CA_CERTS', None),
     'ssl_keyfile': get_env('REDIS_SSL_KEYFILE', None),
     'ssl_certfile': get_env('REDIS_SSL_CERTFILE', None),

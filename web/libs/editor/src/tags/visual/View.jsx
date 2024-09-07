@@ -94,6 +94,7 @@ const Model = types.model({
     "video",
     "videorectangle",
     "ranker",
+    "object3d",
   ]),
 });
 

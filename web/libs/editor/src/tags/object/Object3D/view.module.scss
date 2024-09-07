@@ -1,0 +1,13 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% + 28px);
+  min-height: calc(100vh - 230px);
+  margin-left: -14px;
+  margin-right: -14px;
+  position: relative;
+
+  & > div {
+    flex: 1;
+  }
+}

@@ -43,6 +43,8 @@
   "dependencies": {
     "@martel/audio-file-decoder": "^2.3.15",
     "@radix-ui/react-toast": "^1.1.5",
+    "@react-three/fiber": "^7.0.6",
+    "@react-three/drei": "^7.5.1",
     "@thi.ng/rle-pack": "^3.1.30",
     "antd": "^4.3.3",
     "chroma-js": "^2.1.1",
@@ -86,6 +88,7 @@
     "react-window-infinite-loader": "^1.0.5",
     "sanitize-html": "^2.12.1",
     "strman": "^2.0.1",
+    "three": "^0.133.0",
     "wavesurfer.js": "^6.0.1",
     "xpath-range": "^1.1.1",
     "zod": "^3.22.4"

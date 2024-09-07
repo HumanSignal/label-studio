@@ -23,7 +23,7 @@ class _Registry {
     this.views_models[model.name] = view;
   }
 
-  addRegionType(type: { detectByValue: any }, object: any, detector: any) {
+  addRegionType(type: { detectByValue: any }, object: any, detector?: any) {
     this.regions.push(type);
     if (detector) type.detectByValue = detector;
     const areas = this.areas.get(object);

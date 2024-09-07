@@ -7,7 +7,7 @@ import { TimeSeriesModel } from "./TimeSeries";
 import { PagedViewModel } from "./PagedView";
 import { VideoModel } from "./Video";
 import { ListModel } from "./List";
-
+import { Object3DModel } from "./Object3D";
 // stub files to keep docs of these tags
 import "./HyperText";
 import "./Text";
@@ -22,4 +22,5 @@ export {
   TableModel,
   PagedViewModel,
   ListModel,
+  Object3DModel,
 };
