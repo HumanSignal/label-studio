@@ -6,9 +6,9 @@ import logging
 import numbers
 import os
 import random
-import uuid
 import traceback
-from typing import Any, Mapping, Optional, cast, Union
+import uuid
+from typing import Any, Mapping, Optional, Union, cast
 from urllib.parse import urljoin
 
 import ujson as json
@@ -38,9 +38,9 @@ from django.urls import reverse
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from label_studio_sdk.label_interface.objects import PredictionValue
 from rest_framework.exceptions import ValidationError
 from tasks.choices import ActionType
-from label_studio_sdk.label_interface.objects import PredictionValue
 
 logger = logging.getLogger(__name__)
 
@@ -1000,7 +1000,9 @@ class Prediction(models.Model):
         return result
 
     @classmethod
-    def create_no_commit(cls, project, label_interface, task_id, data, model_version, model_run) -> Optional['Prediction']:
+    def create_no_commit(
+        cls, project, label_interface, task_id, data, model_version, model_run
+    ) -> Optional['Prediction']:
         """
         Creates a Prediction object from the given result data, without committing it to the database.
         or returns None if it fails.
@@ -1038,8 +1040,10 @@ class Prediction(models.Model):
             return prediction
         except Exception as exc:
             # TODO: handle exceptions better
-            logger.error(f'Error creating prediction for task {task_id} with {data}: {exc}. '
-                         f'Traceback: {traceback.format_exc()}')
+            logger.error(
+                f'Error creating prediction for task {task_id} with {data}: {exc}. '
+                f'Traceback: {traceback.format_exc()}'
+            )
 
     class Meta:
         db_table = 'prediction'
@@ -1158,7 +1162,7 @@ class PredictionMeta(models.Model):
                 prompt_tokens_count=data.get('prompt_tokens'),
                 completion_tokens_count=data.get('completion_tokens'),
                 total_tokens_count=data.get('prompt_tokens', 0) + data.get('completion_tokens', 0),
-                inference_time=data.get('inference_time')
+                inference_time=data.get('inference_time'),
             )
             if isinstance(prediction, Prediction):
                 prediction_meta.prediction = prediction
