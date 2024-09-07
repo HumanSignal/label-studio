@@ -14,6 +14,10 @@ categories:
 image: "/tutorials/hf-ner.png"
 ---
 
+<!--
+
+-->
+
 # Hugging Face NER model with Label Studio
 
 This project uses a custom machine learning backend model for Named Entity Recognition (NER) with Hugging Face's transformers and Label Studio.

@@ -17,6 +17,10 @@ categories:
 image: "/tutorials/llm-interactive.png"
 ---
 
+<!--
+
+-->
+
 # Interactive LLM labeling
 
 This example server connects Label Studio to [OpenAI](https://platform.openai.com/), [Ollama](https://ollama.com/),

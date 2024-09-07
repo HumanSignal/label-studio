@@ -14,6 +14,10 @@ categories:
 image: "/tutorials/spacy.png"
 ---
 
+<!--
+
+-->
+
 This ML backend provides a simple way to use [spaCy](https://spacy.io/) models for Named Entity Recognition (NER) and Part-of-Speech (POS) tagging.
 
 Current implementation includes the following models:
