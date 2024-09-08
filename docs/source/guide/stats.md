@@ -124,46 +124,64 @@ For example, for two given annotations `x` and `y`, an agreement metric that per
 #### Example 1
 
 ```
-x:  choice1 => option1
-    choice2 => option2
+x:  choices1 => A
+    choices2 => B
 
-y:  choice1 => option1
-    choice2 => option2
+y:  choices1 => A
+    choices2 => B
 ```    
 Agreement Calculation:
 
-Both annotations match exactly.
+Both annotations `x` and `y` match exactly.
 Agreement(x, y) = 1.0 (100%).
 
 #### Example 2
 
 ```
-x:  choice1 => option1
-    choice2 => option2
+x:  choices1 => A
+    choices2 => B
 
-y:  choice1 => option1
-    choice2 => option3
+y:  choices1 => A
+    choices2 => C
 ```
 
 Agreement Calculation:
 
-choice1 matches, but choice2 does not.
+`choices1` match, but `choices2` do not.
 Agreement(x, y) = 0.5 (50%).
 
 #### Example 3
 
 ```
-x:  choice1 => option1
-    choice2 => option2
+x:  choices1 => A
+    choices2 => B
 
-y:  choice1 => option3
-    choice2 => option4
+y:  choices1 => C
+    choices2 => D
 ```
 
 Agreement Calculation:
 
-Neither choice1 nor choice2 matches.
+Neither `choices1` nor `choices2` match.
 Agreement(x, y) = 0 (0%).
+
+
+#### Example 4
+
+```
+x:  choices1 => A
+    choices2 => B
+    choices3 => [not selected]
+
+y:  choices1 => A
+    choices2 => C
+    choices3 => [not selected]
+```
+
+Agreement Calculation:
+
+`choice1` match, `choice2` don't match, and `choices3` are not selected, which is treated as a <b>match</>.
+Agreement(x, y) = 0.6666 (66.66%).
 
 
 ### Exact matching choices example
