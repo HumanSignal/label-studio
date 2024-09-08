@@ -129,7 +129,8 @@ x:  choices1 => A
 
 y:  choices1 => A
     choices2 => B
-```    
+```
+
 Agreement Calculation:
 
 Both annotations `x` and `y` match exactly.
