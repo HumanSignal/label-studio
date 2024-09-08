@@ -1,6 +1,6 @@
 ---
 title: Task agreement and how it is calculated
-short: Task agreement matrix
+short: Task agreements
 tier: enterprise
 type: guide
 order: 0
@@ -155,15 +155,19 @@ The following **text edit distance** algorithms are available:
 - Needleman-Wunsch
 - Smith-Waterman
 
-### Intersection over Union example
+### Intersection over union example
 
-The Intersection over Union (IoU) metric compares the area of overlapping regions, such as bounding boxes, polygons or textual / time series one-dimensional spans with the overall area, or union, of the regions.
+The Intersection over Union (IoU) metric is used to compare the overlap between regions—such as bounding boxes, polygons, or textual/time series one-dimensional spans—against the combined area, or union, of the regions.
 
-For example, for two annotations `x` and `y` containing either bounding boxes or polygons, the following calculation occurs:
-- LSE identifies whether any regions overlap across the two annotations. Overlapping can be only considered with matched labels.
-- For each pair of overlapping regions across the annotations, the area of the overlap, or intersection `aI` is compared to the combined area `aU` of both regions, referred to as the union of the regions: `aI` ÷ `aU`
-- The average of `aI` ÷ `aU` for each pair of regions is used as the IoU calculation for a pair of annotations, or each IoU calculation for eadch label or region is used. 
-For example, if there are two bounding boxes for each `x` and `y` annotations, the agreement of `x` and `y` = ((`aI` ÷ `aU`) + (`aI` ÷ `aU`)) ÷2 .
+For two annotations, `x` and `y`, which contain either bounding boxes or polygons, the following steps occur:
+
+* **Identifying Overlapping Regions**: The system identifies whether any regions overlap across the two annotations. Overlaps are only considered for matched labels (i.e., regions assigned the same label or class).
+* **Calculating IoU for Each Pair**: For each pair of overlapping regions, the area of overlap, or intersection (aI), is divided by the total combined area of the two regions, known as the union (aU). This gives the IoU for that pair as `aI ÷ aU`, which results in a value between `0` and `1`, where `1` indicates perfect overlap.
+* **Tracking the Maximum IoU**: When comparing multiple regions (e.g., multiple bounding boxes), the system tracks the highest IoU value for the pair using the formula `max_iou = max(iou, max_iou)`. This ensures that the most significant agreement between the two annotations is captured.
+Avoiding Averaging Misconceptions: In some cases, there may be multiple overlapping regions between annotations `x` and `y`. Rather than averaging all IoU values (which could be misleading), the highest IoU for each pair is retained, ensuring the most representative comparison of agreement between the annotations.
+
+This method ensures that only the strongest level of overlap between regions is recorded for each annotation pair, reflecting the highest possible agreement between the two annotations.
+
 
 #### Intersection over union with text
 
