@@ -157,7 +157,7 @@ The following **text edit distance** algorithms are available:
 
 ### Intersection over union example
 
-The Intersection over Union (IoU) metric is used to compare the overlap between regions—such as bounding boxes, polygons, or textual/time series one-dimensional spans—against the combined area, or union, of the regions.
+The Intersection over Union (IoU) metric is used to compare the overlap between regions such as bounding boxes, polygons, or textual/time series one-dimensional spans—against the combined area, or union, of the regions.
 
 For two annotations, `x` and `y`, which contain either bounding boxes or polygons, the following steps occur:
 
