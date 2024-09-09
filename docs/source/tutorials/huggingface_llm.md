@@ -15,10 +15,6 @@ categories:
 image: "/tutorials/hf-llm.png"
 ---
 
-<!--
-
--->
-
 # Hugging Face Large Language Model backend
 
 This machine learning backend is designed to work with Label Studio, providing a custom model for text generation. The model is based on the Hugging Face's transformers library and uses a pre-trained model.

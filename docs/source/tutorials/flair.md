@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/flair.png"
 ---
 
-<!--
-
--->
-
 # Flair NER example
 
 This example demonstrates how to use Flair NER model with Label Studio.

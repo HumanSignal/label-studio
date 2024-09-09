@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/interactive-substring-matching.png"
 ---
 
-<!--
-
--->
-
 # Interactive substring matching
 
 The Machine Learning (ML) backend is designed to enhance the efficiency of auto-labeling in Named Entity Recognition (NER) tasks. It achieves this by selecting a keyword and automatically matching the same keyword in the provided text. 
