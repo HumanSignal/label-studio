@@ -90,7 +90,8 @@ This tutorial uses the [YOLO example](https://github.com/HumanSignal/label-studi
 
 - `<RectangleLabels>` - [Bounding boxes](https://labelstud.io/tags/rectanglelabels); object detection task
 - `<PolygonLabels>` - [Polygons](https://labelstud.io/tags/polygonlables); segmentation task
-- `<VideoRectangle>` - [Video bounding boxes](https://labelstud.io/tags/videorectangle); object tracking task
+- `<VideoRectangle>` - [Video bounding boxes](https://labelstud.io/tags/videorectangle); video object tracking task
+- `<KeyPointLabels>` - [Key points](https://labelstud.io/tags/keypointlabels); pose detection task
 - `<Choices>` - [Classification](https://labelstud.io/tags/choices)
 
 **How to skip the control tag?**
