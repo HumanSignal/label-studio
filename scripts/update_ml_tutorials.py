@@ -23,13 +23,13 @@ The script does the following:
     ---
 """
 
+import logging
 import os
 import re
-import yaml
-import logging
 from pathlib import Path
 from typing import List
 
+import yaml
 
 ML_REPO_PATH = os.getenv('ML_REPO_PATH', '/ml/')
 
@@ -44,9 +44,9 @@ def parse_readme_file(file_path: str) -> dict:
     with open(file_path, 'r') as f:
         content = f.read()
 
-    match = re.search(r"---(.*?)---", content, re.DOTALL)
+    match = re.search(r'---(.*?)---', content, re.DOTALL)
     header = match.group(1).strip() if match else ''
-    body = content[content.find('-->') + 3:].strip()
+    body = content[content.find('-->') + 3 :].strip()
 
     return {'header': header, 'body': body}
 
@@ -68,10 +68,9 @@ def create_tutorial_files():
                 f.write(parsed_content['header'])
                 f.write('\n---\n\n')
             f.write(parsed_content['body'])
-        files_and_headers.append({
-            'model_name': model_name,
-            'header': yaml.load(parsed_content['header'], Loader=yaml.FullLoader)
-        })
+        files_and_headers.append(
+            {'model_name': model_name, 'header': yaml.load(parsed_content['header'], Loader=yaml.FullLoader)}
+        )
 
     update_ml_tutorials_index(files_and_headers)
 
@@ -94,10 +93,7 @@ def update_ml_tutorials_index(files_and_headers: List):
             logging.error(f'No dict header found in {f} file. Skipping ...')
             continue
         print('Processing', f['model_name'])
-        card = {
-            'title': h.get('title') or f['model_name'],
-            'url': f'/tutorials/{f["model_name"]}.html'
-        }
+        card = {'title': h.get('title') or f['model_name'], 'url': f'/tutorials/{f["model_name"]}.html'}
         card.update(h)
         data['cards'].append(card)
 
