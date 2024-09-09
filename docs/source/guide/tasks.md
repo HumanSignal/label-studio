@@ -195,15 +195,6 @@ For example:
     <Image name="image" value="$images[0]"/>
     ```
 
-3. The `value` parameter can include [`Repeater`](/tags/repeater.html) tag substitution, by default `{{idx}}`.
-
-    For example:
-    ```xml
-    <Repeater on="$audios">
-      <Audio name="audio_{{idx}}" value="$audios[{{idx}}].url"/>
-    </Repeater>
-    ```
-
 
 ### `valueType` (optional)
 

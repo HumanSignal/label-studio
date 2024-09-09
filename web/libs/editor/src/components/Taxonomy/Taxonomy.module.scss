@@ -32,7 +32,7 @@
 
   div {
     margin: 0 2px 4px 0;
-    background: var(--sand_100);
+    background: hsl(0deg 0% 95%);
     padding: 0; // all the right space should be a clickable button, so no padding
     border-radius: 4px;
     display: flex;
@@ -69,7 +69,7 @@
   border-radius: 6px;
   left: -1px;
   border: 1px solid var(--sand_300);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, .12);
+  box-shadow: 0 4px 10px rgb(0 0 0 / 12%);
 
   input[type="checkbox"] {
     margin-right: 4px;
@@ -252,8 +252,8 @@
     margin-right: 8px;
     font: inherit;
     font-style: italic;
-    color: var(--primary_link);
-    background: var(--sand_100);
+    color: #09f;
+    background: rgb(0 0 0 / 3%);
   }
 }
 

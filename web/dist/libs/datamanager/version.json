@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-960: Improve the bundling strategy and ship a single entrypoint with a common vendor chunk across all libs (#6163)",
-  "commit": "4aead5381e55dec90a64f7af543147ae8f43a246",
-  "date": "2024-08-30T16:04:34.000Z",
+  "message": "chore: OPTIC-1060: Hot Module Reload support for frontend development (#6280)",
+  "commit": "c5696cd87c585322d3bdc378aa3f52e566624e3d",
+  "date": "2024-09-06T18:30:10.000Z",
   "branch": "develop"
 }

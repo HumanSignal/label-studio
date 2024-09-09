@@ -2823,6 +2823,33 @@
       "version": 4,
       "deleted": false
     },
+    "fflag_feat_optic_1025_zendesk_widget_integration": {
+      "key": "fflag_feat_optic_1025_zendesk_widget_integration",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 1
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "98f5d577937c47528ce3105baf9f7f91",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short": {
       "key": "fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short",
       "on": false,

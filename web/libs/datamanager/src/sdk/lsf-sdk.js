@@ -17,7 +17,6 @@ import {
   FF_DEV_2186,
   FF_DEV_2887,
   FF_DEV_3034,
-  FF_DEV_3734,
   FF_LSDV_4620_3_ML,
   FF_OPTIC_2,
   isFF,
@@ -367,7 +366,7 @@ export class LSFWrapper {
 
     // undefined or true for backward compatibility
     this.lsf.toggleInterface("postpone", this.task.allow_postpone !== false);
-    this.lsf.toggleInterface("topbar:task-counter", !isFF(FF_DEV_3734));
+    this.lsf.toggleInterface("topbar:task-counter", true);
     this.lsf.assignTask(task);
     this.lsf.initializeStore(lsfTask);
     this.setAnnotation(annotationID, fromHistory || isRejectedQueue);

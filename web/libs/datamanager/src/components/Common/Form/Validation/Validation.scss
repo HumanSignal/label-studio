@@ -4,7 +4,7 @@
   &__group {
     padding: 7px 14px;
     border-radius: 5px;
-    background-color: rgba(204, 0, 0, 0.04);
+    background-color: rgb(204 0 0 / 4%);
 
     &+& {
       margin-top: 5px;
@@ -22,6 +22,6 @@
 
   &__message {
     font-size: 12px;
-    color: rgba(var(--black-raw), 0.7);
+    color: rgb(var(--black-raw) / 70%);
   }
 }
