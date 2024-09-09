@@ -12,8 +12,6 @@ import { HtxLabels, LabelsModel } from "./Labels/Labels";
  *
  * First, select a label and then click once to annotate a single frame. Click and drag to annotate multiple frames.
  *
- * To move forward and backward in the timeline without labeling, ensure that no labels are selected before you click.
- *
  * ![Screenshot of video with frame classification](../images/timelinelabels.png)
  *
  * Use with the `<Video>` control tag.
