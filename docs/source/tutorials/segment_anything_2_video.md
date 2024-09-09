@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/sam2-video.png"
 ---
 
-<!--
-
--->
-
 # Using SAM2 with Label Studio for Video Annotation
 
 This guide describes the simplest way to start using **SegmentAnything 2** with Label Studio.

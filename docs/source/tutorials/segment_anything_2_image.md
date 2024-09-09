@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/sam2-images.png"
 ---
 
-<!--
-
--->
-
 # Using SAM2 with Label Studio for Image Annotation
 
 Segment Anything 2, or SAM 2, is a model released by Meta in July 2024. An update to the original Segment Anything Model, 

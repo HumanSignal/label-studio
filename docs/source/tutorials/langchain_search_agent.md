@@ -16,12 +16,6 @@ categories:
 image: "/tutorials/langchain.png"
 ---
 
-<!--
-
--->
-
-
-
 # Langchain search agent
 
 This example demonstrates how to use Label Studio with a custom Machine Learning backend.

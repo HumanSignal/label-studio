@@ -13,10 +13,6 @@ categories:
 image: "/tutorials/watsonx.png"
 ---
 
-<!--
-
--->
-
 # Integrate WatsonX to Label Studio
 
 WatsonX offers a suite of machine learning tools, including access to many LLMs, prompt

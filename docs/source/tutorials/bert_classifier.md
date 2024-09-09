@@ -15,10 +15,6 @@ categories:
 image: "/tutorials/bert.png"
 ---
 
-<!--
-
--->
-
 # BERT-based text classification
 
 The NewModel is a BERT-based text classification model that is designed to work with Label Studio. This model uses the Hugging Face Transformers library to fine-tune a BERT model for text classification. The model is trained on the labeled data from Label Studio and then used to make predictions on new data.  With this model connected to Label Studio, you can: 

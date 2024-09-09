@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/tesseract.png"
 ---
 
-<!--
-
--->
-
 # Interactive bounding boxes OCR using Tesseract
 
 Use an OCR engine for interactive ML-assisted labeling, facilitating faster 
