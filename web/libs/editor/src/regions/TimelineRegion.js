@@ -53,7 +53,7 @@ const Model = types
       return isAlive(self) ? self.object : null;
     },
     get sequence() {
-      return self.ranges.map(rangeToSequence).flat();
+      return self.ranges.flatMap(rangeToSequence);
     },
     getShape() {
       return null;
@@ -99,13 +99,7 @@ const Model = types
     },
   }));
 
-const TimelineRegionModel = types.compose(
-  "TimelineRegionModel",
-  RegionsMixin,
-  AreaMixin,
-  NormalizationMixin,
-  Model,
-);
+const TimelineRegionModel = types.compose("TimelineRegionModel", RegionsMixin, AreaMixin, NormalizationMixin, Model);
 
 Registry.addRegionType(TimelineRegionModel, "video");
 

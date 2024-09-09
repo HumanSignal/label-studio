@@ -71,7 +71,7 @@ export const Frames: FC<TimelineViewProps> = ({
   }, [step]);
 
   const setScroll = useCallback(
-    ({ left, top }: { left?: number, top?: number }) => {
+    ({ left, top }: { left?: number; top?: number }) => {
       if (!length) return;
 
       setHoverOffset(null);
@@ -196,9 +196,9 @@ export const Frames: FC<TimelineViewProps> = ({
       const dimensions = scrollable.current!.getBoundingClientRect();
       const offsetLeft = dimensions.left;
       const rightLimit = dimensions.width - timelineStartOffset;
-      const target = (e.target as Element);
+      const target = e.target as Element;
       // every region has `data-id` attribute, so looking for them
-      const regionRow = target.closest('[data-id]') as HTMLElement | null;
+      const regionRow = target.closest("[data-id]") as HTMLElement | null;
       // not clicking on labels area
       const onKeyframes = e.pageX - offsetLeft > timelineStartOffset;
       // don't draw on region lines, only on the empty space or special new line

@@ -221,7 +221,7 @@ const Model = types
         const area = self.annotation.createResult({ sequence }, {}, control, self);
 
         // add labels
-        self.activeStates().forEach(tag => {
+        self.activeStates().forEach((tag) => {
           area.setValue(tag);
         });
 
@@ -262,7 +262,10 @@ const Model = types
         const control = self.timelineControl;
         // labels should be selected or allow to create region without labels
         if (!control?.selectedLabels?.length && !control?.allowempty) return;
-        return self.drawingRegion = self.addTimelineRegion({ frame, enabled: false });
+
+        self.drawingRegion = self.addTimelineRegion({ frame, enabled: false });
+
+        return self.drawingRegion;
       },
 
       finishDrawing() {
