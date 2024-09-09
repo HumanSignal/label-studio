@@ -59,19 +59,16 @@ Note that if you're running in a cloud server, you'll need to run on an exposed 
 For your project, you can use any labeling config with video properties. Here's a basic one to get you started!
 
 ```xml     
-    <View>
-         <Labels name="videoLabels" toName="video" allowEmpty="true">
-           
-           
-           
-         <Label value="Player" background="#11A39E"/><Label value="Ball" background="#D4380D"/></Labels>
-         
-         <!-- Please specify FPS carefully, it will be used for all project videos -->
-         <Video name="video" value="$video" framerate="25.0"/>
-         <VideoRectangle name="box" toName="video" smart="true"/>
-      </View><!--{
-       "video": "/static/samples/opossum_snow.mp4"
-      }-->
+<View>
+    <Labels name="videoLabels" toName="video" allowEmpty="true">
+        <Label value="Player" background="#11A39E"/>
+        <Label value="Ball" background="#D4380D"/>
+    </Labels>
+
+    <!-- Please specify FPS carefully, it will be used for all project videos -->
+    <Video name="video" value="$video" framerate="25.0"/>
+    <VideoRectangle name="box" toName="video" smart="true"/>
+</View>
 ```
 
 ## Known limitations

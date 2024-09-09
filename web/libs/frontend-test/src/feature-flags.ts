@@ -15,9 +15,6 @@ export const FF_DEV_1536 = "ff_front_dev_1536_taxonomy_user_labels_150222_long";
 // New Audio 2.0 UI
 export const FF_DEV_1713 = "ff_front_DEV_1713_audio_ui_150222_short";
 
-// Clean unnecessary classification areas after deserialization
-export const FF_DEV_2100 = "ff_dev_2100_clean_unnecessary_areas_140422_short";
-
 // Allow to use html inside <Label/> tags
 export const FF_DEV_2128 = "ff_dev_2128_html_in_labels_150422_short";
 
@@ -27,9 +24,6 @@ export const FF_DEV_2290 = "ff_front_dev_2290_draft_in_annotation_history_short"
 export const FF_DEV_2431 = "ff_front_dev_2431_delete_polygon_points_080622_short";
 
 export const FF_DEV_2432 = "ff_front_dev_2432_auto_save_polygon_draft_210622_short";
-
-// Undo keypoints when create new polygon
-export const FF_DEV_2576 = "ff_feat_front_DEV_2576_undo_key_points_polygon_short";
 
 export const FF_DEV_2669 = "ff_front_dev_2669_paragraph_author_filter_210622_short";
 

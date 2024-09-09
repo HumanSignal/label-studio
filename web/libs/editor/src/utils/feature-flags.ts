@@ -15,9 +15,6 @@ export const FF_DEV_1536 = "ff_front_dev_1536_taxonomy_user_labels_150222_long";
 // New Audio 2.0 UI
 export const FF_DEV_1713 = "ff_front_DEV_1713_audio_ui_150222_short";
 
-// Clean unnecessary classification areas after deserialization
-export const FF_DEV_2100 = "ff_dev_2100_clean_unnecessary_areas_140422_short";
-
 // Allow to use html inside <Label/> tags
 export const FF_DEV_2128 = "ff_dev_2128_html_in_labels_150422_short";
 
@@ -27,9 +24,6 @@ export const FF_DEV_2290 = "ff_front_dev_2290_draft_in_annotation_history_short"
 export const FF_DEV_2431 = "ff_front_dev_2431_delete_polygon_points_080622_short";
 
 export const FF_DEV_2432 = "ff_front_dev_2432_auto_save_polygon_draft_210622_short";
-
-// Undo keypoints when create new polygon
-export const FF_DEV_2576 = "ff_feat_front_DEV_2576_undo_key_points_polygon_short";
 
 export const FF_DEV_2669 = "ff_front_dev_2669_paragraph_author_filter_210622_short";
 
@@ -205,11 +199,6 @@ export const FF_LSDV_4711 = "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_
 export const FF_LSDV_4712 = "fflag_feat_front_lsdv_4712_skipduplicates_editing_110423_short";
 
 /**
- * New Ranker tag; flag is used for `deleteAllRegions()` optimization
- */
-export const FF_LSDV_4832 = "fflag_feat_front_lsdv_4832_new_ranker_tag_120423_short";
-
-/**
  * Fixing issue with missed steps in timeseries with optimized data and zoom
  *
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4881_timeseties_points_missing_140423_short
@@ -327,7 +316,7 @@ export function isFF(id: string) {
   const override: Record<string, boolean> = {
     fflag_fix_front_lsdv_4620_memory_leaks_100723_short: false,
   };
-  if (window?.APP_SETTINGS?.sentry_environment === "opensource" && id in override) {
+  if (id in override) {
     return override[id];
   }
   if (id in featureFlags) {

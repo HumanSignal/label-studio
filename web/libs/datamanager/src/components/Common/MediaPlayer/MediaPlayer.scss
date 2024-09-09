@@ -44,7 +44,7 @@
   &__track,
   &__time {
     font-size: 12px;
-    color: rgba(var(--black-raw), 0.7);
+    color: rgb(var(--black-raw) / 70%);
   }
 
   &__track {
