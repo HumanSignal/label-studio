@@ -162,7 +162,7 @@ The Intersection over Union (IoU) metric is used to compare the overlap between 
 For two annotations, `x` and `y`, which contain either bounding boxes or polygons, the following steps occur:
 
 * **Identifying Overlapping Regions**: The system identifies whether any regions overlap across the two annotations. Overlaps are only considered for matched labels (i.e., regions assigned the same label or class).
-* **Calculating IoU for Each Pair**: For each pair of overlapping regions, the area of overlap, or intersection (aI), is divided by the total combined area of the two regions, known as the union (aU). This gives the IoU for that pair as `aI ÷ aU`, which results in a value between `0` and `1`, where `1` indicates perfect overlap.
+* **Calculating IoU for Each Pair**: For each pair of overlapping regions, the area of overlap, or intersection (aI), is divided by the total combined area of the two regions, known as the union (aU). This gives the IoU for that pair as `aI ÷ aU`, which results in a value between `0` and `1`, where `1` indicates perfect overlap and `0` indicates no overlap.
 * **Tracking the Maximum IoU**: When comparing multiple regions (e.g., multiple bounding boxes), the system tracks the highest IoU value for the pair using the formula `max_iou = max(iou, max_iou)`. This ensures that the most significant agreement between the two annotations is captured.
 * **Avoiding Averaging Misconceptions**: In some cases, there may be multiple overlapping regions between annotations `x` and `y`. Rather than averaging all IoU values (which could be misleading), the highest IoU for each pair is retained, ensuring the most representative comparison of agreement between the annotations.
 
