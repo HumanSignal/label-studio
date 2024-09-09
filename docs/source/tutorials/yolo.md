@@ -23,14 +23,7 @@ segmentation, classification, and video object tracking capabilities directly in
 This integration allows you to leverage powerful YOLOv8 models for various machine learning tasks, 
 making it easier to annotate large datasets and ensure high-quality predictions. 
 
-<div align="left">
-  <a href="http://www.youtube.com/watch?v=UyaecID1iG8" title="Integrating YOLO V8 with Label Studio">
-    <img src="http://img.youtube.com/vi/UyaecID1iG8/0.jpg" alt="YOLO Integration Video" style="width:50%;"/>
-      <br>
-    Check the video tutorial
-  </a>
-</div>
-<br/>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/UyaecID1iG8?si=UQQW3mpqu2uDtt7i" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 **Supported Features**
 
@@ -97,7 +90,8 @@ This tutorial uses the [YOLO example](https://github.com/HumanSignal/label-studi
 
 - `<RectangleLabels>` - [Bounding boxes](https://labelstud.io/tags/rectanglelabels); object detection task
 - `<PolygonLabels>` - [Polygons](https://labelstud.io/tags/polygonlables); segmentation task
-- `<VideoRectangle>` - [Video bounding boxes](https://labelstud.io/tags/videorectangle); object tracking task
+- `<VideoRectangle>` - [Video bounding boxes](https://labelstud.io/tags/videorectangle); video object tracking task
+- `<KeyPointLabels>` - [Key points](https://labelstud.io/tags/keypointlabels); pose detection task
 - `<Choices>` - [Classification](https://labelstud.io/tags/choices)
 
 **How to skip the control tag?**
@@ -253,7 +247,7 @@ YOLO provides a classification model and Label Studio supports this with the `Ch
 
 More info: https://docs.ultralytics.com/tasks/classify/
 
-https://github.com/user-attachments/assets/30c5ce43-2c89-4ddf-a77d-9d1d75ac3419
+<video src="https://github.com/user-attachments/assets/30c5ce43-2c89-4ddf-a77d-9d1d75ac3419" controls="controls" style="max-width: 800px;" class="gif-border" />
 
 
 ### Labeling config
@@ -301,7 +295,7 @@ YOLO OBB models are also supported.
 
 More info: https://docs.ultralytics.com/tasks/detect/
 
-https://github.com/user-attachments/assets/413b4650-422d-43dc-809d-51c08f0ad434
+<video src="https://github.com/user-attachments/assets/413b4650-422d-43dc-809d-51c08f0ad434" controls="controls" style="max-width: 800px;" class="gif-border" />
 
 
 ### Labeling config
@@ -358,7 +352,7 @@ Label Studio supports this with the `PolygonLabels` control tag.
 
 More info: https://docs.ultralytics.com/tasks/segment/
 
-https://github.com/user-attachments/assets/9b2447d3-392d-42be-bc7f-ef2b6c81d54c
+<video src="https://github.com/user-attachments/assets/9b2447d3-392d-42be-bc7f-ef2b6c81d54c" controls="controls" style="max-width: 800px;" class="gif-border" />
 
 
 ### Labeling config
@@ -574,7 +568,7 @@ Label Studio supports this with the `VideoRectangle` + `Labels` control tags.
 More info: https://docs.ultralytics.com/modes/track/
 
 
-https://github.com/user-attachments/assets/7b0d50e6-164a-4d66-87cf-df443b77f638
+<video src="https://github.com/user-attachments/assets/7b0d50e6-164a-4d66-87cf-df443b77f638" controls="controls" style="max-width: 800px;" class="gif-border" />
 
 
 
