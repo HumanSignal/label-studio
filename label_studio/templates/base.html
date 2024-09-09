@@ -16,24 +16,18 @@
   <meta name="msapplication-navbutton-color" content="#272727">  <!-- Windows Phone -->
   <meta name="apple-mobile-web-app-status-bar-style" content="#272727">  <!-- iOS Safari -->
 
+  <!-- Preload fonts -->
+  <link rel="preload" href="{{settings.HOSTNAME}}{% static 'fonts/Figtree-Regular.ttf' %}" type="font" crossorigin="anonymous">
+  <link rel="preload" href="{{settings.HOSTNAME}}{% static 'fonts/Figtree-SemiBold.ttf' %}" type="font" crossorigin="anonymous">
+
+  <!-- CSS -->
   <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
   <link href="{{settings.HOSTNAME}}{% static 'css/uikit.css' %}" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}{% static 'css/main.css' %}" rel="stylesheet">
-  <link href="{{settings.HOSTNAME}}/static/fonts/roboto/roboto.css" rel="stylesheet">
-  <link href="{{settings.HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
-
-  <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
-  <script src="{{settings.HOSTNAME}}{% static 'js/helpers.js' %}"></script>
+  <link href="{{settings.FRONTEND_HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
 
   {% block app-scripts %}
-    <script nonce="{{request.csp_nonce}}">
-      EDITOR_JS = `{{settings.HOSTNAME}}/label-studio-frontend/main.js?v={{ versions.lsf.commit }}`;
-      EDITOR_CSS = `{{settings.HOSTNAME}}/label-studio-frontend/main.css?v={{ versions.lsf.commit }}`;
-      DM_JS = `{{settings.HOSTNAME}}/dm/main.js?v={{ versions.dm2.commit }}`;
-      DM_CSS = `{{settings.HOSTNAME}}/dm/main.css?v={{ versions.dm2.commit }}`;
-    </script>
   {% endblock %}
-
 
   <script
    src="https://browser.sentry-cdn.com/5.17.0/bundle.min.js"
@@ -49,7 +43,6 @@
   {% endblock %}
 
   {% block head-toast %}
-    <script src="{{settings.HOSTNAME}}{% static 'js/Toast.min.js' %}"></script>
     <link href="{{settings.HOSTNAME}}{% static 'css/Toast.min.css' %}" rel="stylesheet">
   {% endblock %}
 
@@ -119,10 +112,19 @@
 </script>
 
 {% block app-js %}
-<script src="{{settings.HOSTNAME}}/react-app/main.js?v={{ versions.backend.commit }}"></script>
+<script src="{{settings.FRONTEND_HOSTNAME}}/react-app/runtime.js?v={{ versions.backend.commit }}"></script>
+{% comment %}
+  NOTE: purposely setting this to not cache using backend commit as we do not intend this to change frequently.
+  If for any reason we need to invalidate the cache, we can do so by changing the version number.
+{% endcomment %}
+<script src="{{settings.FRONTEND_HOSTNAME}}/react-app/vendor.js?v=1"></script>
+<script src="{{settings.FRONTEND_HOSTNAME}}/react-app/main.js?v={{ versions.backend.commit }}"></script>
 {% endblock %}
 
-<div id="dynamic-content">
+{% block bottomjs %}
+  <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
+  <script src="{{settings.HOSTNAME}}{% static 'js/helpers.js' %}"></script>
+  <script src="{{settings.HOSTNAME}}{% static 'js/Toast.min.js' %}"></script>
   <script nonce="{{request.csp_nonce}}">
       applyCsrf();
 
@@ -130,10 +132,9 @@
            $(this).closest('.message').transition('fade');
       });
   </script>
+{% endblock %}
 
-  {% block bottomjs %}
-  {% endblock %}
-
+<div id="dynamic-content">
   {% block storage-persistence %}
   <script nonce="{{request.csp_nonce}}">
     {# storage persistence #}

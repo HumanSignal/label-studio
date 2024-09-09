@@ -77,7 +77,6 @@ Data(relativeCoordsFF).Scenario(
     };
 
     LabelStudio.setFeatureFlags({
-      ff_front_dev_2394_zoomed_transforms_260522_short: true,
       ff_front_1170_outliner_030222_short: true,
       fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short: true,
       fflag_fix_front_dev_3793_relative_coords_short: FF3793.enabled,
@@ -244,7 +243,6 @@ Scenario(
     };
 
     LabelStudio.setFeatureFlags({
-      ff_front_dev_2394_zoomed_transforms_260522_short: true,
       ff_front_1170_outliner_030222_short: true,
       fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short: true,
     });

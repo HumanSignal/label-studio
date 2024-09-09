@@ -13,7 +13,7 @@
     border-radius: 0 0 4px 4px;
 
     &_video {
-      border-radius: 0 0 4px 0;
+      border-radius: 0 0 4px;
     }
   }
 
@@ -21,21 +21,18 @@
     height: 100%;
     z-index: 2;
     position: relative;
-    background-color: rgba(var(--accent_color-raw), 0.8);
+    background-color: rgb(var(--accent_color-raw) / 80%);
     transition: background-color 80ms ease;
   }
 
   &::before {
-    top: -5px;
-    left: -5px;
-    right: -5px;
-    bottom: -5px;
+    inset: -5px;
     content: '';
     display: block;
     position: absolute;
   }
 
-  &::hover &__progress {
+  &:hover &__progress {
     background-color: var(--accent_color);
   }
 

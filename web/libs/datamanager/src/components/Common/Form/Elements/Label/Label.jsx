@@ -15,7 +15,7 @@ const Label = forwardRef(
     };
 
     return (
-      <Block ref={ref} name="label" tag={tagName} style={style} mod={mods} data-required={required}>
+      <Block ref={ref} name="label-dm" tag={tagName} style={style} mod={mods} data-required={required}>
         <Elem name="text">
           <Elem name="content">
             {text}

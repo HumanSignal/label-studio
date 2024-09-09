@@ -1,4 +1,4 @@
-.space {
+.space-ls {
   display: grid;
   grid-gap: 16px;
   grid-auto-flow: column;
@@ -37,9 +37,6 @@
   &_stretch &_direction {
     &_horizontal {
       grid-auto-columns: 1fr;
-    }
-
-    &_horizontal {
       grid-auto-rows: 1fr;
     }
   }

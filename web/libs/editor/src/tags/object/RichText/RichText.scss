@@ -30,10 +30,7 @@
 
   &__loading {
     position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+    inset: 0;
     display: flex;
     flex-flow: row nowrap;
     justify-content: center;
@@ -50,7 +47,7 @@
     cursor: auto;
   }
 
-  &__container[data-linenumbers=enabled] {
+  &__container[data-linenumbers="enabled"] {
     padding-left: 3em;
     counter-reset: line-number;
 

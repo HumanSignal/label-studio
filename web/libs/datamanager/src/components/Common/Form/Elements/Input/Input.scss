@@ -1,6 +1,6 @@
 .form-input,
 .form-select,
-.textarea {
+.textarea-dm {
   height: 40px;
   min-height: 40px;
   background: #FAFAFA;
@@ -13,7 +13,7 @@
   transition: box-shadow 80ms ease;
 
   &_newUI {
-    border-color: rgba(137, 128, 152, 0.16);
+    border-color: rgb(137 128 152 / 16%);
   }
 
   &_ghost {
@@ -34,17 +34,17 @@
   }
 }
 
-input.form-input[type=radio] {
+input.form-input[type="radio"] {
   width: 16px;
   height: 16px;
   min-height: 0;
 }
 
-input.form-input[type=range] {
+input.form-input[type="range"] {
   padding: 0;
 }
 
-.textarea {
+.textarea-dm {
   padding: 12px 16px;
   min-height: 50px;
 }

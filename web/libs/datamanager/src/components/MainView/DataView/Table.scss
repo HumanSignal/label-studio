@@ -1,4 +1,4 @@
-.data-view {
+.data-view-dm {
   flex: 1;
   display: flex;
   overflow: hidden;
@@ -16,7 +16,7 @@
   &__description {
     font-size: 16px;
     text-align: center;
-    color: rgba(var(--black-raw), 0.6);
+    color: rgb(var(--black-raw) / 60%);
   }
 }
 
@@ -30,7 +30,7 @@
   text-align: center;
   color: var(--sand_600);
 
-  .button {
+  .button-dm {
     color: var(--primary_link);
     padding: 8px 16px;
     border: 1px solid var(--primary_link);

@@ -7,7 +7,7 @@
 import { inject, observer } from "mobx-react";
 import { Button } from "../../common/Button/Button";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
-import { Block, Elem } from "../../utils/bem";
+import { Block, cn, Elem } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 import { IconBan } from "../../assets/icons";
 import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
@@ -41,6 +41,7 @@ export const Controls = controlsInjector(
     const isNotQuickView = store.hasInterface("topbar:prevnext");
     const historySelected = isDefined(store.annotationStore.selectedHistory);
     const { userGenerate, sentUserGenerate, versions, results, editable: annotationEditable } = annotation;
+    const dropdownTrigger = cn("dropdown").elem("trigger").toClassName();
     const buttons = [];
 
     const [isInProgress, setIsInProgress] = useState(false);
@@ -221,7 +222,7 @@ export const Controls = controlsInjector(
                 look={look}
                 mod={{ has_icon: useExitOption, disabled: isDisabled }}
                 onClick={async (event) => {
-                  if (event.target.classList.contains("lsf-dropdown__trigger")) return;
+                  if (event.target.classList.contains(dropdownTrigger)) return;
                   const selected = store.annotationStore?.selected;
 
                   selected?.submissionInProgress();
@@ -262,7 +263,7 @@ export const Controls = controlsInjector(
               look={look}
               mod={{ has_icon: useExitOption, disabled: isUpdateDisabled }}
               onClick={async (event) => {
-                if (event.target.classList.contains("lsf-dropdown__trigger")) return;
+                if (event.target.classList.contains(dropdownTrigger)) return;
                 const selected = store.annotationStore?.selected;
 
                 selected?.submissionInProgress();

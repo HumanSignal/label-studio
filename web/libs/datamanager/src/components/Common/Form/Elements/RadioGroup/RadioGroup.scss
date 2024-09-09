@@ -1,4 +1,4 @@
-.radio-group {
+.radio-group-dm {
   --radius: 8px;
   --height: 32px;
   --padding: 4px;
@@ -10,7 +10,7 @@
   border-radius: var(--radius);
   padding: var(--padding);
   background: var(--sand_100);
-  box-shadow: inset 0px 1px 0px var(--black_5), inset 0px 0px 0px 1px var(--black_5);
+  box-shadow: inset 0 1px 0 var(--black_5), inset 0 0 0 1px var(--black_5);
   box-sizing: border-box;
 
   &__buttons {
@@ -19,13 +19,13 @@
     grid-auto-columns: 1fr;
     grid-auto-flow: column;
 
-    .radio-group_simple .radio-group__buttons & {
+    .radio-group-dm_simple .radio-group-dm__buttons & {
       all: unset;
       display: inline-block;
       margin-bottom: 16px;
     }
 
-    .radio-group_horizontal .radio-group__buttons & {
+    .radio-group-dm_horizontal .radio-group-dm__buttons & {
       display: grid;
       grid-auto-columns: min-content;
       column-gap: 16px;
@@ -60,13 +60,13 @@
       cursor: not-allowed;
     }
 
-    .radio-group_simple & {
+    .radio-group-dm_simple & {
       all: unset;
       display: block;
       margin-bottom: 16px;
     }
 
-    .radio-group_horizontal & {
+    .radio-group-dm_horizontal & {
       margin: 0;
     }
   }

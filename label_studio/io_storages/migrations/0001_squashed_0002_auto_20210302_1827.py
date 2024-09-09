@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('projects', '0061_delete_storage'),
+        ('projects', '0001_squashed_0065_auto_20210223_2014'),
         ('tasks', '__first__'),
     ]
 

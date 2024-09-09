@@ -28,7 +28,6 @@ const CONFIG_MULTIPLE = `
 `;
 
 const FLAGS = {
-  ff_feat_front_DEV_2576_undo_key_points_polygon_short: true,
   ff_front_dev_2431_delete_polygon_points_080622_short: true,
   ff_front_dev_2432_auto_save_polygon_draft_210622_short: true,
 };

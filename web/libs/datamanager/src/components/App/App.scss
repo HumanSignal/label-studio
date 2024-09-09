@@ -58,11 +58,8 @@
   z-index: 100000;
 }
 
-.offscreen.visible {
-  bottom: auto;
-  right: auto;
-  top: 0;
-  left: 0;
+.offscreen-lsf.visible {
+  inset: 0 auto auto 0;
   opacity: 1;
 }
 

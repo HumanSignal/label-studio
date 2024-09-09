@@ -4,12 +4,10 @@
   }
 
   &__model-exists-info {
-    align-items: center;
     margin-bottom: 20px;
     background: var(--sand_0);
     padding: 10px 20px;
     border: 1px solid var(--sand_300);
-
     border-radius: 8px;
     display: flex;
     justify-content: center;
@@ -18,8 +16,8 @@
   }
  
   &__title-block {
-    margin: 20px 0px;
-    margin-top: 0px;
+    margin: 20px 0;
+    margin-top: 0;
   }
 
   &__title {
@@ -30,8 +28,7 @@
 .ml {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-column-gap: 16px;
-  grid-row-gap: 16px;
+  grid-gap: 16px;
   margin-top: 32px;
   align-items: flex-start;
   grid-auto-rows: max-content;

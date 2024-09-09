@@ -14,8 +14,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('projects', '0060_merge_20210126_1328'),
-        ('projects', '0058_remove_projecttemplate_business'),
+        ('projects', '0001_squashed_0065_auto_20210223_2014'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

@@ -7,23 +7,24 @@ on:
         required: true
         type: string
 
+env:
+  DJANGO_SETTINGS_MODULE: core.settings.label_studio
+  COVERAGE_PROCESS_START: 1
+  LOG_DIR: pytest_logs
+  COLLECT_ANALYTICS: true
+  DEBUG_CONTEXTLOG: true
+  LABEL_STUDIO_TEST_ENVIRONMENT: false
+  SENTRY_RATE: 0
+  JSON_LOG: 0
+
 jobs:
-  migrations:
-    name: "migrations"
+  sqlite-migrations:
+    name: "sqlite-migrations"
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      DJANGO_SETTINGS_MODULE: core.settings.label_studio
-      COVERAGE_PROCESS_START: 1
-      LOG_DIR: pytest_logs
-      COLLECT_ANALYTICS: true
-      DEBUG_CONTEXTLOG: true
-      LABEL_STUDIO_TEST_ENVIRONMENT: false
-      SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
-      SENTRY_RATE: 0
       DJANGO_DB: sqlite
-      JSON_LOG: 0
-      # SENTRY_DSN:
+      SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
 
     steps:
       - uses: hmarr/debug-action@v3.0.0
@@ -62,3 +63,62 @@ jobs:
             echo "::error::${error}"
             exit 1
           fi
+
+  pgsql-migrations:
+    name: "pgsql-migrations"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SENTRY_ENVIRONMENT: tests-ubuntu-pgsql
+      DJANGO_DB: default
+      CI: true
+
+    services:
+      postgres:
+        image: postgres:13.8
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        id: setup_python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install OS dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
+
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
+
+      - name: Install Python dependencies
+        run: |
+          poetry install
+
+      - name: Test migrations
+        run: |
+          poetry run python label_studio/manage.py makemigrations
+
+      - name: Lint migrations
+        run: |
+          poetry run python label_studio/manage.py lintmigrations --warnings-as-errors --project-root-path '.' --git-commit-id ${{ github.event.pull_request.base.sha || github.event.before }}

@@ -9,6 +9,7 @@ import { Pagination } from "../../common/Pagination/Pagination";
 import { Hotkey } from "../../core/Hotkey";
 import { FF_DEV_1170, isFF } from "../../utils/feature-flags";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import { cn } from "../../utils/bem";
 
 const Model = types.model({
   id: types.identifier,
@@ -68,6 +69,7 @@ const Model = types.model({
 const PagedViewModel = types.compose("PagedViewModel", Model, AnnotationMixin);
 const PAGE_QUERY_PARAM = "view_page";
 const hotkeys = Hotkey("Repeater");
+const sidePanelsContentSelector = `.${cn("sidepanels").elem("content").toClassName()}`;
 const DEFAULT_PAGE_SIZE = 1;
 const PAGE_SIZE_OPTIONS = [1, 5, 10, 25, 50, 100];
 
@@ -144,7 +146,7 @@ const HtxPagedView = observer(({ item }) => {
 
   useEffect(() => {
     if (isFF(FF_DEV_1170)) {
-      document.querySelector(".lsf-sidepanels__content")?.scrollTo(0, 0);
+      document.querySelector(sidePanelsContentSelector)?.scrollTo(0, 0);
     } else {
       document.querySelector("#label-studio-dm")?.scrollTo(0, 0);
     }

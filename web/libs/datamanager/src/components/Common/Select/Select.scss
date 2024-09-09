@@ -1,6 +1,6 @@
 @use 'sass:color';
 
-.select {
+.select-dm {
   height: 40px;
   background: #FAFAFA;
   font-size: 16px;
@@ -58,7 +58,7 @@
     }
 
     &_selected:hover,
-    &_selected.select__option_focused {
+    &_selected.select-dm__option_focused {
       background-color: hsl(var(--accent_color), 10%);
     }
   }
@@ -101,7 +101,7 @@
 
     &-label {
       padding: 4px 16px;
-      color: rgba(var(--black-raw), 0.6);
+      color: rgb(var(--black-raw) / 60%);
     }
   }
 
@@ -115,7 +115,7 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0px 0px 0px 6px rgba(var(--accent_color-raw), 0.2), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15), inset 0px 0px 0px 1px rgba(var(--accent_color-raw), 0.2);
-    border-color: rgba(var(--accent_color-raw), 0.2);
+    box-shadow: 0 0 0 6px rgb(var(--accent_color-raw) / 20%), inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15), inset 0 0 0 1px rgb(var(--accent_color-raw) / 20%);
+    border-color: rgb(var(--accent_color-raw) / 20%);
   }
 }

@@ -1,4 +1,4 @@
-.pagination {
+.pagination-dm {
   --button-color: var(--accent_color);
   --border-radius: 5px;
   --height: 40px;
@@ -20,6 +20,7 @@
 
   &_disabled {
     --button-color: #ccc;
+
     background-color: #efefef;
     pointer-events: none;
   }
@@ -30,7 +31,7 @@
     font-size: var(--font-size);
     line-height: var(--line-height);
 
-    .pagination_size_small & {
+    .pagination-dm_size_small & {
       padding-right: 8px;
     }
   }
@@ -41,15 +42,15 @@
     align-items: center;
     border-radius: var(--border-radius, 5px);
     background: var(--white);
-    box-shadow: inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15);
+    box-shadow: inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15);
 
-    .pagination_waiting & {
+    .pagination-dm_waiting & {
       pointer-events: none;
       animation: button-waiting 1s linear infinite;
       background-image: repeating-linear-gradient(-63.43deg,
-          rgba(var(--white-raw), 0.2) 1px, #efefef 2px, #efefef 6px,
-          rgba(var(--white-raw), 0.2) 7px,
-          rgba(var(--white-raw), 0.2) 12px);
+          rgb(var(--white-raw) / 20%) 1px, #efefef 2px, #efefef 6px,
+          rgb(var(--white-raw) / 20%) 7px,
+          rgb(var(--white-raw) / 20%) 12px);
     }
   }
 
@@ -58,7 +59,7 @@
     height: 30px;
     background-color: var(--black_10);
 
-    .pagination_size_small & {
+    .pagination-dm_size_small & {
       height: 20px;
     }
   }
@@ -72,16 +73,17 @@
     user-select: none;
     cursor: pointer;
 
-    .pagination_waiting & {
+    .pagination-dm_waiting & {
       opacity: 0.5;
     }
 
-    .pagination_size_small & {
+    .pagination-dm_size_small & {
       width: 24px;
     }
 
     &_disabled {
       pointer-events: none;
+
       --button-color: #ccc;
     }
 
@@ -89,8 +91,8 @@
     &_arrow-right {
       position: relative;
 
-      &:before,
-      &:after {
+      &::before,
+      &::after {
         content: '';
         display: block;
         position: absolute;
@@ -103,12 +105,11 @@
         border-right: none;
       }
 
-      &:after {
+      &::after {
         display: none;
       }
 
-      .pagination_size_small & {
-
+      .pagination-dm_size_small & {
         &::before,
         &::after {
           width: 5px;
@@ -118,30 +119,28 @@
     }
 
     &_arrow-left {
-
-      &:before,
-      &:after {
+      &::before,
+      &::after {
         transform: translate3d(-50%, -50%, 0) rotate(-45deg);
       }
     }
 
     &_arrow-right {
-
-      &:before,
-      &:after {
+      &::before,
+      &::after {
         transform: translate3d(-50%, -50%, 0) rotate(135deg);
       }
     }
 
     &_arrow-left-double {
-      &:after {
+      &::after {
         display: block;
         margin-left: 7px;
       }
     }
 
     &_arrow-right-double {
-      &:after {
+      &::after {
         display: block;
         margin-left: -7px;
       }
@@ -161,11 +160,11 @@
     background: #FAFAFA;
     margin: 1px 0;
 
-    .pagination_waiting & {
+    .pagination-dm_waiting & {
       opacity: 0.5;
     }
 
-    .pagination_size_small & {
+    .pagination-dm_size_small & {
       width: 70px;
     }
 
@@ -201,7 +200,7 @@
     min-width: 170px;
     padding-left: 16px;
 
-    .pagination_size_small & {
+    .pagination-dm_size_small & {
       padding-left: 8px;
       min-width: 130px;
     }

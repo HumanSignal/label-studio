@@ -1,4 +1,4 @@
-.form {
+.form-dm {
   width: 100%;
   display: block;
 
@@ -7,8 +7,7 @@
     justify-items: stretch;
     justify-content: space-between;
     grid-template-columns: repeat(var(--column-count, 5), 1fr);
-    grid-column-gap: 16px;
-    grid-row-gap: var(--row-gap, 16px);
+    grid-gap: var(--row-gap, 16px) 16px;
 
     &:not(:first-child) {
       margin-top: 12px;
@@ -56,19 +55,18 @@
 }
 
 .form-input,
-.textarea,
+.textarea-dm,
 .counter,
 .form-select__list {
-
   &:not(&_ghost):focus,
   &_focused {
     outline: none;
-    box-shadow: 0px 0px 0px 6px rgba(var(--accent_color-raw), 0.2), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15), inset 0px 0px 0px 1px rgba(var(--accent_color-raw), 0.2);
-    border-color: rgba(var(--accent_color-raw), 0.2);
+    box-shadow: 0 0 0 6px rgb(var(--accent_color-raw) / 20%), inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15), inset 0 0 0 1px rgb(var(--accent_color-raw) / 20%);
+    border-color: rgb(var(--accent_color-raw) / 20%);
   }
 }
 
-.form-indicator {
+.form-indicator-dm {
   font-weight: 500;
 
   &__item {

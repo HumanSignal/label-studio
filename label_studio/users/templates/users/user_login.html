@@ -3,8 +3,8 @@
 {% block user_content %}
   <form id="login-form" action="{% url 'user-login' %}{% if next %}?next={{ next }}{% endif %}" method="post">
     {% csrf_token %}
-    <p><input type="text" class="ls-input" name="email" id="email" placeholder="Email" value="{{ form.data.email }}"></p>
-    <p><input type="password" class="ls-input" name="password" id="password" placeholder="Password"></p>
+    <p><input type="text" class="lsf-input-ls" name="email" id="email" placeholder="Email" value="{{ form.data.email }}"></p>
+    <p><input type="password" class="lsf-input-ls" name="password" id="password" placeholder="Password"></p>
     {% if form.non_field_errors %}
       {% for error in form.non_field_errors %}
         <p class="error">
@@ -13,10 +13,10 @@
       {% endfor %}
     {% endif %}
     <p>
-      <input type="checkbox" id="persist_session" name="persist_session" class="ls-checkbox" checked="checked" style="width: auto;" />
+      <input type="checkbox" id="persist_session" name="persist_session" class="lsf-checkbox-ls" checked="checked" style="width: auto;" />
       <label for="persist_session">Keep me logged in this browser</label>
     </p>
-    <p><button type="submit" aria-label="Log In" class="ls-button ls-button_look_primary">Log in</button></p>
+    <p><button type="submit" aria-label="Log In" class="lsf-button-ls lsf-button-ls_look_primary">Log in</button></p>
   </form>
 
 {% endblock %}

@@ -1,6 +1,6 @@
 {
-  "message": "docs: DOC-239: Add information about rectangle rotation (#6248)",
-  "commit": "c738a68753387d9f743787a1ab98d952cbc8a493",
-  "date": "2024-08-27T19:53:38.000Z",
+  "message": "chore: OPTIC-1060: Hot Module Reload support for frontend development (#6280)",
+  "commit": "c5696cd87c585322d3bdc378aa3f52e566624e3d",
+  "date": "2024-09-06T18:30:10.000Z",
   "branch": "develop"
 }
