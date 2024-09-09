@@ -59,6 +59,11 @@ const Model = types
     get toTag() {
       return self.annotation.names.get(self.toname);
     },
+
+    // Indicates that it could exist without information about objects, taskData and regions
+    get isIndependent() {
+      return self.toTag ? self.toTag.isIndependent : false;
+    },
   }))
   .actions((self) => ({
     applyFilter() {

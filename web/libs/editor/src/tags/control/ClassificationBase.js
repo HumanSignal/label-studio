@@ -44,6 +44,11 @@ const ClassificationBase = types
         }
         return self.annotation.results.find((r) => r.from_name === self);
       },
+
+      // Indicates that it could exist without information about objects, taskData and regions
+      get isIndependent() {
+        return self.isClassificationTag && !self.perregion && !self.peritem && !self.value;
+      },
     };
   })
   .actions((self) => {

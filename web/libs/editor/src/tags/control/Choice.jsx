@@ -125,6 +125,10 @@ const Model = types
     isReadOnly() {
       return self.readonly || self.parent?.isReadOnly();
     },
+    // Indicates that it could exist without information about objects, taskData and regions
+    get isIndependent() {
+      return true;
+    },
   }))
   .volatile(() => ({
     // `selected` is a predefined parameter, we cannot use it for state, so use `sel`

@@ -24,8 +24,15 @@ import "../../tags/visual";
  */
 import { Space } from "../../common/Space/Space";
 import { Button } from "../../common/Button/Button";
-import { Block, cn, Elem } from "../../utils/bem";
-import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
+import { Block, Elem } from "../../utils/bem";
+import {
+  FF_BULK_ANNOTATION,
+  FF_DEV_1170,
+  FF_DEV_3873,
+  FF_LSDV_4620_3_ML,
+  FF_SIMPLE_INIT,
+  isFF,
+} from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
@@ -220,6 +227,7 @@ class App extends Component {
       </Block>
     );
 
+    const isBulkMode = isFF(FF_BULK_ANNOTATION) && store.hasInterface("annotation:bulk");
     const outlinerEnabled = isFF(FF_DEV_1170);
     const newUIEnabled = isFF(FF_DEV_3873);
 
@@ -261,17 +269,24 @@ class App extends Component {
           >
             {outlinerEnabled ? (
               newUIEnabled ? (
-                <SideTabsPanels
-                  panelsHidden={viewingAll}
-                  currentEntity={as.selectedHistory ?? as.selected}
-                  regions={as.selected.regionStore}
-                  showComments={store.hasInterface("annotations:comments")}
-                  focusTab={store.commentStore.tooltipMessage ? "comments" : null}
-                >
-                  {mainContent}
-                  {store.hasInterface("topbar") && <BottomBar store={store} />}
-                </SideTabsPanels>
-              ) : (
+                !isBulkMode ? (
+                  <SideTabsPanels
+                    panelsHidden={viewingAll}
+                    currentEntity={as.selectedHistory ?? as.selected}
+                    regions={as.selected.regionStore}
+                    showComments={store.hasInterface("annotations:comments")}
+                    focusTab={store.commentStore.tooltipMessage ? "comments" : null}
+                  >
+                    {mainContent}
+                    {store.hasInterface("topbar") && <BottomBar store={store} />}
+                  </SideTabsPanels>
+                ) : (
+                  <>
+                    {mainContent}
+                    {store.hasInterface("topbar") && <BottomBar store={store} />}
+                  </>
+                )
+              ) : !isBulkMode ? (
                 <SidePanels
                   panelsHidden={viewingAll}
                   currentEntity={as.selectedHistory ?? as.selected}
@@ -279,6 +294,8 @@ class App extends Component {
                 >
                   {mainContent}
                 </SidePanels>
+              ) : (
+                <>{mainContent}</>
               )
             ) : (
               <>
