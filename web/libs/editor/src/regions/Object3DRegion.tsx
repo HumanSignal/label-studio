@@ -1,83 +1,128 @@
-import { types, getRoot, getParent, type Instance } from "mobx-state-tree";
-import RegionsMixin from "../mixins/Regions";
-import Registry from "../core/Registry";
+import { types, getRoot, getParent } from "mobx-state-tree";
 import { guidGenerator } from "../core/Helpers";
+import Registry from "../core/Registry";
 import { AreaMixin } from "../mixins/AreaMixin";
 import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
 
 const Model = types
   .model("Object3DRegionModel", {
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     type: "object3dregion",
-    object: types.late(() => types.reference(Registry.getModelByTag("object3d"))),
+    object: types.late(() =>
+      types.reference(Registry.getModelByTag("object3d"))
+    ),
 
-    // 3D specific properties
     x: types.number,
     y: types.number,
     z: types.number,
     width: types.number,
     height: types.number,
     depth: types.number,
-    rotationX: types.number,
-    rotationY: types.number,
-    rotationZ: types.number,
+    rotation: types.optional(types.array(types.number), [0, 0, 0])
   })
-  .views((self) => ({
+  .views(self => ({
     get parent() {
       return getParent(self);
     },
 
     get annotation() {
-      return getRoot<any>(self)?.annotationStore?.selected;
+      return getRoot<any>(self).annotationStore.selected;
     },
 
-    // Add more view methods as needed
+    get completion() {
+      return getRoot<any>(self).annotationStore.selected;
+    },
+
+    states() {
+      return self.object.states();
+    },
+
+    activeStates() {
+      const states = self.states();
+      return states.filter(s => s.isSelected);
+    },
+
+    get labelsFromControls() {
+      const object = self.object;
+      const controlsByType = object.annotation.toNames.get(object.name);
+      return (
+        controlsByType?.filter(control => control.type.includes("labels")) ?? []
+      );
+    },
+
+    get labeledLabels() {
+      return self.labelsFromControls
+        .map(control => control.selectedValues())
+        .flat();
+    }
   }))
-  .actions((self) => ({
-    updatePosition(x: number, y: number, z: number) {
+  .actions(self => ({
+    updatePosition(x, y, z) {
       self.x = x;
       self.y = y;
       self.z = z;
     },
 
-    updateDimensions(width: number, height: number, depth: number) {
+    updateDimensions(width, height, depth) {
       self.width = width;
       self.height = height;
       self.depth = depth;
     },
 
-    updateRotation(x: number, y: number, z: number) {
-      self.rotationX = x;
-      self.rotationY = y;
-      self.rotationZ = z;
+    updateRotation(rotationX, rotationY, rotationZ) {
+      self.rotation = [rotationX, rotationY, rotationZ];
     },
 
     serialize() {
       return {
-        value: {
-          x: self.x,
-          y: self.y,
-          z: self.z,
-          width: self.width,
-          height: self.height,
-          depth: self.depth,
-          rotationX: self.rotationX,
-          rotationY: self.rotationY,
-          rotationZ: self.rotationZ,
-        },
+        id: self.id,
+        pid: self.pid,
+        x: self.x,
+        y: self.y,
+        z: self.z,
+        width: self.width,
+        height: self.height,
+        depth: self.depth,
+        rotation: self.rotation
       };
     },
 
-    // Add more action methods as needed
+    setLabel(label) {
+      const object = self.object;
+      const controlsByType = object.annotation.toNames.get(object.name);
+      const labelControl = controlsByType?.find(control =>
+        control.type.includes("labels")
+      );
+
+      if (labelControl) {
+        labelControl.unselectAll();
+        labelControl.toggleSelected(label);
+      }
+    },
+
+    toggleLabel(label) {
+      const object = self.object;
+      const controlsByType = object.annotation.toNames.get(object.name);
+      const labelControl = controlsByType?.find(control =>
+        control.type.includes("labels")
+      );
+
+      if (labelControl) {
+        labelControl.toggleSelected(label);
+      }
+    }
   }));
 
-const Object3DRegionModel = types.compose("Object3DRegionModel", RegionsMixin, AreaMixin, NormalizationMixin, Model);
+const Object3DRegionModel = types.compose(
+  "Object3DRegionModel",
+  RegionsMixin,
+  AreaMixin,
+  NormalizationMixin,
+  Model
+);
 
-type Object3DRegionType = Instance<typeof Object3DRegionModel> & {
-  detectByValue: any;
-};
-
-Registry.addRegionType(Object3DRegionModel as unknown as Object3DRegionType, "object3d");
+Registry.addRegionType(Object3DRegionModel as any, "object3d");
 
 export { Object3DRegionModel };

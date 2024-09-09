@@ -16,8 +16,10 @@ const Model = types
     type: "object3d",
     _value: types.optional(types.string, ""),
     regions: types.array(Object3DRegionModel),
-    // Add any additional properties specific to the 3D object itself
   })
+  .volatile(() => ({
+    selectedRegionId: null,
+  }))
   .views((self) => ({
     get hasStates() {
       const states = self.states();
@@ -25,16 +27,29 @@ const Model = types
     },
 
     states() {
-      return self.annotation.toNames.get(self.name) ?? [];
+      return self.annotation.toNames.get(self.name)?.filter(tag => tag.type.includes("labels")) ?? [];
     },
 
     activeStates() {
       const states = self.states();
-      return states ? states.filter((s) => s.isSelected && s.type.includes("labels")) : [];
+      return states ? states.filter(s => s.isSelected) : [];
     },
 
     get result() {
       return self.annotation.results.find((r) => r.from_name === self);
+    },
+
+    get selectedRegion() {
+      return self.regions.find(r => r.id === self.selectedRegionId);
+    },
+
+    get controlButton() {
+      const { toolsManager } = self.annotation;
+      return toolsManager.findTool("object3d");
+    },
+
+    getRegionByID(id) {
+      return self.regions.find(r => r.id === id);
     },
   }))
   .actions((self) => ({
@@ -49,12 +64,38 @@ const Model = types
         self.regions.splice(index, 1);
         self.annotation.deleteRegion(region);
       }
+      if (self.selectedRegionId === region.id) {
+        self.selectedRegionId = null;
+      }
     },
 
-    setSelected(regionId) {
-      self.regions.forEach((r) => {
-        r.setSelected(r.id === regionId);
+    createRegion(x, y, z) {
+      const region = Object3DRegionModel.create({
+        x, y, z,
+        width: 1, height: 1, depth: 1, // Default size
+        object: self,
       });
+      self.regions.push(region);
+      self.annotation.addRegion(region);
+
+      // Automatically select the first label if available
+      const firstLabel = self.states()[0]?.selectedValues()[0];
+      if (firstLabel) {
+        region.setLabel(firstLabel);
+      }
+
+      return region;
+    },
+
+    selectRegion(id) {
+      self.selectedRegionId = id;
+    },
+
+    updateSelectedRegion(updates) {
+      const region = self.selectedRegion;
+      if (region) {
+        Object.assign(region, updates);
+      }
     },
 
     // This method will be called when loading an annotation result
