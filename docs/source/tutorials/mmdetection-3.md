@@ -16,10 +16,6 @@ categories:
 image: "/tutorials/openmmlab.png"
 ---
 
-<!--
-
--->
-
 # Object detection with bounding boxes using MMDetection
 
 https://mmdetection.readthedocs.io/en/latest/

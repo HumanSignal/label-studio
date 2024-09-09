@@ -17,10 +17,6 @@ categories:
 image: "/tutorials/segment-anything.png"
 ---
 
-<!--
-
--->
-
 # Interactive annotation in Label Studio with Segment Anything Model
 
 https://github.com/shondle/label-studio-ml-backend/assets/106922533/42a8a535-167c-404a-96bd-c2e2382df99a

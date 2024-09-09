@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/easyocr.png"
 ---
 
-<!--
-
--->
-
 # EasyOCR model connection
 
 The [EasyOCR](https://github.com/JaidedAI/EasyOCR) model connection is a powerful tool that integrates the capabilities of EasyOCR with Label Studio. It is designed to assist in machine learning labeling tasks, specifically those involving Optical Character Recognition (OCR). 

@@ -82,6 +82,7 @@ const Model = types
       "KeyPointLabels",
       "BrushLabels",
       "HyperTextLabels",
+      "TimelineLabels",
       "TimeSeriesLabels",
       "ParagraphLabels",
     ]),
