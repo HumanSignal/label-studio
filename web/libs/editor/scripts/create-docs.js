@@ -84,16 +84,18 @@ fetch(currentTagsUrl)
       schema[t.name] = {
         name: t.name,
         description: t.description,
-        attrs: Object.fromEntries(t.params?.map((p) => [
-          p.name,
-          {
-            name: p.name,
-            description: p.description,
-            type: attrType(p.type),
-            required: !p.optional,
-            default: p.defaultvalue,
-          },
-        ]) ?? []),
+        attrs: Object.fromEntries(
+          t.params?.map((p) => [
+            p.name,
+            {
+              name: p.name,
+              description: p.description,
+              type: attrType(p.type),
+              required: !p.optional,
+              default: p.defaultvalue,
+            },
+          ]) ?? [],
+        ),
       };
 
       // we can use comma-separated list of @regions used by tag
@@ -193,7 +195,7 @@ fetch(currentTagsUrl)
     }
 
     // for now only hardcoded list of all tags for View
-    schema.View.children = Object.keys(schema).filter(name => name !== '!top');
-    fs.writeFileSync(path.resolve(outputSchemaDir, 'schema.json'), JSON.stringify(schema, null, 2));
+    schema.View.children = Object.keys(schema).filter((name) => name !== "!top");
+    fs.writeFileSync(path.resolve(outputSchemaDir, "schema.json"), JSON.stringify(schema, null, 2));
   })
   .catch(console.error);
