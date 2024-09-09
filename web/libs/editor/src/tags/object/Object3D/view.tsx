@@ -1,10 +1,10 @@
-import React, { FC, useCallback, useEffect, useState, useMemo } from "react";
+import React, { type FC, useCallback, useEffect, useState, useMemo } from "react";
 import { observer } from "mobx-react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, Box } from "@react-three/drei";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { Object3DModelType } from "./model";
+import type { Object3DModelType } from "./model";
 import { LabelOnRegion } from "./LabelOnRegion";
 import styles from "./view.module.scss";
 
@@ -44,7 +44,7 @@ const RegionBox = observer(({ region, onClick }: RegionBoxProps) => {
       <Box
         position={[x, y, z]}
         args={[width, height, depth]}
-        onClick={e => {
+        onClick={(e) => {
           e.stopPropagation();
           onClick(region);
         }}
@@ -52,16 +52,8 @@ const RegionBox = observer(({ region, onClick }: RegionBoxProps) => {
         <meshStandardMaterial color={color} opacity={opacity} transparent />
       </Box>
       {isSelected && (
-        <Box
-          position={[x, y, z]}
-          args={[width + 0.05, height + 0.05, depth + 0.05]}
-        >
-          <meshBasicMaterial
-            color="white"
-            opacity={0.2}
-            transparent
-            wireframe
-          />
+        <Box position={[x, y, z]} args={[width + 0.05, height + 0.05, depth + 0.05]}>
+          <meshBasicMaterial color="white" opacity={0.2} transparent wireframe />
         </Box>
       )}
       <LabelOnRegion item={region} />
@@ -79,7 +71,7 @@ const Scene = observer(({ item }: SceneProps) => {
 
   useEffect(() => {
     if (modelRef && item._value) {
-      loader.load(item._value, gltf => {
+      loader.load(item._value, (gltf) => {
         if (modelRef) {
           modelRef.clear();
           modelRef.add(gltf.scene);
@@ -95,7 +87,7 @@ const Scene = observer(({ item }: SceneProps) => {
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2(
           (event.clientX / window.innerWidth) * 2 - 1,
-          -(event.clientY / window.innerHeight) * 2 + 1
+          -(event.clientY / window.innerHeight) * 2 + 1,
         );
         raycaster.setFromCamera(mouse, camera);
         const intersects = raycaster.intersectObject(scene, true);
@@ -105,14 +97,14 @@ const Scene = observer(({ item }: SceneProps) => {
         }
       }
     },
-    [item, scene, camera]
+    [item, scene, camera],
   );
 
   const handleRegionClick = useCallback(
     (region: Object3DModelType) => {
       item.selectRegion(region.id);
     },
-    [item]
+    [item],
   );
 
   if (!scene || !camera) {
@@ -122,12 +114,8 @@ const Scene = observer(({ item }: SceneProps) => {
   return (
     <>
       <group ref={setModelRef} onClick={handleModelClick} />
-      {item.regions.map(region => (
-        <RegionBox
-          key={region.id}
-          region={region}
-          onClick={handleRegionClick}
-        />
+      {item.regions.map((region) => (
+        <RegionBox key={region.id} region={region} onClick={handleRegionClick} />
       ))}
     </>
   );

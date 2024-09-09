@@ -27,12 +27,12 @@ const Model = types
     },
 
     states() {
-      return self.annotation.toNames.get(self.name)?.filter(tag => tag.type.includes("labels")) ?? [];
+      return self.annotation.toNames.get(self.name)?.filter((tag) => tag.type.includes("labels")) ?? [];
     },
 
     activeStates() {
       const states = self.states();
-      return states ? states.filter(s => s.isSelected) : [];
+      return states ? states.filter((s) => s.isSelected) : [];
     },
 
     get result() {
@@ -40,7 +40,7 @@ const Model = types
     },
 
     get selectedRegion() {
-      return self.regions.find(r => r.id === self.selectedRegionId);
+      return self.regions.find((r) => r.id === self.selectedRegionId);
     },
 
     get controlButton() {
@@ -49,7 +49,7 @@ const Model = types
     },
 
     getRegionByID(id) {
-      return self.regions.find(r => r.id === id);
+      return self.regions.find((r) => r.id === id);
     },
   }))
   .actions((self) => ({
@@ -71,8 +71,12 @@ const Model = types
 
     createRegion(x, y, z) {
       const region = Object3DRegionModel.create({
-        x, y, z,
-        width: 1, height: 1, depth: 1, // Default size
+        x,
+        y,
+        z,
+        width: 1,
+        height: 1,
+        depth: 1, // Default size
         object: self,
       });
       self.regions.push(region);

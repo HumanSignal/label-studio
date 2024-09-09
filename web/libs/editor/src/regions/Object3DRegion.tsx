@@ -10,9 +10,7 @@ const Model = types
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     type: "object3dregion",
-    object: types.late(() =>
-      types.reference(Registry.getModelByTag("object3d"))
-    ),
+    object: types.late(() => types.reference(Registry.getModelByTag("object3d"))),
 
     x: types.number,
     y: types.number,
@@ -20,9 +18,9 @@ const Model = types
     width: types.number,
     height: types.number,
     depth: types.number,
-    rotation: types.optional(types.array(types.number), [0, 0, 0])
+    rotation: types.optional(types.array(types.number), [0, 0, 0]),
   })
-  .views(self => ({
+  .views((self) => ({
     get parent() {
       return getParent(self);
     },
@@ -41,24 +39,20 @@ const Model = types
 
     activeStates() {
       const states = self.states();
-      return states.filter(s => s.isSelected);
+      return states.filter((s) => s.isSelected);
     },
 
     get labelsFromControls() {
       const object = self.object;
       const controlsByType = object.annotation.toNames.get(object.name);
-      return (
-        controlsByType?.filter(control => control.type.includes("labels")) ?? []
-      );
+      return controlsByType?.filter((control) => control.type.includes("labels")) ?? [];
     },
 
     get labeledLabels() {
-      return self.labelsFromControls
-        .map(control => control.selectedValues())
-        .flat();
-    }
+      return self.labelsFromControls.flatMap((control) => control.selectedValues());
+    },
   }))
-  .actions(self => ({
+  .actions((self) => ({
     updatePosition(x, y, z) {
       self.x = x;
       self.y = y;
@@ -85,16 +79,14 @@ const Model = types
         width: self.width,
         height: self.height,
         depth: self.depth,
-        rotation: self.rotation
+        rotation: self.rotation,
       };
     },
 
     setLabel(label) {
       const object = self.object;
       const controlsByType = object.annotation.toNames.get(object.name);
-      const labelControl = controlsByType?.find(control =>
-        control.type.includes("labels")
-      );
+      const labelControl = controlsByType?.find((control) => control.type.includes("labels"));
 
       if (labelControl) {
         labelControl.unselectAll();
@@ -105,23 +97,15 @@ const Model = types
     toggleLabel(label) {
       const object = self.object;
       const controlsByType = object.annotation.toNames.get(object.name);
-      const labelControl = controlsByType?.find(control =>
-        control.type.includes("labels")
-      );
+      const labelControl = controlsByType?.find((control) => control.type.includes("labels"));
 
       if (labelControl) {
         labelControl.toggleSelected(label);
       }
-    }
+    },
   }));
 
-const Object3DRegionModel = types.compose(
-  "Object3DRegionModel",
-  RegionsMixin,
-  AreaMixin,
-  NormalizationMixin,
-  Model
-);
+const Object3DRegionModel = types.compose("Object3DRegionModel", RegionsMixin, AreaMixin, NormalizationMixin, Model);
 
 Registry.addRegionType(Object3DRegionModel as any, "object3d");
 
