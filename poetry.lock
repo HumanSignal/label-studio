@@ -1794,7 +1794,7 @@ description = ""
 optional = false
 python-versions = "^3.8"
 files = [
-    {file = "388b73b956c9a3c398073929e9fd6eaec6f7b7aa.zip", hash = "sha256:d7636335091e90dc238da228a660fdd1de690b66a69e8ff9e8504a051816e825"},
+    {file = "71d7c7cfa3c9f1bc8f3ca565ab994f2781f43004.zip", hash = "sha256:82cbf10631819ed7a4a47d7253329a11c1617809d243031e05ebeee7ddb28c91"},
 ]
 
 [package.dependencies]
@@ -1816,7 +1816,7 @@ xmljson = "0.2.1"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/388b73b956c9a3c398073929e9fd6eaec6f7b7aa.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/71d7c7cfa3c9f1bc8f3ca565ab994f2781f43004.zip"
 
 [[package]]
 name = "launchdarkly-server-sdk"
@@ -3145,6 +3145,7 @@ files = [
     {file = "PyYAML-6.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:bf07ee2fef7014951eeb99f56f39c9bb4af143d8aa3c21b1677805985307da34"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:855fb52b0dc35af121542a76b9a84f8d1cd886ea97c84703eaa6d88e37a2ad28"},
     {file = "PyYAML-6.0.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:40df9b996c2b73138957fe23a16a4f0ba614f4c0efce1e9406a184b6d07fa3a9"},
+    {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a08c6f0fe150303c1c6b71ebcd7213c2858041a7e01975da3a99aed1e7a378ef"},
     {file = "PyYAML-6.0.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6c22bec3fbe2524cde73d7ada88f6566758a8f7227bfbf93a408a9d86bcc12a0"},
     {file = "PyYAML-6.0.1-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:8d4e9c88387b0f5c7d5f281e55304de64cf7f9c0021a3525bd3b1c542da3b0e4"},
     {file = "PyYAML-6.0.1-cp312-cp312-win32.whl", hash = "sha256:d483d2cdf104e7c9fa60c544d92981f12ad66a457afae824d146093b8c294c54"},
@@ -4153,4 +4154,4 @@ mysql = ["mysqlclient"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4"
-content-hash = "75a0e9a667fdde439794bedfb967d9f284418b2843c1331975bb114305d35836"
+content-hash = "8fd98e347869bda1d4cb425ca6eb4c24a003a097409bd86d5482b482fb68920c"
