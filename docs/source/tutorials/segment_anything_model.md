@@ -25,6 +25,12 @@ Use Facebook's Segment Anything Model with Label Studio!
 In July 2024, Facebook released an update to the Segement Anything model, called SAM 2. To use this newer model for 
 labeling, see [the segment_anything_2_image repo](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_2_image)
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`segment_anything_model` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_model). 
+
 ## Quickstart
 
 ### Using Docker Compose (recommended)

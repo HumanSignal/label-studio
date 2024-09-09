@@ -25,6 +25,12 @@ The NewModel is a BERT-based text classification model that is designed to work 
 - Automatically download the labeled tasks from Label Studio and prepare the data for training.
 - Customize the training parameters such as learning rate, number of epochs, and weight decay.
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`bert_classifier` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/bert_classifier). 
+
 
 ## Running with Docker (recommended)
 

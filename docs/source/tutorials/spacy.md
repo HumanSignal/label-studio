@@ -20,6 +20,11 @@ Current implementation includes the following models:
 - Named Entity Recognition (NER)
 - [coming soon...] Part-of-Speech (POS) tagging
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`spacy` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/spacy). 
 
 ## Quickstart
 

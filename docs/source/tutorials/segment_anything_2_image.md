@@ -25,6 +25,12 @@ You'll need to follow the instructions below to stand up an instance of SAM2 bef
 
 [![Connecting SAM2 Model to Label Studio for Image Annotation ](https://img.youtube.com/vi/FTg8P8z4RgY/0.jpg)](https://www.youtube.com/watch?v=FTg8P8z4RgY)
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`segment_anything_2_image` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_2_image). 
+
 Note that as of 8/1/2024, SAM2 only runs on GPU.
 
 ## Labeling configuration

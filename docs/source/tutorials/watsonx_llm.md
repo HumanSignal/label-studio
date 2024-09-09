@@ -29,6 +29,12 @@ See the configuration notes at the bottom for details on how to set up your envi
 
 For a video demonstration, see [Integrating Label Studio with IBM WatsonX](https://www.youtube.com/watch?v=9iP2yO4Geqc).
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`watsonx_llm` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/watsonx_llm). 
+
 ## Setting up your label_config
 For this project, we recommend you start with the labeling config as defined below, but you can always edit it or expand it to
 meet your needs! Crucially, there must be a `<TextArea>` tag for the model to insert its response into. 

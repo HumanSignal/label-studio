@@ -21,6 +21,12 @@ This machine learning backend is designed to work with Label Studio, providing a
 
 Check [text generation pipelines on Hugging Face](https://huggingface.co/tasks/text-generation) for more details.
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`huggingface_llm` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/huggingface_llm). 
+
 ## Label Studio XML labeling config
 
 This ML backend is compatible with a Label Studio labeling configuration that uses a `<TextArea>` tag. Here is an example of a compatible labeling configuration:

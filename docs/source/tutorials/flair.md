@@ -18,6 +18,12 @@ image: "/tutorials/flair.png"
 
 This example demonstrates how to use Flair NER model with Label Studio.
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`flair` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/flair). 
+
 ## Quickstart
 
 1. Build and start the Machine Learning backend on `http://localhost:9090`
