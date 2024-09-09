@@ -8,7 +8,7 @@ import "./Keypoints.scss";
 import { type Lifespan, visualizeLifespans } from "./Utils";
 
 export interface KeypointsProps {
-  idx: number;
+  idx?: number;
   region: TimelineRegion;
   startOffset: number;
   renderable: boolean;
@@ -17,7 +17,7 @@ export interface KeypointsProps {
 
 export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, renderable, onSelectRegion }) => {
   const { step, seekOffset, visibleWidth, length } = useContext(TimelineContext);
-  const { label, color, visible, sequence, selected } = region;
+  const { label, color, visible, sequence, selected, timeline } = region;
 
   const extraSteps = useMemo(() => {
     return Math.round(visibleWidth / 2);
@@ -32,11 +32,11 @@ export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, render
   }, [seekOffset, visibleWidth, extraSteps, length]);
 
   const firtsPoint = sequence[0];
-  const start = firtsPoint.frame - 1;
-  const offset = start * step;
+  const start = firtsPoint ? firtsPoint.frame - 1 : 0;
+  const offset = firtsPoint ? start * step : startOffset;
 
   const styles = useMemo(
-    (): CSSProperties => ({
+    () => ({
       "--offset": `${startOffset}px`,
       "--color": color,
       "--point-color": chroma(color).alpha(1).css(),
@@ -68,7 +68,7 @@ export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, render
   );
 
   return (
-    <Block name="keypoints" style={styles} mod={{ selected }}>
+    <Block name="keypoints" style={styles} mod={{ selected, timeline }} data-id={region.id}>
       <Elem name="label" onClick={onSelectRegionHandler}>
         <Elem name="name">{label}</Elem>
         <Elem name="data">
@@ -128,18 +128,9 @@ interface LifespanItemProps {
 
 const LifespanItem: FC<LifespanItemProps> = memo(
   ({ mainOffset, width, start, step, offset, enabled, visible, isLast, points }) => {
-    const left = useMemo(() => {
-      return mainOffset + offset + step / 2;
-    }, [mainOffset, offset, step]);
-
-    const right = useMemo(() => {
-      return isLast && enabled ? 0 : "auto";
-    }, [isLast, enabled]);
-
-    const finalWidth = useMemo(() => {
-      return isLast && enabled ? "auto" : width;
-    }, [isLast, enabled]);
-
+    const left = mainOffset + offset + step / 2;
+    const right = isLast && enabled ? 0 : "auto";
+    const finalWidth = isLast && enabled ? "auto" : width;
     const style = useMemo(() => {
       return { left, width: finalWidth, right };
     }, [left, right, finalWidth]);

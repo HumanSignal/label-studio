@@ -3,9 +3,9 @@ import { type FC, type MouseEvent, useCallback, useEffect, useMemo, useRef, useS
 import { useMemoizedHandlers } from "../../../../hooks/useMemoizedHandlers";
 import { Block, Elem } from "../../../../utils/bem";
 import { isDefined } from "../../../../utils/utilities";
-import type { TimelineViewProps } from "../../Types";
-import "./Frames.scss";
+import type { TimelineRegion, TimelineViewProps } from "../../Types";
 import { Keypoints } from "./Keypoints";
+import "./Frames.scss";
 
 const toSteps = (num: number, step: number) => {
   return Math.floor(num / step);
@@ -71,7 +71,7 @@ export const Frames: FC<TimelineViewProps> = ({
   }, [step]);
 
   const setScroll = useCallback(
-    ({ left, top }) => {
+    ({ left, top }: { left?: number; top?: number }) => {
       if (!length) return;
 
       setHoverOffset(null);
@@ -196,6 +196,14 @@ export const Frames: FC<TimelineViewProps> = ({
       const dimensions = scrollable.current!.getBoundingClientRect();
       const offsetLeft = dimensions.left;
       const rightLimit = dimensions.width - timelineStartOffset;
+      const target = e.target as Element;
+      // every region has `data-id` attribute, so looking for them
+      const regionRow = target.closest("[data-id]") as HTMLElement | null;
+      // not clicking on labels area
+      const onKeyframes = e.pageX - offsetLeft > timelineStartOffset;
+      // don't draw on region lines, only on the empty space or special new line
+      const isDrawing = onKeyframes && (!regionRow || regionRow.dataset?.id === "new");
+      let region: any;
 
       const getMouseToFrame = (e: MouseEvent | globalThis.MouseEvent) => {
         const mouseOffset = e.pageX - offsetLeft - timelineStartOffset;
@@ -204,22 +212,35 @@ export const Frames: FC<TimelineViewProps> = ({
       };
 
       const offset = getMouseToFrame(e);
+      const baseFrame = toSteps(offset, step) + 1;
 
       setIndicatorOffset(offset);
 
+      if (isDrawing) {
+        // always a timeline region
+        region = props.onStartDrawing?.(baseFrame);
+      }
+
       const onMouseMove = (e: globalThis.MouseEvent) => {
         const offset = getMouseToFrame(e);
+        const frame = toSteps(offset, step) + 1;
 
         if (offset >= 0 && offset <= rightLimit) {
           setHoverEnabled(false);
           setRegionSelectionDisabled(true);
           setIndicatorOffset(offset);
         }
+
+        if (region) {
+          const [start, end] = frame > baseFrame ? [baseFrame, frame] : [frame, baseFrame];
+          region.setRanges([start, end]);
+        }
       };
 
       const onMouseUp = () => {
         setHoverEnabled(true);
         setRegionSelectionDisabled(false);
+        props.onFinishDrawing?.();
         document.removeEventListener("mousemove", onMouseMove);
         document.removeEventListener("mouseup", onMouseUp);
       };
@@ -282,8 +303,9 @@ export const Frames: FC<TimelineViewProps> = ({
 
     if (!isDefined(scroll) || framesInView < 1) return;
 
-    const firstFrame = toSteps(roundToStep(lastOffsetX.current, step), step);
-    const lastFrame = firstFrame + framesInView;
+    // offsets are zero based, but position is 1 based
+    const firstFrame = toSteps(roundToStep(lastOffsetX.current, step), step) + 1;
+    const lastFrame = firstFrame + framesInView - 1;
 
     const positionDelta = Math.abs(position - lastPosition.current);
 
@@ -293,19 +315,19 @@ export const Frames: FC<TimelineViewProps> = ({
     // this ensures the calculation of offset is kept correct.
     // This is needed because the position is not always a multiple of the step
     // and the offset used to calculate the position is always a multiple of the step.
-    if (positionDelta === 1 && position >= firstFrame && position <= lastFrame) {
-      // set to previous frame scroll
-      // if position is 0, then it will be set to 0
-      if (position <= firstFrame) {
+    if (positionDelta === 1 && (position < firstFrame || position > lastFrame)) {
+      // scroll to previous page if we are going outside of the current one
+      if (position < firstFrame) {
         const prevLeft = clamp((firstFrame - 1 - framesInView) * step, 0, scroll.scrollWidth - scroll.clientWidth);
 
         lastScrollPosition.current = roundToStep(prevLeft, step);
 
         setScroll({ left: prevLeft });
 
-        // set to next frame scroll
-        // if position is last frame, then it will be set to last frame scroll
+        // scroll to the next page if we are going outside of the current one
       } else if (position > lastFrame) {
+        // offsets are zero based, but position is 1 based,
+        // so technically that's +1 to go to the next page, but -1 to switch to offsets
         const nextLeft = clamp(lastFrame * step, 0, scroll.scrollWidth - scroll.clientWidth);
 
         lastScrollPosition.current = roundToStep(nextLeft, step);
@@ -319,15 +341,19 @@ export const Frames: FC<TimelineViewProps> = ({
     // Handle position change outside of the current scroll
     // This updates when the user clicks within the track to change the position
     // or when keyframe hops are used and the position is changed more than 1 frame
-    const scrollTo = roundToStep(position, framesInView);
+    const scrollTo = roundToStep(position - 1, framesInView);
+    // how far are we from the start of currently visible window
+    const diff = (position - 1) * step - lastScrollPosition.current;
 
-    if (lastScrollPosition.current !== scrollTo) {
+    if (diff > (framesInView - 1) * step || diff < 0) {
       setScroll({ left: scrollTo * step });
+      // frames
+      lastScrollPosition.current = scrollTo * step;
     }
-    lastScrollPosition.current = scrollTo;
   }, [position, framesInView, step]);
 
   const styles = {
+    "--view-height": props.height ? `${props.height}px` : null,
     "--frame-size": `${step}px`,
     "--view-size": `${viewWidth}px`,
     "--offset": `${timelineStartOffset}px`,
@@ -379,7 +405,7 @@ export const Frames: FC<TimelineViewProps> = ({
 };
 
 interface KeypointsVirtualProps {
-  regions: any[];
+  regions: TimelineRegion[];
   startOffset: number;
   scrollTop: number;
   disabled?: boolean;
@@ -399,10 +425,10 @@ const KeypointsVirtual: FC<KeypointsVirtualProps> = ({ regions, startOffset, scr
   return (
     <Elem name="keypoints" style={{ height: regions.length * height }}>
       {regions.map((region, i) => {
-        return region.sequence.length > 0 ? (
+        return region.sequence.length > 0 || region.timeline ? (
           <Keypoints
             key={region.id}
-            idx={i + 1}
+            idx={region.index}
             region={region}
             startOffset={startOffset}
             onSelectRegion={disabled ? undefined : onSelectRegion}
