@@ -2771,7 +2771,7 @@
   },
   "TimelineLabels": {
     "name": "TimelineLabels",
-    "description": "Use the TimelineLabels tag to classify video frames. This can be a single frame or a span of frames.\n\nFirst, select a label and then click once to annotate a single frame. Click and drag to annotate multiple frames.\n\nTo move forward and backward in the timeline without labeling, ensure that no labels are selected before you click.\n\n![Screenshot of video with frame classification](../images/timelinelabels.png)\n\nUse with the `<Video>` control tag.\n\n!!! info Tip\n    You can increase the height of the timeline using the `timelineHeight` parameter on the `<Video>` tag.",
+    "description": "Use the TimelineLabels tag to classify video frames. This can be a single frame or a span of frames.\n\nFirst, select a label and then click once to annotate a single frame. Click and drag to annotate multiple frames.\n\n![Screenshot of video with frame classification](../images/timelinelabels.png)\n\nUse with the `<Video>` control tag.\n\n!!! info Tip\n    You can increase the height of the timeline using the `timelineHeight` parameter on the `<Video>` tag.",
     "attrs": {
       "name": {
         "name": "name",
