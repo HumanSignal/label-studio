@@ -22,6 +22,12 @@ The primary function of this connection is to recognize and extract text from im
 
 In the context of Label Studio, this connection enhances the platform's labeling capabilities, allowing users to automatically generate labels for text in images. This can be particularly useful in tasks such as data annotation, document digitization, and more.
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`easyocr` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/easyocr). 
+
 ## Labeling configuration
 
 The EasyOCR model connection can be used with the default labeling configuration for OCR in Label Studio. This configuration typically involves defining the types of labels to be used (e.g., text, handwriting, etc.) and the regions of the image where these labels should be applied.

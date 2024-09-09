@@ -23,7 +23,14 @@ segmentation, classification, and video object tracking capabilities directly in
 This integration allows you to leverage powerful YOLOv8 models for various machine learning tasks, 
 making it easier to annotate large datasets and ensure high-quality predictions. 
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/UyaecID1iG8?si=UQQW3mpqu2uDtt7i" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<div align="left">
+  <a href="http://www.youtube.com/watch?v=UyaecID1iG8" title="Integrating YOLO V8 with Label Studio">
+    <img src="http://img.youtube.com/vi/UyaecID1iG8/0.jpg" alt="YOLO Integration Video" style="width:50%;"/>
+      <br>
+    Check the video tutorial
+  </a>
+</div>
+<br/>
 
 **Supported Features**
 
@@ -170,7 +177,7 @@ to specify multiple and different labels from the ML model:
 <br/>
 Labels are printed in the ML model logs when you start using the ML backend with the INFO logging level. 
 
-Or you can find some labels in [YOLO_CLASSES.md](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/YOLO_CLASSES.md)
+Or you can find some labels in [YOLO_CLASSES.md](YOLO_CLASSES.md)
 </details>
 
 <details>
@@ -222,7 +229,7 @@ The same applies to other YOLO models.
 You can load your own YOLO labels using the following steps:
 
 1. Mount your model as `/app/models/<your-model>.pt` inside of your docker.
-2. Set `ALLOW_CUSTOM_MODEL_PATH=true` (it is true by default) in your Docker environment parameters ([`docker-compose.yml`](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/docker-compose.yml)).
+2. Set `ALLOW_CUSTOM_MODEL_PATH=true` (it is true by default) in your Docker environment parameters ([`docker-compose.yml`](docker-compose.yml)).
 3. Add `model_path="<your-model>.pt"` to the control tag in the labeling configuration, e.g.:
 
 ```xml
@@ -247,7 +254,7 @@ YOLO provides a classification model and Label Studio supports this with the `Ch
 
 More info: https://docs.ultralytics.com/tasks/classify/
 
-<video src="https://github.com/user-attachments/assets/30c5ce43-2c89-4ddf-a77d-9d1d75ac3419" controls="controls" style="max-width: 800px;" class="gif-border" />
+https://github.com/user-attachments/assets/30c5ce43-2c89-4ddf-a77d-9d1d75ac3419
 
 
 ### Labeling config
@@ -295,7 +302,7 @@ YOLO OBB models are also supported.
 
 More info: https://docs.ultralytics.com/tasks/detect/
 
-<video src="https://github.com/user-attachments/assets/413b4650-422d-43dc-809d-51c08f0ad434" controls="controls" style="max-width: 800px;" class="gif-border" />
+https://github.com/user-attachments/assets/413b4650-422d-43dc-809d-51c08f0ad434
 
 
 ### Labeling config
@@ -352,7 +359,9 @@ Label Studio supports this with the `PolygonLabels` control tag.
 
 More info: https://docs.ultralytics.com/tasks/segment/
 
-<video src="https://github.com/user-attachments/assets/9b2447d3-392d-42be-bc7f-ef2b6c81d54c" controls="controls" style="max-width: 800px;" class="gif-border" />
+![Yolo Polygons](./YoloPolygons.gif)
+
+https://github.com/user-attachments/assets/9b2447d3-392d-42be-bc7f-ef2b6c81d54c
 
 
 ### Labeling config
@@ -567,8 +576,10 @@ Label Studio supports this with the `VideoRectangle` + `Labels` control tags.
 
 More info: https://docs.ultralytics.com/modes/track/
 
+![Video Object Tracking](./YoloVideo.gif)
 
-<video src="https://github.com/user-attachments/assets/7b0d50e6-164a-4d66-87cf-df443b77f638" controls="controls" style="max-width: 800px;" class="gif-border" />
+
+https://github.com/user-attachments/assets/7b0d50e6-164a-4d66-87cf-df443b77f638
 
 
 
@@ -713,11 +724,11 @@ Then you can start the ML backend:
 label-studio-ml start ./dir_with_your_model
 ```
 
-Also, you can check [Dockerfile]([Dockerfile](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/Dockerfile)) for additional dependencies and install them manually. 
+Also, you can check [Dockerfile](Dockerfile) for additional dependencies and install them manually. 
 
 ### Parameters
 
-Check the `environment` section in the [`docker-compose.yml`](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/docker-compose.yml) file before running the container. 
+Check the `environment` section in the [`docker-compose.yml`](docker-compose.yml) file before running the container. 
 All available parameters are listed there.
 
 > Note: You can use lots of YOLO model parameters in labeling configurations directly, e.g. `model_path` or `model_score_threshold`.
@@ -795,4 +806,4 @@ LOG_LEVEL=DEBUG python cli.py --ls-url http://localhost:8080 --ls-api-key YOUR_A
 
 ## For developers
 
-The architecture of the project and development guidelines are described in the [README_DEVELOP.md](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/README_DEVELOP.md) file.
+The architecture of the project and development guidelines are described in the [README_DEVELOP.md](README_DEVELOP.md) file.

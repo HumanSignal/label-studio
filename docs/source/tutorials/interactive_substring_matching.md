@@ -18,6 +18,12 @@ image: "/tutorials/interactive-substring-matching.png"
 
 The Machine Learning (ML) backend is designed to enhance the efficiency of auto-labeling in Named Entity Recognition (NER) tasks. It achieves this by selecting a keyword and automatically matching the same keyword in the provided text. 
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`interactive_substring_matching` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/interactive_substring_matching). 
+
 ## Recommended labeling config
 
 This ML backend works with the default NER template from Label Studio. You can find this by selecting Label Studio's pre-built NER template when configuring the labeling interface. It is available under **Natural Language Processing > Named Entity Recognition**.

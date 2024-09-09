@@ -23,7 +23,13 @@ https://mmdetection.readthedocs.io/en/latest/
 This example demonstrates how to use the MMDetection model with Label Studio to annotate images with bounding boxes. 
 The model is based on the YOLOv3 architecture with a MobileNetV2 backbone and trained on the COCO dataset. 
 
-![screenshot.png](/tutorials/screenshot.png)
+![screenshot.png](screenshot.png)
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`mmdetection-3` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/mmdetection-3). 
 
 ## Quick usage
 
