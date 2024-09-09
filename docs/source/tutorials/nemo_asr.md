@@ -36,7 +36,7 @@ This example works with the Label Studio's pre-built **Audio Transcription** tem
 
 But you can use any other labeling interface that combines `<Audio>` and `<TextArea>` elements.
 
-> Warning: If you use files hosted in Label Studio (e.g. audio files directly uploaded via import dialog), you must provide the `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` environment variables to the ML backend. For more information about finding your Label Studio API key, [see our documentation](https://labelstud.io/guide/user_account#Access-token).
+> Warning: If you use files hosted in Label Studio (meaning they were added using the import action), hosted in cloud storage, or connected through local storage, then you must provide the `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` environment variables to the ML backend. For more information, see [Allow the ML backend to access Label Studio data](https://labelstud.io/guide/ml#Allow-the-ML-backend-to-access-Label-Studio-data). For information about finding your Label Studio API key, see [Access token](https://labelstud.io/guide/user_account#Access-token).
 
 ## Running with Docker (recommended)
 
