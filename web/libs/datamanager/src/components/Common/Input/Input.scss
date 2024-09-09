@@ -1,5 +1,5 @@
-.input,
-.textarea {
+.input-dm,
+.textarea-dm {
   height: 32px;
   width: 100%;
   background: #FAFAFA;
@@ -11,7 +11,7 @@
   transition: box-shadow 80ms ease;
 }
 
-.input {
+.input-dm {
   &_size {
     &_compact {
       height: 32px;
@@ -30,14 +30,14 @@
   }
 }
 
-.textarea {
+.textarea-dm {
   padding: 12px 16px;
   min-height: 50px;
 }
 
-.input:focus,
-.textarea:focus {
+.input-dm:focus,
+.textarea-dm:focus {
   outline: none;
-  box-shadow: 0px 0px 0px 6px rgba(var(--accent_color-raw), 0.2), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15), inset 0px 0px 0px 1px rgba(var(--accent_color-raw), 0.2);
-  border-color: rgba(var(--accent_color-raw), 0.2);
+  box-shadow: 0 0 0 6px rgb(var(--accent_color-raw) / 20%), inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15), inset 0 0 0 1px rgb(var(--accent_color-raw) / 20%);
+  border-color: rgb(var(--accent_color-raw) / 20%);
 }

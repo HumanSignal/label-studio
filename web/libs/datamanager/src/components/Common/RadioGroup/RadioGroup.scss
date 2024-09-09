@@ -1,4 +1,4 @@
-.radio-group {
+.radio-group-dm {
   --radius: 8px;
   --height: 40px;
   --padding: 4px;
@@ -9,8 +9,8 @@
   height: var(--height);
   border-radius: var(--radius);
   padding: var(--padding);
-  background: linear-gradient(0deg, var(--black_5), var(--black_5)), #FFFFFF;
-  box-shadow: inset 0px 1px 0px var(--black_5), inset 0px 0px 0px 1px var(--black_5);
+  background: linear-gradient(0deg, var(--black_5), var(--black_5)), #FFF;
+  box-shadow: inset 0 1px 0 var(--black_5), inset 0 0 0 1px var(--black_5);
 
   &__buttons {
     height: calc(var(--height) - calc(var(--padding) * 2));
@@ -74,23 +74,25 @@
   &_newUI {
     --button-checked-shadow: none;
     --button-padding: 4px 8px;
-    box-shadow: none;
-    background: rgba(240, 238, 242, 0.08);
-    border: 1px solid rgba(65, 60, 74, 0.16);
 
-    .radio-group {
+    box-shadow: none;
+    background: rgb(240 238 242 / 8%);
+    border: 1px solid rgb(65 60 74 / 16%);
+
+    .radio-group-dm {
       &__buttons {
         gap: 8px;
       }
 
       &__button {
         --button-border-width: 1px;
+
         opacity: 1;
         border: var(--button-border-width) solid transparent;
         height: calc(var(--height) - calc(var(--padding) * 2) - calc(var(--button-border-width) * 2));
         cursor: pointer;
 
-        .radio-group__input {
+        .radio-group-dm__input {
           cursor: pointer;
         }
 
@@ -100,13 +102,13 @@
           border-color: var(--grape_500);
           cursor: default;
 
-          .radio-group__input {
+          .radio-group-dm__input {
             cursor: default;
           }
         }
 
         &:hover {
-          background: linear-gradient(0deg, rgba(9, 109, 217, 0.05), rgba(9, 109, 217, 0.05)), #FAFAFA;
+          background: linear-gradient(0deg, rgb(9 109 217 / 5%), rgb(9 109 217 / 5%)), #FAFAFA;
         }
       }
     }

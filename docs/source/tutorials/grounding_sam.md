@@ -17,10 +17,10 @@ categories:
 image: "/tutorials/grounding-sam.png"
 ---
 
-# Grounding DINO backend integration with SAM enabled
-
 https://github.com/HumanSignal/label-studio-ml-backend/assets/106922533/d1d2f233-d7c0-40ac-ba6f-368c3c01fd36
 
+
+# Grounding DINO backend integration with SAM enabled
 
 This integration will allow you to:
 
@@ -29,6 +29,12 @@ This integration will allow you to:
 * Get segmentation predictions from SAM with just text prompts.
 
 See [here](https://github.com/IDEA-Research/GroundingDINO) for more details about the pre-trained Grounding DINO model. 
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`grounding_sam` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/grounding_sam). 
 
 
 ## Quickstart
@@ -41,7 +47,7 @@ See [here](https://github.com/IDEA-Research/GroundingDINO) for more details abou
 
     Example:
    - `LABEL_STUDIO_HOST=http://123.456.7.8:8080`
-   - `LABEL_STUDIO_ACCESS_TOKEN=c9djf998eii2948ee9hh835nferkj959923`
+   - `LABEL_STUDIO_ACCESS_TOKEN=your-api-key`
 
 3. Run `docker compose up`
 4. Check the IP of your backend using `docker ps`. You will use this URL when connecting the backend to a Label Studio project. Usually this is `http://localhost:9090`.

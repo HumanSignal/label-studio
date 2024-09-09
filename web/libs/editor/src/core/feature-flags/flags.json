@@ -6,8 +6,6 @@
   "fflag_fix_front_dev_3617_taxonomy_memory_leaks_fix": true,
   "fflag_feat_front_dev_3873_labeling_ui_improvements_short": true,
   "fflag_feat_front_dev_4081_magic_wand_tool": true,
-  "fflag_feat_front_lsdv_3012_syncable_tags_070423_short": true,
-  "fflag_feat_front_lsdv_4832_new_ranker_tag_120423_short": true,
   "fflag_feat_front_lsdv_4620_richtext_opimization_060423_short": true,
-  "fflag_fix_front_lsdv_4620_memory_leaks_100723_short": true
+  "fflag_fix_front_lsdv_4620_memory_leaks_100723_short": false
 }

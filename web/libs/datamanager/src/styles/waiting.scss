@@ -1,10 +1,8 @@
 @mixin waiting($c1: #efefef, $c2: #fff) {
-  $base_color: rgba($c2, 0.2);
-  $accent_color: $c1;
+  $base-color: rgba($c2, 0.2);
+  $accent-color: $c1;
 
-  background-image: repeating-linear-gradient(-63.43deg, $base_color 1px, $accent_color 2px, $accent_color 6px, $base_color 7px, $base_color 12px);
-
-
+  background-image: repeating-linear-gradient(-63.43deg, $base-color 1px, $accent-color 2px, $accent-color 6px, $base-color 7px, $base-color 12px);
   background-color: $c2;
   background-size: 37px 100%;
 

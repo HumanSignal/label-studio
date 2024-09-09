@@ -17,10 +17,6 @@ categories:
 image: "/tutorials/llm-interactive.png"
 ---
 
-<!--
-
--->
-
 # Interactive LLM labeling
 
 This example server connects Label Studio to [OpenAI](https://platform.openai.com/), [Ollama](https://ollama.com/),
@@ -36,6 +32,12 @@ The interactive flow allows you to perform the following scenarios:
 * Evaluate the LLM's performance.
 
 Check the [Generative AI templates](https://labelstud.io/templates/gallery_generative_ai) section for more examples.
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`llm_interactive` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/llm_interactive). 
 
 ## Quickstart
 

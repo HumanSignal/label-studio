@@ -173,7 +173,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
           defaultExpandParent={!isPersistCollapseEnabled}
           autoExpandParent
           checkable={false}
-          prefixCls="lsf-tree"
+          prefixCls={rootClass.toClassName()}
           className={rootClass.toClassName()}
           treeData={regionsTree}
           selectedKeys={selectedKeys}

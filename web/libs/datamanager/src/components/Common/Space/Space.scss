@@ -1,4 +1,4 @@
-.space {
+.space-dm {
   display: grid;
   grid-gap: 16px;
 
@@ -30,12 +30,9 @@
     }
   }
 
-  &_stretch.space_direction {
+  &_stretch.space-dm_direction {
     &_horizontal {
       grid-auto-columns: 1fr;
-    }
-
-    &_horizontal {
       grid-auto-rows: 1fr;
     }
   }

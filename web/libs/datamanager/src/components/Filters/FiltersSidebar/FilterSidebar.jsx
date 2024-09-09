@@ -19,7 +19,7 @@ const sidebarInjector = inject(({ store }) => {
 
 export const FiltersSidebar = sidebarInjector(({ viewsStore, sidebarEnabled, sidebarVisible }) => {
   return sidebarEnabled && sidebarVisible ? (
-    <Block name="sidebar">
+    <Block name="filters-sidebar">
       <Elem name="header">
         <Elem name="extra">
           <Button

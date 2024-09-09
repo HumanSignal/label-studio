@@ -1,4 +1,4 @@
-.tabs {
+.tabs-dm {
   height: 36px;
   display: flex;
   align-items: stretch;
@@ -27,7 +27,7 @@
   }
 
   &__item {
-    color: rgba(0, 0, 0, 0.5);
+    color: rgb(0 0 0 / 50%);
     width: 100%;
     overflow: hidden;
     cursor: pointer;
@@ -40,20 +40,20 @@
       background-color: var(--white);
       box-shadow: -0.5px 0 0 #D9D9D9 inset, 0.5px 0 0 #D9D9D9 inset;
 
-      & .tabs__item-right-button {
+      & .tabs-dm__item-right-button {
         display: flex;
       }
     }
 
     &_virtual {
-      background: linear-gradient(180deg, rgba(243, 243, 243, 0) 0%, #F3F3F3 63.89%), repeating-linear-gradient(-45deg, var(--black_5), var(--black_5) 6px, transparent 6px, transparent 12px), #F3F3F3;
+      background: linear-gradient(180deg, rgb(243 243 243 / 0%) 0%, #F3F3F3 63.89%), repeating-linear-gradient(-45deg, var(--black_5), var(--black_5) 6px, transparent 6px, transparent 12px), #F3F3F3;
     }
 
-    &_virtual.tabs__item_active {
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 63.89%), repeating-linear-gradient(-45deg, var(--black_5), var(--black_5) 6px, transparent 6px, transparent 12px), var(--white);
+    &_virtual.tabs-dm__item_active {
+      background: linear-gradient(180deg, rgb(255 255 255 / 0%) 0%, #FFF 63.89%), repeating-linear-gradient(-45deg, var(--black_5), var(--black_5) 6px, transparent 6px, transparent 12px), var(--white);
     }
 
-    &_hover .tabs__item-right-button {
+    &_hover .tabs-dm__item-right-button {
       display: flex;
     }
   }
@@ -85,7 +85,6 @@
   }
 
   &__item-right-button {
-    display: flex;
     align-items: center;
     justify-content: center;
     display: none;
@@ -112,7 +111,7 @@
     }
 
     &:hover {
-      color: rgba(0, 0, 0, 0.35) !important;
+      color: rgb(0 0 0 / 35%) !important;
     }
   }
 

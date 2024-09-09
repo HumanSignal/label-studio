@@ -21,7 +21,7 @@ const Toggle = forwardRef(
     },
     ref,
   ) => {
-    const rootClass = cn("toggle");
+    const rootClass = cn("toggle-dm");
     const initialChecked = useMemo(() => defaultChecked ?? checked ?? false, [defaultChecked, checked]);
     const [isChecked, setIsChecked] = useState(defaultChecked ?? checked ?? false);
 

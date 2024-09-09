@@ -1,6 +1,6 @@
 {
-  "message": "ci: Fix RichText docs to unblock docs auto-generation (#6250)",
-  "commit": "bafc4d0d320f7230d14522d78c716b2836bd0c7e",
-  "date": "2024-08-23T22:49:05.000Z",
+  "message": "chore: OPTIC-1060: Hot Module Reload support for frontend development (#6280)",
+  "commit": "c5696cd87c585322d3bdc378aa3f52e566624e3d",
+  "date": "2024-09-06T18:30:10.000Z",
   "branch": "develop"
 }

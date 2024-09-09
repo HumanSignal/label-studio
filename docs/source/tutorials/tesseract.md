@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/tesseract.png"
 ---
 
-<!--
-
--->
-
 # Interactive bounding boxes OCR using Tesseract
 
 Use an OCR engine for interactive ML-assisted labeling, facilitating faster 
@@ -31,13 +27,16 @@ Tested against Label Studio 1.10.1, with basic support for both Label Studio
 Local File Storage and S3-compatible storage, with a example data storage with
 MinIO.
 
-## Setup process
+## Before you begin
 
 Before you begin:
 * Ensure git is installed
 * Ensure Docker Compose is installed. For MacOS and Windows users,
    we suggest using Docker Desktop. 
 
+You must also install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`tesseract` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/tesseract). 
 
 ### 1. Install Label Studio
 

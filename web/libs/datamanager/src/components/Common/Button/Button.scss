@@ -1,5 +1,6 @@
-.button {
+.button-dm {
   --button-color: var(--black);
+
   height: 32px;
   border: none;
   cursor: pointer;
@@ -14,38 +15,36 @@
   transition: all 100ms ease;
   justify-content: center;
   color: var(--button-color);
-  box-shadow: inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15);
-
+  box-shadow: inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15);
   font-weight: 500;
   font-size: 14px;
 
   &_newUI {
     box-shadow: none;
-    border: 1px solid rgba(65, 60, 74, 0.16);
+    border: 1px solid rgb(65 60 74 / 16%);
     font-weight: 400;
 
-    &.button {
+    &.button-dm {
       &_withIcon {
         border: 0 none;
       }
     }
 
-    &:not(.button_withIcon) {
+    &:not(.button-dm_withIcon) {
       font-weight: 500;
 
-      &.button {
-
+      &.button-dm {
         &_waiting,
         &_disabled,
         &:disabled,
         &[disabled] {
-          border: 1px solid rgba(65, 60, 74, 0.16);
-          background-color: #FFFFFF;
+          border: 1px solid rgb(65 60 74 / 16%);
+          background-color: #FFF;
         }
       }
     }
 
-    &.dropdown {
+    &.dropdown-dm {
       &__trigger {
         font-weight: 400;
         background-color: #FAFAFA;
@@ -61,23 +60,24 @@
   &_disabled,
   &:disabled,
   &[disabled] {
-    --button-color: rgba(var(--black-raw), 0.5);
+    --button-color: rgb(var(--black-raw) / 50%);
+
     pointer-events: none;
     background-color: #efefef;
   }
 
   &:hover {
-    box-shadow: 0px 2px 4px var(--black_5), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_20);
+    box-shadow: 0 2px 4px var(--black_5), inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_20);
   }
 
   &:active {
-    background: linear-gradient(0deg, var(--black_2), var(--black_2)), #FFFFFF;
-    box-shadow: inset 0px 1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_20);
+    background: linear-gradient(0deg, var(--black_2), var(--black_2)), #FFF;
+    box-shadow: inset 0 1px 0 var(--black_10), inset 0 0 0 1px var(--black_20);
   }
 
   &:focus {
     outline: none;
-    box-shadow: 0px 0px 0px 6px rgba(var(--accent_color-raw), 0.2), inset 0px -1px 0px var(--black_10), inset 0px 0px 0px 1px var(--black_15), inset 0px 0px 0px 1px rgba(var(--accent_color-raw), 0.2);
+    box-shadow: 0 0 0 6px rgb(var(--accent_color-raw) / 20%), inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15), inset 0 0 0 1px rgb(var(--accent_color-raw) / 20%);
   }
 
   &__extra {
@@ -111,18 +111,22 @@
       justify-content: center;
     }
   }
+
   &[href] {
     padding: 0;
     min-width: 0;
     box-shadow: none;
     background: none;
+
     --button-color: var(--accent_color);
+
     text-decoration: underline;
 
     &:hover {
       box-shadow: none;
     }
   }
+
   &_type {
     &_text {
       padding: 0;
@@ -142,6 +146,7 @@
 
     &_link {
       --button-color: var(--accent_color);
+
       text-decoration: underline;
     }
   }
@@ -149,29 +154,31 @@
   &_look {
     &_primary {
       --button-color: var(--white);
+
       background-color: var(--grape_500);
       box-shadow: none;
-      box-shadow: inset 0px -1px 0px var(--black_10);
+      box-shadow: inset 0 -1px 0 var(--black_10);
 
       &:disabled {
-        --button-color: rgba(var(--white-raw), 0.8);
-        background-color: #BBBBBB;
+        --button-color: rgb(var(--white-raw) / 80%);
+
+        background-color: #BBB;
       }
 
       &:hover {
         color: var(--button-color);
-        background: linear-gradient(0deg, rgba(var(--white-raw), 0.1), rgba(var(--white-raw), 0.1)), var(--accent_color);
-        box-shadow: 0px 2px 4px rgba(var(--accent_color-raw), 0.3), inset 0px -1px 0px var(--black_10);
+        background: linear-gradient(0deg, rgb(var(--white-raw) / 10%), rgb(var(--white-raw) / 10%)), var(--accent_color);
+        box-shadow: 0 2px 4px rgb(var(--accent_color-raw) / 30%), inset 0 -1px 0 var(--black_10);
       }
 
       &:active {
         color: var(--button-color);
         background: linear-gradient(0deg, var(--black_4), var(--black_4)), var(--accent_color);
-        box-shadow: inset 0px 1px 0px var(--black_10);
+        box-shadow: inset 0 1px 0 var(--black_10);
       }
 
       &:focus {
-        box-shadow: 0px 0px 0px 6px rgba(var(--accent_color-raw), 0.2), inset 0px -1px 0px var(--black_10);
+        box-shadow: 0 0 0 6px rgb(var(--accent_color-raw) / 20%), inset 0 -1px 0 var(--black_10);
       }
     }
 
@@ -181,13 +188,15 @@
 
     &_destructive {
       --button-color: var(--white);
+
       background-color: var(--danger_color);
     }
   }
 
   &_look_destructive:disabled,
-  &_look_destructive.button_waiting {
-    --button-color: rgba(var(--white-raw), 0.5);
+  &_look_destructive.button-dm_waiting {
+    --button-color: rgb(var(--white-raw) / 50%);
+
     background-color: var(--danger_color);
   }
 
@@ -241,12 +250,12 @@
     justify-content: space-between;
   }
 
-  &_withIcon:not(.button_type_link),
+  &_withIcon:not(.button-dm_type_link),
   &_withIcon:not([href]) {
     padding: 0 14px;
   }
 
-  &_withIcon.button_size_small {
+  &_withIcon.button-dm_size_small {
     padding: 0 10px;
   }
 
@@ -257,19 +266,17 @@
     background-size: 37px 100%;
     animation: button-waiting 1s linear infinite;
     background-image: repeating-linear-gradient(-63.43deg,
-        rgba(var(--white-raw), 0.2) 1px, #efefef 2px, #efefef 6px,
-        rgba(var(--white-raw), 0.2) 7px,
-        rgba(var(--white-raw), 0.2) 12px);
-
+        rgb(var(--white-raw) / 20%) 1px, #efefef 2px, #efefef 6px,
+        rgb(var(--white-raw) / 20%) 7px,
+        rgb(var(--white-raw) / 20%) 12px);
     background-color: var(--white);
   }
 
-  &_waiting.button_look_primary {
+  &_waiting.button-dm_look_primary {
     background-image: repeating-linear-gradient(-63.43deg,
-        rgba(var(--white-raw), 0.2) 1px, transparent 2px, transparent 6px,
-        rgba(var(--white-raw), 0.2) 7px,
-        rgba(var(--white-raw), 0.2) 12px);
-
+        rgb(var(--white-raw) / 20%) 1px, transparent 2px, transparent 6px,
+        rgb(var(--white-raw) / 20%) 7px,
+        rgb(var(--white-raw) / 20%) 12px);
     background-color: var(--accent_color);
   }
 
@@ -282,17 +289,17 @@
   }
 }
 
-.button-group {
+.button-group-dm {
   display: flex;
 
-  &:not(.button-group_collapsed) {
-    .button+.button {
+  &:not(.button-group-dm_collapsed) {
+    .button-dm + .button-dm {
       margin-left: 16px;
     }
   }
 
   &_collapsed {
-    .button {
+    .button-dm {
       &:first-child {
         border-radius: 5px 0 0 5px;
       }
@@ -301,19 +308,19 @@
         border-radius: 0 5px 5px 0;
       }
 
-      &:not(:first-child):not(:last-child) {
+      &:not(:first-child, :last-child) {
         border-radius: 0;
       }
 
       &_newUI {
-        border: 1px solid rgba(65, 60, 74, 0.16);
+        border: 1px solid rgb(65 60 74 / 16%);
         box-shadow: none;
       }
     }
   }
 }
 
-@-webkit-keyframes button-waiting {
+@keyframes button-waiting {
   0% {
     background-position: 0 0;
   }
@@ -323,7 +330,7 @@
   }
 }
 
-@-moz-keyframes button-waiting {
+@keyframes button-waiting {
   0% {
     background-position: 0 0;
   }
@@ -333,7 +340,7 @@
   }
 }
 
-@-ms-keyframes button-waiting {
+@keyframes button-waiting {
   0% {
     background-position: 0 0;
   }
@@ -343,7 +350,7 @@
   }
 }
 
-@-o-keyframes button-waiting {
+@keyframes button-waiting {
   0% {
     background-position: 0 0;
   }

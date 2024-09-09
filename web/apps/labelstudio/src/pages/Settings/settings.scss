@@ -17,6 +17,7 @@
 
 .settings-wrapper {
   --column-count: 1;
+
   border: 1px solid var(--sand_300);
   border-radius: 0.5rem;
   padding: 1.5rem;
@@ -47,13 +48,13 @@
     max-width: 500px;
   }
 
-  .label {
+  .label-ls {
     &__text {
       padding: 0;
     }
   }
 
-  .radio-group__buttons {
+  .radio-group-ls__buttons {
     & .label__content {
       padding: 0 4px;
     }

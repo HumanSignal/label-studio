@@ -1,4 +1,4 @@
-.modal {
+.modal-dm {
   --transition-duration: 100ms;
 
   top: 0;
@@ -10,7 +10,7 @@
   position: absolute;
   align-items: center;
   justify-content: center;
-  background-color: rgba(var(--black-raw), 0.3);
+  background-color: rgb(var(--black-raw) / 30%);
   will-change: opacity;
 
   &__wrapper {
@@ -29,7 +29,7 @@
     margin: 0 auto;
     background-color: var(--white);
     border-radius: 5px;
-    box-shadow: 0 10px 30px rgba(var(--black-raw), 0.3);
+    box-shadow: 0 10px 30px rgb(var(--black-raw) / 30%);
   }
 
   &__header {
@@ -64,8 +64,8 @@
 
   &__footer {
     padding: 16px 32px;
-    background: rgba(0, 0, 0, 0.03);
-    box-shadow: inset 0px 1px 0px var(--black_5);
+    background: rgb(0 0 0 / 3%);
+    box-shadow: inset 0 1px 0 var(--black_5);
     text-align: center;
     font-size: 14px;
     line-height: 22px;

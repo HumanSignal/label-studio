@@ -48,10 +48,6 @@ const CellRenderer = observer(({ col: colInput, data, decoration, cellViews }) =
 });
 
 export const TableRow = observer(({ data, even, style, wrapperStyle, onClick, stopInteractions, decoration }) => {
-  const classNames = ["table-row"];
-
-  if (data.isLoading) classNames.push("loading");
-
   const { columns, cellViews } = React.useContext(TableContext);
 
   const mods = {
@@ -64,7 +60,7 @@ export const TableRow = observer(({ data, even, style, wrapperStyle, onClick, st
 
   return (
     <TableElem name="row-wrapper" mod={mods} style={wrapperStyle} onClick={(e) => onClick?.(data, e)}>
-      <Block name="table-row" style={style} className={classNames.join(" ")}>
+      <Block name="table-row" style={style}>
         {columns.map((col) => {
           return <CellRenderer key={col.id} col={col} data={data} cellViews={cellViews} decoration={decoration} />;
         })}
