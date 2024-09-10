@@ -7,9 +7,7 @@ var iframeTimer = null;
     modal.insertAdjacentHTML("beforeend", iframeTemplate)
 
     const iframe = document.querySelector(`#render-editor-${id}`);
-    const spinner = iframe.querySelector(".render-editor-loader");
-
-    console.log(spinner);
+    const spinner = modal.querySelector(".render-editor-loader");
 
     if (full) {
       iframe.style.width = window.innerWidth * 0.9 + "px"
@@ -22,6 +20,8 @@ var iframeTimer = null;
       clearTimeout(iframeTimer);
 
         if (iframe.contentWindow) {
+
+          console.log(iframe.contentWindow);
           
           // fix editor height
           iframe.style.height = (iframe.contentWindow.document.body.scrollHeight) + 'px';
