@@ -19,17 +19,15 @@ var iframeTimer = null;
 
       clearTimeout(iframeTimer);
 
-        if (iframe.contentWindow) {
-
-          console.log(iframe.contentWindow);
-          
-          // fix editor height
+      iframeTimer = setInterval(function () {
+        if (obj.contentWindow) {
           iframe.style.height = (iframe.contentWindow.document.body.scrollHeight) + 'px';
 
           const segmentBlock = iframe.contentDocument.body.querySelector('div[class*="Segment_block"]');
 
           if(segmentBlock) segmentBlock.style.margin='0'
         }
+      }, 200);
 
     })
 
