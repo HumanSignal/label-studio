@@ -23,7 +23,8 @@ var iframeTimer = null;
         if (iframe.contentWindow) {
           const component = iframe.contentWindow.document.querySelector("#label-studio");
           const height = component.clientHeight;
-          iframe.style.height = height + 10 +  'px';
+          console.log(height);
+          iframe.style.height = height + 'px';
         }
       }, 200);
 
