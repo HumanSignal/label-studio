@@ -2281,7 +2281,8 @@ code.hljs {
   min-height: 100vh;
 }
 
-#render-editor-loader {
+#render-editor-loader,
+.render-editor-loader {
   max-width: 1200px;
   background: var(--color-white);
   padding: 3%;

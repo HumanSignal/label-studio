@@ -9,7 +9,7 @@ var iframeTimer = null;
     const iframe = document.querySelector(`#render-editor-${id}`);
     const spinner = iframe.querySelector(".render-editor-loader");
 
-    console.log(iframe);
+    console.log(spinner);
 
     if (full) {
       iframe.style.width = window.innerWidth * 0.9 + "px"
@@ -133,9 +133,9 @@ function insert_render_editor(config, modal, full, id) {
     const openPreviewButton = pre.querySelector(".code-block-open-preview");
     openPreviewButton.addEventListener("click", () => show_render_editor(code))
 
-  /*   const inlinePlayground = document.querySelector("#main-preview");
+    const inlinePlayground = document.querySelector("#main-preview");
 
-    if(inlinePlayground) insert_render_editor(code, inlinePlayground); */
+    if(inlinePlayground) insert_render_editor(code, inlinePlayground);
   }
 
   const enhanceCodeBlocks = (codeBlock) => {
