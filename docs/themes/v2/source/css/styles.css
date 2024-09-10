@@ -2305,6 +2305,8 @@ code.hljs {
   width: 500px;
   height: 500px;
   border-radius: 10px;
+  box-sizing: content-box;
+  width: 94%;
 }
 
 #main-preview iframe#render-editor {
