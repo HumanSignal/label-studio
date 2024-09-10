@@ -21,12 +21,8 @@ var iframeTimer = null;
 
       iframeTimer = setInterval(function () {
         if (iframe.contentWindow) {
-          console.log(iframe.contentWindow);
-          iframe.style.height = (iframe.contentWindow.document.body.scrollHeight) + 'px';
-
-          const segmentBlock = iframe.contentDocument.body.querySelector('div[class*="Segment_block"]');
-
-          if(segmentBlock) segmentBlock.style.margin='0'
+          console.log(iframe.contentWindow.getComputedStyle())
+          iframe.style.height = (iframe.contentWindow.innerHeight) + 'px';
         }
       }, 200);
 
