@@ -29,7 +29,7 @@ var iframeTimer = null;
       iframeTimer = setInterval(function () {
         if (obj.contentWindow) {
           // fix editor height
-          obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+          /* obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px'; */
 
           // fix editor width
           // let app_editor = obj.contentDocument.body.querySelector('div[class*="App_editor"]').style;
@@ -156,4 +156,3 @@ function insert_render_editor(config, modal, full) {
   codeBlocks.forEach(block => enhanceCodeBlocks(block));
 
 })();
-
