@@ -2301,19 +2301,14 @@ code.hljs {
   max-width: 1200px;
   border: none;
   background: var(--color-white);
-  padding: 3%;
   width: 500px;
   height: 500px;
   border-radius: 10px;
-  box-sizing: content-box;
-  width: 94%;
 }
 
 #main-preview iframe {
   width: 100%;
-  padding: 5px;
   margin: 1em 0;
-  margin-left: -20px;
 }
 
 .page-type-playground .content-markdown {

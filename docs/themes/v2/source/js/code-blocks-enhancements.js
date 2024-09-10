@@ -41,11 +41,12 @@ function show_render_editor(config) {
   const modalTemplate = `
   <div id="preview-wrapper-${id}" class="api-preview-wrapper" onclick="this.remove()">
     <div class="render-editor-loader"><img width="50px" src="/images/design/loading.gif"></div>
+    <div id="preview-wrapper-iframe-${id}"></div>
   </div>
   `
   body.insertAdjacentHTML("beforeend", modalTemplate)
 
-  const modal = document.querySelector(`#preview-wrapper-${id}`);
+  const modal = document.querySelector(`#preview-wrapper-iframe-${id}`);
 
   insert_render_editor(config, modal, true, id);
 }
