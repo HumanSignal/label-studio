@@ -19,15 +19,15 @@ var iframeTimer = null;
 
       clearTimeout(iframeTimer);
 
+      iframeTimer = setInterval(function () {
+        if (iframe.contentWindow) {
+          iframe.style.height = (iframe.contentWindow.document.body.scrollHeight) + 'px';
 
-      if (iframe.contentWindow) {
-        iframe.style.height = (iframe.contentWindow.document.body.scrollHeight) + 'px';
+          const segmentBlock = iframe.contentDocument.body.querySelector('div[class*="Segment_block"]');
 
-        const segmentBlock = iframe.contentDocument.body.querySelector('div[class*="Segment_block"]');
-
-        if(segmentBlock) segmentBlock.style.margin='0'
-      }
-
+          if(segmentBlock) segmentBlock.style.margin='0'
+        }
+      }, 200);
 
     })
 
