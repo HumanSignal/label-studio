@@ -2304,15 +2304,11 @@ code.hljs {
   width: 500px;
   height: 500px;
   border-radius: 10px;
-  box-sizing: border-box;
-  padding: 3%;
 }
 
 #main-preview iframe {
   width: 100%;
   margin: 1em 0;
-  padding: 0;
-  box-sizing: content-box;
 }
 
 .page-type-playground .content-markdown {
