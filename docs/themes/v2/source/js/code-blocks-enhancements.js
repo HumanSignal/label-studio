@@ -21,7 +21,8 @@ var iframeTimer = null;
 
       iframeTimer = setInterval(function () {
         if (iframe.contentWindow) {
-          console.log(iframe.contentWindow)
+          console.log(iframe.contentWindow.document)
+          console.log(iframe.contentWindow.document.querySelector("#label-studio"))
           iframe.style.height = (iframe.contentWindow.innerHeight) + 'px';
         }
       }, 200);
