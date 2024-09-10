@@ -24,7 +24,7 @@ var iframeTimer = null;
 
           console.log(iframe.contentWindow.innerHeight);
           console.log(iframe.contentWindow.document.querySelector("#label-studio"))
-          console.log(iframe.contentWindow.document.querySelector("#label-studio").offsetHeight)
+          console.log(iframe.contentWindow.document.querySelector("#label-studio div[class^='App_editor'], #label-studio div[class*='App_editor']").offsetHeight)
 
           iframe.style.height = (iframe.contentWindow.innerHeight) + 'px';
 
