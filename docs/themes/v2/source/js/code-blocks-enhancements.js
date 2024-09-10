@@ -21,12 +21,9 @@ var iframeTimer = null;
 
       iframeTimer = setInterval(function () {
         if (iframe.contentWindow) {
+          const height = iframe.contentWindow.document.querySelector("#label-studio div[class^='App_editor'], #label-studio div[class*='App_editor']").offsetHeight;
 
-          console.log(iframe.contentWindow.innerHeight);
-          console.log(iframe.contentWindow.document.querySelector("#label-studio"))
-          console.log(iframe.contentWindow.document.querySelector("#label-studio div[class^='App_editor'], #label-studio div[class*='App_editor']").offsetHeight)
-
-          iframe.style.height = (iframe.contentWindow.innerHeight) + 'px';
+          iframe.style.height = height + 'px';
 
         }
       }, 200);
