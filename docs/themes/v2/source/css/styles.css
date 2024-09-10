@@ -2294,7 +2294,8 @@ code.hljs {
   text-align: center;
 }
 
-#render-editor {
+#render-editor,
+.api-render-editor {
   max-width: 1200px;
   border: none;
   background: var(--color-white);

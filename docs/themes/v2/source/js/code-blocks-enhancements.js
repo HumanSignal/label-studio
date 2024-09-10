@@ -1,11 +1,9 @@
 var iframeTimer = null;
 
-  function editor_iframe(res, modal, full) {
-    
-    var id = "id" + Math.random().toString(16).slice(2);
+  function editor_iframe(res, modal, full, id) {
 
     // generate new iframe
-    var iframeTemplate = `<iframe onclick="event.stopPropagation()" id="render-editor-${id}" style="display: none"></iframe>`;
+    var iframeTemplate = `<iframe onclick="event.stopPropagation()" id="render-editor-${id}" class="api-render-editor" style="display: none"></iframe>`;
 
     modal.insertAdjacentHTML("beforeend", iframeTemplate)
 
@@ -39,17 +37,18 @@ var iframeTimer = null;
   }
   
 function show_render_editor(config) {
+  var id = "id" + Math.random().toString(16).slice(2);
   const body = document.querySelector("body");
   const modalTemplate = `
-  <div id="preview-wrapper" onclick="this.remove()">
+  <div id="preview-wrapper-${id}" class="api-preview-wrapper" onclick="this.remove()">
     <div class="render-editor-loader"><img width="50px" src="/images/design/loading.gif"></div>
   </div>
   `
   body.insertAdjacentHTML("beforeend", modalTemplate)
 
-  const modal = document.querySelector("#preview-wrapper");
+  const modal = document.querySelector(`#preview-wrapper-${id}`);
 
-  insert_render_editor(config, modal, true);
+  insert_render_editor(config, modal, true, id);
 }
 
 function insert_render_editor(config, modal, full) {
