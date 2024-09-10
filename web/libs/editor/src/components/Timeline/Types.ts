@@ -11,6 +11,7 @@ export interface TimelineProps<D extends ViewTypes = "frames"> {
   regions: any[];
   length: number;
   position: number;
+  height?: number;
   mode: D;
   framerate: number;
   playing: boolean;
@@ -39,6 +40,8 @@ export interface TimelineProps<D extends ViewTypes = "frames"> {
   onToggleVisibility?: (id: string, visibility: boolean) => void;
   onAddRegion?: (region: Record<string, any>) => any;
   onDeleteRegion?: (id: string) => void;
+  onStartDrawing?: (frame: number) => void;
+  onFinishDrawing?: () => void;
   onZoom?: (zoom: number) => void;
   onSelectRegion?: (event: MouseEvent<HTMLDivElement>, id: string, select?: boolean) => void;
   onAction?: (event: MouseEvent, action: string, data?: any) => void;
@@ -58,6 +61,7 @@ export interface TimelineViewProps {
   speed?: number;
   volume?: number;
   regions: TimelineRegion[];
+  height?: number;
   leftOffset?: number;
   controls?: TimelineControls;
   onScroll: (position: number) => void;
@@ -73,17 +77,22 @@ export interface TimelineViewProps {
   onAddRegion?: TimelineProps["onAddRegion"];
   onDeleteRegion?: TimelineProps["onDeleteRegion"];
   onSelectRegion?: TimelineProps["onSelectRegion"];
+  onStartDrawing?: TimelineProps["onStartDrawing"];
+  onFinishDrawing?: TimelineProps["onFinishDrawing"];
   onVolumeChange?: TimelineProps["onVolumeChange"];
   onSpeedChange?: TimelineProps["onSpeedChange"];
 }
 
 export interface TimelineRegion {
   id: string;
+  index?: number;
   label: string;
   color: string;
   visible: boolean;
   selected: boolean;
   sequence: TimelineRegionKeyframe[];
+  /** is this timeline region with spans */
+  timeline?: boolean;
 }
 
 export interface TimelineRegionKeyframe {
@@ -176,9 +185,9 @@ export interface TimelineControlsProps {
   onPause?: TimelineProps["onPause"];
   onFullScreenToggle: TimelineProps["onFullscreenToggle"];
   onVolumeChange: TimelineProps["onVolumeChange"];
-  onSpeedChange: TimelineProps["onSpeedChange"];
-  onZoom: TimelineProps["onZoom"];
-  onAmpChange: (amp: number) => void;
+  onSpeedChange?: TimelineProps["onSpeedChange"];
+  onZoom?: TimelineProps["onZoom"];
+  onAmpChange?: (amp: number) => void;
   toggleVisibility?: (layerName: string, isVisible: boolean) => void;
 }
 

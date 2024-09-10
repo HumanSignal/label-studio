@@ -16,18 +16,18 @@ categories:
 image: "/tutorials/langchain.png"
 ---
 
-<!--
-
--->
-
-
-
 # Langchain search agent
 
 This example demonstrates how to use Label Studio with a custom Machine Learning backend.
 
 It uses a [Langchain](https://www.langchain.com/)-based agent that accepts a text input, searches for Google,
 and returns the answer based on the search results (a.k.a Retrieval Augmented Generation).
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`langchain_search_agent` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/langchain_search_agent). 
 
 ## Prerequisites
 

@@ -89,14 +89,6 @@ You can add a [header](/tags/header.html) tag to provide instructions to the ann
 <Header>Label the video:</Header>
 ```
 
-Use the [Repeater](/tags/repeater.html) tag to annotate multiple data objects in a dynamic range with the same semantics. You can loop through data items in a python-like `for` cycle in the labeling process.
-It repeats tags inside it for every item in a given data array from your dataset. All the occurrences of `indexFlag` (default is `{{idx}}`) in parameter values will be replaced by the current index.
-Names should always be unique, so you can use this placeholder in tag names. The **Repeater** tag supports the `mode` property. This creates the possibility to enable pagination in **Repeater** for performance improvement. You can add a parameter `<Repeater mode="pagination" ...>` to show only one page at a time, shrinking memory used to one tag set.
-
-```xml
-<Repeater on="$images" indexFlag="{{idx}}" mode="pagination">
-```
-
 Use the [Choices](/tags/choices.html) tag to create a group of choices, with radio buttons, or checkboxes.
 
 ```xml
@@ -218,4 +210,3 @@ Example of using outliner document title:
 - [Choices](/tags/choices.html)
 - [Labels](/tags/labels.html)
 - [RectangleLabels](/tags/rectanglelabels.html)
-- [Repeater](/tags/repeater.html)

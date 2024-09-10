@@ -49,6 +49,7 @@ jobs:
               - 'label_studio/!(frontend)/**'
               - 'poetry.lock'
               - 'pyproject.toml'
+              - 'scripts/*.py'
               - '.github/workflows/bandit.yml'
               - '.github/workflows/tests.yml'
               - '.github/workflows/test_conda.yml'

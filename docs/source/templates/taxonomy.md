@@ -103,7 +103,7 @@ The `apiUrl` must be accessible to Label Studio. You can accomplish this in seve
 1. Save your taxonomy in a separate bucket from your task data. 
 
     If you are unable to use a separate bucket for your taxonomy, see the workaround below. 
-2. [Follow these instructions](storage) to set up cloud storage for Label Studio. This should be a separate connection from your other storage connections.
+2. [Follow these instructions](/guide/storage) to set up cloud storage for Label Studio. This should be a separate connection from your other storage connections.
 
     <div class="admonition note"><p class="admonition-title">note</p><p>Do not sync this storage connection. If you do, you will need to delete the task that is automatically created when syncing the taxonomy.</p></div>
 

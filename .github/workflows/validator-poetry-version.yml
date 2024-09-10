@@ -1,7 +1,7 @@
 name: "Check"
 
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - edited
@@ -29,7 +29,7 @@ jobs:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
             const { repo, owner } = context.repo;
-            const head_sha = '${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha || github.event.after }}'
+            const head_sha = '${{ github.event.merge_group.head_sha || github.event.pull_request.merge_commit_sha || github.event.pull_request.head.sha || github.event.after }}'
             const base_sha = '${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha || github.event.before }}'
             const pyProjectPath = 'pyproject.toml';
             

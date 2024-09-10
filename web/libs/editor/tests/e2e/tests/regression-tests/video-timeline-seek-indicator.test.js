@@ -127,21 +127,28 @@ Scenario("Seek view should be in sync with indicator position", async ({ I, Labe
     let indicatorPosX = indicatorBbox.x;
 
     I.say("Move the video position indicator to the end of the seek indicator");
-    const endOfSeeker = indicatorBbox.width - 2; // The indicator width is set wider by 1.5, to account for the pixel sizing of the position indicator width and placement rounding, so subtract this
+    // indicator will have some gaps because of partially hidden last frame, which can't be accessed.
+    // 30px is empirically determined to have at least one frame back,
+    // so after this we'll go forward step by step until the indicator jumps to the next window
+    const endOfSeeker = indicatorBbox.width + indicatorPosX - 30;
+    const maxStepsForward = 5;
 
     await AtVideoView.drag(positionBbox, endOfSeeker, 0);
     indicatorBbox = await AtVideoView.grabIndicatorBoundingRect();
 
     I.say("Seeker should not have moved");
     assert.equal(indicatorBbox.x, indicatorPosX, "Seeker should not have moved from this one step movement");
-    indicatorPosX = indicatorBbox.x;
 
-    I.say("Click on the seek step forward button");
-    await AtVideoView.clickSeekStepForward(2);
-    indicatorBbox = await AtVideoView.grabIndicatorBoundingRect();
+    for (let i = 0; i < maxStepsForward; i++) {
+      I.say("Click on the seek step forward button");
+      await AtVideoView.clickSeekStepForward(1);
+      indicatorBbox = await AtVideoView.grabIndicatorBoundingRect();
+
+      if (indicatorBbox.x > indicatorPosX) break;
+    }
 
     I.say("Seeker should now have moved to the right");
-    assert.ok(indicatorBbox.x > indicatorPosX, "Seeker should have moved from this one step movement");
+    assert.ok(indicatorBbox.x > indicatorPosX, "Seeker should have moved from these step forward movements");
     indicatorPosX = indicatorBbox.x;
 
     I.say("Click on the seek step backward button");

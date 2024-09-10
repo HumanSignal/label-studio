@@ -30,6 +30,12 @@ This integration will allow you to:
 
 See [here](https://github.com/IDEA-Research/GroundingDINO) for more details about the pre-trained Grounding DINO model. 
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`grounding_sam` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/grounding_sam). 
+
 
 ## Quickstart
 

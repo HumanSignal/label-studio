@@ -4,7 +4,10 @@ const { composePlugins, withNx } = require("@nx/webpack");
 const { withReact } = require("@nx/react");
 const { merge } = require("webpack-merge");
 
-require("dotenv").config();
+require("dotenv").config({
+  // resolve the .env file in the root of the project ../
+  path: path.resolve(__dirname, "../.env"),
+});
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { EnvironmentPlugin, DefinePlugin, ProgressPlugin, optimize } = require("webpack");
@@ -14,8 +17,12 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const RELEASE = require("./release").getReleaseName();
 
 const css_prefix = "lsf-";
-
 const mode = process.env.BUILD_MODULE ? "production" : process.env.NODE_ENV || "development";
+const isDevelopment = mode !== "production";
+const devtool = process.env.NODE_ENV === "production" ? "source-map" : "cheap-module-source-map";
+const FRONTEND_HOSTNAME = process.env.FRONTEND_HOSTNAME || "http://localhost:8010";
+const DJANGO_HOSTNAME = process.env.DJANGO_HOSTNAME || "http://localhost:8080";
+const HMR_PORT = +new URL(FRONTEND_HOSTNAME).port;
 
 const LOCAL_ENV = {
   NODE_ENV: mode,
@@ -23,18 +30,8 @@ const LOCAL_ENV = {
   RELEASE_NAME: RELEASE,
 };
 
-const devtool = process.env.NODE_ENV === "production" ? "source-map" : "cheap-module-source-map";
-
-const isDevelopment = mode !== "production";
-const customDistDir = !!process.env.WORK_DIR;
-
 const BUILD = {
   NO_MINIMIZE: isDevelopment || !!process.env.BUILD_NO_MINIMIZATION,
-};
-
-const dirPrefix = {
-  js: customDistDir ? "js/" : isDevelopment ? "" : "static/js/",
-  css: customDistDir ? "css/" : isDevelopment ? "" : "static/css/",
 };
 
 const plugins = [
@@ -92,10 +89,11 @@ module.exports = composePlugins(
           import: path.resolve(__dirname, "apps/labelstudio/src/main.tsx"),
         },
       };
+
       config.output = {
         ...config.output,
         uniqueName: "labelstudio",
-        publicPath: "auto",
+        publicPath: isDevelopment && FRONTEND_HOSTNAME ? `${FRONTEND_HOSTNAME}/react-app/` : "auto",
         scriptType: "text/javascript",
       };
 
@@ -222,16 +220,48 @@ module.exports = composePlugins(
         loader: "file-loader",
         options: {
           name: "[name].[ext]",
-          outputPath: dirPrefix.js, // colocate wasm with js
         },
       },
     );
+
+    if (isDevelopment) {
+      config.optimization = {
+        ...config.optimization,
+        moduleIds: "named",
+      };
+    }
 
     return merge(config, {
       devtool,
       mode,
       plugins,
       optimization: optimizer(),
+      devServer:
+        process.env.MODE === "standalone"
+          ? {}
+          : {
+              // Port for the Webpack dev server
+              port: HMR_PORT,
+              // Enable HMR
+              hot: true,
+              // Allow cross-origin requests from Django
+              headers: { "Access-Control-Allow-Origin": "*" },
+              static: {
+                directory: path.resolve(__dirname, "../label_studio/core/static/"),
+                publicPath: "/static/",
+              },
+              devMiddleware: {
+                publicPath: `${FRONTEND_HOSTNAME}/react-app/`,
+              },
+              allowedHosts: "all", // Allow access from Django's server
+              proxy: [
+                {
+                  router: {
+                    "/api": `${DJANGO_HOSTNAME}/api`, // Proxy api requests to Django's server
+                  },
+                },
+              ],
+            },
     });
   },
 );
