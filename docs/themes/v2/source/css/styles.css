@@ -2309,7 +2309,7 @@ code.hljs {
   width: 94%;
 }
 
-#main-preview iframe#render-editor {
+#main-preview iframe {
   width: 100%;
   padding: 5px;
   margin: 1em 0;
