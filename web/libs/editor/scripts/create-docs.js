@@ -1,3 +1,19 @@
+/**
+ * This file is used to parse JSDoc for every tag and their regions
+ * and generate two artifacts out of it:
+ * - tag docs for https://labelstud.io/tags/
+ *   generated docs are written to `outputDirArg` (1st arg)
+ * - schema.json — a dictionary for auto-complete in config editor
+ *   generated file is written to `schemaJsonPath` (2nd arg or `SCHEMA_JSON_PATH` env var)
+ *
+ * Special new constructions:
+ * - `@regions` to reference a Region tag(s) used by current tag
+ * - `@subtag` to mark a tag used inside other tag (only Channel for now)
+ *
+ * Usage:
+ *   node scripts/create-docs.js [path/to/docs/dir] [path/to/schema.json]
+ */
+
 const jsdoc2md = require("jsdoc-to-markdown");
 const fs = require("fs");
 const path = require("path");
@@ -49,8 +65,7 @@ const infoHeader = (name, group, isNew = false, meta = {}) =>
 const args = process.argv.slice(2);
 const outputDirArg = args[0] || `${__dirname}/../docs`;
 const outputDir = path.resolve(outputDirArg);
-// @todo more generic way to get schema dir?
-const outputSchemaDir = path.resolve(`${outputDir}/../../../web/apps/labelstudio/src/pages/CreateProject/Config`);
+const schemaJsonPath = args[1] || process.env.SCHEMA_JSON_PATH;
 
 // schema for CodeMirror autocomplete
 const schema = {};
@@ -194,8 +209,11 @@ fetch(currentTagsUrl)
       }
     }
 
-    // for now only hardcoded list of all tags for View
-    schema.View.children = Object.keys(schema).filter((name) => name !== "!top");
-    fs.writeFileSync(path.resolve(outputSchemaDir, "schema.json"), JSON.stringify(schema, null, 2));
+    if (schemaJsonPath) {
+      // @todo we can't generate correct children for every tag for some reason
+      // so for now we only specify children for the only root tag — View
+      schema.View.children = Object.keys(schema).filter((name) => name !== "!top");
+      fs.writeFileSync(schemaJsonPath, JSON.stringify(schema, null, 2));
+    }
   })
   .catch(console.error);
