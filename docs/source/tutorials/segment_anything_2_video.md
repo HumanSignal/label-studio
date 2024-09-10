@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/sam2-video.png"
 ---
 
-<!--
-
--->
-
 # Using SAM2 with Label Studio for Video Annotation
 
 This guide describes the simplest way to start using **SegmentAnything 2** with Label Studio.
@@ -26,6 +22,12 @@ This repository is specifically for working with object tracking in videos. For 
 see the [segment_anything_2_image repository](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_2_image)
 
 ![sam2](/tutorials/Sam2Video.gif)
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`segment_anything_2_video` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_2_video). 
 
 ## Running from source
 

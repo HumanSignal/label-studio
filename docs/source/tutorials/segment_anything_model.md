@@ -17,10 +17,6 @@ categories:
 image: "/tutorials/segment-anything.png"
 ---
 
-<!--
-
--->
-
 # Interactive annotation in Label Studio with Segment Anything Model
 
 https://github.com/shondle/label-studio-ml-backend/assets/106922533/42a8a535-167c-404a-96bd-c2e2382df99a
@@ -28,6 +24,12 @@ https://github.com/shondle/label-studio-ml-backend/assets/106922533/42a8a535-167
 Use Facebook's Segment Anything Model with Label Studio!
 In July 2024, Facebook released an update to the Segement Anything model, called SAM 2. To use this newer model for 
 labeling, see [the segment_anything_2_image repo](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_2_image)
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`segment_anything_model` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/segment_anything_model). 
 
 ## Quickstart
 

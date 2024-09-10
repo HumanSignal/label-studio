@@ -13,10 +13,6 @@ categories:
 image: "/tutorials/watsonx.png"
 ---
 
-<!--
-
--->
-
 # Integrate WatsonX to Label Studio
 
 WatsonX offers a suite of machine learning tools, including access to many LLMs, prompt
@@ -32,6 +28,12 @@ on webhooks, see [our documentation](https://labelstud.io/guide/webhooks)
 See the configuration notes at the bottom for details on how to set up your environment variables to get the system to work.
 
 For a video demonstration, see [Integrating Label Studio with IBM WatsonX](https://www.youtube.com/watch?v=9iP2yO4Geqc).
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`watsonx_llm` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/watsonx_llm). 
 
 ## Setting up your label_config
 For this project, we recommend you start with the labeling config as defined below, but you can always edit it or expand it to

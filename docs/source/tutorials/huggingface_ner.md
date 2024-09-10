@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/hf-ner.png"
 ---
 
-<!--
-
--->
-
 # Hugging Face NER model with Label Studio
 
 This project uses a custom machine learning backend model for Named Entity Recognition (NER) with Hugging Face's transformers and Label Studio.
@@ -27,7 +23,13 @@ The model instantiates `AutoModelForTokenClassification` from Hugging Face's tra
 - If you want to use this model only in inference mode, it serves predictions from the pre-trained model. 
 - If you want to fine-tune the model, you can use the Label Studio interface to provide training data and train the model.
 
-Read more about the compatible models from [Hugging Face's official documentation](https://huggingface.co/docs/transformers/en/tasks/token_classification)
+Read more about the compatible models from [Hugging Face's official documentation](https://huggingface.co/docs/transformers/en/tasks/token_classification). 
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`huggingface_ner` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/huggingface_ner). 
 
 
 ## Labeling configuration

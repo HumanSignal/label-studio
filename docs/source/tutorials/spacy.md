@@ -14,16 +14,17 @@ categories:
 image: "/tutorials/spacy.png"
 ---
 
-<!--
-
--->
-
 This ML backend provides a simple way to use [spaCy](https://spacy.io/) models for Named Entity Recognition (NER) and Part-of-Speech (POS) tagging.
 
 Current implementation includes the following models:
 - Named Entity Recognition (NER)
 - [coming soon...] Part-of-Speech (POS) tagging
 
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`spacy` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/spacy). 
 
 ## Quickstart
 

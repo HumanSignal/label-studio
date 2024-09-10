@@ -15,15 +15,17 @@ categories:
 image: "/tutorials/hf-llm.png"
 ---
 
-<!--
-
--->
-
 # Hugging Face Large Language Model backend
 
 This machine learning backend is designed to work with Label Studio, providing a custom model for text generation. The model is based on the Hugging Face's transformers library and uses a pre-trained model.
 
 Check [text generation pipelines on Hugging Face](https://huggingface.co/tasks/text-generation) for more details.
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`huggingface_llm` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/huggingface_llm). 
 
 ## Label Studio XML labeling config
 

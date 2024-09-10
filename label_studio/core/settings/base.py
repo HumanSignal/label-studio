@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 """
 Django Base settings for Label Studio.
 
@@ -103,6 +103,9 @@ if HOSTNAME:
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
                 logger.info('=> Django URL prefix is set to: %s', FORCE_SCRIPT_NAME)
+
+FRONTEND_HMR = get_bool_env('FRONTEND_HMR', False)
+FRONTEND_HOSTNAME = get_env('FRONTEND_HOSTNAME', 'http://localhost:8010' if FRONTEND_HMR else HOSTNAME)
 
 DOMAIN_FROM_REQUEST = get_bool_env('DOMAIN_FROM_REQUEST', False)
 

@@ -120,6 +120,5 @@ jobs:
           poetry run python label_studio/manage.py makemigrations
 
       - name: Lint migrations
-        continue-on-error: true
         run: |
           poetry run python label_studio/manage.py lintmigrations --warnings-as-errors --project-root-path '.' --git-commit-id ${{ github.event.pull_request.base.sha || github.event.before }}
