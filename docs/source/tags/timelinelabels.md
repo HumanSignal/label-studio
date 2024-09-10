@@ -2,7 +2,6 @@
 title: TimelineLabels
 type: tags
 order: 429
-is_new: t
 meta_title: TimelineLabels tag
 meta_description: Classify video frames using TimelineLabels.
 ---
