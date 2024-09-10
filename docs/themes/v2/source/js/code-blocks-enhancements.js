@@ -22,6 +22,8 @@ var iframeTimer = null;
       iframeTimer = setInterval(function () {
         if (iframe.contentWindow) {
           const component = iframe.contentWindow.document.querySelector("#label-studio");
+          console.log(component);
+          console.log(iframe.contentWindow.document.body.clientHeight)
           const height = component.offsetHeight;
           console.log(height);
           iframe.style.height = height + 'px';
