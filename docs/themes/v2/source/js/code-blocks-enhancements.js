@@ -22,7 +22,7 @@ var iframeTimer = null;
       iframeTimer = setInterval(function () {
         if (iframe.contentWindow) {
           const component = iframe.contentWindow.document.querySelector("#label-studio");
-          const height = component.clientHeight;
+          const height = component.offsetHeight;
           console.log(height);
           iframe.style.height = height + 'px';
         }
