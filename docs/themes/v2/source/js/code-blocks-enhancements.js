@@ -26,10 +26,14 @@ var iframeTimer = null;
       var obj = document.getElementById('render-editor');
       clearTimeout(iframeTimer);
 
+      console.log(obj.contentWindow);
+          console.log(obj.contentWindow.document.body.scrollHeight);
+
       iframeTimer = setInterval(function () {
         if (obj.contentWindow) {
+          
           // fix editor height
-          /* obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px'; */
+          obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
 
           // fix editor width
           // let app_editor = obj.contentDocument.body.querySelector('div[class*="App_editor"]').style;
