@@ -1,19 +1,16 @@
 var iframeTimer = null;
 
-
-
   function editor_iframe(res, modal, full) {
-    // generate new iframe
-    var iframeTemplate = `<iframe onclick="event.stopPropagation()" id="render-editor" style="display: none"></iframe>`;
+    
+    var id = "id" + Math.random().toString(16).slice(2);
 
-    /* if (full) {
-      iframe.css('width', $(window).width() * 0.9);
-    } */
+    // generate new iframe
+    var iframeTemplate = `<iframe onclick="event.stopPropagation()" id="render-editor-${id}" style="display: none"></iframe>`;
 
     modal.insertAdjacentHTML("beforeend", iframeTemplate)
 
-    const iframe = document.querySelector("#render-editor");
-    const spinner = document.querySelector("#render-editor-loader");
+    const iframe = document.querySelector(`#render-editor-${id}`);
+    const spinner = iframe.querySelector(".render-editor-loader");
 
     if (full) {
       iframe.style.width = window.innerWidth * 0.9 + "px"
@@ -23,26 +20,18 @@ var iframeTimer = null;
       if(spinner) spinner.style.display = "none";
       iframe.style.display = "block";
 
-      var obj = document.getElementById('render-editor');
       clearTimeout(iframeTimer);
 
-      console.log(obj.contentWindow);
-          console.log(obj.contentWindow.document.body.scrollHeight);
-
-      iframeTimer = setInterval(function () {
-        if (obj.contentWindow) {
+        if (iframe.contentWindow) {
           
           // fix editor height
-          obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+          iframe.style.height = (iframe.contentWindow.document.body.scrollHeight) + 'px';
 
-          // fix editor width
-          // let app_editor = obj.contentDocument.body.querySelector('div[class*="App_editor"]').style;
-          //app_editor.setProperty('min-width', '100%', 'important');
-          const segmentBlock = obj.contentDocument.body.querySelector('div[class*="Segment_block"]');
+          const segmentBlock = iframe.contentDocument.body.querySelector('div[class*="Segment_block"]');
 
           if(segmentBlock) segmentBlock.style.margin='0'
         }
-      }, 200);
+
     })
 
     // load new data into iframe
@@ -53,7 +42,7 @@ function show_render_editor(config) {
   const body = document.querySelector("body");
   const modalTemplate = `
   <div id="preview-wrapper" onclick="this.remove()">
-    <div id="render-editor-loader"><img width="50px" src="/images/design/loading.gif"></div>
+    <div class="render-editor-loader"><img width="50px" src="/images/design/loading.gif"></div>
   </div>
   `
   body.insertAdjacentHTML("beforeend", modalTemplate)
