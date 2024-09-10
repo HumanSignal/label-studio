@@ -21,8 +21,10 @@ var iframeTimer = null;
 
       iframeTimer = setInterval(function () {
         if (iframe.contentWindow) {
-          const componentHeight = iframe.contentWindow.document.querySelector("#label-studio").innerHeight;
-          iframe.style.height = componentHeight + 'px';
+          const component = iframe.contentWindow.document.querySelector("#label-studio");
+          const height = component.clientHeight;
+          console.log(height);
+          iframe.style.height = height + 'px';
         }
       }, 200);
 
