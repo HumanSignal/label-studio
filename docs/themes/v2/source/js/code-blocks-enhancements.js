@@ -18,16 +18,12 @@ var iframeTimer = null;
       iframe.style.display = "block";
 
       clearTimeout(iframeTimer);
-
-      iframeTimer = setInterval(function () {
         if (iframe.contentWindow) {
           const component = iframe.contentWindow.document.querySelector("#label-studio");
           const height = component.clientHeight;
-          console.log(height);
-          iframe.style.height = height + 'px';
-        }
-      }, 200);
 
+          iframe.style.height = height + 10 + 'px';
+        }
     })
 
     // load new data into iframe
