@@ -1027,7 +1027,7 @@ class Prediction(models.Model):
 
             # given the data receive, create annotation regions in LS format
             # e.g. {"sentiment": "positive"} -> {"value": {"choices": ["positive"]}, "from_name": "", "to_name": "", ..}
-            pred = PredictionValue(result=label_interface.create_regions(data)).model_dump()
+            pred = PredictionValue(result=label_interface.create_regions(data))
 
             prediction = Prediction(
                 project=project,
@@ -1035,7 +1035,7 @@ class Prediction(models.Model):
                 model_version=model_version,
                 model_run=model_run,
                 score=1.0,  # Setting to 1.0 for now as we don't get back a score
-                result=pred['result'],
+                result=pred.result,
             )
             return prediction
         except Exception as exc:
