@@ -1,7 +1,6 @@
 var iframeTimer = null;
 
   function editor_iframe(res, modal, full, id) {
-
     // generate new iframe
     var iframeTemplate = `<iframe onclick="event.stopPropagation()" id="render-editor-${id}" class="api-render-editor" style="display: none"></iframe>`;
 
@@ -9,6 +8,8 @@ var iframeTimer = null;
 
     const iframe = document.querySelector(`#render-editor-${id}`);
     const spinner = iframe.querySelector(".render-editor-loader");
+
+    console.log(iframe);
 
     if (full) {
       iframe.style.width = window.innerWidth * 0.9 + "px"
@@ -51,7 +52,7 @@ function show_render_editor(config) {
   insert_render_editor(config, modal, true, id);
 }
 
-function insert_render_editor(config, modal, full) {
+function insert_render_editor(config, modal, full, id) {
   let url = "https://app.heartex.ai/demo/render-editor?playground=1&open_preview=1";
   if (full) {
     url += '&full_editor=t';
@@ -69,7 +70,7 @@ function insert_render_editor(config, modal, full) {
   })
   .then((response) => response.text())
   .then((data) => {
-    editor_iframe(data, modal, full)
+    editor_iframe(data, modal, full, id)
   })
   .catch((error) => {
     console.log(error);
@@ -132,9 +133,9 @@ function insert_render_editor(config, modal, full) {
     const openPreviewButton = pre.querySelector(".code-block-open-preview");
     openPreviewButton.addEventListener("click", () => show_render_editor(code))
 
-    const inlinePlayground = document.querySelector("#main-preview");
+  /*   const inlinePlayground = document.querySelector("#main-preview");
 
-    if(inlinePlayground) insert_render_editor(code, inlinePlayground);
+    if(inlinePlayground) insert_render_editor(code, inlinePlayground); */
   }
 
   const enhanceCodeBlocks = (codeBlock) => {
