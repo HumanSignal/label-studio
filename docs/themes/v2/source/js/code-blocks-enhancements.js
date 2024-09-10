@@ -21,7 +21,7 @@ var iframeTimer = null;
 
       iframeTimer = setInterval(function () {
         if (iframe.contentWindow) {
-          console.log(iframe.contentWindow.getComputedStyle())
+          console.log(iframe.contentWindow)
           iframe.style.height = (iframe.contentWindow.innerHeight) + 'px';
         }
       }, 200);
