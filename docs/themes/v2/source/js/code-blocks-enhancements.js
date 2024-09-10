@@ -21,7 +21,7 @@ var iframeTimer = null;
 
 
       if (iframe.contentWindow) {
-        iframe.style.height = (iframe.contentWindow.document.body.scrollHeight) + 200 + 'px';
+        iframe.style.height = (iframe.contentWindow.document.body.scrollHeight) + 'px';
 
         const segmentBlock = iframe.contentDocument.body.querySelector('div[class*="Segment_block"]');
 
