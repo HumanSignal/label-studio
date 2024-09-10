@@ -1035,7 +1035,7 @@ class Prediction(models.Model):
                 model_version=model_version,
                 model_run=model_run,
                 score=1.0,  # Setting to 1.0 for now as we don't get back a score
-                result=pred['result']
+                result=pred['result'],
             )
             return prediction
         except Exception as exc:
