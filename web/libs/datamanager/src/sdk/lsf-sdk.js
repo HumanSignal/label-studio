@@ -27,6 +27,7 @@ import { CommentsSdk } from "./comments-sdk";
 // import { LSFHistory } from "./lsf-history";
 import { annotationToServer, taskToLSFormat } from "./lsf-utils";
 import { when } from "mobx";
+import LabelStudio from "@humansignal/editor";
 
 const DEFAULT_INTERFACES = [
   "basic",
@@ -41,17 +42,6 @@ const DEFAULT_INTERFACES = [
   "side-column", // entity
   "edit-history", // undo/redo
 ];
-
-let LabelStudioDM;
-
-const resolveLabelStudio = async () => {
-  if (LabelStudioDM) {
-    return LabelStudioDM;
-  }
-  if (window.LabelStudio) {
-    return (LabelStudioDM = window.LabelStudio);
-  }
-};
 
 export class LSFWrapper {
   /** @type {HTMLElement} */
@@ -200,9 +190,7 @@ export class LSFWrapper {
   /** @private */
   async initLabelStudio(settings) {
     try {
-      const LSF = await resolveLabelStudio();
-
-      this.lsfInstance = new LSF(this.root, settings);
+      this.lsfInstance = new LabelStudio(this.root, settings);
 
       this.lsfInstance.on("presignUrlForProject", this.onPresignUrlForProject);
 

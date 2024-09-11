@@ -10,6 +10,7 @@ import { Icon } from "../Common/Icon/Icon";
 import { Resizer } from "../Common/Resizer/Resizer";
 import { Space } from "../Common/Space/Space";
 import { DataView } from "../MainView";
+import LabelStudio from "@humansignal/editor";
 import "./Label.scss";
 
 const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
@@ -66,7 +67,7 @@ export const Labeling = injector(
     }, [store]);
 
     const initLabeling = useCallback(() => {
-      if (!SDK.lsf) SDK.initLSF(lsfRef.current);
+      if (!SDK.lsf) SDK.initLSF(lsfRef.current, LabelStudio);
       SDK.startLabeling();
     }, []);
 
