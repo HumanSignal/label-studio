@@ -1,6 +1,6 @@
 {
-  "message": "chore: OPTIC-1060: Hot Module Reload support for frontend development (#6280)",
-  "commit": "c5696cd87c585322d3bdc378aa3f52e566624e3d",
-  "date": "2024-09-06T18:30:10.000Z",
+  "message": "chore(deps): bump express from 4.19.2 to 4.20.0 in /web/libs/editor/tests/e2e (#6361)",
+  "commit": "104297c3c1133c16596eba5c59f52d88a0c995b9",
+  "date": "2024-09-11T01:11:27.000Z",
   "branch": "develop"
 }

@@ -13,6 +13,7 @@ const TimelineRange = types.model("TimelineRange", {
 });
 
 // convert range to internal video timeline format
+// it's used in `flatMap()`, so it can return both object and array of objects
 function rangeToSequence(range) {
   const { start, end } = range;
 
