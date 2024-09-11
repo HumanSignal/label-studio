@@ -22,7 +22,7 @@
     "dm:unit": "nx run datamanager:unit",
     "build": "NODE_ENV=production yarn ls:build",
     "version:libs": "nx run-many --target=version",
-    "docs": "nx run-many --target=docs",
+    "docs": "SCHEMA_JSON_PATH=$PWD/apps/labelstudio/src/pages/CreateProject/Config/schema.json; nx docs editor && biome check --apply $SCHEMA_JSON_PATH",
     "watch": "NODE_ENV=development BUILD_NO_SERVER=true yarn ls:watch",
     "dev": "NODE_ENV=development BUILD_NO_SERVER=true yarn ls:dev",
     "test:e2e": "yarn ls:e2e && yarn lsf:e2e",
