@@ -26,6 +26,7 @@ class ErrorBoundary extends React.Component {
  * @param {{app: import("../../stores/AppStore").AppStore} param0
  */
 const AppComponent = ({ app }) => {
+  console.log("AppComponent:rendered", app);
   return (
     <ErrorBoundary>
       <Provider store={app}>

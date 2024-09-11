@@ -39,6 +39,7 @@ const createDynamicModels = (columns) => {
 export const createApp = async (rootNode, datamanager) => {
   const isLabelStream = datamanager.mode === "labelstream";
 
+  console.log("createApp:datamanager", datamanager);
   const response = await datamanager.api.columns();
 
   if (!response || response.error) {
@@ -71,6 +72,8 @@ export const createApp = async (rootNode, datamanager) => {
   appStore._sdk = datamanager;
 
   appStore.fetchData({ isLabelStream });
+
+  console.log("createApp:appStore", appStore);
 
   window.DM = appStore;
 
