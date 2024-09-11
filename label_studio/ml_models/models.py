@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from ml_model_providers.models import ModelProviders
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
-from tasks.models import Annotation, FailedPrediction, Prediction
+from tasks.models import Annotation, FailedPrediction, Prediction, PredictionMeta
 
 logger = logging.getLogger(__name__)
 
@@ -196,10 +196,17 @@ class ModelRun(models.Model):
             prediction_stats_to_be_deleted.delete()
         except Exception as e:
             logger.info(f'PredictionStats model does not exist , exception:{e}')
-        predictions._raw_delete(predictions.db)
 
         # Delete failed predictions. Currently no other model references this, no fk relationships to remove
         failed_predictions = FailedPrediction.objects.filter(model_run=self.id)
+        failed_predictions_ids = [p.id for p in failed_predictions]
+
+        # delete predictions meta
+        PredictionMeta.objects.filter(prediction__in=prediction_ids).delete()
+        PredictionMeta.objects.filter(failed_prediction__in=failed_predictions_ids).delete()
+
+        # remove predictions from db
+        predictions._raw_delete(predictions.db)
         failed_predictions._raw_delete(failed_predictions.db)
 
     def delete(self, *args, **kwargs):
