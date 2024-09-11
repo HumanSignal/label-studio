@@ -1,6 +1,6 @@
 {
-  "message": "chore: OPTIC-1060: Hot Module Reload support for frontend development (#6280)",
-  "commit": "c5696cd87c585322d3bdc378aa3f52e566624e3d",
-  "date": "2024-09-06T18:30:10.000Z",
+  "message": "feat: LEAP-1341: Build schema.json in create-docs script (#6263)",
+  "commit": "8c7157323bebbdfdfa9c3fae6f287339bec58414",
+  "date": "2024-09-11T00:37:21.000Z",
   "branch": "develop"
 }
