@@ -116,10 +116,10 @@ Performs the default evaluation function for each control tag. For example for `
 
 ### Exact matching
 
-For example, for two given annotations `x` and `y`, an agreement metric that performs a naive comparison of the results works like the following:
+For example, for two given annotations `x` and `y`, an agreement metric that performs a naive comparison of the results would work as follows:
 - If both annotations `x` and `y` are empty, the agreement score is `1`.
 - If the annotations share no similar regions, the agreement score is `0`.
-- If multiple regions are in the `x` and `y`, the partial agreement scores calculated for corresponding region pairs are averaged.
+- If multiple regions are in `x` and `y`, the partial agreement scores that are calculated for the corresponding region pairs are averaged.
 
 #### Example 1
 
@@ -181,7 +181,7 @@ y:  choices1 => A
 
 Agreement Calculation:
 
-`choice1` match, `choice2` don't match, and `choices3` are not selected, which is treated as a <b>match</>.
+`choice1` match, `choice2` don't match, and `choices3` are not selected, which is treated as a <b>match</b>.
 Agreement(x, y) = 0.6666 (66.66%).
 
 
