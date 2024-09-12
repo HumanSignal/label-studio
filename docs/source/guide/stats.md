@@ -1,12 +1,12 @@
 ---
-title: Task agreement and how it is calculated
+title: How task agreement and labeling consensus are calculated
 short: Task agreements
 tier: enterprise
 type: guide
 order: 0
 order_enterprise: 307
-meta_title: Data Labeling Statistics
-meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
+meta_title: Task agreement in Label Studio Enterprise
+meta_description: Task agreement, or labeling consensus, and other data annotation statistics for data labeling and machine learning projects.
 section: "Review & Measure Quality"
 ---
 
@@ -17,7 +17,7 @@ Annotation statistics help you determine the quality of your dataset, its readin
 
 ## Task agreement
 
-Task agreement shows the consensus between multiple annotators when labeling the same task. There are several types of task agreement in Label Studio Enterprise:
+Task agreement, also known as "labeling consensus" or "annotation consensus," shows the consensus between multiple annotators when labeling the same task. There are several types of task agreement in Label Studio Enterprise:
 - a per-task agreement score, visible on the Data Manager page for a project. This displays how well the annotations on a particular task match across annotators. 
 - an inter-annotator agreement matrix, visible on the Members page for a project. This displays how well the annotations from specific annotators agree with each other in general, or for specific tasks. 
 
@@ -168,7 +168,6 @@ For two annotations, `x` and `y`, which contain either bounding boxes or polygon
 
 This method ensures that only the strongest level of overlap between regions is recorded for each annotation pair, reflecting the highest possible agreement between the two annotations.
 
-
 #### Intersection over union with text
 
 For data labeling tasks where annotators assign specific labels to text spans in **text**, **hypertext**, or **paragraphs of dialogue**, the agreement score is calculated by comparing the intersection of annotations over the result spans, normalized by the length of each span.
@@ -177,6 +176,20 @@ For two given task annotations `x` and `y`, the agreement score formula is `m(x,
 - For text annotations, the span is defined by the `start` and `end` keys.
 - For hypertext annotations, the span is defined by the `startOffset` and `endOffset` keys. 
 - For paragraphs of dialogue annotations, the span is defined by the `startOffset` and `endOffset` keys. 
+
+#### Intersection over union with time series
+
+Intersection over Union (IoU) for time series data evaluates the overlap between two labeled regions within the time series. Here's how it works:
+
+1. **Identify Regions**: Determine the start and end points of the labeled regions in the time series data.
+2. **Calculate Intersection**: Find the overlapping duration between the two regions.
+3. **Calculate Union**: Determine the total duration covered by both regions.
+4. **Compute IoU**: Divide the intersection duration by the union duration.
+
+For example, if you have two regions:
+- Region A: (0, 20)
+- Region B: (10, 30)
+The intersection is (10, 20) with a duration of 10 units, and the union is (0, 30) with a duration of 30 units. The IoU would be 10/30 = 0.33.
 
 #### Intersection over union with other metrics 
 The IoU metric can be combined with other metrics. Several metrics in Label Studio Enterprise use IoU to establish initial agreement across annotations, then computes the [precision](#precision-example), [recall](#recall-example), or [F1-score](#f1-score-example) for the IoU values above a specific threshold. Text IoU can also include the [edit distance algorithm](#edit-distance-algorithm-example).
