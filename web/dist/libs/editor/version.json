@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1367: Revert mistakenly removed styles for timeline regions (#6368)",
-  "commit": "1fbb9db44217022a76cf85ee2aaaf4402cbdbcbc",
-  "date": "2024-09-11T21:21:23.000Z",
+  "message": "fix: OPTIC-1072: Update SVGs to have currentColor instead of black fill to allow overwrite using css (#6325)",
+  "commit": "6b27d15620fd592015f2e24a5daf82b90bfb4eac",
+  "date": "2024-09-12T04:43:07.000Z",
   "branch": "develop"
 }
