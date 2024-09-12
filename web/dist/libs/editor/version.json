@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-1072: Update SVGs to have currentColor instead of black fill to allow overwrite using css (#6325)",
-  "commit": "6b27d15620fd592015f2e24a5daf82b90bfb4eac",
-  "date": "2024-09-12T04:43:07.000Z",
+  "message": "chore: Ensure the one time dev build does not incorrectly default to using the HMR frontend host (#6376)",
+  "commit": "893b683230cd5960a505e12c2d47d67ad54831e8",
+  "date": "2024-09-12T18:42:16.000Z",
   "branch": "develop"
 }
