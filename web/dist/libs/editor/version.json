@@ -1,6 +1,6 @@
 {
-  "message": "chore: Ensure the one time dev build does not incorrectly default to using the HMR frontend host (#6376)",
-  "commit": "893b683230cd5960a505e12c2d47d67ad54831e8",
-  "date": "2024-09-12T18:42:16.000Z",
+  "message": "chore(deps): bump express from 4.19.2 to 4.21.0 in /web (#6383)",
+  "commit": "b74c69f4680b0e2bb7d61b900eb12b9bcc71843a",
+  "date": "2024-09-13T22:19:04.000Z",
   "branch": "develop"
 }
