@@ -2,6 +2,39 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
+from core.redis import start_job_async_or_sync
+from ml_models.models import ThirdPartyModelVersion
+from ml_model_providers.models import ModelProviderConnection, ModelProviders
+
+
+def _fill_model_version_model_provider_connection():
+    third_party_model_versions = ThirdPartyModelVersion.objects.all()
+    for model_version in third_party_model_versions:
+        if model_version.provider == ModelProviders.OPENAI:
+            model_provider_connection = ModelProviderConnection.objects.filter(
+                organization=model_version.organization,
+                provider=model_version.provider
+            ).first()
+            model_version.model_provider_connection = model_provider_connection
+            model_version.save()
+        elif model_version.provider == ModelProviders.AZURE_OPENAI:
+            model_provider_connection = ModelProviderConnection.objects.filter(
+                organization=model_version.organization,
+                provider=model_version.provider,
+                deployment_name=model_version.provider_model_id,
+            ).first()
+            model_version.model_provider_connection = model_provider_connection
+            model_version.save()
+        else:
+            pass
+
+
+def forwards(apps, schema_editor):
+    start_job_async_or_sync(_fill_model_version_model_provider_connection)
+
+
+def backwards(apps, schema_editor):
+    pass
 
 
 class Migration(migrations.Migration):
@@ -17,4 +50,5 @@ class Migration(migrations.Migration):
             name='model_provider_connection',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='model_versions', to='ml_model_providers.modelproviderconnection'),
         ),
+        migrations.RunPython(forwards, backwards)
     ]
