@@ -7,6 +7,7 @@ html, body {
   font-weight: 400;
   height: 100%;
   font-family: 'Hellix', sans-serif;
+  flex: 1;
 }
 
 .login_page_new_ui .left {
