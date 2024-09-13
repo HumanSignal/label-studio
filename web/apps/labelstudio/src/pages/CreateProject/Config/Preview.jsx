@@ -101,18 +101,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
         lsf.current = ls;
       });
     }
-
-    return () => {
-      if (lsf.current) {
-        console.info("Destroying LSF");
-        // there is can be weird error from LSF, but we can just skip it for now
-        try {
-          lsf.current.destroy();
-        } catch (e) {}
-        lsf.current = null;
-      }
-    };
-  }, [initLabelStudio, currentConfig, currentTask]);
+  }, [currentConfig, currentTask]);
 
   useEffect(() => {
     if (lsf.current?.store) {
@@ -137,6 +126,19 @@ export const Preview = ({ config, data, error, loading, project }) => {
       console.log("LSF task updated");
     }
   }, [currentTask]);
+
+  useEffect(() => {
+    return () => {
+      if (lsf.current) {
+        console.info("Destroying LSF");
+        // there can be weird error from LSF, but we can just skip it for now
+        try {
+          lsf.current.destroy();
+        } catch (e) {}
+        lsf.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className={configClass.elem("preview")}>
