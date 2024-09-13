@@ -2,10 +2,10 @@
 
 from django.db import migrations, models, transaction
 import django.db.models.deletion
+import django_migration_linter as linter
 from core.redis import start_job_async_or_sync
 from ml_models.models import ThirdPartyModelVersion
 from ml_model_providers.models import ModelProviderConnection, ModelProviders
-
 
 def _fill_model_version_model_provider_connection():
     third_party_model_versions = ThirdPartyModelVersion.objects.all()
@@ -48,6 +48,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        linter.IgnoreMigration(),
         migrations.AddField(
             model_name='thirdpartymodelversion',
             name='model_provider_connection',
