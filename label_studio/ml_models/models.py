@@ -67,7 +67,9 @@ class ModelVersion(models.Model):
 
     prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
 
-    model_provider_connection = models.ForeignKey(ModelProviderConnection, related_name='model_versions', on_delete=models.SET_NULL, null=True)
+    model_provider_connection = models.ForeignKey(
+        ModelProviderConnection, related_name='model_versions', on_delete=models.SET_NULL, null=True
+    )
 
     @property
     def full_title(self):
