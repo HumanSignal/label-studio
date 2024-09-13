@@ -7,29 +7,20 @@ from core.redis import start_job_async_or_sync
 from ml_models.models import ThirdPartyModelVersion
 from ml_model_providers.models import ModelProviderConnection, ModelProviders
 
-def _fill_model_version_model_provider_connection():
-    third_party_model_versions = ThirdPartyModelVersion.objects.all()
-    for model_version in third_party_model_versions:
-        if model_version.provider == ModelProviders.OPENAI:
-            with transaction.atomic():
-                model_provider_connection = ModelProviderConnection.objects.filter(
-                    organization=model_version.organization,
-                    provider=model_version.provider
-                ).first()
-                model_version.model_provider_connection = model_provider_connection
-                model_version.save()
-        elif model_version.provider == ModelProviders.AZURE_OPENAI:
-            with transaction.atomic():
-                model_provider_connection = ModelProviderConnection.objects.filter(
-                    organization=model_version.organization,
-                    provider=model_version.provider,
-                    deployment_name=model_version.provider_model_id,
-                ).first()
-                model_version.model_provider_connection = model_provider_connection
-                model_version.save()
-        else:
-            pass
 
+def _fill_model_version_model_provider_connection():
+    for provider in [ModelProviders.OPENAI, ModelProviders.AZURE_OPENAI]:
+        this_provider_model_versions = ThirdPartyModelVersion.objects.filter(provider=provider).values('id', 'organization_id', 'provider_model_id')
+        for provider_model_version in this_provider_model_versions:
+            connection_ids = ModelProviderConnection.objects.filter(
+                organization_id=provider_model_version['organization_id'],
+                provider=provider,
+                **({'deployment_name': provider_model_version['provider_model_id']} if provider == ModelProviders.AZURE_OPENAI else {}),
+            ).values_list('id', flat=True)[:1]
+            connection_id = connection_ids[0] if connection_ids else None
+            print(f"id: {provider_model_version['id']}")
+            print(f"mpc id: {connection_id}")
+            ThirdPartyModelVersion.objects.filter(id=provider_model_version['id']).update(model_provider_connection_id=connection_id)
 
 def forwards(apps, schema_editor):
     start_job_async_or_sync(_fill_model_version_model_provider_connection)
