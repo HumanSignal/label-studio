@@ -18,8 +18,6 @@ def _fill_model_version_model_provider_connection():
                 **({'deployment_name': provider_model_version['provider_model_id']} if provider == ModelProviders.AZURE_OPENAI else {}),
             ).values_list('id', flat=True)[:1]
             connection_id = connection_ids[0] if connection_ids else None
-            print(f"id: {provider_model_version['id']}")
-            print(f"mpc id: {connection_id}")
             ThirdPartyModelVersion.objects.filter(id=provider_model_version['id']).update(model_provider_connection_id=connection_id)
 
 def forwards(apps, schema_editor):
