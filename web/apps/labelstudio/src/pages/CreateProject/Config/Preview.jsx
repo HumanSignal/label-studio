@@ -34,7 +34,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
    * @param {*} _ LS instance
    * @param {string} url http/https are not proxied and returned as is
    */
-  const onPresignUrlForProject = useCallback(async (_, url) => {
+  const onPresignUrlForProject = async (_, url) => {
     const parsedUrl = new URL(url);
 
     // return same url if http(s)
@@ -45,7 +45,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
     const fileuri = btoa(url);
 
     return api.api.createUrl(API_CONFIG.endpoints.presignUrlForProject, { projectId, fileuri }).url;
-  }, []);
+  };
 
   const currentConfig = useMemo(() => {
     // empty string causes error in LSF
