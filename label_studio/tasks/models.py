@@ -6,8 +6,9 @@ import logging
 import numbers
 import os
 import random
+import traceback
 import uuid
-from typing import Any, Mapping, Optional, cast
+from typing import Any, Mapping, Optional, Union, cast
 from urllib.parse import urljoin
 
 import ujson as json
@@ -30,13 +31,14 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.core.files.storage import default_storage
 from django.db import OperationalError, models, transaction
-from django.db.models import JSONField, Q
+from django.db.models import CheckConstraint, JSONField, Q
 from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 from django.dispatch import Signal, receiver
 from django.urls import reverse
 from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from label_studio_sdk.label_interface.objects import PredictionValue
 from rest_framework.exceptions import ValidationError
 from tasks.choices import ActionType
 
@@ -997,6 +999,52 @@ class Prediction(models.Model):
         self.update_task()
         return result
 
+    @classmethod
+    def create_no_commit(
+        cls, project, label_interface, task_id, data, model_version, model_run
+    ) -> Optional['Prediction']:
+        """
+        Creates a Prediction object from the given result data, without committing it to the database.
+        or returns None if it fails.
+
+        Args:
+            project: The Project object to associate with the Prediction object.
+            label_interface: The LabelInterface object to use to create regions from the result data.
+            data: The data to create the Prediction object with.
+                    Must contain keys that match control tags in labeling configuration
+                    Example:
+                        ```
+                        {
+                            'my_choices': 'positive',
+                            'my_textarea': 'generated document summary'
+                        }
+                        ```
+            task_id: The ID of the Task object to associate with the Prediction object.
+            model_version: The model version that produced the prediction.
+            model_run: The model run that created the prediction.
+        """
+        try:
+
+            # given the data receive, create annotation regions in LS format
+            # e.g. {"sentiment": "positive"} -> {"value": {"choices": ["positive"]}, "from_name": "", "to_name": "", ..}
+            pred = PredictionValue(result=label_interface.create_regions(data)).model_dump()
+
+            prediction = Prediction(
+                project=project,
+                task_id=int(task_id),
+                model_version=model_version,
+                model_run=model_run,
+                score=1.0,  # Setting to 1.0 for now as we don't get back a score
+                result=pred['result'],
+            )
+            return prediction
+        except Exception as exc:
+            # TODO: handle exceptions better
+            logger.error(
+                f'Error creating prediction for task {task_id} with {data}: {exc}. '
+                f'Traceback: {traceback.format_exc()}'
+            )
+
     class Meta:
         db_table = 'prediction'
 
@@ -1046,6 +1094,99 @@ class FailedPrediction(models.Model):
     )
     task = models.ForeignKey('tasks.Task', on_delete=models.CASCADE, related_name='failed_predictions')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
+
+
+class PredictionMeta(models.Model):
+    prediction = models.OneToOneField(
+        'Prediction',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='meta',
+        help_text=_('Reference to the associated prediction'),
+    )
+    failed_prediction = models.OneToOneField(
+        'FailedPrediction',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='meta',
+        help_text=_('Reference to the associated failed prediction'),
+    )
+    inference_time = models.FloatField(
+        _('inference time'), null=True, blank=True, help_text=_('Time taken for inference in seconds')
+    )
+    prompt_tokens_count = models.IntegerField(
+        _('prompt tokens count'), null=True, blank=True, help_text=_('Number of tokens in the prompt')
+    )
+    completion_tokens_count = models.IntegerField(
+        _('completion tokens count'), null=True, blank=True, help_text=_('Number of tokens in the completion')
+    )
+    total_tokens_count = models.IntegerField(
+        _('total tokens count'), null=True, blank=True, help_text=_('Total number of tokens')
+    )
+    prompt_cost = models.FloatField(_('prompt cost'), null=True, blank=True, help_text=_('Cost of the prompt'))
+    completion_cost = models.FloatField(
+        _('completion cost'), null=True, blank=True, help_text=_('Cost of the completion')
+    )
+    total_cost = models.FloatField(_('total cost'), null=True, blank=True, help_text=_('Total cost'))
+    extra = models.JSONField(_('extra'), null=True, blank=True, help_text=_('Additional metadata in JSON format'))
+
+    @classmethod
+    def create_no_commit(cls, data, prediction: Union[Prediction, FailedPrediction]) -> Optional['PredictionMeta']:
+        """
+        Creates a PredictionMeta object from the given result data, without committing it to the database.
+        or returns None if it fails.
+
+        Args:
+            data: The data to create the PredictionMeta object with.
+                  Example:
+                    {
+                        'total_cost_usd': 0.1,
+                        'prompt_cost_usd': 0.05,
+                        'completion_cost_usd': 0.05,
+                        'prompt_tokens': 10,
+                        'completion_tokens': 10,
+                        'inference_time': 0.1
+                    }
+            prediction: The Prediction or FailedPrediction object to associate with the PredictionMeta object.
+
+        Returns:
+            The PredictionMeta object created from the given data, or None if it fails.
+        """
+        try:
+            prediction_meta = PredictionMeta(
+                total_cost=data.get('total_cost_usd'),
+                prompt_cost=data.get('prompt_cost_usd'),
+                completion_cost=data.get('completion_cost_usd'),
+                prompt_tokens_count=data.get('prompt_tokens'),
+                completion_tokens_count=data.get('completion_tokens'),
+                total_tokens_count=data.get('prompt_tokens', 0) + data.get('completion_tokens', 0),
+                inference_time=data.get('inference_time'),
+            )
+            if isinstance(prediction, Prediction):
+                prediction_meta.prediction = prediction
+            else:
+                prediction_meta.failed_prediction = prediction
+            logger.debug(f'Created prediction meta: {prediction_meta}')
+            return prediction_meta
+        except Exception as exc:
+            logger.error(f'Error creating prediction meta with {data}: {exc}. Traceback: {traceback.format_exc()}')
+
+    class Meta:
+        db_table = 'prediction_meta'
+        verbose_name = _('Prediction Meta')
+        verbose_name_plural = _('Prediction Metas')
+        constraints = [
+            CheckConstraint(
+                # either prediction or failed_prediction should be not null
+                check=(
+                    (Q(prediction__isnull=False) & Q(failed_prediction__isnull=True))
+                    | (Q(prediction__isnull=True) & Q(failed_prediction__isnull=False))
+                ),
+                name='prediction_or_failed_prediction_not_null',
+            )
+        ]
 
 
 @receiver(post_delete, sender=Task)
@@ -1150,7 +1291,21 @@ def remove_predictions_from_project(sender, instance, **kwargs):
     """Remove predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count() - 1
     instance.task.save(update_fields=['total_predictions'])
+
+    # if there is PredictionMeta object associated with the Prediction object, delete it
+    if hasattr(instance, 'meta'):
+        logger.debug(f'Deleting PredictionMeta object associated with Prediction object {instance.id}')
+        instance.meta.delete()
+
     logger.debug(f'Updated total_predictions for {instance.task.id}.')
+
+
+@receiver(pre_delete, sender=FailedPrediction)
+def remove_failed_predictions_from_project(sender, instance, **kwargs):
+    # if there is PredictionMeta object associated with the Prediction object, delete it
+    if hasattr(instance, 'meta'):
+        logger.debug(f'Deleting PredictionMeta object associated with Prediction object {instance.id}')
+        instance.meta.delete()
 
 
 @receiver(post_save, sender=Prediction)
