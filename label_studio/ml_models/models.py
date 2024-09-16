@@ -5,7 +5,7 @@ import logging
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from ml_model_providers.models import ModelProviders
+from ml_model_providers.models import ModelProviderConnection, ModelProviders
 from projects.models import Project
 from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation, FailedPrediction, Prediction, PredictionMeta
@@ -66,6 +66,10 @@ class ModelVersion(models.Model):
     parent_model = models.ForeignKey(ModelInterface, related_name='model_versions', on_delete=models.CASCADE)
 
     prompt = models.TextField(_('prompt'), null=False, blank=False, help_text='Prompt to execute')
+
+    model_provider_connection = models.ForeignKey(
+        ModelProviderConnection, related_name='model_versions', on_delete=models.SET_NULL, null=True
+    )
 
     @property
     def full_title(self):
