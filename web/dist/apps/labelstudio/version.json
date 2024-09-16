@@ -1,6 +1,6 @@
 {
-  "message": "chore(deps): bump express from 4.19.2 to 4.21.0 in /web (#6383)",
-  "commit": "b74c69f4680b0e2bb7d61b900eb12b9bcc71843a",
-  "date": "2024-09-13T22:19:04.000Z",
+  "message": "chore(deps): bump body-parser from 1.19.0 to 1.20.3 in /web/libs/editor/tests/e2e (#6362)",
+  "commit": "6ec51dd93ee5cf56ffb2fdbda90c8627513fa054",
+  "date": "2024-09-16T18:56:52.000Z",
   "branch": "develop"
 }
