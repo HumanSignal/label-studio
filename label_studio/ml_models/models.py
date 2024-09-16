@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 # skills are partitions of projects (label config + input columns + output columns) into categories of labeling tasks
 class SkillNames(models.TextChoices):
     TEXT_CLASSIFICATION = 'TextClassification', _('TextClassification')
+    MULTI_LABEL_TEXT_CLASSIFICATION = 'MultiLabelTextClassification', _('MultiLabelTextClassification')
     NAMED_ENTITY_RECOGNITION = 'NamedEntityRecognition', _('NamedEntityRecognition')
 
 
