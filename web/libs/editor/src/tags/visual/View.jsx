@@ -53,7 +53,6 @@ import { AnnotationMixin } from "../../mixins/AnnotationMixin";
  *     <Header value="yoho"/>
  *   </View>
  * </View>
-
  * @name View
  * @meta_title View Tag for Defining How Blocks are Displayed
  * @meta_description Customize how blocks are displayed on the labeling interface in Label Studio for machine learning and data science projects.
