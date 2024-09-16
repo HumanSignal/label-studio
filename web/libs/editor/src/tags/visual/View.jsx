@@ -13,15 +13,47 @@ import { AnnotationMixin } from "../../mixins/AnnotationMixin";
  * @example
  * <!-- Create two cards that flex to take up 50% of the screen width on the labeling interface -->
  * <View style="display: flex;">
+ *   <!-- Left side -->
  *   <View style="flex: 50%">
  *     <Header value="Facts:" />
  *     <Text name="text" value="$fact" />
  *   </View>
+ *   <!-- Right side -->
  *   <View style="flex: 50%; margin-left: 1em">
  *     <Header value="Enter your question:" />
  *     <TextArea name="question" />
  *   </View>
  * </View>
+ * @example
+ * <View>
+ *   <Text name="text" value="$text"/>
+ *   <Choices name="sentiment" toName="text">
+ *     <Choice value="Positive"/>
+ *     <Choice value="Negative"/>
+ *     <Choice value="Neutral"/>
+ *   </Choices>
+ *   <!-- Shown only when Positive or Negative is selected --> 
+ *   <View visibleWhen="choice-selected" whenTagName="sentiment" 
+ *         whenChoiceValue="Positive,Negative">
+ *     <Header value="Why?"/>
+ *     <TextArea name="why_positive" toName="text"/>
+ *   </View>
+ * </View>
+ * @example
+ * <View>
+ *   <Labels name="label" toName="text">
+ *     <Label value="PER" background="red"/>
+ *     <Label value="ORG" background="darkorange"/>
+ *     <Label value="LOC" background="orange"/>
+ *     <Label value="MISC" background="green"/>
+ *   </Labels>
+ *   <Text name="text" value="$text"/>
+ *   <!-- Shon only when region PER or ORG is selected -->
+ *   <View visibleWhen="region-selected" whenLabelValue="PER,ORG">
+ *     <Header value="yoho"/>
+ *   </View>
+ * </View>
+
  * @name View
  * @meta_title View Tag for Defining How Blocks are Displayed
  * @meta_description Customize how blocks are displayed on the labeling interface in Label Studio for machine learning and data science projects.
@@ -31,8 +63,8 @@ import { AnnotationMixin } from "../../mixins/AnnotationMixin";
  * @param {string} [idAttr] - Unique ID attribute to use in CSS
  * @param {region-selected|choice-selected|no-region-selected|choice-unselected} [visibleWhen] Control visibility of the content. Can also be used with `when*` attributes below to narrow down visibility
  * @param {string} [whenTagName] Use with visibleWhen. Narrow down visibility by tag name. For regions, use the name of the object tag, for choices, use the name of the choices tag
- * @param {string} [whenLabelValue] Use with visibleWhen="region-selected". Narrow down visibility by label value
- * @param {string} [whenChoiceValue] Use with visibleWhen ("choice-selected" or "choice-unselected") and whenTagName, both are required. Narrow down visibility by choice value
+ * @param {string} [whenLabelValue] Use with visibleWhen="region-selected". Narrow down visibility by label value. Multiple values can be separated with comma
+ * @param {string} [whenChoiceValue] Use with visibleWhen ("choice-selected" or "choice-unselected") and whenTagName, both are required. Narrow down visibility by choice value. Multiple values can be separated with comma
  */
 const TagAttrs = types.model({
   classname: types.optional(types.string, ""),
