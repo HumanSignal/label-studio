@@ -145,7 +145,7 @@ See the following video for an overview of annotator agreement metrics:
 
 You can also review the overall annotator agreement on a more individual basis with the annotator agreement matrix.
 
-Review the annotator agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. You can also filter the matrix to show specific agreement statistics for each label, or view the **Overall** agreement matrix. See more about [how annotator agreement is calculated](stats.html).
+Review the annotator agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. You can also filter the matrix to show specific agreement statistics for each label, or view the **Overall** agreement matrix. See more about [how annotator agreement is calculated](stats).
 
 To see the specific annotations contributing to the agreement, do the following:
 
