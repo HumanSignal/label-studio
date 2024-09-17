@@ -68,7 +68,7 @@ export const LinkingModes = types
       // @deprecated
       startRelationMode(obj) {
         console.warn(
-          "`startRelationMode` is deprecated. Use `startLinkingMode` with `CREATE_RELATION_MODE` as first instead.",
+          "`startRelationMode` is deprecated. Use `startLinkingMode(CREATE_RELATION_MODE, obj)` instead.",
         );
         self.startLinkingMode(RelationMode.key, obj);
       },
