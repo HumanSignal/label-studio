@@ -413,7 +413,7 @@ const Model = types
         self.regs.forEach((r) => r.setHighlight(false));
         if (!region) return;
 
-        if (region.annotation.relationMode) {
+        if (region.annotation.isLinkingMode) {
           region.setHighlight(true);
         }
       },

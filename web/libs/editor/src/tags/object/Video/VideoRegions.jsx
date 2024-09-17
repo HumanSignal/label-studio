@@ -271,7 +271,7 @@ const Shape = observer(({ reg, frame, stageRef, ...props }) => {
         onClick={(e) => {
           const annotation = getParentOfType(reg, Annotation);
 
-          if (annotation && annotation.relationMode) {
+          if (annotation && annotation.isLinkingMode) {
             stageRef.current.container().style.cursor = Constants.DEFAULT_CURSOR;
           }
 

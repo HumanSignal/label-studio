@@ -80,7 +80,7 @@ export default types
       const addEvent = (s) => {
         s.onmouseover = (ev) => {
           if (self.hidden) return;
-          if (self.annotation.relationMode) {
+          if (self.annotation.isLinkingMode) {
             self.toggleHighlight();
             s.style.cursor = Constants.RELATION_MODE_CURSOR;
             // only one span should be highlighted
