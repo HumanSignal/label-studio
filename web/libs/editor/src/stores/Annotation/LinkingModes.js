@@ -6,9 +6,14 @@ import { RelationMode } from "./LinkingModes/RelationMode";
 export const CREATE_RELATION_MODE = RelationMode.key;
 export const LINK_COMMENT_MODE = CommentMode.key;
 
+const LinkingModeUnion = types.union(CommentMode.model, RelationMode.model);
+
 export const LinkingModes = types
   .model("LinkingModes", {
-    linkingModes: types.map(types.union(RelationMode.model, CommentMode.model)),
+    linkingModes: types.optional(types.map(LinkingModeUnion), {
+      [RelationMode.key]: RelationMode.model.create({}),
+      [CommentMode.key]: CommentMode.model.create({}),
+    }),
   })
   .volatile((self) => {
     return {
@@ -32,10 +37,6 @@ export const LinkingModes = types
   }))
   .actions((self) => {
     return {
-      afterCreate() {
-        self.linkingModes.set(RelationMode.key, RelationMode.model.create({}));
-        self.linkingModes.set(CommentMode.key, CommentMode.model.create({}));
-      },
       startLinkingMode(linkingModeName, obj) {
         if (self.isLinkingMode) {
           self.stopLinkingMode();
@@ -67,9 +68,7 @@ export const LinkingModes = types
       },
       // @deprecated Use `startLinkingMode(CREATE_RELATION_MODE, obj)` instead
       startRelationMode(obj) {
-        console.warn(
-          "`startRelationMode` is deprecated. Use `startLinkingMode(CREATE_RELATION_MODE, obj)` instead.",
-        );
+        console.warn("`startRelationMode` is deprecated. Use `startLinkingMode(CREATE_RELATION_MODE, obj)` instead.");
         self.startLinkingMode(RelationMode.key, obj);
       },
       // @deprecated Use `stopLinkingMode` instead
