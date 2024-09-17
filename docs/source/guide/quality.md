@@ -14,6 +14,10 @@ After multiple labelers have annotated tasks, review their output to validate th
 
 The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
 
+See the following video for an overview of reviewer workflows: 
+
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=dhBrphE7PHo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 
 ## Why review annotations?
 
@@ -132,6 +136,10 @@ Review a table to see the following for each annotator:
 - The mean time to annotate the tasks. Select this header to view the `median time` instead. Mean time and median time are calculated using the total time spent on each task by an annotator, including idle time.
 - The agreement of their annotations with the ground truth annotations, if there are any.
 - The agreement of their annotations with predicted annotations, if there are any.
+
+See the following video for an overview of annotator agreement metrics: 
+
+<iframe width="560" height="315" src="https://www.youtube.com/watch?v=Lo_PVE9Pyw4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ### Review annotator agreement matrix
 
