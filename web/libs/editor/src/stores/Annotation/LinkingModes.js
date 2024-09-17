@@ -10,10 +10,10 @@ const LinkingModeUnion = types.union(CommentMode.model, RelationMode.model);
 
 export const LinkingModes = types
   .model("LinkingModes", {
-    linkingModes: types.optional(types.map(LinkingModeUnion), {
+    linkingModes: types.optional(types.map(LinkingModeUnion), () => ({
       [RelationMode.key]: RelationMode.model.create({}),
       [CommentMode.key]: CommentMode.model.create({}),
-    }),
+    })),
   })
   .volatile((self) => {
     return {
