@@ -1,6 +1,6 @@
 import { LabelStudio, Relations } from "@humansignal/frontend-test/helpers/LSF";
 import { CREATE_RELATION_MODE, LINK_COMMENT_MODE } from "../../../../src/stores/Annotation/LinkingModes";
-import { simpleTextConfig, simpleTextData, simpleTextResult } from "../../data/linked_modes/to_coments";
+import { simpleTextConfig, simpleTextData, simpleTextResult } from "../../data/linked_modes/to_comments";
 
 describe("Linking modes: To comments", () => {
   it("should link region to comments", () => {
