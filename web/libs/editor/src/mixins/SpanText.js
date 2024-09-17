@@ -82,7 +82,7 @@ export default types
           if (self.hidden) return;
           if (self.annotation.isLinkingMode) {
             self.toggleHighlight();
-            s.style.cursor = Constants.RELATION_MODE_CURSOR;
+            s.style.cursor = Constants.LINKING_MODE_CURSOR;
             // only one span should be highlighted
             ev.stopPropagation();
           } else {

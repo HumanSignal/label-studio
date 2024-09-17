@@ -192,7 +192,7 @@ export const AudioRegionModel = types
     onMouseOver() {
       if (self.annotation.isLinkingMode) {
         self.setHighlight(true);
-        self._ws_region.element.style.cursor = Constants.RELATION_MODE_CURSOR;
+        self._ws_region.element.style.cursor = Constants.LINKING_MODE_CURSOR;
       }
     },
 

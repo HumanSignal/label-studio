@@ -499,7 +499,7 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
         onMouseOver={() => {
           if (store.annotationStore.selected.isLinkingMode) {
             item.setHighlight(true);
-            stage.container().style.cursor = Constants.RELATION_MODE_CURSOR;
+            stage.container().style.cursor = Constants.LINKING_MODE_CURSOR;
           } else {
             stage.container().style.cursor = Constants.POINTER_CURSOR;
           }

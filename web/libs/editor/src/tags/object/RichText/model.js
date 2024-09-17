@@ -127,7 +127,7 @@ const Model = types
       }
       .htx-highlight.${STATE_CLASS_MODS.highlighted} {
         position: relative;
-        cursor: ${Constants.RELATION_MODE_CURSOR};
+        cursor: ${Constants.LINKING_MODE_CURSOR};
         border-color: rgb(0, 174, 255);
       }
       .htx-highlight.${STATE_CLASS_MODS.hidden} {
