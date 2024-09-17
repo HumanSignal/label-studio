@@ -36,3 +36,4 @@ repos:
         verbose: true
         stages:
           - pre-commit
+          - manual
