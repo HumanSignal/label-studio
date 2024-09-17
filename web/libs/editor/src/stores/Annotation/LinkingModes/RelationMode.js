@@ -2,6 +2,9 @@ import { getParent, types } from "mobx-state-tree";
 
 const RelationModeModel = types
   .model("RelationsMode", {})
+  .volatile(() => ({
+    region: null,
+  }))
   .views((self) => {
     return {
       get annotation() {
@@ -16,17 +19,16 @@ const RelationModeModel = types
     };
   })
   .actions((self) => {
-    let firstRegion = null;
     return {
       start(region) {
-        firstRegion = region;
+        self.region = region;
       },
       stop() {
-        firstRegion = null;
+        self.region = null;
         self.regionStore.unhighlightAll();
       },
       addLinkedRegion(secondRegion) {
-        self.relationStore.addRelation(firstRegion, secondRegion);
+        self.relationStore.addRelation(self.region, secondRegion);
         self.stop();
       },
     };

@@ -2,6 +2,9 @@ import { getParent, types } from "mobx-state-tree";
 
 const CommentModeModel = types
   .model("CommentMode", {})
+  .volatile(() => ({
+    comment: null,
+  }))
   .views((self) => {
     return {
       get annotation() {
@@ -13,17 +16,16 @@ const CommentModeModel = types
     };
   })
   .actions((self) => {
-    let comment = null;
     return {
       start(_comment) {
-        comment = _comment;
+        self.comment = _comment;
       },
       stop() {
-        comment = null;
+        self.comment = null;
         self.regionStore.unhighlightAll();
       },
       addLinkedRegion(region) {
-        comment.setRegionLink(region);
+        self.comment.setRegionLink(region);
         self.stop();
       },
     };
