@@ -1,5 +1,20 @@
 import { LabelStudio, ImageView, Textarea, ToolBar, Modals, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
-import { simpleImageTextareaConfig, simpleImageData, perTagTextareaResult, perTagMIGTextareaConfig, simpleMIGData, requiredPerTagMIGTextareaConfig, TEXTAREA_REQUIRED_WARNING, perRegionMIGTextareaConfig, perRegionRegionsResult, perRegionTextareaResult, requiredPerRegionMIGTextareaConfig, perItemMIGTextareaConfig, perItemTextareaResult, requiredPerItemMIGTextareaConfig } from "../../../data/control_tags/per-item";
+import {
+  simpleImageTextareaConfig,
+  simpleImageData,
+  perTagTextareaResult,
+  perTagMIGTextareaConfig,
+  simpleMIGData,
+  requiredPerTagMIGTextareaConfig,
+  TEXTAREA_REQUIRED_WARNING,
+  perRegionMIGTextareaConfig,
+  perRegionRegionsResult,
+  perRegionTextareaResult,
+  requiredPerRegionMIGTextareaConfig,
+  perItemMIGTextareaConfig,
+  perItemTextareaResult,
+  requiredPerItemMIGTextareaConfig,
+} from "../../../data/control_tags/per-item";
 import { commonBeforeEach } from "./common";
 
 beforeEach(commonBeforeEach);

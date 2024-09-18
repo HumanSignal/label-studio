@@ -1,5 +1,20 @@
 import { LabelStudio, ImageView, Choices, ToolBar, Modals, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
-import { simpleImageChoicesConfig, simpleImageData, perTagChoicesResult, perTagMIGChoicesConfig, simpleMIGData, requiredPerTagMIGChoicesConfig, CHOICES_REQUIRED_WARNING, perRegionMIGChoicesConfig, perRegionRegionsResult, perRegionChoicesResult, requiredPerRegionMIGChoicesConfig, perItemMIGChoicesConfig, perItemChoicesResult, requiredPerItemMIGChoicesConfig } from "../../../data/control_tags/per-item";
+import {
+  simpleImageChoicesConfig,
+  simpleImageData,
+  perTagChoicesResult,
+  perTagMIGChoicesConfig,
+  simpleMIGData,
+  requiredPerTagMIGChoicesConfig,
+  CHOICES_REQUIRED_WARNING,
+  perRegionMIGChoicesConfig,
+  perRegionRegionsResult,
+  perRegionChoicesResult,
+  requiredPerRegionMIGChoicesConfig,
+  perItemMIGChoicesConfig,
+  perItemChoicesResult,
+  requiredPerItemMIGChoicesConfig,
+} from "../../../data/control_tags/per-item";
 import { commonBeforeEach } from "./common";
 
 beforeEach(commonBeforeEach);

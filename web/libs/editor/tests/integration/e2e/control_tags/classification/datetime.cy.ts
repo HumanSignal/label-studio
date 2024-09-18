@@ -1,12 +1,20 @@
+import { LabelStudio, ImageView, DateTime, Modals, Sidebar, ToolBar } from "@humansignal/frontend-test/helpers/LSF";
 import {
-  LabelStudio,
-  ImageView,
-  DateTime,
-  Modals,
-  Sidebar,
-  ToolBar,
-} from "@humansignal/frontend-test/helpers/LSF";
-import { DATETIME_REQUIRED_WARNING, perItemDateTimeResult, perItemMIGDateTimeConfig, perRegionDateTimeResult, perRegionMIGDateTimeConfig, perRegionRegionsResult, perTagDateTimeResult, perTagMIGDateTimeConfig, requiredPerItemMIGDateTimeConfig, requiredPerRegionMIGDateTimeConfig, requiredPerTagMIGDateTimeConfig, simpleImageData, simpleImageDateTimeConfig, simpleMIGData } from "../../../data/control_tags/per-item";
+  DATETIME_REQUIRED_WARNING,
+  perItemDateTimeResult,
+  perItemMIGDateTimeConfig,
+  perRegionDateTimeResult,
+  perRegionMIGDateTimeConfig,
+  perRegionRegionsResult,
+  perTagDateTimeResult,
+  perTagMIGDateTimeConfig,
+  requiredPerItemMIGDateTimeConfig,
+  requiredPerRegionMIGDateTimeConfig,
+  requiredPerTagMIGDateTimeConfig,
+  simpleImageData,
+  simpleImageDateTimeConfig,
+  simpleMIGData,
+} from "../../../data/control_tags/per-item";
 import { commonBeforeEach } from "./common";
 
 beforeEach(commonBeforeEach);

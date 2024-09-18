@@ -1,5 +1,20 @@
 import { LabelStudio, ImageView, Taxonomy, ToolBar, Modals, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
-import { simpleImageTaxonomyConfig, simpleImageData, perTagTaxonomyResult, perTagMIGTaxonomyConfig, simpleMIGData, requiredPerTagMIGTaxonomyConfig, TAXONOMY_REQUIRED_WARNING, perRegionMIGTaxonomyConfig, perRegionRegionsResult, perRegionTaxonomyResult, requiredPerRegionMIGTaxonomyConfig, perItemMIGTaxonomyConfig, perItemTaxonomyResult, requiredPerItemMIGTaxonomyConfig } from "../../../data/control_tags/per-item";
+import {
+  simpleImageTaxonomyConfig,
+  simpleImageData,
+  perTagTaxonomyResult,
+  perTagMIGTaxonomyConfig,
+  simpleMIGData,
+  requiredPerTagMIGTaxonomyConfig,
+  TAXONOMY_REQUIRED_WARNING,
+  perRegionMIGTaxonomyConfig,
+  perRegionRegionsResult,
+  perRegionTaxonomyResult,
+  requiredPerRegionMIGTaxonomyConfig,
+  perItemMIGTaxonomyConfig,
+  perItemTaxonomyResult,
+  requiredPerItemMIGTaxonomyConfig,
+} from "../../../data/control_tags/per-item";
 import { commonBeforeEach } from "./common";
 
 beforeEach(commonBeforeEach);

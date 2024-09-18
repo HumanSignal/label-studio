@@ -1,5 +1,20 @@
 import { LabelStudio, ImageView, Rating, ToolBar, Modals, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
-import { simpleImageRatingConfig, simpleImageData, perTagRatingResult, perTagMIGRatingConfig, simpleMIGData, requiredPerTagMIGRatingConfig, RATING_REQUIRED_WARNING, perRegionMIGRatingConfig, perRegionRegionsResult, perRegionRatingResult, requiredPerRegionMIGRatingConfig, perItemMIGRatingConfig, perItemRatingResult, requiredPerItemMIGRatingConfig } from "../../../data/control_tags/per-item";
+import {
+  simpleImageRatingConfig,
+  simpleImageData,
+  perTagRatingResult,
+  perTagMIGRatingConfig,
+  simpleMIGData,
+  requiredPerTagMIGRatingConfig,
+  RATING_REQUIRED_WARNING,
+  perRegionMIGRatingConfig,
+  perRegionRegionsResult,
+  perRegionRatingResult,
+  requiredPerRegionMIGRatingConfig,
+  perItemMIGRatingConfig,
+  perItemRatingResult,
+  requiredPerItemMIGRatingConfig,
+} from "../../../data/control_tags/per-item";
 import { commonBeforeEach } from "./common";
 
 beforeEach(commonBeforeEach);
