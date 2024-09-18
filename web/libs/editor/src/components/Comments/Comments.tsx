@@ -1,7 +1,6 @@
 import { type FC, useEffect } from "react";
 import { observer } from "mobx-react";
 import { Block } from "../../utils/bem";
-import { CommentForm } from "./CommentForm";
 import { CommentsList } from "./CommentsList";
 import { CommentForm as CommentFormOld } from "./OldComment/CommentForm";
 import { CommentForm as CommentsFormNew } from "./Comment/CommentForm";

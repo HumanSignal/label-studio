@@ -120,7 +120,7 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
   const hasLinkState = linking || region;
 
   return (
-    <Block ref={formRef} tag="form" name="comment-form" mod={{ inline, linked: !!region }} onSubmit={onSubmit}>
+    <Block ref={formRef} tag="form" name="comment-form-enhanced" mod={{ inline, linked: !!region }} onSubmit={onSubmit}>
       <TextArea
         actionRef={actionRef}
         name="comment"
