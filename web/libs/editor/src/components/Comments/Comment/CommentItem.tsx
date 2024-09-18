@@ -39,7 +39,7 @@ interface CommentItemProps {
   listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
 }
 
-export const CommentItem: FC<any> = observer(({ comment, listComments }: CommentItemProps) => {
+export const CommentItem: FC<CommentItemProps> = observer(({ comment, listComments }: CommentItemProps) => {
   const {
     updatedAt,
     isEditMode,
