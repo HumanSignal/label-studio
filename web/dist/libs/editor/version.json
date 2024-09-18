@@ -1,6 +1,6 @@
 {
-  "message": "chore: TRIAG-851: Resolve a development dependency to satisfy dependabot issue (#6393)",
-  "commit": "fb75c7a7b4c820411ba6c05cc48bb746759fe3e7",
-  "date": "2024-09-16T22:41:05.000Z",
+  "message": "docs: Add multiple values in whenChoiceValue and whenLabelValue (#6390)",
+  "commit": "59c1643df5c946abc3c7a5b09ae68a71ea9c3501",
+  "date": "2024-09-18T00:45:36.000Z",
   "branch": "develop"
 }
