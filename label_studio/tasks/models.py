@@ -239,6 +239,36 @@ class Task(TaskMixin, models.Model):
         else:
             return []
 
+    def get_lock_exclude_query(self, user):
+        """
+        Get query for excluding annotations from the lock check
+        """
+        SkipQueue = self.project.SkipQueue
+
+        if self.project.skip_queue == SkipQueue.IGNORE_SKIPPED:
+            # IGNORE_SKIPPED: my skipped tasks don't go anywhere
+            # alien's and my skipped annotations are counted as regular annotations
+            q = Q()
+        else:
+            if self.project.skip_queue == SkipQueue.REQUEUE_FOR_ME:
+                # REQUEUE_FOR_ME means: only my skipped tasks go back to me,
+                # alien's skipped annotations are counted as regular annotations
+                q = Q(was_cancelled=True) & Q(completed_by=user)
+            elif self.project.skip_queue == SkipQueue.REQUEUE_FOR_OTHERS:
+                # REQUEUE_FOR_OTHERS: my skipped tasks go to others
+                # alien's skipped annotations are not counted at all
+                q = Q(was_cancelled=True) & ~Q(completed_by=user)
+            else:
+                raise Exception(f'Invalid SkipQueue value: {self.project.skip_queue}')
+
+            # for LSE we also need to exclude rejected queue
+            rejected_q = self.get_rejected_query()
+
+            if rejected_q:
+                q &= rejected_q
+
+        return q | Q(ground_truth=True)
+
     def has_lock(self, user=None):
         """
         Check whether current task has been locked by some user
@@ -247,23 +277,10 @@ class Task(TaskMixin, models.Model):
         """
         from projects.functions.next_task import get_next_task_logging_level
 
-        SkipQueue = self.project.SkipQueue
-
-        if self.project.skip_queue == SkipQueue.REQUEUE_FOR_ME:
-            # REQUEUE_FOR_ME means: only my skipped tasks go back to me,
-            # alien's skipped annotations are counted as regular annotations
-            q = Q(was_cancelled=True) & Q(completed_by=user)
-        elif self.project.skip_queue == SkipQueue.REQUEUE_FOR_OTHERS:
-            # REQUEUE_FOR_OTHERS: my skipped tasks go to others
-            # alien's skipped annotations are not counted at all
-            q = Q(was_cancelled=True) & ~Q(completed_by=user)
-        else:  # SkipQueue.IGNORE_SKIPPED
-            # IGNORE_SKIPPED: my skipped tasks don't go anywhere
-            # alien's and my skipped annotations are counted as regular annotations
-            q = Q()
+        q = self.get_lock_exclude_query(user)
 
         num_locks = self.num_locks_user(user=user)
-        num_annotations = self.annotations.exclude(q | Q(ground_truth=True)).count()
+        num_annotations = self.annotations.exclude(q).count()
         num = num_locks + num_annotations
 
         if num > self.overlap_with_agreement_threshold(num, num_locks):
