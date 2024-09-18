@@ -22,10 +22,10 @@ The `Choices` tag can be used with any data types.
 | [showInline] | <code>boolean</code> | <code>false</code> | Show choices in the same visual line |
 | [required] | <code>boolean</code> | <code>false</code> | Validate whether a choice has been selected |
 | [requiredMessage] | <code>string</code> |  | Show a message if validation fails |
-| [visibleWhen] | <code>region-selected</code> \| <code>no-region-selected</code> \| <code>choice-selected</code> \| <code>choice-unselected</code> |  | Control visibility of the choices. Can also be used with `when*` attributes below to narrow down visibility |
-| [whenTagName] | <code>string</code> |  | Use with visibleWhen. Narrow down visibility by name of the tag. For regions, use the name of the object tag, for choices, use the name of the choices tag |
-| [whenLabelValue] | <code>string</code> |  | Use with visibleWhen="region-selected". Narrow down visibility by label value |
-| [whenChoiceValue] | <code>string</code> |  | Use with visibleWhen ("choice-selected" or "choice-unselected") and whenTagName, both are required. Narrow down visibility by choice value |
+| [visibleWhen] | <code>region-selected</code> \| <code>no-region-selected</code> \| <code>choice-selected</code> \| <code>choice-unselected</code> |  | Control visibility of the choices. Can also be used with the `when*` parameters below to narrow down visibility |
+| [whenTagName] | <code>string</code> |  | Use with `visibleWhen`. Narrow down visibility by name of the tag. For regions, use the name of the object tag, for choices, use the name of the `choices` tag |
+| [whenLabelValue] | <code>string</code> |  | Use with `visibleWhen="region-selected"`. Narrow down visibility by label value. Multiple values can be separated with commas |
+| [whenChoiceValue] | <code>string</code> |  | Use with `visibleWhen` (`"choice-selected"` or `"choice-unselected"`) and `whenTagName`, both are required. Narrow down visibility by choice value. Multiple values can be separated with commas |
 | [perRegion] | <code>boolean</code> |  | Use this tag to select a choice for a specific region instead of the entire task |
 | [perItem] | <code>boolean</code> |  | Use this tag to select a choice for a specific item inside the object instead of the whole object |
 | [value] | <code>string</code> |  | Task data field containing a list of dynamically loaded choices (see example below) |
