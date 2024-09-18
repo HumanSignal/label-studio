@@ -921,14 +921,14 @@ export class LSFWrapper {
     // It is the earliest time in the task.drafts array or the loadedDate if there are no drafts.
     // When considering the draft created_at time, the difference between the draft lead_time is subtracted from the current time.
     // This is done to get an adjusted startedAt time that accounts for the time the user was not actively labeling the task while in a draft state.
-    // When the adjustedStartedAt time would be after the current time, the loadedDate is used instead.
+    // This adjustment is necessary to ensure that the started_at time is not before the draftStartedAt time.
     const draftStartedAt = draft ? new Date(this.task.drafts[0]?.created_at) : undefined;
 
     let startedAt;
     if (draftStartedAt) {
       const draftLeadTime = Number(this.task.drafts[0]?.lead_time ?? 0);
-      const adjustedStartedAt = new Date(draftStartedAt.getTime() + draftLeadTime * 1000);
-      startedAt = adjustedStartedAt > new Date() ? annotation.loadedDate : adjustedStartedAt;
+      const adjustedStartedAt = new Date(Date.now() - draftLeadTime * 1000);
+      startedAt = adjustedStartedAt < draftStartedAt ? draftStartedAt : adjustedStartedAt;
     } else {
       startedAt = annotation.loadedDate;
     }
