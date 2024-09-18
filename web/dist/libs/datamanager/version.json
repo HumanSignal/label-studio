@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-1087: Label Config Preview not handling editor lifecycle correctly for updates (#6381)",
-  "commit": "d3f251bf8a02bc69c7c001d448726279292add02",
-  "date": "2024-09-18T16:03:41.000Z",
+  "message": "chore: TRIAG-851: Resolve a development dependency to satisfy dependabot issue in test dependencies (#6407)",
+  "commit": "00dcabaf107d7f8b6a0c5be1dcd09bd72c60945c",
+  "date": "2024-09-18T18:15:27.000Z",
   "branch": "develop"
 }
