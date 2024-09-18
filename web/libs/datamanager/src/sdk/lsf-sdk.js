@@ -928,7 +928,7 @@ export class LSFWrapper {
     if (draftStartedAt) {
       const draftLeadTime = Number(this.task.drafts[0]?.lead_time ?? 0);
       const adjustedStartedAt = new Date(Date.now() - draftLeadTime * 1000);
-      startedAt = adjustedStartedAt < draftStartedAt ? draftStartedAt : adjustedStartedAt;
+      startedAt = (adjustedStartedAt < draftStartedAt) ? draftStartedAt : adjustedStartedAt;
     } else {
       startedAt = annotation.loadedDate;
     }
