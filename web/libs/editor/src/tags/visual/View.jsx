@@ -32,8 +32,8 @@ import { AnnotationMixin } from "../../mixins/AnnotationMixin";
  *     <Choice value="Negative"/>
  *     <Choice value="Neutral"/>
  *   </Choices>
- *   <!-- Shown only when Positive or Negative is selected --> 
- *   <View visibleWhen="choice-selected" whenTagName="sentiment" 
+ *   <!-- Shown only when Positive or Negative is selected -->
+ *   <View visibleWhen="choice-selected" whenTagName="sentiment"
  *         whenChoiceValue="Positive,Negative">
  *     <Header value="Why?"/>
  *     <TextArea name="why_positive" toName="text"/>
