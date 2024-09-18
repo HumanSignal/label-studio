@@ -917,12 +917,29 @@ export class LSFWrapper {
     const draftTime = Number(this.task.drafts[0]?.lead_time ?? 0);
     const lead_time = sessionTime + submittedTime + draftTime;
 
+    // StartedAt is the time in which the user first began labeling the task.
+    // It is the earliest time in the task.drafts array or the loadedDate if there are no drafts.
+    // When considering the draft created_at time, the difference between the draft lead_time is subtracted from the current time.
+    // This is done to get an adjusted startedAt time that accounts for the time the user was not actively labeling the task while in a draft state.
+    // When the adjustedStartedAt time would be after the current time, the loadedDate is used instead.
+    const draftStartedAt = draft ? new Date(this.task.drafts[0]?.created_at) : undefined;
+
+    let startedAt;
+    if (draftStartedAt) {
+      const draftLeadTime = Number(this.task.drafts[0]?.lead_time ?? 0);
+      const adjustedStartedAt = new Date(draftStartedAt.getTime() + draftLeadTime * 1000);
+      startedAt = adjustedStartedAt > new Date() ? annotation.loadedDate : adjustedStartedAt;
+    } else {
+      startedAt = annotation.loadedDate;
+    }
+
     const result = {
       lead_time,
       result: (draft ? annotation.versions.draft : annotation.serializeAnnotation()) ?? [],
       draft_id: annotation.draftId,
       parent_prediction: annotation.parent_prediction,
       parent_annotation: annotation.parent_annotation,
+      started_at: startedAt.toISOString(),
     };
 
     if (includeId && userGenerate) {
