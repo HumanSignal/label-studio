@@ -179,7 +179,7 @@ For a description of all the settings available for annotators, see [Project set
 
 See the following video for a brief overview of automated task assignments:
 
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=b1_o-yhT1uY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/b1_o-yhT1uY?si=NspgI-rWwE6l7ZIN" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 #### Review settings
 
