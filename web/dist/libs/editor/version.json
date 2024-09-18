@@ -1,6 +1,6 @@
 {
-  "message": "docs: Add multiple values in whenChoiceValue and whenLabelValue (#6390)",
-  "commit": "59c1643df5c946abc3c7a5b09ae68a71ea9c3501",
-  "date": "2024-09-18T00:45:36.000Z",
+  "message": "fix: OPTIC-1087: Label Config Preview not handling editor lifecycle correctly for updates (#6381)",
+  "commit": "d3f251bf8a02bc69c7c001d448726279292add02",
+  "date": "2024-09-18T16:03:41.000Z",
   "branch": "develop"
 }
