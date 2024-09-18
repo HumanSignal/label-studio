@@ -915,7 +915,7 @@ export class LSFWrapper {
     const sessionTime = (new Date() - annotation.loadedDate) / 1000;
     const submittedTime = Number(annotation.leadTime ?? 0);
     const draftTime = Number(this.task.drafts[0]?.lead_time ?? 0);
-    const lead_time = draft ? draftTime + sessionTime : submittedTime + draftTime + sessionTime;
+    const lead_time = (draft ? 0 : submittedTime) + draftTime + sessionTime;
 
     const result = {
       lead_time,
