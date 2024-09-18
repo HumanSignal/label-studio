@@ -16,7 +16,7 @@ The annotation review workflow is only available in Label Studio Enterprise Edit
 
 See the following video for an overview of reviewer workflows: 
 
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=dhBrphE7PHo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/dhBrphE7PHo?si=YMRI-omwxoQFuhma" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 
 ## Why review annotations?
@@ -139,7 +139,7 @@ Review a table to see the following for each annotator:
 
 See the following video for an overview of annotator agreement metrics: 
 
-<iframe class="video-border" width="560" height="315" src="https://www.youtube.com/watch?v=Lo_PVE9Pyw4" width="100%" height="400vh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe class="video-border" width="560" height="315" src="https://www.youtube.com/embed/Lo_PVE9Pyw4?si=z1vtyI_xIo8aR8fY" width="100%" height="400vh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
 ### Review annotator agreement matrix
