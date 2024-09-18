@@ -1,6 +1,6 @@
 {
-  "message": "chore: TRIAG-851: Resolve a development dependency to satisfy dependabot issue in test dependencies (#6407)",
-  "commit": "00dcabaf107d7f8b6a0c5be1dcd09bd72c60945c",
-  "date": "2024-09-18T18:15:27.000Z",
+  "message": "chore: OPTIC-1124: Refactor the classification tests to separate files to stabilize chromium session (#6409)",
+  "commit": "08c5ae19560702244cee2f346330b4218d16b948",
+  "date": "2024-09-18T21:28:56.000Z",
   "branch": "develop"
 }
