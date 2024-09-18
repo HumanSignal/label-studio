@@ -102,8 +102,6 @@ export const Comment = CommentBase.named("Comment")
       self.isConfirmDelete = newMode;
     }
 
-    function setRegionLink(region) {}
-
     const updateComment = flow(function* (comment) {
       if (self.isPersisted && !self.isDeleted) {
         yield self.sdk.invoke("comments:update", {
@@ -114,6 +112,32 @@ export const Comment = CommentBase.named("Comment")
 
       self.setEditMode(false);
     });
+
+    const update = flow(function* (props) {
+      if (self.isPersisted && !self.isDeleted && !self.isUpdating) {
+        self.isUpdating = true;
+        const [result] = yield self.sdk.invoke("comments:update", {
+          id: self.id,
+          ...props,
+        });
+        if (result.error) return;
+        const data = camelizeKeys(result);
+        applySnapshot(self, data);
+        self.isUpdating = false;
+      }
+    });
+
+    function setRegionLink(region) {
+      const regionRef = {
+        regionId: region.cleanId,
+      };
+      self.update(snakeizeKeys({ regionRef }));
+    }
+
+    function unsetLink() {
+      const regionRef = null;
+      self.update(snakeizeKeys({ regionRef }));
+    }
 
     const deleteComment = flow(function* () {
       if (self.isPersisted && !self.isDeleted && self.isConfirmDelete) {
@@ -132,7 +156,9 @@ export const Comment = CommentBase.named("Comment")
       setDeleted,
       setConfirmMode,
       updateComment,
+      update,
       deleteComment,
       setRegionLink,
+      unsetLink,
     };
   });
