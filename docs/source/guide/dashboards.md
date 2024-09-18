@@ -14,7 +14,7 @@ You can use the Label Studio Enterprise dashboards to help visualize your labeli
 
 See the following video for a brief overview of the analytics available in Label Studio Enterprise:
 
-<iframe width="560" height="315" src="https://www.youtube.com/watch?v=mkaLdrF1Pn8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/mkaLdrF1Pn8?si=jAqTUOyNu0lkw3E-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 ### Project dashboard
 
