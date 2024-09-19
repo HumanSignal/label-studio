@@ -908,34 +908,52 @@ export class LSFWrapper {
     return result;
   }
 
-  /** @private */
-  prepareData(annotation, { includeId, draft } = {}) {
-    const userGenerate = !annotation.userGenerate || annotation.sentUserGenerate;
-
-    const sessionTime = (new Date() - annotation.loadedDate) / 1000;
-    const submittedTime = Number(annotation.leadTime ?? 0);
-    const draftTime = Number(this.task.drafts[0]?.lead_time ?? 0);
-    const lead_time = sessionTime + submittedTime + draftTime;
-
-    // StartedAt is the time in which the user first began labeling the task.
-    // It is the earliest time in the task.drafts array or the loadedDate if there are no drafts.
-    // When considering the draft created_at time, the difference between the draft lead_time is subtracted from the current time.
-    // This is done to get an adjusted startedAt time that accounts for the time the user was not actively labeling the task while in a draft state.
-    // This adjustment is necessary to ensure that the started_at time is not before the draftStartedAt time.
-    const draftStartedAt = draft ? new Date(this.task.drafts[0]?.created_at) : undefined;
-
-    let startedAt;
-    if (draftStartedAt) {
-      const draftLeadTime = Number(this.task.drafts[0]?.lead_time ?? 0);
-      const adjustedStartedAt = new Date(Date.now() - draftLeadTime * 1000);
-      startedAt = (adjustedStartedAt < draftStartedAt) ? draftStartedAt : adjustedStartedAt;
-    } else {
-      startedAt = annotation.loadedDate;
+  /**
+   * Finds the active draft for the given annotation.
+   * @param {Object} annotation - The annotation object.
+   * @returns {Object|undefined} The active draft or undefined if no draft is found.
+   * @private
+   */
+  findActiveDraft(annotation) {
+    if (isDefined(annotation.draftId)) {
+      return this.task.drafts.find((possibleDraft) => possibleDraft.id === annotation.draftId);
     }
+    return undefined;
+  }
+
+  /**
+   * Calculates the startedAt time for an annotation.
+   * @param {Object|undefined} currentDraft - The current draft object, if any.
+   * @param {Date} loadedDate - The date when the annotation was loaded.
+   * @returns {Date} The calculated startedAt time.
+   * @private
+   */
+  calculateStartedAt(currentDraft, loadedDate) {
+    if (currentDraft) {
+      const draftStartedAt = new Date(currentDraft.created_at);
+      const draftLeadTime = Number(currentDraft.lead_time ?? 0);
+      const adjustedStartedAt = new Date(Date.now() - draftLeadTime * 1000);
+
+      if (adjustedStartedAt < draftStartedAt) return draftStartedAt;
+
+      return adjustedStartedAt;
+    }
+    return loadedDate;
+  }
+
+  /** @private */
+  prepareData(annotation, { includeId, isNewDraft } = {}) {
+    const userGenerate = !annotation.userGenerate || annotation.sentUserGenerate;
+    const currentDraft = this.findActiveDraft(annotation);
+    const sessionTime = (new Date() - annotation.loadedDate) / 1000;
+    const submittedTime = isNewDraft ? 0 : Number(annotation.leadTime ?? 0);
+    const draftTime = Number(currentDraft?.lead_time ?? 0);
+    const leadTime = submittedTime + draftTime + sessionTime;
+    const startedAt = this.calculateStartedAt(currentDraft, annotation.loadedDate);
 
     const result = {
-      lead_time,
-      result: (draft ? annotation.versions.draft : annotation.serializeAnnotation()) ?? [],
+      lead_time: leadTime,
+      result: (isNewDraft ? annotation.versions.draft : annotation.serializeAnnotation()) ?? [],
       draft_id: annotation.draftId,
       parent_prediction: annotation.parent_prediction,
       parent_annotation: annotation.parent_annotation,
