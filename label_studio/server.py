@@ -146,16 +146,19 @@ def _create_user(input_args, config):
                 print(f'User {DEFAULT_USERNAME} password changed')
             return user
 
-        if input_args.quiet_mode:
-            return None
+        """if input_args.quiet_mode:
+            return None"""
 
         print(f'Please enter default user email, or press Enter to use {DEFAULT_USERNAME}')
         username = input('Email: ')
         if not username:
             username = DEFAULT_USERNAME
-
-    if not password and not input_args.quiet_mode:
+    
+    if not password:
         password = getpass.getpass(f'User password for {username}: ')
+
+    """if not password and not input_args.quiet_mode:
+        password = getpass.getpass(f'User password for {username}: ')"""
 
     try:
         user = User.objects.create_user(email=username, password=password)
