@@ -3,8 +3,7 @@ import { observer } from "mobx-react";
 import chroma from "chroma-js";
 import { Button } from "antd";
 
-import { IconCommentLinkTo, IconWarning, LsClose } from "../../../assets/icons";
-import { Tooltip } from "../../../common/Tooltip/Tooltip";
+import { IconCommentLinkTo, LsClose } from "../../../assets/icons";
 import { Block, Elem } from "../../../utils/bem";
 import { NodeIcon } from "../../Node/Node";
 import { RegionLabel } from "../../SidePanels/OutlinerPanel/RegionLabel";
