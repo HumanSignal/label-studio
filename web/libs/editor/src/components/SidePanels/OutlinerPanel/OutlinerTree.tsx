@@ -164,7 +164,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
 
   return (
     <Block name="outliner-tree" {...(isFF(FF_OUTLINER_OPTIM) ? { ref: setRef } : {})}>
-      {!!height && (
+      {(!!height || !isFF(FF_OUTLINER_OPTIM)) && (
         <Tree
           key={regions.group}
           draggable={regions.group === "manual"}
