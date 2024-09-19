@@ -692,7 +692,7 @@ There are two modes available:
 
 <div align="left">
   <a href="https://www.youtube.com/watch?v=tfMn5q1tqKI" title="Video Frame Classification with YOLOv8 and Label Studio">
-    <img src="http://img.youtube.com/vi/tfMn5q1tqKI/0.jpg" alt="Video Temporal Classification video" style="width:50%;"/>
+    <img src="https://github.com/user-attachments/assets/6b00fdc1-e19b-4312-86f4-20d8a1de6f20" alt="Video Temporal Classification video" style="width:100%;"/>
       <br>
     Check the video tutorial
   </a>
