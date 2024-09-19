@@ -15,6 +15,11 @@ date: 2024-09-03 09:57:28
     This page covers common user troubleshooting scenarios for Label Studio Community version. For information specific to Label Studio Enterprise, see our [support center articles](https://support.humansignal.com/hc/en-us). 
 
 
+## Installation
+
+See [Troubleshoot installation issues](install_troubleshoot).
+
+
 ## Projects
 
 ### Blank page when loading a project
@@ -205,9 +210,9 @@ Absolute local path from Local Storage settings = c:\data\media\subpath
 
 ## Pre-annotations
 
-### Image annotation units
+Check that you are using the correct annotation units. 
 
-{% details <b>Click for details</b> %}
+{% details <b>Image annotation units</b> %}
 
 <!-- md image_units.md -->
 
