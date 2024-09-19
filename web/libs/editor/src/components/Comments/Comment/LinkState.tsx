@@ -37,6 +37,7 @@ type LinkedRegionProps = {
   item: any;
   onUnlink?: (item: any) => void;
 };
+
 const LinkedRegion: FC<LinkedRegionProps> = observer(({ item, onUnlink }) => {
   const itemColor = item?.background ?? item?.getOneColor?.();
 
