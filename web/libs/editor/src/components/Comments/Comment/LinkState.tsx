@@ -3,11 +3,10 @@ import { observer } from "mobx-react";
 import chroma from "chroma-js";
 import { Button } from "antd";
 
-import { IconCommentLinkTo, IconWarning, LsClose } from "../../../assets/icons";
-import { Tooltip } from "../../../common/Tooltip/Tooltip";
+import { IconCommentLinkTo, LsClose } from "../../../assets/icons";
 import { Block, Elem } from "../../../utils/bem";
 import { NodeIcon } from "../../Node/Node";
-import { displayRegionLabel } from "../../SidePanels/OutlinerPanel/OutlinerTree";
+import { RegionLabel } from "../../SidePanels/OutlinerPanel/RegionLabel";
 
 import "./LinkState.scss";
 
@@ -56,7 +55,7 @@ const LinkedRegion: FC<LinkedRegionProps> = observer(({ item, onUnlink }) => {
       </Elem>
       <Elem name="index">{item.region_index}</Elem>
       <Elem name="title">
-        {displayRegionLabel(item)}
+        <RegionLabel item={item} />
         {item?.text && <Elem name="text">{item.text.replace(/\\n/g, "\n")}</Elem>}
       </Elem>
       {onUnlink && (

@@ -1,6 +1,6 @@
 {
-  "message": "chore: TRIAG-851: Resolve a development dependency to satisfy dependabot issue (#6393)",
-  "commit": "fb75c7a7b4c820411ba6c05cc48bb746759fe3e7",
-  "date": "2024-09-16T22:41:05.000Z",
+  "message": "feat: LEAP-1469: Implement universal linking modes (#6395)",
+  "commit": "f950fa3e0479ccd3ba480b688e692e8223ae133e",
+  "date": "2024-09-19T11:19:41.000Z",
   "branch": "develop"
 }
