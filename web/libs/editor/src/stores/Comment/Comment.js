@@ -60,6 +60,8 @@ export const Comment = types
       self.isConfirmDelete = newMode;
     }
 
+    function setRegionLink(region) {}
+
     const updateComment = flow(function* (comment) {
       if (self.isPersisted && !self.isDeleted) {
         yield self.sdk.invoke("comments:update", {
@@ -89,5 +91,6 @@ export const Comment = types
       setConfirmMode,
       updateComment,
       deleteComment,
+      setRegionLink,
     };
   });
