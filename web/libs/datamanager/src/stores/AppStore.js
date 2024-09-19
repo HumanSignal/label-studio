@@ -635,7 +635,7 @@ export const AppStore = types
       };
 
       if (actionId === "next_task") {
-        const isSelectAll = actionParams.selectedItems.all === true && actionParams.selectedItems.excluded.length === 0;
+        const isSelectAll = actionParams.selectedItems.all === true;
         const isAllLabelStreamMode = labelStreamMode === "all";
         const isFilteredLabelStreamMode = labelStreamMode === "filtered";
         if (isAllLabelStreamMode && !isSelectAll) {
