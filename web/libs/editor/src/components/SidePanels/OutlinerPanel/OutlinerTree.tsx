@@ -28,7 +28,7 @@ import { RegionControlButton } from "../Components/RegionControlButton";
 import "./TreeView.scss";
 import ResizeObserver from "../../../utils/resize-observer";
 import type { EventDataNode, Key } from "rc-tree/es/interface";
-import {RegionLabel} from "./RegionLabel";
+import { RegionLabel } from "./RegionLabel";
 
 const { localStorage } = window;
 const localStoreName = "collapsed-label-pos";
