@@ -83,22 +83,6 @@ const CustomControl = observer(({ button, onClick }: CustomControlProps) => {
   );
 });
 
-export const CustomControls = controlsInjector<{}>(
-  observer(({ store }) => {
-    const buttons = store.customButtons;
-
-    if (!buttons.length) return null;
-
-    return (
-      <Block name="controls">
-        {buttons.map((button) => (
-          <CustomControl button={button} onClick={store.handleCustomButton} />
-        ))}
-      </Block>
-    );
-  }),
-);
-
 export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
   observer(({ store, history, annotation }) => {
     const isReview = store.hasInterface("review") || annotation.canBeReviewed;
