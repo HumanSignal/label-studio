@@ -9,6 +9,7 @@ import ToolsManager from "../tools/Manager";
 import Utils from "../utils";
 import { guidGenerator } from "../utils/unique";
 import { clamp, delay, isDefined } from "../utils/utilities";
+import { CREATE_RELATION_MODE } from "./Annotation/LinkingModes";
 import AnnotationStore from "./Annotation/store";
 import Project from "./ProjectStore";
 import Settings from "./SettingsStore";
@@ -386,8 +387,8 @@ export default types
       hotkeys.addNamed("region:relation", () => {
         const c = self.annotationStore.selected;
 
-        if (c && c.highlightedNode && !c.relationMode) {
-          c.startRelationMode(c.highlightedNode);
+        if (c && c.highlightedNode && !c.isLinkingMode) {
+          c.startLinkingMode(CREATE_RELATION_MODE, c.highlightedNode);
         }
       });
 
@@ -396,7 +397,7 @@ export default types
         e.preventDefault();
         const c = self.annotationStore.selected;
 
-        if (c && c.highlightedNode && !c.relationMode) {
+        if (c && c.highlightedNode && !c.isLinkingMode) {
           c.highlightedNode.requestPerRegionFocus();
         }
       });
@@ -405,7 +406,7 @@ export default types
       hotkeys.addNamed("region:unselect", () => {
         const c = self.annotationStore.selected;
 
-        if (c && !c.relationMode && !c.isDrawing) {
+        if (c && !c.isLinkingMode && !c.isDrawing) {
           self.annotationStore.history.forEach((obj) => {
             obj.unselectAll();
           });
@@ -417,7 +418,7 @@ export default types
       hotkeys.addNamed("region:visibility", () => {
         const c = self.annotationStore.selected;
 
-        if (c && !c.relationMode) {
+        if (c && !c.isLinkingMode) {
           c.hideSelectedRegions();
         }
       });
@@ -437,8 +438,8 @@ export default types
       hotkeys.addNamed("region:exit", () => {
         const c = self.annotationStore.selected;
 
-        if (c && c.relationMode) {
-          c.stopRelationMode();
+        if (c && c.isLinkingMode) {
+          c.stopLinkingMode();
         } else if (!c.isDrawing) {
           c.unselectAll();
         }

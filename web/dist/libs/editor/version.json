@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-1087: Label Config Preview not handling editor lifecycle correctly for updates (#6381)",
-  "commit": "d3f251bf8a02bc69c7c001d448726279292add02",
-  "date": "2024-09-18T16:03:41.000Z",
+  "message": "feat: LEAP-1469: Implement universal linking modes (#6395)",
+  "commit": "f950fa3e0479ccd3ba480b688e692e8223ae133e",
+  "date": "2024-09-19T11:19:41.000Z",
   "branch": "develop"
 }

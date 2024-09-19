@@ -260,7 +260,7 @@ export const HighlightMixin = types
           self.addClass(STATE_CLASS_MODS.highlighted);
         } else {
           self.addClass(self._stylesheet.state.highlighted);
-          self._stylesheet?.setCursor(Constants.RELATION_MODE_CURSOR);
+          self._stylesheet?.setCursor(Constants.LINKING_MODE_CURSOR);
         }
       } else {
         if (isFF(FF_LSDV_4620_3)) {

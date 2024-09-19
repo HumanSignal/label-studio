@@ -695,12 +695,12 @@ const HtxBrushView = ({ item, setShapeRef }) => {
           //     e.cancelBubble = false;
           // }}
           onMouseDown={(e) => {
-            if (store.annotationStore.selected.relationMode) {
+            if (store.annotationStore.selected.isLinkingMode) {
               e.cancelBubble = true;
             }
           }}
           onMouseOver={() => {
-            if (store.annotationStore.selected.relationMode) {
+            if (store.annotationStore.selected.isLinkingMode) {
               item.setHighlight(true);
               stage.container().style.cursor = "crosshair";
             } else {
@@ -709,7 +709,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
             }
           }}
           onMouseOut={() => {
-            if (store.annotationStore.selected.relationMode) {
+            if (store.annotationStore.selected.isLinkingMode) {
               item.setHighlight(false);
             }
 
@@ -719,7 +719,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
           }}
           onClick={(e) => {
             if (item.parent.getSkipInteractions()) return;
-            if (store.annotationStore.selected.relationMode) {
+            if (store.annotationStore.selected.isLinkingMode) {
               item.onClickRegion(e);
               return;
             }
@@ -731,7 +731,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
               if (tool && !isMoveTool) return;
             }
 
-            if (store.annotationStore.selected.relationMode) {
+            if (store.annotationStore.selected.isLinkingMode) {
               stage.container().style.cursor = "default";
             }
 
