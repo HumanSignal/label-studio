@@ -1,5 +1,6 @@
 .link-state {
   $block: &;
+
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -7,7 +8,7 @@
   font-size: 13px;
   line-height: 1.2em;
   transition: color 0.2s ease;
-  padding: 6px 4px 5px 4px;
+  padding: 6px 4px 5px;
 
   &_display {
     padding: 2px 9px 5px 4px;
@@ -50,7 +51,6 @@
     display: flex;
     flex: none;
     max-width: 24px;
-    width: -moz-min-content;
     width: min-content;
     align-items: center;
     justify-content: center;
