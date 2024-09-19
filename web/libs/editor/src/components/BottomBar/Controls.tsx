@@ -5,20 +5,43 @@
  */
 
 import { inject, observer } from "mobx-react";
+import { type Instance } from "mobx-state-tree";
+import { memo, ReactNode, useCallback, useState } from "react";
+
+import { IconBan, LsChevron } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
-import { Tooltip } from "../../common/Tooltip/Tooltip";
-import { Block, cn, Elem } from "../../utils/bem";
-import { isDefined } from "../../utils/utilities";
-import { IconBan } from "../../assets/icons";
-import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
-import "./Controls.scss";
-import { useCallback, useMemo, useState } from "react";
-import { LsChevron } from "../../assets/icons";
 import { Dropdown } from "../../common/Dropdown/DropdownComponent";
+import { Tooltip } from "../../common/Tooltip/Tooltip";
+import { CustomButton } from "../../stores/CustomButton";
+import { Block, cn, Elem } from "../../utils/bem";
+import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
+import { isDefined } from "../../utils/utilities";
+
+import "./Controls.scss";
 
 const TOOLTIP_DELAY = 0.8;
 
-const ButtonTooltip = inject("store")(
+type ButtonTooltipProps = {
+  title: string;
+  children: JSX.Element;
+};
+
+type MixedInParams = {
+  store: MSTStore;
+  history: any;
+}
+
+function controlsInjector<T extends {}>(fn: (props: T & MixedInParams) => ReactNode) {
+  const wrapped = inject(({ store }) => {
+    return {
+      store,
+      history: store?.annotationStore?.selected?.history,
+    };
+  })(fn);
+  return wrapped as unknown as (props: T) => ReactNode;
+}
+
+const ButtonTooltip = controlsInjector<ButtonTooltipProps>(
   observer(({ store, title, children }) => {
     return (
       <Tooltip title={title} enabled={store.settings.enableTooltips} mouseEnterDelay={TOOLTIP_DELAY}>
@@ -28,14 +51,55 @@ const ButtonTooltip = inject("store")(
   }),
 );
 
-const controlsInjector = inject(({ store }) => {
-  return {
-    store,
-    history: store?.annotationStore?.selected?.history,
-  };
+type CustomControlProps = {
+  button: Instance<typeof CustomButton>;
+  onClick?: (name: string) => void;
+};
+
+const CustomControl = observer(({ button, onClick }: CustomControlProps) => {
+  const look = button.disabled ? "disabled" : button.look;
+  const [waiting, setWaiting] = useState(false);
+  const clickHandler = useCallback(
+    async () => {
+      if (!onClick) return;
+      setWaiting(true);
+      await onClick?.(button.name);
+      setWaiting(false);
+    },
+    [button],
+  );
+  return (
+    <ButtonTooltip key={button.name} title={button.tooltip ?? ""}>
+      <Button
+        aria-label={button.ariaLabel}
+        disabled={button.disabled}
+        look={look}
+        onClick={clickHandler}
+        waiting={waiting}
+      >
+        {button.title}
+      </Button>
+    </ButtonTooltip>
+  );
 });
 
-export const Controls = controlsInjector(
+export const CustomControls = controlsInjector<{}>(
+  observer(({ store }) => {
+    const buttons = store.customButtons;
+
+    if (!buttons.length) return null;
+
+    return (
+      <Block name="controls">
+        {buttons.map((button) => (
+          <CustomControl button={button} onClick={store.handleCustomButton} />
+        ))}
+      </Block>
+    );
+  }),
+);
+
+export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
   observer(({ store, history, annotation }) => {
     const isReview = store.hasInterface("review") || annotation.canBeReviewed;
     const isNotQuickView = store.hasInterface("topbar:prevnext");
@@ -80,7 +144,8 @@ export const Controls = controlsInjector(
       ],
     );
 
-    const RejectButton = useMemo(() => {
+    // @todo memo?
+    const RejectButton = memo(({ disabled, store }: { disabled: boolean, store: MSTStore }) => {
       return (
         <ButtonTooltip key="reject" title="Reject annotation: [ Ctrl+Space ]">
           <Button
@@ -102,12 +167,10 @@ export const Controls = controlsInjector(
           </Button>
         </ButtonTooltip>
       );
-    }, [disabled, store]);
+    });
 
-    if (isReview) {
-      buttons.push(RejectButton);
-
-      buttons.push(
+    const AcceptButton = memo(({ disabled, history, store }: { disabled: boolean, history: any, store: MSTStore }) => {
+      return (
         <ButtonTooltip key="accept" title="Accept annotation: [ Ctrl+Enter ]">
           <Button
             aria-label="accept-annotation"
@@ -123,8 +186,19 @@ export const Controls = controlsInjector(
           >
             {history.canUndo ? "Fix + Accept" : "Accept"}
           </Button>
-        </ButtonTooltip>,
+        </ButtonTooltip>
       );
+    });
+
+    if (store.customButtons?.length) {
+      for (const customButton of store.customButtons ?? []) {
+        buttons.push(
+          <CustomControl key={customButton.key} button={customButton} onClick={store.handleCustomButton} />,
+        );
+      }
+    } else if (isReview) {
+      buttons.push(<RejectButton disabled={disabled} store={store} />);
+      buttons.push(<AcceptButton disabled={disabled} history={history} store={store} />);
     } else if (annotation.skipped) {
       buttons.push(
         <Elem name="skipped-info" key="skipped">
