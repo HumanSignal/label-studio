@@ -192,9 +192,14 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
     if (store.customButtons?.length) {
       for (const customButton of store.customButtons ?? []) {
-        buttons.push(
-          <CustomControl key={customButton.key} button={customButton} onClick={store.handleCustomButton} />,
-        );
+        // @todo make a list of all internal buttons and use them here to mix custom buttons with internal ones
+        if (customButton.name === "accept") {
+          buttons.push(<AcceptButton disabled={disabled} history={history} store={store} />);
+        } else {
+          buttons.push(
+            <CustomControl key={customButton.name} button={customButton} onClick={store.handleCustomButton} />,
+          );
+        }
       }
     } else if (isReview) {
       buttons.push(<RejectButton disabled={disabled} store={store} />);
