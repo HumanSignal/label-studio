@@ -33,6 +33,7 @@ export const LinkState: FC<LinkStateProps> = ({ linking, region, onUnlink }) => 
     </Block>
   );
 };
+
 type LinkedRegionProps = {
   item: any;
   onUnlink?: (item: any) => void;
