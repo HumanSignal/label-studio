@@ -26,6 +26,7 @@ import { CommentStore } from "../Comment/CommentStore";
 import RegionStore from "../RegionStore";
 import RelationStore from "../RelationStore";
 import { UserExtended } from "../UserStore";
+import { LinkingModes } from "./LinkingModes";
 
 const hotkeys = Hotkey("Annotations", "Annotations");
 
@@ -96,8 +97,8 @@ const TrackedState = types.model("TrackedState", {
   relationStore: types.optional(RelationStore, {}),
 });
 
-export const Annotation = types
-  .model("Annotation", {
+const _Annotation = types
+  .model("AnnotationBase", {
     id: types.identifier,
     // @todo this value used `guidGenerator(5)` as default value before
     // @todo but it calculates once, so all the annotations have the same pk
@@ -145,8 +146,6 @@ export const Annotation = types
 
     editable: types.optional(types.boolean, true),
     readonly: types.optional(types.boolean, false),
-
-    relationMode: types.optional(types.boolean, false),
 
     suggestions: types.map(Area),
 
@@ -489,22 +488,6 @@ export const Annotation = types
       destroy(area);
     },
 
-    startRelationMode(node1) {
-      self._relationObj = node1;
-      self.relationMode = true;
-
-      document.body.style.cursor = Constants.CHOOSE_CURSOR;
-    },
-
-    stopRelationMode() {
-      document.body.style.cursor = Constants.DEFAULT_CURSOR;
-
-      self._relationObj = null;
-      self.relationMode = false;
-
-      self.regionStore.unhighlightAll();
-    },
-
     deleteAllRegions({ deleteReadOnly = false } = {}) {
       let regions = Array.from(self.areas.values());
 
@@ -533,9 +516,9 @@ export const Annotation = types
     addRegion(reg) {
       self.regionStore.unselectAll(true);
 
-      if (self.relationMode) {
-        self.addRelation(reg);
-        self.stopRelationMode();
+      if (self.isLinkingMode) {
+        self.addLinkedRegion(reg);
+        self.stopLinkingMode();
       }
     },
 
@@ -547,10 +530,6 @@ export const Annotation = types
           mainViewTag.unselectAll && mainViewTag.unselectAll();
           mainViewTag.perRegionCleanup && mainViewTag.perRegionCleanup();
         });
-    },
-
-    addRelation(reg) {
-      self.relationStore.addRelation(self._relationObj, reg);
     },
 
     validate() {
@@ -581,7 +560,7 @@ export const Annotation = types
         }
       });
 
-      self.stopRelationMode();
+      self.stopLinkingMode();
       self.unselectAll();
     },
 
@@ -1432,3 +1411,5 @@ export const Annotation = types
       self.areas.forEach((area) => area.setReady && area.setReady(false));
     },
   }));
+
+export const Annotation = types.compose("Annotation", LinkingModes, _Annotation);

@@ -643,9 +643,9 @@ const Model = types
           if (isFF(FF_ZOOM_OPTIM)) {
             if (skipInteractions) return true;
 
-            const relationMode = self.annotation.relationMode;
+            const isLinkingMode = self.annotation.isLinkingMode;
 
-            if (relationMode) return false;
+            if (isLinkingMode) return false;
 
             const manager = self.getToolsManager();
             const tool = manager.findSelectedTool();

@@ -130,9 +130,9 @@ export const KonvaRegionMixin = types
           deferredSelectId = null;
         };
 
-        if (!annotation.isReadOnly() && annotation.relationMode) {
-          annotation.addRelation(self);
-          annotation.stopRelationMode();
+        if (!annotation.isReadOnly() && annotation.isLinkingMode) {
+          annotation.addLinkedRegion(self);
+          annotation.stopLinkingMode();
           annotation.regionStore.unselectAll();
         } else {
           if (isFF(FF_DBLCLICK_DELAY)) {

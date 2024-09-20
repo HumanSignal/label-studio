@@ -14,6 +14,10 @@ After multiple labelers have annotated tasks, review their output to validate th
 
 The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
 
+See the following video for an overview of reviewer workflows: 
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/dhBrphE7PHo?si=YMRI-omwxoQFuhma" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 
 ## Why review annotations?
 
@@ -133,11 +137,16 @@ Review a table to see the following for each annotator:
 - The agreement of their annotations with the ground truth annotations, if there are any.
 - The agreement of their annotations with predicted annotations, if there are any.
 
+See the following video for an overview of annotator agreement metrics: 
+
+<iframe class="video-border" width="560" height="315" src="https://www.youtube.com/embed/Lo_PVE9Pyw4?si=z1vtyI_xIo8aR8fY" width="100%" height="400vh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
 ### Review annotator agreement matrix
 
 You can also review the overall annotator agreement on a more individual basis with the annotator agreement matrix.
 
-Review the annotator agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. You can also filter the matrix to show specific agreement statistics for each label, or view the **Overall** agreement matrix. See more about [how annotator agreement is calculated](stats.html).
+Review the annotator agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. You can also filter the matrix to show specific agreement statistics for each label, or view the **Overall** agreement matrix. See more about [how annotator agreement is calculated](stats).
 
 To see the specific annotations contributing to the agreement, do the following:
 

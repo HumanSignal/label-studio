@@ -178,7 +178,7 @@ export const AudioRegionModel = types
     onClick(wavesurfer, ev) {
       // if (! self.editable) return;
 
-      if (!self.annotation.relationMode) {
+      if (!self.annotation.isLinkingMode) {
         // Object.values(wavesurfer.regions.list).forEach(r => {
         //   // r.update({ color: self.selectedregionbg });
         // });
@@ -190,14 +190,14 @@ export const AudioRegionModel = types
     },
 
     onMouseOver() {
-      if (self.annotation.relationMode) {
+      if (self.annotation.isLinkingMode) {
         self.setHighlight(true);
-        self._ws_region.element.style.cursor = Constants.RELATION_MODE_CURSOR;
+        self._ws_region.element.style.cursor = Constants.LINKING_MODE_CURSOR;
       }
     },
 
     onMouseLeave() {
-      if (self.annotation.relationMode) {
+      if (self.annotation.isLinkingMode) {
         self.setHighlight(false);
         self._ws_region.element.style.cursor = Constants.MOVE_CURSOR;
       }

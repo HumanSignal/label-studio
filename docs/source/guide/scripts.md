@@ -24,6 +24,10 @@ Custom scripts are defined in the project settings under the Labeling Interface 
 !!! note
     Only users who are in the Admin, Owner, or Manager role can access the project settings to configure custom scripts. 
 
+See the following video for a brief overview and demonstration of custom scripts:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/Spwg81kJdGo?si=miRkS7DDYe9aLyUw" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Use cases
 
 Custom scripts allow you to enhance and tailor your labeling interface and workflow. For example:

@@ -1,6 +1,6 @@
 {
-  "message": "chore(deps): bump body-parser from 1.19.0 to 1.20.3 in /web/libs/editor/tests/e2e (#6362)",
-  "commit": "6ec51dd93ee5cf56ffb2fdbda90c8627513fa054",
-  "date": "2024-09-16T18:56:52.000Z",
+  "message": "fix: OPTIC-447: Filters don't pass to label stream in DM (#6410)",
+  "commit": "040024385d40e125ac8096b773ef88b78e3680c5",
+  "date": "2024-09-20T12:18:26.000Z",
   "branch": "develop"
 }
