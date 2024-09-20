@@ -27,8 +27,8 @@ class ModelProviderConnection(models.Model):
 
     endpoint = models.CharField(max_length=512, null=True, blank=True, help_text='Azure OpenAI endpoint')
 
-    cached_available_models = models.CharField(
-        max_length=4096, null=True, blank=True, help_text='List of available models from the provider'
+    cached_available_models = models.TextField(
+        null=True, blank=True, help_text='List of available models from the provider'
     )
 
     scope = models.CharField(
