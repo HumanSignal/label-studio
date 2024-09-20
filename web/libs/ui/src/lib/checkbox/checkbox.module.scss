@@ -4,7 +4,6 @@
   justify-content: center;
 
   &__box {
-    overflow: hidden;
     position: relative;
     white-space: nowrap;
     display: inline-block;
@@ -25,6 +24,11 @@
     height: 100%;
     border: none;
     position: absolute;
+    &:focus {
+      + .checkbox__check {
+        outline: 2px solid var(--grape_700);
+      }
+    }
   }
 
   &__check {
