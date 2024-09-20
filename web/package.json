@@ -176,7 +176,6 @@
     "pngjs": "^7.0.0",
     "postcss": "^8.4.6",
     "postcss-loader": "^7.3.3",
-    "prettier": "^2.6.2",
     "proper-lockfile": "^4.1.2",
     "react-refresh": "^0.10.0",
     "sass": "^1.32.12",
