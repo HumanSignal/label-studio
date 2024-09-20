@@ -153,7 +153,6 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
     "chai": "^4.3.7",
-    "core-js": "^3.6.5",
     "css-loader": "^5.0.1",
     "css-minimizer-webpack-plugin": "^3.0.2",
     "cypress": "^12.11.0",
