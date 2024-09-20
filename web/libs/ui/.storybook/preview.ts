@@ -1,4 +1,4 @@
-import './preview.scss';
+import "./preview.scss";
 
 // ... existing configuration ...
 
