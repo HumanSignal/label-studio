@@ -2,7 +2,9 @@ import { applySnapshot, getSnapshot, types } from "mobx-state-tree";
 import { guidGenerator } from "../utils/unique";
 
 /**
- * Custom buttons 
+ * Custom buttons that can be injected from outside application.
+ * The only required property is `name`. If the `name` is one of the predefined buttons, it will be rendered as such.
+ * @see CustomControl in BottomBar/Controls
  */
 export const CustomButton = types
   .model("CustomButton", {

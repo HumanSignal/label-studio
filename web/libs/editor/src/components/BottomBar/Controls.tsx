@@ -38,6 +38,7 @@ function controlsInjector<T extends {}>(fn: (props: T & MixedInParams) => ReactN
       history: store?.annotationStore?.selected?.history,
     };
   })(fn);
+  // inject type doesn't handle the injected props, so we have to force cast it
   return wrapped as unknown as (props: T) => ReactNode;
 }
 
@@ -56,6 +57,9 @@ type CustomControlProps = {
   onClick?: (name: string) => void;
 };
 
+/**
+ * Custom action button component, rendering buttons from store.customButtons
+ */
 const CustomControl = observer(({ button, onClick }: CustomControlProps) => {
   const look = button.disabled ? "disabled" : button.look;
   const [waiting, setWaiting] = useState(false);
@@ -69,7 +73,7 @@ const CustomControl = observer(({ button, onClick }: CustomControlProps) => {
     [button],
   );
   return (
-    <ButtonTooltip key={button.name} title={button.tooltip ?? ""}>
+    <ButtonTooltip title={button.tooltip ?? ""}>
       <Button
         aria-label={button.ariaLabel}
         disabled={button.disabled}
@@ -128,7 +132,6 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       ],
     );
 
-    // @todo memo?
     const RejectButton = memo(({ disabled, store }: { disabled: boolean, store: MSTStore }) => {
       return (
         <ButtonTooltip key="reject" title="Reject annotation: [ Ctrl+Space ]">
@@ -174,6 +177,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       );
     });
 
+    // custom buttons replace all the internal buttons, but they can be reused if `name` is one of the internal buttons
     if (store.customButtons?.length) {
       for (const customButton of store.customButtons ?? []) {
         // @todo make a list of all internal buttons and use them here to mix custom buttons with internal ones
