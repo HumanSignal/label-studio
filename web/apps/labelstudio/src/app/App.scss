@@ -10,7 +10,7 @@ body {
   margin: 0;
   font-family: Figtree, sans-serif;
   display: flex;
-  > div:first-child {
+  :global(.login_page_new_ui), :global(.app-wrapper) {
     flex: 1;
   }
 }
