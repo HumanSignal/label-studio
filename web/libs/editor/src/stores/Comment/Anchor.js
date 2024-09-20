@@ -2,7 +2,6 @@ import { getParent, types } from "mobx-state-tree";
 
 export const Anchor = types
   .model({
-    // id: types.optional(types.identifier, guidGenerator),
     regionId: types.maybe(types.string),
     controlName: types.maybe(types.string),
   })
