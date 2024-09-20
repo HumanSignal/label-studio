@@ -1,18 +1,18 @@
 .mark {
-  cursor: pointer;
-  background-color: #f6ffed;
-  border: 1px solid #b7eb8f;
-  border-radius: 5px;
+  background-color: var(--sand_100);
+  border: 1px solid var(--sand_300);
+  border-radius: 4px;
   margin: 0;
   padding: 0.4em 1em;
   white-space: pre-line;
+  box-shadow: 0px 4px 12px 0px var(--black_4), 0px 1px 2px 0px var(--black_10);
 
   &.selected {
-    border: 1px solid red;
+    border: 1px solid var(--persimmon_500);
   }
 
   &.highlighted {
-    border: 1px dashed #00aeff;
+    border: 1px dashed var(--grape_600);
   }
 
   &.relation {
@@ -29,7 +29,14 @@
 
 .row {
   display: flex;
-  margin-bottom: 0.5em;
+  margin-bottom: 1em;
+  flex-wrap: nowrap;
+  align-items: center;
+
+  .mark {
+    margin-bottom: 0;
+    flex-grow: 1;
+  }
 
   // fix antd styles to resize textarea container and fix paddings
   div[class~="ant-typography-edit-content"] {
@@ -37,11 +44,18 @@
     left: -1px;
     padding: 0;
     margin-top: -1px;
-    margin-bottom: calc(1.6em - 9px);
 
     textarea {
       // the same as in .mark, its padding set to 0
       padding: 0.4em 1em;
     }
+
+  }
+
+  span[class~="anticon"] {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: 0 0 0 0.5em;
   }
 }

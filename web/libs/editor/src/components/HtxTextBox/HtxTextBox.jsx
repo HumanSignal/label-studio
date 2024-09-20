@@ -177,13 +177,17 @@ export class HtxTextBox extends React.Component {
     return (
       <>
         <Paragraph {...props}>
-          <span ref={this.textRef}>{text}</span>
-          {isEditable && onChange && (
-            <EditOutlined onClick={this.startEditing} aria-label="Edit Region" className="ant-typography-edit" />
-          )}
+          <span ref={this.textRef}>{text}</span>          
         </Paragraph>
+        {isEditable && onChange && (
+          <Tooltip title="Edit">
+            <EditOutlined onClick={this.startEditing} aria-label="Edit Region" className="ant-typography-edit" />
+          </Tooltip>
+        )}
         {isDeleteable && onDelete && (
-          <DeleteOutlined className={styles.delete} aria-label="Delete Region" onClick={onDelete} />
+          <Tooltip title="Delete">
+            <DeleteOutlined className={styles.delete} aria-label="Delete Region" onClick={onDelete} />
+          </Tooltip>
         )}
       </>
     );
