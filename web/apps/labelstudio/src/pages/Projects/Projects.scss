@@ -16,7 +16,7 @@
     box-sizing: border-box;
     grid-gap: 32px;
     grid-auto-rows: 1fr;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(1, 1fr);
   }
 
   &__link {
@@ -39,6 +39,12 @@
     padding: 10px 40px;
     justify-content: flex-end;
     box-sizing: border-box;
+  }
+
+  @media (width >= 780px) {
+    &__list {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 
   @media (width >= 1200px) {

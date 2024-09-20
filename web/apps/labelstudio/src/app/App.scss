@@ -9,6 +9,10 @@ body {
 
   margin: 0;
   font-family: Figtree, sans-serif;
+  display: flex;
+  > div:first-child {
+    flex: 1;
+  }
 }
 
 .app-wrapper {
