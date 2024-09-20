@@ -4,7 +4,7 @@ import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeGrid } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
 import { Block, Elem } from "../../../utils/bem";
-import { Checkbox } from "../../Common/Checkbox/Checkbox";
+import { Checkbox } from "@humansignal/ui";
 import { Space } from "../../Common/Space/Space";
 import { getProperty, prepareColumns } from "../../Common/Table/utils";
 import * as DataGroups from "../../DataGroups";

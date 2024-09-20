@@ -1,4 +1,5 @@
-import { Checkbox, Input } from "antd";
+import { Input } from "antd";
+import { Checkbox } from "@humansignal/ui";
 import { observer } from "mobx-react";
 import type { FC } from "react";
 import type { SettingsProperties, SettingsProperty } from "../../../core/settings/types";

@@ -22,6 +22,7 @@ import "./codemirror.css";
 import "./config-hint";
 import tags from "./schema.json";
 import { UnsavedChanges } from "./UnsavedChanges";
+import { Checkbox } from "@humansignal/ui";
 
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
@@ -184,7 +185,7 @@ const ConfigureSettings = ({ template }) => {
         return (
           <li key={key}>
             <label>
-              <input type="checkbox" checked={value} onChange={onChange} /> {options.title}
+              <Checkbox checked={value} onChange={onChange} /> {options.title}
             </label>
           </li>
         );

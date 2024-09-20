@@ -1,5 +1,5 @@
 import React from "react";
-import { Checkbox } from "../Checkbox/Checkbox";
+import { Checkbox } from "@humansignal/ui";
 
 const IndeterminateCheckbox = ({ checked, indeterminate, ...props }) => {
   return <Checkbox indeterminate={indeterminate && !checked} checked={checked} {...props} />;
