@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "ui:serve": "FRONTEND_HOSTNAME=http://localhost:3000 nx storybook ui",
-    "ui:test:component": "nx run storybook:test-component",
+    "ui:serve": "nx storybook ui",
+    "ui:test:component": "nx test-component ui",
     "lint": "biome check --apply .",
     "lint-scss": "yarn stylelint '**/*.scss' --fix",
     "ls:dev": "nx run labelstudio:serve:development",
