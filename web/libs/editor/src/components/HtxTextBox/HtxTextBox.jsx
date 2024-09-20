@@ -177,7 +177,7 @@ export class HtxTextBox extends React.Component {
     return (
       <>
         <Paragraph {...props}>
-          <span ref={this.textRef}>{text}</span>          
+          <span ref={this.textRef}>{text}</span>
         </Paragraph>
         {isEditable && onChange && (
           <Tooltip title="Edit">
