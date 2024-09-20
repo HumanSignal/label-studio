@@ -9,6 +9,8 @@ import { useAPI } from "../../../providers/ApiProvider";
 
 const configClass = cn("configure");
 
+// Lazy load Label Studio with a single promise to avoid multiple loads
+// and enable as early as possible to load the dependencies once this component is mounted for the first time
 let dependencies;
 const loadDependencies = async () => {
   if (!dependencies) {
@@ -18,6 +20,7 @@ const loadDependencies = async () => {
 };
 
 export const Preview = ({ config, data, error, loading, project }) => {
+  // @see comment about dependencies above
   loadDependencies();
 
   const lsf = useRef(null);
@@ -59,6 +62,8 @@ export const Preview = ({ config, data, error, loading, project }) => {
   }, [config]);
 
   const initLabelStudio = useCallback(async (config, task) => {
+    // wait for dependencies to load, the promise is resolved only once
+    // and is started when the component is mounted for the first time
     await loadDependencies();
 
     if (lsf.current || !task.data) return;
