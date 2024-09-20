@@ -9,15 +9,21 @@ import { useAPI } from "../../../providers/ApiProvider";
 
 const configClass = cn("configure");
 
-const loadDependencies = async () => import("@humansignal/editor");
+let dependencies;
+const loadDependencies = async () => {
+  if (!dependencies) {
+    dependencies = import("@humansignal/editor");
+  }
+  return dependencies;
+};
 
 export const Preview = ({ config, data, error, loading, project }) => {
-  const lsf = useRef(null);
-  const resolvingEditor = useMemo(loadDependencies);
-  const rootRef = useRef();
-  const projectRef = useRef(project);
-  const api = useAPI();
+  loadDependencies();
 
+  const lsf = useRef(null);
+  const rootRef = useRef();
+  const api = useAPI();
+  const projectRef = useRef(project);
   projectRef.current = project;
 
   const currentTask = useMemo(() => {
@@ -53,12 +59,12 @@ export const Preview = ({ config, data, error, loading, project }) => {
   }, [config]);
 
   const initLabelStudio = useCallback(async (config, task) => {
-    if (!task.data) return;
+    await loadDependencies();
 
-    await resolvingEditor;
+    if (lsf.current || !task.data) return;
 
     try {
-      const lsf = new window.LabelStudio(rootRef.current, {
+      lsf.current = new window.LabelStudio(rootRef.current, {
         config,
         task,
         interfaces: ["side-column"],
@@ -82,12 +88,9 @@ export const Preview = ({ config, data, error, loading, project }) => {
         },
       });
 
-      lsf.on("presignUrlForProject", onPresignUrlForProject);
-
-      return lsf;
+      lsf.current.on("presignUrlForProject", onPresignUrlForProject);
     } catch (err) {
       console.error(err);
-      return null;
     }
   }, []);
 
@@ -99,24 +102,12 @@ export const Preview = ({ config, data, error, loading, project }) => {
   }, [loading, error]);
 
   useEffect(() => {
-    if (!lsf.current) {
-      initLabelStudio(currentConfig, currentTask).then((ls) => {
-        lsf.current = ls;
-      });
-    }
-  }, [currentConfig, currentTask]);
+    initLabelStudio(currentConfig, currentTask);
 
-  useEffect(() => {
-    if (lsf.current?.store) {
-      lsf.current.store.assignConfig(currentConfig);
-      console.log("LSF config updated");
-    }
-  }, [currentConfig]);
-
-  useEffect(() => {
     if (lsf.current?.store) {
       const store = lsf.current.store;
 
+      store.assignConfig(currentConfig);
       store.resetState();
       store.assignTask(currentTask);
       store.initializeStore(currentTask);
@@ -126,18 +117,15 @@ export const Preview = ({ config, data, error, loading, project }) => {
       });
 
       store.annotationStore.selectAnnotation(c.id);
-      console.log("LSF task updated");
+      console.log("LSF updated");
     }
-  }, [currentTask]);
+  }, [currentConfig, currentTask]);
 
   useEffect(() => {
     return () => {
       if (lsf.current) {
         console.info("Destroying LSF");
-        // there can be weird error from LSF, but we can just skip it for now
-        try {
-          lsf.current.destroy();
-        } catch (e) {}
+        lsf.current.destroy();
         lsf.current = null;
       }
     };
