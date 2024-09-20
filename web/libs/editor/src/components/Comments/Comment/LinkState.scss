@@ -1,6 +1,4 @@
 .link-state {
-  $block: &;
-
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -23,10 +21,10 @@
     flex-flow: row;
     align-items: center;
 
-    #{$block}_action & {
+    .link-state_action & {
       color: var(--primary-action-color);
     }
-    #{$block}_display & {
+    .link-state_display & {
       color: var(--secondary-action-color-hover);
     }
 
