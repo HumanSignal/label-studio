@@ -2,6 +2,8 @@
   --black-raw: 0 0 0;
   --white-raw: 255 255 255;
   --accent_color-raw: 86 111 207;
+  --danger_color-raw: 221 0 0;
+  --danger_color_dimmed: rgb(var(--danger_color-raw) / 50%);
   --black: rgb(var(--black-raw));
   --white: rgb(var(--white-raw));
   --black_2:  rgb(var(--black-raw) / 2%);
@@ -82,10 +84,16 @@
   --primary-bright-secondary: var(--grape_0);
   --primary-bright-tertiary: var(--grape_100);
   --primary-text-on-background-dark: var(--grape_800);
+  --color-surface-on-base-subtle: var(--sand_600);
+  --color-negative-bold: #CC5E46;
+  --color-negative-background: #FFF1EE;
+  --color-negative-accent-light: #FFBAAA;
   --accent_color: var(--grape_500);
   --colors-surface-border: var(--sand_300);
   --colors-surface-icon-on-base: var(--sand_700);
   --colors-surface-text: var(--sand_700);
   --primary-button-waiting-animation-bg: repeating-linear-gradient(-63.43deg, hsl(0deg 0% 100% / 20%) 1px, transparent 2px, transparent 6px, hsl(0deg 0% 100% / 20%) 7px, hsl(0deg 0% 100% / 20%) 12px);
   --button-waiting-animation-bg: repeating-linear-gradient(-63.43deg,hsl(60deg 20% 99% / 20%) 1px,#efefef 2px,#efefef 6px,hsl(60deg 20% 99% / 20%) 7px,hsl(60deg 20% 99% / 20%) 12px);
+  --project-title-icon-primary-color: rgba(var(--black-raw), 0.35);
+  --project-title-icon-alternate-color: rgba(var(--white-raw), 0.35);
 }
