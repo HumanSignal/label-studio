@@ -6,7 +6,7 @@ Run `yarn nx test ui` to execute the unit tests via [Jest](https://jestjs.io).
 
 ## Running Storybook
 
-Run `yarn ui:serve` to run the Storybook development server on http://localhost:3000
+Run `yarn nx serve ui` to run the Storybook development server on http://localhost:4400
 
 ## Contribution Guidelines
 
