@@ -1,4 +1,4 @@
-# Spark: HumanSignal UI Library
+# Spark: Human Signal UI Library
 
 ## Running unit tests
 
