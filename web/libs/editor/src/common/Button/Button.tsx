@@ -34,6 +34,9 @@ export interface ButtonProps extends HTMLButtonProps {
   tooltip?: string;
   tooltipTheme?: "light" | "dark";
   nopadding?: boolean;
+  // Block props
+  // @todo can be imported/infered from Block
+  mod?: Record<string, any>;
 }
 
 export interface ButtonGroupProps {

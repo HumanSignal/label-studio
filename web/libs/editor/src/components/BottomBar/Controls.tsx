@@ -6,11 +6,11 @@
 
 import { inject, observer } from "mobx-react";
 import { type Instance } from "mobx-state-tree";
-import { memo, ReactNode, useCallback, useState } from "react";
+import React, { memo, ReactNode, useCallback, useState } from "react";
 
 import { IconBan, LsChevron } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
-import { Dropdown } from "../../common/Dropdown/DropdownComponent";
+import { Dropdown } from "../../common/Dropdown/Dropdown";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { CustomButton } from "../../stores/CustomButton";
 import { Block, cn, Elem } from "../../utils/bem";
@@ -97,7 +97,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
 
     const buttonHandler = useCallback(
-      async (e, callback, tooltipMessage) => {
+      async (e: React.MouseEvent, callback: () => any, tooltipMessage: string) => {
         const { addedCommentThisSession, currentComment, commentFormSubmit } = store.commentStore;
 
         if (isInProgress) return;
@@ -242,11 +242,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
       const useExitOption = !isDisabled && isNotQuickView;
 
-      const SubmitOption = ({ isUpdate, onClickMethod }) => {
+      const SubmitOption = ({ isUpdate, onClickMethod }: { isUpdate: boolean, onClickMethod: () => any}) => {
         return (
           <Button
             name="submit-option"
-            look="secondary"
+            look="primary"
             onClick={async (event) => {
               event.preventDefault();
 
@@ -285,7 +285,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                 look={look}
                 mod={{ has_icon: useExitOption, disabled: isDisabled }}
                 onClick={async (event) => {
-                  if (event.target.classList.contains(dropdownTrigger)) return;
+                  if ((event.target as HTMLButtonElement).classList.contains(dropdownTrigger)) return;
                   const selected = store.annotationStore?.selected;
 
                   selected?.submissionInProgress();
@@ -293,7 +293,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                   store.submitAnnotation();
                 }}
                 icon={
-                  useExitOption && (
+                  useExitOption ? (
                     <Dropdown.Trigger
                       alignment="top-right"
                       content={<SubmitOption onClickMethod={store.submitAnnotation} isUpdate={false} />}
@@ -302,7 +302,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                         <LsChevron />
                       </div>
                     </Dropdown.Trigger>
-                  )
+                  ) : undefined
                 }
               >
                 Submit
@@ -313,7 +313,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       }
 
       if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
-        const isUpdate = isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result;
+        const isUpdate = Boolean(isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result);
         // no changes were made over previously submitted version — no drafts, no pending changes
         const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
         const isUpdateDisabled = isDisabled || noChanges;
@@ -326,7 +326,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
               look={look}
               mod={{ has_icon: useExitOption, disabled: isUpdateDisabled }}
               onClick={async (event) => {
-                if (event.target.classList.contains(dropdownTrigger)) return;
+                if ((event.target as HTMLButtonElement).classList.contains(dropdownTrigger)) return;
                 const selected = store.annotationStore?.selected;
 
                 selected?.submissionInProgress();
@@ -334,7 +334,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                 store.updateAnnotation();
               }}
               icon={
-                useExitOption && (
+                useExitOption ? (
                   <Dropdown.Trigger
                     alignment="top-right"
                     content={<SubmitOption onClickMethod={store.updateAnnotation} isUpdate={isUpdate} />}
@@ -343,7 +343,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                       <LsChevron />
                     </div>
                   </Dropdown.Trigger>
-                )
+                ) : undefined
               }
             >
               {isUpdate ? "Update" : "Submit"}
