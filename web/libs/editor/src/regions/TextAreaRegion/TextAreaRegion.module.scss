@@ -1,18 +1,21 @@
 .mark {
-  background-color: var(--sand_100);
-  border: 1px solid var(--sand_300);
-  border-radius: 4px;
-  margin: 0;
-  padding: 0.4em 1em;
+  background-color: var(--surface-surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-small);
+  margin: 0 var(--spacing-small) 0 0 !important;
+  padding: var(--spacing-small) var(--spacing-medium);
   white-space: pre-line;
   box-shadow: 0px 4px 12px 0px var(--black_4), 0px 1px 2px 0px var(--black_10);
+  flex-grow: 1;
 
-  &.selected {
-    border: 1px solid var(--persimmon_500);
+  &[class*=selected] {
+    border: 1px solid var(--grape_500);
+    background-color: var(--primary-bright-secondary);
   }
 
-  &.highlighted {
-    border: 1px dashed var(--grape_600);
+  &[class*=highlighted] {
+    border: 1px dashed var(--grape_500);
+    background-color: var(--primary-bright-secondary);
   }
 
   &.relation {
@@ -20,22 +23,34 @@
   }
 }
 
-.delete {
-  color: #1890ff;
-  padding-top: 0.5em;
-  padding-left: 1em;
-  line-height: 1.8em;
-}
 
 .row {
   display: flex;
-  margin-bottom: 1em;
+  margin-bottom: var(--spacing-medium);
   flex-wrap: nowrap;
   align-items: center;
+  gap: var(--spacing-small);
 
-  .mark {
-    margin-bottom: 0;
-    flex-grow: 1;
+  > button {
+    display: flex;
+    border-radius: var(--radius-small);
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 0 0 32px;
+    height: 32px;
+
+    &:hover {
+      background-color: var(--sand_200);
+    }
+
+    &[class$=delete], &[class*=delete][class*=tooltip-open] {
+      color: var(--danger_color) !important;
+
+      &:hover {
+        background: var(--red_1) !important;
+        color: var(--danger_color);
+      }
+    }
   }
 
   // fix antd styles to resize textarea container and fix paddings
@@ -44,18 +59,11 @@
     left: -1px;
     padding: 0;
     margin-top: -1px;
+    margin-right: 0 !important;
 
     textarea {
       // the same as in .mark, its padding set to 0
-      padding: 0.4em 1em;
+      padding:  var(--spacing-small)  var(--spacing-medium);
     }
-
-  }
-
-  span[class~="anticon"] {
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    margin: 0 0 0 0.5em;
   }
 }
