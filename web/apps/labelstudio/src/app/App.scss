@@ -8,7 +8,7 @@ body {
   --menu-sidebar-width: 240px;
 
   margin: 0;
-  font-family: Figtree, sans-serif;
+  font-family: var(--font-family);
 }
 
 .app-wrapper {

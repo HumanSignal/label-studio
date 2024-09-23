@@ -269,7 +269,10 @@ $scroll-width: 5px;
   textarea,
   :global(.react-codemirror2) {
     flex: 1;
-    font-family: monospace;
+
+    --font-family: monospace;
+
+    font-family: var(--font-family);
 
     :global(.CodeMirror) {
       height: 100%;

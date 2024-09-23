@@ -402,7 +402,7 @@ const labelToSVG = (() => {
     const svg = document.createElement("svg");
     const svgText = document.createElement("text");
 
-    svgText.style = "font-size: 9.5px; font-weight: bold; color: red; fill: red; font-family: Monaco";
+    svgText.style = "font-size: 9.5px; font-weight: bold; color: red; fill: red; --font-family: Monaco; font-family: var(--font-family);";
     svgText.innerHTML = text;
 
     svg.appendChild(svgText);
@@ -429,13 +429,13 @@ const labelToSVG = (() => {
       const fillColor = Colors.getScaleGradient(score);
 
       items.push(`<rect x="0" y="0" rx="2" ry="2" width="24" height="14" style="fill:${fillColor};opacity:0.5" />`);
-      items.push(`<text x="3" y="10" style="font-size: 8px; font-family: Monaco">${score.toFixed(2)}</text>`);
+      items.push(`<text x="3" y="10" style="font-size: 8px; --font-family: Monaco; font-family: var(--font-family);">${score.toFixed(2)}</text>`);
       width = width + 26;
     }
 
     if (label) {
       items.push(
-        `<text x="${width}" y="11" style="font-size: 9.5px; font-weight: bold; font-family: Monaco">${label}</text>`,
+        `<text x="${width}" y="11" style="font-size: 9.5px; font-weight: bold; --font-family: Monaco; font-family: var(--font-family);">${label}</text>`,
       );
       width = width + calculateTextWidth(label) + 2;
     }

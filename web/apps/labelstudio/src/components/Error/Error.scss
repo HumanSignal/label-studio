@@ -34,7 +34,9 @@
     margin: 15px 0;
   }
 
-  &__stracktrace {
+  &__stacktrace {
+    --font-family: monaco, monospace;
+
     margin: 16px 0;
     padding: 16px;
     overflow: auto;
@@ -43,7 +45,6 @@
     white-space: pre;
     border-radius: 5px;
     background-color: var(--sand_100);
-    font-family: Monaco, monospace;
   }
 
   &__version {
