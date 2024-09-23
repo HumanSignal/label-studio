@@ -8,12 +8,12 @@
   box-shadow: 0 4px 12px 0 var(--black_4), 0 1px 2px 0 var(--black_10);
   flex-grow: 1;
 
-  &[class*="selected"] {
+  &.selected {
     border: 1px solid var(--grape_500);
     background-color: var(--primary-bright-secondary);
   }
 
-  &[class*="highlighted"] {
+  &.highlighted {
     border: 1px dashed var(--grape_500);
     background-color: var(--primary-bright-secondary);
   }
