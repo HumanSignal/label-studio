@@ -10,8 +10,10 @@ import { FF_DEV_3034, FF_PER_FIELD_COMMENTS, isFF } from "../../utils/feature-fl
 
 import "./Comments.scss";
 
-const CommentForm = isFF(FF_PER_FIELD_COMMENTS) ? CommentsFormNew : CommentFormOld;
-const CommentsList = isFF(FF_PER_FIELD_COMMENTS) ? CommentsListNew : CommentsListOld;
+const isPerFieldComments = isFF(FF_PER_FIELD_COMMENTS);
+
+const CommentForm = isPerFieldComments ? CommentsFormNew : CommentFormOld;
+const CommentsList = isPerFieldComments ? CommentsListNew : CommentsListOld;
 
 export const Comments: FC<{ annotationStore: any; commentStore: any; cacheKey?: string }> = observer(
   ({ annotationStore, commentStore, cacheKey }) => {
