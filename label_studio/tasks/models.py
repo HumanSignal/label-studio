@@ -1027,7 +1027,7 @@ class Prediction(models.Model):
 
             # given the data receive, create annotation regions in LS format
             # e.g. {"sentiment": "positive"} -> {"value": {"choices": ["positive"]}, "from_name": "", "to_name": "", ..}
-            pred = PredictionValue(result=label_interface.create_regions(data))
+            pred = PredictionValue(result=label_interface.create_regions(data)).model_dump()
 
             prediction = Prediction(
                 project=project,
@@ -1035,7 +1035,7 @@ class Prediction(models.Model):
                 model_version=model_version,
                 model_run=model_run,
                 score=1.0,  # Setting to 1.0 for now as we don't get back a score
-                result=pred.result,
+                result=pred['result'],
             )
             return prediction
         except Exception as exc:
@@ -1291,7 +1291,21 @@ def remove_predictions_from_project(sender, instance, **kwargs):
     """Remove predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count() - 1
     instance.task.save(update_fields=['total_predictions'])
+
+    # if there is PredictionMeta object associated with the Prediction object, delete it
+    if hasattr(instance, 'meta'):
+        logger.debug(f'Deleting PredictionMeta object associated with Prediction object {instance.id}')
+        instance.meta.delete()
+
     logger.debug(f'Updated total_predictions for {instance.task.id}.')
+
+
+@receiver(pre_delete, sender=FailedPrediction)
+def remove_failed_predictions_from_project(sender, instance, **kwargs):
+    # if there is PredictionMeta object associated with the Prediction object, delete it
+    if hasattr(instance, 'meta'):
+        logger.debug(f'Deleting PredictionMeta object associated with Prediction object {instance.id}')
+        instance.meta.delete()
 
 
 @receiver(post_save, sender=Prediction)

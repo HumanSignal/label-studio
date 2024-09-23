@@ -2,7 +2,6 @@
 title: TimelineLabels
 type: tags
 order: 429
-is_new: t
 meta_title: TimelineLabels tag
 meta_description: Classify video frames using TimelineLabels.
 ---
@@ -10,8 +9,6 @@ meta_description: Classify video frames using TimelineLabels.
 Use the TimelineLabels tag to classify video frames. This can be a single frame or a span of frames.
 
 First, select a label and then click once to annotate a single frame. Click and drag to annotate multiple frames.
-
-To move forward and backward in the timeline without labeling, ensure that no labels are selected before you click.
 
 ![Screenshot of video with frame classification](../images/timelinelabels.png)
 

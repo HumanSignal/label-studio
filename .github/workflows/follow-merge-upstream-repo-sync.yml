@@ -100,11 +100,11 @@ jobs:
         run: |
           set -xeuo pipefail
 
-          poetry add "https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip" --lock
+          poetry add "https://github.com/${{ steps.fm.outputs.repo_name }}/archive/${{ steps.fm.outputs.commit_sha }}.zip" --lock
 
           git add pyproject.toml poetry.lock
           git status -s
-          git commit --allow-empty -m '[submodules] Bump ${{ github.event.client_payload.repo_name }} version' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git commit --allow-empty -m '[submodules] Bump ${{ steps.fm.outputs.repo_name }} version' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
       - name: Find or Create PR

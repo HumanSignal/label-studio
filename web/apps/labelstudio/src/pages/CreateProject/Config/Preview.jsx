@@ -15,7 +15,10 @@ export const Preview = ({ config, data, error, loading, project }) => {
   const lsf = useRef(null);
   const resolvingEditor = useMemo(loadDependencies);
   const rootRef = useRef();
+  const projectRef = useRef(project);
   const api = useAPI();
+
+  projectRef.current = project;
 
   const currentTask = useMemo(() => {
     return {
@@ -37,7 +40,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
     // return same url if http(s)
     if (["http:", "https:"].includes(parsedUrl.protocol)) return url;
 
-    const projectId = project.id;
+    const projectId = projectRef.current.id;
 
     const fileuri = btoa(url);
 
@@ -101,18 +104,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
         lsf.current = ls;
       });
     }
-
-    return () => {
-      if (lsf.current) {
-        console.info("Destroying LSF");
-        // there is can be weird error from LSF, but we can just skip it for now
-        try {
-          lsf.current.destroy();
-        } catch (e) {}
-        lsf.current = null;
-      }
-    };
-  }, [initLabelStudio, currentConfig, currentTask]);
+  }, [currentConfig, currentTask]);
 
   useEffect(() => {
     if (lsf.current?.store) {
@@ -137,6 +129,19 @@ export const Preview = ({ config, data, error, loading, project }) => {
       console.log("LSF task updated");
     }
   }, [currentTask]);
+
+  useEffect(() => {
+    return () => {
+      if (lsf.current) {
+        console.info("Destroying LSF");
+        // there can be weird error from LSF, but we can just skip it for now
+        try {
+          lsf.current.destroy();
+        } catch (e) {}
+        lsf.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className={configClass.elem("preview")}>

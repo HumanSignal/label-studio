@@ -85,6 +85,7 @@
     transform: translate3d(0, -50%, 0);
   }
 
+  /** instant */
   &_timeline &__point:first-child:last-child {
     width: 6px;
     transform: translate3d(-50%, -50%, 0);

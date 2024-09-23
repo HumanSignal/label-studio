@@ -822,4 +822,14 @@ Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-da
 
 ### Troubleshooting pre-annotations
 
-See [Troubleshooting ML Backends & Predictions](https://support.humansignal.com/hc/en-us/sections/23627938255117-ML-Backend-Predictions) in the HumanSignal support center. 
+<div class="opensource-only">
+
+See [Troubleshooting pre-annotations](troubleshooting#Pre-annotations).
+
+</div>
+
+<div class="enterprise-only">
+
+See [Troubleshooting ML Backends & Predictions](https://support.humansignal.com/hc/en-us/sections/23627938255117-ML-Backend-Predictions) in the HumanSignal support center.
+
+</div>
