@@ -15,6 +15,7 @@ type LinkStateProps = {
   region: any;
   onUnlink?: (region: any) => void;
 };
+
 export const LinkState: FC<LinkStateProps> = ({ linking, region, onUnlink }) => {
   const isVisible = linking || region;
   const mod = useMemo(() => {
@@ -33,10 +34,12 @@ export const LinkState: FC<LinkStateProps> = ({ linking, region, onUnlink }) => 
     </Block>
   );
 };
+
 type LinkedRegionProps = {
   item: any;
   onUnlink?: (item: any) => void;
 };
+
 const LinkedRegion: FC<LinkedRegionProps> = observer(({ item, onUnlink }) => {
   const itemColor = item?.background ?? item?.getOneColor?.();
 
