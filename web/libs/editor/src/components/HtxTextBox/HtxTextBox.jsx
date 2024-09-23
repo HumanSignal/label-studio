@@ -191,7 +191,8 @@ export class HtxTextBox extends React.Component {
             tooltipTheme="Dark"
             style={{ padding: 0 }}
             icon={<IconEdit />}
-            onClick={this.startEditing} />
+            onClick={this.startEditing}
+          />
         )}
         {isDeleteable && onDelete && (
           <Button
@@ -202,7 +203,8 @@ export class HtxTextBox extends React.Component {
             tooltipTheme="Dark"
             style={{ padding: 0 }}
             icon={<IconTrashAlt />}
-            onClick={onDelete} />
+            onClick={onDelete}
+          />
         )}
       </>
     );

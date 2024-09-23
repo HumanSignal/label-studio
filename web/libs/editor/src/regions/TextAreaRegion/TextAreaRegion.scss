@@ -5,15 +5,15 @@
   margin: 0 var(--spacing-small) 0 0 !important;
   padding: var(--spacing-small) var(--spacing-medium);
   white-space: pre-line;
-  box-shadow: 0px 4px 12px 0px var(--black_4), 0px 1px 2px 0px var(--black_10);
+  box-shadow: 0 4px 12px 0 var(--black_4), 0 1px 2px 0 var(--black_10);
   flex-grow: 1;
 
-  &[class*=selected] {
+  &[class*="selected"] {
     border: 1px solid var(--grape_500);
     background-color: var(--primary-bright-secondary);
   }
 
-  &[class*=highlighted] {
+  &[class*="highlighted"] {
     border: 1px dashed var(--grape_500);
     background-color: var(--primary-bright-secondary);
   }
@@ -45,7 +45,6 @@
         }
       }
     }
-    
   }
 
   // fix antd styles to resize textarea container and fix paddings
