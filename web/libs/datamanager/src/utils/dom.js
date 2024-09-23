@@ -27,7 +27,7 @@ const positioner = (source, target) => {
   };
 };
 
-export const alignElements = (elem, target, align, padding = 0) => {
+export const alignElements = (elem, target, align, padding = 0, openUpwardForShortViewport = true) => {
   let offsetLeft = 0;
   let offsetTop = 0;
 
@@ -70,7 +70,7 @@ export const alignElements = (elem, target, align, padding = 0) => {
   if (offsetTop < window.scrollX) {
     offsetTop = pos.bottom + padding;
     resultAlign[0] = "bottom";
-  } else if (offsetTop + pos.target.height > window.scrollX + window.innerHeight) {
+  } else if (openUpwardForShortViewport && offsetTop + pos.target.height > window.scrollX + window.innerHeight) {
     offsetTop = pos.top - padding;
     resultAlign[0] = "top";
   }
