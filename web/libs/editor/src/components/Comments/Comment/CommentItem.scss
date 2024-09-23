@@ -19,6 +19,7 @@
   --comment-item-content-color: var(--sand_900);
   --comment-item-content-color-resolved: var(--sand_500);
   --comment-item-icon-color-resolved: var(--success_color);
+  --comment-item-region-opacity: 1;
 
   padding: var(--comment-item-padding);
   color: var(--comment-item-content-color);
@@ -115,6 +116,8 @@
   }
 
   &_resolved {
+    --comment-item-region-opacity: 0.39;
+    
     & .comment-item__resolved {
       opacity: 1;
       width: 12px;
