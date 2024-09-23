@@ -24,6 +24,7 @@
     height: 100%;
     border: none;
     position: absolute;
+
     &:focus {
       + .checkbox__check {
         outline: 2px solid var(--grape_700);
