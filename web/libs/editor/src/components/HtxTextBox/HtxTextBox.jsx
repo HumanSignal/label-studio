@@ -191,6 +191,7 @@ export class HtxTextBox extends React.Component {
             tooltipTheme="Dark"
             style={{ padding: 0 }}
             icon={<IconEdit />}
+            aria-label="Edit Region"
             onClick={this.startEditing}
           />
         )}
@@ -203,6 +204,7 @@ export class HtxTextBox extends React.Component {
             tooltipTheme="Dark"
             style={{ padding: 0 }}
             icon={<IconTrashAlt />}
+            aria-label="Delete Region"
             onClick={onDelete}
           />
         )}
