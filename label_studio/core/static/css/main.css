@@ -3,7 +3,7 @@ html {
 }
 
 body {
-  font-family: 'Figtree', sans-serif !important; 
+  --font-family: 'Figtree', sans-serif !important; 
 
   --sand_900: #12110D;
   --sand_800: #262522;
