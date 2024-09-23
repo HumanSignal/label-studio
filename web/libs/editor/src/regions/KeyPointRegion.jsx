@@ -256,7 +256,7 @@ const HtxKeyPointView = ({ item, setShapeRef }) => {
           t.setAttr("scaleY", 1);
         }}
         onMouseOver={() => {
-          if (store.annotationStore.selected.relationMode) {
+          if (store.annotationStore.selected.isLinkingMode) {
             item.setHighlight(true);
             stage.container().style.cursor = "crosshair";
           } else {
@@ -266,14 +266,14 @@ const HtxKeyPointView = ({ item, setShapeRef }) => {
         onMouseOut={() => {
           stage.container().style.cursor = "default";
 
-          if (store.annotationStore.selected.relationMode) {
+          if (store.annotationStore.selected.isLinkingMode) {
             item.setHighlight(false);
           }
         }}
         onClick={(e) => {
           if (item.parent.getSkipInteractions()) return;
 
-          if (store.annotationStore.selected.relationMode) {
+          if (store.annotationStore.selected.isLinkingMode) {
             stage.container().style.cursor = Constants.DEFAULT_CURSOR;
           }
 

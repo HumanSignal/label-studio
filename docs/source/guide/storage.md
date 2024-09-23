@@ -26,9 +26,19 @@ When working with an external cloud storage connection, keep the following in mi
 
 * Label Studio doesn’t import the data stored in the bucket, but instead creates *references* to the objects. Therefore, you must have full access control on the data to be synced and shown on the labeling screen.
 * Sync operations with external buckets only goes one way. It either creates tasks from objects on the bucket (Source storage) or pushes annotations to the output bucket (Target storage). Changing something on the bucket side doesn’t guarantee consistency in results.
-* We recommend using a separate bucket folder for each Label Studio project.
+* We recommend using a separate bucket folder for each Label Studio project. 
 
-For more troubleshooting information, see [Troubleshooting Import, Export, & Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center. 
+<div class="opensource-only">
+
+For more troubleshooting information, see [Troubleshooting Label Studio](troubleshooting).
+
+</div>
+
+<div class="enterprise-only">
+
+For more troubleshooting information, see [Troubleshooting Import, Export, & Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center.
+
+</div>
 
 ## How external storage connections and sync work
 
@@ -662,4 +672,14 @@ If you're using Label Studio in Docker, you need to mount the local directory th
 
 ### Troubleshooting cloud storage
 
-See [Troubleshooting Import, Export, and Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center. 
+<div class="opensource-only">
+
+For more troubleshooting information, see [Troubleshooting Label Studio](troubleshooting).
+
+</div>
+
+<div class="enterprise-only">
+
+For more troubleshooting information, see [Troubleshooting Import, Export, & Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center.
+
+</div>

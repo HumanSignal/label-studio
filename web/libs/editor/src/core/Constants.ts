@@ -33,7 +33,7 @@ export default {
   CHOOSE_CURSOR: "pointer",
   POINTER_CURSOR: "pointer",
   MOVE_CURSOR: "hand",
-  RELATION_MODE_CURSOR: "crosshair",
+  LINKING_MODE_CURSOR: "crosshair",
 
   // images
   BRIGHTNESS_VALUE: 100,

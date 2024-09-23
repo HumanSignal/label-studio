@@ -1,6 +1,6 @@
 {
-  "message": "chore(deps): bump express from 4.19.2 to 4.21.0 in /web (#6383)",
-  "commit": "b74c69f4680b0e2bb7d61b900eb12b9bcc71843a",
-  "date": "2024-09-13T22:19:04.000Z",
+  "message": "fix: OPTIC-447: Filters don't pass to label stream in DM (#6410)",
+  "commit": "040024385d40e125ac8096b773ef88b78e3680c5",
+  "date": "2024-09-20T12:18:26.000Z",
   "branch": "develop"
 }

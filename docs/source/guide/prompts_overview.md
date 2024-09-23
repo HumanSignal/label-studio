@@ -133,7 +133,7 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
 | Feature | Support |
 | --- | --- |
 | **Supported data types** | Text |
-| **Supported model types** | Text Classification |
+| **Supported model types** | Text Classification <br>Named Entity Recognition (NER) |
 | **Class selection** | Single selection (the LLM can apply one label per task)|
 | **Supported base models** | OpenAI gpt-3.5-turbo-16k <br>OpenAI gpt-3.5-turbo-instruct* <br>OpenAI gpt-4-turbo <br>OpenAI gpt-3.5-turbo <br>OpenAI gpt-4o <br>OpenAI gpt-4 <br><br>* This model is not supported via Azure OpenAI|
 | **Text compatibility** | Task text must be utf-8 compatible |

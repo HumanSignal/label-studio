@@ -4,6 +4,7 @@ import { type FC, useMemo, useState } from "react";
 import { IconLink, IconPlusAlt, IconTrash, IconWarning } from "../../../assets/icons";
 import { IconEyeClosed, IconEyeOpened } from "../../../assets/icons/timeline";
 import { Button, type ButtonProps } from "../../../common/Button/Button";
+import { CREATE_RELATION_MODE } from "../../../stores/Annotation/LinkingModes";
 import { Block, Elem } from "../../../utils/bem";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
@@ -94,14 +95,14 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
     <RegionActionButton
       key="relation"
       icon={<IconLink />}
-      primary={annotation.relationMode}
+      primary={annotation.isLinkingMode}
       onClick={(_e: any, hotkey?: any) => {
         // If this is triggered by a hotkey, defer to the global bound handler for relations to avoid contention.
         if (hotkey) return;
-        if (annotation.relationMode) {
-          annotation.stopRelationMode();
+        if (annotation.isLinkingMode) {
+          annotation.stopLinkingMode();
         } else {
-          annotation.startRelationMode(region);
+          annotation.startLinkingMode(CREATE_RELATION_MODE, region);
         }
       }}
       hotkey="region:relation"
