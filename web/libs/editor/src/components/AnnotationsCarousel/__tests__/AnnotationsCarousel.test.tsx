@@ -1,5 +1,3 @@
-/* global test, expect, jest */
-import React from "react";
 import Enzyme, { mount } from "enzyme";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
 import { AnnotationsCarousel } from "../AnnotationsCarousel";

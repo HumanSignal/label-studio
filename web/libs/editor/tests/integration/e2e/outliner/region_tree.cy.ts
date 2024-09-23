@@ -1,4 +1,4 @@
-import { ImageView, Labels, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
+import { LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
 import { FF_DEV_3873, FF_OUTLINER_OPTIM } from "../../../../src/utils/feature-flags";
 
 describe("Outliner - Regions tree", () => {

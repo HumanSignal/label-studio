@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Circle, Rect } from "react-konva";
 import { observer } from "mobx-react";
 import { getParent, getRoot, hasParent, types } from "mobx-state-tree";

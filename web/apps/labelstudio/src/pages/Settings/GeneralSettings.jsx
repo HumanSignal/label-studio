@@ -1,9 +1,9 @@
-import React, { useCallback, useContext } from "react";
+import { useCallback, useContext } from "react";
 import { Button } from "../../components";
-import { Form, Input, Label, Select, TextArea } from "../../components/Form";
+import { Form, Input, Select, TextArea } from "../../components/Form";
 import { RadioGroup } from "../../components/Form/Elements/RadioGroup/RadioGroup";
 import { ProjectContext } from "../../providers/ProjectProvider";
-import { Block, cn, Elem } from "../../utils/bem";
+import { Block, Elem } from "../../utils/bem";
 import { EnterpriseBadge } from "../../components/Badges/Enterprise";
 import "./settings.scss";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";

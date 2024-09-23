@@ -1,5 +1,4 @@
 import { observer } from "mobx-react";
-import React from "react";
 import { FilterInput } from "../FilterInput";
 
 const BaseInput = observer(({ value, onChange, placeholder }) => {

@@ -1,4 +1,4 @@
-import React, { type ReactChildren } from "react";
+import type { ReactChildren } from "react";
 import "./SkeletonLoader.scss";
 import { Block } from "../../../utils/bem";
 import { SkeletonLine } from "./SkeletonLine";

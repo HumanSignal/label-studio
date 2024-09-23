@@ -1,4 +1,3 @@
-import React from "react";
 import { Rate } from "antd";
 import { inject, observer } from "mobx-react";
 import { types } from "mobx-state-tree";

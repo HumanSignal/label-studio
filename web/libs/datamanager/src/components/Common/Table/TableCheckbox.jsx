@@ -1,4 +1,3 @@
-import React from "react";
 import { Checkbox } from "../Checkbox/Checkbox";
 
 const IndeterminateCheckbox = ({ checked, indeterminate, ...props }) => {
