@@ -49,26 +49,28 @@ type AcceptButtonProps = {
   store: MSTStore;
 };
 
-export const AcceptButton = memo(({ disabled, history, store }: AcceptButtonProps) => {
-  return (
-    <ButtonTooltip key="accept" title="Accept annotation: [ Ctrl+Enter ]">
-      <Button
-        aria-label="accept-annotation"
-        disabled={disabled}
-        look="primary"
-        onClick={async () => {
-          const selected = store.annotationStore?.selected;
+export const AcceptButton = memo(
+  observer(({ disabled, history, store }: AcceptButtonProps) => {
+    return (
+      <ButtonTooltip key="accept" title="Accept annotation: [ Ctrl+Enter ]">
+        <Button
+          aria-label="accept-annotation"
+          disabled={disabled}
+          look="primary"
+          onClick={async () => {
+            const selected = store.annotationStore?.selected;
 
-          selected?.submissionInProgress();
-          await store.commentStore.commentFormSubmit();
-          store.acceptAnnotation();
-        }}
-      >
-        {history.canUndo ? "Fix + Accept" : "Accept"}
-      </Button>
-    </ButtonTooltip>
-  );
-});
+            selected?.submissionInProgress();
+            await store.commentStore.commentFormSubmit();
+            store.acceptAnnotation();
+          }}
+        >
+          {history.canUndo ? "Fix + Accept" : "Accept"}
+        </Button>
+      </ButtonTooltip>
+    );
+  }),
+);
 
 type RejectButtonProps = {
   disabled: boolean;
@@ -80,30 +82,32 @@ type RejectButtonProps = {
   onRejectWithComment: (event: React.MouseEvent, action: () => any) => void;
 };
 
-export const RejectButton = memo(({ disabled, store, onRejectWithComment }: RejectButtonProps) => {
-  return (
-    <ButtonTooltip key="reject" title="Reject annotation: [ Ctrl+Space ]">
-      <Button
-        aria-label="reject-annotation"
-        disabled={disabled}
-        onClick={async (e) => {
-          const action = () => store.rejectAnnotation({});
-          const selected = store.annotationStore?.selected;
+export const RejectButton = memo(
+  observer(({ disabled, store, onRejectWithComment }: RejectButtonProps) => {
+    return (
+      <ButtonTooltip key="reject" title="Reject annotation: [ Ctrl+Space ]">
+        <Button
+          aria-label="reject-annotation"
+          disabled={disabled}
+          onClick={async (e) => {
+            const action = () => store.rejectAnnotation({});
+            const selected = store.annotationStore?.selected;
 
-          if (store.hasInterface("comments:reject") ?? true) {
-            onRejectWithComment(e, action);
-          } else {
-            selected?.submissionInProgress();
-            await store.commentStore.commentFormSubmit();
-            action();
-          }
-        }}
-      >
-        Reject
-      </Button>
-    </ButtonTooltip>
-  );
-});
+            if (store.hasInterface("comments:reject") ?? true) {
+              onRejectWithComment(e, action);
+            } else {
+              selected?.submissionInProgress();
+              await store.commentStore.commentFormSubmit();
+              action();
+            }
+          }}
+        >
+          Reject
+        </Button>
+      </ButtonTooltip>
+    );
+  }),
+);
 
 type SkipButtonProps = {
   disabled: boolean;
@@ -115,48 +119,52 @@ type SkipButtonProps = {
   onSkipWithComment: (event: React.MouseEvent, action: () => any) => void;
 };
 
-export const SkipButton = memo(({ disabled, store, onSkipWithComment }: SkipButtonProps) => {
-  return (
-    <ButtonTooltip key="skip" title="Cancel (skip) task: [ Ctrl+Space ]">
-      <Button
-        aria-label="skip-task"
-        disabled={disabled}
-        onClick={async (e) => {
-          const action = () => store.skipTask({});
-          const selected = store.annotationStore?.selected;
+export const SkipButton = memo(
+  observer(({ disabled, store, onSkipWithComment }: SkipButtonProps) => {
+    return (
+      <ButtonTooltip key="skip" title="Cancel (skip) task: [ Ctrl+Space ]">
+        <Button
+          aria-label="skip-task"
+          disabled={disabled}
+          onClick={async (e) => {
+            const action = () => store.skipTask({});
+            const selected = store.annotationStore?.selected;
 
-          if (store.hasInterface("comments:skip") ?? true) {
-            onSkipWithComment(e, action);
-          } else {
+            if (store.hasInterface("comments:skip") ?? true) {
+              onSkipWithComment(e, action);
+            } else {
+              selected?.submissionInProgress();
+              await store.commentStore.commentFormSubmit();
+              store.skipTask({});
+            }
+          }}
+        >
+          Skip
+        </Button>
+      </ButtonTooltip>
+    );
+  }),
+);
+
+export const UnskipButton = memo(
+  observer(({ disabled, store }: { disabled: boolean; store: MSTStore }) => {
+    return (
+      <ButtonTooltip key="cancel-skip" title="Cancel skip: []">
+        <Button
+          aria-label="cancel-skip"
+          disabled={disabled}
+          look="primary"
+          onClick={async () => {
+            const selected = store.annotationStore?.selected;
+
             selected?.submissionInProgress();
             await store.commentStore.commentFormSubmit();
-            store.skipTask({});
-          }
-        }}
-      >
-        Skip
-      </Button>
-    </ButtonTooltip>
-  );
-});
-
-export const UnskipButton = memo(({ disabled, store }: { disabled: boolean; store: MSTStore }) => {
-  return (
-    <ButtonTooltip key="cancel-skip" title="Cancel skip: []">
-      <Button
-        aria-label="cancel-skip"
-        disabled={disabled}
-        look="primary"
-        onClick={async () => {
-          const selected = store.annotationStore?.selected;
-
-          selected?.submissionInProgress();
-          await store.commentStore.commentFormSubmit();
-          store.unskipTask();
-        }}
-      >
-        Cancel skip
-      </Button>
-    </ButtonTooltip>
-  );
-});
+            store.unskipTask();
+          }}
+        >
+          Cancel skip
+        </Button>
+      </ButtonTooltip>
+    );
+  }),
+);
