@@ -2,11 +2,15 @@
   background-color: var(--surface-surface);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-small);
-  margin: 0 var(--spacing-small) 0 0 !important;
+  margin: 0 var(--spacing-small) 0 0;
   padding: var(--spacing-small) var(--spacing-medium);
   white-space: pre-line;
   box-shadow: 0 4px 12px 0 var(--black_4), 0 1px 2px 0 var(--black_10);
   flex-grow: 1;
+
+  &.ant-typography {
+    margin-bottom: 0;
+  }
 
   &.selected {
     border: 1px solid var(--grape_500);
@@ -53,7 +57,7 @@
     left: -1px;
     padding: 0;
     margin-top: -1px;
-    margin-right: 0 !important;
+    margin-right: 0;
 
     textarea {
       // the same as in .mark, its padding set to 0
