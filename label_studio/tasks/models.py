@@ -1099,7 +1099,7 @@ class FailedPrediction(models.Model):
 class PredictionMeta(models.Model):
     prediction = models.OneToOneField(
         'Prediction',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name='meta',
@@ -1107,7 +1107,7 @@ class PredictionMeta(models.Model):
     )
     failed_prediction = models.OneToOneField(
         'FailedPrediction',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name='meta',
