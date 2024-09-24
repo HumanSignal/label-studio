@@ -112,12 +112,12 @@
   }
 
   &__linkState {
-    padding: 9px 3px 4px 3px;
+    padding: 9px 3px 4px;
   }
 
   &_resolved {
     --comment-item-region-opacity: 0.39;
-    
+
     & .comment-item__resolved {
       opacity: 1;
       width: 12px;
