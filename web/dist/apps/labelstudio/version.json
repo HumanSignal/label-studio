@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1469: Implement universal linking modes (#6395)",
-  "commit": "f950fa3e0479ccd3ba480b688e692e8223ae133e",
-  "date": "2024-09-19T11:19:41.000Z",
+  "message": "fix: OPTIC-447: Filters don't pass to label stream in DM (#6410)",
+  "commit": "040024385d40e125ac8096b773ef88b78e3680c5",
+  "date": "2024-09-20T12:18:26.000Z",
   "branch": "develop"
 }
