@@ -1,10 +1,51 @@
-import { flow, getEnv, getRoot, types } from "mobx-state-tree";
+import { applySnapshot, flow, getEnv, getParent, getRoot, types } from "mobx-state-tree";
 import Utils from "../../utils";
-import { camelizeKeys } from "../../utils/utilities";
+import { FF_PER_FIELD_COMMENTS } from "../../utils/feature-flags";
+import { camelizeKeys, snakeizeKeys } from "../../utils/utilities";
 import { UserExtended } from "../UserStore";
+import { Anchor } from "./Anchor";
 
-export const Comment = types
-  .model("Comment", {
+export const CommentBase = types
+  .model("CommentBase", {
+    text: types.string,
+    ...(isFF(FF_PER_FIELD_COMMENTS) ? { regionRef: types.optional(types.maybeNull(Anchor), null) } : {}),
+  })
+  .views((self) => ({
+    get annotation() {
+      /*
+       * The `getEnv` is used in case when we use "CommentBase" separately
+       * to provide the same functionality of comment (`setRegionLink`)
+       * during creating new comment.
+       * In this case, the comment is stored in a volatile field "currentComment"
+       * of 'CommentStore' and cannot access the MST tree by itself.
+       */
+      const env = getEnv(self);
+      if (env?.annotationStore) {
+        return env.annotationStore.selected;
+      }
+      // otherwise, we use the standard way to get the annotation
+      const commentsStore = getParent(self, 2);
+      return commentsStore.annotation;
+    },
+  }))
+  .actions((self) => {
+    return {
+      setText(text) {
+        self.text = text;
+      },
+      unsetLink() {
+        self.regionRef = null;
+      },
+      setRegionLink(region) {
+        self.regionRef = {
+          regionId: region.cleanId,
+        };
+      },
+    };
+  });
+
+export const Comment = CommentBase.named("Comment")
+  .props({
     id: types.identifierNumber,
     text: types.string,
     createdAt: types.optional(types.string, Utils.UDate.currentISODate()),
@@ -15,6 +56,7 @@ export const Comment = types
     isEditMode: types.optional(types.boolean, false),
     isDeleted: types.optional(types.boolean, false),
     isConfirmDelete: types.optional(types.boolean, false),
+    isUpdating: types.optional(types.boolean, false),
   })
   .preProcessSnapshot((sn) => {
     return camelizeKeys(sn ?? {});
@@ -24,7 +66,7 @@ export const Comment = types
       return getEnv(self).events;
     },
     get isPersisted() {
-      return self.id > 0;
+      return self.id > 0 && !self.isUpdating;
     },
     get canResolveAny() {
       const p = getRoot(self);

@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-447: Filters don't pass to label stream in DM (#6410)",
-  "commit": "040024385d40e125ac8096b773ef88b78e3680c5",
-  "date": "2024-09-20T12:18:26.000Z",
+  "message": "feat: LEAP-1440: Allow to attach a region to a new comment (#6400)",
+  "commit": "4ff9df53619002ad17e901e568c829764ebca205",
+  "date": "2024-09-24T13:45:27.000Z",
   "branch": "develop"
 }
