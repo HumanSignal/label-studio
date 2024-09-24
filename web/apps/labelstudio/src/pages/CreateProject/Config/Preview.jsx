@@ -23,6 +23,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
   // @see comment about dependencies above
   loadDependencies();
 
+  const [storeReady, setStoreReady] = useState(false);
   const lsf = useRef(null);
   const rootRef = useRef();
   const api = useAPI();
@@ -82,6 +83,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
             const c = as.createAnnotation();
 
             as.selectAnnotation(c.id);
+            setStoreReady(true);
           };
 
           if (isFF(FF_DEV_3617)) {
@@ -108,7 +110,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
 
   useEffect(() => {
     initLabelStudio(currentConfig, currentTask).then(() => {
-      if (lsf.current?.store) {
+      if (storeReady && lsf.current?.store) {
         const store = lsf.current.store;
 
         store.resetState();
@@ -124,7 +126,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
         console.log("LSF updated");
       }
     });
-  }, [currentConfig, currentTask]);
+  }, [currentConfig, currentTask, storeReady]);
 
   useEffect(() => {
     return () => {
