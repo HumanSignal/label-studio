@@ -9,6 +9,7 @@ import { useMounted } from "../../common/Utils/useMounted";
 import { FF_DEV_3034, FF_PER_FIELD_COMMENTS, isFF } from "../../utils/feature-flags";
 
 import "./Comments.scss";
+const CommentForm = isFF(FF_PER_FIELD_COMMENTS) ? CommentsFormNew : CommentFormOld;
 
 const isPerFieldComments = isFF(FF_PER_FIELD_COMMENTS);
 
