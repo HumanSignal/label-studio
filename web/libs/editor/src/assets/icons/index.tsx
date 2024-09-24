@@ -116,3 +116,4 @@ export { ReactComponent as IconPropertyAngle } from "./properties/angle.svg";
 
 export * from "./annotation";
 export * from "./outliner";
+export * from "./comment";
