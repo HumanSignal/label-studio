@@ -12,11 +12,9 @@
 }
 
 .CodeMirror-hint-name {
-  --font-family: monospace;
-  
   font-weight: 500;
   color: darkgoldenrod;
-  font-family: var(--font-family);
+  font-family: var(--font-mono);
 }
 
 .CodeMirror-hint-active .CodeMirror-hint-name {

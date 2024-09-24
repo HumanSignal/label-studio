@@ -367,11 +367,10 @@ const createSpanStylesheet = (document, identifier, color) => {
     `,
     // @todo this style was applied in old RichText only
     [`${className}[data-label]::after`]: `
-      --font-family: Monaco;
       padding: 2px 2px;
       font-size: 9.5px;
       font-weight: bold;
-      font-family: var(--font-family);
+      font-family: var(--font-mono);
       vertical-align: super;
       content: attr(data-label);
       line-height: 0;

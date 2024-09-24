@@ -85,9 +85,7 @@
 }
 
 .react-dropdown-tree-select .node > .toggle {
-  --font-family: monospace;
-  
-  font-family: var(--font-family);
+  font-family: var(--font-mono);
   font-style: normal;
   color: initial;
   cursor: pointer;

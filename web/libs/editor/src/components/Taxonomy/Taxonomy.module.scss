@@ -152,7 +152,6 @@
 }
 
 .taxonomy__grouping {
-  --font-family: monospace;
   font-size: 16px;
   display: inline-block;
   width: 24px;
@@ -162,7 +161,7 @@
   user-select: none;
   flex-shrink: 0;
   pointer-events: all;
-  font-family: var(--font-family);
+  font-family: var(--font-mono);
 
   svg {
     transition: transform 0.1s; // visible rotation of arrow

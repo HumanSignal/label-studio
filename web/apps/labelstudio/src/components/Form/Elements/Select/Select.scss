@@ -1,8 +1,5 @@
 .select-ls {
   position: relative;
-
-  --font-family: figtree, sans-serif;
-
   &__list {
     top: 0;
     left: 0;
@@ -36,8 +33,5 @@
 select:disabled {
   background: var(--sand_200);
   color: var(--sand_500);
-
-  --font-family: figtree, sans-serif;
-
   opacity: 1;
 }

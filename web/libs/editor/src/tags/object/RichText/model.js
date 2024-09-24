@@ -114,11 +114,10 @@ const Model = types
       }
       .htx-highlight[data-index]::after,
       .htx-highlight[data-label]::after {
-        --font-family: Monaco;
         padding: 2px 2px;
         font-size: 9.5px;
         font-weight: bold;
-        font-family: var(--font-family);
+        font-family: var(--font-mono);
         vertical-align: super;
         content: attr(data-label);
         line-height: 0;
