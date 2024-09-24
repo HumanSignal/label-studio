@@ -5,13 +5,14 @@
  */
 
 import { observer } from "mobx-react";
-import { type Instance } from "mobx-state-tree";
-import React, { useCallback, useState } from "react";
+import type { Instance } from "mobx-state-tree";
+import type React from "react";
+import { useCallback, useState } from "react";
 
 import { IconBan, LsChevron } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
 import { Dropdown } from "../../common/Dropdown/Dropdown";
-import { CustomButton } from "../../stores/CustomButton";
+import type { CustomButton } from "../../stores/CustomButton";
 import { Block, cn, Elem } from "../../utils/bem";
 import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import { isDefined } from "../../utils/utilities";
@@ -31,15 +32,12 @@ type CustomControlProps = {
 const CustomControl = observer(({ button, disabled, onClick }: CustomControlProps) => {
   const look = button.disabled || disabled ? "disabled" : button.look;
   const [waiting, setWaiting] = useState(false);
-  const clickHandler = useCallback(
-    async () => {
-      if (!onClick) return;
-      setWaiting(true);
-      await onClick?.(button.name);
-      setWaiting(false);
-    },
-    [],
-  );
+  const clickHandler = useCallback(async () => {
+    if (!onClick) return;
+    setWaiting(true);
+    await onClick?.(button.name);
+    setWaiting(false);
+  }, []);
   return (
     <ButtonTooltip title={button.tooltip ?? ""}>
       <Button
@@ -145,7 +143,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
       const useExitOption = !isDisabled && isNotQuickView;
 
-      const SubmitOption = ({ isUpdate, onClickMethod }: { isUpdate: boolean, onClickMethod: () => any}) => {
+      const SubmitOption = ({ isUpdate, onClickMethod }: { isUpdate: boolean; onClickMethod: () => any }) => {
         return (
           <Button
             name="submit-option"

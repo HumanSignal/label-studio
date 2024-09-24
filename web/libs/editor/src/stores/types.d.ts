@@ -2,7 +2,7 @@ type RawResult = {
   from_name: string;
   to_name: string;
   value: object;
-}
+};
 
 type MSTAnnotation = {
   canBeReviewed: boolean;
@@ -26,7 +26,7 @@ type MSTCommentStore = {
   setTooltipMessage: (message: string) => void;
   currentComment: any;
   addedCommentThisSession: boolean;
-}
+};
 
 type MSTStore = {
   customButtons: Instance<typeof CustomButton>[];
@@ -49,4 +49,4 @@ type MSTStore = {
   acceptAnnotation: (options?: any) => void;
   skipTask: (options?: any) => void;
   unskipTask: (options?: any) => void;
-}
+};

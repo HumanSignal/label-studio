@@ -5,14 +5,15 @@
  */
 
 import { inject, observer } from "mobx-react";
-import React, { memo, ReactNode } from "react";
+import type React from "react";
+import { memo, type ReactNode } from "react";
 import { Button } from "../../common/Button/Button";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 
 type MixedInParams = {
   store: MSTStore;
   history: any;
-}
+};
 
 export function controlsInjector<T extends {}>(fn: (props: T & MixedInParams) => ReactNode) {
   const wrapped = inject(({ store }) => {
@@ -46,7 +47,7 @@ type AcceptButtonProps = {
   disabled: boolean;
   history: any;
   store: MSTStore;
-}
+};
 
 export const AcceptButton = memo(({ disabled, history, store }: AcceptButtonProps) => {
   return (
@@ -77,7 +78,7 @@ type RejectButtonProps = {
    * conditions are checked in wrapper and if all good the `action` is called.
    **/
   onRejectWithComment: (event: React.MouseEvent, action: () => any) => void;
-}
+};
 
 export const RejectButton = memo(({ disabled, store, onRejectWithComment }: RejectButtonProps) => {
   return (
@@ -112,7 +113,7 @@ type SkipButtonProps = {
    * conditions are checked in wrapper and if all good the `action` is called.
    **/
   onSkipWithComment: (event: React.MouseEvent, action: () => any) => void;
-}
+};
 
 export const SkipButton = memo(({ disabled, store, onSkipWithComment }: SkipButtonProps) => {
   return (
@@ -139,7 +140,7 @@ export const SkipButton = memo(({ disabled, store, onSkipWithComment }: SkipButt
   );
 });
 
-export const UnskipButton = memo(({ disabled, store }: { disabled: boolean, store: MSTStore }) => {
+export const UnskipButton = memo(({ disabled, store }: { disabled: boolean; store: MSTStore }) => {
   return (
     <ButtonTooltip key="cancel-skip" title="Cancel skip: []">
       <Button
@@ -157,5 +158,5 @@ export const UnskipButton = memo(({ disabled, store }: { disabled: boolean, stor
         Cancel skip
       </Button>
     </ButtonTooltip>
-    );
+  );
 });
