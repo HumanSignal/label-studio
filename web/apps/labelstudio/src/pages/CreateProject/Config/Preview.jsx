@@ -112,10 +112,10 @@ export const Preview = ({ config, data, error, loading, project }) => {
     if (lsf.current?.store) {
       const store = lsf.current.store;
 
-      store.assignConfig(currentConfig);
       store.resetState();
       store.assignTask(currentTask);
       store.initializeStore(currentTask);
+      store.assignConfig(currentConfig);
 
       const c = store.annotationStore.addAnnotation({
         userGenerate: true,
