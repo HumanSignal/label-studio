@@ -67,7 +67,7 @@ export const alignElements = (elem, target, align, padding = 0, openUpwardForSho
       break;
   }
 
-  if (offsetTop < window.scrollX) {
+  if (offsetTop < window.scrollY) {
     offsetTop = pos.bottom + padding;
     resultAlign[0] = "bottom";
   } else if (openUpwardForShortViewport && offsetTop + pos.target.height > window.scrollY + window.innerHeight) {
