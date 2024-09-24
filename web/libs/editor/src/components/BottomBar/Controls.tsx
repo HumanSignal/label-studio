@@ -4,64 +4,32 @@
  * Only this component should get interface updates, other versions should be removed.
  */
 
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
 import { type Instance } from "mobx-state-tree";
-import React, { memo, ReactNode, useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 
 import { IconBan, LsChevron } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
 import { Dropdown } from "../../common/Dropdown/Dropdown";
-import { Tooltip } from "../../common/Tooltip/Tooltip";
 import { CustomButton } from "../../stores/CustomButton";
 import { Block, cn, Elem } from "../../utils/bem";
 import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import { isDefined } from "../../utils/utilities";
+import { AcceptButton, ButtonTooltip, controlsInjector, RejectButton, SkipButton, UnskipButton } from "./buttons";
 
 import "./Controls.scss";
 
-const TOOLTIP_DELAY = 0.8;
-
-type ButtonTooltipProps = {
-  title: string;
-  children: JSX.Element;
-};
-
-type MixedInParams = {
-  store: MSTStore;
-  history: any;
-}
-
-function controlsInjector<T extends {}>(fn: (props: T & MixedInParams) => ReactNode) {
-  const wrapped = inject(({ store }) => {
-    return {
-      store,
-      history: store?.annotationStore?.selected?.history,
-    };
-  })(fn);
-  // inject type doesn't handle the injected props, so we have to force cast it
-  return wrapped as unknown as (props: T) => ReactNode;
-}
-
-const ButtonTooltip = controlsInjector<ButtonTooltipProps>(
-  observer(({ store, title, children }) => {
-    return (
-      <Tooltip title={title} enabled={store.settings.enableTooltips} mouseEnterDelay={TOOLTIP_DELAY}>
-        {children}
-      </Tooltip>
-    );
-  }),
-);
-
 type CustomControlProps = {
   button: Instance<typeof CustomButton>;
+  disabled: boolean;
   onClick?: (name: string) => void;
 };
 
 /**
  * Custom action button component, rendering buttons from store.customButtons
  */
-const CustomControl = observer(({ button, onClick }: CustomControlProps) => {
-  const look = button.disabled ? "disabled" : button.look;
+const CustomControl = observer(({ button, disabled, onClick }: CustomControlProps) => {
+  const look = button.disabled || disabled ? "disabled" : button.look;
   const [waiting, setWaiting] = useState(false);
   const clickHandler = useCallback(
     async () => {
@@ -70,13 +38,13 @@ const CustomControl = observer(({ button, onClick }: CustomControlProps) => {
       await onClick?.(button.name);
       setWaiting(false);
     },
-    [button],
+    [],
   );
   return (
     <ButtonTooltip title={button.tooltip ?? ""}>
       <Button
         aria-label={button.ariaLabel}
-        disabled={button.disabled}
+        disabled={button.disabled || disabled || waiting}
         look={look}
         onClick={clickHandler}
         waiting={waiting}
@@ -132,51 +100,6 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       ],
     );
 
-    const RejectButton = memo(({ disabled, store }: { disabled: boolean, store: MSTStore }) => {
-      return (
-        <ButtonTooltip key="reject" title="Reject annotation: [ Ctrl+Space ]">
-          <Button
-            aria-label="reject-annotation"
-            disabled={disabled}
-            onClick={async (e) => {
-              if (store.hasInterface("comments:reject") ?? true) {
-                buttonHandler(e, () => store.rejectAnnotation({}), "Please enter a comment before rejecting");
-              } else {
-                const selected = store.annotationStore?.selected;
-
-                selected?.submissionInProgress();
-                await store.commentStore.commentFormSubmit();
-                store.rejectAnnotation({});
-              }
-            }}
-          >
-            Reject
-          </Button>
-        </ButtonTooltip>
-      );
-    });
-
-    const AcceptButton = memo(({ disabled, history, store }: { disabled: boolean, history: any, store: MSTStore }) => {
-      return (
-        <ButtonTooltip key="accept" title="Accept annotation: [ Ctrl+Enter ]">
-          <Button
-            aria-label="accept-annotation"
-            disabled={disabled}
-            look="primary"
-            onClick={async () => {
-              const selected = store.annotationStore?.selected;
-
-              selected?.submissionInProgress();
-              await store.commentStore.commentFormSubmit();
-              store.acceptAnnotation();
-            }}
-          >
-            {history.canUndo ? "Fix + Accept" : "Accept"}
-          </Button>
-        </ButtonTooltip>
-      );
-    });
-
     // custom buttons replace all the internal buttons, but they can be reused if `name` is one of the internal buttons
     if (store.customButtons?.length) {
       for (const customButton of store.customButtons ?? []) {
@@ -185,12 +108,21 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           buttons.push(<AcceptButton disabled={disabled} history={history} store={store} />);
         } else {
           buttons.push(
-            <CustomControl key={customButton.name} button={customButton} onClick={store.handleCustomButton} />,
+            <CustomControl
+              key={customButton.name}
+              disabled={disabled}
+              button={customButton}
+              onClick={store.handleCustomButton}
+            />,
           );
         }
       }
     } else if (isReview) {
-      buttons.push(<RejectButton disabled={disabled} store={store} />);
+      const onRejectWithComment = (e: React.MouseEvent, action: () => any) => {
+        buttonHandler(e, action, "Please enter a comment before rejecting");
+      };
+
+      buttons.push(<RejectButton disabled={disabled} store={store} onRejectWithComment={onRejectWithComment} />);
       buttons.push(<AcceptButton disabled={disabled} history={history} store={store} />);
     } else if (annotation.skipped) {
       buttons.push(
@@ -198,47 +130,14 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           <IconBan color="#d00" /> Was skipped
         </Elem>,
       );
-      buttons.push(
-        <ButtonTooltip key="cancel-skip" title="Cancel skip: []">
-          <Button
-            aria-label="cancel-skip"
-            disabled={disabled}
-            look="primary"
-            onClick={async () => {
-              const selected = store.annotationStore?.selected;
-
-              selected?.submissionInProgress();
-              await store.commentStore.commentFormSubmit();
-              store.unskipTask();
-            }}
-          >
-            Cancel skip
-          </Button>
-        </ButtonTooltip>,
-      );
+      buttons.push(<UnskipButton disabled={disabled} store={store} />);
     } else {
       if (store.hasInterface("skip")) {
-        buttons.push(
-          <ButtonTooltip key="skip" title="Cancel (skip) task: [ Ctrl+Space ]">
-            <Button
-              aria-label="skip-task"
-              disabled={disabled}
-              onClick={async (e) => {
-                if (store.hasInterface("comments:skip") ?? true) {
-                  buttonHandler(e, () => store.skipTask({}), "Please enter a comment before skipping");
-                } else {
-                  const selected = store.annotationStore?.selected;
+        const onSkipWithComment = (e: React.MouseEvent, action: () => any) => {
+          buttonHandler(e, action, "Please enter a comment before skipping");
+        };
 
-                  selected?.submissionInProgress();
-                  await store.commentStore.commentFormSubmit();
-                  store.skipTask({});
-                }
-              }}
-            >
-              Skip
-            </Button>
-          </ButtonTooltip>,
-        );
+        buttons.push(<SkipButton disabled={disabled} store={store} onSkipWithComment={onSkipWithComment} />);
       }
 
       const isDisabled = disabled || submitDisabled;
