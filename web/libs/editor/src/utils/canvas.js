@@ -429,7 +429,9 @@ const labelToSVG = (() => {
       const fillColor = Colors.getScaleGradient(score);
 
       items.push(`<rect x="0" y="0" rx="2" ry="2" width="24" height="14" style="fill:${fillColor};opacity:0.5" />`);
-      items.push(`<text x="3" y="10" style="font-size: 8px; font-family: var(--font-mono);">${score.toFixed(2)}</text>`);
+      items.push(
+        `<text x="3" y="10" style="font-size: 8px; font-family: var(--font-mono);">${score.toFixed(2)}</text>`,
+      );
       width = width + 26;
     }
 
