@@ -1,12 +1,14 @@
 import { type FC, useEffect } from "react";
 import { observer } from "mobx-react";
 import { Block } from "../../utils/bem";
-import { CommentForm } from "./CommentForm";
 import { CommentsList } from "./CommentsList";
+import { CommentForm as CommentFormOld } from "./OldComment/CommentForm";
+import { CommentForm as CommentsFormNew } from "./Comment/CommentForm";
 import { useMounted } from "../../common/Utils/useMounted";
-import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
+import { FF_DEV_3034, FF_PER_FIELD_COMMENTS, isFF } from "../../utils/feature-flags";
 
 import "./Comments.scss";
+const CommentForm = isFF(FF_PER_FIELD_COMMENTS) ? CommentsFormNew : CommentFormOld;
 
 export const Comments: FC<{ annotationStore: any; commentStore: any; cacheKey?: string }> = observer(
   ({ annotationStore, commentStore, cacheKey }) => {
