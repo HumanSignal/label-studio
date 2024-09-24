@@ -107,23 +107,23 @@ export const Preview = ({ config, data, error, loading, project }) => {
   }, [loading, error]);
 
   useEffect(() => {
-    initLabelStudio(currentConfig, currentTask);
+    initLabelStudio(currentConfig, currentTask).then(() => {
+      if (lsf.current?.store) {
+        const store = lsf.current.store;
 
-    if (lsf.current?.store) {
-      const store = lsf.current.store;
+        store.resetState();
+        store.assignTask(currentTask);
+        store.assignConfig(currentConfig);
+        store.initializeStore(currentTask);
 
-      store.resetState();
-      store.assignTask(currentTask);
-      store.initializeStore(currentTask);
-      store.assignConfig(currentConfig);
+        const c = store.annotationStore.addAnnotation({
+          userGenerate: true,
+        });
 
-      const c = store.annotationStore.addAnnotation({
-        userGenerate: true,
-      });
-
-      store.annotationStore.selectAnnotation(c.id);
-      console.log("LSF updated");
-    }
+        store.annotationStore.selectAnnotation(c.id);
+        console.log("LSF updated");
+      }
+    });
   }, [currentConfig, currentTask]);
 
   useEffect(() => {
