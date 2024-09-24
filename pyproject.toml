@@ -203,7 +203,7 @@ django-migration-linter = "^5.1.0"
 
 # Humansignal repo dependencies
 
-label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/10ca9af14ecab53c4de553ba97c7a135da2d36f9.zip"}
+label-studio-sdk = {url = "https://github.com/HumanSignal/label-studio-sdk/archive/a41cbe7595ebf86c9f1b3fc9f4b6d14e585bbcf7.zip"}
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"
