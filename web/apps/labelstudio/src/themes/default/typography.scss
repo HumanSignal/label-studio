@@ -17,7 +17,7 @@
 
 body {
   --font-sans: 'Figtree', sans-serif !important;
-  --font-mono: monaco, monospace;
+  --font-mono: monaco, monospace !important;
   --font-weight-400: 400;
   --font-weight-500: 500;
   --font-weight-600: 600;
@@ -26,4 +26,6 @@ body {
   --font-size-400: 16px;
   --font-line-height-small: 18px;
   --font-line-height-medium: 20px;
+
+  font-family: var(--font-sans) !important;
 }
