@@ -163,6 +163,7 @@ export const TabsItem = ({
         {showMenu && (
           <Dropdown.Trigger
             align="bottom-left"
+            openUpwardForShortViewport={false}
             content={
               <TabsMenu
                 editable={tabIsEditable}
