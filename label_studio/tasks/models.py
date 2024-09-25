@@ -1116,7 +1116,7 @@ class FailedPrediction(models.Model):
 class PredictionMeta(models.Model):
     prediction = models.OneToOneField(
         'Prediction',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name='meta',
@@ -1124,7 +1124,7 @@ class PredictionMeta(models.Model):
     )
     failed_prediction = models.OneToOneField(
         'FailedPrediction',
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name='meta',
@@ -1308,21 +1308,7 @@ def remove_predictions_from_project(sender, instance, **kwargs):
     """Remove predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count() - 1
     instance.task.save(update_fields=['total_predictions'])
-
-    # if there is PredictionMeta object associated with the Prediction object, delete it
-    if hasattr(instance, 'meta'):
-        logger.debug(f'Deleting PredictionMeta object associated with Prediction object {instance.id}')
-        instance.meta.delete()
-
     logger.debug(f'Updated total_predictions for {instance.task.id}.')
-
-
-@receiver(pre_delete, sender=FailedPrediction)
-def remove_failed_predictions_from_project(sender, instance, **kwargs):
-    # if there is PredictionMeta object associated with the Prediction object, delete it
-    if hasattr(instance, 'meta'):
-        logger.debug(f'Deleting PredictionMeta object associated with Prediction object {instance.id}')
-        instance.meta.delete()
 
 
 @receiver(post_save, sender=Prediction)
