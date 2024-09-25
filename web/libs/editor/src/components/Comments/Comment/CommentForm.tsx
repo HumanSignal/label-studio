@@ -33,14 +33,14 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
 
   const getCurrentComment = useCallback(
     (mayCreate = true) => {
-      let currentComment = commentStore.currentComment[annotationStore.selected.id];
+      let currentComment = commentStore.commentInProgress;
       if (!currentComment && mayCreate) {
-        currentComment = CommentBase.create({ text: "" }, { annotationStore });
+        currentComment = CommentBase.create({ text: "" }, { annotationStore: commentStore.annotationStore });
         commentStore.setCurrentComment(currentComment);
       }
       return currentComment;
     },
-    [commentStore, annotationStore],
+    [commentStore],
   );
 
   const updateComment = useCallback(
