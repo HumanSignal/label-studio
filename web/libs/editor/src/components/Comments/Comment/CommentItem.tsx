@@ -186,7 +186,7 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
                       >
                         {isEditMode ? "Cancel edit" : "Edit"}
                       </Menu.Item>
-                      <Menu.Item onClick={toggleLink}>{regionRef?.region ? "Unlink" : "Link to ..."}</Menu.Item>
+                      <Menu.Item onClick={toggleLink}>{regionRef?.region ? "Unlink" : "Link to..."}</Menu.Item>
                       {!isConfirmDelete && (
                         <Menu.Item
                           onClick={() => {
