@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-447: Filters don't pass to label stream in DM (#6410)",
-  "commit": "040024385d40e125ac8096b773ef88b78e3680c5",
-  "date": "2024-09-20T12:18:26.000Z",
+  "message": "fix: OPTIC-1125: Label config preview always showing a step behind when making updates (#6417)",
+  "commit": "08b2ea44fc954cc70e64528054878275cce53427",
+  "date": "2024-09-25T09:30:15.000Z",
   "branch": "develop"
 }

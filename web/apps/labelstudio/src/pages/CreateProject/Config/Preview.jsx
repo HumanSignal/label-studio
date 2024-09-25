@@ -9,15 +9,25 @@ import { useAPI } from "../../../providers/ApiProvider";
 
 const configClass = cn("configure");
 
-const loadDependencies = async () => import("@humansignal/editor");
+// Lazy load Label Studio with a single promise to avoid multiple loads
+// and enable as early as possible to load the dependencies once this component is mounted for the first time
+let dependencies;
+const loadDependencies = async () => {
+  if (!dependencies) {
+    dependencies = import("@humansignal/editor");
+  }
+  return dependencies;
+};
 
 export const Preview = ({ config, data, error, loading, project }) => {
-  const lsf = useRef(null);
-  const resolvingEditor = useMemo(loadDependencies);
-  const rootRef = useRef();
-  const projectRef = useRef(project);
-  const api = useAPI();
+  // @see comment about dependencies above
+  loadDependencies();
 
+  const [storeReady, setStoreReady] = useState(false);
+  const lsf = useRef(null);
+  const rootRef = useRef();
+  const api = useAPI();
+  const projectRef = useRef(project);
   projectRef.current = project;
 
   const currentTask = useMemo(() => {
@@ -53,12 +63,14 @@ export const Preview = ({ config, data, error, loading, project }) => {
   }, [config]);
 
   const initLabelStudio = useCallback(async (config, task) => {
-    if (!task.data) return;
+    // wait for dependencies to load, the promise is resolved only once
+    // and is started when the component is mounted for the first time
+    await loadDependencies();
 
-    await resolvingEditor;
+    if (lsf.current || !task.data) return;
 
     try {
-      const lsf = new window.LabelStudio(rootRef.current, {
+      lsf.current = new window.LabelStudio(rootRef.current, {
         config,
         task,
         interfaces: ["side-column"],
@@ -71,6 +83,7 @@ export const Preview = ({ config, data, error, loading, project }) => {
             const c = as.createAnnotation();
 
             as.selectAnnotation(c.id);
+            setStoreReady(true);
           };
 
           if (isFF(FF_DEV_3617)) {
@@ -82,12 +95,9 @@ export const Preview = ({ config, data, error, loading, project }) => {
         },
       });
 
-      lsf.on("presignUrlForProject", onPresignUrlForProject);
-
-      return lsf;
+      lsf.current.on("presignUrlForProject", onPresignUrlForProject);
     } catch (err) {
       console.error(err);
-      return null;
     }
   }, []);
 
@@ -99,45 +109,30 @@ export const Preview = ({ config, data, error, loading, project }) => {
   }, [loading, error]);
 
   useEffect(() => {
-    if (!lsf.current) {
-      initLabelStudio(currentConfig, currentTask).then((ls) => {
-        lsf.current = ls;
-      });
-    }
-  }, [currentConfig, currentTask]);
+    initLabelStudio(currentConfig, currentTask).then(() => {
+      if (storeReady && lsf.current?.store) {
+        const store = lsf.current.store;
 
-  useEffect(() => {
-    if (lsf.current?.store) {
-      lsf.current.store.assignConfig(currentConfig);
-      console.log("LSF config updated");
-    }
-  }, [currentConfig]);
+        store.resetState();
+        store.assignTask(currentTask);
+        store.assignConfig(currentConfig);
+        store.initializeStore(currentTask);
 
-  useEffect(() => {
-    if (lsf.current?.store) {
-      const store = lsf.current.store;
+        const c = store.annotationStore.addAnnotation({
+          userGenerate: true,
+        });
 
-      store.resetState();
-      store.assignTask(currentTask);
-      store.initializeStore(currentTask);
-
-      const c = store.annotationStore.addAnnotation({
-        userGenerate: true,
-      });
-
-      store.annotationStore.selectAnnotation(c.id);
-      console.log("LSF task updated");
-    }
-  }, [currentTask]);
+        store.annotationStore.selectAnnotation(c.id);
+        console.log("LSF updated");
+      }
+    });
+  }, [currentConfig, currentTask, storeReady]);
 
   useEffect(() => {
     return () => {
       if (lsf.current) {
         console.info("Destroying LSF");
-        // there can be weird error from LSF, but we can just skip it for now
-        try {
-          lsf.current.destroy();
-        } catch (e) {}
+        lsf.current.destroy();
         lsf.current = null;
       }
     };

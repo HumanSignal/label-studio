@@ -3,7 +3,7 @@
 import logging   # noqa: I001
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 import rules
 
@@ -11,6 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class AllPermissions(BaseModel):
+    model_config = ConfigDict(protected_namespaces=('__.*__', '_.*'))
+
     organizations_create: str = 'organizations.create'
     organizations_view: str = 'organizations.view'
     organizations_change: str = 'organizations.change'

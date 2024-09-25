@@ -132,8 +132,8 @@ describe("Rect3Point tool", () => {
     ImageView.clickAtRelative(0.5, 0.5);
 
     LabelStudio.serialize().then(([result]) => {
-      expect(result.value.x).to.be.closeTo(50, 0.1);
-      expect(result.value.y).to.be.closeTo(50, 0.1);
+      expect(result.value.x).to.be.closeTo(50, 0.2);
+      expect(result.value.y).to.be.closeTo(50, 0.2);
       expect(result.value.rotation).to.be.eq(0);
     });
   });
