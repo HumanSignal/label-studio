@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-1120: Draft lead time incorrectly calculated which can cause annotation lead time to be wrong (#6406)",
-  "commit": "55fd471b5c7f1cb65cb97239a417e100e7cc553b",
-  "date": "2024-09-25T13:16:28.000Z",
+  "message": "feat: LEAP-1467: Adapt Textarea result container to new style (#6413)",
+  "commit": "7d1c6d4091299ba10a3868f85479f5c280620a9e",
+  "date": "2024-09-25T17:51:05.000Z",
   "branch": "develop"
 }
