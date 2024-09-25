@@ -49,7 +49,7 @@ By utilizing AI to handle the bulk of the annotation work, you can significantly
 3. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an OpenAI API key.
 
     * [Create a Prompt](prompts_create)
-    * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
+    * [Model provider keys](prompts_create#Model-provider-API-keys)
 4. Write a prompt and evaluate it against your ground truth dataset. 
 
     * [Draft a prompt](prompt_draft)
@@ -118,7 +118,7 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
 3. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an OpenAI API key.
 
     * [Create a Prompt](prompts_create)
-    * [Where do I find my OpenAI API Key?](https://help.openai.com/en/articles/4936850-where-do-i-find-my-openai-api-key)
+    * [Model provider keys](prompts_create#Model-provider-API-keys)
 4. Write a prompt and evaluate it against your ground truth dataset. 
 
     * [Draft a prompt](prompt_draft)
