@@ -154,6 +154,7 @@ export const ActionsButton = injector(
             <Menu size="compact">{actionButtons}</Menu>
           )
         }
+        openUpwardForShortViewport={false}
         disabled={!hasSelected}
         onToggle={(visible) => isFFLOPSE3 && setIsOpen(visible)}
       >
