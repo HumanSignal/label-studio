@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1440: Allow to attach a region to a new comment (#6400)",
-  "commit": "4ff9df53619002ad17e901e568c829764ebca205",
-  "date": "2024-09-24T13:45:27.000Z",
+  "message": "fix: LEAP-1258: prevent dropdown from opening upward when viewport short (#6426)",
+  "commit": "d3cb7a40c580e38c406c072560016a17f5d1c8b6",
+  "date": "2024-09-25T00:35:30.000Z",
   "branch": "develop"
 }
