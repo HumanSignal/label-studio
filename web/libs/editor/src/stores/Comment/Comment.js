@@ -118,9 +118,12 @@ export const Comment = CommentBase.named("Comment")
         self.isUpdating = true;
         const [result] = yield self.sdk.invoke("comments:update", {
           id: self.id,
-          ...props,
+          ...snakeizeKeys(props),
         });
-        if (result.error) return;
+        if (result.error) {
+          self.isUpdating = false;
+          return;
+        }
         const data = camelizeKeys(result);
         applySnapshot(self, data);
         self.isUpdating = false;
@@ -131,12 +134,12 @@ export const Comment = CommentBase.named("Comment")
       const regionRef = {
         regionId: region.cleanId,
       };
-      self.update(snakeizeKeys({ regionRef }));
+      self.update({ regionRef });
     }
 
     function unsetLink() {
       const regionRef = null;
-      self.update(snakeizeKeys({ regionRef }));
+      self.update({ regionRef });
     }
 
     const deleteComment = flow(function* () {
