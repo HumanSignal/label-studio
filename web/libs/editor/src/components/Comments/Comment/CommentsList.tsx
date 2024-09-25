@@ -24,7 +24,7 @@ export const CommentsList: FC<{ commentStore: any }> = observer(({ commentStore 
     },
     [commentStore],
   );
-  const globalLinking = commentStore.annotation && commentStore.annotation.linkingMode === LINK_COMMENT_MODE;
+  const globalLinking = commentStore.annotation?.linkingMode === LINK_COMMENT_MODE;
   const currentComment = commentStore.annotation.currentLinkingMode?.comment;
   const contextValue = useMemo(
     () => ({ startLinkingMode, currentComment, globalLinking }),
