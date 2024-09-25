@@ -292,6 +292,8 @@ export const FF_CUSTOM_SCRIPT = "fflag_feat_all_leap_883_custom_script_270524_sh
  */
 export const FF_LEAP_1173 = "fflag_feat_front_leap_1173_disable_postpone_skip_short";
 
+export const FF_PER_FIELD_COMMENTS = "fflag_feat_all_leap_1430_per_field_comments_100924_short";
+
 Object.assign(window, {
   APP_SETTINGS: {
     ...(window.APP_SETTINGS ?? {}),

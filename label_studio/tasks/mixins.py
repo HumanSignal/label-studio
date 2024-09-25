@@ -27,6 +27,9 @@ class TaskMixin:
         """
         pass
 
+    def get_rejected_query(self):
+        pass
+
 
 class AnnotationMixin:
     def has_permission(self, user: 'User') -> bool:  # noqa: F821

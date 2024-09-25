@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-447: Filters don't pass to label stream in DM (#6410)",
-  "commit": "040024385d40e125ac8096b773ef88b78e3680c5",
-  "date": "2024-09-20T12:18:26.000Z",
+  "message": "fix: OPTIC-1120: Draft lead time incorrectly calculated which can cause annotation lead time to be wrong (#6406)",
+  "commit": "55fd471b5c7f1cb65cb97239a417e100e7cc553b",
+  "date": "2024-09-25T13:16:28.000Z",
   "branch": "develop"
 }

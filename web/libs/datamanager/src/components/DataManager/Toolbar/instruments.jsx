@@ -90,6 +90,7 @@ export const instruments = {
         title={"Columns"}
         size={size}
         style={style}
+        openUpwardForShortViewport={false}
       />
     );
   },

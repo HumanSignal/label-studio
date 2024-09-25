@@ -20,6 +20,7 @@ export class CommentsSdk {
     const body = {
       is_resolved: comment.is_resolved,
       text: comment.text,
+      region_ref: comment.region_ref,
     };
 
     if (comment.annotation) {
