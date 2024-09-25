@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1258: prevent dropdown from opening upward when viewport short (#6426)",
-  "commit": "d3cb7a40c580e38c406c072560016a17f5d1c8b6",
-  "date": "2024-09-25T00:35:30.000Z",
+  "message": "fix: OPTIC-1125: Label config preview always showing a step behind when making updates (#6417)",
+  "commit": "08b2ea44fc954cc70e64528054878275cce53427",
+  "date": "2024-09-25T09:30:15.000Z",
   "branch": "develop"
 }
