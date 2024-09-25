@@ -635,14 +635,17 @@ export const AppStore = types
       };
 
       if (actionId === "next_task") {
-        if (labelStreamMode === "all") {
+        const isSelectAll = actionParams.selectedItems.all === true;
+        const isAllLabelStreamMode = labelStreamMode === "all";
+        const isFilteredLabelStreamMode = labelStreamMode === "filtered";
+        if (isAllLabelStreamMode && !isSelectAll) {
           delete actionParams.filters;
 
           if (actionParams.selectedItems.all === false && actionParams.selectedItems.included.length === 0) {
             delete actionParams.selectedItems;
             delete actionParams.ordering;
           }
-        } else if (labelStreamMode === "filtered") {
+        } else if (isFilteredLabelStreamMode) {
           delete actionParams.selectedItems;
         }
       }

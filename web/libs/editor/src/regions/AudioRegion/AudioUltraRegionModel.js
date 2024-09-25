@@ -110,14 +110,14 @@ export const AudioUltraRegionModel = types
       },
 
       onMouseOver() {
-        if (self.annotation.relationMode) {
+        if (self.annotation.isLinkingMode) {
           self.setHighlight(true);
-          self._ws_region.switchCursor(Constants.RELATION_MODE_CURSOR);
+          self._ws_region.switchCursor(Constants.LINKING_MODE_CURSOR);
         }
       },
 
       onMouseLeave() {
-        if (self.annotation.relationMode) {
+        if (self.annotation.isLinkingMode) {
           self.setHighlight(false);
           self._ws_region.switchCursor(Constants.MOVE_CURSOR);
         }
