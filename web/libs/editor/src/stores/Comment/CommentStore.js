@@ -70,7 +70,7 @@ export const CommentStore = types
     get commentInProgress() {
       if (!self.annotation) return undefined;
       return self.currentComment[self.annotation.id];
-    }
+    },
   }))
   .actions((self) => {
     function serialize({ commentsFilter, queueComments } = { commentsFilter: "all", queueComments: false }) {
