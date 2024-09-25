@@ -219,7 +219,7 @@ Here is an example of a prompt for this. It includes 1000 labels from YOLOv8 cla
 
 </details>
 
-## YOLOv5 and other YOLO models
+## YOLOv5 and other YOLO versions
 
 YOLOv8 models have been successfully tested with this ML backend.
 
@@ -424,32 +424,32 @@ More info: [Ultralytics YOLO Keypoint Documentation](https://docs.ultralytics.co
     model_add_bboxes="true" model_point_size="1"
     model_path="yolov8n-pose.pt"
   >
-    <Label value="nose" predicted_values="person" model_index="1" background="red" />
+    <Label value="nose" predicted_values="person" model_index="0" background="red" />
 
-    <Label value="left_eye" predicted_values="person" model_index="2" background="yellow" />
-    <Label value="right_eye" predicted_values="person" model_index="3" background="yellow" />
+    <Label value="left_eye" predicted_values="person" model_index="1" background="yellow" />
+    <Label value="right_eye" predicted_values="person" model_index="2" background="yellow" />
 
-    <Label value="left_ear" predicted_values="person" model_index="4" background="purple" />
-    <Label value="right_ear" predicted_values="person" model_index="5" background="purple" />
+    <Label value="left_ear" predicted_values="person" model_index="3" background="purple" />
+    <Label value="right_ear" predicted_values="person" model_index="4" background="purple" />
     
     <View>
-      <Label value="left_shoulder" predicted_values="person" model_index="6" background="green" />
-      <Label value="left_elbow" predicted_values="person" model_index="8" background="green" />
-      <Label value="left_wrist" predicted_values="person" model_index="10" background="green" />
+      <Label value="left_shoulder" predicted_values="person" model_index="5" background="green" />
+      <Label value="left_elbow" predicted_values="person" model_index="7" background="green" />
+      <Label value="left_wrist" predicted_values="person" model_index="9" background="green" />
 
-      <Label value="right_shoulder" predicted_values="person" model_index="7" background="blue" />
-      <Label value="right_elbow" predicted_values="person" model_index="9" background="blue" />
-      <Label value="right_wrist" predicted_values="person" model_index="11" background="blue" />
+      <Label value="right_shoulder" predicted_values="person" model_index="6" background="blue" />
+      <Label value="right_elbow" predicted_values="person" model_index="8" background="blue" />
+      <Label value="right_wrist" predicted_values="person" model_index="10" background="blue" />
     </View>
     
     <View>
-      <Label value="left_hip" predicted_values="person" model_index="12" background="brown" />
-      <Label value="left_knee" predicted_values="person" model_index="14" background="brown" />
-      <Label value="left_ankle" predicted_values="person" model_index="16" background="brown" />
+      <Label value="left_hip" predicted_values="person" model_index="11" background="brown" />
+      <Label value="left_knee" predicted_values="person" model_index="13" background="brown" />
+      <Label value="left_ankle" predicted_values="person" model_index="15" background="brown" />
 
-      <Label value="right_hip" predicted_values="person" model_index="13" background="orange" />
-      <Label value="right_knee" predicted_values="person" model_index="15" background="orange" />
-      <Label value="right_ankle" predicted_values="person" model_index="17" background="orange" />
+      <Label value="right_hip" predicted_values="person" model_index="12" background="orange" />
+      <Label value="right_knee" predicted_values="person" model_index="14" background="orange" />
+      <Label value="right_ankle" predicted_values="person" model_index="16" background="orange" />
     </View>
   </KeyPointLabels>
   
@@ -461,12 +461,12 @@ More info: [Ultralytics YOLO Keypoint Documentation](https://docs.ultralytics.co
 
 | Parameter               | Type   | Default | Description                                                                                                                                                                    |
 |-------------------------|--------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                       |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                   |
 | `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for bounding box detections. Keypoints that are related to the detected bbox with a confidence below this threshold will be disregarded. |
 | `model_point_threshold` | float  | 0.0     | Minimum confidence threshold for keypoints. Keypoints with confidence below this value will be ignored.                                                                        |
 | `model_add_bboxes`      | bool   | True    | Adds bounding boxes for detected keypoints. All keypoints will be grouped by parent bounding boxes on the region panel. See details in the tip below.                          |
 | `model_point_size`      | float  | 1       | Size of the keypoints in pixels. Just a visual parameter.                                                                                                                      |
-| `model_index`           | int    | None    | Index of the keypoint in the YOLO model output. It's used in `Label` tags only to build mapping between a Label and an output point.                                           |
+| `model_index`           | int    | None    | Index of the keypoint in the YOLO model output starting from 0. It's used in `Label` tags only to build mapping between a Label and an output point.                           |
 
 For example:
 
@@ -507,32 +507,32 @@ You can use this labeling configuration to get rid of bounding boxes and keep on
     model_path="yolov8n-pose.pt" model_point_size="1"
     model_add_bboxes="false"              
   >
-    <Label value="nose" predicted_values="person" model_index="1" background="red" />
+    <Label value="nose" predicted_values="person" model_index="0" background="red" />
 
-    <Label value="left_eye" predicted_values="person" model_index="2" background="yellow" />
-    <Label value="right_eye" predicted_values="person" model_index="3" background="yellow" />
+    <Label value="left_eye" predicted_values="person" model_index="1" background="yellow" />
+    <Label value="right_eye" predicted_values="person" model_index="2" background="yellow" />
 
-    <Label value="left_ear" predicted_values="person" model_index="4" background="purple" />
-    <Label value="right_ear" predicted_values="person" model_index="5" background="purple" />
+    <Label value="left_ear" predicted_values="person" model_index="3" background="purple" />
+    <Label value="right_ear" predicted_values="person" model_index="4" background="purple" />
     
     <View>
-      <Label value="left_shoulder" predicted_values="person" model_index="6" background="green" />
-      <Label value="left_elbow" predicted_values="person" model_index="8" background="green" />
-      <Label value="left_wrist" predicted_values="person" model_index="10" background="green" />
+      <Label value="left_shoulder" predicted_values="person" model_index="5" background="green" />
+      <Label value="left_elbow" predicted_values="person" model_index="7" background="green" />
+      <Label value="left_wrist" predicted_values="person" model_index="9" background="green" />
 
-      <Label value="right_shoulder" predicted_values="person" model_index="7" background="blue" />
-      <Label value="right_elbow" predicted_values="person" model_index="9" background="blue" />
-      <Label value="right_wrist" predicted_values="person" model_index="11" background="blue" />
+      <Label value="right_shoulder" predicted_values="person" model_index="6" background="blue" />
+      <Label value="right_elbow" predicted_values="person" model_index="8" background="blue" />
+      <Label value="right_wrist" predicted_values="person" model_index="10" background="blue" />
     </View>
     
     <View>
-      <Label value="left_hip" predicted_values="person" model_index="12" background="brown" />
-      <Label value="left_knee" predicted_values="person" model_index="14" background="brown" />
-      <Label value="left_ankle" predicted_values="person" model_index="16" background="brown" />
+      <Label value="left_hip" predicted_values="person" model_index="11" background="brown" />
+      <Label value="left_knee" predicted_values="person" model_index="13" background="brown" />
+      <Label value="left_ankle" predicted_values="person" model_index="15" background="brown" />
 
-      <Label value="right_hip" predicted_values="person" model_index="13" background="orange" />
-      <Label value="right_knee" predicted_values="person" model_index="15" background="orange" />
-      <Label value="right_ankle" predicted_values="person" model_index="17" background="orange" />
+      <Label value="right_hip" predicted_values="person" model_index="12" background="orange" />
+      <Label value="right_knee" predicted_values="person" model_index="14" background="orange" />
+      <Label value="right_ankle" predicted_values="person" model_index="16" background="orange" />
     </View>
   </KeyPointLabels>
   <Image name="image" value="$image" />
@@ -548,8 +548,8 @@ Each keypoint can be associated with a specific part of a person or object,
 and you can define this mapping using the `model_index` and `predicted_values` attributes.
 
 ```xml
-<Label value="left_eye" predicted_values="person" model_index="2" />
-<Label value="right_eye" predicted_values="person" model_index="3" />
+<Label value="left_eye" predicted_values="person" model_index="1" />
+<Label value="right_eye" predicted_values="person" model_index="2" />
 ```
 
 This configuration ensures that the keypoints detected by the YOLO model are correctly labeled in the Label Studio interface.
