@@ -24,7 +24,6 @@ This integration allows you to leverage powerful YOLOv8 models for various machi
 making it easier to annotate large datasets and ensure high-quality predictions. 
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/UyaecID1iG8?si=UQQW3mpqu2uDtt7i" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-<br/>
 
 **Supported Features**
 
