@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1467: Adapt Textarea result container to new style (#6413)",
-  "commit": "7d1c6d4091299ba10a3868f85479f5c280620a9e",
-  "date": "2024-09-25T17:51:05.000Z",
+  "message": "feat: LEAP-1439: Display link in existing comment and allow linking (#6404)",
+  "commit": "c46ff7e359dd063c4c40c14a78f7c6936b17e860",
+  "date": "2024-09-26T02:01:44.000Z",
   "branch": "develop"
 }
