@@ -953,7 +953,7 @@ export class LSFWrapper {
   prepareData(annotation, { includeId, isNewDraft } = {}) {
     const userGenerate = !annotation.userGenerate || annotation.sentUserGenerate;
     const currentDraft = this.findActiveDraft(annotation);
-    const sessionTime = (new Date() - annotation.loadedDate) / 1000;
+    const sessionTime = (Date.now() - annotation.loadedDate.getTime()) / 1000;
     const submittedTime = isNewDraft ? 0 : Number(annotation.leadTime ?? 0);
     const draftTime = Number(currentDraft?.lead_time ?? 0);
     const leadTime = submittedTime + draftTime + sessionTime;
