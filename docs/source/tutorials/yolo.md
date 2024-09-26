@@ -60,7 +60,9 @@ This tutorial uses the [YOLO example](https://github.com/HumanSignal/label-studi
 
 ## Quick start
 
-1. Add `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` to the `docker-compose.yml` file. These variables should point to your Label Studio instance and its API key, respectively. For more information about finding your Label Studio API key, [see our documentation](https://labelstud.io/guide/user_account#Access-token).
+1. Add `LABEL_STUDIO_URL` and `LABEL_STUDIO_API_KEY` to the `docker-compose.yml` file. 
+These variables should point to your Label Studio instance and its API key, respectively. 
+For more information about finding your Label Studio API key, [see our documentation](https://labelstud.io/guide/user_account#Access-token).
 
 2. Run docker compose
 
@@ -227,17 +229,140 @@ Attempts to run YOLOv5 were unsuccessful without modifications.
 It may be possible to run it by applying some changes, such as installing additional dependencies. 
 The same applies to other YOLO models.
 
-## Custom YOLO models
+## Your own custom YOLO models
 
 You can load your own YOLO labels using the following steps:
 
-1. Mount your model as `/app/models/<your-model>.pt` inside of your docker.
-2. Set `ALLOW_CUSTOM_MODEL_PATH=true` (it is true by default) in your Docker environment parameters ([`docker-compose.yml`](docker-compose.yml)).
-3. Add `model_path="<your-model>.pt"` to the control tag in the labeling configuration, e.g.:
+1. Mount your model as `/app/models/<your-model>.pt` inside of your Docker.
+2. Add `model_path="<your-model>.pt"` to the control tag in the labeling configuration, e.g.:
 
 ```xml
 <RectangleLabels model_path="my_model.pt">
 ```
+
+<details>
+<summary><b>Step by step guide</b>: Using your own custom YOLOv8 model</summary>
+<br/>
+You can integrate your own custom-trained YOLOv8 models with the YOLO ML backend for Label Studio. 
+Follow these detailed steps to set up your custom model in the ML backend Docker:
+
+### Step 1: Prepare your custom YOLOv8 model
+
+Ensure that your custom YOLOv8 model is saved as a `.pt` file, which is the standard format for PyTorch models. 
+Let's assume your model file is named `my_custom_model.pt`.
+
+### Step 2: Place your model
+
+1. **Create a 'models' directory:**
+
+   In your project root directory `yolo` (the same directory where your `docker-compose.yml` is located), 
+   create a new folder named `models` and place your `my_custom_model.pt` file inside it.
+
+   ```
+   yolo/
+   ├── docker-compose.yml
+   ├── models/
+       └── my_custom_model.pt
+   ```
+
+2. **Modify `docker-compose.yml` to mount the 'models' directory:**
+
+   Update your `docker-compose.yml` file to include a volume that maps the local `models` directory 
+   to the `/app/models` directory inside the Docker container.
+
+   ```yaml
+   services:
+     yolo:
+       container_name: yolo
+       ...
+       volumes:
+         - ./models:/app/models  # Mount the local 'models' directory
+       environment:
+         - ALLOW_CUSTOM_MODEL_PATH=true
+       ...
+   ```
+
+### Step 3: Ensure environment variables are set correctly
+
+- **`ALLOW_CUSTOM_MODEL_PATH=true`**: Ensure this is set in your Docker environment variables to allow the ML backend to load custom model paths (it's `true` by default).
+- **`LABEL_STUDIO_URL`**: This is necessary to specify the external IP or domain of your Label Studio instance. 
+  If you run Label Studio and ML backend locally, you can try setting it to `LABEL_STUDIO_URL=http://host.docker.internal:8080`.
+- **`LABEL_STUDIO_API_KEY`**: This is necessary to specify the API key of your Label Studio instance. 
+  You can find it in Label Studio on the [User Account page](https://labelstud.io/guide/user_account#Access-token).
+- **`LOG_LEVEL`**: (optional) Set the logging level for the ML backend. You can use `DEBUG`, `INFO`, `WARNING`, `ERROR`.
+
+Example `docker-compose.yml`:
+
+```yaml
+environment:
+  - ALLOW_CUSTOM_MODEL_PATH=true
+  - LABEL_STUDIO_URL=http://host.docker.internal:8080
+  - LABEL_STUDIO_API_KEY=your_api_key
+  - LOG_LEVEL=DEBUG  # optional 
+```
+
+### Step 4: Update your Labeling Configuration in Label Studio
+
+In your Label Studio project, specify the path to your custom model in the labeling configuration 
+by adding the `model_path` parameter to the control tag you're using 
+(e.g., `<RectangleLabels>`, `<PolygonLabels>`, `<Choices>`, etc.).
+
+**Example for Object Detection with `<RectangleLabels>`:**
+
+```xml
+<View>
+  <Image name="image" value="$image"/>
+  <RectangleLabels 
+          name="label" toName="image" 
+          model_path="my_custom_model.pt" 
+          model_score_threshold="0.25">
+    <Label value="Cat"/>
+    <Label value="Dog"/>
+  </RectangleLabels>
+</View>
+```
+
+**Important Notes:**
+
+- **`model_path`**: The **`model_path`** should match the filename of your custom model and must be located in the `/app/models` directory inside the Docker container.
+- **Class names mapping**: Ensure that the `value` attributes in your `<Label>` tags correspond to the **class names** your model predicts. If they differ, use the `predicted_values` attribute to map them. Example:
+  ```xml
+  <Label value="Cat" predicted_values="feline"/>
+  <Label value="Dog" predicted_values="canine"/>
+  ```
+- **Where to find class names**: See ML backend logs **to know the exact class names** your model predicts, and then 
+you can use these names in the `predicted_values` attribute and in the `value` of Label tags directly.
+
+### Step 5: Restart the ML Backend
+
+After making these changes, restart the ML backend to apply the new configuration.
+
+```bash
+docker-compose down
+docker-compose up --build
+```
+
+### Step 6: Connect the ML Backend to your Label Studio project
+
+1. Open your Label Studio instance.
+2. Go to the **Settings** of your project.
+3. Navigate to the **Model** tab.
+4. Connect to the ML backend by entering the ML backend URL 
+(if you run it locally, it's most likely `http://localhost:9090`).
+
+### Step 7: Test your setup
+
+Add some tasks (images or other data) to your Label Studio project and open a task in the labeling interface. 
+The ML backend should now use your custom model to generate predictions.
+
+### Common pitfalls
+
+- **Incorrect model path:** Ensure that the `model_path` in your labeling configuration exactly matches the filename of your model inside `/app/models`.
+- **Label mismatch:** Double-check that your labels in Label Studio match the classes your model predicts, or use `predicted_values` to map them.
+- **Keypoints models and model_index:** If you use a keypoints model, you should specify the `model_index` parameter in each `Label` tag. 
+
+</details>
+
 
 ## Training
 
@@ -274,10 +399,10 @@ https://github.com/user-attachments/assets/30c5ce43-2c89-4ddf-a77d-9d1d75ac3419
 
 ### Parameters
 
-| Parameter               | Type   | Default | Description                                                                                                                                                                                                                                                                                                                                                          |
-|-------------------------|--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives.                                                                                                                                                                               |
-| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                                                                                                                                                                                                         |
+| Parameter               | Type   | Default | Description                                                                                                                                                                                                                                                                                                                                                                  |
+|-------------------------|--------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives.                                                                                                                                                                                       |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#your-own-custom-yolo-models).                                                                                                                                                                                                                                                          |
 | `choice`                | string | single  | Possible values: `single`, `single-radio`, `multiple`. If you use `choice="single"` (default) you can select only one label. The ML backend will return the label with the highest confidence using argmax strategy. If you use `choice="multiple"` you can select multiple labels. The ML backend will return all labels with confidence above the `model_score_threshold`. |
 
 
@@ -325,7 +450,7 @@ https://github.com/user-attachments/assets/413b4650-422d-43dc-809d-51c08f0ad434
 | Parameter               | Type   | Default | Description                                                                                                                                                                            |
 |-------------------------|--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives. |
-| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                               |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#your-own-custom-yolo-models).                                                                    |
 | `model_obb`             | bool   | False   | Enables Oriented Bounding Boxes (OBB) mode. Typically it uses `*-obb.pt` yolo models.                                                                                                  |
 
 For example:
@@ -384,7 +509,7 @@ https://github.com/user-attachments/assets/9b2447d3-392d-42be-bc7f-ef2b6c81d54c
 | Parameter               | Type   | Default | Description                                                                                                                                                                            |
 |-------------------------|--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives. |
-| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                               |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#your-own-custom-yolo-models).                                                                    |
 
 For example:
 ```xml
@@ -461,7 +586,7 @@ More info: [Ultralytics YOLO Keypoint Documentation](https://docs.ultralytics.co
 
 | Parameter               | Type   | Default | Description                                                                                                                                                                    |
 |-------------------------|--------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                   |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#your-own-custom-yolo-models).                                                            |
 | `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for bounding box detections. Keypoints that are related to the detected bbox with a confidence below this threshold will be disregarded. |
 | `model_point_threshold` | float  | 0.0     | Minimum confidence threshold for keypoints. Keypoints with confidence below this value will be ignored.                                                                        |
 | `model_add_bboxes`      | bool   | True    | Adds bounding boxes for detected keypoints. All keypoints will be grouped by parent bounding boxes on the region panel. See details in the tip below.                          |
@@ -634,7 +759,7 @@ https://docs.ultralytics.com/modes/track/?h=track#tracking-arguments
 | `model_conf`    | float  | 0.25      | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives. |
 | `model_iou`     | float  | 0.7       | Intersection Over Union (IoU) threshold for Non-Maximum Suppression (NMS). Lower values result in fewer detections by eliminating overlapping boxes, useful for reducing duplicates.   |
 | `model_tracker` | string | `botsort` | Sets the tracker to use for multi-object tracking. Options include `botsort`, `bytetrack`, or a custom YAML file.                                                                      |
-| `model_path`    | string | None      | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                                                               |
+| `model_path`    | string | None      | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#your-own-custom-yolo-models).                                                                    |
 
 For example: 
 ```xml
