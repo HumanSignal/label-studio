@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { observer } from "mobx-react";
-import { Block } from "../../utils/bem";
+import { Block } from "../../../utils/bem";
 import { CommentItem } from "./CommentItem";
 
 export const CommentsList: FC<{ commentStore: any }> = observer(({ commentStore }) => {

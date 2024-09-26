@@ -25,8 +25,11 @@ export const CommentStore = types
     get task() {
       return getParent(self).task;
     },
+    get annotationStore() {
+      return getParent(self).annotationStore;
+    },
     get annotation() {
-      return getParent(self).annotationStore.selected;
+      return self.annotationStore.selected;
     },
     get annotationId() {
       return isNaN(self.annotation?.pk) ? undefined : self.annotation.pk;
@@ -63,6 +66,10 @@ export const CommentStore = types
     },
     get hasUnsaved() {
       return self.queuedComments.length > 0;
+    },
+    get commentInProgress() {
+      if (!self.annotation) return undefined;
+      return self.currentComment[self.annotation.id];
     },
   }))
   .actions((self) => {
