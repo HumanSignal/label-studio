@@ -14,7 +14,7 @@ This document describes the IP configuration, hostnames, and usage limits that g
 
 ## Mail configuration
 
-app.humansignal.com (app.heartex.com) sends emails from the `heartex.com` domain by using [SendGrid](https://sendgrid.com/), and has its own dedicated IP addresses:
+app.humansignal.com (app.heartex.com) sends emails from the `humansignal.com` domain by using [SendGrid](https://sendgrid.com/), and has its own dedicated IP addresses:
 
 - `208.117.59.219`
 
@@ -26,7 +26,7 @@ app.humansignal.com (app.heartex.com) utilizes the following IP addresses to han
 - `52.22.82.31`
 - `3.233.209.176`
 
-In addition, all outbound connections from our SaaS platform are issued from the following IP addresses (Import/Export, MLBackends):
+In addition, all outbound connections from our SaaS platform are issued from the following IP addresses (Import/Export, ML backends, Prompts):
 
 - `3.219.3.197`
 - `34.237.73.3`

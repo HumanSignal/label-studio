@@ -73,6 +73,7 @@ export const FieldsButton = injector(
     selected,
     tooltip,
     tooltipTheme = "dark",
+    openUpwardForShortViewport = true,
   }) => {
     const content = [];
 
@@ -102,6 +103,7 @@ export const FieldsButton = injector(
           maxHeight: 280,
           overflow: "auto",
         }}
+        openUpwardForShortViewport={openUpwardForShortViewport}
       >
         {tooltip ? (
           <Elem name={"field-button"} style={{ zIndex: 1000 }}>

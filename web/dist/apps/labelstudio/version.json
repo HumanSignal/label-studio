@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-447: Filters don't pass to label stream in DM (#6410)",
-  "commit": "040024385d40e125ac8096b773ef88b78e3680c5",
-  "date": "2024-09-20T12:18:26.000Z",
+  "message": "feat: LEAP-1454: Custom action buttons in LSF (#6411)",
+  "commit": "52014d2c89881add8ceb7a587a45a2055eda9d34",
+  "date": "2024-09-26T11:02:56.000Z",
   "branch": "develop"
 }

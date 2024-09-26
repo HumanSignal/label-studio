@@ -707,7 +707,7 @@ export class LSFWrapper {
 
   onSubmitDraft = async (studio, annotation, params = {}) => {
     const annotationDoesntExist = !annotation.pk;
-    const data = { body: this.prepareData(annotation, { draft: true }) }; // serializedAnnotation
+    const data = { body: this.prepareData(annotation, { isNewDraft: true }) }; // serializedAnnotation
     const hasChanges = this.needsDraftSave(annotation);
     const showToast = params?.useToast && hasChanges;
     // console.log('onSubmitDraft', params?.useToast, hasChanges);
@@ -908,18 +908,31 @@ export class LSFWrapper {
     return result;
   }
 
-  /** @private */
-  prepareData(annotation, { includeId, draft } = {}) {
-    const userGenerate = !annotation.userGenerate || annotation.sentUserGenerate;
+  /**
+   * Finds the active draft for the given annotation.
+   * @param {Object} annotation - The annotation object.
+   * @returns {Object|undefined} The active draft or undefined if no draft is found.
+   * @private
+   */
+  findActiveDraft(annotation) {
+    if (isDefined(annotation.draftId)) {
+      return this.task.drafts.find((possibleDraft) => possibleDraft.id === annotation.draftId);
+    }
+    return undefined;
+  }
 
+  /** @private */
+  prepareData(annotation, { includeId, isNewDraft } = {}) {
+    const userGenerate = !annotation.userGenerate || annotation.sentUserGenerate;
+    const currentDraft = this.findActiveDraft(annotation);
     const sessionTime = (new Date() - annotation.loadedDate) / 1000;
-    const submittedTime = Number(annotation.leadTime ?? 0);
-    const draftTime = Number(this.task.drafts[0]?.lead_time ?? 0);
-    const lead_time = sessionTime + submittedTime + draftTime;
+    const submittedTime = isNewDraft ? 0 : Number(annotation.leadTime ?? 0);
+    const draftTime = Number(currentDraft?.lead_time ?? 0);
+    const leadTime = submittedTime + draftTime + sessionTime;
 
     const result = {
-      lead_time,
-      result: (draft ? annotation.versions.draft : annotation.serializeAnnotation()) ?? [],
+      lead_time: leadTime,
+      result: (isNewDraft ? annotation.versions.draft : annotation.serializeAnnotation()) ?? [],
       draft_id: annotation.draftId,
       parent_prediction: annotation.parent_prediction,
       parent_annotation: annotation.parent_annotation,

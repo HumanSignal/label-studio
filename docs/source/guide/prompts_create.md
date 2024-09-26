@@ -101,8 +101,9 @@ From the Prompts page, click **Create Prompt** in the upper right and then compl
         * For text classification, this means that the labeling configuration for the project must use `Choice` tags. 
         * For NER, this means that the labeling configuration for the project must use `Label` tags. 
     * The labeling configuration cannot include multi-class classification. This means that setting the  `choice="multiple"` parameter is not supported for either the `<Labels>` or `<Choices>` tags.  
-    * The project must include text data (e.g. it cannot only include unsupported data types such as image, audio, video).
+    * The project must include text data. While it can include other data types such as images or video, it must include `<Text>`.
     * You must have access to the project. If you are in the Manager role, you need to be added to the project to have access. 
+    * The project cannot be located in your Personal Sandbox workspace. 
 
 ## Types
 
