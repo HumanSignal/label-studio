@@ -1,4 +1,4 @@
-.comment-form-enhanced {
+.comment-form-new {
   --primary-action-color: var(--grape_500);
   --primary-action-padding: 4px;
   --primary-action-border-radius: 4px;
@@ -78,7 +78,7 @@
   }
 
   &_inline {
-    & .comment-form-enhanced__actions {
+    & .comment-form-new__actions {
       grid-row: 1 / 2;
       grid-column: 2 / -1;
 

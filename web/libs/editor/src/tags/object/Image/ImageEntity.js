@@ -67,7 +67,7 @@ export const ImageEntity = types
   }))
   .actions((self) => ({
     preload() {
-      if (self.ensurePreloaded()) return;
+      if (self.ensurePreloaded() || !self.src) return;
 
       self.setDownloading(true);
 

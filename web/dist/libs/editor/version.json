@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1440: Allow to attach a region to a new comment (#6400)",
-  "commit": "4ff9df53619002ad17e901e568c829764ebca205",
-  "date": "2024-09-24T13:45:27.000Z",
+  "message": "fix: LEAP-1507: show review instructions in review stream (#6444)",
+  "commit": "c4cb483d06b663e4c4501acd957ee2658c5f41b8",
+  "date": "2024-09-26T22:06:17.000Z",
   "branch": "develop"
 }
