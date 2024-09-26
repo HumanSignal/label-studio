@@ -1,6 +1,6 @@
 {
-  "message": "fix: OPTIC-1125: Label config preview always showing a step behind when making updates (#6417)",
-  "commit": "08b2ea44fc954cc70e64528054878275cce53427",
-  "date": "2024-09-25T09:30:15.000Z",
+  "message": "feat: LEAP-1467: Adapt Textarea result container to new style (#6413)",
+  "commit": "7d1c6d4091299ba10a3868f85479f5c280620a9e",
+  "date": "2024-09-25T17:51:05.000Z",
   "branch": "develop"
 }

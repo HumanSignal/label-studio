@@ -1,6 +1,10 @@
 import React from "react";
-import { Tooltip, Typography } from "antd";
-import { DeleteOutlined, EditOutlined, EnterOutlined } from "@ant-design/icons";
+import { Typography } from "antd";
+import { EnterOutlined } from "@ant-design/icons";
+import { IconEdit, IconTrashAlt } from "../../assets/icons";
+import { Button } from "../../common/Button/Button";
+import { Tooltip } from "../../common/Tooltip/Tooltip";
+import { Elem } from "../../utils/bem";
 import styles from "./HtxTextBox.module.scss";
 import throttle from "lodash.throttle";
 
@@ -178,12 +182,31 @@ export class HtxTextBox extends React.Component {
       <>
         <Paragraph {...props}>
           <span ref={this.textRef}>{text}</span>
-          {isEditable && onChange && (
-            <EditOutlined onClick={this.startEditing} aria-label="Edit Region" className="ant-typography-edit" />
-          )}
         </Paragraph>
+        {isEditable && onChange && (
+          <Button
+            type="text"
+            className={styles.button}
+            tooltip="Edit"
+            tooltipTheme="Dark"
+            style={{ padding: 0 }}
+            icon={<IconEdit />}
+            aria-label="Edit Region"
+            onClick={this.startEditing}
+          />
+        )}
         {isDeleteable && onDelete && (
-          <DeleteOutlined className={styles.delete} aria-label="Delete Region" onClick={onDelete} />
+          <Button
+            type="text"
+            look="danger"
+            className={styles.button}
+            tooltip="Delete"
+            tooltipTheme="Dark"
+            style={{ padding: 0 }}
+            icon={<IconTrashAlt />}
+            aria-label="Delete Region"
+            onClick={onDelete}
+          />
         )}
       </>
     );
