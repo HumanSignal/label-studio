@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1439: Display link in existing comment and allow linking (#6404)",
-  "commit": "c46ff7e359dd063c4c40c14a78f7c6936b17e860",
-  "date": "2024-09-26T02:01:44.000Z",
+  "message": "feat: LEAP-1454: Custom action buttons in LSF (#6411)",
+  "commit": "52014d2c89881add8ceb7a587a45a2055eda9d34",
+  "date": "2024-09-26T11:02:56.000Z",
   "branch": "develop"
 }
