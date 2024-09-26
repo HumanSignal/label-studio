@@ -235,7 +235,7 @@ class App extends Component {
             <InstructionsModal
               visible={store.showingDescription}
               onCancel={() => store.toggleDescription()}
-              title="Labeling Instructions"
+              title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
             >
               {store.description}
             </InstructionsModal>
