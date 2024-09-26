@@ -1567,6 +1567,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_feat_all_leap_1429_flexible_reject_mode_250924_short": {
+      "key": "fflag_feat_all_leap_1429_flexible_reject_mode_250924_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 1
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "dc85fa6d78d84d09a54702d35d2184c1",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_feat_all_leap_1430_per_field_comments_100924_short": {
       "key": "fflag_feat_all_leap_1430_per_field_comments_100924_short",
       "on": false,
