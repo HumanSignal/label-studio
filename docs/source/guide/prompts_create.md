@@ -89,7 +89,7 @@ From the Prompts page, click **Create Prompt** in the upper right and then compl
 | --- | --- |
 | Name | Enter a name for the Prompt. |
 | Description | Enter a description for the Prompt.  |
-| Type | Select the Prompt model type. At this time, we only support [text classification](#Text-classification). |
+| Type | Select the Prompt model type: [Text Classification](#Text-classification) or [Named Entity Recognition](#Named-entity-recognition-NER)  |
 | Target Project| Select the project you want to use. If you don't have any eligible projects, you will see an error message. <br><br>See the note below.  |
 | Classes | This list is automatically generated from the labeling configuration of the target project. |
 
@@ -97,17 +97,17 @@ From the Prompts page, click **Create Prompt** in the upper right and then compl
 
 !!! note Eligible projects
     Target projects must meet the following criteria:
-    * The labeling configuration for the project must use single class classification (e.g. `choice="single"`). 
-    * The project must include text data (e.g. it cannot only include unsupported data types such as image, audio, video).
+    * The labeling configuration for the project must be compatible with the **Type** you selected above:
+        * For text classification, this means that the labeling configuration for the project must use `Choice` tags. 
+        * For NER, this means that the labeling configuration for the project must use `Label` tags. 
+    * The labeling configuration cannot include multi-class classification. This means that setting the  `choice="multiple"` parameter is not supported for either the `<Labels>` or `<Choices>` tags.  
+    * The project must include text data. While it can include other data types such as images or video, it must include `<Text>`.
     * You must have access to the project. If you are in the Manager role, you need to be added to the project to have access. 
-
-![Screenshot of the create model page](/images/prompts/model_create.png)
+    * The project cannot be located in your Personal Sandbox workspace. 
 
 ## Types
 
-### Text classification 
-
-At present, Prompts only supports single-label text classification tasks.  
+### Text classification  
 
 Text classification is the process of assigning predefined categories or labels to segments of text based on their content. This involves analyzing the text and determining which category or label best describes its subject, sentiment, or purpose. The goal is to organize and categorize textual data in a way that makes it easier to analyze, search, and utilize. 
 
@@ -119,3 +119,17 @@ Text classification labeling tasks are fundamental in many applications, enablin
 * **Support Ticket Classification**: Labeling customer support tickets based on the issue type, such as "billing," "technical support," or "account management."
 * **Content Moderation**: Identifying and labeling inappropriate content on social media platforms, such as "offensive language," "hate speech," or "harassment."
 
+### Named entity recognition (NER)
+
+A Named Entity Recognition (NER) labeling task involves identifying and classifying named entities within text. For example, people, organizations, locations, dates, and other proper nouns. The goal is to label these entities with predefined categories that make the text easier to analyze and understand. NER is commonly used in tasks like information extraction, text summarization, and content classification.
+
+For example, in the sentence "Heidi Opossum goes grocery shopping at Aldi in Miami" the NER task would involve identifying "Aldi" as a place or organization, "Heidi Opossum" as a person (even though, to be precise, she is an iconic opossum), and "Miami" as a location. Once labeled, this structured data can be used for various purposes such as improving search functionality, organizing information, or training machine learning models for more complex natural language processing tasks.
+
+NER labeling is crucial for industries such as finance, healthcare, and legal services, where accurate entity identification helps in extracting key information from large amounts of text, improving decision-making, and automating workflows.
+
+Some examples include:
+
+* **News and Media Monitoring**: Media organizations use NER to automatically tag and categorize entities such as people, organizations, and locations in news articles. This helps in organizing news content, enabling efficient search and retrieval, and generating summaries or reports. 
+* **Intelligence and Risk Analysis**: By extracting entities such as personal names, organizations, IP addresses, and financial transactions from suspicious activity reports or communications, organizations can better assess risks and detect fraud or criminal activity.
+* **Specialized Document Review**: Once trained, NER can help extract industry-specific key entities for better document review, searching, and classification. 
+* **Customer Feedback and Product Review**: Extract named entities like product names, companies, or services from customer feedback or reviews. This allows businesses to categorize and analyze feedback based on specific products, people, or regions, helping them make data-driven improvements.

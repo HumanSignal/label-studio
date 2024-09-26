@@ -707,7 +707,7 @@ export class LSFWrapper {
 
   onSubmitDraft = async (studio, annotation, params = {}) => {
     const annotationDoesntExist = !annotation.pk;
-    const data = { body: this.prepareData(annotation, { draft: true }) }; // serializedAnnotation
+    const data = { body: this.prepareData(annotation, { isNewDraft: true }) }; // serializedAnnotation
     const hasChanges = this.needsDraftSave(annotation);
     const showToast = params?.useToast && hasChanges;
     // console.log('onSubmitDraft', params?.useToast, hasChanges);
@@ -920,6 +920,7 @@ export class LSFWrapper {
     }
     return undefined;
   }
+
 
   /**
    * Calculates the startedAt time for an annotation.
