@@ -941,7 +941,15 @@ export class LSFWrapper {
     return loadedDate;
   }
 
-  /** @private */
+  /**
+   * Prepare data for draft/submission of annotation
+   * @param {Object} annotation - The annotation object.
+   * @param {Object} options - The options object.
+   * @param {boolean} options.includeId - Whether to include the id in the result.
+   * @param {boolean} options.isNewDraft - Whether the draft is new.
+   * @returns {Object} The prepared data.
+   * @private
+   */
   prepareData(annotation, { includeId, isNewDraft } = {}) {
     const userGenerate = !annotation.userGenerate || annotation.sentUserGenerate;
     const currentDraft = this.findActiveDraft(annotation);
