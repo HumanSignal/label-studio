@@ -102,6 +102,7 @@ if HOSTNAME:
             match = pattern.match(HOSTNAME)
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
+                SESSION_COOKIE_PATH = FORCE_SCRIPT_NAME
                 logger.info('=> Django URL prefix is set to: %s', FORCE_SCRIPT_NAME)
 
 FRONTEND_HMR = get_bool_env('FRONTEND_HMR', False)
