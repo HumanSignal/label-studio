@@ -921,7 +921,6 @@ export class LSFWrapper {
     return undefined;
   }
 
-
   /**
    * Calculates the startedAt time for an annotation.
    * @param {Object|undefined} currentDraft - The current draft object, if any.
