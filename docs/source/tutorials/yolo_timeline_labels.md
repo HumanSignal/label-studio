@@ -75,7 +75,7 @@ This tutorial uses the [YOLO example](https://github.com/HumanSignal/label-studi
 | `model_classifier_f1_threshold`       | float  | 0.95    | F1 score threshold for early stopping during training. Set to prevent overfitting.                                                                |
 | `model_classifier_accuracy_threshold` | float  | 1.00    | Accuracy threshold for early stopping during training. Set to prevent overfitting.                                                                |
 | `model_score_threshold`               | float  | 0.5     | Minimum confidence threshold for predictions. Labels with confidence below this threshold will be disregarded.                                    |
-| `model_path`                          | string | None    | Path to the custom YOLO model. See more in the section "Custom YOLO Models."                                                                      |
+| `model_path`                          | string | None    | Path to the custom YOLO model. See more in the section [Your own custom models](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/README.md#your-own-custom-yolo-models)                                                                      |
 
 **Note:** You can customize the neural network parameters directly in the labeling configuration by adjusting the attributes in the `<TimelineLabels>` tag.
 
@@ -151,7 +151,7 @@ and it generates predictions for each frame in the video.
 
 #### Custom YOLO models for feature extraction
 
-You can load your own YOLO models using the steps described in the [main README](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/README.md#custom-yolo-models).
+You can load your own YOLO models using the steps described in the [main README](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/README.md#your-own-custom-yolo-models).
 However, it should have similar architecture as `yolov8-cls` models. See `utils/neural_nets.py::cached_feature_extraction()` for more details.
 
 #### Cache folder 
