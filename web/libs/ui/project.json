@@ -5,6 +5,19 @@
   "projectType": "library",
   "tags": [],
   "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "defaultConfiguration": "production",
+      "options": {
+        "compiler": "babel",
+        "webpackConfig": "webpack.config.js",
+        "tsConfig": "libs/ui/tsconfig.lib.json",
+        "main": "libs/ui/src/index.ts",
+        "outputPath": "dist/libs/ui",
+        "isolatedConfig": true,
+        "generatePackageJson": true
+      }
+    },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
