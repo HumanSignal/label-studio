@@ -4,38 +4,56 @@
  * Only this component should get interface updates, other versions should be removed.
  */
 
-import { inject, observer } from "mobx-react";
+import { observer } from "mobx-react";
+import type { Instance } from "mobx-state-tree";
+import type React from "react";
+import { useCallback, useState } from "react";
+
+import { IconBan, LsChevron } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
-import { Tooltip } from "../../common/Tooltip/Tooltip";
+import { Dropdown } from "../../common/Dropdown/Dropdown";
+import type { CustomButton } from "../../stores/CustomButton";
 import { Block, cn, Elem } from "../../utils/bem";
-import { isDefined } from "../../utils/utilities";
-import { IconBan } from "../../assets/icons";
 import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
+import { isDefined } from "../../utils/utilities";
+import { AcceptButton, ButtonTooltip, controlsInjector, RejectButton, SkipButton, UnskipButton } from "./buttons";
+
 import "./Controls.scss";
-import { useCallback, useMemo, useState } from "react";
-import { LsChevron } from "../../assets/icons";
-import { Dropdown } from "../../common/Dropdown/DropdownComponent";
 
-const TOOLTIP_DELAY = 0.8;
+type CustomControlProps = {
+  button: Instance<typeof CustomButton>;
+  disabled: boolean;
+  onClick?: (name: string) => void;
+};
 
-const ButtonTooltip = inject("store")(
-  observer(({ store, title, children }) => {
-    return (
-      <Tooltip title={title} enabled={store.settings.enableTooltips} mouseEnterDelay={TOOLTIP_DELAY}>
-        {children}
-      </Tooltip>
-    );
-  }),
-);
-
-const controlsInjector = inject(({ store }) => {
-  return {
-    store,
-    history: store?.annotationStore?.selected?.history,
-  };
+/**
+ * Custom action button component, rendering buttons from store.customButtons
+ */
+const CustomControl = observer(({ button, disabled, onClick }: CustomControlProps) => {
+  const look = button.disabled || disabled ? "disabled" : button.look;
+  const [waiting, setWaiting] = useState(false);
+  const clickHandler = useCallback(async () => {
+    if (!onClick) return;
+    setWaiting(true);
+    await onClick?.(button.name);
+    setWaiting(false);
+  }, []);
+  return (
+    <ButtonTooltip title={button.tooltip ?? ""}>
+      <Button
+        aria-label={button.ariaLabel}
+        disabled={button.disabled || disabled || waiting}
+        look={look}
+        onClick={clickHandler}
+        waiting={waiting}
+      >
+        {button.title}
+      </Button>
+    </ButtonTooltip>
+  );
 });
 
-export const Controls = controlsInjector(
+export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
   observer(({ store, history, annotation }) => {
     const isReview = store.hasInterface("review") || annotation.canBeReviewed;
     const isNotQuickView = store.hasInterface("topbar:prevnext");
@@ -49,7 +67,7 @@ export const Controls = controlsInjector(
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
 
     const buttonHandler = useCallback(
-      async (e, callback, tooltipMessage) => {
+      async (e: React.MouseEvent, callback: () => any, tooltipMessage: string) => {
         const { addedCommentThisSession, currentComment, commentFormSubmit } = store.commentStore;
 
         if (isInProgress) return;
@@ -80,98 +98,44 @@ export const Controls = controlsInjector(
       ],
     );
 
-    const RejectButton = useMemo(() => {
-      return (
-        <ButtonTooltip key="reject" title="Reject annotation: [ Ctrl+Space ]">
-          <Button
-            aria-label="reject-annotation"
-            disabled={disabled}
-            onClick={async (e) => {
-              if (store.hasInterface("comments:reject") ?? true) {
-                buttonHandler(e, () => store.rejectAnnotation({}), "Please enter a comment before rejecting");
-              } else {
-                const selected = store.annotationStore?.selected;
+    // custom buttons replace all the internal buttons, but they can be reused if `name` is one of the internal buttons
+    if (store.customButtons?.length) {
+      for (const customButton of store.customButtons ?? []) {
+        // @todo make a list of all internal buttons and use them here to mix custom buttons with internal ones
+        if (customButton.name === "accept") {
+          buttons.push(<AcceptButton disabled={disabled} history={history} store={store} />);
+        } else {
+          buttons.push(
+            <CustomControl
+              key={customButton.name}
+              disabled={disabled}
+              button={customButton}
+              onClick={store.handleCustomButton}
+            />,
+          );
+        }
+      }
+    } else if (isReview) {
+      const onRejectWithComment = (e: React.MouseEvent, action: () => any) => {
+        buttonHandler(e, action, "Please enter a comment before rejecting");
+      };
 
-                selected?.submissionInProgress();
-                await store.commentStore.commentFormSubmit();
-                store.rejectAnnotation({});
-              }
-            }}
-          >
-            Reject
-          </Button>
-        </ButtonTooltip>
-      );
-    }, [disabled, store]);
-
-    if (isReview) {
-      buttons.push(RejectButton);
-
-      buttons.push(
-        <ButtonTooltip key="accept" title="Accept annotation: [ Ctrl+Enter ]">
-          <Button
-            aria-label="accept-annotation"
-            disabled={disabled}
-            look="primary"
-            onClick={async () => {
-              const selected = store.annotationStore?.selected;
-
-              selected?.submissionInProgress();
-              await store.commentStore.commentFormSubmit();
-              store.acceptAnnotation();
-            }}
-          >
-            {history.canUndo ? "Fix + Accept" : "Accept"}
-          </Button>
-        </ButtonTooltip>,
-      );
+      buttons.push(<RejectButton disabled={disabled} store={store} onRejectWithComment={onRejectWithComment} />);
+      buttons.push(<AcceptButton disabled={disabled} history={history} store={store} />);
     } else if (annotation.skipped) {
       buttons.push(
         <Elem name="skipped-info" key="skipped">
           <IconBan color="#d00" /> Was skipped
         </Elem>,
       );
-      buttons.push(
-        <ButtonTooltip key="cancel-skip" title="Cancel skip: []">
-          <Button
-            aria-label="cancel-skip"
-            disabled={disabled}
-            look="primary"
-            onClick={async () => {
-              const selected = store.annotationStore?.selected;
-
-              selected?.submissionInProgress();
-              await store.commentStore.commentFormSubmit();
-              store.unskipTask();
-            }}
-          >
-            Cancel skip
-          </Button>
-        </ButtonTooltip>,
-      );
+      buttons.push(<UnskipButton disabled={disabled} store={store} />);
     } else {
       if (store.hasInterface("skip")) {
-        buttons.push(
-          <ButtonTooltip key="skip" title="Cancel (skip) task: [ Ctrl+Space ]">
-            <Button
-              aria-label="skip-task"
-              disabled={disabled}
-              onClick={async (e) => {
-                if (store.hasInterface("comments:skip") ?? true) {
-                  buttonHandler(e, () => store.skipTask({}), "Please enter a comment before skipping");
-                } else {
-                  const selected = store.annotationStore?.selected;
+        const onSkipWithComment = (e: React.MouseEvent, action: () => any) => {
+          buttonHandler(e, action, "Please enter a comment before skipping");
+        };
 
-                  selected?.submissionInProgress();
-                  await store.commentStore.commentFormSubmit();
-                  store.skipTask({});
-                }
-              }}
-            >
-              Skip
-            </Button>
-          </ButtonTooltip>,
-        );
+        buttons.push(<SkipButton disabled={disabled} store={store} onSkipWithComment={onSkipWithComment} />);
       }
 
       const isDisabled = disabled || submitDisabled;
@@ -179,11 +143,11 @@ export const Controls = controlsInjector(
 
       const useExitOption = !isDisabled && isNotQuickView;
 
-      const SubmitOption = ({ isUpdate, onClickMethod }) => {
+      const SubmitOption = ({ isUpdate, onClickMethod }: { isUpdate: boolean; onClickMethod: () => any }) => {
         return (
           <Button
             name="submit-option"
-            look="secondary"
+            look="primary"
             onClick={async (event) => {
               event.preventDefault();
 
@@ -222,7 +186,7 @@ export const Controls = controlsInjector(
                 look={look}
                 mod={{ has_icon: useExitOption, disabled: isDisabled }}
                 onClick={async (event) => {
-                  if (event.target.classList.contains(dropdownTrigger)) return;
+                  if ((event.target as HTMLButtonElement).classList.contains(dropdownTrigger)) return;
                   const selected = store.annotationStore?.selected;
 
                   selected?.submissionInProgress();
@@ -230,7 +194,7 @@ export const Controls = controlsInjector(
                   store.submitAnnotation();
                 }}
                 icon={
-                  useExitOption && (
+                  useExitOption ? (
                     <Dropdown.Trigger
                       alignment="top-right"
                       content={<SubmitOption onClickMethod={store.submitAnnotation} isUpdate={false} />}
@@ -239,7 +203,7 @@ export const Controls = controlsInjector(
                         <LsChevron />
                       </div>
                     </Dropdown.Trigger>
-                  )
+                  ) : undefined
                 }
               >
                 Submit
@@ -250,7 +214,7 @@ export const Controls = controlsInjector(
       }
 
       if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
-        const isUpdate = isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result;
+        const isUpdate = Boolean(isFF(FF_REVIEWER_FLOW) || sentUserGenerate || versions.result);
         // no changes were made over previously submitted version — no drafts, no pending changes
         const noChanges = isFF(FF_REVIEWER_FLOW) && !history.canUndo && !annotation.draftId;
         const isUpdateDisabled = isDisabled || noChanges;
@@ -263,7 +227,7 @@ export const Controls = controlsInjector(
               look={look}
               mod={{ has_icon: useExitOption, disabled: isUpdateDisabled }}
               onClick={async (event) => {
-                if (event.target.classList.contains(dropdownTrigger)) return;
+                if ((event.target as HTMLButtonElement).classList.contains(dropdownTrigger)) return;
                 const selected = store.annotationStore?.selected;
 
                 selected?.submissionInProgress();
@@ -271,7 +235,7 @@ export const Controls = controlsInjector(
                 store.updateAnnotation();
               }}
               icon={
-                useExitOption && (
+                useExitOption ? (
                   <Dropdown.Trigger
                     alignment="top-right"
                     content={<SubmitOption onClickMethod={store.updateAnnotation} isUpdate={isUpdate} />}
@@ -280,7 +244,7 @@ export const Controls = controlsInjector(
                       <LsChevron />
                     </div>
                   </Dropdown.Trigger>
-                )
+                ) : undefined
               }
             >
               {isUpdate ? "Update" : "Submit"}
