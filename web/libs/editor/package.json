@@ -2,9 +2,6 @@
   "name": "@humansignal/editor",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {
-    "postinstall": "npx -y copy-files-from-to"
-  },
   "private": true,
   "dependencies": {
     "@ant-design/colors": "6.0.0",
