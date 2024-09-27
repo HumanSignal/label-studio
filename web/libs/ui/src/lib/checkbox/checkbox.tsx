@@ -1,6 +1,7 @@
 /* eslint-disable-next-line */
 import React, { type InputHTMLAttributes } from "react";
 import styles from "./checkbox.module.scss";
+import { nanoid } from "nanoid";
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   indeterminate?: boolean;
@@ -10,16 +11,20 @@ const classNameMap = { ...styles };
 export const Checkbox = ({ checked, indeterminate, style, onChange, children, ...props }: CheckboxProps) => {
   const checkboxRef = React.createRef();
   const withLabel = !!children;
+  const [id] = React.useState(nanoid);
 
   React.useEffect(() => {
-    checkboxRef.current.indeterminate = indeterminate;
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = indeterminate;
+    }
   }, [checkboxRef, indeterminate]);
 
   const checkboxContent = (
     <span className={styles.checkbox__box}>
       <input
         {...props}
-        ref={checkboxRef}
+        id={id}
+        ref={checkboxRef as React.Ref<HTMLInputElement>}
         checked={!!checked}
         className={styles.checkbox__input}
         type="checkbox"
@@ -41,7 +46,7 @@ export const Checkbox = ({ checked, indeterminate, style, onChange, children, ..
       style={style}
     >
       {children ? (
-        <label className={styles.checkbox__label}>
+        <label className={styles.checkbox__label} htmlFor={id}>
           {checkboxContent} {children}
         </label>
       ) : (
