@@ -15,10 +15,7 @@ date: 2024-06-11 16:53:16
 ## Prerequisites
 
 * An OpenAI API key or an Azure OpenAI key. 
-* A project that meets the following criteria:
-  * Text-based data set (meaning you are annotating text and not image or video files). 
-  * The labeling configuration for the project must be set up to use single-class classification (`choice="single"`). 
-  * (Optional, depending on your [use case](prompts_overview#Use-cases) and if you want to evaluate the accuracy of your prompt): At least one task with a [ground truth annotation](quality#Define-ground-truth-annotations-for-a-project). 
+* A project that meets the [criteria noted below](#Create-a-Prompt). 
 
 ## Model provider API keys
 
@@ -99,11 +96,12 @@ From the Prompts page, click **Create Prompt** in the upper right and then compl
     Target projects must meet the following criteria:
     * The labeling configuration for the project must be compatible with the **Type** you selected above:
         * For text classification, this means that the labeling configuration for the project must use `Choice` tags. 
-        * For NER, this means that the labeling configuration for the project must use `Label` tags. 
-    * The labeling configuration cannot include multi-class classification. This means that setting the  `choice="multiple"` parameter is not supported for either the `<Labels>` or `<Choices>` tags.  
+        * For NER, this means that the labeling configuration for the project must use `Label` tags.  
+    * The project must have one output type (`Choice` or `Label`) and not a mix of both. 
     * The project must include text data. While it can include other data types such as images or video, it must include `<Text>`.
     * You must have access to the project. If you are in the Manager role, you need to be added to the project to have access. 
     * The project cannot be located in your Personal Sandbox workspace. 
+    * While projects connected to an ML backend will still appear in the list of eligible projects, we do not recommend using Prompts with an ML backend. 
 
 ## Types
 
