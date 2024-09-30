@@ -827,7 +827,7 @@ Small models like `yolov8n.pt` are recommended for real-time tracking, however, 
 This ML backend supports temporal multi-label video classification for the [`<TimelineLabels>` control tag](https://labelstud.io/tags/timelinelabels) in Label Studio. 
 There are two modes available:
 - **Simple:** In the simple mode, the model uses pre-trained YOLO classes to generate predictions without additional training.  
-- **Trainable:** In the [trainable mode](README_TIMELINE_LABELS.md), the model can be trained on custom labels and annotations submitted in Label Studio using few-shot learning as training is performed on a small number of annotations.  
+- **Trainable:** In the [trainable mode](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/README_TIMELINE_LABELS.md), the model can be trained on custom labels and annotations submitted in Label Studio using few-shot learning as training is performed on a small number of annotations.  
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/tfMn5q1tqKI?si=T5FhfImJEnWRSqpY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
