@@ -23,7 +23,14 @@ segmentation, classification, and video object tracking capabilities directly in
 This integration allows you to leverage powerful YOLOv8 models for various machine learning tasks, 
 making it easier to annotate large datasets and ensure high-quality predictions. 
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/UyaecID1iG8?si=UQQW3mpqu2uDtt7i" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<div align="left">
+  <a href="http://www.youtube.com/watch?v=UyaecID1iG8" title="Integrating YOLO V8 with Label Studio">
+    <img src="http://img.youtube.com/vi/UyaecID1iG8/0.jpg" alt="YOLO Integration Video" style="width:50%;"/>
+      <br>
+    Check the video tutorial
+  </a>
+</div>
+<br/>
 
 **Supported Features**
 
@@ -36,7 +43,7 @@ making it easier to annotate large datasets and ensure high-quality predictions.
 | Image Classification                                         | `<Choices>`                          | ✅                    | Native              | Native              |
 | Pose Detection                                               | `<KeyPoints>`                        | ✅                    | Native              | Native              |
 | Video Object Tracking                                        | `<VideoRectangle>`                   | ✅                    | Native              | Native              |
-| [Video Temporal Classification](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/README_TIMELINE_LABELS.md) | `<TimelineLabels>`                   | ✅                    | Native              | Native              |
+| [Video Temporal Classification](./README_TIMELINE_LABELS.md) | `<TimelineLabels>`                   | ✅                    | Native              | Native              |
 
 
 * **LS Control Tag**: Label Studio [control tag](https://labelstud.io/tags/) from the labeling configuration. 
@@ -175,7 +182,7 @@ to specify multiple and different labels from the ML model:
 <br/>
 Labels are printed in the ML model logs when you start using the ML backend with the INFO logging level. 
 
-Or you can find some labels in [YOLO_CLASSES.md](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/YOLO_CLASSES.md)
+Or you can find some labels in [YOLO_CLASSES.md](YOLO_CLASSES.md)
 </details>
 
 <details>
@@ -214,13 +221,23 @@ Here is an example of a prompt for this. It includes 1000 labels from YOLOv8 cla
 
 </details>
 
-## YOLOv5 and other YOLO versions
+## Supported YOLO Versions: YOLOv5, YOLO11, and others
 
-YOLOv8 models have been successfully tested with this ML backend.
+- **YOLOv5**: This model is supported for object detection tasks. Make sure to specify `model_path="yolov5nu.pt"` (don't forget the **`u`**) to use the YOLOv5 model.
 
-Attempts to run YOLOv5 were unsuccessful without modifications. 
-It may be possible to run it by applying some changes, such as installing additional dependencies. 
-The same applies to other YOLO models.
+- **YOLOv8**: These models have been successfully tested with the current ML backend. Check the full list of [v8 models here](https://docs.ultralytics.com/models/yolov8/#supported-tasks-and-modes).
+
+- **YOLO11**: YOLO11 models have also been successfully tested with this ML backend. Check the full list of [v11 models here](https://docs.ultralytics.com/models/yolo11/#supported-tasks-and-modes).
+
+    **Warning 1**: You must upgrade the `ultralytics` package to the latest version (`pip install -U ultralytics`) or rebuild the ML backend Docker from scratch (`docker-compose build --no-cache`) if you used it before the latest Ultralytics update on **Monday, September 30, 2024**.
+
+    **Warning 2**: YOLO11 models do not use the `v` in their naming convention. For example, use **`yolo11n.pt`** instead of `yolov11n.pt`, unlike the naming convention in YOLOv8.
+
+- For a full list of supported YOLO versions and models, refer to the Ultralytics documentation:
+  [Ultralytics Supported YOLO Models](https://docs.ultralytics.com/models/)
+
+    **Note**: Some YOLO models listed in the Ultralytics documentation have not been tested with this ML backend, but they might still work.
+
 
 ## Your own custom YOLO models
 
@@ -238,6 +255,22 @@ You can load your own YOLO labels using the following steps:
 <br/>
 You can integrate your own custom-trained YOLOv8 models with the YOLO ML backend for Label Studio. 
 Follow these detailed steps to set up your custom model in the ML backend Docker:
+
+### Step 0: Install Label Studio and clone this Github repository
+
+1. Install and run Label Studio (or see [more ways here](https://labelstud.io/guide/install)). 
+
+```
+pip install label-studio
+label-studio
+```
+
+2. Clone the Label Studio ML backend repository and go to the `yolo` example folder:
+
+```
+git clone https://github.com/HumanSignal/label-studio-ml-backend.git
+cd label-studio-ml-backend/examples/yolo
+```
 
 ### Step 1: Prepare your custom YOLOv8 model
 
@@ -375,7 +408,7 @@ YOLO provides a classification model and Label Studio supports this with the `Ch
 
 More info: https://docs.ultralytics.com/tasks/classify/
 
-<video src="https://github.com/user-attachments/assets/30c5ce43-2c89-4ddf-a77d-9d1d75ac3419" controls="controls" style="max-width: 800px;" class="gif-border" />
+https://github.com/user-attachments/assets/30c5ce43-2c89-4ddf-a77d-9d1d75ac3419
 
 
 ### Labeling config
@@ -395,7 +428,7 @@ More info: https://docs.ultralytics.com/tasks/classify/
 | Parameter               | Type   | Default | Description                                                                                                                                                                                                                                                                                                                                                                  |
 |-------------------------|--------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives.                                                                                                                                                                                       |
-| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#Your-own-custom-YOLO-models).                                                                                                                                                                                                                                                          |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#your-own-custom-yolo-models).                                                                                                                                                                                                                                                          |
 | `choice`                | string | single  | Possible values: `single`, `single-radio`, `multiple`. If you use `choice="single"` (default) you can select only one label. The ML backend will return the label with the highest confidence using argmax strategy. If you use `choice="multiple"` you can select multiple labels. The ML backend will return all labels with confidence above the `model_score_threshold`. |
 
 
@@ -423,7 +456,7 @@ YOLO OBB models are also supported.
 
 More info: https://docs.ultralytics.com/tasks/detect/
 
-<video src="https://github.com/user-attachments/assets/413b4650-422d-43dc-809d-51c08f0ad434" controls="controls" style="max-width: 800px;" class="gif-border" />
+https://github.com/user-attachments/assets/413b4650-422d-43dc-809d-51c08f0ad434
 
 
 ### Labeling config
@@ -443,7 +476,7 @@ More info: https://docs.ultralytics.com/tasks/detect/
 | Parameter               | Type   | Default | Description                                                                                                                                                                            |
 |-------------------------|--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives. |
-| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#Your-own-custom-YOLO-models).                                                                    |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#your-own-custom-yolo-models).                                                                    |
 | `model_obb`             | bool   | False   | Enables Oriented Bounding Boxes (OBB) mode. Typically it uses `*-obb.pt` yolo models.                                                                                                  |
 
 For example:
@@ -480,7 +513,9 @@ Label Studio supports this with the `PolygonLabels` control tag.
 
 More info: https://docs.ultralytics.com/tasks/segment/
 
-<video src="https://github.com/user-attachments/assets/9b2447d3-392d-42be-bc7f-ef2b6c81d54c" controls="controls" style="max-width: 800px;" class="gif-border" />
+![Yolo Polygons](./YoloPolygons.gif)
+
+https://github.com/user-attachments/assets/9b2447d3-392d-42be-bc7f-ef2b6c81d54c
 
 
 ### Labeling config
@@ -500,7 +535,7 @@ More info: https://docs.ultralytics.com/tasks/segment/
 | Parameter               | Type   | Default | Description                                                                                                                                                                            |
 |-------------------------|--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives. |
-| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#Your-own-custom-YOLO-models).                                                                    |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#your-own-custom-yolo-models).                                                                    |
 
 For example:
 ```xml
@@ -577,7 +612,7 @@ More info: [Ultralytics YOLO Keypoint Documentation](https://docs.ultralytics.co
 
 | Parameter               | Type   | Default | Description                                                                                                                                                                    |
 |-------------------------|--------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#Your-own-custom-YOLO-models).                                                            |
+| `model_path`            | string | None    | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#your-own-custom-yolo-models).                                                            |
 | `model_score_threshold` | float  | 0.5     | Sets the minimum confidence threshold for bounding box detections. Keypoints that are related to the detected bbox with a confidence below this threshold will be disregarded. |
 | `model_point_threshold` | float  | 0.0     | Minimum confidence threshold for keypoints. Keypoints with confidence below this value will be ignored.                                                                        |
 | `model_add_bboxes`      | bool   | True    | Adds bounding boxes for detected keypoints. All keypoints will be grouped by parent bounding boxes on the region panel. See details in the tip below.                          |
@@ -695,7 +730,10 @@ Label Studio supports this with the `VideoRectangle` + `Labels` control tags.
 
 More info: https://docs.ultralytics.com/modes/track/
 
-<video src="https://github.com/user-attachments/assets/7b0d50e6-164a-4d66-87cf-df443b77f638" controls="controls" style="max-width: 800px;" class="gif-border" />
+![Video Object Tracking](./YoloVideo.gif)
+
+
+https://github.com/user-attachments/assets/7b0d50e6-164a-4d66-87cf-df443b77f638
 
 
 
@@ -747,7 +785,7 @@ https://docs.ultralytics.com/modes/track/?h=track#tracking-arguments
 | `model_conf`    | float  | 0.25      | Sets the minimum confidence threshold for detections. Objects detected with confidence below this threshold will be disregarded. Adjusting this value can help reduce false positives. |
 | `model_iou`     | float  | 0.7       | Intersection Over Union (IoU) threshold for Non-Maximum Suppression (NMS). Lower values result in fewer detections by eliminating overlapping boxes, useful for reducing duplicates.   |
 | `model_tracker` | string | `botsort` | Sets the tracker to use for multi-object tracking. Options include `botsort`, `bytetrack`, or a custom YAML file.                                                                      |
-| `model_path`    | string | None      | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#Your-own-custom-YOLO-models).                                                                    |
+| `model_path`    | string | None      | Path to the custom YOLO model. See more in the section [Your own custom YOLO models](#your-own-custom-yolo-models).                                                                    |
 
 For example: 
 ```xml
@@ -801,9 +839,15 @@ Small models like `yolov8n.pt` are recommended for real-time tracking, however, 
 This ML backend supports temporal multi-label video classification for the [`<TimelineLabels>` control tag](https://labelstud.io/tags/timelinelabels) in Label Studio. 
 There are two modes available:
 - **Simple:** In the simple mode, the model uses pre-trained YOLO classes to generate predictions without additional training.  
-- **Trainable:** In the [trainable mode](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/README_TIMELINE_LABELS.md), the model can be trained on custom labels and annotations submitted in Label Studio using few-shot learning as training is performed on a small number of annotations.  
+- **Trainable:** In the [trainable mode](README_TIMELINE_LABELS.md), the model can be trained on custom labels and annotations submitted in Label Studio using few-shot learning as training is performed on a small number of annotations.  
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/tfMn5q1tqKI?si=T5FhfImJEnWRSqpY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<div align="left">
+  <a href="https://www.youtube.com/watch?v=tfMn5q1tqKI" title="Video Frame Classification with YOLOv8 and Label Studio">
+    <img src="https://github.com/user-attachments/assets/6b00fdc1-e19b-4312-86f4-20d8a1de6f20" alt="Video Temporal Classification video" style="width:100%;"/>
+      <br>
+    Check the video tutorial
+  </a>
+</div>
 <br/>
 
 ### Labeling config
@@ -824,7 +868,7 @@ There are two modes available:
 
 For more details on using the `TimelineLabels` ML backend, including training the model 
 and adjusting neural network classifier parameters, please refer to 
-**[README_TIMELINE_LABELS.md](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/README_TIMELINE_LABELS.md)**.
+**[README_TIMELINE_LABELS.md](README_TIMELINE_LABELS.md)**.
 
 ### Default model
 
@@ -883,11 +927,11 @@ Then you can start the ML backend:
 label-studio-ml start ./dir_with_your_model
 ```
 
-Also, you can check [Dockerfile](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/Dockerfile) for additional dependencies and install them manually. 
+Also, you can check [Dockerfile](Dockerfile) for additional dependencies and install them manually. 
 
 ### Parameters
 
-Check the `environment` section in the [`docker-compose.yml`](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/docker-compose.yml) file before running the container. 
+Check the `environment` section in the [`docker-compose.yml`](docker-compose.yml) file before running the container. 
 All available parameters are listed there.
 
 > Note: You can use lots of YOLO model parameters in labeling configurations directly, e.g. `model_path` or `model_score_threshold`.
@@ -965,4 +1009,4 @@ LOG_LEVEL=DEBUG python cli.py --ls-url http://localhost:8080 --ls-api-key YOUR_A
 
 ## For developers
 
-The architecture of the project and development guidelines are described in the [README_DEVELOP.md](https://github.com/HumanSignal/label-studio-ml-backend/blob/master/label_studio_ml/examples/yolo/README_DEVELOP.md) file.
+The architecture of the project and development guidelines are described in the [README_DEVELOP.md](README_DEVELOP.md) file.
