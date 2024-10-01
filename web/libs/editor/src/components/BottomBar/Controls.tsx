@@ -12,40 +12,44 @@ import { useCallback, useState } from "react";
 import { IconBan, LsChevron } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
 import { Dropdown } from "../../common/Dropdown/Dropdown";
-import type { CustomButton } from "../../stores/CustomButton";
+import { CustomButton } from "../../stores/CustomButton";
 import { Block, cn, Elem } from "../../utils/bem";
 import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import { isDefined } from "../../utils/utilities";
-import { AcceptButton, ButtonTooltip, controlsInjector, RejectButton, SkipButton, UnskipButton } from "./buttons";
+import { AcceptButton, ButtonTooltip, controlsInjector, RejectButtonDefinition, SkipButton, UnskipButton } from "./buttons";
 
 import "./Controls.scss";
 
-type CustomControlProps = {
-  button: Instance<typeof CustomButton>;
+type CustomButtonType = Instance<typeof CustomButton>;
+// @todo should be Instance<typeof AppStore>["customButtons"] but it doesn't fit to itself
+type CustomButtonsField = Map<string, CustomButtonType | string | Array<CustomButtonType | string>>;
+type ControlButtonProps = {
+  button: CustomButtonType;
   disabled: boolean;
-  onClick?: (name: string) => void;
+  onClick: (e: React.MouseEvent) => void;
 };
+
+/** If given one element, wrap it in an array */
+function toArray<T>(arg: undefined | T | (T | undefined)[]): T[] {
+  return (Array.isArray(arg) ? arg : [arg]).filter(v => v !== undefined);
+}
 
 /**
  * Custom action button component, rendering buttons from store.customButtons
  */
-const CustomControl = observer(({ button, disabled, onClick }: CustomControlProps) => {
+const ControlButton = observer(({ button, disabled, onClick }: ControlButtonProps) => {
   const look = button.disabled || disabled ? "disabled" : button.look;
-  const [waiting, setWaiting] = useState(false);
-  const clickHandler = useCallback(async () => {
-    if (!onClick) return;
-    setWaiting(true);
-    await onClick?.(button.name);
-    setWaiting(false);
-  }, []);
+  // @todo do we need waiting? all buttons should utilize isSubmitting
+  // const [waiting, setWaiting] = useState(false);
+
   return (
     <ButtonTooltip title={button.tooltip ?? ""}>
       <Button
         aria-label={button.ariaLabel}
-        disabled={button.disabled || disabled || waiting}
+        disabled={button.disabled || disabled}// || waiting}
         look={look}
-        onClick={clickHandler}
-        waiting={waiting}
+        onClick={onClick}
+        // waiting={waiting}
       >
         {button.title}
       </Button>
@@ -60,14 +64,16 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     const historySelected = isDefined(store.annotationStore.selectedHistory);
     const { userGenerate, sentUserGenerate, versions, results, editable: annotationEditable } = annotation;
     const dropdownTrigger = cn("dropdown").elem("trigger").toClassName();
+    const customButtons: CustomButtonsField = store.customButtons;
     const buttons = [];
 
     const [isInProgress, setIsInProgress] = useState(false);
     const disabled = !annotationEditable || store.isSubmitting || historySelected || isInProgress;
     const submitDisabled = store.hasInterface("annotations:deny-empty") && results.length === 0;
 
-    const buttonHandler = useCallback(
-      async (e: React.MouseEvent, callback: () => any, tooltipMessage: string) => {
+    /** Check all things related to comments and then call the action if all is good */
+    const handleActionWithComments = useCallback(
+      async (e: React.MouseEvent, callback: () => any, errorMessage: string) => {
         const { addedCommentThisSession, currentComment, commentFormSubmit } = store.commentStore;
 
         if (isInProgress) return;
@@ -84,7 +90,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
           await commentFormSubmit();
           callback();
         } else {
-          store.commentStore.setTooltipMessage(tooltipMessage);
+          store.commentStore.setTooltipMessage(errorMessage);
         }
         setIsInProgress(false);
       },
@@ -98,29 +104,65 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       ],
     );
 
-    // custom buttons replace all the internal buttons, but they can be reused if `name` is one of the internal buttons
-    if (store.customButtons?.length) {
-      for (const customButton of store.customButtons ?? []) {
+    const buttonsBefore = customButtons.get("_before");
+    const buttonsReplacement = customButtons.get("_replace");
+    const firstToRender = buttonsReplacement ?? buttonsBefore;
+
+    // either we render _before buttons and then the rest, or we render only _replace buttons
+    if (firstToRender) {
+      const allButtons = Array.isArray(firstToRender) ? firstToRender : [firstToRender];
+      for (const customButton of allButtons) {
         // @todo make a list of all internal buttons and use them here to mix custom buttons with internal ones
-        if (customButton.name === "accept") {
-          buttons.push(<AcceptButton disabled={disabled} history={history} store={store} />);
+        // string buttons is a way to render internal buttons
+        if (typeof customButton === "string") {
+          if (customButton === "accept") {
+            // just an example of internal button usage
+            // @todo move buttons to separate components
+            buttons.push(<AcceptButton disabled={disabled} history={history} store={store} />);
+          }
         } else {
           buttons.push(
-            <CustomControl
+            <ControlButton
               key={customButton.name}
               disabled={disabled}
               button={customButton}
-              onClick={store.handleCustomButton}
+              onClick={() => store.handleCustomButton?.(customButton.name)}
             />,
           );
         }
       }
-    } else if (isReview) {
-      const onRejectWithComment = (e: React.MouseEvent, action: () => any) => {
-        buttonHandler(e, action, "Please enter a comment before rejecting");
-      };
+    }
 
-      buttons.push(<RejectButton disabled={disabled} store={store} onRejectWithComment={onRejectWithComment} />);
+    if (buttonsReplacement) {
+      // do nothing as all custom buttons are rendered already and we don't need internal buttons
+    } else if (isReview) {
+      const customRejectButtons = toArray(customButtons.get("reject"));
+      const hasCustomReject = customRejectButtons.length > 0;
+      const originalRejectButton = RejectButtonDefinition;
+      const rejectButtons: CustomButtonType[] = hasCustomReject
+        // @todo implement reuse of internal buttons later (they are set as strings)
+        ? customRejectButtons.filter(button => typeof button !== "string")
+        : [originalRejectButton];
+
+      rejectButtons.forEach(button => {
+        const action = hasCustomReject
+          ? () => store.handleCustomButton?.(button.name)
+          : () => store.rejectAnnotation({});
+
+        const onReject = async (e: React.MouseEvent) => {
+          const selected = store.annotationStore?.selected;
+
+          if (store.hasInterface("comments:reject")) {
+            handleActionWithComments(e, action, "Please enter a comment before rejecting");
+          } else {
+            selected?.submissionInProgress();
+            await store.commentStore.commentFormSubmit();
+            action();
+          }
+        }
+
+        buttons.push(<ControlButton button={button} disabled={disabled} onClick={onReject} />);
+      });
       buttons.push(<AcceptButton disabled={disabled} history={history} store={store} />);
     } else if (annotation.skipped) {
       buttons.push(
@@ -132,7 +174,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     } else {
       if (store.hasInterface("skip")) {
         const onSkipWithComment = (e: React.MouseEvent, action: () => any) => {
-          buttonHandler(e, action, "Please enter a comment before skipping");
+          handleActionWithComments(e, action, "Please enter a comment before skipping");
         };
 
         buttons.push(<SkipButton disabled={disabled} store={store} onSkipWithComment={onSkipWithComment} />);
