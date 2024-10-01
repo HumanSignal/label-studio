@@ -45,6 +45,7 @@
   line-height: 1.2em;
   justify-content: stretch;
   width: 100%;
+  opacity: var(--comment-item-region-opacity, 1);
 
   &__icon {
     display: flex;

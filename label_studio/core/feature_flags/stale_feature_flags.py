@@ -54,4 +54,6 @@ STALE_FEATURE_FLAGS = {
     'ff_front_dev_1495_avatar_mess_210122_short': True,
     'ff_front_1170_outliner_030222_short': True,
     'fflag_fix_front_lsdv_4620_memory_leaks_100723_short': False,
+    'fflag_fix_back_lsdv_5410_temporary_disable_auto_inference_jobs_short': True,
+    'fflag_feat_front_prod_292_archive_workspaces_short': True,
 }

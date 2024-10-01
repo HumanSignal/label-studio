@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1467: Adapt Textarea result container to new style (#6413)",
-  "commit": "7d1c6d4091299ba10a3868f85479f5c280620a9e",
-  "date": "2024-09-25T17:51:05.000Z",
+  "message": "fix: LEAP-1507: show review instructions in review stream (#6444)",
+  "commit": "c4cb483d06b663e4c4501acd957ee2658c5f41b8",
+  "date": "2024-09-26T22:06:17.000Z",
   "branch": "develop"
 }
