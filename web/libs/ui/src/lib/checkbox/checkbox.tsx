@@ -6,7 +6,6 @@ import styles from "./checkbox.module.scss";
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   indeterminate?: boolean;
 }
-const classNameMap = { ...styles };
 
 export const Checkbox = ({ checked, indeterminate, style, onChange, children, ...props }: CheckboxProps) => {
   const checkboxRef = React.createRef();
