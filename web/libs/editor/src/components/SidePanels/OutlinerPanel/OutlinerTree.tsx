@@ -265,6 +265,13 @@ const useEventHandlers = () => {
       return;
     }
 
+    if (!self.isReadOnly() && annotation.isLinkingMode) {
+      annotation.addLinkedRegion(self);
+      annotation.stopLinkingMode();
+      annotation.regionStore.unselectAll();
+      return;
+    }
+
     const wasNotSelected = !self.selected;
 
     if (wasNotSelected) {
