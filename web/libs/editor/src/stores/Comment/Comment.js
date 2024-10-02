@@ -39,7 +39,9 @@ export const CommentBase = types
       return commentsStore?.annotation;
     },
     get isHighlighted() {
-      return self.commentsStore?.highlightedComment === self;
+      const highlightedRegionKey = self.commentsStore?.highlightedComment?.regionRef?.uniqueKey;
+      const currentRegionKey = self.regionRef?.uniqueKey;
+      return !!highlightedRegionKey && highlightedRegionKey === currentRegionKey;
     },
   }))
   .actions((self) => {
