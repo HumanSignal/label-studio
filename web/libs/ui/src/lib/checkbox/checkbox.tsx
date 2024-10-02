@@ -1,4 +1,3 @@
-/* eslint-disable-next-line */
 import { nanoid } from "nanoid";
 import React, { type InputHTMLAttributes } from "react";
 import styles from "./checkbox.module.scss";
