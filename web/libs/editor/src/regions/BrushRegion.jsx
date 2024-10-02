@@ -10,7 +10,7 @@ import Canvas from "../utils/canvas";
 
 import { ImageViewContext } from "../components/ImageView/ImageViewContext";
 import { LabelOnMask } from "../components/ImageView/LabelOnRegion";
-import { Geometry } from "../components/RelationsOverlay/Geometry";
+import { Geometry } from "../components/InteractiveOverlays/Geometry";
 import { defaultStyle } from "../core/Constants";
 import { guidGenerator } from "../core/Helpers";
 import { AreaMixin } from "../mixins/AreaMixin";

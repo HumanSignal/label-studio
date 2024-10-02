@@ -10,6 +10,7 @@ export const CommentStore = types
   .model("CommentStore", {
     loading: types.optional(types.maybeNull(types.string), "list"),
     comments: types.optional(types.array(Comment), []),
+    highlightedComment: types.safeReference(Comment),
   })
   .volatile(() => ({
     addedCommentThisSession: false,
@@ -71,6 +72,20 @@ export const CommentStore = types
       if (!self.annotation) return undefined;
       return self.currentComment[self.annotation.id];
     },
+    get overlayComments() {
+      const uniqTargetKeys = new Set();
+      return self.comments.filter((comment) => {
+        const { regionRef } = comment;
+
+        if (!regionRef) return false;
+        if (uniqTargetKeys.has(regionRef.uniqueKey)) return false;
+        uniqTargetKeys.add(regionRef.uniqueKey);
+        return true;
+      })
+    },
+    get isHighlighting() {
+      return !!self.highlightedComment;
+    }
   }))
   .actions((self) => {
     function serialize({ commentsFilter, queueComments } = { commentsFilter: "all", queueComments: false }) {
@@ -85,6 +100,10 @@ export const CommentStore = types
 
     function setCurrentComment(comment) {
       self.currentComment = { ...self.currentComment, [self.annotation.id]: comment };
+    }
+
+    function setHighlightedComment(comment) {
+      self.highlightedComment = comment
     }
 
     function setCommentFormSubmit(submitCallback) {
@@ -338,5 +357,6 @@ export const CommentStore = types
       addComment,
       setComments,
       listComments,
+      setHighlightedComment,
     };
   });

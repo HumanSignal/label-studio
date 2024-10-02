@@ -5,7 +5,16 @@ import { RelationShape } from "./RelationShape";
 import { createPropertyWatcher, DOMWatcher } from "./watchers";
 
 const parentImagePropsWatch = {
-  parent: ["zoomScale", "zoomingPositionX", "zoomingPositionY", "rotation", "currentImage"],
+  parent: [
+    "zoomScale",
+    "zoomingPositionX",
+    "zoomingPositionY",
+    "rotation",
+    "currentImage",
+    "containerWidth",
+    "containerHeight",
+    "canvasSize",
+  ],
 };
 
 const obtainWatcher = (node) => {
@@ -63,7 +72,7 @@ const connect = (relation, root) => {
 /**
  * Calculate BBox for the shape
  * @param {RelationShape} shape
- * @param {HTMLElement} root
+ * @param {HTMLOrSVGElement} root
  */
 const calculateBBox = (shape, root) => {
   const { x, y } = Geometry.getDOMBBox(root, true) ?? { x: 0, y: 0 };
@@ -269,4 +278,5 @@ export default {
   connect,
   getNodesBBox,
   calculatePath,
+  calculateBBox,
 };

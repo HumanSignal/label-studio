@@ -10,6 +10,7 @@ import { observer, Provider } from "mobx-react";
  * Core
  */
 import Tree from "../../core/Tree";
+import { CommentsOverlay } from "../InteractiveOverlays/CommentsOverlay";
 import { TreeValidation } from "../TreeValidation/TreeValidation";
 
 /**
@@ -40,7 +41,7 @@ import { BottomBar } from "../BottomBar/BottomBar";
 import Debug from "../Debug";
 import Grid from "./Grid";
 import { InstructionsModal } from "../InstructionsModal/InstructionsModal";
-import { RelationsOverlay } from "../RelationsOverlay/RelationsOverlay";
+import { RelationsOverlay } from "../InteractiveOverlays/RelationsOverlay";
 import Segment from "../Segment/Segment";
 import Settings from "../Settings/Settings";
 import { SidebarTabs } from "../SidebarTabs/SidebarTabs";
@@ -148,6 +149,7 @@ class App extends Component {
         <Elem name="annotation">
           {<Annotation root={root} annotation={as.selected} />}
           {this.renderRelations(as.selected)}
+          {this.renderCommentsOverlay(as.selected)}
         </Elem>
         {!isFF(FF_DEV_3873) && getRoot(as).hasInterface("infobar") && this._renderInfobar(as)}
       </Block>
@@ -189,6 +191,16 @@ class App extends Component {
         ref={this.relationsRef}
         tags={selectedStore.names}
         taskData={taskData}
+      />
+    );
+  }
+
+  renderCommentsOverlay(selectedAnnotation) {
+    const commentStore = this.props.store.commentStore;
+    return (
+      <CommentsOverlay
+        commentStore={commentStore}
+        annotation={selectedAnnotation}
       />
     );
   }

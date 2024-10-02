@@ -1,6 +1,7 @@
-import { observer } from "mobx-react";
-import { type FC, useCallback, useContext, useState } from "react";
 import { Tooltip } from "antd";
+import { observer } from "mobx-react";
+import type React from "react";
+import { type FC, useCallback, useContext, useState } from "react";
 
 import { IconCheck, IconEllipsis } from "../../../assets/icons";
 import { Button } from "../../../common/Button/Button";
@@ -35,6 +36,9 @@ interface CommentItemProps {
     toggleResolve: () => void;
     canResolveAny: boolean;
     unsetLink: () => {};
+    isHighlighted: boolean;
+    setHighlighted: (value: boolean) => {};
+    _commentRef: React.Ref<HTMLElement>;
   };
   listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
 }
@@ -57,6 +61,9 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
     setEditMode,
     toggleResolve,
     canResolveAny,
+    isHighlighted,
+    setHighlighted,
+    _commentRef,
   } = comment;
   const { startLinkingMode: _startLinkingMode, currentComment, globalLinking } = useContext(CommentsContext);
   const currentUser = window.APP_SETTINGS?.user;
@@ -107,7 +114,17 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
   };
 
   return (
-    <Block name="comment-item" mod={{ resolved }}>
+    <Block
+      name="comment-item"
+      mod={{ resolved, highlighted: isHighlighted }}
+      onMouseEnter={() => {
+        setHighlighted(true);
+      }}
+      onMouseLeave={() => {
+        setHighlighted(false);
+      }}
+      ref={_commentRef}
+    >
       <Space spread size="medium" truncated>
         <Space size="small" truncated>
           <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy} />

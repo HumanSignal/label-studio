@@ -4,6 +4,51 @@ type RawResult = {
   value: object;
 };
 
+type MSTagProps = {
+  isReady?: boolean
+};
+
+type MSTTagImage = {
+  type: "image";
+  stageWidth: number,
+  stageHeight: number,
+  containerWidth: number,
+  containerHeight: number,
+  canvasSize?: { width: number, height: number },
+} & MSTagProps;
+
+type MSTTag = MSTTagImage | {
+  type: string,
+} & MSTagProps;
+
+type MixinMSTArea = {
+  id: string,
+  ouid: number,
+  results: RawResult[],
+  parentID: string | null,
+}
+
+type MixinMSTRegion = {
+  pid: string,
+  score: number | null,
+  filtered: boolean,
+  parentID: string,
+  fromSuggestion: boolean,
+  dynamic: boolean,
+  origin: "prediction" | "prediction-changed" | "manual",
+  item_index: number | null,
+}
+
+type MixinMSTRegionVolatile = {
+  hidden: boolean,
+  locked: boolean,
+  isDrawing: boolean,
+  shapeRef: null,
+  drawingTimeout: null,
+}
+
+type MSTRegion = MixinMSTArea & MixinMSTRegion & MixinMSTRegionVolatile;
+
 type MSTAnnotation = {
   canBeReviewed: boolean;
   userGenerate: boolean;
@@ -17,19 +62,60 @@ type MSTAnnotation = {
     result?: RawResult[];
   };
   results: RawResult[];
+  names: Map<string, MSTTag>;
 
   submissionInProgress: () => void;
 };
 
+type MSTUserExtended = {
+  id: types.identifierNumber,
+  firstName: string | null,
+  lastName: string | null,
+  username: string | null,
+  email: string | null,
+  lastActivity: string | null,
+  avatar: string | null,
+  initials: string | null,
+  phone: string | null,
+};
+
+type MSTAnchor = {
+  regionId?: string,
+  controlName?: string,
+  region?: MSTRegion,
+  overlayNode?: MSTRegion
+};
+
+type MSTComment = {
+  id: number,
+  text: types.string,
+  createdAt: string,
+  updatedAt: string,
+  resolvedAt: string,
+  createdBy: MSTUserExtended | null,
+  isResolved: boolean,
+  isEditMode: boolean
+  isDeleted: boolean,
+  isConfirmDelete: boolean,
+  isUpdating: boolean,
+  regionRef: MSTAnchor;
+  isHighlighted: boolean;
+  setHighlighted: (value: boolean) => void;
+  scrollIntoView: () => void;
+}
+
 type MSTCommentStore = {
+  comments: MSTComment[];
+  overlayComments: MSTComment[];
   commentFormSubmit: () => void;
   setTooltipMessage: (message: string) => void;
   currentComment: any;
   addedCommentThisSession: boolean;
+  isHighlighting: boolean;
 };
 
 type MSTStore = {
-  customButtons: Instance<typeof CustomButton>[];
+  customButtons: CustomControlProps.button[];
   settings: Record<string, boolean>;
   isSubmitting: boolean;
   // @todo WHAT IS THIS?

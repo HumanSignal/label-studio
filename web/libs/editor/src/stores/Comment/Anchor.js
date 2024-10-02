@@ -1,4 +1,5 @@
 import { getParent, types } from "mobx-state-tree";
+import { isDefined } from "../../utils/utilities";
 
 export const Anchor = types
   .model({
@@ -12,6 +13,16 @@ export const Anchor = types
     get region() {
       return self.annotation.regionStore.regions.find((r) => r.cleanId === self.regionId);
     },
+    get overlayNode() {
+      return self.region;
+    },
+    get uniqueKey() {
+      const parts = [self.regionId];
+      if (isDefined(self.controlName)) {
+        parts.push(self.controlName);
+      }
+      return parts.join("-");
+    }
   }))
   .actions((self) => ({
     serialize() {
