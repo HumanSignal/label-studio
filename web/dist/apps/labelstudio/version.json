@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1507: show review instructions in review stream (#6444)",
-  "commit": "c4cb483d06b663e4c4501acd957ee2658c5f41b8",
-  "date": "2024-09-26T22:06:17.000Z",
+  "message": "feat: OPTIC-1095: Send the started_at time of when annotation work had began (#6408)",
+  "commit": "86d9d3179f9b9244a1d69bb164bba856b5be631a",
+  "date": "2024-10-02T12:21:45.000Z",
   "branch": "develop"
 }
