@@ -1,7 +1,7 @@
 /* eslint-disable-next-line */
+import { nanoid } from "nanoid";
 import React, { type InputHTMLAttributes } from "react";
 import styles from "./checkbox.module.scss";
-import { nanoid } from "nanoid";
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   indeterminate?: boolean;
