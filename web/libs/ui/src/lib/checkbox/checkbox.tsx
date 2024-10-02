@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import React, { type InputHTMLAttributes } from "react";
+import { type InputHTMLAttributes, useEffect, useMemo, useRef } from "react";
 import styles from "./checkbox.module.scss";
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
@@ -7,33 +7,33 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
 }
 
 export const Checkbox = ({ checked, indeterminate, style, onChange, children, ...props }: CheckboxProps) => {
-  const checkboxRef = React.createRef();
+  const checkboxRef = useRef<HTMLInputElement>();
   const withLabel = !!children;
-  const [id] = React.useState(nanoid);
+  const id = useMemo(nanoid, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (checkboxRef.current) {
       checkboxRef.current.indeterminate = indeterminate;
     }
-  }, [checkboxRef, indeterminate]);
+  }, [indeterminate]);
 
   const checkboxContent = (
     <span className={styles.checkbox__box}>
       <input
         {...props}
         id={id}
-        ref={checkboxRef as React.Ref<HTMLInputElement>}
+        ref={checkboxRef}
         checked={!!checked}
         className={styles.checkbox__input}
         type="checkbox"
-        onChange={(e) => {
-          onChange?.(e);
-        }}
+        onChange={onChange}
       />
       <span
-        className={`${styles.checkbox__check} ${checked ? styles.checkbox_checked : ""} ${
-          indeterminate ? styles.checkbox_indeterminate : ""
-        }`}
+        className={[
+          styles.checkbox__check,
+          checked && styles.checkbox_checked,
+          indeterminate && styles.checkbox_indeterminate,
+        ].filter(Boolean).join(" ")}
       />
     </span>
   );
