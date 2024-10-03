@@ -1,15 +1,16 @@
-import { nanoid } from "nanoid";
 import { type InputHTMLAttributes, useEffect, useMemo, useRef } from "react";
+import { clsx } from "clsx";
 import styles from "./checkbox.module.scss";
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   indeterminate?: boolean;
+  checkboxClassName?: string;
+  ariaLabel?: string;
 }
 
-export const Checkbox = ({ checked, indeterminate, style, onChange, children, ...props }: CheckboxProps) => {
+export const Checkbox = ({ checked, indeterminate, style, onChange, children, checkboxClassName, ariaLabel, ...props }: CheckboxProps) => {
   const checkboxRef = useRef<HTMLInputElement>();
   const withLabel = !!children;
-  const id = useMemo(nanoid, []);
 
   useEffect(() => {
     if (checkboxRef.current) {
@@ -21,30 +22,30 @@ export const Checkbox = ({ checked, indeterminate, style, onChange, children, ..
     <span className={styles.checkbox__box}>
       <input
         {...props}
-        id={id}
         ref={checkboxRef}
         checked={!!checked}
-        className={styles.checkbox__input}
+        className={clsx(styles.checkbox__input, checkboxClassName)}
         type="checkbox"
         onChange={onChange}
+        aria-checked={!!checked}
+        aria-label={ariaLabel ?? (typeof children === 'string' ? children : "")}
       />
       <span
-        className={[
-          styles.checkbox__check,
-          checked && styles.checkbox_checked,
-          indeterminate && styles.checkbox_indeterminate,
-        ].filter(Boolean).join(" ")}
+        className={clsx(styles.checkbox__check, {
+          [styles.checkbox__check_checked]: checked,
+          [styles.checkbox__check_indeterminate]: indeterminate,
+        })}
       />
     </span>
   );
 
   return (
     <div
-      className={`${styles.checkbox} ${props.className} ${withLabel ? styles.checkbox_withLabel : ""}`}
+      className={clsx(styles.checkbox, {[styles.checkbox_withLabel]: withLabel}, props.className)}
       style={style}
     >
       {children ? (
-        <label className={styles.checkbox__label} htmlFor={id}>
+        <label className={styles.checkbox__label}>
           {checkboxContent} {children}
         </label>
       ) : (

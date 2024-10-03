@@ -13,10 +13,11 @@ import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { SkeletonLoader } from "../../Common/SkeletonLoader";
 
 const GridHeader = observer(({ row, selected }) => {
+  const isSelected = selected.isSelected(row.id);
   return (
     <Elem name="cell-header">
       <Space>
-        <Checkbox checked={selected.isSelected(row.id)} />
+        <Checkbox checked={isSelected} ariaLabel={`${isSelected ? "Unselect": "Select"} Task ${row.id}`}/>
         <span>{row.id}</span>
       </Space>
     </Elem>
