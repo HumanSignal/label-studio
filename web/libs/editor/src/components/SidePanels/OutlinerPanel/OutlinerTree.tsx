@@ -20,7 +20,7 @@ import { Tooltip } from "../../../common/Tooltip/Tooltip";
 import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
 import { Block, cn, Elem } from "../../../utils/bem";
-import { FF_DEV_2755, FF_DEV_3873, FF_OUTLINER_OPTIM, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_2755, FF_DEV_3873, FF_OUTLINER_OPTIM, FF_PER_FIELD_COMMENTS, isFF } from "../../../utils/feature-flags";
 import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
@@ -265,11 +265,13 @@ const useEventHandlers = () => {
       return;
     }
 
-    if (!self.isReadOnly() && annotation.isLinkingMode) {
-      annotation.addLinkedRegion(self);
-      annotation.stopLinkingMode();
-      annotation.regionStore.unselectAll();
-      return;
+    if (isFF(FF_PER_FIELD_COMMENTS)) {
+      if (!self.isReadOnly() && annotation.isLinkingMode) {
+        annotation.addLinkedRegion(self);
+        annotation.stopLinkingMode();
+        annotation.regionStore.unselectAll();
+        return;
+      }
     }
 
     const wasNotSelected = !self.selected;
