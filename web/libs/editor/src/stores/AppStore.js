@@ -182,6 +182,11 @@ export default types
           : [currentUser];
       }
     }
+    // fix for old version of custom buttons which were just an array
+    // @todo remove after a short time
+    if (Array.isArray(sn.customButtons)) {
+      sn.customButtons = { _replace: sn.customButtons };
+    }
     return {
       ...sn,
       _autoAnnotation: localStorage.getItem("autoAnnotation") === "true",
