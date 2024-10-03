@@ -2,6 +2,7 @@ import { observer } from "mobx-react";
 import { isAlive } from "mobx-state-tree";
 import type React from "react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMounted } from "../../common/Utils/useMounted";
 
 import ResizeObserver from "../../utils/resize-observer";
 import { guidGenerator } from "../../utils/unique";
@@ -91,13 +92,26 @@ const CommentItem: React.FC<CommentItemProps> = observer(({ comment, rootRef }) 
 });
 
 type CommentsOverlayProps = {
-  commentStore?: MSTCommentStore;
+  commentStore: MSTCommentStore;
   annotation: MSTAnnotation;
 };
 const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotation, commentStore }) => {
   const { overlayComments } = commentStore || {};
   const rootRef = useRef<SVGSVGElement>();
   const [uniqKey, forceUpdate] = useState<any>(guidGenerator());
+
+  const mounted = useMounted();
+
+  const loadComments = async () => {
+    await commentStore.listComments({ mounted, suppressClearComments: commentStore.isRelevantList });
+  };
+
+  useEffect(() => {
+    loadComments();
+    // id is internal id,
+    // always different for different annotations, even empty ones;
+    // remain the same when user submit draft, so no unneeded calls.
+  }, [commentStore.annotationId]);
 
   const resizeObserver: ResizeObserver = useMemo(() => {
     let requestId: number;

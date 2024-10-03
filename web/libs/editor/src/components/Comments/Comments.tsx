@@ -20,7 +20,11 @@ export const Comments: FC<{ annotationStore: any; commentStore: any; cacheKey?: 
     const mounted = useMounted();
 
     const loadComments = async () => {
-      await commentStore.listComments({ mounted });
+      const listCommentsOptions: any = { mounted };
+      if (isPerFieldComments) {
+        listCommentsOptions.suppressClearComments = commentStore.isRelevantList;
+      }
+      await commentStore.listComments(listCommentsOptions);
       if (!isFF(FF_DEV_3034)) {
         commentStore.restoreCommentsFromCache(cacheKey);
       }

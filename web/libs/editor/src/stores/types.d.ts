@@ -107,11 +107,15 @@ type MSTComment = {
 type MSTCommentStore = {
   comments: MSTComment[];
   overlayComments: MSTComment[];
+  annotationId: string;
   commentFormSubmit: () => void;
   setTooltipMessage: (message: string) => void;
   currentComment: any;
   addedCommentThisSession: boolean;
   isHighlighting: boolean;
+  isRelevantList: boolean;
+  listComments: (options: { mounted?: { current: boolean }; suppressClearComments: boolean }) => Promise<void>;
+  restoreCommentsFromCache: (cacheKey: string) => void;
 };
 
 type MSTStore = {

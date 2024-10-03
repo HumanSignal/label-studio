@@ -18,6 +18,7 @@ export const CommentStore = types
     currentComment: {},
     inputRef: {},
     tooltipMessage: "",
+    commentsKey: null,
   }))
   .views((self) => ({
     get store() {
@@ -81,10 +82,28 @@ export const CommentStore = types
         if (uniqTargetKeys.has(regionRef.uniqueKey)) return false;
         uniqTargetKeys.add(regionRef.uniqueKey);
         return true;
-      })
+      });
     },
     get isHighlighting() {
       return !!self.highlightedComment;
+    },
+
+    get targetCommentsKey() {
+      if (self.annotationId) {
+        return { annotation: self.annotationId };
+      }
+      if (self.draftId) {
+        return { draft: self.draftId };
+      }
+      return null;
+    },
+
+    get isRelevantList() {
+      if (!self.commentsKey) return false;
+      if (Object.keys(self.commentsKey).length !== Object.keys(self.targetCommentsKey).length) return false;
+      return Object.keys(self.commentsKey).every(key => {
+        return self.commentsKey[key] === self.targetCommentsKey[key];
+      })
     }
   }))
   .actions((self) => {
@@ -103,7 +122,7 @@ export const CommentStore = types
     }
 
     function setHighlightedComment(comment) {
-      self.highlightedComment = comment
+      self.highlightedComment = comment;
     }
 
     function setCommentFormSubmit(submitCallback) {
@@ -256,9 +275,10 @@ export const CommentStore = types
       yield addComment(self.currentComment);
     });
 
-    function setComments(comments) {
+    function setComments(comments, commentsKey = null) {
       if (comments) {
         self.comments.replace(comments);
+        self.commentsKey = commentsKey
       }
     }
 
@@ -320,13 +340,14 @@ export const CommentStore = types
         }
 
         const annotation = self.annotationId;
+        const commentsKey = self.targetCommentsKey;
         const [comments] = yield self.sdk.invoke("comments:list", {
           annotation,
           draft: self.draftId,
         });
 
         if (mounted.current && annotation === self.annotationId) {
-          self.setComments(comments);
+          self.setComments(comments, commentsKey);
         }
       } catch (err) {
         console.error(err);
