@@ -110,7 +110,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
     // either we render _before buttons and then the rest, or we render only _replace buttons
     if (firstToRender) {
-      const allButtons = Array.isArray(firstToRender) ? firstToRender : [firstToRender];
+      const allButtons = toArray(firstToRender);
       for (const customButton of allButtons) {
         // @todo make a list of all internal buttons and use them here to mix custom buttons with internal ones
         // string buttons is a way to render internal buttons
