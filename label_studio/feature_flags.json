@@ -1351,33 +1351,6 @@
       "version": 5,
       "deleted": false
     },
-    "fflag__feature_develop__prompts__dia_1397_multi_label_classification": {
-      "key": "fflag__feature_develop__prompts__dia_1397_multi_label_classification",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "ebd2fabd86ef4b8b9279e5a1def8f62d",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "fflag__feature_develop__prompts__dia_1398_prompt_auto_refinement": {
       "key": "fflag__feature_develop__prompts__dia_1398_prompt_auto_refinement",
       "on": false,
