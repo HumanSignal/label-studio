@@ -116,7 +116,7 @@
     "@nx/webpack": "17.0.3",
     "@nx/workspace": "17.0.3",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
-    "@sentry/browser": "^6.8.0",
+    "@sentry/browser": "^8.33.0",
     "@sentry/react": "^6.8.0",
     "@sentry/tracing": "^6.8.0",
     "@storybook/addon-essentials": "^7.5.3",
