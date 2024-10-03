@@ -26,7 +26,14 @@ import "../../tags/visual";
 import { Space } from "../../common/Space/Space";
 import { Button } from "../../common/Button/Button";
 import { Block, cn, Elem } from "../../utils/bem";
-import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
+import {
+  FF_DEV_1170,
+  FF_DEV_3873,
+  FF_LSDV_4620_3_ML,
+  FF_PER_FIELD_COMMENTS,
+  FF_SIMPLE_INIT,
+  isFF
+} from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
@@ -149,7 +156,7 @@ class App extends Component {
         <Elem name="annotation">
           {<Annotation root={root} annotation={as.selected} />}
           {this.renderRelations(as.selected)}
-          {this.renderCommentsOverlay(as.selected)}
+          {isFF(FF_PER_FIELD_COMMENTS) && this.renderCommentsOverlay(as.selected)}
         </Elem>
         {!isFF(FF_DEV_3873) && getRoot(as).hasInterface("infobar") && this._renderInfobar(as)}
       </Block>

@@ -5,47 +5,51 @@ type RawResult = {
 };
 
 type MSTagProps = {
-  isReady?: boolean
+  isReady?: boolean;
 };
 
 type MSTTagImage = {
   type: "image";
-  stageWidth: number,
-  stageHeight: number,
-  containerWidth: number,
-  containerHeight: number,
-  canvasSize?: { width: number, height: number },
+  stageWidth: number;
+  stageHeight: number;
+  containerWidth: number;
+  containerHeight: number;
+  canvasSize?: { width: number; height: number };
 } & MSTagProps;
 
-type MSTTag = MSTTagImage | {
-  type: string,
-} & MSTagProps;
+type MSTTag = (
+  | MSTTagImage
+  | {
+      type: string;
+    }
+) &
+  MSTagProps;
 
 type MixinMSTArea = {
-  id: string,
-  ouid: number,
-  results: RawResult[],
-  parentID: string | null,
-}
+  id: string;
+  ouid: number;
+  results: RawResult[];
+  parentID: string | null;
+};
 
 type MixinMSTRegion = {
-  pid: string,
-  score: number | null,
-  filtered: boolean,
-  parentID: string,
-  fromSuggestion: boolean,
-  dynamic: boolean,
-  origin: "prediction" | "prediction-changed" | "manual",
-  item_index: number | null,
-}
+  pid: string;
+  score: number | null;
+  filtered: boolean;
+  parentID: string;
+  fromSuggestion: boolean;
+  dynamic: boolean;
+  origin: "prediction" | "prediction-changed" | "manual";
+  item_index: number | null;
+};
 
 type MixinMSTRegionVolatile = {
-  hidden: boolean,
-  locked: boolean,
-  isDrawing: boolean,
-  shapeRef: null,
-  drawingTimeout: null,
-}
+  hidden: boolean;
+  locked: boolean;
+  isDrawing: boolean;
+  shapeRef: null;
+  drawingTimeout: null;
+};
 
 type MSTRegion = MixinMSTArea & MixinMSTRegion & MixinMSTRegionVolatile;
 
@@ -68,41 +72,41 @@ type MSTAnnotation = {
 };
 
 type MSTUserExtended = {
-  id: types.identifierNumber,
-  firstName: string | null,
-  lastName: string | null,
-  username: string | null,
-  email: string | null,
-  lastActivity: string | null,
-  avatar: string | null,
-  initials: string | null,
-  phone: string | null,
+  id: types.identifierNumber;
+  firstName: string | null;
+  lastName: string | null;
+  username: string | null;
+  email: string | null;
+  lastActivity: string | null;
+  avatar: string | null;
+  initials: string | null;
+  phone: string | null;
 };
 
 type MSTAnchor = {
-  regionId?: string,
-  controlName?: string,
-  region?: MSTRegion,
-  overlayNode?: MSTRegion
+  regionId?: string;
+  controlName?: string;
+  region?: MSTRegion;
+  overlayNode?: MSTRegion;
 };
 
 type MSTComment = {
-  id: number,
-  text: types.string,
-  createdAt: string,
-  updatedAt: string,
-  resolvedAt: string,
-  createdBy: MSTUserExtended | null,
-  isResolved: boolean,
-  isEditMode: boolean
-  isDeleted: boolean,
-  isConfirmDelete: boolean,
-  isUpdating: boolean,
+  id: number;
+  text: types.string;
+  createdAt: string;
+  updatedAt: string;
+  resolvedAt: string;
+  createdBy: MSTUserExtended | null;
+  isResolved: boolean;
+  isEditMode: boolean;
+  isDeleted: boolean;
+  isConfirmDelete: boolean;
+  isUpdating: boolean;
   regionRef: MSTAnchor;
   isHighlighted: boolean;
   setHighlighted: (value: boolean) => void;
   scrollIntoView: () => void;
-}
+};
 
 type MSTCommentStore = {
   comments: MSTComment[];

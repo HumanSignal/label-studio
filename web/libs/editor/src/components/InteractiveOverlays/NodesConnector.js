@@ -1,4 +1,5 @@
 import { debounce } from "../../utils/debounce";
+import { FF_PER_FIELD_COMMENTS, isFF } from "../../utils/feature-flags";
 import { wrapArray } from "../../utils/utilities";
 import { Geometry } from "./Geometry";
 import { RelationShape } from "./RelationShape";
@@ -11,9 +12,7 @@ const parentImagePropsWatch = {
     "zoomingPositionY",
     "rotation",
     "currentImage",
-    "containerWidth",
-    "containerHeight",
-    "canvasSize",
+    ...(isFF(FF_PER_FIELD_COMMENTS) ? ["containerWidth", "containerHeight", "canvasSize"] : []),
   ],
 };
 
