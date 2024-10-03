@@ -22,6 +22,7 @@ export const Comments: FC<{ annotationStore: any; commentStore: any; cacheKey?: 
     const loadComments = async () => {
       const listCommentsOptions: any = { mounted };
       if (isPerFieldComments) {
+        // It prevents blinking on opening comments tab for the same annotation when comments are already there
         listCommentsOptions.suppressClearComments = commentStore.isRelevantList;
       }
       await commentStore.listComments(listCommentsOptions);
