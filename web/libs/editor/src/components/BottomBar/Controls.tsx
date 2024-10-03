@@ -39,17 +39,14 @@ function toArray<T>(arg: undefined | T | (T | undefined)[]): T[] {
  */
 const ControlButton = observer(({ button, disabled, onClick }: ControlButtonProps) => {
   const look = button.disabled || disabled ? "disabled" : button.look;
-  // @todo do we need waiting? all buttons should utilize isSubmitting
-  // const [waiting, setWaiting] = useState(false);
 
   return (
     <ButtonTooltip title={button.tooltip ?? ""}>
       <Button
         aria-label={button.ariaLabel}
-        disabled={button.disabled || disabled}// || waiting}
+        disabled={button.disabled || disabled}
         look={look}
         onClick={onClick}
-        // waiting={waiting}
       >
         {button.title}
       </Button>
