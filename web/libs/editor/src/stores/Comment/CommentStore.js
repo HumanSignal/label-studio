@@ -18,6 +18,11 @@ export const CommentStore = types
     currentComment: {},
     inputRef: {},
     tooltipMessage: "",
+    /**
+     * A key that indicates affiliation of the current loaded comment list to the annotation/draft to the annotation/draft.
+     * It's used to check if the current comment list related to the current opened annotation.
+     * It should be removed in case we start to use separate comment stores per annotation.
+     */
     commentsKey: null,
   }))
   .views((self) => ({
@@ -73,14 +78,18 @@ export const CommentStore = types
       if (!self.annotation) return undefined;
       return self.currentComment[self.annotation.id];
     },
+    /**
+     * A subset of comments that should be displayed on the overlay.
+     * For now, it uses only the last comment from the group of ones linked to the same target.
+     */
     get overlayComments() {
       const uniqTargetKeys = new Set();
       return self.comments.filter((comment) => {
         const { regionRef } = comment;
 
         if (!regionRef) return false;
-        if (uniqTargetKeys.has(regionRef.uniqueKey)) return false;
-        uniqTargetKeys.add(regionRef.uniqueKey);
+        if (uniqTargetKeys.has(regionRef.targetKey)) return false;
+        uniqTargetKeys.add(regionRef.targetKey);
         return true;
       });
     },
@@ -88,6 +97,12 @@ export const CommentStore = types
       return !!self.highlightedComment;
     },
 
+    /**
+     * It gets the key that indicates the target of the comment list
+     * we should expect for the current state of stores.
+     * Basically, it's based on the current annotation or the current draft.
+     * @returns Record<string,string> | null
+     */
     get targetCommentsKey() {
       if (self.annotationId) {
         return { annotation: self.annotationId };
@@ -98,6 +113,10 @@ export const CommentStore = types
       return null;
     },
 
+    /**
+     * Indicates if the currently loaded list of comments at least is related to the currently displaying annotation.
+     * @returns {boolean}
+     */
     get isRelevantList() {
       if (!self.commentsKey) return false;
       if (Object.keys(self.commentsKey).length !== Object.keys(self.targetCommentsKey).length) return false;

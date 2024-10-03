@@ -13,10 +13,24 @@ export const Anchor = types
     get region() {
       return self.annotation.regionStore.regions.find((r) => r.cleanId === self.regionId);
     },
+    /**
+     * This will be provided to CommentsOverlay to observe changes in bbox coordinates and sizes
+     *
+     * @return {Object} The overlays-applicable node of the anchor.
+     */
     get overlayNode() {
       return self.region;
     },
-    get uniqueKey() {
+    /**
+     * A key that should be uniq in the contexts of current annotation and current moment
+     * based on the target of Anchor.
+     * It allows distinguishing Anchors by their target (basically by area on the screen to which it was attached)
+     * and group Anchors with the same target.
+     * Right now it is used to display only one comment per area on the screen.
+     *
+     * @return {string} A key string might to be unique for each unique Anchor's target.
+     */
+    get targetKey() {
       const parts = [self.regionId];
       if (isDefined(self.controlName)) {
         parts.push(self.controlName);
