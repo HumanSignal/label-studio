@@ -937,14 +937,43 @@ export class LSFWrapper {
     return undefined;
   }
 
-  /** @private */
+  /**
+   * Calculates the startedAt time for an annotation.
+   * @param {Object|undefined} currentDraft - The current draft object, if any.
+   * @param {Date} loadedDate - The date when the annotation was loaded.
+   * @returns {Date} The calculated startedAt time.
+   * @private
+   */
+  calculateStartedAt(currentDraft, loadedDate) {
+    if (currentDraft) {
+      const draftStartedAt = new Date(currentDraft.created_at);
+      const draftLeadTime = Number(currentDraft.lead_time ?? 0);
+      const adjustedStartedAt = new Date(Date.now() - draftLeadTime * 1000);
+
+      if (adjustedStartedAt < draftStartedAt) return draftStartedAt;
+
+      return adjustedStartedAt;
+    }
+    return loadedDate;
+  }
+
+  /**
+   * Prepare data for draft/submission of annotation
+   * @param {Object} annotation - The annotation object.
+   * @param {Object} options - The options object.
+   * @param {boolean} options.includeId - Whether to include the id in the result.
+   * @param {boolean} options.isNewDraft - Whether the draft is new.
+   * @returns {Object} The prepared data.
+   * @private
+   */
   prepareData(annotation, { includeId, isNewDraft } = {}) {
     const userGenerate = !annotation.userGenerate || annotation.sentUserGenerate;
     const currentDraft = this.findActiveDraft(annotation);
-    const sessionTime = (new Date() - annotation.loadedDate) / 1000;
+    const sessionTime = (Date.now() - annotation.loadedDate.getTime()) / 1000;
     const submittedTime = isNewDraft ? 0 : Number(annotation.leadTime ?? 0);
     const draftTime = Number(currentDraft?.lead_time ?? 0);
     const leadTime = submittedTime + draftTime + sessionTime;
+    const startedAt = this.calculateStartedAt(currentDraft, annotation.loadedDate);
 
     const result = {
       lead_time: leadTime,
@@ -952,6 +981,7 @@ export class LSFWrapper {
       draft_id: annotation.draftId,
       parent_prediction: annotation.parent_prediction,
       parent_annotation: annotation.parent_annotation,
+      started_at: startedAt.toISOString(),
     };
 
     if (includeId && userGenerate) {

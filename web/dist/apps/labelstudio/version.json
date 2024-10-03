@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1507: show review instructions in review stream (#6444)",
-  "commit": "c4cb483d06b663e4c4501acd957ee2658c5f41b8",
-  "date": "2024-09-26T22:06:17.000Z",
+  "message": "chore: OPTIC-1151: Extract font family to a constant (#6424)",
+  "commit": "d3a0eb6b1a3b71d6a0a491bf4277cefb078841c6",
+  "date": "2024-10-03T10:44:49.000Z",
   "branch": "develop"
 }
