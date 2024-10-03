@@ -1,6 +1,6 @@
 {
-  "message": "feat: OPTIC-1095: Send the started_at time of when annotation work had began (#6408)",
-  "commit": "86d9d3179f9b9244a1d69bb164bba856b5be631a",
-  "date": "2024-10-02T12:21:45.000Z",
+  "message": "chore: OPTIC-1151: Extract font family to a constant (#6424)",
+  "commit": "d3a0eb6b1a3b71d6a0a491bf4277cefb078841c6",
+  "date": "2024-10-03T10:44:49.000Z",
   "branch": "develop"
 }
