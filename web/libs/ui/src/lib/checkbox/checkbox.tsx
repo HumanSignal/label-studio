@@ -8,7 +8,16 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
   ariaLabel?: string;
 }
 
-export const Checkbox = ({ checked, indeterminate, style, onChange, children, checkboxClassName, ariaLabel, ...props }: CheckboxProps) => {
+export const Checkbox = ({
+  checked,
+  indeterminate,
+  style,
+  onChange,
+  children,
+  checkboxClassName,
+  ariaLabel,
+  ...props
+}: CheckboxProps) => {
   const checkboxRef = useRef<HTMLInputElement>();
   const withLabel = !!children;
 
@@ -28,7 +37,7 @@ export const Checkbox = ({ checked, indeterminate, style, onChange, children, ch
         type="checkbox"
         onChange={onChange}
         aria-checked={!!checked}
-        aria-label={ariaLabel ?? (typeof children === 'string' ? children : "")}
+        aria-label={ariaLabel ?? (typeof children === "string" ? children : "")}
       />
       <span
         className={clsx(styles.checkbox__check, {
@@ -40,10 +49,7 @@ export const Checkbox = ({ checked, indeterminate, style, onChange, children, ch
   );
 
   return (
-    <div
-      className={clsx(styles.checkbox, {[styles.checkbox_withLabel]: withLabel}, props.className)}
-      style={style}
-    >
+    <div className={clsx(styles.checkbox, { [styles.checkbox_withLabel]: withLabel }, props.className)} style={style}>
       {children ? (
         <label className={styles.checkbox__label}>
           {checkboxContent} {children}

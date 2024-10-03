@@ -2,6 +2,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   --checkbox-size: 18px;
   --checkbox-indeterminate-gap: 4px;
   --checkbox-indeterminate-border-radius: 3px;
@@ -52,10 +53,12 @@
       background-position: center;
       transition: all 120ms ease;
     }
+
     &::after {
       inset: 4px;
       border-radius: 2px;
     }
+
     &::before,
     &::after {
       inset: 0;
@@ -64,17 +67,19 @@
       opacity: 0;
       position: absolute;
     }
+
     &_checked::before,
     &_indeterminate::after {
       opacity: 1;
     }
+
     &_indeterminate::before {
       display: block;
       inset: var(--checkbox-indeterminate-gap);
       width: calc(var(--checkbox-size) - (2 * var(--checkbox-indeterminate-gap)));
       height: calc(var(--checkbox-size) - (2 * var(--checkbox-indeterminate-gap)));
       border-radius: var(--checkbox-indeterminate-border-radius);
-      background-color: currentColor;
+      background-color: currentcolor;
       opacity: 1;
       background-image: none;
     }
