@@ -72,6 +72,9 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
     const handleActionWithComments = useCallback(
       async (e: React.MouseEvent, callback: () => any, errorMessage: string) => {
         const { addedCommentThisSession, currentComment, commentFormSubmit } = store.commentStore;
+        const comment = currentComment[annotation.id];
+        // accept both old and new comment formats
+        const commentText = (comment?.text ?? comment)?.trim();
 
         if (isInProgress) return;
         setIsInProgress(true);
@@ -81,7 +84,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
         if (addedCommentThisSession) {
           selected?.submissionInProgress();
           callback();
-        } else if (currentComment[annotation.id]?.trim()) {
+        } else if (commentText) {
           e.preventDefault();
           selected?.submissionInProgress();
           await commentFormSubmit();
