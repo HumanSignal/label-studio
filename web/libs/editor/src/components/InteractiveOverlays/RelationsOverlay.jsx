@@ -281,7 +281,11 @@ const checkTagsAreReady = (tags, callback) => {
   }
 };
 
-// @todo Why not just to use container thar checks if tags are ready and do not render any children until they are ready?
+/**
+ * @todo Why not just to use container that checks if tags are ready
+ *  and do not render any children until they are ready?
+ * @see {@link CommentsOverlay}
+ */
 const EnsureTagsReady = observer(
   forwardRef(({ tags, taskData, ...props }, ref) => {
     const [ready, setReady] = useState(false);
