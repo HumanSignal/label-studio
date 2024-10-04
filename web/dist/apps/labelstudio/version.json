@@ -1,6 +1,6 @@
 {
-  "message": "chore: OPTIC-1151: Extract font family to a constant (#6424)",
-  "commit": "d3a0eb6b1a3b71d6a0a491bf4277cefb078841c6",
-  "date": "2024-10-03T10:44:49.000Z",
+  "message": "chore(deps-dev): bump @sentry/browser from 6.19.7 to 8.33.0 in /web (#6462)",
+  "commit": "f26bba5f2aa64a4d3406cd02ece05ecfabb735b2",
+  "date": "2024-10-03T19:15:28.000Z",
   "branch": "develop"
 }
