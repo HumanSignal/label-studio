@@ -150,7 +150,7 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
     width: 100%;
     display: flex;
     align-items: center;
-    gap: var(--spacing-small);
+    gap: var(--spacing-small, 8px);
   }
 
   &:not(.checkbox_disabled) {
