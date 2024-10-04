@@ -184,7 +184,9 @@ const ConfigureSettings = ({ template }) => {
         };
         return (
           <li key={key}>
-            <Checkbox checked={value} onChange={onChange}>{options.title}</Checkbox>
+            <Checkbox checked={value} onChange={onChange}>
+              {options.title}
+            </Checkbox>
           </li>
         );
       case String:

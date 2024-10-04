@@ -5,27 +5,21 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
   --checkbox-default-color: var(--grape_0);
   --checkbox-default-background-color: var(--sand_100);
   --checkbox-default-border-color: var(--sand_300);
-
   --checkbox-default-checked-color: var(--grape_0);
   --checkbox-default-checked-background-color: var(--grape_700);
   --checkbox-default-checked-border-color: var(--grape_700);
-
   --checkbox-default-hover-background-color: var(--sand_200);
   --checkbox-default-hover-color: var(--grape_0);
   --checkbox-default-hover-border-color: var(--sand_400);
-
   --checkbox-default-checked-hover-color: var(--grape_0);
   --checkbox-default-checked-hover-background-color: var(--grape_600);
   --checkbox-default-checked-hover-border-color: var(--grape_600);
-
   --checkbox-default-checked-focused-color: var(--grape_0);
   --checkbox-default-checked-focused-background-color: var(--grape_800);
   --checkbox-default-checked-focused-border-color: var(--grape_800);
-
   --checkbox-default-disabled-background-color: var(--sand_200);
   --checkbox-default-disabled-color: var(--sand_500);
   --checkbox-default-disabled-border-color: var(--sand_400);
-
   --checkbox-default-indeterminate-gap: 3px;
 
   display: inline-flex;
@@ -48,9 +42,11 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
       &__box {
         border-color: var(--checkbox-disabled-border-color, var(--checkbox-default-disabled-border-color));
       }
+
       &__check {
         background-color: var(--checkbox-disabled-background-color, var(--checkbox-default-disabled-background-color));
         color: var(--checkbox-disabled-color, var(--checkbox-default-disabled-color));
+
         &_checked::before,
         &_indeterminate::after {
           background-color: var(--checkbox-disabled-color, var(--checkbox-default-disabled-color));
@@ -64,9 +60,10 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
       border-color: var(--checkbox-checked-focused-border-color, var(--checkbox-default-checked-focused-border-color, #37447A));
 
       /* focus-outline/primary */
-      box-shadow: 0px 0px 0px 4px var(--color-primary-focus-outline, #D4DBFB);
+      box-shadow: 0 0 0 4px var(--color-primary-focus-outline, #D4DBFB);
     }
   }
+
   &__box {
     overflow: hidden;
     position: relative;
@@ -79,6 +76,7 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
     border-radius: 4px;
     cursor: pointer;
     box-sizing: content-box;
+
     &_checked {
       border-color: var(--checkbox-checked-border-color, var(--checkbox-default-checked-border-color));
     }
@@ -108,10 +106,7 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
 
     &::before,
     &::after {
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
+      inset: 0;
       display: block;
       content: '';
       opacity: 0;
@@ -155,17 +150,21 @@ $check-icon: "data:image/svg+xml;charset=UTF-8,%3csvg width='13' height='10' vie
 
   &:not(.checkbox_disabled) {
     cursor: pointer;
+
     &:hover {
       .checkbox {
         &__box {
           border-color: var(--checkbox-hover-border-color, var(--checkbox-default-hover-border-color));
+
           &_checked {
             border-color: var(--checkbox-checked-hover-border-color, var(--checkbox-default-checked-hover-border-color));
           }
         }
+
         &__check {
           background-color: var(--checkbox-hover-background-color, var(--checkbox-default-hover-background-color));
           color: var(--checkbox-hover-color, var(--checkbox-default-hover-color));
+
           &_checked,
           &_indeterminate::after {
             background-color: var(--checkbox-checked-hover-background-color, var(--checkbox-default-checked-hover-background-color));
