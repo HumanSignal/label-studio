@@ -51,7 +51,9 @@ class UserSerializerWithProjects(UserSerializer):
         return [json.loads(key) for key in contributed_to]
 
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + ('created_projects', 'contributed_to_projects')
+        all_fields = list(UserSerializer.Meta.fields)
+        del all_fields[all_fields.index('org_membership')]
+        fields = all_fields + ['created_projects', 'contributed_to_projects']
 
 
 class OrganizationMemberUserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
