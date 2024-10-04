@@ -19,7 +19,6 @@ export const Checkbox = ({
   ...props
 }: CheckboxProps) => {
   const checkboxRef = useRef<HTMLInputElement>();
-  const withLabel = !!children;
 
   useEffect(() => {
     if (checkboxRef.current) {
@@ -28,7 +27,7 @@ export const Checkbox = ({
   }, [indeterminate]);
 
   const checkboxContent = (
-    <span className={styles.checkbox__box}>
+    <span className={clsx(styles.checkbox__box, { [styles.checkbox__box_checked]: checked })}>
       <input
         {...props}
         ref={checkboxRef}
@@ -36,7 +35,7 @@ export const Checkbox = ({
         className={clsx(styles.checkbox__input, checkboxClassName)}
         type="checkbox"
         onChange={onChange}
-        aria-checked={!!checked}
+        aria-checked={indeterminate ? 'mixed' : !!checked}
         aria-label={ariaLabel ?? (typeof children === "string" ? children : "")}
       />
       <span
@@ -49,7 +48,7 @@ export const Checkbox = ({
   );
 
   return (
-    <div className={clsx(styles.checkbox, { [styles.checkbox_withLabel]: withLabel }, props.className)} style={style}>
+    <div className={clsx(styles.checkbox, { [styles.checkbox_disabled]: props.disabled }, props.className)} style={style}>
       {children ? (
         <label className={styles.checkbox__label}>
           {checkboxContent} {children}
