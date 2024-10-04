@@ -1,4 +1,4 @@
-import React, { type FC } from "react";
+import type { FC } from "react";
 import { Block, Elem } from "../../../utils/bem";
 
 import "./Info.scss";

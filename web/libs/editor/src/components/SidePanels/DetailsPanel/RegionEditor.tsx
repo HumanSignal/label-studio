@@ -9,7 +9,7 @@ import {
   isUnionType,
   types,
 } from "mobx-state-tree";
-import React, {
+import {
   type ChangeEvent,
   type FC,
   type HTMLInputTypeAttribute,

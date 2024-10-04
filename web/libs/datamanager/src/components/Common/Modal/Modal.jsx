@@ -1,4 +1,4 @@
-import React, { createRef } from "react";
+import { createRef } from "react";
 import { render } from "react-dom";
 import { cn } from "../../../utils/bem";
 import { Button } from "../Button/Button";

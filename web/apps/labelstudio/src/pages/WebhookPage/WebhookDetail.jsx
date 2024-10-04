@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../../components";
 import { Form, Input, Label, Toggle } from "../../components/Form";
 import { Block, cn, Elem } from "../../utils/bem";
@@ -8,10 +8,7 @@ import { useAPI } from "../../providers/ApiProvider";
 import "./WebhookPage.scss";
 import { Space } from "../../components/Space/Space";
 import { useProject } from "../../providers/ProjectProvider";
-import { modal } from "../../components/Modal/Modal";
-import { useModalControls } from "../../components/Modal/ModalPopup";
 import { WebhookDeleteModal } from "./WebhookDeleteModal";
-import { format } from "date-fns";
 
 const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack, onSelectActive }) => {
   // if webhook === null - create mod

@@ -1,4 +1,4 @@
-import React, { forwardRef, useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import { cn } from "../../utils/bem";
 import Label from "../Label/Label";
 import "./Input.scss";

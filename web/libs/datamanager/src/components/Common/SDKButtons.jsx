@@ -1,4 +1,3 @@
-import React from "react";
 import { useSDK } from "../../providers/SDKProvider";
 import { Button } from "./Button/Button";
 

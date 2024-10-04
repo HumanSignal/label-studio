@@ -1,4 +1,4 @@
-import React, { cloneElement, forwardRef, useMemo } from "react";
+import { cloneElement, forwardRef, useMemo } from "react";
 import { Block, Elem } from "../../../utils/bem";
 import { FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
 import { isDefined } from "../../../utils/utils";

@@ -1,4 +1,3 @@
-import React from "react";
 import { observer } from "mobx-react";
 import { flow, getRoot, types } from "mobx-state-tree";
 import { Spin } from "antd";

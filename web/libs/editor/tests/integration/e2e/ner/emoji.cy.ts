@@ -1,4 +1,4 @@
-import { Labels, LabelStudio, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
+import { Labels, LabelStudio } from "@humansignal/frontend-test/helpers/LSF";
 import { RichText } from "@humansignal/frontend-test/helpers/LSF/RichText";
 import { FF_LSDV_4620_3 } from "../../../../src/utils/feature-flags";
 import {

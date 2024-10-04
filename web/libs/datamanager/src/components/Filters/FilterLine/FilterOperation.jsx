@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
-import React, { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { Elem } from "../../../utils/bem";
 import { debounce } from "../../../utils/debounce";
 import { FilterDropdown } from "../FilterDropdown";

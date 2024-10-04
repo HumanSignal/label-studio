@@ -1,5 +1,4 @@
 import { format } from "date-fns/esm";
-import { React } from "react";
 import { Button } from "../../../components";
 import { DescriptionList } from "../../../components/DescriptionList/DescriptionList";
 import { Tooltip } from "../../../components/Tooltip/Tooltip";

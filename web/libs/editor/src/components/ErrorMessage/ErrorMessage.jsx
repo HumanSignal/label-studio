@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./ErrorMessage.module.scss";
 import { sanitizeHtml } from "../../utils/html";
 

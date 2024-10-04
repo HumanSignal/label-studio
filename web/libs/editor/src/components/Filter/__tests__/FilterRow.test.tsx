@@ -1,4 +1,3 @@
-import React from "react";
 import { FilterRow } from "../FilterRow";
 import { fireEvent, render, screen } from "@testing-library/react";
 

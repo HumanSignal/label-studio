@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Label } from "..";
 import { BemWithSpecifiContext } from "../../../../utils/bem";
 import { FormField } from "../../FormField";

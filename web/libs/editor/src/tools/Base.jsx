@@ -1,6 +1,5 @@
 import { getEnv, getSnapshot, getType, types } from "mobx-state-tree";
 import { observer } from "mobx-react";
-import React from "react";
 import { Tool } from "../components/Toolbar/Tool";
 import { toKebabCase } from "strman";
 

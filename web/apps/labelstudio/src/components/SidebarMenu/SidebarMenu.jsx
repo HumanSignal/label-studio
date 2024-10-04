@@ -1,4 +1,3 @@
-import React from "react";
 import { cn } from "../../utils/bem";
 import { Menu } from "../Menu/Menu";
 import "./SidebarMenu.scss";

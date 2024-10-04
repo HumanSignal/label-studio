@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import { Component } from "react";
 import { Button, Tooltip } from "antd";
 import { observer } from "mobx-react";
 

@@ -3,7 +3,6 @@ import { useHistory } from "react-router";
 import { Button } from "../../components";
 import { Label } from "../../components/Form";
 import { confirm } from "../../components/Modal/Modal";
-import { Space } from "../../components/Space/Space";
 import { Spinner } from "../../components/Spinner/Spinner";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";

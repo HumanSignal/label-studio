@@ -1,5 +1,3 @@
-/* global describe, it, expect */
-import React from "react";
 import Enzyme, { shallow } from "enzyme";
 import { shallowToJson } from "enzyme-to-json";
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17";

@@ -5,7 +5,6 @@ import { usePage, usePageSize } from "../../../components/Pagination/Pagination"
 import { useAPI } from "../../../providers/ApiProvider";
 import { Block, Elem } from "../../../utils/bem";
 import { isDefined } from "../../../utils/helpers";
-import { useUpdateEffect } from "../../../utils/hooks";
 import "./PeopleList.scss";
 import { CopyableTooltip } from "../../../components/CopyableTooltip/CopyableTooltip";
 

@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useAPI } from "../../../providers/ApiProvider";
-import { Label, Select } from "../../../components/Form";
+import { Select } from "../../../components/Form";
 import { ProjectContext } from "../../../providers/ProjectProvider";
 
 export const ModelVersionSelector = ({

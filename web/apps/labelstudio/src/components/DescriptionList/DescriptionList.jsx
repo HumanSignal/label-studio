@@ -1,4 +1,3 @@
-import React from "react";
 import { cn } from "../../utils/bem";
 import "./DescriptionList.scss";
 import { IconInfoOutline } from "../../assets/icons";

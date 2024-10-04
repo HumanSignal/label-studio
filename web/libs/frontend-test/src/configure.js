@@ -1,6 +1,5 @@
 import { defineConfig } from "cypress";
 import path from "path";
-import { setupTypescript } from "./plugins/typescript";
 import installLogsPrinter from "cypress-terminal-report/src/installLogsPrinter";
 import * as tasks from "./tasks";
 import { disableChromeGPU } from "./plugins/disable_gpu";

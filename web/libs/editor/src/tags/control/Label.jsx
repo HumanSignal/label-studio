@@ -1,7 +1,6 @@
 import { inject, observer } from "mobx-react";
 import { getType, types } from "mobx-state-tree";
 import ColorScheme from "pleasejs";
-import React from "react";
 
 import { Tooltip } from "../../common/Tooltip/Tooltip";
 import InfoModal from "../../components/Infomodal/Infomodal";

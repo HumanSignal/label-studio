@@ -1,4 +1,3 @@
-import React from "react";
 import { getParentOfType, getType } from "mobx-state-tree";
 import type { IAnyComplexType, IAnyStateTreeNode } from "mobx-state-tree/dist/internal";
 

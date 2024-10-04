@@ -1,4 +1,4 @@
-import { FaAngleDown, FaCaretDown, FaChevronDown } from "react-icons/fa";
+import { FaAngleDown, FaCaretDown } from "react-icons/fa";
 import { Block } from "../../../utils/bem";
 import { FF_LOPS_E_10, FF_SELF_SERVE, isFF } from "../../../utils/feature-flags";
 import { ErrorBox } from "../../Common/ErrorBox";

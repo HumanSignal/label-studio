@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";
 

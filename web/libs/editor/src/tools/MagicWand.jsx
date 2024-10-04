@@ -1,4 +1,3 @@
-import React from "react";
 import chroma from "chroma-js";
 import { observer } from "mobx-react";
 import { flow, types } from "mobx-state-tree";

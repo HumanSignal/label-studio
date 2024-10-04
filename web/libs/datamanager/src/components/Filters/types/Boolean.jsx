@@ -1,4 +1,3 @@
-import React from "react";
 import { FilterDropdown } from "../FilterDropdown";
 
 export const BooleanFilter = [

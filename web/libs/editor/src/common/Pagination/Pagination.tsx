@@ -1,4 +1,4 @@
-import React, { type ChangeEvent, type FC, forwardRef, type KeyboardEvent, useCallback, useState } from "react";
+import { type ChangeEvent, type FC, forwardRef, type KeyboardEvent, useCallback, useState } from "react";
 import { Hotkey } from "../../core/Hotkey";
 import { useHotkey } from "../../hooks/useHotkey";
 import { Block, Elem } from "../../utils/bem";

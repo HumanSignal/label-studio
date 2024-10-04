@@ -1,4 +1,4 @@
-import React, { type FC, memo, type MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { type FC, memo, type MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   IconBackward,
   IconChevronLeft,

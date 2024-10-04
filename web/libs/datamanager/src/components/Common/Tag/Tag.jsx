@@ -1,5 +1,4 @@
 import color from "chroma-js";
-import React from "react";
 import { Block } from "../../../utils/bem";
 import { colors } from "../../../utils/colors";
 import "./Tag.scss";

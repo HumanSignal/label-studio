@@ -1,5 +1,5 @@
 import { getRoot, isAlive, types } from "mobx-state-tree";
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Rect } from "react-konva";
 import { ImageViewContext } from "../components/ImageView/ImageViewContext";
 import { LabelOnRect } from "../components/ImageView/LabelOnRegion";

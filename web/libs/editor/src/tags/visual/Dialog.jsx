@@ -1,4 +1,3 @@
-import React from "react";
 import { inject, observer } from "mobx-react";
 import { types } from "mobx-state-tree";
 import { Divider, Empty } from "antd";

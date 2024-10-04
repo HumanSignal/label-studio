@@ -5,7 +5,6 @@ import { Block, Elem } from "../../utils/bem";
 import { Space } from "../../common/Space/Space";
 import { LsInvisible, LsVisible } from "../../assets/icons";
 import { Label } from "../Label/Label";
-import React from "react";
 import { asVars } from "../../utils/styles";
 import "./LabelItem.scss";
 

@@ -1,4 +1,3 @@
-import React from "react";
 import { cn } from "../../../../utils/bem";
 import { FormField } from "../../FormField";
 import { default as Label } from "../Label/Label";

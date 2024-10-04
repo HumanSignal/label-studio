@@ -1,5 +1,4 @@
 import { observer } from "mobx-react";
-import React from "react";
 import { FilterDropdown } from "../FilterDropdown";
 // import { Common } from "./Common";
 

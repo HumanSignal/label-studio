@@ -1,4 +1,4 @@
-import React, { type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { cn } from "../../utils/bem";
 import "./ToggleItems.scss";
 

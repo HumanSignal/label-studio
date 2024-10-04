@@ -1,5 +1,5 @@
 import chroma from "chroma-js";
-import { type CSSProperties, type FC, memo, type MouseEvent, useCallback, useContext, useMemo } from "react";
+import { type FC, memo, type MouseEvent, useCallback, useContext, useMemo } from "react";
 import { Block, Elem } from "../../../../utils/bem";
 import { clamp } from "../../../../utils/utilities";
 import { TimelineContext } from "../../Context";

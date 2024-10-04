@@ -1,5 +1,4 @@
 import { observer } from "mobx-react";
-import React from "react";
 import { isDefined } from "../../../utils/utils";
 import { FilterInput } from "../FilterInput";
 
