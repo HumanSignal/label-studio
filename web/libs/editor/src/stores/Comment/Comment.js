@@ -57,6 +57,7 @@ export const Comment = CommentBase.named("Comment")
     isDeleted: types.optional(types.boolean, false),
     isConfirmDelete: types.optional(types.boolean, false),
     isUpdating: types.optional(types.boolean, false),
+    ...(isFF(FF_PER_FIELD_COMMENTS) ? { classifications: types.maybeNull(types.frozen({})) } : {}),
   })
   .preProcessSnapshot((sn) => {
     return camelizeKeys(sn ?? {});
@@ -102,11 +103,12 @@ export const Comment = CommentBase.named("Comment")
       self.isConfirmDelete = newMode;
     }
 
-    const updateComment = flow(function* (comment) {
+    const updateComment = flow(function* (comment, classifications = undefined) {
       if (self.isPersisted && !self.isDeleted) {
         yield self.sdk.invoke("comments:update", {
           id: self.id,
           text: comment,
+          classifications,
         });
       }
 

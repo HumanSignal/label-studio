@@ -12,6 +12,12 @@ import { Block, Elem } from "../../../utils/bem";
 import { humanDateDiff, userDisplayName } from "../../../utils/utilities";
 import { CommentFormBase } from "../CommentFormBase";
 import { CommentsContext } from "./CommentsList";
+import {
+  NewTaxonomy,
+  type TaxonomyItem,
+  type SelectedItem,
+  type TaxonomyPath,
+} from "../../../components/NewTaxonomy/NewTaxonomy";
 
 import "./CommentItem.scss";
 import { LinkState } from "./LinkState";
@@ -27,8 +33,9 @@ interface CommentItemProps {
     createdBy: any;
     text: string;
     regionRef: any;
+    classifications: any;
     isResolved: boolean;
-    updateComment: (comment: string) => void;
+    updateComment: (comment: string, classifications?: any) => void;
     deleteComment: () => void;
     setConfirmMode: (confirmMode: boolean) => void;
     setEditMode: (isGoingIntoEditMode: boolean) => void;
@@ -38,6 +45,59 @@ interface CommentItemProps {
   };
   listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
 }
+
+// TODO(jo): figure out how to get the taxonomy from the project.
+// For now, just use a hardcoded string.
+const taxoString = `<Taxonomy name="default">
+  <TaxonomyItem value="title">
+    <TaxonomyItem value="spelling" />
+    <TaxonomyItem value="grammar" />
+  </TaxonomyItem>
+  <TaxonomyItem value="subtitle">
+    <TaxonomyItem value="spelling" />
+    <TaxonomyItem value="grammar" />
+  </TaxonomyItem>
+</Taxonomy>`;
+
+const parseTaxonomyXML = (xmlString: string): TaxonomyItem[] => {
+  // Assume that there is a single root Taxonomy element for now, which may have multiple
+  // TaxonomyItem children.
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+  const taxonomyItems: TaxonomyItem[] = [];
+
+  const parseItems = (node: Element, depth = 0, path: string[] = []): TaxonomyItem => {
+    const value = node.getAttribute("value") || "";
+    const newPath = [...path, value];
+    const children: TaxonomyItem[] = [];
+
+    node.querySelectorAll(":scope > TaxonomyItem").forEach((childNode) => {
+      children.push(parseItems(childNode, depth + 1, newPath));
+    });
+
+    return { label: value, children: children.length ? children : undefined, depth, path: newPath };
+  };
+
+  const taxonomyRoot = xmlDoc.querySelector("Taxonomy");
+  if (taxonomyRoot) {
+    taxonomyRoot.querySelectorAll(":scope > TaxonomyItem").forEach((node) => {
+      taxonomyItems.push(parseItems(node));
+    });
+  }
+  return taxonomyItems;
+};
+
+const taxoItems = parseTaxonomyXML(taxoString);
+
+const taxoPathsToSelections = (paths: TaxonomyPath[] | null): SelectedItem[] =>
+  paths
+    ? paths.map((path) =>
+        path.map((pathElt) => ({
+          label: pathElt,
+          value: pathElt,
+        })),
+      )
+    : [];
 
 export const CommentItem: FC<CommentItemProps> = observer(({ comment, listComments }: CommentItemProps) => {
   const {
@@ -50,6 +110,7 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
     createdBy,
     text: initialText,
     regionRef,
+    classifications,
     isResolved: resolved,
     updateComment,
     deleteComment,
@@ -62,6 +123,8 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
   const currentUser = window.APP_SETTINGS?.user;
   const isCreator = currentUser?.id === createdBy.id;
   const [text, setText] = useState(initialText);
+
+  const [selections, setSelections] = useState<SelectedItem[]>(taxoPathsToSelections(classifications?.default?.values));
   const [linkingComment, setLinkingComment] = useState();
   const region = regionRef?.region;
   const linking = !!(linkingComment && currentComment === linkingComment && globalLinking);
@@ -152,9 +215,34 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
             <>
               {text}
               {hasLinkState && (
-                <Elem name="linkState">
-                  <LinkState linking={linking} region={region} />
-                </Elem>
+                <>
+                  <Elem name="categorySelector">
+                    <NewTaxonomy
+                      selected={selections}
+                      items={taxoItems}
+                      onChange={async (_, values) => {
+                        const theseSelections = taxoPathsToSelections(values);
+                        await updateComment(
+                          text,
+                          theseSelections.length
+                            ? {
+                                default: {
+                                  type: "taxonomy",
+                                  values,
+                                },
+                              }
+                            : null,
+                        );
+                        setSelections(theseSelections);
+                      }}
+                      options={{ pathSeparator: "/", showFullPath: true }}
+                      defaultSearch={false}
+                    />
+                  </Elem>
+                  <Elem name="linkState">
+                    <LinkState linking={linking} region={region} />
+                  </Elem>
+                </>
               )}
             </>
           )}
