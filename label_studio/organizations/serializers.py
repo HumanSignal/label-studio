@@ -79,7 +79,8 @@ class NewUserSerializer(UserSerializer):
 
     class Meta(UserSerializer.Meta):
         all_fields = list(UserSerializer.Meta.fields)
-        del all_fields[all_fields.index('org_membership')]
+        if 'org_membership' in all_fields:
+            del all_fields[all_fields.index('org_membership')]
         fields = all_fields + ['created_projects', 'contributed_to_projects']
 
 
