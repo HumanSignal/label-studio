@@ -187,7 +187,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         initials = '?'
 
         if (
-            settings.CLOUD_INSTANCE
+            getattr(settings, 'CLOUD_INSTANCE', False)
             or flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self)
         ) and is_deleted:
 

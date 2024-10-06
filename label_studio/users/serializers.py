@@ -20,7 +20,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         return instance.avatar_url
 
     def get_initials(self, instance):
-        if settings.CLOUD_INSTANCE or flag_set(
+        if getattr(settings, 'CLOUD_INSTANCE', False) or flag_set(
             'fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=instance
         ):
             return instance.get_initials(self._is_deleted(instance))
@@ -67,7 +67,7 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         if uid not in self.context[key]:
             self.context[key][uid] = super().to_representation(instance)
 
-        if settings.CLOUD_INSTANCE or flag_set(
+        if getattr(settings, 'CLOUD_INSTANCE', False) or flag_set(
             'fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=instance
         ):
             if self._is_deleted(instance):
