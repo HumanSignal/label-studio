@@ -1,6 +1,6 @@
 {
-  "message": "feat: OPTIC-1130: Unify and move Checkbox to Spark (#6418)",
-  "commit": "0f5a47873a24080f74e3edf50cf3cbee96ef98a0",
-  "date": "2024-10-07T13:06:39.000Z",
+  "message": "feat: LEAP-1492: More flexible Custom buttons (#6454)",
+  "commit": "65f69dd87cb9e54acc31d12fb7084514859f3288",
+  "date": "2024-10-07T19:38:13.000Z",
   "branch": "develop"
 }
