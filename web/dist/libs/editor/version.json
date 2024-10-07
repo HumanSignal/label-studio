@@ -1,6 +1,6 @@
 {
-  "message": "feat: OPTIC-1095: Send the started_at time of when annotation work had began (#6408)",
-  "commit": "86d9d3179f9b9244a1d69bb164bba856b5be631a",
-  "date": "2024-10-02T12:21:45.000Z",
+  "message": "chore(deps-dev): bump @sentry/browser from 6.19.7 to 8.33.0 in /web (#6462)",
+  "commit": "f26bba5f2aa64a4d3406cd02ece05ecfabb735b2",
+  "date": "2024-10-03T19:15:28.000Z",
   "branch": "develop"
 }

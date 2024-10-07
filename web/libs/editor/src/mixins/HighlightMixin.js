@@ -370,7 +370,7 @@ const createSpanStylesheet = (document, identifier, color) => {
       padding: 2px 2px;
       font-size: 9.5px;
       font-weight: bold;
-      font-family: Monaco;
+      font-family: var(--font-mono);
       vertical-align: super;
       content: attr(data-label);
       line-height: 0;
