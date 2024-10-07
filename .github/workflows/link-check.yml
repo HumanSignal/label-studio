@@ -1,0 +1,18 @@
+name: Check for Broken Links
+
+on:
+  push:
+    branches: ["develop"]
+    paths:
+      - "docs/**"
+      - ".github/workflows/link-check.yml"
+jobs:
+  linkChecker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run Link Checker
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: --verbose --no-progress docs/
