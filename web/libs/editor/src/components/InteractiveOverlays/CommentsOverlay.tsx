@@ -100,6 +100,7 @@ const ResultTagBbox: React.FC<ResultItemProps> = observer(({ result, rootRef }) 
   const node = result.area;
   const isHidden = !node || node.hidden;
   const [forceUpdateId, forceUpdate] = useState<any>({});
+  const [hovered, setHovered] = useState(false);
 
   const shape = useMemo(() => {
     return node && root ? NodesConnector.createShape(node, root) : null;
@@ -125,15 +126,18 @@ const ResultTagBbox: React.FC<ResultItemProps> = observer(({ result, rootRef }) 
   const itemStyle = {
     pointerEvents: "all" as const,
     stroke: "var(--grape_600)",
-    strokeDasharray: "4 2",
+    strokeDasharray: hovered ? undefined : "4 2",
+    cursor: "crosshair",
   };
 
   return (
     <rect
       {...bbox}
+      rx={3}
+      ry={3}
       style={itemStyle}
-      // onMouseEnter={onHover}
-      // onMouseLeave={onUnHover}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       stroke="red"
       strokeWidth={1}
       fill="none"
@@ -207,9 +211,16 @@ const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotat
     // biome-ignore lint/a11y/noSvgWithoutTitle: It's not just an icon or a figure; it's an entire interactive layer.
     <svg className={containerStyles.join(" ")} ref={setRef} xmlns="http://www.w3.org/2000/svg">
       <g key={uniqKey}>
-        {annotation.isLinkingMode && annotation.results.map((result: MSTResult) => (
+        {/* @todo for now we'll render only global classifications but the goal is to render pre-regions as well */}
+        {/* {annotation.isLinkingMode && annotation.results.map((result: MSTResult) => (
           <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />
-        ))}
+        ))} */}
+        {annotation.isLinkingMode && annotation.regions.filter(r => r.classification)
+          .map((region) => region.results[0])
+          .map((result) => (
+            <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />
+          ))
+        }
         {overlayComments.map((comment: MSTComment) => {
           const { id } = comment;
           return <CommentItem key={id} comment={comment} rootRef={rootRef} />;

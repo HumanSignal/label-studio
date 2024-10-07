@@ -34,10 +34,11 @@ type MSTTag = (
 type MixinMSTArea = {
   id: string;
   ouid: number;
-  results: RawResult[];
+  results: MSTResult[];
   parentID: string | null;
   control: object;
   object: object;
+  classification?: boolean;
 };
 
 type MixinMSTRegion = {
@@ -74,6 +75,7 @@ type MSTAnnotation = {
     draft?: RawResult[];
     result?: RawResult[];
   };
+  regions: MSTRegion[];
   results: MSTResult[];
   names: Map<string, MSTTag>;
   isLinkingMode: boolean;
