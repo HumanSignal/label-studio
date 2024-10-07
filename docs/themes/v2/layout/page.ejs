@@ -1,3 +1,4 @@
+<% const isEnterpriseTheme = theme.tier === "enterprise" %>
 <% const pageContainsHeadings = page.content.includes("<h2") %>
 <% const tocPageTypes = page.type === "guide" || page.type === "blog" || page.type === "templates" || page.type === "tags" %>
 
@@ -9,7 +10,7 @@
 <div class="content-grid">
   <div class="content-markdown">
     <% if(page.type && page.parent !== undefined) { %>
-      <%- breadcrumb({pageType: page.type, parentPage: page.parent, currentPage: page.title, parentPageExtension: page.parent_page_extension }) %>
+      <%- breadcrumb({pageType: page.type, parentPage: isEnterpriseTheme && page.parent_enterprise ? page.parent_enterprise : page.parent, currentPage: page.title, parentPageExtension: page.parent_page_extension }) %>
     <% } %>
     <% if (!page.hide_frontmatter_title && page.title.trim()) { %>
       <%- partial("component/heading", {text: page.title, size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
