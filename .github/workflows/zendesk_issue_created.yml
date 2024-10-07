@@ -1,0 +1,35 @@
+name: "ZenDesk: Create a zendesk ticket out of an issue"
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  issue_created:
+    name: Issue created
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - env:
+          ZENDESK_BASIC_AUTH: ${{ secrets.ZENDESK_BASIC_AUTH }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_USER: ${{ github.event.issue.user.login }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          WORKFLOW_RUN_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: |
+          body=$(jq -n --arg body "$ISSUE_BODY" '{body: $body}' | jq .body)
+          echo "$body"
+
+          curl -X POST https://labelstudio.zendesk.com/api/v2/tickets -H "Authorization: Basic $ZENDESK_BASIC_AUTH" -H "Content-Type: application/json" --data-binary @- <<DATA
+          {
+            "ticket": {
+              "subject":   "Github_Issue: $ISSUE_TITLE",
+              "comment":   { "body": "[GITHUB_ISSUE_COMMENT]\n\n${body:1:-1}\n\nGITHUB ISSUE URL: ${ISSUE_URL}\nWORKFLOW RUN: ${WORKFLOW_RUN_LINK}" },
+              "tags": ["gh-issue"],
+              "external_id": "$ISSUE_URL",
+              "requester": { "locale_id": 1, "name": "$ISSUE_USER from Github", "email": "$ISSUE_USER@users.noreply.github.com" }
+            }
+          }
+          DATA
