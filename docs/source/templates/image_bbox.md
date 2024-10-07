@@ -24,13 +24,13 @@ Note that when you rotate rectangles (bounding boxes), the anchor point is diffe
 
 If you rotate a bounding box using your mouse in the labeling interface, the rotation anchor point is the center of the rectangle.
 
-![Diagram showing mouse rotation](../images/rectangle_ui_rotation.jpg)
+![Diagram showing mouse rotation](/images/rectangle_ui_rotation.jpg)
 
 **Bounding box rotation in the Label Studio results**
 
 If you rotate by directly editing the rotation angle under the **Info** panel of the labeling interface, the rotation anchor point is the top left. This is also how it is saved in the Label Studio results (regardless of how you performed the rotation).
 
-![Diagram showing result rotation](../images/rectangle_db_rotation.jpg)
+![Diagram showing result rotation](/images/rectangle_db_rotation.jpg)
 
 ## Create a rotated bounding box
 
