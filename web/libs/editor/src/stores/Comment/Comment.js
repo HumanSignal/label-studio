@@ -1,5 +1,6 @@
-import { applySnapshot, flow, getEnv, getParentOfType, getRoot, types } from "mobx-state-tree";
+import { applySnapshot, flow, getEnv, getRoot, types } from "mobx-state-tree";
 import { createRef } from "react";
+import Types from "../../core/Types";
 
 import Utils from "../../utils";
 import { FF_PER_FIELD_COMMENTS } from "../../utils/feature-flags";
@@ -7,7 +8,6 @@ import { camelizeKeys, snakeizeKeys } from "../../utils/utilities";
 import { UserExtended } from "../UserStore";
 
 import { Anchor } from "./Anchor";
-import { CommentStore } from "./CommentStore";
 
 export const CommentBase = types
   .model("CommentBase", {
@@ -17,7 +17,7 @@ export const CommentBase = types
   .views((self) => ({
     get commentsStore() {
       try {
-        return getParentOfType(self, CommentStore);
+        return Types.getParentOfTypeString(self, "CommentStore");
       } catch (e) {
         return null;
       }
