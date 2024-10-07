@@ -92,6 +92,13 @@
 
   &__label {
     flex: auto 1 0;
+    max-width: 100%;
+
+    & div {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
   }
 
   &__text {
