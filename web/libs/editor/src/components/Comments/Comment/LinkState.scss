@@ -46,6 +46,11 @@
   justify-content: stretch;
   width: 100%;
   opacity: var(--comment-item-region-opacity, 1);
+  overflow: hidden;
+
+  &_interactive {
+    user-select: none
+  }
 
   &__icon {
     display: flex;
@@ -83,6 +88,18 @@
     flex: 1;
     color: var(--text-color, var(--sand_900));
     min-width: 0;
+  }
+
+  &__label {
+    flex: auto 1 0;
+  }
+
+  &__text {
+    margin-left: 5px;
+    color: var(--sand_900);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   &__close {

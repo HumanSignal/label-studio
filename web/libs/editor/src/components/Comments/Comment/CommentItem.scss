@@ -78,6 +78,7 @@
     display: flex;
     gap: 8px;
     align-items: flex-start;
+    overflow: hidden;
   }
 
   &__actions {
@@ -111,10 +112,13 @@
     font-size: var(--comment-item-content-font-size);
     line-height: var(--comment-item-content-line-height);
     letter-spacing: var(--comment-item-content-letter-spacing);
+    overflow: hidden;
   }
 
   &__linkState {
     padding: 9px 3px 4px;
+    width: 100%;
+    overflow: hidden;
   }
 
   &_resolved {

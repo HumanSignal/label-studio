@@ -170,7 +170,7 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
               {text}
               {hasLinkState && (
                 <Elem name="linkState">
-                  <LinkState linking={linking} region={region} />
+                  <LinkState linking={linking} region={region} interactive />
                 </Elem>
               )}
             </>
