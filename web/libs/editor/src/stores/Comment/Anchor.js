@@ -36,7 +36,7 @@ export const Anchor = types
         parts.push(self.controlName);
       }
       return parts.join("-");
-    }
+    },
   }))
   .actions((self) => ({
     serialize() {

@@ -54,7 +54,7 @@ type MixinMSTRegionVolatile = {
 type MSTRegion = MixinMSTArea & MixinMSTRegion & MixinMSTRegionVolatile;
 
 type MSTAnnotation = {
-  id: string,
+  id: string;
   canBeReviewed: boolean;
   userGenerate: boolean;
   sentUserGenerate: boolean;
@@ -113,7 +113,7 @@ type MSTCommentStore = {
   comments: MSTComment[];
   overlayComments: MSTComment[];
   annotationId: string;
-  annotation?: MSTAnnotation,
+  annotation?: MSTAnnotation;
   commentFormSubmit: () => void;
   setTooltipMessage: (message: string) => void;
   currentComment: any;

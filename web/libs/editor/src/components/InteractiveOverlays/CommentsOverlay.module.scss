@@ -1,5 +1,5 @@
-$iconPrimaryColor: #576CC1;
-$iconSecondaryColor: #F0F3FE;
+$icon-primary-color: #576CC1;
+$icon-secondary-color: #F0F3FE;
 
 .container {
   position: absolute;
@@ -13,22 +13,23 @@ $iconSecondaryColor: #F0F3FE;
   .commentItem {
     transition: opacity 300ms;
     transform: translateY(-100%);
-    filter: drop-shadow(0px 2px 8px #12110D52) drop-shadow(0px 8px 16px #12110D1F);
+    filter: drop-shadow(0 2px 8px #12110D52) drop-shadow(0 8px 16px #12110D1F);
     pointer-events: all;
     cursor: pointer;
   }
 
   .commentIcon {
+    /* for the future */
   }
 
   .commentIconBackground {
     transition: fill 300ms;
-    fill: $iconSecondaryColor;
+    fill: $icon-secondary-color;
   }
 
   .commentIconLines {
     transition: fill 300ms;
-    fill: $iconPrimaryColor;
+    fill: $icon-primary-color;
   }
 
   &._highlighting {
@@ -39,11 +40,11 @@ $iconSecondaryColor: #F0F3FE;
         opacity: 1;
 
         & .commentIconBackground {
-          fill: $iconPrimaryColor;
+          fill: $icon-primary-color;
         }
 
         & .commentIconLines {
-          fill: $iconSecondaryColor;
+          fill: $icon-secondary-color;
         }
       }
     }

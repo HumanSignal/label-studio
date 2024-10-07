@@ -32,7 +32,7 @@ import {
   FF_LSDV_4620_3_ML,
   FF_PER_FIELD_COMMENTS,
   FF_SIMPLE_INIT,
-  isFF
+  isFF,
 } from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
@@ -204,12 +204,7 @@ class App extends Component {
 
   renderCommentsOverlay(selectedAnnotation) {
     const commentStore = this.props.store.commentStore;
-    return (
-      <CommentsOverlay
-        commentStore={commentStore}
-        annotation={selectedAnnotation}
-      />
-    );
+    return <CommentsOverlay commentStore={commentStore} annotation={selectedAnnotation} />;
   }
 
   render() {
