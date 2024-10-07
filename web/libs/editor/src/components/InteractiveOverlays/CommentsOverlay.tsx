@@ -124,7 +124,7 @@ const ResultTagBbox: React.FC<ResultItemProps> = observer(({ result, rootRef }) 
 
   const itemStyle = {
     pointerEvents: "all" as const,
-    stroke: "var(--grape-600)",
+    stroke: "var(--grape_600)",
     strokeDasharray: "4 2",
   };
 
