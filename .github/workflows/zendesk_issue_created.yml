@@ -32,11 +32,17 @@ jobs:
             --data-binary @- <<DATA
           {
             "ticket": {
-              "subject":   "Github_Issue: $ISSUE_TITLE",
-              "comment":   { "body": "[GITHUB_ISSUE_COMMENT]\n\n${body:1:-1}\n\nGITHUB ISSUE URL: ${ISSUE_URL}\nWORKFLOW RUN: ${WORKFLOW_RUN_LINK}" },
+              "subject": "Github_Issue: $ISSUE_TITLE",
+              "comment": {
+                "body": "[GITHUB_ISSUE_DESCRIPTION]\n\n${body:1:-1}\n\nGITHUB ISSUE URL: ${ISSUE_URL}\nWORKFLOW RUN: ${WORKFLOW_RUN_LINK}"
+              },
               "tags": ["gh-issue"],
               "external_id": "$ISSUE_URL",
-              "requester": { "locale_id": 1, "name": "$ISSUE_USER from Github", "email": "$ISSUE_USER@users.noreply.github.com" }
+              "requester": {
+                "locale_id": 1,
+                "name": "$ISSUE_USER from Github",
+                "email": "$ISSUE_USER@users.noreply.github.com"
+              }
             }
           }
           DATA
