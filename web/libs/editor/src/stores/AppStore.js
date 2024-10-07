@@ -161,11 +161,9 @@ export default types
 
     queuePosition: types.optional(types.number, 0),
 
-    customButtons: types.map(types.union(
-      types.string,
-      CustomButton,
-      types.array(types.union(types.string, CustomButton)),
-    )),
+    customButtons: types.map(
+      types.union(types.string, CustomButton, types.array(types.union(types.string, CustomButton))),
+    ),
   })
   .preProcessSnapshot((sn) => {
     // This should only be handled if the sn.user value is an object, and converted to a reference id for other

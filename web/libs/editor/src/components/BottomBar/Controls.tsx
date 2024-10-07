@@ -12,11 +12,18 @@ import { useCallback, useState } from "react";
 import { IconBan, LsChevron } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
 import { Dropdown } from "../../common/Dropdown/Dropdown";
-import { CustomButton } from "../../stores/CustomButton";
+import type { CustomButton } from "../../stores/CustomButton";
 import { Block, cn, Elem } from "../../utils/bem";
 import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import { isDefined } from "../../utils/utilities";
-import { AcceptButton, ButtonTooltip, controlsInjector, RejectButtonDefinition, SkipButton, UnskipButton } from "./buttons";
+import {
+  AcceptButton,
+  ButtonTooltip,
+  controlsInjector,
+  RejectButtonDefinition,
+  SkipButton,
+  UnskipButton,
+} from "./buttons";
 
 import "./Controls.scss";
 
@@ -31,7 +38,7 @@ type ControlButtonProps = {
 
 /** If given one element, wrap it in an array */
 function toArray<T>(arg: undefined | T | (T | undefined)[]): T[] {
-  return (Array.isArray(arg) ? arg : [arg]).filter(v => v !== undefined);
+  return (Array.isArray(arg) ? arg : [arg]).filter((v) => v !== undefined);
 }
 
 /**
@@ -42,12 +49,7 @@ const ControlButton = observer(({ button, disabled, onClick }: ControlButtonProp
 
   return (
     <ButtonTooltip title={button.tooltip ?? ""}>
-      <Button
-        aria-label={button.ariaLabel}
-        disabled={button.disabled || disabled}
-        look={look}
-        onClick={onClick}
-      >
+      <Button aria-label={button.ariaLabel} disabled={button.disabled || disabled} look={look} onClick={onClick}>
         {button.title}
       </Button>
     </ButtonTooltip>
@@ -139,12 +141,12 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
       const customRejectButtons = toArray(customButtons.get("reject"));
       const hasCustomReject = customRejectButtons.length > 0;
       const originalRejectButton = RejectButtonDefinition;
+      // @todo implement reuse of internal buttons later (they are set as strings)
       const rejectButtons: CustomButtonType[] = hasCustomReject
-        // @todo implement reuse of internal buttons later (they are set as strings)
-        ? customRejectButtons.filter(button => typeof button !== "string")
+        ? customRejectButtons.filter((button) => typeof button !== "string")
         : [originalRejectButton];
 
-      rejectButtons.forEach(button => {
+      rejectButtons.forEach((button) => {
         const action = hasCustomReject
           ? () => store.handleCustomButton?.(button.name)
           : () => store.rejectAnnotation({});
@@ -159,7 +161,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
             await store.commentStore.commentFormSubmit();
             action();
           }
-        }
+        };
 
         buttons.push(<ControlButton button={button} disabled={disabled} onClick={onReject} />);
       });
