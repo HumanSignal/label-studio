@@ -1,5 +1,5 @@
 /* global it, describe, expect, test */
-import { emailFromCreatedBy, getUrl, isString, isStringEmpty, isStringJSON, toTimeString } from "../utilities";
+import { emailFromCreatedBy, toArray, getUrl, isString, isStringEmpty, isStringJSON, toTimeString } from "../utilities";
 
 describe("Helper function emailFromCreatedBy", () => {
   expect(emailFromCreatedBy("abc@def.com, 12")).toBe("abc@def.com");
@@ -12,6 +12,24 @@ describe("Helper function emailFromCreatedBy", () => {
   expect(emailFromCreatedBy("Ab.C D@E.F ab.c+12@def.com.pt, 12")).toBe("ab.c+12@def.com.pt");
   // just a email, should not be a real case though
   expect(emailFromCreatedBy("ab.c+12@def.com.pt")).toBe("ab.c+12@def.com.pt");
+});
+
+describe("Helper function toArray, converting any value to array, skipping undefined values", () => {
+  test("Empty", () => {
+    expect(toArray()).toEqual([]);
+  });
+
+  test("Single value", () => {
+    expect(toArray("value")).toEqual(["value"]);
+  });
+
+  test("Zero", () => {
+    expect(toArray(0)).toEqual([0]);
+  });
+
+  test("Array", () => {
+    expect(toArray(["value"])).toEqual(["value"]);
+  });
 });
 
 /**

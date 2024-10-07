@@ -15,7 +15,7 @@ import { Dropdown } from "../../common/Dropdown/Dropdown";
 import type { CustomButton } from "../../stores/CustomButton";
 import { Block, cn, Elem } from "../../utils/bem";
 import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
-import { isDefined } from "../../utils/utilities";
+import { isDefined, toArray } from "../../utils/utilities";
 import {
   AcceptButton,
   ButtonTooltip,
@@ -35,11 +35,6 @@ type ControlButtonProps = {
   disabled: boolean;
   onClick: (e: React.MouseEvent) => void;
 };
-
-/** If given one element, wrap it in an array */
-function toArray<T>(arg: undefined | T | (T | undefined)[]): T[] {
-  return (Array.isArray(arg) ? arg : [arg]).filter((v) => v !== undefined);
-}
 
 /**
  * Custom action button component, rendering buttons from store.customButtons
