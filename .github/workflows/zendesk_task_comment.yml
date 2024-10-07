@@ -1,4 +1,4 @@
-name: "ZenDesk: Handle GH Issue Response"
+name: "ZenDesk: Comment GitHub Issue on Zendesk Ticket Comment"
 
 on:
   workflow_dispatch:
@@ -15,77 +15,72 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - uses: actions/github-script@v5
+        env:
+          PAYLOAD: ${{ inputs.client_payload }}
         with:
           github-token: ${{ secrets.GIT_PAT_HEIDI }}
           script: |
-            try {
-              // Get the client payload input from the workflow_dispatch
-              const payload = JSON.parse(inputs.client_payload);
+            const payload = JSON.parse(process.env.PAYLOAD);
+            console.log("Parsed payload: ", JSON.stringify(payload, null, 2));
 
-              // Log the parsed payload for debugging
-              console.log("Parsed payload: ", JSON.stringify(payload, null, 2));
+            // Extract issue details from the Zendesk external_id
+            const parts = payload.ticket.external_id.split("/");
+            const issue_number = parts[parts.length - 1];
+            const issue_repo = parts[parts.length - 3];
+            const issue_owner = parts[parts.length - 4];
 
-              // Extract issue details from the Zendesk external_id
-              const parts = payload.ticket.external_id.split("/");
-              const issue_number = parts[parts.length - 1];
-              const issue_repo = parts[parts.length - 3];
-              const issue_owner = parts[parts.length - 4];
+            // Extract comment details
+            const comment_author = payload.comment.author || "HumanSignal Support";
+            const comment_body = payload.comment.body;
+            const formatted_comment_body = `${comment_body}\n\n*Comment by ${comment_author}*`;
 
-              // Extract comment details
-              const comment_author = payload.comment.author || "HumanSignal Support";
-              const comment_body = payload.comment.body;
-              const formatted_comment_body = `${comment_body}\n\n*Comment by ${comment_author}*`;
+            // Add a comment to the GitHub issue
+            await github.rest.issues.createComment({
+              owner: issue_owner,
+              repo: issue_repo,
+              issue_number: issue_number,
+              body: formatted_comment_body
+            });
 
-              // Add a comment to the GitHub issue
-              await github.rest.issues.createComment({
+            // Extract labels from the custom_field
+            let new_labels = [];
+            if (payload.ticket.custom_field) {
+              new_labels = payload.ticket.custom_field.split(" ").map(label => label.trim());
+            }
+
+            // Get the current labels on the GitHub issue
+            const { data: current_labels } = await github.rest.issues.listLabelsOnIssue({
+              owner: issue_owner,
+              repo: issue_repo,
+              issue_number: issue_number
+            });
+
+            const current_label_names = current_labels.map(label => label.name);
+
+            // Labels to be added
+            const labels_to_add = new_labels.filter(label => !current_label_names.includes(label));
+
+            // Labels to be removed
+            const labels_to_remove = current_label_names.filter(label => !new_labels.includes(label));
+
+            // Remove labels that are not in the new labels list
+            for (const label of labels_to_remove) {
+              await github.rest.issues.removeLabel({
                 owner: issue_owner,
                 repo: issue_repo,
                 issue_number: issue_number,
-                body: formatted_comment_body
+                name: label
               });
+            }
 
-              // Extract labels from the custom_field
-              let new_labels = [];
-              if (payload.ticket.custom_field) {
-                new_labels = payload.ticket.custom_field.split(" ").map(label => label.trim());
-              }
-
-              // Get the current labels on the GitHub issue
-              const { data: current_labels } = await github.rest.issues.listLabelsOnIssue({
+            // Add the new labels
+            if (labels_to_add.length > 0) {
+              await github.rest.issues.addLabels({
                 owner: issue_owner,
                 repo: issue_repo,
-                issue_number: issue_number
+                issue_number: issue_number,
+                labels: labels_to_add
               });
-
-              const current_label_names = current_labels.map(label => label.name);
-
-              // Labels to be added
-              const labels_to_add = new_labels.filter(label => !current_label_names.includes(label));
-
-              // Labels to be removed
-              const labels_to_remove = current_label_names.filter(label => !new_labels.includes(label));
-
-              // Remove labels that are not in the new labels list
-              for (const label of labels_to_remove) {
-                await github.rest.issues.removeLabel({
-                  owner: issue_owner,
-                  repo: issue_repo,
-                  issue_number: issue_number,
-                  name: label
-                });
-              }
-
-              // Add the new labels
-              if (labels_to_add.length > 0) {
-                await github.rest.issues.addLabels({
-                  owner: issue_owner,
-                  repo: issue_repo,
-                  issue_number: issue_number,
-                  labels: labels_to_add
-                });
-              }
-
-              console.log("Comment and labels successfully added to GitHub issue.");
-            } catch (error) {
-              core.setFailed(`Workflow failed: ${error.message}`);
             }
+
+            console.log("Comment and labels successfully added to GitHub issue.");

@@ -15,31 +15,26 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - uses: actions/github-script@v5
+        env:
+          PAYLOAD: ${{ inputs.client_payload }}
         with:
           github-token: ${{ secrets.GIT_PAT_HEIDI }}
           script: |
-            try {
-              // Parse the client payload (received from Zendesk)
-              const payload = JSON.parse(inputs.client_payload);
+            const payload = JSON.parse(process.env.PAYLOAD);
+            console.log("Parsed payload: ", JSON.stringify(payload, null, 2));
 
-              // Log the parsed payload for debugging
-              console.log("Parsed payload: ", JSON.stringify(payload, null, 2));
+            // Extract issue details from the Zendesk external_id
+            const parts = payload.ticket.external_id.split("/");
+            const issue_number = parts[parts.length - 1];
+            const issue_repo = parts[parts.length - 3];
+            const issue_owner = parts[parts.length - 4];
 
-              // Extract issue details from the Zendesk external_id
-              const parts = payload.ticket.external_id.split("/");
-              const issue_number = parts[parts.length - 1];
-              const issue_repo = parts[parts.length - 3];
-              const issue_owner = parts[parts.length - 4];
+            // Close the GitHub issue
+            await github.rest.issues.update({
+              owner: issue_owner,
+              repo: issue_repo,
+              issue_number: issue_number,
+              state: "closed"
+            });
 
-              // Close the GitHub issue
-              await github.rest.issues.update({
-                owner: issue_owner,
-                repo: issue_repo,
-                issue_number: issue_number,
-                state: "closed"
-              });
-
-              console.log(`GitHub issue #${issue_number} closed successfully.`);
-            } catch (error) {
-              core.setFailed(`Workflow failed: ${error.message}`);
-            }
+            console.log(`GitHub issue #${issue_number} closed successfully.`);
