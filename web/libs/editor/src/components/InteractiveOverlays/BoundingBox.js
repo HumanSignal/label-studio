@@ -74,6 +74,9 @@ const stageRelatedBBox = (region, bbox) => {
 };
 
 const _detect = (region) => {
+  if (region.classification) {
+    return Geometry.getDOMBBox(region.control.elementRef?.current);
+  }
   switch (region.type) {
     case "textrange":
     case "richtextregion":

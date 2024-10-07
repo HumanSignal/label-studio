@@ -6,10 +6,9 @@ import { useMounted } from "../../common/Utils/useMounted";
 
 import ResizeObserver from "../../utils/resize-observer";
 import { guidGenerator } from "../../utils/unique";
+import NodesConnector from "./NodesConnector";
 
 import styles from "./CommentsOverlay.module.scss";
-
-import NodesConnector from "./NodesConnector";
 
 const CommentIcon = () => {
   return (
@@ -92,6 +91,61 @@ const CommentItem: React.FC<CommentItemProps> = observer(({ comment, rootRef }) 
   );
 });
 
+type ResultItemProps = {
+  result: MSTResult;
+  rootRef: React.MutableRefObject<HTMLOrSVGElement | undefined>;
+};
+const ResultTagBbox: React.FC<ResultItemProps> = observer(({ result, rootRef }) => {
+  const root = rootRef.current;
+  const node = result.area;
+  const isHidden = !node || node.hidden;
+  const [forceUpdateId, forceUpdate] = useState<any>({});
+
+  const shape = useMemo(() => {
+    return node && root ? NodesConnector.createShape(node, root) : null;
+  }, [node, root]);
+
+  const bbox = useMemo(() => {
+    if (!shape || !root) return { x: 0, y: 0, width: 0, height: 0 };
+    return NodesConnector.calculateBBox(shape, root)[0];
+  }, [shape, root, forceUpdateId]);
+
+  useEffect(() => {
+    shape?.onUpdate(() => {
+      forceUpdate({});
+    });
+    return () => {
+      shape?.destroy();
+    };
+  }, [shape]);
+
+  if (!root || !node || isHidden) return null;
+  if (bbox.width < 1 || bbox.height < 1) return null;
+
+  const itemStyle = {
+    pointerEvents: "all" as const,
+    stroke: "var(--grape-600)",
+    strokeDasharray: "4 2",
+  };
+
+  return (
+    <rect
+      {...bbox}
+      style={itemStyle}
+      // onMouseEnter={onHover}
+      // onMouseLeave={onUnHover}
+      stroke="red"
+      strokeWidth={1}
+      fill="none"
+      onClick={() => {
+        result.annotation.addLinkedResult(result);
+        result.annotation.stopLinkingMode();
+      }}
+    >
+    </rect>
+  );
+});
+
 type CommentsOverlayProps = {
   commentStore: MSTCommentStore;
   annotation: MSTAnnotation;
@@ -152,10 +206,15 @@ const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotat
   return (
     // biome-ignore lint/a11y/noSvgWithoutTitle: It's not just an icon or a figure; it's an entire interactive layer.
     <svg className={containerStyles.join(" ")} ref={setRef} xmlns="http://www.w3.org/2000/svg">
-      {overlayComments.map((comment: MSTComment) => {
-        const { id } = comment;
-        return <CommentItem key={[id, uniqKey].join("-")} comment={comment} rootRef={rootRef} />;
-      })}
+      <g key={uniqKey}>
+        {annotation.isLinkingMode && annotation.results.map((result: MSTResult) => (
+          <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />
+        ))}
+        {overlayComments.map((comment: MSTComment) => {
+          const { id } = comment;
+          return <CommentItem key={id} comment={comment} rootRef={rootRef} />;
+        })}
+      </g>
     </svg>
   );
 });

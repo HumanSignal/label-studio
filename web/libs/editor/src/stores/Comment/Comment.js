@@ -57,6 +57,12 @@ export const CommentBase = types
           regionId: region.cleanId,
         };
       },
+      setResultLink(result) {
+        self.regionRef = {
+          regionId: result.area.cleanId,
+          controlName: result.from_name.name,
+        };
+      },
       setHighlighted(value = true) {
         const commentsStore = self.commentsStore;
         if (commentsStore) {
