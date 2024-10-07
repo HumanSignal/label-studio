@@ -1,11 +1,13 @@
 name: Check for Broken Links
 
 on:
-  push:
+  pull_request:
     branches: ["develop"]
     paths:
       - "docs/**"
       - ".github/workflows/link-check.yml"
+  workflow_dispatch:
+
 jobs:
   linkChecker:
     runs-on: ubuntu-latest
