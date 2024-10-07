@@ -6,8 +6,6 @@ import { Button } from "antd";
 import { IconCommentLinkTo, LsClose } from "../../../assets/icons";
 import { Block, Elem } from "../../../utils/bem";
 import { NodeIcon } from "../../Node/Node";
-// @todo use own version of it to have more control over styles and display more relevant info
-import { ResultItem } from "../../SidePanels/DetailsPanel/RegionDetails";
 import { RegionLabel } from "../../SidePanels/OutlinerPanel/RegionLabel";
 
 import "./LinkState.scss";
@@ -92,7 +90,7 @@ const LinkedRegion: FC<LinkedRegionProps> = observer(({ region, result, interact
       )}
       {result ? (
         <Elem name="title">
-          <ResultItem result={result} />
+          <ResultText result={result} />
         </Elem>
       ) : (
         <Elem name="title">
@@ -109,4 +107,21 @@ const LinkedRegion: FC<LinkedRegionProps> = observer(({ region, result, interact
       )}
     </Block>
   );
+});
+
+/**
+ * Simply displaying the content of classification result
+ */
+const ResultText: FC<{ result: MSTResult }> = observer(({ result }) => {
+  const { from_name: control, type, mainValue } = result;
+  const { name } = control;
+
+  if (type === "textarea") return [name, mainValue.join(" | ")].join(": ");
+  if (type === "choices") return [name, mainValue.join(", ")].join(": ");
+  if (type === "taxonomy") {
+    const values = mainValue.map((v: string[]) => v.join("/"));
+    return [name, values.join(", ")].join(": ");
+  }
+
+  return [name, String(mainValue)].join(": ");
 });

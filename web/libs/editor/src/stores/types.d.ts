@@ -8,6 +8,10 @@ type MSTResult = {
   id: string;
   area: MSTRegion;
   annotation: MSTAnnotation;
+  type: string;
+  mainValue: any;
+  // @todo tag
+  from_name: any;
 }
 
 type MSTagProps = {
