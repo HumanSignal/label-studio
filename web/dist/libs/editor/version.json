@@ -1,6 +1,6 @@
 {
-  "message": "chore(deps-dev): bump @sentry/browser from 6.19.7 to 8.33.0 in /web (#6462)",
-  "commit": "f26bba5f2aa64a4d3406cd02ece05ecfabb735b2",
-  "date": "2024-10-03T19:15:28.000Z",
+  "message": "feat: OPTIC-1130: Unify and move Checkbox to Spark (#6418)",
+  "commit": "0f5a47873a24080f74e3edf50cf3cbee96ef98a0",
+  "date": "2024-10-07T13:06:39.000Z",
   "branch": "develop"
 }
