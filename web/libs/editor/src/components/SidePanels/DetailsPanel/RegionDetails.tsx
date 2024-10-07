@@ -67,6 +67,16 @@ export const ResultItem: FC<{ result: any }> = observer(({ result }) => {
         </Elem>
       );
     }
+    if (type === "taxonomy") {
+      return (
+        <Elem name="result">
+          <Text>Taxonomy: </Text>
+          <Elem name="value">
+            <ChoicesResult mainValue={mainValue.map((v: string[]) => v.join("/"))} />
+          </Elem>
+        </Elem>
+      );
+    }
   }, [type, mainValue]);
 
   return content ? <Block name="region-meta">{content}</Block> : null;
