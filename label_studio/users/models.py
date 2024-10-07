@@ -186,7 +186,11 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     def get_initials(self, is_deleted=False):
         initials = '?'
 
-        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self) and is_deleted:
+        if (
+            getattr(settings, 'CLOUD_INSTANCE', False)
+            or flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self)
+        ) and is_deleted:
+
             return 'DU'
 
         if not self.first_name and not self.last_name:

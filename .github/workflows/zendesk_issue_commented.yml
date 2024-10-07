@@ -1,0 +1,50 @@
+name: "ZenDesk: Push an issue comment to zendesk ticket"
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  issue_commented:
+    name: Issue comment
+    if: ${{ !github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - env:
+          ZENDESK_BASIC_AUTH: ${{ secrets.ZENDESK_BASIC_AUTH }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_USER: ${{ github.event.comment.user.login }}
+        run: |
+          ## add comment to zendesk ticket
+          echo "Looking up ticket by issue: $ISSUE_URL"
+          tickets=$(curl "https://labelstudio.zendesk.com/api/v2/search.json?query=external_id:$ISSUE_URL" -H "Authorization: Basic $ZENDESK_BASIC_AUTH" -H "Content-Type: application/json")
+          ticket_number=$(echo $tickets | jq '.results[0].id')
+          echo $ticket_number
+
+          echo "Commenting Zendesk ticket $ticket_number"
+
+          echo "Looking up user by issuer: $ISSUE_USER"
+          users=$(curl "https://labelstudio.zendesk.com/api/v2/users/search.json?query=$ISSUE_USER@users.noreply.github.com" -H "Authorization: Basic $ZENDESK_BASIC_AUTH" -H "Content-Type: application/json")
+          user_id=$(echo $users | jq '.users[0].id')
+          echo $user_id
+
+          body=$(jq -n --arg body "$ISSUE_COMMENT_BODY" '{body: $body}' | jq .body)
+          body=${body:1:-1}
+          echo "$body"
+
+          if [[ "$user_id" == "null" ]]; then
+            echo "Fall back to generic github user"
+            user_id="388861316959"
+            body="$body\n\nComment by $ISSUE_USER"
+          fi
+
+          curl -X PUT https://labelstudio.zendesk.com/api/v2/tickets/$ticket_number -H "Authorization: Basic $ZENDESK_BASIC_AUTH" -H "Content-Type: application/json" --data-binary @- <<DATA
+          {
+            "ticket": {
+              "comment": { "body": "[GITHUB_ISSUE_COMMENT]\n\n$body", "author_id": $user_id }
+            }
+          }
+          DATA
