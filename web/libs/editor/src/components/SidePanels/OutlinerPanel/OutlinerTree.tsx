@@ -265,13 +265,11 @@ const useEventHandlers = () => {
       return;
     }
 
-    if (isFF(FF_PER_FIELD_COMMENTS)) {
-      if (!self.isReadOnly() && annotation.isLinkingMode) {
-        annotation.addLinkedRegion(self);
-        annotation.stopLinkingMode();
-        annotation.regionStore.unselectAll();
-        return;
-      }
+    if (isFF(FF_PER_FIELD_COMMENTS) && !self.isReadOnly() && annotation.isLinkingMode) {
+      annotation.addLinkedRegion(self);
+      annotation.stopLinkingMode();
+      annotation.regionStore.unselectAll();
+      return;
     }
 
     const wasNotSelected = !self.selected;
