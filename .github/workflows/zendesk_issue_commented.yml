@@ -45,7 +45,7 @@ jobs:
           echo "$body"
 
           curl "https://${ZENDESK_HOST}/api/v2/tickets/${ticket_id}.json" \
-            --request POST \
+            --request PUT \
             --user "${ZENDESK_USER}/token:${ZENDESK_TOKEN}" \
             --header "Content-Type: application/json" \
             --data-binary @- <<DATA
