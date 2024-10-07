@@ -19,8 +19,8 @@ export const CommentStore = types
     inputRef: {},
     tooltipMessage: "",
     /**
-     * A key that indicates affiliation of the current loaded comment list to the annotation/draft to the annotation/draft.
-     * It's used to check if the current comment list related to the current opened annotation.
+     * A key that indicates affiliation of the current loaded comment list to the annotation/draft.
+     * It's used to check if the current comment list is related to the current opened annotation.
      * It should be removed in case we start to use separate comment stores per annotation.
      */
     commentsKey: null,
@@ -114,7 +114,7 @@ export const CommentStore = types
     },
 
     /**
-     * Indicates if the currently loaded list of comments at least is related to the currently displaying annotation.
+     * Indicates if the currently loaded list of comments is related to the currently displaying annotation.
      * @returns {boolean}
      */
     get isRelevantList() {

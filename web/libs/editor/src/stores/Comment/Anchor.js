@@ -22,13 +22,13 @@ export const Anchor = types
       return self.region;
     },
     /**
-     * A key that should be uniq in the contexts of current annotation and current moment
+     * A key that should be unique in the context of the current annotation and current moment
      * based on the target of Anchor.
      * It allows distinguishing Anchors by their target (basically by area on the screen to which it was attached)
-     * and group Anchors with the same target.
+     * and groups Anchors with the same target.
      * Right now it is used to display only one comment per area on the screen.
      *
-     * @return {string} A key string might to be unique for each unique Anchor's target.
+     * @return {string} A key which points to a unique Anchor's target.
      */
     get targetKey() {
       const parts = [self.regionId];

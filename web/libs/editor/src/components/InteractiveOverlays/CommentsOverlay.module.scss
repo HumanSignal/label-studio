@@ -1,7 +1,7 @@
-$icon-primary-color: var(--grape_600);
-$icon-secondary-color: var(--grape_0);
-
 .container {
+  --icon-primary-color: var(--grape_600);
+  --icon-secondary-color: var(--grape_0);
+
   position: absolute;
   top: 0;
   left: 0;
@@ -24,12 +24,12 @@ $icon-secondary-color: var(--grape_0);
 
   .commentIconBackground {
     transition: fill 300ms;
-    fill: $icon-secondary-color;
+    fill: var(--icon-secondary-color);
   }
 
   .commentIconLines {
     transition: fill 300ms;
-    fill: $icon-primary-color;
+    fill: var(--icon-primary-color);
   }
 
   &._highlighting {
@@ -40,11 +40,11 @@ $icon-secondary-color: var(--grape_0);
         opacity: 1;
 
         & .commentIconBackground {
-          fill: $icon-primary-color;
+          fill: var(--icon-primary-color);
         }
 
         & .commentIconLines {
-          fill: $icon-secondary-color;
+          fill: var(--icon-secondary-color);
         }
       }
     }
