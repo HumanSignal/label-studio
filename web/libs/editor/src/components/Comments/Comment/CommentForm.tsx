@@ -13,6 +13,65 @@ import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 
 import { LinkState } from "./LinkState";
 import "./CommentForm.scss";
+import {
+  NewTaxonomy,
+  type TaxonomyItem,
+  type SelectedItem,
+  type TaxonomyPath,
+} from "../../../components/NewTaxonomy/NewTaxonomy";
+
+// TODO(jo): figure out how to get the taxonomy from the project.
+// For now, just use a hardcoded string.
+const taxoString = `<Taxonomy name="default">
+  <TaxonomyItem value="title">
+    <TaxonomyItem value="spelling" />
+    <TaxonomyItem value="grammar" />
+  </TaxonomyItem>
+  <TaxonomyItem value="subtitle">
+    <TaxonomyItem value="spelling" />
+    <TaxonomyItem value="grammar" />
+  </TaxonomyItem>
+</Taxonomy>`;
+
+const parseTaxonomyXML = (xmlString: string): TaxonomyItem[] => {
+  // Assume that there is a single root Taxonomy element for now, which may have multiple
+  // TaxonomyItem children.
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+  const taxonomyItems: TaxonomyItem[] = [];
+
+  const parseItems = (node: Element, depth = 0, path: string[] = []): TaxonomyItem => {
+    const value = node.getAttribute("value") || "";
+    const newPath = [...path, value];
+    const children: TaxonomyItem[] = [];
+
+    node.querySelectorAll(":scope > TaxonomyItem").forEach((childNode) => {
+      children.push(parseItems(childNode, depth + 1, newPath));
+    });
+
+    return { label: value, children: children.length ? children : undefined, depth, path: newPath };
+  };
+
+  const taxonomyRoot = xmlDoc.querySelector("Taxonomy");
+  if (taxonomyRoot) {
+    taxonomyRoot.querySelectorAll(":scope > TaxonomyItem").forEach((node) => {
+      taxonomyItems.push(parseItems(node));
+    });
+  }
+  return taxonomyItems;
+};
+
+const taxoItems = parseTaxonomyXML(taxoString);
+
+const taxoPathsToSelections = (paths: TaxonomyPath[] | null): SelectedItem[] =>
+  paths
+    ? paths.map((path) =>
+        path.map((pathElt) => ({
+          label: pathElt,
+          value: pathElt,
+        })),
+      )
+    : [];
 
 export type CommentFormProps = {
   commentStore: any;
@@ -51,6 +110,14 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
     [commentStore, annotationStore],
   );
 
+  const updateCommentClassifications = useCallback(
+    (classifications: object | null) => {
+      const currentComment = getCurrentComment();
+      currentComment.setClassifications(classifications);
+    },
+    [commentStore, annotationStore],
+  );
+
   const linkToHandler: MouseEventHandler<HTMLElement> = useCallback(
     (e) => {
       e?.preventDefault?.();
@@ -75,16 +142,19 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
       const currentComment = getCurrentComment(false);
       const text = currentComment?.text;
       const regionRef = currentComment?.regionRef;
+      const classifications = currentComment?.classifications;
 
       if (!text.trim()) return;
 
       try {
         commentStore.setCurrentComment(undefined);
 
-        await commentStore.addComment({
+        const commentProps = {
           text,
           regionRef,
-        });
+          classifications,
+        };
+        await commentStore.addComment(commentProps);
       } catch (err) {
         commentStore.setCurrentComment(currentComment);
         console.error(err);
@@ -114,11 +184,11 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
 
   const currentLinkingComment = annotationStore.selected.currentLinkingMode?.comment;
   const currentComment = getCurrentComment();
-  const { text = "", regionRef } = currentComment || {};
+  const { text = "", regionRef, classifications } = currentComment || {};
   const { region } = regionRef || {};
   const linking = !!linkingComment && currentLinkingComment === linkingComment && globalLinking;
   const hasLinkState = linking || region;
-
+  const selections = taxoPathsToSelections(classifications?.default?.values);
   return (
     <Block ref={formRef} tag="form" name="comment-form-new" mod={{ inline, linked: !!region }} onSubmit={onSubmit}>
       <TextArea
@@ -133,6 +203,27 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
         onBlur={clearTooltipMessage}
       />
       <Elem tag="div" name="actions">
+        <Elem name="categorySelector">
+          <NewTaxonomy
+            selected={selections}
+            items={taxoItems}
+            onChange={async (_, values) => {
+              const theseSelections = taxoPathsToSelections(values);
+              const newClassifications = theseSelections.length
+                ? {
+                    default: {
+                      type: "taxonomy",
+                      values,
+                    },
+                  }
+                : null;
+              updateCommentClassifications(newClassifications);
+            }}
+            options={{ pathSeparator: "/", showFullPath: true }}
+            defaultSearch={false}
+          />
+          <br /> <br /> <br /> <br />
+        </Elem>
         {!region && (
           <Tooltip title="Link to..." mouseEnterDelay={TOOLTIP_DELAY}>
             <Elem name="action" tag="button" mod={{ highlight: linking }} onClick={linkToHandler}>

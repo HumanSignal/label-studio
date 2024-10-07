@@ -8,7 +8,9 @@ import { Anchor } from "./Anchor";
 export const CommentBase = types
   .model("CommentBase", {
     text: types.string,
-    ...(isFF(FF_PER_FIELD_COMMENTS) ? { regionRef: types.optional(types.maybeNull(Anchor), null) } : {}),
+    ...(isFF(FF_PER_FIELD_COMMENTS)
+      ? { regionRef: types.optional(types.maybeNull(Anchor), null), classifications: types.maybeNull(types.frozen({})) }
+      : {}),
   })
   .views((self) => ({
     get annotation() {
@@ -41,6 +43,9 @@ export const CommentBase = types
           regionId: region.cleanId,
         };
       },
+      setClassifications(classifications) {
+        self.classifications = classifications;
+      },
     };
   });
 
@@ -57,7 +62,6 @@ export const Comment = CommentBase.named("Comment")
     isDeleted: types.optional(types.boolean, false),
     isConfirmDelete: types.optional(types.boolean, false),
     isUpdating: types.optional(types.boolean, false),
-    ...(isFF(FF_PER_FIELD_COMMENTS) ? { classifications: types.maybeNull(types.frozen({})) } : {}),
   })
   .preProcessSnapshot((sn) => {
     return camelizeKeys(sn ?? {});
@@ -103,12 +107,11 @@ export const Comment = CommentBase.named("Comment")
       self.isConfirmDelete = newMode;
     }
 
-    const updateComment = flow(function* (comment, classifications = undefined) {
+    const updateComment = flow(function* (comment) {
       if (self.isPersisted && !self.isDeleted) {
         yield self.sdk.invoke("comments:update", {
           id: self.id,
           text: comment,
-          classifications,
         });
       }
 
@@ -137,6 +140,10 @@ export const Comment = CommentBase.named("Comment")
         regionId: region.cleanId,
       };
       self.update({ regionRef });
+    }
+
+    function setClassifications(classifications) {
+      self.update({ classifications });
     }
 
     function unsetLink() {
