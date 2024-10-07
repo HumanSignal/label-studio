@@ -111,7 +111,7 @@ const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotat
     // id is internal id,
     // always different for different annotations, even empty ones;
     // remain the same when user submit draft, so no unneeded calls.
-  }, [commentStore.annotationId]);
+  }, [commentStore.annotation?.id]);
 
   const resizeObserver: ResizeObserver = useMemo(() => {
     let requestId: number;
