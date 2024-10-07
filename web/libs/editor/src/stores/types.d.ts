@@ -4,6 +4,12 @@ type RawResult = {
   value: object;
 };
 
+type MSTResult = {
+  id: string;
+  area: MSTRegion;
+  annotation: MSTAnnotation;
+}
+
 type MSTagProps = {
   isReady?: boolean;
 };
@@ -22,14 +28,16 @@ type MSTTag = (
   | {
       type: string;
     }
-) &
-  MSTagProps;
+  )
+  & MSTagProps;
 
 type MixinMSTArea = {
   id: string;
   ouid: number;
   results: RawResult[];
   parentID: string | null;
+  control: object;
+  object: object;
 };
 
 type MixinMSTRegion = {
@@ -66,8 +74,9 @@ type MSTAnnotation = {
     draft?: RawResult[];
     result?: RawResult[];
   };
-  results: RawResult[];
+  results: MSTResult[];
   names: Map<string, MSTTag>;
+  isLinkingMode: boolean;
 
   submissionInProgress: () => void;
 };
