@@ -144,7 +144,7 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
       const regionRef = currentComment?.regionRef;
       const classifications = currentComment?.classifications;
 
-      if (!text.trim()) return;
+      if (!text.trim() && !classifications) return;
 
       try {
         commentStore.setCurrentComment(undefined);
@@ -202,8 +202,8 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
         onSubmit={inline ? onSubmit : undefined}
         onBlur={clearTooltipMessage}
       />
-      <Elem tag="div" name="actions">
-        <Elem name="categorySelector">
+      <Elem name="input-row" style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+        <Elem name="category-selector" style={{ display: "flex", paddingTop: ".65em", paddingBottom: ".65em" }}>
           <NewTaxonomy
             selected={selections}
             items={taxoItems}
@@ -219,20 +219,21 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
                 : null;
               updateCommentClassifications(newClassifications);
             }}
-            options={{ pathSeparator: "/", showFullPath: true }}
+            options={{ pathSeparator: "/", showFullPath: true, minWidth: 250 }}
             defaultSearch={false}
           />
-          <br /> <br /> <br /> <br />
         </Elem>
-        {!region && (
-          <Tooltip title="Link to..." mouseEnterDelay={TOOLTIP_DELAY}>
-            <Elem name="action" tag="button" mod={{ highlight: linking }} onClick={linkToHandler}>
-              <IconCommentLinkTo />
-            </Elem>
-          </Tooltip>
-        )}
-        <Elem name="action" tag="button" type="submit">
-          <IconSend />
+        <Elem name="buttons" style={{ display: "flex" }}>
+          {!region && (
+            <Tooltip title="Link to..." mouseEnterDelay={TOOLTIP_DELAY}>
+              <Elem name="action" tag="button" mod={{ highlight: linking }} onClick={linkToHandler}>
+                <IconCommentLinkTo />
+              </Elem>
+            </Tooltip>
+          )}
+          <Elem name="action" tag="button" type="submit">
+            <IconSend />
+          </Elem>
         </Elem>
       </Elem>
       {hasLinkState && (

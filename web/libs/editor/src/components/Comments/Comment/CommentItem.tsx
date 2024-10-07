@@ -42,6 +42,7 @@ interface CommentItemProps {
 
 export const CommentItem: FC<CommentItemProps> = observer(({ comment, listComments }: CommentItemProps) => {
   const {
+    classifications,
     updatedAt,
     isEditMode,
     isConfirmDelete,
@@ -152,6 +153,20 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
             </Elem>
           ) : (
             <>
+              {classifications?.default?.values && (
+                <ul>
+                  {classifications?.default?.values?.map((valueArray: string[], index: number) => (
+                    <li key={index} style={{ fontSize: "13px", letterSpacing: ".05em" }}>
+                      {valueArray.map((value: string, subIndex: number) => (
+                        <span key={subIndex}>
+                          {value}
+                          {subIndex < valueArray.length - 1 && "/"}
+                        </span>
+                      ))}
+                    </li>
+                  ))}
+                </ul>
+              )}
               {text}
               {hasLinkState && (
                 <Elem name="linkState">

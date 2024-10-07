@@ -9,7 +9,10 @@ export const CommentBase = types
   .model("CommentBase", {
     text: types.string,
     ...(isFF(FF_PER_FIELD_COMMENTS)
-      ? { regionRef: types.optional(types.maybeNull(Anchor), null), classifications: types.maybeNull(types.frozen({})) }
+      ? {
+          regionRef: types.optional(types.maybeNull(Anchor), null),
+          classifications: types.optional(types.frozen({}), null),
+        }
       : {}),
   })
   .views((self) => ({
