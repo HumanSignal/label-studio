@@ -11,7 +11,15 @@ export const Anchor = types
       return getParent(self).annotation;
     },
     get region() {
-      return self.annotation.regionStore.regions.find((r) => r.cleanId === self.regionId);
+      return self.annotation.regions.find((r) => r.cleanId === self.regionId);
+    },
+    get result() {
+      // @todo we might link global classifications via region id only in a future
+      // @todo so then we have to check for `region.classification === true`
+      if (!self.controlName) return null;
+      // if we just removed the region
+      if (!self.region) return null;
+      return self.region.results.find(r => r.from_name.name === self.controlName);
     },
     /**
      * This will be provided to CommentsOverlay to observe changes in bbox coordinates and sizes
