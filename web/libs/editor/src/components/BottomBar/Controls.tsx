@@ -28,8 +28,15 @@ import {
 import "./Controls.scss";
 
 type CustomButtonType = Instance<typeof CustomButton>;
+// these buttons can be reused inside custom buttons or can be replaces with custom buttons
+type SupportedInternalButtons = "accept" | "reject";
+// special places for custom buttons — before, after or instead of internal buttons
+type SpecialPlaces = "_before" | "_after" | "_replace";
 // @todo should be Instance<typeof AppStore>["customButtons"] but it doesn't fit to itself
-type CustomButtonsField = Map<string, CustomButtonType | string | Array<CustomButtonType | string>>;
+type CustomButtonsField = Map<
+  SpecialPlaces | SupportedInternalButtons,
+  CustomButtonType | SupportedInternalButtons | Array<CustomButtonType | SupportedInternalButtons>
+>;
 type ControlButtonProps = {
   button: CustomButtonType;
   disabled: boolean;
