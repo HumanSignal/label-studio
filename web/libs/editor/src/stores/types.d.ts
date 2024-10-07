@@ -29,7 +29,8 @@ type MSTCommentStore = {
 };
 
 type MSTStore = {
-  customButtons: Instance<typeof CustomButton>[];
+  // @todo we can't import CustomButton store here and use it type :(
+  customButtons: any;
   settings: Record<string, boolean>;
   isSubmitting: boolean;
   // @todo WHAT IS THIS?

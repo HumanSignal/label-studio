@@ -72,42 +72,16 @@ export const AcceptButton = memo(
   }),
 );
 
-type RejectButtonProps = {
-  disabled: boolean;
-  store: MSTStore;
-  /**
-   * Handler wrapper for reject with required comment,
-   * conditions are checked in wrapper and if all good the `action` is called.
-   **/
-  onRejectWithComment: (event: React.MouseEvent, action: () => any) => void;
+export const RejectButtonDefinition = {
+  id: "reject",
+  name: "reject",
+  title: "Reject",
+  look: undefined,
+  ariaLabel: "reject-annotation",
+  tooltip: "Reject annotation: [ Ctrl+Space ]",
+  // @todo we need this for types compatibility, but better to fix CustomButtonType
+  disabled: false,
 };
-
-export const RejectButton = memo(
-  observer(({ disabled, store, onRejectWithComment }: RejectButtonProps) => {
-    return (
-      <ButtonTooltip key="reject" title="Reject annotation: [ Ctrl+Space ]">
-        <Button
-          aria-label="reject-annotation"
-          disabled={disabled}
-          onClick={async (e) => {
-            const action = () => store.rejectAnnotation({});
-            const selected = store.annotationStore?.selected;
-
-            if (store.hasInterface("comments:reject") ?? true) {
-              onRejectWithComment(e, action);
-            } else {
-              selected?.submissionInProgress();
-              await store.commentStore.commentFormSubmit();
-              action();
-            }
-          }}
-        >
-          Reject
-        </Button>
-      </ButtonTooltip>
-    );
-  }),
-);
 
 type SkipButtonProps = {
   disabled: boolean;

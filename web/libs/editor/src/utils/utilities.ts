@@ -144,6 +144,16 @@ export function wrapArray(value: any[]) {
   return ([] as any[]).concat(...[value]);
 }
 
+/**
+ * If given one element, wrap it in an array. Removes missing items. Returns empty array for undefined.
+ * @template T
+ * @param {T | T[]} arg
+ * @returns {T[]}
+ **/
+export function toArray<T>(arg: undefined | T | (T | undefined)[]): T[] {
+  return (Array.isArray(arg) ? arg : [arg]).filter((v) => v !== undefined);
+}
+
 export function delay(ms = 0) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
