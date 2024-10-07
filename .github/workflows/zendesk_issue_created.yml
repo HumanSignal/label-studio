@@ -2,7 +2,8 @@ name: "ZenDesk: Create a zendesk ticket out of an issue"
 
 on:
   issues:
-    types: [opened]
+    types:
+      - opened
 
 jobs:
   issue_created:
