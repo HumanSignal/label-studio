@@ -12,7 +12,9 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - env:
-          ZENDESK_BASIC_AUTH: ${{ secrets.ZENDESK_BASIC_AUTH }}
+          ZENDESK_HOST: ${{ vars.ZENDESK_HOST }}
+          ZENDESK_USER: ${{ vars.ZENDESK_USER }}
+          ZENDESK_TOKEN: ${{ secrets.ZENDESK_TOKEN }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_USER: ${{ github.event.issue.user.login }}
@@ -21,8 +23,12 @@ jobs:
         run: |
           body=$(jq -n --arg body "$ISSUE_BODY" '{body: $body}' | jq .body)
           echo "$body"
-
-          curl -X POST https://labelstudio.zendesk.com/api/v2/tickets -H "Authorization: Basic $ZENDESK_BASIC_AUTH" -H "Content-Type: application/json" --data-binary @- <<DATA
+          
+          curl https://${ZENDESK_HOST}/api/v2/tickets \
+            --request POST \
+            --user "${ZENDESK_USER}/token:${ZENDESK_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data-binary @- <<DATA
           {
             "ticket": {
               "subject":   "Github_Issue: $ISSUE_TITLE",
