@@ -25,6 +25,7 @@ import { Block, Elem, useBEM } from "../../../utils/bem";
 import "./RegionEditor.scss";
 import { TimeDurationControl } from "../../TimeDurationControl/TimeDurationControl";
 import { FF_DEV_2715, isFF } from "../../../utils/feature-flags";
+import { Checkbox } from "@humansignal/ui";
 
 interface RegionEditorProps {
   region: any;
@@ -179,9 +180,8 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
   return (
     <Elem name="property" tag="label">
       {isBoolean ? (
-        <input
+        <Checkbox
           className={block?.elem("input").toClassName()}
-          type="checkbox"
           checked={value}
           onChange={(e) => onChangeHandler(e.target.checked)}
         />

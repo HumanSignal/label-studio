@@ -1,6 +1,6 @@
 {
-  "message": "feat: OPTIC-1095: Send the started_at time of when annotation work had began (#6408)",
-  "commit": "86d9d3179f9b9244a1d69bb164bba856b5be631a",
-  "date": "2024-10-02T12:21:45.000Z",
+  "message": "feat: LEAP-1445: Add comments overlay (#6459)",
+  "commit": "0a86fa37758ade75e41da5eb760ff8f803daa00a",
+  "date": "2024-10-08T13:33:01.000Z",
   "branch": "develop"
 }

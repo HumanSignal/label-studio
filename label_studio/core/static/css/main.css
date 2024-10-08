@@ -3,7 +3,8 @@ html {
 }
 
 body {
-  font-family: 'Figtree', sans-serif !important; 
+  --font-sans: 'Figtree', sans-serif !important;
+  --font-mono: Monaco, monospace;
 
   --sand_900: #12110D;
   --sand_800: #262522;

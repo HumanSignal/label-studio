@@ -16,6 +16,7 @@
         "main": "libs/editor/src/index.js",
         "outputPath": "dist/libs/editor",
         "isolatedConfig": true,
+        "generatePackageJson": true,
         "assets": [
           {
             "glob": "public",
