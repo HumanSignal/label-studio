@@ -131,8 +131,15 @@ The [F1 score](https://en.wikipedia.org/wiki/F-score) is a metric to assess a ma
 
 `F1 = 2 * (precision * recall) / (precision + recall)`
 
-* **Precision**: The quality of the model's positive predictions.
-* **Recall**: The model's ability to find all positive instances.
+* **Precision**: The proportion of correct positive predictions out of all positive predictions. This is a measure of the quality of the predictions, and looks at how many predictions are correctly aligned with ground truths. 
+
+    This metric is useful for limiting false positives. It answers the question: "How often were the positive predictions correct?" or "How much can I trust a positive prediction?" In other words, it measures how good the model is at not making false predictions.
+
+* **Recall**: The proportion of correct positive predictions out of all actual positives. This is a measure of a model's ability to find all positive predictions, and mostly applies to situations in which multiple labels are possible.
+
+     This metric is useful for maximizing the number positive predictions that you get back. It answers the question "How many of the actual positives were successfully identified?" In other words, it measures how good the model is at not missing things.
+
+Note that a "positive" prediction denotes either a 'positive' label (like a checkbox), or the presence of a particular choice/label in the prediction.
 
 </td>
 </tr>
