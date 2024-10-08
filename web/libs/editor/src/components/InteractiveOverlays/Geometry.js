@@ -327,7 +327,7 @@ export class Geometry {
 
   /**
    * Get BBox of any DOM node
-   * @param {HTMLElement} domNode
+   * @param {HTMLOrSVGElement} domNode
    * @param {boolean} single Should return all possible BBoxes or not
    * @return {BBox[]}
    */
