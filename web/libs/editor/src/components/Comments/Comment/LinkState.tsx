@@ -58,6 +58,7 @@ const LinkedRegion: FC<LinkedRegionProps> = observer(({ region, result, interact
       region?.setHighlight?.(false);
     };
     const clickHandler = () => {
+      if (region.classification) return null;
       region.annotation.selectArea(region);
     };
     return { mouseEnterHandler, mouseLeaveHandler, clickHandler };
