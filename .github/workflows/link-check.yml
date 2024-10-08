@@ -25,7 +25,7 @@ jobs:
         uses: celinekurpershoek/link-checker@v1.0.2
         with:
           # Required:
-          url: $PREVIEW_URL
+          url: "https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app"
           honorRobotExclusions: false
           ignorePatterns: "github,google"
           recursiveLinks: true # Check all URLs on all reachable pages (could take a while)
