@@ -211,7 +211,7 @@ const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotat
     // biome-ignore lint/a11y/noSvgWithoutTitle: It's not just an icon or a figure; it's an entire interactive layer.
     <svg className={containerStyles.join(" ")} ref={setRef} xmlns="http://www.w3.org/2000/svg">
       <g key={uniqKey}>
-        {annotation.isLinkingMode && annotation.results.map((result: MSTResult) => (
+        {annotation.linkingMode === LINK_COMMENT_MODE && annotation.results.map((result: MSTResult) => (
           <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />
         ))}
         {overlayComments.map((comment: MSTComment) => {
