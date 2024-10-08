@@ -10,6 +10,7 @@ export const CommentStore = types
   .model("CommentStore", {
     loading: types.optional(types.maybeNull(types.string), "list"),
     comments: types.optional(types.array(Comment), []),
+    highlightedComment: types.safeReference(Comment),
   })
   .volatile(() => ({
     addedCommentThisSession: false,
@@ -17,6 +18,12 @@ export const CommentStore = types
     currentComment: {},
     inputRef: {},
     tooltipMessage: "",
+    /**
+     * A key that indicates affiliation of the current loaded comment list to the annotation/draft.
+     * It's used to check if the current comment list is related to the current opened annotation.
+     * It should be removed in case we start to use separate comment stores per annotation.
+     */
+    commentsKey: null,
   }))
   .views((self) => ({
     get store() {
@@ -74,6 +81,52 @@ export const CommentStore = types
       if (!self.annotation) return undefined;
       return self.currentComment[self.annotation.id];
     },
+    /**
+     * A subset of comments that should be displayed on the overlay.
+     * For now, it uses only the last comment from the group of ones linked to the same target.
+     */
+    get overlayComments() {
+      const uniqTargetKeys = new Set();
+      return self.comments.filter((comment) => {
+        const { regionRef } = comment;
+
+        if (!regionRef) return false;
+        if (uniqTargetKeys.has(regionRef.targetKey)) return false;
+        uniqTargetKeys.add(regionRef.targetKey);
+        return true;
+      });
+    },
+    get isHighlighting() {
+      return !!self.highlightedComment;
+    },
+
+    /**
+     * It gets the key that indicates the target of the comment list
+     * we should expect for the current state of stores.
+     * Basically, it's based on the current annotation or the current draft.
+     * @returns Record<string,string> | null
+     */
+    get targetCommentsKey() {
+      if (self.annotationId) {
+        return { annotation: self.annotationId };
+      }
+      if (self.draftId) {
+        return { draft: self.draftId };
+      }
+      return null;
+    },
+
+    /**
+     * Indicates if the currently loaded list of comments is related to the currently displaying annotation.
+     * @returns {boolean}
+     */
+    get isRelevantList() {
+      if (!self.commentsKey) return false;
+      if (Object.keys(self.commentsKey).length !== Object.keys(self.targetCommentsKey).length) return false;
+      return Object.keys(self.commentsKey).every((key) => {
+        return self.commentsKey[key] === self.targetCommentsKey[key];
+      });
+    },
   }))
   .actions((self) => {
     function serialize({ commentsFilter, queueComments } = { commentsFilter: "all", queueComments: false }) {
@@ -88,6 +141,10 @@ export const CommentStore = types
 
     function setCurrentComment(comment) {
       self.currentComment = { ...self.currentComment, [self.annotation.id]: comment };
+    }
+
+    function setHighlightedComment(comment) {
+      self.highlightedComment = comment;
     }
 
     function setCommentFormSubmit(submitCallback) {
@@ -240,9 +297,10 @@ export const CommentStore = types
       yield addComment(self.currentComment);
     });
 
-    function setComments(comments) {
+    function setComments(comments, commentsKey = null) {
       if (comments) {
         self.comments.replace(comments);
+        self.commentsKey = commentsKey;
       }
     }
 
@@ -304,13 +362,14 @@ export const CommentStore = types
         }
 
         const annotation = self.annotationId;
+        const commentsKey = self.targetCommentsKey;
         const [comments] = yield self.sdk.invoke("comments:list", {
           annotation,
           draft: self.draftId,
         });
 
         if (mounted.current && annotation === self.annotationId) {
-          self.setComments(comments);
+          self.setComments(comments, commentsKey);
         }
       } catch (err) {
         console.error(err);
@@ -341,5 +400,6 @@ export const CommentStore = types
       addComment,
       setComments,
       listComments,
+      setHighlightedComment,
     };
   });

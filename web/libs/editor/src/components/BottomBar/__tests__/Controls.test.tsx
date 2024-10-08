@@ -25,6 +25,7 @@ const mockStore = {
       },
     },
   },
+  customButtons: new Map(),
 };
 
 const mockHistory = {

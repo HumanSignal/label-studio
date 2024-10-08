@@ -7,13 +7,13 @@ import { CommentItem } from "./CommentItem";
 
 export type CommentContextType = {
   startLinkingMode: (comment: any) => void;
-  isLinking: boolean;
+  globalLinking: boolean;
   currentComment: any;
 };
 
 export const CommentsContext = createContext<CommentContextType>({
   startLinkingMode: () => {},
-  isLinking: false,
+  globalLinking: false,
   currentComment: null,
 });
 

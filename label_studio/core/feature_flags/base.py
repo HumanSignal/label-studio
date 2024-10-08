@@ -107,7 +107,6 @@ def flag_set(feature_flag, user=None, override_system_default=None):
         if request and getattr(request, 'user', None) and request.user.is_authenticated:
             user = request.user
 
-    user_dict = _get_user_repr(user)
     env_value = get_bool_env(feature_flag, default=None)
     if env_value is not None:
         return env_value
@@ -115,6 +114,7 @@ def flag_set(feature_flag, user=None, override_system_default=None):
         system_default = override_system_default
     else:
         system_default = settings.FEATURE_FLAGS_DEFAULT_VALUE
+    user_dict = _get_user_repr(user)
     return client.variation(feature_flag, user_dict, system_default)
 
 

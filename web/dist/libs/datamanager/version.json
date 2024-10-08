@@ -1,6 +1,6 @@
 {
-  "message": "chore(deps-dev): bump @sentry/browser from 6.19.7 to 8.33.0 in /web (#6462)",
-  "commit": "f26bba5f2aa64a4d3406cd02ece05ecfabb735b2",
-  "date": "2024-10-03T19:15:28.000Z",
+  "message": "feat: LEAP-1445: Add comments overlay (#6459)",
+  "commit": "0a86fa37758ade75e41da5eb760ff8f803daa00a",
+  "date": "2024-10-08T13:33:01.000Z",
   "branch": "develop"
 }

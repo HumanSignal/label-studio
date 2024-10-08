@@ -160,7 +160,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: ${{ github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
-        uses: codecov/codecov-action@v4.5.0
+        uses: codecov/codecov-action@v4.6.0
         with:
           name: codecov-python-${{ matrix.python-version }}
           flags: pytests
