@@ -88,15 +88,29 @@ export class LSFWrapper {
    * @param {LSFOptions} options
    */
   constructor(dm, element, options) {
+    // we need to pass the rest of the options to LSF below
+    const {
+      task,
+      preload,
+      isLabelStream,
+      annotation,
+      interfacesModifier,
+      isInteractivePreannotations,
+      user,
+      keymap,
+      messages,
+      ...restOptions
+    } = options;
+
     this.datamanager = dm;
     this.store = dm.store;
     this.root = element;
-    this.task = options.task;
-    this.preload = options.preload;
-    this.labelStream = options.isLabelStream ?? false;
-    this.initialAnnotation = options.annotation;
-    this.interfacesModifier = options.interfacesModifier;
-    this.isInteractivePreannotations = options.isInteractivePreannotations ?? false;
+    this.task = task;
+    this.preload = preload;
+    this.labelStream = isLabelStream ?? false;
+    this.initialAnnotation = annotation;
+    this.interfacesModifier = interfacesModifier;
+    this.isInteractivePreannotations = isInteractivePreannotations ?? false;
 
     let interfaces = [...DEFAULT_INTERFACES];
 
@@ -192,6 +206,8 @@ export class LSFWrapper {
       onSelectAnnotation: this.onSelectAnnotation,
       onNextTask: this.onNextTask,
       onPrevTask: this.onPrevTask,
+
+      ...restOptions,
     };
 
     this.initLabelStudio(lsfProperties);
