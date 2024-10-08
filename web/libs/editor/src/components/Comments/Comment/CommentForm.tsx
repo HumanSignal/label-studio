@@ -16,19 +16,6 @@ import "./CommentForm.scss";
 import { NewTaxonomy as Taxonomy } from "../../../components/NewTaxonomy/NewTaxonomy";
 import { parseCommentClassificationConfig, taxonomyPathsToSelectedItems } from "./CommentClassificationUtil";
 
-// TODO(jo): figure out how to get the taxonomy from the project.
-// For now, just use a hardcoded string.
-const taxoString = `<Taxonomy name="default">
-  <TaxonomyItem value="title">
-    <TaxonomyItem value="spelling" />
-    <TaxonomyItem value="grammar" />
-  </TaxonomyItem>
-  <TaxonomyItem value="subtitle">
-    <TaxonomyItem value="spelling" />
-    <TaxonomyItem value="grammar" />
-  </TaxonomyItem>
-</Taxonomy>`;
-
 export type CommentFormProps = {
   commentStore: any;
   annotationStore: any;
