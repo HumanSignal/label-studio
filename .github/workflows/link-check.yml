@@ -1,20 +1,25 @@
-name: Check for Broken Links
+name: Check for broken links
 
 on:
   pull_request:
-    branches: ["develop"]
-    paths:
-      - "docs/**"
-      - ".github/workflows/link-check.yml"
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
-  linkChecker:
+  check_links:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
-      - name: Run Link Checker
+
+      - name: Get Netlify Deploy Preview URL
+        run: |
+          PREVIEW_URL="https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app"
+          echo "Preview URL is $PREVIEW_URL"
+          echo "PREVIEW_URL=$PREVIEW_URL" >> $GITHUB_ENV
+
+      - name: Run Lychee to check for broken links
         uses: lycheeverse/lychee-action@v1
         with:
-          args: --verbose --no-progress docs/
+          input: ${{ env.PREVIEW_URL }}
+          verbose: true
