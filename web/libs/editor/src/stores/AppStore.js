@@ -161,6 +161,11 @@ export default types
 
     queuePosition: types.optional(types.number, 0),
 
+    /**
+     * Project field used for applying classifications to comments
+     */
+    commentClassificationConfig: types.maybeNull(types.string),
+
     customButtons: types.array(CustomButton, []),
   })
   .preProcessSnapshot((sn) => {

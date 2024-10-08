@@ -13,12 +13,8 @@ import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 
 import { LinkState } from "./LinkState";
 import "./CommentForm.scss";
-import {
-  NewTaxonomy as Taxonomy,
-  type TaxonomyItem,
-  type SelectedItem,
-  type TaxonomyPath,
-} from "../../../components/NewTaxonomy/NewTaxonomy";
+import { NewTaxonomy as Taxonomy } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { parseCommentClassificationConfig, taxonomyPathsToSelectedItems } from "./CommentClassificationUtil";
 
 // TODO(jo): figure out how to get the taxonomy from the project.
 // For now, just use a hardcoded string.
@@ -32,46 +28,6 @@ const taxoString = `<Taxonomy name="default">
     <TaxonomyItem value="grammar" />
   </TaxonomyItem>
 </Taxonomy>`;
-
-const parseTaxonomyXML = (xmlString: string): TaxonomyItem[] => {
-  // Assume that there is a single root Taxonomy element for now, which may have multiple
-  // TaxonomyItem children.
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(xmlString, "application/xml");
-  const taxonomyItems: TaxonomyItem[] = [];
-
-  const parseItems = (node: Element, depth = 0, path: string[] = []): TaxonomyItem => {
-    const value = node.getAttribute("value") || "";
-    const newPath = [...path, value];
-    const children: TaxonomyItem[] = [];
-
-    node.querySelectorAll(":scope > TaxonomyItem").forEach((childNode) => {
-      children.push(parseItems(childNode, depth + 1, newPath));
-    });
-
-    return { label: value, children: children.length ? children : undefined, depth, path: newPath };
-  };
-
-  const taxonomyRoot = xmlDoc.querySelector("Taxonomy");
-  if (taxonomyRoot) {
-    taxonomyRoot.querySelectorAll(":scope > TaxonomyItem").forEach((node) => {
-      taxonomyItems.push(parseItems(node));
-    });
-  }
-  return taxonomyItems;
-};
-
-const taxoItems = parseTaxonomyXML(taxoString);
-
-const taxoPathsToSelections = (paths: TaxonomyPath[] | null): SelectedItem[] =>
-  paths
-    ? paths.map((path) =>
-        path.map((pathElt) => ({
-          label: pathElt,
-          value: pathElt,
-        })),
-      )
-    : [];
 
 export type CommentFormProps = {
   commentStore: any;
@@ -188,54 +144,65 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
   const { region } = regionRef || {};
   const linking = !!linkingComment && currentLinkingComment === linkingComment && globalLinking;
   const hasLinkState = linking || region;
-  const selections = taxoPathsToSelections(classifications?.default?.values);
+  const selections = taxonomyPathsToSelectedItems(classifications?.default?.values);
+  const classificationsItems = parseCommentClassificationConfig(commentStore.commentClassificationConfig);
+
+  const Buttons = () => (
+    <Elem name="buttons">
+      {!region && (
+        <Tooltip title="Link to..." mouseEnterDelay={TOOLTIP_DELAY}>
+          <Elem name="action" tag="button" mod={{ highlight: linking }} onClick={linkToHandler}>
+            <IconCommentLinkTo />
+          </Elem>
+        </Tooltip>
+      )}
+      <Elem name="action" tag="button" type="submit">
+        <IconSend />
+      </Elem>
+    </Elem>
+  );
+
   return (
     <Block ref={formRef} tag="form" name="comment-form-new" mod={{ inline, linked: !!region }} onSubmit={onSubmit}>
-      <TextArea
-        actionRef={actionRef}
-        name="comment"
-        placeholder="Add a comment"
-        value={text}
-        rows={ROWS}
-        maxRows={MAX_ROWS}
-        onInput={updateComment}
-        onSubmit={inline ? onSubmit : undefined}
-        onBlur={clearTooltipMessage}
-      />
-      <Elem name="input-row">
-        <Elem name="category-selector">
-          <Taxonomy
-            selected={selections}
-            items={taxoItems}
-            onChange={async (_, values) => {
-              const theseSelections = taxoPathsToSelections(values);
-              const newClassifications = theseSelections.length
-                ? {
-                    default: {
-                      type: "taxonomy",
-                      values,
-                    },
-                  }
-                : null;
-              updateCommentClassifications(newClassifications);
-            }}
-            options={{ pathSeparator: "/", showFullPath: true }}
-            defaultSearch={false}
-          />
-        </Elem>
-        <Elem name="buttons">
-          {!region && (
-            <Tooltip title="Link to..." mouseEnterDelay={TOOLTIP_DELAY}>
-              <Elem name="action" tag="button" mod={{ highlight: linking }} onClick={linkToHandler}>
-                <IconCommentLinkTo />
-              </Elem>
-            </Tooltip>
-          )}
-          <Elem name="action" tag="button" type="submit">
-            <IconSend />
-          </Elem>
-        </Elem>
+      <Elem name="text-row">
+        <TextArea
+          actionRef={actionRef}
+          name="comment"
+          placeholder="Add a comment"
+          value={text}
+          rows={ROWS}
+          maxRows={MAX_ROWS}
+          onInput={updateComment}
+          onSubmit={inline ? onSubmit : undefined}
+          onBlur={clearTooltipMessage}
+        />
+        {classificationsItems.length === 0 && <Buttons />}
       </Elem>
+      {classificationsItems.length > 0 && (
+        <Elem name="classifications-row">
+          <Elem name="category-selector">
+            <Taxonomy
+              selected={selections}
+              items={classificationsItems}
+              onChange={async (_, values) => {
+                const newClassifications =
+                  values.length > 0
+                    ? {
+                        default: {
+                          type: "taxonomy",
+                          values,
+                        },
+                      }
+                    : null;
+                updateCommentClassifications(newClassifications);
+              }}
+              options={{ pathSeparator: "/", showFullPath: true }}
+              defaultSearch={false}
+            />
+          </Elem>
+          <Buttons />
+        </Elem>
+      )}
       {hasLinkState && (
         <Elem name="link-state">
           <LinkState linking={linking} region={region} onUnlink={currentComment?.unsetLink} />

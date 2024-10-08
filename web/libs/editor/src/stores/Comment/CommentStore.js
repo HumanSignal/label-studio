@@ -41,6 +41,9 @@ export const CommentStore = types
     get currentUser() {
       return getRoot(self).user;
     },
+    get commentClassificationConfig() {
+      return getRoot(self).commentClassificationConfig;
+    },
     get sdk() {
       return getEnv(self).events;
     },

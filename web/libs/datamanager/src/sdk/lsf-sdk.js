@@ -160,6 +160,7 @@ export class LSFWrapper {
     const queueDone = dm.store.project.queue_done;
     const queueLeft = dm.store.project.queue_left;
     const queuePosition = queueDone ? queueDone + 1 : queueLeft ? queueTotal - queueLeft + 1 : 1;
+    const commentClassificationConfig = dm.store.project.comment_classification_config;
 
     const lsfProperties = {
       user: options.user,
@@ -174,6 +175,7 @@ export class LSFWrapper {
       messages: options.messages,
       queueTotal,
       queuePosition,
+      commentClassificationConfig,
 
       /* EVENTS */
       onSubmitDraft: this.onSubmitDraft,

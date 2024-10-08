@@ -27,7 +27,12 @@
     width: 100%;
   }
 
-  &__input-row {
+  &__text-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__classifications-row {
     display: flex;
     width: 100%;
     align-items: center;
@@ -39,7 +44,6 @@
   }
 
   &__action {
-    margin-top: 4px;
     display: flex;
     justify-content: center;
     align-items: center;
