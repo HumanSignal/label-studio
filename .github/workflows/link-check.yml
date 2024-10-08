@@ -22,7 +22,7 @@ jobs:
           echo "PREVIEW_URL=$PREVIEW_URL" >> $GITHUB_ENV
 
       - name: Run Lychee to check for broken links
-        uses: lycheeverse/lychee-action@v1
+        uses: lycheeverse/lychee-action@v2
         with:
-          input: ${{ env.PREVIEW_URL }}
+          args: $PREVIEW_URL
           verbose: true
