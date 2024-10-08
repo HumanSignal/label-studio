@@ -74,8 +74,11 @@ const stageRelatedBBox = (region, bbox) => {
 };
 
 const _detect = (region) => {
-  if (region.classification) {
-    return Geometry.getDOMBBox(region.control.elementRef?.current);
+  // that's a tricky way to detect bbox of exact result instead of whole region
+  // works for global classifications and per-regions
+  const isResult = !!region.from_name;
+  if (isResult) {
+    return Geometry.getDOMBBox(region.from_name.elementRef?.current);
   }
   switch (region.type) {
     case "textrange":

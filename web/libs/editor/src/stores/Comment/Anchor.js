@@ -27,7 +27,7 @@ export const Anchor = types
      * @return {Object} The overlays-applicable node of the anchor.
      */
     get overlayNode() {
-      return self.region;
+      return self.result ?? self.region;
     },
     /**
      * A key that should be unique in the context of the current annotation and current moment

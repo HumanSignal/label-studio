@@ -103,8 +103,8 @@ const ResultTagBbox: React.FC<ResultItemProps> = observer(({ result, rootRef }) 
   const [hovered, setHovered] = useState(false);
 
   const shape = useMemo(() => {
-    return node && root ? NodesConnector.createShape(node, root) : null;
-  }, [node, root]);
+    return result && root ? NodesConnector.createShape(result, root) : null;
+  }, [result, root]);
 
   const bbox = useMemo(() => {
     if (!shape || !root) return { x: 0, y: 0, width: 0, height: 0 };
@@ -211,16 +211,9 @@ const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotat
     // biome-ignore lint/a11y/noSvgWithoutTitle: It's not just an icon or a figure; it's an entire interactive layer.
     <svg className={containerStyles.join(" ")} ref={setRef} xmlns="http://www.w3.org/2000/svg">
       <g key={uniqKey}>
-        {/* @todo for now we'll render only global classifications but the goal is to render pre-regions as well */}
-        {/* {annotation.isLinkingMode && annotation.results.map((result: MSTResult) => (
+        {annotation.isLinkingMode && annotation.results.map((result: MSTResult) => (
           <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />
-        ))} */}
-        {annotation.isLinkingMode && annotation.regions.filter(r => r.classification)
-          .map((region) => region.results[0])
-          .map((result) => (
-            <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />
-          ))
-        }
+        ))}
         {overlayComments.map((comment: MSTComment) => {
           const { id } = comment;
           return <CommentItem key={id} comment={comment} rootRef={rootRef} />;

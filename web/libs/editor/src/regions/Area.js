@@ -29,12 +29,10 @@ const ClassificationArea = types.compose(
       classification: true,
     })
     .views((self) => ({
-      get control() {
-        return self.results[0].from_name;
-      },
       get supportSuggestions() {
         return false;
       },
+      // it's required in some contexts when it's treated as a region
       get type() {
         return "";
       },
