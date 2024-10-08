@@ -14,7 +14,7 @@ import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 import { LinkState } from "./LinkState";
 import "./CommentForm.scss";
 import {
-  NewTaxonomy,
+  NewTaxonomy as Taxonomy,
   type TaxonomyItem,
   type SelectedItem,
   type TaxonomyPath,
@@ -202,9 +202,9 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
         onSubmit={inline ? onSubmit : undefined}
         onBlur={clearTooltipMessage}
       />
-      <Elem name="input-row" style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-        <Elem name="category-selector" style={{ display: "flex", paddingTop: ".65em", paddingBottom: ".65em" }}>
-          <NewTaxonomy
+      <Elem name="input-row">
+        <Elem name="category-selector">
+          <Taxonomy
             selected={selections}
             items={taxoItems}
             onChange={async (_, values) => {
@@ -219,11 +219,11 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
                 : null;
               updateCommentClassifications(newClassifications);
             }}
-            options={{ pathSeparator: "/", showFullPath: true, minWidth: 250 }}
+            options={{ pathSeparator: "/", showFullPath: true }}
             defaultSearch={false}
           />
         </Elem>
-        <Elem name="buttons" style={{ display: "flex" }}>
+        <Elem name="buttons">
           {!region && (
             <Tooltip title="Link to..." mouseEnterDelay={TOOLTIP_DELAY}>
               <Elem name="action" tag="button" mod={{ highlight: linking }} onClick={linkToHandler}>

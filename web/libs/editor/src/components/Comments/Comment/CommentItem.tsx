@@ -154,18 +154,11 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
           ) : (
             <>
               {classifications?.default?.values && (
-                <ul>
+                <Elem name="classifications" tag="ul">
                   {classifications?.default?.values?.map((valueArray: string[], index: number) => (
-                    <li key={index} style={{ fontSize: "13px", letterSpacing: ".05em" }}>
-                      {valueArray.map((value: string, subIndex: number) => (
-                        <span key={subIndex}>
-                          {value}
-                          {subIndex < valueArray.length - 1 && "/"}
-                        </span>
-                      ))}
-                    </li>
+                    <li key={index}>{valueArray.join("/")}</li>
                   ))}
-                </ul>
+                </Elem>
               )}
               {text}
               {hasLinkState && (

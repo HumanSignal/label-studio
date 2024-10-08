@@ -12,36 +12,30 @@
   --highlight-color: var(--grape_100);
   --highlight-border-color: var(--grape_800);
 
-  display: grid;
-  grid-template-columns: auto var(--action-buttons-width);
-  align-items: center;
-  gap: 4px;
-
   & .textarea_inline {
     position: relative;
     z-index: 1;
-    padding: 8px var(--action-buttons-width) 8px 16px !important;
+    padding: 8px 16px;
   }
 
-  &_linked {
-    grid-template-columns: auto var(--action-button-width);
-
-    .textarea_inline {
-      padding: 8px var(--action-button-width) 8px 16px !important;
-    }
-  }
-
-  &__actions {
-    position: relative;
-    z-index: 1;
-    height: 100%;
-    width: 100%;
+  &__category-selector {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-shrink: 0;
-    flex-grow: 0;
-    gap: 4px;
+    flex-grow: 1;
+  }
+
+  &__category-selector > div {
+    width: 100%;
+  }
+
+  &__input-row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__buttons {
+    display: flex;
   }
 
   &__action {
@@ -56,6 +50,8 @@
     background-color: transparent;
     color: var(--secondary-action-color);
     border-radius: var(--primary-action-border-radius);
+    padding-left: 8px;
+    padding-right: 8px;
 
     &:hover {
       color: var(--secondary-action-color-hover);
