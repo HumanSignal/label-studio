@@ -37,6 +37,7 @@ const CommentItem: React.FC<CommentItemProps> = observer(({ comment, rootRef }) 
   const root = rootRef.current;
   const node = comment.regionRef?.overlayNode;
   const isHidden = !node || node.hidden;
+  // {} !== {} it's always so, and it's a way to force re-render
   const [forceUpdateId, forceUpdate] = useState<any>({});
 
   const onHover = useCallback(() => {
