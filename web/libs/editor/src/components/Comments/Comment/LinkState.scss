@@ -88,6 +88,7 @@
     flex: 1;
     color: var(--text-color, var(--sand_900));
     min-width: 0;
+
     //// @todo use these styles if we don't need multiline texts
     // overflow: hidden;
     // white-space: nowrap;
@@ -100,6 +101,7 @@
 
     & div {
       overflow: hidden;
+
       //// @todo disabled for now to allow multiline texts
       // white-space: nowrap;
       text-overflow: ellipsis;

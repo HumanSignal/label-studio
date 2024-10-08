@@ -3,7 +3,7 @@ import { isAlive } from "mobx-state-tree";
 import type React from "react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMounted } from "../../common/Utils/useMounted";
-
+import { LINK_COMMENT_MODE } from "../../stores/Annotation/LinkingModes";
 import ResizeObserver from "../../utils/resize-observer";
 import { guidGenerator } from "../../utils/unique";
 import NodesConnector from "./NodesConnector";
@@ -78,7 +78,6 @@ const CommentItem: React.FC<CommentItemProps> = observer(({ comment, rootRef }) 
     itemStyles.push(styles._highlighted);
   }
   return (
-    // biome-ignore lint/a11y/noSvgWithoutTitle: Intentionally not displaying the title over the comment icon
     <g
       className={itemStyles.join(" ")}
       style={positionStyle}
@@ -145,8 +144,7 @@ const ResultTagBbox: React.FC<ResultItemProps> = observer(({ result, rootRef }) 
         result.annotation.addLinkedResult(result);
         result.annotation.stopLinkingMode();
       }}
-    >
-    </rect>
+    />
   );
 });
 
@@ -211,9 +209,10 @@ const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotat
     // biome-ignore lint/a11y/noSvgWithoutTitle: It's not just an icon or a figure; it's an entire interactive layer.
     <svg className={containerStyles.join(" ")} ref={setRef} xmlns="http://www.w3.org/2000/svg">
       <g key={uniqKey}>
-        {annotation.linkingMode === LINK_COMMENT_MODE && annotation.results.map((result: MSTResult) => (
-          <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />
-        ))}
+        {annotation.linkingMode === LINK_COMMENT_MODE &&
+          annotation.results.map((result: MSTResult) => (
+            <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />
+          ))}
         {overlayComments.map((comment: MSTComment) => {
           const { id } = comment;
           return <CommentItem key={id} comment={comment} rootRef={rootRef} />;

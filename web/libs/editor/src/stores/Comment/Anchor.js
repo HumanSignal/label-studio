@@ -19,7 +19,7 @@ export const Anchor = types
       if (!self.controlName) return null;
       // if we just removed the region
       if (!self.region) return null;
-      return self.region.results.find(r => r.from_name.name === self.controlName);
+      return self.region.results.find((r) => r.from_name.name === self.controlName);
     },
     /**
      * This will be provided to CommentsOverlay to observe changes in bbox coordinates and sizes
