@@ -232,6 +232,12 @@ module.exports = composePlugins(
       };
     }
 
+    config.resolve.alias = {
+      // Common dependencies across at least two sub-packages
+      react: path.resolve(__dirname, "node_modules/react"),
+      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+    };
+
     return merge(config, {
       devtool,
       mode,

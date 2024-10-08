@@ -1824,6 +1824,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_all_optic_1181_membership_performance": {
+      "key": "fflag_feat_all_optic_1181_membership_performance",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "3691490c5dc2478e9f6ea4ee816efb87",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_all_optic_520_annotator_report_short": {
       "key": "fflag_feat_all_optic_520_annotator_report_short",
       "on": false,

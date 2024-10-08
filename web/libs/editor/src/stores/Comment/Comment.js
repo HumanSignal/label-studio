@@ -1,8 +1,12 @@
-import { applySnapshot, flow, getEnv, getParent, getRoot, types } from "mobx-state-tree";
+import { applySnapshot, flow, getEnv, getRoot, types } from "mobx-state-tree";
+import { createRef } from "react";
+import Types from "../../core/Types";
+
 import Utils from "../../utils";
 import { FF_PER_FIELD_COMMENTS } from "../../utils/feature-flags";
 import { camelizeKeys, snakeizeKeys } from "../../utils/utilities";
 import { UserExtended } from "../UserStore";
+
 import { Anchor } from "./Anchor";
 
 export const CommentBase = types
@@ -11,6 +15,13 @@ export const CommentBase = types
     ...(isFF(FF_PER_FIELD_COMMENTS) ? { regionRef: types.optional(types.maybeNull(Anchor), null) } : {}),
   })
   .views((self) => ({
+    get commentsStore() {
+      try {
+        return Types.getParentOfTypeString(self, "CommentStore");
+      } catch (e) {
+        return null;
+      }
+    },
     get annotation() {
       /*
        * The `getEnv` is used in case when we use "CommentBase" separately
@@ -24,8 +35,13 @@ export const CommentBase = types
         return env.annotationStore.selected;
       }
       // otherwise, we use the standard way to get the annotation
-      const commentsStore = getParent(self, 2);
-      return commentsStore.annotation;
+      const commentsStore = self.commentsStore;
+      return commentsStore?.annotation;
+    },
+    get isHighlighted() {
+      const highlightedRegionKey = self.commentsStore?.highlightedComment?.regionRef?.targetKey;
+      const currentRegionKey = self.regionRef?.targetKey;
+      return !!highlightedRegionKey && highlightedRegionKey === currentRegionKey;
     },
   }))
   .actions((self) => {
@@ -40,6 +56,16 @@ export const CommentBase = types
         self.regionRef = {
           regionId: region.cleanId,
         };
+      },
+      setHighlighted(value = true) {
+        const commentsStore = self.commentsStore;
+        if (commentsStore) {
+          if (value) {
+            commentsStore.setHighlightedComment(self);
+          } else if (self.isHighlighted) {
+            commentsStore.setHighlightedComment(undefined);
+          }
+        }
       },
     };
   });
@@ -60,6 +86,11 @@ export const Comment = CommentBase.named("Comment")
   })
   .preProcessSnapshot((sn) => {
     return camelizeKeys(sn ?? {});
+  })
+  .volatile((self) => {
+    return {
+      _commentRef: createRef(),
+    };
   })
   .views((self) => ({
     get sdk() {
@@ -153,6 +184,17 @@ export const Comment = CommentBase.named("Comment")
       self.setConfirmMode(false);
     });
 
+    const scrollIntoView = () => {
+      const commentEl = self._commentRef.current;
+      if (!commentEl) return;
+
+      if (commentEl.scrollIntoViewIfNeeded) {
+        commentEl.scrollIntoViewIfNeeded();
+      } else {
+        commentEl.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    };
+
     return {
       toggleResolve,
       setEditMode,
@@ -163,5 +205,6 @@ export const Comment = CommentBase.named("Comment")
       deleteComment,
       setRegionLink,
       unsetLink,
+      scrollIntoView,
     };
   });

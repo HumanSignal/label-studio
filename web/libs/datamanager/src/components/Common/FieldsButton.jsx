@@ -1,7 +1,7 @@
 import { inject, observer } from "mobx-react";
 import React from "react";
 import { Button } from "./Button/Button";
-import { Checkbox } from "./Checkbox/Checkbox";
+import { Checkbox } from "@humansignal/ui";
 import { Dropdown } from "./Dropdown/Dropdown";
 import { Menu } from "./Menu/Menu";
 import { Tooltip } from "./Tooltip/Tooltip";
