@@ -51,7 +51,7 @@ With your [Prompt created](prompts_create), you can begin drafting your prompt c
 
 When you evaluate a prompt, you will see the following metrics:
 
-
+<table>
 <thead>
     <tr>
       <th>Metric</th>
