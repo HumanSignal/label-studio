@@ -2,8 +2,11 @@ name: Check for broken links
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: ["develop"]
+    paths:
+      - "docs/**"
+      - ".github/workflows/link-check.yml"
+  workflow_dispatch:
 
 jobs:
   check_links:
