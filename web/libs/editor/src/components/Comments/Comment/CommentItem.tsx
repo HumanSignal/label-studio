@@ -153,7 +153,7 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
             </Elem>
           ) : (
             <>
-              {classifications?.default?.values && (
+              {classifications?.default?.values?.length > 0 && (
                 <Elem name="classifications" tag="ul">
                   {classifications?.default?.values?.map((valueArray: string[], index: number) => (
                     <li key={index}>{valueArray.join("/")}</li>
