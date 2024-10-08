@@ -100,8 +100,13 @@
 
     & div {
       overflow: hidden;
-      white-space: nowrap;
+      //// @todo disabled for now to allow multiline texts
+      // white-space: nowrap;
       text-overflow: ellipsis;
+    }
+
+    .labels-list {
+      display: inline;
     }
   }
 
