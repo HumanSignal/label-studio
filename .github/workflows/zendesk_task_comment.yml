@@ -20,8 +20,28 @@ jobs:
         with:
           github-token: ${{ secrets.GIT_PAT_HEIDI }}
           script: |
-            const payload = JSON.parse(process.env.PAYLOAD);
-            console.log("Parsed payload: ", JSON.stringify(payload, null, 2));
+            // Get the client payload input from the workflow_dispatch
+            const clientPayloadRaw = process.env.GITHUB_EVENT_PATH ? require(process.env.GITHUB_EVENT_PATH).inputs.client_payload : null;
+
+            // If no payload is provided, throw an error
+            if (!clientPayloadRaw) {
+              throw new Error("No client payload provided.");
+            }
+
+            // Escape problematic control characters in the raw JSON string
+            const sanitizedPayloadRaw = clientPayloadRaw
+              .replace(/[\u0000-\u001F\u007F-\u009F]/g, "")  // Remove control characters
+              .replace(/\n/g, "\\n")                          // Escape newlines
+              .replace(/\r/g, "\\r");                         // Escape carriage returns
+
+            // Parse the sanitized JSON payload
+            let payload;
+            try {
+              payload = JSON.parse(sanitizedPayloadRaw);
+              console.log("Parsed payload: ", JSON.stringify(payload, null, 2));
+            } catch (err) {
+              throw new Error("Invalid JSON format: " + err.message);
+            }
 
             // Extract issue details from the Zendesk external_id
             const parts = payload.ticket.external_id.split("/");
@@ -31,7 +51,7 @@ jobs:
 
             // Extract comment details
             const comment_author = payload.comment.author || "HumanSignal Support";
-            const comment_body = payload.comment.body;
+            const comment_body = payload.comment.body.replace(/\\n/g, "\n").replace(/\\r/g, "\r");  // Restore escaped line breaks
             const formatted_comment_body = `${comment_body}\n\n*Comment by ${comment_author}*`;
 
             // Add a comment to the GitHub issue
