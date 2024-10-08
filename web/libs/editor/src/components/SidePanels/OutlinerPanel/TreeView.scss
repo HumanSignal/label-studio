@@ -56,7 +56,7 @@
       max-width: 100%;
 
       .ff_outliner_optim & {
-        align-items: flex-start;
+        align-items: center;
       }
     }
   }
@@ -93,7 +93,11 @@
     min-width: 0;
 
     .labels-list {
-      display: inline-block;
+      display: inline;
+      // make it dense for multiline labels
+      line-height: 1.2;
+      //+ add a little padding so it won't be too close to the item edges
+      padding: 2px 0;
     }
   }
 

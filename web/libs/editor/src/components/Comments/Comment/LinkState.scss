@@ -9,7 +9,7 @@
   padding: 6px 4px 5px;
 
   &_display {
-    padding: 2px 9px 5px 4px;
+    padding: 2px 9px 2px 4px;
     gap: 2px;
     font-size: 14px;
     line-height: 22px;
@@ -88,6 +88,10 @@
     flex: 1;
     color: var(--text-color, var(--sand_900));
     min-width: 0;
+    //// @todo use these styles if we don't need multiline texts
+    // overflow: hidden;
+    // white-space: nowrap;
+    // text-overflow: ellipsis;
   }
 
   &__label {
