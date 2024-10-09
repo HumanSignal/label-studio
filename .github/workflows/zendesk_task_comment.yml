@@ -15,13 +15,18 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - uses: actions/github-script@v5
-        env:
-          PAYLOAD: ${{ inputs.client_payload }}
         with:
           github-token: ${{ secrets.GIT_PAT_HEIDI }}
           script: |
-            const payload = JSON.parse(process.env.PAYLOAD);
-            console.log("Parsed payload: ", JSON.stringify(payload, null, 2));
+            const sanitizedClientPayloadRaw = context.payload.inputs.client_payload
+              .trim()
+              .replaceAll("\n", "\\n")
+              .replaceAll("\r", "\\r");
+            
+            core.startGroup("Parsed payload");
+            const payload = JSON.parse(sanitizedClientPayloadRaw);
+            core.info(JSON.stringify(payload, null, 2));
+            core.endGroup();
 
             // Extract issue details from the Zendesk external_id
             const parts = payload.ticket.external_id.split("/");
@@ -83,4 +88,4 @@ jobs:
               });
             }
 
-            console.log("Comment and labels successfully added to GitHub issue.");
+            core.info(`Comment and labels successfully added to GitHub issue #${issue_number}.`);
