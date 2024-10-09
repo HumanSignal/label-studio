@@ -25,7 +25,7 @@ jobs:
 
       - name: Run broken-link-checker and fail on broken links for Label Studio Docs
         run: |
-          npx blc https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app -roef --exclude "/api"
+          npx blc https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app -roef --exclude "/api" 2>&1|grep -iEB1 "[^0].broken"
           exit_code=$?  # Capture the exit code
           echo "Exit code: $exit_code"  # Print the exit code
 
@@ -34,8 +34,13 @@ jobs:
             exit 1
           fi
 
-          echo "No broken links found."
-
       - name: Run broken-link-checker and fail on broken links for Human Signal Docs
         run: |
-          npx blc https://deploy-preview-${{ github.event.pull_request.number }}--heartex-docs.netlify.app -roef --exclude "/api"
+          npx blc https://deploy-preview-${{ github.event.pull_request.number }}--heartex-docs.netlify.app -roef --exclude "/api" 2>&1|grep -iEB1 "[^0].broken"
+          exit_code=$?  # Capture the exit code
+          echo "Exit code: $exit_code"  # Print the exit code
+
+          if [ $exit_code -ne 0 ]; then
+            echo "Broken links found!"
+            exit 1
+          fi
