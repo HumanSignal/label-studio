@@ -15,19 +15,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Get Netlify Deploy Preview URL
-        run: |
-          PREVIEW_URL="https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app"
-          echo "Preview URL is $PREVIEW_URL"
-          echo "PREVIEW_URL=$PREVIEW_URL" >> $GITHUB_ENV
-
-      - name: Check for broken links
-        uses: celinekurpershoek/link-checker@v1.0.2
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          # Required:
-          url: "https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app"
-          honorRobotExclusions: false
-          ignorePatterns: "github,google"
-          recursiveLinks: true # Check all URLs on all reachable pages (could take a while)
+          node-version: "16"
+
+      - name: Install dependencies
+        run: npm install broken-link-checker
+
+      - name: Run broken-link-checker
+        run: npx blc https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app -roe 2>&1|grep -iEB1 "[^0].broken"
+
       - name: Get the result
         run: echo "${{steps.link-report.outputs.result}}"
