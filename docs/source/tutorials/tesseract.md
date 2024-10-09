@@ -173,5 +173,5 @@ Example below:
 ![ls_demo_ocr](https://user-images.githubusercontent.com/17755198/165186574-05f0236f-a5f2-4179-ac90-ef11123927bc.gif)
 
 Reference links: 
-- https://labelstud.io/blog/Improve-OCR-quality-with-Tesseract-and-Label-Studio.html
+- https://labelstud.io/blog/improve-ocr-quality-for-receipt-processing-with-tesseract-and-label-studio
 - https://labelstud.io/blog/release-130.html
