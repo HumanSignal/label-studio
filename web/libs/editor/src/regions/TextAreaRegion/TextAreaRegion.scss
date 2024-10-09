@@ -1,7 +1,7 @@
 .mark {
   background-color: var(--surface-surface);
   border: 1px solid var(--surface-border);
-  border-radius: var(--radius-small);
+  border-radius: var(--radius-small, 0.5rem);
   margin: 0 var(--spacing-small, 0.5rem) 0 0;
   padding: var(--spacing-small, 0.5rem) var(--spacing-medium, 1rem);
   white-space: pre-line;
