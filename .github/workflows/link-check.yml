@@ -24,7 +24,11 @@ jobs:
         run: npm install broken-link-checker
 
       - name: Run broken-link-checker
-        run: npx blc https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app -roef 2>&1|grep -iEB1 "[^0].broken"
-
-      - name: Get the result
-        run: echo "${{steps.link-report.outputs.result}}"
+        run: |
+          npx blc https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app -roef 2>&1|grep -iEB1 "[^0].broken"
+          if [ $? -eq 0 ]; then
+            echo "Broken links found!"
+            exit 1
+          else
+            echo "No broken links found."
+          fi
