@@ -12,7 +12,7 @@ To decommission Minio, do the following:
 
 ## Configure Persistent Storage
 
-To configure Persistent Storage, follow the instructions in [Set up persistent storage](persistent_storage).
+To configure Persistent Storage, follow the instructions in [Set up persistent storage](persistent_storage.html).
 
 ## Upgrade to the latest available Release
 

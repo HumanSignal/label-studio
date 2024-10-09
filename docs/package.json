@@ -18,7 +18,6 @@
     "front-matter": "^4.0.2",
     "hexo": "^6.3.0",
     "hexo-admonition": "^1.1.2",
-    "hexo-broken-link-checker": "^1.0.3",
     "hexo-cli": "^4.3.0",
     "hexo-deployer-git": "^3.0.0",
     "hexo-footnote": "^1.0.4",
