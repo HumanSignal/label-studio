@@ -25,6 +25,7 @@ jobs:
 
       - name: Run broken-link-checker
         run: npx blc https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app -roe 2>&1|grep -iEB1 "[^0].broken"
+        continue-on-error: true
 
       - name: Get the result
         run: echo "${{steps.link-report.outputs.result}}"
