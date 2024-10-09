@@ -52,7 +52,7 @@ By utilizing AI to handle the bulk of the annotation work, you can significantly
     * [Model provider keys](prompts_create#Model-provider-API-keys)
 4. Write a prompt and evaluate it against your ground truth dataset. 
 
-    * [Draft a prompt](prompt_draft)
+    * [Draft a prompt](prompt_drafts)
 5. When your prompt is returning an overall accuracy that is acceptable, you can choose to apply it to the rest of the tasks in your project. 
 
     * [Generate predictions from a prompt](prompts_predictions)
@@ -84,7 +84,7 @@ Additionally, this workflow provides a scalable solution for continuously expand
     * [Create a Prompt](prompts_create)
     * [Model provider keys](prompts_create#Model-provider-API-keys)
 3. Write a prompt and run it against your task samples. 
-    * [Draft a prompt](prompt_draft)
+    * [Draft a prompt](prompt_drafts)
   
 When you run your prompt, you create predictions for the selected sample (this can be a portion of the project tasks or all tasks). From here you have several options:
 
@@ -121,7 +121,7 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
     * [Model provider keys](prompts_create#Model-provider-API-keys)
 4. Write a prompt and evaluate it against your ground truth dataset. 
 
-    * [Draft a prompt](prompt_draft)
+    * [Draft a prompt](prompt_drafts)
 5. Continue iterating and refining your prompt until you reach an acceptable accuracy score. 
 
 ![Diagram of fine-tuning workflow](/images/prompts/tuning-diagram.png)
