@@ -27,7 +27,7 @@ const RatingResult: FC<{ mainValue: string[] }> = observer(({ mainValue }) => {
   return <span>{mainValue}</span>;
 });
 
-const ResultItem: FC<{ result: any }> = observer(({ result }) => {
+export const ResultItem: FC<{ result: any }> = observer(({ result }) => {
   const { type, mainValue } = result;
   /**
    * @todo before fix this var was always false, so fix is left commented out
@@ -63,6 +63,16 @@ const ResultItem: FC<{ result: any }> = observer(({ result }) => {
           <Text>Choices: </Text>
           <Elem name="value">
             <ChoicesResult mainValue={mainValue} />
+          </Elem>
+        </Elem>
+      );
+    }
+    if (type === "taxonomy") {
+      return (
+        <Elem name="result">
+          <Text>Taxonomy: </Text>
+          <Elem name="value">
+            <ChoicesResult mainValue={mainValue.map((v: string[]) => v.join("/"))} />
           </Elem>
         </Elem>
       );
