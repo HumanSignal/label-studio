@@ -121,7 +121,7 @@ export const CommentStore = types
      * @returns {boolean}
      */
     get isRelevantList() {
-      if (!self.commentsKey) return false;
+      if (!self.commentsKey || !self.targetCommentsKey) return false;
       if (Object.keys(self.commentsKey).length !== Object.keys(self.targetCommentsKey).length) return false;
       return Object.keys(self.commentsKey).every((key) => {
         return self.commentsKey[key] === self.targetCommentsKey[key];

@@ -66,6 +66,13 @@ export const LinkingModes = types
           self.currentLinkingMode.addLinkedRegion?.(region);
         }
       },
+
+      addLinkedResult(region) {
+        if (self.currentLinkingMode) {
+          self.currentLinkingMode.addLinkedResult?.(region);
+        }
+      },
+
       // @deprecated Use `startLinkingMode(CREATE_RELATION_MODE, obj)` instead
       startRelationMode(obj) {
         console.warn("`startRelationMode` is deprecated. Use `startLinkingMode(CREATE_RELATION_MODE, obj)` instead.");

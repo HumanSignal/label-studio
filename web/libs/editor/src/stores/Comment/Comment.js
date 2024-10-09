@@ -65,6 +65,12 @@ export const CommentBase = types
       setClassifications(classifications) {
         self.classifications = classifications;
       },
+      setResultLink(result) {
+        self.regionRef = {
+          regionId: result.area.cleanId,
+          controlName: result.from_name.name,
+        };
+      },
       setHighlighted(value = true) {
         const commentsStore = self.commentsStore;
         if (commentsStore) {

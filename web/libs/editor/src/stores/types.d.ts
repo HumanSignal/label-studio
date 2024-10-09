@@ -4,6 +4,16 @@ type RawResult = {
   value: object;
 };
 
+type MSTResult = {
+  id: string;
+  area: MSTRegion;
+  annotation: MSTAnnotation;
+  type: string;
+  mainValue: any;
+  // @todo tag
+  from_name: any;
+};
+
 type MSTagProps = {
   isReady?: boolean;
 };
@@ -17,19 +27,17 @@ type MSTTagImage = {
   canvasSize?: { width: number; height: number };
 } & MSTagProps;
 
-type MSTTag = (
-  | MSTTagImage
-  | {
-      type: string;
-    }
-) &
-  MSTagProps;
+type MSTTag = MSTTagImage | (MSTagProps & { type: string });
 
 type MixinMSTArea = {
   id: string;
   ouid: number;
-  results: RawResult[];
+  results: MSTResult[];
   parentID: string | null;
+  control: object;
+  object: object;
+  classification?: boolean;
+  selected: boolean;
 };
 
 type MixinMSTRegion = {
@@ -66,8 +74,11 @@ type MSTAnnotation = {
     draft?: RawResult[];
     result?: RawResult[];
   };
-  results: RawResult[];
+  regions: MSTRegion[];
+  results: MSTResult[];
   names: Map<string, MSTTag>;
+  isLinkingMode: boolean;
+  linkingMode: "create_relation" | "link_to_comment";
 
   submissionInProgress: () => void;
 };
