@@ -12,12 +12,13 @@ import "./LinkState.scss";
 
 type LinkStateProps = {
   linking: boolean;
-  region: any;
+  region: MSTRegion;
+  result: MSTResult;
   onUnlink?: (region: any) => void;
-  interactive: boolean;
+  interactive?: boolean;
 };
 
-export const LinkState: FC<LinkStateProps> = ({ linking, region, onUnlink, interactive }) => {
+export const LinkState: FC<LinkStateProps> = ({ linking, region, result, onUnlink, interactive }) => {
   const isVisible = linking || region;
   const mod = useMemo(() => {
     if (linking) return { action: true };
@@ -31,34 +32,37 @@ export const LinkState: FC<LinkStateProps> = ({ linking, region, onUnlink, inter
         <IconCommentLinkTo />
       </Elem>
       {mod?.action && "Select an object to link it to this comment."}
-      {mod?.display && <LinkedRegion item={region} onUnlink={onUnlink} interactive={interactive} />}
+      {mod?.display && <LinkedRegion region={region} result={result} onUnlink={onUnlink} interactive={interactive} />}
     </Block>
   );
 };
 
 type LinkedRegionProps = {
-  item: any;
+  region: any;
+  result?: MSTResult;
   onUnlink?: (item: any) => void;
-  interactive: boolean;
+  interactive?: boolean;
 };
 
-const LinkedRegion: FC<LinkedRegionProps> = observer(({ item, interactive, onUnlink }) => {
-  const itemColor = item?.background ?? item?.getOneColor?.();
+const LinkedRegion: FC<LinkedRegionProps> = observer(({ region, result, interactive, onUnlink }) => {
+  const itemColor = region?.background ?? region?.getOneColor?.();
+  const isClassification: boolean = region.classification;
 
   const { mouseEnterHandler, mouseLeaveHandler, clickHandler } = useMemo(() => {
     if (!interactive) return {};
 
     const mouseEnterHandler = () => {
-      item?.setHighlight?.(true);
+      region?.setHighlight?.(true);
     };
     const mouseLeaveHandler = () => {
-      item?.setHighlight?.(false);
+      region?.setHighlight?.(false);
     };
     const clickHandler = () => {
-      item.annotation.selectArea(item);
+      if (region.classification) return null;
+      region.annotation.selectArea(region);
     };
     return { mouseEnterHandler, mouseLeaveHandler, clickHandler };
-  }, [interactive, item]);
+  }, [interactive, region]);
 
   const style = useMemo(() => {
     const color = chroma(itemColor ?? "#666").alpha(1);
@@ -77,16 +81,26 @@ const LinkedRegion: FC<LinkedRegionProps> = observer(({ item, interactive, onUnl
       onMouseLeave={mouseLeaveHandler}
       onClick={clickHandler}
     >
-      <Elem name="icon">
-        <NodeIcon node={item} />
-      </Elem>
-      <Elem name="index">{item.region_index}</Elem>
-      <Elem name="title">
-        <Elem name="label">
-          <RegionLabel item={item} />
+      {!isClassification && (
+        <>
+          <Elem name="icon">
+            <NodeIcon node={region} />
+          </Elem>
+          <Elem name="index">{region.region_index}</Elem>
+        </>
+      )}
+      {result ? (
+        <Elem name="title">
+          <ResultText result={result} />
         </Elem>
-        {item?.text && <Elem name="text">{item.text.replace(/\\n/g, "\n")}</Elem>}
-      </Elem>
+      ) : (
+        <Elem name="title">
+          <Elem name="label">
+            <RegionLabel item={region} />
+          </Elem>
+          {region?.text && <Elem name="text">{region.text.replace(/\\n/g, "\n")}</Elem>}
+        </Elem>
+      )}
       {onUnlink && (
         <Elem name="close">
           <Button size="small" type="text" icon={<LsClose />} onClick={onUnlink} />
@@ -94,4 +108,21 @@ const LinkedRegion: FC<LinkedRegionProps> = observer(({ item, interactive, onUnl
       )}
     </Block>
   );
+});
+
+/**
+ * Simply displaying the content of classification result
+ */
+const ResultText: FC<{ result: MSTResult }> = observer(({ result }) => {
+  const { from_name: control, type, mainValue } = result;
+  const { name } = control;
+
+  if (type === "textarea") return [name, mainValue.join(" | ")].join(": ");
+  if (type === "choices") return [name, mainValue.join(", ")].join(": ");
+  if (type === "taxonomy") {
+    const values = mainValue.map((v: string[]) => v.join("/"));
+    return [name, values.join(", ")].join(": ");
+  }
+
+  return [name, String(mainValue)].join(": ");
 });

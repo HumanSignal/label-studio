@@ -71,6 +71,7 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
   const [text, setText] = useState(initialText);
   const [linkingComment, setLinkingComment] = useState();
   const region = regionRef?.region;
+  const result = regionRef?.result;
   const linking = !!(linkingComment && currentComment === linkingComment && globalLinking);
   const hasLinkState = linking || region;
 
@@ -170,7 +171,7 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
               {text}
               {hasLinkState && (
                 <Elem name="linkState">
-                  <LinkState linking={linking} region={region} interactive />
+                  <LinkState linking={linking} region={region} result={result} interactive />
                 </Elem>
               )}
             </>

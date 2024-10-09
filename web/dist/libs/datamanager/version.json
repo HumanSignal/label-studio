@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1492: More flexible Custom buttons (#6454)",
-  "commit": "65f69dd87cb9e54acc31d12fb7084514859f3288",
-  "date": "2024-10-07T19:38:13.000Z",
+  "message": "feat: LEAP-1441: Allow to connect comments to classifications (#6486)",
+  "commit": "8484a8489a41ca698fb02777904b84e655f7a79f",
+  "date": "2024-10-09T15:17:41.000Z",
   "branch": "develop"
 }

@@ -34,7 +34,9 @@ With your [Prompt created](prompts_create), you can begin drafting your prompt c
    * **Ground Truths** - Generate predictions and a prompt accuracy score for all tasks with ground truth annotations. This option is only available if your project has ground truth annotations. 
    
         See the [Auto-labeling with Prompts](prompts_overview#Auto-labeling-with-Prompts) use case and the [Prompt evaluation and fine-tuning](prompts_overview#Prompt-evaluation-and-fine-tuning). 
-4. Click **Save**. 
+4. If this is your first version of the prompt or you want to adjust the current version, click **Save**. 
+
+    If you want to create a new version of the prompt so that you can compare evaluations between versions, click the drop-down menu next to **Save** and select **Save As**. 
 5. Click **Evaluate** (if running against a ground truth baseline) or **Run**. 
 
 !!! warning
@@ -44,6 +46,127 @@ With your [Prompt created](prompts_create), you can begin drafting your prompt c
 
 <br><br>
 <video src="../images/prompts/prompts.mp4" controls="controls" style="max-width: 800px;" class="gif-border" />
+
+## Evaluation results
+
+When you evaluate a prompt, you will see the following metrics:
+
+<table>
+<thead>
+    <tr>
+      <th>Metric</th>
+      <th>Tasks</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
+
+**Overall accuracy**
+</td>
+<td>
+
+Ground Truths
+
+</td>
+<td>
+
+Text classification 
+
+NER
+
+</td>
+<td>
+
+A measure of how many predictions are correct when measured against the ground truth. 
+
+For example, if there are 10 ground truths and your Prompt's predictions match 7 of them, then the overall accuracy would be `0.70`. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Outputs**
+</td>
+<td>
+
+All task types
+
+</td>
+<td>
+
+Text classification 
+
+NER
+
+</td>
+<td>
+
+Number of tasks evaluated.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**F1 Score**
+</td>
+<td>
+
+Ground Truths
+
+</td>
+<td>
+
+Text classification
+
+NER
+
+</td>
+<td>
+
+The [F1 score](https://en.wikipedia.org/wiki/F-score) is a metric to assess a machine learning model's accuracy. This is measured in terms of **precision** and **recall** as follows:
+
+`F1 = 2 * (precision * recall) / (precision + recall)`
+
+* **Precision**: The proportion of correct positive predictions out of all positive predictions. This is a measure of the quality of the predictions, and looks at how many predictions are correctly aligned with ground truths. 
+
+    This metric is useful for limiting false positives. It answers the question: "How often were the positive predictions correct?" or "How much can I trust a positive prediction?" In other words, it measures how good the model is at not making false predictions.
+
+* **Recall**: The proportion of correct positive predictions out of all actual positives. This is a measure of a model's ability to find all positive predictions, and is especially useful in situations in which multiple labels are possible.
+
+     This metric is useful for maximizing the number positive predictions that you get back. It answers the question "How many of the actual positives were successfully identified?" In other words, it measures how good the model is at not missing things.
+
+Note that a "positive" prediction denotes either a 'positive' label (like a checkbox), or the presence of a particular choice/label in the prediction.
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Inference cost**
+</td>
+<td>
+
+All task types
+
+</td>
+<td>
+
+Text classification 
+
+NER
+
+</td>
+<td>
+
+The cost to run the prompt evaluation based on the number of tokens required. 
+
+</td>
+</tr>
+</table>
 
 ## Drafting effective prompts
 
