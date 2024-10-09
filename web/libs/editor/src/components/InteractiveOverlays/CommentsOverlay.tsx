@@ -90,6 +90,15 @@ const CommentItem: React.FC<CommentItemProps> = observer(({ comment, rootRef }) 
   );
 });
 
+/** Is used to narrow all results down to classifications good to be selected */
+const isClassification = (result: MSTResult) => {
+  const { isClassificationTag } = result.from_name;
+  const isGlobalClassification = result.area.classification;
+  const isActivePerRegion = result.area.selected;
+
+  return isClassificationTag && (isGlobalClassification || isActivePerRegion);
+};
+
 type ResultItemProps = {
   result: MSTResult;
   rootRef: React.MutableRefObject<HTMLOrSVGElement | undefined>;
@@ -152,7 +161,7 @@ type CommentsOverlayProps = {
   commentStore: MSTCommentStore;
   annotation: MSTAnnotation;
 };
-const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotation, commentStore }) => {
+const CommentsOverlayInner = observer(({ annotation, commentStore }: CommentsOverlayProps) => {
   const { overlayComments } = commentStore || {};
   const rootRef = useRef<SVGSVGElement>();
   const [uniqKey, forceUpdate] = useState<any>(guidGenerator());
@@ -210,9 +219,9 @@ const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotat
     <svg className={containerStyles.join(" ")} ref={setRef} xmlns="http://www.w3.org/2000/svg">
       <g key={uniqKey}>
         {annotation.linkingMode === LINK_COMMENT_MODE &&
-          annotation.results.map((result: MSTResult) => (
-            <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />
-          ))}
+          annotation.results
+            .filter(isClassification)
+            .map((result) => <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />)}
         {overlayComments.map((comment: MSTComment) => {
           const { id } = comment;
           return <CommentItem key={id} comment={comment} rootRef={rootRef} />;
