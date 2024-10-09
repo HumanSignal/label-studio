@@ -94,10 +94,8 @@
 
     .labels-list {
       display: inline;
-      // make it dense for multiline labels
-      line-height: 1.2;
-      //+ add a little padding so it won't be too close to the item edges
-      padding: 2px 0;
+      line-height: 1.2; // make it dense for multiline labels
+      padding: 2px 0; // + add a little padding so it won't be too close to the item edges
     }
   }
 
