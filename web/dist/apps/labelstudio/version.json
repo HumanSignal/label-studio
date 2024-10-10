@@ -1,6 +1,6 @@
 {
-  "message": "ci: LEAP-1553: Fix path-to-regexp CVE (#6501)",
-  "commit": "6bd45efcabbb6cf601bd041fd1e7a33e6ac3db07",
-  "date": "2024-10-10T18:27:53.000Z",
+  "message": "chore(deps-dev): bump vite from 5.2.11 to 5.2.14 in /web (#6398)",
+  "commit": "a735d7a4ee6da6b94cc821f799d698170f6b990d",
+  "date": "2024-10-10T19:01:47.000Z",
   "branch": "develop"
 }
