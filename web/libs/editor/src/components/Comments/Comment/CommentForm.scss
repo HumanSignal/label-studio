@@ -54,8 +54,7 @@
     background-color: transparent;
     color: var(--secondary-action-color);
     border-radius: var(--primary-action-border-radius);
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-inline: 8px;
 
     &:hover {
       color: var(--secondary-action-color-hover);
