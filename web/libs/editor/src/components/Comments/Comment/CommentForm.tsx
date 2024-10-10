@@ -1,9 +1,6 @@
 import { type FC, type MouseEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import { observer } from "mobx-react";
 
-import { IconCommentLinkTo } from "../../../assets/icons";
-import { ReactComponent as IconSend } from "../../../assets/icons/send.svg";
-import { Tooltip } from "../../../common/Tooltip/Tooltip";
 import { LINK_COMMENT_MODE } from "../../../stores/Annotation/LinkingModes";
 import { CommentBase } from "../../../stores/Comment/Comment";
 import { TextArea } from "../../../common/TextArea/TextArea";
@@ -14,6 +11,7 @@ import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 import { LinkState } from "./LinkState";
 import "./CommentForm.scss";
 import { NewTaxonomy as Taxonomy } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { CommentFormButtons } from "./CommentFormButtons";
 import { parseCommentClassificationConfig, taxonomyPathsToSelectedItems } from "./classificationUtils";
 
 export type CommentFormProps = {
@@ -24,7 +22,6 @@ export type CommentFormProps = {
 
 const ROWS = 1;
 const MAX_ROWS = 4;
-const TOOLTIP_DELAY = 0.8;
 
 export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annotationStore, inline = true }) => {
   const formRef = useRef<HTMLFormElement>(null);
@@ -134,21 +131,6 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
   const selections = taxonomyPathsToSelectedItems(classifications?.default?.values);
   const classificationsItems = parseCommentClassificationConfig(commentStore.commentClassificationConfig);
 
-  const Buttons = () => (
-    <Elem name="buttons">
-      {!region && (
-        <Tooltip title="Link to..." mouseEnterDelay={TOOLTIP_DELAY}>
-          <Elem name="action" tag="button" mod={{ highlight: linking }} onClick={linkToHandler}>
-            <IconCommentLinkTo />
-          </Elem>
-        </Tooltip>
-      )}
-      <Elem name="action" tag="button" type="submit">
-        <IconSend />
-      </Elem>
-    </Elem>
-  );
-
   return (
     <Block ref={formRef} tag="form" name="comment-form-new" mod={{ inline, linked: !!region }} onSubmit={onSubmit}>
       <Elem name="text-row">
@@ -163,7 +145,9 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
           onSubmit={inline ? onSubmit : undefined}
           onBlur={clearTooltipMessage}
         />
-        {classificationsItems.length === 0 && <Buttons />}
+        {classificationsItems.length === 0 && (
+          <CommentFormButtons region={region} linking={linking} onLinkTo={linkToHandler} />
+        )}
       </Elem>
       {classificationsItems.length > 0 && (
         <Elem name="classifications-row">
@@ -187,7 +171,7 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
               defaultSearch={false}
             />
           </Elem>
-          <Buttons />
+          <CommentFormButtons region={region} linking={linking} onLinkTo={linkToHandler} />
         </Elem>
       )}
       {hasLinkState && (
