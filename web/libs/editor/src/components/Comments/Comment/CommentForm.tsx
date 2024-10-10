@@ -10,9 +10,11 @@ import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 
 import { LinkState } from "./LinkState";
 import "./CommentForm.scss";
-import { NewTaxonomy as Taxonomy } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
 import { CommentFormButtons } from "./CommentFormButtons";
 import { parseCommentClassificationConfig, taxonomyPathsToSelectedItems } from "./classificationUtils";
+
+const TAXONOMY_OPTIONS = { pathSeparator: "/", showFullPath: true };
 
 export type CommentFormProps = {
   commentStore: any;
@@ -46,14 +48,6 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
     (comment: string) => {
       const currentComment = getCurrentComment();
       currentComment.setText(comment);
-    },
-    [commentStore, annotationStore],
-  );
-
-  const updateCommentClassifications = useCallback(
-    (classifications: object | null) => {
-      const currentComment = getCurrentComment();
-      currentComment.setClassifications(classifications);
     },
     [commentStore, annotationStore],
   );
@@ -131,6 +125,30 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
   const selections = taxonomyPathsToSelectedItems(classifications?.default?.values);
   const classificationsItems = parseCommentClassificationConfig(commentStore.commentClassificationConfig);
 
+  const updateCommentClassifications = useCallback(
+    (classifications: object | null) => {
+      const currentComment = getCurrentComment();
+      currentComment.setClassifications(classifications);
+    },
+    [commentStore, annotationStore],
+  );
+
+  const taxonomyOnChange = useCallback(
+    async (_: Node, values: TaxonomyPath[]) => {
+      const newClassifications =
+        values.length > 0
+          ? {
+              default: {
+                type: "taxonomy",
+                values,
+              },
+            }
+          : null;
+      updateCommentClassifications(newClassifications);
+    },
+    [updateCommentClassifications],
+  );
+
   return (
     <Block ref={formRef} tag="form" name="comment-form-new" mod={{ inline, linked: !!region }} onSubmit={onSubmit}>
       <Elem name="text-row">
@@ -155,19 +173,8 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
             <Taxonomy
               selected={selections}
               items={classificationsItems}
-              onChange={async (_, values) => {
-                const newClassifications =
-                  values.length > 0
-                    ? {
-                        default: {
-                          type: "taxonomy",
-                          values,
-                        },
-                      }
-                    : null;
-                updateCommentClassifications(newClassifications);
-              }}
-              options={{ pathSeparator: "/", showFullPath: true }}
+              onChange={taxonomyOnChange}
+              options={TAXONOMY_OPTIONS}
               defaultSearch={false}
             />
           </Elem>
