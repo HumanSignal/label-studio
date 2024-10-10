@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Wait for Netlify deploy preview to complete
         run: echo "Netlify deploy preview has passed"
-        if: ${{ github.event.pull_request.head.repo.statuses | contains('netlify') }}
+        if: ${{ contains(github.event.pull_request.head.repo.status.contexts, 'netlify') }}
 
   check_links:
     runs-on: ubuntu-latest
