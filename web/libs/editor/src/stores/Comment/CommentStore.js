@@ -3,6 +3,7 @@ import { when } from "mobx";
 import uniqBy from "lodash/uniqBy";
 import Utils from "../../utils";
 import { snakeizeKeys } from "../../utils/utilities";
+import { parseCommentClassificationConfig } from "../../utils/commentClassification";
 import { Comment } from "./Comment";
 import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
 
@@ -48,8 +49,8 @@ export const CommentStore = types
     get currentUser() {
       return getRoot(self).user;
     },
-    get commentClassificationConfig() {
-      return getRoot(self).commentClassificationConfig;
+    get commentClassificationsItems() {
+      return parseCommentClassificationConfig(getRoot(self).commentClassificationConfig);
     },
     get sdk() {
       return getEnv(self).events;

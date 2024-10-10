@@ -1,10 +1,27 @@
-import type { TaxonomyItem, SelectedItem, TaxonomyPath } from "../../NewTaxonomy/NewTaxonomy";
+import type { TaxonomyItem, SelectedItem, TaxonomyPath } from "../components/NewTaxonomy/NewTaxonomy";
 
-export const parseCommentClassificationConfig = (xmlString: string): TaxonomyItem[] => {
-  // Assume that there is a single root Taxonomy element for now, which may have multiple
-  // TaxonomyItem children.
+export const parseCommentClassificationConfig = (config: string | null): TaxonomyItem[] => {
+  /**
+   * Assume that there is a single root Taxonomy element for now, which may have multiple
+   * TaxonomyItem childrenl, as in this simple example below.
+   * <Taxonomy name="default">
+   *   <TaxonomyItem value="title">
+   *     <TaxonomyItem value="spelling" />
+   *     <TaxonomyItem value="grammar" />
+   *   </TaxonomyItem>
+   *   <TaxonomyItem value="subtitle">
+   *     <TaxonomyItem value="spelling" />
+   *     <TaxonomyItem value="grammar" />
+   *   </TaxonomyItem>
+   * </Taxonomy>
+   */
+
+  if (!config) {
+    return [];
+  }
+
   const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+  const xmlDoc = parser.parseFromString(config, "application/xml");
   const taxonomyItems: TaxonomyItem[] = [];
 
   const parseItems = (node: Element, depth = 0, path: string[] = []): TaxonomyItem => {
@@ -31,7 +48,7 @@ export const parseCommentClassificationConfig = (xmlString: string): TaxonomyIte
 export const taxonomyPathsToSelectedItems = (paths: TaxonomyPath[] | null): SelectedItem[] =>
   paths
     ? paths.map((path) =>
-        path.map((pathElt) => ({
+        path.map((pathElt: any) => ({
           label: pathElt,
           value: pathElt,
         })),

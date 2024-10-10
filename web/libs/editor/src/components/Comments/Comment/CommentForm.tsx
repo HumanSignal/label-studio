@@ -1,4 +1,4 @@
-import { type FC, type MouseEventHandler, useCallback, useEffect, useRef, useState } from "react";
+import { type FC, type MouseEventHandler, useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { observer } from "mobx-react";
 
 import { LINK_COMMENT_MODE } from "../../../stores/Annotation/LinkingModes";
@@ -12,7 +12,7 @@ import { LinkState } from "./LinkState";
 import "./CommentForm.scss";
 import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
 import { CommentFormButtons } from "./CommentFormButtons";
-import { parseCommentClassificationConfig, taxonomyPathsToSelectedItems } from "./classificationUtils";
+import { taxonomyPathsToSelectedItems } from "../../../utils/commentClassification";
 
 const TAXONOMY_OPTIONS = { pathSeparator: "/", showFullPath: true };
 
@@ -122,8 +122,8 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
   const { region, result } = regionRef || {};
   const linking = !!linkingComment && currentLinkingComment === linkingComment && globalLinking;
   const hasLinkState = linking || region;
-  const selections = taxonomyPathsToSelectedItems(classifications?.default?.values);
-  const classificationsItems = parseCommentClassificationConfig(commentStore.commentClassificationConfig);
+  const selections = useMemo(() => taxonomyPathsToSelectedItems(classifications?.default?.values), [classifications]);
+  const classificationsItems = commentStore.commentClassificationsItems;
 
   const updateCommentClassifications = useCallback(
     (classifications: object | null) => {
