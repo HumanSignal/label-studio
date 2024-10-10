@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1441: Allow to connect comments to classifications (#6486)",
-  "commit": "8484a8489a41ca698fb02777904b84e655f7a79f",
-  "date": "2024-10-09T15:17:41.000Z",
+  "message": "ci: LEAP-1553: Fix path-to-regexp CVE (#6501)",
+  "commit": "6bd45efcabbb6cf601bd041fd1e7a33e6ac3db07",
+  "date": "2024-10-10T18:27:53.000Z",
   "branch": "develop"
 }
