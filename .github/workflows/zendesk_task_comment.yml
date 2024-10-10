@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       custom_field:
-        description: "Comma separated list of labels"
+        description: "Space separated list of labels"
         required: false
         default: ""
         type: string
@@ -64,8 +64,8 @@ jobs:
 
             // Extract labels from the custom_field
             let new_labels = [];
-            if (payload.ticket.custom_field) {
-              new_labels = payload.ticket.custom_field.split(" ").map(label => label.trim());
+            if (context.payload.inputs.custom_field) {
+              new_labels = context.payload.inputs.custom_field.split(" ").map(label => label.trim());
             }
 
             // Get the current labels on the GitHub issue
