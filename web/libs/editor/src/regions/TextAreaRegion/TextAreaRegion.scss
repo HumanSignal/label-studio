@@ -1,9 +1,9 @@
 .mark {
   background-color: var(--surface-surface);
   border: 1px solid var(--surface-border);
-  border-radius: var(--radius-small, 0.5rem);
-  margin: 0 var(--spacing-small, 0.5rem) 0 0;
-  padding: var(--spacing-small, 0.5rem) var(--spacing-medium, 1rem);
+  border-radius: var(--radius-small);
+  margin: 0 var(--spacing-small) 0 0;
+  padding: var(--spacing-small) var(--spacing-medium);
   white-space: pre-line;
   box-shadow: 0 4px 12px 0 var(--black_4), 0 1px 2px 0 var(--black_10);
   flex-grow: 1;
@@ -29,10 +29,10 @@
 
 .row {
   display: flex;
-  margin-bottom: var(--spacing-medium, 1rem);
+  margin-bottom: var(--spacing-medium);
   flex-wrap: nowrap;
   align-items: center;
-  gap: var(--spacing-small, 0.5rem);
+  gap: var(--spacing-small);
 
   .button {
     display: flex;
@@ -61,7 +61,7 @@
 
     textarea {
       // the same as in .mark, its padding set to 0
-      padding: var(--spacing-small, 0.5rem) var(--spacing-medium, 1rem);
+      padding: var(--spacing-small) var(--spacing-medium);
     }
   }
 }
