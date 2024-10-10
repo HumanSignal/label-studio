@@ -14,7 +14,7 @@ import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 import { LinkState } from "./LinkState";
 import "./CommentForm.scss";
 import { NewTaxonomy as Taxonomy } from "../../../components/NewTaxonomy/NewTaxonomy";
-import { parseCommentClassificationConfig, taxonomyPathsToSelectedItems } from "./CommentClassificationUtil";
+import { parseCommentClassificationConfig, taxonomyPathsToSelectedItems } from "./classificationUtils";
 
 export type CommentFormProps = {
   commentStore: any;

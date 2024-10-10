@@ -1,4 +1,4 @@
-import type { TaxonomyItem, SelectedItem, TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
+import type { TaxonomyItem, SelectedItem, TaxonomyPath } from "../../NewTaxonomy/NewTaxonomy";
 
 export const parseCommentClassificationConfig = (xmlString: string): TaxonomyItem[] => {
   // Assume that there is a single root Taxonomy element for now, which may have multiple
