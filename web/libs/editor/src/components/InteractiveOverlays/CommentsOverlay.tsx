@@ -3,13 +3,12 @@ import { isAlive } from "mobx-state-tree";
 import type React from "react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMounted } from "../../common/Utils/useMounted";
-
+import { LINK_COMMENT_MODE } from "../../stores/Annotation/LinkingModes";
 import ResizeObserver from "../../utils/resize-observer";
 import { guidGenerator } from "../../utils/unique";
+import NodesConnector from "./NodesConnector";
 
 import styles from "./CommentsOverlay.module.scss";
-
-import NodesConnector from "./NodesConnector";
 
 const CommentIcon = () => {
   return (
@@ -36,7 +35,9 @@ type CommentItemProps = {
 const CommentItem: React.FC<CommentItemProps> = observer(({ comment, rootRef }) => {
   const root = rootRef.current;
   const node = comment.regionRef?.overlayNode;
-  const isHidden = !node || node.hidden;
+  // result is hidden when it's per-region and the region is not selected
+  const isHiddenResult = node?.area && !node.area.selected && !node.area.classification;
+  const isHidden = !node || node.hidden || isHiddenResult;
   // {} !== {} it's always so, and it's a way to force re-render
   const [forceUpdateId, forceUpdate] = useState<any>({});
 
@@ -79,7 +80,6 @@ const CommentItem: React.FC<CommentItemProps> = observer(({ comment, rootRef }) 
     itemStyles.push(styles._highlighted);
   }
   return (
-    // biome-ignore lint/a11y/noSvgWithoutTitle: Intentionally not displaying the title over the comment icon
     <g
       className={itemStyles.join(" ")}
       style={positionStyle}
@@ -92,11 +92,78 @@ const CommentItem: React.FC<CommentItemProps> = observer(({ comment, rootRef }) 
   );
 });
 
+/** Is used to narrow all results down to classifications good to be selected */
+const isClassification = (result: MSTResult) => {
+  const { isClassificationTag } = result.from_name;
+  const isGlobalClassification = result.area.classification;
+  const isActivePerRegion = result.area.selected;
+
+  return isClassificationTag && (isGlobalClassification || isActivePerRegion);
+};
+
+type ResultItemProps = {
+  result: MSTResult;
+  rootRef: React.MutableRefObject<HTMLOrSVGElement | undefined>;
+};
+const ResultTagBbox: React.FC<ResultItemProps> = observer(({ result, rootRef }) => {
+  const root = rootRef.current;
+  const node = result.area;
+  const isHidden = !node || node.hidden;
+  const [forceUpdateId, forceUpdate] = useState<any>({});
+  const [hovered, setHovered] = useState(false);
+
+  const shape = useMemo(() => {
+    return result && root ? NodesConnector.createShape(result, root) : null;
+  }, [result, root]);
+
+  const bbox = useMemo(() => {
+    if (!shape || !root) return { x: 0, y: 0, width: 0, height: 0 };
+    return NodesConnector.calculateBBox(shape, root)[0];
+  }, [shape, root, forceUpdateId]);
+
+  useEffect(() => {
+    shape?.onUpdate(() => {
+      forceUpdate({});
+    });
+    return () => {
+      shape?.destroy();
+    };
+  }, [shape]);
+
+  if (!root || !node || isHidden) return null;
+  if (bbox.width < 1 || bbox.height < 1) return null;
+
+  const itemStyle = {
+    pointerEvents: "all" as const,
+    stroke: "var(--grape_600)",
+    strokeDasharray: hovered ? undefined : "4 2",
+    cursor: "crosshair",
+  };
+
+  return (
+    <rect
+      {...bbox}
+      rx={3}
+      ry={3}
+      style={itemStyle}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      stroke="red"
+      strokeWidth={1}
+      fill="none"
+      onClick={() => {
+        result.annotation.addLinkedResult(result);
+        result.annotation.stopLinkingMode();
+      }}
+    />
+  );
+});
+
 type CommentsOverlayProps = {
   commentStore: MSTCommentStore;
   annotation: MSTAnnotation;
 };
-const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotation, commentStore }) => {
+const CommentsOverlayInner = observer(({ annotation, commentStore }: CommentsOverlayProps) => {
   const { overlayComments } = commentStore || {};
   const rootRef = useRef<SVGSVGElement>();
   const [uniqKey, forceUpdate] = useState<any>(guidGenerator());
@@ -152,10 +219,16 @@ const CommentsOverlayInner: React.FC<CommentsOverlayProps> = observer(({ annotat
   return (
     // biome-ignore lint/a11y/noSvgWithoutTitle: It's not just an icon or a figure; it's an entire interactive layer.
     <svg className={containerStyles.join(" ")} ref={setRef} xmlns="http://www.w3.org/2000/svg">
-      {overlayComments.map((comment: MSTComment) => {
-        const { id } = comment;
-        return <CommentItem key={[id, uniqKey].join("-")} comment={comment} rootRef={rootRef} />;
-      })}
+      <g key={uniqKey}>
+        {annotation.linkingMode === LINK_COMMENT_MODE &&
+          annotation.results
+            .filter(isClassification)
+            .map((result) => <ResultTagBbox key={result.id} result={result} rootRef={rootRef} />)}
+        {overlayComments.map((comment: MSTComment) => {
+          const { id } = comment;
+          return <CommentItem key={id} comment={comment} rootRef={rootRef} />;
+        })}
+      </g>
     </svg>
   );
 });

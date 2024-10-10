@@ -115,7 +115,7 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
   const currentLinkingComment = annotationStore.selected.currentLinkingMode?.comment;
   const currentComment = getCurrentComment();
   const { text = "", regionRef } = currentComment || {};
-  const { region } = regionRef || {};
+  const { region, result } = regionRef || {};
   const linking = !!linkingComment && currentLinkingComment === linkingComment && globalLinking;
   const hasLinkState = linking || region;
 
@@ -146,7 +146,7 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
       </Elem>
       {hasLinkState && (
         <Elem name="link-state">
-          <LinkState linking={linking} region={region} onUnlink={currentComment?.unsetLink} />
+          <LinkState linking={linking} region={region} result={result} onUnlink={currentComment?.unsetLink} />
         </Elem>
       )}
       {commentStore.tooltipMessage && <Elem name="tooltipMessage">{commentStore.tooltipMessage}</Elem>}
