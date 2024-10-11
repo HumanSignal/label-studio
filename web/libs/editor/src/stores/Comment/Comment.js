@@ -12,7 +12,12 @@ import { Anchor } from "./Anchor";
 export const CommentBase = types
   .model("CommentBase", {
     text: types.string,
-    ...(isFF(FF_PER_FIELD_COMMENTS) ? { regionRef: types.optional(types.maybeNull(Anchor), null) } : {}),
+    ...(isFF(FF_PER_FIELD_COMMENTS)
+      ? {
+          regionRef: types.optional(types.maybeNull(Anchor), null),
+          classifications: types.optional(types.frozen({}), null),
+        }
+      : {}),
   })
   .views((self) => ({
     get commentsStore() {
@@ -56,6 +61,9 @@ export const CommentBase = types
         self.regionRef = {
           regionId: region.cleanId,
         };
+      },
+      setClassifications(classifications) {
+        self.classifications = classifications;
       },
       setResultLink(result) {
         self.regionRef = {

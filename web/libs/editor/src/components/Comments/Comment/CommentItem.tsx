@@ -28,8 +28,9 @@ interface CommentItemProps {
     createdBy: any;
     text: string;
     regionRef: any;
+    classifications: any;
     isResolved: boolean;
-    updateComment: (comment: string) => void;
+    updateComment: (comment: string, classifications?: any) => void;
     deleteComment: () => void;
     setConfirmMode: (confirmMode: boolean) => void;
     setEditMode: (isGoingIntoEditMode: boolean) => void;
@@ -45,6 +46,7 @@ interface CommentItemProps {
 
 export const CommentItem: FC<CommentItemProps> = observer(({ comment, listComments }: CommentItemProps) => {
   const {
+    classifications,
     updatedAt,
     isEditMode,
     isConfirmDelete,
@@ -69,6 +71,7 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
   const currentUser = window.APP_SETTINGS?.user;
   const isCreator = currentUser?.id === createdBy.id;
   const [text, setText] = useState(initialText);
+
   const [linkingComment, setLinkingComment] = useState();
   const region = regionRef?.region;
   const result = regionRef?.result;
@@ -168,6 +171,13 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
             </Elem>
           ) : (
             <>
+              {classifications?.default?.values?.length > 0 && (
+                <Elem name="classifications" tag="ul">
+                  {classifications?.default?.values?.map((valueArray: string[], index: number) => (
+                    <li key={index}>{valueArray.join("/")}</li>
+                  ))}
+                </Elem>
+              )}
               {text}
               {hasLinkState && (
                 <Elem name="linkState">

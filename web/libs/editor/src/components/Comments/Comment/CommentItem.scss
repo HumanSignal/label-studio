@@ -151,4 +151,9 @@
     justify-content: space-between;
     padding: var(--comment-item-padding);
   }
+
+  &__classifications {
+    font-size: 13px;
+    letter-spacing: .8px;
+  }
 }
