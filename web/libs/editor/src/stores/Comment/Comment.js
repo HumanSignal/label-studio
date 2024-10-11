@@ -182,10 +182,6 @@ export const Comment = CommentBase.named("Comment")
       self.update({ regionRef });
     }
 
-    function setClassifications(classifications) {
-      self.update({ classifications });
-    }
-
     function unsetLink() {
       const regionRef = null;
       self.update({ regionRef });

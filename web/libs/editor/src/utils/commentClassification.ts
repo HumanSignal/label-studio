@@ -3,7 +3,7 @@ import type { TaxonomyItem, SelectedItem, TaxonomyPath } from "../components/New
 export const parseCommentClassificationConfig = (config: string | null): TaxonomyItem[] => {
   /**
    * Assume that there is a single root Taxonomy element for now, which may have multiple
-   * TaxonomyItem childrenl, as in this simple example below.
+   * TaxonomyItem children, as in this simple example below.
    * <Taxonomy name="default">
    *   <TaxonomyItem value="title">
    *     <TaxonomyItem value="spelling" />
