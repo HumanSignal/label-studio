@@ -13,15 +13,11 @@ parent_enterprise: "install_enterprise"
 
 Install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure using Docker or public cloud. If you want to use a different installation method:
 - You can use Kubernetes and Helm to deploy Label Studio Enterprise in the cloud. See [Deploy Label Studio Enterprise on Kubernetes](install_enterprise_k8s.html).
-- You can run Label Studio Enterprise in an airgapped environment, and no data leaves your infrastructure. See [Install Label Studio Enterprise without public internet access](install_enterprise_airgapped.html).
+- You can run Label Studio Enterprise in an airgapped environment, and no data leaves your infrastructure. See [Install Label Studio Enterprise without public internet access](install_k8s_airgapped).
 
 See [Secure Label Studio](security.html) for more details about security and hardening for Label Studio Enterprise.
 
-<div class="enterprise-only">
-
-To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a>. This page is specific to the Enterprise version of Label Studio.
-
-</div>
+To install Label Studio Community Edition, see [Install Label Studio](https://labelstud.io/guide/install). This page is specific to the Enterprise version of Label Studio.
 
 <!-- md deploy.md -->
 
