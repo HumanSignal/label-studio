@@ -130,7 +130,7 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
       const currentComment = getCurrentComment();
       currentComment.setClassifications(classifications);
     },
-    [commentStore, annotationStore],
+    [getCurrentComment],
   );
 
   const taxonomyOnChange = useCallback(
