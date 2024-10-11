@@ -16,7 +16,6 @@ const injector = inject(({ store }) => {
 export const OrderButton = injector(({ size, ordering, view, ...rest }) => {
   return (
     <Space style={{ fontSize: 12 }}>
-      Order
       <Button.Group collapsed {...rest}>
         <FieldsButton
           size={size}

@@ -3,7 +3,7 @@
   --height: 40px;
   --padding: 4px;
   --font-size: 16px;
-  --button-padding: 0 10px;
+  --button-padding: 0 4px;
   --button-checked-shadow: 0px 1px 0px var(--black_10), 0px 0px 0px 1px var(--black_2), 0px 5px 10px var(--black_15);
 
   height: var(--height);
@@ -37,11 +37,18 @@
       opacity: 1;
       background-color: var(--white);
       box-shadow: var(--button-checked-shadow);
+      & svg {
+        color: var(--grape_500);
+      }
     }
 
     &_disabled {
       opacity: 0.3;
       cursor: not-allowed;
+    }
+
+    & span {
+      display: flex;
     }
   }
 

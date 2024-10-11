@@ -15,10 +15,10 @@ export const ViewToggle = viewInjector(
     return (
       <RadioGroup size={size} value={view.type} onChange={(e) => view.setType(e.target.value)} {...rest}>
         <RadioGroup.Button value="list">
-          <Tooltip title="List view">{isDatasetsFF ? <LsList /> : <span>List</span>}</Tooltip>
+          <Tooltip title="List view">{isDatasetsFF ? <LsList /> : <span><LsList/></span>}</Tooltip>
         </RadioGroup.Button>
         <RadioGroup.Button value="grid">
-          <Tooltip title="Grid view">{isDatasetsFF ? <LsGrid /> : <span>Grid</span>}</Tooltip>
+          <Tooltip title="Grid view">{isDatasetsFF ? <LsGrid /> : <span><LsGrid/></span>}</Tooltip>
         </RadioGroup.Button>
       </RadioGroup>
     );
