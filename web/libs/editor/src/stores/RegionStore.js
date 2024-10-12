@@ -135,7 +135,7 @@ const SelectionMap = types
 export default types
   .model("RegionStore", {
     sort: types.optional(
-      types.enumeration(["date", "score"]),
+      types.enumeration(["date", "score", "area"]),
       window.localStorage.getItem(localStorageKeys.sort) ?? "date",
     ),
 
@@ -233,11 +233,24 @@ export default types
       },
 
       get sortedRegions() {
+        const sortDescending = (sortFunction, isDesc) => {
+          if (isDesc) {
+            return (a, b) => sortFunction(b, a);
+          }
+          return (a, b) => sortFunction(a, b);
+        };
+        const sortByDate = (a, b) => a.ouid - b.ouid;
+        const sortByScore = (a, b) => a.score - b.score;
+        const sortByArea = (a, b) => {
+          const areaA = a.area || 0;
+          const areaB = b.area || 0;
+          return areaA - areaB;
+        };
+
         const sorts = {
-          date: (isDesc) =>
-            [...self.filteredRegions].sort(isDesc ? (a, b) => b.ouid - a.ouid : (a, b) => a.ouid - b.ouid),
-          score: (isDesc) =>
-            [...self.filteredRegions].sort(isDesc ? (a, b) => b.score - a.score : (a, b) => a.score - b.score),
+          date: (isDesc) => [...self.filteredRegions].sort(sortDescending(sortByDate, isDesc)),
+          score: (isDesc) => [...self.filteredRegions].sort(sortDescending(sortByScore, isDesc)),
+          area: (isDesc) => [...self.filteredRegions].sort(sortDescending(sortByArea, isDesc)),
         };
 
         const sorted = sorts[self.sort](self.sortOrder === "desc");

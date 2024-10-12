@@ -102,6 +102,21 @@ const Model = types
     get flattenedPoints() {
       return getFlattenedPoints(this.points);
     },
+    get area() {
+      let totalArea = 0;
+
+      for (let i = 0, l = this.points.length; i < l; i++) {
+        const addX = this.points[i].x;
+        const addY = this.points[i === this.points.length - 1 ? 0 : i + 1].y;
+        const subX = this.points[i === this.points.length - 1 ? 0 : i + 1].x;
+        const subY = this.points[i].y;
+
+        totalArea += addX * addY * 0.5;
+        totalArea -= subX * subY * 0.5;
+      }
+
+      return Math.abs(totalArea);
+    },
   }))
   .actions((self) => {
     return {

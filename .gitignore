@@ -74,6 +74,7 @@ docker-compose.override.yml
 .bash_history
 
 .pdm-python
+my-label-studio/
 
 # actions-hub
 .github/actions-hub
