@@ -979,6 +979,7 @@ export default observer(
               />
             ) : (
               <div className={[styles.frame, ...imagePositionClassnames].join(" ")} style={item.canvasSize}>
+                {(item.imageCrossOrigin !== "") ? 
                 <img
                   ref={(ref) => {
                     item.setImageRef(ref);
@@ -995,6 +996,23 @@ export default observer(
                   crossOrigin={item.imageCrossOrigin}
                   alt="LS"
                 />
+                :
+                <img
+                ref={(ref) => {
+                  item.setImageRef(ref);
+                  this.imageRef.current = ref;
+                }}
+                loading={isFF(FF_DEV_3077) && !item.lazyoff ? "lazy" : "false"}
+                style={item.imageTransform}
+                src={item.currentSrc}
+                onLoad={(e) => {
+                  item.updateImageSize(e);
+                  item.currentImageEntity.setImageLoaded(true);
+                }}
+                onError={this.handleError}
+                alt="LS"
+              /> 
+    }
                 <CanvasOverlay item={item} />
               </div>
             )}
