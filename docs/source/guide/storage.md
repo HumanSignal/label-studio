@@ -17,7 +17,7 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Amazon S3](#Amazon-S3)
 - [Google Cloud Storage](#Google-Cloud-Storage)
 - [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
-- [Redis database](#Redis-database)
+- [Redis database](#Redis-database) <div class="enterprise-only">(for On-prem only)</div>
 - [Local storage](#Local-storage) <div class="enterprise-only">(for On-prem only)</div>
 
 ## Troubleshooting
