@@ -203,7 +203,10 @@ class App extends Component {
   }
 
   renderCommentsOverlay(selectedAnnotation) {
-    const commentStore = this.props.store.commentStore;
+    const { store } = this.props;
+    const { commentStore } = store;
+
+    if (!store.hasInterface("annotations:comments") || !commentStore.isCommentable) return null;
     return <CommentsOverlay commentStore={commentStore} annotation={selectedAnnotation} />;
   }
 
