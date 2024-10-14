@@ -518,6 +518,13 @@ Currently, this configuration is only supported if you host the Redis database i
 
 Label Studio does not manage the Redis database for you. See the [Redis Quick Start](https://redis.io/topics/quickstart) for details about hosting and managing your own Redis database. Because Redis is an in-memory database, data saved in Redis does not persist. To make sure you don't lose data, set up [Redis persistence](https://redis.io/topics/persistence) or use another method to persist the data, such as using Redis in the cloud with [Microsoft Azure](https://azure.microsoft.com/en-us/services/cache/) or [Amazon AWS](https://aws.amazon.com/redis/).
 
+<div class="enterprise-only">
+
+!!! note
+    Redis storage is only available for on-prem deployments. 
+
+</div>
+
 ### Task format for Source Redis Storage
 
 Label Studio only supports string values for Redis databases, which should represent Label Studio tasks in JSON format. 
