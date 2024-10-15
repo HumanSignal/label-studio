@@ -277,7 +277,9 @@ Rejected tasks are removed from the queue and not reassigned back to the annotat
 </td>
 <td>
 
-Reviewers have the option on each rejected task whether it should be removed from the queue or reassigned to the annotator (placed back in the queue). 
+When rejecting a task, reviewers have the option to decide whether the task should be removed from the queue or reassigned to the annotator (placed back in their queue). 
+
+For example, a reviewer might decide to requeue a task that is nearly correct but just needs a slight change. But a task with more errors may be easier to simply remove. 
 
 </td>
 </tr>
