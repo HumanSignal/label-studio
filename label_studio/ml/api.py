@@ -6,17 +6,17 @@ import drf_yasg.openapi as openapi
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from django.conf import settings
-from django.http import Http404
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import no_body, swagger_auto_schema
-from ml.models import MLBackend
-from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
 from projects.models import Project, Task
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from ml.models import MLBackend
+from ml.serializers import MLBackendSerializer, MLInteractiveAnnotatingRequest
 
 logger = logging.getLogger(__name__)
 
@@ -292,15 +292,19 @@ class MLBackendPredictTestAPI(APIView):
             task = Task.get_random(project=ml_backend.project)
             if not task:
                 return Response(
-                    status=status.HTTP_200_OK, 
-                    data={'error': 'Project has no tasks to run prediction on, import at least 1 task to run prediction'}
+                    status=status.HTTP_200_OK,
+                    data={
+                        'error': 'Project has no tasks to run prediction on, import at least 1 task to run prediction'
+                    },
                 )
 
             kwargs = ml_backend._predict(task)
             if not kwargs:
                 return Response(
-                    status=status.HTTP_200_OK, 
-                    data={'error': 'ML backend did not return any predictions, check ML backend logs for more details'}
+                    status=status.HTTP_200_OK,
+                    data={
+                        'error': 'ML backend did not return any predictions, check ML backend logs for more details'
+                    },
                 )
             return Response(**kwargs)
 
