@@ -187,7 +187,7 @@ class ModelRun(models.Model):
         Executing a raw SQL query here for speed. This ignores any foreign key relationships
         so if another model has a Prediction fk and set to on_delete=CASCADE for example,
         it will not take affect. The only relationship like this that currently exists
-        is in Annotation.parent_prediction, which we are handling here
+        is in Annotation.parent_prediction, which we are handling here.
         """
         predictions = Prediction.objects.filter(model_run=self.id)
         prediction_ids = [p.id for p in predictions]
