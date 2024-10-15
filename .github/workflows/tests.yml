@@ -14,7 +14,7 @@ env:
 jobs:
   run_pytest_sqlite:
     name: LS SQLite Ubuntu
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -76,7 +76,7 @@ jobs:
 
   run_pytest_postgresql:
     name: LS PostgreSQL Ubuntu
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
@@ -160,7 +160,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: ${{ github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.login != 'dependabot[bot]' }}
-        uses: codecov/codecov-action@v4.5.0
+        uses: codecov/codecov-action@v4.6.0
         with:
           name: codecov-python-${{ matrix.python-version }}
           flags: pytests

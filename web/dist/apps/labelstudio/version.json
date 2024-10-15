@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1507: show review instructions in review stream (#6444)",
-  "commit": "c4cb483d06b663e4c4501acd957ee2658c5f41b8",
-  "date": "2024-09-26T22:06:17.000Z",
+  "message": "fix: LEAP-1583: Fix comment overlay displaying conditions (#6504)",
+  "commit": "a25d4ac14b90d9da0772c31dadb48c2803397730",
+  "date": "2024-10-14T15:34:52.000Z",
   "branch": "develop"
 }

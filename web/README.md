@@ -61,6 +61,7 @@ To start the development server with HMR:
     - `yarn dm:unit`: Run unit tests for Datamanager.
 - **General**
     - `yarn build`: Build all apps and libraries in the project.
+    - `yarn ui:serve`: Serve the Storybook instance for the shared UI library.
     - `yarn test:e2e`: Run end-to-end tests for all apps and libraries.
     - `yarn test:integration`: Run integration tests for all apps and libraries.
     - `yarn test:unit`: Run unit tests for all apps and libraries.

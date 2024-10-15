@@ -20,9 +20,11 @@
   --comment-item-content-color-resolved: var(--sand_500);
   --comment-item-icon-color-resolved: var(--success_color);
   --comment-item-region-opacity: 1;
+  --comment-item-highlight-bg-color: var(--grape_0);
 
   padding: var(--comment-item-padding);
   color: var(--comment-item-content-color);
+  transition: background-color 300ms;
 
   & > * + * {
     margin-top: var(--comment-item-spacing);
@@ -76,6 +78,7 @@
     display: flex;
     gap: 8px;
     align-items: flex-start;
+    overflow: hidden;
   }
 
   &__actions {
@@ -109,10 +112,14 @@
     font-size: var(--comment-item-content-font-size);
     line-height: var(--comment-item-content-line-height);
     letter-spacing: var(--comment-item-content-letter-spacing);
+    overflow: hidden;
   }
 
   &__linkState {
-    padding: 9px 3px 4px;
+    padding: 4px 0 0;
+    margin-left: -5px;
+    width: 100%;
+    overflow: hidden;
   }
 
   &_resolved {
@@ -130,6 +137,11 @@
     }
   }
 
+  &_highlighted {
+    background-color: var(--comment-item-highlight-bg-color);
+    border-radius: 4px;
+  }
+
   &__question {
     padding: 0;
   }
@@ -138,5 +150,10 @@
     display: flex;
     justify-content: space-between;
     padding: var(--comment-item-padding);
+  }
+
+  &__classifications {
+    font-size: 13px;
+    letter-spacing: .8px;
   }
 }

@@ -1,6 +1,7 @@
-import { observer } from "mobx-react";
-import { type FC, useCallback, useContext, useState } from "react";
 import { Tooltip } from "antd";
+import { observer } from "mobx-react";
+import type React from "react";
+import { type FC, useCallback, useContext, useState } from "react";
 
 import { IconCheck, IconEllipsis } from "../../../assets/icons";
 import { Button } from "../../../common/Button/Button";
@@ -27,20 +28,25 @@ interface CommentItemProps {
     createdBy: any;
     text: string;
     regionRef: any;
+    classifications: any;
     isResolved: boolean;
-    updateComment: (comment: string) => void;
+    updateComment: (comment: string, classifications?: any) => void;
     deleteComment: () => void;
     setConfirmMode: (confirmMode: boolean) => void;
     setEditMode: (isGoingIntoEditMode: boolean) => void;
     toggleResolve: () => void;
     canResolveAny: boolean;
     unsetLink: () => {};
+    isHighlighted: boolean;
+    setHighlighted: (value: boolean) => {};
+    _commentRef: React.Ref<HTMLElement>;
   };
   listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
 }
 
 export const CommentItem: FC<CommentItemProps> = observer(({ comment, listComments }: CommentItemProps) => {
   const {
+    classifications,
     updatedAt,
     isEditMode,
     isConfirmDelete,
@@ -57,13 +63,18 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
     setEditMode,
     toggleResolve,
     canResolveAny,
+    isHighlighted,
+    setHighlighted,
+    _commentRef,
   } = comment;
   const { startLinkingMode: _startLinkingMode, currentComment, globalLinking } = useContext(CommentsContext);
   const currentUser = window.APP_SETTINGS?.user;
   const isCreator = currentUser?.id === createdBy.id;
   const [text, setText] = useState(initialText);
+
   const [linkingComment, setLinkingComment] = useState();
   const region = regionRef?.region;
+  const result = regionRef?.result;
   const linking = !!(linkingComment && currentComment === linkingComment && globalLinking);
   const hasLinkState = linking || region;
 
@@ -107,7 +118,17 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
   };
 
   return (
-    <Block name="comment-item" mod={{ resolved }}>
+    <Block
+      name="comment-item"
+      mod={{ resolved, highlighted: isHighlighted }}
+      onMouseEnter={() => {
+        setHighlighted(true);
+      }}
+      onMouseLeave={() => {
+        setHighlighted(false);
+      }}
+      ref={_commentRef}
+    >
       <Space spread size="medium" truncated>
         <Space size="small" truncated>
           <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy} />
@@ -150,10 +171,17 @@ export const CommentItem: FC<CommentItemProps> = observer(({ comment, listCommen
             </Elem>
           ) : (
             <>
+              {classifications?.default?.values?.length > 0 && (
+                <Elem name="classifications" tag="ul">
+                  {classifications?.default?.values?.map((valueArray: string[], index: number) => (
+                    <li key={index}>{valueArray.join("/")}</li>
+                  ))}
+                </Elem>
+              )}
               {text}
               {hasLinkState && (
                 <Elem name="linkState">
-                  <LinkState linking={linking} region={region} />
+                  <LinkState linking={linking} region={region} result={result} interactive />
                 </Elem>
               )}
             </>
