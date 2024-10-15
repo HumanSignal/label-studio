@@ -292,18 +292,18 @@ class MLBackendPredictTestAPI(APIView):
             task = Task.get_random(project=ml_backend.project)
             if not task:
                 return Response(
-                    status=status.HTTP_200_OK,
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     data={
-                        'error': 'Project has no tasks to run prediction on, import at least 1 task to run prediction'
+                        'detail': 'Project has no tasks to run prediction on, import at least 1 task to run prediction'
                     },
                 )
 
             kwargs = ml_backend._predict(task)
             if not kwargs:
                 return Response(
-                    status=status.HTTP_200_OK,
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     data={
-                        'error': 'ML backend did not return any predictions, check ML backend logs for more details'
+                        'detail': 'ML backend did not return any predictions, check ML backend logs for more details'
                     },
                 )
             return Response(**kwargs)
