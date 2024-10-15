@@ -1,0 +1,34 @@
+.toggle-items {
+  display: flex;
+  justify-content: stretch;
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+  background: var(--sand_100);
+  border: 1px solid var(--sand_300);
+  border-radius: 8px;
+  font-weight: 500;
+
+  &_big {
+    font-size: 16px;
+  }
+
+  &_big &__item {
+    padding: 4px 20px;
+  }
+
+  &__item {
+    cursor: pointer;
+    color: var(--sand_600);
+    border-radius: 4px;
+    padding: 2px 16px;
+    flex-grow: 1;
+    text-align: center;
+
+    &_active {
+      color: var(--sand_900);
+      background: var(--sand_0);
+      box-shadow: 0 1px 0 var(--sand_300), 0 0 0 1px var(--sand_100), 0 5px 10px var(--sand_200);
+    }
+  }
+}

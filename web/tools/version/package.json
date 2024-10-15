@@ -1,0 +1,9 @@
+{
+  "name": "@humansignal/version",
+  "version": "0.0.1",
+  "description": "Version generator for internal libraries",
+  "main": "version.mjs",
+  "bin": "version",
+  "license": "MIT",
+  "dependencies": {}
+}

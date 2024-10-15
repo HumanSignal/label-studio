@@ -1,0 +1,67 @@
+{
+  "name": "ui",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/ui/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "defaultConfiguration": "production",
+      "options": {
+        "compiler": "babel",
+        "webpackConfig": "webpack.config.js",
+        "tsConfig": "libs/ui/tsconfig.lib.json",
+        "main": "libs/ui/src/index.ts",
+        "outputPath": "dist/libs/ui",
+        "isolatedConfig": true,
+        "generatePackageJson": true
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/ui/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "storybook": {
+      "executor": "@nx/storybook:storybook",
+      "options": {
+        "port": 4400,
+        "configDir": "libs/ui/.storybook"
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "build-storybook": {
+      "executor": "@nx/storybook:build",
+      "outputs": ["{options.outputDir}"],
+      "options": {
+        "outputDir": "dist/storybook/ui",
+        "configDir": "libs/ui/.storybook"
+      },
+      "configurations": {
+        "ci": {
+          "quiet": true
+        }
+      }
+    },
+    "test-storybook": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "test-storybook -c libs/ui/.storybook --url=http://localhost:4400"
+      }
+    }
+  }
+}

@@ -1,35 +1,31 @@
-from datetime import datetime
-from functools import reduce
 import hashlib
 import io
 import json
 import logging
 import pathlib
 import shutil
+from datetime import datetime
+from functools import reduce
 
+import django_rq
+from core.redis import redis_connected
+from core.utils.common import batch
+from core.utils.io import (
+    SerializableGenerator,
+    get_all_dirs_from_dir,
+    get_all_files_from_dir,
+    get_temp_dir,
+)
+from data_manager.models import View
+from django.conf import settings
 from django.core.files import File
 from django.core.files import temp as tempfile
 from django.db import transaction
 from django.db.models import Prefetch
 from django.db.models.query_utils import Q
 from django.utils import dateformat, timezone
-import django_rq
-from label_studio_converter import Converter
-from django.conf import settings
-
-from core.redis import redis_connected
-from core.utils.common import batch
-from core.utils.io import (
-    get_all_files_from_dir,
-    get_temp_dir,
-    read_bytes_stream,
-    get_all_dirs_from_dir,
-    SerializableGenerator,
-)
-from data_manager.models import View
-from projects.models import Project
+from label_studio_sdk.converter import Converter
 from tasks.models import Annotation, Task
-
 
 ONLY = 'only'
 EXCLUDE = 'exclude'
@@ -139,20 +135,22 @@ class ExportMixin:
             options['context'] = {'interpolate_key_frames': settings.INTERPOLATE_KEY_FRAMES}
             if 'interpolate_key_frames' in serialization_options:
                 options['context']['interpolate_key_frames'] = serialization_options['interpolate_key_frames']
+            if serialization_options.get('include_annotation_history') is False:
+                options['omit'] = ['annotations.history']
         return options
 
     def get_task_queryset(self, ids, annotation_filter_options):
-        annotations_qs = self._get_filtered_annotations_queryset(
-            annotation_filter_options=annotation_filter_options
+        annotations_qs = self._get_filtered_annotations_queryset(annotation_filter_options=annotation_filter_options)
+        return (
+            Task.objects.filter(id__in=ids)
+            .prefetch_related(
+                Prefetch(
+                    'annotations',
+                    queryset=annotations_qs,
+                )
+            )
+            .prefetch_related('predictions', 'drafts')
         )
-        return Task.objects.filter(id__in=ids).prefetch_related(
-            Prefetch(
-                "annotations",
-                queryset=annotations_qs,
-            )
-        ).prefetch_related(
-                'predictions', 'drafts'
-            )
 
     def get_export_data(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         """
@@ -181,11 +179,11 @@ class ExportMixin:
 
         logger.debug('Run get_task_queryset')
 
+        start = datetime.now()
         with transaction.atomic():
             # TODO: make counters from queryset
             # counters = Project.objects.with_counts().filter(id=self.project.id)[0].get_counters()
             self.counters = {'task_number': 0}
-            result = []
             all_tasks = self.project.tasks
             logger.debug('Tasks filtration')
             task_ids = (
@@ -203,10 +201,24 @@ class ExportMixin:
                 if isinstance(task_filter_options, dict) and task_filter_options.get('only_with_annotations'):
                     tasks = [task for task in tasks if task.annotations.exists()]
 
+                if serialization_options and serialization_options.get('include_annotation_history') is True:
+                    task_ids = [task.id for task in tasks]
+                    annotation_ids = Annotation.objects.filter(task_id__in=task_ids).values_list('id', flat=True)
+                    base_export_serializer_option = self.update_export_serializer_option(
+                        base_export_serializer_option, annotation_ids
+                    )
+
                 serializer = ExportDataSerializer(tasks, many=True, **base_export_serializer_option)
                 self.counters['task_number'] += len(tasks)
                 for task in serializer.data:
                     yield task
+        duration = datetime.now() - start
+        logger.info(
+            f'{self.counters["task_number"]} tasks from project {self.project_id} exported in {duration.total_seconds():.2f} seconds'
+        )
+
+    def update_export_serializer_option(self, base_export_serializer_option, annotation_ids):
+        return base_export_serializer_option
 
     @staticmethod
     def eval_md5(file):
@@ -222,9 +234,7 @@ class ExportMixin:
     def save_file(self, file, md5):
         now = datetime.now()
         file_name = f'project-{self.project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.json'
-        file_path = (
-            f'{self.project.id}/{file_name}'
-        )  # finally file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
+        file_path = f'{self.project.id}/{file_name}'  # finally file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
         file_ = File(file, name=file_path)
         self.file.save(file_path, file_)
         self.md5 = md5
@@ -247,7 +257,7 @@ class ExportMixin:
                     )
                 )
             )
-            with tempfile.NamedTemporaryFile(suffix=".export.json", dir=settings.FILE_UPLOAD_TEMP_DIR) as file:
+            with tempfile.NamedTemporaryFile(suffix='.export.json', dir=settings.FILE_UPLOAD_TEMP_DIR) as file:
                 for chunk in iter_json:
                     encoded_chunk = chunk.encode('utf-8')
                     file.write(encoded_chunk)
@@ -259,7 +269,7 @@ class ExportMixin:
             self.status = self.Status.COMPLETED
             self.save(update_fields=['status'])
 
-        except Exception as exc:
+        except Exception:
             self.status = self.Status.FAILED
             self.save(update_fields=['status'])
             logger.exception('Export was failed')
@@ -277,7 +287,7 @@ class ExportMixin:
 
         if redis_connected():
             queue = django_rq.get_queue('default')
-            job = queue.enqueue(
+            queue.enqueue(
                 export_background,
                 self.id,
                 task_filter_options,
@@ -326,11 +336,12 @@ class ExportMixin:
                 output_file = pathlib.Path(tmp_dir) / (str(out_dir.stem) + '.zip')
                 filename = pathlib.Path(input_name).stem + '.zip'
 
-            out = read_bytes_stream(output_file)
-            return File(
-                out,
-                name=filename,
-            )
+            # TODO(jo): can we avoid the `f.read()` here?
+            with open(output_file, mode='rb') as f:
+                return File(
+                    io.BytesIO(f.read()),
+                    name=filename,
+                )
 
 
 def export_background(

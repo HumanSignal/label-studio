@@ -1,0 +1,10 @@
+<View>
+  <Header value="Watch the video:"></Header>
+  <Video name="video" value="$video"></Video>
+  <Header value="Select genre:"></Header>
+  <Choices name="choice" toName="video" choice="multiple">
+    <Choice value="Sci-Fi" />
+    <Choice value="Thriller" />
+    <Choice value="Comedy" />
+  </Choices>
+</View>

@@ -1,0 +1,47 @@
+.audio-seeker {
+  height: 5px;
+  width: 100%;
+  position: relative;
+  border-radius: 0 0 4px 4px;
+  background-color: var(--black_5);
+
+  &__wrapper {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    border-radius: 0 0 4px 4px;
+
+    &_video {
+      border-radius: 0 0 4px;
+    }
+  }
+
+  &__progress {
+    height: 100%;
+    z-index: 2;
+    position: relative;
+    background-color: rgb(var(--accent_color-raw) / 80%);
+    transition: background-color 80ms ease;
+  }
+
+  &::before {
+    inset: -5px;
+    content: '';
+    display: block;
+    position: absolute;
+  }
+
+  &:hover &__progress {
+    background-color: var(--accent_color);
+  }
+
+  &__buffer {
+    top: 0;
+    left: 0;
+    z-index: 1;
+    height: 100%;
+    position: absolute;
+    background-color: var(--black_5);
+  }
+}

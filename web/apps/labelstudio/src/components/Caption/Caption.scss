@@ -1,0 +1,18 @@
+.caption {
+  margin: 8px 0;
+  font-size: 0.875rem;
+
+  a {
+    color: var(--primary_link);
+    text-decoration: underline;
+
+    &::before {
+      content: " ";
+    }
+
+    &:hover {
+      text-decoration: none;
+      color: var(--primary_link);
+    }
+  }
+}

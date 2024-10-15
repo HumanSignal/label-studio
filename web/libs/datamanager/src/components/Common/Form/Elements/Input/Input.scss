@@ -1,0 +1,50 @@
+.form-input,
+.form-select,
+.textarea-dm {
+  height: 40px;
+  min-height: 40px;
+  background: #FAFAFA;
+  font-size: 16px;
+  line-height: 22px;
+  border: 1px solid var(--sand_300);
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 0 16px;
+  transition: box-shadow 80ms ease;
+
+  &_newUI {
+    border-color: rgb(137 128 152 / 16%);
+  }
+
+  &_ghost {
+    border: none;
+    padding: 0;
+    background-color: transparent;
+    outline: none;
+  }
+
+  &_size {
+    &_small {
+      height: 24px;
+      font-size: 12px;
+      line-height: 18px;
+      min-height: 24px;
+      padding: 0 8px;
+    }
+  }
+}
+
+input.form-input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+}
+
+input.form-input[type="range"] {
+  padding: 0;
+}
+
+.textarea-dm {
+  padding: 12px 16px;
+  min-height: 50px;
+}

@@ -10,17 +10,20 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Delete branch
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         if: startsWith(github.event.pull_request.head.ref, 'fb-')
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         with:
           script: |
             const { repo, owner } = context.repo;
+            const head_ref = process.env.HEAD_REF;
             await github.rest.git.deleteRef({
               owner,
               repo,
-              ref: 'heads/${{ github.event.pull_request.head.ref }}',
+              ref: `heads/${head_ref}`,
             });
-            console.log(`Branch ${{ github.event.pull_request.head.ref }} is deleted`)
+            console.log(`Branch ${head_ref} is deleted`)

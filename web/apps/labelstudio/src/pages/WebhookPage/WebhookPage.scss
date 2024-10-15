@@ -1,0 +1,235 @@
+.webhook-wrap {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  width: 42rem;
+
+  & h1 {
+    margin-bottom: 0.5rem;
+  }
+
+  &__content {
+    flex: 1;
+    margin: 2rem;
+    width: 42rem;
+  }
+
+  &__footer {
+    box-sizing: content-box !important;
+    flex: none;
+    width: 100%;
+    height: 112px - 24px;
+    background: var(--sand_100);
+    border: 1px var(--sand_300) solid;
+    margin-left: -2px;
+    display: flex;
+    padding-top: 24px;
+  }
+
+  &__footer-text {
+    width: 42rem;
+    font-size: 0.875rem;
+    color: var(--sand_600);
+
+    & p {
+      margin: 0;
+      margin-bottom: 6px;
+    }
+
+    & a {
+      color: var(--grape_600);
+      text-decoration: underline;
+    }
+  }
+
+  &__footer-icon {
+    margin: 0 24px;
+  }
+}
+
+.webhook {
+  &__title {
+    font-weight: 500;
+    margin-bottom: 24px;
+  }
+
+  &__title-base {
+    color: var(--sand_600);
+    cursor: pointer;
+  }
+
+  &__controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+}
+
+.webhook-delete-modal {
+  &__width-button {
+    width: 170px;
+  }
+
+  &__modal-text {
+    margin-bottom: 32px;
+  }
+}
+
+.webhook-list {
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    font-size: 16px;
+    border: 1px solid var(--sand_300);
+    border-radius: 0.5rem;
+
+    &:hover {
+      background-color: var(--sand_100);
+    }
+
+    &:hover .webhook-list__item-control {
+      display: flex !important;
+      justify-content: space-between;
+    }
+  }
+
+  &__item + &__item {
+    margin-top: 1rem;
+  }
+
+  &__url-wrap {
+    display: flex;
+    align-items: center;
+  }
+
+  &__item-url {
+    max-width: 370px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    font-weight: 500;
+    margin-left: 0.5rem;
+  }
+
+  &__item-date {
+    color: var(--sand_600);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
+  &__item-control {
+    display: none;
+
+    & button+button {
+      margin-left: 0.5rem;
+    }
+  }
+}
+
+.webhook-form {
+  &__form-row {
+    padding-left: 16;
+  }
+
+  &__form-toggle {
+    justify-content: flex-end;
+  }
+}
+
+.webhook-detail {
+  &__width-button {
+    width: 170px;
+  }
+
+  &__black-text {
+    color: var(--sand_900);
+  }
+
+  &__activator {
+    width: 135px;
+  }
+
+  &__url-space {
+    grid-template-columns: auto 135px;
+  }
+
+  &__url-input {
+    align-self: stretch;
+    width: auto;
+  }
+
+  &__form-label {
+    padding-left: 0;
+  }
+
+  &__form-row {
+    margin-bottom: 24px;
+  }
+
+  &__delete-button {
+    margin-right: auto;
+  }
+
+  &__cancel-button {
+    margin-right: 1rem;
+  }
+
+  &__status {
+    margin-right: 16px;
+  }
+
+  &__headers {
+    border: 1px solid var(--sand_300);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  &__headers-add {
+    border: none;
+    padding: 0 !important;
+    height: 32px;
+    width: 32px;
+    margin-right: 7px;
+
+    & span {
+      color: var(--grape_500) !important;
+    }
+
+  }
+
+  &__headers-row {
+    grid-template-columns: 1fr 1fr 40px;
+    margin: 0.5rem 0;
+  }
+
+  &__headers-remove {
+    height: 32px;
+    width: 32px;
+    padding: 0 !important;
+    border: none;
+  }
+
+  &__controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+}
+
+.webhook-payload {
+  border: 1px solid var(--sand_300);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+
+  &__content-row {
+    margin: 0.5rem 0;
+  }
+}

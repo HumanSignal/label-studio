@@ -1,0 +1,16 @@
+.timer-duration-control {
+  display: flex;
+
+  & > label:not(:first-child) .time-box,
+  & > .time-box:not(:first-child) {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+  }
+
+  & > label:not(:last-child) .time-box,
+  & > .time-box:not(:last-child) {
+    border-right: none;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+  }
+}

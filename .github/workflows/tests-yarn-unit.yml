@@ -1,0 +1,43 @@
+name: "yarn unit"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
+env:
+  NODE: "18"
+  FRONTEND_MONOREPO_DIR: "web"
+
+jobs:
+  main:
+    name: "yarn unit"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Configure git
+        shell: bash
+        run: |
+          set -xeuo pipefail
+          git config --global user.name 'robot-ci-heartex'
+          git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      - name: Run tests
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          yarn test:unit

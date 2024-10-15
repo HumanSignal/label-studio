@@ -3,9 +3,9 @@ title: Comments and notifications
 short: Comments and notifications
 type: guide
 tier: enterprise
-section: "Labeling"
-order: 410
-order_enterprise: 113
+section: "Create & Manage Projects"
+order: 0
+order_enterprise: 146
 meta_title: Comment and notification systems in Label Studio
 meta_description: The Comments and Notifications feature defines how annotators, reviewers and administrators communicate and receive updates on projects and tasks.
 ---
@@ -25,12 +25,12 @@ The following two workflows are flexible and can be combined. For example, in Fi
 
 <center>
 <br>
-<img src="/images/comments-notifications/workflow-notifications.png" class="gif-border"/>
+<img src="/images/workflow-notifications.png"/>
 <br><i>Figure 1A. The workflow based on notifications</i><br>
 
 <br>
 
-<img src="/images/comments-notifications/workflow-data-manager.png" style="margin: 0 auto" class="gif-border"/>
+<img src="/images/workflow-data-manager.png" style="max-width: 17rem;"/>
 <br><i>Figure 2B. The workflow based on the Data Manager</i><br>
 </center>
 
@@ -55,7 +55,7 @@ This approach is centered on the notification panel (see figure 1A). The entry p
 
 Annotators will see notifications from reviewers and other users when another user’s comment is added to the annotator draft or annotation
 
-!!! info
+!!! note
     An annotator must be added to the project or workspace to see associated comments.
 
 #### Reviewers and other higher roles
@@ -77,7 +77,7 @@ Reviewers (or other higher roles) can write comments during the review stream. I
 - The comment is the first one in a task draft or an annotation
 - There is a new comment in an annotation that were reviewed by this reviewer previously
 
-!!! info
+!!! note
     A reviewer must be added to the project or workspace to see associated comments.
 
 ### Submitted annotations vs postponed drafts
@@ -228,7 +228,7 @@ To see the notifications, navigate and click the user profile icon on the top-ri
 3. To mark an individual notification as an unread notification, click on the three dots (**...**) >> **Mark as Unread** option. 
 4. To mark all the notification as a read notification, click on the three dots (**...**) >> **Mark All as Read** option. 
 
-!!! info
+!!! note
     The read notification has a gray color background which means a user has already read this notification.
 
 

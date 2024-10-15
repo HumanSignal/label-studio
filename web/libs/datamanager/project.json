@@ -1,0 +1,58 @@
+{
+  "name": "datamanager",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/datamanager/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "defaultConfiguration": "production",
+      "options": {
+        "compiler": "babel",
+        "webpackConfig": "webpack.config.js",
+        "tsConfig": "libs/datamanager/tsconfig.lib.json",
+        "main": "libs/datamanager/src/index.js",
+        "outputPath": "dist/libs/datamanager",
+        "isolatedConfig": true,
+        "generatePackageJson": true
+      },
+      "configurations": {
+        "development": {
+          "extractLicenses": false,
+          "optimization": false,
+          "sourceMap": true,
+          "vendorChunk": true
+        },
+        "production": {
+          "optimization": true,
+          "sourceMap": false,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false
+        }
+      }
+    },
+    "unit": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/datamanager/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "codeCoverage": true
+        }
+      }
+    },
+    "version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/datamanager",
+        "command": "node ../../tools/version/version.mjs"
+      }
+    }
+  }
+}

@@ -3,24 +3,21 @@
 import logging
 import os
 import threading
+from urllib.parse import unquote, urlsplit, urlunsplit
+
 import google.auth
-
-from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
-from django.conf import settings
-from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
-
 from core.feature_flags import flag_set
-from storages.backends.s3boto3 import S3Boto3Storage
+from django.conf import settings
+from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
 from storages.backends.azure_storage import AzureStorage
-from storages.backends.gcloud import _quote, clean_name, GoogleCloudStorage
-
+from storages.backends.gcloud import GoogleCloudStorage, _quote, clean_name
+from storages.backends.s3boto3 import S3Boto3Storage
 
 logger = logging.getLogger(__name__)
 
 
-
 class SkipMissedManifestStaticFilesStorage(ManifestStaticFilesStorage):
-    """ We need this class to escape missing files from
+    """We need this class to escape missing files from
     django.contrib.staticfiles.finders.FileSystemFinder:
     this class tries to find js/css/png/jpg/... inside of you js/css/...
     """
@@ -51,9 +48,8 @@ class SkipMissedManifestStaticFilesStorage(ManifestStaticFilesStorage):
         path, filename = os.path.split(clean_name)
         root, ext = os.path.splitext(filename)
         if file_hash is not None:
-            file_hash = ".%s" % file_hash
-        hashed_name = os.path.join(path, "%s%s%s" %
-                                   (root, file_hash, ext))
+            file_hash = '.%s' % file_hash
+        hashed_name = os.path.join(path, '%s%s%s' % (root, file_hash, ext))
         unparsed_name = list(parsed_name)
         unparsed_name[2] = hashed_name
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
@@ -102,30 +98,25 @@ class AlternativeGoogleCloudStorageBase(GoogleCloudStorage):
         name = self._normalize_name(clean_name(name))
         blob = self.bucket.blob(name)
         blob_params = self.get_object_parameters(name)
-        no_signed_url = (
-            blob_params.get('acl', self.default_acl) == 'publicRead' or not self.querystring_auth)
+        no_signed_url = blob_params.get('acl', self.default_acl) == 'publicRead' or not self.querystring_auth
 
         if not self.custom_endpoint and no_signed_url:
             return blob.public_url
         elif no_signed_url:
             out = '{storage_base_url}/{quoted_name}'.format(
                 storage_base_url=self.custom_endpoint,
-                quoted_name=_quote(name, safe=b"/~"),
+                quoted_name=_quote(name, safe=b'/~'),
             )
             return out
         elif not self.custom_endpoint:
-            out2 = blob.generate_signed_url(
-                expiration=self.expiration,
-                version="v4",
-                **self._get_signing_kwargs()
-            )
+            out2 = blob.generate_signed_url(expiration=self.expiration, version='v4', **self._get_signing_kwargs())
             return out2
         else:
             out3 = blob.generate_signed_url(
                 bucket_bound_hostname=self.custom_endpoint,
                 expiration=self.expiration,
-                version="v4",
-                **self._get_signing_kwargs()
+                version='v4',
+                **self._get_signing_kwargs(),
             )
             return out3
 
@@ -141,9 +132,9 @@ class AlternativeGoogleCloudStorageBase(GoogleCloudStorage):
     def _get_signing_kwargs(self):
         credentials = self._get_signing_credentials()
         out = {
-            "service_account_email": credentials.service_account_email,
-            "access_token": credentials.token,
-            "credentials": credentials
+            'service_account_email': credentials.service_account_email,
+            'access_token': credentials.token,
+            'credentials': credentials,
         }
         return out
 

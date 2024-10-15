@@ -1,0 +1,158 @@
+.simple-settings {
+  width: 42rem;
+}
+
+.simple-settings,
+.annotation-settings,
+.general-settings,
+.storage-settings,
+.webhook {
+  & h1 {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    margin-top: 0;
+    font-size: 1.75rem;
+  }
+}
+
+.settings-wrapper {
+  --column-count: 1;
+
+  border: 1px solid var(--sand_300);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  width: 40rem;
+
+  & +.settings-wrapper,
+  & +.form-wrapper {
+    margin-top: 1.5rem;
+  }
+
+  & h3 {
+    margin: 0 0 0.5rem;
+    font-weight: 500;
+  }
+
+  &__header {
+    font-weight: 500;
+    font-size: 1.5rem;
+    margin-bottom: 0;
+  }
+}
+
+.general-settings {
+  display: flex;
+
+  .heidy-tip {
+    margin: 0 0 0 40px;
+    max-width: 500px;
+  }
+
+  .label-ls {
+    &__text {
+      padding: 0;
+    }
+  }
+
+  .radio-group-ls__buttons {
+    & .label__content {
+      padding: 0 4px;
+    }
+  }
+}
+
+.workspace-placeholder {
+  &__badge-wrapper {
+    display: flex;
+    margin-bottom: 8px;
+    line-height: normal;
+  }
+
+  &__title {
+    font-size: 0.875rem;
+    color: var(--sand_900);
+    font-weight: 500;
+  }
+}
+
+.settings-caption {
+  color: var(--sand_700);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0.4px;
+
+  a {
+    color: var(--primary_link);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.disabled-field {
+  display: flex;
+  align-items: flex-start;
+
+  p {
+    padding: 0;
+    margin: 0;
+
+    a {
+      color: var(--primary_link);
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 16px;
+      letter-spacing: 0.4px;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__label {
+    margin-top: 5px;
+  }
+
+  input {
+    margin-top: 5px;
+  }
+
+  &__title {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 500;
+    padding: 0 16px;
+    height: 22px;
+    display: flex;
+    margin-bottom: 4px;
+    align-items: center;
+  }
+
+  &__description {
+    margin-top: 5px;
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--sand_600);
+    font-weight: 500;
+    padding: 0 16px;
+    height: 22px;
+    display: flex;
+    margin-bottom: 4px;
+  }
+}
+
+.annotation-settings {
+  &__wrapper {
+    width: 488px;
+  }
+}

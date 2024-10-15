@@ -8,6 +8,4 @@ class JSONSchemaValidator(BaseValidator):
         try:
             jsonschema.validate(input, schema)
         except jsonschema.exceptions.ValidationError:
-            raise django.core.exceptions.ValidationError(
-                '%(value)s failed JSON schema check', params={'value': input}
-            )
+            raise django.core.exceptions.ValidationError('%(value)s failed JSON schema check', params={'value': input})

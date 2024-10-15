@@ -1,0 +1,38 @@
+var _g;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgGear = function SvgGear(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    fill: "none",
+    ref: ref
+  }, props), _g || (_g = /*#__PURE__*/React.createElement("g", {
+    stroke: "#000",
+    strokeWidth: 2,
+    opacity: 0.23
+  }, /*#__PURE__*/React.createElement("path", {
+    strokeLinecap: "square",
+    d: "m2.152 10.264 19.696 3.473M21.397 8.58 2.603 15.42M18.428 4.34 5.572 19.66M8.58 2.603l6.84 18.794M4.34 5.572l15.32 12.856M13.736 2.152l-3.472 19.696"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: 12,
+    cy: 12,
+    r: 8,
+    fill: "#fff",
+    transform: "rotate(10 12 12)"
+  }), /*#__PURE__*/React.createElement("path", {
+    strokeLinecap: "square",
+    d: "M12.02 11.993 2.602 15.42M12.026 12.022l7.634 6.406M13.736 2.152 12 12"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: 12,
+    cy: 12,
+    r: 2,
+    fill: "#fff",
+    transform: "rotate(10 12 12)"
+  }))));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgGear);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgb3BhY2l0eT0iMC4yMyIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIj4KPHBhdGggZD0iTTIuMTUxODUgMTAuMjYzOUwyMS44NDggMTMuNzM2OSIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIvPgo8cGF0aCBkPSJNMjEuMzk2OSA4LjU4MDJMMi42MDMwMSAxNS40MjA2IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIi8+CjxwYXRoIGQ9Ik0xOC40Mjc4IDQuMzM5OThMNS41NzIwNSAxOS42NjA5IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIi8+CjxwYXRoIGQ9Ik04LjU3OTc0IDIuNjAzMzhMMTUuNDIwMSAyMS4zOTcyIiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIi8+CjxwYXRoIGQ9Ik00LjMzOTQ5IDUuNTcyNDhMMTkuNjYwNCAxOC40MjgyIiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIi8+CjxwYXRoIGQ9Ik0xMy43MzY0IDIuMTUyMjVMMTAuMjYzNSAyMS44NDg0IiBzdHJva2UtbGluZWNhcD0ic3F1YXJlIi8+CjxjaXJjbGUgY3g9IjExLjk5OTkiIGN5PSIxMi4wMDAzIiByPSI4IiB0cmFuc2Zvcm09InJvdGF0ZSgxMCAxMS45OTk5IDEyLjAwMDMpIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTIuMDE5MSAxMS45OTMzTDIuNjAzMDIgMTUuNDIwNCIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIvPgo8cGF0aCBkPSJNMTIuMDI1OSAxMi4wMjIyTDE5LjY2MDQgMTguNDI4MiIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIvPgo8cGF0aCBkPSJNMTMuNzM2NCAyLjE1MjI1TDExLjk5OTkgMTIuMDAwMyIgc3Ryb2tlLWxpbmVjYXA9InNxdWFyZSIvPgo8Y2lyY2xlIGN4PSIxMS45OTk5IiBjeT0iMTIuMDAwMyIgcj0iMiIgdHJhbnNmb3JtPSJyb3RhdGUoMTAgMTEuOTk5OSAxMi4wMDAzKSIgZmlsbD0id2hpdGUiLz4KPC9nPgo8L3N2Zz4K";

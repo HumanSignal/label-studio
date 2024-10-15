@@ -1,17 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
-import django
 import json
 import os
-from unittest import mock
 
-from django.urls import get_resolver
-from django.shortcuts import reverse
+import django
+import pytest
 from django.core.management import call_command
-from tasks.models import Annotation
-from tasks.models import Task
-
+from django.shortcuts import reverse
+from django.urls import get_resolver
+from tasks.models import Annotation, Task
 
 owner_statuses = {
     '/tasks/1000/label': {'get': 200, 'post': 200, 'put': 405, 'patch': 405, 'delete': 405},
@@ -79,7 +76,8 @@ owner_statuses = {
     '/django-rq/workers/1000/': {'get': 302, 'post': 302, 'put': 302, 'patch': 302, 'delete': 302},
     '/django-rq/queues/1000/': {'get': 302, 'post': 302, 'put': 302, 'patch': 302, 'delete': 302},
     '/django-rq/stats.json/': {'get': 200, 'post': 200, 'put': 200, 'patch': 200, 'delete': 200},
-    '/django-rq/': {'get': 302, 'post': 302, 'put': 302, 'patch': 302, 'delete': 302}}
+    '/django-rq/': {'get': 302, 'post': 302, 'put': 302, 'patch': 302, 'delete': 302},
+}
 
 
 other_business_statuses = {
@@ -147,7 +145,8 @@ other_business_statuses = {
     '/django-rq/workers/1000/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302},
     '/django-rq/queues/1000/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302},
     '/django-rq/stats.json/': {'get': 200, 'post': 200, 'put': 200, 'delete': 200},
-    '/django-rq/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302}}
+    '/django-rq/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302},
+}
 
 
 other_annotator_statuses = {
@@ -215,7 +214,8 @@ other_annotator_statuses = {
     '/django-rq/workers/1000/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302},
     '/django-rq/queues/1000/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302},
     '/django-rq/stats.json/': {'get': 200, 'post': 200, 'put': 200, 'delete': 200},
-    '/django-rq/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302}}
+    '/django-rq/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302},
+}
 
 
 group_annotator_statuses = {
@@ -283,12 +283,12 @@ group_annotator_statuses = {
     '/django-rq/workers/1000/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302},
     '/django-rq/queues/1000/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302},
     '/django-rq/stats.json/': {'get': 200, 'post': 200, 'put': 200, 'delete': 200},
-    '/django-rq/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302}}
+    '/django-rq/': {'get': 302, 'post': 302, 'put': 302, 'delete': 302},
+}
 
 
 def build_urls(project_id, task_id, annotation_id):
-    """ Get all the ulrs from django
-    """
+    """Get all the ulrs from django"""
     urls = []
     exclude_urls = {'schema-json', 'schema-swagger-ui', 'schema-redoc'}
     resolver = get_resolver(None).reverse_dict
@@ -323,8 +323,10 @@ def build_urls(project_id, task_id, annotation_id):
             try:
                 url = reverse(url_name, kwargs=kwargs)
             except django.urls.exceptions.NoReverseMatch as e:
-                print(f'\n\n ---> Could not find "{url_name}" with django reverse and kwargs "{kwargs}".\n'
-                      f'Probably some kwarg is absent\n\n')
+                print(
+                    f'\n\n ---> Could not find "{url_name}" with django reverse and kwargs "{kwargs}".\n'
+                    f'Probably some kwarg is absent\n\n'
+                )
                 raise e
 
             exclude = ['/password-reset/complete/', '/password-reset/']
@@ -340,8 +342,7 @@ def build_urls(project_id, task_id, annotation_id):
 
 
 def restore_objects(project):
-    """ Create task and annotation for URL tests
-    """
+    """Create task and annotation for URL tests"""
     # task_db, annotation_db = None, None
 
     if project.pk != 1000:
@@ -352,7 +353,7 @@ def restore_objects(project):
         task_db = Task.objects.get(pk=1000)
     except Task.DoesNotExist:
         task_db = Task()
-        task_db.data = {"data": {"image": "kittens.jpg"}}
+        task_db.data = {'data': {'image': 'kittens.jpg'}}
         task_db.project = project
         task_db.id = 1000  # we need to use id 1000 to avoid db last start
         task_db.save()
@@ -362,7 +363,7 @@ def restore_objects(project):
     except Annotation.DoesNotExist:
         task_db = Task.objects.get(pk=1000)
         annotation_db = Annotation()
-        annotation = [{"from_name": "some", "to_name": "x", "type": "none", "value": {"none": ["Opossum"]}}]
+        annotation = [{'from_name': 'some', 'to_name': 'x', 'type': 'none', 'value': {'none': ['Opossum']}}]
         annotation_db.result = annotation
         annotation_db.id = 1000  # we need to use id 1000 to avoid db last start
         annotation_db.task = task_db
@@ -393,20 +394,18 @@ def check_urls(urls, runner, match_statuses, project):
         r = runner.delete(url)
         status['delete'] = r.status_code
 
-
-        #assert url in match_statuses, '\nNew URL found, please check statuses and add \n\n' \
+        # assert url in match_statuses, '\nNew URL found, please check statuses and add \n\n' \
         #                              + url + ': ' + str(status) + \
         #                              '\n\nto dict \n\n' + runner.statuses_name + '\n'
 
         statuses[url] = status
-        #assert match_statuses[url] == status, f'Expected statuses mismatch: "{url}"'
+        # assert match_statuses[url] == status, f'Expected statuses mismatch: "{url}"'
 
     # print(statuses)  # use this to collect urls -> statuses dict
 
 
 def run(owner, runner):
-    """ Get all urls from Django and GET/POST/PUT/DELETE them
-    """
+    """Get all urls from Django and GET/POST/PUT/DELETE them"""
     owner.task_db, owner.annotation_db = restore_objects(owner.project)
     urls = build_urls(owner.project.id, owner.task_db.id, owner.annotation_db.id)
 
@@ -431,16 +430,17 @@ def test_all_urls_other_business(setup_project_choices, business_client):
 @pytest.mark.django_db
 def test_urls_mismatch_with_registered(tmpdir):
     from core.utils.io import find_file
-    from core.utils.params import get_bool_env
 
     all_urls_file = find_file('all_urls.json')
     with open(all_urls_file) as f:
         all_urls = json.load(f)
 
-    instruction = f'If you created, removed or updated URLs, run the following command:\n./manage.py show_urls --format pretty-json > new_urls.json\n' \
-                  f'After creation, you should verify and correct mismatched data by updating {all_urls_file}.'
+    instruction = (
+        f'If you created, removed or updated URLs, run the following command:\n./manage.py show_urls --format pretty-json > new_urls.json\n'
+        f'After creation, you should verify and correct mismatched data by updating {all_urls_file}.'
+    )
 
-    f = tmpdir.mkdir("subdir").join('show_urls.json')
+    f = tmpdir.mkdir('subdir').join('show_urls.json')
     call_command('show_urls', format='pretty-json', stdout=f)
     filename = os.path.join(f.dirname, f.basename)
     with open(filename) as f1:
@@ -451,12 +451,16 @@ def test_urls_mismatch_with_registered(tmpdir):
 
     if len(all_urls) > len(all_current_urls):
         urls_removed = '\n'.join(set(all_urls) - set(all_current_urls))
-        assert False, f'URLs number mismatch: {len(all_urls)} expected but new version contains {len(all_current_urls)}. ' \
-                      f'URLs removed:\n{urls_removed}.\n{instruction}'
+        assert False, (
+            f'URLs number mismatch: {len(all_urls)} expected but new version contains {len(all_current_urls)}. '
+            f'URLs removed:\n{urls_removed}.\n{instruction}'
+        )
     elif len(all_urls) < len(all_current_urls):
         urls_added = '\n'.join(set(all_current_urls) - set(all_urls))
-        assert False, f'URLs number mismatch: {len(all_urls)} expected but new version contains {len(all_current_urls)}. ' \
-                      f'New URLs added:\n{urls_added}.\n{instruction}'
+        assert False, (
+            f'URLs number mismatch: {len(all_urls)} expected but new version contains {len(all_current_urls)}. '
+            f'New URLs added:\n{urls_added}.\n{instruction}'
+        )
 
     for url, new_url in zip(all_urls, all_current_urls):
         assert url == new_url, f'URL name mismatch found. {instruction}'

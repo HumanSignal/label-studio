@@ -1,0 +1,132 @@
+.range {
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+
+  &_align {
+    &_horizontal {
+      min-width: 120px;
+      height: 28px;
+      flex-direction: row;
+    }
+
+    &_vertical {
+      min-height: 120px;
+      width: 28px;
+      flex-direction: column;
+    }
+
+    .range_with-icon &_horizontal {
+      padding: 0 5px;
+    }
+
+    .range_with-icon &_vertical {
+      padding: 5px 0;
+    }
+  }
+
+  &__body {
+    position: relative;
+
+    .range_align_horizontal & {
+      height: 4px;
+      width: 100%;
+    }
+
+    .range_align_vertical & {
+      height: 100%;
+      width: 4px;
+    }
+
+    .range_align_horizontal &_with-icon {
+      margin: 0 5px;
+    }
+
+    .range_align_vertical &_with-icon {
+      margin: 5px 0;
+    }
+  }
+
+  &__line {
+    background: linear-gradient(0deg, var(--black_5), var(--black_5)), #FFF;
+    box-shadow: inset 0 1px 0 var(--black_5), inset 0 0 0 1px var(--black_5);
+    border-radius: 8px;
+
+    .range_align_horizontal & {
+      height: 4px;
+      width: 100%;
+    }
+
+    .range_align_vertical & {
+      width: 4px;
+      height: 100%;
+    }
+  }
+
+  &__indicator {
+    border-radius: 8px;
+    position: absolute;
+    background-color: rgb(var(--accent_color-raw) / 50%);
+
+    .range_align_horizontal & {
+      top: 0;
+      height: 4px;
+    }
+
+    .range_align_vertical & {
+      left: 0;
+      width: 4px;
+    }
+  }
+
+  &__range-handle {
+    width: 0;
+    height: 0;
+    position: absolute;
+
+    &::before {
+      content: '';
+      position: absolute;
+      background: var(--grape_500);
+      box-shadow: 0 5px 10px rgb(0 153 255 / 30%), inset 0 -1px 0 var(--black_10);
+      border-radius: 2px;
+      transform: translate3d(-50%, -50%, 0);
+    }
+
+    &::after {
+      content: '';
+      width: 25px;
+      height: 25px;
+      position: absolute;
+      transform: translate3d(-50%, -50%, 0);
+    }
+
+    .range_align_horizontal & {
+      top: 50%;
+      cursor: col-resize;
+
+      &::before {
+        width: 10px;
+        height: 16px;
+      }
+    }
+
+    .range_align_vertical & {
+      left: 50%;
+      cursor: row-resize;
+
+      &::before {
+        width: 16px;
+        height: 10px;
+      }
+    }
+  }
+
+  &__icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

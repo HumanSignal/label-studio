@@ -1,0 +1,8 @@
+<View>
+  <Labels name="ner" toName="text">
+    <Label value="Person"></Label>
+    <Label value="Organization"></Label>
+    <Label value="Date"></Label>
+  </Labels>
+  <Text name="text" value="$url" valueType="url"></Text>
+</View>

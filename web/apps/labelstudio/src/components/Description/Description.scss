@@ -1,0 +1,43 @@
+.description {
+  color: var(--sand_600);
+  line-height: 140%;
+
+  & a {
+    color: var(--grape_500);
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  &_size {
+    &_small {
+      font-size: 0.75rem;
+    }
+
+    &_medium {
+      font-size: 0.875rem;
+    }
+
+    &_large {
+      font-size: 1.125rem;
+    }
+  }
+
+  &:not(.description_noOffset) {
+    &.description_size {
+      &_small {
+        margin: 16px 0;
+      }
+  
+      &_medium {
+        margin: 32px 0;
+      }
+  
+      &_large {
+        margin: 40px 0;
+      }
+    }
+  }
+}

@@ -1,13 +1,15 @@
 ---
-title: Manage data for your labeling project
-short: Data manager
+title: Use the Data Manager in projects
+short: Data Manager
 type: guide
 tier: all
-order: 207
-order_enterprise: 111
-meta_title: Manage data for your labeling project
-meta_description: Manage, filter, and sort project data for your machine learning data science labeling project.
-section: "Labeling"
+order: 122
+order_enterprise: 122
+meta_title: Use the Data Manager in projects
+meta_description: Manage, filter, and sort project data for your labeling project.
+section: "Create & Manage Projects"
+parent: "manage_projects_lso"
+parent_enterprise: "manage_projects" 
 
 ---
 
@@ -36,7 +38,7 @@ In Label Studio Community Edition, the data manager is the default view for your
 
 With filters and tabs, you can split data into different sections to be labeled by different annotators, or set up data in a particular order to perform labeling according to prediction score, or another value in your data.
 
-When you filter or sort the data before you label it, you modify which tasks and the order of the tasks you see when labeling. While [task sampling](start.html#Set_up_task_sampling_for_your_project) affects the task order for an entire project and can't be changed, filtering and sorting tasks can be changed at any time. 
+When you filter or sort the data before you label it, you modify which tasks and the order of the tasks you see when labeling. While [task sampling](https://labelstud.io/guide/start#Set-up-task-sampling-for-your-project) affects the task order for an entire project and can't be changed, filtering and sorting tasks can be changed at any time. 
 
 <img src="/images/data-manager-filters.png" class="gif-border">
 
@@ -53,7 +55,7 @@ You can sort the data in your project by prediction score if you upload [pre-ann
 1. In a project, update the **Order** of the data from the default to use the **Prediction score** field.
 2. Update the order of the items in either ascending or descending order to label based on higher confidence or lower confidence predictions. 
 3. Select **Label Tasks As Displayed** to start labeling tasks in prediction score order. 
-You can also use [task sampling](start.html#Set_up_task_sampling_for_your_project) to use prediction score ordering.
+You can also use [task sampling](https://labelstud.io/guide/start#Set-up-task-sampling-for-your-project) to use prediction score ordering.
 
 ### Example: Split a dataset using tabs and filters
 If you want to label a large dataset, you might want to use tabs and filters to split it up into smaller sections, and assign different annotators to different tabs. You can't assign annotators to specific tasks in Label Studio Community Edition, but you can rename the tabs after specific annotators as a way to basically assign tasks using tabs.  

@@ -1,0 +1,17 @@
+$size: 20px;
+
+.badge {
+  height: $size;
+  min-width: $size;
+  border-radius: $size / 2;
+  line-height: $size;
+  padding: 0 6px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: normal;
+  text-align: center;
+  white-space: nowrap;
+  background: var(--sand_600);
+  color: var(--sand_0);
+  box-shadow: 0 0 0 1px var(--sand_0);
+}

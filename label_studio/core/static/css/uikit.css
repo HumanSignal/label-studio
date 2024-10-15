@@ -23,7 +23,7 @@ body {
 }
 .field--wide > *:not(:first-child) {
   display: block;
-  margin-top: 10px;
+  margin-top: 4px;
   width: 100%;
   box-sizing: border-box;
 }
@@ -160,7 +160,6 @@ ul.toggle li.active {
 
   font-size: 12px;
   font-weight: bold;
-  font-family: Roboto;
   color: rgba(0, 0, 0, 0.4);
 }
 

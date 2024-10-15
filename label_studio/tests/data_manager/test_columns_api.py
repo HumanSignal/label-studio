@@ -1,4 +1,5 @@
 import json
+
 import pytest
 
 pytestmark = pytest.mark.django_db
@@ -6,18 +7,13 @@ pytestmark = pytest.mark.django_db
 
 def _get_columns(business_client, label_config=None):
     r = business_client.post(
-        "/api/projects/",
-        data=json.dumps(
-            dict(
-                title="test_project1",
-                **({'label_config': label_config} if label_config else {})
-            )
-        ),
-        content_type="application/json",
+        '/api/projects/',
+        data=json.dumps(dict(title='test_project1', **({'label_config': label_config} if label_config else {}))),
+        content_type='application/json',
     )
 
-    project1_id = r.json()["id"]
-    r = business_client.get(f"/api/dm/columns/?project={project1_id}")
+    project1_id = r.json()['id']
+    r = business_client.get(f'/api/dm/columns/?project={project1_id}')
 
     assert r.status_code == 200, r.content
     r_json = r.json()
@@ -61,8 +57,7 @@ def test_columns_api_annotates_default_columns_with_project_defined_false(busine
 
 
 def test_columns_api_annotates_config_defined_columns_with_project_defined_true(business_client):
-    config_with_text_column = (
-        """
+    config_with_text_column = """
         <View>
             <Text value="$text" name="artist" />
             <View>
@@ -72,7 +67,6 @@ def test_columns_api_annotates_config_defined_columns_with_project_defined_true(
             </View>
         </View>
         """
-    )
 
     columns = _get_columns(business_client, config_with_text_column)
 

@@ -1,0 +1,108 @@
+.breadcrumbs {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+
+  &__label {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  &__beta {
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 16px;
+    color: var(--plum_0);
+    padding: 2px 8px;
+    background-color: var(--plum_500);
+    border-radius: 12px;
+  }
+
+  &__list {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__item {
+    font-size: 16px;
+    line-height: 22px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: default;
+
+    &:not(.breadcrumbs__item_last) {
+      cursor: pointer;
+
+      & > span,
+      & > a {
+        color: var(--sand_600) !important;
+      }
+    }
+
+    &:not(:nth-child(2)) {
+      flex-shrink: 0;
+    }
+
+    &:nth-child(2) span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &:only-child {
+      pointer-events: none;
+    }
+  }
+
+  &__item > span,
+  &__item > a {
+    text-decoration: none;
+    color: var(--sand_900);
+
+    &:hover {
+      color: var(--grape_500) !important;
+    }
+  }
+
+  &__item + &__item {
+    margin-left: 30px;
+  }
+
+  &__item + &__item::before {
+    top: 50%;
+    right: 100%;
+    width: 30px;
+    content: "/";
+    height: 16px;
+    display: block;
+    color: var(--sand_600);
+    position: absolute;
+    transform: translate3d(0, -50%, 0);
+    text-align: center;
+    line-height: 16px;
+    font-size: 18px;
+  }
+
+  &__settings {
+    width: 20px;
+    height: 20px;
+    display: block;
+    margin-left: 10px;
+  }
+
+  &__settings img {
+    display: block;
+    opacity: 0.23;
+  }
+}

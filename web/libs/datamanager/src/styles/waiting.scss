@@ -1,0 +1,22 @@
+@mixin waiting($c1: #efefef, $c2: #fff) {
+  $base-color: rgba($c2, 0.2);
+  $accent-color: $c1;
+
+  background-image: repeating-linear-gradient(-63.43deg, $base-color 1px, $accent-color 2px, $accent-color 6px, $base-color 7px, $base-color 12px);
+  background-color: $c2;
+  background-size: 37px 100%;
+
+  &_animated {
+    animation: waiting 1s linear infinite;
+  }
+}
+
+@keyframes waiting {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}

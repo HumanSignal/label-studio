@@ -1,0 +1,123 @@
+.tabs-dm {
+  height: 36px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  box-shadow: 0 -1px 0 #D9D9D9 inset;
+  background: var(--sand_200);
+
+  &-content {
+    &__draggable {
+      align-items: center;
+      width: 150px;
+      height: 36px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &__droppable {
+    display: flex;
+    overflow: hidden;
+  }
+
+  &__list {
+    display: flex;
+    min-width: 0;
+  }
+
+  &__item {
+    color: rgb(0 0 0 / 50%);
+    width: 100%;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    box-shadow: -0.5px 0 0 #D9D9D9 inset, 0.5px 0 0 #D9D9D9 inset;
+
+    &_active {
+      color: black;
+      cursor: default;
+      background-color: var(--white);
+      box-shadow: -0.5px 0 0 #D9D9D9 inset, 0.5px 0 0 #D9D9D9 inset;
+
+      & .tabs-dm__item-right-button {
+        display: flex;
+      }
+    }
+
+    &_virtual {
+      background: linear-gradient(180deg, rgb(243 243 243 / 0%) 0%, #F3F3F3 63.89%), repeating-linear-gradient(-45deg, var(--black_5), var(--black_5) 6px, transparent 6px, transparent 12px), #F3F3F3;
+    }
+
+    &_virtual.tabs-dm__item_active {
+      background: linear-gradient(180deg, rgb(255 255 255 / 0%) 0%, #FFF 63.89%), repeating-linear-gradient(-45deg, var(--black_5), var(--black_5) 6px, transparent 6px, transparent 12px), var(--white);
+    }
+
+    &_hover .tabs-dm__item-right-button {
+      display: flex;
+    }
+  }
+
+  &__item-left {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 36px;
+    padding-left: 16px;
+    padding-right: 4px;
+    display: flex;
+    align-items: center;
+
+    &_edit {
+      padding-left: 6px;
+    }
+  }
+
+  &__item-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    width: 36px;
+    max-width: 60%;
+  }
+
+  &__item-right-button {
+    align-items: center;
+    justify-content: center;
+    display: none;
+    height: 36px;
+    width: 36px;
+    margin: none;
+    padding: none;
+  }
+
+  &__add {
+    padding: 0;
+    border: none;
+    outline: none;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--black_15) !important;
+    background: none;
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    &:hover {
+      color: rgb(0 0 0 / 35%) !important;
+    }
+  }
+
+  &__extra {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+}

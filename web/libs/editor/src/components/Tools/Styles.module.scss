@@ -1,0 +1,17 @@
+.block {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  border: 1px solid rgb(34 36 38 / 15%);
+  border-radius: 0.2857rem;
+  width: fit-content;
+  padding: 0.5em;
+}
+
+.divider {
+  margin: 12px 0;
+}
+
+.button {
+  margin: 0.3rem 0;
+}

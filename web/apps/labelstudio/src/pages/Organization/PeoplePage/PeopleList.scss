@@ -1,0 +1,107 @@
+.people-list {
+  width: 100%;
+  min-width: 650px;
+  font-size: 16px;
+
+  &__wrapper {
+    border-radius: 4px;
+    border: 1px solid var(--sand_300);
+    background: var(--sand_0);
+  }
+
+  &__loading {
+    width: 100%;
+    display: flex;
+    min-height: 250px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__users {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+  }
+
+  &__header {
+    font-weight: 500;
+    display: flex;
+  }
+
+  &__column,
+  &__field {
+    z-index: 2;
+    height: 48px;
+    padding: 0 10px;
+    border: none;
+    color: var(--sand_900);
+    display: flex;
+    position: relative;
+    align-items: center;
+
+    &.avatar {
+      width: 28px;
+      box-sizing: content-box;
+    }
+
+    &.name {
+      flex: 1;
+    }
+
+    &.email {
+      width: 200px;
+    }
+
+    &.last-activity {
+      width: 160px;
+    }
+  }
+
+  &__field {
+    &.last-activity {
+      color: var(--sand_600);
+    }
+  }
+
+  &__column {
+    font-weight: 500;
+    background: none;
+  }
+
+  &__user {
+    cursor: pointer;
+    display: flex;
+
+    &:nth-child(odd):not(&_active) {
+      background-color: var(--sand_100);
+    }
+
+    &_active {
+      position: relative;
+      background-color: var(--sand_0);
+
+      &::before,
+      &::after {
+        top: 0;
+        bottom: 0;
+        left: -1px;
+        content: '';
+        display: block;
+        position: absolute;
+      }
+
+      &::after {
+        z-index: 1;
+        background-color: var(--sand_0);
+        width: calc(100% + 22px);
+        box-shadow: inset 2px 0 0 var(--grape_500), 1px 0 0 1px var(--sand_300) inset;
+      }
+
+      &::before {
+        z-index: 0;
+        height: 100%;
+        width: calc(100% + 22px);
+      }
+    }
+  }
+}

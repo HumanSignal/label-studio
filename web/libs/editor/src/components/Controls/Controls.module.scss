@@ -1,0 +1,65 @@
+@import "../../assets/styles/global";
+
+.task {
+  opacity: 0.4;
+}
+
+.container {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+
+  & > button,
+  & > span {
+    margin: 0 10px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    @include respond("phone") {
+      margin-left: 0;
+      margin-bottom: 5px;
+    }
+  }
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  @include respond("phone") {
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-flow: column;
+  }
+}
+
+.block {
+  clear: both;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+
+  @include respond("phone") {
+    flex-flow: column;
+    align-items: flex-start;
+  }
+}
+
+.rewrite {
+  background: var(--success_color);
+  border-color: var(--success_color);
+
+  &:hover {
+    background: var(--kale_300);
+    border-color: var(--kale_300);
+  }
+}

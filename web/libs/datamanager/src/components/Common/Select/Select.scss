@@ -1,0 +1,121 @@
+@use 'sass:color';
+
+.select-dm {
+  height: 40px;
+  background: #FAFAFA;
+  font-size: 16px;
+  line-height: 22px;
+  border: 1px solid var(--sand_300);
+  box-sizing: border-box;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &_size {
+    &_compact {
+      height: 32px;
+    }
+
+    &_small {
+      height: 24px;
+      font-size: 12px;
+    }
+  }
+
+  &__list {
+    width: max-content;
+  }
+
+  &__selected {
+    width: 100%;
+    padding: 0 7px;
+    min-width: 60px;
+    display: flex;
+    font-weight: 500;
+    align-items: center;
+  }
+
+  &__value {
+    width: max-content;
+    min-width: 30px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__option {
+    cursor: pointer;
+    padding: 4px 16px;
+
+    &:hover,
+    &_focused {
+      background-color: #f7f7f7;
+    }
+
+    &_selected {
+      color: white;
+      background-color: var(--accent_color);
+    }
+
+    &_selected:hover,
+    &_selected.select-dm__option_focused {
+      background-color: hsl(var(--accent_color), 10%);
+    }
+  }
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+    position: relative;
+
+    &::before,
+    &::after {
+      width: 6px;
+      height: 6px;
+      display: block;
+      position: absolute;
+      content: "";
+      border: 1px solid var(--accent_color);
+      border-right: none;
+      border-bottom: none;
+    }
+
+    &::before {
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, 50%) rotate(45deg);
+    }
+
+    &::after {
+      bottom: 0;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-135deg);
+    }
+  }
+
+  &__optgroup {
+    &-list {
+      width: max-content;
+    }
+
+    &-label {
+      padding: 4px 16px;
+      color: rgb(var(--black-raw) / 60%);
+    }
+  }
+
+  &__optgroup-list &__option {
+    padding-left: 24px;
+  }
+
+  &_disabled {
+    pointer-events: none;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 6px rgb(var(--accent_color-raw) / 20%), inset 0 -1px 0 var(--black_10), inset 0 0 0 1px var(--black_15), inset 0 0 0 1px rgb(var(--accent_color-raw) / 20%);
+    border-color: rgb(var(--accent_color-raw) / 20%);
+  }
+}

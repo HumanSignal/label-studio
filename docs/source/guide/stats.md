@@ -1,13 +1,13 @@
 ---
-title: Annotation agreement and how it is calculated
-short: Annotation agreement
+title: How task agreement and labeling consensus are calculated
+short: Task agreements
 tier: enterprise
 type: guide
-order: 300
-order_enterprise: 114
-meta_title: Data Labeling Statistics
-meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
-section: "Quality control"
+order: 0
+order_enterprise: 307
+meta_title: Task agreement in Label Studio Enterprise
+meta_description: Task agreement, or labeling consensus, and other data annotation statistics for data labeling and machine learning projects.
+section: "Review & Measure Quality"
 ---
 
 Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
@@ -17,7 +17,7 @@ Annotation statistics help you determine the quality of your dataset, its readin
 
 ## Task agreement
 
-Task agreement shows the consensus between multiple annotators when labeling the same task. There are several types of task agreement in Label Studio Enterprise:
+Task agreement, also known as "labeling consensus" or "annotation consensus," shows the consensus between multiple annotators when labeling the same task. There are several types of task agreement in Label Studio Enterprise:
 - a per-task agreement score, visible on the Data Manager page for a project. This displays how well the annotations on a particular task match across annotators. 
 - an inter-annotator agreement matrix, visible on the Members page for a project. This displays how well the annotations from specific annotators agree with each other in general, or for specific tasks. 
 
@@ -26,16 +26,28 @@ You can also see how the annotations from a specific annotator compare to the pr
 For more about viewing agreement in Label Studio Enterprise, see [Verify model and annotator performance](quality.html#Verify-model-and-annotator-performance).
 
 
+### Configure task agreement settings for a project
+
+To configure task agreement settings for a project, go to the project **Settings** page and select **Quality**. From here you can configure several the following:
+
+* Select which agreement metric to use. The default metric is the [basic matching function](#Basic-matching-function). 
+* Set a low agreement threshold. 
+
+    A low agreement threshold  ensures that a task cannot be marked complete until it meets a minimum agreement threshold. 
+* Customize the weight of different labels when calculating agreement. 
+
+For more information, see [Project settings - Task agreement](project_settings_lse#task-agreement). 
+
 ## Agreement method
 
 The agreement method defines how [agreement scores](stats.html#Agreement-score) across all annotations for a task are combined to form a single inter-annotator agreement score. Label Studio uses the mean average of all inter-annotation agreement scores for each annotation pair as the final task agreement score. 
 
 Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." width=800 height=365 src="/images/LSE/stats-no_grouping.png"/></div>
+<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, agreement scores are computed for each pair, the resulting scores are averaged for a task." src="/images/stats-no_grouping.png"/></div>
 
 ### Example
 One annotation that labels the text span "Excellent tool" as "positive", a second annotation that labels the span "tool" as "positive", and a third annotation that labels the text span "tool" as "negative".
-<br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" width=800 height=100 src="/images/LSE/stats-agreement-example.jpg"/></div>
+<br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" src="/images/stats-agreement-example.png"/></div>
 
 The agreement score for the first two annotations is 50%, based on the intersection of the text spans. The agreement score comparing the second annotation with the third annotation is 0%, because the same text span was labeled differently. 
 
@@ -104,10 +116,74 @@ Performs the default evaluation function for each control tag. For example for `
 
 ### Exact matching
 
-For example, for two given annotations `x` and `y`, an agreement metric that performs a naive comparison of the results works like the following:
-- If both `x` and `y` are empty annotations, the agreement score is `1`.
-- If `x` and `y` share no similar points, the agreement score is `0`. 
-- If different labeling types are used in `x` and `y`, the partial agreement scores for each data labeling type are averaged.
+For example, for two given annotations `x` and `y`, an agreement metric that performs a naive comparison of the results would work as follows:
+- If both annotations `x` and `y` are empty, the agreement score is `1`.
+- If the annotations share no similar regions, the agreement score is `0`.
+- If multiple regions are in `x` and `y`, the partial agreement scores that are calculated for the corresponding region pairs are averaged.
+
+#### Example 1
+
+```
+x:  choices1 => A
+    choices2 => B
+
+y:  choices1 => A
+    choices2 => B
+```
+
+Agreement Calculation:
+
+Both annotations `x` and `y` match exactly.
+Agreement(x, y) = 1.0 (100%).
+
+#### Example 2
+
+```
+x:  choices1 => A
+    choices2 => B
+
+y:  choices1 => A
+    choices2 => C
+```
+
+Agreement Calculation:
+
+`choices1` match, but `choices2` do not.
+Agreement(x, y) = 0.5 (50%).
+
+#### Example 3
+
+```
+x:  choices1 => A
+    choices2 => B
+
+y:  choices1 => C
+    choices2 => D
+```
+
+Agreement Calculation:
+
+Neither `choices1` nor `choices2` match.
+Agreement(x, y) = 0 (0%).
+
+
+#### Example 4
+
+```
+x:  choices1 => A
+    choices2 => B
+    choices3 => [not selected]
+
+y:  choices1 => A
+    choices2 => C
+    choices3 => [not selected]
+```
+
+Agreement Calculation:
+
+`choice1` match, `choice2` don't match, and `choices3` are not selected, which is treated as a <b>match</b>.
+Agreement(x, y) = 0.6666 (66.66%).
+
 
 ### Exact matching choices example
 For data labeling tasks where annotators select a choice, such as image or text classification, or data labeling tasks where annotators select a rating, you can select the `Exact matching choices` agreement metric. For this function, the agreement score for two given task annotations `x` and `y` is computed as follows:
@@ -143,15 +219,18 @@ The following **text edit distance** algorithms are available:
 - Needleman-Wunsch
 - Smith-Waterman
 
-### Intersection over Union example
+### Intersection over union example
 
-The Intersection over Union (IoU) metric compares the area of overlapping regions, such as bounding boxes, polygons or textual / time series one-dimensional spans with the overall area, or union, of the regions.
+The Intersection over Union (IoU) metric is used to compare the overlap between regions such as bounding boxes, polygons, or textual/time series one-dimensional spans—against the combined area, or union, of the regions.
 
-For example, for two annotations `x` and `y` containing either bounding boxes or polygons, the following calculation occurs:
-- LSE identifies whether any regions overlap across the two annotations. Overlapping can be only considered with matched labels.
-- For each pair of overlapping regions across the annotations, the area of the overlap, or intersection `aI` is compared to the combined area `aU` of both regions, referred to as the union of the regions: `aI` ÷ `aU`
-- The average of `aI` ÷ `aU` for each pair of regions is used as the IoU calculation for a pair of annotations, or each IoU calculation for eadch label or region is used. 
-For example, if there are two bounding boxes for each `x` and `y` annotations, the agreement of `x` and `y` = ((`aI` ÷ `aU`) + (`aI` ÷ `aU`)) ÷2 .
+For two annotations, `x` and `y`, which contain either bounding boxes or polygons, the following steps occur:
+
+* **Identifying Overlapping Regions**: The system identifies whether any regions overlap across the two annotations. Overlaps are only considered for matched labels (i.e., regions assigned the same label or class).
+* **Calculating IoU for Each Pair**: For each pair of overlapping regions, the area of overlap, or intersection (aI), is divided by the total combined area of the two regions, known as the union (aU). This gives the IoU for that pair as `aI ÷ aU`, which results in a value between `0` and `1`, where `1` indicates perfect overlap and `0` indicates no overlap.
+* **Tracking the Maximum IoU**: When comparing multiple regions (e.g., multiple bounding boxes), the system tracks the highest IoU value for the pair using the formula `max_iou = max(iou, max_iou)`. This ensures that the most significant agreement between the two annotations is captured.
+* **Avoiding Averaging Misconceptions**: In some cases, there may be multiple overlapping regions between annotations `x` and `y`. Rather than averaging all IoU values (which could be misleading), the highest IoU for each pair is retained, ensuring the most representative comparison of agreement between the annotations.
+
+This method ensures that only the strongest level of overlap between regions is recorded for each annotation pair, reflecting the highest possible agreement between the two annotations.
 
 #### Intersection over union with text
 
@@ -161,6 +240,20 @@ For two given task annotations `x` and `y`, the agreement score formula is `m(x,
 - For text annotations, the span is defined by the `start` and `end` keys.
 - For hypertext annotations, the span is defined by the `startOffset` and `endOffset` keys. 
 - For paragraphs of dialogue annotations, the span is defined by the `startOffset` and `endOffset` keys. 
+
+#### Intersection over union with time series
+
+Intersection over Union (IoU) for time series data evaluates the overlap between two labeled regions within the time series. Here's how it works:
+
+1. **Identify Regions**: Determine the start and end points of the labeled regions in the time series data.
+2. **Calculate Intersection**: Find the overlapping duration between the two regions.
+3. **Calculate Union**: Determine the total duration covered by both regions.
+4. **Compute IoU**: Divide the intersection duration by the union duration.
+
+For example, if you have two regions:
+- Region A: (0, 20)
+- Region B: (10, 30)
+The intersection is (10, 20) with a duration of 10 units, and the union is (0, 30) with a duration of 30 units. The IoU would be 10/30 = 0.33.
 
 #### Intersection over union with other metrics 
 The IoU metric can be combined with other metrics. Several metrics in Label Studio Enterprise use IoU to establish initial agreement across annotations, then computes the [precision](#precision-example), [recall](#recall-example), or [F1-score](#f1-score-example) for the IoU values above a specific threshold. Text IoU can also include the [edit distance algorithm](#edit-distance-algorithm-example).

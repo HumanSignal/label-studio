@@ -21,14 +21,6 @@ Example of the Magic Wand in use:
 ![Animated GIF showing Magic Wand clicking on cloud and dragging, automatically segmenting and selecting
 pixels to create a mask](../images/magicwand_example.gif)
 
-### Feature Flag
-
-The Magic Wand is currently turned off by default behind a feature flag. If you want to turn it on, you
-must enable it by either:
-- Setting an environment variable when starting the Label Studio server, either by starting up the
-  server with `fflag_feat_front_dev_4081_magic_wand_tool=1 label-studio`, or manually finding the flag
-`flag_feat_front_dev_4081_magic_wand_tool` and setting it to true.
-
 ### CORS Configuration
 
 The Magic Wand requires pixel-level access to images that are being labelled in order to do its

@@ -1,0 +1,23 @@
+[
+  {
+    "data": {
+      "url": "https://htx-pub.s3.us-east-1.amazonaws.com/examples/audio/barradeen-emotional.mp3"
+    },
+    "predictions": [
+      {
+        "model_version": "model 1",
+        "result": [
+          {
+            "from_name": "answer",
+            "id": "oMvLrMj8WP",
+            "to_name": "answer",
+            "type": "textarea",
+            "value": {
+              "text": "Mario"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,197 @@
+@import "../../../../assets/styles/global";
+
+.wave {
+  --container-edge-padding: 24px;
+  --border-color: var(--sand_300);
+
+  position: relative;
+  user-select: none;
+
+  &_compact {
+    --border-color: var(--sand_300);
+  }
+
+  &__loader {
+    top: 0;
+    left: 0;
+    z-index: 10;
+    height: 3px;
+    width: 100%;
+    display: flex;
+    opacity: 0.4;
+    pointer-events: none;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px var(--grape_100);
+
+    @include waiting(var(--primary_link));
+
+    span {
+      display: block;
+      padding: 0 6px;
+      font-size: 10px;
+      font-weight: bold;
+      border-radius: 10px;
+      background-color: rgb(255 255 255 / 50%);
+    }
+  }
+
+  &__wrapper {
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+
+    &_layout {
+      &_stack {
+        flex-direction: column;
+        width: 100%;
+        align-items: flex-start;
+      }
+    }
+
+    &_edge {
+      &_relaxed {
+        background-color: var(--sand_100);
+
+      & .wave__timeline{
+        background-color: var(--sand_0);
+      }
+    }
+  }
+
+  &__scale {
+    flex: none;
+    width: 36px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--sand_0);
+  }
+
+  &__body {
+    flex: 1;
+    position: relative;
+    background-color: var(--sand_100);
+    overflow: hidden;
+  }
+
+  &_with-playhead{
+    & .wave__body{
+      overflow: revert;
+    }
+
+    & .wave__cursor{
+      pointer-events: auto;
+      border-radius: 0;
+      top: -4px;
+      height: calc(100% + 4px);
+
+      &::before{
+        position: absolute;
+        top: -16px;
+        left: -4px;
+        content: url("data:image/svg+xml,%3Csvgwidth='9'height='5'viewBox='0095'fill='none'xmlns='http://www.w3.org/2000/svg'%3E%3Cpathd='M11C10.7238581.223860.51.50.5H7.5C7.776140.580.72385881V3.21922C83.448667.843853.648657.621273.70429L4.621274.4543C4.541654.47424.458354.47424.378734.45429L1.378733.70429L1.257464.18937L1.378733.70429C1.156153.6486513.4486613.21922V1Z'fill='%2340A9FF'stroke='%231F1F1F'/%3E%3C/svg%3E%0A");
+        width: 9px;
+        height: 5px;
+      }
+    }
+  }
+
+  &__wrapper_layout_stack{
+    & .wave__body{
+      width: 100%;
+    }
+  }
+
+  &__cursor {
+    top: 0;
+    left: 150px;
+    width: 2px;
+    height: 100%;
+    z-index: 10;
+    border-radius: 2px;
+    position: absolute;
+    pointer-events: none;
+    background-color: var(--sand_900);
+    transform: translate3d(-50%, 0, 0);
+  }
+
+  &__controls {
+    height: 48px;
+    padding: 0 6px;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  &__surfer {
+    height: 88px;
+
+    // stylelint-disable-next-line selector-type-no-unknown
+    & .wave_compact wave{
+      overflow: revert !important;
+    }
+
+    // stylelint-disable-next-line selector-type-no-unknown
+    & .wave_compact showtitle{
+      z-index: 10 !important;
+
+      & > div{
+        background-color: var(--sand_900);
+        color: var(--sand_0);
+        box-shadow: none;
+      }
+    }
+
+    // stylelint-disable-next-line selector-type-no-unknown
+    showtitle div {
+      left: 8px;
+      padding: 0 8px;
+      border-radius: 4px;
+      position: relative;
+      background-color: var(--sand_0);
+      box-shadow: 0 4px 15px rgb(0 0 0 / 20%);
+    }
+  }
+
+  &_compact {
+    & .wave__surfer{
+      height: 60px;
+    }
+  }
+
+  &__timeline {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 24px;
+    position: absolute;
+    pointer-events: none;
+
+    &_position {
+      &_outside {
+        pointer-events: auto;
+        height: auto;
+        position: relative;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+      }
+    }
+
+    &_placement {
+      &_bottom {
+        bottom: 0;
+      }
+
+      &_top {
+        bottom: revert;
+        top: 0;
+      }
+    }
+  }
+  }
+}

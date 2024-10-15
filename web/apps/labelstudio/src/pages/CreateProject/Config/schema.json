@@ -1,0 +1,2641 @@
+{
+  "Audio": {
+    "name": "Audio",
+    "description": "The Audio tag plays audio and shows its waveform. Use for audio annotation tasks where you want to label regions of audio, see the waveform, and manipulate audio during annotation.\n\nUse with the following data types: audio",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "value": {
+        "name": "value",
+        "description": "Data field containing path or a URL to the audio.",
+        "type": "string",
+        "required": true
+      },
+      "defaultspeed": {
+        "name": "defaultspeed",
+        "description": "Default speed level (from 0.5 to 2).",
+        "type": "string",
+        "required": false,
+        "default": 1
+      },
+      "defaultscale": {
+        "name": "defaultscale",
+        "description": "Audio pane default y-scale for waveform.",
+        "type": "string",
+        "required": false,
+        "default": 1
+      },
+      "defaultzoom": {
+        "name": "defaultzoom",
+        "description": "Default zoom level for waveform. (from 1 to 1500).",
+        "type": "string",
+        "required": false,
+        "default": 1
+      },
+      "defaultvolume": {
+        "name": "defaultvolume",
+        "description": "Default volume level (from 0 to 1).",
+        "type": "string",
+        "required": false,
+        "default": 1
+      },
+      "hotkey": {
+        "name": "hotkey",
+        "description": "Hotkey used to play or pause audio.",
+        "type": "string",
+        "required": false
+      },
+      "sync": {
+        "name": "sync",
+        "description": "Object name to sync with.",
+        "type": "string",
+        "required": false
+      },
+      "height": {
+        "name": "height",
+        "description": "Total height of the audio player.",
+        "type": "string",
+        "required": false,
+        "default": 96
+      },
+      "waveheight": {
+        "name": "waveheight",
+        "description": "Minimum height of a waveform when in `splitchannels` mode with multiple channels to display.",
+        "type": "string",
+        "required": false,
+        "default": 32
+      },
+      "splitchannels": {
+        "name": "splitchannels",
+        "description": "Display multiple audio channels separately, if the audio file has more than one channel. (**NOTE: Requires more memory to operate.**)",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "decoder": {
+        "name": "decoder",
+        "description": "Decoder type to use to decode audio data. (`\"webaudio\"` or `\"ffmpeg\"`)",
+        "type": "string",
+        "required": false,
+        "default": "webaudio"
+      },
+      "player": {
+        "name": "player",
+        "description": "Player type to use to play audio data. (`\"html5\"` or `\"webaudio\"`)",
+        "type": "string",
+        "required": false,
+        "default": "html5"
+      }
+    }
+  },
+  "HyperText": {
+    "name": "HyperText",
+    "description": "The `HyperText` tag displays hypertext markup for labeling. Use for labeling HTML-encoded text and webpages for NER and NLP projects.\n\nUse with the following data types: HTML.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "value": {
+        "name": "value",
+        "description": "Value of the element",
+        "type": "string",
+        "required": true
+      },
+      "valueType": {
+        "name": "valueType",
+        "description": "Whether the text is stored directly in uploaded data or needs to be loaded from a URL",
+        "type": ["url", "text"],
+        "required": false,
+        "default": "text"
+      },
+      "inline": {
+        "name": "inline",
+        "description": "Whether to embed HTML directly in Label Studio or use an iframe",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "saveTextResult": {
+        "name": "saveTextResult",
+        "description": "Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url`",
+        "type": ["yes", "no"],
+        "required": false
+      },
+      "encoding": {
+        "name": "encoding",
+        "description": "How to decode values from encoded strings",
+        "type": ["none", "base64", "base64unicode"],
+        "required": false
+      },
+      "selectionEnabled": {
+        "name": "selectionEnabled",
+        "description": "Enable or disable selection",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "clickableLinks": {
+        "name": "clickableLinks",
+        "description": "Whether to allow opening resources from links in the hypertext markup.",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "highlightColor": {
+        "name": "highlightColor",
+        "description": "Hex string with highlight color, if not provided uses the labels color",
+        "type": "string",
+        "required": false
+      },
+      "showLabels": {
+        "name": "showLabels",
+        "description": "Whether or not to show labels next to the region; unset (by default) — use editor settings; true/false — override settings",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "granularity": {
+        "name": "granularity",
+        "description": "Control region selection granularity",
+        "type": ["symbol", "word", "sentence", "paragraph"],
+        "required": false
+      }
+    }
+  },
+  "Image": {
+    "name": "Image",
+    "description": "The `Image` tag shows an image on the page. Use for all image annotation tasks to display an image on the labeling interface.\n\nUse with the following data types: images.\n\nWhen you annotate image regions with this tag, the annotations are saved as percentages of the original size of the image, from 0-100.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "value": {
+        "name": "value",
+        "description": "Data field containing a path or URL to the image",
+        "type": "string",
+        "required": true
+      },
+      "valueList": {
+        "name": "valueList",
+        "description": "References a variable that holds a list of image URLs",
+        "type": "string",
+        "required": false
+      },
+      "smoothing": {
+        "name": "smoothing",
+        "description": "Enable smoothing, by default it uses user settings",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "width": {
+        "name": "width",
+        "description": "Image width",
+        "type": "string",
+        "required": false,
+        "default": "100%"
+      },
+      "maxWidth": {
+        "name": "maxWidth",
+        "description": "Maximum image width",
+        "type": "string",
+        "required": false,
+        "default": "750px"
+      },
+      "zoom": {
+        "name": "zoom",
+        "description": "Enable zooming an image with the mouse wheel",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "negativeZoom": {
+        "name": "negativeZoom",
+        "description": "Enable zooming out an image",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "zoomBy": {
+        "name": "zoomBy",
+        "description": "Scale factor",
+        "type": "float",
+        "required": false,
+        "default": 1.1
+      },
+      "grid": {
+        "name": "grid",
+        "description": "Whether to show a grid",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "gridSize": {
+        "name": "gridSize",
+        "description": "Specify size of the grid",
+        "type": "number",
+        "required": false,
+        "default": 30
+      },
+      "gridColor": {
+        "name": "gridColor",
+        "description": "Color of the grid in hex, opacity is 0.15",
+        "type": "string",
+        "required": false,
+        "default": "#EEEEF4"
+      },
+      "zoomControl": {
+        "name": "zoomControl",
+        "description": "Show zoom controls in toolbar",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "brightnessControl": {
+        "name": "brightnessControl",
+        "description": "Show brightness control in toolbar",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "contrastControl": {
+        "name": "contrastControl",
+        "description": "Show contrast control in toolbar",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "rotateControl": {
+        "name": "rotateControl",
+        "description": "Show rotate control in toolbar",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "crosshair": {
+        "name": "crosshair",
+        "description": "Show crosshair cursor",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "horizontalAlignment": {
+        "name": "horizontalAlignment",
+        "description": "Where to align image horizontally. Can be one of \"left\", \"center\", or \"right\"",
+        "type": ["left", "center", "right"],
+        "required": false,
+        "default": "left"
+      },
+      "verticalAlignment": {
+        "name": "verticalAlignment",
+        "description": "Where to align image vertically. Can be one of \"top\", \"center\", or \"bottom\"",
+        "type": ["top", "center", "bottom"],
+        "required": false,
+        "default": "top"
+      },
+      "defaultZoom": {
+        "name": "defaultZoom",
+        "description": "Specify the initial zoom of the image within the viewport while preserving its ratio. Can be one of \"auto\", \"original\", or \"fit\"",
+        "type": ["auto", "original", "fit"],
+        "required": false,
+        "default": "fit"
+      },
+      "crossOrigin": {
+        "name": "crossOrigin",
+        "description": "Configures CORS cross domain behavior for this image, either \"none\", \"anonymous\", or \"use-credentials\", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin).",
+        "type": ["none", "anonymous", "use-credentials"],
+        "required": false,
+        "default": "none"
+      }
+    }
+  },
+  "List": {
+    "name": "List",
+    "description": "The `List` tag is used to display a list of similar items like articles, search results, etc. Task data in the `value` parameter should be an array of objects with `id`, `title`, `body`, and `html` fields.\n\nIt's much more lightweight to use `List` than to group other tags like Text. Also, you can attach classifications to provide additional data about this list.\n\nThe `List` tag can be used with the `Ranker` tag to rank items or pick relevant items from a list.\nItems can be styled in `Style` tag by using `.htx-ranker-item` class.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "value": {
+        "name": "value",
+        "description": "Data field containing a JSON with array of objects (id, title, body) to rank",
+        "type": "string",
+        "required": true
+      },
+      "title": {
+        "name": "title",
+        "description": "Title of the list",
+        "type": "string",
+        "required": false
+      }
+    }
+  },
+  "Paragraphs": {
+    "name": "Paragraphs",
+    "description": "The `Paragraphs` tag displays paragraphs of text on the labeling interface. Use to label dialogue transcripts for NLP and NER projects.\nThe `Paragraphs` tag expects task data formatted as an array of objects like the following:\n[{ $nameKey: \"Author name\", $textKey: \"Text\" }, ... ]\n\nUse with the following data types: text.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "value": {
+        "name": "value",
+        "description": "Data field containing the paragraph content",
+        "type": "string",
+        "required": true
+      },
+      "valueType": {
+        "name": "valueType",
+        "description": "Whether the data is stored directly in uploaded JSON data or needs to be loaded from a URL",
+        "type": ["json", "url"],
+        "required": false,
+        "default": "json"
+      },
+      "audioUrl": {
+        "name": "audioUrl",
+        "description": "Audio to sync phrases with",
+        "type": "string",
+        "required": false
+      },
+      "sync": {
+        "name": "sync",
+        "description": "Object name to sync with",
+        "type": "string",
+        "required": false
+      },
+      "showPlayer": {
+        "name": "showPlayer",
+        "description": "Whether to show audio player above the paragraphs. Ignored if sync object is audio",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "saveTextResult": {
+        "name": "saveTextResult",
+        "description": "Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url`",
+        "type": ["no", "yes"],
+        "required": false,
+        "default": "yes"
+      },
+      "layout": {
+        "name": "layout",
+        "description": "Whether to use a dialogue-style layout or not",
+        "type": ["none", "dialogue"],
+        "required": false,
+        "default": "none"
+      },
+      "nameKey": {
+        "name": "nameKey",
+        "description": "The key field to use for name",
+        "type": "string",
+        "required": false,
+        "default": "author"
+      },
+      "textKey": {
+        "name": "textKey",
+        "description": "The key field to use for the text",
+        "type": "string",
+        "required": false,
+        "default": "text"
+      },
+      "contextScroll": {
+        "name": "contextScroll",
+        "description": "Turn on contextual scroll mode",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      }
+    }
+  },
+  "Table": {
+    "name": "Table",
+    "description": "The `Table` tag is used to display object keys and values in a table.",
+    "attrs": {
+      "value": {
+        "name": "value",
+        "description": "Data field value containing JSON type for Table",
+        "type": "string",
+        "required": true
+      },
+      "valueType": {
+        "name": "valueType",
+        "description": "Value to define the data type in Table",
+        "type": "string",
+        "required": false
+      }
+    }
+  },
+  "Text": {
+    "name": "Text",
+    "description": "The `Text` tag shows text that can be labeled. Use to display any type of text on the labeling interface.\nYou can use `<Style>.htx-text{ white-space: pre-wrap; }</Style>` to preserve all spaces in the text, otherwise spaces are trimmed when displayed and saved in the results.\nEvery space in the text sample is counted when calculating result offsets, for example for NER labeling tasks.\n\nUse with the following data types: text.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "value": {
+        "name": "value",
+        "description": "Data field containing text or a UR",
+        "type": "string",
+        "required": true
+      },
+      "valueType": {
+        "name": "valueType",
+        "description": "Whether the text is stored directly in uploaded data or needs to be loaded from a URL",
+        "type": ["url", "text"],
+        "required": false,
+        "default": "text"
+      },
+      "saveTextResult": {
+        "name": "saveTextResult",
+        "description": "Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url`",
+        "type": ["yes", "no"],
+        "required": false
+      },
+      "encoding": {
+        "name": "encoding",
+        "description": "How to decode values from encoded strings",
+        "type": ["none", "base64", "base64unicode"],
+        "required": false
+      },
+      "selectionEnabled": {
+        "name": "selectionEnabled",
+        "description": "Enable or disable selection",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "highlightColor": {
+        "name": "highlightColor",
+        "description": "Hex string with highlight color, if not provided uses the labels color",
+        "type": "string",
+        "required": false
+      },
+      "showLabels": {
+        "name": "showLabels",
+        "description": "Whether or not to show labels next to the region; unset (by default) — use editor settings; true/false — override settings",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "granularity": {
+        "name": "granularity",
+        "description": "Control region selection granularity",
+        "type": ["symbol", "word", "sentence", "paragraph"],
+        "required": false
+      }
+    }
+  },
+  "TimeSeries": {
+    "name": "TimeSeries",
+    "description": "The `TimeSeries` tag can be used to label time series data. Read more about Time Series Labeling on [the time series template page](../templates/time_series.html).\n\nNote: The time axis in your data must be sorted, otherwise the TimeSeries tag does not work.\nTo use autogenerated indices as time axes, don't use the `timeColumn` parameter.\n\nUse with the following data types: time series.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "value": {
+        "name": "value",
+        "description": "Key used to look up the data, either URLs for your time-series if valueType=url, otherwise expects JSON",
+        "type": "string",
+        "required": true
+      },
+      "valueType": {
+        "name": "valueType",
+        "description": "Format of time series data provided. If set to \"url\" then Label Studio loads value references inside `value` key, otherwise it expects JSON.",
+        "type": ["url", "json"],
+        "required": false,
+        "default": "url"
+      },
+      "timeColumn": {
+        "name": "timeColumn",
+        "description": "Column name or index that provides temporal values. If your time series data has no temporal column then one is automatically generated.",
+        "type": "string",
+        "required": false
+      },
+      "timeFormat": {
+        "name": "timeFormat",
+        "description": "Pattern used to parse values inside timeColumn, parsing is provided by d3, and follows `strftime` implementation",
+        "type": "string",
+        "required": false
+      },
+      "timeDisplayFormat": {
+        "name": "timeDisplayFormat",
+        "description": "Format used to display temporal value. Can be a number or a date. If a temporal column is a date, use strftime to format it. If it's a number, use [d3 number](https://github.com/d3/d3-format#locale_format) formatting.",
+        "type": "string",
+        "required": false
+      },
+      "durationDisplayFormat": {
+        "name": "durationDisplayFormat",
+        "description": "Format used to display temporal duration value for brush range. If the temporal column is a date, use strftime to format it. If it's a number, use [d3 number](https://github.com/d3/d3-format#locale_format) formatting.",
+        "type": "string",
+        "required": false
+      },
+      "sep": {
+        "name": "sep",
+        "description": "Separator for your CSV file.",
+        "type": "string",
+        "required": false,
+        "default": ","
+      },
+      "overviewChannels": {
+        "name": "overviewChannels",
+        "description": "Comma-separated list of channel names or indexes displayed in overview.",
+        "type": "string",
+        "required": false
+      },
+      "overviewWidth": {
+        "name": "overviewWidth",
+        "description": "Default width of overview window in percents",
+        "type": "string",
+        "required": false,
+        "default": "25%"
+      },
+      "fixedScale": {
+        "name": "fixedScale",
+        "description": "Whether to scale y-axis to the maximum to fit all the values. If false, current view scales to fit only the displayed values.",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      }
+    }
+  },
+  "Channel": {
+    "name": "Channel",
+    "description": "Channel tag can be used to label time series data",
+    "attrs": {
+      "column": {
+        "name": "column",
+        "description": "column name or index",
+        "type": "string",
+        "required": true
+      },
+      "legend": {
+        "name": "legend",
+        "description": "display name of the channel",
+        "type": "string",
+        "required": false
+      },
+      "units": {
+        "name": "units",
+        "description": "display units name",
+        "type": "string",
+        "required": false
+      },
+      "displayFormat": {
+        "name": "displayFormat",
+        "description": "format string for the values, uses d3-format:<br/>\n       `[,][.precision][f\\|%]`<br/>\n       `,` - group thousands with separator (from locale): `,` (12345.6 -> 12,345.6) `,.2f` (12345.6 -> 12,345.60)<br/>\n       `.precision` - precision for `f\\|%` type, significant digits for empty type:<br/>\n                    `.3f` (12.3456 -> 12.345, 1000 -> 1000.000)<br/>\n                    `.3` (12.3456 -> 12.3, 1.2345 -> 1.23, 12345 -> 1.23e+4)<br/>\n       `f` - treat as float, default precision is .6: `f` (12 -> 12.000000) `.2f` (12 -> 12.00) `.0f` (12.34 -> 12)<br/>\n       `%` - treat as percents and format accordingly: `%.0` (0.128 -> 13%) `%.1` (1.2345 -> 123.4%)",
+        "type": "string",
+        "required": false
+      },
+      "height": {
+        "name": "height",
+        "description": "height of the plot",
+        "type": "number",
+        "required": false
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "plot stroke color, expects hex value",
+        "type": "string",
+        "required": false,
+        "default": "#f48a42"
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "plot stroke width",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "markerColor": {
+        "name": "markerColor",
+        "description": "plot stroke color, expects hex value",
+        "type": "string",
+        "required": false,
+        "default": "#f48a42"
+      },
+      "markerSize": {
+        "name": "markerSize",
+        "description": "plot stroke width",
+        "type": "number",
+        "required": false,
+        "default": 0
+      },
+      "markerSymbol": {
+        "name": "markerSymbol",
+        "description": "plot stroke width",
+        "type": "number",
+        "required": false,
+        "default": "circle"
+      },
+      "timeRange": {
+        "name": "timeRange",
+        "description": "data range of x-axis / time axis",
+        "type": "string",
+        "required": false
+      },
+      "dataRange": {
+        "name": "dataRange",
+        "description": "data range of y-axis / data axis",
+        "type": "string",
+        "required": false
+      },
+      "showAxis": {
+        "name": "showAxis",
+        "description": "show or bide both axis",
+        "type": "string",
+        "required": false
+      },
+      "fixedScale": {
+        "name": "fixedScale",
+        "description": "if false current view scales to fit only displayed values; if given overwrites TimeSeries' fixedScale",
+        "type": ["true", "false"],
+        "required": false
+      }
+    }
+  },
+  "Video": {
+    "name": "Video",
+    "description": "Video tag plays a simple video file. Use for video annotation tasks such as classification and transcription.\n\nUse with the following data types: video",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "value": {
+        "name": "value",
+        "description": "URL of the video",
+        "type": "string",
+        "required": true
+      },
+      "frameRate": {
+        "name": "frameRate",
+        "description": "video frame rate per second; default is 24; can use task data like `$fps`",
+        "type": "number",
+        "required": false,
+        "default": 24
+      },
+      "sync": {
+        "name": "sync",
+        "description": "object name to sync with",
+        "type": "string",
+        "required": false
+      },
+      "muted": {
+        "name": "muted",
+        "description": "muted video",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "height": {
+        "name": "height",
+        "description": "height of the video player",
+        "type": "number",
+        "required": false,
+        "default": 600
+      },
+      "timelineHeight": {
+        "name": "timelineHeight",
+        "description": "height of the timeline with regions",
+        "type": "number",
+        "required": false,
+        "default": 64
+      }
+    }
+  },
+  "Brush": {
+    "name": "Brush",
+    "description": "The `Brush` tag is used for image segmentation tasks where you want to apply a mask or use a brush to draw a region on the image.\n\nUse with the following data types: image.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the image to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether the data labeler can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "smart": {
+        "name": "smart",
+        "description": "Show smart tool for interactive pre-annotations",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "smartOnly": {
+        "name": "smartOnly",
+        "description": "Only show smart tool for interactive pre-annotations",
+        "type": ["true", "false"],
+        "required": false
+      }
+    }
+  },
+  "BrushLabels": {
+    "name": "BrushLabels",
+    "description": "The `BrushLabels` tag for image segmentation tasks is used in the area where you want to apply a mask or use a brush to draw a region on the image.\n\nUse with the following data types: image.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the image to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether the data labeler can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      }
+    }
+  },
+  "Choice": {
+    "name": "Choice",
+    "description": "The `Choice` tag represents a single choice for annotations. Use with the `Choices` tag or `Taxonomy` tag to provide specific choice options.",
+    "attrs": {
+      "value": {
+        "name": "value",
+        "description": "Choice value",
+        "type": "string",
+        "required": true
+      },
+      "selected": {
+        "name": "selected",
+        "description": "Specify whether to preselect this choice on the labeling interface",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "alias": {
+        "name": "alias",
+        "description": "Alias for the choice. If used, the alias replaces the choice value in the annotation results. Alias does not display in the interface.",
+        "type": "string",
+        "required": false
+      },
+      "style": {
+        "name": "style",
+        "description": "CSS style of the checkbox element",
+        "type": "style",
+        "required": false
+      },
+      "hotkey": {
+        "name": "hotkey",
+        "description": "Hotkey for the selection",
+        "type": "string",
+        "required": false
+      },
+      "html": {
+        "name": "html",
+        "description": "Can be used to show enriched content, it has higher priority than `value`, however `value` will be used in the exported result (should be properly escaped)",
+        "type": "string",
+        "required": false
+      },
+      "hint": {
+        "name": "hint",
+        "description": "Hint for choice on hover",
+        "type": "string",
+        "required": false
+      },
+      "color": {
+        "name": "color",
+        "description": "Color for Taxonomy item",
+        "type": "string",
+        "required": false
+      }
+    }
+  },
+  "Choices": {
+    "name": "Choices",
+    "description": "The `Choices` tag is used to create a group of choices, with radio buttons or checkboxes. It can be used for single or multi-class classification. Also, it is used for advanced classification tasks where annotators can choose one or multiple answers.\n\nChoices can have dynamic value to load labels from task. This task data should contain a list of options to create underlying `<Choice>`s. All the parameters from options will be transferred to corresponding tags.\n\nThe `Choices` tag can be used with any data types.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the group of choices",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the data item that you want to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Single or multi-class classification",
+        "type": ["single", "single-radio", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show choices in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "required": {
+        "name": "required",
+        "description": "Validate whether a choice has been selected",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "requiredMessage": {
+        "name": "requiredMessage",
+        "description": "Show a message if validation fails",
+        "type": "string",
+        "required": false
+      },
+      "visibleWhen": {
+        "name": "visibleWhen",
+        "description": "Control visibility of the choices. Can also be used with `when*` attributes below to narrow down visibility",
+        "type": ["region-selected", "no-region-selected", "choice-selected", "choice-unselected"],
+        "required": false
+      },
+      "whenTagName": {
+        "name": "whenTagName",
+        "description": "Use with visibleWhen. Narrow down visibility by name of the tag. For regions, use the name of the object tag, for choices, use the name of the choices tag",
+        "type": "string",
+        "required": false
+      },
+      "whenLabelValue": {
+        "name": "whenLabelValue",
+        "description": "Use with visibleWhen=\"region-selected\". Narrow down visibility by label value",
+        "type": "string",
+        "required": false
+      },
+      "whenChoiceValue": {
+        "name": "whenChoiceValue",
+        "description": "Use with visibleWhen (\"choice-selected\" or \"choice-unselected\") and whenTagName, both are required. Narrow down visibility by choice value",
+        "type": "string",
+        "required": false
+      },
+      "perRegion": {
+        "name": "perRegion",
+        "description": "Use this tag to select a choice for a specific region instead of the entire task",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "perItem": {
+        "name": "perItem",
+        "description": "Use this tag to select a choice for a specific item inside the object instead of the whole object",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "value": {
+        "name": "value",
+        "description": "Task data field containing a list of dynamically loaded choices (see example below)",
+        "type": "string",
+        "required": false
+      },
+      "allowNested": {
+        "name": "allowNested",
+        "description": "Allow to use `children` field in dynamic choices to nest them. Submitted result will contain array of arrays, every item is a list of values from topmost parent choice down to selected one.",
+        "type": ["true", "false"],
+        "required": false
+      }
+    }
+  },
+  "DateTime": {
+    "name": "DateTime",
+    "description": "The DateTime tag adds date and time selection to the labeling interface. Use this tag to add a date, timestamp, month, or year to an annotation.\n\nUse with the following data types: audio, image, HTML, paragraph, text, time series, video",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the element that you want to label",
+        "type": "string",
+        "required": true
+      },
+      "only": {
+        "name": "only",
+        "description": "Comma-separated list of parts to display (date, time, month, year)\n       date and month/year can't be used together. The date option takes precedence",
+        "type": "string",
+        "required": true
+      },
+      "format": {
+        "name": "format",
+        "description": "Input/output strftime format for datetime (internally it's always ISO);\n       when both date and time are displayed, by default shows ISO with a \"T\" separator;\n       when only date is displayed, by default shows ISO date;\n       when only time is displayed, by default shows a 24 hour time with leading zero",
+        "type": "string",
+        "required": true
+      },
+      "min": {
+        "name": "min",
+        "description": "Set a minimum datetime value for only=date in ISO format, or minimum year for only=year",
+        "type": "string",
+        "required": false
+      },
+      "max": {
+        "name": "max",
+        "description": "Set a maximum datetime value for only=date in ISO format, or maximum year for only=year",
+        "type": "string",
+        "required": false
+      },
+      "required": {
+        "name": "required",
+        "description": "Whether datetime is required or not",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "requiredMessage": {
+        "name": "requiredMessage",
+        "description": "Message to show if validation fails",
+        "type": "string",
+        "required": false
+      },
+      "perRegion": {
+        "name": "perRegion",
+        "description": "Use this option to label regions instead of the whole object",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "perItem": {
+        "name": "perItem",
+        "description": "Use this option to label items inside the object instead of the whole object",
+        "type": ["true", "false"],
+        "required": false
+      }
+    }
+  },
+  "Ellipse": {
+    "name": "Ellipse",
+    "description": "The `Ellipse` tag is used to add an elliptical bounding box to an image. Use for bounding box image segmentation tasks with ellipses.\n\nUse with the following data types: image.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the image to label",
+        "type": "string",
+        "required": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of ellipse",
+        "type": "float",
+        "required": false,
+        "default": 0.6
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Ellipse fill color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#f48a42"
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of the stroke",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "canRotate": {
+        "name": "canRotate",
+        "description": "Show or hide rotation control",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "smart": {
+        "name": "smart",
+        "description": "Show smart tool for interactive pre-annotations",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "smartOnly": {
+        "name": "smartOnly",
+        "description": "Only show smart tool for interactive pre-annotations",
+        "type": ["true", "false"],
+        "required": false
+      }
+    }
+  },
+  "EllipseLabels": {
+    "name": "EllipseLabels",
+    "description": "The `EllipseLabels` tag creates labeled ellipses. Use to apply labels to ellipses for semantic segmentation.\n\nUse with the following data types: image.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the image to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether you can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of ellipse",
+        "type": "float",
+        "required": false,
+        "default": 0.6
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Ellipse fill color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of stroke",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "canRotate": {
+        "name": "canRotate",
+        "description": "Show or hide rotation option",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      }
+    }
+  },
+  "HyperTextLabels": {
+    "name": "HyperTextLabels",
+    "description": "The `HyperTextLabels` tag creates labeled hyper text (HTML). Use with the HyperText object tag to annotate HTML text or HTML elements for named entity recognition tasks.\n\nUse with the following data types: HTML.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the HTML element to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure if you can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      }
+    }
+  },
+  "KeyPoint": {
+    "name": "KeyPoint",
+    "description": "The `KeyPoint` tag is used to add a key point to an image without selecting a label. This can be useful when you have only one label to assign to the key point.\n\nUse with the following data types: image.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the image to label",
+        "type": "string",
+        "required": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of keypoint",
+        "type": "float",
+        "required": false,
+        "default": 0.9
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Keypoint fill color in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#8bad00"
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of the stroke",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Keypoint stroke color in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#8bad00"
+      },
+      "smart": {
+        "name": "smart",
+        "description": "Show smart tool for interactive pre-annotations",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "smartOnly": {
+        "name": "smartOnly",
+        "description": "Only show smart tool for interactive pre-annotations",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap keypoint to image pixels",
+        "type": ["pixel", "none"],
+        "required": false,
+        "default": "none"
+      }
+    }
+  },
+  "KeyPointLabels": {
+    "name": "KeyPointLabels",
+    "description": "The `KeyPointLabels` tag creates labeled keypoints. Use to apply labels to identified key points, such as identifying facial features for a facial recognition labeling project.\n\nUse with the following data types: image.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the image to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether you can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of the keypoint",
+        "type": "float",
+        "required": false,
+        "default": 0.9
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of the stroke",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap keypoint to image pixels",
+        "type": ["pixel", "none"],
+        "required": false,
+        "default": "none"
+      }
+    }
+  },
+  "Label": {
+    "name": "Label",
+    "description": "The `Label` tag represents a single label. Use with the `Labels` tag, including `BrushLabels`, `EllipseLabels`, `HyperTextLabels`, `KeyPointLabels`, and other `Labels` tags to specify the value of a specific label.",
+    "attrs": {
+      "value": {
+        "name": "value",
+        "description": "Value of the label",
+        "type": "string",
+        "required": true
+      },
+      "selected": {
+        "name": "selected",
+        "description": "Whether to preselect this label",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times this label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "hint": {
+        "name": "hint",
+        "description": "Hint for label on hover",
+        "type": "string",
+        "required": false
+      },
+      "hotkey": {
+        "name": "hotkey",
+        "description": "Hotkey to use for the label. Automatically generated if not specified",
+        "type": "string",
+        "required": false
+      },
+      "alias": {
+        "name": "alias",
+        "description": "Label alias",
+        "type": "string",
+        "required": false
+      },
+      "showAlias": {
+        "name": "showAlias",
+        "description": "Whether to show alias inside label text",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "aliasStyle": {
+        "name": "aliasStyle",
+        "description": "CSS style for the alias",
+        "type": "string",
+        "required": false,
+        "default": "opacity:0.6"
+      },
+      "size": {
+        "name": "size",
+        "description": "Size of text in the label",
+        "type": "string",
+        "required": false,
+        "default": "medium"
+      },
+      "background": {
+        "name": "background",
+        "description": "Background color of an active label in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#36B37E"
+      },
+      "selectedColor": {
+        "name": "selectedColor",
+        "description": "Color of text in an active label in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#ffffff"
+      },
+      "granularity": {
+        "name": "granularity",
+        "description": "Set control based on symbol or word selection (only for Text)",
+        "type": ["symbol", "word"],
+        "required": false
+      },
+      "html": {
+        "name": "html",
+        "description": "HTML code is used to display label button instead of raw text provided by `value` (should be properly escaped)",
+        "type": "string",
+        "required": false
+      },
+      "category": {
+        "name": "category",
+        "description": "Category is used in the export (in label-studio-converter lib) to make an order of labels for YOLO and COCO",
+        "type": "int",
+        "required": false
+      }
+    }
+  },
+  "Labels": {
+    "name": "Labels",
+    "description": "The `Labels` tag provides a set of labels for labeling regions in tasks for machine learning and data science projects. Use the `Labels` tag to create a set of labels that can be assigned to identified region and specify the values of labels to assign to regions.\n\nAll types of Labels can have dynamic value to load labels from task. This task data should contain a list of options to create underlying `<Label>`s. All the parameters from options will be transferred to corresponding tags.\n\nThe Labels tag can be used with audio and text data types. Other data types have type-specific Labels tags.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the element that you want to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether you can select one or multiple labels for a region",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Whether to show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of rectangle highlighting the label",
+        "type": "float",
+        "required": false,
+        "default": 0.6
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Rectangle fill color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#f48a42"
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of the stroke",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "value": {
+        "name": "value",
+        "description": "Task data field containing a list of dynamically loaded labels (see example below)",
+        "type": "string",
+        "required": false
+      }
+    }
+  },
+  "Magicwand": {
+    "name": "Magicwand",
+    "description": "The `Magicwand` tag makes it possible to click in a region of an image a user is doing segmentation\nlabeling on, drag the mouse to dynamically change flood filling tolerance, then release the mouse button\nto get a new labeled area. It is particularly effective at segmentation labeling broad, diffuse, complex\nedged objects, such as clouds, cloud shadows, snow, etc. in earth observation applications or organic\nshapes in biomedical applications.\n\nUse with the following data types: image.\n\nZooming is supported for the Magic Wand, but it will not work on rotated images.\n\nExample of the Magic Wand in use:\n\n![Animated GIF showing Magic Wand clicking on cloud and dragging, automatically segmenting and selecting\npixels to create a mask](../images/magicwand_example.gif)\n\n### CORS Configuration\n\nThe Magic Wand requires pixel-level access to images that are being labelled in order to do its\nthresholding and flood filling. If you are hosting your images to label on a third-party domain,\nyou will need to enable CORS headers for the Magic Wand to work with cross domain HTTP `GET`\nrequests in order for the Magic Wand to be able to threshold the actual image pixel data. See the\n[Label Studio storage guide](../guide/storage.html#Troubleshoot-CORS-and-access-problems) for more\ndetails on configuring CORS.\n\n### `Image` Tag Configuration\n\nThe `Magicwand` tag is configured to work with an `Image` tag that it will operate on for labeling.\nIf you are storing an image cross-domain that the `Image` tag will reference, you will have to\ncorrectly setup the `crossOrigin` on the `Image` attribute. This attribute mimics the same\n`crossOrigin` attribute that a normal DOM `img` tag would\nhave ([reference])(https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin).\n\nIf the image is on a public server or Google/AWS/Azure bucket that is publicly readable\nwithout any authentication, you should set `crossOrigin` to `anonymous`.\n\nIf the image is on a server or a private cloud bucket that requires authentication of any\nkind (i.e. the request must have HTTP headers that prove authentication set along with the\nthird party request), then you should set `crossOrigin` to `use-credentials`. Note that Google's\ncloud buckets [do not support authenticated requests for CORS requests](https://cloud.google.com/storage/docs/cross-origin#additional_considerations),\nwhich  means you either need to make that Google bucket world readable to work with the Magic Wand, or\nuse Label Studio's signed URL support ([AWS](../guide/storage.html#Set-up-connection-in-the-Label-Studio-UI),\n[GCP](../guide/storage.html#Set-up-connection-in-the-Label-Studio-UI-1), and\n[Azure](../guide/storage.html#Set-up-connection-in-the-Label-Studio-UI-2)).\n\nIf the image is on the same host as your Label Studio instance, you can simply leave off the\n`crossOrigin` attribute or set it to `none`.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the image to label",
+        "type": "string",
+        "required": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of the Magic Wand region during use",
+        "type": "float",
+        "required": false,
+        "default": 0.6
+      },
+      "blurradius": {
+        "name": "blurradius",
+        "description": "The edges of a Magic Wand region are blurred and simplified, this is the radius of the blur kernel",
+        "type": "number",
+        "required": false,
+        "default": 5
+      },
+      "defaultthreshold": {
+        "name": "defaultthreshold",
+        "description": "When the user initially clicks without dragging, how far a color has to be from the initial selected pixel to also be selected",
+        "type": "number",
+        "required": false,
+        "default": 15
+      }
+    }
+  },
+  "Number": {
+    "name": "Number",
+    "description": "The Number tag supports numeric classification. Use to classify tasks using numbers.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the element that you want to label",
+        "type": "string",
+        "required": true
+      },
+      "min": {
+        "name": "min",
+        "description": "Minimum number value",
+        "type": "number",
+        "required": false
+      },
+      "max": {
+        "name": "max",
+        "description": "Maximum number value",
+        "type": "number",
+        "required": false
+      },
+      "step": {
+        "name": "step",
+        "description": "Step for value increment/decrement",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "defaultValue": {
+        "name": "defaultValue",
+        "description": "Default number value; will be added automatically to result for required fields",
+        "type": "number",
+        "required": false
+      },
+      "hotkey": {
+        "name": "hotkey",
+        "description": "Hotkey for increasing number value",
+        "type": "string",
+        "required": false
+      },
+      "required": {
+        "name": "required",
+        "description": "Whether number is required or not",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "requiredMessage": {
+        "name": "requiredMessage",
+        "description": "Message to show if validation fails",
+        "type": "string",
+        "required": false
+      },
+      "perRegion": {
+        "name": "perRegion",
+        "description": "Use this tag to classify specific regions instead of the whole object",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "perItem": {
+        "name": "perItem",
+        "description": "Use this tag to classify specific items inside the object instead of the whole object",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "slider": {
+        "name": "slider",
+        "description": "Use slider look instead of input; use min and max to add your constraints",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      }
+    }
+  },
+  "Pairwise": {
+    "name": "Pairwise",
+    "description": "The `Pairwise` tag is used to compare two different objects and select one item from the list. If you want annotators to compare two objects and determine whether they are similar or not, use the `Choices` tag.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Comma-separated names of the elements you want to compare",
+        "type": "string",
+        "required": true
+      },
+      "selectionStyle": {
+        "name": "selectionStyle",
+        "description": "Style for the selection",
+        "type": "string",
+        "required": false
+      }
+    }
+  },
+  "ParagraphLabels": {
+    "name": "ParagraphLabels",
+    "description": "The `ParagraphLabels` tag creates labeled paragraphs. Use with the `Paragraphs` tag to label a paragraph of text.\n\nUse with the following data types: paragraphs.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the paragraph element to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether you can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      }
+    }
+  },
+  "Polygon": {
+    "name": "Polygon",
+    "description": "The `Polygon` tag is used to add polygons to an image without selecting a label. This can be useful when you have only one label to assign to the polygon. Use for image segmentation tasks.\n\nUse with the following data types: image.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of tag",
+        "type": "string",
+        "required": true
+      },
+      "toname": {
+        "name": "toname",
+        "description": "Name of image to label",
+        "type": "string",
+        "required": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of polygon",
+        "type": "number",
+        "required": false,
+        "default": 0.6
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Polygon fill color in hexadecimal or HTML color name",
+        "type": "string",
+        "required": false,
+        "default": "transparent"
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#f48a42"
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of stroke",
+        "type": "number",
+        "required": false,
+        "default": 3
+      },
+      "pointSize": {
+        "name": "pointSize",
+        "description": "Size of polygon handle points",
+        "type": ["small", "medium", "large"],
+        "required": false,
+        "default": "small"
+      },
+      "pointStyle": {
+        "name": "pointStyle",
+        "description": "Style of points",
+        "type": ["rectangle", "circle"],
+        "required": false,
+        "default": "circle"
+      },
+      "smart": {
+        "name": "smart",
+        "description": "Show smart tool for interactive pre-annotations",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "smartOnly": {
+        "name": "smartOnly",
+        "description": "Only show smart tool for interactive pre-annotations",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap polygon to image pixels",
+        "type": ["pixel", "none"],
+        "required": false,
+        "default": "none"
+      }
+    }
+  },
+  "PolygonLabels": {
+    "name": "PolygonLabels",
+    "description": "The `PolygonLabels` tag is used to create labeled polygons. Use to apply labels to polygons in semantic segmentation tasks.\n\nUse with the following data types: image.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of tag",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of image to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether you can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of polygon",
+        "type": "number",
+        "required": false,
+        "default": 0.2
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Polygon fill color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of stroke",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "pointSize": {
+        "name": "pointSize",
+        "description": "Size of polygon handle points",
+        "type": ["small", "medium", "large"],
+        "required": false,
+        "default": "medium"
+      },
+      "pointStyle": {
+        "name": "pointStyle",
+        "description": "Style of points",
+        "type": ["rectangle", "circle"],
+        "required": false,
+        "default": "rectangle"
+      },
+      "snap": {
+        "name": "snap",
+        "description": "Snap polygon to image pixels",
+        "type": ["pixel", "none"],
+        "required": false,
+        "default": "none"
+      }
+    }
+  },
+  "Ranker": {
+    "name": "Ranker",
+    "description": "The `Ranker` tag is used to rank items in a `List` tag or pick relevant items from a `List`, depending on using nested `Bucket` tags.\nIn simple case of `List` + `Ranker` tags the first one becomes interactive and saved result is a dict with the only key of tag's name and with value of array of ids in new order.\nWith `Bucket`s any items from the `List` can be moved to these buckets, and resulting groups will be exported as a dict `{ bucket-name-1: [array of ids in this bucket], ... }`\nBy default all items will sit in `List` and will not be exported, unless they are moved to a bucket. But with `default=\"true\"` parameter you can specify a bucket where all items will be placed by default, so exported result will always have all items from the list, grouped by buckets.\nColumns and items can be styled in `Style` tag by using respective `.htx-ranker-column` and `.htx-ranker-item` classes. Titles of columns are defined in `title` parameter of `Bucket` tag.\nNote: When `Bucket`s used without `default` param, the original list will also be stored as \"_\" named column in results, but that's internal value and this may be changed later.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "List tag name to connect to",
+        "type": "string",
+        "required": true
+      }
+    }
+  },
+  "Rating": {
+    "name": "Rating",
+    "description": "The `Rating` tag adds a rating selection to the labeling interface. Use for labeling tasks involving ratings.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the element that you want to label",
+        "type": "string",
+        "required": true
+      },
+      "maxRating": {
+        "name": "maxRating",
+        "description": "Maximum rating value",
+        "type": "number",
+        "required": false,
+        "default": 5
+      },
+      "defaultValue": {
+        "name": "defaultValue",
+        "description": "Default rating value",
+        "type": "number",
+        "required": false,
+        "default": 0
+      },
+      "size": {
+        "name": "size",
+        "description": "Rating icon size",
+        "type": ["small", "medium", "large"],
+        "required": false,
+        "default": "medium"
+      },
+      "icon": {
+        "name": "icon",
+        "description": "Rating icon",
+        "type": ["star", "heart", "fire", "smile"],
+        "required": false,
+        "default": "star"
+      },
+      "hotkey": {
+        "name": "hotkey",
+        "description": "HotKey for changing rating value",
+        "type": "string",
+        "required": true
+      },
+      "required": {
+        "name": "required",
+        "description": "Whether rating validation is required",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "requiredMessage": {
+        "name": "requiredMessage",
+        "description": "Message to show if validation fails",
+        "type": "string",
+        "required": false
+      },
+      "perRegion": {
+        "name": "perRegion",
+        "description": "Use this tag to rate regions instead of the whole object",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "perItem": {
+        "name": "perItem",
+        "description": "Use this tag to rate items inside the object instead of the whole object",
+        "type": ["true", "false"],
+        "required": false
+      }
+    }
+  },
+  "Rectangle": {
+    "name": "Rectangle",
+    "description": "The `Rectangle` tag is used to add a rectangle (Bounding Box) to an image without selecting a label. This can be useful when you have only one label to assign to a rectangle.\n\nUse with the following data types: image.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the image to label",
+        "type": "string",
+        "required": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of rectangle",
+        "type": "float",
+        "required": false,
+        "default": 0.6
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Rectangle fill color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#f48a42"
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of the stroke",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "canRotate": {
+        "name": "canRotate",
+        "description": "Whether to show or hide rotation control. Note that the anchor point in the results is different than the anchor point used when rotating with the rotation tool. For more information, see [Rotation](/templates/image_bbox#Rotation).",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "smart": {
+        "name": "smart",
+        "description": "Show smart tool for interactive pre-annotations",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "smartOnly": {
+        "name": "smartOnly",
+        "description": "Only show smart tool for interactive pre-annotations",
+        "type": ["true", "false"],
+        "required": false
+      }
+    }
+  },
+  "RectangleLabels": {
+    "name": "RectangleLabels",
+    "description": "The `RectangleLabels` tag creates labeled rectangles. Use to apply labels to bounding box semantic segmentation tasks.\n\nUse with the following data types: image.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the image to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether you can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of rectangle",
+        "type": "float",
+        "required": false,
+        "default": 0.6
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Rectangle fill color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of stroke",
+        "type": "number",
+        "required": false,
+        "default": 1
+      },
+      "canRotate": {
+        "name": "canRotate",
+        "description": "Show or hide rotation control. Note that the anchor point in the results is different than the anchor point used when rotating with the rotation tool. For more information, see [Rotation](/templates/image_bbox#Rotation).",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      }
+    }
+  },
+  "Relation": {
+    "name": "Relation",
+    "description": "The `Relation` tag represents a single relation label. Use with the `Relations` tag to specify the value of a label to apply to a relation between regions.",
+    "attrs": {
+      "value": {
+        "name": "value",
+        "description": "Value of the relation",
+        "type": "string",
+        "required": true
+      },
+      "background": {
+        "name": "background",
+        "description": "Background color of the active label in hexadecimal",
+        "type": "string",
+        "required": false
+      }
+    }
+  },
+  "Relations": {
+    "name": "Relations",
+    "description": "The `Relations` tag is used to create label relations between regions. Use to provide many values to apply to the relationship between two labeled regions.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.",
+    "attrs": {
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether you can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      }
+    }
+  },
+  "Shortcut": {
+    "name": "Shortcut",
+    "description": "The `Shortcut` tag to define a shortcut that annotators can use to add a predefined object, such as a specific label value, with a hotkey or keyboard shortcut.\n\nUse with the following data types:\n- Audio\n- Image\n- HTML\n- Paragraphs\n- Text\n- Time series\n- Video",
+    "attrs": {
+      "value": {
+        "name": "value",
+        "description": "The value of the shortcut",
+        "type": "string",
+        "required": true
+      },
+      "alias": {
+        "name": "alias",
+        "description": "Shortcut alias",
+        "type": "string",
+        "required": false
+      },
+      "hotkey": {
+        "name": "hotkey",
+        "description": "Hotkey",
+        "type": "string",
+        "required": false
+      },
+      "background": {
+        "name": "background",
+        "description": "Background color in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#333333"
+      }
+    }
+  },
+  "Taxonomy": {
+    "name": "Taxonomy",
+    "description": "The `Taxonomy` tag is used to create one or more hierarchical classifications, storing both choice selections and their ancestors in the results. Use for nested classification tasks with the `Choice` tag.\n\nYou can define nested classifications using the `Choice` tag, or retrieve external classifications using the `apiUrl` parameter. For more information on these options, see the [Taxonomy template page](/templates/taxonomy).\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the element that you want to classify",
+        "type": "string",
+        "required": true
+      },
+      "apiUrl": {
+        "name": "apiUrl",
+        "description": "**Beta** -- Retrieve the taxonomy from a remote source. This can be a JSON-formatted file or a hierarchical data source read as an API. For more information, see the [Taxonomy template page](/templates/taxonomy)",
+        "type": "string",
+        "required": false
+      },
+      "leafsOnly": {
+        "name": "leafsOnly",
+        "description": "Allow annotators to select only leaf nodes of taxonomy",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "showFullPath": {
+        "name": "showFullPath",
+        "description": "Whether to show the full path of selected items",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "pathSeparator": {
+        "name": "pathSeparator",
+        "description": "Separator to show in the full path (default is \" / \"). To avoid errors, ensure that your data does not include this separator",
+        "type": "string",
+        "required": false,
+        "default": "/"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a choice can be selected per task or per region",
+        "type": "number",
+        "required": false
+      },
+      "maxWidth": {
+        "name": "maxWidth",
+        "description": "Maximum width for dropdown",
+        "type": "number",
+        "required": false
+      },
+      "minWidth": {
+        "name": "minWidth",
+        "description": "Minimum width for dropdown",
+        "type": "number",
+        "required": false
+      },
+      "required": {
+        "name": "required",
+        "description": "Whether taxonomy validation is required",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "requiredMessage": {
+        "name": "requiredMessage",
+        "description": "Message to show if validation fails",
+        "type": "string",
+        "required": false
+      },
+      "placeholder=": {
+        "name": "placeholder=",
+        "description": "What to display as prompt on the input",
+        "type": "string",
+        "required": false
+      },
+      "perRegion": {
+        "name": "perRegion",
+        "description": "Use this tag to classify specific regions instead of the whole object",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "perItem": {
+        "name": "perItem",
+        "description": "Use this tag to classify specific items inside the object instead of the whole object",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "legacy": {
+        "name": "legacy",
+        "description": "Use this tag to enable the legacy version of the Taxonomy tag. The legacy version supports the ability for annotators to add labels as needed. However, when true, the `apiUrl` parameter is not usable.",
+        "type": ["true", "false"],
+        "required": false
+      }
+    }
+  },
+  "TextArea": {
+    "name": "TextArea",
+    "description": "The `TextArea` tag is used to display a text area for user input. Use for transcription, paraphrasing, or captioning tasks.\n\nUse with the following data types: audio, image, HTML, paragraphs, text, time series, video.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the element that you want to label",
+        "type": "string",
+        "required": true
+      },
+      "value": {
+        "name": "value",
+        "description": "Pre-filled value",
+        "type": "string",
+        "required": true
+      },
+      "label": {
+        "name": "label",
+        "description": "Label text",
+        "type": "string",
+        "required": false
+      },
+      "placeholder": {
+        "name": "placeholder",
+        "description": "Placeholder text",
+        "type": "string",
+        "required": false
+      },
+      "maxSubmissions": {
+        "name": "maxSubmissions",
+        "description": "Maximum number of submissions",
+        "type": "string",
+        "required": false
+      },
+      "editable": {
+        "name": "editable",
+        "description": "Whether to display an editable textarea",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "skipDuplicates": {
+        "name": "skipDuplicates",
+        "description": "Prevent duplicates in textarea inputs",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "transcription": {
+        "name": "transcription",
+        "description": "If false, always show editor",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "displayMode": {
+        "name": "displayMode",
+        "description": "Display mode for the textarea; region-list shows it for every region in regions list",
+        "type": ["tag", "region-list"],
+        "required": false,
+        "default": "tag"
+      },
+      "rows": {
+        "name": "rows",
+        "description": "Number of rows in the textarea",
+        "type": "number",
+        "required": false
+      },
+      "required": {
+        "name": "required",
+        "description": "Validate whether content in textarea is required",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      },
+      "requiredMessage": {
+        "name": "requiredMessage",
+        "description": "Message to show if validation fails",
+        "type": "string",
+        "required": false
+      },
+      "showSubmitButton": {
+        "name": "showSubmitButton",
+        "description": "Whether to show or hide the submit button. By default it shows when there are more than one rows of text, such as in textarea mode.",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "perRegion": {
+        "name": "perRegion",
+        "description": "Use this tag to label regions instead of whole objects",
+        "type": ["true", "false"],
+        "required": false
+      },
+      "perItem": {
+        "name": "perItem",
+        "description": "Use this tag to label items inside objects instead of whole objects",
+        "type": ["true", "false"],
+        "required": false
+      }
+    }
+  },
+  "TimeSeriesLabels": {
+    "name": "TimeSeriesLabels",
+    "description": "The `TimeSeriesLabels` tag is used to create a labeled time range.\n\nUse with the following data types: time series.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toname": {
+        "name": "toname",
+        "description": "Name of the timeseries to label",
+        "type": "string",
+        "required": true
+      },
+      "choice": {
+        "name": "choice",
+        "description": "Configure whether you can select one or multiple labels",
+        "type": ["single", "multiple"],
+        "required": false,
+        "default": "single"
+      },
+      "maxUsages": {
+        "name": "maxUsages",
+        "description": "Maximum number of times a label can be used per task",
+        "type": "number",
+        "required": false
+      },
+      "showInline": {
+        "name": "showInline",
+        "description": "Show labels in the same visual line",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "opacity": {
+        "name": "opacity",
+        "description": "Opacity of the range",
+        "type": "float",
+        "required": false,
+        "default": 0.9
+      },
+      "fillColor": {
+        "name": "fillColor",
+        "description": "Range fill color in hexadecimal or HTML color name",
+        "type": "string",
+        "required": false,
+        "default": "transparent"
+      },
+      "strokeColor": {
+        "name": "strokeColor",
+        "description": "Stroke color in hexadecimal",
+        "type": "string",
+        "required": false,
+        "default": "#f48a42"
+      },
+      "strokeWidth": {
+        "name": "strokeWidth",
+        "description": "Width of the stroke",
+        "type": "number",
+        "required": false,
+        "default": 1
+      }
+    }
+  },
+  "TimelineLabels": {
+    "name": "TimelineLabels",
+    "description": "Use the TimelineLabels tag to classify video frames. This can be a single frame or a span of frames.\n\nFirst, select a label and then click once to annotate a single frame. Click and drag to annotate multiple frames.\n\n![Screenshot of video with frame classification](../images/timelinelabels.png)\n\nUse with the `<Video>` control tag.\n\n!!! info Tip\n    You can increase the height of the timeline using the `timelineHeight` parameter on the `<Video>` tag.",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the video element",
+        "type": "string",
+        "required": true
+      }
+    }
+  },
+  "VideoRectangle": {
+    "name": "VideoRectangle",
+    "description": "VideoRectangle tag brings Object Tracking capabilities to videos. It works in combination with the `<Video/>` and the `<Labels/>` tags.\n\nUse with the following data types: video",
+    "attrs": {
+      "name": {
+        "name": "name",
+        "description": "Name of the element",
+        "type": "string",
+        "required": true
+      },
+      "toName": {
+        "name": "toName",
+        "description": "Name of the element to control (video)",
+        "type": "string",
+        "required": true
+      }
+    }
+  },
+  "Collapse": {
+    "name": "Collapse",
+    "description": "Collapse tag, a content area which can be collapsed and expanded.",
+    "attrs": {
+      "accordion": {
+        "name": "accordion",
+        "description": "Works as an accordion",
+        "type": ["true", "false"],
+        "required": false,
+        "default": true
+      },
+      "bordered": {
+        "name": "bordered",
+        "description": "Shows border",
+        "type": "string",
+        "required": false,
+        "default": false
+      }
+    }
+  },
+  "Filter": {
+    "name": "Filter",
+    "description": "Use the Filter tag to add a filter search for a large number of labels or choices. Use with the Labels tag or Choices tag.",
+    "attrs": {
+      "placeholder": {
+        "name": "placeholder",
+        "description": "Placeholder text for filter",
+        "type": "string",
+        "required": false,
+        "default": "\"Quick Filter\""
+      },
+      "minlength": {
+        "name": "minlength",
+        "description": "Size of the filter",
+        "type": "number",
+        "required": false,
+        "default": 3
+      },
+      "style": {
+        "name": "style",
+        "description": "CSS style of the string",
+        "type": "string",
+        "required": false
+      },
+      "hotkey": {
+        "name": "hotkey",
+        "description": "Hotkey to use to focus on the filter text area",
+        "type": "string",
+        "required": false
+      }
+    }
+  },
+  "Header": {
+    "name": "Header",
+    "description": "The `Header` tag is used to show a header on the labeling interface.",
+    "attrs": {
+      "value": {
+        "name": "value",
+        "description": "Text of header, either static text or the field name in data to use for the header",
+        "type": "string",
+        "required": true
+      },
+      "size": {
+        "name": "size",
+        "description": "Level of header on a page, used to control size of the text",
+        "type": "number",
+        "required": false,
+        "default": 4
+      },
+      "style": {
+        "name": "style",
+        "description": "CSS style for the header",
+        "type": "string",
+        "required": false
+      },
+      "underline": {
+        "name": "underline",
+        "description": "Whether to underline the header",
+        "type": ["true", "false"],
+        "required": false,
+        "default": false
+      }
+    }
+  },
+  "Style": {
+    "name": "Style",
+    "description": "The `Style` tag is used in combination with the View tag to apply custom CSS properties to the labeling interface. See the [CSS Reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference) on the MDN page for a full list of available properties that you can reference. You can also adjust default Label Studio CSS classes. Use the browser developer tools to inspect the element on the UI and locate the class name, then specify that class name in the `Style` tag.",
+    "attrs": {
+      "`.<className>`": {
+        "name": "`.<className>`",
+        "description": "Reference the className specified in the View tag to apply to a section of the labeling configuration.",
+        "type": "string",
+        "required": true
+      },
+      "CSS property": {
+        "name": "CSS property",
+        "description": "CSS property and value to apply.",
+        "type": "string",
+        "required": false
+      }
+    }
+  },
+  "View": {
+    "name": "View",
+    "description": "The `View` element is used to configure the display of blocks, similar to the div tag in HTML.",
+    "attrs": {
+      "display": {
+        "name": "display",
+        "type": ["block", "inline"],
+        "required": true
+      },
+      "style": {
+        "name": "style",
+        "description": "CSS style string",
+        "type": "string",
+        "required": false
+      },
+      "className": {
+        "name": "className",
+        "description": "Class name of the CSS style to apply. Use with the Style tag",
+        "type": "string",
+        "required": false
+      },
+      "idAttr": {
+        "name": "idAttr",
+        "description": "Unique ID attribute to use in CSS",
+        "type": "string",
+        "required": false
+      },
+      "visibleWhen": {
+        "name": "visibleWhen",
+        "description": "Control visibility of the content. Can also be used with `when*` attributes below to narrow down visibility",
+        "type": ["region-selected", "choice-selected", "no-region-selected", "choice-unselected"],
+        "required": false
+      },
+      "whenTagName": {
+        "name": "whenTagName",
+        "description": "Use with visibleWhen. Narrow down visibility by tag name. For regions, use the name of the object tag, for choices, use the name of the choices tag",
+        "type": "string",
+        "required": false
+      },
+      "whenLabelValue": {
+        "name": "whenLabelValue",
+        "description": "Use with visibleWhen=\"region-selected\". Narrow down visibility by label value",
+        "type": "string",
+        "required": false
+      },
+      "whenChoiceValue": {
+        "name": "whenChoiceValue",
+        "description": "Use with visibleWhen (\"choice-selected\" or \"choice-unselected\") and whenTagName, both are required. Narrow down visibility by choice value",
+        "type": "string",
+        "required": false
+      }
+    },
+    "children": [
+      "Audio",
+      "HyperText",
+      "Image",
+      "List",
+      "Paragraphs",
+      "Table",
+      "Text",
+      "TimeSeries",
+      "Channel",
+      "Video",
+      "Brush",
+      "BrushLabels",
+      "Choice",
+      "Choices",
+      "DateTime",
+      "Ellipse",
+      "EllipseLabels",
+      "HyperTextLabels",
+      "KeyPoint",
+      "KeyPointLabels",
+      "Label",
+      "Labels",
+      "Magicwand",
+      "Number",
+      "Pairwise",
+      "ParagraphLabels",
+      "Polygon",
+      "PolygonLabels",
+      "Ranker",
+      "Rating",
+      "Rectangle",
+      "RectangleLabels",
+      "Relation",
+      "Relations",
+      "Shortcut",
+      "Taxonomy",
+      "TextArea",
+      "TimeSeriesLabels",
+      "TimelineLabels",
+      "VideoRectangle",
+      "Collapse",
+      "Filter",
+      "Header",
+      "Style",
+      "View"
+    ]
+  }
+}

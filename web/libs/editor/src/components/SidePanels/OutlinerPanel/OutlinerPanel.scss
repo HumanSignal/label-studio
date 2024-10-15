@@ -1,0 +1,38 @@
+.outliner {
+  --view-controls-height: 40px;
+
+  &.ff_hide_all_regions {
+    --view-controls-height: 32px;
+  }
+
+  &.ff_outliner_optim {
+    height: 100%;
+  }
+
+  &__empty {
+    padding: 16px;
+    font-size: 14px;
+    color: var(--sand_600);
+  }
+
+  .ff_outliner_optim &-tree {
+    height: calc(100% - var(--view-controls-height));
+  }
+}
+
+.filters-info {
+  text-align: center;
+  margin: 22px 0 30px;
+
+  &-title {
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--sand_900);
+  }
+
+  &-description {
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--sand_700);
+  }
+}

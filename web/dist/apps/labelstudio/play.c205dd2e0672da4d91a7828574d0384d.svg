@@ -1,0 +1,19 @@
+var _path;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgPlay = function SvgPlay(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 24,
+    height: 24,
+    fill: "none",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "#000",
+    d: "M6 8.13c0-2.284 0-3.426.743-3.86.742-.434 1.738.125 3.728 1.245l6.88 3.87c2.06 1.159 3.09 1.738 3.09 2.615 0 .877-1.03 1.456-3.09 2.615l-6.88 3.87c-1.99 1.12-2.986 1.68-3.728 1.245C6 19.296 6 18.154 6 15.87z"
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgPlay);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTYgOC4xMjk1NEM2IDUuODQ2MDggNiA0LjcwNDM0IDYuNzQyNzMgNC4yNjk5NkM3LjQ4NTQ2IDMuODM1NTcgOC40ODA1NyA0LjM5NTMyIDEwLjQ3MDggNS41MTQ4MkwxNy4zNTE2IDkuMzg1MjdDMTkuNDEwOCAxMC41NDM2IDIwLjQ0MDQgMTEuMTIyNyAyMC40NDA0IDEyQzIwLjQ0MDQgMTIuODc3MyAxOS40MTA4IDEzLjQ1NjQgMTcuMzUxNiAxNC42MTQ3TDEwLjQ3MDggMTguNDg1MkM4LjQ4MDU3IDE5LjYwNDcgNy40ODU0NiAyMC4xNjQ0IDYuNzQyNzMgMTkuNzNDNiAxOS4yOTU3IDYgMTguMTUzOSA2IDE1Ljg3MDVWOC4xMjk1NFoiIGZpbGw9ImJsYWNrIi8+Cjwvc3ZnPgo=";

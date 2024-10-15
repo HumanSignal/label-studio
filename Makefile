@@ -14,21 +14,48 @@ makemigrations-dev:
 shell-dev:
 	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio python label_studio/manage.py shell_plus
 
-# Install modules
-frontend-setup:
-	cd label_studio/frontend && yarn install --frozen-lockfile && yarn run download:all;
+env-dev-setup:
+	if [ ! -f .env ]; then \
+		cp .env.development .env; \
+	fi
 
-# Fetch DM and LSF
-frontend-fetch:
-	cd label_studio/frontend && yarn run download:all;
+docker-dev-override:
+	if [ ! -f docker-compose.override.yml ]; then \
+		cp docker-compose.override.example.yml docker-compose.override.yml; \
+	fi
+
+# Configure Django dev server with Hot Module Replacement in docker
+docker-dev-setup: env-dev-setup docker-dev-override
+
+docker-run-dev:
+	docker-compose up --build
+
+docker-migrate-dev:
+	docker-compose run app python3 /label-studio/label_studio/manage.py migrate
+
+# Install modules
+frontend-install:
+	cd web && yarn install --frozen-lockfile;
+
+# Alias for backward compatibility
+frontend-setup: frontend-install
+
+# Run frontend dev server in Hot Module Replacement mode
+# For more information on HMR, see the "Environment Configuration" section in:
+# web/README.md
+frontend-dev:
+	cd web && yarn run dev
 
 # Build frontend continuously on files changes
 frontend-watch:
-	cd label_studio/frontend && yarn start
+	cd web && yarn run watch
 
 # Build production-ready optimized bundle
-frontend-build:
-	cd label_studio/frontend && yarn install --frozen-lockfile && yarn run build:production
+frontend-build: frontend-setup
+	cd web && yarn run build
+
+frontend-storybook-serve: frontend-setup
+	cd web && yarn run ui:serve
 
 # Run tests
 test:
@@ -46,3 +73,27 @@ docker-testing-shell:
 # Update urls
 update-urls:
 	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio python label_studio/manage.py show_urls --format pretty-json > ./label_studio/core/all_urls.json
+
+# Format changed files on branch
+fmt:
+	pre-commit run --config .pre-commit-dev.yaml --hook-stage manual
+
+# Format all files in repo
+fmt-all:
+	pre-commit run --config .pre-commit-dev.yaml --hook-stage manual --all-files
+
+# Check for lint issues on this branch
+fmt-check:
+	pre-commit run --hook-stage pre-push
+
+# Check for lint issues in entire repo
+fmt-check-all:
+	pre-commit run --hook-stage pre-push --all-files
+
+# Configure pre-push hook using pre-commit
+configure-hooks:
+	pre-commit install --hook-type pre-push
+
+# Generate swagger.json
+generate-swagger:
+	DJANGO_DB=sqlite LOG_DIR=tmp DEBUG=true LOG_LEVEL=DEBUG DJANGO_SETTINGS_MODULE=core.settings.label_studio python label_studio/manage.py generate_swagger swagger.json

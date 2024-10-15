@@ -1,0 +1,11 @@
+.datamanager {
+  height: calc(100vh - var(--header-height));
+
+  #label-studio-dm [class*="Annotations_annotation_selected"] {
+    background: var(--grape_0);
+  }
+}
+
+.datamanager * {
+  font-family: var(--font-sans) !important;
+}

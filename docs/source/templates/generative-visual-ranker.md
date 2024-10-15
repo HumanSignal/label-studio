@@ -1,17 +1,17 @@
 ---
 title: Visual Ranker
 type: templates
-category: Generative AI
-cat: generative-ai
-order: 907
+category: Ranking and Scoring
+cat: ranking-and-scoring
+order: 560
 is_new: t
 meta_title: Create a ranked dataset for text-to-image models with Label Studio
 meta_description: Template for creating a ranked dataset for text-to-image models with Label Studio for your machine learning and data science projects.
 ---
 
-## Overview
+<img src="/images/templates/visual-ranker.png" alt="" class="gif-border" width="700px"/>
 
-The template provides the worklow to rank the quality of the text-to-image models responses, like Dall-E, Midjourney, Stable Diffusion etc.
+The template provides the workflow to rank the quality of the text-to-image models responses, like Dall-E, Midjourney, Stable Diffusion etc.
 
 Using this template gives the ability to compare the quality of the responses from different generative AI  models, and rank the dynamic set of items with handy drag-and-drop interface.
 

@@ -3,15 +3,58 @@ html {
 }
 
 body {
-    color: #3a3a3a;
-    overflow-x: unset !important;
+  --font-sans: 'Figtree', sans-serif !important;
+  --font-mono: Monaco, monospace;
+
+  --sand_900: #12110D;
+  --sand_800: #262522;
+  --sand_700: #45433E;
+  --sand_600: #6B6860;
+  --sand_500: #A49F95;
+  --sand_400: #CAC5B8;
+  --sand_300: #E1DED5;
+  --sand_200: #F0EFEB;
+  --sand_100: #F9F8F6;
+  --sand_0: #FDFDFC;
+
+  --grape_0: #F0F3FE;
+  --grape_100: #D4DBFB; 
+  --grape_500: #566FCF;
+  --grape_600: #576CC1;
+  --grape_700: #4C5FA9;
+  --grape_800: #37447A;
+
+  --kale_0: #F4F9F9;
+  --kale_400: #57B7AB;
+
+  --plum_500: #CC6FBE;
+  --plum_400: #E37BD3;
+  --plum_100: #F7D6F2;
+  --plum_0: #FBF2FC;
+
+  --persimmon_300: #FF9F89;
+  --persimmon_400: #FF7557;
+
+  --canteloupe_0: #FFF6EF;
+  --canteloupe_100: #FFE4D0;
+  --canteloupe_400: #FFA663;
+  --canteloupe_500: #E69559;
+  --canteloupe_600: #CC854F;
+  --canteloupe_700: #B37445;
+
+  --red_1: #FFF1F0;
+  --red_3: #FFCCC7;
+  --red_7: #CF1322;
+  --red_10: #5C0011;
+
+  --primary_link: #566FCF;
+
+  overflow-x: unset !important;
 }
 
-body, a, li, p, h1, h2, h3, h4, h5, h6, input, button, textarea, select {
-    font-family: 'Roboto', sans-serif;
-}
 h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
+    color: var(--sand_900);
 }
 a {
     text-decoration: none;
@@ -37,13 +80,6 @@ table th {
     font-weight: normal;
     font-size: 1em;
 }
-table td {
-
-}
-
-.label, .value {
-    font-family: 'Roboto', sans-serif !important;
-}
 
 .team-header {
     background: #f7fcff !important;
@@ -66,10 +102,6 @@ table td {
     font-size: 1.2em;
     max-width: 600px;
     margin: auto;
-}
-
-h1, h2, h3, h4, h5, h6, .ui.breadcrumb .active.section {
-    color: #34414a;
 }
 
 pre {
@@ -511,7 +543,6 @@ hotkey i {
     font-weight: normal !important;
 }
 .ui .statistic .value {
-    font-family: Roboto, sans-serif !important;
     font-weight: lighter !important;
     color: #444 !important;
 }
@@ -520,9 +551,8 @@ hotkey i {
     margin-bottom: 1.1em;
     box-sizing: content-box !important;
     text-transform: none !important;
-    font-size: 1.28571429rem;
+    font-size: 1.25;
     font-weight: normal;
-    color: #34414a !important;
 }
 .ui form p:first-of-type, .ui .form p:first-of-type {
     margin-top: 0 !important;

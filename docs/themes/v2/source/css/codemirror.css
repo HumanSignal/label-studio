@@ -134,16 +134,16 @@
 /* DEFAULT THEME */
 
 .cm-s-default .cm-header {
-  color: blue;
+  color: #617ADA;
 }
 .cm-s-default .cm-quote {
-  color: #090;
+  color: #34988D;
 }
 .cm-negative {
-  color: #d44;
+  color: #E6694E;
 }
 .cm-positive {
-  color: #292;
+  color: #34988D;
 }
 .cm-header,
 .cm-strong {
@@ -160,16 +160,16 @@
 }
 
 .cm-s-default .cm-keyword {
-  color: #708;
+  color: #E6694E;
 }
 .cm-s-default .cm-atom {
-  color: #219;
+  color: #617ADA;
 }
 .cm-s-default .cm-number {
-  color: #164;
+  color: #34988D;
 }
 .cm-s-default .cm-def {
-  color: #00f;
+  color: #617ADA;
 }
 .cm-s-default .cm-variable,
 .cm-s-default .cm-punctuation,
@@ -177,51 +177,51 @@
 .cm-s-default .cm-operator {
 }
 .cm-s-default .cm-variable-2 {
-  color: #05a;
+  color: #12110D;
 }
 .cm-s-default .cm-variable-3,
 .cm-s-default .cm-type {
-  color: #085;
+  color: #34988D;
 }
 .cm-s-default .cm-comment {
-  color: #a50;
+  color: #E69559;
 }
 .cm-s-default .cm-string {
-  color: #a11;
+  color: #CC6FBE;
 }
 .cm-s-default .cm-string-2 {
-  color: #f50;
+  color: #E6694E;
 }
 .cm-s-default .cm-meta {
-  color: #555;
+  color: #6B6860;
 }
 .cm-s-default .cm-qualifier {
-  color: #555;
+  color: #6B6860;
 }
 .cm-s-default .cm-builtin {
-  color: #30a;
+  color: #12110D;
 }
 .cm-s-default .cm-bracket {
-  color: #997;
+  color: #6B6860;
 }
 .cm-s-default .cm-tag {
-  color: #170;
+  color: #34988D;
 }
 .cm-s-default .cm-attribute {
-  color: #00c;
+  color: #617ADA;
 }
 .cm-s-default .cm-hr {
-  color: #999;
+  color: #6B6860;
 }
 .cm-s-default .cm-link {
-  color: #00c;
+  color: #617ADA;
 }
 
 .cm-s-default .cm-error {
-  color: #f00;
+  color: #E6694E;
 }
 .cm-invalidchar {
-  color: #f00;
+  color: #E6694E;
 }
 
 .CodeMirror-composing {

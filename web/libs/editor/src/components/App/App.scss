@@ -1,0 +1,160 @@
+@import "../../assets/styles/global";
+
+.editor {
+  --main-bg-color: var(--sand_100);
+  --sticky-items-offset: 48px;
+  --topbar-height: 48px;
+  --bottombar-height: 0;
+
+  width: 100%;
+  height: 100%;
+  min-width: 320px;
+  margin: 0 auto;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: stretch;
+  background-color: var(--main-bg-color);
+
+  &__auto_height {
+    height: auto;
+  }
+
+  &_fullscreen {
+    position: absolute;
+    background: var(--sand_0);
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 2em;
+  }
+}
+
+@include respond("phone") {
+  .editor {
+    width: 300px;
+    min-width: 300px;
+  }
+}
+
+.wrapper {
+  flex: 1;
+  display: grid;
+  grid-template-columns: calc(100% - 320px) 320px;
+  grid-template-rows: 1fr;
+  align-items: stretch;
+  max-width: 100%;
+  height: calc(100% - var(--sticky-items-offset));
+
+  &_view_all,
+  &_outliner {
+    grid-template-columns: 100%;
+
+    & .menu {
+      padding-bottom: 8px;
+    }
+  }
+
+  &_bsp {
+    display: block;
+  }
+
+  &_showingBottomBar {
+    --bottombar-height: 48px;
+  }
+}
+
+.main-view {
+  flex: 1;
+  z-index: 1;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &__annotation {
+    padding: 1em;
+  }
+
+  &__infobar {
+    padding: 6px 1em 7px;
+    font-size: 14px;
+    color: var(--sand_600);
+    background-color: var(--main-bg-color);
+    border-top: 1px solid var(--sand_300);
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+  }
+}
+
+.main-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.key-group {
+  &__key {
+    padding: 0 4px;
+    height: 16px;
+    color: var(--sand_900);
+    display: inline-flex;
+    align-items: center;
+    background: var(--sand_0);
+    border-radius: 2px;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 10%), 0 1px 0 rgb(0 0 0 / 8%);
+  }
+
+  &__key + &__key {
+    margin-left: 4px;
+  }
+
+  & + & {
+    margin-left: 5px;
+  }
+}
+
+.sub__result {
+  margin: -35px 0 30px;
+}
+
+.menu {
+  width: 320px;
+  min-width: 320px;
+  flex: none;
+  display: flex;
+  flex-flow: column;
+  z-index: 100;
+  align-self: stretch;
+  background-color: var(--sand_0);
+  border-left: 1px solid var(--sand_300);
+
+  @include respond("phone") {
+    margin-left: 0;
+    margin-top: 20px;
+  }
+
+  &_bsp {
+    display: flex;
+    flex-direction: row;
+    margin-top: 2em;
+
+    & > div {
+      margin-right: 2em;
+      width: 33.3%;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  &:empty {
+    width: 0;
+    min-width: auto;
+  }
+}

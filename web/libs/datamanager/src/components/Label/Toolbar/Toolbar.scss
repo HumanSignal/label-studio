@@ -1,0 +1,30 @@
+.label-toolbar {
+  flex-shrink: 0;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  padding: 13px 1em;
+  justify-content: space-between;
+  background-color: #f0f0f0;
+
+  &_labelStream {
+    padding: 0;
+    flex: 1;
+  }
+
+  &__actions,
+  &__tools {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__actions {
+    padding-left: 10px;
+  }
+
+  &__tools {
+    max-width: 320px;
+    margin-left: 20px;
+  }
+}

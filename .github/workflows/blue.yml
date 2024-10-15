@@ -1,0 +1,27 @@
+name: Blue
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
+jobs:
+  blue:
+    name: Blue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: blue --all-files --hook-stage pre-push

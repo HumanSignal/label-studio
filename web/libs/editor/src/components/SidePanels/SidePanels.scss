@@ -1,0 +1,120 @@
+@import "../../assets/styles/global";
+
+.sidepanels {
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+
+  &_newLabelingUI {
+    .sidepanels {
+      --panel-border-color: var(--sand_300);
+
+      &__wrapper {
+        &_align_left {
+          border-right: 1px solid var(--panel-border-color);
+        }
+
+        &_align_right {
+          border-left: 1px solid var(--panel-border-color);
+        }
+      }
+    }
+  }
+
+  &__content {
+    height: 100%;
+    position: relative;
+    z-index: 1;
+
+    @include styled-scrollbars;
+
+    & .main-content {
+      overflow: auto;
+      padding-bottom: calc(var(--bottombar-height) + 8px);
+    }
+
+    &_resizing {
+      position: relative;
+      pointer-events: none;
+
+      &::before {
+        top: 0;
+        left: 0;
+        content: "";
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        display: block;
+        position: absolute;
+      }
+    }
+  }
+
+  &__wrapper {
+    --snap-rotation: 90deg;
+
+    top: 0;
+    z-index: 11;
+    height: 100%;
+    min-width: 10px;
+    position: absolute;
+    pointer-events: none;
+
+    &_snap::before {
+      top: 8px;
+      left: 0;
+      bottom: 8px;
+      z-index: 150;
+      width: 5px;
+      content: "";
+      display: block;
+      position: absolute;
+      background: var(--grape_500);
+    }
+
+    &_align_left.sidepanels_snap::before {
+      border-radius: 0 4px 4px 0;
+    }
+
+    &_align_right.sidepanels_snap::before {
+      left: calc(100% - 6px);
+      border-radius: 4px 0 0 4px;
+    }
+
+    &_align {
+      &_left {
+        left: 0;
+
+        --snap-rotation: -90deg;
+      }
+
+      &_right {
+        top: 0;
+        right: 0;
+
+        --snap-rotation: 90deg;
+      }
+    }
+  }
+
+  &_collapsed {
+    height: auto;
+    overflow: visible;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    & .sidepanels__wrapper {
+      position: static;
+      width: 100%;
+      max-width: auto;
+      min-width: 100%;
+      flex-shrink: 0;
+      height: auto;
+    }
+
+    & .sidepanels__content {
+      flex: 1;
+    }
+  }
+}

@@ -1,0 +1,72 @@
+.toggle {
+  width: 42px;
+  height: 24px;
+  display: block;
+  min-width: 42px;
+  max-height: 24px;
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  color: var(--toggle-color, var(--grape_500));
+  transition: box-shadow 80ms ease;
+  background: linear-gradient(0deg, rgb(0 0 0 / 5%), rgb(0 0 0 / 5%)), var(--sand_0);
+  box-shadow: inset 0 1px 0 rgb(0 0 0 / 5%), inset 0 0 0 1px rgb(0 0 0 / 5%);
+
+  &__input {
+    top: 0;
+    left: 0;
+    margin: 0;
+    opacity: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  }
+
+  &__indicator {
+    height: 24px;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 120ms ease;
+
+    &::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 100%;
+      transition: all 120ms ease;
+      background: var(--sand_200);
+      box-shadow: 0 5px 10px rgb(0 0 0 / 15%), inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 5%);
+    }
+  }
+
+  &_checked &__indicator {
+    margin-left: 18px;
+
+    &::before {
+      width: 16px;
+      height: 16px;
+      background: currentcolor;
+      box-shadow: 0 5px 10px var(--grape_100), inset 0 -1px 0 rgb(0 0 0 / 10%);
+    }
+  }
+
+  &_disabled {
+    box-shadow: none;
+    pointer-events: none;
+    background: var(--sand_200);
+  }
+
+  &_disabled &__indicator {
+    transition: none;
+  }
+
+  &_disabled &__indicator::before,
+  &_disabled.toggle_checked &__indicator::before {
+    box-shadow: none;
+    transition: none;
+    background-color: var(--sand_500);
+  }
+}

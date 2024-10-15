@@ -1,7 +1,7 @@
 /* Account page */
 
 body {
-  --border-color: rgba(0, 0, 0, 0.15);
+  --border-color: var(--sand_300);
   --color-error: #d00;
 }
 .account-page {
@@ -13,11 +13,18 @@ body {
   border: 1px solid var(--border-color);
   padding: 24px;
   display: flex;
+  border-radius: 8px;
   flex-direction: column;
   gap: 40px;
 }
 .account-page header {
   font-size: 1.5em;
+  font-weight: 500;
+}
+
+.account-page header sub{
+  font-size: .875rem;
+  color: var(--sand_600);
 }
 .account-page form ul {
   margin: 0;
@@ -73,7 +80,7 @@ body {
   align-items: center;
 }
 .account-page footer p {
-  color: rgba(0, 0, 0, 0.2);
+  color: var(--sand_600);
   margin: 0;
 }
 
@@ -244,9 +251,6 @@ textarea.example_code {
   font-weight: 100;
   white-space: normal;
 }
-.access_token__info label {
-  opacity: 0.6;
-}
 
 button.blinking-status::after {
   content: "✓";
@@ -267,7 +271,6 @@ button.blinking-status.blink::after {
 
 .users th,
 .users td {
-  font: 16px/normal 'Roboto';
   color: black;
 }
 

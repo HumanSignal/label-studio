@@ -1,0 +1,257 @@
+.tree {
+  user-select: none;
+
+  &-list {
+    display: block;
+  }
+
+  &-treenode {
+    min-height: 32px;
+    display: flex;
+    padding: 0 4px;
+    align-items: center;
+    position: relative;
+    max-width: 100%;
+    box-sizing: border-box;
+
+    &:hover,
+    &-selected {
+      background-color: var(--selection-color, var(--sand_100));
+    }
+
+    &:hover .outliner-item__controls {
+      display: flex;
+    }
+
+    &:hover .outliner-item__controls_newUI {
+      .outliner-item__control_type_lock button,
+      .outliner-item__control_type_visibility button {
+        display: inline-flex !important;
+      }
+    }
+  }
+
+  &-switcher {
+    width: 24px;
+    height: 24px;
+    opacity: 0.4;
+    transform: rotate(-90deg);
+
+    &_open {
+      transform: rotate(0deg);
+    }
+
+    &-noop {
+      display: none;
+      width: calc(24px - 16px);
+    }
+  }
+
+  &-node {
+    &-content-wrapper {
+      flex: 1;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      max-width: 100%;
+
+      .ff_outliner_optim & {
+        align-items: center;
+      }
+    }
+  }
+
+  &-iconEle {
+    display: flex;
+    flex: none;
+    height: 32px;
+    max-width: 24px;
+    width: min-content;
+    align-items: center;
+    justify-content: center;
+    color: var(--icon-color);
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  &-indent {
+    display: inline-block;
+    height: 0;
+
+    &-unit {
+      width: 24px;
+      display: inline-block;
+    }
+  }
+
+  &-title {
+    flex: 1;
+    padding-left: 5px;
+    min-width: 0;
+
+    .labels-list {
+      display: inline;
+      line-height: 1.2; // make it dense for multiline labels
+      padding: 2px 0; // + add a little padding so it won't be too close to the item edges
+    }
+  }
+
+  &__node {
+    border: 1px dashed transparent;
+
+    &_hidden {
+      opacity: 0.4;
+    }
+
+    &_isDrawing {
+      border-color: var(--incomplete-warning-color, var(--canteloupe_400));
+    }
+  }
+}
+
+.outliner-item {
+  min-height: 32px;
+  position: relative;
+
+  &__wrapper {
+    display: flex;
+  }
+
+  &__content {
+    display: flex;
+    min-height: 32px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__index {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    font-size: 9px;
+    color: var(--sand_0);
+    margin-right: 4px;
+    text-align: center;
+    align-items: center;
+    border-radius: 4px;
+    justify-content: center;
+    background-color: var(--text-color, var(--sand_900));
+  }
+
+  &__title {
+    align-items: center;
+    display: inline-flex;
+    flex: 1;
+    color: var(--text-color, var(--sand_900));
+    min-width: 0;
+  }
+
+  &__text {
+    margin-left: 5px;
+    color: var(--sand_900);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__incomplete {
+    display: inline-flex;
+    margin-left: 5px;
+    align-items: center;
+
+    svg {
+      width: 20px;
+      height: 17px;
+      fill: var(--incomplete-warning-color, #FA8C16);
+    }
+  }
+
+  &__controls {
+    top: 0;
+    right: 0;
+    height: 32px;
+    display: none;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    grid-template-columns: repeat(5, 32px);
+
+    &_newUI {
+      display: flex;
+      position: initial;
+      justify-content: space-between;
+
+      .outliner-item__control_type_predict {
+        width: 14px;
+      }
+
+      .outliner-item__control_type_score {
+        font-size: 12px;
+      }
+
+      .outliner-item__control_type_predict:empty,
+      .outliner-item__control_type_score:empty {
+        display: none;
+      }
+    }
+
+    &_withControls {
+      grid-template-columns: repeat(6, 32px);
+    }
+  }
+
+  &__control {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &-wrapper {
+      display: flex;
+      margin-left: 13px;
+    }
+  }
+
+  &:hover &__controls {
+    display: flex;
+
+    .outliner-item__control_type_lock {
+      display: flex;
+    }
+  }
+}
+
+.ocr {
+  background: none;
+  position: relative;
+  padding: 0 0 8px;
+
+  &_empty {
+    display: none;
+  }
+
+  &_collapsed {
+    height: 36px;
+    overflow-y: hidden;
+  }
+
+  &__collapse {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 6px;
+    right: 8px;
+    opacity: 0.25;
+    padding: 0;
+  }
+
+  &_hidden {
+    & .ocr{
+      background: var(--sand_0);
+    }
+  }
+}

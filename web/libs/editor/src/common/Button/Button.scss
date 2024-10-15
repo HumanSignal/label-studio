@@ -1,0 +1,327 @@
+.button {
+  --button-color: var(--sand_900);
+
+  height: 32px;
+  border: none;
+  cursor: pointer;
+  padding: 0 15px;
+  outline: none;
+  display: inline-flex;
+  background-color: var(--sand_0);
+  align-items: center;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 100ms ease;
+  justify-content: center;
+  color: var(--button-color);
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 15%);
+  font-weight: 500;
+  font-size: 14px;
+
+  &_newUI {
+    .button__extra {
+      margin-left: 3px;
+    }
+  }
+
+  &_waiting,
+  &_disabled,
+  &:disabled,
+  &[disabled] {
+    --button-color: var(--sand_500);
+
+    pointer-events: none;
+    background-color: var(--sand_200);
+  }
+
+  &:hover {
+    box-shadow: 0 2px 4px rgb(0 0 0 / 5%), inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 20%);
+  }
+
+  &:active {
+    background: linear-gradient(0deg, rgb(0 0 0 / 2%), rgb(0 0 0 / 2%)), var(--sand_0);
+    box-shadow: inset 0 1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 20%);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 6px var(--grape_100), inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 15%), inset 0 0 0 1px var(--grape_100);
+  }
+
+  &__extra {
+    font-size: 14px;
+    line-height: 16px;
+    display: flex;
+    color: var(--sand_500);
+    align-items: center;
+    margin-left: 7px;
+    margin-right: -7px;
+  }
+
+  &__icon {
+    display: flex;
+    width: 16px;
+    height: 100%;
+    align-items: center;
+
+    &:not(:only-child) {
+      margin-right: 12px;
+    }
+
+    &:only-child {
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &_type {
+    &_text {
+      padding: 0;
+    }
+
+    &_text,
+    &_link,
+    &[href] {
+      padding: 0;
+      min-width: 0;
+      box-shadow: none;
+      background: none;
+
+      &:hover {
+        box-shadow: none;
+      }
+    }
+
+    &_link,
+    &[href] {
+      --button-color: var(--primary_link);
+
+      text-decoration: underline;
+    }
+  }
+
+  &_look {
+    &_primary {
+      --button-color: var(--sand_0);
+
+      background-color: var(--primary_link);
+      box-shadow: none;
+      box-shadow: inset 0 -1px 0 rgb(0 0 0 / 10%);
+
+      &:disabled {
+        --button-color: var(--sand_500);
+
+        background-color: var(--sand_200);
+      }
+
+      &:hover {
+        color: var(--button-color);
+        background: linear-gradient(0deg, rgb(255 255 255 / 10%), rgb(255 255 255 / 10%)), var(--primary_link);
+        box-shadow: 0 2px 4px var(--grape_100), inset 0 -1px 0 rgb(0 0 0 / 10%);
+      }
+
+      &:active {
+        color: var(--button-color);
+        background: linear-gradient(0deg, rgb(0 0 0 / 4%), rgb(0 0 0 / 4%)), var(--primary_link);
+        box-shadow: inset 0 1px 0 rgb(0 0 0 / 10%);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 6px var(--grape_100), inset 0 -1px 0 rgb(0 0 0 / 10%);
+      }
+    }
+
+    &_danger {
+      --button-color: var(--danger_color);
+    }
+
+    &_destructive {
+      --button-color: var(--sand_0);
+
+      background-color: var(--danger_color);
+    }
+
+    &_outlined {
+      background: none;
+      padding: 1.5rem 2rem;
+      font-size: 0.875rem;
+      border: 1px solid var(--primary_link);
+      outline: none;
+      box-shadow: none;
+      color: var(--grape_700);
+    }
+
+    &_alt {
+      --button-color: var(--sand_900);
+
+      box-shadow: none;
+      background-color: var(--sand_0);
+
+      &:hover,
+      &:focus,
+      &:active {
+        --button-color: var(--sand_900);
+
+        box-shadow: none;
+        background-color: var(--sand_100);
+      }
+
+      &:disabled {
+        --button-color: var(--sand_500);
+
+        background-color: var(--sand_200);
+      }
+    }
+
+    &_active {
+      background: none;
+      border-radius: 4px;
+      border: 1px solid var(--sand_300);
+      box-shadow: none;
+      outline: none;
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+
+  &_look_destructive:disabled,
+  &_look_destructive.button_waiting {
+    --button-color: rgb(255 255 255 / 50%);
+
+    background-color: var(--danger_color);
+  }
+
+  &_danger.button_look_alt,
+  &_danger.button_type_text {
+    --button-color: var(--danger_color);
+
+    &:disabled {
+      --button-color: var(--sand_500);
+
+      background-color: var(--sand_200);
+    }
+  }
+
+  &_size {
+    &_compact {
+      height: 36px;
+      font-size: 16px;
+      line-height: 20px;
+    }
+
+    &_medium {
+      height: 32px;
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    &_small {
+      height: 24px;
+      font-size: 12px;
+      line-height: 12px;
+      padding: 0 10px;
+    }
+
+    &_large {
+      height: 40px;
+      font-size: 16px;
+    }
+  }
+
+  &_size_small &__extra {
+    margin-left: 5px;
+    margin-right: -5px;
+  }
+
+  &_size_medium &__extra {
+    margin-left: 7px;
+    margin-right: -7px;
+  }
+
+  &_size_compact &__extra {
+    margin-left: 7px;
+    margin-right: -7px;
+  }
+
+  &_size_large &__extra {
+    margin-left: 10px;
+    margin-right: -10px;
+  }
+
+  &_nopadding {
+    padding: 0;
+  }
+
+  &_withIcon {
+    justify-content: space-between;
+  }
+
+  &_withIcon:not(.button_type_link, &[href]) {
+    padding: 0 14px;
+  }
+
+  &_withIcon.button_size_small {
+    padding: 0 10px;
+  }
+
+  &_waiting {
+    pointer-events: none;
+    background-repeat: repeat;
+    background-position: 40px;
+    background-size: 37px 100%;
+    animation: button-waiting 1s linear infinite;
+    background-image: var(--button-waiting-animation-bg);
+    background-color: var(--sand_0);
+  }
+
+  &_waiting.button_look_primary {
+    background-image: var(--primary-button-waiting-animation-bg);
+    background-color: var(--primary_link);
+  }
+
+  &_size_small &__icon {
+    width: 12px;
+
+    &:not(:only-child) {
+      margin-right: 8px;
+    }
+  }
+}
+
+.button-group {
+  display: flex;
+
+  &:not(.button-group_collapsed) {
+    .button + .button {
+      margin-left: 16px;
+    }
+  }
+
+  &_collapsed {
+    .button:first-child {
+      border-radius: 5px 0 0 5px;
+    }
+
+    .button:last-child {
+      border-radius: 0 5px 5px 0;
+    }
+
+    .button:not(:first-child, :last-child) {
+      border-radius: 0;
+    }
+  }
+}
+
+@keyframes button-waiting {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}

@@ -1,0 +1,14 @@
+.dynamic-preannotations {
+  top: 0;
+  height: 44px;
+  display: flex;
+  z-index: 100;
+  align-items: center;
+  position: sticky;
+  box-sizing: border-box;
+  background-color: var(--sand_0);
+
+  &__wrapper {
+    width: 100%;
+  }
+}

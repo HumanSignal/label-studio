@@ -1,0 +1,30 @@
+.entity {
+  padding: 0 15px;
+  margin-top: 12px;
+
+  &__info {
+    margin-bottom: 12px;
+  }
+
+  &__warning {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px;
+    gap: 8px;
+    background: var(--canteloupe_0);
+    border: 1px solid var(--sand_300);
+    border-radius: 4px;
+    margin: 16px 0 0;
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+
+    svg {
+      width: 20px;
+      height: 17px;
+      fill: var(--incomplete-warning-color, var(--canteloupe_400));
+    }
+  }
+}

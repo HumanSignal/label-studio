@@ -1,20 +1,19 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import re
 import json
-from django import template
+import re
 from datetime import datetime
-from django.utils.html import format_html
+
+from django import template
 from django.conf import settings
-from django.template.loader_tags import do_include
+from django.utils.html import format_html
 
 register = template.Library()
 
 
 @register.filter
-def initials(val, jn=""):
-    """ Given a string return its initials join by $jn
-    """
+def initials(val, jn=''):
+    """Given a string return its initials join by $jn"""
     res = []
     parts = val.split(' ')
     if len(parts) <= 1:
@@ -22,15 +21,15 @@ def initials(val, jn=""):
         print(parts)
 
     if len(parts) > 1:
-        res = [ parts[0][0], parts[1][0] ]
+        res = [parts[0][0], parts[1][0]]
     elif len(parts) == 1:
-        res = [ val[0], val[1] ]
-        
+        res = [val[0], val[1]]
+
     return jn.join(res).upper()
-        
+
 
 @register.filter
-def get_at_index(l, index):
+def get_at_index(l, index):  # noqa: E741
     return l[index]
 
 
@@ -76,7 +75,7 @@ def collaborator_id_in_url(id_, url):
 def date_for_license(date):
     if isinstance(date, str):
         date = datetime.strptime(date, '%Y-%m-%d')
-    return date.strftime("%d %b %Y %H:%M")
+    return date.strftime('%d %b %Y %H:%M')
 
 
 @register.filter

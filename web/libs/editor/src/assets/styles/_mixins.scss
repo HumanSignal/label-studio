@@ -1,0 +1,49 @@
+@mixin respond($breakpoint) {
+  @if $breakpoint == "phone" {
+    @media (width <= 760px) {
+      @content;
+    }
+  } @else if $breakpoint == "tablet" {
+    @media (width <= 1200px) {
+      @content;
+    }
+  }
+}
+
+@mixin styled-scrollbars(){
+  scrollbar-color: var(--sand_400) transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar{
+    width: 4px;
+    height: 4px;
+    background-color: var(--sand_0);
+  }
+
+  &::-webkit-scrollbar-thumb{
+    background: var(--sand_400);
+  }
+}
+
+@mixin waiting($c1: #efefef, $c2: #fff) {
+  $base-color: rgba($c2, 0.2);
+  $accent-color: $c1;
+
+  background-image: repeating-linear-gradient(-63.43deg, $base-color 1px, $accent-color 2px, $accent-color 6px, $base-color 7px, $base-color 12px);
+  background-color: $c2;
+  background-size: 37px 100%;
+
+  &_animated {
+    animation: waiting 1s linear infinite;
+  }
+}
+
+@keyframes waiting {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 37px 0;
+  }
+}

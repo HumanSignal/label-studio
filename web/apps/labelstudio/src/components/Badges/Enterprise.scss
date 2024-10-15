@@ -1,0 +1,31 @@
+.enterprise-badge {
+  display: inline-block;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #FFA663 0%, #FF7557 51.56%, #E37BD3 100%);
+  vertical-align: middle;
+  margin: 0 8px;
+  height: 20px;
+
+  &__label {
+    margin: 1px;
+    background: var(--persimmon_0);
+    color: var(--persimmon_400);
+    border-radius: 3px;
+    font-size: 11px;
+    padding: 2px 5px 2px 3px;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    line-height: 100%;
+    font-weight: 500;
+  }
+
+  &_filled &__label {
+    background: none;
+    color: var(--persimmon_0);
+  }
+
+  &_filled &__icon path {
+    fill: var(--persimmon_0);
+  }
+}

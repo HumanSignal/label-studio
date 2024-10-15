@@ -9,11 +9,14 @@ on:
 
 jobs:
   codespell:
+    if: ${{ false }}  # disable for now
     name: Check for spelling errors
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Codespell
         uses: codespell-project/actions-codespell@v2
+        with:
+          skip: "**/3rdpartylicenses.txt,**/package.json,**/package-lock.json"

@@ -1,0 +1,28 @@
+var _path, _rect;
+function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+import * as React from "react";
+import { forwardRef } from "react";
+var SvgMinifyTool = function SvgMinifyTool(props, ref) {
+  return /*#__PURE__*/React.createElement("svg", _extends({
+    xmlns: "http://www.w3.org/2000/svg",
+    width: 28,
+    height: 28,
+    fill: "none",
+    ref: ref
+  }, props), _path || (_path = /*#__PURE__*/React.createElement("path", {
+    fill: "currentColor",
+    fillRule: "evenodd",
+    d: "M21 13a6.994 6.994 0 0 1-3.177 5.865l1.105 2.764a1 1 0 0 1-1.857.742l-1.065-2.663A7 7 0 1 1 21 13m-7 5a5 5 0 1 0 0-10 5 5 0 0 0 0 10",
+    clipRule: "evenodd"
+  })), _rect || (_rect = /*#__PURE__*/React.createElement("rect", {
+    width: 6,
+    height: 2,
+    x: 11,
+    y: 12,
+    fill: "currentColor",
+    rx: 0.5
+  })));
+};
+var ForwardRef = /*#__PURE__*/forwardRef(SvgMinifyTool);
+export { ForwardRef as ReactComponent };
+export default "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgiIGhlaWdodD0iMjgiIHZpZXdCb3g9IjAgMCAyOCAyOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0yMSAxM0MyMSAxNS40NTUzIDE5LjczNTkgMTcuNjE1NCAxNy44MjMgMTguODY0OEwxOC45Mjg1IDIxLjYyODZDMTkuMTMzNiAyMi4xNDE0IDE4Ljg4NDIgMjIuNzIzNCAxOC4zNzE0IDIyLjkyODVDMTcuODU4NiAyMy4xMzM2IDE3LjI3NjYgMjIuODg0MiAxNy4wNzE1IDIyLjM3MTRMMTYuMDA2MyAxOS43MDgzQzE1LjM3MDcgMTkuODk4MSAxNC42OTczIDIwIDE0IDIwQzEwLjEzNCAyMCA3IDE2Ljg2NiA3IDEzQzcgOS4xMzQwMSAxMC4xMzQgNiAxNCA2QzE3Ljg2NiA2IDIxIDkuMTM0MDEgMjEgMTNaTTE0IDE4QzE2Ljc2MTQgMTggMTkgMTUuNzYxNCAxOSAxM0MxOSAxMC4yMzg2IDE2Ljc2MTQgOCAxNCA4QzExLjIzODYgOCA5IDEwLjIzODYgOSAxM0M5IDE1Ljc2MTQgMTEuMjM4NiAxOCAxNCAxOFoiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8cmVjdCB4PSIxMSIgeT0iMTIiIHdpZHRoPSI2IiBoZWlnaHQ9IjIiIHJ4PSIwLjUiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8L3N2Zz4K";

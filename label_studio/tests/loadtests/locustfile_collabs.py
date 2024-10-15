@@ -4,17 +4,28 @@ import json
 import random
 import string
 
-from locust import HttpUser, TaskSet, task, between
+from locust import HttpUser, TaskSet, between, task
 
 
 def randomString(stringLength):
-    """Generate a random string of fixed length """
+    """Generate a random string of fixed length"""
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
 
 
-all_labels = ['Person', 'Organization', 'Fact', 'Money', 'Date', 'Time', 'Ordinal', 'Percent', 'Product', 'Language',
-              'Location']
+all_labels = [
+    'Person',
+    'Organization',
+    'Fact',
+    'Money',
+    'Date',
+    'Time',
+    'Ordinal',
+    'Percent',
+    'Product',
+    'Language',
+    'Location',
+]
 
 
 def get_result(text):
@@ -22,21 +33,18 @@ def get_result(text):
     end = min(len(text), start + random.randint(3, 30))
     results = []
     for i in range(random.randint(1, 10)):
-        results.append({
-            'type': 'labels',
-            'from_name': 'ner',
-            'to_name': 'text',
-            'value': {
-                'labels': [random.choice(all_labels)],
-                'start': start,
-                'end': end
+        results.append(
+            {
+                'type': 'labels',
+                'from_name': 'ner',
+                'to_name': 'text',
+                'value': {'labels': [random.choice(all_labels)], 'start': start, 'end': end},
             }
-        })
+        )
     return results
 
 
 class UserWorksWithProject(TaskSet):
-
     def on_start(self):
         r = self.client.get('/api/annotator/projects')
         all_projects = r.json()
@@ -51,7 +59,9 @@ class UserWorksWithProject(TaskSet):
         results = get_result(task_text)
         payload = json.dumps({'result': results})
         headers = {'content-type': 'application/json'}
-        self.client.post('/api/tasks/%i/annotations' % task_id, payload, headers=headers, name='/api/tasks/<id>/annotations')
+        self.client.post(
+            '/api/tasks/%i/annotations' % task_id, payload, headers=headers, name='/api/tasks/<id>/annotations'
+        )
 
     @task(1)
     def stop(self):
@@ -70,8 +80,5 @@ class WebsiteUser(HttpUser):
         response = self.client.get('/')
         csrftoken = response.cookies['csrftoken']
         num_collabs = 100
-        payload = {
-            'email': f'collab_{random.randint(0, num_collabs)}@loadtests.me',
-            'password': '123456789'
-        }
-        r = self.client.post('/annotator/login', payload, headers={'X-CSRFToken': csrftoken})
+        payload = {'email': f'collab_{random.randint(0, num_collabs)}@loadtests.me', 'password': '123456789'}
+        self.client.post('/annotator/login', payload, headers={'X-CSRFToken': csrftoken})

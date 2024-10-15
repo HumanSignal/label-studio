@@ -1,0 +1,87 @@
+name: "Check"
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
+    branches:
+      - develop
+      - 'lse-release/**'
+  merge_group:
+
+env:
+  ACTIONS_STEP_DEBUG: '${{ secrets.ACTIONS_STEP_DEBUG }}'
+
+jobs:
+  version:
+    name: "PyProject Package Version"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Validate
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const head_sha = '${{ github.event.merge_group.head_sha || github.event.pull_request.merge_commit_sha || github.event.pull_request.head.sha || github.event.after }}'
+            const base_sha = '${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha || github.event.before }}'
+            const pyProjectPath = 'pyproject.toml';
+            
+            async function getPoetryVersion(ref) {
+              const {data: commit} = await github.rest.repos.getCommit({
+                owner,
+                repo,
+                ref,
+              });
+              const pyprojectBlob = await github.rest.repos.getContent({
+                owner: owner,
+                repo: repo,
+                ref: commit.sha,
+                path: pyProjectPath,
+              });
+              const pyproject = Buffer.from(pyprojectBlob.data.content, pyprojectBlob.data.encoding).toString("utf8");
+              const matchVersion = pyproject.match(/^version\s*=\s*"(?<version>.*)"/m);
+              return matchVersion.groups.version;
+            }
+            
+            async function parseVersion(a) {
+              const match = a.match(/(?<x>\d+)?\.(?<y>\d+)?\.(?<z>\d+)?(?<t>\.dev|\.post)?(?<n>\d+)?/);
+              return [
+                match.groups.x * 1,
+                match.groups.y * 1,
+                match.groups.z * 1,
+                {'.dev': -1, '.post': 1}[match.groups.t] || 0,
+                match.groups.n * 1 || 0,
+              ];
+            }
+            
+            async function compareVersions(a, b) {
+              const a_parsed = await parseVersion(a);
+              const b_parsed = await parseVersion(b);
+              for (let i = 0; i < a_parsed.length; i++) {
+                if (a_parsed[i] === b_parsed[i])
+                  continue;
+                return b_parsed[i] - a_parsed[i];
+              }
+              return 0;
+            }
+            
+            const base_version = await getPoetryVersion(base_sha);
+            console.log(`Base version: ${base_version}`);
+            
+            const head_version = await getPoetryVersion(head_sha);
+            console.log(`Head version: ${head_version}`);
+            
+            const compare = await compareVersions(base_version, head_version);
+            
+            if (compare < 0) {
+              const error_msg = `It is prohibited to downgrade version`;
+              core.error(error_msg, {file: pyProjectPath,});
+              throw error_msg;
+            }

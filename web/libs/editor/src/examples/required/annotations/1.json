@@ -1,0 +1,13 @@
+{
+    "annotations": [
+        {
+            "id": "1001",
+            "result": []
+        }
+    ],
+    "data": {
+        "text": "To have faith is to trust yourself to the water"
+    },
+    "id": 1,
+    "task_path": "../examples/references/tasks.json"
+}

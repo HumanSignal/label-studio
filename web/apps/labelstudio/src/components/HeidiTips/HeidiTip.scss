@@ -1,0 +1,79 @@
+.heidy-tip {
+  &__content {
+    padding: 1rem;
+    border: 1px solid var(--sand_300);
+    font-size: 14px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px 0 rgb(0 0 0 / 10%);
+    box-sizing: border-box;
+    background: var(--sand_0);
+  }
+
+  &__header {
+    display: flex;
+    width: 100%;
+    min-height: 24px;
+    margin-bottom: 8px;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  &__title {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    letter-spacing: 0.15px;
+  }
+
+  &__text {
+    line-height: 20px;
+    letter-spacing: 0.25px;
+  }
+
+  &__link {
+    color: var(--grape_500);
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &::before {
+      content: " ";
+    }
+  }
+
+  &__dismiss {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    display: flex;
+    box-shadow: none;
+    justify-content: center;
+    align-items: center;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    svg > path {
+      stroke: var(--sand_600);
+    }
+
+    &:hover {
+      background: var(--grape_0);
+
+      svg > path {
+        stroke: var(--grape_700);
+      }
+    }
+  }
+
+  &__heidi {
+    margin-top: -12px;
+    padding-left: 16px;
+    pointer-events: none;
+  }
+}

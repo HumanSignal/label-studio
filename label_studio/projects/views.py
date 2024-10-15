@@ -2,19 +2,18 @@
 """
 import json
 import logging
+
 import lxml.etree
+from core.label_config import get_sample_task
+from core.utils.common import get_organization_from_request
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
-from rest_framework import status, generics
-from rest_framework.exceptions import ValidationError
-from projects.models import Project
-
-from core.label_config import get_sample_task
-from core.utils.common import get_organization_from_request
-
 from organizations.models import Organization
+from projects.models import Project
+from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -32,15 +31,14 @@ def project_settings(request, pk, sub_path):
 def playground_replacements(request, task_data):
     if request.GET.get('playground', '0') == '1':
         for key in task_data:
-            if "/samples/time-series.csv" in task_data[key]:
-                task_data[key] = "https://app.heartex.ai" + task_data[key]
+            if '/samples/time-series.csv' in task_data[key]:
+                task_data[key] = 'https://app.heartex.ai' + task_data[key]
     return task_data
 
 
 @require_http_methods(['GET', 'POST'])
 def upload_example_using_config(request):
-    """ Generate upload data example by config only
-    """
+    """Generate upload data example by config only"""
     config = request.GET.get('label_config', '')
     if not config:
         config = request.POST.get('label_config', '')

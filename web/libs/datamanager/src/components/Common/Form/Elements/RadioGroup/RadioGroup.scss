@@ -1,0 +1,110 @@
+.radio-group-dm {
+  --radius: 8px;
+  --height: 32px;
+  --padding: 4px;
+  --font-size: 16px;
+  --button-padding: 0 10px;
+  --button-checked-shadow: 0px 1px 0px var(--black_10), 0px 0px 0px 1px var(--black_2), 0px 5px 10px var(--black_15);
+
+  height: var(--height);
+  border-radius: var(--radius);
+  padding: var(--padding);
+  background: var(--sand_100);
+  box-shadow: inset 0 1px 0 var(--black_5), inset 0 0 0 1px var(--black_5);
+  box-sizing: border-box;
+
+  &__buttons {
+    height: calc(var(--height) - calc(var(--padding) * 2));
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+
+    .radio-group-dm_simple .radio-group-dm__buttons & {
+      all: unset;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    .radio-group-dm_horizontal .radio-group-dm__buttons & {
+      display: grid;
+      grid-auto-columns: min-content;
+      column-gap: 16px;
+      align-items: center;
+      grid-auto-flow: column;
+      margin: 0;
+    }
+  }
+
+  &__button {
+    display: flex;
+    opacity: 0.6;
+    padding: var(--button-padding);
+    cursor: pointer;
+    font-weight: 500;
+    position: relative;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size);
+    border-radius: calc(var(--radius) - var(--padding));
+    height: calc(var(--height) - calc(var(--padding) * 2));
+
+    &_checked {
+      opacity: 1;
+      background-color: var(--white);
+      box-shadow: var(--button-checked-shadow);
+    }
+
+    &_disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .radio-group-dm_simple & {
+      all: unset;
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .radio-group-dm_horizontal & {
+      margin: 0;
+    }
+  }
+
+  &__input {
+    top: 0;
+    left: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  }
+
+  &_size {
+    &_large {
+      --height: 40px;
+      --radius: 8px;
+    }
+
+    &_compact {
+      --height: 32px;
+      --radius: 8px;
+    }
+
+    &_small {
+      --height: 24px;
+      --radius: 4px;
+      --padding: 2px;
+      --font-size: 12px;
+      --button-padding: 0 5px;
+      --button-checked-shadow: 0px 1px 0px var(--black_10), 0px 0px 0px 1px var(--black_2), 0px 2px 4px var(--black_15);
+    }
+  }
+
+  &_simple {
+    --height: auto;
+
+    all: unset;
+    display: block;
+  }
+}

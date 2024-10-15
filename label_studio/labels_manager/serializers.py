@@ -1,12 +1,9 @@
-from django.db import transaction
 from django.conf import settings
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-
-from organizations.models import Organization
+from django.db import transaction
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
-from users.models import User
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from .models import Label, LabelLink
 
@@ -18,9 +15,9 @@ class LabelListSerializer(serializers.ListSerializer):
         return items
 
     def create(self, validated_data):
-        ''' Bulk creation objects of Label model with related LabelLink
+        """Bulk creation objects of Label model with related LabelLink
         reusing already existing labels
-        '''
+        """
         from webhooks.utils import emit_webhooks_for_instance
 
         with transaction.atomic():
@@ -55,7 +52,6 @@ class LabelListSerializer(serializers.ListSerializer):
                 else:
                     created_labels = {label.title: label for label in Label.objects.bulk_create(labels_create)}
 
-
             # connect existing and created labels to project with LabelLink
             links = []
             result = []
@@ -82,14 +78,16 @@ class LabelListSerializer(serializers.ListSerializer):
             label_ids = [label.id for label in result]
             links = LabelLink.objects.filter(label_id__in=label_ids, project=project).all()
             if links:
-                emit_webhooks_for_instance(self.context['request'].user.active_organization, links[0].project, 'LABEL_LINK_CREATED', links)
+                emit_webhooks_for_instance(
+                    self.context['request'].user.active_organization, links[0].project, 'LABEL_LINK_CREATED', links
+                )
 
         return result
 
 
 class LabelCreateSerializer(serializers.ModelSerializer):
-    created_by = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
-    organization = serializers.PrimaryKeyRelatedField(queryset=Organization.objects.all(), required=False)
+    created_by = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
+    organization = serializers.PrimaryKeyRelatedField(required=False, read_only=True)
     project = serializers.PrimaryKeyRelatedField(queryset=Project.objects.all())
     from_name = serializers.CharField()
 
@@ -101,6 +99,7 @@ class LabelCreateSerializer(serializers.ModelSerializer):
 
 class LabelLinkSerializer(FlexFieldsModelSerializer):
     annotations_count = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = LabelLink
         fields = '__all__'

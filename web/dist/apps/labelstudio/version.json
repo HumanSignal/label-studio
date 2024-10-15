@@ -1,0 +1,6 @@
+{
+  "message": "fix: LEAP-1583: Fix comment overlay displaying conditions (#6504)",
+  "commit": "a25d4ac14b90d9da0772c31dadb48c2803397730",
+  "date": "2024-10-14T15:34:52.000Z",
+  "branch": "develop"
+}

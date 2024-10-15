@@ -1,22 +1,36 @@
 {% extends 'users/new-ui/user_base.html' %}
 
 {% block user_content %}
-  <form id="login-form" action="{% url 'user-login' %}{% if next %}?next={{ next }}{% endif %}" method="post">
-    {% csrf_token %}
-    <p><input type="text" class="ls-input" name="email" id="email" placeholder="Email" value="{{ form.data.email }}"></p>
-    <p><input type="password" class="ls-input" name="password" id="password" placeholder="Password"></p>
-    {% if form.non_field_errors %}
-      {% for error in form.non_field_errors %}
-        <p class="error">
-          {{ error }}
-        </p>
-      {% endfor %}
-    {% endif %}
-    <p>
-      <input type="checkbox" id="persist_session" name="persist_session" class="ls-checkbox" checked="checked" style="width: auto;" />
-      <label for="persist_session">Keep me logged in this browser</label>
-    </p>
-    <p><button type="submit" aria-label="Log In" class="ls-button ls-button_look_primary">Log in</button></p>
-  </form>
-
+  <div class="form-wrapper">
+    <h2>Log in</h2>
+    <form id="login-form" action="{% url 'user-login' %}{% if next %}?next={{ next }}{% endif %}" method="post">
+      {% csrf_token %}
+      <div class="input-wrapper">
+        <label>Email Address</label>
+        <input type="text" class="lsf-input-ls" name="email" id="email" value="{{ form.data.email }}">
+      </div>
+      <div class="input-wrapper">
+        <label>Password</label>
+        <input type="password" class="lsf-input-ls" name="password" id="password">
+      </div>
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          <p class="error">
+            {{ error }}
+          </p>
+        {% endfor %}
+      {% endif %}
+      <div class="form-group">
+        <input type="checkbox" id="persist_session" name="persist_session" class="lsf-checkbox-ls" checked="checked" style="width: auto;" />
+        <label for="persist_session">Keep me logged in this browser</label>
+      </div>
+      <button type="submit" aria-label="Log In" class="lsf-button-ls lsf-button-ls_look_primary">Log in</button>
+    </form>
+  </div>
+  {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
+  <div class="text-wrapper">
+    <p class="">Don't have an account?</p>
+    <a href="{{ settings.HOSTNAME }}/user/signup">Sign up</a>
+  </div>
+  {% endif %}
 {% endblock %}

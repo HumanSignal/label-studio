@@ -1,0 +1,61 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "tasksRunnerOptions": {
+    "default": {
+      "options": {
+        "cacheableOperations": ["build-storybook", "version"]
+      }
+    }
+  },
+  "targetDefaults": {
+    "build": {
+      "inputs": ["production", "^production"]
+    },
+    "e2e": {
+      "inputs": ["default", "^production"]
+    },
+    "test": {
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
+    },
+    "version": {
+      "cache": true,
+      "inputs": ["default", "^production", "{workspaceRoot}/tools/version.mjs"],
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}/version.json"]
+    },
+    "build-storybook": {
+      "cache": true,
+      "inputs": ["default", "^production", "{projectRoot}/.storybook/**/*", "{projectRoot}/tsconfig.storybook.json"]
+    }
+  },
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
+      "!{projectRoot}/.storybook/**/*",
+      "!{projectRoot}/tsconfig.storybook.json",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/eslint.config.js"
+    ],
+    "sharedGlobals": ["{workspaceRoot}/babel.config.json"]
+  },
+  "generators": {
+    "@nx/react": {
+      "application": {
+        "style": "scss",
+        "bundler": "webpack",
+        "babel": true
+      },
+      "component": {
+        "style": "scss"
+      },
+      "library": {
+        "style": "scss",
+        "unitTestRunner": "jest"
+      }
+    }
+  }
+}

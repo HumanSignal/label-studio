@@ -1,0 +1,19 @@
+.agreement {
+  &__score {
+    &_zero {
+      color: var(--black);
+    }
+
+    &_low {
+      color: #D00;
+    }
+
+    &_medium {
+      color: #D98F00;
+    }
+
+    &_high {
+      color: #419400;
+    }
+  }
+}

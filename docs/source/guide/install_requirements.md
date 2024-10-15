@@ -2,8 +2,8 @@
 title: Requirements to Install and upgrade Label Studio
 short: Requirements
 tier: opensource
-section: "Install"
-order: 103
+section: "Install & Setup"
+order: 61 
 meta_title: Requirements to Install and Upgrade
 meta_description: "Label Studio documentation: Requirements to install and upgrade Label Studio." 
 ---

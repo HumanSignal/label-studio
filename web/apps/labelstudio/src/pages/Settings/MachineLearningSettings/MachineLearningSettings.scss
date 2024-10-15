@@ -1,0 +1,138 @@
+.test-request {
+  & h4 {
+    margin-bottom: 2px;
+    font-weight: bold;
+  }
+
+  &__blocks {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__left {
+    flex: 1;
+  }
+
+  &__right {
+    margin-left: 20px;
+    flex: 1;
+  }
+
+  &__code {
+    max-height: 400px;
+    overflow-y: scroll;
+    padding: 10px;
+    border-radius: 4px;
+    background: var(--sand_0);
+    border: 1px solid var(--sand_300); 
+
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  }
+}
+
+.ml-settings {
+  display: flex;
+
+  &__wrapper {
+    width: 680px;
+  }
+
+  & .form {
+    margin-top: 32px;
+  }
+
+  & .description {
+    line-height: 1.5;
+  }
+}
+
+.ml {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 16px;
+  margin-top: 32px;
+  align-items: flex-start;
+  grid-auto-rows: max-content;
+
+  &__info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &__status {
+    color: var(--sand_500);
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+    font-size: 12px;
+    border: 1px solid var(--sand_300);
+    padding: 3px 6px;
+    border-radius: 10px;
+    max-width: 100px;
+  }
+
+  &__summary {
+    margin-bottom: 16px;
+  }
+
+  &__indicator {
+    width: 8px;
+    height: 8px;
+    display: block;
+    margin-right: 8px;
+    border-radius: 100%;
+    background-color: var(--indicator-color);
+
+    &_state_CO {
+      --indicator-color: var(--success_color);
+    }
+
+    &_state_DI {
+      --indicator-color: var(--canteloupe_400);
+    }
+
+    &_state_ER {
+      --indicator-color: var(--danger_color);
+    }
+
+    &_state_TR,
+    &_state_PR {
+      --indicator-color: var(--grape_500);
+
+      position: relative;
+
+      &::before {
+        top: 0;
+        left: 0;
+        content: '';
+        width: 100%;
+        height: 100%;
+        opacity: 0.5;
+        display: block;
+        border-radius: 100%;
+        background-color: var(--indicator-color);
+        animation: state-pulse 2s ease infinite;
+      }
+    }
+  }
+}
+
+@keyframes state-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0;
+    transform: scale(3);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
+}

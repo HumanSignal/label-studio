@@ -2,11 +2,11 @@
 title: Secure Label Studio
 type: guide
 tier: all
-order: 101
-order_enterprise: 128
+order: 99
+order_enterprise: 99
 meta_title: Secure Label Studio
 meta_description: About the security and hardening processes used by various Label Studio editions, and how you can configure a more secure data labeling project.
-section: "Security and Privacy"
+section: "Install & Setup"
 ---
 
 Label Studio provides many ways to secure access to your data and your deployment architecture.
@@ -61,6 +61,13 @@ If you're using Label Studio Enterprise, you can further secure user access in m
 
 Access to the REST API is restricted by user role and requires an access token that is specific to a user account. Access tokens can be reset at any time from the Label Studio UI or using the API.
 
+## Enable SSRF protection for production environments
+
+When deploying Label Studio into a production environment, set the `SSRF_PROTECTION_ENABLED` environment variable to `true`. 
+
+This variable is disabled by default to support users who are working with data in their local environments. However, it should be enabled in production usage. 
+
+
 ## Secure access to data in Label Studio
 
 Data in Label Studio is stored in one or two places, depending on your deployment configuration.
@@ -93,6 +100,10 @@ In Label Studio Enterprise, if you're using Amazon S3, Label Studio can use an I
 
 </div>
 
+
+!!! warning Note on securing cloud data
+    If you need to secure your data in a way to ensure that it is not touched by Label Studio, see [Source storage Sync and URI resolving](storage#Source-storage-Sync-and-URI-resolving). 
+
 ### Secure access to Redis storage
 
 If you use Redis as an external storage database for data and annotations, the setup supports TLS/SSL and requires the Label Studio client to be authenticated to the database with a valid certificate.
@@ -104,3 +115,89 @@ If you use Redis as an external storage database for data and annotations, the s
 Label Studio Enterprise automatically logs all user activities so that you can monitor the activities being performed in the application.
 
 </div>
+
+## Information collected by Label Studio
+
+Label Studio collects usage statistics including the number of page visits, number of annotations, and data types being used in labeling configurations that you set up. The information we collect helps us improve the experience of labeling data in Label Studio and helps us plan future data types and labeling configurations to support.
+
+<div class="opensource-only">
+
+You can disable data collection by setting the environment variable `COLLECT_ANALYTICS` to `False`. 
+
+</div>
+
+## Add self-signed certificate to trusted root store
+
+<div class="code-tabs">
+  <div data-name="Docker Compose">
+
+1. Mount your self-signed certificate as a volume into `app` container:
+
+```yaml
+volumes:
+  - ./my.cert:/tmp/my.cert:ro
+```
+2. Add environment variable with the name `CUSTOM_CA_CERTS` mentioning all certificates in comma-separated way that should be added into trust store:
+
+```yaml
+CUSTOM_CA_CERTS=/tmp/my.cert
+```
+  </div>
+
+  <div data-name="Kubernetes">
+
+1. Upload your self-signed certificate as a k8s secret.
+   Upload `my.cert` as a secrets with a name `test-my-root-cert`:
+   
+```yaml
+kubectl create secret generic test-my-root-cert --from-file=file=my.cert
+```
+
+2. Add volumes into your values.yaml file and mention them in `.global.customCaCerts`:
+
+```yaml
+global:
+  customCaCerts:
+   - /opt/heartex/secrets/ca_certs/file/file
+
+app:
+  extraVolumes:
+    - name: foo
+      secret:
+        secretName: test-my-root-cert
+  extraVolumeMounts:
+    - name: foo
+      mountPath: "/opt/heartex/secrets/ca_certs/file"
+      readOnly: true
+
+rqworker:
+  extraVolumes:
+    - name: foo
+      secret:
+        secretName: test-my-root-cert
+  extraVolumeMounts:
+    - name: foo
+      mountPath: "/opt/heartex/secrets/ca_certs/file"
+      readOnly: true
+```
+  </div>
+</div>
+
+
+### Add self-signed certificate to trusted root store for S3 storage
+
+Boto library is used to connect to cloud storage S3. `AWS_CA_BUNDLE` has to be set as environment variable.
+<div class="code-tabs">
+  <div data-name="Docker Compose">
+
+1. Mount your self-signed certificate as a volume into `app` container: (has to be .pem file type)
+
+```yaml
+volumes:
+  - ./ca.pem:/tmp/ca.pem:ro
+```
+2. Add environment variable with the name `AWS_CA_BUNDLE` to be trusted by boto library.
+
+```yaml
+AWS_CA_BUNDLE=/tmp/ca.pem
+```

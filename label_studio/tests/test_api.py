@@ -1,17 +1,16 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import pytest
 import json
-import requests_mock
 from unittest import mock
 
+import pytest
+import requests_mock
+from projects.models import Project
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
-from .utils import ml_backend_mock
+from tasks.models import Annotation
 
-from projects.models import Project
-from ml.models import MLBackendTrainJob
-from tasks.models import Annotation, Task
+from .utils import ml_backend_mock
 
 
 @pytest.fixture
@@ -26,10 +25,7 @@ def client_and_token(business_client):
 @pytest.fixture(params=['business_authorized', 'user_with_token'])
 def any_api_client(request, client_and_token, business_client):
     client, token = client_and_token
-    result = {
-        'type': request.param,
-        'token': token
-    }
+    result = {'type': request.param, 'token': token}
     if request.param == 'business_authorized':
         result['client'] = business_client
     elif request.param == 'user_with_token':
@@ -37,42 +33,131 @@ def any_api_client(request, client_and_token, business_client):
     return result
 
 
-@pytest.mark.parametrize('payload, response, status_code', [
-    # status OK
-    (
-        {"title": "111", "label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"my_text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},  # noqa
-        None,
-        201
-    ),
-    # invalid label config: unexisted toName
-    (
-        {"title": "111", "label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"unexisted\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},  # noqa
-        {"label_config": ["toName=\"unexisted\" not found in names: ['my_class', 'my_text']"]},
-        400
-    ),
-    # invalid label config: missed toName
-    (
-        {"title": "111", "label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},  # noqa
-        {'label_config': ["Validation failed on : 'toName' is a required property"]},  # noqa
-        400
-    ),
-    # empty label config
-    (
-        {"title": "111", "label_config": None},
-        {'label_config': ['can only parse strings']},
-        400
-    )
-])
+@pytest.mark.parametrize('use_x_api_key', [True, False])
+@pytest.mark.parametrize(
+    'payload, response, status_code',
+    [
+        # status OK
+        (
+            {
+                'title': '111',
+                'label_config': '<View><Text name="my_text" value="$text"/><Choices name="my_class" toName="my_text"><Choice value="pos"/><Choice value="neg"/></Choices></View>',
+            },
+            None,
+            201,
+        ),
+        # invalid label config: unexisted toName
+        (
+            {
+                'title': '111',
+                'label_config': '<View><Text name="my_text" value="$text"/><Choices name="my_class" toName="unexisted"><Choice value="pos"/><Choice value="neg"/></Choices></View>',
+            },
+            {'label_config': ["toName=\"unexisted\" not found in names: ['my_class', 'my_text']"]},
+            400,
+        ),
+        # invalid label config: missed toName
+        (
+            {
+                'title': '111',
+                'label_config': '<View><Text name="my_text" value="$text"/><Choices name="my_class"><Choice value="pos"/><Choice value="neg"/></Choices></View>',
+            },
+            {'label_config': ["Validation failed on : 'toName' is a required property"]},
+            400,
+        ),
+        # empty label config
+        ({'title': '111', 'label_config': None}, {'label_config': ['can only parse strings']}, 400),
+        # <Choices> surrounded by <View> -> OK
+        (
+            {
+                'title': '111',
+                'label_config': '<View><Text name="my_text" value="$text"/><View className="non-root"><Choices name="my_class" toName="my_text"><Choice value="pos"/><Choice value="neg"/></Choices></View></View>',
+            },
+            None,
+            201,
+        ),
+        # <Choices> with value attribute but without nested <Choice>
+        # example from https://labelstud.io/templates/serp_ranking
+        (
+            {
+                'title': '111',
+                'label_config': """
+                <View>
+  
+  <Header value="Search request" size="5"/> 
+  <Text name="text" value="$text"/>
+ 
+  <Header value="Generated responses" size="5"/> 
+  <View className="dynamic_choices">
+    <Choices name="dynamic_choices" toName="text" selection="checkbox" value="$options" layout="vertical" choice="multiple" allownested="true"/>
+  </View>
+  <View style="box-shadow: 2px 2px 5px #999; padding: 20px; margin-top: 1em; border-radius: 5px;">
+    <Header value="Search Quality"/>
+    <Rating name="relevance" toName="text"/>
+  </View>
+  <View style="box-shadow: 2px 2px 5px #999; padding: 15px 5px 10px 20px; margin-top: 1.5em; margin-bottom: 1.25em; border-radius: 5px; display: flex; align-items: center;">
+    <Header value="Labeling Confidence" style="font-size: 1.25em"/>
+    <View style="margin: 0 1em 0.5em 1.5em">
+      <Choices name="confidence" toName="text" choice="single" showInLine="true">
+        <Choice value="Low" html="&lt;img width='40' src='https://www.iconsdb.com/icons/preview/green/thumbs-up-xxl.png'/&gt;"/>
+        <Choice value="High" html="&lt;img width='40' src='https://www.iconsdb.com/icons/preview/red/thumbs-down-xxl.png'/&gt;"/>
+      </Choices>
+    </View>
+  </View>
+  
+  <Style>
+  .searchresultsarea {
+    margin-left: 10px;
+    font-family: 'Arial';
+  }
+  .searchresult {
+    margin-left: 8px;
+  }
+  .searchresult h2 {
+    font-size: 19px;
+    line-height: 18px;
+    font-weight: normal;
+    color: rgb(29, 1, 189);
+    margin-bottom: 0px;
+    margin-top: 25px;
+  }
+  .searchresult a {
+    font-size: 14px;
+    line-height: 14px;
+    color: green;
+    margin-bottom: 0px;
+  }
+  .searchresult button {
+    font-size: 10px;
+    line-height: 14px;
+    color: green;
+    margin-bottom: 0px;
+    padding: 0px;
+    border-width: 0px;
+    background-color: white;
+  }
+  </Style>
+</View>
+                """,
+            },
+            None,
+            201,
+        ),
+    ],
+)
 @pytest.mark.django_db
-def test_create_project(client_and_token, payload, response, status_code):
+def test_create_project(client_and_token, payload, response, status_code, use_x_api_key):
     client, token = client_and_token
+
+    if use_x_api_key:
+        client.credentials(HTTP_X_API_KEY=token.key)
+
     payload['organization_pk'] = client.organization_pk
     with ml_backend_mock():
         r = client.post(
             '/api/projects/',
             data=json.dumps(payload),
             content_type='application/json',
-            headers={'Authorization': f'Token {token}'}
+            headers={'Authorization': f'Token {token}'},
         )
     assert r.status_code == status_code
     if response:
@@ -83,34 +168,43 @@ def test_create_project(client_and_token, payload, response, status_code):
             assert response_data == response
 
 
-@pytest.mark.parametrize('payload, response, status_code', [
-    # status OK
-    (
-        {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"my_text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},  # noqa
-        None,
-        200
-    ),
-    # TODO: this should instead of next one, but "configured_project" fixture doesn't update project.summary with data columns
-    # invalid column
-    # (
-    #     {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"my_text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},
-    #     # noqa
-    #     {'label_config': ['These fields are not found in data: text']},
-    #     400
-    # ),
-    # invalid label config: unexisted toName
-    (
-        {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"unexisted\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},  # noqa
-        {"label_config": ["toName=\"unexisted\" not found in names: ['my_class', 'my_text']"]},
-        400
-    ),
-    # invalid label config: missed toName
-    (
-        {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"}, # noqa
-        {'label_config': ["Validation failed on : 'toName' is a required property"]},  # noqa
-        400
-    )
-])
+@pytest.mark.parametrize(
+    'payload, response, status_code',
+    [
+        # status OK
+        (
+            {
+                'label_config': '<View><Text name="my_text" value="$text"/><Choices name="my_class" toName="my_text"><Choice value="pos"/><Choice value="neg"/></Choices></View>'
+            },
+            None,
+            200,
+        ),
+        # TODO: this should instead of next one, but "configured_project" fixture doesn't update project.summary with data columns
+        # invalid column
+        # (
+        #     {"label_config": "<View><Text name=\"my_text\" value=\"$text\"/><Choices name=\"my_class\" toName=\"my_text\"><Choice value=\"pos\"/><Choice value=\"neg\"/></Choices></View>"},
+        #
+        #     {'label_config': ['These fields are not found in data: text']},
+        #     400
+        # ),
+        # invalid label config: unexisted toName
+        (
+            {
+                'label_config': '<View><Text name="my_text" value="$text"/><Choices name="my_class" toName="unexisted"><Choice value="pos"/><Choice value="neg"/></Choices></View>'
+            },
+            {'label_config': ["toName=\"unexisted\" not found in names: ['my_class', 'my_text']"]},
+            400,
+        ),
+        # invalid label config: missed toName
+        (
+            {
+                'label_config': '<View><Text name="my_text" value="$text"/><Choices name="my_class"><Choice value="pos"/><Choice value="neg"/></Choices></View>'
+            },
+            {'label_config': ["Validation failed on : 'toName' is a required property"]},
+            400,
+        ),
+    ],
+)
 @pytest.mark.django_db
 def test_patch_project(client_and_token, configured_project, payload, response, status_code):
     client, token = client_and_token
@@ -119,7 +213,7 @@ def test_patch_project(client_and_token, configured_project, payload, response, 
         f'/api/projects/{configured_project.id}/',
         data=json.dumps(payload),
         content_type='application/json',
-        headers={'Authorization': f'Token {token}'}
+        headers={'Authorization': f'Token {token}'},
     )
     assert r.status_code == status_code
     if response:
@@ -129,14 +223,23 @@ def test_patch_project(client_and_token, configured_project, payload, response, 
         else:
             assert response_data == response
 
+
 @mock.patch('ml.serializers.validate_upload_url')
-@pytest.mark.parametrize('external_status_code, current_active_ml_backend_url, ml_backend_call_count', [
-    (201, 'http://my.super.ai', 4),
-])
+@pytest.mark.parametrize(
+    'external_status_code, current_active_ml_backend_url, ml_backend_call_count',
+    [
+        (201, 'http://my.super.ai', 4),
+    ],
+)
 @pytest.mark.django_db
 def test_creating_activating_new_ml_backend(
-    mock_validate_upload_url, client_and_token, configured_project, external_status_code,
-    current_active_ml_backend_url, ml_backend_call_count, settings
+    mock_validate_upload_url,
+    client_and_token,
+    configured_project,
+    external_status_code,
+    current_active_ml_backend_url,
+    ml_backend_call_count,
+    settings,
 ):
     # Turn off telemetry to avoid requests mock receiving requests from it, to
     # eliminate flakes. TODO(jo): consider implementing this more broadly in test.
@@ -149,13 +252,9 @@ def test_creating_activating_new_ml_backend(
         m.get(f'{my_url}/health', text=json.dumps({'status': 'UP'}))
         r = business_client.post(
             '/api/ml',
-            data=json.dumps({
-                'project': configured_project.id,
-                'title': 'My Super AI',
-                'url': my_url
-            }),
+            data=json.dumps({'project': configured_project.id, 'title': 'My Super AI', 'url': my_url}),
             content_type='application/json',
-            headers={'Authorization': f'Token {token}'}
+            headers={'Authorization': f'Token {token}'},
         )
 
         assert r.status_code == external_status_code
@@ -176,20 +275,48 @@ def test_delete_annotations(business_client, configured_project):
 
 # --- TaskAPI ---
 
-@pytest.mark.parametrize('response, status_code', [
-    # status OK
-    (
-        {"annotations": [], 'predictions': [], 'drafts': [],
-         "data": {"text": "text B", "meta_info": "meta info B"}, "meta": {},
-         "created_at": "", "updated_at": "", 'updated_by': [], "is_labeled": False, "project": 0,
-         'overlap': 1, 'file_upload': None, 'annotations_ids': '', 'annotations_results': '',
-         'annotators': [], 'completed_at': None, 'predictions_model_versions': '', 'draft_exists': False,
-         'predictions_results': '', 'predictions_score': None, 'total_annotations': 0, 'total_predictions': 0,
-         'avg_lead_time': None, 'cancelled_annotations': 0, 'inner_id': 0,'storage_filename': None,
-         'comment_authors': [], 'comment_count': 0, 'last_comment_updated_at': None, 'unresolved_comment_count': 0},
-        200
-    )
-])
+
+@pytest.mark.parametrize(
+    'response, status_code',
+    [
+        # status OK
+        (
+            {
+                'annotations': [],
+                'predictions': [],
+                'drafts': [],
+                'data': {'text': 'text B', 'meta_info': 'meta info B'},
+                'meta': {},
+                'created_at': '',
+                'updated_at': '',
+                'updated_by': [],
+                'is_labeled': False,
+                'project': 0,
+                'overlap': 1,
+                'file_upload': None,
+                'annotations_ids': '',
+                'annotations_results': '',
+                'annotators': [],
+                'completed_at': None,
+                'predictions_model_versions': '',
+                'draft_exists': False,
+                'predictions_results': '',
+                'predictions_score': None,
+                'total_annotations': 0,
+                'total_predictions': 0,
+                'avg_lead_time': None,
+                'cancelled_annotations': 0,
+                'inner_id': 0,
+                'storage_filename': None,
+                'comment_authors': [],
+                'comment_count': 0,
+                'last_comment_updated_at': None,
+                'unresolved_comment_count': 0,
+            },
+            200,
+        )
+    ],
+)
 @pytest.mark.django_db
 def test_get_task(client_and_token, configured_project, response, status_code):
     client, token = client_and_token
@@ -199,30 +326,53 @@ def test_get_task(client_and_token, configured_project, response, status_code):
     response['updated_at'] = task.updated_at.isoformat().replace('+00:00', 'Z')
     response['id'] = task.id
     r = client.get(
-        f'/api/tasks/{task.id}/',
-        content_type='application/json',
-        headers={'Authorization': f'Token {token}'}
+        f'/api/tasks/{task.id}/', content_type='application/json', headers={'Authorization': f'Token {token}'}
     )
     assert r.status_code == status_code
     if response:
         assert r.json() == response
 
 
-@pytest.mark.parametrize('payload, response, status_code', [
-    # status OK
-    (
-        {"annotations": [], 'predictions': [],
-         "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
-         "created_at": "", "updated_at": "", "updated_by": None, "is_labeled": False,
-         "project": 0, 'file_upload': None},
-        {"id": 0, "annotations": [], 'predictions': [],
-         "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
-         "created_at": "", "updated_at": "", "updated_by": None, "is_labeled": False, "project": 0,
-         'overlap': 1, 'file_upload': None, "inner_id": 1,
-         'comment_authors': [], 'comment_count': 0, 'last_comment_updated_at': None, 'unresolved_comment_count': 0},
-        200
-    )
-])
+@pytest.mark.parametrize(
+    'payload, response, status_code',
+    [
+        # status OK
+        (
+            {
+                'annotations': [],
+                'predictions': [],
+                'data': {'text': 'TEST1', 'meta_info': 'TEST2'},
+                'meta': {},
+                'created_at': '',
+                'updated_at': '',
+                'updated_by': None,
+                'is_labeled': False,
+                'project': 0,
+                'file_upload': None,
+            },
+            {
+                'id': 0,
+                'annotations': [],
+                'predictions': [],
+                'data': {'text': 'TEST1', 'meta_info': 'TEST2'},
+                'meta': {},
+                'created_at': '',
+                'updated_at': '',
+                'updated_by': None,
+                'is_labeled': False,
+                'project': 0,
+                'overlap': 1,
+                'file_upload': None,
+                'inner_id': 1,
+                'comment_authors': [],
+                'comment_count': 0,
+                'last_comment_updated_at': None,
+                'unresolved_comment_count': 0,
+            },
+            200,
+        )
+    ],
+)
 @pytest.mark.django_db
 def test_patch_task(client_and_token, configured_project, payload, response, status_code):
     client, token = client_and_token
@@ -233,7 +383,7 @@ def test_patch_task(client_and_token, configured_project, payload, response, sta
         f'/api/tasks/{task.id}/',
         data=json.dumps(payload),
         content_type='application/json',
-        headers={'Authorization': f'Token {token}'}
+        headers={'Authorization': f'Token {token}'},
     )
 
     task = configured_project.tasks.order_by('-updated_at').all()[0]  # call DB again after update

@@ -1,0 +1,16 @@
+.progress {
+  color: var(--persimmon_400);
+}
+
+.wave {
+  position: relative;
+
+  canvas {
+    // prevent reset.css from breaking waveforms
+    max-width: unset;
+  }
+}
+
+.menu {
+  margin: 2em 0;
+}

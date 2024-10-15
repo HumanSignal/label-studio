@@ -1,0 +1,30 @@
+.card {
+  border-radius: 5px;
+  background-color: var(--sand_0);
+  border: 1px solid var(--sand_300);
+
+  &__header {
+    display: flex;
+    height: 48px;
+    padding: 0 15px;
+    align-items: center;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 18px;
+    justify-content: space-between;
+    box-shadow: 0 1px 0 0 rgb(0 0 0 / 10%);
+
+    &-content {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  &__content {
+    padding: 15px;
+  }
+
+  &:not(:first-child) {
+    margin-top: 24px;
+  }
+}

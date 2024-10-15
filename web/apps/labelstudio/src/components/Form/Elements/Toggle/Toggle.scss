@@ -1,0 +1,64 @@
+.toggle {
+  width: 42px;
+  height: 24px;
+  display: block;
+  min-width: 42px;
+  max-height: 24px;
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: box-shadow 80ms ease;
+  background: var(--sand_0);
+  border: 1px solid var(--sand_300);
+
+  &__input {
+    top: 0;
+    left: 0;
+    margin: 0;
+    opacity: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+  }
+
+  &__indicator {
+    height: 24px;
+    width: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 120ms ease;
+
+    &::before {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border-radius: 100%;
+      transition: all 120ms ease;
+      background: var(--sand_400);
+      box-shadow: 0 5px 10px rgb(18 17 13 / 15%), inset 0 -1px 0 rgb(18 17 13 / 10%), inset 0 0 0 1px rgb(18 17 13 / 5%);
+    }
+  }
+
+  &_checked &__indicator {
+    margin-left: 18px;
+
+    &::before {
+      width: 16px;
+      height: 16px;
+      background: var(--primary_link);
+      box-shadow: 0 5px 10px var(--grape_100), inset 0 -1px 0 rgb(0 0 0 / 10%);
+    }
+  }
+
+  &_disabled &__indicator {
+    transition: none;
+  }
+
+  &_disabled &__indicator::before {
+    background-color: var(--sand_100);
+    box-shadow: none;
+    transition: none;
+  }
+}

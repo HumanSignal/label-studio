@@ -23,13 +23,13 @@ jobs:
       release_tag: ${{ github.ref_name }}
     secrets: inherit
 
-  build_ubi_docker_image:
-    name: "Build UBI docker image"
-    uses: ./.github/workflows/docker-build-ubi.yml
-    with:
-      sha: ${{ github.ref_name }}
-      version: ${{ github.ref_name }}
-    secrets: inherit
+#  build_ubi_docker_image:
+#    name: "Build UBI docker image"
+#    uses: ./.github/workflows/docker-build-ubi.yml
+#    with:
+#      sha: ${{ github.ref_name }}
+#      version: ${{ github.ref_name }}
+#    secrets: inherit
 
   build_hugging_face_docker_image:
     name: "Build Hugging Face docker image"
@@ -42,6 +42,31 @@ jobs:
       dockerfile_path: Dockerfile.hgface
       ref: ${{ github.ref_name }}
     secrets: inherit
+
+  jira_set_fix_version:
+    name: "Set Jira fix version"
+    needs:
+      - promote_docker_image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Checkout Actions Hub
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_PAT }}
+          repository: HumanSignal/actions-hub
+          path: ./.github/actions-hub
+
+      - name: Set Jira fix version
+        uses: ./.github/actions-hub/actions/jira-set-fix-version
+        continue-on-error: true
+        with:
+          jira_server: "${{ vars.JIRA_SERVER }}"
+          jira_username: "${{ secrets.JIRA_USERNAME }}"
+          jira_token: "${{ secrets.JIRA_TOKEN }}"
+          jira_fix_version: "LS OpenSource/${{ github.ref_name }}"
+          jira_fix_version_released: true
 
   build-pypi:
     name: "Build"
@@ -61,10 +86,10 @@ jobs:
     needs:
       - build-pypi
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Delete Release Candidate Assets
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           RELEASE_ID: "${{ github.event.release.id }}"
         with:
@@ -96,10 +121,10 @@ jobs:
     needs:
       - build-pypi
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: DispatchEvent
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -125,3 +150,27 @@ jobs:
     with:
       docker_image_version: ${{ github.ref_name }}
     secrets: inherit
+
+  notify_slack_on_failure:
+    name: "Notify Slack on Failure"
+    needs:
+      - promote_docker_image
+      - build_hugging_face_docker_image
+      - build-pypi
+      - delete-rc-assets
+      - update-homebrew-tap
+      - update-helm-chart
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Send Notification to Slack
+        id: slack_notify_ops_release
+        uses: slackapi/slack-github-action@v1.27
+        with:
+          channel-id: '${{ vars.SLACK_CH_RELEASE_TRAIN }}'
+          slack-message: |
+            One or more steps of Label Studio OpenSource release pipeline got failed! <!subteam^${{ vars.SLACK_GR_DEVOPS }}>
+
+            ><https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|[Workflow run]>
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_LSE_BOT_TOKEN }}

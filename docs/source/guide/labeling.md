@@ -1,12 +1,12 @@
 ---
-title: Label and annotate data
+title: Labeling guide
 tier: all 
 type: guide
-order: 208
-order_enterprise: 112
+order: 134
+order_enterprise: 134
 meta_title: Label and annotate data
 meta_description: Label and annotate data to create bounding boxes, label text spans, set up relations. Filter and sort project data for machine learning dataset creation.
-section: "Labeling"
+section: "Create & Manage Projects"
 
 ---
 
@@ -31,6 +31,9 @@ From a project, click **Label All Tasks** to start labeling all tasks. To label 
 You can also label a specific task in the **Quick View** or **Preview** by clicking it from the project data manager view, but you won't automatically see the next task in the labeling queue after submitting your annotations. 
 
 You can also select the checkboxes next to specific tasks and then click **Label $n Tasks** to label the selected number of tasks. For example, select the checkboxes for 5 different tasks, then click **Label 5 Tasks** to label only those 5 tasks. 
+
+!!! note
+    When labeling tasks, you should not open the label stream (meaning to click **Label All Tasks**) simultaneously in two tabs. This could result in you receiving the same task twice, which can circumvent project settings that address annotator overlap. 
 
 ### Label a region in the data
 Annotate a section of the data by adding a region. 
@@ -100,6 +103,13 @@ After you relate two annotation regions, you can modify the relation in the **Re
 
 ### Skipping a task
 When annotators skip a task, the task no longer appears in the labeling queue for that annotator. Other annotators still see the task in their labeling queue. 
+
+### Exiting a labeling flow 
+When annotators are not finished with their annotation work but would like to exit their labeling flow to, for example, pause the [lead time](/guide/task_format.html#Relevant-JSON-property-descriptions) calculation on their annotations, they can click the drop-down menu next to **Submit** and then select **Submit and Exit** (or **Update and Exit**). This will submit the current annotation and redirect them to the Projects page. 
+
+If they are not done with their annotation, then they can simply check to make sure their draft was saved in the history panel and then navigate to the Projects page to stop the [lead time](/guide/task_format.html#Relevant-JSON-property-descriptions) calculation from running. 
+
+<img src="../images/submit-and-exit.png" class="gif-border">
 
 
 ## Label with collaborators
@@ -202,9 +212,9 @@ If you want to change the hotkeys used for specific actions, set the `EDITOR_KEY
 ```
 EDITOR_KEYMAP='{"annotation:submit":{"key": "shift+s","description": "My Custom Submit Hotkey!"}}'
 ```
-This overwrites the existing hotkey mapping with your custom mapping. See [more about how to set environment variables](start.html#Set-environment-variables). 
+This overwrites the existing hotkey mapping with your custom mapping. See [more about how to set environment variables](https://labelstud.io/guide/start#Set-environment-variables). 
 
-Refer to the full list of customizable hotkeys in the [`keymap.json` file of the `label-studio-frontend`](https://github.com/heartexlabs/label-studio-frontend/blob/master/src/core/settings/keymap.json) repository to update a different hotkey combination. 
+Refer to the full list of customizable hotkeys in the [`keymap.json` file](https://github.com/HumanSignal/label-studio/blob/develop/web/libs/editor/src/core/settings/keymap.json) to update a different hotkey combination. 
 
 You cannot use this environment variable to remove an existing or add a new keyboard shortcut. 
 
@@ -238,6 +248,7 @@ You can add multiple types of regions to image annotations. You can add any of t
 To add different types of regions to your image annotations, follow this example.
 
 Create a custom template for your labeling interface using the following example:
+
 ```xml
 <View>
   <Image name="image" value="$image" />
@@ -250,13 +261,12 @@ Create a custom template for your labeling interface using the following example
     <Choice value="yes"></Choice>
     <Choice value="no"></Choice>
   </Choices>
-<Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
-  <Label value="building" background="green"></Label>
-  <Label value="vehicle" background="blue"></Label>
+  <Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
+    <Label value="building" background="green"></Label>
+    <Label value="vehicle" background="blue"></Label>
   </Labels>
 </View>
 ```
-
 This example makes rectangles, ellipses, polygons, keypoints, and brush masks available to the annotator, along with image classification choices of yes and no, and region labels of building and vehicle.
 
 ### Faster image labeling
@@ -267,20 +277,19 @@ If you accidentally select a point on an image while creating a polygon, just do
 ### Create regions without labels
 When you're annotating images, you can create regions without applying labels. 
 
-1. Create a region by double-clicking or clicking and dragging to create a bounding box, or click the points necessary to construct a polygon.
-2. Select the created region in the sidebar or on the image.
-3. Select the label that you want to apply to the region.
-4. Repeat these steps for any regions that you want to create.
+1. Create a custom template using the example provided above under [Add multiple types of regions to image annotations](#Add-multiple-types-of-regions-to-image-annotations).
+2. Select which tool you want to use in the labeling toolbar. You only need to do this for the first task. 
+3. Create a region by double-clicking or clicking and dragging to create a bounding box, or click the points necessary to construct a polygon.
+4. Select the created region in the sidebar or on the image.
+5. Select the label that you want to apply to the region.
+6. Repeat these steps for any regions that you want to create.
 
 This can be helpful for two-step labeling, where you want one annotator to create regions and another annotator to label the regions. 
-
-By default, regions without labels appear gray.
 
 ### Erase brush mask labels
 If you make a mistake when labeling with the brush mask, you can erase it. You must select a brush region in the sidebar before you can erase any part of it. 
 
 If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
-
 
 ## Outliner 
 
@@ -291,7 +300,7 @@ The **Outliner** is a replacement for the existing interface with a multiple-pan
 Outliner is the area where you can see all the details about annotation, regions, and labeling history. It is split into two panels, named **Outliner** and **Details**. Figure 3 shows the appearance of the **Outliner** panel on the right of the image and **Details** panel on the left of the image. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/outliner-details-panels-view.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/outliner-details-panels-view.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 3: View of Outliner and Details panels view </i>
  
 **Panel actions**
@@ -301,46 +310,46 @@ There are two panels which is the outliner for the regions list. These panels ca
 The **Outliner** and **Details** panels are collapsible and detachable, so you can arrange them the way you want. Figure 4 shows the **Collapse details** button which allows you to collapse the **Details** panel and use the remaining portion of the screen. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/collapse-details-button.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/collapse-details-button.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 4: Collapsed details button</i>
 
 Now, the **Details** panel is collapsed, and you can expand it by clicking the **Expand Details** icon.
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/details-collapsed-button-view.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/details-collapsed-button-view.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 5: Details panel in collapsed view</i>
 
 The details panel is displayed in expanded view to explore the feature. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/details-panel-expanded-view.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/details-panel-expanded-view.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 6: Details panel in expanded view</i>
 
 To collapse the **Outliner** panel, click on the **Collapse outliner** icon. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/collapse-outliner-button.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/collapse-outliner-button.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 7: Collapse outliner button</i>
 
 Now, the **Outliner** panel is collapsed, and you can expand it by clicking the **Expand Details** icon.
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/outliner-collapsed-view.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/outliner-collapsed-view.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 8: Outliner panel in collapsed view</i>
 
 The **Expand Details** icon expands the **Outliner** panel for further actions.
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/expand-outliner-button.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/expand-outliner-button.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 9: Outliner panel with expand outliner icon</i>
 
 The Outliner panel is displayed in expanded view to explore the feature. 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/outliner-expanded-view.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/outliner-expanded-view.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 10: Outliner panel in expanded view</i>
 
 These panels are detachable, so you can place them wherever you want on the screen, and you can resize them. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/details-floating-dock.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/details-floating-dock.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 11: Details panel in floating dock view</i>
  
 **Region editor** 
@@ -348,7 +357,7 @@ These panels are detachable, so you can place them wherever you want on the scre
 You can edit regions with a focus on labeling. You can zoom in and precise control over the numbers and dimensions of each region attribute. The image region details like height, rotation, and so on can be changed using the inputs in the **Details** panel. Now, you can collapse all panels and get the maximum working area. This feature design makes some actions clear in the product user interface.
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/region-editor.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/region-editor.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 12: Edit regions using different attributes</i>
 
 
@@ -358,10 +367,10 @@ You can edit regions with a focus on labeling. You can zoom in and precise contr
 <div class="enterprise-only"> <p>The <b>Comments</b> box is available inside the outliner. </p></div>
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/comments-box.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/comments-box.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 13: Comments box </i>
 
-!!! info 
+!!! note
     Use Outliner to work with larger annotation tasks (many bounding boxes in one image, larger videos, and so on).
 
 To add a region in the OCR transcription templates, draw a rectangle, and you can see a text box that appears in the **Outliner** panel to enter OCR text. The new functionality allows you to select a region and the **Details** panel changes. You can experience the following:
@@ -391,19 +400,19 @@ You can group or sort regions using the following functionality from the drop-do
 You can also order your regions by **Order by Score** or **Order by Time** options. 
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/group-by-label-sorted-by-score-expanded-dog-icon.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/group-by-label-sorted-by-score-expanded-dog-icon.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 14: Group by label using sorted by score</i>
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/group-by-tool-sorted-by-score.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/group-by-tool-sorted-by-score.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 15: Group by tool using sorted by score</i>
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/group-by-label-sorted-by-score.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/group-by-label-sorted-by-score.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 16: Group by label using sorted by score</i>
 
 <br>
-<div style="margin:auto; text-align:center;"><img src="/images/manual-grouping.png" style="opacity: 0.8" class="gif-border"/></div>
+<img src="/images/manual-grouping.png" style="opacity: 0.8" class="gif-border"/>
 <i>Figure 17: Manual grouping</i>
 
 **Prediction indication of the region**

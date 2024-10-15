@@ -1,0 +1,119 @@
+.audio-slider {
+  --background-active-color: var(--grape_100);
+  --button-color: var(--primary_link);
+
+  position: relative;
+
+  &__range {
+    margin: 0 20px;
+    width: calc(100% - 40px);
+    padding: 0;
+    appearance: none;
+    height: 4px;
+    background: var(--sand_200);
+    border-radius: 8px;
+    background-image: linear-gradient(var(--background-active-color), var(--background-active-color));
+    background-size: 70% 100%;
+    background-repeat: no-repeat;
+    border: none;
+  }
+
+  &__control {
+    padding: 0 16px;
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+  }
+
+  &__info {
+    display: flex;
+  }
+
+  &__input {
+    width: 40px;
+    height: 24px;
+    border-radius: 2px;
+    background: var(--sand_100);
+    border: 1px solid var(--sand_300);
+    line-height: 24px;
+    padding: 0;
+    text-align: center;
+    outline: none;
+
+    &_error_control {
+      color: var(--danger_color);
+      border: 1px solid var(--red_1);
+    }
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: var(--button-color);
+    cursor: ew-resize;
+    transition: background 0.3s ease-in-out;
+    z-index: 2;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    appearance: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: var(--button-color);
+    cursor: ew-resize;
+    box-shadow: 0 0 2px 0 var(--sand_700);
+    transition: background 0.3s ease-in-out;
+  }
+
+  input[type="range"]::-ms-thumb {
+    appearance: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: var(--button-color);
+    cursor: ew-resize;
+    box-shadow: 0 0 2px 0 var(--sand_700);
+    transition: background 0.3s ease-in-out;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    background: var(--button-color);
+  }
+
+
+  input[type="range"]::-moz-range-thumb:hover {
+    background: var(--button-color);
+  }
+
+  input[type="range"]::-ms-thumb:hover {
+    background: var(--button-color);
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+  }
+
+  input[type="range"]::-moz-range-track {
+    appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+  }
+
+
+  input[type="range"]::-ms-track {
+    appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+  }
+}

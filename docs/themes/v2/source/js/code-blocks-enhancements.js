@@ -1,19 +1,13 @@
 var iframeTimer = null;
 
-
-
-  function editor_iframe(res, modal, full) {
+  function editor_iframe(res, modal, full, id) {
     // generate new iframe
-    var iframeTemplate = `<iframe onclick="event.stopPropagation()" id="render-editor" style="display: none"></iframe>`;
-
-    /* if (full) {
-      iframe.css('width', $(window).width() * 0.9);
-    } */
+    var iframeTemplate = `<iframe onclick="event.stopPropagation()" id="render-editor-${id}" class="api-render-editor" style="display: none"></iframe>`;
 
     modal.insertAdjacentHTML("beforeend", iframeTemplate)
 
-    const iframe = document.querySelector("#render-editor");
-    const spinner = document.querySelector("#render-editor-loader");
+    const iframe = document.querySelector(`#render-editor-${id}`);
+    const spinner = modal.querySelector(".render-editor-loader");
 
     if (full) {
       iframe.style.width = window.innerWidth * 0.9 + "px"
@@ -23,22 +17,17 @@ var iframeTimer = null;
       if(spinner) spinner.style.display = "none";
       iframe.style.display = "block";
 
-      var obj = document.getElementById('render-editor');
       clearTimeout(iframeTimer);
 
       iframeTimer = setInterval(function () {
-        if (obj.contentWindow) {
-          // fix editor height
-          obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+        if (iframe.contentWindow) {
+          const height = iframe.contentWindow.document.querySelector("#label-studio div[class^='App_editor'], #label-studio div[class*='App_editor']").offsetHeight;
 
-          // fix editor width
-          // let app_editor = obj.contentDocument.body.querySelector('div[class*="App_editor"]').style;
-          //app_editor.setProperty('min-width', '100%', 'important');
-          const segmentBlock = obj.contentDocument.body.querySelector('div[class*="Segment_block"]');
+          iframe.style.height = height + 'px';
 
-          if(segmentBlock) segmentBlock.style.margin='0'
         }
       }, 200);
+
     })
 
     // load new data into iframe
@@ -46,20 +35,21 @@ var iframeTimer = null;
   }
   
 function show_render_editor(config) {
+  var id = "id" + Math.random().toString(16).slice(2);
   const body = document.querySelector("body");
   const modalTemplate = `
-  <div id="preview-wrapper" onclick="this.remove()">
-    <div id="render-editor-loader"><img width="50px" src="/images/loading.gif"></div>
+  <div id="preview-wrapper-${id}" class="api-preview-wrapper" onclick="this.remove()">
+    <div class="render-editor-loader"><img width="50px" src="/images/design/loading.gif"></div>
   </div>
   `
   body.insertAdjacentHTML("beforeend", modalTemplate)
 
-  const modal = document.querySelector("#preview-wrapper");
+  const modal = document.querySelector(`#preview-wrapper-${id}`);
 
-  insert_render_editor(config, modal, true);
+  insert_render_editor(config, modal, true, id);
 }
 
-function insert_render_editor(config, modal, full) {
+function insert_render_editor(config, modal, full, id) {
   let url = "https://app.heartex.ai/demo/render-editor?playground=1&open_preview=1";
   if (full) {
     url += '&full_editor=t';
@@ -77,7 +67,7 @@ function insert_render_editor(config, modal, full) {
   })
   .then((response) => response.text())
   .then((data) => {
-    editor_iframe(data, modal, full)
+    editor_iframe(data, modal, full, id)
   })
   .catch((error) => {
     console.log(error);
@@ -132,7 +122,7 @@ function insert_render_editor(config, modal, full) {
     const htmlTemplate = `
     <div class="playground-buttons">
       <button class="code-block-open-preview">Open Preview</button>
-      <a href="/playground?config=${encodeURI(code)}" target="_blank" rel="noreferrer noopener">Launch in Playground</a>
+      <a href="/playground?config=${encodeURIComponent(code)}" target="_blank" rel="noreferrer noopener">Launch in Playground</a>
     </div>
     `
     pre.insertAdjacentHTML("beforeend", htmlTemplate);
@@ -156,4 +146,3 @@ function insert_render_editor(config, modal, full) {
   codeBlocks.forEach(block => enhanceCodeBlocks(block));
 
 })();
-

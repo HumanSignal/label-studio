@@ -1,0 +1,127 @@
+.columns__selector {
+  position: absolute;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+  top: 0;
+
+  &__button-new.columns__selector__button-new {
+    z-index: 1000;
+    height: 28px;
+    width: 28px;
+    background-color: var(--white);
+    box-shadow: 0 2px 5px 0 var(--black_20);
+    margin: 6.5px 20px;
+    border-radius: 4px;
+
+    &:hover {
+      border: none;
+      filter: none;
+      background: #ebf3fc;
+    }
+
+    &:active {
+      background: linear-gradient(0deg, var(--black_2), var(--black_2)), #FFF;
+      box-shadow: 0 0 5px 0 var(--black_20);
+    }
+  }
+}
+
+.table {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background-color: var(--white);
+
+  &_fit {
+    width: max-content;
+  }
+
+  &__sticky-header {
+    width: 100%;
+  }
+
+  &__auto-size,
+  &__virtual {
+    width: auto;
+
+    .table_fit & {
+      width: fit-content;
+    }
+  }
+
+  &__virtual {
+    max-width: 100vw;
+    min-width: 100vw;
+  }
+
+  &__virtual>div {
+    min-width: fit-content;
+  }
+
+  &__row-wrapper {
+    min-width: fit-content;
+    position: relative;
+    cursor: pointer;
+    background-color: var(--sand_0);
+
+    &_disabled,
+    &_loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    &_even:not(.table__row_wrapper_selected) {
+      background-color: var(--sand_100);
+    }
+
+    &_selected {
+      background-color: var(--grape_0);
+    }
+
+    &:not(.table__row_wrapper_selected):hover {
+      background-color: var(--grape_0);
+    }
+
+    &_highlighted:not(.table__row_wrapper_selected)::after {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      content: "";
+      z-index: 50;
+      position: absolute;
+      pointer-events: none;
+      box-shadow: 0 0 0 1px rgb(var(--accent_color-raw) / 80%) inset;
+    }
+  }
+
+  &__cell {
+    flex: 150 0 auto;
+    width: fit-content;
+    min-width: min-content;
+    max-width: min-content;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    word-break: break-word;
+  }
+
+  &__cell-content {
+    flex: 0;
+    display: flex;
+    white-space: nowrap;
+    align-items: center;
+
+    &_disabled {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+}

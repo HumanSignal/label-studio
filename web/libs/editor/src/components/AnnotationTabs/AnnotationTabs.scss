@@ -1,0 +1,111 @@
+.annotation-tabs {
+  height: 44px;
+  width: 100%;
+  display: flex;
+  display: grid;
+  z-index: 100;
+  position: sticky;
+  grid-template-columns: 1fr;
+  top: var(--sticky-items-offset);
+  background-color: var(--main-bg-color);
+  border-bottom: 1px solid var(--sand_300);
+
+  &_viewAll {
+    grid-template-columns: 1fr 44px;
+  }
+
+  &_addNew {
+    grid-template-columns: 44px 1fr;
+  }
+
+  &_viewAll.annotation-tabs_addNew {
+    grid-template-columns: 44px 1fr 44px;
+  }
+
+  &__add,
+  &__all {
+    border: none;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-size: 16px;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__add {
+    border-right: 1px solid var(--sand_300);
+  }
+
+  &__all {
+    outline: none;
+    color: var(--sand_600);
+
+    &_active {
+      color: var(--grape_500);
+    }
+  }
+
+  &__list {
+    flex: 1;
+    display: flex;
+    overflow: auto;
+    position: relative;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.entity-tab {
+  height: 100%;
+  min-width: 170px;
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  padding: 10px 12px;
+  box-sizing: border-box;
+
+  &_bordered {
+    border-right: 1px solid var(--sand_300);
+  }
+
+  &_selected {
+    opacity: 1;
+    cursor: default;
+    background-color: var(--main-bg-color);
+    box-shadow: inset 0 2px 0 var(--grape_500);
+  }
+
+  &__userpic {
+    width: 24px;
+    height: 24px;
+
+    &_prediction {
+      color: var(--plum_400);
+      background-color: var(--plum_0);
+      box-shadow: inset 0 0 0 1px rgb(148 75 255 / 15%);
+    }
+  }
+
+  &__ground-truth {
+    color: var(--canteloupe_400);
+    margin-top: -2px;
+
+    path {
+      fill-opacity: 1;
+      stroke-opacity: 1;
+    }
+  }
+
+  &__skipped {
+    color: var(--danger_color);
+  }
+}

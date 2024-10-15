@@ -1,0 +1,99 @@
+.region-item {
+  width: 100%;
+
+  &__header {
+    height: 32px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    line-height: 22px;
+    width: 100%;
+    padding: 0 8px;
+  }
+
+  &__counter {
+    flex: none;
+    width: 24px;
+    display: flex;
+    color: var(--sand_500);
+    align-items: center;
+    justify-content: center;
+  }
+
+  &_hidden {
+    & .region-item__counter, .region-item__title, .region-item__score, .region-item__id, {
+      opacity: 0.4;
+    }
+
+    & .region-item__desc {
+      background: var(--sand_0);
+    }
+  }
+
+  &__id {
+    display: flex;
+    color: var(--labelColor);
+    width: 16px;
+    height: 16px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      color: var(--sand_500);
+    }
+  }
+
+  &__toggle {
+    width: 24px;
+    flex: 0 0 24px;
+    padding: 0 !important;
+    text-align: center;
+  }
+
+  &__desc {
+    position: relative;
+    background: var(--sand_100);
+    padding: 7px 32px 7px 12px;
+    border-top: 1px solid var(--sand_300);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    min-height: 36px;
+
+    &_empty {
+      display: none;
+    }
+
+    &_collapsed {
+      height: 36px;
+      overflow: hidden;
+    }
+  }
+
+  &__collapse {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top: 6px;
+    right: 8px;
+    opacity: 0.25;
+    padding: 0;
+  }
+
+  &__controls:empty + &__collapse {
+    display: none;
+  }
+
+  &__prediction {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      color: var(--plum_400);
+    }
+  }
+}

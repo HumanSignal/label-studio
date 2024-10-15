@@ -1,15 +1,18 @@
 ---
 title: Frontend builds
 short: Frontend builds
-type: guide
 tier: all
-order: 219
-order_enterprise: 126
+order: 0
+order_enterprise: 0
+hide_menu: true
 meta_title: Customize User Interface
 meta_description: Label Studio documentation for integrating the Label Studio frontend interface into your own machine learning or data labeling application workflow.
-section: "Integration and Development"
+section: "Integrate & Extend"
 
 ---
+
+!!! attention
+    As of [Label Studio 1.11.0](https://github.com/HumanSignal/label-studio/releases/tag/1.11.0), the Label Studio frontend has been deprecated as a separate library and is no longer supported as a standalone distribution. For information about using the frontend library within Label Studio, see [the README](https://github.com/HumanSignal/label-studio/blob/develop/web/libs/editor/README.md). 
 
 The [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) (LSF) is the main labeling interface distributed within Label Studio and as a separate package via NPM and Unpkg. You can integrate the LSF into your projects without Label Studio to provide data labeling capabilities to your users.
 
@@ -103,7 +106,7 @@ const labelStudio = new LabelStudio('label-studio', {
     predictions: [],
     id: 1,
     data: {
-      image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+      image: "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
     }
   }
 });
@@ -199,7 +202,7 @@ const task = {
   predictions: [],
   id: 1,
   data: {
-    image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+    image: "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
   }
 }
 
@@ -276,7 +279,7 @@ All frontend-related files are stored under `label-studio/frontend` directory. Y
 
 Under `dist/` folder locate the `lsf/` folder and replace its contents with your custom LSF build.
 
-!!! info
+!!! note
     Inside every folder under `dist/` you will find a `version.json` file. Do not modify or remove it. Its presence is required for the Label Studio to operate.
 
 1. **Do not forget** to remove the old build from LSB:

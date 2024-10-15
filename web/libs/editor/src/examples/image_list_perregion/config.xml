@@ -1,0 +1,15 @@
+<View>
+  <Image name="img" valueList="$images"></Image>
+
+  <RectangleLabels name="tag" toName="img" fillOpacity="0.5" strokeWidth="5">
+    <Label value="Planet"></Label>
+    <Label value="Moonwalker" background="blue"></Label>
+  </RectangleLabels>
+
+  <View visibleWhen="region-selected">
+    <Choices name="type" toName="img" perRegion="true">
+      <Choice value="Planet"></Choice>
+      <Choice value="Moonwalker"></Choice>
+    </Choices>
+  </View>
+</View>

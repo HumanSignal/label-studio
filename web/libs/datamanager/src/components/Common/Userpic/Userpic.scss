@@ -1,0 +1,67 @@
+.userpic-dm {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  font-size: 12px;
+  position: relative;
+  align-items: center;
+  border-radius: 50%;
+  justify-content: center;
+  background: rgb(0 0 0 / 8%);
+  box-shadow: 0 0 0 1px var(--black_10);
+
+  img {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+    line-height: 22px;
+    object-fit: cover;
+    position: absolute;
+    border-radius: 100%;
+  }
+
+  &__username {
+    display: block;
+    line-height: 22px;
+    font-weight: bold;
+    opacity: 0.6;
+  }
+
+  &__badge {
+    position: absolute;
+
+    &_topLeft {
+      top: 0;
+      left: 0;
+    }
+
+    &_topRight {
+      top: 0;
+      right: 0;
+    }
+
+    &_bottomLeft {
+      bottom: 0;
+      left: 0;
+    }
+
+    &_bottomRight {
+      bottom: 0;
+      right: 0;
+    }
+  }
+
+  &_faded {
+    background: rgb(0 0 0 / 3%);
+    box-shadow: inset 0 0 0 1px var(--black_10);
+  }
+
+  &_faded &__username {
+    opacity: 0.2;
+  }
+
+  &_faded img {
+    opacity: 0.3;
+  }
+}

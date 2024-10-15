@@ -1,31 +1,32 @@
 ---
 title: Configuration details of SaaS
+short: SaaS configuration
 type: guide
 tier: enterprise
-order: 102
-order_enterprise: 128
-meta_title: app.heartex.com Settings
-meta_description: This page contains information about the settings that are used on app.heartex.com, available to HumanSignal SaaS customers.
-section: "Security and Privacy"
+order: 0
+order_enterprise: 96
+meta_title: app.humansignal.com Settings
+meta_description: This page contains information about the settings that are used on app.humansignal.com, available to HumanSignal SaaS customers.
+section: "Install & Setup"
 ---
 
-This document describes the IP configuration, hostnames, and usage limits that govern the interactions with app.heartex.com.
+This document describes the IP configuration, hostnames, and usage limits that govern the interactions with app.humansignal.com (app.heartex.com).
 
 ## Mail configuration
 
-app.heartex.com sends emails from the `heartex.com` domain by using [SendGrid](https://sendgrid.com/), and has its own dedicated IP addresses:
+app.humansignal.com (app.heartex.com) sends emails from the `humansignal.com` domain by using [SendGrid](https://sendgrid.com/), and has its own dedicated IP addresses:
 
 - `208.117.59.219`
 
 ## IP range
 
-app.heartex.com utilizes the following IP addresses to handle the traffic:
+app.humansignal.com (app.heartex.com) utilizes the following IP addresses to handle the traffic:
 
 - `34.199.69.93`
 - `52.22.82.31`
 - `3.233.209.176`
 
-In addition, all outbound connections from our SaaS platform are issued from the following IP addresses (Import/Export, MLBackends):
+In addition, all outbound connections from our SaaS platform are issued from the following IP addresses (Import/Export, ML backends, Prompts):
 
 - `3.219.3.197`
 - `34.237.73.3`
@@ -35,9 +36,9 @@ In addition, all outbound connections from our SaaS platform are issued from the
 
 For setting up allow-lists in local HTTP(S) proxies, or other web-blocking software on user-end computers, add the following hostnames:
 
-- `app.heartex.com`
+- `app.humansignal.com`
 
-Please note that our documentation and company pages, served via https://app.heartex.com/docs/api and https://humansignal.com/ respectively, load certain page content directly from commonly used public CDN hostnames.
+Please note that our documentation and company pages, served via https://app.humansignal.com/docs/api and https://humansignal.com/ respectively, load certain page content directly from commonly used public CDN hostnames.
 
 ## Usage Limits
 

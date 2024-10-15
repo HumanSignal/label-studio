@@ -1,6 +1,0 @@
-{
-  "message": "fix: LOPS-382: [FE] We are using 'Tasks' rather than 'Items' when user selects x items in dataset",
-  "commit": "facbe44c42c6b8bf9406dcfebd8322807b823750",
-  "branch": "master",
-  "date": "2023/08/29 08:53:44"
-}

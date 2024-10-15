@@ -1,0 +1,10 @@
+.tab-panel {
+  display: flex;
+  padding: 12px 16px;
+  background-color: var(--white);
+  justify-content: space-between;
+
+  &_newUI {
+    padding: 8px;
+  }
+}

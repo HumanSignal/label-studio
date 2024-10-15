@@ -1,0 +1,36 @@
+name: "biome"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+
+env:
+  NODE: "18"
+  FRONTEND_MONOREPO_DIR: "web"
+
+jobs:
+  main:
+    name: "biomejs"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.head_sha }}
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      - name: Run biome
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}
+        run: |
+          yarn biome check .

@@ -1,0 +1,35 @@
+{
+    "annotations": [
+        {
+            "result": [
+                {
+                    "from_name": "sentiment",
+                    "id": "sZ2AW3fNVw",
+                    "to_name": "my_text",
+                    "type": "choices",
+                    "value": {
+                        "choices": [
+                            "Negative"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "asin": "1384719342",
+        "helpful": [
+            13,
+            14
+        ],
+        "overall": 5,
+        "reviewText": "What a waste of money and time!",
+        "reviewTime": "03 16, 2013",
+        "reviewerID": "A14VAT5EAX3D9S",
+        "reviewerName": "Jake",
+        "summary": "Jake",
+        "unixReviewTime": 1363392000
+    },
+    "id": 1,
+    "task_path": "../examples/sentiment_analysis/tasks.json"
+}

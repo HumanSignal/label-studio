@@ -32,7 +32,7 @@ stages:
       content-type: application/json
     json:
       data:
-        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        image: "https://heartex.com/static/samples/sample.jpg"
         options:
           - value: "a"
           - value: "b"
@@ -84,7 +84,7 @@ stages:
       content-type: application/json
     json:
       data:
-        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        image: "https://heartex.com/static/samples/sample.jpg"
         options:
           - value: "a"
           - value: "b"
@@ -136,7 +136,7 @@ stages:
       content-type: application/json
     json:
       data:
-        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        image: "https://heartex.com/static/samples/sample.jpg"
         options:
           - value: "a"
           - value: "b"
@@ -188,7 +188,7 @@ stages:
       content-type: application/json
     json:
       data:
-        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        image: "https://heartex.com/static/samples/sample.jpg"
         options:
           - value: "a"
           - value: "b"
@@ -240,7 +240,7 @@ stages:
       content-type: application/json
     json:
       data:
-        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        image: "https://heartex.com/static/samples/sample.jpg"
         options:
           - value: "a"
           - value: "b"
@@ -292,7 +292,7 @@ stages:
       content-type: application/json
     json:
       data:
-        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        image: "https://heartex.com/static/samples/sample.jpg"
         options:
           - value: "a"
           - value: "b"
@@ -344,7 +344,7 @@ stages:
       content-type: application/json
     json:
       data:
-        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        image: "https://heartex.com/static/samples/sample.jpg"
         options:
           - value: "a"
           - value: "b"
@@ -396,7 +396,7 @@ stages:
       content-type: application/json
     json:
       data:
-        image: "https://develop.dev.heartex.com/static/samples/sample.jpg"
+        image: "https://heartex.com/static/samples/sample.jpg"
         options:
           - value: "a"
           - value: "b"

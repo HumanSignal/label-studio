@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "allowJs": false,
+    "checkJs": false,
+    "jsx": "preserve",
+    "strict": true,
+    "rootDirs": ["./src"],
+    "typeRoots": ["./types", "./node_modules/@types"],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+  },
+  "references": [
+    {
+      "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ],
+  "exclude": [
+    "./dist",
+    "./lib",
+  ],
+  "extends": "../../tsconfig.base.json"
+}

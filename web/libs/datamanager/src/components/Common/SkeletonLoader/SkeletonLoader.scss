@@ -1,0 +1,57 @@
+.skeletonLoader {
+  --skeleton-light-color: linear-gradient(0deg, rgb(9 109 217 / 5%), rgb(9 109 217 / 5%)), #FAFAFA;
+  --skeleton-dark-color: linear-gradient(0deg, rgb(9 109 217 / 14%), rgb(9 109 217 / 14%)), #FAFAFA;
+  --skeleton-gap: 4px;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--skeleton-gap);
+  position: relative;
+  width: 100%;
+  flex: 0 0 auto;
+  margin-left: 0;
+  z-index: 1;
+  color: transparent;
+
+  &__line {
+    --line-width: 60%;
+    --line-height: 16px;
+
+    height: var(--line-height);
+    width: var(--line-width);
+    min-width: 20px;
+    border-radius: 8px;
+    display: block;
+    background: var(--skeleton-light-color);
+    animation-name: skeleton-animation;
+    animation-timing-function: ease-in-out;
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  &__gap {
+    --height: 8px;
+
+    height: var(--height);
+  }
+}
+
+
+@keyframes skeleton-animation {
+  0% {
+    background: var(--skeleton-light-color);
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+
+  100% {
+    background: var(--skeleton-dark-color);
+    opacity: 1;
+  }
+}

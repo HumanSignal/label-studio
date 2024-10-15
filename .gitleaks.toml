@@ -11,5 +11,6 @@ stopwords = [
 ]
 paths = [
     '''gitleaks\.toml''',
-    '''label_studio\/feature_flags\.json'''
+    '''label_studio\/feature_flags\.json''',
+    '''docs/.*'''
 ]

@@ -1,0 +1,83 @@
+.field-label {
+  margin-bottom: 0;
+
+  &__text {
+    padding: 0 16px;
+    height: 22px;
+    display: flex;
+    margin-bottom: 4px;
+    font-size: 14px;
+    line-height: 22px;
+    justify-content: space-between;
+  }
+
+  &__description {
+    margin-top: 5px;
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--sand_500);
+  }
+
+  &__field {
+    line-height: 0;
+  }
+
+  &_size_small &__text {
+    font-size: 10px;
+    margin: 0;
+    height: 14px;
+    line-height: 14px;
+  }
+
+  &_size_large &__text {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 16px;
+  }
+
+  &_flat &__text {
+    padding: 0;
+  }
+
+  .input,
+  .select,
+  .textarea {
+    width: 100%;
+  }
+
+  &[data-required] &__text::after {
+    content: "Required";
+    color: var(--sand_500);
+  }
+
+  &_placement_right {
+    display: inline-flex;
+    flex-direction: row-reverse;
+  }
+
+  &_placement_left {
+    display: inline-flex;
+  }
+
+  &_empty &__text,
+  &_placement_right &__text,
+  &_placement_left &__text {
+    margin-bottom: 0;
+    font-size: 16px;
+    line-height: 22px;
+    height: auto;
+    align-items: center;
+  }
+
+  &_placement_right:not(.label_withDescription) &__field,
+  &_placement_left:not(.label_withDescription) &__field {
+    display: flex;
+    align-items: center;
+  }
+
+  &_placement_right.label_withDescription &__field,
+  &_placement_left.label_withDescription &__field {
+    margin-top: 5px;
+  }
+}

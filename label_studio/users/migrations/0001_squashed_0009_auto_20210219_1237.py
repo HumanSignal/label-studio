@@ -67,9 +67,6 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'users',
                 'db_table': 'htx_user',
             },
-            managers=[
-                ('objects', users.models.UserManager()),
-            ],
         ),
         migrations.RunPython(add_tokens),
         # migrations.RunPython(add_users),  # TODO: flag:ent

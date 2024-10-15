@@ -1,0 +1,43 @@
+@import "../../assets/styles/global";
+
+.container {
+  display: flex;
+  justify-content: space-between;
+
+  @include respond("phone") {
+    flex-direction: column;
+  }
+}
+
+.block {
+  &__controls {
+    @include respond("phone") {
+      width: 100%;
+    }
+  }
+
+  & > button {
+    margin: 0 5px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    @include respond("phone") {
+      margin: 0 2px;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.common {
+  margin-left: auto;
+}
+
+.hidden {
+  display: none;
+}

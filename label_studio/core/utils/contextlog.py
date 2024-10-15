@@ -1,21 +1,21 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import calendar
+import io
+import json
 import logging
 import os
-import sys
-import io
-import requests
-import calendar
-import threading
-import json
 import platform
-
+import sys
+import threading
 from datetime import datetime
 from uuid import uuid4
-from .common import get_app_version, get_client_ip
-from .params import get_bool_env
-from .io import get_config_dir, find_file
+
+import requests
 from django.conf import settings
+
+from .common import get_app_version, get_client_ip
+from .io import find_file, get_config_dir
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def _load_log_payloads():
     for item in log_payloads:
         out[item['name']] = {
             'exclude_from_logs': item.get('exclude_from_logs', False),
-            'log_payloads': item.get('log_payloads')
+            'log_payloads': item.get('log_payloads'),
         }
     return out
 
@@ -42,16 +42,8 @@ class ContextLog(object):
     _log_payloads = _load_log_payloads()
 
     def __init__(self):
-        self.collect_analytics = settings.COLLECT_ANALYTICS
         self.version = get_app_version()
         self.server_id = self._get_server_id()
-
-    def _get_label_studio_env(self):
-        env = {}
-        for env_key, env_value in os.environ.items():
-            if env_key.startswith('LABEL_STUDIO_'):
-                env[env_key] = env_value
-        return env
 
     def _get_server_id(self):
         user_id_file = os.path.join(get_config_dir(), 'user_id')
@@ -70,8 +62,9 @@ class ContextLog(object):
     def _is_docker(self):
         path = '/proc/self/cgroup'
         return (
-            os.path.exists('/.dockerenv') or
-            os.path.isfile(path) and any('docker' in line for line in open(path, encoding='utf-8'))
+            os.path.exists('/.dockerenv')
+            or os.path.isfile(path)
+            and any('docker' in line for line in open(path, encoding='utf-8'))
         )
 
     def _get_timestamp_now(self):
@@ -80,15 +73,15 @@ class ContextLog(object):
     def _get_response_content(self, response):
         try:
             return json.loads(response.content)
-        except:
+        except:  # noqa: E722
             return
 
     def _assert_field_in_test(self, field, payload, view_name):
-        if get_bool_env('TEST_ENVIRONMENT', False):
+        if settings.TEST_ENVIRONMENT:
             assert field in payload, f'The field "{field}" should be presented for "{view_name}"'
 
     def _assert_type_in_test(self, type, payload, view_name):
-        if get_bool_env('TEST_ENVIRONMENT', False):
+        if settings.TEST_ENVIRONMENT:
             assert isinstance(payload, type), f'The type of payload is not "{type}" for "{view_name}"'
 
     def _get_fields(self, view_name, payload, fields):
@@ -116,8 +109,28 @@ class ContextLog(object):
             self._assert_type_in_test(dict, payload['response'], view_name)
             new_response = {}
             self._assert_field_in_test('drafts', payload['response'], view_name)
-            new_response['drafts'] = len(payload['response']['drafts']) if isinstance(payload['response']['drafts'], list) else payload['response']['drafts']
-            for key in ["id", "inner_id", "cancelled_annotations", "total_annotations", "total_predictions", "updated_by", "created_at", "updated_at", "overlap", "comment_count", "unresolved_comment_count", "last_comment_updated_at", "project", "comment_authors", "queue"]:
+            new_response['drafts'] = (
+                len(payload['response']['drafts'])
+                if isinstance(payload['response']['drafts'], list)
+                else payload['response']['drafts']
+            )
+            for key in [
+                'id',
+                'inner_id',
+                'cancelled_annotations',
+                'total_annotations',
+                'total_predictions',
+                'updated_by',
+                'created_at',
+                'updated_at',
+                'overlap',
+                'comment_count',
+                'unresolved_comment_count',
+                'last_comment_updated_at',
+                'project',
+                'comment_authors',
+                'queue',
+            ]:
                 self._assert_field_in_test(key, payload['response'], view_name)
                 new_response[key] = payload['response'][key]
             payload['response'] = new_response
@@ -148,10 +161,12 @@ class ContextLog(object):
             payload['response'] = [item.get('title') for item in payload['response']]
             return
 
-        if (view_name == 'tasks:api:task-annotations' and payload['method'] in 'POST') or \
-            (view_name == 'tasks:api-annotations:annotation-detail' and payload['method'] == 'PATCH') or \
-            (view_name == 'tasks:api:task-annotations-drafts' and payload['method'] == 'POST') or \
-            (view_name == 'tasks:api-drafts:draft-detail' and payload['method'] == 'PATCH'):
+        if (
+            (view_name == 'tasks:api:task-annotations' and payload['method'] in 'POST')
+            or (view_name == 'tasks:api-annotations:annotation-detail' and payload['method'] == 'PATCH')
+            or (view_name == 'tasks:api:task-annotations-drafts' and payload['method'] == 'POST')
+            or (view_name == 'tasks:api-drafts:draft-detail' and payload['method'] == 'PATCH')
+        ):
             self._assert_field_in_test('lead_time', payload['json'], view_name)
             self._assert_field_in_test('result', payload['json'], view_name)
             self._assert_type_in_test(list, payload['json']['result'], view_name)
@@ -186,7 +201,7 @@ class ContextLog(object):
             return True
 
     def dont_send(self, request):
-        return not self.collect_analytics or self._exclude_endpoint(request)
+        return not settings.COLLECT_ANALYTICS or self._exclude_endpoint(request)
 
     def send(self, request=None, response=None, body=None):
         if self.dont_send(request):
@@ -195,22 +210,28 @@ class ContextLog(object):
             payload = self.create_payload(request, response, body)
         except Exception as exc:
             logger.debug(exc, exc_info=True)
-            if get_bool_env('TEST_ENVIRONMENT', False):
+            if settings.TEST_ENVIRONMENT:
                 raise
         else:
-            if get_bool_env('TEST_ENVIRONMENT', False):
+            if settings.TEST_ENVIRONMENT:
                 pass
-            elif get_bool_env('DEBUG_CONTEXTLOG', False):
-                logger.debug(f'In DEBUG mode, contextlog is not sent.')
+            elif settings.DEBUG_CONTEXTLOG:
+                logger.debug('In DEBUG mode, contextlog is not sent.')
                 logger.debug(json.dumps(payload, indent=2))
+            elif settings.CONTEXTLOG_SYNC:
+                self.send_job(request, response, body)
             else:
                 thread = threading.Thread(target=self.send_job, args=(request, response, body))
                 thread.start()
 
     @staticmethod
     def browser_exists(request):
-        return hasattr(request, 'user_agent') and request.user_agent and \
-               hasattr(request.user_agent, 'browser') and request.user_agent.browser
+        return (
+            hasattr(request, 'user_agent')
+            and request.user_agent
+            and hasattr(request.user_agent, 'browser')
+            and request.user_agent.browser
+        )
 
     def create_payload(self, request, response, body):
         advanced_json = None
@@ -234,7 +255,6 @@ class ContextLog(object):
             'client_ip': get_client_ip(request),
             'is_docker': self._is_docker(),
             'python': str(sys.version_info[0]) + '.' + str(sys.version_info[1]),
-            'env': self._get_label_studio_env(),
             'version': self.version,
             'view_name': request.resolver_match.view_name if request.resolver_match else None,
             'namespace': request.resolver_match.namespace if request.resolver_match else None,
@@ -245,38 +265,42 @@ class ContextLog(object):
             'advanced_json': advanced_json,
             'language': request.LANGUAGE_CODE,
             'content_type': request.content_type,
-            'content_length': int(request.environ.get('CONTENT_LENGTH')) if request.environ.get('CONTENT_LENGTH') else None,
+            'content_length': int(request.environ.get('CONTENT_LENGTH'))
+            if request.environ.get('CONTENT_LENGTH')
+            else None,
             'status_code': response.status_code,
-            'response': self._get_response_content(response)
+            'response': self._get_response_content(response),
         }
         if self.browser_exists(request):
-            payload.update({
-                'is_mobile': request.user_agent.is_mobile,
-                'is_tablet': request.user_agent.is_tablet,
-                'is_touch_capable': request.user_agent.is_touch_capable,
-                'is_pc': request.user_agent.is_pc,
-                'is_bot': request.user_agent.is_bot,
-                'browser': request.user_agent.browser.family,
-                'browser_version': request.user_agent.browser.version_string,
-                'os': request.user_agent.os.family,
-                'platform_system': platform.system(),
-                'platform_release': platform.release(),
-                'os_version': request.user_agent.os.version_string,
-                'device': request.user_agent.device.family,
-            })
+            payload.update(
+                {
+                    'is_mobile': request.user_agent.is_mobile,
+                    'is_tablet': request.user_agent.is_tablet,
+                    'is_touch_capable': request.user_agent.is_touch_capable,
+                    'is_pc': request.user_agent.is_pc,
+                    'is_bot': request.user_agent.is_bot,
+                    'browser': request.user_agent.browser.family,
+                    'browser_version': request.user_agent.browser.version_string,
+                    'os': request.user_agent.os.family,
+                    'platform_system': platform.system(),
+                    'platform_release': platform.release(),
+                    'os_version': request.user_agent.os.version_string,
+                    'device': request.user_agent.device.family,
+                }
+            )
         self._secure_data(payload, request)
-        for key in ('json', 'response', 'values', 'env'):
+        for key in ('json', 'response', 'values'):
             payload[key] = payload[key] or None
         return payload
 
     def send_job(self, request, response, body):
         try:
             payload = self.create_payload(request, response, body)
-        except:
+        except:  # noqa: E722
             pass
         else:
             try:
-               url = 'https://tele.labelstud.io'
-               requests.post(url=url, json=payload, timeout=3.0)
-            except:
+                url = 'https://tele.labelstud.io'
+                requests.post(url=url, json=payload, timeout=3.0)
+            except:  # noqa: E722
                 pass

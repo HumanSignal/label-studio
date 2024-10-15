@@ -1,0 +1,17 @@
+.labels {
+  margin: 1em 0;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-flow: wrap;
+
+  &_hidden {
+    display: none;
+  }
+
+  &:not(.labels_inline) {
+    margin: 0;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

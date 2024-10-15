@@ -1,56 +1,64 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from typing import Optional, Mapping
 import json
 import logging
+from typing import Any, Mapping, Optional
 
-from django.db.models import Q, Avg, Count, Sum, Value, BooleanField, Case, When
-from django.conf import settings
-from django.utils.translation import gettext_lazy as _
-from django.db.models import JSONField
-from django.core.validators import MinLengthValidator, MaxLengthValidator
-from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
-
-from data_manager.managers import TaskQuerySet
-from projects.functions.utils import make_queryset_from_iterable
-from tasks.models import Task, Prediction, Annotation, AnnotationDraft, Q_task_finished_annotations, bulk_update_stats_project_tasks
+from core.feature_flags import flag_set
+from core.label_config import (
+    check_control_in_config_by_regex,
+    check_toname_in_config_by_regex,
+    config_line_stipped,
+    extract_data_types,
+    get_all_control_tag_tuples,
+    get_all_labels,
+    get_all_object_tag_names,
+    get_all_types,
+    get_annotation_tuple,
+    get_original_fromname_by_regex,
+    get_sample_task,
+    validate_label_config,
+)
 from core.utils.common import (
     create_hash,
     get_attr_or_item,
     load_func,
     merge_labels_counters,
 )
+from core.utils.db import fast_first
 from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
-from core.label_config import (
-    validate_label_config,
-    extract_data_types,
-    get_all_object_tag_names,
-    config_line_stipped,
-    get_sample_task,
-    get_all_labels,
-    get_all_control_tag_tuples,
-    get_annotation_tuple, check_control_in_config_by_regex, check_toname_in_config_by_regex,
-    get_original_fromname_by_regex, get_all_types,
-)
-from core.feature_flags import flag_set
-from core.bulk_update_utils import bulk_update
-from label_studio_tools.core.label_config import parse_config
-from projects.functions import (
-    annotate_task_number, annotate_finished_task_number, annotate_total_predictions_number,
-    annotate_total_annotations_number, annotate_num_tasks_with_annotations,
-    annotate_useful_annotation_number, annotate_ground_truth_number, annotate_skipped_annotations_number
-)
+from django.conf import settings
+from django.core.validators import MaxLengthValidator, MinLengthValidator
+from django.db import models, transaction
+from django.db.models import Avg, BooleanField, Case, Count, JSONField, Max, Q, Sum, Value, When
+from django.utils.translation import gettext_lazy as _
+from label_studio_sdk._extensions.label_studio_tools.core.label_config import parse_config
 from labels_manager.models import Label
-
+from projects.functions import (
+    annotate_finished_task_number,
+    annotate_ground_truth_number,
+    annotate_num_tasks_with_annotations,
+    annotate_skipped_annotations_number,
+    annotate_task_number,
+    annotate_total_annotations_number,
+    annotate_total_predictions_number,
+    annotate_useful_annotation_number,
+)
+from projects.functions.utils import make_queryset_from_iterable
+from tasks.models import (
+    Annotation,
+    AnnotationDraft,
+    Prediction,
+    Q_task_finished_annotations,
+    Task,
+    bulk_update_stats_project_tasks,
+)
 
 logger = logging.getLogger(__name__)
 
 
 class ProjectManager(models.Manager):
-    def for_user(self, user):
-        return self.filter(organization=user.active_organization)
-
     COUNTER_FIELDS = [
         'task_number',
         'finished_task_number',
@@ -62,27 +70,32 @@ class ProjectManager(models.Manager):
         'skipped_annotations_number',
     ]
 
+    ANNOTATED_FIELDS = {
+        'task_number': annotate_task_number,
+        'finished_task_number': annotate_finished_task_number,
+        'total_predictions_number': annotate_total_predictions_number,
+        'total_annotations_number': annotate_total_annotations_number,
+        'num_tasks_with_annotations': annotate_num_tasks_with_annotations,
+        'useful_annotation_number': annotate_useful_annotation_number,
+        'ground_truth_number': annotate_ground_truth_number,
+        'skipped_annotations_number': annotate_skipped_annotations_number,
+    }
+
+    def for_user(self, user):
+        return self.filter(organization=user.active_organization)
+
     def with_counts(self, fields=None):
         return self.with_counts_annotate(self, fields=fields)
 
     @staticmethod
     def with_counts_annotate(queryset, fields=None):
-        available_fields = {
-            'task_number': annotate_task_number,
-            'finished_task_number': annotate_finished_task_number,
-            'total_predictions_number': annotate_total_predictions_number,
-            'total_annotations_number': annotate_total_annotations_number,
-            'num_tasks_with_annotations': annotate_num_tasks_with_annotations,
-            'useful_annotation_number': annotate_useful_annotation_number,
-            'ground_truth_number': annotate_ground_truth_number,
-            'skipped_annotations_number': annotate_skipped_annotations_number,
-        }
+        available_fields = ProjectManager.ANNOTATED_FIELDS
         if fields is None:
             to_annotate = available_fields
         else:
             to_annotate = {field: available_fields[field] for field in fields if field in available_fields}
 
-        for _, annotate_func in to_annotate.items():
+        for _, annotate_func in to_annotate.items():  # noqa: F402
             queryset = annotate_func(queryset)
 
         return queryset
@@ -140,6 +153,7 @@ class Project(ProjectMixin, models.Model):
         default=None,
         help_text='Parsed label config in JSON format. See more about it in documentation',
     )
+    label_config_hash = models.BigIntegerField(null=True, default=None)
     expert_instruction = models.TextField(
         _('expert instruction'), blank=True, null=True, default='', help_text='Labeling instructions in HTML format'
     )
@@ -165,6 +179,9 @@ class Project(ProjectMixin, models.Model):
     show_collab_predictions = models.BooleanField(
         _('show predictions to annotator'), default=True, help_text='If set, the annotator can view model predictions'
     )
+
+    # evaluate is the wrong word here. correct should be retrieve_predictions_automatically
+    # deprecated
     evaluate_predictions_automatically = models.BooleanField(
         _('evaluate predictions automatically'),
         default=False,
@@ -196,14 +213,28 @@ class Project(ProjectMixin, models.Model):
         help_text='Minimum number of completed tasks after which model training is started',
     )
 
-    control_weights = JSONField(_('control weights'), null=True, default=dict, help_text="Dict of weights for each control tag in metric calculation. Each control tag (e.g. label or choice) will "
-                                                                                         "have it's own key in control weight dict with weight for each label and overall weight."
-                                                                                         "For example, if bounding box annotation with control tag named my_bbox should be included with 0.33 weight in agreement calculation, "
-                                                                                         "and the first label Car should be twice more important than Airplaine, then you have to need the specify: "
-                                                                                         "{'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplaine': 0.5}, 'overall': 0.33}")
+    control_weights = JSONField(
+        _('control weights'),
+        null=True,
+        default=dict,
+        help_text='Dict of weights for each control tag in metric calculation. Each control tag (e.g. label or choice) will '
+        "have it's own key in control weight dict with weight for each label and overall weight."
+        'For example, if bounding box annotation with control tag named my_bbox should be included with 0.33 weight in agreement calculation, '
+        'and the first label Car should be twice more important than Airplaine, then you have to need the specify: '
+        "{'my_bbox': {'type': 'RectangleLabels', 'labels': {'Car': 1.0, 'Airplaine': 0.5}, 'overall': 0.33}",
+    )
+
+    # Welcome reader! You might be wondering how `model_version` is
+    # set and used; let's explain. `model_version` can either be set
+    # to the prediction `model_version` associated with the
+    # `tasks.Prediction` model, or to the ML backend title. Yes,
+    # understandably, this can be confusing. However, this appears to
+    # be the best approach we currently have for improving the
+    # experience while maintaining backward compatibility.
     model_version = models.TextField(
         _('model version'), blank=True, null=True, default='', help_text='Machine learning model version'
     )
+
     data_types = JSONField(_('data_types'), default=dict, null=True)
 
     is_draft = models.BooleanField(
@@ -226,8 +257,9 @@ class Project(ProjectMixin, models.Model):
     )
 
     sampling = models.CharField(max_length=100, choices=SAMPLING_CHOICES, null=True, default=SEQUENCE)
-    skip_queue = models.CharField(max_length=100, choices=SkipQueue.choices, null=True,
-                                  default=SkipQueue.REQUEUE_FOR_OTHERS)
+    skip_queue = models.CharField(
+        max_length=100, choices=SkipQueue.choices, null=True, default=SkipQueue.REQUEUE_FOR_OTHERS
+    )
     show_ground_truth_first = models.BooleanField(_('show ground truth first'), default=False)
     show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
     overlap_cohort_percentage = models.IntegerField(_('overlap_cohort_percentage'), default=100)
@@ -259,12 +291,19 @@ class Project(ProjectMixin, models.Model):
     def num_tasks(self):
         return self.tasks.count()
 
-    def get_current_predictions(self):
-        return Prediction.objects.filter(Q(task__project=self.id) & Q(model_version=self.model_version))
+    @property
+    def ml_backend(self):
+        return fast_first(self.ml_backends.all())
 
     @property
-    def num_predictions(self):
-        return self.get_current_predictions().count()
+    def should_retrieve_predictions(self):
+        """Returns true if the model was set to be used"""
+        if self.show_collab_predictions:
+            ml = self.ml_backend
+            if ml:
+                return ml.title == self.model_version
+
+        return False
 
     @property
     def num_annotations(self):
@@ -280,7 +319,13 @@ class Project(ProjectMixin, models.Model):
 
     @property
     def has_any_predictions(self):
-        return Prediction.objects.filter(Q(task__project=self.id)).exists()
+        if flag_set(
+            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+            user='auto',
+        ):
+            return Prediction.objects.filter(Q(project=self.id)).exists()
+        else:
+            return Prediction.objects.filter(Q(task__project=self.id)).exists()
 
     @property
     def business(self):
@@ -340,11 +385,11 @@ class Project(ProjectMixin, models.Model):
         if len(token):
             return Project.objects.get(token=token)
         else:
-            raise KeyError(f'Can\'t find Project by invite URL: {url}')
+            raise KeyError(f"Can't find Project by invite URL: {url}")
 
     def reset_token(self):
         self.token = create_hash()
-        self.save()
+        self.save(update_fields=['token'])
 
     def add_collaborator(self, user):
         created = False
@@ -365,18 +410,19 @@ class Project(ProjectMixin, models.Model):
         membership = ProjectMember.objects.filter(user=user, project=self)
         return membership.exists() and membership.first().enabled
 
-    def _update_tasks_states(self,
-                             maximum_annotations_changed,
-                             overlap_cohort_percentage_changed,
-                             tasks_number_changed):
+    def _update_tasks_states(
+        self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
+    ):
         """
         Update tasks states after settings change
         :param maximum_annotations_changed: If maximum_annotations param changed
         :param overlap_cohort_percentage_changed: If cohort_percentage param changed
         :param tasks_number_changed: If tasks number changed in project
         """
-        logger.info(f"Starting _update_tasks_states with params: Project {str(self)} maximum_annotations "
-                    f"{self.maximum_annotations} and percentage {self.overlap_cohort_percentage}")
+        logger.info(
+            f'Starting _update_tasks_states with params: Project {str(self)} maximum_annotations '
+            f'{self.maximum_annotations} and percentage {self.overlap_cohort_percentage}'
+        )
         # if only maximum annotations parameter is tweaked
         if maximum_annotations_changed and (not overlap_cohort_percentage_changed or self.maximum_annotations == 1):
             tasks_with_overlap = self.tasks.filter(overlap__gt=1)
@@ -390,9 +436,7 @@ class Project(ProjectMixin, models.Model):
                 self.tasks.update(overlap=self.maximum_annotations)
                 tasks_with_overlap = self.tasks.all()
             # update is_labeled after change
-            bulk_update_stats_project_tasks(
-                tasks_with_overlap, project=self
-            )
+            bulk_update_stats_project_tasks(tasks_with_overlap, project=self)
 
         # if cohort slider is tweaked
         elif overlap_cohort_percentage_changed and self.maximum_annotations > 1:
@@ -409,26 +453,26 @@ class Project(ProjectMixin, models.Model):
         all_project_tasks = Task.objects.filter(project=self)
         max_annotations = self.maximum_annotations
         must_tasks = int(self.tasks.count() * self.overlap_cohort_percentage / 100 + 0.5)
-        logger.info(f"Starting _rearrange_overlap_cohort with params: Project {str(self)} maximum_annotations "
-                    f"{max_annotations} and percentage {self.overlap_cohort_percentage}")
+        logger.info(
+            f'Starting _rearrange_overlap_cohort with params: Project {str(self)} maximum_annotations '
+            f'{max_annotations} and percentage {self.overlap_cohort_percentage}'
+        )
         tasks_with_max_annotations = all_project_tasks.annotate(
             anno=Count('annotations', filter=Q_task_finished_annotations & Q(annotations__ground_truth=False))
         ).filter(anno__gte=max_annotations)
 
-        tasks_with_min_annotations = all_project_tasks.exclude(
-            id__in=tasks_with_max_annotations
-        )
+        tasks_with_min_annotations = all_project_tasks.exclude(id__in=tasks_with_max_annotations)
         # check how many tasks left to finish
         left_must_tasks = max(must_tasks - tasks_with_max_annotations.count(), 0)
-        logger.info(f"Required tasks {must_tasks} and left required tasks {left_must_tasks}")
+        logger.info(f'Required tasks {must_tasks} and left required tasks {left_must_tasks}')
         if left_must_tasks > 0:
             # if there are unfinished tasks update tasks with count(annotations) >= overlap
             ids = list(tasks_with_max_annotations.values_list('id', flat=True))
             all_project_tasks.filter(id__in=ids).update(overlap=max_annotations, is_labeled=True)
             # order other tasks by count(annotations)
-            tasks_with_min_annotations = tasks_with_min_annotations.annotate(
-                anno=Count('annotations')
-            ).order_by('-anno').distinct()
+            tasks_with_min_annotations = (
+                tasks_with_min_annotations.annotate(anno=Count('annotations')).order_by('-anno').distinct()
+            )
             # assign overlap depending on annotation count
             # assign max_annotations and update is_labeled
             ids = list(tasks_with_min_annotations[:left_must_tasks].values_list('id', flat=True))
@@ -461,7 +505,7 @@ class Project(ProjectMixin, models.Model):
             return count != 1
 
     def created_at_prettify(self):
-        return self.created_at.strftime("%d %b %Y %H:%M:%S")
+        return self.created_at.strftime('%d %b %Y %H:%M:%S')
 
     def onboarding_step_finished(self, step):
         """Mark specific step as finished"""
@@ -495,18 +539,18 @@ class Project(ProjectMixin, models.Model):
         # validate data columns consistency
         fields_from_config = get_all_object_tag_names(config_string)
         if not fields_from_config:
-            logger.debug(f'Data fields not found in labeling config')
+            logger.debug('Data fields not found in labeling config')
             return
 
-        #TODO: DEV-2939 Add validation for fields addition in label config
-        '''fields_from_config = {field.split('[')[0] for field in fields_from_config}  # Repeater tag support
+        # TODO: DEV-2939 Add validation for fields addition in label config
+        """fields_from_config = {field.split('[')[0] for field in fields_from_config}  # Repeater tag support
         fields_from_data = set(self.summary.common_data_columns)
         fields_from_data.discard(settings.DATA_UNDEFINED_NAME)
         if fields_from_data and not fields_from_config.issubset(fields_from_data):
             different_fields = list(fields_from_config.difference(fields_from_data))
             raise LabelStudioValidationErrorSentryIgnored(
                 f'These fields are not present in the data: {",".join(different_fields)}'
-            )'''
+            )"""
 
         if self.num_annotations == 0 and self.num_drafts == 0:
             logger.debug(
@@ -519,7 +563,7 @@ class Project(ProjectMixin, models.Model):
         # validate annotations consistency
         annotations_from_config = set(get_all_control_tag_tuples(config_string))
         if not annotations_from_config:
-            logger.debug(f'Annotation schema is not found in config')
+            logger.debug('Annotation schema is not found in config')
             return
         annotations_from_data = set(self.summary.created_annotations)
         if annotations_from_data and not annotations_from_data.issubset(annotations_from_config):
@@ -529,9 +573,11 @@ class Project(ProjectMixin, models.Model):
                 from_name, to_name, t = ann_tuple.split('|')
                 if t.lower() == 'textarea':  # avoid textarea to_name check (see DEV-1598)
                     continue
-                if not check_control_in_config_by_regex(config_string, from_name) or \
-                not check_toname_in_config_by_regex(config_string, to_name) or \
-                t not in get_all_types(config_string):
+                if (
+                    not check_control_in_config_by_regex(config_string, from_name)
+                    or not check_toname_in_config_by_regex(config_string, to_name)
+                    or t not in get_all_types(config_string)
+                ):
                     diff_str.append(
                         f'{self.summary.created_annotations[ann_tuple]} '
                         f'with from_name={from_name}, to_name={to_name}, type={t}'
@@ -542,20 +588,35 @@ class Project(ProjectMixin, models.Model):
                     f'Created annotations are incompatible with provided labeling schema, we found:\n{diff_str}'
                 )
 
-
         # validate labels consistency
         labels_from_config, dynamic_label_from_config = get_all_labels(config_string)
         created_labels = merge_labels_counters(self.summary.created_labels, self.summary.created_labels_drafts)
+
+        def display_count(count: int, type: str) -> Optional[str]:
+            """Helper for displaying pluralized sources of validation errors,
+            eg "1 draft" or "3 annotations"
+            """
+            if not count:
+                return None
+            return f'{count} {type}{"s" if count > 1 else ""}'
+
         for control_tag_from_data, labels_from_data in created_labels.items():
             # Check if labels created in annotations, and their control tag has been removed
-            if labels_from_data and ((control_tag_from_data not in labels_from_config) and (
-                    control_tag_from_data not in dynamic_label_from_config)) and \
-                    not check_control_in_config_by_regex(config_string, control_tag_from_data):
+            if (
+                labels_from_data
+                and (
+                    (control_tag_from_data not in labels_from_config)
+                    and (control_tag_from_data not in dynamic_label_from_config)
+                )
+                and not check_control_in_config_by_regex(config_string, control_tag_from_data)
+            ):
                 raise LabelStudioValidationErrorSentryIgnored(
                     f'There are {sum(labels_from_data.values(), 0)} annotation(s) created with tag '
                     f'"{control_tag_from_data}", you can\'t remove it'
                 )
-            labels_from_config_by_tag = set(labels_from_config[get_original_fromname_by_regex(config_string, control_tag_from_data)])
+            labels_from_config_by_tag = set(
+                labels_from_config[get_original_fromname_by_regex(config_string, control_tag_from_data)]
+            )
             parsed_config = parse_config(config_string)
             tag_types = [tag_info['type'] for _, tag_info in parsed_config.items()]
             # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
@@ -569,23 +630,70 @@ class Project(ProjectMixin, models.Model):
             # check if labels from is subset if config labels
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
-                diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
-                if (strict is True) and ((control_tag_from_data not in dynamic_label_from_config) and
-                        (not check_control_in_config_by_regex(config_string, control_tag_from_data, filter=dynamic_label_from_config.keys()))):
+                diff_str = ''
+                for label in different_labels:
+                    annotation_label_count = self.summary.created_labels.get(control_tag_from_data, {}).get(label, 0)
+                    draft_label_count = self.summary.created_labels_drafts.get(control_tag_from_data, {}).get(label, 0)
+                    annotation_display_count = display_count(annotation_label_count, 'annotation')
+                    draft_display_count = display_count(draft_label_count, 'draft')
+
+                    display = [disp for disp in [annotation_display_count, draft_display_count] if disp]
+                    if display:
+                        diff_str += f'{label} ({", ".join(display)})\n'
+
+                if (strict is True) and (
+                    (control_tag_from_data not in dynamic_label_from_config)
+                    and (
+                        not check_control_in_config_by_regex(
+                            config_string, control_tag_from_data, filter=dynamic_label_from_config.keys()
+                        )
+                    )
+                ):
                     # raise error if labels not dynamic and not in regex rules
                     raise LabelStudioValidationErrorSentryIgnored(
-                        f'These labels still exist in annotations or drafts:\n{diff_str}.'
-                        f'Please add labels to tag with name="{str(control_tag_from_data)}".')
+                        f'These labels still exist in annotations or drafts:\n{diff_str}'
+                        f'Please add labels to tag with name="{str(control_tag_from_data)}".'
+                    )
                 else:
                     logger.info(f'project_id={self.id} inconsistent labels in config and annotations: {diff_str}')
 
     def _label_config_has_changed(self):
         return self.label_config != self.__original_label_config
 
-    def delete_predictions(self):
-        predictions = Prediction.objects.filter(task__project=self)
-        count = predictions.count()
-        predictions.delete()
+    def should_none_model_version(self, model_version):
+        """
+        Returns True if the model version provided matches the object's model version,
+        or no model version is set for the object but model version exists in ML backend.
+        """
+        return self.model_version == model_version or self.ml_backend_in_model_version
+
+    def delete_predictions(self, model_version=None):
+        """
+        Deletes the predictions based on the provided model version.
+        If no model version is provided, it deletes all the predictions for this project.
+
+        :param model_version: Identifier of the model version (default is None)
+        :type model_version: str, optional
+        :return: Dictionary with count of deleted predictions
+        :rtype: dict
+        """
+        params = {'project': self}
+
+        if model_version:
+            params.update({'model_version': model_version})
+
+        predictions = Prediction.objects.filter(**params)
+
+        with transaction.atomic():
+            # If we are deleting specific model_version then we need
+            # to remove that from the project
+            if self.should_none_model_version(model_version):
+                self.model_version = None
+                self.save(update_fields=['model_version'])
+
+            _, deleted_map = predictions.delete()
+
+        count = deleted_map.get('tasks.Prediction', 0)
         return {'deleted_predictions': count}
 
     def get_updated_weights(self):
@@ -605,7 +713,6 @@ class Project(ProjectMixin, models.Model):
                 weight = weights.get('overall', None)
                 return weight if weight is not None else 1.0
 
-
         for control_name in outputs:
             control_type = outputs[control_name]['type']
             if control_type in exclude_control_types:
@@ -618,21 +725,26 @@ class Project(ProjectMixin, models.Model):
             }
         return control_weights
 
-    def save(self, *args, recalc=True, **kwargs):
+    def save(self, *args, update_fields=None, recalc=True, **kwargs):
         exists = True if self.pk else False
         project_with_config_just_created = not exists and self.label_config
 
         if self._label_config_has_changed() or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
             self.parsed_label_config = parse_config(self.label_config)
+            self.label_config_hash = hash(str(self.parsed_label_config))
+            if update_fields is not None:
+                update_fields = {'data_types', 'parsed_label_config', 'label_config_hash'}.union(update_fields)
 
         if self.label_config and (self._label_config_has_changed() or not exists or not self.control_weights):
             self.control_weights = self.get_updated_weights()
+            if update_fields is not None:
+                update_fields = {'control_weights'}.union(update_fields)
 
         if self._label_config_has_changed():
             self.__original_label_config = self.label_config
 
-        super(Project, self).save(*args, **kwargs)
+        super(Project, self).save(*args, update_fields=update_fields, **kwargs)
 
         if not exists:
             steps = ProjectOnboardingSteps.objects.all()
@@ -786,8 +898,7 @@ class Project(ProjectMixin, models.Model):
         return self.parsed_label_config
 
     def get_counters(self):
-        """Method to get extra counters data from Manager method with_counts()
-        """
+        """Method to get extra counters data from Manager method with_counts()"""
         result = {}
         for field in ProjectManager.COUNTER_FIELDS:
             value = getattr(self, field, None)
@@ -795,28 +906,75 @@ class Project(ProjectMixin, models.Model):
                 result[field] = value
         return result
 
-    def get_model_versions(self, with_counters=False):
+    def get_model_versions(self, with_counters=False, extended=False):
         """
-        Get model_versions from project predictions
-        :param with_counters: With count of predictions for each version
-        :return:
-        Dict or list
-        {model_version: count_predictions}, [model_versions]
+        Get model_versions from project predictions.
+        :param with_counters: Boolean, if True, counts predictions for each version. Default is False.
+        :param extended: Boolean, if True, returns additional information. Default is False.
+        :return: Dict or list containing model versions and their count predictions.
         """
-        predictions = Prediction.objects.filter(task__project=self)
-        # model_versions = set(predictions.values_list('model_version', flat=True).distinct())
-        model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
-        output = {r['model_version']: r['count'] for r in model_versions}
-        if self.model_version is not None and self.model_version not in output:
-            output[self.model_version] = 0
-        if with_counters:
-            return output
+        if flag_set(
+            'fflag_perf_back_lsdv_4695_update_prediction_query_to_use_direct_project_relation',
+            user='auto',
+        ):
+            predictions = Prediction.objects.filter(project=self)
         else:
-            return list(output)
+            predictions = Prediction.objects.filter(task__project=self)
+        # model_versions = set(predictions.values_list('model_version', flat=True).distinct())
+
+        if extended:
+            model_versions = list(
+                predictions.values('model_version').annotate(count=Count('model_version'), latest=Max('created_at'))
+            )
+
+            # remove the load from the DB side and sort in here
+            model_versions.sort(key=lambda x: x['latest'], reverse=True)
+
+            return model_versions
+        else:
+            # TODO this needs to be removed at some point
+            model_versions = predictions.values('model_version').annotate(count=Count('model_version'))
+            output = {r['model_version']: r['count'] for r in model_versions}
+
+            # Ensure that self.model_version exists in output
+            if self.model_version and self.model_version not in output:
+                output[self.model_version] = 0
+
+            # Return as per requirement
+            return output if with_counters else list(output.keys())
+
+    def get_ml_backends(self, *args, **kwargs):
+        from ml.models import MLBackend
+
+        return MLBackend.objects.filter(project=self, **kwargs)
+
+    def has_ml_backend(self, *args, **kwargs):
+        return self.get_ml_backends(**kwargs).exists()
+
+    @property
+    def ml_backend_in_model_version(self):
+        """
+        Returns True if the ml_backend title matches this model version.
+        If this model version is not set, Returns False
+        """
+        return bool(self.model_version and self.has_ml_backend(title=self.model_version))
+
+    def update_ml_backends_state(self):
+        """
+        Updates the state of all ml_backends associated with this instance.
+
+        :return: List of updated MLBackend instances.
+        """
+        ml_backends = self.get_ml_backends()
+        for mlb in ml_backends:
+            mlb.update_state()
+
+        return ml_backends
 
     def get_active_ml_backends(self):
-        from ml.models import MLBackend, MLBackendState
-        return MLBackend.objects.filter(project=self, state=MLBackendState.CONNECTED)
+        from ml.models import MLBackendState
+
+        return self.get_ml_backends(state=MLBackendState.CONNECTED)
 
     def get_all_storage_objects(self, type_='import'):
         from io_storages.models import get_storage_classes
@@ -831,50 +989,17 @@ class Project(ProjectMixin, models.Model):
         self._storage_objects = storage_objects
         return storage_objects
 
-    def _update_tasks_counters(self, queryset, from_scratch=True):
-        """
-        Update tasks counters
-        :param queryset: Tasks to update queryset
-        :param from_scratch: Skip calculated tasks
-        :return: Count of updated tasks
-        """
-        objs = []
+    def resolve_storage_uri(self, url: str) -> Optional[Mapping[str, Any]]:
+        from io_storages.functions import get_storage_by_url
 
-        total_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
-        cancelled_annotations = Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True))
-        total_predictions = Count("predictions", distinct=True)
-        # construct QuerySet in case of list of Tasks
-        if isinstance(queryset, list) and len(queryset) > 0 and isinstance(queryset[0], Task):
-            queryset = Task.objects.filter(id__in=[task.id for task in queryset])
-        # construct QuerySet in case annotated queryset
-        if isinstance(queryset, TaskQuerySet) and queryset.exists() and isinstance(queryset[0], int):
-            queryset = Task.objects.filter(id__in=queryset)
+        storage_objects = self.get_all_storage_objects()
+        storage = get_storage_by_url(url, storage_objects)
 
-        if not from_scratch:
-            queryset = queryset.exclude(
-                Q(total_annotations__gt=0) |
-                Q(cancelled_annotations__gt=0) |
-                Q(total_predictions__gt=0)
-            )
-
-        # filter our tasks with 0 annotations and 0 predictions and update them with 0
-        queryset.filter(annotations__isnull=True, predictions__isnull=True).\
-            update(total_annotations=0, cancelled_annotations=0, total_predictions=0)
-
-        # filter our tasks with 0 annotations and 0 predictions
-        queryset = queryset.filter(Q(annotations__isnull=False) | Q(predictions__isnull=False))
-        queryset = queryset.annotate(new_total_annotations=total_annotations,
-                                     new_cancelled_annotations=cancelled_annotations,
-                                     new_total_predictions=total_predictions)
-
-        for task in queryset.only('id', 'total_annotations', 'cancelled_annotations', 'total_predictions'):
-            task.total_annotations = task.new_total_annotations
-            task.cancelled_annotations = task.new_cancelled_annotations
-            task.total_predictions = task.new_total_predictions
-            objs.append(task)
-        with transaction.atomic():
-            bulk_update(objs, update_fields=['total_annotations', 'cancelled_annotations', 'total_predictions'], batch_size=settings.BATCH_SIZE)
-        return len(objs)
+        if storage:
+            return {
+                'url': storage.generate_http_url(url),
+                'presign_ttl': storage.presign_ttl,
+            }
 
     def _update_tasks_counters_and_is_labeled(self, task_ids, from_scratch=True):
         """
@@ -883,30 +1008,40 @@ class Project(ProjectMixin, models.Model):
         :param from_scratch: Skip calculated tasks
         :return: Count of updated tasks
         """
+        from tasks.functions import update_tasks_counters
+
         num_tasks_updated = 0
         page_idx = 0
 
-        while (task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE:(page_idx + 1) * settings.BATCH_SIZE]):
+        while task_ids_slice := task_ids[page_idx * settings.BATCH_SIZE : (page_idx + 1) * settings.BATCH_SIZE]:
             with transaction.atomic():
                 # If counters are updated, is_labeled must be updated as well. Hence, if either fails, we
                 # will roll back.
                 queryset = make_queryset_from_iterable(task_ids_slice)
-                num_tasks_updated += self._update_tasks_counters(queryset, from_scratch)
+                num_tasks_updated += update_tasks_counters(queryset, from_scratch)
                 bulk_update_stats_project_tasks(queryset, self)
             page_idx += 1
         return num_tasks_updated
 
-    def _update_tasks_counters_and_task_states(self, queryset, maximum_annotations_changed,
-                                               overlap_cohort_percentage_changed, tasks_number_changed,
-                                               from_scratch=True, recalculate_stats_counts : Optional[Mapping[str, int]] = None):
+    def _update_tasks_counters_and_task_states(
+        self,
+        queryset,
+        maximum_annotations_changed,
+        overlap_cohort_percentage_changed,
+        tasks_number_changed,
+        from_scratch=True,
+        recalculate_stats_counts: Optional[Mapping[str, int]] = None,
+    ):
         """
         Update tasks counters and update tasks states (rearrange and\or is_labeled)
         :param queryset: Tasks to update queryset
         :param from_scratch: Skip calculated tasks
         :return: Count of updated tasks
         """
+        from tasks.functions import update_tasks_counters
+
         queryset = make_queryset_from_iterable(queryset)
-        objs = self._update_tasks_counters(queryset, from_scratch)
+        objs = update_tasks_counters(queryset, from_scratch)
         self._update_tasks_states(maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed)
 
         if recalculate_all_stats and recalculate_stats_counts:
@@ -915,7 +1050,7 @@ class Project(ProjectMixin, models.Model):
         return objs
 
     def __str__(self):
-        return f'{self.title} (id={self.id})' or _("Business number %d") % self.pk
+        return f'{self.title} (id={self.id})' or _('Business number %d') % self.pk
 
     class Meta:
         db_table = 'project'
@@ -927,16 +1062,16 @@ class Project(ProjectMixin, models.Model):
 class ProjectOnboardingSteps(models.Model):
     """ """
 
-    DATA_UPLOAD = "DU"
-    CONF_SETTINGS = "CF"
-    PUBLISH = "PB"
-    INVITE_EXPERTS = "IE"
+    DATA_UPLOAD = 'DU'
+    CONF_SETTINGS = 'CF'
+    PUBLISH = 'PB'
+    INVITE_EXPERTS = 'IE'
 
     STEPS_CHOICES = (
-        (DATA_UPLOAD, "Import your data"),
-        (CONF_SETTINGS, "Configure settings"),
-        (PUBLISH, "Publish project"),
-        (INVITE_EXPERTS, "Invite collaborators"),
+        (DATA_UPLOAD, 'Import your data'),
+        (CONF_SETTINGS, 'Configure settings'),
+        (PUBLISH, 'Publish project'),
+        (INVITE_EXPERTS, 'Invite collaborators'),
     )
 
     code = models.CharField(max_length=2, choices=STEPS_CHOICES, null=True)
@@ -955,7 +1090,7 @@ class ProjectOnboardingSteps(models.Model):
 class ProjectOnboarding(models.Model):
     """ """
 
-    step = models.ForeignKey(ProjectOnboardingSteps, on_delete=models.CASCADE, related_name="po_through")
+    step = models.ForeignKey(ProjectOnboardingSteps, on_delete=models.CASCADE, related_name='po_through')
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     finished = models.BooleanField(default=False)
@@ -974,21 +1109,19 @@ class LabelStreamHistory(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='histories', help_text='User ID'
-    )  # noqa
+    )
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='histories', help_text='Project ID')
     data = models.JSONField(default=list)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['user', 'project'], name='unique_history')
-        ]
+        constraints = [models.UniqueConstraint(fields=['user', 'project'], name='unique_history')]
 
 
 class ProjectMember(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='project_memberships', help_text='User ID'
-    )  # noqa
+    )
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='members', help_text='Project ID')
     enabled = models.BooleanField(default=True, help_text='Project member is enabled')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
@@ -1014,10 +1147,12 @@ class ProjectSummary(models.Model):
         null=True,
         default=dict,
         help_text='Unique annotation types identified by tuple (from_name, to_name, type)',
-    )  # noqa
+    )
     # { from_name: {label1: task_count_with_label1, label2: task_count_with_label2} }
     created_labels = JSONField(_('created labels'), null=True, default=dict, help_text='Unique labels')
-    created_labels_drafts = JSONField(_('created labels in drafts'), null=True, default=dict, help_text='Unique drafts labels')
+    created_labels_drafts = JSONField(
+        _('created labels in drafts'), null=True, default=dict, help_text='Unique drafts labels'
+    )
 
     def has_permission(self, user):
         user.project = self.project  # link for activity log
@@ -1079,7 +1214,12 @@ class ProjectSummary(models.Model):
             self.common_data_columns = common_data_columns
         logger.debug(f'summary.all_data_columns = {self.all_data_columns}')
         logger.debug(f'summary.common_data_columns = {self.common_data_columns}')
-        self.save(update_fields=['all_data_columns', 'common_data_columns', ])
+        self.save(
+            update_fields=[
+                'all_data_columns',
+                'common_data_columns',
+            ]
+        )
 
     def _get_annotation_key(self, result):
         result_type = result.get('type', None)
@@ -1144,37 +1284,43 @@ class ProjectSummary(models.Model):
         self.save(update_fields=['created_annotations', 'created_labels'])
 
     def remove_created_annotations_and_labels(self, annotations):
-        created_annotations = dict(self.created_annotations)
-        labels = dict(self.created_labels)
-        for annotation in annotations:
-            results = get_attr_or_item(annotation, 'result') or []
-            if not isinstance(results, list):
-                continue
+        # we are going to remove all annotations, so we'll reset the corresponding fields on the summary
+        remove_all_annotations = self.project.annotations.count() == len(annotations)
+        created_annotations, created_labels = (
+            ({}, {}) if remove_all_annotations else (dict(self.created_annotations), dict(self.created_labels))
+        )
 
-            for result in results:
-                # reduce annotation counters
-                key = self._get_annotation_key(result)
-                if key in created_annotations:
-                    created_annotations[key] -= 1
-                    if created_annotations[key] == 0:
-                        created_annotations.pop(key)
-
-                # reduce labels counters
-                from_name = result.get('from_name', None)
-                if from_name not in labels:
+        if not remove_all_annotations:
+            for annotation in annotations:
+                results = get_attr_or_item(annotation, 'result') or []
+                if not isinstance(results, list):
                     continue
-                for label in self._get_labels(result):
-                    label = str(label)
-                    if label in labels[from_name]:
-                        labels[from_name][label] -= 1
-                        if labels[from_name][label] == 0:
-                            labels[from_name].pop(label)
-                if not labels[from_name]:
-                    labels.pop(from_name)
+
+                for result in results:
+                    # reduce annotation counters
+                    key = self._get_annotation_key(result)
+                    if key in created_annotations:
+                        created_annotations[key] -= 1
+                        if created_annotations[key] == 0:
+                            created_annotations.pop(key)
+
+                    # reduce labels counters
+                    from_name = result.get('from_name', None)
+                    if from_name not in created_labels:
+                        continue
+                    for label in self._get_labels(result):
+                        label = str(label)
+                        if label in created_labels[from_name]:
+                            created_labels[from_name][label] -= 1
+                            if created_labels[from_name][label] == 0:
+                                created_labels[from_name].pop(label)
+                    if not created_labels[from_name]:
+                        created_labels.pop(from_name)
+
         logger.debug(f'summary.created_annotations = {created_annotations}')
-        logger.debug(f'summary.created_labels = {labels}')
+        logger.debug(f'summary.created_labels = {created_labels}')
         self.created_annotations = created_annotations
-        self.created_labels = labels
+        self.created_labels = created_labels
         self.save(update_fields=['created_annotations', 'created_labels'])
 
     def update_created_labels_drafts(self, drafts):
@@ -1196,31 +1342,35 @@ class ProjectSummary(models.Model):
                 for label in self._get_labels(result):
                     labels[from_name][label] = labels[from_name].get(label, 0) + 1
 
-        logger.debug(f'summary.created_labels = {labels}')
+        logger.debug(f'update summary.created_labels_drafts = {labels}')
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])
 
     def remove_created_drafts_and_labels(self, drafts):
-        labels = dict(self.created_labels_drafts)
-        for draft in drafts:
-            results = get_attr_or_item(draft, 'result') or []
-            if not isinstance(results, list):
-                continue
+        # we are going to remove all drafts, so we'll reset the corresponding field on the summary
+        remove_all_drafts = AnnotationDraft.objects.filter(task__project=self.project).count() == len(drafts)
+        labels = {} if remove_all_drafts else dict(self.created_labels_drafts)
 
-            for result in results:
-                # reduce labels counters
-                from_name = result.get('from_name', None)
-                if from_name not in labels:
+        if not remove_all_drafts:
+            for draft in drafts:
+                results = get_attr_or_item(draft, 'result') or []
+                if not isinstance(results, list):
                     continue
-                for label in self._get_labels(result):
-                    label = str(label)
-                    if label in labels[from_name]:
-                        labels[from_name][label] -= 1
-                        if labels[from_name][label] == 0:
-                            labels[from_name].pop(label)
-                if not labels[from_name]:
-                    labels.pop(from_name)
-        logger.debug(f'summary.created_labels = {labels}')
+
+                for result in results:
+                    # reduce labels counters
+                    from_name = result.get('from_name', None)
+                    if from_name not in labels:
+                        continue
+                    for label in self._get_labels(result):
+                        label = str(label)
+                        if label in labels[from_name]:
+                            labels[from_name][label] -= 1
+                            if labels[from_name][label] == 0:
+                                labels[from_name].pop(label)
+                    if not labels[from_name]:
+                        labels.pop(from_name)
+        logger.debug(f'summary.created_labels_drafts = {labels}')
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])
 
@@ -1232,9 +1382,7 @@ class ProjectImport(models.Model):
         FAILED = 'failed', _('Failed')
         COMPLETED = 'completed', _('Completed')
 
-    project = models.ForeignKey(
-        'projects.Project', null=True, related_name='imports', on_delete=models.CASCADE
-    )
+    project = models.ForeignKey('projects.Project', null=True, related_name='imports', on_delete=models.CASCADE)
     preannotated_from_fields = models.JSONField(null=True, blank=True)
     commit_to_project = models.BooleanField(default=False)
     return_task_ids = models.BooleanField(default=False)
@@ -1267,9 +1415,7 @@ class ProjectReimport(models.Model):
         FAILED = 'failed', _('Failed')
         COMPLETED = 'completed', _('Completed')
 
-    project = models.ForeignKey(
-        'projects.Project', null=True, related_name='reimports', on_delete=models.CASCADE
-    )
+    project = models.ForeignKey('projects.Project', null=True, related_name='reimports', on_delete=models.CASCADE)
     status = models.CharField(max_length=64, choices=Status.choices, default=Status.CREATED)
     error = models.TextField(null=True, blank=True)
     task_count = models.IntegerField(default=0)

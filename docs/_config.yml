@@ -64,6 +64,10 @@ markdown:
   smartLists: true
   smartypants: true
 
+marked:
+  gfm: true
+  breaks: false
+
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)

@@ -1,19 +1,16 @@
-import logging
-
+import django_filters
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
-import django_filters
-from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from projects import models as project_models
 from rest_framework import generics
-from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Webhook, WebhookAction
 from .serializers import WebhookSerializer, WebhookSerializerForUpdate
-from projects import models as project_models
 
 
 class WebhookFilterSet(django_filters.FilterSet):
@@ -26,8 +23,11 @@ class WebhookFilterSet(django_filters.FilterSet):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Webhooks'],
+        x_fern_sdk_group_name='webhooks',
+        x_fern_sdk_method_name='list',
+        x_fern_audiences=['public'],
         operation_summary='List all webhooks',
-        operation_description="List all webhooks set up for your organization.",
+        operation_description='List all webhooks set up for your organization.',
         manual_parameters=[
             openapi.Parameter(
                 name='project',
@@ -42,8 +42,11 @@ class WebhookFilterSet(django_filters.FilterSet):
     name='post',
     decorator=swagger_auto_schema(
         tags=['Webhooks'],
+        x_fern_sdk_group_name='webhooks',
+        x_fern_sdk_method_name='create',
+        x_fern_audiences=['public'],
         operation_summary='Create a webhook',
-        operation_description="Create a webhook for your organization.",
+        operation_description='Create a webhook for your organization.',
     ),
 )
 class WebhookListAPI(generics.ListCreateAPIView):
@@ -60,21 +63,45 @@ class WebhookListAPI(generics.ListCreateAPIView):
         serializer.save(organization=self.request.user.active_organization)
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(tags=['Webhooks'], operation_summary='Get webhook info'))
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Webhooks'],
+        x_fern_sdk_group_name='webhooks',
+        x_fern_sdk_method_name='get',
+        x_fern_audiences=['public'],
+        operation_summary='Get webhook info',
+    ),
+)
 @method_decorator(
     name='put',
     decorator=swagger_auto_schema(
-        tags=['Webhooks'], operation_summary='Save webhook info', query_serializer=WebhookSerializerForUpdate
+        x_fern_audiences=['internal'],
+        tags=['Webhooks'],
+        operation_summary='Save webhook info',
+        query_serializer=WebhookSerializerForUpdate,
     ),
 )
 @method_decorator(
     name='patch',
     decorator=swagger_auto_schema(
-        tags=['Webhooks'], operation_summary='Update webhook info', query_serializer=WebhookSerializerForUpdate
+        tags=['Webhooks'],
+        x_fern_sdk_group_name='webhooks',
+        x_fern_sdk_method_name='update',
+        x_fern_audiences=['public'],
+        operation_summary='Update webhook info',
+        query_serializer=WebhookSerializerForUpdate,
     ),
 )
 @method_decorator(
-    name='delete', decorator=swagger_auto_schema(tags=['Webhooks'], operation_summary='Delete webhook info')
+    name='delete',
+    decorator=swagger_auto_schema(
+        tags=['Webhooks'],
+        x_fern_sdk_group_name='webhooks',
+        x_fern_sdk_method_name='delete',
+        x_fern_audiences=['public'],
+        operation_summary='Delete webhook info',
+    ),
 )
 class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Webhook.objects.all()
@@ -94,14 +121,17 @@ class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Webhooks'],
+        x_fern_sdk_group_name='webhooks',
+        x_fern_sdk_method_name='info',
+        x_fern_audiences=['public'],
         operation_summary='Get all webhook actions',
         operation_description='Get descriptions of all available webhook actions to set up webhooks.',
-        responses={"200": "Object with description data."},
+        responses={'200': 'Object with description data.'},
         manual_parameters=[
             openapi.Parameter(
                 'organization-only',
                 openapi.IN_QUERY,
-                description="organization-only or not",
+                description='organization-only or not',
                 type=openapi.TYPE_BOOLEAN,
             )
         ],

@@ -1,0 +1,96 @@
+.menu-wrapper {
+  max-width: 100%;
+  min-height: 100vh;
+  min-width: 100vw;
+  font-size: 16px;
+}
+
+.menu-header {
+  top: 0;
+  height: var(--header-height);
+  z-index: 1000;
+  position: sticky;
+  display: flex;
+  box-sizing: border-box;
+  background-color: var(--sand_0);
+  justify-content: space-evenly;
+  border-bottom: 1px solid var(--sand_300);
+
+  &__context {
+    flex: 1;
+    display: flex;
+    padding: 0 0 0 1.125rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__context-item {
+    &_left,
+    &_right {
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  &__trigger {
+    display: flex;
+    padding: 0 20px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 240px;
+    max-width: 240px;
+    box-sizing: border-box;
+    box-shadow: 1px 0 0 0 rgb(0 0 0 / 10%);
+  }
+
+  &__user {
+    display: flex;
+    margin: 0 20px;
+    align-self: center;
+    cursor: pointer;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__userpic-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary_link);
+  }
+}
+
+.newsletter-menu-item {
+  width: 200px;
+  white-space: normal;
+  height: auto;
+  padding-bottom: 8px;
+  padding-top: 8px;
+  margin-top: -8px;
+  font-size: 14px;
+  position: relative;
+  background: var(--grape_100);
+  line-height: 1.4em;
+  transition: 0.2s all;
+
+  .main-menu &:hover {
+    background: var(--grape_100);
+  }
+}
+
+.newsletter-menu-badge {
+  position: absolute;
+  display: block;
+  width: 8px;
+  height: 8px;
+  right: 8px;
+  top: 8px;
+  border-radius: 50%;
+  background: var(--primary_link);
+}

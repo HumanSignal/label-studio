@@ -46,6 +46,10 @@ on:
         type: string
         required: false
 
+env:
+  PYTHON_VERSION_FILE: "pyproject.toml"
+  FRONTEND_MONOREPO_DIR: "web"
+
 jobs:
   pypi:
     name: "PyPI"
@@ -54,44 +58,57 @@ jobs:
       pipy-artifact-url: ${{ steps.pypi-package-details.outputs.pipy-artifact-url }}
       pipy-artifact-digests-sha256: ${{ steps.pypi-package-details.outputs.pipy-artifact-digests-sha256 }}
     steps:
-      - uses: hmarr/debug-action@v2.1.0
+      - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
+
+      - name: Install toml
+        run: |
+          set -euo pipefail
+          wget -q -O- "https://github.com/gnprice/toml-cli/releases/download/v0.2.3/toml-0.2.3-x86_64-linux.tar.gz" | tar -xz -C .
+          mv toml-0.2.3-x86_64-linux/toml toml
+          chmod +x toml
 
       - name: Manage version
         env:
           PROVIDED_VERSION: ${{ inputs.version }}
         run: |
-          set -x
+          set -euo pipefail
           version=$(sed "s/^v//g" <<< ${PROVIDED_VERSION})
-          sed -i "s/^__version__[ ]*=.*/__version__ = '${version}'/g" label_studio/__init__.py
+          ./toml set '${{ env.PYTHON_VERSION_FILE }}' tool.poetry.version "$version" > pyproject.toml.new
+          mv -f pyproject.toml.new pyproject.toml
+
+      - name: Setup frontend environment
+        uses: ./.github/actions/setup-frontend-environment
+        with:
+          node-version: "${{ env.NODE }}"
+          directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+
+      - name: "Build"
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn build
+
+      - name: "Generate version files"
+        continue-on-error: true
+        working-directory: "${{ env.FRONTEND_MONOREPO_DIR }}"
+        run: yarn version:libs
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Configure pip cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pypi-${{ hashFiles('deploy/requirements-mw.txt') }}-${{ hashFiles('deploy/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pypi-
+      - name: Set up Poetry
+        uses: snok/install-poetry@v1
 
-      - name: Install dependencies
-        run: |
-          pip install -r deploy/requirements-mw.txt
-          pip install -r deploy/requirements.txt
-          pip install -e .
-          pip install twine
+      - name: Install Python dependencies
+        run: poetry install --with build
 
       - name: Collect static
-        run: |
-          python label_studio/manage.py collectstatic
+        run: poetry run python label_studio/manage.py collectstatic
 
       - name: Download feature flags
         env:
@@ -105,7 +122,7 @@ jobs:
             --retry-delay 10 \
             -H "Authorization: $LAUNCHDARKLY_COMMUNITY_SDK_KEY" \
             "https://sdk.launchdarkly.com/sdk/latest-all" >"$LAUNCHDARKLY_DOWNLOAD_PATH"
-          if [ "$(jq 'has("flags")' <<< cat $LAUNCHDARKLY_DOWNLOAD_PATH)" = "true" ]; then 
+          if [ "$(jq 'has("flags")' <<< cat $LAUNCHDARKLY_DOWNLOAD_PATH)" = "true" ]; then
             echo "feature_flags.json is valid"
           else
             echo "feature_flags.json is invalid"
@@ -116,19 +133,19 @@ jobs:
       - name: Package
         env:
           VERSION_OVERRIDE: ${{ inputs.version }}
-        run: python setup.py sdist bdist_wheel
+        run: poetry build
 
       - name: Upload to PYPI
         if: inputs.upload_to_pypi
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_APIKEY }}
-        run: twine upload dist/*
+        run: poetry run twine upload dist/*
 
       - name: Get PyPI package details
         id: pypi-package-details
         if: inputs.upload_to_pypi
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         env:
           VERSION: ${{ inputs.version }}
         with:
@@ -156,7 +173,7 @@ jobs:
 
       - name: Attach artifacts to release
         if: inputs.release-id
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GIT_PAT }}
           script: |
@@ -174,9 +191,26 @@ jobs:
                });
             }
 
+      - name: Check file size
+        env:
+          DIST_DIR: "./dist"
+          THRESHOLD: "100"
+        run: |
+          result=true
+          for file in $(find "${DIST_DIR}" -maxdepth 1 -type f); do
+            size=$(du -m "$file" | cut -f1)
+            if [ $size -ge $THRESHOLD ]; then
+              echo "::error::${file}(${size}Mb) exceeds size threshold(${THRESHOLD}Mb)"
+              result=false
+            fi
+          done
+          if [ "${result}" != "true" ]; then
+            exit 1
+          fi
+
       - name: Upload to artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Dist
           path: dist/

@@ -1,0 +1,37 @@
+.MessageToast {
+  border-radius: 4px;
+
+  &_info {
+    --background-color: var(--sand_900);
+    --hover-background-color: var(--sand_800);
+  }
+
+  &_error {
+    --background-color: var(--red_7);
+    --hover-background-color: var(--red_10);
+  }
+
+  background-color: var(--background-color);
+
+  .toast {
+    --border-color: var(--sand_900);
+    --padding: 8px 16px;
+
+    background-color: inherit;
+
+    &__action,
+    &__content {
+      color: var(--sand_100);
+      display: flex;
+      align-items: center;
+    }
+
+    &__action {
+      background-color: inherit;
+
+      &:hover {
+        background-color: var(--hover-background-color);
+      }
+    }
+  }
+}

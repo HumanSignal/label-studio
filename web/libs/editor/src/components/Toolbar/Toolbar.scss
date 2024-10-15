@@ -1,0 +1,29 @@
+.toolbar {
+  width: 40px;
+  background: var(--sand_0);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 5%), 0 5px 10px rgb(0 0 0 / 10%);
+  border-radius: 7px;
+  position: sticky;
+  top: 70px;
+  margin-top: 50px;
+
+  &::before {
+    height: 12px;
+    display: block;
+    background-color: var(--sand_100);
+    content: "";
+    border-radius: 7px 7px 0 0;
+  }
+
+  &__group ~ &__group {
+    margin-top: 4px;
+    border-top: 2px solid var(--sand_300);
+  }
+
+  &_expanded {
+    width: auto;
+    min-width: 210px;
+    display: flex;
+    flex-direction: column;
+  }
+}

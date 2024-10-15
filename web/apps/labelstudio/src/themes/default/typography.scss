@@ -1,0 +1,31 @@
+@font-face {
+  font-family: Figtree;
+  src: url("/static/fonts/Figtree-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+@font-face {
+  font-family: Figtree;
+  src: url("/static/fonts/Figtree-SemiBold.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  --font-sans: 'Figtree', sans-serif !important;
+  --font-mono: monaco, monospace !important;
+  --font-weight-400: 400;
+  --font-weight-500: 500;
+  --font-weight-600: 600;
+  --font-size-200: 12px;
+  --font-size-300: 14px;
+  --font-size-400: 16px;
+  --font-line-height-small: 18px;
+  --font-line-height-medium: 20px;
+
+  font-family: var(--font-sans) !important;
+}

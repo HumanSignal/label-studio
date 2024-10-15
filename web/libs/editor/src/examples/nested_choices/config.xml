@@ -1,0 +1,15 @@
+<View>
+  <Text name="text" value="$reviewText" valueType="text" />
+  <Choices name="sentiment" toName="text" showInLine="true">
+    <Choice value="Positive" />
+    <Choice value="Negative" />
+    <Choice value="Neutral" />
+  </Choices>
+  <Choices name="ch" toName="text"
+    choice="single" showInLine="true"
+    visibleWhen="choice-selected"
+  >
+    <Choice value="Descriptive" />
+    <Choice value="Emotional" />
+  </Choices>
+</View>

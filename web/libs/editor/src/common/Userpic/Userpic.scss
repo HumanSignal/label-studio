@@ -1,0 +1,31 @@
+.userpic {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  align-items: center;
+  border-radius: 13.5px;
+  justify-content: center;
+  background: var(--sand_100);
+  user-select: none;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%);
+
+  img {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    font-size: 12px;
+    line-height: 22px;
+    object-fit: cover;
+    position: absolute;
+  }
+
+  &__username {
+    display: block;
+    font-size: 12px;
+    line-height: 22px;
+    font-weight: bold;
+    opacity: 0.4;
+  }
+}

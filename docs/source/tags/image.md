@@ -18,6 +18,7 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | Name of the element |
 | value | <code>string</code> |  | Data field containing a path or URL to the image |
+| [valueList] | <code>string</code> |  | References a variable that holds a list of image URLs |
 | [smoothing] | <code>boolean</code> |  | Enable smoothing, by default it uses user settings |
 | [width] | <code>string</code> | <code>&quot;100%&quot;</code> | Image width |
 | [maxWidth] | <code>string</code> | <code>&quot;750px&quot;</code> | Maximum image width |
@@ -32,11 +33,10 @@ When you annotate image regions with this tag, the annotations are saved as perc
 | [contrastControl] | <code>boolean</code> | <code>false</code> | Show contrast control in toolbar |
 | [rotateControl] | <code>boolean</code> | <code>false</code> | Show rotate control in toolbar |
 | [crosshair] | <code>boolean</code> | <code>false</code> | Show crosshair cursor |
-| [horizontalAlignment] | <code>string</code> | <code>&quot;left&quot;</code> | Where to align image horizontally. Can be one of "left", "center" or "right" |
-| [verticalAlignment] | <code>string</code> | <code>&quot;top&quot;</code> | Where to align image vertically. Can be one of "top", "center" or "bottom" |
-| [defaultZoom] | <code>string</code> | <code>&quot;fit&quot;</code> | Specify the initial zoom of the image within the viewport while preserving it’s ratio. Can be one of "auto", "original" or "fit" |
-| [valuelist] | <code>string</code> |  | References a variable that holds a list of image URLs |
-| [crossOrigin] | <code>string</code> | <code>&quot;none&quot;</code> | Configures CORS cross domain behavior for this image, either "none", "anonymous", or "use-credentials", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin). |
+| [horizontalAlignment] | <code>left</code> \| <code>center</code> \| <code>right</code> | <code>left</code> | Where to align image horizontally. Can be one of "left", "center", or "right" |
+| [verticalAlignment] | <code>top</code> \| <code>center</code> \| <code>bottom</code> | <code>top</code> | Where to align image vertically. Can be one of "top", "center", or "bottom" |
+| [defaultZoom] | <code>auto</code> \| <code>original</code> \| <code>fit</code> | <code>fit</code> | Specify the initial zoom of the image within the viewport while preserving its ratio. Can be one of "auto", "original", or "fit" |
+| [crossOrigin] | <code>none</code> \| <code>anonymous</code> \| <code>use-credentials</code> | <code>none</code> | Configures CORS cross domain behavior for this image, either "none", "anonymous", or "use-credentials", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin). |
 
 ### Example
 

@@ -1,11 +1,16 @@
 ---
 title: Create the simplest Machine Learning backend
-type: blog
+short: Create a simple ML backend
+type: guide
+hide_menu: true
 tier: all
 order: 10
 meta_title: Integrating with Machine Learning Backend Tutorial
 meta_description: Label Studio tutorial for creating and integrating your Machine Learning backend with Label Studio.
-
+section: "Machine learning"
+parent: "ml_tutorials"
+parent_enterprise: "ml_tutorials"
+parent_page_extension: "html"
 ---
 
 

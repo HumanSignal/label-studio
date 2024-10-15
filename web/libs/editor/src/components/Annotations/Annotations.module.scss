@@ -1,0 +1,59 @@
+.buttons {
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skipped {
+  color: var(--danger_color);
+  min-width: 2em;
+}
+
+.annotationcard {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+
+  & > div:first-child {
+    flex-grow: 1;
+  }
+}
+
+.annotation {
+  padding: 1em !important;
+  cursor: pointer;
+
+  &_selected {
+    background: rgb(0 0 0 / 5%);
+  }
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  color: var(--primary_link);
+  font-weight: bold;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.titlespace {
+  justify-content: space-between;
+}
+
+.itembtns {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.draftbtn {
+  padding: 0;
+  border: 0;
+  vertical-align: -0.5px;
+  height: auto;
+}

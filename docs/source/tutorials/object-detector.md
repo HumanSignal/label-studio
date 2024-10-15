@@ -1,11 +1,15 @@
 ---
 title: OpenMMLab Image object detector or MMDetection
-type: blog
+type: guide
+hide_menu: true
 tier: all
 order: 40
 meta_title: OpenMMLab Image object detector or MMDetection
 meta_description: Label Studio tutorial for OpenMMLab Image object detector or MMDetection
-
+section: "Machine learning"
+parent: "ml_tutorials"
+parent_enterprise: "ml_tutorials"
+parent_page_extension: "html"
 ---
 
 

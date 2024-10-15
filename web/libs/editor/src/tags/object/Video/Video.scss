@@ -1,0 +1,52 @@
+.video-segmentation {
+  z-index: 1;
+  position: relative;
+
+  &_fullscreen {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--sand_0);
+
+    &__main {
+      flex: 1;
+    }
+
+    &__timeline {
+      flex: none;
+    }
+  }
+}
+
+.video-segmentation_fullscreen .video-segmentation_main {
+  flex: 1;
+}
+
+.video {
+  video {
+    max-width: 100%;
+  }
+
+  &_fullscreen {
+    height: 1vh;
+    flex: 100 1 1vh;
+    display: flex;
+    flex-direction: column;
+
+    &__main {
+      flex: 1;
+    }
+
+    &__controls {
+      flex: none;
+      padding: 0 16px;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    height: 32px;
+    align-items: center;
+    background-color: var(--sand_0);
+    justify-content: flex-end;
+  }
+}

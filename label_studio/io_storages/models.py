@@ -1,11 +1,32 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from django.conf import settings
+from django.conf import settings  # noqa: I001
 
-from .azure_blob.models import AzureBlobImportStorage, AzureBlobImportStorageLink, AzureBlobExportStorage, AzureBlobExportStorageLink
-from .s3.models import S3ImportStorage, S3ImportStorageLink, S3ExportStorage, S3ExportStorageLink
-from .gcs.models import GCSImportStorage, GCSImportStorageLink, GCSExportStorage, GCSExportStorageLink
-from .redis.models import RedisImportStorage, RedisImportStorageLink, RedisExportStorage, RedisExportStorageLink
+from .azure_blob.models import (  # noqa: F401
+    AzureBlobImportStorage,
+    AzureBlobImportStorageLink,
+    AzureBlobExportStorage,
+    AzureBlobExportStorageLink,
+)
+from .s3.models import (  # noqa: F401
+    S3ImportStorage,
+    S3ImportStorageLink,
+    S3ExportStorage,
+    S3ExportStorageLink,
+)
+from .gcs.models import (  # noqa: F401
+    GCSImportStorage,
+    GCSImportStorageLink,
+    GCSExportStorage,
+    GCSExportStorageLink,
+)
+from .redis.models import (  # noqa: F401
+    RedisImportStorage,
+    RedisImportStorageLink,
+    RedisExportStorage,
+    RedisExportStorageLink,
+)
+
 from label_studio.core.utils.common import load_func
 
 

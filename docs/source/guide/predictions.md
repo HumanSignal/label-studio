@@ -3,11 +3,13 @@ title: Import pre-annotated data into Label Studio
 short: Import pre-annotations
 type: guide
 tier: all
-order: 122
-order_enterprise: 107
+order: 163
+order_enterprise: 163
 meta_title: Import pre-annotated data into Label Studio
 meta_description: Import predicted labels, predictions, pre-annotations, or pre-labels into Label Studio for your data labeling, machine learning, and data science projects.
-section: "Import and Export"
+section: "Import & Export"
+parent: "tasks"
+parent_enterprise: "tasks"
 ---
 
 If you have predictions generated for your dataset from a model, either as pre-annotated tasks or pre-labeled tasks, you can import the predictions with your dataset into Label Studio for review and correction. Label Studio automatically displays the pre-annotations that you import on the Labeling page for each task. 
@@ -717,7 +719,7 @@ For more assistance, review this [example code creating a Label Studio task with
 
 ## Import OCR pre-annotations 
 
-Import pre-annotations for optical character recognition (OCR), such as output from [tesseract like in this example blog post](/blog/Improve-OCR-quality-with-Tesseract-and-Label-Studio.html). 
+Import pre-annotations for optical character recognition (OCR), such as output from [tesseract like in this example blog post](https://labelstud.io/blog/improve-ocr-quality-for-receipt-processing-with-tesseract-and-label-studio). 
 
 In this example, import pre-annotations for OCR tasks using the [OCR template](/templates/optical_character_recognition.html):
 
@@ -818,111 +820,16 @@ Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-da
     The image data in this example task references an uploaded file, identified by the source_filename assigned by Label Studio after uploading the image. The best way to reference image data is using presigned URLs for images stored in cloud storage, or absolute paths to image data stored in local storage and added to Label Studio by [syncing storage](storage.html). 
 
 
-## Troubleshoot pre-annotations
+### Troubleshooting pre-annotations
 
-<!-- md image_units.md -->
+<div class="opensource-only">
 
-If annotators can't see predictions or if you encounter unexpected behavior after you import pre-annotations into Label Studio, review this guidance to resolve the issues.
-
-### Make sure the predictions are visible to annotators
-In the **Settings > Machine Learning** section for your project, make sure that the following settings are configured:
-- Enable **Show predictions to annotators in the Label Stream and Quick View**
-- Select the relevant **Model Version** in the drop-down. If there is no drop-down menu visible, there might not be a model version listed for the pre-annotations, or there might be another issue happening. 
-
-<div class="enterprise-only">
-
-- Disable the option to <b>Reveal pre-annotations interactively</b>, which requires manual action from annotators to display pre-annotated regions.
+See [Troubleshooting pre-annotations](troubleshooting#Pre-annotations).
 
 </div>
 
-### Check the configuration values of the labeling configuration and tasks
-The `from_name` of the pre-annotation task JSON must match the value of the name in the `<Labels name="label" toName="text">` portion of the labeling configuration. The `to_name` must match the `toName` value. 
+<div class="enterprise-only">
 
-In the text example on this page, the JSON includes `"from_name": "label"` to correspond with the `<Labels name="label"` and `"to_name": text` to correspond with the `toName="text` of the labeling configuration. The default template might contain `<Labels name="ner" toName="text">`. To work with this example JSON, you need to update the values to match.
+See [Troubleshooting ML Backends & Predictions](https://support.humansignal.com/hc/en-us/sections/23627938255117-ML-Backend-Predictions) in the HumanSignal support center.
 
-In the image example on this page, the XML includes
-  ```xml
-  ...
-  <Choices name="choice" toName="image" showInLine="true">`
-  ...
-  <RectangleLabels name="label" toName="image">
-  ...
-  ```
-To correspond with the following portions of the example JSON:
-```json
-...
-"type": "rectanglelabels",        
-"from_name": "label", "to_name": "image",
-...
-type": "choices",
-"from_name": "choice", "to_name": "image",
-...
-```
-
-### Check the labels in your configuration and your tasks
-Make sure that you have a labeling configuration set up for the labeling interface, and that the labels in your JSON file exactly match the labels in your configuration. If you're using a [tool to transform your model output](https://github.com/heartexlabs/label-studio-transformers), make sure that the labels aren't altered by the tool. 
-
-### Check the IDs and toName values
-If you're performing nested labeling, such as displaying a TextArea tag for specific Label or Choice values, the IDs for those results must match. 
-
-For example, if you want to transcribe text alongside a named entity resolution task, you might have the following labeling configuration:
-```xml
-  <View>
-    <Labels name="label" toName="text">
-      <Label value="PER" background="red"/>
-      <Label value="ORG" background="darkorange"/>
-      <Label value="LOC" background="orange"/>
-      <Label value="MISC" background="green"/>
-    </Labels>
-    <Text name="text" value="$text"/>
-    <TextArea name="entity" toName="text" perRegion="true"/>
-  </View>
-```
-
-If you wanted to add predicted text and suggested transcriptions for this labeling configuration, you might use the following example JSON. 
-```json
-{
-"data":{
-         "text":"The world that we live in is a broad expanse of nothingness, said the existential philosopher, before he rode away with his cat on his motorbike. "
-      },
-   "predictions":[
-      {
-            "result":[
-               {
-                  "value":{
-                     "start":135,
-                     "end":144,
-                     "text":"motorbike",
-                     "labels":[
-                        "ORG"
-                     ]
-                  },
-                  "id":"def",
-                  "from_name":"ner",
-                  "to_name":"text",
-                  "type":"labels"
-               },
-               {
-                  "value":{
-                     "start":135,
-                     "end":144,
-                     "text":[
-                        "yay"
-                     ]
-                  },
-                  "id":"def",
-                  "from_name":"entity",
-                  "to_name":"text",
-                  "type":"textarea"
-               }
-            ]
-      }
-   ]
-}
-```
-Because the TextArea tag applies to each labeled region, the IDs for the label results and the textarea results must match. 
-
-
-### Read only and hidden regions
-
-In some situations it's very helpful to hide or to make `read-only` bounding boxes, text spans, audio segments, etc. You can put `"readonly": true` or `"hidden": true` in regions to achieve this (the dict inside of `annotations.result` list).  
+</div>

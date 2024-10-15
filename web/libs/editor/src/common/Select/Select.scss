@@ -1,0 +1,148 @@
+.select {
+  --select-surface-color: var(--sand_0);
+
+  height: 40px;
+  background-color: var(--select-surface-color);
+  font-size: 16px;
+  line-height: 22px;
+  border: 1px solid var(--sand_300);
+  box-sizing: border-box;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &_surface {
+    &_emphasis {
+      --select-surface-color: var(--sand_0);
+    }
+  }
+
+  &_size {
+    &_compact {
+      height: 32px;
+      border-radius: 3px;
+    }
+
+    &_small {
+      height: 24px;
+      font-size: 12px;
+    }
+  }
+
+  &__list {
+    width: max-content;
+  }
+
+  &__dropdown {
+    &:not(.dropdown__trigger) {
+      max-height: 280px;
+      overflow: auto;
+
+      .select__option {
+        padding-inline: 12px;
+      }
+    }
+  }
+
+  &__dropdown_variant_rounded {
+    &:not(.dropdown__trigger) {
+      border-radius: 4px;
+      padding-bottom: 8px;
+      margin-top: 4px;
+    }
+  }
+
+  &__selected {
+    width: 100%;
+    padding: 0 7px;
+    min-width: 60px;
+    display: flex;
+    font-weight: 500;
+    align-items: center;
+    height: 100%;
+  }
+
+  &__value {
+    width: max-content;
+    min-width: 30px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__option {
+    cursor: pointer;
+    padding: 4px 16px;
+
+    &:hover,
+    &_focused {
+      background-color: var(--sand_0);
+    }
+
+    &_selected {
+      color: var(--sand_0);
+      background-color: var(--primary_link);
+    }
+
+    &_selected:hover,
+    &_selected.select_focused {
+      background-color: var(--grape_0);
+    }
+  }
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+    position: relative;
+
+    &::before,
+    &::after {
+      width: 6px;
+      height: 6px;
+      display: block;
+      position: absolute;
+      content: "";
+      border: 1px solid var(--primary_link);
+      border-right: none;
+      border-bottom: none;
+    }
+
+    &::before {
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, 50%) rotate(45deg);
+    }
+
+    &::after {
+      bottom: 0;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-135deg);
+    }
+  }
+
+  &__optgroup {
+    &-list {
+      width: max-content;
+    }
+
+    &-label {
+      padding: 4px 16px;
+      color:var(--sand_700);
+    }
+  }
+
+  &__optgroup-list &__option {
+    padding-left: 24px;
+  }
+
+  &_disabled {
+    pointer-events: none;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 6px var(--grape_100), inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 15%), inset 0 0 0 1px var(--grape_100);
+    border-color: var(--primary_link);
+  }
+}

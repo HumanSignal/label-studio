@@ -1,0 +1,109 @@
+.prediction-settings {
+  &__wrapper {
+    width: 680px;
+  }
+
+  &__model-exists-info {
+    margin-bottom: 20px;
+    background: var(--sand_0);
+    padding: 10px 20px;
+    border: 1px solid var(--sand_300);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+ 
+  &__title-block {
+    margin: 20px 0;
+    margin-top: 0;
+  }
+
+  &__title {
+    font-weight: 500;
+  }
+}
+
+.ml {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 16px;
+  margin-top: 32px;
+  align-items: flex-start;
+  grid-auto-rows: max-content;
+
+  &__info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &__status {
+    color: var(--sand_500);
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+  }
+
+  &__summary {
+    margin-bottom: 16px;
+  }
+
+  &__indicator {
+    width: 8px;
+    height: 8px;
+    display: block;
+    margin-right: 8px;
+    border-radius: 100%;
+    background-color: var(--indicator-color);
+
+    &_state_CO {
+      --indicator-color: var(--success_color);
+    }
+
+    &_state_DI {
+      --indicator-color: var(--canteloupe_400);
+    }
+
+    &_state_ER {
+      --indicator-color: var(--danger_color);
+    }
+
+    &_state_TR,
+    &_state_PR {
+      --indicator-color: var(--grape_500);
+
+      position: relative;
+
+      &::before {
+        top: 0;
+        left: 0;
+        content: '';
+        width: 100%;
+        height: 100%;
+        opacity: 0.5;
+        display: block;
+        border-radius: 100%;
+        background-color: var(--indicator-color);
+        animation: state-pulse 2s ease infinite;
+      }
+    }
+  }
+}
+
+@keyframes state-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0;
+    transform: scale(3);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
+}

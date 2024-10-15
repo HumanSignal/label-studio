@@ -3,20 +3,21 @@ title: Review annotations in Label Studio
 short: Review annotations
 tier: enterprise
 type: guide
-order: 300
-order_enterprise: 113
+order: 0
+order_enterprise: 304
 meta_title: Review annotation quality in Label Studio
 meta_description: In data labeling projects, start evaluating annotator performance against ground truth annotations, predictions, and other annotator's annotations.
-section: "Quality control"
+section: "Review & Measure Quality"
 ---
 
 After multiple labelers have annotated tasks, review their output to validate the quality of the results. You can also perform this task after a model has predicted labels for tasks in your dataset. To configure the settings for reviewing annotations, see [Set up review settings for your project](setup_project.html#Set-up-review-settings-for-your-project).
 
-<div class="enterprise-only">
-
 The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="https://labelstud.io/guide/label_studio_compare.html">Label Studio Features</a> to learn more.
 
-</div>
+See the following video for an overview of reviewer workflows: 
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/dhBrphE7PHo?si=YMRI-omwxoQFuhma" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 
 ## Why review annotations?
 
@@ -26,13 +27,20 @@ Data labeling is a crucial step for training many machine learning models, and i
 
 After you [assign reviewers to tasks](#Assign-reviewers-to-tasks), they can review annotated tasks. Administrators and project managers can review tasks at any time, without being added to a project.
 
-1. Reviewers can click **Review Annotations** for a specific project, then click **Review All Tasks** on the Data Manager to start reviewing tasks. Administrators and project managers can click **Explore All Reviews** from the Data Manager or **Explore Review** from the Dashboard to review tasks.
-2. Review the first task and annotation. By default, you view the tasks in numeric order. If you want to change the order that you review tasks, see [Choose what to review](#Choose-what-to-review). You can see the annotator and their annotation. - If the annotation is correct, click **Accept**. - If the annotation is mostly correct, you can correct it by selecting a different option, changing the selected region, moving the bounding box, or whichever makes sense for the type of label you're reviewing. After correcting the annotation, click **Fix & Accept**. - If the annotation is completely incorrect, or you don't want to attempt to correct it at all, click **Reject** to reject the annotation. To place a rejected task back in the Label Stream for annotation, you must delete the annotation. Rejecting an annotation does not return it to annotators to re-label.
-   After you complete a review, the next task appears for your review.
+1. Reviewers can click **Review Annotations** for a specific project, then click **Review All Tasks** on the Data Manager to start reviewing tasks. Administrators and project managers can click tasks from the Data Manager or **Explore Review**.
+2. Review the first task and annotation. 
+
+    By default, you view the tasks in the order in which they were presented to the annotator. If you want to change the order that you review tasks, see [Choose what to review](#Choose-what-to-review). 
+    
+    - If the annotation is correct, click **Accept**. 
+    
+    - If the annotation is mostly correct, you can correct it by selecting a different option, changing the selected region, moving the bounding box, or whichever makes sense for the type of label you're reviewing. After correcting the annotation, click **Fix & Accept**. 
+    - If the annotation is completely incorrect, or you don't want to attempt to correct it at all, click **Reject** to reject the annotation. To place a rejected task back in the Label Stream for annotation, you must delete the annotation. Rejecting an annotation does not return it to annotators to re-label.
+
 3. Continue reviewing annotated tasks until you've reviewed all annotated tasks. Click **Data Manager** to return to the list of tasks for the project.
 
-!!! note
-If there are multiple annotations, you can select the tab of each annotation by annotator and result ID to view them separately. The [annotation result ID](labeling.html#How-Label-Studio-saves-results-in-annotations) is different from the task ID visible in the left menu. To see annotations side-by-side, you can click the task in the Data Manager and view a grid of annotations in the task preview mode.
+!!! info Tip
+    If there are multiple annotations, you can select the tab of each annotation by annotator and result ID to view them separately. The [annotation result ID](labeling.html#How-Label-Studio-saves-results-in-annotations) is different from the task ID visible in the left menu. To see annotations side-by-side, you can click the task in the Data Manager and view a grid of annotations in the task preview mode.
 
 ### Choose what to review
 
@@ -79,7 +87,7 @@ You can now navigate back through the review stream in the same path as moving f
 16. Navigate back through the Review Stream using the go back (`<`) button.
 
 !!! note
-Confirm that you are not taken through the same path that you have come through moving forward.
+    Confirm that you are not taken through the same path that you have come through moving forward.
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/go-back-reviewstream.png" style="opacity: 0.8"/></div>
@@ -129,11 +137,16 @@ Review a table to see the following for each annotator:
 - The agreement of their annotations with the ground truth annotations, if there are any.
 - The agreement of their annotations with predicted annotations, if there are any.
 
+See the following video for an overview of annotator agreement metrics: 
+
+<iframe class="video-border" width="560" height="315" src="https://www.youtube.com/embed/Lo_PVE9Pyw4?si=z1vtyI_xIo8aR8fY" width="100%" height="400vh" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
 ### Review annotator agreement matrix
 
 You can also review the overall annotator agreement on a more individual basis with the annotator agreement matrix.
 
-Review the annotator agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. You can also filter the matrix to show specific agreement statistics for each label, or view the **Overall** agreement matrix. See more about [how annotator agreement is calculated](stats.html).
+Review the annotator agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. You can also filter the matrix to show specific agreement statistics for each label, or view the **Overall** agreement matrix. See more about [how annotator agreement is calculated](stats).
 
 To see the specific annotations contributing to the agreement, do the following:
 
@@ -153,7 +166,7 @@ Define ground truth annotations in a Label Studio project. Use ground truth anno
 Label Studio Enterprise compares annotations from annotators and model predictions against the ground truth annotations for a task to calculate an accuracy score between 0 and 1.
 
 !!! note
-Ground truth annotations are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](https://labelstud.io/guide/label_studio_compare.html) to learn more.
+    Ground truth annotations are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](https://labelstud.io/guide/label_studio_compare.html) to learn more.
 
 ## Define ground truth annotations for a project
 

@@ -35,6 +35,28 @@
         }
       }
     },
+    "tag_with_name_and_toname": {
+      "type": "object",
+      "oneOf": [
+        {
+          "required": [
+            "@name",
+            "@toName"
+          ]
+        }
+      ],
+      "properties": {
+        "@name": {
+          "$ref": "#/definitions/@name"
+        },
+        "@toName": {
+          "$ref": "#/definitions/@toName"
+        },
+        "$": {
+          "$ref": "#/definitions/$"
+        }
+      }
+    },
     "tag_with_value_required_name": {
       "type": "object",
       "oneOf": [
@@ -80,6 +102,13 @@
         "items": {"$ref": "#/definitions/tag_with_value_required_name"}
       }, {"$ref": "#/definitions/tag_with_value_required_name"}]
     },
+    "tags_with_name_and_toname": {
+      "anyOf": [{"$ref": "#/definitions/tag_with_name_and_toname"},
+        {
+          "type": "array",
+          "items": {"$ref": "#/definitions/tag_with_name_and_toname"}
+        }]
+    },
     "View": {
       "type": "object",
       "additionalProperties": true,
@@ -92,7 +121,8 @@
         "Text": {"$ref": "#/definitions/tags_with_value_required_name"},
         "HyperText": {"$ref": "#/definitions/tags_with_value_required_name"},
         "View": {"$ref": "#/definitions/MaybeMultipleView"},
-        "TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"}
+        "TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"},
+        "Number": {"$ref": "#/definitions/tags_with_name_and_toname"}
       }
     },
     "MaybeMultipleView": {
@@ -219,7 +249,8 @@
         "Image": {"$ref": "#/definitions/tags_with_value_required_name"},
         "Text": {"$ref": "#/definitions/tags_with_value_required_name"},
         "HyperText": {"$ref": "#/definitions/tags_with_value_required_name"},
-        "TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"}
+        "TextArea": {"$ref": "#/definitions/MaybeMultipleTextAreas"},
+        "Number": {"$ref": "#/definitions/tags_with_name_and_toname"}
       }
     }
   }

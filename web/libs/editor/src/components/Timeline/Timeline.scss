@@ -1,0 +1,20 @@
+.timeline {
+  user-select: none;
+  background-color: var(--sand_0);
+
+  &__topbar {
+    min-height: 48px;
+    padding: 6px;
+    display: grid;
+    grid-row-gap: 8px;
+    align-items: center;
+    grid-auto-rows: min-content;
+    grid-template-rows: 1fr;
+    border-top: 1px solid var(--sand_300);
+    border-bottom: 1px solid var(--sand_300);
+  }
+}
+
+.audio {
+  min-width: 425px;
+}

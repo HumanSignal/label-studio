@@ -1,5 +1,14 @@
+redis_title: &redis_title
+  - type: text
+    name: title
+    label: Storage Title
+
 # 2x2 grid
 redis_params: &redis_params
+  - type: text
+    name: db
+    label: Database Number (db)
+    placeholder: 1
   - type: text
     name: path
     label: Path
@@ -16,7 +25,10 @@ redis_params: &redis_params
     label: Port
 
 ImportStorage:
-  # Title, Bucket, Prefix
+  # Title
+  - columnCount: 1
+    fields: *redis_title
+  # Path, Password, Host and Port
   - columnCount: 2
     fields: *redis_params
   # Regex filter

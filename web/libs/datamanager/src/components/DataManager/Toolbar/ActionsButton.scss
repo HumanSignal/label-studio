@@ -1,0 +1,185 @@
+.actionButton {
+  --compact-height: 32px;
+
+  height: var(--compact-height);
+  padding: 0 13px;
+  display: flex;
+  align-items: center;
+
+  &__titleContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: space-between;
+  }
+
+  &_isTitle {
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.5px;
+    color: var(--grape_500);
+    cursor: initial;
+    padding: 16px 12px 8px;
+    height: var(--compact-height);
+
+    .actionButton {
+      &__titleContainer:hover {
+        background-color: transparent;
+      }
+
+      &__title {
+        font-size: 12px;
+      }
+    }
+
+    &:hover {
+      background-color: transparent !important;
+      color: var(--grape_500) !important;
+    }
+  }
+
+  &_isSeparator {
+    cursor: initial;
+    height: 1px;
+    background-color: rgb(137 128 152 / 12%) !important;
+    padding: 0;
+
+    .actionButton__titleContainer {
+      display: none;
+    }
+
+    &.menu__item {
+      height: 1px;
+    }
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
+
+  &_hasSeperator {
+    border-top: 1px solid rgb(137 128 152 / 12%);
+  }
+
+  &__title {
+    flex-grow: 1;
+    font-size: 16px;
+  }
+
+  &_hasSubMenu {
+    color: var(--sand_600);
+
+    &:hover {
+      color: var(--black);
+      background-color: var(--black_4);
+    }
+  }
+
+  &_danger {
+    color: #d00;
+  }
+
+  &_disabled {
+    background-color: var(--black_4);
+    color: rgb(0 0 0 / 25%);
+    cursor: initial;
+
+    &:hover {
+      background-color: var(--black_4) !important;
+      color: rgb(0 0 0 / 25%) !important;
+      cursor: initial;
+    }
+  }
+}
+
+.actionButtonPrime {
+  gap: 8px;
+}
+
+.actionmenu,
+.actionButton-submenu {
+  &_newUI {
+    .actionButton {
+      position: relative;
+      padding: 8px;
+      height: auto;
+
+      &.menu__item {
+        height: auto;
+        color: #1F1F1F;
+
+        &.actionButton_isTitle {
+          color: var(--grape_500);
+        }
+
+        &_look_danger {
+          color: #d00;
+        }
+      }
+
+      &:not(.menu-dm__item_active):hover {
+        background-color: transparent;
+
+        .menu-dm {
+          &__titleContainer {
+            background-color: rgb(65 60 74 / 8%);
+          }
+        }
+      }
+
+      &_hasSubMenu {
+        color: #1F1F1F;
+
+        &:hover{
+          color: #1F1F1F;
+          background-color: transparent;
+        }
+
+        .actionButton__titleContainer:hover {
+          background-color: var(--grape_0);
+        }
+      }
+
+      &__titleContainer {
+        height: 100%;
+        width: 100%;
+        padding: 4px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: rgb(65 60 74 / 8%);
+        }
+      }
+
+      &_isTitle {
+        padding: 16px 8px 0;
+
+        .actionButton__titleContainer {
+          cursor: default;
+
+          &:hover {
+            background: transparent;
+          }
+        }
+      }
+
+      &_isSeparator {
+        height: 1px;
+        padding: 0;
+
+        &.menu__item {
+          height: 1px;
+          padding: 0;
+        }
+      }
+    }
+  }
+}
+
+.actionButton-submenu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

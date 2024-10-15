@@ -1,0 +1,88 @@
+.spinner-ls {
+  --spinner-size: 50px;
+  --corner-size: calc(var(--spinner-size) * 0.375);
+  --spinner-duration: 2.5s;
+  --spinner-color: var(--persimmon_400);
+
+  position: relative;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+
+  &__body {
+    top: 50%;
+    left: 50%;
+    width: var(--spinner-size);
+    height: var(--spinner-size);
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background-color: var(--persimmon_0);
+    box-shadow: 0 0 0 calc(var(--spinner-size) * 0.0625) var(--persimmon_400) inset, 0 0 0 calc(var(--spinner-size) * 0.0625) var(--persimmon_400);
+    will-change: transform, width, height;
+
+    &:not(.spinner-ls__body_stopped) {
+      animation: logo-spin var(--spinner-duration) ease infinite;
+    }
+
+    & > span {
+      position: absolute;
+      background-color: var(--spinner-color);
+      width: var(--corner-size);
+      height: var(--corner-size);
+      border-radius: calc(var(--corner-size) * 0.16);
+    }
+
+    &>span:nth-child(1) {
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -50%);
+    }
+
+    &>span:nth-child(2) {
+      top: 0;
+      right: 0;
+      transform: translate(50%, -50%);
+    }
+
+    &>span:nth-child(3) {
+      bottom: 0;
+      left: 0;
+      transform: translate(-50%, 50%);
+    }
+
+    &>span:nth-child(4) {
+      bottom: 0;
+      right: 0;
+      transform: translate(50%, 50%);
+    }
+  }
+}
+
+@keyframes logo-spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  20% {
+    width: 0;
+    height: 0;
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  45% {
+    width: 0;
+    height: 0;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  70% {
+    width: var(--spinner-size);
+    height: var(--spinner-size);
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  100% {
+    width: var(--spinner-size);
+    height: var(--spinner-size);
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+}
