@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1583: Fix comment overlay displaying conditions (#6504)",
-  "commit": "a25d4ac14b90d9da0772c31dadb48c2803397730",
-  "date": "2024-10-14T15:34:52.000Z",
+  "message": "fix: LEAP-1494: Padding in new textarea is missing in LSO (#6496)",
+  "commit": "3b04299dfd5bd0a994a56ead2b78cf2cbda94f4e",
+  "date": "2024-10-15T11:13:16.000Z",
   "branch": "develop"
 }
