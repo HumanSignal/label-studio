@@ -201,7 +201,7 @@ Enable **Show before reviewing** to display a pop-up message to reviewers when t
 
 <dd>
 
-Configure additional settings for reviewers.
+Configure what is required for a task to be considered reviewed. 
 
 <table>
 <thead>
@@ -232,6 +232,72 @@ In a task where multiple annotators submitted labels, the reviewer needs to acce
 
 </td>
 </tr>
+</table>
+
+</dd>
+
+<dt id="reject-options">Reject Options</dt>
+
+<dd>
+
+Configure what rejection options are available to reviewers. 
+
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
+
+**Requeue rejected tasks back to annotators**
+</td>
+<td>
+
+Rejected tasks are reassigned back to the annotator. 
+
+</td>
+</tr>
+<td>
+
+**Remove rejected tasks from labeling queue**
+</td>
+<td>
+
+Rejected tasks are removed from the queue and not reassigned back to the annotator. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Allow reviewer to choose: Requeue or Remove**
+</td>
+<td>
+
+Reviewers have the option on each rejected task whether it should be removed from the queue or reassigned to the annotator (placed back in the queue). 
+
+</td>
+</tr>
+</table>
+
+</dd>
+
+<dt id="review-settings">Additional settings</dt>
+
+<dd>
+
+Configure additional reviewer settings
+
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
 <tr>
 <td>
 
@@ -270,17 +336,6 @@ Note that in most cases, skipped tasks do not contribute towards meeting the min
 When disabled, reviewers can only enter the review stream. When enabled, reviewers can access the Data Manager, where they can select which tasks to review. 
 
 However, some information is still hidden from reviewers and they can only view a subset of the Data Manager columns. For example, they cannot see columns such as who the other Reviewers are. 
-
-</td>
-</tr>
-<tr>
-<td>
-
-**Requeue rejected tasks back to annotators**
-</td>
-<td>
-
-Rejected tasks are reassigned back to the annotator. 
 
 </td>
 </tr>
