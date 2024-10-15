@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1492: More flexible Custom buttons (#6454)",
-  "commit": "65f69dd87cb9e54acc31d12fb7084514859f3288",
-  "date": "2024-10-07T19:38:13.000Z",
+  "message": "fix: LEAP-1494: Padding in new textarea is missing in LSO (#6496)",
+  "commit": "3b04299dfd5bd0a994a56ead2b78cf2cbda94f4e",
+  "date": "2024-10-15T11:13:16.000Z",
   "branch": "develop"
 }

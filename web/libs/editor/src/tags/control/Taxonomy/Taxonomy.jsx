@@ -630,7 +630,7 @@ const HtxTaxonomy = observer(({ item }) => {
   }
 
   return (
-    <div className={className} style={visibleStyle}>
+    <div className={className} style={visibleStyle} ref={item.elementRef}>
       {isFF(FF_TAXONOMY_ASYNC) && !item.legacy ? (
         <NewTaxonomy
           items={item.items}

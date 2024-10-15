@@ -4,7 +4,65 @@ type RawResult = {
   value: object;
 };
 
+type MSTResult = {
+  id: string;
+  area: MSTRegion;
+  annotation: MSTAnnotation;
+  type: string;
+  mainValue: any;
+  // @todo tag
+  from_name: any;
+};
+
+type MSTagProps = {
+  isReady?: boolean;
+};
+
+type MSTTagImage = {
+  type: "image";
+  stageWidth: number;
+  stageHeight: number;
+  containerWidth: number;
+  containerHeight: number;
+  canvasSize?: { width: number; height: number };
+} & MSTagProps;
+
+type MSTTag = MSTTagImage | (MSTagProps & { type: string });
+
+type MixinMSTArea = {
+  id: string;
+  ouid: number;
+  results: MSTResult[];
+  parentID: string | null;
+  control: object;
+  object: object;
+  classification?: boolean;
+  selected: boolean;
+};
+
+type MixinMSTRegion = {
+  pid: string;
+  score: number | null;
+  filtered: boolean;
+  parentID: string;
+  fromSuggestion: boolean;
+  dynamic: boolean;
+  origin: "prediction" | "prediction-changed" | "manual";
+  item_index: number | null;
+};
+
+type MixinMSTRegionVolatile = {
+  hidden: boolean;
+  locked: boolean;
+  isDrawing: boolean;
+  shapeRef: null;
+  drawingTimeout: null;
+};
+
+type MSTRegion = MixinMSTArea & MixinMSTRegion & MixinMSTRegionVolatile;
+
 type MSTAnnotation = {
+  id: string;
   canBeReviewed: boolean;
   userGenerate: boolean;
   sentUserGenerate: boolean;
@@ -16,21 +74,69 @@ type MSTAnnotation = {
     draft?: RawResult[];
     result?: RawResult[];
   };
-  results: RawResult[];
+  regions: MSTRegion[];
+  results: MSTResult[];
+  names: Map<string, MSTTag>;
+  isLinkingMode: boolean;
+  linkingMode: "create_relation" | "link_to_comment";
 
   submissionInProgress: () => void;
 };
 
+type MSTUserExtended = {
+  id: types.identifierNumber;
+  firstName: string | null;
+  lastName: string | null;
+  username: string | null;
+  email: string | null;
+  lastActivity: string | null;
+  avatar: string | null;
+  initials: string | null;
+  phone: string | null;
+};
+
+type MSTAnchor = {
+  regionId?: string;
+  controlName?: string;
+  region?: MSTRegion;
+  overlayNode?: MSTRegion;
+};
+
+type MSTComment = {
+  id: number;
+  text: types.string;
+  createdAt: string;
+  updatedAt: string;
+  resolvedAt: string;
+  createdBy: MSTUserExtended | null;
+  isResolved: boolean;
+  isEditMode: boolean;
+  isDeleted: boolean;
+  isConfirmDelete: boolean;
+  isUpdating: boolean;
+  regionRef: MSTAnchor;
+  isHighlighted: boolean;
+  setHighlighted: (value: boolean) => void;
+  scrollIntoView: () => void;
+};
+
 type MSTCommentStore = {
+  comments: MSTComment[];
+  overlayComments: MSTComment[];
+  annotationId: string;
+  annotation?: MSTAnnotation;
   commentFormSubmit: () => void;
   setTooltipMessage: (message: string) => void;
   currentComment: any;
   addedCommentThisSession: boolean;
+  isHighlighting: boolean;
+  isRelevantList: boolean;
+  listComments: (options: { mounted?: { current: boolean }; suppressClearComments: boolean }) => Promise<void>;
+  restoreCommentsFromCache: (cacheKey: string) => void;
 };
 
 type MSTStore = {
-  // @todo we can't import CustomButton store here and use it type :(
-  customButtons: any;
+  customButtons: CustomControlProps.button[];
   settings: Record<string, boolean>;
   isSubmitting: boolean;
   // @todo WHAT IS THIS?

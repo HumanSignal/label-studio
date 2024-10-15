@@ -28,6 +28,10 @@ const CommentModeModel = types
         self.comment.setRegionLink(region);
         self.stop();
       },
+      addLinkedResult(result) {
+        self.comment.setResultLink(result);
+        self.stop();
+      },
     };
   });
 

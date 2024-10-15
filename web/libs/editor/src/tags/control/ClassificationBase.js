@@ -1,4 +1,5 @@
 import { types } from "mobx-state-tree";
+import React from "react";
 import { FF_LSDV_4583, isFF } from "../../utils/feature-flags";
 
 /**
@@ -29,6 +30,10 @@ const ClassificationBase = types
     }
     return {};
   })
+  .volatile(() => ({
+    // for interactions with the tag, i.e. linking comments to classification
+    elementRef: React.createRef(),
+  }))
   .views((self) => {
     return {
       selectedValues() {
