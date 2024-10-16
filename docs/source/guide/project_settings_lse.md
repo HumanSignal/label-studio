@@ -285,7 +285,7 @@ Reviewers see the following options:
 
 For example, a reviewer might decide to requeue an annotation that is nearly correct but just needs a slight change. However, an annotation with numerous errors may be easier to simply reject entirely and remove from the queue. 
 
-Note that when you click **Reject**, the annotation is also marked as cancelled/skipped (`was_cancelled: true`). This is reflected in various metrics (for example, Data Manager columns and dashboards), and differentiates between the two rejection actions in the API. 
+Note that when you click **Reject**, the annotation is also marked as cancelled/skipped. This is reflected in various metrics (for example, Data Manager columns and dashboards), and differentiates between the two rejection actions in the API with `was_cancelled: true`. 
 
 </td>
 </tr>
