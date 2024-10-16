@@ -135,7 +135,7 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
 | **Supported data types** | Text |
 | **Supported model types** | Text Classification <br>Named Entity Recognition (NER) |
 | **Class selection** | Multi-selection (the LLM can apply multiple labels per task)|
-| **Supported base models** | OpenAI gpt-3.5-turbo-16k <br>OpenAI gpt-3.5-turbo-instruct* <br>OpenAI gpt-4-turbo <br>OpenAI gpt-3.5-turbo <br>OpenAI gpt-4o <br>OpenAI gpt-4<br>[Azure OpenAI chat-based models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models) |
+| **Supported base models** | OpenAI gpt-3.5-turbo-16k <br>OpenAI gpt-3.5-turbo-instruct* <br>OpenAI gpt-4-turbo <br>OpenAI gpt-3.5-turbo <br>OpenAI gpt-4o <br>OpenAI gpt-4<br>[Azure OpenAI chat-based models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)<br>[Custom LLM](prompts_create#Model-provider-API-keys) |
 | **Text compatibility** | Task text must be utf-8 compatible |
 | **Task size** | Total size of each task can be no more than 1MB (approximately 200-500 pages of text) |
 | **Network access** | If you are using a firewall or restricting network access to your OpenAI models, you will need to allow the following IPs: <br>3.219.3.197 <br>34.237.73.3 <br>4.216.17.242 |
