@@ -236,6 +236,7 @@ module.exports = composePlugins(
       // Common dependencies across at least two sub-packages
       react: path.resolve(__dirname, "node_modules/react"),
       "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+      "@humansignal/ui": path.resolve(__dirname, "libs/ui"),
     };
 
     return merge(config, {
