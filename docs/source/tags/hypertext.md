@@ -18,6 +18,7 @@ Use with the following data types: HTML.
 | value | <code>string</code> |  | Value of the element |
 | [valueType] | <code>url</code> \| <code>text</code> | <code>text</code> | Whether the text is stored directly in uploaded data or needs to be loaded from a URL |
 | [inline] | <code>boolean</code> | <code>false</code> | Whether to embed HTML directly in Label Studio or use an iframe |
+| [sanitizeHtml] | <code>boolean</code> | <code>true</code> | Whether to sanitize the provided html (remove scripts etc) |
 | [saveTextResult] | <code>yes</code> \| <code>no</code> |  | Whether to store labeled text along with the results. By default, doesn't store text for `valueType=url` |
 | [encoding] | <code>none</code> \| <code>base64</code> \| <code>base64unicode</code> |  | How to decode values from encoded strings |
 | [selectionEnabled] | <code>boolean</code> | <code>true</code> | Enable or disable selection |
