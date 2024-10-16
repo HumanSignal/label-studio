@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1560: Add interface for requiring comments on rejection in QuickView (#6520)",
-  "commit": "78d07803cb2a783b90ce2197507ee7b8848293b4",
-  "date": "2024-10-16T13:32:11.000Z",
+  "message": "feat: LEAP-1476: Add ability to edit classifications on existing comments (#6532)",
+  "commit": "e824fbd3bf170509ffa5dd815deb7b0a5705381b",
+  "date": "2024-10-16T21:39:46.000Z",
   "branch": "develop"
 }
