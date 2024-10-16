@@ -11,13 +11,25 @@ meta_description: The comments and notifications feature defines how annotators,
 ---
 
 
-Comments are a Label Studio Enterprise feature that allow communication between reviewers and annotators. These can be an important tool in your review workflow, allowing you to:
+Comments are a Label Studio Enterprise feature that allow communication between reviewers and annotators:
+
+**Annotator to reviewer communication** 
+- Ask for clarification on a task
+- Provide reasoning or context for their annotation
+
+**Reviewer to annotator communication** 
+- Answer questions
+- Give feedback to help the annotator improve 
+
+ This annotator-reviewer feedback loop is an important tool in your review workflow, allowing you to:
 
 - Speed up the labeling process
 - Increase the annotation quality
 - Build more solid labeling and review processes
 
 ![Screenshot of comments](/images/review/comments.png)
+
+
 
 
 ## Permissions
