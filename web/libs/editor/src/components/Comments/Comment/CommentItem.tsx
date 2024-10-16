@@ -1,7 +1,7 @@
 import { Tooltip } from "antd";
 import { observer } from "mobx-react";
 import type React from "react";
-import { type FC, useCallback, useContext, useState } from "react";
+import { type FC, useCallback, useContext, useMemo, useState } from "react";
 
 import { IconCheck, IconEllipsis } from "../../../assets/icons";
 import { Button } from "../../../common/Button/Button";
@@ -100,6 +100,36 @@ export const CommentItem: FC<CommentItemProps> = observer(
       }
     }, [comment, startLinkingMode, regionRef?.region]);
 
+    const taxonomyOnChange = useCallback(
+      async (_: Node, values: TaxonomyPath[]) => {
+        const newClassifications =
+          values.length > 0
+            ? {
+                default: {
+                  type: "taxonomy",
+                  values,
+                },
+              }
+            : null;
+        setClassifications(newClassifications);
+      },
+      [setClassifications],
+    );
+
+    const taxonomySelectedItems = useMemo(
+      () => taxonomyPathsToSelectedItems(classifications?.default?.values),
+      [classifications],
+    );
+
+    const commentFormBaseOnSubmit = useCallback(
+      async (value: any) => {
+        await updateComment(value, classifications);
+        setText(value);
+        await listComments({ suppressClearComments: true });
+      },
+      [updateComment, listComments, classifications],
+    );
+
     if (isDeleted) return null;
 
     const TimeTracker = () => {
@@ -156,32 +186,13 @@ export const CommentItem: FC<CommentItemProps> = observer(
           <Elem name="text">
             {isEditMode ? (
               <>
-                <CommentFormBase
-                  value={text}
-                  onSubmit={async (value) => {
-                    await updateComment(value, classifications);
-                    setText(value);
-                    await listComments({ suppressClearComments: true });
-                  }}
-                  classifications={classifications}
-                />
+                <CommentFormBase value={text} onSubmit={commentFormBaseOnSubmit} classifications={classifications} />
                 {classificationsItems.length > 0 && (
                   <Elem name="classifications-row">
                     <Taxonomy
-                      selected={taxonomyPathsToSelectedItems(classifications?.default?.values)}
+                      selected={taxonomySelectedItems}
                       items={classificationsItems}
-                      onChange={async (_: Node, values: TaxonomyPath[]) => {
-                        const newClassifications =
-                          values.length > 0
-                            ? {
-                                default: {
-                                  type: "taxonomy",
-                                  values,
-                                },
-                              }
-                            : null;
-                        setClassifications(newClassifications);
-                      }}
+                      onChange={taxonomyOnChange}
                       options={COMMENT_TAXONOMY_OPTIONS}
                       defaultSearch={false}
                     />
