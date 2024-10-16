@@ -1,6 +1,6 @@
 {
-  "message": "ci: LEAP-1417 LEAP-1544 LEAP-1546: CVE fixes (#6519)",
-  "commit": "0cc638c60f711f5179c0acece17a010f3a24d44b",
-  "date": "2024-10-16T08:35:41.000Z",
+  "message": "fix: LEAP-1586: Fix CommentsOverlay display without preloading image functionality (#6523)",
+  "commit": "90139c2428ee1733b63ab3f1d6136083bc12dcc6",
+  "date": "2024-10-16T11:28:47.000Z",
   "branch": "develop"
 }
