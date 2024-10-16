@@ -150,7 +150,7 @@ const HtxVideoView = ({ item, store }) => {
 
   const setPosition = useCallback(
     (value) => {
-      if (value !== position) {
+      if (value !== position && videoLength) {
         const nextPosition = clamp(value, 1, videoLength);
 
         _setPosition(nextPosition);
@@ -167,7 +167,11 @@ const HtxVideoView = ({ item, store }) => {
   );
 
   const supportsRegions = useMemo(() => {
-    return isDefined(item?.videoControl());
+    return isDefined(item?.videoControl);
+  }, [item]);
+
+  const supportsTimelineRegions = useMemo(() => {
+    return isDefined(item?.timelineControl);
   }, [item]);
 
   useEffect(() => {
@@ -446,20 +450,37 @@ const HtxVideoView = ({ item, store }) => {
   const regions = item.regs.map((reg) => {
     const color = reg.style?.fillcolor ?? reg.tag?.fillcolor ?? defaultStyle.fillcolor;
     const label = reg.labels.join(", ") || "Empty";
-    const sequence = reg.sequence.map((s) => ({
-      frame: s.frame,
-      enabled: s.enabled,
-    }));
+    const timeline = reg.type.includes("timeline");
+    const sequence = reg.sequence;
 
     return {
       id: reg.cleanId,
+      index: reg.region_index,
       label,
       color,
       visible: !reg.hidden,
       selected: reg.selected || reg.inSelection,
       sequence,
+      timeline,
     };
   });
+
+  // new Timeline Regions are added at the top of timeline, so we have to reverse the order
+  if (item.timelineControl) regions.reverse();
+
+  // when label is selected and user is ready to draw a new region, we create a labeled empty line at the top
+  if (item.timelineControl?.selectedLabels?.length && !item.annotation.selectionSize && !item.drawingRegion) {
+    const label = item.timelineControl.selectedLabels[0];
+    regions.unshift({
+      id: "new",
+      label: label.value,
+      color: label.background,
+      visible: true,
+      selected: true,
+      sequence: [],
+      timeline: true,
+    });
+  }
 
   return (
     <ObjectTag item={item}>
@@ -526,11 +547,12 @@ const HtxVideoView = ({ item, store }) => {
             length={videoLength}
             position={position}
             regions={regions}
+            height={item.timelineheight}
             altHopSize={store.settings.videoHopSize}
             allowFullscreen={false}
             fullscreen={isFullScreen}
             defaultStepSize={16}
-            disableView={!supportsRegions}
+            disableView={!supportsTimelineRegions && !supportsRegions}
             framerate={item.framerate}
             controls={{ FramesControl: true }}
             customControls={[
@@ -563,6 +585,8 @@ const HtxVideoView = ({ item, store }) => {
             onPause={handlePause}
             onFullscreenToggle={handleFullscreenToggle}
             onSelectRegion={handleSelectRegion}
+            onStartDrawing={item.startDrawing}
+            onFinishDrawing={item.finishDrawing}
             onAction={handleAction}
           />
         )}

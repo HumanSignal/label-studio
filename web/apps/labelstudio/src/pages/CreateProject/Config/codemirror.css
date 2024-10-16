@@ -1,6 +1,7 @@
 .CodeMirror-hints {
   z-index: 3000;
 }
+
 .CodeMirror-hint-tag {
   white-space: normal;
   line-height: 1.4em;
@@ -9,19 +10,22 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .CodeMirror-hint-name {
-  font-family: monospace;
   font-weight: 500;
   color: darkgoldenrod;
+  font-family: var(--font-mono);
 }
+
 .CodeMirror-hint-active .CodeMirror-hint-name {
   color: blanchedalmond;
 }
+
 .CodeMirror-hint-type {
   font-style: italic;
   color: #aaa;
 }
+
 .CodeMirror-hint-active .CodeMirror-hint-type {
   color: #ddd;
 }
-.CodeMirror-hint-description {}

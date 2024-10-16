@@ -107,7 +107,6 @@ def flag_set(feature_flag, user=None, override_system_default=None):
         if request and getattr(request, 'user', None) and request.user.is_authenticated:
             user = request.user
 
-    user_dict = _get_user_repr(user)
     env_value = get_bool_env(feature_flag, default=None)
     if env_value is not None:
         return env_value
@@ -115,6 +114,7 @@ def flag_set(feature_flag, user=None, override_system_default=None):
         system_default = override_system_default
     else:
         system_default = settings.FEATURE_FLAGS_DEFAULT_VALUE
+    user_dict = _get_user_repr(user)
     return client.variation(feature_flag, user_dict, system_default)
 
 
@@ -131,8 +131,10 @@ def all_flags(user):
     env_ff = get_all_env_with_prefix('ff_', is_bool=True)
     env_fflag = get_all_env_with_prefix('fflag_', is_bool=True)
     env_fflag2 = get_all_env_with_prefix('fflag-', is_bool=True)
+    env_fflag3 = get_all_env_with_prefix('feat_', is_bool=True)
     env_ff.update(env_fflag)
     env_ff.update(env_fflag2)
+    env_ff.update(env_fflag3)
 
     for env_flag_name, env_flag_on in env_ff.items():
         flags[env_flag_name] = env_flag_on

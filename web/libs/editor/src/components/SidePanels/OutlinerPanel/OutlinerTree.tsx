@@ -20,7 +20,7 @@ import { Tooltip } from "../../../common/Tooltip/Tooltip";
 import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
 import { Block, cn, Elem } from "../../../utils/bem";
-import { FF_DEV_2755, FF_DEV_3873, FF_OUTLINER_OPTIM, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_2755, FF_DEV_3873, FF_OUTLINER_OPTIM, FF_PER_FIELD_COMMENTS, isFF } from "../../../utils/feature-flags";
 import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
@@ -28,6 +28,7 @@ import { RegionControlButton } from "../Components/RegionControlButton";
 import "./TreeView.scss";
 import ResizeObserver from "../../../utils/resize-observer";
 import type { EventDataNode, Key } from "rc-tree/es/interface";
+import { RegionLabel } from "./RegionLabel";
 
 const { localStorage } = window;
 const localStoreName = "collapsed-label-pos";
@@ -164,7 +165,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
 
   return (
     <Block name="outliner-tree" {...(isFF(FF_OUTLINER_OPTIM) ? { ref: setRef } : {})}>
-      {!!height && (
+      {(!!height || !isFF(FF_OUTLINER_OPTIM)) && (
         <Tree
           key={regions.group}
           draggable={regions.group === "manual"}
@@ -206,37 +207,7 @@ const useDataTree = ({ regions, rootClass, footer }: any) => {
     const color = chroma(style ?? "#666").alpha(1);
     const mods: Record<string, any> = { hidden, type, isDrawing };
 
-    const label = (() => {
-      if (!type) {
-        return "No Label";
-      }
-      if (type.includes("label")) {
-        return item.value;
-      }
-      if (type.includes("region") || type.includes("range")) {
-        const labelsInResults = item.labelings.map((result: any) => result.selectedLabels || []);
-
-        const labels: any[] = [].concat(...labelsInResults);
-
-        return (
-          <Block name="labels-list">
-            {labels.map((label, index) => {
-              const color = label.background || "#000000";
-
-              return [
-                index ? ", " : null,
-                <Elem key={label.id} style={{ color }}>
-                  {label.value || "No label"}
-                </Elem>,
-              ];
-            })}
-          </Block>
-        );
-      }
-      if (type.includes("tool")) {
-        return item.value;
-      }
-    })();
+    const label = <RegionLabel item={item} />;
 
     // The only source of truth for region indices is here, where they are coming from different
     // RegionStore methods and just rendered a second later; so we store them in a region
@@ -291,6 +262,13 @@ const useEventHandlers = () => {
 
     if (multi) {
       annotation.toggleRegionSelection(self);
+      return;
+    }
+
+    if (isFF(FF_PER_FIELD_COMMENTS) && !self.isReadOnly() && annotation.isLinkingMode) {
+      annotation.addLinkedRegion(self);
+      annotation.stopLinkingMode();
+      annotation.regionStore.unselectAll();
       return;
     }
 

@@ -43,6 +43,7 @@ export const OrderButton = injector(({ size, ordering, view, ...rest }) => {
               </div>
             </Space>
           )}
+          openUpwardForShortViewport={false}
         />
 
         <Button

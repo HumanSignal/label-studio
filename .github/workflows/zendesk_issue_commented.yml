@@ -1,0 +1,60 @@
+name: "ZenDesk: Push an issue comment to zendesk ticket"
+
+on:
+  issue_comment:
+    types:
+      - created
+
+jobs:
+  issue_commented:
+    name: Issue comment
+    if: ${{ !github.event.issue.pull_request && github.event.comment.user.login != 'heidi-humansignal' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - env:
+          ZENDESK_HOST: ${{ vars.ZENDESK_HOST }}
+          ZENDESK_USER: ${{ vars.ZENDESK_USER }}
+          ZENDESK_TOKEN: ${{ secrets.ZENDESK_TOKEN }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_COMMENT_BODY: ${{ github.event.comment.body }}
+          ISSUE_USER: ${{ github.event.comment.user.login }}
+          WORKFLOW_RUN_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        run: |
+          echo "Looking up ticket by issue: ${ISSUE_URL}"
+          tickets=$(curl "https://${ZENDESK_HOST}/api/v2/search.json?query=external_id:${ISSUE_URL}" \
+            --user "${ZENDESK_USER}/token:${ZENDESK_TOKEN}" \
+            -H "Content-Type: application/json")
+          ticket_id=$(echo $tickets | jq '.results[0].id')
+          echo "Found Zendesk ticket ${ticket_id}"
+
+          echo "Looking up user by issuer: ${ISSUE_USER}"
+          users=$(curl "https://labelstudio.zendesk.com/api/v2/users/search.json?query=$ISSUE_USER@users.noreply.github.com" \
+            --user "${ZENDESK_USER}/token:${ZENDESK_TOKEN}" \
+            --header "Content-Type: application/json")
+          user_id=$(echo $users | jq '.users[0].id')
+          if [[ "$user_id" == "null" ]]; then
+            echo "Fall back to generic github user"
+            user_id="388861316959"
+          else
+            echo "Found user ${user_id}"
+          fi
+
+          body=$(jq -n --arg body "$ISSUE_COMMENT_BODY" '{body: $body}' | jq .body)
+          echo "$body"
+
+          curl "https://${ZENDESK_HOST}/api/v2/tickets/${ticket_id}.json" \
+            --request PUT \
+            --user "${ZENDESK_USER}/token:${ZENDESK_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data-binary @- <<DATA
+          {
+            "ticket": {
+              "comment": { 
+                "body": "[GITHUB_ISSUE_COMMENT]\n\n${body:1:-1}\n\nGITHUB ISSUE URL: ${ISSUE_URL}\nWORKFLOW RUN: ${WORKFLOW_RUN_LINK}",
+                "author_id": $user_id
+              }
+            }
+          }
+          DATA

@@ -818,3 +818,52 @@ def test_interactive_annotating_with_drafts(business_client, configured_project)
         js = json.loads(history.text)
 
         assert len(js['tasks'][0]['drafts']) == 1
+
+
+@pytest.mark.django_db
+def test_predictions_meta(business_client, configured_project):
+    from tasks.models import FailedPrediction, Prediction, PredictionMeta
+
+    task = configured_project.tasks.first()
+
+    # create Prediction
+    prediction = Prediction.objects.create(
+        task=task,
+        project=task.project,
+        result={
+            'result': [
+                {'from_name': 'text_class', 'to_name': 'text', 'type': 'choices', 'value': {'choices': ['class_A']}}
+            ]
+        },
+        score=0.95,
+        model_version='12345',
+    )
+
+    # create FailedPrediction
+    failed_prediction = FailedPrediction.objects.create(
+        task=task,
+        project=task.project,
+        message='error',
+        model_version='12345',
+    )
+
+    # assert we can create PredictionMeta with Prediction
+    p = PredictionMeta.objects.create(prediction=prediction)
+    meta = PredictionMeta.objects.get(id=p.id)
+    # assert default values like meta.inference_time == 0 and meta.failed_prediction == null
+    assert meta.inference_time is None
+    assert meta.failed_prediction is None
+
+    # assert we can create PredictionMeta with FailedPrediction
+    p = PredictionMeta.objects.create(failed_prediction=failed_prediction)
+    meta = PredictionMeta.objects.get(id=p.id)
+    assert meta.total_cost is None
+    assert meta.prediction is None
+
+    # assert it raise an exception if we create PredictionMeta with both Prediction and FailedPrediction
+    with pytest.raises(Exception):
+        PredictionMeta.objects.create(prediction=prediction, failed_prediction=failed_prediction)
+
+    # assert it raises if no Prediction or FailedPrediction is provided
+    with pytest.raises(Exception):
+        PredictionMeta.objects.create()

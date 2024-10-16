@@ -195,15 +195,6 @@ For example:
     <Image name="image" value="$images[0]"/>
     ```
 
-3. The `value` parameter can include [`Repeater`](/tags/repeater.html) tag substitution, by default `{{idx}}`.
-
-    For example:
-    ```xml
-    <Repeater on="$audios">
-      <Audio name="audio_{{idx}}" value="$audios[{{idx}}].url"/>
-    </Repeater>
-    ```
-
 
 ### `valueType` (optional)
 
@@ -510,7 +501,7 @@ http-server -p 3000 --cors
 
 ### Add the file directory as source storage in the Label Studio UI
 
-If you're running Label Studio on Docker and want to add local file storage, you need to mount the file directory and set up environment variables. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
+If you're running Label Studio on Docker and want to add local file storage, you need to mount the file directory and set up environment variables. See [Run Label Studio on Docker and use local storage](https://labelstud.io/guide/start#Run-Label-Studio-on-Docker-and-use-Local-Storage).
 
 
 ## Import data from the Label Studio UI

@@ -497,9 +497,9 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
         name={`${item.id} _transformable`}
         {...eventHandlers}
         onMouseOver={() => {
-          if (store.annotationStore.selected.relationMode) {
+          if (store.annotationStore.selected.isLinkingMode) {
             item.setHighlight(true);
-            stage.container().style.cursor = Constants.RELATION_MODE_CURSOR;
+            stage.container().style.cursor = Constants.LINKING_MODE_CURSOR;
           } else {
             stage.container().style.cursor = Constants.POINTER_CURSOR;
           }
@@ -507,13 +507,13 @@ const HtxRectangleView = ({ item, setShapeRef }) => {
         onMouseOut={() => {
           stage.container().style.cursor = Constants.DEFAULT_CURSOR;
 
-          if (store.annotationStore.selected.relationMode) {
+          if (store.annotationStore.selected.isLinkingMode) {
             item.setHighlight(false);
           }
         }}
         onClick={(e) => {
           if (item.parent.getSkipInteractions()) return;
-          if (store.annotationStore.selected.relationMode) {
+          if (store.annotationStore.selected.isLinkingMode) {
             stage.container().style.cursor = Constants.DEFAULT_CURSOR;
           }
 

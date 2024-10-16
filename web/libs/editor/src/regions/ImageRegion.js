@@ -86,8 +86,8 @@ const RegionMixin = types
       const parent = self.parent;
       const keepStates = tryToKeepStates && self.store.settings.continuousLabeling;
 
-      if (annotation.relationMode) {
-        annotation.stopRelationMode();
+      if (annotation.isLinkingMode) {
+        annotation.stopLinkingMode();
       }
       if (parent.setSelected) {
         parent.setSelected(undefined);
@@ -108,9 +108,9 @@ const RegionMixin = types
     onClickRegion() {
       const annotation = self.annotation;
 
-      if (annotation.relationMode) {
-        annotation.addRelation(self);
-        annotation.stopRelationMode();
+      if (annotation.isLinkingMode) {
+        annotation.addLinkedRegion(self);
+        annotation.stopLinkingMode();
         annotation.regionStore.unselectAll();
       } else {
         if (self.selected) {

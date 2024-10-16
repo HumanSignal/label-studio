@@ -10,7 +10,7 @@ import Canvas from "../utils/canvas";
 
 import { ImageViewContext } from "../components/ImageView/ImageViewContext";
 import { LabelOnMask } from "../components/ImageView/LabelOnRegion";
-import { Geometry } from "../components/RelationsOverlay/Geometry";
+import { Geometry } from "../components/InteractiveOverlays/Geometry";
 import { defaultStyle } from "../core/Constants";
 import { guidGenerator } from "../core/Helpers";
 import { AreaMixin } from "../mixins/AreaMixin";
@@ -695,12 +695,12 @@ const HtxBrushView = ({ item, setShapeRef }) => {
           //     e.cancelBubble = false;
           // }}
           onMouseDown={(e) => {
-            if (store.annotationStore.selected.relationMode) {
+            if (store.annotationStore.selected.isLinkingMode) {
               e.cancelBubble = true;
             }
           }}
           onMouseOver={() => {
-            if (store.annotationStore.selected.relationMode) {
+            if (store.annotationStore.selected.isLinkingMode) {
               item.setHighlight(true);
               stage.container().style.cursor = "crosshair";
             } else {
@@ -709,7 +709,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
             }
           }}
           onMouseOut={() => {
-            if (store.annotationStore.selected.relationMode) {
+            if (store.annotationStore.selected.isLinkingMode) {
               item.setHighlight(false);
             }
 
@@ -719,7 +719,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
           }}
           onClick={(e) => {
             if (item.parent.getSkipInteractions()) return;
-            if (store.annotationStore.selected.relationMode) {
+            if (store.annotationStore.selected.isLinkingMode) {
               item.onClickRegion(e);
               return;
             }
@@ -731,7 +731,7 @@ const HtxBrushView = ({ item, setShapeRef }) => {
               if (tool && !isMoveTool) return;
             }
 
-            if (store.annotationStore.selected.relationMode) {
+            if (store.annotationStore.selected.isLinkingMode) {
               stage.container().style.cursor = "default";
             }
 

@@ -117,7 +117,7 @@ const Model = types
         padding: 2px 2px;
         font-size: 9.5px;
         font-weight: bold;
-        font-family: Monaco;
+        font-family: var(--font-mono);
         vertical-align: super;
         content: attr(data-label);
         line-height: 0;
@@ -127,7 +127,7 @@ const Model = types
       }
       .htx-highlight.${STATE_CLASS_MODS.highlighted} {
         position: relative;
-        cursor: ${Constants.RELATION_MODE_CURSOR};
+        cursor: ${Constants.LINKING_MODE_CURSOR};
         border-color: rgb(0, 174, 255);
       }
       .htx-highlight.${STATE_CLASS_MODS.hidden} {
@@ -413,7 +413,7 @@ const Model = types
         self.regs.forEach((r) => r.setHighlight(false));
         if (!region) return;
 
-        if (region.annotation.relationMode) {
+        if (region.annotation.isLinkingMode) {
           region.setHighlight(true);
         }
       },

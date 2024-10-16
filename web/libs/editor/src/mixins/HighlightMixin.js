@@ -260,7 +260,7 @@ export const HighlightMixin = types
           self.addClass(STATE_CLASS_MODS.highlighted);
         } else {
           self.addClass(self._stylesheet.state.highlighted);
-          self._stylesheet?.setCursor(Constants.RELATION_MODE_CURSOR);
+          self._stylesheet?.setCursor(Constants.LINKING_MODE_CURSOR);
         }
       } else {
         if (isFF(FF_LSDV_4620_3)) {
@@ -370,7 +370,7 @@ const createSpanStylesheet = (document, identifier, color) => {
       padding: 2px 2px;
       font-size: 9.5px;
       font-weight: bold;
-      font-family: Monaco;
+      font-family: var(--font-mono);
       vertical-align: super;
       content: attr(data-label);
       line-height: 0;

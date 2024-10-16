@@ -82,6 +82,7 @@ export { ReactComponent as IconViewAll } from "./view-all.svg";
 export { ReactComponent as IconLink } from "./link.svg";
 export { ReactComponent as IconPlusAlt } from "./plus-alt.svg";
 export { ReactComponent as IconTrash } from "./trash.svg";
+export { ReactComponent as IconTrashAlt } from "./trash-alt.svg";
 export { ReactComponent as IconTrashRect } from "./trash-rect.svg";
 export { ReactComponent as IconMenu } from "./menu.svg";
 export { ReactComponent as IconMinus } from "./minus.svg";
@@ -100,6 +101,7 @@ export { ReactComponent as IconSortDownNew } from "./sort-down-new.svg";
 export { ReactComponent as IconFilter } from "./filter.svg";
 export { ReactComponent as IconDelete } from "./delete.svg";
 export { ReactComponent as IconModels } from "./models.svg";
+export { ReactComponent as IconEdit } from "./edit.svg";
 
 export { ReactComponent as IconArrowLeft } from "./arrow-left.svg";
 export { ReactComponent as IconArrowLeftSmall } from "./arrow-left-small.svg";
@@ -116,3 +118,4 @@ export { ReactComponent as IconPropertyAngle } from "./properties/angle.svg";
 
 export * from "./annotation";
 export * from "./outliner";
+export * from "./comment";

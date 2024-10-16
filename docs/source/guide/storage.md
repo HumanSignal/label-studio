@@ -26,9 +26,19 @@ When working with an external cloud storage connection, keep the following in mi
 
 * Label Studio doesn’t import the data stored in the bucket, but instead creates *references* to the objects. Therefore, you must have full access control on the data to be synced and shown on the labeling screen.
 * Sync operations with external buckets only goes one way. It either creates tasks from objects on the bucket (Source storage) or pushes annotations to the output bucket (Target storage). Changing something on the bucket side doesn’t guarantee consistency in results.
-* We recommend using a separate bucket folder for each Label Studio project.
+* We recommend using a separate bucket folder for each Label Studio project. 
 
-For more troubleshooting information, see [Troubleshooting Import, Export, & Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center. 
+<div class="opensource-only">
+
+For more troubleshooting information, see [Troubleshooting Label Studio](troubleshooting).
+
+</div>
+
+<div class="enterprise-only">
+
+For more troubleshooting information, see [Troubleshooting Import, Export, & Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center.
+
+</div>
 
 ## How external storage connections and sync work
 
@@ -573,7 +583,7 @@ Add these variables to your environment setup:
 - `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true`
 - `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/home/user` (or `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=C:\\data\\media` for Windows).
 
-Without these settings, Local storage and URLs in tasks that point to local files won't work. Keep in mind that serving data from the local file system can be a **security risk**. See [Set environment variables](start.html#Set_environment_variables) for more about using environment variables.
+Without these settings, Local storage and URLs in tasks that point to local files won't work. Keep in mind that serving data from the local file system can be a **security risk**. See [Set environment variables](https://labelstud.io/guide/start#Set-environment-variables) for more about using environment variables.
 
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
@@ -588,17 +598,17 @@ In the Label Studio UI, do the following to set up the connection:
 5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
 6. Specify an **Absolute local path** to the directory with your files. The local path must be an absolute path and include the `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` value. 
 
-    For example, if `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then your local path must be `/home/user/dataset1`. For more about that environment variable, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).  
+    For example, if `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then your local path must be `/home/user/dataset1`. For more about that environment variable, see [Run Label Studio on Docker and use local storage](https://labelstud.io/guide/start#Run-Label-Studio-on-Docker-and-use-Local-Storage).  
 
 !!! note
     If you are using Windows, ensure that you use backslashes when entering your **Absolute local path**.  
 
-7. (Optional) In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
-8. (Optional) Toggle **Treat every bucket object as a source file**. 
+1. (Optional) In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
+2. (Optional) Toggle **Treat every bucket object as a source file**. 
    - Enable this option if you want to create Label Studio tasks from media files automatically, such as JPG, MP3, or similar file types. Use this option for labeling configurations with one source tag.
    - Disable this option if you want to import tasks in Label Studio JSON format directly from your storage. Use this option for complex labeling configurations with HyperText or multiple source tags.    
-9. Click **Add Storage**.
-10. Repeat these steps for **Add Target Storage** to use a local file directory for exporting.
+3. Click **Add Storage**.
+4.  Repeat these steps for **Add Target Storage** to use a local file directory for exporting.
 
 After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_localfiles_sync_create).
 
@@ -657,9 +667,19 @@ You can also create a storage connection using the Label Studio API.
 - See [Create export storage](/api#operation/api_storages_export_localfiles_create) and after annotating, [sync the export storage](/api#operation/api_storages_export_localfiles_sync_create).
 
 ### Set up local storage with Docker
-If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
+If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](https://labelstud.io/guide/start#Run-Label-Studio-on-Docker-and-use-Local-Storage).
 
 
 ### Troubleshooting cloud storage
 
-See [Troubleshooting Import, Export, and Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center. 
+<div class="opensource-only">
+
+For more troubleshooting information, see [Troubleshooting Label Studio](troubleshooting).
+
+</div>
+
+<div class="enterprise-only">
+
+For more troubleshooting information, see [Troubleshooting Import, Export, & Storage](https://support.humansignal.com/hc/en-us/sections/16982163062029-Import-Export-Storage) in the HumanSignal support center.
+
+</div>

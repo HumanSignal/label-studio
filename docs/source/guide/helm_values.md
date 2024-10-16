@@ -37,8 +37,19 @@ parent_enterprise: "install_enterprise_k8s"
   }
 </style>
 
+<div class="opensource-only">
+
 Refer to these tables with available Helm chart values for your `values.yaml` file
-when configuring your Label Studio deployment on Kubernetes. See [Deploy Label Studio on Kubernetes](install_k8s.html) for more.
+when configuring your Label Studio deployment on Kubernetes. See [Deploy Label Studio on Kubernetes](install_k8s) for more.
+
+</div>
+
+<div class="enterprise-only">
+
+Refer to these tables with available Helm chart values for your `values.yaml` file
+when configuring your Label Studio deployment on Kubernetes. See [Deploy Label Studio on Kubernetes](install_enterprise_k8s) for more.
+
+</div>
 
 ## Global parameters
 

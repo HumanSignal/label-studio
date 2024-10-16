@@ -40,7 +40,8 @@ import ObjectBase from "../Base";
  * @param {number} [frameRate=24] video frame rate per second; default is 24; can use task data like `$fps`
  * @param {string} [sync] object name to sync with
  * @param {boolean} [muted=false] muted video
- * @param {number} [height=600] height of the video
+ * @param {number} [height=600] height of the video player
+ * @param {number} [timelineHeight=64] height of the timeline with regions
  */
 
 const TagAttrs = types.model({
@@ -48,6 +49,7 @@ const TagAttrs = types.model({
   hotkey: types.maybeNull(types.string),
   framerate: types.optional(types.string, "24"),
   height: types.optional(types.string, "600"),
+  timelineheight: types.maybeNull(types.string),
   muted: false,
 });
 
@@ -65,6 +67,7 @@ const Model = types
     ref: React.createRef(),
     frame: 1,
     length: 1,
+    drawingRegion: null,
   }))
   .views((self) => ({
     get store() {
@@ -75,11 +78,11 @@ const Model = types
       return self.ref.current?.position ?? 1;
     },
 
-    control() {
-      return self.annotation.toNames.get(self.name)?.find((s) => !s.type.endsWith("labels"));
+    get timelineControl() {
+      return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("timeline"));
     },
 
-    videoControl() {
+    get videoControl() {
       return self.annotation.toNames.get(self.name)?.find((s) => s.type.includes("video"));
     },
 
@@ -197,8 +200,14 @@ const Model = types
         }
       },
 
-      addRegion(data) {
-        const control = self.videoControl() ?? self.control();
+      addVideoRegion(data) {
+        const control = self.videoControl;
+        const value = {};
+
+        if (!control) {
+          console.error("No video control is found");
+          return;
+        }
 
         const sequence = [
           {
@@ -209,19 +218,35 @@ const Model = types
           },
         ];
 
-        if (!control) {
-          console.error("NO CONTROL");
-          return;
-        }
-
         const area = self.annotation.createResult({ sequence }, {}, control, self);
 
         // add labels
-        self.activeStates().forEach((state) => {
-          area.setValue(state);
+        self.activeStates().forEach((tag) => {
+          area.setValue(tag);
         });
 
         return area;
+      },
+
+      addTimelineRegion(data) {
+        const control = self.timelineControl;
+
+        if (!control) {
+          console.error("No video timeline control is found");
+          return;
+        }
+
+        const frame = data.frame ?? self.frame;
+        const value = {
+          ranges: [{ start: frame, end: frame }],
+        };
+        // @todo only one attached labeling tag is supported right now :(
+        const labels = self.activeStates()?.[0];
+        const labeling = {
+          [labels.valueType]: labels.selectedValues(),
+        };
+
+        return self.annotation.createResult(value, labeling, control, self);
       },
 
       deleteRegion(id) {
@@ -230,6 +255,21 @@ const Model = types
 
       findRegion(id) {
         return self.regs.find((reg) => reg.cleanId === id);
+      },
+
+      /** Create a new timeline region at a given `frame` (only of labels are selected) */
+      startDrawing(frame) {
+        const control = self.timelineControl;
+        // labels should be selected or allow to create region without labels
+        if (!control?.selectedLabels?.length && !control?.allowempty) return;
+
+        self.drawingRegion = self.addTimelineRegion({ frame, enabled: false });
+
+        return self.drawingRegion;
+      },
+
+      finishDrawing() {
+        self.drawingRegion = null;
       },
     };
   });

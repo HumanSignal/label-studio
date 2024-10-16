@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { Checkbox, Modal, Table, Tabs } from "antd";
+import { Modal, Table, Tabs } from "antd";
+import { Checkbox } from "@humansignal/ui";
 import { observer } from "mobx-react";
 
 import { Hotkey } from "../../core/Hotkey";
