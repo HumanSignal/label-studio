@@ -256,7 +256,7 @@ Configure what rejection options are available to reviewers.
 </td>
 <td>
 
-Rejected tasks are reassigned back to the annotator. 
+When a reviewer clicks **Reject**, the annotation is reassigned back to the annotator. 
 
 </td>
 </tr>
@@ -266,7 +266,7 @@ Rejected tasks are reassigned back to the annotator.
 </td>
 <td>
 
-Rejected tasks are removed from the queue and not reassigned back to the annotator. 
+When a reviewer clicks **Reject**, the annotation is not reassigned back to the annotator. 
 
 </td>
 </tr>
@@ -277,9 +277,15 @@ Rejected tasks are removed from the queue and not reassigned back to the annotat
 </td>
 <td>
 
-When rejecting a task, reviewers have the option to decide whether the task should be removed from the queue or reassigned to the annotator (placed back in their queue). 
+Reviewers see the following options:
 
-For example, a reviewer might decide to requeue a task that is nearly correct but just needs a slight change. But a task with more errors may be easier to simply remove. 
+* **Accept**
+* **Reject** -- When selected, the annotation is rejected and is not reassigned back to the annotator. 
+* **Requeue** -- When selected, the annotation is rejected and then reassigned back to the annotator.  
+
+For example, a reviewer might decide to requeue an annotation that is nearly correct but just needs a slight change. However, an annotation with numerous errors may be easier to simply reject entirely and remove from the queue. 
+
+Note that in order to differentiate between the two actions in project metrics, when you click **Reject** the annotation is also marked as cancelled/skipped. This is reflected in various stats (for example, Data Manager columns and dashboards). 
 
 </td>
 </tr>
