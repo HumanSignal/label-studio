@@ -17,7 +17,7 @@ import { RefreshButton } from "./RefreshButton";
 import { ViewToggle } from "./ViewToggle";
 
 const style = {
-  minWidth: "110px",
+  minWidth: "80px",
   justifyContent: "space-between",
 };
 

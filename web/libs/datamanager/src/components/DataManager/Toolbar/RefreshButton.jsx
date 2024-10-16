@@ -17,7 +17,7 @@ export const RefreshButton = injector(({ store, needsDataFetch, projectFetch, si
   return (
     <Button
       size={size}
-      look={needsDataFetch && "primary"}
+      look={needsDataFetch}
       waiting={projectFetch}
       onClick={async () => {
         await store.fetchProject({ force: true, interaction: "refresh" });
