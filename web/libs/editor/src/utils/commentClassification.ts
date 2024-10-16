@@ -54,3 +54,5 @@ export const taxonomyPathsToSelectedItems = (paths: TaxonomyPath[] | null): Sele
         })),
       )
     : [];
+
+export const COMMENT_TAXONOMY_OPTIONS = { pathSeparator: "/", showFullPath: true };

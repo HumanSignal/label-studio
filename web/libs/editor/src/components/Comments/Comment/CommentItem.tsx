@@ -14,12 +14,10 @@ import { humanDateDiff, userDisplayName } from "../../../utils/utilities";
 import { CommentFormBase } from "../CommentFormBase";
 import { CommentsContext } from "./CommentsList";
 import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
-import { taxonomyPathsToSelectedItems } from "../../../utils/commentClassification";
+import { taxonomyPathsToSelectedItems, COMMENT_TAXONOMY_OPTIONS } from "../../../utils/commentClassification";
 
 import "./CommentItem.scss";
 import { LinkState } from "./LinkState";
-
-const TAXONOMY_OPTIONS = { pathSeparator: "/", showFullPath: true };
 
 interface CommentItemProps {
   comment: {
@@ -165,25 +163,30 @@ export const CommentItem: FC<CommentItemProps> = observer(
                     setText(value);
                     await listComments({ suppressClearComments: true });
                   }}
+                  classifications={classifications}
                 />
-                <Taxonomy
-                  selected={taxonomyPathsToSelectedItems(classifications?.default?.values)}
-                  items={classificationsItems}
-                  onChange={async (_: Node, values: TaxonomyPath[]) => {
-                    const newClassifications =
-                      values.length > 0
-                        ? {
-                            default: {
-                              type: "taxonomy",
-                              values,
-                            },
-                          }
-                        : null;
-                    setClassifications(newClassifications);
-                  }}
-                  options={TAXONOMY_OPTIONS}
-                  defaultSearch={false}
-                />
+                {classificationsItems.length > 0 && (
+                  <Elem name="classifications-row">
+                    <Taxonomy
+                      selected={taxonomyPathsToSelectedItems(classifications?.default?.values)}
+                      items={classificationsItems}
+                      onChange={async (_: Node, values: TaxonomyPath[]) => {
+                        const newClassifications =
+                          values.length > 0
+                            ? {
+                                default: {
+                                  type: "taxonomy",
+                                  values,
+                                },
+                              }
+                            : null;
+                        setClassifications(newClassifications);
+                      }}
+                      options={COMMENT_TAXONOMY_OPTIONS}
+                      defaultSearch={false}
+                    />
+                  </Elem>
+                )}
               </>
             ) : isConfirmDelete ? (
               <Elem name="confirmForm">
