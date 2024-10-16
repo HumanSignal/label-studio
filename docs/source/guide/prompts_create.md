@@ -75,6 +75,24 @@ You can find all this information in the **Details** section of the deployment i
 
 {% enddetails %}
 
+{% details <b>Use a custom LLM</b> %}
+
+You can use your own self-hosted and fine-tuned model as long as it meets the following criteria:
+
+* Your server must provide [JSON mode](https://python.useinstructor.com/concepts/patching/#json-mode) for the LLM. 
+* The JSON mode must use [OpenAI format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format). 
+
+Examples of compatible LLMs include [Ollama](https://ollama.com/), [vllm](https://github.com/vllm-project/vllm) (not tested), and [sglang](https://github.com/sgl-project/sglang?tab=readme-ov-file#openai-compatible-api). 
+
+To add a custom model, enter the following:
+
+* A name for the model. 
+* The endpoint URL for the model. 
+* An API key to access the model. (Optional)
+* An auth token to access the model. (Optional)
+
+{% enddetails %}
+
 
 ## Create a Prompt
 
