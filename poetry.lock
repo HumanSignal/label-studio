@@ -1963,7 +1963,7 @@ description = ""
 optional = false
 python-versions = "^3.8"
 files = [
-    {file = "6c228588c52a92e844455f3efa5eb672b5bf05bd.zip", hash = "sha256:e4f8e959970d7df4479f3adca5149bd5ea9fd75b71a90c5a8c910aacdd17ce9d"},
+    {file = "e431b64e48de8d38908823848cd5fa6a28736dc3.zip", hash = "sha256:279cb0a600cf97b90ccec2ad40c5d22070a03e60af14e7ecb6d0043e1694a682"},
 ]
 
 [package.dependencies]
@@ -1986,7 +1986,7 @@ xmljson = "0.2.1"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/6c228588c52a92e844455f3efa5eb672b5bf05bd.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/e431b64e48de8d38908823848cd5fa6a28736dc3.zip"
 
 [[package]]
 name = "launchdarkly-server-sdk"
@@ -4347,4 +4347,4 @@ mysql = ["mysqlclient"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<4"
-content-hash = "7c58207a8c2207c68107fb5a0e22f5516366a2e363e6f625b8b21a98edccdbc9"
+content-hash = "949039b4822072c0b32786a2983ac03e261e3b922fbf21d6d09abb706947058e"
