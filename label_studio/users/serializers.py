@@ -1,6 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from core.feature_flags import flag_set
 from core.utils.common import load_func
 from core.utils.db import fast_first
 from django.conf import settings
