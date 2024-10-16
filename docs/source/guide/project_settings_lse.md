@@ -280,12 +280,12 @@ When a reviewer clicks **Reject**, the annotation is not reassigned back to the 
 Reviewers see the following options:
 
 * **Accept**
-* **Reject** -- When selected, the annotation is rejected and cancelled/skipped. 
+* **Reject** -- When selected, the annotation is rejected and skipped. 
 * **Requeue** -- When selected, the annotation is rejected and then reassigned back to the annotator.  
 
 For example, a reviewer might decide to requeue an annotation that is nearly correct but just needs a slight change. However, an annotation with numerous errors may be easier to simply reject entirely and remove from the queue. 
 
-Note that when you click **Reject**, the annotation is also marked as cancelled/skipped. This is reflected in various metrics (for example, Data Manager columns and dashboards), and is necessary to differentiate between the two rejection actions. 
+Note that when you click **Reject**, the annotation is also marked as cancelled/skipped (`was_cancelled: true`). This is reflected in various metrics (for example, Data Manager columns and dashboards), and is necessary to differentiate between the two rejection actions. 
 
 </td>
 </tr>
