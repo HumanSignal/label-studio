@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1494: Padding in new textarea is missing in LSO (#6496)",
-  "commit": "3b04299dfd5bd0a994a56ead2b78cf2cbda94f4e",
-  "date": "2024-10-15T11:13:16.000Z",
+  "message": "ci: LEAP-1417 LEAP-1544 LEAP-1546: CVE fixes (#6519)",
+  "commit": "0cc638c60f711f5179c0acece17a010f3a24d44b",
+  "date": "2024-10-16T08:35:41.000Z",
   "branch": "develop"
 }
