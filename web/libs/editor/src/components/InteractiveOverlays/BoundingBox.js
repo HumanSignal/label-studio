@@ -75,6 +75,13 @@ const stageRelatedBBox = (region, bbox) => {
 };
 
 const _detect = (region) => {
+  // that's a tricky way to detect bbox of exact result instead of whole region
+  // works for global classifications and per-regions
+  const isResult = !!region.from_name;
+  if (isResult) {
+    return Geometry.getDOMBBox(region.from_name.elementRef?.current);
+  }
+
   let type = region.type;
   if (type === "audioregion") {
     if (isFF(FF_DEV_2715)) {

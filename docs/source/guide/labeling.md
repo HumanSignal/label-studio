@@ -212,7 +212,7 @@ If you want to change the hotkeys used for specific actions, set the `EDITOR_KEY
 ```
 EDITOR_KEYMAP='{"annotation:submit":{"key": "shift+s","description": "My Custom Submit Hotkey!"}}'
 ```
-This overwrites the existing hotkey mapping with your custom mapping. See [more about how to set environment variables](start.html#Set-environment-variables). 
+This overwrites the existing hotkey mapping with your custom mapping. See [more about how to set environment variables](https://labelstud.io/guide/start#Set-environment-variables). 
 
 Refer to the full list of customizable hotkeys in the [`keymap.json` file](https://github.com/HumanSignal/label-studio/blob/develop/web/libs/editor/src/core/settings/keymap.json) to update a different hotkey combination. 
 

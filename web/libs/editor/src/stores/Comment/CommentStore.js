@@ -3,6 +3,7 @@ import { when } from "mobx";
 import uniqBy from "lodash/uniqBy";
 import Utils from "../../utils";
 import { snakeizeKeys } from "../../utils/utilities";
+import { parseCommentClassificationConfig } from "../../utils/commentClassification";
 import { Comment } from "./Comment";
 import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
 
@@ -47,6 +48,9 @@ export const CommentStore = types
     },
     get currentUser() {
       return getRoot(self).user;
+    },
+    get commentClassificationsItems() {
+      return parseCommentClassificationConfig(getRoot(self).commentClassificationConfig);
     },
     get sdk() {
       return getEnv(self).events;
@@ -118,7 +122,7 @@ export const CommentStore = types
      * @returns {boolean}
      */
     get isRelevantList() {
-      if (!self.commentsKey) return false;
+      if (!self.commentsKey || !self.targetCommentsKey) return false;
       if (Object.keys(self.commentsKey).length !== Object.keys(self.targetCommentsKey).length) return false;
       return Object.keys(self.commentsKey).every((key) => {
         return self.commentsKey[key] === self.targetCommentsKey[key];

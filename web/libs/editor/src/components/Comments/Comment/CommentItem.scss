@@ -116,7 +116,8 @@
   }
 
   &__linkState {
-    padding: 9px 3px 4px;
+    padding: 4px 0 0;
+    margin-left: -5px;
     width: 100%;
     overflow: hidden;
   }
@@ -149,5 +150,10 @@
     display: flex;
     justify-content: space-between;
     padding: var(--comment-item-padding);
+  }
+
+  &__classifications {
+    font-size: 13px;
+    letter-spacing: .8px;
   }
 }
