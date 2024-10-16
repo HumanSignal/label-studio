@@ -445,12 +445,12 @@ Select the [metric](stats#Available-agreement-metrics) that should determine tas
 </td>
 <td>
 
+Note that to see these options, the project must be set up to [automatically distribute tasks](#distribute-tasks).
+
 You can set a low agreement strategy to ensure that a task is not marked complete until it meets 1) the required [overlap](#overlap) and 2) a minimum agreement level.  
 
 * **Do nothing** - Tasks with a low agreement can be marked complete; no additional actions are taken. 
 * **Assign additional annotator** - Automatically assign an additional annotator to tasks with low agreement. 
-
-    Note that your project must be set up to [automatically distribute tasks](#distribute-tasks).
 
 </td>
 </tr>
