@@ -26,12 +26,15 @@ Comments are a Label Studio Enterprise feature that allow communication between 
 <td>
 
 **Annotator to reviewer communication** 
+
 - Ask for clarification on a task
 - Provide reasoning or context for their annotation
+  
 </td>
 <td>
 
 **Reviewer to annotator communication** 
+
 - Answer questions
 - Give feedback to help the annotator improve 
 
