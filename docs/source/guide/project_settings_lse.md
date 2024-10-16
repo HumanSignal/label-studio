@@ -250,7 +250,11 @@ If enabled, a reviewer can only see tasks to which they've been assigned. Otherw
 </td>
 <td>
 
-If enabled, a reviewer only sees tasks that have met the **Annotations per task minimum** threshold. 
+When enabled, a reviewer only sees tasks that have been completed by all required annotators. 
+
+If your project is using auto distribution, then this means a reviewer only sees tasks that have met the **Annotations per task minimum** threshold. 
+
+If your project is using manual distribution, then this means a reviewer only sees tasks in which all assigned annotators have submitted an annotation. 
 
 Note that in most cases, skipped tasks do not contribute towards meeting the minimum.  
 

@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1583: Fix comment overlay displaying conditions (#6504)",
-  "commit": "a25d4ac14b90d9da0772c31dadb48c2803397730",
-  "date": "2024-10-14T15:34:52.000Z",
+  "message": "ci: LEAP-1417 LEAP-1544 LEAP-1546: CVE fixes (#6519)",
+  "commit": "0cc638c60f711f5179c0acece17a010f3a24d44b",
+  "date": "2024-10-16T08:35:41.000Z",
   "branch": "develop"
 }
