@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block page_labeling %}
+  <title>Account & Settings | Label Studio</title>
+  {{ block.super }}
+{% endblock %}
+
 {% block head %}
 <link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/uikit.css' %}">
 <link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/users.css' %}">
