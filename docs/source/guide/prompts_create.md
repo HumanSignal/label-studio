@@ -35,6 +35,8 @@ To remove the key, click **API Keys** in the upper right of the Prompts page. Yo
 
 You can only have one OpenAI key per organization. For a list of the OpenAI models we support, see [Features, requirements, and constraints](prompts_overview#Features-requirements-and-constraints). 
 
+If you don't already have one, you can [create an OpenAI account here](https://platform.openai.com/signup).
+
 You can find your OpenAI API key on the [API key page](https://platform.openai.com/api-keys). 
 
 Once added, all supported OpenAI models will appear in the base model options when you configure your prompt.
