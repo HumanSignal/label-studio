@@ -1,4 +1,10 @@
 [[redirects]]
+from = "/redirect/guide/*"
+to = "/guide/:splat"
+status = 301
+force = true
+
+[[redirects]]
 from = "https://heartex-docs.netlify.app/api/*"
 to = "https://app.heartex.com/docs/api/:splat"
 status = 301
