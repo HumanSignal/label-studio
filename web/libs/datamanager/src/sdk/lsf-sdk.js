@@ -155,7 +155,7 @@ export class LSFWrapper {
       interfaces.push("comments:resolve-any");
     }
 
-    if (this.project.review_settings.require_comment_on_reject) {
+    if (this.project.review_settings?.require_comment_on_reject) {
       interfaces.push("comments:reject");
     }
 
