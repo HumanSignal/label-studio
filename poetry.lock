@@ -1342,16 +1342,6 @@ files = [
 ]
 
 [[package]]
-name = "htmlmin"
-version = "0.1.12"
-description = "An HTML Minifier"
-optional = false
-python-versions = "*"
-files = [
-    {file = "htmlmin-0.1.12.tar.gz", hash = "sha256:50c1ef4630374a5d723900096a961cff426dff46b48f34d194a81bbe14eca178"},
-]
-
-[[package]]
 name = "httpcore"
 version = "1.0.2"
 description = "A minimal low-level HTTP client."
@@ -4188,4 +4178,4 @@ mysql = ["mysqlclient"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4"
-content-hash = "dd9790ad1dc368a6c372f585c1a0dc5159178d27949a30e11fd4d334fb1914b1"
+content-hash = "54ff2e9849d98d18ef0264fa05a7dda24fcf0fcd06b3239d2fdae1c5c19006c8"
