@@ -248,8 +248,9 @@ export const DataStore = (modelName, { listItemType, apiMethod, properties, asso
             associatedList,
           });
 
+        // There's a bug in the listIncludes logic here. It nullifies the highlighed id when it shouldnt
         if (isDefined(highlightedID) && !listIncludes(self.list, highlightedID)) {
-          self.highlighted = null;
+          //self.highlighted = null;
         }
 
         self.postProcessData?.(data);
