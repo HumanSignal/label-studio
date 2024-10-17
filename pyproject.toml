@@ -172,7 +172,7 @@ drf-flex-fields = "0.9.5"
 humansignal-drf-yasg = ">=1.21.9"
 drf-generators = "0.3.0"
 lockfile = ">=0.12.0"
-lxml = ">=4.9.4"
+lxml = {extras = ["html_clean"], version = ">=4.9.4"}
 defusedxml = ">=0.7.1"
 numpy = "^1.26.4"
 ordered-set = "4.0.2"

@@ -1935,12 +1935,29 @@ files = [
     {file = "lxml-5.3.0.tar.gz", hash = "sha256:4e109ca30d1edec1ac60cdbe341905dc3b8f55b16855e03a54aaf59e51ec8c6f"},
 ]
 
+[package.dependencies]
+lxml-html-clean = {version = "*", optional = true, markers = "extra == \"html-clean\""}
+
 [package.extras]
 cssselect = ["cssselect (>=0.7)"]
 html-clean = ["lxml-html-clean"]
 html5 = ["html5lib"]
 htmlsoup = ["BeautifulSoup4"]
 source = ["Cython (>=3.0.11)"]
+
+[[package]]
+name = "lxml-html-clean"
+version = "0.3.1"
+description = "HTML cleaner from lxml project"
+optional = false
+python-versions = "*"
+files = [
+    {file = "lxml_html_clean-0.3.1-py3-none-any.whl", hash = "sha256:081e6378c68ebb4113940ed82a3534c99e24ba1ca5ad5ce8868c7c4d264618f1"},
+    {file = "lxml_html_clean-0.3.1.tar.gz", hash = "sha256:d9f7d8ae36092f4ed5079cfbf95ff06d3c6fd04f4a861422ce251ece72d3c4b5"},
+]
+
+[package.dependencies]
+lxml = "*"
 
 [[package]]
 name = "markdown-it-py"
@@ -4178,4 +4195,4 @@ mysql = ["mysqlclient"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4"
-content-hash = "54ff2e9849d98d18ef0264fa05a7dda24fcf0fcd06b3239d2fdae1c5c19006c8"
+content-hash = "0a76946c8dd0c3950513ffff08d8f67b2876ba81ff3837e1ac8f6b6bb6d5b791"
