@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1476: Add ability to edit classifications on existing comments (#6532)",
-  "commit": "e824fbd3bf170509ffa5dd815deb7b0a5705381b",
-  "date": "2024-10-16T21:39:46.000Z",
+  "message": "fix: LEAP-1596: Missed check for review_settings (#6535)",
+  "commit": "ff2f11da387840c0863c711494b7d7ed2e3fd5c2",
+  "date": "2024-10-17T12:31:43.000Z",
   "branch": "develop"
 }
