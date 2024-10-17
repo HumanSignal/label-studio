@@ -7,7 +7,7 @@ section: "Review & Measure Quality"
 order: 0
 order_enterprise: 306
 meta_title: Comment in Label Studio Enterprise
-meta_description: The comments and notifications feature defines how annotators, reviewers and administrators communicate and receive updates on projects and tasks.
+meta_description: The comments and notifications features define how annotators, reviewers and administrators communicate and receive updates on projects and tasks.
 ---
 
 
