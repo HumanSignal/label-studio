@@ -145,7 +145,9 @@ def s3_with_hypertext_s3_links(s3):
     s3.put_object(
         Bucket=bucket_name,
         Key='test.json',
-        Body=json.dumps({'text': '<a href="s3://hypertext-bucket/file with /spaces and\' / \' / quotes.jpg"/>'}),
+        Body=json.dumps(
+            {'text': '<a href="s3://pytest-s3-jsons-hypertext/file with /spaces and\' / \' / quotes.jpg"/>'}
+        ),
     )
     yield s3
 
@@ -157,7 +159,11 @@ def s3_with_partially_encoded_s3_links(s3):
     s3.put_object(
         Bucket=bucket_name,
         Key='test.json',
-        Body=json.dumps({'text': '<a href="s3://hypertext-bucket/file with /spaces and\' / \' / %2Bquotes%3D.jpg"/>'}),
+        Body=json.dumps(
+            {
+                'text': '<a href="s3://pytest-s3-json-partially-encoded/file with /spaces and\' / \' / %2Bquotes%3D.jpg"/>'
+            }
+        ),
     )
     yield s3
 
