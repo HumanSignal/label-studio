@@ -11,7 +11,7 @@ meta_description: The comments and notifications features define how annotators,
 ---
 
 
-Comments are a Label Studio Enterprise feature that allow communication between reviewers and annotators:
+Comments are a Label Studio Enterprise feature that allows communication between reviewers and annotators:
 
 <div class="noheader rowheader">
 
