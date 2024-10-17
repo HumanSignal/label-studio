@@ -168,5 +168,5 @@ When a reviewer writes a comment, then the users who are notified depend on thei
 
 A reviewer receives a notification when:
 
-* If the comment is the first comment on an annotation, then all users within a project that have the role of Reviewer or higher see the comment in their [notification list](#Notifications). 
+* If the comment is the first comment on an annotation, then all users within a project that have the role of Reviewer or higher see the comment in their [notification list](#Comment-notifications). 
 * If you have already left a comment on an annotation, you receive a notification when any user, regardless of role, adds a new comment.
