@@ -27,18 +27,16 @@
 
     .link-state_display & {
       color: var(--secondary-action-color-hover);
+
+      // align linked region icon with the rest
+      align-self: flex-start;
+      transform: translateY(2px);
     }
 
     svg {
       width: 20px;
       height: 20px;
     }
-  }
-
-  // align linked region icon with the rest
-  &_display &__prefix {
-    align-self: flex-start;
-    transform: translateY(2px);
   }
 }
 
@@ -91,7 +89,6 @@
 
   &__title {
     align-items: center;
-    display: inline-flex;
     flex: 1;
     color: var(--text-color, var(--sand_900));
     min-width: 0;
