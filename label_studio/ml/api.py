@@ -6,7 +6,6 @@ import drf_yasg.openapi as openapi
 from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from django.conf import settings
-from django.http import Http404
 from django.utils.decorators import method_decorator
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import no_body, swagger_auto_schema
@@ -291,9 +290,21 @@ class MLBackendPredictTestAPI(APIView):
         if random:
             task = Task.get_random(project=ml_backend.project)
             if not task:
-                raise Http404
+                return Response(
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    data={
+                        'detail': 'Project has no tasks to run prediction on, import at least 1 task to run prediction'
+                    },
+                )
 
             kwargs = ml_backend._predict(task)
+            if not kwargs:
+                return Response(
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    data={
+                        'detail': 'ML backend did not return any predictions, check ML backend logs for more details'
+                    },
+                )
             return Response(**kwargs)
 
         else:
