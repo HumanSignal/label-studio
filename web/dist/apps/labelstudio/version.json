@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1560: Add interface for requiring comments on rejection in QuickView (#6520)",
-  "commit": "78d07803cb2a783b90ce2197507ee7b8848293b4",
-  "date": "2024-10-16T13:32:11.000Z",
+  "message": "fix: LEAP-1596: Missed check for review_settings (#6535)",
+  "commit": "ff2f11da387840c0863c711494b7d7ed2e3fd5c2",
+  "date": "2024-10-17T12:31:43.000Z",
   "branch": "develop"
 }
