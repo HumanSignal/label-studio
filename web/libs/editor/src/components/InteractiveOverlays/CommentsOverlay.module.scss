@@ -19,7 +19,9 @@
   }
 
   .commentIcon {
-    /* for the future */
+    // to fit into usual screen edges with paddings
+    scale: 0.8;
+    translate: -2px 4px;
   }
 
   .commentIconBackground {
