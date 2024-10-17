@@ -86,7 +86,7 @@ export class Regions {
     const currentTime = this.waveform.currentTime;
 
     this.regions.forEach((region) => {
-      region.highlighted = region.start <= currentTime && region.end >= currentTime;
+      region.active = region.start <= currentTime && region.end >= currentTime;
       region.render();
     });
   }

@@ -1,8 +1,8 @@
-import { type MutableRefObject, useEffect, useRef, useState } from "react";
+import { type MutableRefObject, useEffect, useMemo, useRef, useState } from "react";
 
 import { isTimeRelativelySimilar } from "../Common/Utils";
 import type { Layer } from "../Visual/Layer";
-import { Waveform, type WaveformOptions } from "../Waveform";
+import { Waveform, type WaveformFrameState, type WaveformOptions } from "../Waveform";
 
 export const useWaveform = (
   containter: MutableRefObject<HTMLElement | null | undefined>,
@@ -14,6 +14,7 @@ export const useWaveform = (
     onError?: (error: Error) => void;
     autoLoad?: boolean;
     showLabels?: boolean;
+    onFrameChanged?: (frame: { width: number; height: number; zoom: number; scroll: number }) => void;
   },
 ) => {
   const waveform = useRef<Waveform>();
@@ -28,6 +29,30 @@ export const useWaveform = (
   const [muted, setMuted] = useState(options?.muted ?? false);
   const [layers, setLayers] = useState<Layer[]>([]);
   const [layerVisibility, setLayerVisibility] = useState(new Map());
+
+  const onFrameChangedRef = useRef(options?.onFrameChanged);
+  onFrameChangedRef.current = options?.onFrameChanged;
+
+  const updateAfterRegionDraw = useMemo(() => {
+    let prevFrameState: WaveformFrameState | null = null;
+    let requestId = -1;
+    const updateAfterRegionDraw = (frameState: WaveformFrameState) => {
+      cancelAnimationFrame(requestId);
+      requestId = requestAnimationFrame(() => {
+        if (
+          !prevFrameState ||
+          frameState.width !== prevFrameState.width ||
+          frameState.height !== prevFrameState.height ||
+          frameState.zoom !== prevFrameState.zoom ||
+          frameState.scroll !== prevFrameState.scroll
+        ) {
+          onFrameChangedRef.current?.(frameState);
+          prevFrameState = frameState;
+        }
+      });
+    };
+    return updateAfterRegionDraw;
+  }, []);
 
   useEffect(() => {
     const wf = new Waveform({
@@ -64,6 +89,7 @@ export const useWaveform = (
       }
     });
     wf.on("zoom", setZoom);
+    wf.on("frameDrawn", updateAfterRegionDraw);
     wf.on("muted", setMuted);
     wf.on("durationChanged", setDuration);
     wf.on("volumeChanged", setVolume);
