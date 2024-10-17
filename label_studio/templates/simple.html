@@ -4,7 +4,6 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <title>Label Studio</title>
   <meta charset="utf-8">
   <meta name="author" content=""/>
   <meta name="viewport" content="width=device-width, initial-scale=0.9, shrink-to-fit=no">
@@ -14,9 +13,13 @@
   <meta name="msapplication-navbutton-color" content="#272727">  <!-- Windows Phone -->
   <meta name="apple-mobile-web-app-status-bar-style" content="#272727">  <!-- iOS Safari -->
 
-  <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
   <link href="{{settings.HOSTNAME}}{% static 'css/main.css' %}" rel="stylesheet"/>
   <link href="{{settings.FRONTEND_HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
+
+  {% block page_labeling %}
+    <title>Label Studio</title>
+    <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
+  {% endblock %}
 
   {% block head %}
   {% endblock %}
