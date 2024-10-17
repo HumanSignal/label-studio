@@ -19,10 +19,11 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - '3.8'
           - '3.9'
           - '3.10'
           - '3.11'
+          - '3.12'
+          - '3.13'
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
@@ -176,7 +177,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-          - '3.8'
           - '3.9'
 
     # required for poetry action
@@ -217,15 +217,6 @@ jobs:
 
       - name: Install Python dependencies
         run: poetry install --with test
-
-      - name: Fix sqlite.dll for python < 3.9
-        if: ${{ contains(matrix.python-version, '3.8') }}
-        run: |
-          set PYTHONIOENCODING=utf-8
-          set PYTHONLEGACYWINDOWSSTDIO=utf-8
-          bash -c "poetry run label-studio init my_project --agree-fix-sqlite --force-fix-sqlite"
-          cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
-        shell: cmd
 
       - name: Init project
         run: |
