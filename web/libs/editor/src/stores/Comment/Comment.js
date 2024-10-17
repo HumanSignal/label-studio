@@ -147,12 +147,18 @@ export const Comment = CommentBase.named("Comment")
       self.isConfirmDelete = newMode;
     }
 
-    const updateComment = flow(function* (comment) {
+    const updateComment = flow(function* (comment, classifications = undefined) {
       if (self.isPersisted && !self.isDeleted) {
-        yield self.sdk.invoke("comments:update", {
+        const payload = {
           id: self.id,
           text: comment,
-        });
+        };
+
+        if (classifications !== undefined) {
+          payload.classifications = classifications;
+        }
+
+        yield self.sdk.invoke("comments:update", payload);
       }
 
       self.setEditMode(false);
