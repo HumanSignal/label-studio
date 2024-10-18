@@ -41,7 +41,12 @@ export const CommentsListInner: FC<{ commentStore: any }> = observer(({ commentS
   return (
     <Block name="comments-list">
       {commentStore.comments.map((comment: any) => (
-        <CommentItem key={comment.id} comment={comment} listComments={commentStore.listComments} />
+        <CommentItem
+          key={comment.id}
+          comment={comment}
+          listComments={commentStore.listComments}
+          classificationsItems={commentStore.commentClassificationsItems}
+        />
       ))}
     </Block>
   );

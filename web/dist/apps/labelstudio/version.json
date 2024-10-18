@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1586: Fix CommentsOverlay display without preloading image functionality (#6523)",
-  "commit": "90139c2428ee1733b63ab3f1d6136083bc12dcc6",
-  "date": "2024-10-16T11:28:47.000Z",
+  "message": "fix: LEAP-1596: Missed check for review_settings (#6535)",
+  "commit": "ff2f11da387840c0863c711494b7d7ed2e3fd5c2",
+  "date": "2024-10-17T12:31:43.000Z",
   "branch": "develop"
 }

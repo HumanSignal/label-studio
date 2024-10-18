@@ -155,6 +155,10 @@ export class LSFWrapper {
       interfaces.push("comments:resolve-any");
     }
 
+    if (this.project.review_settings?.require_comment_on_reject) {
+      interfaces.push("comments:reject");
+    }
+
     if (this.interfacesModifier) {
       interfaces = this.interfacesModifier(interfaces, this.labelStream);
     }
