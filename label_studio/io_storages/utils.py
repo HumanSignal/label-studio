@@ -3,6 +3,7 @@
 import logging
 import re
 from dataclasses import dataclass
+from typing import Union
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +18,7 @@ class BucketURI:
     scheme: str
 
 
-def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[str | None, str | None]:
+def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[Union[str, None], Union[str, None]]:
     data = str(data).strip()
     middle_check = False
 
