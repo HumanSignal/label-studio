@@ -55,6 +55,10 @@ const VisibilityMixin = types
 
           "no-region-selected": () => !self.annotation.highlightedNode,
           "choice-unselected": (params) => !fns["choice-selected"](params),
+          "tag-selected": ({ tagName }) => {
+            const tag = self.annotation.names.get(tagName);
+            return tag.isSelected;
+            },
         };
 
         if (Object.keys(fns).includes(self.visiblewhen)) {
