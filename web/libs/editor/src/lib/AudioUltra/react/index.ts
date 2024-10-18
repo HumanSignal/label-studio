@@ -36,7 +36,7 @@ export const useWaveform = (
   const updateAfterRegionDraw = useMemo(() => {
     let prevFrameState: WaveformFrameState | null = null;
     let requestId = -1;
-    const updateAfterRegionDraw = (frameState: WaveformFrameState) => {
+    return (frameState: WaveformFrameState) => {
       cancelAnimationFrame(requestId);
       requestId = requestAnimationFrame(() => {
         if (
@@ -51,7 +51,6 @@ export const useWaveform = (
         }
       });
     };
-    return updateAfterRegionDraw;
   }, []);
 
   useEffect(() => {

@@ -57,7 +57,7 @@ describe("Audio regions", () => {
     });
   });
 
-  it("Should have indication of highligted state", () => {
+  it("Should have indication of highlighted state", () => {
     LabelStudio.params()
       .config(audioWithLabelsConfig)
       .data(audioWithLabelsData)
