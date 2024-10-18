@@ -17,22 +17,22 @@ export const AudioUltraRegionModel = types
   })
   .volatile(() => ({
     hideable: true,
-    _ws_region: null,
+    _wsRegion: null,
   }))
   .views((self) => ({
     get bboxTriggers() {
-      return [self.start, self.end, self._ws_region, self.object?._ws, self.object?._wf_frame];
+      return [self.start, self.end, self._wsRegion, self.object?._ws, self.object?._wfFrame];
     },
     get bboxCoordsCanvas() {
       if (!self.bboxTriggers) {
         return null;
       }
 
-      const { _ws_region } = self;
-      if (!_ws_region) return null;
-      if (!_ws_region.inViewport) return null;
+      const { _wsRregion } = self;
+      if (!_wsRegion) return null;
+      if (!_wsRegion.inViewport) return null;
 
-      const { xStart, xEnd, yStart, yEnd, visualizer } = _ws_region;
+      const { xStart, xEnd, yStart, yEnd, visualizer } = _wsRegion;
       return {
         left: clamp(xStart, 0, visualizer.width),
         top: yStart,
@@ -168,7 +168,7 @@ export const AudioUltraRegionModel = types
       },
 
       setWSRegion(wsRegion) {
-        self._ws_region = wsRegion;
+        self._wsRegion = wsRegion;
 
         if (wsRegion) {
           wsRegion.on("mouseOver", self.onMouseOver);

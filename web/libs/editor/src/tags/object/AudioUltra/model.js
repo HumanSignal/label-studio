@@ -134,7 +134,7 @@ export const AudioModel = types.compose(
       errors: [],
       stageRef: createRef(),
       _ws: null,
-      _wf_frame: null,
+      _wfFrame: null,
     }))
     .views((self) => ({
       get hasStates() {
@@ -539,7 +539,7 @@ export const AudioModel = types.compose(
           }
         },
         setWFFrame(frame) {
-          self._wf_frame = frame;
+          self._wfFrame = frame;
         },
       };
     }),
