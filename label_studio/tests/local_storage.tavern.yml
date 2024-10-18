@@ -58,7 +58,7 @@ stages:
   response:
     json:
       data:
-        image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
+        image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9_]+/[A-Za-z0-9_]+/T)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
     status_code: 200
 - name: stage
   request:
@@ -85,7 +85,7 @@ stages:
     json:
       tasks:
         - data:
-            image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9]+/[A-Za-z0-9]+/T)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
+            image_url: !re_match \/data\/local-files\/\?d=(tmp|var/folders/[A-Za-z0-9_]+/[A-Za-z0-9_]+/T)[\/\\]files[\/\\]subdir[\/\\]test_image2.png
     status_code: 200
 ---
 test_name: test_local_files_not_enabled

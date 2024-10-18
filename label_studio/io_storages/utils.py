@@ -2,6 +2,8 @@
 """
 import logging
 import re
+from dataclasses import dataclass
+from typing import Union
 
 logger = logging.getLogger(__name__)
 
@@ -9,7 +11,14 @@ logger = logging.getLogger(__name__)
 uri_regex = r"([\"'])(?P<uri>(?P<storage>{})://[^\1=]*)\1"
 
 
-def get_uri_via_regex(data, prefixes=('s3', 'gs')):
+@dataclass
+class BucketURI:
+    bucket: str
+    path: str
+    scheme: str
+
+
+def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[Union[str, None], Union[str, None]]:
     data = str(data).strip()
     middle_check = False
 
@@ -38,3 +47,38 @@ def get_uri_via_regex(data, prefixes=('s3', 'gs')):
             logger.warning("Can't parse task.data to match URI. Reason: Match is not found.")
             return None, None
     return r_match.group('uri'), r_match.group('storage')
+
+
+def parse_bucket_uri(value: object, storage) -> Union[BucketURI, None]:
+    if not value:
+        return None
+
+    uri, _ = get_uri_via_regex(value, prefixes=(storage.url_scheme,))
+    if not uri:
+        return None
+
+    try:
+        scheme, rest = uri.split('://', 1)
+        bucket, path = rest.split('/', 1)
+    except ValueError:
+        return None
+
+    return BucketURI(bucket=bucket, path=path, scheme=scheme)
+
+
+def storage_can_resolve_bucket_url(storage, url) -> bool:
+    if not storage.can_resolve_scheme(url):
+        return False
+
+    uri = parse_bucket_uri(url, storage)
+    if not uri:
+        return False
+
+    storage_bucket: str | None = getattr(storage, 'bucket', None) or getattr(storage, 'container', None)
+    if storage_bucket != uri.bucket:
+        return False
+
+    if storage.prefix and not uri.path.startswith(storage.prefix):
+        return False
+
+    return True

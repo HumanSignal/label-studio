@@ -3,6 +3,7 @@
 import json
 import logging
 import re
+from typing import Union
 
 import boto3
 from core.feature_flags import flag_set
@@ -20,6 +21,7 @@ from io_storages.base_models import (
     ProjectStorageMixin,
 )
 from io_storages.s3.utils import get_client_and_resource, resolve_s3_url
+from io_storages.utils import storage_can_resolve_bucket_url
 from tasks.models import Annotation
 from tasks.validation import ValidationError as TaskValidationError
 
@@ -174,6 +176,9 @@ class S3ImportStorageBase(S3StorageMixin, ImportStorage):
 
     def generate_http_url(self, url):
         return resolve_s3_url(url, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
+
+    def can_resolve_url(self, url: Union[str, None]) -> bool:
+        return storage_can_resolve_bucket_url(self, url)
 
     def get_blob_metadata(self, key):
         return AWS.get_blob_metadata(
