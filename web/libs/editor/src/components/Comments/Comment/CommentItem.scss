@@ -115,6 +115,15 @@
     overflow: hidden;
   }
 
+  .comment_form {
+    // to hide the weird glow below the focused form, because it has outline but it's already cut off
+    overflow: hidden;
+  }
+
+  &__classifications-row {
+    margin-top: 4px;
+  }
+
   &__classifications-row > div {
     width: 100%;
   }
