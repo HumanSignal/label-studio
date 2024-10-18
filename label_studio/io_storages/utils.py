@@ -49,7 +49,7 @@ def get_uri_via_regex(data, prefixes=('s3', 'gs')) -> tuple[Union[str, None], Un
     return r_match.group('uri'), r_match.group('storage')
 
 
-def parse_bucket_uri(value: object, storage) -> BucketURI | None:
+def parse_bucket_uri(value: object, storage) -> Union[BucketURI, None]:
     if not value:
         return None
 
