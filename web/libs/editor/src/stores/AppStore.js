@@ -388,6 +388,30 @@ export default types
       }
 
       /**
+       * Hotkey for next task
+       */
+      if (self.hasInterface("skip", "review")) {
+        hotkeys.addNamed('task:next', () => {
+          const annotationStore = self.annotationStore;
+
+          if (annotationStore.viewingAll) return;
+
+          self.nextTask()
+        });
+      }
+      /**
+       * Hotkey for previous task
+       */
+      if (self.hasInterface("skip", "review")) {
+        hotkeys.addNamed('task:previous', () => {
+          const annotationStore = self.annotationStore;
+
+          if (annotationStore.viewingAll) return;
+
+          self.prevTask()
+        });
+      }
+      /**
        * Hotkey for delete
        */
       hotkeys.addNamed("region:delete-all", () => {
