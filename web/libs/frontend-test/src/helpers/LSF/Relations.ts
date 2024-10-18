@@ -28,6 +28,12 @@ export const Relations = {
   get hiddenRelations() {
     return this.relations.should("be.visible").get(".lsf-relations__item_hidden .lsf-relations__content");
   },
+  get overlay() {
+    return cy.get(".relations-overlay");
+  },
+  get overlayItems() {
+    return this.overlay.find("g");
+  },
   hasRelations(count: number) {
     cy.get(".lsf-details__section-head").should("have.text", `Relations (${count})`);
   },
