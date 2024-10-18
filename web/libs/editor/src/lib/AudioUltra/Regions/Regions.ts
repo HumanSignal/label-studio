@@ -408,7 +408,7 @@ export class Regions {
       });
       this.hoveredRegions.clear();
     }
-  }
+  };
 
   private get cursorLockedByPlayhead() {
     return this.waveform.cursor.hasFocus() && this.waveform.cursor.isFocused("playhead");
