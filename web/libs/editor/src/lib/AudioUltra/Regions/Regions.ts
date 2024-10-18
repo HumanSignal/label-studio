@@ -74,6 +74,7 @@ export class Regions {
     container.addEventListener("mousedown", this.handleMouseDown);
     container.addEventListener("mouseup", this.handleMouseUp);
     container.addEventListener("click", this.handleClick);
+    container.addEventListener("mouseleave", this.handleMouseLeave);
   }
 
   handleDraw = () => {
@@ -226,6 +227,7 @@ export class Regions {
     container.removeEventListener("mousedown", this.handleMouseDown);
     container.removeEventListener("mouseup", this.handleMouseUp);
     container.removeEventListener("click", this.handleClick);
+    container.removeEventListener("mouseleave", this.handleMouseLeave);
 
     this.regions.forEach((region) => region.destroy());
     this.regions = [];
@@ -398,6 +400,15 @@ export class Regions {
       }
     }
   };
+
+  private handleMouseLeave = (e: MouseEvent) => {
+    if (this.hoveredRegions.size) {
+      this.hoveredRegions.forEach((region) => {
+        region.invoke("mouseLeave", [region, e]);
+      });
+      this.hoveredRegions.clear();
+    }
+  }
 
   private get cursorLockedByPlayhead() {
     return this.waveform.cursor.hasFocus() && this.waveform.cursor.isFocused("playhead");
