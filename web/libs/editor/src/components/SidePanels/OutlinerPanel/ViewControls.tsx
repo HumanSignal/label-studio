@@ -10,6 +10,7 @@ import {
   IconSortUp,
   IconSortUpNew,
   IconSpeed,
+  IconArea,
   IconTagAlt,
 } from "../../../assets/icons";
 import { Button } from "../../../common/Button/Button";
@@ -28,7 +29,7 @@ const { Block, Elem } = BemWithSpecifiContext();
 
 export type GroupingOptions = "manual" | "label" | "type";
 
-export type OrderingOptions = "score" | "date";
+export type OrderingOptions = "score" | "date" | "area";
 
 export type OrderingDirection = "asc" | "desc";
 
@@ -85,6 +86,12 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             selectedLabel: "By Score",
             icon: <IconSpeed />,
           };
+        case "area":
+          return {
+            label: "Order by Area",
+            selectedLabel: "By Area",
+            icon: <IconArea />,
+          };
       }
     }, []);
 
@@ -108,7 +115,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             <Grouping
               value={ordering}
               direction={orderingDirection}
-              options={["score", "date"]}
+              options={["score", "date", "area"]}
               onChange={(value) => onOrderingChange(value)}
               readableValueForKey={getOrderingLabels}
               allowClickSelected

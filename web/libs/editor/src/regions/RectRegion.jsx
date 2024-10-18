@@ -222,6 +222,9 @@ const Model = types
     get canvasHeight() {
       return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.height) : self.height;
     },
+    get area() {
+      return self.width * self.height;
+    },
   }))
   .actions((self) => ({
     afterCreate() {

@@ -93,6 +93,7 @@ export { ReactComponent as IconLockUnlocked } from "./unlocked.svg";
 export { ReactComponent as IconCursor } from "./cursor.svg";
 export { ReactComponent as IconList } from "./list.svg";
 export { ReactComponent as IconSpeed } from "./speed.svg";
+export { ReactComponent as IconArea } from "./area.svg";
 export { ReactComponent as IconTagAlt } from "./tag-alt.svg";
 export { ReactComponent as IconSortUp } from "./sort-up.svg";
 export { ReactComponent as IconSortUpNew } from "./sort-up-new.svg";
