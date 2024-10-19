@@ -110,9 +110,10 @@ label-studio
 ### Install locally with Anaconda
 
 ```bash
-conda create --name label-studio
+# Requires Python >=3.7 <=3.9
+conda create --name label-studio python=3.9
 conda activate label-studio
-conda install psycopg2
+conda install psycopg2 # required for LS 1.7.2 only
 pip install label-studio
 ```
 
