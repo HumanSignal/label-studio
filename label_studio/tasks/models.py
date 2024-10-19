@@ -349,7 +349,10 @@ class Task(TaskMixin, models.Model):
         return mixin_has_permission and self.project.has_permission(user)
 
     def clear_expired_locks(self):
+        """Clear expired locks for the Current tasks"""
         self.locks.filter(expire_at__lt=now()).delete()
+        """Clear expired locks for the All tasks"""
+        TaskLock.objects.filter(expire_at__date__lt=now()).delete()
 
     def set_lock(self, user):
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
