@@ -17,41 +17,40 @@ Use with the following data types: time series.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| name | <code>string</code> |  | Name of the element |
-| value | <code>string</code> |  | Key used to look up the data, either URLs for your time-series if valueType=url, otherwise expects JSON |
+| name | <code>string</code> |  | Name of the element. |
+| value | <code>string</code> |  | Key used to look up the data, either URLs for your time-series if valueType=url, otherwise expects JSON. |
 | [valueType] | <code>url</code> \| <code>json</code> | <code>url</code> | Format of time series data provided. If set to "url" then Label Studio loads value references inside `value` key, otherwise it expects JSON. |
 | [timeColumn] | <code>string</code> |  | Column name or index that provides temporal values. If your time series data has no temporal column then one is automatically generated. |
-| [timeFormat] | <code>string</code> |  | Pattern used to parse values inside timeColumn, parsing is provided by d3, and follows `strftime` implementation |
+| [timeFormat] | <code>string</code> |  | Pattern used to parse values inside timeColumn, parsing is provided by d3, and follows `strftime` implementation. |
 | [timeDisplayFormat] | <code>string</code> |  | Format used to display temporal value. Can be a number or a date. If a temporal column is a date, use strftime to format it. If it's a number, use [d3 number](https://github.com/d3/d3-format#locale_format) formatting. |
 | [durationDisplayFormat] | <code>string</code> |  | Format used to display temporal duration value for brush range. If the temporal column is a date, use strftime to format it. If it's a number, use [d3 number](https://github.com/d3/d3-format#locale_format) formatting. |
 | [sep] | <code>string</code> | <code>&quot;,&quot;</code> | Separator for your CSV file. |
 | [overviewChannels] | <code>string</code> |  | Comma-separated list of channel names or indexes displayed in overview. |
-| [overviewWidth] | <code>string</code> | <code>&quot;25%&quot;</code> | Default width of overview window in percents |
+| [overviewWidth] | <code>string</code> | <code>&quot;25%&quot;</code> | Default width of overview window in percents. |
 | [fixedScale] | <code>boolean</code> | <code>false</code> | Whether to scale y-axis to the maximum to fit all the values. If false, current view scales to fit only the displayed values. |
 
 ## Channel
 
-Channel tag can be used to label time series data
+Use the channel tag to specify which columns from the provided data should be shown during labeling. Using the following parameters, define how the channel will be displayed.
 
 ### Parameters
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| column | <code>string</code> |  | column name or index |
-| [legend] | <code>string</code> |  | display name of the channel |
-| [units] | <code>string</code> |  | display units name |
-| [displayFormat] | <code>string</code> |  | format string for the values, uses d3-format:<br/>        `[,][.precision][f\|%]`<br/>        `,` - group thousands with separator (from locale): `,` (12345.6 -> 12,345.6) `,.2f` (12345.6 -> 12,345.60)<br/>        `.precision` - precision for `f\|%` type, significant digits for empty type:<br/>                     `.3f` (12.3456 -> 12.345, 1000 -> 1000.000)<br/>                     `.3` (12.3456 -> 12.3, 1.2345 -> 1.23, 12345 -> 1.23e+4)<br/>        `f` - treat as float, default precision is .6: `f` (12 -> 12.000000) `.2f` (12 -> 12.00) `.0f` (12.34 -> 12)<br/>        `%` - treat as percents and format accordingly: `%.0` (0.128 -> 13%) `%.1` (1.2345 -> 123.4%) |
-| [height] | <code>number</code> |  | height of the plot |
-| [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | plot stroke color, expects hex value |
-| [strokeWidth] | <code>number</code> | <code>1</code> | plot stroke width |
-| [markerColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | plot stroke color, expects hex value |
-| [markerSize] | <code>number</code> | <code>0</code> | plot stroke width |
-| [markerSymbol] | <code>number</code> | <code>circle</code> | plot stroke width |
-| [timeRange] | <code>string</code> |  | data range of x-axis / time axis |
-| [dataRange] | <code>string</code> |  | data range of y-axis / data axis |
-| [showAxis] | <code>string</code> |  | show or bide both axis |
-| [fixedScale] | <code>boolean</code> |  | if false current view scales to fit only displayed values; if given overwrites TimeSeries' fixedScale |
-
+| column | <code>string</code> |  | Column name or index. |
+| [legend] | <code>string</code> |  | Display name of the channel. |
+| [units] | <code>string</code> |  | Display units of the channel. |
+| [displayFormat] | <code>string</code> |  | Format string for the values, uses d3-format:<br/>        `[,][.precision][f\|%]`<br/>        `,` - group thousands with separator (from locale): `,` (12345.6 -> 12,345.6) `,.2f` (12345.6 -> 12,345.60)<br/>        `.precision` - precision for `f\|%` type, significant digits for empty type:<br/>                     `.3f` (12.3456 -> 12.345, 1000 -> 1000.000)<br/>                     `.3` (12.3456 -> 12.3, 1.2345 -> 1.23, 12345 -> 1.23e+4)<br/>        `f` - treat as float, default precision is .6: `f` (12 -> 12.000000) `.2f` (12 -> 12.00) `.0f` (12.34 -> 12)<br/>        `%` - treat as percents and format accordingly: `%.0` (0.128 -> 13%) `%.1` (1.2345 -> 123.4%). |
+| [height] | <code>number</code> |  | Height of the plot. Must be larger than 0. |
+| [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | Plot stroke color, expects hex value. |
+| [strokeWidth] | <code>number</code> | <code>1</code> | Plot stroke width. Must be larger than 0. |
+| [markerColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | Plot marker color, expects hex value. |
+| [markerSize] | <code>number</code> | <code>0</code> | Size of data point markers. Must be larger than 0. |
+| [markerSymbol] | <code>string</code> | <code>circle</code> | Symbol for data point markers. |
+| [timeRange] | <code>string</code> |  | Range of x-axis / time axis. |
+| [dataRange] | <code>string</code> |  | Range of y-axis / data axis. |
+| [showAxis] | <code>string</code> |  | Show or hide both axis. |
+| [fixedScale] | <code>boolean</code> |  | If false, current view scales to fit only displayed values; if given overwrites TimeSeries' fixedScale. |
 
 ### Example
 
@@ -69,6 +68,7 @@ Labeling configuration for time series data stored in a CSV loaded from a URL co
   </TimeSeriesLabels>
 </View>
 ```
+
 ### Example
 
 Labeling configuration for time series data stored in the task field `ts` in Label Studio JSON format. The time field is stored as a date in the `timeformat` field and formatted as a full date on the plot (by default).
