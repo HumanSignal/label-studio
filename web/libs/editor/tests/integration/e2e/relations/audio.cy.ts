@@ -1,4 +1,4 @@
-import { AudioView, LabelStudio, Relations, Sidebar } from "@humansignal/frontend-test/helpers/LSF";
+import { AudioView, LabelStudio, Relations } from "@humansignal/frontend-test/helpers/LSF";
 import { audioWithFourRegionsResult, audioWithLabelsConfig, audioWithLabelsData } from "../../data/relations/audio";
 
 describe("Relations: Audio", () => {

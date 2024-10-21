@@ -1,4 +1,3 @@
-import React from "react";
 import { Checkbox } from "@humansignal/ui";
 
 const IndeterminateCheckbox = ({ checked, indeterminate, ...props }) => {
