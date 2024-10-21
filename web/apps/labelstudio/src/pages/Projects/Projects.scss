@@ -20,18 +20,18 @@
   }
 
   &__link {
-    color: #000;
+    color: var(--color-neutral-content);
     display: block;
     display: flex;
     text-decoration: none;
 
     &:hover {
-      color: #000;
+      color: var(--color-neutral-content);
     }
   }
 
   &__pages {
-    background-color: var(--sand_0);
+    background-color: var(--color-neutral-background);
     bottom: 0;
     width: 100%;
     position: sticky;
@@ -75,12 +75,12 @@
     font-size: 32px;
     font-weight: 700;
     margin: 16px;
-    color: var(--sand_900);
+    color: var(--color-neutral-content);
   }
 
   p {
     font-size: 1.25rem;
-    color: var(--sand_700);
+    color: var(--color-neutral-subtle);
     margin: 0;
   }
 
@@ -162,7 +162,7 @@
     grid-auto-columns: max-content;
 
     &-item {
-      --icon-color: var(--sand_0);
+      --icon-color: var(--color-neutral-background);
 
       display: flex;
       align-items: center;
