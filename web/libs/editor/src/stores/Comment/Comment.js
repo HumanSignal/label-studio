@@ -9,6 +9,12 @@ import { UserExtended } from "../UserStore";
 
 import { Anchor } from "./Anchor";
 
+/**
+ * A reduced version of the Comment model.
+ * It is used only for creating a new comment, storing values in the similar structure
+ * and to handle some actions that should be present in both cases (creating and editing).
+ * So that some actions have to be overridden in the Comment model in case we want them to work properly with the backend.
+ */
 export const CommentBase = types
   .model("CommentBase", {
     text: types.string,
@@ -84,6 +90,10 @@ export const CommentBase = types
     };
   });
 
+/**
+ * The main Comment model.
+ * Should be fully functional and used for all cases except creating a new comment.
+ */
 export const Comment = CommentBase.named("Comment")
   .props({
     id: types.identifierNumber,
