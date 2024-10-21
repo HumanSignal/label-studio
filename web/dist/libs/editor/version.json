@@ -1,6 +1,6 @@
 {
-  "message": "ci: LEAP-1417 LEAP-1544 LEAP-1546: CVE fixes (#6519)",
-  "commit": "0cc638c60f711f5179c0acece17a010f3a24d44b",
-  "date": "2024-10-16T08:35:41.000Z",
+  "message": "feat: LEAP-1592: Hide task navigation arrow based on setting (#6526)",
+  "commit": "d124b273fc058b4d33d86853252360e61200fa77",
+  "date": "2024-10-21T10:59:54.000Z",
   "branch": "develop"
 }
