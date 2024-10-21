@@ -80,6 +80,11 @@
     "key": "alt+h",
     "description": "Toggle selected region visibility"
   },
+  "region:visibility-all": {
+    "key": "ctrl+h",
+    "mac": "ctrl+h",
+    "description": "Toggle all regions visibility"
+  },
   "region:lock": {
     "key": "alt+l",
     "description": "Lock selected region"

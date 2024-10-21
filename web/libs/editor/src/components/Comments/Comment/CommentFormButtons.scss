@@ -1,0 +1,39 @@
+
+.comment-form-buttons {
+  &__buttons {
+    display: flex;
+  }
+
+  &__action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    flex-grow: 0;
+    appearance: none;
+    border: none;
+    background-color: transparent;
+    color: var(--secondary-action-color);
+    border-radius: var(--primary-action-border-radius);
+    padding-inline: 8px;
+
+    &:hover {
+      color: var(--secondary-action-color-hover);
+      background-color: var(--primary-action-surface-color-hover);
+    }
+
+    &_highlight {
+      color: var(--secondary-action-color-hover);
+      background-color: var(--highlight-color);
+      border: 1px solid var(--highlight-border-color);
+    }
+
+    &[type="submit"] {
+      color: var(--primary-action-color);
+
+      &:hover {
+        color: var(--primary-action-color);
+      }
+    }
+  }
+}

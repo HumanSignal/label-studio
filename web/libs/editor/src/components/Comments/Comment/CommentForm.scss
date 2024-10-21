@@ -12,69 +12,31 @@
   --highlight-color: var(--grape_100);
   --highlight-border-color: var(--grape_800);
 
-  display: grid;
-  grid-template-columns: auto var(--action-buttons-width);
-  align-items: center;
-  gap: 4px;
-
   & .textarea_inline {
     position: relative;
     z-index: 1;
-    padding: 8px var(--action-buttons-width) 8px 16px !important;
+    padding: 8px 16px;
   }
 
-  &_linked {
-    grid-template-columns: auto var(--action-button-width);
-
-    .textarea_inline {
-      padding: 8px var(--action-button-width) 8px 16px !important;
-    }
+  &__category-selector {
+    display: flex;
+    flex-grow: 1;
   }
 
-  &__actions {
-    position: relative;
-    z-index: 1;
-    height: 100%;
+  &__category-selector > div {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    flex-shrink: 0;
-    flex-grow: 0;
-    gap: 4px;
   }
 
-  &__action {
-    margin-top: 4px;
+  &__text-row {
     display: flex;
-    justify-content: center;
+    gap: 8px;
+  }
+
+  &__classifications-row {
+    display: flex;
+    width: 100%;
     align-items: center;
-    flex-shrink: 0;
-    flex-grow: 0;
-    appearance: none;
-    border: none;
-    background-color: transparent;
-    color: var(--secondary-action-color);
-    border-radius: var(--primary-action-border-radius);
-
-    &:hover {
-      color: var(--secondary-action-color-hover);
-      background-color: var(--primary-action-surface-color-hover);
-    }
-
-    &_highlight {
-      color: var(--secondary-action-color-hover);
-      background-color: var(--highlight-color);
-      border: 1px solid var(--highlight-border-color);
-    }
-
-    &[type="submit"] {
-      color: var(--primary-action-color);
-
-      &:hover {
-        color: var(--primary-action-color);
-      }
-    }
+    gap: 8px;
   }
 
   &_inline {

@@ -161,6 +161,11 @@ export default types
 
     queuePosition: types.optional(types.number, 0),
 
+    /**
+     * Project field used for applying classifications to comments
+     */
+    commentClassificationConfig: types.maybeNull(types.string),
+
     customButtons: types.map(
       types.union(types.string, CustomButton, types.array(types.union(types.string, CustomButton))),
     ),
@@ -431,6 +436,11 @@ export default types
         if (c && !c.isLinkingMode) {
           c.hideSelectedRegions();
         }
+      });
+
+      hotkeys.addNamed("region:visibility-all", () => {
+        const { selected } = self.annotationStore;
+        selected.regionStore.toggleVisibility();
       });
 
       hotkeys.addNamed("annotation:undo", () => {

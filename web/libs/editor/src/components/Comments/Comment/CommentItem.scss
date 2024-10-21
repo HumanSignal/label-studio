@@ -115,6 +115,10 @@
     overflow: hidden;
   }
 
+  &__classifications-row > div {
+    width: 100%;
+  }
+
   &__linkState {
     padding: 4px 0 0;
     margin-left: -5px;
@@ -150,5 +154,10 @@
     display: flex;
     justify-content: space-between;
     padding: var(--comment-item-padding);
+  }
+
+  &__classifications {
+    font-size: 13px;
+    letter-spacing: .8px;
   }
 }

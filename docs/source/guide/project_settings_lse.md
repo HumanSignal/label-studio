@@ -201,7 +201,7 @@ Enable **Show before reviewing** to display a pop-up message to reviewers when t
 
 <dd>
 
-Configure additional settings for reviewers.
+Configure what is required for a task to be considered reviewed. 
 
 <table>
 <thead>
@@ -232,6 +232,80 @@ In a task where multiple annotators submitted labels, the reviewer needs to acce
 
 </td>
 </tr>
+</table>
+
+</dd>
+
+<dt id="reject-options">Reject Options</dt>
+
+<dd>
+
+Configure what rejection options are available to reviewers. 
+
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
+
+**Requeue rejected tasks back to annotators**
+</td>
+<td>
+
+When a reviewer clicks **Reject**, the annotation is reassigned back to the annotator. 
+
+</td>
+</tr>
+<td>
+
+**Remove rejected tasks from labeling queue**
+</td>
+<td>
+
+When a reviewer clicks **Reject**, the annotation is not reassigned back to the annotator. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Allow reviewer to choose: Requeue or Remove**
+</td>
+<td>
+
+Reviewers see the following options:
+
+* **Accept**
+* **Reject** -- When selected, the annotation is rejected and skipped. 
+* **Requeue** -- When selected, the annotation is rejected and then reassigned back to the annotator.  
+
+For example, a reviewer might decide to requeue an annotation that is nearly correct but just needs a slight change. However, an annotation with numerous errors may be easier to simply reject entirely and remove from the queue. 
+
+Note that when you click **Reject**, the annotation is also marked as cancelled/skipped. This is reflected in various metrics (for example, Data Manager columns and dashboards), and differentiates between the two rejection actions in the API with `was_cancelled: true`. 
+
+</td>
+</tr>
+</table>
+
+</dd>
+
+<dt id="review-settings">Additional settings</dt>
+
+<dd>
+
+Configure additional reviewer settings
+
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
 <tr>
 <td>
 
@@ -250,7 +324,11 @@ If enabled, a reviewer can only see tasks to which they've been assigned. Otherw
 </td>
 <td>
 
-If enabled, a reviewer only sees tasks that have met the **Annotations per task minimum** threshold. 
+When enabled, a reviewer only sees tasks that have been completed by all required annotators. 
+
+If your project is using auto distribution, then this means a reviewer only sees tasks that have met the **Annotations per task minimum** threshold. 
+
+If your project is using manual distribution, then this means a reviewer only sees tasks in which all assigned annotators have submitted an annotation. 
 
 Note that in most cases, skipped tasks do not contribute towards meeting the minimum.  
 
@@ -266,17 +344,6 @@ Note that in most cases, skipped tasks do not contribute towards meeting the min
 When disabled, reviewers can only enter the review stream. When enabled, reviewers can access the Data Manager, where they can select which tasks to review. 
 
 However, some information is still hidden from reviewers and they can only view a subset of the Data Manager columns. For example, they cannot see columns such as who the other Reviewers are. 
-
-</td>
-</tr>
-<tr>
-<td>
-
-**Requeue rejected tasks back to annotators**
-</td>
-<td>
-
-Rejected tasks are reassigned back to the annotator. 
 
 </td>
 </tr>
@@ -378,12 +445,12 @@ Select the [metric](stats#Available-agreement-metrics) that should determine tas
 </td>
 <td>
 
+Note that to see these options, the project must be set up to [automatically distribute tasks](#distribute-tasks).
+
 You can set a low agreement strategy to ensure that a task is not marked complete until it meets 1) the required [overlap](#overlap) and 2) a minimum agreement level.  
 
 * **Do nothing** - Tasks with a low agreement can be marked complete; no additional actions are taken. 
 * **Assign additional annotator** - Automatically assign an additional annotator to tasks with low agreement. 
-
-    Note that your project must be set up to [automatically distribute tasks](#distribute-tasks).
 
 </td>
 </tr>

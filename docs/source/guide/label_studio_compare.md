@@ -3,7 +3,7 @@ title: Compare Community and Enterprise Features
 short: Open Source vs Enterprise
 type: guide
 tier: all
-order: 28 
+order: 28
 order_enterprise: 28
 section: "Discover & Learn"
 meta_title: Label Studio Community and Enterprise Features
@@ -70,7 +70,7 @@ Label Studio is available as open source software as well as an [Enterprise clo
     <td style="text-align:center">✔️</td>
   </tr>
    <tr>
-    <td><a href="https://docs.heartex.com/guide/comments_notifications.html">Team collaboration features like comments and notifications on annotation tasks.</a></td>
+    <td><a href="https://docs.humansignal.com/guide/comments_notifications.html">Team collaboration features like comments and notifications on annotation tasks.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -89,7 +89,7 @@ Label Studio is available as open source software as well as an [Enterprise clo
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="https://docs.heartex.com/guide/setup_project.html#Set-up-annotation-settings-for-your-project">Set rules and automate how tasks are distributed to annotators.</a></td>
+    <td><a href="https://docs.humansignal.com/guide/setup_project.html#Set-up-annotation-settings-for-your-project">Set rules and automate how tasks are distributed to annotators.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -167,12 +167,12 @@ Label Studio is available as open source software as well as an [Enterprise clo
   </tr>
   
   <tr>
-    <td><a href="https://docs.heartex.com/guide/manage_users.html#Roles-in-Label-Studio-Enterprise">Role-based automated workflows for annotators and reviewers.</a></td>
+    <td><a href="https://docs.humansignal.com/guide/manage_users.html#Roles-in-Label-Studio-Enterprise">Role-based automated workflows for annotators and reviewers.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
    <tr>
-    <td><a href="https://docs.heartex.com/guide/manage_users.html#Roles-and-workspaces">Role-based access control into workspaces and projects.</a></td>
+    <td><a href="https://docs.humansignal.com/guide/manage_users.html#Roles-and-workspaces">Role-based access control into workspaces and projects.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -186,12 +186,12 @@ Label Studio is available as open source software as well as an [Enterprise clo
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="active_learning.html">Accelerate labeling with active learning loops.</a></td>
+    <td><a href="https://docs.humansignal.com/guide/active_learning.html">Accelerate labeling with active learning loops.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="https://docs.heartex.com/guide/active_learning.html#Set-up-task-sampling-with-prediction-scores">Automatically label and sort tasks by prediction score with the ML model backend.</a></td>
+    <td><a href="https://docs.humansignal.com/guide/active_learning.html#Set-up-task-sampling-with-prediction-scores">Automatically label and sort tasks by prediction score with the ML model backend.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -217,17 +217,17 @@ Label Studio is available as open source software as well as an [Enterprise clo
     <td colspan="3"><b>Annotator Performance</b></td>
   </tr>
   <tr>
-    <td><a href="https://docs.heartex.com/guide/stats.html">Annotator agreement metrics to monitor and improve label quality.</a></td>
+    <td><a href="https://docs.humansignal.com/guide/stats.html">Annotator agreement metrics to monitor and improve label quality.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="https://docs.heartex.com/guide/ml.html">Compare ML model predictions with annotations to identify low quality data.</a></td>
+    <td><a href="https://docs.humansignal.com/guide/ml.html">Compare ML model predictions with annotations to identify low quality data.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
-    <td><a href="https://docs.heartex.com/guide/quality.html">Assign reviewers to review, fix and update annotations.</a></td>
+    <td><a href="https://docs.humansignal.com/guide/quality.html">Assign reviewers to review, fix and update annotations.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
@@ -235,7 +235,7 @@ Label Studio is available as open source software as well as an [Enterprise clo
     <td colspan="3"><b>Security and Support </b></td>
   </tr>
   <tr>
-    <td><a href="https://docs.heartex.com/guide/auth_setup.html">Secure access and authentication of users via SAML SSO or LDAP.</a></td>
+    <td><a href="https://docs.humansignal.com/guide/auth_setup.html">Secure access and authentication of users via SAML SSO or LDAP.</a></td>
     <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
    </tr>
@@ -268,4 +268,3 @@ Label Studio is available as open source software as well as an [Enterprise clo
     <td style="text-align:center">✔️</td>
   </tr>
 </table>
-

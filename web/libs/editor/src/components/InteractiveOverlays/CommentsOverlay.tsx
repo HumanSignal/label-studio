@@ -242,9 +242,7 @@ const WhenTagsReady: React.FC<WhenTagsReadyProps> = memo(
     if (
       !Array.from(tags.values()).every((tag) => {
         if (!isAlive(tag)) return false;
-        // Unfortunately, for some reason image do not use `isReady` in the way it was planed to do, so we need to check it separately
-        // @ts-ignore
-        if (tag.imageIsLoaded === false) return false;
+
         return tag?.isReady ?? true;
       }, true)
     ) {

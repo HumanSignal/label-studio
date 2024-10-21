@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1441: Allow to connect comments to classifications (#6486)",
-  "commit": "8484a8489a41ca698fb02777904b84e655f7a79f",
-  "date": "2024-10-09T15:17:41.000Z",
+  "message": "fix: LEAP-1596: Missed check for review_settings (#6535)",
+  "commit": "ff2f11da387840c0863c711494b7d7ed2e3fd5c2",
+  "date": "2024-10-17T12:31:43.000Z",
   "branch": "develop"
 }
