@@ -188,6 +188,14 @@ export const Comment = CommentBase.named("Comment")
       self.update({ regionRef });
     }
 
+    function setResultLink(result) {
+      const regionRef = {
+        regionId: result.area.cleanId,
+        controlName: result.from_name.name,
+      };
+      self.update({ regionRef });
+    }
+
     function unsetLink() {
       const regionRef = null;
       self.update({ regionRef });
@@ -224,6 +232,7 @@ export const Comment = CommentBase.named("Comment")
       update,
       deleteComment,
       setRegionLink,
+      setResultLink,
       unsetLink,
       scrollIntoView,
     };
