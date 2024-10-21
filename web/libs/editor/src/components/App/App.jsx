@@ -329,4 +329,3 @@ class App extends Component {
 }
 
 export default observer(App);
-
