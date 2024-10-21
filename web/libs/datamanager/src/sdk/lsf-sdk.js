@@ -88,15 +88,29 @@ export class LSFWrapper {
    * @param {LSFOptions} options
    */
   constructor(dm, element, options) {
+    // we need to pass the rest of the options to LSF below
+    const {
+      task,
+      preload,
+      isLabelStream,
+      annotation,
+      interfacesModifier,
+      isInteractivePreannotations,
+      user,
+      keymap,
+      messages,
+      ...restOptions
+    } = options;
+
     this.datamanager = dm;
     this.store = dm.store;
     this.root = element;
-    this.task = options.task;
-    this.preload = options.preload;
-    this.labelStream = options.isLabelStream ?? false;
-    this.initialAnnotation = options.annotation;
-    this.interfacesModifier = options.interfacesModifier;
-    this.isInteractivePreannotations = options.isInteractivePreannotations ?? false;
+    this.task = task;
+    this.preload = preload;
+    this.labelStream = isLabelStream ?? false;
+    this.initialAnnotation = annotation;
+    this.interfacesModifier = interfacesModifier;
+    this.isInteractivePreannotations = isInteractivePreannotations ?? false;
 
     let interfaces = [...DEFAULT_INTERFACES];
 
@@ -106,7 +120,7 @@ export class LSFWrapper {
 
     if (this.labelStream) {
       interfaces.push("infobar");
-      interfaces.push("topbar:prevnext");
+      if (!window.APP_SETTINGS.label_stream_navigation_disabled) interfaces.push("topbar:prevnext");
       if (FF_DEV_2186 && this.project.review_settings?.require_comment_on_reject) {
         interfaces.push("comments:update");
       }
@@ -141,6 +155,10 @@ export class LSFWrapper {
       interfaces.push("comments:resolve-any");
     }
 
+    if (this.project.review_settings?.require_comment_on_reject) {
+      interfaces.push("comments:reject");
+    }
+
     if (this.interfacesModifier) {
       interfaces = this.interfacesModifier(interfaces, this.labelStream);
     }
@@ -160,6 +178,7 @@ export class LSFWrapper {
     const queueDone = dm.store.project.queue_done;
     const queueLeft = dm.store.project.queue_left;
     const queuePosition = queueDone ? queueDone + 1 : queueLeft ? queueTotal - queueLeft + 1 : 1;
+    const commentClassificationConfig = dm.store.project.comment_classification_config;
 
     const lsfProperties = {
       user: options.user,
@@ -174,6 +193,7 @@ export class LSFWrapper {
       messages: options.messages,
       queueTotal,
       queuePosition,
+      commentClassificationConfig,
 
       /* EVENTS */
       onSubmitDraft: this.onSubmitDraft,
@@ -192,6 +212,8 @@ export class LSFWrapper {
       onSelectAnnotation: this.onSelectAnnotation,
       onNextTask: this.onNextTask,
       onPrevTask: this.onPrevTask,
+
+      ...restOptions,
     };
 
     this.initLabelStudio(lsfProperties);
@@ -921,14 +943,43 @@ export class LSFWrapper {
     return undefined;
   }
 
-  /** @private */
+  /**
+   * Calculates the startedAt time for an annotation.
+   * @param {Object|undefined} currentDraft - The current draft object, if any.
+   * @param {Date} loadedDate - The date when the annotation was loaded.
+   * @returns {Date} The calculated startedAt time.
+   * @private
+   */
+  calculateStartedAt(currentDraft, loadedDate) {
+    if (currentDraft) {
+      const draftStartedAt = new Date(currentDraft.created_at);
+      const draftLeadTime = Number(currentDraft.lead_time ?? 0);
+      const adjustedStartedAt = new Date(Date.now() - draftLeadTime * 1000);
+
+      if (adjustedStartedAt < draftStartedAt) return draftStartedAt;
+
+      return adjustedStartedAt;
+    }
+    return loadedDate;
+  }
+
+  /**
+   * Prepare data for draft/submission of annotation
+   * @param {Object} annotation - The annotation object.
+   * @param {Object} options - The options object.
+   * @param {boolean} options.includeId - Whether to include the id in the result.
+   * @param {boolean} options.isNewDraft - Whether the draft is new.
+   * @returns {Object} The prepared data.
+   * @private
+   */
   prepareData(annotation, { includeId, isNewDraft } = {}) {
     const userGenerate = !annotation.userGenerate || annotation.sentUserGenerate;
     const currentDraft = this.findActiveDraft(annotation);
-    const sessionTime = (new Date() - annotation.loadedDate) / 1000;
+    const sessionTime = (Date.now() - annotation.loadedDate.getTime()) / 1000;
     const submittedTime = isNewDraft ? 0 : Number(annotation.leadTime ?? 0);
     const draftTime = Number(currentDraft?.lead_time ?? 0);
     const leadTime = submittedTime + draftTime + sessionTime;
+    const startedAt = this.calculateStartedAt(currentDraft, annotation.loadedDate);
 
     const result = {
       lead_time: leadTime,
@@ -936,6 +987,7 @@ export class LSFWrapper {
       draft_id: annotation.draftId,
       parent_prediction: annotation.parent_prediction,
       parent_annotation: annotation.parent_annotation,
+      started_at: startedAt.toISOString(),
     };
 
     if (includeId && userGenerate) {

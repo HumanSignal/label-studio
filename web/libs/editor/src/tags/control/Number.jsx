@@ -202,7 +202,7 @@ const HtxNumber = inject("store")(
     const numberClassName = cn("number").toClassName();
 
     return (
-      <div className={numberClassName} style={visibleStyle}>
+      <div className={numberClassName} style={visibleStyle} ref={item.elementRef}>
         <input
           disabled={disabled}
           style={sliderStyle}

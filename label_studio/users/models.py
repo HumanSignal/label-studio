@@ -3,7 +3,6 @@
 import datetime
 from typing import Optional
 
-from core.feature_flags import flag_set
 from core.utils.common import load_func
 from core.utils.db import fast_first
 from django.conf import settings
@@ -186,7 +185,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     def get_initials(self, is_deleted=False):
         initials = '?'
 
-        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=self) and is_deleted:
+        if is_deleted:
             return 'DU'
 
         if not self.first_name and not self.last_name:

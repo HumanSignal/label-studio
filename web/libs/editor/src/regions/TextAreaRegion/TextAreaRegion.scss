@@ -1,0 +1,67 @@
+.mark {
+  background-color: var(--surface-surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-small);
+  margin: 0 var(--spacing-small) 0 0;
+  padding: var(--spacing-small) var(--spacing-medium);
+  white-space: pre-line;
+  box-shadow: 0 4px 12px 0 var(--black_4), 0 1px 2px 0 var(--black_10);
+  flex-grow: 1;
+
+  &.ant-typography {
+    margin-bottom: 0;
+  }
+
+  &.selected {
+    border: 1px solid var(--grape_500);
+    background-color: var(--primary-bright-secondary);
+  }
+
+  &.highlighted {
+    border: 1px dashed var(--grape_500);
+    background-color: var(--primary-bright-secondary);
+  }
+
+  &.relation {
+    cursor: crosshair;
+  }
+}
+
+.row {
+  display: flex;
+  margin-bottom: var(--spacing-medium);
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--spacing-small);
+
+  .button {
+    display: flex;
+    flex: 0 0 32px;
+
+    &:hover {
+      background-color: var(--sand_200);
+    }
+
+    &_look {
+      &_danger {
+        &:hover {
+          background-color: var(--red_1);
+        }
+      }
+    }
+  }
+
+  // fix antd styles to resize textarea container and fix paddings
+  div[class~="ant-typography-edit-content"] {
+    flex-grow: 1;
+    left: -1px;
+    padding: 0;
+    margin-top: -1px;
+    margin-right: 0;
+
+    textarea {
+      // the same as in .mark, its padding set to 0
+      padding: var(--spacing-small) var(--spacing-medium);
+    }
+  }
+}

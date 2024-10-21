@@ -157,7 +157,7 @@ const HtxRating = inject("store")(
     };
 
     return (
-      <div style={visibleStyle} onKeyDownCapture={dontBreakSubmit}>
+      <div style={visibleStyle} onKeyDownCapture={dontBreakSubmit} ref={item.elementRef}>
         <Rate
           character={<StarOutlined style={{ fontSize: iconSize }} />}
           value={item.rating}

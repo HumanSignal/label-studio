@@ -5,6 +5,7 @@ import { destroy, detach, flow, getEnv, getParent, getSnapshot, isRoot, types, w
 import uniqBy from "lodash/uniqBy";
 import InfoModal from "../components/Infomodal/Infomodal";
 import { Hotkey } from "../core/Hotkey";
+import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";
 import ToolsManager from "../tools/Manager";
 import Utils from "../utils";
 import { guidGenerator } from "../utils/unique";
@@ -26,7 +27,7 @@ import {
   isFF,
 } from "../utils/feature-flags";
 import { CommentStore } from "./Comment/CommentStore";
-import { destroy as destroySharedStore } from "../mixins/SharedChoiceStore/mixin";
+import { CustomButton } from "./CustomButton";
 
 const hotkeys = Hotkey("AppStore", "Global Hotkeys");
 
@@ -159,6 +160,15 @@ export default types
     queueTotal: types.optional(types.number, 0),
 
     queuePosition: types.optional(types.number, 0),
+
+    /**
+     * Project field used for applying classifications to comments
+     */
+    commentClassificationConfig: types.maybeNull(types.string),
+
+    customButtons: types.map(
+      types.union(types.string, CustomButton, types.array(types.union(types.string, CustomButton))),
+    ),
   })
   .preProcessSnapshot((sn) => {
     // This should only be handled if the sn.user value is an object, and converted to a reference id for other
@@ -174,6 +184,11 @@ export default types
           ? [currentUser, ...sn.users.filter(({ id }) => id !== currentUser.id)]
           : [currentUser];
       }
+    }
+    // fix for old version of custom buttons which were just an array
+    // @todo remove after a short time
+    if (Array.isArray(sn.customButtons)) {
+      sn.customButtons = { _replace: sn.customButtons };
     }
     return {
       ...sn,
@@ -423,6 +438,11 @@ export default types
         }
       });
 
+      hotkeys.addNamed("region:visibility-all", () => {
+        const { selected } = self.annotationStore;
+        selected.regionStore.toggleVisibility();
+      });
+
       hotkeys.addNamed("annotation:undo", () => {
         const annotation = self.annotationStore.selected;
 
@@ -547,9 +567,9 @@ export default types
       const res = fn();
 
       self.commentStore.setAddedCommentThisSession(false);
+
       // Wait for request, max 5s to not make disabled forever broken button;
       // but block for at least 0.2s to prevent from double clicking.
-
       Promise.race([Promise.all([res, delay(200)]), delay(5000)])
         .catch((err) => {
           showModal(err?.message || err || defaultMessage);
@@ -557,6 +577,7 @@ export default types
         })
         .then(() => self.setFlags({ isSubmitting: false }));
     }
+
     function incrementQueuePosition(number = 1) {
       self.queuePosition = clamp(self.queuePosition + number, 1, self.queueTotal);
     }
@@ -681,6 +702,24 @@ export default types
         await getEnv(self).events.invoke("rejectAnnotation", self, { isDirty, entity, comment });
         self.incrementQueuePosition(-1);
       }, "Error during reject, try again");
+    }
+
+    function handleCustomButton(button) {
+      if (self.isSubmitting) return;
+
+      handleSubmittingFlag(async () => {
+        const entity = self.annotationStore.selected;
+
+        entity.beforeSend();
+        // @todo add needsValidation or something like that as a parameter to custom buttons
+        // if (!entity.validate()) return;
+
+        const isDirty = entity.history.canUndo;
+
+        await getEnv(self).events.invoke("customButton", self, button, { isDirty, entity });
+        self.incrementQueuePosition();
+        entity.dropDraft();
+      }, `Error during handling ${button} button, try again`);
     }
 
     /**
@@ -957,6 +996,7 @@ export default types
       updateAnnotation,
       acceptAnnotation,
       rejectAnnotation,
+      handleCustomButton,
       presignUrlForProject,
       setUsers,
       mergeUsers,

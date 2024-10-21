@@ -18,7 +18,7 @@ Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon
 <div class="opensource-only">
 
 !!! warning
-    To install Label Studio Enterprise Edition, see <a href="install_enterprise_k8s.html">Deploy Label Studio Enterprise on Kubernetes</a>. This page is specific to the community version of Label Studio.
+    To install Label Studio Enterprise Edition, see <a href="https://docs.humansignal.com/guide/install_enterprise_k8s">Deploy Label Studio Enterprise on Kubernetes</a>. This page is specific to the community version of Label Studio.
 
 </div>
 

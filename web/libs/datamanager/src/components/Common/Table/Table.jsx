@@ -84,14 +84,17 @@ export const Table = observer(
               indeterminate={selectedItems.isIndeterminate}
               onChange={() => props.onSelectAll()}
               className="select-all"
+              ariaLabel={`${selectedItems.isAllSelected ? "Unselect" : "Select"} all rows`}
             />
           );
         },
         Cell: ({ data }) => {
+          const isChecked = selectedItems.isSelected(data.id);
           return (
             <TableCheckboxCell
-              checked={selectedItems.isSelected(data.id)}
+              checked={isChecked}
               onChange={() => props.onSelectRow(data.id)}
+              ariaLabel={`${isChecked ? "Unselect" : "Select"} Task ${data.id}`}
             />
           );
         },

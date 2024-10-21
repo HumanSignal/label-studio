@@ -1,0 +1,55 @@
+name: Check for broken links
+
+on:
+  pull_request:
+    branches: ["develop"]
+    types: [synchronize, opened]
+    paths:
+      - "docs/**"
+      - ".github/workflows/link-check.yml"
+  workflow_dispatch:
+
+jobs:
+  wait_for_netlify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Netlify deploy preview to complete
+        run: echo "Netlify deploy preview has passed"
+        if: ${{ contains(github.event.pull_request.head.repo.status.contexts, 'netlify') }}
+
+  check_links:
+    runs-on: ubuntu-latest
+    needs: wait_for_netlify
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install broken-link-checker
+
+      - name: Run broken-link-checker and fail on broken links for Label Studio Docs
+        run: |
+          npx blc https://deploy-preview-${{ github.event.pull_request.number }}--label-studio-docs-new-theme.netlify.app -roef --exclude "/api" --filter-level 0
+          exit_code=$?  # Capture the exit code
+          echo "Exit code: $exit_code"  # Print the exit code
+
+          if [ $exit_code -ne 0 ]; then
+            echo "Broken links found!"
+            exit 1
+          fi
+
+      - name: Run broken-link-checker and fail on broken links for Human Signal Docs
+        run: |
+          npx blc https://deploy-preview-${{ github.event.pull_request.number }}--heartex-docs.netlify.app -roef --exclude "/api" --filter-level 0
+          exit_code=$?  # Capture the exit code
+          echo "Exit code: $exit_code"  # Print the exit code
+
+          if [ $exit_code -ne 0 ]; then
+            echo "Broken links found!"
+            exit 1
+          fi
