@@ -120,7 +120,7 @@ export class LSFWrapper {
 
     if (this.labelStream) {
       interfaces.push("infobar");
-      interfaces.push("topbar:prevnext");
+      if (!window.APP_SETTINGS.label_stream_navigation_disabled) interfaces.push("topbar:prevnext");
       if (FF_DEV_2186 && this.project.review_settings?.require_comment_on_reject) {
         interfaces.push("comments:update");
       }
@@ -155,7 +155,7 @@ export class LSFWrapper {
       interfaces.push("comments:resolve-any");
     }
 
-    if (this.project.review_settings.require_comment_on_reject) {
+    if (this.project.review_settings?.require_comment_on_reject) {
       interfaces.push("comments:reject");
     }
 

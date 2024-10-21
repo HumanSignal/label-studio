@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1476: Add ability to edit classifications on existing comments (#6532)",
-  "commit": "e824fbd3bf170509ffa5dd815deb7b0a5705381b",
-  "date": "2024-10-16T21:39:46.000Z",
+  "message": "feat: LEAP-1592: Hide task navigation arrow based on setting (#6526)",
+  "commit": "d124b273fc058b4d33d86853252360e61200fa77",
+  "date": "2024-10-21T10:59:54.000Z",
   "branch": "develop"
 }
