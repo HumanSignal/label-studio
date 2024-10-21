@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1596: Missed check for review_settings (#6535)",
-  "commit": "ff2f11da387840c0863c711494b7d7ed2e3fd5c2",
-  "date": "2024-10-17T12:31:43.000Z",
+  "message": "fix: LEAP-1490: Fix AudioUltra working with relations and comments (#6494)",
+  "commit": "6c2e4ea21d7ccc9c6b5c45a97aceed33cdef12c8",
+  "date": "2024-10-21T14:28:45.000Z",
   "branch": "develop"
 }

@@ -160,6 +160,14 @@ export interface WaveformOptions {
     denoize: boolean;
   };
 }
+
+export type WaveformFrameState = {
+  width: number;
+  height: number;
+  zoom: number;
+  scroll: number;
+};
+
 interface WaveformEventTypes extends RegionsGlobalEvents, RegionGlobalEvents {
   load: () => void;
   error: (error: Error) => void;
@@ -176,6 +184,7 @@ interface WaveformEventTypes extends RegionsGlobalEvents, RegionGlobalEvents {
   durationChanged: (duration: number) => void;
   scroll: (scroll: number) => void;
   layersUpdated: (layers: Map<string, Layer>) => void;
+  frameDrawn: (frameState: WaveformFrameState) => void;
 }
 
 export class Waveform extends Events<WaveformEventTypes> {
@@ -549,7 +558,18 @@ export class Waveform extends Events<WaveformEventTypes> {
   private initEvents() {
     this.cursor.on("mouseMove", this.handleCursorMove);
     this.visualizer.on("layersUpdated", () => this.invoke("layersUpdated", [this.getLayers()]));
+    this.visualizer.on("draw", () => this.handleDrawn());
   }
+
+  private handleDrawn = () => {
+    const frameState = {
+      width: this.visualizer.width,
+      height: this.visualizer.height,
+      zoom: this.zoom,
+      scroll: this.visualizer.getScrollLeftPx(),
+    };
+    this.invoke("frameDrawn", [frameState]);
+  };
 
   /**
    * Handle cursor move event
