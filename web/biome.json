@@ -59,7 +59,7 @@
           "level": "warn"
         },
         "noUnusedVariables": {
-          "level": "error"
+          "level": "warn"
         }
       },
       "performance": {
