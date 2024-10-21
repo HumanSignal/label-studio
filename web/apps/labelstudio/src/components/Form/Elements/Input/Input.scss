@@ -3,15 +3,25 @@
 .textarea-ls {
   height: 40px;
   min-height: 40px;
-  background: var(--sand_0);
+  background: var(--color-neutral-background-bold);
   font-size: 16px;
   line-height: 22px;
-  border: 1px solid var(--sand_300);
+  border: 1px solid var(--color-neutral-border);
   box-sizing: border-box;
   border-radius: 5px;
   padding: 0 16px;
-  transition: box-shadow 80ms ease;
+  transition: box-shadow 150ms ease-out;
   font-weight: 400;
+  color: var(--color-neutral-content);
+
+  &::placeholder {
+    color: var(--color-neutral-content-subtle);
+  }
+  
+
+  &:active {
+    border-color: var(--color-neutral-border-dark);
+  }
 
   &_ghost {
     border: none;

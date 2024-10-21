@@ -5,13 +5,13 @@
 
   top: -1000px;
   left: -1000px;
-  color: var(--sand_0);
+  color: var(--color-neutral-inverted-content);
   display: none;
   z-index: 10000;
   padding: 4px 10px;
   position: absolute;
   pointer-events: none;
-  background-color: var(--sand_900);
+  background-color: var(--color-neutral-inverted-background);
   border-radius: 3px;
 
   &::before {
@@ -22,7 +22,7 @@
     height: 10px;
     display: block;
     position: absolute;
-    background-color: var(--sand_900);
+    background-color: var(--color-neutral-inverted-background);
     transform: translate(-50%, 50%) rotate(45deg);
   }
 
@@ -83,11 +83,11 @@
   &_theme {
     &_light {
       color: var(--sand_900);
-      background-color: var(--sand_0);
+      background-color: var(--color-neutral-background);
       box-shadow: 0 2px 15px rgb(0 0 0 / 20%);
 
       &::before {
-        background-color: var(--sand_0);
+        background-color: var(--color-neutral-content);
       }
     }
   }

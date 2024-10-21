@@ -94,7 +94,7 @@ const TabsSwitch = switchInjector(
                 {...provided.draggableProps}
                 {...provided.dragHandleProps}
                 style={{
-                  background: snapshot.isDragging && "#ddd",
+                  background: snapshot.isDragging,
                   ...provided.draggableProps.style,
                 }}
               >

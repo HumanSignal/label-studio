@@ -5,10 +5,11 @@
   z-index: 150;
   font-weight: 500;
   overflow: visible;
-  background-color: var(--white);
+  background-color: var(--color-neutral-background);
   min-width: fit-content;
   font-size: 14px;
-  border-bottom: 1px solid #D8D5DD;
+  border-bottom: 1px solid var(--color-neutral-border);
+  color: var(--color-neutral-content);
 
   &__extra {
     flex: 1;

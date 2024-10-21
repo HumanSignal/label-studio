@@ -2,19 +2,19 @@
   border-radius: 4px;
 
   &_info {
-    --background-color: var(--sand_900);
-    --hover-background-color: var(--sand_800);
+    --background-color: var(--color-neutral-inverted-background);
+    --hover-background-color: var(--color-neutral-inverted-background-bold-light);
   }
 
   &_error {
-    --background-color: var(--red_7);
-    --hover-background-color: var(--red_10);
+    --background-color: var(--color-negative-background);
+    --hover-background-color: var(--color-negative-background-light);
   }
 
   background-color: var(--background-color);
 
   .toast {
-    --border-color: var(--sand_900);
+    --border-color: var(--color-neutral-border);
     --padding: 8px 16px;
 
     background-color: inherit;

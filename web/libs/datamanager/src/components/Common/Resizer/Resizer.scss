@@ -30,7 +30,7 @@
       content: "";
       z-index: 5;
       display: block;
-      background: #bdbdbd;
+      background: var(--color-neutral-border);
       position: absolute;
     }
 
@@ -42,8 +42,8 @@
     &_resizing::before {
       top: 0;
       bottom: 0;
-      background-color: var(--accent_color);
-      box-shadow: 0 0 0 1px var(--accent_color);
+      background-color: var(--color-primary-border);
+      box-shadow: 0 0 0 1px var(--color-primary-border);
     }
   }
 }

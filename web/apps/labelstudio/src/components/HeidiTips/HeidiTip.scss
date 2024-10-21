@@ -1,12 +1,12 @@
 .heidy-tip {
   &__content {
     padding: 1rem;
-    border: 1px solid var(--sand_300);
+    border: 1px solid var(--color-neutral-border);
     font-size: 14px;
     border-radius: 8px;
     box-shadow: 0 2px 6px 0 rgb(0 0 0 / 10%);
     box-sizing: border-box;
-    background: var(--sand_0);
+    background: var(--color-neutral-background-bold);
   }
 
   &__header {
@@ -23,15 +23,17 @@
     font-weight: 500;
     line-height: 24px;
     letter-spacing: 0.15px;
+    color:  var(--color-neutral-content);
   }
 
   &__text {
     line-height: 20px;
     letter-spacing: 0.25px;
+    color:  var(--color-neutral-content-subtler);
   }
 
   &__link {
-    color: var(--grape_500);
+    color: var(--color-primary-content-bold);
     font-weight: 500;
 
     &:hover {
@@ -59,14 +61,14 @@
     }
 
     svg > path {
-      stroke: var(--sand_600);
+      stroke: var(--color-neutral-content-subtlest);
     }
 
     &:hover {
-      background: var(--grape_0);
+      background: var(--color-primary-emphasis-subtle);
 
       svg > path {
-        stroke: var(--grape_700);
+        stroke: var(--color-primary-content-bold);
       }
     }
   }

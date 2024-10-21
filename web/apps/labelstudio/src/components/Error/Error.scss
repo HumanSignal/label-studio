@@ -3,7 +3,7 @@
   padding: 16px;
   border-radius: 5px;
   box-sizing: border-box;
-  background-color: var(--sand_0);
+  background-color: var(--color-neutral-background);
 }
 
 .error-message {
@@ -24,7 +24,7 @@
   &__detail {
     font-size: 24px;
     font-weight: bold;
-    color: var(--danger_color);
+    color: var(--color-negative-content-bold);
     margin: 16px 0;
     white-space: pre-line;
     word-break: break-word;
@@ -62,7 +62,7 @@
 
   &__message {
     margin: 5px 0;
-    color: var(--sand_900);
+    color: var(--color-neutral-content-subtle);
     padding: 0;
     white-space: pre-line;
     word-break: break-word;

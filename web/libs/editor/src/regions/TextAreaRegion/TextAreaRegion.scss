@@ -1,25 +1,26 @@
 .mark {
-  background-color: var(--surface-surface);
-  border: 1px solid var(--surface-border);
+  background-color: var(--color-neutral-background-bold);
+  border: 1px solid var(--color-neutral-border);
   border-radius: var(--radius-small);
   margin: 0 var(--spacing-small) 0 0;
   padding: var(--spacing-small) var(--spacing-medium);
   white-space: pre-line;
   box-shadow: 0 4px 12px 0 var(--black_4), 0 1px 2px 0 var(--black_10);
   flex-grow: 1;
+  color: var(--color-neutral-content);
 
   &.ant-typography {
     margin-bottom: 0;
   }
 
   &.selected {
-    border: 1px solid var(--grape_500);
-    background-color: var(--primary-bright-secondary);
+    border: 1px solid var(--color-primary-border);
+    background-color: var(--color-primary-emphasis);
   }
 
   &.highlighted {
-    border: 1px dashed var(--grape_500);
-    background-color: var(--primary-bright-secondary);
+    border: 1px dashed var(--color-primary-border);
+    background-color: var(--color-primary-emphasis-subtle);
   }
 
   &.relation {
@@ -39,13 +40,13 @@
     flex: 0 0 32px;
 
     &:hover {
-      background-color: var(--sand_200);
+      background-color: var(--color-neutral-background-bold);
     }
 
     &_look {
       &_danger {
         &:hover {
-          background-color: var(--red_1);
+          background-color: var(--color-negative-emphasis-subtle);
         }
       }
     }

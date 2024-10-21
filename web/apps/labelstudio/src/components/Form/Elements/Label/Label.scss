@@ -1,5 +1,6 @@
 .label-ls {
   margin-bottom: 0;
+  color: var(--color-neutral-content);
 
   &__text {
     height: 22px;
@@ -11,7 +12,7 @@
 
   &__description {
     font-size: 0.875rem;
-    color: var(--sand_600);
+    color: var(--color-neutral-content-subtler);
     font-weight: 400;
     line-height: 140%;
 

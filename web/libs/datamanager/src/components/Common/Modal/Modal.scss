@@ -27,7 +27,7 @@
     min-width: 400px;
     min-height: 100px;
     margin: 0 auto;
-    background-color: var(--white);
+    background-color: var(--color-neutral-background);
     border-radius: 5px;
     box-shadow: 0 10px 30px rgb(var(--black-raw) / 30%);
   }
@@ -41,7 +41,7 @@
     box-sizing: content-box;
 
     &_divided {
-      border-bottom: 1px solid var(--black_5);
+      border-bottom: 1px solid var(--color-neutral-border);
     }
   }
 

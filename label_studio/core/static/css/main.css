@@ -154,7 +154,7 @@ pre {
 }
 
 main.main {
-    background: #FCFCFC !important;
+    background: var(--color-neutral-background);
     padding: 2em 4rem 2rem 2rem;
 }
 

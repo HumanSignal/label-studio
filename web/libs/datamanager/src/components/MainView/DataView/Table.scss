@@ -3,7 +3,7 @@
   display: flex;
   overflow: hidden;
   flex-direction: column;
-  background: var(--sand_0);
+  background: var(--color-neutral-background);
 }
 
 .no-results {
@@ -14,9 +14,15 @@
   align-items: center;
 
   &__description {
+
+    h3 {
+      color: var(--color-neutral-content);
+    }
+    
     font-size: 16px;
     text-align: center;
-    color: rgb(var(--black-raw) / 60%);
+    color: var(--color-neutral-content-subtler);
+    margin-bottom: 8px;
   }
 }
 

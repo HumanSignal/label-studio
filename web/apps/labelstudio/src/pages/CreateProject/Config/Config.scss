@@ -45,7 +45,7 @@ $scroll-width: 5px;
   flex-direction: column;
   padding: 16px 16px - $scroll-width 16px 20px;
   overflow-y: scroll;
-  background-color: var(--sand_0);
+  background-color: var(--color-neutral-background);
 
   &::-webkit-scrollbar {
     width: $scroll-width;

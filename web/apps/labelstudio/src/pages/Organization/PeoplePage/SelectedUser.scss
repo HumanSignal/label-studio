@@ -1,7 +1,7 @@
 .user-info {
   padding: 20px 24px;
-  border: 1px solid var(--sand_300);
-  background: var(--sand_0);
+  border: 1px solid var(--color-neutral-border);
+  background: var(--color-neutral-background-bold);
   align-self: start;
   display: flex;
   flex-direction: column;
@@ -25,7 +25,7 @@
     grid-template: auto / 64px auto;
     column-gap: 16px;
     line-height: 1.5;
-    color: var(--sand_600);
+    color: var(--color-neutral-content);
     margin-bottom: 16px;
     align-items: center;
   }
@@ -39,7 +39,7 @@
     margin: 0;
     font-weight: 500;
     line-height: 1.2;
-    color: var(--sand_900);
+    color: var(--color-neutral-content);
   }
 
   &__section {
@@ -51,11 +51,12 @@
       margin-top: 1em;
       margin-bottom: 8px;
       font-weight: 500;
+      color: var(--color-neutral-content);
     }
   }
 
   &__last-active {
-    color: var(--sand_600);
+    color: var(--color-neutral-content-subtler);
     margin-top: 32px;
     margin-bottom: 0;
   }
@@ -74,11 +75,11 @@
     margin-left: -10px;
     align-items: center;
     border-radius: 4px;
-    color: var(--primary_link);
+    color: var(--color-primary-content-bold);
 
     &:hover {
-      background-color: var(--grape_0);
-      color: var(--grape_500);
+      background-color: var(--color-primary-emphasis);
+      color: var(--color-primary-content);
     }
   }
 }

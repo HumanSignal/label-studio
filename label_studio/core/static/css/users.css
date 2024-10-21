@@ -1,8 +1,8 @@
 /* Account page */
 
 body {
-  --border-color: var(--sand_300);
-  --color-error: #d00;
+  --border-color: var(--color-neutral-border);
+  --color-error: var(--color-negative-content-bold);
 }
 .account-page {
   display: grid;
@@ -24,7 +24,7 @@ body {
 
 .account-page header sub{
   font-size: .875rem;
-  color: var(--sand_600);
+  color: var(--color-neutral-content-subtler);
 }
 .account-page form ul {
   margin: 0;
@@ -72,7 +72,7 @@ body {
 }
 .user-activity p {
   margin-bottom: 10px;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--color-neutral-content-subtler);
 }
 .account-page footer {
   display: flex;
@@ -80,7 +80,7 @@ body {
   align-items: center;
 }
 .account-page footer p {
-  color: var(--sand_600);
+  color: var(--color-neutral-content-subtler);
   margin: 0;
 }
 
@@ -93,7 +93,7 @@ body {
 }
 #users table {
   font-size: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-color);
   text-align: left;
 }
 #users table thead {
@@ -136,7 +136,7 @@ body {
   grid-template: auto / 64px auto;
   column-gap: 16px;
   line-height: 1.5;
-  color: rgba(0, 0, 0, 0.6);
+  color:  var(--color-neutral-content);
 }
 .user-info__header > .email {
   margin-top: 0 !important;

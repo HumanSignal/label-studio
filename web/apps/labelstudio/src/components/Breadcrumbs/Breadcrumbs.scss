@@ -46,7 +46,11 @@
 
       & > span,
       & > a {
-        color: var(--sand_600) !important;
+        color: var(--color-neutral-content-subtler);
+
+        &:hover {
+          color: var(--color-primary-content-bold-subtle);
+        }
       }
     }
 
@@ -68,10 +72,10 @@
   &__item > span,
   &__item > a {
     text-decoration: none;
-    color: var(--sand_900);
+    color: var(--color-neutral-content) ;
 
-    &:hover {
-      color: var(--grape_500) !important;
+    a {
+      color: var(--color-primary-content-bold);
     }
   }
 

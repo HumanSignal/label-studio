@@ -7,8 +7,10 @@
   list-style-type: none;
   max-width: 100%;
   box-sizing: border-box;
-  background: var(--sand_0);
-  border-radius: 4px;
+  background: var(--color-neutral-background);
+  border-radius: 0;
+  transition: background-color 400ms ease-out;
+  border-right: 1px solid var(--color-neutral-border);
 
   &__item {
     height: 48px;
@@ -17,11 +19,12 @@
     border-radius: 0.5rem;
     align-items: center;
     box-sizing: border-box;
-    color: var(--sand_600);
+    color: var(--color-neutral-content-subtler);
     font-size: 1rem;
     white-space: nowrap;
     text-decoration: none;
     cursor: pointer;
+    transition: all 150ms ease-out;
 
     &-icon {
       margin-right: 10px;
@@ -47,27 +50,28 @@
 
     &_look {
       &_danger {
-        color: var(--danger_color);
+        color: var(--color-negative-content-bold);
       }
     }
 
     &:not(.main-menu__item_look_danger):hover {
-      color: var(--sand_900);
+      color: var(--color-neutral-content);
+      background: var(--color-primary-emphasis-subtle);
     }
 
     &:not(.main-menu__item_active):hover {
-      color: var(--grape_700);
-      background: var(--grape_0);
+      color: var(--color-neutral-content);
+      background: var(--color-primary-emphasis-subtle);
     }
 
     &_active {
-      color: var(--sand_900);
-      background-color: var(--sand_200);
+      color: var(--color-neutral-content);
       font-weight: 500;
     }
 
     &_active:not(.sidebar__pin) {
       pointer-events: none;
+      background: var(--color-neutral-emphasis);
     }
 
     &:hover &-icon,
@@ -76,11 +80,11 @@
     }
 
     &_dangerous {
-      color: var(--danger_color);
+      color: var(--color-negative-content-bold);
 
       &:hover {
-        color: var(--danger_color) !important;
-        background-color: var(--red_1) !important;
+        color: var(--color-negative-content-bold) !important;
+        background-color: var(--color-negative-emphasis-subtle) !important;
       }
     }
   }
@@ -92,7 +96,8 @@
   &__divider {
     height: 1px;
     margin: 8px 0;
-    background-color: var(--sand_200);
+    background-color: var(--color-neutral-border);
+    transition: background-color 150ms ease-out;
   }
 
   &_size_compact {
@@ -134,15 +139,15 @@
     cursor: pointer;
 
     &:hover {
-      background-color: var(--grape_0);
+      background-color: var(--color-primary-emphasis-subtle);
     }
 
     &_dangerous {
-      color: var(--danger_color);
+      color: var(--color-negative-content-bold);
 
       &:hover {
-        color: var(--danger_color);
-        background-color: var(--red_1);
+        color: var(--color-negative-content-bold);
+        background-color: var(--color-negative-emphasis-subtle);
       }
     }
   }
