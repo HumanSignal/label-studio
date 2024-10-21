@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1592: Hide task navigation arrow based on setting (#6526)",
-  "commit": "d124b273fc058b4d33d86853252360e61200fa77",
-  "date": "2024-10-21T10:59:54.000Z",
+  "message": "fix: LEAP-1490: Fix AudioUltra working with relations and comments (#6494)",
+  "commit": "6c2e4ea21d7ccc9c6b5c45a97aceed33cdef12c8",
+  "date": "2024-10-21T14:28:45.000Z",
   "branch": "develop"
 }
