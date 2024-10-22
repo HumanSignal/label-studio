@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1490: Fix AudioUltra working with relations and comments (#6494)",
-  "commit": "6c2e4ea21d7ccc9c6b5c45a97aceed33cdef12c8",
-  "date": "2024-10-21T14:28:45.000Z",
+  "message": "fix: LEAP-1581: Improve styles in new comments (#6537)",
+  "commit": "02eb60246d28113a45a6a975cf7ac84901e99ea8",
+  "date": "2024-10-22T17:21:42.000Z",
   "branch": "develop"
 }
