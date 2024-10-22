@@ -46,7 +46,7 @@ By utilizing AI to handle the bulk of the annotation work, you can significantly
     * [Labeling guide](labeling)
     * [Define ground truth annotations for a project](quality#Define-ground-truth-annotations-for-a-project)
     * [Blog - What's a ground truth dataset?](https://humansignal.com/blog/what-s-a-ground-truth-dataset/)
-3. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an OpenAI API key.
+3. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an API key to connect to your model.
 
     * [Create a Prompt](prompts_create)
     * [Model provider keys](prompts_create#Model-provider-API-keys)
@@ -79,7 +79,7 @@ Additionally, this workflow provides a scalable solution for continuously expand
 
     * [Create a project](setup_project)
     * [Sync data from external storage](storage)
-2. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an OpenAI API key or an Azure OpenAI key.
+2. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an API key to connect to your model.
 
     * [Create a Prompt](prompts_create)
     * [Model provider keys](prompts_create#Model-provider-API-keys)
@@ -115,7 +115,7 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
     * [Labeling guide](labeling)
     * [Define ground truth annotations for a project](quality#Define-ground-truth-annotations-for-a-project)
     * [Blog - What's a ground truth dataset?](https://humansignal.com/blog/what-s-a-ground-truth-dataset/)
-3. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an OpenAI API key.
+3. Go to the Prompts page and create a new Prompt. If you haven't already, you will also need to add an API key to connect to your model.
 
     * [Create a Prompt](prompts_create)
     * [Model provider keys](prompts_create#Model-provider-API-keys)
@@ -135,7 +135,7 @@ This feedback loop allows you to iteratively fine-tune your prompts, optimizing 
 | **Supported data types** | Text |
 | **Supported model types** | Text Classification <br>Named Entity Recognition (NER) |
 | **Class selection** | Multi-selection (the LLM can apply multiple labels per task)|
-| **Supported base models** | OpenAI gpt-3.5-turbo-16k <br>OpenAI gpt-3.5-turbo-instruct* <br>OpenAI gpt-4-turbo <br>OpenAI gpt-3.5-turbo <br>OpenAI gpt-4o <br>OpenAI gpt-4<br>[Azure OpenAI chat-based models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models) |
+| **Supported base models** | OpenAI gpt-3.5-turbo-16k <br>OpenAI gpt-3.5-turbo-instruct* <br>OpenAI gpt-4-turbo <br>OpenAI gpt-3.5-turbo <br>OpenAI gpt-4o <br>OpenAI gpt-4<br>[Azure OpenAI chat-based models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)<br>[Custom LLM](prompts_create#Add-OpenAI-Azure-OpenAI-or-a-custom-model) |
 | **Text compatibility** | Task text must be utf-8 compatible |
 | **Task size** | Total size of each task can be no more than 1MB (approximately 200-500 pages of text) |
 | **Network access** | If you are using a firewall or restricting network access to your OpenAI models, you will need to allow the following IPs: <br>3.219.3.197 <br>34.237.73.3 <br>4.216.17.242 |

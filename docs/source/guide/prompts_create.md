@@ -31,6 +31,8 @@ Once added, you will have the option to select from the base models associated w
 
 To remove the key, click **API Keys** in the upper right of the Prompts page. You'll have the option to remove the key and add a new one. 
 
+### Add OpenAI, Azure OpenAI, or a custom model
+
 {% details <b>Use an OpenAI key</b> %}
 
 You can only have one OpenAI key per organization. For a list of the OpenAI models we support, see [Features, requirements, and constraints](prompts_overview#Features-requirements-and-constraints). 
@@ -74,6 +76,24 @@ When adding the key to Label Studio, you are asked for the following information
 You can find all this information in the **Details** section of the deployment in Azure OpenAI Studio. 
 
 ![Screenshot of the Azure deployment details](/images/prompts/azure_deployment.png)
+
+{% enddetails %}
+
+{% details <b>Use a custom LLM</b> %}
+
+You can use your own self-hosted and fine-tuned model as long as it meets the following criteria:
+
+* Your server must provide [JSON mode](https://python.useinstructor.com/concepts/patching/#json-mode) for the LLM. 
+* The server API must follow [OpenAI format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format). 
+
+Examples of compatible LLMs include [Ollama](https://ollama.com/) and [sglang](https://github.com/sgl-project/sglang?tab=readme-ov-file#openai-compatible-api). 
+
+To add a custom model, enter the following:
+
+* A name for the model. 
+* The endpoint URL for the model. For example, `https://my.openai.endpoint.com/v1`
+* An API key to access the model. (Optional)
+* An auth token to access the model. (Optional)
 
 {% enddetails %}
 
