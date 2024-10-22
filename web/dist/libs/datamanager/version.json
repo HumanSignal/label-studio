@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1577: Fix saving linked results at backend (#6541)",
-  "commit": "223b786c85cee28dc6241c659c258dddb0d27e22",
-  "date": "2024-10-22T14:20:28.000Z",
+  "message": "fix: LEAP-1581: Improve styles in new comments (#6537)",
+  "commit": "02eb60246d28113a45a6a975cf7ac84901e99ea8",
+  "date": "2024-10-22T17:21:42.000Z",
   "branch": "develop"
 }
