@@ -88,7 +88,7 @@ const IMAGE_PRELOAD_COUNT = 3;
  * @param {left|center|right} [horizontalAlignment=left]      - Where to align image horizontally. Can be one of "left", "center", or "right"
  * @param {top|center|bottom} [verticalAlignment=top]         - Where to align image vertically. Can be one of "top", "center", or "bottom"
  * @param {auto|original|fit} [defaultZoom=fit]               - Specify the initial zoom of the image within the viewport while preserving its ratio. Can be one of "auto", "original", or "fit"
- * @param {none|anonymous|use-credentials} [crossOrigin=none] - Configures CORS cross domain behavior for this image, either "none", "anonymous", or "use-credentials", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin).
+ * @param {none|anonymous|use-credentials|""} [crossOrigin=""] - Configures CORS cross domain behavior for this image, either "none", "anonymous", or "use-credentials", similar to [DOM `img` crossOrigin property](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin).
  */
 const TagAttrs = types.model({
   value: types.maybeNull(types.string),
@@ -125,7 +125,7 @@ const TagAttrs = types.model({
   verticalalignment: types.optional(types.enumeration(["top", "center", "bottom"]), "top"),
   defaultzoom: types.optional(types.enumeration(["auto", "original", "fit"]), "fit"),
 
-  crossorigin: types.optional(types.enumeration(["none", "anonymous", "use-credentials"]), "none"),
+  crossorigin: types.optional(types.enumeration(["none", "anonymous", "use-credentials", ""]), "none"),
 });
 
 const IMAGE_CONSTANTS = {
@@ -289,6 +289,10 @@ const Model = types
 
     get imageCrossOrigin() {
       const value = self.crossorigin.toLowerCase();
+
+      if (value === "") {
+        return value
+      }
 
       if (isFF(FF_LSDV_4711) && (!value || value === "none")) return "anonymous";
 
