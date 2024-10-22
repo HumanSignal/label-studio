@@ -10,6 +10,7 @@ export const EntityTab = observer(
   forwardRef(
     ({ entity, selected, style, onClick, bordered = true, prediction = false, displayGroundTruth = false }, ref) => {
       const isUnsaved = (entity.userGenerate && !entity.sentUserGenerate) || entity.draftSelected;
+      const infoIsHidden = entity.store.hasInterface("annotations:hide-info");
 
       return (
         <Block
@@ -29,15 +30,17 @@ export const EntityTab = observer(
               tag={Userpic}
               showUsername
               username={prediction ? entity.createdBy : null}
-              user={entity.user ?? { email: entity.createdBy }}
+              user={infoIsHidden ? {} : (entity.user ?? { email: entity.createdBy })}
               mod={{ prediction }}
             >
               {prediction && <LsSparks style={{ width: 16, height: 16 }} />}
             </Elem>
 
-            <Elem name="identifier">
-              ID {entity.pk ?? entity.id} {isUnsaved && "*"}
-            </Elem>
+            {!infoIsHidden && (
+              <Elem name="identifier">
+                ID {entity.pk ?? entity.id} {isUnsaved && "*"}
+              </Elem>
+            )}
 
             {displayGroundTruth && entity.ground_truth && <Elem name="ground-truth" tag={LsStar} />}
 
