@@ -83,6 +83,7 @@
   &_selected {
     background-color: var(--sand_0);
     border-color: var(--sand_300);
+    transform: translate(0, 1px);
 
     &:hover {
       background-color: var(--sand_0);
