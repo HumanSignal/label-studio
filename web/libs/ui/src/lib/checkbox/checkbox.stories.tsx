@@ -1,4 +1,3 @@
-import React from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Checkbox } from "./checkbox";
 import { action } from "@storybook/addon-actions";

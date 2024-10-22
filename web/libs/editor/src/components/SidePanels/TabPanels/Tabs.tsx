@@ -1,7 +1,7 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { IconOutlinerDrag } from "../../../assets/icons";
 import { useDrag } from "../../../hooks/useDrag";
-import { Block, cn, Elem } from "../../../utils/bem";
+import { Block, Elem } from "../../../utils/bem";
 import { DEFAULT_PANEL_HEIGHT } from "../constants";
 import "./Tabs.scss";
 import { type BaseProps, Side, type TabProps } from "./types";
