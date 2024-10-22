@@ -31,6 +31,8 @@ Once added, you will have the option to select from the base models associated w
 
 To remove the key, click **API Keys** in the upper right of the Prompts page. You'll have the option to remove the key and add a new one. 
 
+### Add OpenAI, Azure OpenAI, or a custom model
+
 {% details <b>Use an OpenAI key</b> %}
 
 You can only have one OpenAI key per organization. For a list of the OpenAI models we support, see [Features, requirements, and constraints](prompts_overview#Features-requirements-and-constraints). 
@@ -82,7 +84,7 @@ You can use your own self-hosted and fine-tuned model as long as it meets the fo
 * Your server must provide [JSON mode](https://python.useinstructor.com/concepts/patching/#json-mode) for the LLM. 
 * The server API must follow [OpenAI format](https://platform.openai.com/docs/api-reference/chat/create#chat-create-response_format). 
 
-Examples of compatible LLMs include [Ollama](https://ollama.com/), [vllm](https://github.com/vllm-project/vllm) (not tested), and [sglang](https://github.com/sgl-project/sglang?tab=readme-ov-file#openai-compatible-api). 
+Examples of compatible LLMs include [Ollama](https://ollama.com/) and [sglang](https://github.com/sgl-project/sglang?tab=readme-ov-file#openai-compatible-api). 
 
 To add a custom model, enter the following:
 
