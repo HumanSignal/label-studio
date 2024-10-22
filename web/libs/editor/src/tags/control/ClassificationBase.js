@@ -57,7 +57,7 @@ const ClassificationBase = types
        */
       getRegionElement() {
         return self.elementRef.current;
-      }
+      },
     };
   })
   .actions((self) => {
