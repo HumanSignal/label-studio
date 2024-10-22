@@ -1,4 +1,3 @@
-import React from "react";
 import { Menubar } from "../components/Menubar/Menubar";
 import { ProjectRoutes } from "../routes/ProjectRoutes";
 

@@ -1,6 +1,3 @@
-/* eslint-disable react/jsx-no-target-blank */
-import React from "react";
-
 import { htmlEscape } from "./html";
 
 const URL_CORS_DOCS = "https://labelstud.io/guide/storage.html#Troubleshoot-CORS-and-access-problems";

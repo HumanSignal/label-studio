@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { FaTrash } from "react-icons/fa";
 import { BemWithSpecifiContext } from "../../../utils/bem";
 import { Button } from "../../Common/Button/Button";

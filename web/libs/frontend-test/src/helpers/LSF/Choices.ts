@@ -1,6 +1,3 @@
-import { FF_DEV_2007 } from "../../feature-flags";
-import { LabelStudio } from "./LabelStudio";
-
 class ChoicesHelper {
   private get _baseRootSelector() {
     return ".lsf-choices";

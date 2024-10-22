@@ -1,4 +1,3 @@
-import React from "react";
 import { Select } from "antd";
 import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";

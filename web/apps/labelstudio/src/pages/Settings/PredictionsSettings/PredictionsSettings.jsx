@@ -2,14 +2,12 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { Description } from "../../../components/Description/Description";
 import { Divider } from "../../../components/Divider/Divider";
 import { EmptyState } from "../../../components/EmptyState/EmptyState";
-import { Caption } from "../../../components/Caption/Caption";
 import { IconPredictions } from "../../../assets/icons";
 import { useAPI } from "../../../providers/ApiProvider";
 import { ProjectContext } from "../../../providers/ProjectProvider";
 import { Spinner } from "../../../components/Spinner/Spinner";
 import { PredictionsList } from "./PredictionsList";
 import { Block, Elem } from "../../../utils/bem";
-import { Label } from "../../../components/Form";
 import "./PredictionsSettings.scss";
 
 export const PredictionsSettings = () => {

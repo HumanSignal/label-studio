@@ -1,4 +1,3 @@
-import React from "react";
 import { useRoutesMap } from "../providers/RoutesProvider";
 import { resolveRoutes } from "../utils/routeHelpers";
 import { RouteWithStaticFallback } from "./RouteWithStaticFallback";

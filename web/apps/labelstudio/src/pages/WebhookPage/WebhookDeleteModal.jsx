@@ -1,12 +1,8 @@
-import React from "react";
-
 import { Button } from "../../components";
-import { Elem } from "../../components/Menu/MenuContext";
 import { modal } from "../../components/Modal/Modal";
 import { useModalControls } from "../../components/Modal/ModalPopup";
 import { Space } from "../../components/Space/Space";
-import { useAPI } from "../../providers/ApiProvider";
-import { Block, cn } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 
 export const WebhookDeleteModal = ({ onDelete }) => {
   return modal({
