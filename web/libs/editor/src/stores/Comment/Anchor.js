@@ -27,7 +27,34 @@ export const Anchor = types
      * @return {Object} The overlays-applicable node of the anchor.
      */
     get overlayNode() {
-      return self.result ?? self.region;
+      const { result, region } = self;
+      if (region?.hidden) return null;
+      const isOnCurrentItem = (region.item_index ?? 0) === (region.object.currentItemIndex ?? 0);
+      if (!isOnCurrentItem) return null;
+
+      if (result) {
+        const controlTag = result.from_name;
+        // Most probably, it's always true as we should work only with classification results for now.
+        // If this is not the case, then at the time of writing this comment,
+        // we assume that we have no way of displaying anything related to the overlay for this result.
+        const isClassification = controlTag.isClassificationTag;
+        // Taking into account `visiblewhen`
+        const isVisible = controlTag.isVisible;
+        // The result that is displayed at the control tag right now
+        const currentResult = controlTag.result;
+        // It'll always be true for perObject mode,
+        // and for perRegion/perItem it'll be true only if the result is already displayed at the control tag
+        // (related region/item are selected)
+        const isCurrentResult = currentResult === result;
+        const isDisplayedAtControlTag = isClassification && isVisible && isCurrentResult;
+        if (isDisplayedAtControlTag) {
+          return result;
+        }
+      }
+
+      // if a result does not exist,
+      // or it's hidden, we still need to indicate comment existence on its region if it's possible
+      return self.region;
     },
     /**
      * A key that should be unique in the context of the current annotation and current moment
