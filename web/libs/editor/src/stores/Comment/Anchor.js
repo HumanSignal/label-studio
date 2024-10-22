@@ -7,8 +7,11 @@ export const Anchor = types
     controlName: types.maybe(types.string),
   })
   .views((self) => ({
+    get comment() {
+      return getParent(self);
+    },
     get annotation() {
-      return getParent(self).annotation;
+      return self.comment.annotation;
     },
     get region() {
       return self.annotation.regions.find((r) => r.cleanId === self.regionId);
@@ -28,6 +31,7 @@ export const Anchor = types
      */
     get overlayNode() {
       const { result, region } = self;
+      if (self.comment.isResolved) return null;
       if (region?.hidden) return null;
       const isOnCurrentItem = (region.item_index ?? 0) === (region.object.currentItemIndex ?? 0);
       if (!isOnCurrentItem) return null;
