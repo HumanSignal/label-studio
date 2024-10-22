@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1490: Fix AudioUltra working with relations and comments (#6494)",
-  "commit": "6c2e4ea21d7ccc9c6b5c45a97aceed33cdef12c8",
-  "date": "2024-10-21T14:28:45.000Z",
+  "message": "fix: LEAP-1577: Fix saving linked results at backend (#6541)",
+  "commit": "223b786c85cee28dc6241c659c258dddb0d27e22",
+  "date": "2024-10-22T14:20:28.000Z",
   "branch": "develop"
 }
