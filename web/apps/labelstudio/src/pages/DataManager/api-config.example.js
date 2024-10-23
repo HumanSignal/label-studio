@@ -1,12 +1,11 @@
-/* 
-to mock a request, you can define the endpoint with a schema that looks like this:
-endpointName:{                              //endpointName is what is used when calling callAPI, passed in as a string
-      method: "GET",                        //Optional. defaults to GET. options are GET, POST, PATCH, DELETE
-      mock: undefined,                      //Optional. function that returns the mock data
-      path: "/tasks/:taskID/annotations",   //Required. path to the endpoint you want to mock
-}
-see an example below
-*/
+/**
+ * To mock a request, you can define the endpoint inside `endpoints` with a schema that looks like this:
+ * endpointName: {                            // endpointName is what is used when calling callAPI, passed in as a string
+ *   method?: "GET",                          // defaults to GET. options are GET, POST, PATCH, DELETE
+ *   path: "/tasks/:taskID/annotations",      // actual endpoint pattern you want to mock
+ *   mock: (url, params, fakeRequest) => any, // function that returns the mock data wrapped into internal response object
+ * }
+ */
 export const APIConfig = {
   gateway: "/api/dm",
   endpoints: {
