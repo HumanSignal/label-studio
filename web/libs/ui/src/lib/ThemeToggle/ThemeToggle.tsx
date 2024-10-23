@@ -1,24 +1,11 @@
 import { clsx } from "clsx";
 import styles from "./ThemeToggle.module.scss";
-import MultiStateToggle from "../MultiStateToggle/MultiStateToggle";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ReactComponent as Sun } from "./icons/sun.svg";
 import { ReactComponent as Moon } from "./icons/moon.svg";
 
 const THEME_OPTIONS = ["Auto", "Light", "Dark"];
 const PREFERRED_COLOR_SCHEME_KEY = "preferred-color-scheme";
-export interface ThemeToggleOption {
-  label?: string;
-  icon?: string;
-}
-const ThemeOption = ({ label, icon }: ThemeToggleOption) => {
-  return (
-    <div className={clsx(styles.themeOption)}>
-      <div className={clsx(styles.themeOption__icon)}>{icon === "Dark" ? <Moon /> : <Sun />}</div>
-      <div className={clsx(styles.themeOption__label)}>{label}</div>
-    </div>
-  );
-};
 export const ThemeToggle = () => {
   const presetTheme = window.localStorage.getItem(PREFERRED_COLOR_SCHEME_KEY) ?? THEME_OPTIONS[0];
   const [theme, setTheme] = useState(presetTheme);
@@ -33,7 +20,7 @@ export const ThemeToggle = () => {
     document.documentElement.setAttribute("data-color-scheme", appliedTheme.toLowerCase());
   }, [appliedTheme]);
 
-  const themeChanged = (theme: string) => {
+  const themeChanged = useCallback(() => {
     const length = THEME_OPTIONS.length;
     const index = (THEME_OPTIONS.indexOf(theme) + 1) % length;
     const nextTheme = THEME_OPTIONS[index];
@@ -41,19 +28,16 @@ export const ThemeToggle = () => {
     window.localStorage.setItem(PREFERRED_COLOR_SCHEME_KEY, nextTheme);
     setTheme(nextTheme);
     setAppliedTheme(nextTheme === "Auto" ? systemMode : nextTheme);
-  };
+  }, [theme]);
 
   return (
-    <div className={clsx(styles.themeToggle)}>
-      <MultiStateToggle
-        options={THEME_OPTIONS?.map((option) => ({
-          value: option,
-          label: <ThemeOption key={option} label={option} icon={option === "Auto" ? appliedTheme : option} />,
-        }))}
-        selectedOption={theme}
-        onChange={themeChanged}
-      />
-    </div>
+    <button className={clsx(styles.themeToggle)} onClick={themeChanged}>
+      <span className={clsx(styles.animationWrapper)}>
+        <Moon />
+        <Sun />
+      </span>
+      <span className={clsx(styles.themeToggle__label)}>{theme}</span>
+    </button>
   );
 };
 
