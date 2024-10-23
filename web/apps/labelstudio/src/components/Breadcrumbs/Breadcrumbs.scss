@@ -49,7 +49,7 @@
         color: var(--color-neutral-content-subtler);
 
         &:hover {
-          color: var(--color-primary-content-bold-subtle);
+          color: var(--color-primary-content);
         }
       }
     }
@@ -75,7 +75,7 @@
     color: var(--color-neutral-content) ;
 
     a {
-      color: var(--color-primary-content-bold);
+      color: var(--color-primary-surface-content);
     }
   }
 
