@@ -1,7 +1,6 @@
 /* global Sentry */
 
 import { createBrowserHistory } from "history";
-import React from "react";
 import { render } from "react-dom";
 import { Router } from "react-router-dom";
 import { LEAVE_BLOCKER_KEY, leaveBlockerCallback } from "../components/LeaveBlocker/LeaveBlocker";

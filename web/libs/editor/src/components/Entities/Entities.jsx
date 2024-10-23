@@ -1,4 +1,3 @@
-import React from "react";
 import { Dropdown } from "antd";
 import { observer } from "mobx-react";
 

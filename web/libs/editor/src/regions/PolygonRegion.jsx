@@ -1,5 +1,5 @@
 import Konva from "konva";
-import React, { memo, useContext, useEffect, useMemo } from "react";
+import { memo, useContext, useEffect, useMemo } from "react";
 import { Group, Line } from "react-konva";
 import { destroy, detach, getRoot, isAlive, types } from "mobx-state-tree";
 

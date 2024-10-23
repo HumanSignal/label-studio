@@ -4,7 +4,6 @@ import { EnterOutlined } from "@ant-design/icons";
 import { IconEdit, IconTrashAlt } from "../../assets/icons";
 import { Button } from "../../common/Button/Button";
 import { Tooltip } from "../../common/Tooltip/Tooltip";
-import { Elem } from "../../utils/bem";
 import styles from "./HtxTextBox.module.scss";
 import throttle from "lodash.throttle";
 

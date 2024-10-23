@@ -21,7 +21,6 @@
   <link rel="preload" href="{{settings.HOSTNAME}}{% static 'fonts/Figtree-SemiBold.ttf' %}" type="font" crossorigin="anonymous">
 
   <!-- CSS -->
-  <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
   <link href="{{settings.HOSTNAME}}{% static 'css/uikit.css' %}" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}{% static 'css/main.css' %}" rel="stylesheet">
   <link href="{{settings.FRONTEND_HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
@@ -38,8 +37,12 @@
     window.exports = () => {};
   </script>
 
-  {% block head %}
+  {% block page_labeling %}
     <title>Label Studio</title>
+    <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
+  {% endblock %}
+
+  {% block head %}
   {% endblock %}
 
   {% block head-toast %}

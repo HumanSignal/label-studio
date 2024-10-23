@@ -1,4 +1,3 @@
-import React from "react";
 import { inject, observer } from "mobx-react";
 import { getEnv, types } from "mobx-state-tree";
 

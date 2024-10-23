@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import React, { createContext, useCallback, useContext, useEffect, useReducer } from "react";
+import { createContext, useCallback, useContext, useEffect, useReducer } from "react";
 import { Link } from "react-router-dom";
 import { useAPI } from "../../providers/ApiProvider";
 import { Block, Elem } from "../../utils/bem";

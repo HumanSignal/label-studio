@@ -1,4 +1,3 @@
-import React from "react";
 import { Table } from "antd";
 import { inject, observer } from "mobx-react";
 import { flow, getEnv, types } from "mobx-state-tree";

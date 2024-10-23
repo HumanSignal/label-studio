@@ -1,4 +1,3 @@
-import React from "react";
 import { Button, List, Select } from "antd";
 import { getRoot, isValidReference } from "mobx-state-tree";
 import { observer } from "mobx-react";
