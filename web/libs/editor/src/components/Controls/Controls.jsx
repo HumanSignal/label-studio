@@ -1,8 +1,3 @@
-/**
- * @deprecated This component is not used anywhere.
- */
-
-import React from "react";
 import { inject, observer } from "mobx-react";
 import { CheckCircleOutlined, CheckOutlined } from "@ant-design/icons";
 

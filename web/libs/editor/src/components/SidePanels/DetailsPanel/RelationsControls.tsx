@@ -1,4 +1,4 @@
-import React, { type FC, useCallback } from "react";
+import { type FC, useCallback } from "react";
 import { observer } from "mobx-react";
 import { Block, Elem } from "../../../utils/bem";
 import { Button } from "../../../common/Button/Button";

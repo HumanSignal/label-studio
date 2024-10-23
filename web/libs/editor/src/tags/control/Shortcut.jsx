@@ -1,4 +1,3 @@
-import React from "react";
 import { Tag } from "antd";
 import { inject, observer } from "mobx-react";
 import { getParent, types } from "mobx-state-tree";

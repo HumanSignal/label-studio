@@ -1,6 +1,6 @@
 import chr from "chroma-js";
 import { format } from "date-fns";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { LsBulb, LsCheck, LsEllipsis, LsMinus } from "../../assets/icons";
 import { Button, Dropdown, Menu, Pagination, Userpic } from "../../components";

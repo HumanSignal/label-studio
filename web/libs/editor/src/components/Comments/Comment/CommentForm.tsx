@@ -12,9 +12,7 @@ import { LinkState } from "./LinkState";
 import "./CommentForm.scss";
 import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
 import { CommentFormButtons } from "./CommentFormButtons";
-import { taxonomyPathsToSelectedItems } from "../../../utils/commentClassification";
-
-const TAXONOMY_OPTIONS = { pathSeparator: "/", showFullPath: true };
+import { taxonomyPathsToSelectedItems, COMMENT_TAXONOMY_OPTIONS } from "../../../utils/commentClassification";
 
 export type CommentFormProps = {
   commentStore: any;
@@ -174,7 +172,7 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
               selected={selections}
               items={classificationsItems}
               onChange={taxonomyOnChange}
-              options={TAXONOMY_OPTIONS}
+              options={COMMENT_TAXONOMY_OPTIONS}
               defaultSearch={false}
             />
           </Elem>

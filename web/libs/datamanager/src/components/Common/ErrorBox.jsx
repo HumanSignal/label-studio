@@ -1,5 +1,4 @@
 import { inject } from "mobx-react";
-import React from "react";
 import { RiErrorWarningFill } from "react-icons/ri";
 import { Button } from "./Button/Button";
 import { Dropdown } from "./Dropdown/Dropdown";

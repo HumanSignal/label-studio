@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1494: Padding in new textarea is missing in LSO (#6496)",
-  "commit": "3b04299dfd5bd0a994a56ead2b78cf2cbda94f4e",
-  "date": "2024-10-15T11:13:16.000Z",
+  "message": "chore: OPTIC-1154: biome linting tweaks (#6425)",
+  "commit": "7ed55c66a55660150fdc567ac9f861cc564db21c",
+  "date": "2024-10-22T20:22:23.000Z",
   "branch": "develop"
 }

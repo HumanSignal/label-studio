@@ -1,5 +1,4 @@
 import { inject, observer } from "mobx-react";
-import React from "react";
 import { Block } from "../../../utils/bem";
 import { FF_LOPS_E_10, isFF } from "../../../utils/feature-flags";
 import { Space } from "../../Common/Space/Space";

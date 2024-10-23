@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { DragDropContext, type DropResult } from "react-beautiful-dnd";
 
 import Column from "./Column";

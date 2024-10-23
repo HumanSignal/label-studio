@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from "react";
+import { useCallback, useContext } from "react";
 
 import { format, formatDistanceToNow, parseISO } from "date-fns";
 import { IconInfoOutline, IconPredictions, LsEllipsis } from "../../../assets/icons";
