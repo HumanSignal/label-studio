@@ -18,7 +18,7 @@
     color: var(--color-neutral-content-subtler);
   }
 
-  &:hover:not(.disabled):not([disabled]) {
+  &:hover:not(.disabled, [disabled]) {
     border-color: var(--color-neutral-border-bolder);
   }
   
