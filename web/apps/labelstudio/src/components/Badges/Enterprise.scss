@@ -8,8 +8,8 @@
 
   &__label {
     margin: 1px;
-    background: var(--persimmon_0);
-    color: var(--persimmon_400);
+    background: var(--color-negative-background);
+    color: var(--color-negative-content-subtle);
     border-radius: 3px;
     font-size: 11px;
     padding: 2px 5px 2px 3px;
@@ -22,10 +22,10 @@
 
   &_filled &__label {
     background: none;
-    color: var(--persimmon_0);
+    color: var(--color-negative-background);
   }
 
   &_filled &__icon path {
-    fill: var(--persimmon_0);
+    fill: var(--color-negative-background);
   }
 }
