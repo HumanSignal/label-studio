@@ -4,14 +4,14 @@
   display: flex;
   min-width: 114px;
   border-radius: 8px;
-  background: var(--sand_100);
+  background: var(--color-neutral-surface);
   box-sizing: border-box;
-  box-shadow: 0 0 0 1px var(--sand_300) inset;
+  box-shadow: 0 0 0 1px var(--color-neutral-border) inset;
   transition: box-shadow 80ms ease;
 
   &_disabled {
     opacity: 0.6;
-    background-color: var(--sand_200);
+    background-color: var(--color-neutral-background);
   }
 
   &__btn {
@@ -19,31 +19,31 @@
     min-height: 32px;
     margin: 4px;
     border-radius: 4px;
-    background: var(--sand_0);
+    background: var(--color-neutral-background);
     display: flex;
-    color: var(--primary_link);
+    color: var(--color-primary-surface-content);
     border: none;
     outline: none;
     align-items: center;
     justify-content: center;
     transition: all 80ms ease;
-    box-shadow: 0 1px 0 var(--sand_200), 0 0 0 1px var(--sand_100), 0 5px 10px var(--sand_300);
+    box-shadow: 0 1px 0 var(--color-neutral-shadow), 0 0 0 1px var(--color-neutral-shadow), 0 5px 10px var(--color-neutral-shadow);
 
     &_disabled {
       box-shadow: none;
       background: none;
       pointer-events: none;
-      color: var(--sand_500);
+      color: var(--color-content-subtlest);
     }
 
     &:active {
-      background: var(--sand_0);
-      box-shadow: 0 1px 0 var(--sand_200), 0 0 0 1px var(--sand_100), 0 5px 10px var(--sand_300);
+      background: var(--color-neutral-background);
+      box-shadow: 0 1px 0 var(--color-neutral-shadow), 0 0 0 1px var(--color-neutral-shadow), 0 5px 10px var(--color-neutral-shadow);
     }
 
     &:active,
     &:hover {
-      color: var(--grape_700);
+      color: var(--color-primary-surface-content);
     }
   }
 
@@ -57,5 +57,6 @@
     outline: none;
     font-size: 16px;
     line-height: 22px;
+    color: var(--color-neutral-content);
   }
 }

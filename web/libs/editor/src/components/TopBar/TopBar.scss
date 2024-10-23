@@ -6,7 +6,7 @@
   display: flex;
   align-items: stretch;
   justify-content: space-between;
-  background-color: var(--color-neutral-backround-bold-dark);
+  background-color: var(--color-neutral-surface-active);
   border-bottom: 1px solid var(--color-neutral-border);
   user-select: none;
   position: sticky;
@@ -40,7 +40,7 @@
 
   &_newLabelingUI {
     display: block;
-    background-color: var(--color-neutral-background-bold-dark);
+    background-color: var(--color-neutral-surface-active);
     height: 42px;
     border-bottom: 1px solid var(--color-neutral-border);
 

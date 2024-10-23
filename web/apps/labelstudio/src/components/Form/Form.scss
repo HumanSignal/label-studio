@@ -38,12 +38,12 @@
   &__info {
     display: flex;
     align-items: center;
-    color: var(--danger_color);
+    color: var(--color-negative-content);
     font-size: 14px;
     line-height: 22px;
 
     &_valid {
-      color: var(--sand_600);
+      color: var(--color-neutral-content-subtler);
     }
   }
 
@@ -60,13 +60,14 @@
 .select-ls__list {
   transition: all 100ms ease-out;
   outline: 0;
+  color: var(--color-neutral-content);
 
   &:not(&_ghost):focus,
   &_focused {
     outline: 4px solid var(--color-primary-focus-outline);
 
     // box-shadow: 0 0 0 6px var(--grape_100), inset 0 -1px 0 rgb(0 0 0 / 10%), inset 0 0 0 1px rgb(0 0 0 / 15%), inset 0 0 0 1px var(--grape_100);
-    border-color: var(--color-neutral-border-dark);
+    border-color: var(--color-neutral-border-boldest);
   }
 }
 

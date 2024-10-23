@@ -7,6 +7,8 @@ html, body {
   font-weight: 400;
   height: 100%;
   font-family: 'Hellix', sans-serif;
+  background-color: var(--color-neutral-background-bold);
+  color: var(--color-neutral-content);
 }
 
 .login_page_new_ui .left {
@@ -60,12 +62,16 @@ html, body {
   line-height: 28px;
 }
 
+.login_page_new_ui .left img {
+  color: var(--color-neutral-content);
+}
+
 .login_page_new_ui .tips {
   max-width: 520px;
   border-radius: 8px;
   border: 1px solid var(--sand_300);
-  background: var(--sand_0);
-  box-shadow: 0 2px 6px 0 var(--sand_300);
+  background: var(--color-neutral-surface);
+  box-shadow: 0 2px 6px 0 rgb(var(--color-neutral-shadow) / 20%);
   padding: 16px;
   margin:18vh 60px 0 60px;
   position: relative;
@@ -100,7 +106,7 @@ html, body {
 }
 
 .login_page_new_ui .tips .description a {
-  color: var(--primary_link);
+  color: var(--color-primary-content);
   font-size: .875rem;
   font-style: normal;
   font-weight: 500;
@@ -134,22 +140,23 @@ html, body {
   text-align: center;
   padding: .75rem 0;
   font-size: 1rem;
-  color: var(--sand_500);
+  color: var(--color-neutral-border);
   border-top: 2px solid transparent;
+  transition: all 150ms ease-out;
 }
 .login_page_new_ui .toggle > *.active {
-  border-color: var(--primary_link); 
-  color: var(--primary_link);
+  border-color: var(--color-primary-surface); 
+  color: var(--color-primary-content);
 }
 .login_page_new_ui .toggle > *:hover {
-  color: var(--grape_700);
-  border-color: var(--grape_700);
+  color: var(--color-primary-surface-hover);
+  border-color: var(--color-primary-surface-hover);
 }
 .form-wrapper{
   position: relative;
-  background: #FDFDFC;
+  background: var(--color-neutral-surface);
   margin-top: 1.5rem;
-  border: 1px solid #E1DED5;
+  border: 1px solid var(--color-neutral-border);
   padding: 2rem;
   border-radius: 1rem;
   box-shadow: 0px 0px 12px rgba(23, 20, 13, 0.16);
@@ -177,7 +184,7 @@ html, body {
   margin: 0;
 }
 .login_page_new_ui form .error {
-  color: var(--red_7);
+  color: var(--color-negative-content);
   font-size: .875rem;
 }
 .login_page_new_ui form input,
@@ -188,7 +195,8 @@ html, body {
 
 .login_page_new_ui form button {
   border-radius: 4rem;
-  background: var(--sand_900);
+  background: var(--color-neutral-inverted-surface);
+  color: var(--color-neutral-inverted-content);
 }
 
 .login_page_new_ui .field_errors {
@@ -198,7 +206,7 @@ html, body {
   text-align: left;
   font-size: .875rem;
   line-height: 16px;
-  color: var(--red_7);
+  color: var(--color-negative-content);
 }
 .login_page_new_ui .field_errors li {
   margin-top: .25rem;
@@ -213,10 +221,10 @@ html, body {
 .auto-generated form input {
   height: 40px;
   min-height: 40px;
-  background: var(--sand_0);
+  background: var(--color-neutral-surface);
   font-size: 1rem;
   line-height: 22px;
-  border: 1px solid var(--sand_300);
+  border: 1px solid var(--color-neutral-border);
   box-sizing: border-box;
   border-radius: 5px;
   padding: 0 16px;

@@ -4,9 +4,7 @@
   align-items: stretch;
   justify-content: space-between;
   box-shadow: 0 -1px 0 var(--color-neutral-border) inset;
-  background: var(--color-neutral-background-bold);
-
-  // border-bottom: 1px solid var(--color-neutral-border);
+  background: var(--color-neutral-surface);
   padding-top: 2px;
 
   &-content {
@@ -33,7 +31,7 @@
 
   &__item {
     color: var(--color-neutral-content-subtler);
-    background-color: var(--color-neutral-background-bold-dark);
+    background-color: var(--color-neutral-surface-active);
     width: 100%;
     overflow: hidden;
     cursor: pointer;
@@ -119,7 +117,7 @@
     }
 
     &:hover {
-      color: var(--color-primary-content-bold);
+      color: var(--color-primary-surface-content);
     }
   }
 

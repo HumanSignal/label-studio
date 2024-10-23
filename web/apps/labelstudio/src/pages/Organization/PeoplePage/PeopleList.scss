@@ -73,12 +73,12 @@
     display: flex;
 
     &:nth-child(odd):not(&_active) {
-      background-color: var(--color-neutral-background-bold);
+      background-color: var(--color-neutral-surface);
     }
 
     &_active {
       position: relative;
-      background-color: var(--color-primary-background-bold);
+      background-color: var(--color-primary-surface);
 
       &::before,
       &::after {
@@ -92,7 +92,7 @@
 
       &::after {
         z-index: 1;
-        background-color: var(--color-neutral-background-bold);
+        background-color: var(--color-neutral-surface);
         width: calc(100% + 22px);
         box-shadow: inset 4px 0 0 var(--grape_500), 1px 0 0 1px var(--color-neutral-border) inset;
       }

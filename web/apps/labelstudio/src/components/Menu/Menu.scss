@@ -37,8 +37,8 @@
     }
 
     &-beta {
-      background-color: var(--plum_500);
-      color: var(--plum_0);
+      background-color: var(--color-accent-plum-bold);
+      color: var(--color-accent-plum-subtlest);
       font-size: 12px;
       font-style: normal;
       font-weight: 500;
@@ -50,7 +50,7 @@
 
     &_look {
       &_danger {
-        color: var(--color-negative-content-bold);
+        color: var(--color-negative-content);
       }
     }
 
@@ -80,10 +80,10 @@
     }
 
     &_dangerous {
-      color: var(--color-negative-content-bold);
+      color: var(--color-negative-content);
 
       &:hover {
-        color: var(--color-negative-content-bold) !important;
+        color: var(--color-negative-content) !important;
         background-color: var(--color-negative-emphasis-subtle) !important;
       }
     }
@@ -143,10 +143,10 @@
     }
 
     &_dangerous {
-      color: var(--color-negative-content-bold);
+      color: var(--color-negative-content);
 
       &:hover {
-        color: var(--color-negative-content-bold);
+        color: var(--color-negative-content);
         background-color: var(--color-negative-emphasis-subtle);
       }
     }

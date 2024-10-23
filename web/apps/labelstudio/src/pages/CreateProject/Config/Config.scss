@@ -4,7 +4,7 @@ $scroll-width: 5px;
   &::-webkit-scrollbar {
     width: 6px;
     height: 6px;
-    background-color: var(--sand_100);
+    background-color: var(--color-neutral-border-boldest);
   }
 
   &::-webkit-scrollbar-thumb {
@@ -211,6 +211,7 @@ $scroll-width: 5px;
   font-size: 1.75rem;
   width: 100%;
   display: flex;
+  color: var(--color-neutral-content);
 }
 
 .wizard h1 a[name="config"] {
@@ -286,7 +287,7 @@ $scroll-width: 5px;
 
 .wizard .configure__visual {
   > * {
-    border-top: 1px solid var(--sand_300);
+    border-top: 1px solid var(--color-neutral-border);
     padding-top: 16px;
     margin-bottom: 16px;
   }
@@ -295,16 +296,18 @@ $scroll-width: 5px;
 .wizard .configure__object {
   h4 {
     margin-bottom: 8px;
+    color: var(--color-neutral-content);
   }
 
   > p {
     line-height: 32px;
+    color: var(--color-neutral-content-subtler);
   }
 
   > p.configure__object-error {
     line-height: 22px;
     margin-top: 8px;
-    color: var(--red_10);
+    color: var(--color-negative-content);
   }
 
   input {
@@ -341,6 +344,10 @@ $scroll-width: 5px;
   align-items: flex-start;
   flex: 1;
 
+  span {
+    color: var(--color-neutral-content-subtler);
+  }
+
   textarea {
     flex-grow: 1;
     margin: 8px 0;
@@ -352,6 +359,7 @@ $scroll-width: 5px;
 .wizard .configure__visual h4 {
   margin: 0;
   font-weight: 500;
+  color: var(--color-neutral-content);
 }
 
 /*** Configure Labels ***/
@@ -365,6 +373,7 @@ $scroll-width: 5px;
   h3 {
     font-size: 16px;
     margin: 0 32px 7px;
+    color: var(--color-neutral-content);
   }
 }
 
@@ -492,6 +501,7 @@ $scroll-width: 5px;
 
   label {
     cursor: pointer;
+    color: var(--color-neutral-content-subtler);
   }
 
   input[type="checkbox"] {
@@ -513,16 +523,18 @@ $scroll-width: 5px;
   min-width: 500px;
   padding: 16px 16px 0;
   overflow-y: auto;
-  border-left: 1px solid var(--sand_300);
-  background-color: var(--sand_100);
+  border-left: 1px solid var(--color-neutral-border);
+  background-color: var(--color-neutral-surface);
   display: flex;
   flex-direction: column;
+  color: var(--color-neutral-content);
 
   @include styled-scroll;
 
   h3 {
     margin: 8px 0 16px;
     font-size: 16px;
+    color: var(--color-neutral-content);
   }
 
   iframe {

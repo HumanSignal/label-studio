@@ -1,7 +1,7 @@
 .user-info {
   padding: 20px 24px;
   border: 1px solid var(--color-neutral-border);
-  background: var(--color-neutral-background-bold);
+  background: var(--color-neutral-surface);
   align-self: start;
   display: flex;
   flex-direction: column;
@@ -15,9 +15,14 @@
     height: 32px;
     position: absolute;
 
-    --button-color: var(--grape_500);
+    --button-color: var(--color-primary-content);
 
     border: none;
+
+    &:hover {
+      color: var(--color-primary-content);
+      background-color: var(--color-primary-emphasis-subtle);
+    }
   }
 
   &__header {
@@ -64,7 +69,6 @@
   &__links-list {
     display: flex;
     flex-direction: column;
-    max-width: 350px;
   }
 
   &__project-link {
@@ -75,11 +79,10 @@
     margin-left: -10px;
     align-items: center;
     border-radius: 4px;
-    color: var(--color-primary-content-bold);
+    color: var(--color-primary-content);
 
     &:hover {
-      background-color: var(--color-primary-emphasis);
-      color: var(--color-primary-content);
+      background-color: var(--color-primary-emphasis-subtle);
     }
   }
 }

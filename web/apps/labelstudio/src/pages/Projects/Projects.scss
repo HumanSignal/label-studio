@@ -102,8 +102,8 @@
   transition: all 150ms ease-out;
 
   &:hover {
-    background-color: var(--color-neutral-background-bold);
-    border-color: var(--color-primary-border);
+    background-color: var(--color-neutral-surface);
+    border-color: var(--color-primary-border-subtle);
   }
 
   &__header {
@@ -173,11 +173,11 @@
 
       &_type {
         &_completed {
-          --icon-color: var(--color-positive-content-bold);
+          --icon-color: var(--color-positive-icon);
         }
 
         &_rejected {
-          --icon-color: var(--color-negative-content-bold);
+          --icon-color: var(--color-negative-icon);
         }
 
         &_predictions {

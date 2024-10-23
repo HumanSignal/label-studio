@@ -38,7 +38,7 @@
     button {
       margin-left: -1px;
       border-radius: 0 5px 5px 0;
-      background: var(--color-primary-background-bold);
+      background: var(--color-primary-surface);
       color: var(--sand_0);
       cursor: pointer;
     }
@@ -163,11 +163,11 @@
   position: relative;
 
   a {
-    color: var(--color-primary-content-bold);
+    color: var(--color-primary-surface-content);
     text-decoration: underline;
 
     &:hover {
-      color: var(--color-primary-content-bold-subtle);
+      color: var(--color-primary-surface-content-subtle);
     }
   }
 

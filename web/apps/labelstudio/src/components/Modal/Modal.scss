@@ -79,24 +79,25 @@
     text-align: center;
     font-size: 14px;
     line-height: 22px;
+    color: var(--color-neutral-content-subtle);
 
     & a {
-      color: var(--color-primary-content-bold);
+      color: var(--color-primary-surface-content);
       text-decoration: underline;
 
       &:hover {
-        color: var(--color-primary-content-bold-light);
+        color: var(--color-primary-surface-content-light);
       }
     }
 
     &:not(.modal__footer_bare) {
-      background: var(--color-neutral-background-bold);
+      background: var(--color-neutral-surface);
       box-shadow: inset 0 1px 0 var(--color-neutral-border);
     }
   }
 
   &__close {
-    --button-color: var(--primary_link);
+    --button-color: var(--color-primary-surface-content);
 
     border: none;
 

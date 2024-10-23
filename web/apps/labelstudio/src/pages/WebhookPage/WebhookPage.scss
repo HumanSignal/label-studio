@@ -22,7 +22,7 @@
     width: 100%;
     height: 112px - 24px;
     background: var(--color-primary-background);
-    border: 1px var(--color-primary-border-light) solid;
+    border: 1px var(--color-primary-border-subtlest) solid;
     margin-left: -2px;
     display: flex;
     padding-top: 24px;
@@ -40,7 +40,7 @@
     }
 
     & a {
-      color: var(--color-primary-content-bold);
+      color: var(--color-primary-content);
       text-decoration: underline;
     }
   }

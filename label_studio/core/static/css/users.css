@@ -3,6 +3,7 @@
 body {
   --border-color: var(--color-neutral-border);
   --color-error: var(--color-negative-content-bold);
+  color: var(--color-neutral-content);
 }
 .account-page {
   display: grid;
