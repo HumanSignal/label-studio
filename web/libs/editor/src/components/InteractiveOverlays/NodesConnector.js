@@ -17,7 +17,7 @@ const parentImagePropsWatch = {
 };
 
 const obtainWatcher = (node) => {
-  // that's a tricky way to get watcher also fo exact result instead of whole region
+  // that's a tricky way to get watcher also for an exact result instead of whole region
   // works for global classifications and per-regions
   const isResult = !!node.from_name;
   if (isResult) {
