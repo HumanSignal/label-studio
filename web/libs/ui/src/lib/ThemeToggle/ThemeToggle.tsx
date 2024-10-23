@@ -6,6 +6,7 @@ import { ReactComponent as Sun } from "./icons/sun.svg";
 import { ReactComponent as Moon } from "./icons/moon.svg";
 
 const THEME_OPTIONS = ["Auto", "Light", "Dark"];
+const PREFERRED_COLOR_SCHEME_KEY = "preferred-color-scheme";
 export interface ThemeToggleOption {
   label?: string;
   icon?: string;
@@ -19,12 +20,13 @@ const ThemeOption = ({ label, icon }: ThemeToggleOption) => {
   );
 };
 export const ThemeToggle = () => {
-  const [theme, setTheme] = useState(THEME_OPTIONS[0]);
+  const presetTheme = window.localStorage.getItem(PREFERRED_COLOR_SCHEME_KEY) ?? THEME_OPTIONS[0];
+  const [theme, setTheme] = useState(presetTheme);
   const systemMode = useMemo(
     () => (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "Dark" : "Light"),
     [],
   );
-  const [appliedTheme, setAppliedTheme] = useState(theme === "Auto" ? systemMode : theme);
+  const [appliedTheme, setAppliedTheme] = useState(presetTheme === "Auto" ? systemMode : presetTheme);
 
   useEffect(() => {
     if (!appliedTheme) return;
@@ -36,6 +38,7 @@ export const ThemeToggle = () => {
     const index = (THEME_OPTIONS.indexOf(theme) + 1) % length;
     const nextTheme = THEME_OPTIONS[index];
 
+    window.localStorage.setItem(PREFERRED_COLOR_SCHEME_KEY, nextTheme);
     setTheme(nextTheme);
     setAppliedTheme(nextTheme === "Auto" ? systemMode : nextTheme);
   };
