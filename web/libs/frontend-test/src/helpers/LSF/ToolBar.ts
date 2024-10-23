@@ -1,4 +1,3 @@
-import { FF_DEV_1170 } from "@humansignal/frontend-test/feature-flags";
 import { LabelStudio } from "@humansignal/frontend-test/helpers/LSF/LabelStudio";
 import { FF_DEV_3873 } from "../../../../editor/src/utils/feature-flags";
 

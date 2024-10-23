@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { Button } from "antd";
 import { observer } from "mobx-react";
 import { PauseCircleOutlined, PlayCircleOutlined } from "@ant-design/icons";

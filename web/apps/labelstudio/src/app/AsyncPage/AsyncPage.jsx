@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { ErrorWrapper } from "../../components/Error/Error";
 import { modal } from "../../components/Modal/Modal";
