@@ -1,0 +1,24 @@
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: outline 0.1s ease;
+}
+
+.themeOption {
+  display: flex;
+  justify-content: center;
+  align-self: stretch;
+
+  &__label {
+    display: flex;
+    height: 100%;
+    align-items: center;
+  }
+
+  &__icon {
+    display: flex;
+    height: 100%;
+    align-items: center;
+  }
+}

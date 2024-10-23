@@ -1,0 +1,19 @@
+.multiStateToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: outline 0.1s ease;
+
+  &__option {
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+    display: none;
+
+    &_selected {
+      display: inline-flex;
+    }
+  }
+}

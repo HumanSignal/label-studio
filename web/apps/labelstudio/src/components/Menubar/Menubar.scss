@@ -16,6 +16,10 @@
   border-bottom: 1px solid var(--color-neutral-border);
   transition: background-color 400ms ease-out;
 
+  &__spacer {
+    width: var(--spacing-small);
+  }
+
   &__context {
     flex: 1;
     display: flex;

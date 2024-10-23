@@ -28,6 +28,7 @@ import "./MenuContent.scss";
 import "./MenuSidebar.scss";
 import { ModelsPage } from "../../pages/Organization/Models/ModelsPage";
 import { FF_DIA_835, isFF } from "../../utils/feature-flags";
+import { ThemeToggle } from "@humansignal/ui";
 
 export const MenubarContext = createContext();
 
@@ -143,6 +144,10 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
 
             <RightContextMenu className={contextItem.mod({ right: true })} />
           </div>
+
+          <div className={menubarClass.elem("spacer").toString()} />
+
+          <ThemeToggle />
 
           <Dropdown.Trigger
             ref={useMenuRef}

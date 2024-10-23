@@ -19,7 +19,6 @@
     margin-left: 0;
     height: 100%;
     background-color: var(--color-neutral-background);
-    transition: margin var(--menu-animation-duration) var(--menu-animation-curve);
     will-change: margin-left;
     transition: background-color 400ms ease-out;
     
