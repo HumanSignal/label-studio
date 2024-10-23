@@ -31,7 +31,7 @@ export const Anchor = types
      */
     get overlayNode() {
       const { result, region } = self;
-      if (self.comment.isResolved) return null;
+      if (self.comment.isResolved || self.comment.isDeleted) return null;
       if (!region || region.hidden) return null;
       const isOnCurrentItem = (region.item_index ?? 0) === (region.object.currentItemIndex ?? 0);
       if (!isOnCurrentItem) return null;
