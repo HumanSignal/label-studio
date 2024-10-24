@@ -59,8 +59,8 @@ import { AnnotationMixin } from "../../mixins/AnnotationMixin";
  * @param {string} [style] CSS style string
  * @param {string} [className] - Class name of the CSS style to apply. Use with the Style tag
  * @param {string} [idAttr] - Unique ID attribute to use in CSS
- * @param {region-selected|choice-selected|no-region-selected|choice-unselected} [visibleWhen] Control visibility of the content. Can also be used with the `when*` parameters below to narrow visibility
- * @param {string} [whenTagName] Use with `visibleWhen`. Narrow down visibility by tag name. For regions, use the name of the object tag, for choices, use the name of the `choices` tag
+ * @param {region-selected|choice-selected|no-region-selected|choice-unselected|tag-selected} [visibleWhen] Control visibility of the content. Can also be used with the `when*` parameters below to narrow visibility
+ * @param {string} [whenTagName] Use with `visibleWhen`. Narrow down visibility by tag name. For regions, use the name of the object tag, for choices, use the name of the `choices` tag, for tag use the name of the tag
  * @param {string} [whenLabelValue] Use with `visibleWhen="region-selected"`. Narrow down visibility by label value. Multiple values can be separated with commas
  * @param {string} [whenChoiceValue] Use with `visibleWhen` (`"choice-selected"` or `"choice-unselected"`) and `whenTagName`, both are required. Narrow down visibility by choice value. Multiple values can be separated with commas
  */
@@ -113,14 +113,17 @@ const Model = types.model({
     "textarea",
     "pairwise",
     "style",
+    "label",
     "relations",
     "filter",
+    "timeseries",
+    "timeserieslabels",
     "pagedview",
     "paragraphs",
     "paragraphlabels",
     "video",
     "videorectangle",
-    "timelinelabels",
+    "ranker",
   ]),
 });
 
