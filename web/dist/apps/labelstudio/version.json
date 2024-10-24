@@ -1,6 +1,6 @@
 {
-  "message": "chore: OPTIC-1234: add examples of how to mock the api endpoint for runtime (#6538)",
-  "commit": "b3aeed61cc1ad8e1f724db3c1b6b85882bdbb36e",
-  "date": "2024-10-24T13:51:30.000Z",
+  "message": "fix: LEAP-1579: LEAP-1576: LEAP-1582: Improve comment icons usability (#6546)",
+  "commit": "094e5d7ab9df76c443a970db887798b7a48e6db8",
+  "date": "2024-10-24T14:06:52.000Z",
   "branch": "develop"
 }
