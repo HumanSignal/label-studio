@@ -43,6 +43,16 @@
     "mac": "alt+enter",
     "description": "Skip task"
   },
+  "task:next": {
+    "key": "ctrl+right",
+    "mac": "command+right",
+    "description": "Next task"
+  },
+  "task:previous": {
+    "key": "ctrl+left",
+    "mac": "command+left",
+    "description": "Previous task"
+  },
   "annotation:undo": {
     "key": "ctrl+z",
     "mac": "command+z",
