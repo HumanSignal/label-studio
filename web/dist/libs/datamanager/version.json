@@ -1,6 +1,6 @@
 {
-  "message": "chore: OPTIC-1154: biome linting tweaks (#6425)",
-  "commit": "7ed55c66a55660150fdc567ac9f861cc564db21c",
-  "date": "2024-10-22T20:22:23.000Z",
+  "message": "chore: OPTIC-1234: add examples of how to mock the api endpoint for runtime (#6538)",
+  "commit": "b3aeed61cc1ad8e1f724db3c1b6b85882bdbb36e",
+  "date": "2024-10-24T13:51:30.000Z",
   "branch": "develop"
 }
