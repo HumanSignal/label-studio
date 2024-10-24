@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import Button from "antd/lib/button/index";
 import Radio from "antd/lib/radio/index";
 import Checkbox from "antd/lib/checkbox/index";

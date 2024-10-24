@@ -1,4 +1,4 @@
-import React, { Fragment, useContext } from "react";
+import { Fragment, useContext } from "react";
 import { Circle } from "react-konva";
 import { getRoot, types } from "mobx-state-tree";
 

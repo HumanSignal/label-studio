@@ -82,7 +82,7 @@ jobs:
         continue-on-error: true
         uses: ./.github/actions-hub/actions/git-merge
         with:
-          base_branch: ${{ steps.get-branch.outputs.base_name }}
+          base_branch: ${{ steps.get-branch.outputs.base_branch_name }}
           head_branch: ${{ steps.get-branch.outputs.branch_name }}
           our_files: "pyproject.toml poetry.lock web"
           working_directory: "${{ env.UPSTREAM_REPO_WORKDIR }}"

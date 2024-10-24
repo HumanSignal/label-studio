@@ -1,8 +1,12 @@
 {% extends 'simple.html' %}
 {% load static %}
 
-{% block head %}
+{% block page_labeling %}
   <title>404 | Label Studio</title>
+  {{ block.super }}
+{% endblock %}
+
+{% block head %}
   <link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/error.css' %}"/>
 {% endblock %}
 

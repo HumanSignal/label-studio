@@ -1,4 +1,4 @@
-import { type InputHTMLAttributes, useEffect, useMemo, useRef } from "react";
+import { type InputHTMLAttributes, useEffect, useRef } from "react";
 import { clsx } from "clsx";
 import styles from "./checkbox.module.scss";
 

@@ -48,6 +48,8 @@ export class Segment extends Events<SegmentEvents> {
   color: RgbaColorArray = rgba("#afafaf");
   selected = false;
   highlighted = false;
+  // active means that segment intersects with the cursor
+  active = false;
   updateable = true;
   locked = false;
   deleteable = true;
@@ -168,6 +170,21 @@ export class Segment extends Events<SegmentEvents> {
     return this.xStart + this.width;
   }
 
+  get yStart() {
+    const { timelinePlacement, timelineHeight } = this;
+    const timelineLayer = this.visualizer.getLayer("timeline");
+    const timelineTop = timelinePlacement === defaults.timelinePlacement;
+    const top = timelineLayer?.isVisible && timelineTop ? timelineHeight : 0;
+
+    return top;
+  }
+
+  get yEnd() {
+    const { height } = this.visualizer;
+    const { timelineHeight } = this;
+    return this.yStart + (height - timelineHeight);
+  }
+
   get width() {
     const { start, end } = this;
     const { width } = this.visualizer;
@@ -203,7 +220,7 @@ export class Segment extends Events<SegmentEvents> {
 
   private get inViewport() {
     const { xStart: startX, xEnd: endX } = this;
-    const width = this.visualizer.width * this.zoom;
+    const width = this.visualizer.width;
 
     // Both coordinates are less than or equal to 0
     if (startX <= 0 && endX <= 0) return false;
@@ -322,16 +339,14 @@ export class Segment extends Events<SegmentEvents> {
       return;
     }
 
-    const { color: _color, selected, highlighted, timelinePlacement, timelineHeight } = this;
+    const { color: _color, selected, highlighted, active } = this;
     const { height } = this.visualizer;
 
     const color = _color.clone();
-    const timelineLayer = this.visualizer.getLayer("timeline");
-    const timelineTop = timelinePlacement === defaults.timelinePlacement;
-    const top = timelineLayer?.isVisible && timelineTop ? timelineHeight : 0;
+    const top = this.yStart;
     const layer = this.controller.layerGroup;
 
-    if (selected || highlighted) {
+    if (selected || highlighted || active) {
       color.darken(0.4);
     }
 
@@ -359,7 +374,7 @@ export class Segment extends Events<SegmentEvents> {
   };
 
   handleHighlighted = (highlighted?: boolean) => {
-    if (!this.updateable || this.selected) return;
+    if (!this.updateable || (this.isDragging && this.selected)) return;
     this.highlighted = highlighted ?? !this.highlighted;
     this.invoke("update", [this]);
     this.waveform.invoke("regionUpdated", [this]);

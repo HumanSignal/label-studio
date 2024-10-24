@@ -21,7 +21,6 @@ export const Actions = ({ store }) => {
         <Tooltip placement="topLeft" title="Show instructions">
           <Button
             icon={<IconInfoOutline style={{ width: 20, height: 20 }} />}
-            primary={store.showingDescription}
             type="text"
             aria-label="Instructions"
             onClick={() => store.toggleDescription()}

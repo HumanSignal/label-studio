@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import { Component } from "react";
 import { MIN_SIZE } from "../../tools/Base";
 import { getBoundingBoxAfterChanges } from "../../utils/image";
 import LSTransformer from "./LSTransformer";

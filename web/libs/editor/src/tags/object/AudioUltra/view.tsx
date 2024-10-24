@@ -58,6 +58,9 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
       denoize: true,
     },
     autoPlayNewSegments: true,
+    onFrameChanged: (frameState) => {
+      item.setWFFrame(frameState);
+    },
   });
 
   useEffect(() => {
@@ -87,17 +90,26 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
     };
 
     const selectRegion = (region: Region | Segment, event: MouseEvent) => {
+      const annotation = item.annotation;
+
       const growSelection = event.metaKey || event.ctrlKey;
 
       if (!growSelection || (!region.selected && !region.isRegion)) item.annotation.regionStore.unselectAll();
 
       // to select or unselect region
       const itemRegion = item.regs.find((obj: any) => obj.id === region.id);
-
-      itemRegion && item.annotation.regionStore.toggleSelection(itemRegion, region.selected);
-
       // to select or unselect unlabeled segments
       const targetInWave = item._ws.regions.findRegion(region.id);
+
+      if (annotation.isLinkingMode && itemRegion) {
+        annotation.addLinkedRegion(itemRegion);
+        annotation.stopLinkingMode();
+        annotation.regionStore.unselectAll();
+        region.handleSelected(false);
+        return;
+      }
+
+      itemRegion && item.annotation.regionStore.toggleSelection(itemRegion, region.selected);
 
       if (targetInWave) {
         targetInWave.handleSelected(region.selected);
@@ -145,7 +157,12 @@ const AudioUltraView: FC<AudioUltraProps> = ({ item }) => {
       {item.errors?.map((error: any, i: any) => (
         <ErrorMessage key={`err-${i}`} error={error} />
       ))}
-      <div ref={(el) => (rootRef.current = el)} />
+      <div
+        ref={(el) => {
+          rootRef.current = el;
+          item.stageRef.current = el;
+        }}
+      />
       <Controls
         position={controls.currentTime}
         playing={controls.playing}

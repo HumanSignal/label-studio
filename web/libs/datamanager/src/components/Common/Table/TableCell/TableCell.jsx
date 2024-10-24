@@ -1,4 +1,3 @@
-import React from "react";
 import { TableElem } from "../TableContext";
 
 export const TableCell = ({ ...props }) => {

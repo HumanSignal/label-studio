@@ -54,7 +54,13 @@
       "correctness": {
         "useExhaustiveDependencies": "off",
         "noChildrenProp": "off",
-        "useJsxKeyInIterable": "off"
+        "useJsxKeyInIterable": "off",
+        "noUnusedImports": {
+          "level": "warn"
+        },
+        "noUnusedVariables": {
+          "level": "warn"
+        }
       },
       "performance": {
         "noAccumulatingSpread": "off",
