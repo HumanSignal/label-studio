@@ -5,6 +5,7 @@ import json
 import logging
 import traceback as tb
 from datetime import datetime
+from typing import Union
 from urllib.parse import urljoin
 
 import django_rq
@@ -231,9 +232,13 @@ class ImportStorage(Storage):
     def generate_http_url(self, url):
         raise NotImplementedError
 
-    def can_resolve_url(self, url):
-        # TODO: later check to the full prefix like "url.startswith(self.path_full)"
-        # Search of occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
+    def can_resolve_url(self, url: Union[str, None]) -> bool:
+        return self.can_resolve_scheme(url)
+
+    def can_resolve_scheme(self, url: Union[str, None]) -> bool:
+        if not url:
+            return False
+        # TODO: Search for occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
         _, prefix = get_uri_via_regex(url, prefixes=(self.url_scheme,))
         if prefix == self.url_scheme:
             return True
@@ -261,8 +266,8 @@ class ImportStorage(Storage):
         elif isinstance(uri, str):
             try:
                 # extract uri first from task data
-                extracted_uri, extracted_storage = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
-                if not extracted_storage:
+                extracted_uri, _ = get_uri_via_regex(uri, prefixes=(self.url_scheme,))
+                if not self.can_resolve_url(extracted_uri):
                     logger.debug(f'No storage info found for URI={uri}')
                     return
 

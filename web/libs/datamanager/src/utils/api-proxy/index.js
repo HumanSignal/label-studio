@@ -484,7 +484,7 @@ export class APIProxy {
             return Promise.resolve(response);
           },
           text() {
-            return JSON.stringify(response);
+            return typeof response === "string" ? response : JSON.stringify(response);
           },
           headers: {},
           status: 200,

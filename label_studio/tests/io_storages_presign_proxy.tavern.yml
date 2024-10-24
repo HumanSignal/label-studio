@@ -431,16 +431,19 @@ stages:
         content-type: application/json
       json:
         data:
-          image: gs://whatever-bucket-with/manual.link.jpg
+          image: gs://test-gs-bucket_JSON/manual.link.jpg
           dict:
-            key1: gs://whatever-bucket-with/manual.link.jpg
+            key1: gs://test-gs-bucket_JSON/manual.link.jpg
             array:
-              - gs://whatever-bucket-with/manual.link.jpg
-              - gs://whatever-bucket-with/manual.link.jpg
+              - gs://test-gs-bucket_JSON/manual.link.jpg
+              - gs://test-gs-bucket_JSON/manual.link.jpg
           array:
-            - item1: gs://whatever-bucket-with/manual.link.jpg
+            - item1: gs://test-gs-bucket_JSON/manual.link.jpg
               some: "some text"
-            - item2: gs://whatever-bucket-with/manual.link.jpg
+            - item2: gs://test-gs-bucket_JSON/manual.link.jpg
+              some: "some text"
+            # This link should not be resolved - no matching bucket
+            - item3: gs://bad-bucket/manual.link.jpg
               some: "some text"
       method: POST
       url: "{django_live_url}/api/projects/{project_pk}/import"
@@ -473,16 +476,19 @@ stages:
     response:
       json:
         data:
-          image: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
+          image: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly90ZXN0LWdzLWJ1Y2tldF9KU09OL21hbnVhbC5saW5rLmpwZw=="
           dict:
-            key1: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
+            key1: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly90ZXN0LWdzLWJ1Y2tldF9KU09OL21hbnVhbC5saW5rLmpwZw=="
             array:
-              - !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
-              - !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
+              - !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly90ZXN0LWdzLWJ1Y2tldF9KU09OL21hbnVhbC5saW5rLmpwZw=="
+              - !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly90ZXN0LWdzLWJ1Y2tldF9KU09OL21hbnVhbC5saW5rLmpwZw=="
           array:
-            - item1: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
+            - item1: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly90ZXN0LWdzLWJ1Y2tldF9KU09OL21hbnVhbC5saW5rLmpwZw=="
               some: "some text"
-            - item2: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
+            - item2: !re_match "/tasks/\\d+/presign/\\?fileuri=Z3M6Ly90ZXN0LWdzLWJ1Y2tldF9KU09OL21hbnVhbC5saW5rLmpwZw=="
+              some: "some text"
+            # This link should remain unresolved - no matching bucket
+            - item3: !re_match "gs://bad-bucket/manual.link.+"
               some: "some text"
       status_code: 200
 ---
@@ -1152,7 +1158,7 @@ stages:
   response:
     json:
       data:
-        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=czM6Ly9oeXBlcnRleHQtYnVja2V0L2ZpbGUgd2l0aCAvc3BhY2VzIGFuZCcgLyAnIC8gcXVvdGVzLmpwZw=="
+        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=czM6Ly9weXRlc3QtczMtanNvbnMtaHlwZXJ0ZXh0L2ZpbGUgd2l0aCAvc3BhY2VzIGFuZCcgLyAnIC8gcXVvdGVzLmpwZw=="
     status_code: 200
 ---
 # - Check that json blobs containing partially encoded contents resolve correctly from the bucket,
@@ -1216,7 +1222,7 @@ stages:
   response:
     json:
       data:
-        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=czM6Ly9oeXBlcnRleHQtYnVja2V0L2ZpbGUgd2l0aCAvc3BhY2VzIGFuZCcgLyAnIC8gJTJCcXVvdGVzJTNELmpwZw=="
+        text: !re_match "<a href=\"/tasks/\\d+/presign/\\?fileuri=czM6Ly9weXRlc3QtczMtanNvbi1wYXJ0aWFsbHktZW5jb2RlZC9maWxlIHdpdGggL3NwYWNlcyBhbmQnIC8gJyAvICUyQnF1b3RlcyUzRC5qcGc="
     status_code: 200
 ---
 # we don't fail when unexisted s3:// links occur in the list

@@ -1,6 +1,6 @@
 {
-  "message": "chore(deps): bump http-proxy-middleware from 2.0.6 to 2.0.7 in /web (#6551)",
-  "commit": "199f4241d1ef2b1838a56a90e4ccee4519763ada",
-  "date": "2024-10-23T16:03:04.000Z",
+  "message": "fix: LEAP-1579: LEAP-1576: LEAP-1582: Improve comment icons usability (#6546)",
+  "commit": "094e5d7ab9df76c443a970db887798b7a48e6db8",
+  "date": "2024-10-24T14:06:52.000Z",
   "branch": "develop"
 }

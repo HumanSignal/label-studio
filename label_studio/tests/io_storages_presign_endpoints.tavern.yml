@@ -101,11 +101,11 @@ stages:
 
   - name: get_presigned_url
     request:
-      url: "{django_live_url}/projects/{project_pk}/presign?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
+      url: "{django_live_url}/projects/{project_pk}/presign?fileuri=Z3M6Ly90ZXN0LWdzLWJ1Y2tldC9tYW51YWwubGluay5qcGc="
     response:
       status_code: 303
       headers:
-        location: "https://storage.googleapis.com/whatever-bucket-with/manual.link.jpg"
+        location: "https://storage.googleapis.com/test-gs-bucket/manual.link.jpg"
 
 
 ---
@@ -139,8 +139,8 @@ stages:
 
   - name: get_presigned_url
     request:
-      url: "{django_live_url}/tasks/{task_pk}/presign?fileuri=Z3M6Ly93aGF0ZXZlci1idWNrZXQtd2l0aC9tYW51YWwubGluay5qcGc="
+      url: "{django_live_url}/tasks/{task_pk}/presign?fileuri=Z3M6Ly90ZXN0LWdzLWJ1Y2tldC9tYW51YWwubGluay5qcGc="
     response:
       status_code: 303
       headers:
-        location: "https://storage.googleapis.com/whatever-bucket-with/manual.link.jpg"
+        location: "https://storage.googleapis.com/test-gs-bucket/manual.link.jpg"
