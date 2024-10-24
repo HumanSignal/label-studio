@@ -249,6 +249,36 @@ stages:
   response:
     status_code: 400
 
+- id: import_task_invalid_url
+  name: Import task from wrong bucket
+  request:
+    url: "{django_live_url}/api/projects/{project_pk}/tasks"
+    json:
+      data:
+        image_url: "s3:/"
+    method: POST
+    headers:
+      content-type: application/json
+  response:
+    status_code: 201
+    save:
+      json:
+        task_pk: id
+
+# check, that image_url is not resolved and api is not broken
+- id: get_task
+  name: Get task and check, that image_url is not resolved
+  request:
+    url: "{django_live_url}/api/tasks/{task_pk}"
+    method: GET
+    headers:
+      content-type: application/json
+  response:
+    status_code: 200
+    json:
+      data:
+        image_url: "s3:/"
+
 ---
 test_name: test_import_from_s3_storage_recursive_scan
 strict: false
@@ -575,16 +605,19 @@ stages:
         content-type: application/json
       json:
         data:
-          image: gs://whatever-bucket-with/manual.link.jpg
+          image: gs://test-gs-bucket_JSON/manual.link.jpg
           dict:
-            key1: gs://whatever-bucket-with/manual.link.jpg
+            key1: gs://test-gs-bucket_JSON/manual.link.jpg
             array:
-              - gs://whatever-bucket-with/manual.link.jpg
-              - gs://whatever-bucket-with/manual.link.jpg
+              - gs://test-gs-bucket_JSON/manual.link.jpg
+              - gs://test-gs-bucket_JSON/manual.link.jpg
           array:
-            - item1: gs://whatever-bucket-with/manual.link.jpg
+            - item1: gs://test-gs-bucket_JSON/manual.link.jpg
               some: 'some text'
-            - item2: gs://whatever-bucket-with/manual.link.jpg
+            - item2: gs://test-gs-bucket_JSON/manual.link.jpg
+              some: 'some text'
+            # This link should not be resolved - no matching bucket
+            - item3: gs://bad-bucket/manual.link.jpg
               some: 'some text'
       method: POST
       url: '{django_live_url}/api/projects/{project_pk}/import'
@@ -617,16 +650,19 @@ stages:
     response:
       json:
         data:
-          image: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+          image: !re_match "https://storage.googleapis.com/test-gs-bucket_JSON/manual.link.+"
           dict:
-            key1: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+            key1: !re_match "https://storage.googleapis.com/test-gs-bucket_JSON/manual.link.+"
             array:
-              - !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
-              - !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+              - !re_match "https://storage.googleapis.com/test-gs-bucket_JSON/manual.link.+"
+              - !re_match "https://storage.googleapis.com/test-gs-bucket_JSON/manual.link.+"
           array:
-            - item1: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+            - item1: !re_match "https://storage.googleapis.com/test-gs-bucket_JSON/manual.link.+"
               some: 'some text'
-            - item2: !re_match "https://storage.googleapis.com/whatever-bucket-with/manual.link.+"
+            - item2: !re_match "https://storage.googleapis.com/test-gs-bucket_JSON/manual.link.+"
+              some: 'some text'
+            # This link should remain unresolved - no matching bucket
+            - item3: !re_match "gs://bad-bucket/manual.link.+"
               some: 'some text'
       status_code: 200
 
@@ -1569,7 +1605,7 @@ stages:
   response:
     json:
       data:
-        text: !re_match "<a href=\"https://hypertext-bucket.s3.amazonaws.com/file%20with%20/spaces%20and%27%20/%20%27%20/%20quotes.jpg.+X-Amz-Security-Token=testing"
+        text: !re_match "<a href=\"https://pytest-s3-jsons-hypertext.s3.amazonaws.com/file%20with%20/spaces%20and%27%20/%20%27%20/%20quotes.jpg.+X-Amz-Security-Token=testing"
     status_code: 200
 
 ---
