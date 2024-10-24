@@ -31,11 +31,16 @@ export const ThemeToggle = () => {
   }, [theme]);
 
   return (
-    <button className={clsx(styles.themeToggle)} onClick={themeChanged}>
-      <span className={clsx(styles.animationWrapper)}>
-        <Moon />
-        <Sun />
-      </span>
+    <button 
+      className={clsx(styles.themeToggle, { [styles.dark]: appliedTheme === "Dark", [styles.light]: appliedTheme === "Light" })} 
+      onClick={themeChanged}
+    >
+      <div className={clsx(styles.themeToggle__icon)}>
+        <div className={clsx(styles.animationWrapper)}>
+          <Moon className={clsx(styles.moon)} />
+          <Sun className={clsx(styles.sun)} />
+        </div>
+      </div>
       <span className={clsx(styles.themeToggle__label)}>{theme}</span>
     </button>
   );
