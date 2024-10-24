@@ -43,7 +43,7 @@ export const Anchor = types
         // we assume that we have no way of displaying anything related to the overlay for this result.
         const isClassification = controlTag.isClassificationTag;
         // Taking into account `visiblewhen`
-        const isVisible = controlTag.isVisible;
+        const isVisible = controlTag.isVisible !== false;
         // The result that is displayed at the control tag right now
         const currentResult = controlTag.result;
         // It'll always be true for perObject mode,
