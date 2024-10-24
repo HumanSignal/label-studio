@@ -89,9 +89,17 @@ jobs:
 
 # POETRY
 
-      - name: "Poetry: Set up"
+      - name: "Install poetry"
         if: steps.details.outputs.poetry
-        uses: snok/install-poetry@v1
+        run: pipx install poetry
+
+      - name: "Set up Python"
+        id: setup_python
+        if: steps.details.outputs.poetry
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'poetry'
 
       - name: "Poetry: Commit and Push"
         if: steps.details.outputs.poetry
