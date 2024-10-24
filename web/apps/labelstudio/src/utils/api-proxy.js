@@ -460,6 +460,11 @@ export class APIProxy {
           json() {
             return Promise.resolve(response);
           },
+          text() {
+            return typeof response === "string" ? response : JSON.stringify(response);
+          },
+          headers: {},
+          status: 200,
         });
       }, this.mockDelay);
     });
