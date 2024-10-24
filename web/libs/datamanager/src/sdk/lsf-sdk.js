@@ -865,6 +865,9 @@ export class LSFWrapper {
   onEntityCreate = (...args) => this.datamanager.invoke("onEntityCreate", ...args);
   onEntityDelete = (...args) => this.datamanager.invoke("onEntityDelete", ...args);
   onSelectAnnotation = (prevAnnotation, nextAnnotation, options) => {
+    if (window.APP_SETTINGS.read_only_quick_view_enabled && !this.labelStream) {
+      prevAnnotation?.setEditable(false);
+    }
     if (isFF(FF_OPTIC_2) && !!nextAnnotation?.history?.undoIdx) {
       this.saveDraft(nextAnnotation).then(() => {
         this.datamanager.invoke("onSelectAnnotation", prevAnnotation, nextAnnotation, options, this);

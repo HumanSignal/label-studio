@@ -359,7 +359,7 @@ const _Annotation = types
       if (self.type === "annotation") self.setInitialValues();
     },
 
-    setEdit(val) {
+    setEditable(val) {
       self.editable = val;
     },
 
