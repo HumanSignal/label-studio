@@ -41,6 +41,7 @@ const WARNING_MESSAGES = {
  * @param {string} value                                  - value of the element
  * @param {url|text} [valueType=url|text]                 – source of the data, check (Data retrieval)[https://labelstud.io/guide/tasks.html] page for more inforamtion
  * @param {boolean} [inline=false]                        - whether to embed html directly to LS or use iframe (only HyperText)
+ * @param {boolean} [sanitizeHtml=true]                   - whether to sanitize the provided html (only HyperText)
  * @param {boolean} [saveTextResult=true]                 – whether or not to save selected text to the serialized data
  * @param {boolean} [selectionEnabled=true]               - enable or disable selection
  * @param {boolean} [clickableLinks=false]                – allow annotator to open resources from links
@@ -56,6 +57,8 @@ const TagAttrs = types.model("RichTextModel", {
   valuetype: types.optional(types.enumeration(["text", "url"]), () => (window.LS_SECURE_MODE ? "url" : "text")),
 
   inline: false,
+
+  sanitizehtml: types.optional(types.boolean, true),
 
   /** Whether or not to save selected text to the serialized data */
   savetextresult: types.optional(types.enumeration(["none", "no", "yes"]), () =>
@@ -235,7 +238,7 @@ const Model = types
         // clean up the html — remove scripts and iframes
         // nodes count better be the same, so replace them with stubs
         // we should not sanitize text tasks because we already have htmlEscape in view.js
-        if (isFF(FF_SAFE_TEXT) && self.type === "text") {
+        if (!self.sanitizehtml || (isFF(FF_SAFE_TEXT) && self.type === "text")) {
           self._value = String(val);
         } else {
           self._value = sanitizeHtml(String(val));
