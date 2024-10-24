@@ -17,20 +17,20 @@
       line-height: 24px;
 
       &_look_danger {
-        border-color: var(--sand_300);
+        border-color: var(--color-neutral-border);
       }
     }
 
     .submit {
       border-radius: 4px;
-      background: var(--grape_500);
+      background: var(--color-primary-surface);
       box-shadow: 0 4px 4px 0 rgb(0 0 0 / 25%);
       display: flex;
       width: 160px;
       height: 40px;
       justify-content: center;
       align-items: center;
-      color: var(--sand_0);
+      color: var(--color-primary-surface-content);
       text-align: center;
       font-size: 16px;
       font-style: normal;
@@ -42,8 +42,8 @@
       cursor: pointer;
 
       &_disabled {
-        color: rgb(255 255 255 / 80%);
-        background-color: var(--sand_400);
+        color: var(--color-neutral-content-subtlest);
+        background-color: var(--color-neutral-background);
       }
 
       &__has_icon {

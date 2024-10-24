@@ -20,18 +20,18 @@
   }
 
   &__link {
-    color: #000;
+    color: var(--color-neutral-content);
     display: block;
     display: flex;
     text-decoration: none;
 
     &:hover {
-      color: #000;
+      color: var(--color-neutral-content);
     }
   }
 
   &__pages {
-    background-color: var(--sand_0);
+    background-color: var(--color-neutral-background);
     bottom: 0;
     width: 100%;
     position: sticky;
@@ -75,12 +75,12 @@
     font-size: 32px;
     font-weight: 700;
     margin: 16px;
-    color: var(--sand_900);
+    color: var(--color-neutral-content);
   }
 
   p {
     font-size: 1.25rem;
-    color: var(--sand_700);
+    color: var(--color-neutral-subtle);
     margin: 0;
   }
 
@@ -90,21 +90,26 @@
 }
 
 .project-card {
-  --text-color: var(--sand_900);
-
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: var(--sand_0);
-  border: 1px solid var(--sand_300);
+  background: var(--color-neutral-background);
+  border: 1px solid var(--color-neutral-border);
   border-radius: 0.5rem;
   overflow: hidden;
-  color: var(--text-color);
+  color: var(--color-neutral-content-subtle);
   box-shadow: 0 4px 8px rgb(0 0 0 / 5%);
+  transition: all 150ms ease-out;
+
+  &:hover {
+    background-color: var(--color-neutral-surface);
+    border-color: var(--color-primary-border-subtle);
+  }
 
   &__header {
     padding: 12px 16px;
-    border-bottom: 1px solid var(--sand_300);
+    border-bottom: 1px solid var(--color-neutral-border);
+    transition: all 150ms ease-out;
   }
 
   &__menu {
@@ -157,7 +162,7 @@
     grid-auto-columns: max-content;
 
     &-item {
-      --icon-color: var(--sand_0);
+      --icon-color: var(--color-neutral-background);
 
       display: flex;
       align-items: center;
@@ -168,11 +173,11 @@
 
       &_type {
         &_completed {
-          --icon-color: var(--kale_400);
+          --icon-color: var(--color-positive-icon);
         }
 
         &_rejected {
-          --icon-color: var(--red_7);
+          --icon-color: var(--color-negative-icon);
         }
 
         &_predictions {
@@ -188,11 +193,11 @@
 
   &__description {
     flex: 1;
-    font-size: 16px;
-    line-height: 22px;
+    font-size: 14px;
+    line-height: 16px;
     padding: 12px 16px 0;
     overflow: hidden;
-    color: var(--sand_700);
+    color: var(--color-neutral-content-subtle);
     text-overflow: ellipsis;
     display: -webkit-box;
     word-break: break-word;
@@ -208,7 +213,7 @@
   }
 
   &__created-date {
-    color: var(--sand_600);
+    color: var(--color-neutral-content-subtler);
     font-size: 0.875rem;
 
     & > span {
@@ -217,18 +222,25 @@
   }
 
   &_colored {
-    --text-color: var(--sand_0);
-
+    --color-project-header-content: var(--color-sand-000);
+    --color-project-header-icon: var(--color-neutral-icon);
     background-color: var(--background-color);
+    border-color: var(--border-color);
+
+    &:hover {
+      border-color: var(--header-color);
+    }
 
     & .project-card__header {
       background-color: var(--header-color);
+      color: var(--color-project-header-content);
       box-shadow: none;
     }
 
     & .project-card__detail {
+      color: var(--content-color);
       &-item {
-        --icon-color: var(--sand_0);
+        --icon-color: var(--icon-color);
       }
     }
   }

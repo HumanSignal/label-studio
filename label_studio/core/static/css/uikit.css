@@ -1,6 +1,6 @@
 body {
-  --border-color: rgba(0, 0, 0, 0.15);
-  --color-error: #d00;
+  --border-color: varf(--color-neutral-border);
+  --color-error: var(--color-negative-content);
 }
 
 .full_content {
@@ -63,8 +63,8 @@ textarea {
 }
 
 input[type=text][disabled] {
-  background: rgba(0, 0, 0, 0.03);
-  color: rgba(0, 0, 0, 0.4)
+  background: var(--color-neutral-surface);
+  color: var(--color-neutral-content-subtlest);
 }
 
 a.button,

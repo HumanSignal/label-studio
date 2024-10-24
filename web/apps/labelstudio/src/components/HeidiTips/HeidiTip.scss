@@ -1,12 +1,12 @@
 .heidy-tip {
   &__content {
     padding: 1rem;
-    border: 1px solid var(--sand_300);
+    border: 1px solid var(--color-neutral-border);
     font-size: 14px;
     border-radius: 8px;
     box-shadow: 0 2px 6px 0 rgb(0 0 0 / 10%);
     box-sizing: border-box;
-    background: var(--sand_0);
+    background: var(--color-neutral-surface);
   }
 
   &__header {
@@ -23,16 +23,19 @@
     font-weight: 500;
     line-height: 24px;
     letter-spacing: 0.15px;
+    color:  var(--color-neutral-content);
   }
 
   &__text {
     line-height: 20px;
     letter-spacing: 0.25px;
+    color:  var(--color-neutral-content-subtler);
   }
 
   &__link {
-    color: var(--grape_500);
+    color: var(--color-primary-content);
     font-weight: 500;
+    display: block;
 
     &:hover {
       text-decoration: underline;
@@ -56,17 +59,28 @@
     svg {
       width: 14px;
       height: 14px;
+
+
+      .spike-fill {
+        fill: var(--color-neutral-surface);
+        display: none;
+      }
+      
+      .spike-stroke {
+        fill: var(--color-neutral-border);
+        display: none;
+      }
     }
 
     svg > path {
-      stroke: var(--sand_600);
+      stroke: var(--color-neutral-content-subtlest);
     }
 
     &:hover {
-      background: var(--grape_0);
+      background: var(--color-primary-emphasis-subtle);
 
-      svg > path {
-        stroke: var(--grape_700);
+      svg path {
+        stroke: var(--color-primary-surface-content);
       }
     }
   }
@@ -75,5 +89,13 @@
     margin-top: -12px;
     padding-left: 16px;
     pointer-events: none;
+    color: var(--color-neutral-border);
+
+    svg {
+      path.spike-stroke {
+        color: red;
+      }
+
+    }
   }
 }

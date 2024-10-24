@@ -1,6 +1,6 @@
 .button-ls {
-  --button-color: var(--grape_500);
-  --button-background-color: var(--sand_0);
+  --button-color: var(--color-neutral-content);
+  --button-background-color: var(--color-neutral-surface-hover);
   --button-background-image: none;
   --button-shadow: inset 0px -1px 0px rgb(0 0 0 / 10%), inset 0px 0px 0px 1px rgb(0 0 0 / 15%);
   --button-content-align: center;
@@ -12,11 +12,11 @@
   --button-min-width: 0;
   --icon-size: 16px;
   --button-padding: 0 16px;
-  --button-radius: 5px;
+  --button-radius: 4px;
   --button-font-size: var(--font-size-400);
   --button-margin-left: 0;
   --button-margin-right: 0;
-  --button-border: 1px solid var(--button-color);
+  --button-border: 1px solid var(--color-neutral-border);
   --button-gap: 6px;
 
   border: var(--button-border);
@@ -48,8 +48,8 @@
   gap: var(--button-gap);
 
   &:hover:not(:disabled, .button-ls_waiting, .button-ls_look_danger, .button-ls_look_primary) {
-    --button-color: var(--grape_700);
-    --button-background-color: var(--grape_0);
+    --button-color: var(--color-neutral-content);
+    --button-background-color: var(--color-neutral-surface);
   }
 
   &:active {
@@ -60,23 +60,23 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 4px var(--grape_100);
+    box-shadow: 0 0 0 4px var(--color-primary-focus-outline);
   }
 
   &_waiting,
   &:disabled,
   &_disabled {
-    --button-color: var(--sand_500);
-    --button-background-color: var(--sand_200);
+    --button-color: var(--color-neutral-content-subtlest);
+    --button-background-color: var(--color-neutral-background);
     --button-events: none;
 
     border: none;
 
     & svg {
-      color: var(--sand_500) !important;
+      color: var(--color-neutral-content-subtlest) !important;
 
       & path {
-        stroke: var(--sand_500);
+        stroke: var(--color-neutral-content-subtlest);
       }
     }
   }
@@ -145,38 +145,38 @@
 
   &_look {
     &_primary {
-      --button-color: var(--sand_0);
-      --button-background-color: var(--primary_link);
+      --button-color: var(--color-primary-surface-content);
+      --button-background-color: var(--color-primary-surface);
       --button-border: none;
 
       &:hover:not(:disabled, .button-ls_waiting) {
-        --button-background-color: var(--grape_700);
-        --button-color: var(--sand_0);
+        --button-background-color: var(--color-primary-surface-hover);
+        --button-color: var(--color-primary-surface-content);
       }
 
       &:active:not(:disabled) {
-        --button-background-color: var(--primary_link);
+        --button-background-color: var(--color-primary-content);
       }
 
       &:focus:not(:disabled) {
-        box-shadow: 0 0 0 4px var(--grape_100);
+        box-shadow: 0 0 0 4px var(--color-primary-focus-outline);
       }
     }
 
     &_danger {
-      --button-color: var(--danger_color);
+      --button-color: var(--color-negative-content);
 
       &:hover:not(:disabled, &_waiting) {
-        --button-color: var(--danger_color);
+        --button-color: var(--color-negative-content);
 
-        border-color: var(--danger_color);
-        background: var(--red_1);
+        border-color: var(--color-negative-border);
+        background: var(--color-negative-emphasis-subtle);
       }
     }
 
     &_destructive {
       --button-color: var(--sand_0);
-      --button-background-color: var(--danger_color);
+      --button-background-color: var(--color-negative-surface);
 
       &:hover:not(:disabled, .button-ls_waiting) {
         --button-color: var(--danger_color);

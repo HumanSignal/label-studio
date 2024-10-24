@@ -1,9 +1,9 @@
 .description {
-  color: var(--sand_600);
+  color: var(--color-neutral-content-subtler);
   line-height: 140%;
 
   & a {
-    color: var(--grape_500);
+    color: var(--color-primary-surface-content);
     text-decoration: underline;
 
     &:hover {

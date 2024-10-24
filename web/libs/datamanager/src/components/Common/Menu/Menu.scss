@@ -28,7 +28,7 @@
     border-radius: 3px;
     align-items: center;
     box-sizing: border-box;
-    color: var(--sand_600);
+    color: var(--color-neutral-content-subtler);
     font-size: 14px;
     white-space: nowrap;
     user-select: none;
@@ -36,20 +36,19 @@
     &-icon {
       margin-right: 10px;
       object-fit: contain;
-      opacity: 0.5;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     &:not(.menu-dm__item_look_danger):hover {
-      color: var(--grape_700);
-      background-color: var(--grape_0);
+      color: var(--color-primary-content);
+      background-color: var(--color-primary-emphasis-subtle);
     }
 
     &_active {
-      color: var(--grape_700);
-      background-color: var(--grape_0);
+      color: var(--color-primary-content);
+      background-color: var(--color-primary-emphasis);
     }
 
     &_active:not(.sidebar__pin, .menu-dm__item_clickable) {
@@ -63,10 +62,10 @@
 
     &_look {
       &_danger {
-        color: var(--danger_color);
+        color: var(--color-negative-content);
 
         &:hover {
-          background-color: var(--red_1);
+          background-color: var(--color-negative-emphasis-subtle);
         }
       }
     }

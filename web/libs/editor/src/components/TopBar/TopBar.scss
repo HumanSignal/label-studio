@@ -6,15 +6,15 @@
   display: flex;
   align-items: stretch;
   justify-content: space-between;
-  background-color: var(--sand_0);
-  border-bottom: 1px solid var(--sand_300);
+  background-color: var(--color-neutral-surface-active);
+  border-bottom: 1px solid var(--color-neutral-border);
   user-select: none;
   position: sticky;
   top: 0;
 
   &__button {
     &:hover {
-      background-color: var(--grape_0);
+      background-color: var(--color-primary-emphasis-subtle);
     }
   }
 
@@ -34,15 +34,15 @@
     }
 
     & + & {
-      border-left: 1px solid var(--sand_300);
+      border-left: 1px solid var(--color-neutral-border);
     }
   }
 
   &_newLabelingUI {
     display: block;
-    background-color: var(--sand_0);
+    background-color: var(--color-neutral-surface-active);
     height: 42px;
-    border-bottom: 1px solid var(--sand_300);
+    border-bottom: 1px solid var(--color-neutral-border);
 
     & .topbar {
       &__group {

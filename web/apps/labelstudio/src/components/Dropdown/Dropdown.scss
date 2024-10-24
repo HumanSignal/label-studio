@@ -4,9 +4,10 @@
   display: none;
   position: absolute;
   box-sizing: border-box;
-  background-color: var(--sand_0);
-  box-shadow: 0 5px 20px rgb(0 0 0 / 20%);
+  background-color: var(--color-neutral-background);
+  box-shadow: 0 5px 16px rgb(0 0 0 / 8%), 0 4px 8px rgb(0 0 0 / 16%);
   will-change: transform, opacity;
+  border-radius: var(--radius-xs);
 
   &_align {
     &_left {

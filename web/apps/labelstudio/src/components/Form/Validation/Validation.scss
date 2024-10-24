@@ -4,8 +4,9 @@
   &__group {
     padding: 7px 14px;
     border-radius: 5px;
-    background-color: var(--red_1);
-    color: var(--danger_color);
+    background-color: var(--color-negative-background);
+    color: var(--color-negative-content);
+    border: 1px solid var(--color-negative-border-subtlest);
 
     & + & {
       margin-top: 5px;
@@ -23,6 +24,6 @@
 
   &__message {
     font-size: 12px;
-    color: var(--sand_700);
+    color: var(--color-neutral-content);
   }
 }

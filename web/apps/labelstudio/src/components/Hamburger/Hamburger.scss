@@ -10,7 +10,7 @@
     width: 100%;
     display: block;
     position: absolute;
-    background-color: var(--sand_900);
+    background-color: var(--color-neutral-content);
 
     &:nth-child(1) {
       top: 0;
@@ -32,7 +32,7 @@
 
   &:hover span,
   &_opened span {
-    background-color: var(--sand_900);
+    background-color: var(--color-neutral-content);
   }
 
   &_opened span {

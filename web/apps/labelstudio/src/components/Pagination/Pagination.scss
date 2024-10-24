@@ -6,9 +6,9 @@
   --button-color: var(--primary_link);
 
   &_disabled {
-    --button-color: var(--sand_500);
+    --button-color: var(--color-neutral-content-subtlest);
 
-    background-color: var(--sand_200);
+    background-color: var(--color-neutral-surface);
     pointer-events: none;
   }
 
@@ -16,7 +16,7 @@
     padding-right: 16px;
     font-size: 16px;
     line-height: 19px;
-    color: rgb(0 0 0 / 40%);
+    color: var(--color-neutral-content-subtler);
   }
 
   &__navigation {

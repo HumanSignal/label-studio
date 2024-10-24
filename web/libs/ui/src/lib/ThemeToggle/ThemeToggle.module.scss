@@ -1,0 +1,143 @@
+.themeToggle {
+  display: flex;
+  justify-content: center;
+  align-self: stretch;
+  transition: outline 0.1s ease;
+  overflow: hidden;
+  height: 32px;
+  align-self: center;
+  border: 1px solid var(--color-neutral-border);
+  border-radius: 24px;
+  background: var(--color-neutral-background);
+  padding: 4px 8px 4px 0;
+  width: 90px;
+  transition: all 150ms ease-out;
+
+  &:hover {
+    background: var(--color-neutral-surface);
+    border-color: var(--color-neutral-border-bold);
+  }
+
+  &:active {
+    background: var(--color-neutral-surface-active);
+    border-color: var(--color-neutral-border-bold);
+  }
+
+  &__label {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    color: var(--color-neutral-content);
+  }
+
+  &__icon {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    position: relative;
+    width: 36px;
+    height: 28px;
+    margin-right: 0px;
+    position: relative;
+    align-self: center;
+  }
+
+  &.light .animationWrapper {
+    transform: rotate(90deg);
+  }
+
+  &.dark .animationWrapper {
+    transform: rotate(0deg);
+  }
+
+}
+
+.animationWrapper {
+  width: 90px;
+  height: 90px;
+  position: absolute;
+  top: -1px;
+  left: -29px;
+  transition: all 600ms cubic-bezier(0.47, 0, 0.23, 1.30);
+  overflow: hidden;
+
+  svg {
+    position: absolute;
+  }
+}
+
+.moon {
+  left: 30px;
+  top: 0;
+}
+
+.sun {
+  left: 0;
+  top: 30px;
+}
+/*
+
+.colorScheme__cycle {
+  background-color: var(--color-neutral-background) !important;
+  border: 1px solid var(--color-neutral-border) !important;
+  color: var(--color-neutral-content) !important;
+  display: flex;
+  align-items: center;
+  padding: 0 8px 0 4px !important;
+  height: 40px;
+  margin: 8px 0;
+  border-radius: 18px !important;
+  width: calc(100% - 16px);
+  overflow: hidden !important;
+  align-self: center;
+  justify-self: left;
+  transition: all 150ms ease-out;
+}
+
+.colorScheme__cycle .icon {
+  width: 36px;
+  height: 28px;
+  margin-right: 0px;
+  position: relative;
+  top: -1px;
+}
+
+.colorScheme__cycle .icon .wrapper {
+  width: 90px;
+  height: 90px;
+  position: absolute;
+  top:0;
+  left: -29px;
+  transition: all 600ms cubic-bezier(0.47, 0, 0.23, 1.30);
+  overflow: hidden;
+}
+
+html[data-color-scheme=light] .colorScheme__cycle .icon .wrapper {
+  transform: rotate(90deg);
+}
+
+html[data-color-scheme=dark] .colorScheme__cycle .icon .wrapper {
+  transform: rotate(0deg);
+}
+
+.colorScheme__cycle .icon .wrapper svg {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+}
+
+.colorScheme__cycle .icon .wrapper svg:first-child {
+  left:0;
+  top: 30px;
+}
+
+.colorScheme__cycle .icon .wrapper svg:nth-child(2) {
+  left:30px;
+  top: 0px;
+}
+
+
+.colorScheme_cycle span {
+  display: flex;
+}
+*/

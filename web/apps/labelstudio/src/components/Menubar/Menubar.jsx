@@ -12,6 +12,7 @@ import {
   LsSettings,
   LsSlack,
 } from "../../assets/icons";
+import { LSLogo } from "../../assets/images";
 import { useConfig } from "../../providers/ConfigProvider";
 import { useContextComponent, useFixedLocation } from "../../providers/RoutesProvider";
 import { cn } from "../../utils/bem";
@@ -27,6 +28,7 @@ import "./MenuContent.scss";
 import "./MenuSidebar.scss";
 import { ModelsPage } from "../../pages/Organization/Models/ModelsPage";
 import { FF_DIA_835, isFF } from "../../utils/feature-flags";
+import { ThemeToggle } from "@humansignal/ui";
 
 export const MenubarContext = createContext();
 
@@ -132,7 +134,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
         <div className={menubarClass}>
           <Dropdown.Trigger dropdown={menuDropdownRef} closeOnClickOutside={!sidebarPinned}>
             <div className={`${menubarClass.elem("trigger")} main-menu-trigger`}>
-              <img src={absoluteURL("/static/icons/logo.svg")} alt="Label Studio Logo" height="22" />
+              <LSLogo className={`${menubarClass.elem("logo")}`} alt="Label Studio Logo" />
               <Hamburger opened={sidebarOpened} />
             </div>
           </Dropdown.Trigger>
@@ -142,6 +144,10 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
 
             <RightContextMenu className={contextItem.mod({ right: true })} />
           </div>
+
+          <div className={menubarClass.elem("spacer").toString()} />
+
+          <ThemeToggle />
 
           <Dropdown.Trigger
             ref={useMenuRef}

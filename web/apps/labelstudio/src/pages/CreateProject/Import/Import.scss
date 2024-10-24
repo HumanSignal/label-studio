@@ -16,7 +16,7 @@
   & > header {
     font-size: 14px;
     padding: 24px 32px;
-    background: var(--sand_0);
+    background: var(--color-neutral-background);
     display: flex;
     align-items: center;
 
@@ -29,7 +29,7 @@
     display: flex;
 
     input {
-      border: 1px solid var(--sand_300);
+      border: 1px solid var(--color-neutral-border);
       line-height: 1em;
       width: 320px;
       border-radius: 5px 0 0 5px;
@@ -38,14 +38,14 @@
     button {
       margin-left: -1px;
       border-radius: 0 5px 5px 0;
-      background: var(--grape_500);
+      background: var(--color-primary-surface);
       color: var(--sand_0);
       cursor: pointer;
     }
 
     & + span {
       margin: 0 16px;
-      color: var(--sand_600);
+      color: var(--color-neutral-content-subtler);
     }
   }
 
@@ -57,9 +57,9 @@
   & > main {
     flex: 1;
     overflow-y: auto;
-    background: linear-gradient(white 30%, rgb(255 255 255 / 0%)), linear-gradient(rgb(0 0 0 / 10%), white 100%);
+    background: linear-gradient(var(--color-neutral-background) 30%, rgb(255 255 255 / 0%)), linear-gradient(rgb(0 0 0 / 10%), var(--color-neutral-background) 100%);
     background-repeat: no-repeat;
-    background-color: var(--sand_0);
+    background-color: var(--color-neutral-background);
     background-size: 100% 20px, 100% 5px;
     background-attachment: local, scroll;
   }
@@ -107,8 +107,8 @@
     display: flex;
     align-items: center;
     padding: 8px;
-    border: 1px solid var(--grape_500);
-    background: var(--grape_0);
+    border: 1px solid var(--color-primary-border);
+    background: var(--color-primary-background);
     border-radius: 4px;
     cursor: pointer;
   }
@@ -163,11 +163,11 @@
   position: relative;
 
   a {
-    color: var(--grape_600);
+    color: var(--color-primary-surface-content);
     text-decoration: underline;
 
     &:hover {
-      color: var(--grape_700);
+      color: var(--color-primary-surface-content-subtle);
     }
   }
 
@@ -202,8 +202,8 @@
     flex-direction: column;
     align-items: center;
     cursor: pointer;
-    background: var(--grape_0);
-    border: 1px dashed var(--grape_500);
+    background: var(--color-primary-emphasis-subtle);
+    border: 1px dashed var(--color-primary-border);
     padding: 2rem;
     width: 40rem;
     border-radius: 8px;
