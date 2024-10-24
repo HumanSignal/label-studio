@@ -2985,6 +2985,33 @@
       "version": 15,
       "deleted": false
     },
+    "fflag_feat_front_optic_1217_theme_toggle_short": {
+      "key": "fflag_feat_front_optic_1217_theme_toggle_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "1b3bca98ba6c4a7bb5559e50c280cf4a",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_front_optic_66_lazy_chart_evaluation_19092023_short": {
       "key": "fflag_feat_front_optic_66_lazy_chart_evaluation_19092023_short",
       "on": true,
@@ -3303,6 +3330,33 @@
       },
       "clientSide": false,
       "salt": "4923bc1812ba4b1fa10b701540668464",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_feature_develop__prompts__dia_1488_select_virtualized": {
+      "key": "fflag_feature_develop__prompts__dia_1488_select_virtualized",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "4c64408db482476b8cfe26bb8b1b34d7",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,

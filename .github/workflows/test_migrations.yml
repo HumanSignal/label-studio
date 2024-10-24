@@ -29,30 +29,30 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
-      - name: Checkout
+      - name: "Checkout"
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
 
-      - name: Set up Python
+      - name: "Install poetry"
+        run: pipx install poetry
+
+      - name: "Set up Python"
         id: setup_python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
+          cache: 'poetry'
 
-      - name: Install OS dependencies
+      - name: "Install OS dependencies"
         run: |
           sudo apt-get update
           sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
 
-      - name: Set up Poetry
-        uses: snok/install-poetry@v1
+      - name: "Install dependencies"
+        run: poetry install
 
-      - name: Install Python dependencies
-        run: |
-          poetry install
-
-      - name: Test migrations
+      - name: "Test migrations"
         run: |
           output=$(poetry run python label_studio/manage.py makemigrations)
           if ! grep 'No changes detected' <<< "${output}"; then
@@ -91,34 +91,35 @@ jobs:
     steps:
       - uses: hmarr/debug-action@v3.0.0
 
-      - name: Checkout
+      - name: "Checkout"
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0
 
-      - name: Set up Python
+      - name: "Install poetry"
+        run: pipx install poetry
+
+      - name: "Set up Python"
         id: setup_python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
+          cache: 'poetry'
 
-      - name: Install OS dependencies
+      - name: "Install OS dependencies"
         run: |
           sudo apt-get update
           sudo apt-get install libsasl2-dev python3-dev libldap2-dev libssl-dev libxml2-dev libxslt-dev
 
-      - name: Set up Poetry
-        uses: snok/install-poetry@v1
-
-      - name: Install Python dependencies
+      - name: "Install dependencies"
         run: |
           poetry install
 
-      - name: Test migrations
+      - name: "Test migrations"
         run: |
           poetry run python label_studio/manage.py makemigrations
 
-      - name: Lint migrations
+      - name: "Lint migrations"
         run: |
           poetry run python label_studio/manage.py lintmigrations --warnings-as-errors --project-root-path '.' --git-commit-id ${{ github.event.pull_request.base.sha || github.event.before }}
