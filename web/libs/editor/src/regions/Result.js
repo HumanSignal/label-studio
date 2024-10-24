@@ -250,6 +250,16 @@ const Result = types
 
       return { strokecolor, strokewidth, fillcolor, fillopacity, opacity };
     },
+
+    /**
+     *  This name historically is used for the region elements for getting their bboxes.
+     *  Now we need it for a result also.
+     *  Let's say "Region" here means just an area on the screen.
+     *  So that it's an element through which we can get the bbox for an area where classification takes place.
+     */
+    getRegionElement() {
+      return self.from_name?.getRegionElement?.();
+    },
   }))
   .volatile(() => ({
     pid: "",

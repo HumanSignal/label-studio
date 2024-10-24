@@ -1,6 +1,6 @@
 {
-  "message": "fix: LEAP-1609: Fix missing `useState` import (#6548)",
-  "commit": "9045c1fc0685fd480386a1ffa4ee266d85ec7d55",
-  "date": "2024-10-23T12:55:21.000Z",
+  "message": "fix: LEAP-1579: LEAP-1576: LEAP-1582: Improve comment icons usability (#6546)",
+  "commit": "094e5d7ab9df76c443a970db887798b7a48e6db8",
+  "date": "2024-10-24T14:06:52.000Z",
   "branch": "develop"
 }
