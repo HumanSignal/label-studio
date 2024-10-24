@@ -1,6 +1,6 @@
 {
-  "message": "chore(deps): bump http-proxy-middleware from 2.0.6 to 2.0.7 in /web (#6551)",
-  "commit": "199f4241d1ef2b1838a56a90e4ccee4519763ada",
-  "date": "2024-10-23T16:03:04.000Z",
+  "message": "chore: OPTIC-1234: add examples of how to mock the api endpoint for runtime (#6538)",
+  "commit": "b3aeed61cc1ad8e1f724db3c1b6b85882bdbb36e",
+  "date": "2024-10-24T13:51:30.000Z",
   "branch": "develop"
 }
