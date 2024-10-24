@@ -2,6 +2,7 @@
 """
 import json
 import logging
+from typing import Union
 
 from core.redis import start_job_async_or_sync
 from django.conf import settings
@@ -94,7 +95,7 @@ class GCSImportStorageBase(GCSStorageMixin, ImportStorage):
             presign_ttl=self.presign_ttl,
         )
 
-    def can_resolve_url(self, url: str | None) -> bool:
+    def can_resolve_url(self, url: Union[str, None]) -> bool:
         return storage_can_resolve_bucket_url(self, url)
 
     def scan_and_create_links(self):

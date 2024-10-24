@@ -5,6 +5,7 @@ import json
 import logging
 import traceback as tb
 from datetime import datetime
+from typing import Union
 from urllib.parse import urljoin
 
 import django_rq
@@ -231,10 +232,10 @@ class ImportStorage(Storage):
     def generate_http_url(self, url):
         raise NotImplementedError
 
-    def can_resolve_url(self, url: str | None) -> bool:
+    def can_resolve_url(self, url: Union[str, None]) -> bool:
         return self.can_resolve_scheme(url)
 
-    def can_resolve_scheme(self, url: str | None) -> bool:
+    def can_resolve_scheme(self, url: Union[str, None]) -> bool:
         if not url:
             return False
         # TODO: Search for occurrences inside string, e.g. for cases like "gs://bucket/file.pdf" or "<embed src='gs://bucket/file.pdf'/>"
