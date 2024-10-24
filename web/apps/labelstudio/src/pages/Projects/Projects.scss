@@ -193,11 +193,11 @@
 
   &__description {
     flex: 1;
-    font-size: 16px;
-    line-height: 22px;
+    font-size: 14px;
+    line-height: 16px;
     padding: 12px 16px 0;
     overflow: hidden;
-    color: var(--sand_700);
+    color: var(--color-neutral-content-subtle);
     text-overflow: ellipsis;
     display: -webkit-box;
     word-break: break-word;
@@ -213,7 +213,7 @@
   }
 
   &__created-date {
-    color: var(--sand_600);
+    color: var(--color-neutral-content-subtler);
     font-size: 0.875rem;
 
     & > span {
@@ -222,18 +222,25 @@
   }
 
   &_colored {
-    --text-color: var(--sand_0);
-
+    --color-project-header-content: var(--color-sand-000);
+    --color-project-header-icon: var(--color-neutral-icon);
     background-color: var(--background-color);
+    border-color: var(--border-color);
+
+    &:hover {
+      border-color: var(--header-color);
+    }
 
     & .project-card__header {
       background-color: var(--header-color);
+      color: var(--color-project-header-content);
       box-shadow: none;
     }
 
     & .project-card__detail {
+      color: var(--content-color);
       &-item {
-        --icon-color: var(--sand_0);
+        --icon-color: var(--icon-color);
       }
     }
   }

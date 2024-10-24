@@ -8,9 +8,10 @@
   display: none;
   position: absolute;
   box-sizing: border-box;
-  background-color: var(--sand_0);
-  box-shadow: 0 5px 20px var(--black_20);
+  background-color: var(--color-neutral-background);
+  box-shadow: 0 5px 20px var(--color-neutral-shadow);
   will-change: transform, opacity;
+  border-radius: var(--radius-small);
 
   &_align {
     &_left {
@@ -24,6 +25,7 @@
 
   &__trigger {
     position: relative;
+    padding-right: 8px;
   }
 
   &.before-appear,

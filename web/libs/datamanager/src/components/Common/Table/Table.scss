@@ -75,7 +75,7 @@
     }
 
     &_even:not(.table__row_wrapper_selected) {
-      background-color: var(--color-neutral-surface);
+      background-color: var(--color-neutral-emphasis-subtle);
     }
 
     &_selected {

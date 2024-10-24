@@ -35,6 +35,10 @@
       display: flex;
       align-items: center;
     }
+
+    .button-ls {
+      height: 32px;
+    }
   }
 
   &__trigger {
@@ -50,7 +54,7 @@
     transition: all 150ms ease-out;
 
     &:hover {
-      background-color: var(--color-neutral-surface);
+      background-color: var(--color-neutral-emphasis-subtle);
     }
   }
 

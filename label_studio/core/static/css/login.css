@@ -33,6 +33,18 @@ html, body {
   background-size: contain;
 }
 
+.login_page_new_ui .ls-logo {
+  width: 414px;
+  height: 64px;
+  color: var(--color-neutral-content);
+}
+
+.login_page_new_ui .hs-logo {
+  width: 152px;
+  height: 22px;
+  color: var(--color-neutral-content);
+}
+
 .login_page_new_ui .left h2 {
   font-size: 24px;
   font-weight: 500;
@@ -50,7 +62,7 @@ html, body {
   margin: 8px 0 0 0;
 }
 
-.login_page_new_ui .left .logo_humansignal{
+.login_page_new_ui .left .by {
   position: absolute;
   bottom: 60px;
   left: 60px;
@@ -69,7 +81,7 @@ html, body {
 .login_page_new_ui .tips {
   max-width: 520px;
   border-radius: 8px;
-  border: 1px solid var(--sand_300);
+  border: 1px solid var(--color-neutral-border);
   background: var(--color-neutral-surface);
   box-shadow: 0 2px 6px 0 rgb(var(--color-neutral-shadow) / 20%);
   padding: 16px;
@@ -85,6 +97,7 @@ html, body {
   position: absolute;
   bottom: -72px;
   left: 16px;
+  fill: var(--color-neutral-border);
   background: url('../images/heidi-tip.svg') no-repeat center center;
 }
 
@@ -193,7 +206,7 @@ html, body {
   font-family: 'Hellix', sans-serif;
 }
 
-.login_page_new_ui form button {
+.login_page_new_ui form .lsf-button-ls.lsf-button-ls_look_primary {
   border-radius: 4rem;
   background: var(--color-neutral-inverted-surface);
   color: var(--color-neutral-inverted-content);
@@ -309,7 +322,7 @@ label{
   left: 8px;
   width: 5px;
   height: 12px;
-  border: solid var(--sand_0);
+  border: solid var(--color-neutral-inverted-surface-content);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }

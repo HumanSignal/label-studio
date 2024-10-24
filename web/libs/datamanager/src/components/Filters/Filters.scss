@@ -1,5 +1,5 @@
 .filters {
-  background-color: white;
+  background-color: var(--color-neutral-background);
   position: relative;
 
   &:not(&_sidebar) {

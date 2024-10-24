@@ -11,17 +11,17 @@
 }
 
 @mixin styled-scrollbars(){
-  scrollbar-color: var(--sand_400) transparent;
+  scrollbar-color: var(--color-neutral-border-boldest) transparent;
   scrollbar-width: thin;
 
   &::-webkit-scrollbar{
     width: 4px;
     height: 4px;
-    background-color: var(--sand_0);
+    background-color: var(--color-neutral-surface);
   }
 
   &::-webkit-scrollbar-thumb{
-    background: var(--sand_400);
+    background: var(--color-neutral-border-boldest);
   }
 }
 

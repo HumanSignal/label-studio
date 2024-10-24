@@ -12,8 +12,8 @@
 
   &__tabs-row {
     display: flex;
-    background: var(--sand_100);
-    border-bottom: 1px solid var(--sand_300);
+    background: var(--color-neutral-surface);
+    border-bottom: 1px solid var(--color-neutral-border);
 
     .ff_outliner_optim & {
       height: var(--tab-row-height);
@@ -30,7 +30,7 @@
   }
 
   &__contents {
-    background: var(--sand_0);
+    background: var(--color-neutral-background);
     height: 100%;
     position: relative;
     z-index: 1;
@@ -103,7 +103,7 @@
     font-size: 14px;
     line-height: 24px;
     letter-spacing: 0.15px;
-    border-color: var(--sand_300);
+    border-color: var(--color-neutral-border);
     margin: 0 2px;
     display: block;
     cursor: grab;
@@ -133,7 +133,7 @@
   }
 
   &__contents {
-    background: var(--sand_0);
+    background: var(--color-neutral-background);
   }
 
   &__icon {

@@ -77,11 +77,11 @@
   &__item {
     &_type {
       &_success {
-        color: var(--success_color);
+        color: var(--color-positive-content);
       }
 
       &_fail {
-        color: var(--danger_color);
+        color: var(--color-negative-content);
       }
     }
   }

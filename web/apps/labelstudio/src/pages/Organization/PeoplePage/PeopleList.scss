@@ -73,7 +73,7 @@
     display: flex;
 
     &:nth-child(odd):not(&_active) {
-      background-color: var(--color-neutral-surface);
+      background-color: var(--color-neutral-emphasis-subtle);
     }
 
     &_active {

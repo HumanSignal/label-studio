@@ -101,7 +101,7 @@
   }
 
   &_size_compact {
-    background: var(--sand_0);
+    background: var(--color-neutral-background);
   }
 
   &_size_compact &__item,
@@ -165,7 +165,7 @@
   &__title {
     padding: 4px 10px;
     font-size: 14px;
-    color: var(--sand_600);
+    color: var(--color-neutral-content-subtler);
   }
 
   &__list {
