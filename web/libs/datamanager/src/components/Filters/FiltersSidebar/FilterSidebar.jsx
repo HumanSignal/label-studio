@@ -1,5 +1,4 @@
 import { inject } from "mobx-react";
-import React from "react";
 import { FaCaretSquareLeft } from "react-icons/fa";
 import { Block, Elem } from "../../../utils/bem";
 import { Button } from "../../Common/Button/Button";

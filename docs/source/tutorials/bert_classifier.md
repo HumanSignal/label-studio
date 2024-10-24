@@ -15,10 +15,6 @@ categories:
 image: "/tutorials/bert.png"
 ---
 
-<!--
-
--->
-
 # BERT-based text classification
 
 The NewModel is a BERT-based text classification model that is designed to work with Label Studio. This model uses the Hugging Face Transformers library to fine-tune a BERT model for text classification. The model is trained on the labeled data from Label Studio and then used to make predictions on new data.  With this model connected to Label Studio, you can: 
@@ -28,6 +24,12 @@ The NewModel is a BERT-based text classification model that is designed to work 
 - Fine-tune the model on your specific task and use it to make predictions on new data.
 - Automatically download the labeled tasks from Label Studio and prepare the data for training.
 - Customize the training parameters such as learning rate, number of epochs, and weight decay.
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`bert_classifier` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/bert_classifier). 
 
 
 ## Running with Docker (recommended)

@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import React, { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaCode } from "react-icons/fa";
 import { RiCodeLine } from "react-icons/ri";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -84,14 +84,17 @@ export const Table = observer(
               indeterminate={selectedItems.isIndeterminate}
               onChange={() => props.onSelectAll()}
               className="select-all"
+              ariaLabel={`${selectedItems.isAllSelected ? "Unselect" : "Select"} all rows`}
             />
           );
         },
         Cell: ({ data }) => {
+          const isChecked = selectedItems.isSelected(data.id);
           return (
             <TableCheckboxCell
-              checked={selectedItems.isSelected(data.id)}
+              checked={isChecked}
               onChange={() => props.onSelectRow(data.id)}
+              ariaLabel={`${isChecked ? "Unselect" : "Select"} Task ${data.id}`}
             />
           );
         },

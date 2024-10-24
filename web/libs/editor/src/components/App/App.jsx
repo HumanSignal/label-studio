@@ -10,6 +10,7 @@ import { observer, Provider } from "mobx-react";
  * Core
  */
 import Tree from "../../core/Tree";
+import { CommentsOverlay } from "../InteractiveOverlays/CommentsOverlay";
 import { TreeValidation } from "../TreeValidation/TreeValidation";
 
 /**
@@ -25,7 +26,14 @@ import "../../tags/visual";
 import { Space } from "../../common/Space/Space";
 import { Button } from "../../common/Button/Button";
 import { Block, cn, Elem } from "../../utils/bem";
-import { FF_DEV_1170, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
+import {
+  FF_DEV_1170,
+  FF_DEV_3873,
+  FF_LSDV_4620_3_ML,
+  FF_PER_FIELD_COMMENTS,
+  FF_SIMPLE_INIT,
+  isFF,
+} from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
@@ -40,7 +48,7 @@ import { BottomBar } from "../BottomBar/BottomBar";
 import Debug from "../Debug";
 import Grid from "./Grid";
 import { InstructionsModal } from "../InstructionsModal/InstructionsModal";
-import { RelationsOverlay } from "../RelationsOverlay/RelationsOverlay";
+import { RelationsOverlay } from "../InteractiveOverlays/RelationsOverlay";
 import Segment from "../Segment/Segment";
 import Settings from "../Settings/Settings";
 import { SidebarTabs } from "../SidebarTabs/SidebarTabs";
@@ -148,6 +156,7 @@ class App extends Component {
         <Elem name="annotation">
           {<Annotation root={root} annotation={as.selected} />}
           {this.renderRelations(as.selected)}
+          {isFF(FF_PER_FIELD_COMMENTS) && this.renderCommentsOverlay(as.selected)}
         </Elem>
         {!isFF(FF_DEV_3873) && getRoot(as).hasInterface("infobar") && this._renderInfobar(as)}
       </Block>
@@ -193,6 +202,14 @@ class App extends Component {
     );
   }
 
+  renderCommentsOverlay(selectedAnnotation) {
+    const { store } = this.props;
+    const { commentStore } = store;
+
+    if (!store.hasInterface("annotations:comments") || !commentStore.isCommentable) return null;
+    return <CommentsOverlay commentStore={commentStore} annotation={selectedAnnotation} />;
+  }
+
   render() {
     const { store } = this.props;
     const as = store.annotationStore;
@@ -235,7 +252,7 @@ class App extends Component {
             <InstructionsModal
               visible={store.showingDescription}
               onCancel={() => store.toggleDescription()}
-              title="Labeling Instructions"
+              title={store.hasInterface("review") ? "Review Instructions" : "Labeling Instructions"}
             >
               {store.description}
             </InstructionsModal>

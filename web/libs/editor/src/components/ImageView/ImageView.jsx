@@ -1,4 +1,4 @@
-import React, { Component, createRef, forwardRef, Fragment, memo, useEffect, useRef, useState } from "react";
+import { Component, createRef, forwardRef, Fragment, memo, useEffect, useRef, useState } from "react";
 import { Group, Layer, Line, Rect, Stage } from "react-konva";
 import { observer } from "mobx-react";
 import { getEnv, getRoot, isAlive } from "mobx-state-tree";
@@ -227,7 +227,7 @@ const TransformerBack = observer(({ item }) => {
             item.annotation.unselectAreas();
           }}
           onMouseOver={(ev) => {
-            if (!item.annotation.relationMode) {
+            if (!item.annotation.isLinkingMode) {
               ev.target.getStage().container().style.cursor = Constants.POINTER_CURSOR;
             }
           }}

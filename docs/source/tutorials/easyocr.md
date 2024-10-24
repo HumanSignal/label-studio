@@ -14,10 +14,6 @@ categories:
 image: "/tutorials/easyocr.png"
 ---
 
-<!--
-
--->
-
 # EasyOCR model connection
 
 The [EasyOCR](https://github.com/JaidedAI/EasyOCR) model connection is a powerful tool that integrates the capabilities of EasyOCR with Label Studio. It is designed to assist in machine learning labeling tasks, specifically those involving Optical Character Recognition (OCR). 
@@ -25,6 +21,12 @@ The [EasyOCR](https://github.com/JaidedAI/EasyOCR) model connection is a powerfu
 The primary function of this connection is to recognize and extract text from images, which can be a crucial step in many machine learning workflows. By automating this process, the EasyOCR model connection can significantly increase efficiency, reducing the time and effort required for manual text extraction.
 
 In the context of Label Studio, this connection enhances the platform's labeling capabilities, allowing users to automatically generate labels for text in images. This can be particularly useful in tasks such as data annotation, document digitization, and more.
+
+## Before you begin
+
+Before you begin, you must install the [Label Studio ML backend](https://github.com/HumanSignal/label-studio-ml-backend?tab=readme-ov-file#quickstart). 
+
+This tutorial uses the [`easyocr` example](https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples/easyocr). 
 
 ## Labeling configuration
 

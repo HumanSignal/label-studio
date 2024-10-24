@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import React, { useState } from "react";
+import { useState } from "react";
 import { inject, observer } from "mobx-react";
 import { types } from "mobx-state-tree";
 
@@ -365,7 +365,7 @@ const HtxDateTime = inject("store")(
     };
 
     return (
-      <div className="htx-datetime" style={visibleStyle}>
+      <div className="htx-datetime" style={visibleStyle} ref={item.elementRef}>
         {item.showMonth && (
           <select
             {...visual}

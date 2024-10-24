@@ -28,12 +28,6 @@
       "@humansignal/frontend-test/*": [
         "libs/frontend-test/src/*"
       ],
-      "@humansignal/icons": [
-        "libs/storybook/icons.ts"
-      ],
-      "@humansignal/storybook": [
-        "libs/storybook/src/index.ts"
-      ],
       "@humansignal/ui": [
         "libs/ui/src/index.ts"
       ]

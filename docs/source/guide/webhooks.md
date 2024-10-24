@@ -91,7 +91,7 @@ Label Studio makes two main types of events available to integrate with webhooks
 
 ### Enable organization-level webhooks
 
-To use the organization-level webhooks that trigger events for each project, you must [set an environment variable](start.html#Set-environment-variables).
+To use the organization-level webhooks that trigger events for each project, you must [set an environment variable](https://labelstud.io/guide/start#Set-environment-variables).
 ```shell
 LABEL_STUDIO_ALLOW_ORGANIZATION_WEBHOOKS=true
 ```

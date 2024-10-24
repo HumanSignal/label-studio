@@ -1,6 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from core.feature_flags import flag_set
 from core.utils.common import load_func
 from core.utils.db import fast_first
 from django.conf import settings
@@ -20,12 +19,13 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         return instance.avatar_url
 
     def get_initials(self, instance):
-        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=instance):
-            return instance.get_initials(self._is_deleted(instance))
-        else:
-            return instance.get_initials()
+        return instance.get_initials(self._is_deleted(instance))
 
     def _is_deleted(self, instance):
+        if 'deleted_organization_members' in self.context:
+            organization_members = self.context.get('deleted_organization_members', None)
+            return instance.id in organization_members
+
         if organization_members := self.context.get('organization_members', None):
             # Finds the first organization_member matching the instance's id. If not found, set to None.
             organization_member_for_user = next(
@@ -65,10 +65,10 @@ class BaseUserSerializer(FlexFieldsModelSerializer):
         if uid not in self.context[key]:
             self.context[key][uid] = super().to_representation(instance)
 
-        if flag_set('fflag_feat_all_optic_114_soft_delete_for_churned_employees', user=instance):
-            if self._is_deleted(instance):
-                for field in ['username', 'first_name', 'last_name', 'email']:
-                    self.context[key][uid][field] = 'User' if field == 'last_name' else 'Deleted'
+        if self._is_deleted(instance):
+            for field in ['username', 'first_name', 'last_name', 'email']:
+                self.context[key][uid][field] = 'User' if field == 'last_name' else 'Deleted'
+
         return self.context[key][uid]
 
     class Meta:

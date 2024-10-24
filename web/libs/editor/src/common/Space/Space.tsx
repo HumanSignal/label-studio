@@ -1,4 +1,4 @@
-import React, { type CSSProperties, type FC } from "react";
+import type { CSSProperties, FC } from "react";
 import { BemWithSpecifiContext } from "../../utils/bem";
 import "./Space.scss";
 

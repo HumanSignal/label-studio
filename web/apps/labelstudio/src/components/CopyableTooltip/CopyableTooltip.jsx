@@ -1,4 +1,3 @@
-import React from "react";
 import { Children, cloneElement, forwardRef, useCallback } from "react";
 import { useCopyText } from "../../hooks/useCopyText";
 import { Tooltip } from "../Tooltip/Tooltip";

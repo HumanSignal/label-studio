@@ -2,7 +2,6 @@ import { type FC, type RefObject, useCallback, useRef } from "react";
 import { Block, Elem } from "../../utils/bem";
 import { ReactComponent as IconSend } from "../../assets/icons/send.svg";
 
-import "./CommentForm.scss";
 import { TextArea } from "../../common/TextArea/TextArea";
 import { observer } from "mobx-react";
 
@@ -14,10 +13,11 @@ export type CommentFormProps = {
   inline?: boolean;
   rows?: number;
   maxRows?: number;
+  classifications?: object | null;
 };
 
 export const CommentFormBase: FC<CommentFormProps> = observer(
-  ({ value = "", inline = true, onChange, onSubmit, onBlur, rows = 1, maxRows = 4 }) => {
+  ({ value = "", inline = true, onChange, onSubmit, onBlur, rows = 1, maxRows = 4, classifications }) => {
     const formRef = useRef<HTMLFormElement>(null);
     const actionRef = useRef<{ update?: (text?: string) => void; el?: RefObject<HTMLTextAreaElement> }>({});
 
@@ -29,7 +29,7 @@ export const CommentFormBase: FC<CommentFormProps> = observer(
 
         const comment = (new FormData(formRef.current).get("comment") as string)?.trim();
 
-        if (!comment) return;
+        if (!comment && !classifications) return;
 
         onSubmit?.(comment);
       },

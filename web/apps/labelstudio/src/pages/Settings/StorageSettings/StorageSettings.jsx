@@ -1,4 +1,3 @@
-import React from "react";
 import { Columns } from "../../../components/Columns/Columns";
 import { Description } from "../../../components/Description/Description";
 import { Block, cn } from "../../../utils/bem";

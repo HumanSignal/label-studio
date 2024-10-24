@@ -14,7 +14,8 @@
         "tsConfig": "libs/datamanager/tsconfig.lib.json",
         "main": "libs/datamanager/src/index.js",
         "outputPath": "dist/libs/datamanager",
-        "isolatedConfig": true
+        "isolatedConfig": true,
+        "generatePackageJson": true
       },
       "configurations": {
         "development": {

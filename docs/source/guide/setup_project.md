@@ -99,7 +99,7 @@ When you're done, click **Save**.
 <div class="opensource-only">
 
 !!! error Enterprise
-    Workspaces are only available for Label Studio Enterprise users. Label Studio Enterprise also includes many additional configuration options for projects, such as role-based access control and workflow automation. For more information, see [Compare Community and Enterprise Features](label_studio_comparison). 
+    Workspaces are only available for Label Studio Enterprise users. Label Studio Enterprise also includes many additional configuration options for projects, such as role-based access control and workflow automation. For more information, see [Compare Community and Enterprise Features](label_studio_compare). 
 
 </div>
 
@@ -177,6 +177,9 @@ Annotators are the users who are labeling project tasks.
 
 For a description of all the settings available for annotators, see [Project settings - Annotation](project_settings_lse#Annotation) and [Project settings - Quality](project_settings_lse#Quality). 
 
+See the following video for a brief overview of automated task assignments:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/b1_o-yhT1uY?si=NspgI-rWwE6l7ZIN" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 #### Review settings
 

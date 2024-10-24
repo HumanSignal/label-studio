@@ -1,4 +1,3 @@
-import React from "react";
 import { BemWithSpecifiContext } from "../../utils/bem";
 import "./Space.scss";
 

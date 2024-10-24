@@ -23,6 +23,7 @@ The script does the following:
     ---
 """
 
+import logging
 import os
 import re
 from pathlib import Path
@@ -30,22 +31,24 @@ from typing import List
 
 import yaml
 
-ML_REPO_PATH = os.getenv('ML_REPO_PATH', 'label-studio-ml-backend/')
+ML_REPO_PATH = os.getenv('ML_REPO_PATH', '/ml/')
 
 
 def get_readme_files() -> List:
     p = Path(ML_REPO_PATH) / 'label_studio_ml' / 'examples'
-    return list(Path(p).rglob('README.md'))
+    return sorted(list(Path(p).rglob('README.md')))
 
 
 def parse_readme_file(file_path: str) -> dict:
+    print(file_path)
     with open(file_path, 'r') as f:
         content = f.read()
 
-    header = re.findall(r'---\n(.*?)\n---', content, re.DOTALL)
-    body = re.sub(r'---\n(.*?)\n---', '', content, flags=re.DOTALL)
+    match = re.search(r'---(.*?)---', content, re.DOTALL)
+    header = match.group(1).strip() if match else ''
+    body = content[content.find('-->') + 3 :].strip()
 
-    return {'header': header[0].strip() if header else '', 'body': body.strip()}
+    return {'header': header, 'body': body}
 
 
 def create_tutorial_files():
@@ -85,10 +88,13 @@ def update_ml_tutorials_index(files_and_headers: List):
     data['cards'] = []
     print(data)
     for f in files_and_headers:
+        h = f['header']
+        if not isinstance(h, dict):
+            logging.error(f'No dict header found in {f} file. Skipping ...')
+            continue
         print('Processing', f['model_name'])
-        h = f['header'] or {}
         card = {'title': h.get('title') or f['model_name'], 'url': f'/tutorials/{f["model_name"]}.html'}
-        card.update(f['header'] or {})
+        card.update(h)
         data['cards'].append(card)
 
     p = Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'guide' / 'ml_tutorials.html'

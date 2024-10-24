@@ -1,0 +1,137 @@
+.link-state {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 1.2em;
+  transition: color 0.2s ease;
+  padding: 6px 4px 5px;
+
+  &_display {
+    padding: 2px 9px 2px 4px;
+    gap: 2px;
+    font-size: 14px;
+    line-height: 22px;
+  }
+
+  &__prefix {
+    flex-grow: 0;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+
+    .link-state_action & {
+      color: var(--primary-action-color);
+    }
+
+    .link-state_display & {
+      color: var(--secondary-action-color-hover);
+
+      // align linked region icon with the rest
+      align-self: flex-start;
+      transform: translateY(2px);
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+.link-state-region {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: flex-start; // text can be multiline
+  gap: 4px;
+  font-size: 1em;
+  line-height: 1.2em;
+  justify-content: stretch;
+  width: 100%;
+  opacity: var(--comment-item-region-opacity, 1);
+  overflow: hidden;
+
+  &_interactive {
+    user-select: none
+  }
+
+  &__icon {
+    display: flex;
+    flex: none;
+    max-width: 24px;
+    width: min-content;
+    align-items: center;
+    justify-content: center;
+    color: var(--icon-color);
+    flex-grow: 0;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  &__index {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px; // to align with 24px icon
+    display: flex;
+    font-size: 9px;
+    color: var(--sand_0);
+    text-align: center;
+    align-items: center;
+    border-radius: 4px;
+    justify-content: center;
+    background-color: var(--text-color, var(--sand_900));
+    flex-grow: 0;
+  }
+
+  &__title {
+    align-items: center;
+    flex: 1;
+    color: var(--text-color, var(--sand_900));
+    min-width: 0;
+    margin-top: 3px; // to align with icon and index
+
+    /// text-overflow for multiline texts
+    /// @see https://stackoverflow.com/a/41137262/308527
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    // reset style from parent to densify text
+    white-space: normal;
+
+    * {
+      display: inline;
+    }
+  }
+
+  &__label {
+    flex: auto 1 0;
+    max-width: 100%;
+    margin-right: 5px;
+
+    & div {
+      overflow: hidden;
+
+      //// @todo disabled for now to allow multiline texts
+      // white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .labels-list {
+      display: inline;
+    }
+  }
+
+  &__text {
+    color: var(--sand_900);
+  }
+
+  &__close {
+    flex-grow: 0;
+  }
+}

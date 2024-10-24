@@ -82,16 +82,24 @@ jobs:
         continue-on-error: true
         uses: ./.github/actions-hub/actions/git-merge
         with:
-          base_branch: ${{ steps.get-branch.outputs.base_name }}
+          base_branch: ${{ steps.get-branch.outputs.base_branch_name }}
           head_branch: ${{ steps.get-branch.outputs.branch_name }}
           our_files: "pyproject.toml poetry.lock web"
           working_directory: "${{ env.UPSTREAM_REPO_WORKDIR }}"
 
 # POETRY
 
-      - name: "Poetry: Set up"
+      - name: "Install poetry"
         if: steps.details.outputs.poetry
-        uses: snok/install-poetry@v1
+        run: pipx install poetry
+
+      - name: "Set up Python"
+        id: setup_python
+        if: steps.details.outputs.poetry
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'poetry'
 
       - name: "Poetry: Commit and Push"
         if: steps.details.outputs.poetry
@@ -100,11 +108,11 @@ jobs:
         run: |
           set -xeuo pipefail
 
-          poetry add "https://github.com/${{ github.event.client_payload.repo_name }}/archive/${{ github.event.client_payload.commit_sha }}.zip" --lock
+          poetry add "https://github.com/${{ steps.fm.outputs.repo_name }}/archive/${{ steps.fm.outputs.commit_sha }}.zip" --lock
 
           git add pyproject.toml poetry.lock
           git status -s
-          git commit --allow-empty -m '[submodules] Bump ${{ github.event.client_payload.repo_name }} version' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          git commit --allow-empty -m '[submodules] Bump ${{ steps.fm.outputs.repo_name }} version' -m 'Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
           git push origin HEAD
 
       - name: Find or Create PR
@@ -155,8 +163,8 @@ jobs:
           '
 
       - name: Enable AutoMerge
-        id: enable-pr-automerge
         if: github.event.client_payload.event_action == 'merged'
+        continue-on-error: true
         shell: bash
         env:
           GIT_PAT: ${{ secrets.GIT_PAT }}

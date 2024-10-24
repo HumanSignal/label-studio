@@ -1,7 +1,6 @@
 /* global Sentry */
 
 import { createBrowserHistory } from "history";
-import React from "react";
 import { render } from "react-dom";
 import { Router } from "react-router-dom";
 import { LEAVE_BLOCKER_KEY, leaveBlockerCallback } from "../components/LeaveBlocker/LeaveBlocker";
@@ -79,3 +78,7 @@ const root = document.querySelector(".app-wrapper");
 const content = document.querySelector("#main-content");
 
 render(<App content={content.innerHTML} />, root);
+
+if (module?.hot) {
+  module.hot.accept(); // Enable HMR for React components
+}

@@ -1,4 +1,4 @@
-import React, { createRef, useCallback } from "react";
+import { createRef, useCallback } from "react";
 import Button from "antd/lib/button/index";
 import Form from "antd/lib/form/index";
 import Input from "antd/lib/input/index";
@@ -403,7 +403,7 @@ const HtxTextArea = observer(({ item }) => {
   visibleStyle.marginTop = "4px";
 
   return item.displaymode === PER_REGION_MODES.TAG ? (
-    <div className={textareaClassName} style={visibleStyle}>
+    <div className={textareaClassName} style={visibleStyle} ref={item.elementRef}>
       {Tree.renderChildren(item, item.annotation)}
 
       {item.showSubmit && (

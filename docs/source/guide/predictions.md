@@ -719,7 +719,7 @@ For more assistance, review this [example code creating a Label Studio task with
 
 ## Import OCR pre-annotations 
 
-Import pre-annotations for optical character recognition (OCR), such as output from [tesseract like in this example blog post](/blog/Improve-OCR-quality-with-Tesseract-and-Label-Studio.html). 
+Import pre-annotations for optical character recognition (OCR), such as output from [tesseract like in this example blog post](https://labelstud.io/blog/improve-ocr-quality-for-receipt-processing-with-tesseract-and-label-studio). 
 
 In this example, import pre-annotations for OCR tasks using the [OCR template](/templates/optical_character_recognition.html):
 
@@ -822,4 +822,14 @@ Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-da
 
 ### Troubleshooting pre-annotations
 
-See [Troubleshooting ML Backends & Predictions](https://support.humansignal.com/hc/en-us/sections/23627938255117-ML-Backend-Predictions) in the HumanSignal support center. 
+<div class="opensource-only">
+
+See [Troubleshooting pre-annotations](troubleshooting#Pre-annotations).
+
+</div>
+
+<div class="enterprise-only">
+
+See [Troubleshooting ML Backends & Predictions](https://support.humansignal.com/hc/en-us/sections/23627938255117-ML-Backend-Predictions) in the HumanSignal support center.
+
+</div>

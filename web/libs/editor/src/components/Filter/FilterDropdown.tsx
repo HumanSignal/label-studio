@@ -1,4 +1,4 @@
-import React, { type FC } from "react";
+import type { FC } from "react";
 import { Select } from "../../common/Select/Select";
 
 interface FilterDropdownInterface {

@@ -33,7 +33,7 @@ After setting up the SSO, you can use native authentication to access the Label 
 
 - You can use SSO along with normal login. This is not a recommended option.
 
-- You can prevent a user from creating his own organization by using [DISABLE_SIGNUP_WITHOUT_LINK](signup.html#Restrict-signup-for-local-deployments) option.
+- You can prevent a user from creating his own organization by using [DISABLE_SIGNUP_WITHOUT_LINK](admin_user#Require-invites-for-new-users) option.
 
 ### Connect your Identity Provider to Label Studio Enterprise
 

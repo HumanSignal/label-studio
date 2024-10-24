@@ -1,0 +1,35 @@
+name: "ZenDesk: Close GitHub Issue on Zendesk Ticket Solved"
+
+on:
+  workflow_dispatch:
+    inputs:
+      external_id:
+        description: "GitHub issue url"
+        required: true
+        type: string
+
+jobs:
+  close_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v3.0.0
+
+      - uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GIT_PAT_HEIDI }}
+          script: |
+            // Extract issue details from the Zendesk external_id
+            const parts = context.payload.inputs.external_id.split("/");
+            const issue_number = parts[parts.length - 1];
+            const issue_repo = parts[parts.length - 3];
+            const issue_owner = parts[parts.length - 4];
+
+            // Close the GitHub issue
+            const { data: issue } await github.rest.issues.update({
+              owner: issue_owner,
+              repo: issue_repo,
+              issue_number: issue_number,
+              state: "closed"
+            });
+
+            core.info(`GitHub issue ${issue.html_url} closed successfully.`);

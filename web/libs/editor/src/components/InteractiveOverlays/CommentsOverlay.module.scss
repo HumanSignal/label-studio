@@ -1,0 +1,55 @@
+.container {
+  --icon-primary-color: var(--grape_600);
+  --icon-secondary-color: var(--grape_0);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+
+  .commentItem {
+    transition: opacity 300ms;
+    transform: translateY(-100%);
+    filter: drop-shadow(0 2px 8px #12110D52) drop-shadow(0 8px 16px #12110D1F);
+    pointer-events: all;
+    cursor: pointer;
+  }
+
+  .commentIcon {
+    // to fit into usual screen edges with paddings
+    scale: 0.8;
+    translate: -2px 4px;
+  }
+
+  .commentIconBackground {
+    transition: fill 300ms;
+    fill: var(--icon-secondary-color);
+  }
+
+  .commentIconLines {
+    transition: fill 300ms;
+    fill: var(--icon-primary-color);
+  }
+
+  &._highlighting {
+    & .commentItem {
+      opacity: 0.2;
+
+      &._highlighted {
+        opacity: 1;
+
+        & .commentIconBackground {
+          fill: var(--icon-primary-color);
+        }
+
+        & .commentIconLines {
+          fill: var(--icon-secondary-color);
+        }
+      }
+    }
+  }
+
+}
