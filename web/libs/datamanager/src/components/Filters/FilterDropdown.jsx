@@ -1,5 +1,4 @@
 import { observer } from "mobx-react";
-import React from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { Icon } from "../Common/Icon/Icon";
 import { Select } from "../Common/Select/Select";

@@ -1,5 +1,4 @@
 import { getRoot, getSnapshot, types } from "mobx-state-tree";
-import React from "react";
 import {
   CommentCheck,
   CommentRed,

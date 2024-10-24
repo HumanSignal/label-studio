@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAPI } from "../../providers/ApiProvider";
 import "./WebhookPage.scss";
@@ -6,7 +6,6 @@ import "./WebhookPage.scss";
 import WebhookList from "./WebhookList";
 import WebhookDetail from "./WebhookDetail";
 import { useProject } from "../../providers/ProjectProvider";
-import { Button, Spinner } from "../../components";
 import { Block, Elem } from "../../utils/bem";
 import { IconInfo } from "../../assets/icons";
 import { useHistory } from "react-router";

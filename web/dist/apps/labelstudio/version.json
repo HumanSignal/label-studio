@@ -1,6 +1,6 @@
 {
-  "message": "feat: LEAP-1592: Hide task navigation arrow based on setting (#6526)",
-  "commit": "d124b273fc058b4d33d86853252360e61200fa77",
-  "date": "2024-10-21T10:59:54.000Z",
+  "message": "chore(deps): bump http-proxy-middleware from 2.0.6 to 2.0.7 in /web (#6551)",
+  "commit": "199f4241d1ef2b1838a56a90e4ccee4519763ada",
+  "date": "2024-10-23T16:03:04.000Z",
   "branch": "develop"
 }

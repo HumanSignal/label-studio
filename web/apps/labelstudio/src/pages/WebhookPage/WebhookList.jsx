@@ -1,14 +1,12 @@
-import React, { useCallback } from "react";
-import { LsCross, LsPencil, LsPlus } from "../../assets/icons";
+import { useCallback } from "react";
+import { LsCross, LsPencil } from "../../assets/icons";
 import { Button } from "../../components";
-import { Form, Input, Label, Toggle } from "../../components/Form";
-import { modal } from "../../components/Modal/Modal";
+import { Toggle } from "../../components/Form";
 import { Block, Elem } from "../../utils/bem";
 import "./WebhookPage.scss";
 import { format } from "date-fns";
 import { useAPI } from "../../providers/ApiProvider";
 import { WebhookDeleteModal } from "./WebhookDeleteModal";
-import { useProject } from "../../providers/ProjectProvider";
 
 const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) => {
   const api = useAPI();

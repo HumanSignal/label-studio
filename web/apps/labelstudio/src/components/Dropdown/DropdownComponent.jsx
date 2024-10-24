@@ -1,4 +1,4 @@
-import React, { cloneElement, forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { cloneElement, forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { Block, cn } from "../../utils/bem";
 import { alignElements } from "../../utils/dom";

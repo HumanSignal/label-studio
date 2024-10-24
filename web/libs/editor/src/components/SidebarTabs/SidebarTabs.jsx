@@ -1,4 +1,3 @@
-import React from "react";
 import { Block, Elem } from "../../utils/bem";
 import "./SidebarTabs.scss";
 
