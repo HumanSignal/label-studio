@@ -35,9 +35,7 @@ type CommentItemProps = {
 const CommentItem: React.FC<CommentItemProps> = observer(({ comment, rootRef }) => {
   const root = rootRef.current;
   const node = comment.regionRef?.overlayNode;
-  // result is hidden when it's per-region and the region is not selected
-  const isHiddenResult = node?.area && !node.area.selected && !node.area.classification;
-  const isHidden = !node || node.hidden || isHiddenResult;
+  const isHidden = !node;
   // {} !== {} it's always so, and it's a way to force re-render
   const [forceUpdateId, forceUpdate] = useState<any>({});
 

@@ -49,6 +49,15 @@ const ClassificationBase = types
         }
         return self.annotation.results.find((r) => r.from_name === self);
       },
+
+      /**
+       * That name historically was used for regions, but now it's used for the classifications as well.
+       * Let's say "Region" here means just an area on the screen.
+       * So that it's an element through which we can get the bbox For an area where classification takes place.
+       */
+      getRegionElement() {
+        return self.elementRef.current;
+      },
     };
   })
   .actions((self) => {
