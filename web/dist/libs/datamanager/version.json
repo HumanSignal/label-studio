@@ -1,6 +1,6 @@
 {
-  "message": "chore: OPTIC-1154: biome linting tweaks (#6425)",
-  "commit": "7ed55c66a55660150fdc567ac9f861cc564db21c",
-  "date": "2024-10-22T20:22:23.000Z",
+  "message": "chore(deps): bump http-proxy-middleware from 2.0.6 to 2.0.7 in /web (#6551)",
+  "commit": "199f4241d1ef2b1838a56a90e4ccee4519763ada",
+  "date": "2024-10-23T16:03:04.000Z",
   "branch": "develop"
 }
