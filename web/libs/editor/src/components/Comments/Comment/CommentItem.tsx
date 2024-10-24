@@ -76,6 +76,8 @@ export const CommentItem: FC<CommentItemProps> = observer(
     const { startLinkingMode: _startLinkingMode, currentComment, globalLinking } = useContext(CommentsContext);
     const currentUser = window.APP_SETTINGS?.user;
     const isCreator = currentUser?.id === createdBy.id;
+    const infoIsHidden = comment.commentsStore?.store?.hasInterface("annotations:hide-info");
+    const hiddenUser = infoIsHidden ? { email: isCreator ? "Me" : "User" } : null;
     const [text, setText] = useState(initialText);
 
     const [linkingComment, setLinkingComment] = useState();
@@ -167,9 +169,9 @@ export const CommentItem: FC<CommentItemProps> = observer(
       >
         <Space spread size="medium" truncated>
           <Space size="small" truncated>
-            <Elem tag={Userpic} user={createdBy} name="userpic" showUsername username={createdBy} />
+            <Elem tag={Userpic} user={hiddenUser ?? createdBy} name="userpic" showUsername username={createdBy} />
             <Elem name="name" tag="span">
-              {userDisplayName(createdBy)}
+              {userDisplayName(hiddenUser ?? createdBy)}
             </Elem>
           </Space>
 
@@ -178,7 +180,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
             <Elem name="saving" mod={{ hide: isPersisted }}>
               <Elem name="dot" />
             </Elem>
-            <TimeTracker />
+            {!infoIsHidden && <TimeTracker />}
           </Space>
         </Space>
 

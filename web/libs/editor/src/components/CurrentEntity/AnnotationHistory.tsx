@@ -1,3 +1,4 @@
+import { when } from "mobx";
 import { inject, observer } from "mobx-react";
 import { type FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Tooltip } from "antd";
@@ -19,7 +20,6 @@ import { Userpic } from "../../common/Userpic/Userpic";
 import { Block, Elem } from "../../utils/bem";
 import { humanDateDiff, userDisplayName } from "../../utils/utilities";
 import "./AnnotationHistory.scss";
-import { when } from "mobx";
 
 type HistoryItemType =
   | "prediction"
@@ -55,6 +55,8 @@ const DraftState: FC<{
 }> = observer(({ annotation, inline, isSelected }) => {
   const hasChanges = annotation.history.hasChanges;
   const store = annotation.list; // @todo weird name
+  const infoIsHidden = store.store.hasInterface("annotations:hide-info");
+  const hiddenUser = infoIsHidden ? { email: "Me" } : null;
 
   const [hasUnsavedChanges, setChanges] = useState(false);
 
@@ -67,7 +69,7 @@ const DraftState: FC<{
   return (
     <HistoryItem
       key="draft"
-      user={annotation.user ?? { email: annotation.createdBy }}
+      user={hiddenUser ?? annotation.user ?? { email: annotation.createdBy }}
       date={annotation.draftSaved}
       extra={
         annotation.isDraftSaving ? (
@@ -88,6 +90,7 @@ const DraftState: FC<{
       comment=""
       acceptedState="draft_created"
       selected={isSelected}
+      hideInfo={infoIsHidden}
       onClick={() => {
         store.selectHistory(null);
         annotation.toggleDraft(true);
@@ -107,6 +110,8 @@ const AnnotationHistoryComponent: FC<any> = ({
   const annotation = annotationStore.selected;
   const lastItem = history?.length ? history[0] : null;
   const hasChanges = annotation.history.hasChanges;
+  const infoIsHidden = annotationStore.store.hasInterface("annotations:hide-info");
+  const currentUser = window.APP_SETTINGS?.user;
 
   // if user makes changes at the first time there are no draft yet
   const isDraftSelected =
@@ -123,17 +128,19 @@ const AnnotationHistoryComponent: FC<any> = ({
           const isLastItem = lastItem?.id === item.id;
           const isSelected =
             isLastItem && !selectedHistory && showDraft ? !isDraftSelected : selectedHistory?.id === item.id;
+          const hiddenUser = infoIsHidden ? { email: currentUser?.id === user.id ? "Me" : "User" } : null;
 
           return (
             <HistoryItem
               key={id}
               inline={inline}
-              user={user ?? { email: item?.createdBy }}
+              user={hiddenUser ?? user ?? { email: item?.createdBy }}
               date={createdDate}
               comment={item.comment}
               acceptedState={item.actionType}
               selected={isSelected}
               disabled={item.results.length === 0}
+              hideInfo={infoIsHidden}
               onClick={async () => {
                 if (!showDraft) {
                   annotationStore.selectHistory(isSelected ? null : item);
@@ -171,6 +178,7 @@ const HistoryItemComponent: FC<{
   selected?: boolean;
   disabled?: boolean;
   inline?: boolean;
+  hideInfo?: boolean;
   onClick: any;
 }> = ({
   entity,
@@ -182,6 +190,7 @@ const HistoryItemComponent: FC<{
   selected = false,
   disabled = false,
   inline = false,
+  hideInfo: infoIsHidden,
   onClick,
 }) => {
   const isPrediction = entity?.type === "prediction";
@@ -243,16 +252,18 @@ const HistoryItemComponent: FC<{
           </Elem>
         </Space>
 
-        <Space size="small">
-          {extra && <Elem name="date">{extra}</Elem>}
-          {date && (
-            <Elem name="date">
-              <Tooltip placement="topRight" title={new Date(date).toLocaleString()}>
-                {humanDateDiff(date)}
-              </Tooltip>
-            </Elem>
-          )}
-        </Space>
+        {!infoIsHidden && (
+          <Space size="small">
+            {extra && <Elem name="date">{extra}</Elem>}
+            {date && (
+              <Elem name="date">
+                <Tooltip placement="topRight" title={new Date(date).toLocaleString()}>
+                  {humanDateDiff(date)}
+                </Tooltip>
+              </Elem>
+            )}
+          </Space>
+        )}
       </Space>
       {(reason || comment) && (
         <Elem name="action" tag={Space} size="small">

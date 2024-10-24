@@ -118,6 +118,10 @@ export class LSFWrapper {
       interfaces.push("annotations:deny-empty");
     }
 
+    if (window.APP_SETTINGS.annotator_reviewer_firewall_enabled) {
+      interfaces.push("annotations:hide-info");
+    }
+
     if (this.labelStream) {
       interfaces.push("infobar");
       if (!window.APP_SETTINGS.label_stream_navigation_disabled) interfaces.push("topbar:prevnext");
