@@ -1,0 +1,64 @@
+/* GPS Visualization Component Styles */
+
+/* Map container styles */
+.gps-visualization-map-only {
+  width: 100%;
+  height: 500px;
+  position: relative;
+}
+
+.gps-visualization-map-only .leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--border-radius-medium);
+  border: 1px solid var(--color-neutral-border);
+}
+
+/* Error and loading message styles */
+.gps-error,
+.gps-nodata {
+  padding: var(--spacing-loose);
+  text-align: center;
+  border: 1px dashed var(--color-neutral-border);
+  border-radius: var(--border-radius-medium);
+  color: var(--color-neutral-content-subtle);
+  background-color: var(--color-neutral-background);
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gps-error {
+  color: var(--color-negative-content);
+  border-color: var(--color-negative-border);
+  background-color: var(--color-negative-background);
+}
+
+/* Timeline z-index management */
+.lsf-timeline {
+  position: relative;
+  z-index: 1000;
+}
+
+/* Marker animation keyframes */
+@keyframes pulse-marker {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Moving marker animation */
+.moving-marker-icon {
+  animation: pulse-marker 1.5s infinite ease-in-out;
+}
+
+ 

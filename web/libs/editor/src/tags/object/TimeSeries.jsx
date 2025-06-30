@@ -481,6 +481,10 @@ const Model = types
       }
       return self._formatDuration(duration);
     },
+
+    get regs() {
+      return self.annotation.regionStore.regions.filter((r) => r.object === self);
+    },
   }))
 
   .actions((self) => ({
@@ -1415,7 +1419,9 @@ const Overview = observer(({ item, data, series }) => {
     cursorLine.current.attr("transform", `translate(${pos},0)`).style("display", "block");
   }, [item.cursorTime, width]);
 
-  item.regs.map((r) => fixMobxObserve(r.start, r.end, r.selected, r.hidden, r.style?.fillcolor));
+  React.useEffect(() => {
+    item.regs.map((r) => fixMobxObserve(r.start, r.end, r.selected, r.hidden, r.style?.fillcolor));
+  }, [item.regs]);
 
   return <div className="htx-timeseries-overview" ref={ref} />;
 });

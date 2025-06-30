@@ -128,8 +128,10 @@ const Model = types
       "video",
       "videorectangle",
       "timelinelabels",
+      "gpsmap",
       "custominterface",
       ...Registry.customTags.map((t) => t.tag.toLowerCase()),
+
     ]),
   })
   .views((self) => ({

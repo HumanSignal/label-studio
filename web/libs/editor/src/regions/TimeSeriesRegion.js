@@ -9,6 +9,7 @@ import { guidGenerator } from "../core/Helpers";
 import Registry from "../core/Registry";
 import { AreaMixin } from "../mixins/AreaMixin";
 import { AnnotationMixin } from "../mixins/AnnotationMixin";
+import { FF_TIMESERIES_SYNC, isFF } from "../utils/feature-flags";
 
 const hotkeys = Hotkey("TimeSeries", "Time Series Segmentation");
 
@@ -67,6 +68,29 @@ const Model = types
       hotkeys.addNamed("ts:shrink-right-large", () => self.shrinkRight(lots));
 
       self.parent.scrollToRegion(self);
+
+      // Seek to the region's start time and emit sync event to update all synced components
+      if (isFF(FF_TIMESERIES_SYNC) && self.parent.sync) {
+        const regionStartTime = self.start;
+        
+        // Update cursor position to the region's start
+        self.parent.setCursor(regionStartTime);
+        
+        // Emit sync event so all synced components (Audio, GPS, Accelerometer, etc.) seek to this time
+        const [minKey] = self.parent.keysRange;
+        if (minKey !== undefined) {
+          let relativeTime;
+          if (self.parent.isDate) {
+            // Convert milliseconds to seconds for sync message
+            relativeTime = (regionStartTime - minKey) / 1000;
+          } else {
+            // Already in seconds/indices
+            relativeTime = regionStartTime - minKey;
+          }
+          // Emit seek sync event
+          self.parent.syncSend({ time: relativeTime, playing: false }, "seek");
+        }
+      }
     },
 
     updateAppearenceFromState() {

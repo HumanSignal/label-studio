@@ -120,7 +120,14 @@
     "tailwind-merge": "^2.6.0",
     "webfft": "^1.0.3",
     "xpath-range": "^1.1.1",
-    "zod": "^3.23.8"
+    "zod": "^3.22.4",
+    "deck.gl": "^8.9.0",
+    "@deck.gl/react": "^8.9.0",
+    "@deck.gl/layers": "^8.9.0",
+    "@deck.gl/geo-layers": "^8.9.0",
+    "@deck.gl/aggregation-layers": "^8.9.0",
+    "supercluster": "^7.1.0",
+    "turf": "^3.0.14"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
@@ -249,7 +256,7 @@
     "moment": "2.29.4",
     "on-headers": "1.1.0",
     "form-data": "4.0.4",
-    "stylus": "0.0.1-security"
+    "stylus": "0.64.0"
   },
   "copyFiles": [
     {

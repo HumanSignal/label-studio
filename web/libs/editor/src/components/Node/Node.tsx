@@ -20,6 +20,7 @@ import {
   IconRectangleToolSmart,
   IconText,
   IconTimelineRegion,
+  IconCursor,
 } from "@humansignal/icons";
 
 interface NodeViewProps {
@@ -61,12 +62,14 @@ const NodeViews: Record<string, NodeViewProps> = {
     name: "Audio",
     icon: AudioOutlined,
   },
-
+  GPSRegionModel: {
+    name: "GPS",
+    icon: IconCursor,
+  },
   TimeSeriesRegionModel: {
     name: "TimeSeries",
     icon: LineChartOutlined,
   },
-
   TextAreaRegionModel: {
     name: "Input",
     icon: MessageOutlined,

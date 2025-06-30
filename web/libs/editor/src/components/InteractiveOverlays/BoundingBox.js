@@ -104,6 +104,35 @@ const _detect = (region) => {
 
       return regionBbox;
     }
+    case "gpsregion": {
+      const bbox = region.bboxCoordsCanvas;
+
+      if (!bbox) return DEFAULT_BBOX;
+
+      // For GPS regions, we need to get the waveform container position
+      // since they don't use the same stageRef structure as image regions
+      const waveform = region.object?._ws;
+      const containerEl = waveform?.container;
+
+      if (containerEl) {
+        const containerBbox = Geometry.getDOMBBox(containerEl, true);
+
+        return {
+          x: containerBbox.x + bbox.left,
+          y: containerBbox.y + bbox.top,
+          width: bbox.right - bbox.left,
+          height: bbox.bottom - bbox.top,
+        };
+      } else {
+        // Fallback: return canvas coordinates (this won't work for relations but won't crash)
+        return {
+          x: bbox.left,
+          y: bbox.top,
+          width: bbox.right - bbox.left,
+          height: bbox.bottom - bbox.top,
+        };
+      }
+    }
     case "audioregion": {
       const bbox = region.bboxCoordsCanvas;
       const stageEl = region.parent?.stageRef?.current;

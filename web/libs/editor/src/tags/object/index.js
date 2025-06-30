@@ -8,6 +8,7 @@ import { TimeSeriesModel } from "./TimeSeries";
 import { PagedViewModel } from "./PagedView";
 import { VideoModel } from "./Video";
 import { ListModel } from "./List";
+import { GPSMapModel } from "./GPSMap";
 
 // stub files to keep docs of these tags
 import "./HyperText";
@@ -24,4 +25,5 @@ export {
   PagedViewModel,
   ListModel,
   PdfModel,
+  GPSMapModel,
 };

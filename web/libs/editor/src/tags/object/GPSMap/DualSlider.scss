@@ -1,0 +1,48 @@
+.dual-slider {
+  --background-active-color: var(--color-primary-surface-active);
+  --button-color: var(--primary_link);
+
+  position: relative;
+  margin: 0 20px;
+  width: calc(100% - 40px);
+
+  &__track {
+    position: relative;
+    height: 4px;
+    background: var(--color-neutral-surface);
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 8px 0;
+  }
+
+  &__track-fill {
+    position: absolute;
+    height: 100%;
+    background: var(--background-active-color);
+    border-radius: 8px;
+    pointer-events: none;
+  }
+
+  &__handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--button-color);
+    cursor: ew-resize;
+    transform: translateX(-50%) translateY(-50%);
+    top: 50%;
+    transition: background 0.3s ease-in-out;
+    z-index: 2;
+
+    &:hover,
+    &_active {
+      background: var(--button-color);
+      transform: translateX(-50%) translateY(-50%) scale(1.1);
+    }
+
+    &:active {
+      transform: translateX(-50%) translateY(-50%) scale(1.2);
+    }
+  }
+} 

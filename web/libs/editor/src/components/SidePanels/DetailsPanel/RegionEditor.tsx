@@ -1,6 +1,6 @@
-import { observe } from "mobx";
-import { observer } from "mobx-react";
-import { type IAnyType, isLiteralType, isOptionalType, isPrimitiveType, isUnionType, types } from "mobx-state-tree";
+import {observe} from "mobx";
+import {observer} from "mobx-react";
+import {type IAnyType, isLiteralType, isOptionalType, isPrimitiveType, isUnionType, types} from "mobx-state-tree";
 import {
   type ChangeEvent,
   type FC,
@@ -12,13 +12,14 @@ import {
   useMemo,
   useState,
 } from "react";
-import { IconPropertyAngle } from "@humansignal/icons";
-import { Checkbox, Select } from "@humansignal/ui";
-import { Block, Elem, useBEM } from "../../../utils/bem";
-import { TimeDurationControl } from "../../TimeDurationControl/TimeDurationControl";
-import { TimelineRegionEditor } from "./TimelineRegionEditor";
+import {IconPropertyAngle} from "@humansignal/icons";
+import {Checkbox, Select} from "@humansignal/ui";
+import {Block, Elem, useBEM} from "../../../utils/bem";
+import {TimeDurationControl} from "../../TimeDurationControl/TimeDurationControl";
+import {TimelineRegionEditor} from "./TimelineRegionEditor";
 import "./RegionEditor.scss";
-import type { MSTRegion } from "../../../stores/types";
+import type {MSTRegion} from "../../../stores/types";
+import GPSRegionProperties from "./GPSRegionProperties";
 
 interface RegionEditorProps {
   region: MSTRegion;
@@ -51,19 +52,25 @@ const IconMapping = {
   angle: IconPropertyAngle,
 };
 
-const RegionEditorComponent: FC<RegionEditorProps> = ({ region }) => {
-  const isAudioRegion = region.type === "audioregion";
-  const isTimelineRegion = region.type === "timelineregion";
-  const Component = isTimelineRegion ? TimelineRegionEditor : isAudioRegion ? AudioRegionProperties : RegionProperties;
+const RegionEditorComponent: FC<RegionEditorProps> = ({region}) => {
+  let Component: FC<{ region: any }> = RegionProperties; // Default
+
+  if (region.type === "timelineregion") {
+    Component = TimelineRegionEditor;
+  } else if (region.type === "gpsregion") {
+    Component = GPSRegionProperties;
+  } else if (region.type === "audioregion") {
+    Component = AudioRegionProperties;
+  }
 
   return (
-    <Block name="region-editor" mod={{ disabled: region.isReadOnly() }}>
-      <Component region={region} />
+    <Block name="region-editor" mod={{disabled: region.isReadOnly()}}>
+      <Component region={region as any}/>
     </Block>
   );
 };
 
-const RegionProperties = ({ region }: RegionEditorProps) => {
+const RegionProperties = ({region}: RegionEditorProps) => {
   const fields = region.editableFields ?? [];
 
   return (
@@ -83,7 +90,7 @@ const RegionProperties = ({ region }: RegionEditorProps) => {
   );
 };
 
-const AudioRegionProperties = observer(({ region }: { region: any }) => {
+const AudioRegionProperties = observer(({region}: { region: any }) => {
   const changeStartTimeHandler = (value: number) => {
     region.setProperty("start", value);
   };
@@ -115,7 +122,7 @@ interface RegionPropertyProps {
   region: MSTRegion;
 }
 
-const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) => {
+const RegionProperty: FC<RegionPropertyProps> = ({property, label, region}) => {
   const block = useBEM();
   const [value, setValue] = useState(region.getProperty(property));
 
@@ -161,7 +168,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
   }, [propertyType, isPrimitive]);
 
   const onChangeHandler = useCallback(
-    (value) => {
+    (value: any) => {
       if (value !== region.getProperty(property)) {
         try {
           region.setProperty(property, value);
@@ -174,7 +181,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
   );
 
   useEffect(() => {
-    const cancelObserve = observe(region, property, ({ newValue, oldValue }) => {
+    const cancelObserve = observe(region, property, ({newValue, oldValue}) => {
       if (oldValue.storedValue !== newValue.storedValue) setValue(newValue.storedValue);
     });
 
@@ -182,7 +189,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
   }, [region]);
 
   return (
-    <Elem name="property" mod={{ text: isString }} tag="label">
+    <Elem name="property" mod={{text: isString}} tag="label">
       {isBoolean ? (
         <Checkbox
           className={block?.elem("input").toClassName()}
@@ -190,7 +197,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
           onChange={(e) => onChangeHandler(e.target.checked)}
         />
       ) : isString ? (
-        <RegionInput type="text" value={value} onChange={(v) => onChangeHandler(v)} />
+        <RegionInput type="text" value={value} onChange={(v) => onChangeHandler(v)}/>
       ) : isPrimitive ? (
         <RegionInput
           type={getInputType(propertyType)}
@@ -206,7 +213,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
           options={options}
         />
       ) : null}
-      <PropertyLabel label={label} />
+      <PropertyLabel label={label}/>
     </Elem>
   );
 };
@@ -216,12 +223,12 @@ interface RegionInputProps extends InputHTMLAttributes<HTMLInputElement | HTMLTe
   onChange?: (newValue: any) => void;
 }
 
-const RegionInput: FC<RegionInputProps> = ({ onChange: onChangeValue, type, value, step, ...props }) => {
+const RegionInput: FC<RegionInputProps> = ({onChange: onChangeValue, type, value, step, ...props}) => {
   const block = useBEM();
   const [currentValue, setValue] = useState(value);
 
   const updateValue = useCallback(
-    (value, safeValue = true) => {
+    (value: any, safeValue = true) => {
       const newValue = value;
 
       setValue(newValue);
@@ -297,7 +304,7 @@ const RegionInput: FC<RegionInputProps> = ({ onChange: onChangeValue, type, valu
   );
 };
 
-const PropertyLabel: FC<{ label: string }> = ({ label }) => {
+const PropertyLabel: FC<{ label: string }> = ({label}) => {
   const IconComponent = useMemo(() => {
     if (label.startsWith("icon:")) {
       const iconName = label.split(":")[1] as keyof typeof IconMapping;
@@ -310,7 +317,7 @@ const PropertyLabel: FC<{ label: string }> = ({ label }) => {
 
   return (
     <Elem name="text" tag="span">
-      {IconComponent ? <IconComponent /> : label}
+      {IconComponent ? <IconComponent/> : label}
     </Elem>
   );
 };

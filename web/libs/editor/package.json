@@ -35,9 +35,15 @@
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-window": "^1.8.9",
     "sanitize-html": "^2.12.1",
-
+    "strman": "^2.0.1",
+    "wavesurfer.js": "^6.0.1",
+    "xpath-range": "^1.1.1",
     "webfft": "^1.0.3",
-    "xpath-range": "^1.1.1"
+    "deck.gl": "^8.9.0",
+    "@deck.gl/react": "^8.9.0",
+    "@deck.gl/layers": "^8.9.0",
+    "@deck.gl/geo-layers": "^8.9.0",
+    "@deck.gl/aggregation-layers": "^8.9.0"
   },
   "main": "src/index.js",
   "devDependencies": {

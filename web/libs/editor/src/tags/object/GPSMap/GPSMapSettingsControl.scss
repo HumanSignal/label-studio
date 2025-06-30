@@ -1,0 +1,235 @@
+// @use "sass:color";
+// Removed incorrect Constants import
+// @import "../../../../common/Constants";
+
+.gpsmap-settings-control {
+  position: relative;
+
+  &__modal {
+    position: fixed;
+    width: 360px;
+    max-height: 500px;
+    background: var(--color-neutral-background);
+    box-shadow: 0 4px 10px 0 rgba(var(--color-neutral-shadow-raw) / 30%);
+    border-radius: 4px;
+    padding: 0;
+    z-index: 102;
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  &__scroll-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  &__section-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: var(--color-neutral-background);
+    color: var(--color-neutral-content-subtler);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-top: 1px solid var(--color-neutral-border);
+    border-bottom: 1px solid var(--color-neutral-border);
+    margin: 8px 0;
+
+    &:first-child {
+      margin-top: 0;
+      border-top: none;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+  }
+
+  &__setting-item {
+    padding: 5px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+
+    label {
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: var(--color-neutral-content-subtle);
+      font-weight: 500;
+    }
+
+    select,
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    textarea {
+      width: 100%;
+      padding: 6px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--color-neutral-border);
+      background-color: var(--color-neutral-background);
+      font-size: 14px;
+      line-height: 1.4;
+      height: 32px;
+      color: var(--color-neutral-content);
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary-emphasis);
+        box-shadow: 0 0 0 2px var(--color-primary-shadow);
+      }
+    }
+
+    textarea {
+      height: auto;
+      min-height: 60px;
+    }
+  }
+
+  &__toggle {
+    padding: 8px 16px;
+    margin-bottom: 8px;
+  }
+
+  &__api-note {
+    display: block;
+    font-size: 11px;
+    color: var(--color-neutral-content-subtle);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  // ADD style for toggle element to match ConfigControl
+  &__toggle {
+    padding: 8px 16px; // Match setting-item padding
+    margin-bottom: 8px; // Reduced from 12px
+    // Remove flex properties, let Toggle component handle internal layout
+    // display: flex; 
+    // align-items: center;
+  }
+
+  // Label with tooltip styles
+  &__label-with-tooltip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color-secondary, #6c757d);
+    cursor: help;
+
+    &:hover {
+      color: var(--text-color-primary, #212529);
+    }
+  }
+
+  // API key indicator styles
+  &__api-required {
+    color: #d63384; // Pink/purple color for API key indicator
+    font-weight: normal;
+    font-size: 0.85em;
+    margin-left: 6px;
+  }
+
+  &__api-warning {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 10px;
+    background-color: rgba(#ffd43b, 0.1);
+    border-left: 3px solid #ffd43b;
+    border-radius: 2px;
+    font-size: 12px;
+    color: #664d03;
+
+    svg {
+      flex-shrink: 0;
+      color: #ffc107;
+    }
+  }
+
+  // Slider styling
+  &__slider {
+    width: 100%;
+    height: 6px;
+    appearance: none;
+    background: var(--sand_300, #e9ecef);
+    border-radius: 3px;
+    outline: none;
+    margin: 10px 0;
+
+    &::-webkit-slider-thumb {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--lsblue_400, #007bff);
+      cursor: pointer;
+      border: none;
+    }
+
+    &::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--lsblue_400, #007bff);
+      cursor: pointer;
+      border: none;
+    }
+
+    &:focus {
+      &::-webkit-slider-thumb {
+        box-shadow: 0 0 0 3px rgba(#007bff, 0.25);
+      }
+
+      &::-moz-range-thumb {
+        box-shadow: 0 0 0 3px rgba(#007bff, 0.25);
+      }
+    }
+  }
+
+  &__buttons {
+    margin-top: 0;
+    padding: 2px 0;
+    border-top: 1px solid var(--color-neutral-border);
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    background: var(--color-neutral-background);
+  }
+
+  &__menu-button {
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 150ms ease-out;
+    color: var(--color-neutral-content-subtle);
+
+    &:hover {
+      background: var(--color-primary-emphasis-subtle);
+    }
+  }
+
+  // Removed other specific styles
+}
+
+// Match AudioUltra's Range styling for full width (from SpectrogramControl.scss)
+.audio-slider {
+  .lsf-range__body {
+    width: 100%;
+  }
+  
+  // Also match the range class pattern from SpectrogramControl
+  .range__body {
+    width: 100%;
+  }
+}
+
+

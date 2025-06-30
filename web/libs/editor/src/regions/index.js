@@ -16,6 +16,7 @@ import { RichTextRegionModel } from "./RichTextRegion";
 import { TimelineRegionModel } from "./TimelineRegion";
 import { VideoRectangleRegionModel } from "./VideoRectangleRegion";
 import { CustomRegionModel } from "./CustomRegion";
+import { GPSRegionModel } from "./GPSRegion";
 
 const AllRegionsType = types.union(
   AudioRegionModel,
@@ -33,6 +34,7 @@ const AllRegionsType = types.union(
   TimelineRegionModel,
   ParagraphsRegionModel,
   VideoRectangleRegionModel,
+  GPSRegionModel,
   CustomRegionModel,
   ...Registry.customTags.map((t) => t.region).filter(Boolean),
 );
@@ -63,4 +65,5 @@ export {
   TimelineRegionModel,
   VideoRectangleRegionModel,
   CustomRegionModel,
+  GPSRegionModel,
 };
