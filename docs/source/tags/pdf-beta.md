@@ -77,5 +77,5 @@ This is a new tag to add bounding boxes to the PDF and assign labels to them. Th
 
 
 <video style="max-width: 800px;" class="gif-border" autoplay loop muted>
-  <source src="/images/tags/pdf-ocr.mp4">
+  <source src="/images/tags/pdf2-ocr.mp4">
 </video>
