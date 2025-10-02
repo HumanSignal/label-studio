@@ -88,7 +88,12 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
     <Dropdown.Trigger
       content={
         isOpen ? (
-          <AgreementSelected.HeaderCell agreementFilters={agreementFilters} onSave={onSave} align="left" onClose={closeHandler} />
+          <AgreementSelected.HeaderCell
+            agreementFilters={agreementFilters}
+            onSave={onSave}
+            align="left"
+            onClose={closeHandler}
+          />
         ) : (
           <></>
         )
