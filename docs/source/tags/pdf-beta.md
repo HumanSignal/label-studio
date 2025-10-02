@@ -40,12 +40,12 @@ Labeling configuration to label PDF documents:
   <Style>
     .pdf-actions{display:flex;justify-content:space-between}
   </Style>
-  <Header value="Label any areas where you wish to correct OCR" size="4"/>
+  <Header value="Label any areas that you wish to correct" size="4"/>
   <View className="pdf-actions">
     <OcrLabels name="ocr" toName="pdf">
       <Label value="Typo"/>
-      <Label value="Amount"/>
-      <Label value="Logo"/>
+      <Label value="Incorrect amount"/>
+      <Label value="Incorrect name"/>
     </OcrLabels>
   </View>
   <Pdf name="pdf" value="$pdf"/>
