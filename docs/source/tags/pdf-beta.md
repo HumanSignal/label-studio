@@ -11,8 +11,8 @@ meta_description: Label Studio PDF tag for loading PDF documents for machine lea
 
 The `Pdf` tag displays a PDF document in the labeling interface. You can use this tag to:
 
-- Perform document-level annotations such as classification, transcription, and summarization.
-- Create regions within pages for OCR, NER, and other times of annotations (beta). <span class="badge"></span>
+- Perform document-level annotations such as classification, transcription, and summarization. See [PDF](pdf#Example) for an example labeling config. 
+- Create regions within pages for OCR, NER, and other types of annotations (beta). <span class="badge"></span>
 
 Supports:
 * Zoom
@@ -28,29 +28,6 @@ Use with the following data types: PDF.
 
 {% insertmd includes/tags/pdf.md %}
 
-
-## Example: Document-level classification
-
-Example for document-level annotation:
-
-```html
-<View>
-  <Pdf name="pdf" value="$pdf" />
-  <Choices name="choices" toName="pdf">
-    <Choice value="Legal" />
-    <Choice value="Financial" />
-    <Choice value="Technical" />
-  </Choices>
-</View>
-```
-
-**Example Input data:**
-
-```json
-{
-  "pdf": "https://app.humansignal.com/static/samples/sample.pdf"
-}
-```
 
 ## Example: OCR 🧪 <span class="badge"></span>
 
@@ -88,8 +65,6 @@ Labeling configuration to label PDF documents pre-annotated by Tesseract OCR:
 The above example uses `OcrLabels`. 
 
 This is a new tag to add bounding boxes to the PDF and assign labels to them. This tag must have one or more `Label` tag children, and supports standard parameters such as `maxUsages` (see [RectangleLabels](rectanglelabels) as an example).
-
-
 
 **Results:**
 
