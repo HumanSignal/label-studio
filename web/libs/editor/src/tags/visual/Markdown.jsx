@@ -17,9 +17,13 @@ import { guidGenerator } from "../../utils/unique";
  *   <Markdown value="$markdown_text"/>
  * </View>
  * @example
- * <!-- Display static markdown content -->
+ * <!-- Display static markdown content; indents mark code blocks, so avoid them -->
  * <View>
- *   <Markdown value="## Instructions&#10;&#10;Please **carefully** read the following text and mark all entities."/>
+ * <Markdown>
+ * ## Instructions
+ *
+ * Please **carefully** read the following text and mark all entities.
+ * </Markdown>
  * </View>
  * @example
  * <!-- Display markdown with custom styling -->
