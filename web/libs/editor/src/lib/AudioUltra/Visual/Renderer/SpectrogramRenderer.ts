@@ -20,7 +20,7 @@ import { LRUCache } from "../../Common/LRUCache";
 import type { FFTProcessor, SpectrogramScale } from "../../Analysis/FFTProcessor";
 import type { ColorMapper, ColorScheme } from "../ColorMapper";
 import type { WindowFunctionType } from "../WindowFunctions";
-import { downsampleLinear, downsampleLog, downsampleMel } from "./Downsampler";
+import { downsampleBark, downsampleLinear, downsampleLog, downsampleMel, downsamplePerceptual } from "./Downsampler";
 import { ProgressRendererPlugin } from "./Plugins/ProgressRendererPlugin";
 import { GridRendererPlugin } from "./Plugins/GridRendererPlugin";
 import type { RenderContext, Renderer } from "./Renderer";
@@ -349,6 +349,12 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
     } else if (scale === "mel") {
       const bins = Math.min(MAX_MEL_DISPLAY_BINS, fftData.length);
       displayData = downsampleMel(fftData, bins);
+    } else if (scale === "bark") {
+      const bins = Math.min(MAX_MEL_DISPLAY_BINS, fftData.length);
+      displayData = downsampleBark(fftData, bins);
+    } else if (scale === "perceptual") {
+      const bins = Math.min(MAX_LOG_DISPLAY_BINS, fftData.length);
+      displayData = downsamplePerceptual(fftData, bins);
     }
     const binCount = displayData.length;
     if (binCount <= 0 || channelHeight <= 0) return;
@@ -365,7 +371,9 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
       let yBottom: number;
       let binHeight: number;
       switch (scale) {
-        case "log": {
+        case "bark":
+        case "log":
+        case "perceptual": {
           const logTotal = Math.log(binCount + 1);
           const logCurrent = Math.log(i + 1);
           const logNext = Math.log(i + 2);
@@ -570,6 +578,8 @@ export class SpectrogramRenderer implements Renderer<SpectrogramRendererConfig> 
     let finalSpectrum: Float32Array | null = null;
     if (this.spectrogramScale === "mel") {
       finalSpectrum = this.fftProcessor.convertToMelScale(linearSpectrum, this.numberOfMelBands);
+    } else if (this.spectrogramScale === "bark") {
+      finalSpectrum = this.fftProcessor.convertToBarkScale(linearSpectrum, this.numberOfMelBands);
     } else if (this.spectrogramScale === "log") {
       finalSpectrum = linearSpectrum;
     } else {

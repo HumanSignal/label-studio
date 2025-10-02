@@ -10,7 +10,7 @@ import "./SpectrogramControl.scss";
 import colormap from "colormap";
 
 // Define Scale Options Type
-type SpectrogramScale = "linear" | "log" | "mel";
+type SpectrogramScale = "linear" | "log" | "mel" | "bark" | "perceptual";
 
 // Default values
 const DEFAULT_FFT_VALUE = 512;
@@ -183,6 +183,8 @@ const SCALE_OPTIONS: { label: string; value: SpectrogramScale }[] = [
   { value: "linear", label: "Linear Frequency" },
   { value: "log", label: "Logarithmic Frequency" },
   { value: "mel", label: "Mel Scale" },
+  { value: "bark", label: "Bark Scale" },
+  { value: "perceptual", label: "Perceptual" },
 ];
 
 export interface SpectrogramControlProps {

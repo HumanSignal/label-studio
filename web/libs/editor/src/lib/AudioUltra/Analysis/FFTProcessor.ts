@@ -1,9 +1,10 @@
 import webfft from "webfft";
 import { applyWindowFunction, type WindowFunctionType } from "../Visual/WindowFunctions";
+import { BarkBanks } from "./BarkBanks";
 import { MelBanks } from "./MelBanks";
 import { SPECTROGRAM_DEFAULTS } from "../Visual/constants";
 
-export type SpectrogramScale = "linear" | "log" | "mel";
+export type SpectrogramScale = "linear" | "log" | "mel" | "bark" | "perceptual";
 
 export interface FFTProcessorOptions {
   fftSamples: number;
@@ -21,6 +22,10 @@ export class FFTProcessor {
   // Added a cache for MelBanks instances to avoid recreating them constantly
   private melBanksCache: MelBanks | null = null;
   private melBanksCacheKey: string | null = null;
+
+  // Added a cache for BarkBanks instances to avoid recreating them constantly
+  private barkBanksCache: BarkBanks | null = null;
+  private barkBanksCacheKey: string | null = null;
 
   // Persistent buffers for performance
   private fftInputBuffer: Float32Array | null = null;
@@ -67,9 +72,13 @@ export class FFTProcessor {
       this.initialize(); // Re-initialize with a new size
       this.melBanksCache = null; // Clear MelBanks cache if FFT size changes
       this.melBanksCacheKey = null;
+      this.barkBanksCache = null; // Clear BarkBanks cache if FFT size changes
+      this.barkBanksCacheKey = null;
     } else if (needsMelCacheClear) {
       this.melBanksCache = null; // Clear MelBanks cache if the sample rate changes
       this.melBanksCacheKey = null;
+      this.barkBanksCache = null; // Clear BarkBanks cache if the sample rate changes
+      this.barkBanksCacheKey = null;
     }
   }
 
@@ -191,6 +200,48 @@ export class FFTProcessor {
   }
 
   /**
+   * Converts a linear power spectrum to the Bark scale using the BarkBanks class.
+   *
+   * @param linearSpectrum The input power spectrum.
+   * @param numberOfBarkBands The desired number of Bark bands for this conversion.
+   * @returns The Bark scaled spectrum or null if parameters are missing/invalid.
+   */
+  convertToBarkScale(linearSpectrum: Float32Array, numberOfBarkBands: number): Float32Array | null {
+    if (!this.options.sampleRate) {
+      console.warn("Sample rate required for Bark scale conversion.");
+      return null;
+    }
+    if (numberOfBarkBands <= 0) {
+      console.warn("Number of Bark bands must be positive.");
+      return null;
+    }
+
+    const linearBinCount = linearSpectrum.length;
+    const currentKey = `${this.options.sampleRate}-${linearBinCount}-${numberOfBarkBands}`;
+
+    // Check cache
+    if (!this.barkBanksCache || this.barkBanksCacheKey !== currentKey) {
+      try {
+        this.barkBanksCache = new BarkBanks(this.options.sampleRate, linearBinCount, numberOfBarkBands);
+        this.barkBanksCacheKey = currentKey;
+      } catch (error) {
+        console.error("Failed to create BarkBanks instance:", error);
+        this.barkBanksCache = null;
+        this.barkBanksCacheKey = null;
+        return null;
+      }
+    }
+
+    // Apply the filter bank using the cached instance
+    try {
+      return this.barkBanksCache.applyFilterbank(linearSpectrum);
+    } catch (error) {
+      console.error("Error applying Bark filterbank:", error);
+      return null;
+    }
+  }
+
+  /**
    * Returns a fallback array when FFT calculation fails.
    */
   private handleFFTError(): Float32Array | null {
@@ -208,6 +259,8 @@ export class FFTProcessor {
     this.fftInterleavedInputBuffer = null;
     this.melBanksCache = null; // Clear cache on dispose
     this.melBanksCacheKey = null;
+    this.barkBanksCache = null; // Clear cache on dispose
+    this.barkBanksCacheKey = null;
   }
 
   // Getter for FFT samples size
