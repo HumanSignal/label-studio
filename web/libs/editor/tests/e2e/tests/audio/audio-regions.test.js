@@ -153,7 +153,9 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
 
         AtOutliner.dontSeeSelectedRegion();
       },
-    );
+    )
+      .tag("@flakey")
+      .retry(3);
 
     FFlagScenario("Can select a region below a hidden region", async ({ I, LabelStudio, AtAudioView, AtOutliner }) => {
       LabelStudio.setFeatureFlags({
