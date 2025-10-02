@@ -33,7 +33,7 @@ Use with the following data types: PDF.
 
 Beta and Label Studio Enterprise only.
 
-Labeling configuration to label PDF documents pre-annotated by Tesseract OCR:
+Labeling configuration to label PDF documents:
 
 ```xml
 <View>
@@ -44,7 +44,7 @@ Labeling configuration to label PDF documents pre-annotated by Tesseract OCR:
   <View className="pdf-actions">
     <OcrLabels name="ocr" toName="pdf">
       <Label value="Typo"/>
-      <Label value="Not detected"/>
+      <Label value="Amount"/>
       <Label value="Logo"/>
     </OcrLabels>
   </View>
