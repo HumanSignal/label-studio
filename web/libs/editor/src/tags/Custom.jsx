@@ -4,6 +4,7 @@ import React from "react";
 
 import { destroy, types, getRoot } from "mobx-state-tree";
 import { observer } from "mobx-react";
+import { EnterpriseBadge } from "@humansignal/ui";
 import Registry from "../core/Registry";
 import ControlBase from "./control/Base";
 import ClassificationBase from "./control/ClassificationBase";
@@ -1072,8 +1073,20 @@ function({ React, data, item, annotation, store, getValue, setValue, getTagValue
   );
 });
 
+const CustomComponentWrapper = observer(({ item }) => {
+  if (!APP_SETTINGS?.billing?.enterprise) {
+    return (
+      <div className="flex items-center gap-2">
+        <EnterpriseBadge />
+        CustomInterface tag is only available in the enterprise.
+      </div>
+    );
+  }
+  return <CustomInterfaceComponent item={item} />;
+});
+
 // Register the custom tag
-Registry.addTag("custominterface", CustomInterfaceModel, CustomInterfaceComponent);
+Registry.addTag("custominterface", CustomInterfaceModel, CustomComponentWrapper);
 Registry.addObjectType(CustomInterfaceModel);
 
-export { CustomInterfaceModel, CustomInterfaceComponent };
+export { CustomInterfaceModel, CustomComponentWrapper as CustomInterfaceComponent };

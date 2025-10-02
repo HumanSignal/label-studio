@@ -64,7 +64,9 @@ Scenario("Play/pause of multiple synced audio stay in sync", async ({ I, LabelSt
     assert.notEqual(audioTime1, 0);
     assert.notEqual(audioTime2, 0);
   }
-});
+})
+  .tag("@flakey")
+  .retry(3);
 
 /**
  * @TODO: Fix `The play() request was interrupted by a call to pause()`

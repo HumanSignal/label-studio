@@ -18,6 +18,7 @@
     "lsf:e2e:slow": "DEFAULT_CPU_THROTTLING=100 yarn lsf:e2e",
     "lsf:e2e:parallel": "cd libs/editor/tests/e2e && yarn test:parallel",
     "lsf:e2e:ci": "cd libs/editor/tests/e2e && yarn test:ci",
+    "lsf:e2e:flakey": "cd libs/editor/tests/e2e && yarn test:ci --grep \"@flakey\"",
     "lsf:integration": "nx run editor:integration",
     "lsf:integration:slow": "DEFAULT_CPU_THROTTLING=4 DEFAULT_NETWORK_THROTTLING=4g nx run editor:integration",
     "lsf:integration:watch": "nx run editor:integration --watch",
