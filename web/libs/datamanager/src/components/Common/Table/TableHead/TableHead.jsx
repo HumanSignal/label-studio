@@ -73,8 +73,12 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
   const selectedView = root.viewsStore.selected;
   const agreementFilters = selectedView.agreement_selected;
   const [isOpen, setIsOpen] = useState(false);
+  const closeHandler = () => {
+    setIsOpen(false);
+  };
   const onSave = (agreementFilters) => {
     selectedView.setAgreementFilters(agreementFilters);
+    closeHandler();
     return selectedView.save();
   };
   const onToggle = (isOpen) => {
@@ -84,7 +88,7 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
     <Dropdown.Trigger
       content={
         isOpen ? (
-          <AgreementSelected.HeaderCell agreementFilters={agreementFilters} onSave={onSave} align="left" />
+          <AgreementSelected.HeaderCell agreementFilters={agreementFilters} onSave={onSave} align="left" onClose={closeHandler} />
         ) : (
           <></>
         )
