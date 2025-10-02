@@ -76,3 +76,6 @@ This is a new tag to add bounding boxes to the PDF and assign labels to them. Th
 | `ocrtext` | String | Captured text.  This can be edited by selecting the region and then editing the text from the **Info** panel. |
 
 
+<video style="max-width: 800px;" class="gif-border" autoplay loop muted>
+  <source src="/images/tags/pdf-ocr.mp4">
+</video>
