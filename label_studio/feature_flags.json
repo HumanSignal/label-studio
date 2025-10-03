@@ -4686,6 +4686,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_fix_back_plt_893_project_list_oom_fix_02102025_short": {
+      "key": "fflag_fix_back_plt_893_project_list_oom_fix_02102025_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "99caa0953517427cadbadef27a97315c",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_fix_back_plt_902_async_import_background_oom_fix_22092025_short": {
       "key": "fflag_fix_back_plt_902_async_import_background_oom_fix_22092025_short",
       "on": true,
