@@ -158,11 +158,11 @@ def get_not_solved_tasks_qs(
     prioritized_on_agreement = False
     # if annotator is assigned for tasks, he must solve it regardless of is_labeled=True
     if not assigned_flag:
-        # include tasks that have been completed if their agreement is not at threshold if threshold setting is set
+        # low agreement strategy for auto-assigned annotators:
+        # Include tasks that have been completed if their agreement is not at threshold if threshold setting is set
         lse_project = getattr(project, 'lse_project', None)
         if (
             lse_project
-            and flag_set('fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short', user='auto')
             and lse_project.agreement_threshold is not None
             and get_tasks_agreement_queryset
             and user.is_project_annotator(project)
@@ -181,10 +181,7 @@ def get_not_solved_tasks_qs(
         # otherwise, filtering out completed tasks is sufficient
         else:
             # ignore tasks that are already labeled for onboarding mode
-            if not (
-                flag_set('fflag_feat_all_leap_1825_annotator_evaluation_short', user='auto')
-                and project.show_ground_truth_first
-            ):
+            if not project.show_ground_truth_first:
                 not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
     if not flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
