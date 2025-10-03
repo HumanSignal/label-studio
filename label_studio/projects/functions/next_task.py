@@ -23,7 +23,9 @@ def _oss_should_attempt_gt_first(user: User, project: Project) -> bool:
 
 
 get_tasks_agreement_queryset = load_func(settings.GET_TASKS_AGREEMENT_QUERYSET)
-should_attempt_ground_truth_first = load_func(settings.SHOULD_ATTEMPT_GROUND_TRUTH_FIRST) or _oss_should_attempt_gt_first
+should_attempt_ground_truth_first = (
+    load_func(settings.SHOULD_ATTEMPT_GROUND_TRUTH_FIRST) or _oss_should_attempt_gt_first
+)
 
 
 def get_next_task_logging_level(user: User) -> int:
@@ -256,7 +258,7 @@ def get_next_task_without_dm_queue(
         if next_task:
             queue_info += (' & ' if queue_info else '') + 'Ground truth queue'
 
-    # Low agreement strategy: reassign this annotator to low agreement tasks 
+    # Low agreement strategy: reassign this annotator to low agreement tasks
     if not next_task and prioritized_low_agreement:
         logger.debug(f'User={user} tries low agreement from prepared tasks')
         next_task = _get_first_unlocked(not_solved_tasks, user)
