@@ -26,7 +26,7 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
   const [isRightDisabled, setIsRightDisabled] = useState(false);
 
   const updatePosition = useCallback(
-    (e: React.MouseEvent, goLeft = true) => {
+    (_e: React.MouseEvent, goLeft = true) => {
       if (containerRef.current && carouselRef.current) {
         const step = containerRef.current.clientWidth;
         const carouselWidth = carouselRef.current.clientWidth;
@@ -62,13 +62,18 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
   }, [annotationStore, JSON.stringify(annotationStore.predictions), JSON.stringify(annotationStore.annotations)]);
 
   return enableAnnotations || enablePredictions || enableCreateAnnotation ? (
-    <Block name="annotations-carousel" style={{ "--carousel-left": `${currentPosition}px` }}>
+    <Block
+      name="annotations-carousel"
+      mix={currentPosition > 0 ? "annotations-carousel_scrolled" : undefined}
+      style={{ "--carousel-left": `${currentPosition}px` }}
+    >
       <Elem ref={containerRef} name="container">
         <Elem ref={carouselRef} name="carosel">
           {sortAnnotations(entities).map((entity) => (
             <AnnotationButton
               key={entity?.id}
               entity={entity}
+              store={store}
               capabilities={{
                 enablePredictions,
                 enableCreateAnnotation,
