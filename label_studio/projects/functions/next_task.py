@@ -173,7 +173,9 @@ def get_not_solved_tasks_qs(
             qs = get_tasks_agreement_queryset(not_solved_tasks)
             qs = qs.annotate(annotators=Count('annotations__completed_by', distinct=True))
 
-            low_agreement_pred = Q(_agreement__lt=lse_project.agreement_threshold, is_labeled=True) | Q(is_labeled=False)
+            low_agreement_pred = Q(_agreement__lt=lse_project.agreement_threshold, is_labeled=True) | Q(
+                is_labeled=False
+            )
             capacity_pred = Q(annotators__lt=F('overlap') + (lse_project.max_additional_annotators_assignable or 0))
 
             if onboarding_active:
