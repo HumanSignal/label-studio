@@ -8,6 +8,8 @@ meta_description: Customize Label Studio with the Markdown tag to display format
 
 The `Markdown` tag is used to display markdown-formatted text content on the labeling interface. Use this tag to provide rich text instructions, descriptions, or content with formatting support including headers, bold text, lists, links, and more.
 
+Also that's the simplest way to display auxiliary text content on the labeling interface.
+
 Use with the following data types: Text content in Markdown format.
 
 {% insertmd includes/tags/view.md %}
@@ -32,6 +34,8 @@ Please **carefully** read the following text and mark all entities.
   <Text name="text" value="$text" />
 </View>
 ```
+
+Indents are important in markdown, so it's advised to keep markdown content unindented.
 
 ### Example
 
