@@ -17,7 +17,7 @@ date: 2024-02-06 22:28:14
     Many settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare) to learn more.
 
 !!! error Starter Cloud
-    If you see an Enterprise badge: <span class="badge"></span>.
+    If you see an Enterprise badge: <span class="badge"></span>
     
     This means the setting is not available in Label Studio Starter Cloud. 
 
@@ -192,7 +192,7 @@ If an annotator skips a task, the task is moved to the bottom of their queue. Th
 
 If the annotator exits the label stream without labeling the skipped task, and then later re-enters the label stream, whether they see the task again depends on how task distribution is set up. 
 
-* Auto distribution: Whether they see the task again depends on if other annotators have since completed the task. If the task is still incomplete when the annotator re-enters the labeling stream, they can update label and re-submit the task. 
+* Automatic distribution: Whether they see the task again depends on if other annotators have since completed the task. If the task is still incomplete when the annotator re-enters the labeling stream, they can update label and re-submit the task. 
 * Manual distribution: The annotator will continue to see the skipped task until it is completed.  
 
 Skipped tasks are not marked as completed, and affect the Overall Project Progress calculation visible from the project Dashboard. (Meaning that the progress for a project that has skipped tasks will be less than 100%.)  
@@ -533,7 +533,7 @@ Use these settings to determine task completeness and agreement metrics.
 <dd>
 
 !!! note
-    Overlap settings only apply when the project is using Auto distribution mode. If you are using Manual distribution mode, all tasks must be manually assigned - meaning that you are also manually determining overlap.  
+    Overlap settings only apply when the project is using Automatic distribution mode. If you are using Manual distribution mode, all tasks must be manually assigned - meaning that you are also manually determining overlap.  
 
 By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, increase the **Annotations per task minimum**.
 
@@ -552,11 +552,11 @@ The following options supersede what you specified under [**Annotations > Task S
 | Field          | Description    |
 | ------------- | ------------ |
 | **Show tasks with overlap first**         | If your overlap enforcement is less than 100% (meaning that only some tasks require multiple annotators), then the tasks that *do* require multiple annotations are shown first. <br /><br />If your overlap is 100%, then this setting has no effect.   |
-| **Show tasks with ground truth labels first** | Prioritize tasks that already have a ground truth label. |
+
 
 </dd>
 
-<dt id="annotation-limit">Annotation Limit</dt>
+<dt id="annotation-limit">Annotation Limit <span class="badge"></span></dt>
 
 <dd>
 
@@ -624,7 +624,7 @@ Use this option to determine what types of tasks annotators will see first.
 <tr>
 <td>
 
-**Minimum number of tasks for evaluation**
+**Minimum number of tasks for evaluation** <br /><span class="badge"></span>
 </td>
 <td>
 
@@ -635,7 +635,7 @@ The desired ground truth score threshold will not be assessed until the annotato
 <tr>
 <td>
 
-**Desired ground truth score threshold**
+**Desired ground truth score threshold** <br /><span class="badge"></span>
 </td>
 <td>
 
@@ -646,7 +646,7 @@ The agreement threshold the annotator must meet when evaluated against ground tr
 <tr>
 <td>
 
-**Pause annotator on failed evaluation**
+**Pause annotator on failed evaluation** <br /><span class="badge"></span>
 </td>
 <td>
 
@@ -763,7 +763,7 @@ Project members have access to published projects, depending on the permissions 
 
 Some users cannot be added or removed from the Members page at the project level. These users include administrators, who already have access to every project (outside of the Sandbox). This also includes users who have been added as members to the Workspace. Workspace membership is inherited by the projects within the workspace.   
 
-* If you have [Auto distribution](#distribute-tasks) enabled, users with the Annotator role are automatically assigned tasks when they are added as members. Similarly, by default, project members with the Reviewer role are able to begin reviewing annotations once the tasks are labeled. 
+* If you have [Automatic distribution](#distribute-tasks) enabled, users with the Annotator role are automatically assigned tasks when they are added as members. Similarly, by default, project members with the Reviewer role are able to begin reviewing annotations once the tasks are labeled. 
 
 * If you have [Manual distribution](#distribute-tasks) enabled, you need to add users with the Annotator role as project members before you can assign them to tasks. And if you have [**Review only manually assigned tasks**](#reviewing-options) enabled, the users with the Reviewer role must also be project members before they can be assigned to tasks. 
 
