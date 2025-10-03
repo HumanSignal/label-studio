@@ -183,7 +183,7 @@ export class MediaLoader extends Destructable {
       });
 
       xhr.addEventListener("readystatechange", () => {
-        if (xhr.readyState === 4 && xhr.status !== 200 && xhr.status !== 0) {
+        if (xhr.readyState === 4 && xhr.status >= 400 && xhr.status !== 0) {
           errorHandler();
         }
       });
