@@ -64,7 +64,7 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
   return enableAnnotations || enablePredictions || enableCreateAnnotation ? (
     <Block
       name="annotations-carousel"
-      mix={currentPosition > 0 ? "annotations-carousel_scrolled" : undefined}
+      mod={{ scrolled: currentPosition > 0 }}
       style={{ "--carousel-left": `${currentPosition}px` }}
     >
       <Elem ref={containerRef} name="container">
