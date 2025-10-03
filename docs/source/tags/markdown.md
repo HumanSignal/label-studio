@@ -79,5 +79,4 @@ The Markdown tag supports standard Markdown syntax including:
 - **Links** - `[link text](URL)`
 - **Code** - Inline `` `code` `` and code blocks with ``` 
 - **Blockquotes** - `> quoted text`
-- **Tables** - Standard Markdown table syntax
 - **Line breaks** - Double line breaks create new paragraphs
