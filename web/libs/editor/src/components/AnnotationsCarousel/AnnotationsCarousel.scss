@@ -18,8 +18,9 @@
   &__carosel {
     flex: 1;
     display: flex;
-    gap: 2px;
+    gap: var(--spacing-tighter);
     white-space: nowrap;
+    padding-left: var(--spacing-tighter);
     padding-right: 77px;
     position: relative;
     transform: translateX(calc(-1 * var(--carousel-left)));
