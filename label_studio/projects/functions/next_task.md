@@ -37,7 +37,7 @@ flowchart TD
     F{prioritized_low_agreement?} -- yes --> LAL["Low agreement queue<br/>first unlocked"] --> K
     F -- no --> G
 
-    G{project.show_ground_truth_first?} -- yes --> GT["Ground truth queue<br/>_try_ground_truth()"] --> H
+    G{"GT-first gating?<br/>should_attempt_ground_truth_first(user, project)"} -- yes --> GT["Ground truth queue<br/>_try_ground_truth()"] --> H
     G -- no --> H
 
     H{project.maximum_annotations > 1?} -- yes --> BF["Breadth first queue<br/>_try_breadth_first()"] --> I
@@ -65,9 +65,14 @@ flowchart TD
 
 ## Legend and flags
 
-- fflag ALL-LEAP-1825 (Annotator Evaluation): enables evaluation mode where ground truth can be served early; removes the default `is_labeled=false` filter in the candidate pool.
-- fflag OPTIC-161 (Low Agreement Threshold): enables agreement-aware filtering and prioritization when `lse_project.agreement_threshold` is set. Also limits tasks by capacity: `annotators < overlap + max_additional_annotators_assignable`.
 - fflag FIX-BACK-LSDV-4523 (Overlap First Ordering): applies the "Show overlap first" filtering after GT/low-agreement/breadth-first attempts; otherwise, it is applied earlier while building the candidate pool.
+
+### GT-first gating
+- `should_attempt_ground_truth_first(user, project)` returns true when:
+  - `show_ground_truth_first=True` and either no `lse_project` or `annotator_evaluation_minimum_tasks` is not set, or
+  - the user's completed GT-equipped tasks < `annotator_evaluation_minimum_tasks`, or
+  - minimum tasks reached but the user's GT agreement score is missing or below `annotator_evaluation_minimum_score` (percent).
+- Otherwise returns false (GT-first disabled; proceed via low-agreement/overlap/sampling).
 
 ## Queue labels appended to response
 
