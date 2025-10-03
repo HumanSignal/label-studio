@@ -73,7 +73,6 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
             <AnnotationButton
               key={entity?.id}
               entity={entity}
-              store={store}
               capabilities={{
                 enablePredictions,
                 enableCreateAnnotation,

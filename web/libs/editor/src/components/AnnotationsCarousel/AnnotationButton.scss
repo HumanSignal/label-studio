@@ -5,7 +5,7 @@
   border-width: 1px 1px 0;
   border-style: solid;
   background-color: var(--color-neutral-surface);
-  margin-top: 2px;
+  margin-top: var(--spacing-tightest);
   align-items: flex-start;
   gap: var(--spacing-base);
   cursor: pointer;
@@ -26,7 +26,7 @@
   &__mainSection {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--spacing-tight);
     flex: 1 0 auto;
 
     & .annotation-button__userpic_prediction {
@@ -141,7 +141,7 @@
     opacity: 0;
     padding: var(--spacing-tighter);
     border: 1px solid var(--trigger-border-color);
-    transition: all 150ms ease-out;
+    transition: opacity 150ms ease-out, background-color 150ms ease-out;
 
     svg {
       width: 20px;
@@ -164,7 +164,7 @@
   &__picSection {
     position: relative;
     opacity: 0.7;
-    transition: all 150ms ease-out;
+    transition: opacity 150ms ease-out;
   }
 
   &__status {
