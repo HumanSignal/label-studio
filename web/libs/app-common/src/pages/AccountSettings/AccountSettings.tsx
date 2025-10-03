@@ -7,7 +7,7 @@ import { HotkeysHeaderButtons } from "./sections/Hotkeys";
 import clsx from "clsx";
 import { useAtomValue } from "jotai";
 import { settingsAtom } from "./atoms";
-import { useAuth } from "@humansignal/core";
+import { useAuth } from "@humansignal/core/providers/AuthProvider";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements

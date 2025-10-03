@@ -92,6 +92,24 @@ Start and finish a labeling project with Label Studio by following these steps:
 
 </div>
 
+## Label Studio citations
+
+If you would like to cite Label Studio, you can add the following information to your references section:
+
+```
+@misc{Label Studio,
+  title={{Label Studio}: Data labeling software},
+  url={https://github.com/HumanSignal/label-studio},
+  note={Open source software available from https://github.com/HumanSignal/label-studio},
+  author={
+    Maxim Tkachenko and
+    Mikhail Malyuk and
+    Andrey Holmanyuk and
+    Nikolai Liubimov},
+  year={2020-2025},
+}
+```
+
 ## Architecture
 
 <div class="opensource-only">
