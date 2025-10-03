@@ -167,15 +167,23 @@ def get_not_solved_tasks_qs(
             and get_tasks_agreement_queryset
             and user.is_project_annotator(project)
         ):
-            not_solved_tasks = (
-                get_tasks_agreement_queryset(not_solved_tasks)
-                # include tasks that are not labeled or are labeled but fall below the agreement threshold
-                .filter(
-                    Q(_agreement__lt=lse_project.agreement_threshold, is_labeled=True) | Q(is_labeled=False)
-                ).annotate(annotators=Count('annotations__completed_by', distinct=True))
-                # skip tasks that have been annotated by the maximum additional number of annotators
-                .filter(annotators__lt=F('overlap') + lse_project.max_additional_annotators_assignable)
-            )
+            # Onboarding mode (GT-first) should keep GT tasks eligible regardless of is_labeled/agreement
+            onboarding_active = bool(project.show_ground_truth_first and user.is_project_annotator(project))
+
+            qs = get_tasks_agreement_queryset(not_solved_tasks)
+            qs = qs.annotate(annotators=Count('annotations__completed_by', distinct=True))
+
+            low_agreement_pred = Q(_agreement__lt=lse_project.agreement_threshold, is_labeled=True) | Q(is_labeled=False)
+            capacity_pred = Q(annotators__lt=F('overlap') + (lse_project.max_additional_annotators_assignable or 0))
+
+            if onboarding_active:
+                gt_subq = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
+                qs = qs.annotate(has_ground_truths=Exists(gt_subq))
+                # Keep all GT tasks; apply low-agreement+capacity to the rest
+                not_solved_tasks = qs.filter(Q(has_ground_truths=True) | (low_agreement_pred & capacity_pred))
+            else:
+                not_solved_tasks = qs.filter(low_agreement_pred & capacity_pred)
+
             prioritized_on_agreement, not_solved_tasks = _prioritize_low_agreement_tasks(not_solved_tasks, lse_project)
 
         # otherwise, filtering out completed tasks is sufficient
@@ -232,15 +240,18 @@ def get_next_task_without_dm_queue(
             use_task_lock = False
             queue_info += (' & ' if queue_info else '') + 'Task lock'
 
-    if not next_task and prioritized_low_agreement:
-        logger.debug(f'User={user} tries low agreement from prepared tasks')
-        next_task = _get_first_unlocked(not_solved_tasks, user)
-        queue_info += (' & ' if queue_info else '') + 'Low agreement queue'
-
+    # Try GT first when GT-first is enabled
     if not next_task and project.show_ground_truth_first:
         logger.debug(f'User={user} tries ground truth from prepared tasks')
         next_task = _try_ground_truth(not_solved_tasks, project, user)
-        queue_info += (' & ' if queue_info else '') + 'Ground truth queue'
+        if next_task:
+            queue_info += (' & ' if queue_info else '') + 'Ground truth queue'
+
+    if not next_task and prioritized_low_agreement:
+        logger.debug(f'User={user} tries low agreement from prepared tasks')
+        next_task = _get_first_unlocked(not_solved_tasks, user)
+        if next_task:
+            queue_info += (' & ' if queue_info else '') + 'Low agreement queue'
 
     if not next_task and project.maximum_annotations > 1:
         # if there are any tasks in progress (with maximum number of annotations), randomly sampling from them
