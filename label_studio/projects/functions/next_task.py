@@ -189,7 +189,10 @@ def get_not_solved_tasks_qs(
             if project.show_ground_truth_first:
                 gt_subq = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
                 qs = qs.annotate(has_ground_truths=Exists(gt_subq))
-                # Keep all GT tasks; apply low-agreement+capacity to the rest
+                # Keep all GT tasks + apply low-agreement+capacity to the rest. For sure, we can do:
+                # - if user.solved_tasks_array.count < lse_project.annotator_evaluation_minimum_tasks
+                # - else, apply low-agreement+capacity to the rest (maybe performance will be better)
+                # but it's a question - what is better here. This version is simpler at least from the code perspective. 
                 not_solved_tasks = qs.filter(Q(has_ground_truths=True) | (low_agreement_pred & capacity_pred))
             else:
                 not_solved_tasks = qs.filter(low_agreement_pred & capacity_pred)
