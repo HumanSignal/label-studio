@@ -6,7 +6,8 @@ import { HotkeysManager } from "./Hotkeys";
 import type React from "react";
 import { PersonalJWTToken } from "./PersonalJWTToken";
 import type { AuthTokenSettings } from "../types";
-import { ABILITY, type AuthPermissions, ff } from "@humansignal/core";
+import { ABILITY, type AuthPermissions } from "@humansignal/core/providers/AuthProvider";
+import { ff } from "@humansignal/core";
 import { Badge } from "@humansignal/ui";
 
 export type SectionType = {

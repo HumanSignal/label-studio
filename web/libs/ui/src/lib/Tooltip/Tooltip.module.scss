@@ -4,7 +4,7 @@
   --animation-curve: cubic-bezier(0.21, 1.04, 0.68, 1);
   --animation-start: -10px;
   --pointer-size: 10px;
-  --offset-x: 24px;
+  --offset-x: var(--spacing-base);
 
   top: -1000px;
   left: -1000px;
@@ -119,6 +119,19 @@
         bottom: 0;
         right: 18px;
         transform: translate(-50%, 50%) rotate(45deg);
+      }
+    }
+
+    &_bottom-right {
+      margin-left: calc(var(--offset-x) - (var(--pointer-size) / 2));
+
+      --animation-start: 10px;
+
+      &::before {
+        left: initial;
+        top: 0;
+        right: var(--offset-x);
+        transform: translate(-50%, -50%) rotate(45deg);
       }
     }
   }

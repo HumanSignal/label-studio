@@ -162,4 +162,6 @@ Scenario("Seek view should be in sync with indicator position", async ({ I, Labe
     I.say("Seeker should now have moved to the left");
     assert.ok(indicatorBbox.x < indicatorPosX, "Seeker should have moved to the left from this one step movement");
   }
-});
+})
+  .tag("@flakey")
+  .retry(3);

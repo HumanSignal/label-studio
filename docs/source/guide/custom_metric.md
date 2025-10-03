@@ -286,6 +286,9 @@ To grant permissions to a specific user, role, or EKS node group used to manage 
       },
       {
          "Action": [
+            "logs:CreateLogGroup",
+            "logs:PutRetentionPolicy",
+            "logs:TagResource",
             "logs:StartQuery",
             "logs:GetQueryResults"
          ],

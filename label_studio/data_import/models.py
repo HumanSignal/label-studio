@@ -74,14 +74,71 @@ class FileUpload(models.Model):
             setattr(self, '_file_body', body)
         return body
 
-    def read_tasks_list_from_csv(self, sep=','):
+    def _detect_csv_separator(self):
+        """
+        Detect the CSV separator by analyzing the first line of the file.
+
+        This method implements a reliable heuristic:
+        1. If semicolons are more frequent than commas in the first line, use semicolon
+        2. Otherwise, default to comma
+
+        Returns:
+            str: The detected separator (',' or ';')
+        """
+        try:
+            # Read the first line to analyze separators
+            with self.file.open() as f:
+                first_line = f.readline()
+                if isinstance(first_line, bytes):
+                    first_line = first_line.decode('utf-8')
+
+                # Count potential separators
+                comma_count = first_line.count(',')
+                semicolon_count = first_line.count(';')
+
+                # Use semicolon if it's clearly indicated by higher frequency
+                if semicolon_count > comma_count:
+                    logger.debug(
+                        f'Detected semicolon separator (found {semicolon_count} semicolons vs {comma_count} commas)'
+                    )
+                    return ';'
+                else:
+                    logger.debug(
+                        f'Using default comma separator (found {comma_count} commas vs {semicolon_count} semicolons)'
+                    )
+                    return ','
+        except Exception as e:
+            logger.warning(f'Failed to detect CSV separator, defaulting to comma: {e}')
+            return ','
+
+    def read_tasks_list_from_csv(self):
+        """
+        Read tasks from a CSV file with automatic separator detection.
+
+        The separator is automatically detected by analyzing the first line:
+        - If semicolons are clearly indicated (more frequent than commas), use semicolon
+        - Otherwise, use the default comma separator
+
+        Returns:
+            list: List of tasks in the format [{'data': {...}}, ...]
+        """
         logger.debug('Read tasks list from CSV file {}'.format(self.filepath))
-        tasks = pd.read_csv(self.file.open(), sep=sep).fillna('').to_dict('records')
+        separator = self._detect_csv_separator()
+        tasks = pd.read_csv(self.file.open(), sep=separator).fillna('').to_dict('records')
         tasks = [{'data': task} for task in tasks]
         return tasks
 
     def read_tasks_list_from_tsv(self):
-        return self.read_tasks_list_from_csv('\t')
+        """
+        Read tasks from a TSV (tab-separated values) file.
+
+        Returns:
+            list: List of tasks in the format [{'data': {...}}, ...]
+        """
+        logger.debug('Read tasks list from TSV file {}'.format(self.filepath))
+        tasks = pd.read_csv(self.file.open(), sep='\t').fillna('').to_dict('records')
+        tasks = [{'data': task} for task in tasks]
+        return tasks
 
     def read_tasks_list_from_txt(self):
         logger.debug('Read tasks list from text file {}'.format(self.filepath))

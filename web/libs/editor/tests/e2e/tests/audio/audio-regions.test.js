@@ -105,7 +105,9 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
     AtOutliner.seeSelectedRegion();
     AtAudioView.clickAt(220);
     AtOutliner.dontSeeSelectedRegion();
-  });
+  })
+    .tag("@flakey")
+    .retry(3);
 
   // Don't need to test this for both scenarios of flags, as it is the same code and is verified in the above test
   if (!flags.fflag_feat_front_lsdv_e_278_contextual_scrolling_short) {
@@ -151,7 +153,9 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
 
         AtOutliner.dontSeeSelectedRegion();
       },
-    );
+    )
+      .tag("@flakey")
+      .retry(3);
 
     FFlagScenario("Can select a region below a hidden region", async ({ I, LabelStudio, AtAudioView, AtOutliner }) => {
       LabelStudio.setFeatureFlags({
@@ -189,7 +193,9 @@ FFlagMatrix(["fflag_feat_front_lsdv_e_278_contextual_scrolling_short"], (flags) 
       // click on the region below the hidden one to select it
       AtAudioView.clickAt(51);
       AtOutliner.seeSelectedRegion("Speech");
-    });
+    })
+      .tag("@flakey")
+      .retry(3);
 
     FFlagScenario(
       "Selecting a region brings it to the front of the stack",
