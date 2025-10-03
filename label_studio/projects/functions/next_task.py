@@ -242,8 +242,22 @@ def get_next_task_without_dm_queue(
             use_task_lock = False
             queue_info += (' & ' if queue_info else '') + 'Task lock'
 
-    # Try GT first when GT-first is enabled
-    if not next_task and project.show_ground_truth_first:
+    # Try GT first only during onboarding window (GT-first enabled and user hasn't reached min GT tasks)
+    allow_gt_first = False
+    if project.show_ground_truth_first:
+        lse_project = getattr(project, 'lse_project', None)
+        # if no LSE project or min tasks unset, allow GT-first
+        if not lse_project or lse_project.annotator_evaluation_minimum_tasks is None:
+            allow_gt_first = True
+        else:
+            # count user's completed annotations on GT-equipped tasks
+            gt_tasks_qs = Task.objects.filter(project=project, annotations__ground_truth=True).distinct()
+            user_gt_completed = (
+                user.annotations.filter(task__in=gt_tasks_qs, was_cancelled=False).values('task_id').distinct().count()
+            )
+            allow_gt_first = user_gt_completed < lse_project.annotator_evaluation_minimum_tasks
+
+    if not next_task and allow_gt_first:
         logger.debug(f'User={user} tries ground truth from prepared tasks')
         next_task = _try_ground_truth(not_solved_tasks, project, user)
         if next_task:
