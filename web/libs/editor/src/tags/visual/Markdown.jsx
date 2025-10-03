@@ -7,6 +7,7 @@ import Tree from "../../core/Tree";
 import ProcessAttrsMixin from "../../mixins/ProcessAttrs";
 import VisibilityMixin from "../../mixins/Visibility";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
+import { parseValue } from "../../utils/data";
 import { guidGenerator } from "../../utils/unique";
 
 // Custom markdown components with Tailwind styling
@@ -122,21 +123,30 @@ const markdownComponents = {
  * @param {string} [whenLabelValue] Use with `visibleWhen="region-selected"`. Narrow down visibility by label value
  * @param {string} [whenChoiceValue] Use with `visibleWhen` and `whenTagName`. Narrow down visibility by choice value
  */
-const Model = types.model({
-  id: types.optional(types.identifier, guidGenerator),
-  type: "markdown",
-  value: types.optional(types.string, ""),
-  _value: types.optional(types.string, ""),
-  classname: types.optional(types.string, ""),
-  style: types.maybeNull(types.string),
-  idattr: types.optional(types.string, ""),
-});
+const Model = types
+  .model({
+    id: types.optional(types.identifier, guidGenerator),
+    type: "markdown",
+    value: types.optional(types.string, ""),
+    _value: types.optional(types.string, ""),
+    classname: types.optional(types.string, ""),
+    style: types.maybeNull(types.string),
+    idattr: types.optional(types.string, ""),
+  })
+  .actions((self) => ({
+    updateValue(store) {
+      const value = parseValue(self.value, store?.task?.dataObj ?? {});
 
-const MarkdownModel = types.compose("MarkdownModel", Model, ProcessAttrsMixin, VisibilityMixin, AnnotationMixin);
+      // cut CDATA
+      self._value = value.replace(/^\s*<!\[CDATA\[|\]\]>\s*$/g, "");
+    },
+  }));
+
+const MarkdownModel = types.compose("MarkdownModel", ProcessAttrsMixin, VisibilityMixin, AnnotationMixin, Model);
 
 const HtxMarkdown = observer(({ item }) => {
   const style = item.style ? Tree.cssConverter(item.style) : {};
-  
+
   if (item.isVisible === false) {
     style.display = "none";
   }
