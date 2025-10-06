@@ -17,6 +17,7 @@ from .stale_feature_flags import STALE_FEATURE_FLAGS
 logger = logging.getLogger(__name__)
 
 get_user_repr = load_func(settings.FEATURE_FLAGS_GET_USER_REPR)
+get_user_repr_from_organization = load_func(settings.FEATURE_FLAGS_GET_USER_REPR_FROM_ORGANIZATION)
 
 
 def get_feature_file_path():
@@ -69,7 +70,7 @@ else:
     client = ldclient.get()
 
 
-def flag_set(feature_flag, user=None, override_system_default=None):
+def flag_set(feature_flag, user=None, override_system_default=None, organization=None):
     """Use this method to check whether this flag is set ON to the current user, to split the logic on backend
     For example,
     ```
@@ -97,6 +98,11 @@ def flag_set(feature_flag, user=None, override_system_default=None):
         if request and getattr(request, 'user', None) and request.user.is_authenticated:
             user = request.user
 
+    if organization is None:
+        user_dict = get_user_repr(user)
+    else:
+        user_dict = get_user_repr_from_organization(organization)
+
     env_value = get_bool_env(feature_flag, default=None)
     if env_value is not None:
         return env_value
@@ -104,7 +110,6 @@ def flag_set(feature_flag, user=None, override_system_default=None):
         system_default = override_system_default
     else:
         system_default = settings.FEATURE_FLAGS_DEFAULT_VALUE
-    user_dict = get_user_repr(user)
     return client.variation(feature_flag, user_dict, system_default)
 
 

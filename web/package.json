@@ -105,6 +105,7 @@
     "react-joyride": "^2.9.3",
     "react-konva": "^18.2.10",
     "react-konva-utils": "^0.2.0",
+    "react-markdown": "^10.1.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-singleton-hook": "^3.1.1",
