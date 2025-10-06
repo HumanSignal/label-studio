@@ -12,11 +12,6 @@ export const FF_DEV_1480 = "ff_front_dev_1480_created_on_in_review_180122_short"
 export const FF_DEV_1682 = "ff_front_dev_1682_model_version_dropdown_070622_short";
 
 /**
- * Fixes how presigned urls are generated and accessed to remove possibility of CORS errors.
- */
-export const FF_LSDV_4711 = "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short";
-
-/**
  * Enables "Enterprise Awareness" features
  */
 export const FF_LSDV_E_297 = "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short";
