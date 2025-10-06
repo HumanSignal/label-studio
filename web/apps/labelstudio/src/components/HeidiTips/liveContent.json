@@ -193,7 +193,7 @@
         "url": "https://humansignal.com/pdf-interest-signup",
         "params": {
           "experiment": "project_settings_tip",
-          "treatment": "connect_ml_models_live"
+          "treatment": "lse_pdf_live"
         }
       }
     }
