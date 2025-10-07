@@ -424,8 +424,8 @@ export const Tab = types
 
     setAgreementFilters({
       ground_truth = false,
-      annotators = { all: false, ids: [] },
-      models = { all: false, ids: [] },
+      annotators = { all: true, ids: [] },
+      models = { all: true, ids: [] },
     }) {
       self.agreement_selected = {
         ground_truth,
