@@ -422,7 +422,11 @@ export const Tab = types
       self.save();
     },
 
-    setAgreementFilters({ ground_truth = false, annotators = { all: false, ids: [] }, models = { all: false, ids: [] }   }) {
+    setAgreementFilters({
+      ground_truth = false,
+      annotators = { all: false, ids: [] },
+      models = { all: false, ids: [] },
+    }) {
       self.agreement_selected = {
         ground_truth,
         annotators: {
