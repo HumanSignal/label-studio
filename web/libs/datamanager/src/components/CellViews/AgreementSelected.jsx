@@ -44,3 +44,7 @@ AgreementSelected.HeaderCell = ({ agreementFilters, onSave, onClose }) => {
 
   return content;
 };
+
+AgreementSelected.style = {
+  minWidth: 210,
+};
