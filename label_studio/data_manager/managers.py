@@ -548,11 +548,7 @@ def annotate_completed_at(queryset: TaskQuerySet) -> TaskQuerySet:
     is_lse_project = bool(LseProject)
     has_custom_agreement_queryset = bool(get_tasks_agreement_queryset)
 
-    if (
-        is_lse_project
-        and has_custom_agreement_queryset
-        and flag_set('fflag_feat_optic_161_project_settings_for_low_agreement_threshold_score_short', user='auto')
-    ):
+    if is_lse_project and has_custom_agreement_queryset:
         return annotated_completed_at_considering_agreement_threshold(queryset)
 
     return base_annotate_completed_at(queryset)
