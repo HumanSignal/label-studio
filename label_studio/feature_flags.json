@@ -4767,6 +4767,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_fix_back_plt_913_cache_annotator_queue_total_07102025_short": {
+      "key": "fflag_fix_back_plt_913_cache_annotator_queue_total_07102025_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "6a17a708748344a2b39b2664bde851a3",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_fix_back_plt_913_cache_finished_task_number_06102025_short": {
       "key": "fflag_fix_back_plt_913_cache_finished_task_number_06102025_short",
       "on": true,

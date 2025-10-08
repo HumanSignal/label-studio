@@ -1,5 +1,7 @@
-# Warning
+The Label Studio ML Backend (https://github.com/HumanSignal/label-studio-ml-backend/) is an SDK that lets you wrap your machine learning code and turn it into a web server. The web server can be connected to a running Label Studio instance to automate labeling tasks. 
 
-Since v1.0 this folder was moved to another repository Label Studio ML Backend :
+You can find ML backend examples for Label Studio studio here:
+https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml/examples
 
-https://github.com/HumanSignal/label-studio-ml-backend/tree/master/label_studio_ml
+This folder (label-studio/label_studio/ml) is an API that interacts with Label Studio ML Backends.
+
