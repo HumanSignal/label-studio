@@ -249,7 +249,7 @@
     "moment": "2.29.4",
     "on-headers": "1.1.0",
     "form-data": "4.0.4",
-    "stylus": "0.0.1-security"
+    "stylus": "0.64.0"
   },
   "copyFiles": [
     {

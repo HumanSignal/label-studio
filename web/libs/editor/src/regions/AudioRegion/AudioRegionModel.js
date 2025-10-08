@@ -3,6 +3,7 @@ import { AudioModel } from "../../tags/object/Audio/model";
 import Utils from "../../utils";
 import Constants from "../../core/Constants";
 import { clamp } from "../../utils/utilities";
+import { FF_TIMESERIES_SYNC, isFF } from "../../utils/feature-flags";
 
 export const AudioRegionModel = types
   .model("AudioRegionModel", {
@@ -101,6 +102,13 @@ export const AudioRegionModel = types
         self._ws_region.handleSelected(true);
         self._ws_region.bringToFront();
         self._ws_region.scrollToRegion();
+
+        // Emit sync event to update all synced components (TimeSeries, etc.)
+        if (isFF(FF_TIMESERIES_SYNC) && self.object.sync) {
+          const regionStartTime = self.start;
+          // Audio time is already in seconds, so just use it directly
+          self.object.syncSend({ time: regionStartTime, playing: false }, "seek");
+        }
       },
 
       deleteRegion() {
