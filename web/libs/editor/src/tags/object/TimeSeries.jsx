@@ -17,6 +17,7 @@ import {
   getOptimalWidth,
   getRegionColor,
   idFromValue,
+  snapToNearestDataPoint,
   sparseValues,
 } from "./TimeSeries/helpers";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
@@ -1035,13 +1036,18 @@ const Model = types
       if (!isFF(FF_TIMESERIES_SYNC)) return;
       if (self.suppressSync) return;
 
-      const centerTime = self.centerTime; // centerTime is in NATIVE units (ms if isDate, else seconds/indices)
+      let centerTime = self.centerTime; // centerTime is in NATIVE units (ms if isDate, else seconds/indices)
       if (centerTime !== null && self.sync && !self.isPlaying) {
         const [minKey] = self.keysRange; // Native unit
         if (minKey === undefined) {
           // console.warn("TimeSeries emitSeekSync: minKey is undefined.");
           return;
         }
+
+        // Snap to the nearest actual data point to avoid floating-point precision errors
+        const timeData = self.dataObj?.[self.keyColumn];
+        centerTime = snapToNearestDataPoint(centerTime, timeData);
+
         // Convert native centerTime to relative seconds for the sync message
         let relativeTime;
         if (self.isDate) {
@@ -1061,7 +1067,11 @@ const Model = types
       if (self.isNotReady) return;
 
       const [minKey, maxKey] = self.keysRange;
-      const finalTime = Math.max(minKey, Math.min(timeClicked, maxKey));
+      const clampedTime = Math.max(minKey, Math.min(timeClicked, maxKey));
+
+      // Snap to the nearest actual data point to avoid floating-point precision errors
+      const timeData = self.dataObj?.[self.keyColumn];
+      const finalTime = snapToNearestDataPoint(clampedTime, timeData);
 
       const insideView = self.brushRange && finalTime >= self.brushRange[0] && finalTime <= self.brushRange[1];
 
@@ -1472,7 +1482,11 @@ const HtxTimeSeriesViewRTS = ({ item }) => {
     // Calculate the clicked time within the current brush range
     const timeClicked = brushTimeStartNative + (clickX / plottingAreaWidth) * brushDurationNative;
     const [minKey, maxKey] = item.keysRange;
-    const finalTime = Math.max(minKey, Math.min(timeClicked, maxKey));
+    const clampedTime = Math.max(minKey, Math.min(timeClicked, maxKey));
+
+    // Snap to the nearest actual data point to avoid floating-point precision errors
+    const timeData = item.dataObj?.[item.keyColumn];
+    const finalTime = snapToNearestDataPoint(clampedTime, timeData);
 
     // Since we're clicking on the visible area, the time is always inside the current view
     // Update cursor position to the clicked location

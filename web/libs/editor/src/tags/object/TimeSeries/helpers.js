@@ -60,3 +60,51 @@ export const formatRegion = (node) => {
 };
 
 export const formatTrackerTime = (time) => new Date(time).toUTCString();
+
+/**
+ * Snap a time value to the nearest actual data point to avoid floating-point precision errors
+ * @param {number} targetTime - The time to snap
+ * @param {Array} timeData - Array of time values from the data
+ * @returns {number} - The snapped time value (or original if no data)
+ */
+export const snapToNearestDataPoint = (targetTime, timeData) => {
+  if (!timeData || timeData.length === 0) {
+    return targetTime;
+  }
+
+  // Binary search to find the closest data point
+  let left = 0;
+  let right = timeData.length - 1;
+  let closestIndex = 0;
+  let minDiff = Math.abs(timeData[0] - targetTime);
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    const diff = Math.abs(timeData[mid] - targetTime);
+
+    if (diff < minDiff) {
+      minDiff = diff;
+      closestIndex = mid;
+    }
+
+    if (timeData[mid] < targetTime) {
+      left = mid + 1;
+    } else if (timeData[mid] > targetTime) {
+      right = mid - 1;
+    } else {
+      // Exact match found
+      closestIndex = mid;
+      break;
+    }
+  }
+
+  // Also check adjacent points to ensure we have the absolute closest
+  if (closestIndex > 0 && Math.abs(timeData[closestIndex - 1] - targetTime) < minDiff) {
+    closestIndex = closestIndex - 1;
+  }
+  if (closestIndex < timeData.length - 1 && Math.abs(timeData[closestIndex + 1] - targetTime) < minDiff) {
+    closestIndex = closestIndex + 1;
+  }
+
+  return timeData[closestIndex];
+};
