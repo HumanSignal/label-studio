@@ -73,6 +73,8 @@ This is a new tag to add bounding boxes to the PDF and assign labels to them. Th
 !!! note
     When you are rotating within the UI, it appears to originate from the center of the region. However, we store the origin as `(x, y)` - meaning in the top left corner of the region.
 
+<br/>
+<br/>
 
 
 <video style="max-width: 800px;" class="gif-border" autoplay loop muted>
