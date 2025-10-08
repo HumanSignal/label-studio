@@ -1,6 +1,7 @@
 from django.db import migrations, connection
 from copy import deepcopy
 from django.apps import apps as django_apps
+from django.conf import settings
 from core.models import AsyncMigrationStatus
 from core.redis import start_job_async_or_sync
 from core.utils.iterators import iterate_queryset
@@ -79,7 +80,7 @@ def forward_migration():
     migration.save(update_fields=['status'])
 
 def forwards(apps, schema_editor):
-    start_job_async_or_sync(forward_migration, queue_name='low')
+    start_job_async_or_sync(forward_migration, queue_name=settings.SERVICE_QUEUE_NAME)
 
 
 def backwards(apps, schema_editor):
