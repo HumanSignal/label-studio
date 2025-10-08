@@ -33,21 +33,16 @@ Use with the following data types: PDF.
 
 Beta and Label Studio Enterprise only.
 
-Labeling configuration to label PDF documents:
+Labeling configuration for PDFs:
 
 ```xml
 <View>
-  <Style>
-    .pdf-actions{display:flex;justify-content:space-between}
-  </Style>
-  <Header value="Label any areas that you wish to correct" size="4"/>
-  <View className="pdf-actions">
-    <OcrLabels name="ocr" toName="pdf">
-      <Label value="Typo"/>
-      <Label value="Incorrect amount"/>
-      <Label value="Incorrect name"/>
-    </OcrLabels>
-  </View>
+  <OcrLabels name="ocr" toName="pdf">
+    <Label value="Typo"/>
+    <Label value="Incorrect amount"/>
+    <Label value="Incorrect name"/>
+  </OcrLabels>
+
   <Pdf name="pdf" value="$pdf"/>
 </View>
 ```
@@ -71,9 +66,13 @@ This is a new tag to add bounding boxes to the PDF and assign labels to them. Th
 | Result | Type | Description |
 | --- | --- | --- |
 | `x`, `y`, `width`, `height` | Number | Numbers from 0 to 1 that are relative to the page dimensions. | 
-| `rotation`| Number | Number in degrees clockwise from 0–360. |
+| `rotation`| Number | Number in degrees clockwise from 0–360. Rotation is calculated with the origin at `(x, y)` (the top-left corner of the region). |
 | `pageIndex` | Number | Page number, 1-based. |
 | `ocrtext` | String | Captured text.  This can be edited by selecting the region and then editing the text from the **Info** panel. |
+
+!!! note
+    When you are rotating within the UI, it appears to originate from the center of the region. However, we store the origin as `(x, y)` - meaning in the top left corner of the region.
+
 
 
 <video style="max-width: 800px;" class="gif-border" autoplay loop muted>
