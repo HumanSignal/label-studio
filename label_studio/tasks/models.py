@@ -134,8 +134,8 @@ class Task(TaskMixin, models.Model):
         db_index=True,
         help_text='Number of total predictions for the current task',
     )
-    agreement = models.FloatField(
-        _('agreement'),
+    precomputed_agreement = models.FloatField(
+        _('precomputed_agreement'),
         null=True,
         db_index=True,
         help_text='Average agreement score for the task',
