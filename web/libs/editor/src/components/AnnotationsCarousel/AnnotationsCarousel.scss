@@ -7,6 +7,27 @@
   min-width: 0;
   flex: 1;
 
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 100%;
+    display: block;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(to right, rgba(var(--color-neutral-shadow-raw) / 16%), rgba(var(--color-neutral-shadow-raw) / 0%));
+    z-index: 1;
+    transition: opacity 300ms ease-out;
+  }
+
+  &_scrolled {
+    &::before {       
+      opacity: 1;
+    }
+  }
+
   &__container {
     display: flex;
     width: 100%;
@@ -18,12 +39,13 @@
   &__carosel {
     flex: 1;
     display: flex;
-    gap: 2px;
+    gap: var(--spacing-tighter);
     white-space: nowrap;
+    padding-left: var(--spacing-tighter);
     padding-right: 77px;
     position: relative;
     transform: translateX(calc(-1 * var(--carousel-left)));
-    transition: all 0.15s ease-in-out 0s;
+    transition: all 200ms ease-out 0s;
   }
 
   &__carousel-controls {
@@ -33,19 +55,23 @@
     top: 50%;
     transform: translateY(-50%);
     display: flex;
-    gap: 4px;
-    padding-right: 4px;
+    gap: var(--spacing-tighter);
+    padding-right: var(--spacing-tighter);
+
+    button:not(:disabled) {
+      box-shadow: 0 2px 6px rgba(var(--color-neutral-shadow-raw) / 20%);
+    }
   }
 
   &__nav {
     padding: 0;
     height: 28px;
     width: 28px;
-    box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%);
+    box-shadow: 0 2px 5px 0 rgb(var(--color-neutral-shadow-raw) / 20%);
 
     &:hover {
       background: var(--color-primary-emphasis-subtle);
-      box-shadow: 0 2px 5px 0 rgb(0 0 0 / 20%);
+      box-shadow: 0 2px 5px 0 rgb(var(--color-neutral-shadow-raw) / 20%);
     }
 
     &_disabled {

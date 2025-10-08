@@ -78,10 +78,16 @@ def _try_tasks_with_overlap(tasks: QuerySet[Task]) -> Tuple[Union[Task, None], Q
         return None, tasks.filter(overlap=1)
 
 
-def _try_breadth_first(tasks: QuerySet[Task], user: User) -> Union[Task, None]:
+def _try_breadth_first(tasks: QuerySet[Task], user: User, project: Project) -> Union[Task, None]:
     """Try to find tasks with maximum amount of annotations, since we are trying to label tasks as fast as possible"""
 
-    tasks = tasks.annotate(annotations_count=Count('annotations', filter=~Q(annotations__completed_by=user)))
+    # Exclude ground truth annotations from the count when not in onboarding mode
+    # to prevent GT tasks from being prioritized via breadth-first logic
+    annotation_filter = ~Q(annotations__completed_by=user)
+    if not project.show_ground_truth_first:
+        annotation_filter &= ~Q(annotations__ground_truth=True)
+
+    tasks = tasks.annotate(annotations_count=Count('annotations', filter=annotation_filter))
     max_annotations_count = tasks.aggregate(Max('annotations_count'))['annotations_count__max']
     if max_annotations_count == 0:
         # there is no any labeled tasks found
@@ -272,7 +278,7 @@ def get_next_task_without_dm_queue(
     if not next_task and project.maximum_annotations > 1:
         # if there are already labeled tasks, but task.overlap still < project.maximum_annotations, randomly sampling from them
         logger.debug(f'User={user} tries depth first from prepared tasks')
-        next_task = _try_breadth_first(not_solved_tasks, user)
+        next_task = _try_breadth_first(not_solved_tasks, user, project)
         if next_task:
             queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
 
