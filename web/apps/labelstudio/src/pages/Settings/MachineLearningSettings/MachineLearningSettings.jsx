@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Button, Typography, Spinner, EmptyState, SimpleCard } from "@humansignal/ui";
+import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { Form, Label, Toggle } from "../../../components/Form";
 import { modal } from "../../../components/Modal/Modal";
 import { IconModels, IconExternal } from "@humansignal/icons";
@@ -18,6 +19,8 @@ export const MachineLearningSettings = () => {
   const [backends, setBackends] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
+
+  useUpdatePageTitle(createTitleFromSegments([project?.title, "Model Settings"]));
 
   const fetchBackends = useCallback(async () => {
     setLoading(true);
