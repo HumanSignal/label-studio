@@ -4821,6 +4821,33 @@
       "version": 3,
       "deleted": false
     },
+    "fflag_fix_back_plt_914_projects_list_cache_sdk_09102025_short": {
+      "key": "fflag_fix_back_plt_914_projects_list_cache_sdk_09102025_short",
+      "on": true,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "482919695c1d4166896badf1d9405427",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 3,
+      "deleted": false
+    },
     "fflag_fix_bros_113_members_user_order_20250816": {
       "key": "fflag_fix_bros_113_members_user_order_20250816",
       "on": false,
