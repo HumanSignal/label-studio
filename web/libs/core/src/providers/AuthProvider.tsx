@@ -1,21 +1,3 @@
-/**
- * AuthProvider and useAuth Hook
- *
- * This module provides authentication context and user management for Label Studio.
- * The useAuth hook consolidates functionality previously split between useAuth and useCurrentUser,
- * providing a unified interface for:
- * - Current user data access
- * - User profile updates (asynchronous)
- * - Loading states
- * - Permission checking
- *
- * Interface:
- * - user: Current user data or null
- * - isLoading: True when fetching or updating user
- * - refetch: Refetch current user data
- * - update: Update user profile (returns promise)
- * - permissions: Permission checking helpers (can, canAny, canAll)
- */
 import { createContext, memo, useCallback, useContext, useMemo } from "react";
 import type { APIUser } from "../types/user";
 import { useAtomValue } from "jotai";
@@ -38,7 +20,7 @@ type AuthState = {
   user: APIUser | null;
   isLoading: boolean;
   refetch: () => void;
-  update: (userUpdate: Partial<APIUser>) => Promise<APIUser> | undefined;
+  update: (userUpdate: Partial<APIUser>) => Promise<APIUser | undefined>;
   permissions: AuthPermissions;
 };
 
@@ -71,12 +53,12 @@ export const AuthProvider = memo<{ children: React.ReactNode }>(({ children }) =
   }, [queryClient]);
 
   const update = useCallback(
-    (userUpdate: Partial<APIUser>) => {
+    async (userUpdate: Partial<APIUser>) => {
       if (!userQuery.data) {
         console.error("User is not loaded. Try fetching first.");
-        return;
+        return undefined;
       }
-      return updateUserMutation.mutateAsync({ pk: userQuery.data.id, user: userUpdate });
+      return await updateUserMutation.mutateAsync({ pk: userQuery.data.id, user: userUpdate });
     },
     [userQuery.data, updateUserMutation],
   );
@@ -117,7 +99,7 @@ export const useAuth = () => {
 
   return {
     user: ctx.user,
-    isLoading: ctx.isLoading,
+    isLoading: ctx?.isLoading ?? false,
     refetch: ctx.refetch,
     update: ctx.update,
     permissions: ctx.permissions,
