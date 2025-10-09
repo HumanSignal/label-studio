@@ -1522,19 +1522,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         transform={transform}
         fitScale={fitScale}
         onClick={(e) => {
-          // Handle cmd-click to select all points
-          if ((e.evt.ctrlKey || e.evt.metaKey) && !e.evt.altKey && !e.evt.shiftKey) {
-            // Check if this instance can have selection
-            if (!tracker.canInstanceHaveSelection(instanceId)) {
-              return; // Block the selection
-            }
-
-            // Select all points in the path
-            const allPointIndices = Array.from({ length: initialPoints.length }, (_, i) => i);
-            tracker.selectPoints(instanceId, new Set(allPointIndices));
-            return;
-          }
-
           // Check if click is on the last added point by checking cursor position
           if (cursorPosition && lastAddedPointId) {
             const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
@@ -1655,16 +1642,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               if (success) {
                 return; // Path was closed, don't select the point
               }
-            }
-
-            // Handle cmd-click to select all points
-            if ((e.evt.ctrlKey || e.evt.metaKey) && !e.evt.altKey && !e.evt.shiftKey) {
-              // Select all points in the path
-              const allPointIndices = Array.from({ length: initialPoints.length }, (_, i) => i);
-              tracker.selectPoints(instanceId, new Set(allPointIndices));
-              pointSelectionHandled.current = true; // Mark that we handled selection
-              e.evt.stopImmediatePropagation(); // Prevent all other handlers from running
-              return;
             }
 
             // Check if this is the last added point and already selected (second click)
