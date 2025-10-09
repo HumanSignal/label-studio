@@ -35,12 +35,7 @@ export const DangerZone = () => {
         return (
           <div>
             <Typography variant="body" size="medium" className="mb-tight">
-              {message.split("**").map((part, index) => {
-                if (index % 2 === 1) {
-                  return <strong key={index}>{part}</strong>;
-                }
-                return part;
-              })}
+              {message}
             </Typography>
             <Input
               label={`To proceed, type "${requiredWord}" in the field below:`}
@@ -48,6 +43,7 @@ export const DangerZone = () => {
               onChange={(e) => ctrl?.setState({ inputValue: e.target.value })}
               autoFocus
               data-testid="danger-zone-confirmation-input"
+              autoComplete="off"
             />
           </div>
         );
@@ -88,19 +84,31 @@ export const DangerZone = () => {
     const actionConfig = {
       reset_cache: {
         title: "Reset Cache",
-        message: `You are about to reset the cache for **${project.title}**. This action cannot be undone.`,
+        message: (
+          <>
+            You are about to reset the cache for <strong>{project.title}</strong>. This action cannot be undone.
+          </>
+        ),
         requiredWord: "cache",
         buttonText: "Reset Cache",
       },
       tabs: {
         title: "Drop All Tabs",
-        message: `You are about to drop all tabs for **${project.title}**. This action cannot be undone.`,
+        message: (
+          <>
+            You are about to drop all tabs for <strong>{project.title}</strong>. This action cannot be undone.
+          </>
+        ),
         requiredWord: "tabs",
         buttonText: "Drop All Tabs",
       },
       project: {
         title: "Delete Project",
-        message: `You are about to delete the project **${project.title}**. This action cannot be undone.`,
+        message: (
+          <>
+            You are about to delete the project <strong>{project.title}</strong>. This action cannot be undone.
+          </>
+        ),
         requiredWord: "delete",
         buttonText: "Delete Project",
       },
