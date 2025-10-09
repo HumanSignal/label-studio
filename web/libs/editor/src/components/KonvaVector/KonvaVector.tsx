@@ -35,6 +35,7 @@ import {
   HIT_RADIUS,
   TRANSFORMER_SETUP_DELAY,
   TRANSFORMER_CLEAR_DELAY,
+  CLICK_DELAY,
   MIN_POINTS_FOR_CLOSING,
   MIN_POINTS_FOR_BEZIER_CLOSING,
   INVISIBLE_SHAPE_OPACITY,
@@ -229,6 +230,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     onMouseMove,
     onMouseUp,
     onClick,
+    onDblClick,
     onMouseEnter,
     onMouseLeave,
     allowClose = false,
@@ -340,6 +342,21 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
   // Flag to track if point selection was handled in VectorPoints onClick
   const pointSelectionHandled = useRef(false);
+
+  // Flag to track if VectorShape already handled the click/double-click
+  const shapeHandledClick = useRef(false);
+
+  // Timeout ref for delayed click execution (to prevent clicks during double-click)
+  const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup click timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Initialize PointCreationManager instance
   const pointCreationManager = useMemo(() => new PointCreationManager(), []);
@@ -1494,7 +1511,42 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 pointSelectionHandled.current = false;
                 return;
               }
-              eventHandlers.handleLayerClick(e);
+
+            // Skip if VectorShape already handled the click
+            if (shapeHandledClick.current) {
+              shapeHandledClick.current = false;
+              return;
+            }
+
+            // Clear any existing click timeout
+            if (clickTimeoutRef.current) {
+              clearTimeout(clickTimeoutRef.current);
+            }
+
+            // Delay click execution to check if it's part of a double-click
+            clickTimeoutRef.current = setTimeout(() => {
+                eventHandlers.handleLayerClick(e);
+              }, CLICK_DELAY);
+          }
+      }
+      onDblClick={
+        disabled
+          ? undefined
+          : (e) => {
+            // Skip if VectorShape already handled the double-click
+            if (shapeHandledClick.current) {
+              shapeHandledClick.current = false;
+              return;
+            }
+
+            // Clear the pending click timeout to prevent single click from executing
+            if (clickTimeoutRef.current) {
+              clearTimeout(clickTimeoutRef.current);
+              clickTimeoutRef.current = null;
+            }
+
+            // Execute double click handler
+            onDblClick?.(e);
             }
       }
     >
@@ -1522,38 +1574,64 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         transform={transform}
         fitScale={fitScale}
         onClick={(e) => {
-          // Check if click is on the last added point by checking cursor position
-          if (cursorPosition && lastAddedPointId) {
-            const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
-            if (lastAddedPoint) {
-              const scale = transform.zoom * fitScale;
-              const hitRadius = 15 / scale; // Same radius as used in event handlers
-              const distance = Math.sqrt(
-                (cursorPosition.x - lastAddedPoint.x) ** 2 + (cursorPosition.y - lastAddedPoint.y) ** 2,
-              );
+          // Mark that VectorShape handled the click
+          shapeHandledClick.current = true;
 
-              if (distance <= hitRadius) {
-                // Find the index of the last added point
-                const lastAddedPointIndex = initialPoints.findIndex((p) => p.id === lastAddedPointId);
+          // Clear any existing click timeout
+          if (clickTimeoutRef.current) {
+            clearTimeout(clickTimeoutRef.current);
+          }
 
-                // Only trigger onFinish if the last added point is already selected (second click)
-                // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-                if (lastAddedPointIndex !== -1 && selectedPoints.has(lastAddedPointIndex) && !disabled) {
-                  const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
-                  if (!hasModifiers) {
-                    e.evt.preventDefault();
-                    onFinish?.(e);
+          // Delay click execution to check if it's part of a double-click
+          clickTimeoutRef.current = setTimeout(() => {
+            // Check if click is on the last added point by checking cursor position
+            if (cursorPosition && lastAddedPointId) {
+              const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
+              if (lastAddedPoint) {
+                const scale = transform.zoom * fitScale;
+                const hitRadius = 15 / scale; // Same radius as used in event handlers
+                const distance = Math.sqrt(
+                  (cursorPosition.x - lastAddedPoint.x) ** 2 + (cursorPosition.y - lastAddedPoint.y) ** 2,
+                );
+
+                if (distance <= hitRadius) {
+                  // Find the index of the last added point
+                  const lastAddedPointIndex = initialPoints.findIndex((p) => p.id === lastAddedPointId);
+
+                  // Only trigger onFinish if the last added point is already selected (second click)
+                  // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
+                  if (lastAddedPointIndex !== -1 && selectedPoints.has(lastAddedPointIndex) && !disabled) {
+                    const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
+                    if (!hasModifiers) {
+                      onFinish?.(e);
+                      return;
+                    }
+                    // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
                     return;
                   }
-                  // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
-                  return;
                 }
               }
             }
+
+            // Call the event handler (for drawing/interaction logic)
+            eventHandlers.handleLayerClick(e);
+
+            // Call the original onClick handler (custom callback)
+            onClick?.(e);
+          }, CLICK_DELAY);
+        }}
+        onDblClick={(e) => {
+          // Mark that VectorShape handled the double-click
+          shapeHandledClick.current = true;
+
+          // Clear the pending click timeout to prevent single click from executing
+          if (clickTimeoutRef.current) {
+            clearTimeout(clickTimeoutRef.current);
+            clickTimeoutRef.current = null;
           }
 
-          // Call the original onClick handler
-          onClick?.(e);
+          // Execute double click handler
+          onDblClick?.(e);
         }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}

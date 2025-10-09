@@ -570,6 +570,9 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             }
             item.updateCursor();
           }}
+          onDblClick={(e) => {
+            console.log("double click");
+          }}
           closed={item.closed}
           width={stageWidth}
           height={stageHeight}

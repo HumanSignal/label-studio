@@ -4,7 +4,7 @@ import type { BezierPoint } from "../types";
 import chroma from "chroma-js";
 import type { KonvaEventObject } from "konva/lib/Node";
 
-interface VectorShapeProps {
+export interface VectorShapeProps {
   segments: Array<{ from: BezierPoint; to: BezierPoint }>;
   allowClose?: boolean;
   isPathClosed?: boolean;
@@ -15,6 +15,7 @@ interface VectorShapeProps {
   transform?: { zoom: number; offsetX: number; offsetY: number };
   fitScale?: number;
   onClick?: (e: KonvaEventObject<MouseEvent>) => void;
+  onDblClick?: (e: KonvaEventObject<MouseEvent>) => void;
   onMouseEnter?: (e: any) => void;
   onMouseLeave?: (e: any) => void;
 }
@@ -212,6 +213,7 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
   transform = { zoom: 1, offsetX: 0, offsetY: 0 },
   fitScale = 1,
   onClick,
+  onDblClick,
   onMouseEnter,
   onMouseLeave,
 }) => {
@@ -270,6 +272,7 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
               fill={undefined} // No fill for individual segments
               hitStrokeWidth={20}
               onClick={onClick}
+              onDblClick={onDblClick}
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
             />
@@ -299,6 +302,7 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
             fill={fillWithOpacity}
             hitStrokeWidth={20}
             onClick={onClick}
+            onDblClick={onDblClick}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
           />
