@@ -57,7 +57,7 @@ const RightContextMenu = ({ className, ...props }) => {
 export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSidebarToggle, onSidebarPin }) => {
   const menuDropdownRef = useRef();
   const useMenuRef = useRef();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const location = useFixedLocation();
 
   const config = useConfig();
@@ -201,7 +201,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
             }
           >
             <div title={user?.email} className={menubarClass.elem("user")}>
-              <Userpic user={user} isInProgress={!user} />
+              <Userpic user={user} isInProgress={isLoading} />
               {showNewsletterDot && <div className={menubarClass.elem("userpic-badge")} />}
             </div>
           </Dropdown.Trigger>
