@@ -2,16 +2,7 @@ title: OCR Invoices Pre-NER BIO Format
 type: community
 group: Community Contributions
 image: /static/templates/community-contributions/ocr-invoices-pre-ner-bio-format.jpg
-details: |
-  <h1>OCR Invoices Pre-NER BIO Format</h1>
-  <dl>
-    <dt>Industry Applications</dt>
-    <dd>accounts payable automation, invoice processing, financial document processing, expense management, accounting software, ERP integration, vendor management, tax preparation, audit compliance, business process automation, procurement systems, bookkeeping automation</dd>
-    <dt>Associated Models</dt>
-    <dd>OCR preprocessing, BIO tagging, sequential labeling, document layout analysis</dd>
-    <dt>Domain Terminology</dt>
-    <dd>NLP, invoice digitization, document understanding, structured extraction, financial NER, receipt processing</dd>
-  </dl>
+details: <h1>OCR Invoices Pre-NER BIO Format</h1>
 source_repo: https://github.com/humanSignal/awesome-label-studio-config/tree/main/label-configs/ocr-invoices-pre-ner-bio-format
 config: |
   <View>

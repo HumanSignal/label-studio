@@ -17,7 +17,7 @@ class JWTSettings(models.Model):
     organization = AutoOneToOneField(Organization, related_name='jwt', primary_key=True, on_delete=models.DO_NOTHING)
     api_tokens_enabled = models.BooleanField(
         _('JWT API tokens enabled'),
-        default=False,
+        default=True,
         help_text='Enable JWT API token authentication for this organization',
     )
     api_token_ttl_days = models.IntegerField(
@@ -27,7 +27,7 @@ class JWTSettings(models.Model):
     )
     legacy_api_tokens_enabled = models.BooleanField(
         _('legacy API tokens enabled'),
-        default=True,
+        default=False,
         help_text='Enable legacy API token authentication for this organization',
     )
 

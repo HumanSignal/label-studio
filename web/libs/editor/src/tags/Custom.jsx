@@ -5,7 +5,6 @@ import React from "react";
 import { destroy, types, getRoot } from "mobx-state-tree";
 import { observer } from "mobx-react";
 import { EnterpriseBadge } from "@humansignal/ui";
-import Registry from "../core/Registry";
 import ControlBase from "./control/Base";
 import ClassificationBase from "./control/ClassificationBase";
 

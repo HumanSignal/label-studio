@@ -3,7 +3,7 @@ title: Two-Level Sentiment Analysis of X / Twitter posts
 type: templates
 category: Community Contributions
 cat: community
-order: 1003
+order: 1004
 meta_title: Two-Level Sentiment Analysis of X / Twitter posts Data Labeling Template
 meta_description: Template for two-level sentiment analysis of x / twitter posts with Label Studio
 community: true
