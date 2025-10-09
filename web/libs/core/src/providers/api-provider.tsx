@@ -1,21 +1,16 @@
 import {
-	createContext,
-	forwardRef,
-	type PropsWithChildren,
-	useCallback,
-	useContext,
-	useEffect,
-	useMemo,
-	useState,
+  createContext,
+  forwardRef,
+  type PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
 import type { ApiResponse, WrappedResponse } from "../lib/api-proxy/types";
 import { getApiInstance } from "../lib/api-provider/api-instance";
-import type {
-	ApiCallOptions,
-	ApiContextType,
-	ErrorHandlerOptions,
-	FormattedError,
-} from "../lib/api-provider/types";
+import type { ApiCallOptions, ApiContextType, ErrorHandlerOptions, FormattedError } from "../lib/api-provider/types";
 
 export const ApiContext = createContext<ApiContextType | null>(null);
 ApiContext.displayName = "ApiContext";
@@ -27,31 +22,31 @@ ApiContext.displayName = "ApiContext";
  * @returns Formatted error object
  */
 export const errorFormatter = (result: ApiResponse): FormattedError => {
-	const response = "response" in result ? result.response : null;
-	const isShutdown = false;
+  const response = "response" in result ? result.response : null;
+  const isShutdown = false;
 
-	return {
-		isShutdown,
-		title: result.error ? "Runtime error" : "Server error",
-		message: response?.detail ?? result?.error ?? "An unknown error occurred",
-		stacktrace: response?.exc_info ?? undefined,
-		version: response?.version,
-		validation: Object.entries<string[]>(response?.validation_errors ?? {}),
-	};
+  return {
+    isShutdown,
+    title: result.error ? "Runtime error" : "Server error",
+    message: response?.detail ?? result?.error ?? "An unknown error occurred",
+    stacktrace: response?.exc_info ?? undefined,
+    version: response?.version,
+    validation: Object.entries<string[]>(response?.validation_errors ?? {}),
+  };
 };
 
 interface ApiProviderProps {
-	/**
-	 * Callback to handle non-fatal errors.
-	 * This is called for errors that should be displayed to the user.
-	 */
-	onError?: (error: FormattedError, response: ApiResponse) => void;
+  /**
+   * Callback to handle non-fatal errors.
+   * This is called for errors that should be displayed to the user.
+   */
+  onError?: (error: FormattedError, response: ApiResponse) => void;
 
-	/**
-	 * Callback to handle fatal errors that should stop the application.
-	 * This is called for errors like 401 (unauthorized) or 404 (not found).
-	 */
-	onFatalError?: (error: FormattedError, response: ApiResponse) => void;
+  /**
+   * Callback to handle fatal errors that should stop the application.
+   * This is called for errors like 401 (unauthorized) or 404 (not found).
+   */
+  onFatalError?: (error: FormattedError, response: ApiResponse) => void;
 }
 
 /**
@@ -65,113 +60,103 @@ interface ApiProviderProps {
  * </ApiProvider>
  * ```
  */
-export const ApiProvider = forwardRef<
-	ApiContextType,
-	PropsWithChildren<ApiProviderProps>
->(({ children, onError, onFatalError }, ref) => {
-	const [error, setError] = useState<ApiResponse | null>(null);
-	const api = getApiInstance();
+export const ApiProvider = forwardRef<ApiContextType, PropsWithChildren<ApiProviderProps>>(
+  ({ children, onError, onFatalError }, ref) => {
+    const [error, setError] = useState<ApiResponse | null>(null);
+    const api = getApiInstance();
 
-	const resetError = useCallback(() => setError(null), []);
+    const resetError = useCallback(() => setError(null), []);
 
-	/**
-	 * Handles API errors with appropriate user feedback.
-	 */
-	const handleError = useCallback(
-		async (
-			response: Response | ApiResponse,
-			options: ErrorHandlerOptions = {},
-		): Promise<boolean> => {
-			let result: ApiResponse = response as ApiResponse;
+    /**
+     * Handles API errors with appropriate user feedback.
+     */
+    const handleError = useCallback(
+      async (response: Response | ApiResponse, options: ErrorHandlerOptions = {}): Promise<boolean> => {
+        let result: ApiResponse = response as ApiResponse;
 
-			if (response instanceof Response) {
-				result = await api.generateError(response);
-			}
+        if (response instanceof Response) {
+          result = await api.generateError(response);
+        }
 
-			const errorDetails = errorFormatter(result);
-			const { showGlobalError = true, customHandler } = options;
+        const errorDetails = errorFormatter(result);
+        const { showGlobalError = true, customHandler } = options;
 
-			if (!showGlobalError) {
-				return errorDetails.isShutdown;
-			}
+        if (!showGlobalError) {
+          return errorDetails.isShutdown;
+        }
 
-			if (customHandler) {
-				customHandler(errorDetails, result);
-			} else if (onError) {
-				onError(errorDetails, result);
-			}
+        if (customHandler) {
+          customHandler(errorDetails, result);
+        } else if (onError) {
+          onError(errorDetails, result);
+        }
 
-			if (errorDetails.isShutdown && onFatalError) {
-				onFatalError(errorDetails, result);
-			}
+        if (errorDetails.isShutdown && onFatalError) {
+          onFatalError(errorDetails, result);
+        }
 
-			return errorDetails.isShutdown;
-		},
-		[api, onError, onFatalError],
-	);
+        return errorDetails.isShutdown;
+      },
+      [api, onError, onFatalError],
+    );
 
-	/**
-	 * Calls an API method with the given options.
-	 * Handles errors automatically unless suppressError is true.
-	 */
-	const callApi = useCallback(
-		async <T,>(
-			method: string,
-			options: ApiCallOptions = {},
-		): Promise<WrappedResponse<T> | null> => {
-			const { params = {}, errorFilter, suppressError, ...rest } = options;
+    /**
+     * Calls an API method with the given options.
+     * Handles errors automatically unless suppressError is true.
+     */
+    const callApi = useCallback(
+      async <T,>(method: string, options: ApiCallOptions = {}): Promise<WrappedResponse<T> | null> => {
+        const { params = {}, errorFilter, suppressError, ...rest } = options;
 
-			setError(null);
+        setError(null);
 
-			const result = await api.invoke<T>(method, params, rest);
+        const result = await api.invoke<T>(method, params, rest);
 
-			if (result?.error) {
-				const shouldShowGlobalError =
-					!errorFilter || errorFilter(result) === false;
+        if (result?.error) {
+          const shouldShowGlobalError = !errorFilter || errorFilter(result) === false;
 
-				if (suppressError !== true) {
-					setError(result);
-				}
+          if (suppressError !== true) {
+            setError(result);
+          }
 
-				if (shouldShowGlobalError && suppressError !== true) {
-					await handleError(result, {
-						showGlobalError: true,
-					});
-					return null;
-				}
-			}
+          if (shouldShowGlobalError && suppressError !== true) {
+            await handleError(result, {
+              showGlobalError: true,
+            });
+            return null;
+          }
+        }
 
-			return result;
-		},
-		[api, handleError],
-	);
+        return result;
+      },
+      [api, handleError],
+    );
 
-	const contextValue: ApiContextType = useMemo(
-		() => ({
-			api,
-			callApi,
-			handleError,
-			resetError,
-			error,
-			showGlobalError: true,
-			errorFormatter,
-			isValidMethod(name: string) {
-				return api.isValidMethod(name);
-			},
-		}),
-		[api, callApi, handleError, resetError, error],
-	);
+    const contextValue: ApiContextType = useMemo(
+      () => ({
+        api,
+        callApi,
+        handleError,
+        resetError,
+        error,
+        showGlobalError: true,
+        errorFormatter,
+        isValidMethod(name: string) {
+          return api.isValidMethod(name);
+        },
+      }),
+      [api, callApi, handleError, resetError, error],
+    );
 
-	useEffect(() => {
-		if (ref && !(ref instanceof Function)) {
-			ref.current = contextValue;
-		}
-	}, [ref, contextValue]);
+    useEffect(() => {
+      if (ref && !(ref instanceof Function)) {
+        ref.current = contextValue;
+      }
+    }, [ref, contextValue]);
 
-	return (
-		<ApiContext.Provider value={contextValue}>{children}</ApiContext.Provider>
-	);
-});
+    return <ApiContext.Provider value={contextValue}>{children}</ApiContext.Provider>;
+  },
+);
 
 ApiProvider.displayName = "ApiProvider";
 
@@ -189,9 +174,9 @@ ApiProvider.displayName = "ApiProvider";
  * ```
  */
 export const useAPI = (): ApiContextType => {
-	const context = useContext(ApiContext);
-	if (!context) {
-		throw new Error("useAPI must be used within an ApiProvider");
-	}
-	return context;
+  const context = useContext(ApiContext);
+  if (!context) {
+    throw new Error("useAPI must be used within an ApiProvider");
+  }
+  return context;
 };

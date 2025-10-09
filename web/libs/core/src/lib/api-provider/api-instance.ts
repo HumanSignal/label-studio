@@ -10,22 +10,24 @@ let apiInstance: APIProxy<Record<string, unknown>> | null = null;
  * @param config - Configuration for the API instance
  * @returns The initialized API instance
  */
-export function createApiInstance(
-	config: ApiProviderConfig,
-): APIProxy<Record<string, unknown>> {
-	if (apiInstance) {
-		console.warn("API instance already exists. Returning existing instance.");
-		return apiInstance;
-	}
+export function createApiInstance(config: ApiProviderConfig): APIProxy<Record<string, unknown>> {
+  if (apiInstance) {
+    console.warn("API instance already exists. Returning existing instance.");
+    return apiInstance;
+  }
 
-	apiInstance = new APIProxy({
-		gateway: config.gateway,
-		endpoints: config.endpoints,
-		commonHeaders: config.commonHeaders,
-		onRequestFinished: config.onRequestFinished,
-	});
+  apiInstance = new APIProxy({
+    gateway: config.gateway,
+    endpoints: config.endpoints,
+    commonHeaders: config.commonHeaders,
+    onRequestFinished: config.onRequestFinished,
+    alwaysExpectJSON: config.alwaysExpectJSON,
+    sharedParams: config.sharedParams,
+    mockDelay: config.mockDelay,
+    mockDisabled: config.mockDisabled,
+  });
 
-	return apiInstance;
+  return apiInstance;
 }
 
 /**
@@ -36,12 +38,10 @@ export function createApiInstance(
  * @throws {Error} If API instance is not initialized
  */
 export function getApiInstance(): APIProxy<Record<string, unknown>> {
-	if (!apiInstance) {
-		throw new Error(
-			"API instance not initialized. Call createApiInstance first.",
-		);
-	}
-	return apiInstance;
+  if (!apiInstance) {
+    throw new Error("API instance not initialized. Call createApiInstance first.");
+  }
+  return apiInstance;
 }
 
 /**
@@ -49,7 +49,7 @@ export function getApiInstance(): APIProxy<Record<string, unknown>> {
  * This should not be used in production code.
  */
 export function resetApiInstance(): void {
-	apiInstance = null;
+  apiInstance = null;
 }
 
 /**
@@ -57,15 +57,15 @@ export function resetApiInstance(): void {
  * This maintains backward compatibility with direct API imports.
  */
 export const API = new Proxy({} as APIProxy<Record<string, unknown>>, {
-	get(_target, prop) {
-		const instance = getApiInstance();
-		const value = instance[prop as keyof APIProxy<Record<string, unknown>>];
+  get(_target, prop) {
+    const instance = getApiInstance();
+    const value = instance[prop as keyof APIProxy<Record<string, unknown>>];
 
-		// Bind methods to the instance
-		if (typeof value === "function") {
-			return value.bind(instance);
-		}
+    // Bind methods to the instance
+    if (typeof value === "function") {
+      return value.bind(instance);
+    }
 
-		return value;
-	},
+    return value;
+  },
 });
