@@ -45,7 +45,7 @@ export const TabFilter = types
       try {
         while (current) {
           parent = getParent(current);
-          if (parent && parent.filters && Array.isArray(parent.filters)) {
+          if (parent?.filters && Array.isArray(parent.filters)) {
             return parent;
           }
           current = parent;
@@ -118,6 +118,12 @@ export const TabFilter = types
       }
       if (self.operator === null) {
         self.setOperator(self.component[0].key);
+      }
+
+      // If this filter's column has child_filter metadata and no child filter exists, create it
+      // This ensures child filters are automatically recreated after navigation
+      if (!self.child_filter && self.filter?.field?.child_filter) {
+        self.view?.applyChildFilter(self);
       }
     },
 
