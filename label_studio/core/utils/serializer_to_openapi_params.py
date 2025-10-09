@@ -141,11 +141,8 @@ def _get_field_config(field: serializers.Field, overrides: dict) -> dict:
 
     elif isinstance(field, serializers.JSONField):
         config['type'] = OpenApiTypes.OBJECT
-
     elif isinstance(field, serializers.ListField):
-        config['type'] = OpenApiTypes.ARRAY
-        child_type = _map_field_type(field.child) if hasattr(field, 'child') else OpenApiTypes.STR
-        config['extra_kwargs']['items'] = {'type': child_type}
+        config['type'] = OpenApiTypes.STR
 
     return config
 
@@ -170,7 +167,7 @@ def _map_field_type(field: serializers.Field) -> str:
     elif isinstance(field, serializers.DecimalField):
         return OpenApiTypes.NUMBER
     elif isinstance(field, serializers.ListField):
-        return OpenApiTypes.ARRAY
+        return OpenApiTypes.STR
     elif isinstance(field, serializers.JSONField):
         return OpenApiTypes.OBJECT
     elif isinstance(field, serializers.DictField):
