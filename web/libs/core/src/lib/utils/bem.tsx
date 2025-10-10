@@ -1,18 +1,35 @@
 /**
- * Simplified BEM utility for Modal component
- * Based on the BEM implementation from datamanager/editor
+ * BEM (Block Element Modifier) utility for creating CSS class names
+ *
+ * This utility provides a flexible way to create BEM-style CSS class names
+ * with support for blocks, elements, modifiers, and mixing.
  *
  * @note This utility uses `any` types intentionally for flexibility with BEM patterns.
  * @note Non-null assertions are used where type safety is guaranteed by the BEM structure.
  */
-// biome-ignore lint/complexity/noBannedTypes: Generic BEM utility requires flexible typing
-// biome-ignore lint/suspicious/noExplicitAny: Generic BEM utility requires any for flexibility
-import { type Context, type FC, createElement, createContext, forwardRef, useContext } from "react";
+import {
+  type Context,
+  type FC,
+  type ComponentClass,
+  type FunctionComponent,
+  type ReactHTML,
+  type ReactSVG,
+  type CSSProperties,
+  type DOMAttributes,
+  createElement,
+  createContext,
+  forwardRef,
+  useContext,
+} from "react";
 
 type CNMod = Record<string, string | boolean | number | null | undefined>;
 type CNMix = string | CN | undefined | null;
 
 type TagNames = keyof HTMLElementTagNameMap | FC<any>;
+type ComponentType = FC<any> | ComponentClass<unknown, unknown> | FunctionComponent<unknown>;
+type TagNameType = keyof ReactHTML | keyof ReactSVG | string;
+
+export type CNTagName = ComponentType | TagNameType;
 
 export type CN = {
   block(name: string): CN;
@@ -53,7 +70,21 @@ type WrappedComponentProps<CN extends FC<any>, TN extends TagNames> = Omit<
         [key in keyof Parameters<CN>[0]]: Parameters<CN>[0][key];
       });
 
-const CSS_PREFIX = "";
+type CNComponentProps = {
+  name: string;
+  tag?: CNTagName;
+  block?: string;
+  mod?: CNMod;
+  mix?: CNMix | CNMix[];
+  className?: string;
+  component?: CNTagName;
+  style?: CSSProperties;
+  rawClassName?: string;
+} & DOMAttributes<HTMLElement>;
+
+export type BemComponent = FunctionComponent<CNComponentProps>;
+
+const CSS_PREFIX = process.env.CSS_PREFIX ?? "ls-";
 
 const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?: CNMod) => {
   const rootName = block;
@@ -111,7 +142,7 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
 
 export const BlockContext = createContext<CN | null>(null);
 
-export const cn = (block: string, options: CNOptions = {}): CN => {
+const cn = (block: string, options: CNOptions = {}): CN => {
   const { elem, mix, mod } = options ?? {};
   const blockName = block;
 
@@ -162,6 +193,8 @@ export const cn = (block: string, options: CNOptions = {}): CN => {
   return classNameBuilder;
 };
 
+export { cn as cnb };
+
 export const BemWithSpecificContext = (context?: Context<CN | null>) => {
   const Context = context ?? createContext<CN | null>(null);
 
@@ -172,12 +205,15 @@ export const BemWithSpecificContext = (context?: Context<CN | null>) => {
     ) => {
       const rootClass = cn(name);
       const finalMix = ([] as [CNMix?]).concat(mix).filter((cn) => !!cn);
-      const className =
-        rawClassName ||
+      const className = [
         rootClass
           .mod(mod)
           .mix(...(finalMix as CNMix[]), rest.className)
-          .toClassName();
+          .toClassName(),
+        rawClassName,
+      ]
+        .filter(Boolean)
+        .join(" ");
       const finalProps = { ...rest, ref, className } as any;
 
       return createElement(
@@ -192,18 +228,23 @@ export const BemWithSpecificContext = (context?: Context<CN | null>) => {
 
   const Elem = forwardRef(
     <T extends FC<any>, D extends TagNames>(
-      { tag = "div", component, block, name, mod, mix, ...rest }: WrappedComponentProps<T, D>,
+      { tag = "div", component, block, name, mod, mix, rawClassName, ...rest }: WrappedComponentProps<T, D>,
       ref: any,
     ) => {
       const blockCtx = useContext(Context);
 
       const finalMix = ([] as [CNMix?]).concat(mix).filter((cn) => !!cn);
 
-      const className = (block ? cn(block) : blockCtx)!
-        .elem(name)
-        .mod(mod)
-        .mix(...(finalMix as CNMix[]), rest.className)
-        .toClassName();
+      const className = [
+        (block ? cn(block) : blockCtx)!
+          .elem(name)
+          .mod(mod)
+          .mix(...(finalMix as CNMix[]), rest.className)
+          .toClassName(),
+        rawClassName,
+      ]
+        .filter(Boolean)
+        .join(" ");
 
       const finalProps: any = { ...rest, ref, className };
 
@@ -219,4 +260,10 @@ export const BemWithSpecificContext = (context?: Context<CN | null>) => {
   Elem.displayName = "Elem";
 
   return { Block, Elem, Context };
+};
+
+export const { Block, Elem } = BemWithSpecificContext(BlockContext);
+
+export const useBEM = () => {
+  return useContext(BlockContext)!;
 };

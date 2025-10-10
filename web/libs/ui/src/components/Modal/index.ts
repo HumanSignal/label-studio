@@ -5,6 +5,7 @@ export { ModalFooter } from "./ModalFooter";
 export { ModalHeader } from "./ModalHeader";
 export { ModalTitle } from "./ModalTitle";
 export { useModalControls } from "./ModalPopup";
+export { Block, Elem } from "@humansignal/core";
 
 export type { ModalProps } from "./ModalPopup";
 export type {

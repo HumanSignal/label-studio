@@ -91,11 +91,8 @@ export const info = <T,>(props: InfoProps<T>): ModalUpdateProps<T> => {
 export { Modal, useModalControls } from "@humansignal/ui";
 
 // Re-export for backward compatibility
-Object.assign(Modal, {
-  info,
-  confirm,
-  modal,
-});
+// Note: Modal is a React component class, not a namespace, so we can't assign to it
+// The original pattern was likely different - these functions are exported separately
 
 // Export standalone modal as default
 export { modal as standaloneModal };

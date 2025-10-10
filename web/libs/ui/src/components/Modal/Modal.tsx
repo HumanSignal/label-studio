@@ -1,8 +1,9 @@
 import { createRef, type ReactElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-import { cn } from "./bem";
+import { cnb as cn } from "@humansignal/core";
 import { Button, type ButtonProps } from "../../lib/button/button";
 import { Modal, type ModalProps } from "./ModalPopup";
+import { ToastViewport } from "../../lib/toast/toast";
 
 export type ConfirmProps<T> = ModalProps<T> & {
   okText?: string;
@@ -90,17 +91,20 @@ const standaloneModal = <T,>(props: ModalProps<T> & ExtraProps): ModalUpdateProp
     };
 
     const modalContent = (
-      <Modal
-        ref={modalRef}
-        {...props}
-        onHide={() => {
-          props.onHidden?.();
-          unmountComponentAtNode(rootDiv);
-          rootDiv.remove();
-          if (props.unique) UNIQUE_MODALS.delete(props.unique);
-        }}
-        animateAppearance={animate}
-      />
+      <>
+        <Modal
+          ref={modalRef}
+          {...props}
+          onHide={() => {
+            props.onHidden?.();
+            unmountComponentAtNode(rootDiv);
+            rootDiv.remove();
+            if (props.unique) UNIQUE_MODALS.delete(props.unique);
+          }}
+          animateAppearance={animate}
+        />
+        {!props.simple && <ToastViewport />}
+      </>
     );
 
     render(wrapWithProviders(modalContent), rootDiv);

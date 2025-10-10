@@ -57,12 +57,5 @@ export const info = <T,>(props: InfoProps<T>): ModalUpdateProps<T> => {
 // Re-export Modal component and hooks
 export { Modal, useModalControls } from "@humansignal/ui";
 
-// Re-export for backward compatibility
-Object.assign(Modal, {
-  info,
-  confirm,
-  modal,
-});
-
 // Export standalone modal as alias
 export { modal as standaloneModal };

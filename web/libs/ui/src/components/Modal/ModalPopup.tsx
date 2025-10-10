@@ -1,12 +1,12 @@
 import { Component, createContext, createRef, type FC, useContext } from "react";
 import { createPortal } from "react-dom";
-import { cn } from "./bem";
+import { cnb as cn } from "@humansignal/core";
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { aroundTransition } from "@humansignal/core/lib/utils/transition";
 import { setRef } from "@humansignal/core/lib/utils/unwrapRef";
+import { Block, Elem } from "./ModalContext";
 import { ModalBody } from "./ModalBody";
 import { ModalCloseButton } from "./ModalCloseButton";
-import { Block, Elem } from "./ModalContext";
 import { ModalFooter } from "./ModalFooter";
 import { ModalHeader } from "./ModalHeader";
 import { ModalTitle } from "./ModalTitle";
