@@ -65,7 +65,8 @@ const revokeTokenAtom = atomWithMutation((get) => {
   return {
     mutationKey: ["revoke"],
     async mutationFn({ token }: { token: string }) {
-      await API.invoke("accessTokenRevoke", null, {
+      const api = getApiInstance();
+      await api.invoke("accessTokenRevoke", null, {
         params: {},
         body: {
           refresh: token,
@@ -206,7 +207,7 @@ function CreateTokenForm() {
           labelProps={{ className: "flex-1", rawClassName: "flex-1" }}
           className="w-full"
           readOnly
-          value={data}
+          value={data ?? ""}
         />
         <Button onClick={() => copy()} disabled={copied} variant="neutral" look="outlined">
           {copied ? "Copied!" : "Copy"}

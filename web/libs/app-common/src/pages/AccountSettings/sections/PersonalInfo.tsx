@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { Button, InputFile, ToastType, useToast, Userpic } from "@humansignal/ui";
 import { getApiInstance } from "@humansignal/core";
 import styles from "../AccountSettings.module.scss";
-import { useCurrentUserAtom } from "@humansignal/core/lib/hooks/useCurrentUser";
+import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { atomWithMutation } from "jotai-tanstack-query";
 import { useAtomValue } from "jotai";
 
@@ -41,12 +41,12 @@ const updateUserAvatarAtom = atomWithMutation(() => ({
 
 export const PersonalInfo = () => {
   const toast = useToast();
-  const { user, fetch: refetchUser, isInProgress: userInProgress, updateAsync: updateUser } = useCurrentUserAtom();
+  const { user, refetch: refetchUser, isLoading: userInProgress, update: updateUser } = useAuth();
   const updateUserAvatar = useAtomValue(updateUserAvatarAtom);
   const [isInProgress, setIsInProgress] = useState(false);
-  const [fname, setFname] = useState(user?.first_name);
-  const [lname, setLname] = useState(user?.last_name);
-  const [phone, setPhone] = useState(user?.phone);
+  const [fname, setFname] = useState(user?.first_name ?? "");
+  const [lname, setLname] = useState(user?.last_name ?? "");
+  const [phone, setPhone] = useState(user?.phone ?? "");
   const avatarRef = useRef<HTMLInputElement>();
   const fileChangeHandler: FormEventHandler<HTMLInputElement> = useCallback(
     async (e) => {
@@ -61,10 +61,7 @@ export const PersonalInfo = () => {
       });
 
       if (!response.$meta.ok) {
-        toast.show({
-          message: response?.response?.detail ?? "Error updating avatar",
-          type: ToastType.error,
-        });
+        toast?.show({ message: response?.response?.detail ?? "Error updating avatar", type: ToastType.error });
       } else {
         refetchUser();
       }
@@ -89,10 +86,7 @@ export const PersonalInfo = () => {
 
       refetchUser();
       if (!response?.$meta.ok) {
-        toast.show({
-          message: response?.response?.detail ?? "Error updating user",
-          type: ToastType.error,
-        });
+        toast?.show({ message: response?.response?.detail ?? "Error updating user", type: ToastType.error });
       }
     },
     [user?.id],
@@ -103,9 +97,9 @@ export const PersonalInfo = () => {
   }, [userInProgress]);
 
   useEffect(() => {
-    setFname(user?.first_name);
-    setLname(user?.last_name);
-    setPhone(user?.phone);
+    setFname(user?.first_name ?? "");
+    setLname(user?.last_name ?? "");
+    setPhone(user?.phone ?? "");
   }, [user]);
 
   return (
@@ -148,7 +142,7 @@ export const PersonalInfo = () => {
           </div>
           <div className={styles.flexRow}>
             <div className={styles.flex1}>
-              <Input label="E-mail" type="email" readOnly={true} value={user?.email} />
+              <Input label="E-mail" type="email" readOnly={true} value={user?.email ?? ""} />
             </div>
             <div className={styles.flex1}>
               <Input
@@ -161,7 +155,7 @@ export const PersonalInfo = () => {
             </div>
           </div>
           <div className={clsx(styles.flexRow, styles.flexEnd)}>
-            <Button look="primary" style={{ width: 125 }} waiting={isInProgress}>
+            <Button style={{ width: 125 }} waiting={isInProgress}>
               Save
             </Button>
           </div>

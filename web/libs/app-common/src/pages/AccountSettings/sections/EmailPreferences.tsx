@@ -1,14 +1,13 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Checkbox, Spinner } from "@humansignal/ui";
+import { useAuth } from "@humansignal/core/providers/AuthProvider";
+import { ff, useAPI } from "@humansignal/core";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
  * each one of these eventually has to be migrated to core/ui
  */
-import { useAPI } from "@humansignal/core";
 import { useConfig } from "apps/labelstudio/src/providers/ConfigProvider";
-import { useCurrentUser } from "apps/labelstudio/src/providers/CurrentUser";
-import { ff } from "@humansignal/core";
 
 type NotificationCheckboxProps = {
   id: string;
@@ -34,7 +33,7 @@ export const EmailPreferences = () => {
   const isEnterpriseEmailNotificationsEnabled =
     ff.isActive(ff.FF_ENTERPRISE_EMAIL_NOTIFICATIONS) && window.APP_SETTINGS?.billing?.enterprise;
   const config = useConfig();
-  const { user, setQueryData } = useCurrentUser();
+  const { user, refetch } = useAuth();
   const api = useAPI();
   const [isAllowNewsLetter, setIsAllowNewsLetter] = useState(config.user.allow_newsletters);
   const [emailNotificationSettings, setEmailNotificationSettings] = useState(
@@ -60,16 +59,11 @@ export const EmailPreferences = () => {
         setEmailNotificationSettings(response.lse_fields.email_notification_settings);
         // @ts-ignore
         emailNotificationSettingsRef.current = response.lse_fields.email_notification_settings;
-        setQueryData?.({
-          // @ts-ignore
-          lse_fields: {
-            email_notification_settings: response.lse_fields.email_notification_settings,
-          },
-        });
+        refetch();
       }
       setIsLoading(false);
     },
-    [user?.id, setQueryData],
+    [user],
   );
 
   const message = useMemo(() => {
