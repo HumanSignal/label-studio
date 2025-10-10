@@ -1,5 +1,5 @@
 import { IconClose } from "@humansignal/icons";
-import { Button } from "../Button";
+import { Button } from "../../lib/button/button";
 import { useModalControls } from "./ModalPopup";
 
 export const ModalCloseButton = () => {

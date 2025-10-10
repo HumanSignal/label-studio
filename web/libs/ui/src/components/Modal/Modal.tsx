@@ -1,7 +1,7 @@
 import { createRef, type ReactElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { cn } from "./bem";
-import { Button, type ButtonProps } from "../Button";
+import { Button, type ButtonProps } from "../../lib/button/button";
 import { Modal, type ModalProps } from "./ModalPopup";
 
 export type ConfirmProps<T> = ModalProps<T> & {
