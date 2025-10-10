@@ -1,14 +1,13 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Checkbox, Spinner } from "@humansignal/ui";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
+import { ff, useAPI } from "@humansignal/core";
 
 /**
  * FIXME: This is legacy imports. We're not supposed to use such statements
  * each one of these eventually has to be migrated to core/ui
  */
-import { useAPI } from "apps/labelstudio/src/providers/ApiProvider";
 import { useConfig } from "apps/labelstudio/src/providers/ConfigProvider";
-import { ff } from "@humansignal/core";
 
 type NotificationCheckboxProps = {
   id: string;
@@ -80,7 +79,9 @@ export const EmailPreferences = () => {
         label={message}
         checked={isAllowNewsLetter}
         onToggle={(e, id, setIsLoading) =>
-          toggleHandler(e, id, setIsLoading, { allow_newsletters: e.target.checked ? 1 : 0 })
+          toggleHandler(e, id, setIsLoading, {
+            allow_newsletters: e.target.checked ? 1 : 0,
+          })
         }
       />
 
@@ -100,7 +101,9 @@ export const EmailPreferences = () => {
                   newEmailNotificationSettings[key] = value;
                 }
               });
-              toggleHandler(e, id, setIsLoading, { email_notification_settings: newEmailNotificationSettings });
+              toggleHandler(e, id, setIsLoading, {
+                email_notification_settings: newEmailNotificationSettings,
+              });
             };
             return (
               <NotificationCheckbox

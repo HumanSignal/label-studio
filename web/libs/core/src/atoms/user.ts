@@ -1,20 +1,20 @@
 import type { APIUser } from "@humansignal/core/types/user";
-import { API } from "apps/labelstudio/src/providers/ApiProvider";
+import { getApiInstance } from "../lib/api-provider/api-instance";
 import { atomWithMutation, atomWithQuery, queryClientAtom } from "jotai-tanstack-query";
 
 export const currentUserAtom = atomWithQuery(() => ({
   queryKey: ["current-user"],
   async queryFn() {
-    // @ts-expect-error - API.invoke typing issue with method names
-    return await API.invoke<APIUser>("me");
+    const api = getApiInstance();
+    return await api.invoke<APIUser>("me");
   },
 }));
 
 export const currentUserUpdateAtom = atomWithMutation((get) => ({
   mutationKey: ["update-current-user"],
   async mutationFn({ pk, user }: { pk: number; user: Partial<APIUser> }) {
-    // @ts-expect-error - API.invoke typing issue with method names
-    return await API.invoke<APIUser>("updateUser", { pk }, { body: user });
+    const api = getApiInstance();
+    return await api.invoke<APIUser>("updateUser", { pk }, { body: user });
   },
 
   onSettled() {

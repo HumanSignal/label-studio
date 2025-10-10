@@ -1,7 +1,7 @@
-import { useContext, useCallback } from "react";
+import { useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { ApiContext } from "apps/labelstudio/src/providers/ApiProvider";
-import { isDefined } from "apps/labelstudio/src/utils/helpers";
+import { useAPI } from "@humansignal/core";
+import { isDefined } from "@humansignal/core";
 import { getProviderConfig } from "../providers";
 
 interface UseStorageApiProps {
@@ -13,7 +13,7 @@ interface UseStorageApiProps {
 }
 
 export const useStorageApi = ({ target, storage, project, onSubmit, onClose }: UseStorageApiProps) => {
-  const api = useContext(ApiContext);
+  const api = useAPI();
   const isEditMode = Boolean(storage);
   const action = storage ? "updateStorage" : "createStorage";
 
@@ -119,7 +119,12 @@ export const useStorageApi = ({ target, storage, project, onSubmit, onClose }: U
 
       // First, save the storage
       const result = await api.callApi(action, {
-        params: { target, type: storageData.provider, project, pk: storage?.id },
+        params: {
+          target,
+          type: storageData.provider,
+          project,
+          pk: storage?.id,
+        },
         body,
       });
 
@@ -163,7 +168,12 @@ export const useStorageApi = ({ target, storage, project, onSubmit, onClose }: U
 
       // Only save the storage, don't sync
       const result = await api.callApi(action, {
-        params: { target, type: storageData.provider, project, pk: storage?.id },
+        params: {
+          target,
+          type: storageData.provider,
+          project,
+          pk: storage?.id,
+        },
         body,
       });
 
