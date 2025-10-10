@@ -558,7 +558,7 @@ class ImportStorage(Storage):
                 logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
                 keys_for_existed_count.append(key)
                 if len(keys_for_existed_count) >= settings.STORAGE_EXISTED_COUNT_BATCH_SIZE:
-                    tasks_existed += link_class.objects.filter(key__in=keys_for_existed_count, storage=self.id).count()
+                    tasks_existed += link_class.objects.filter(key__in=keys_for_existed_count, storage_id=self.id).count()
                     keys_for_existed_count = []
                 continue
 
@@ -884,6 +884,10 @@ class ImportStorageLink(models.Model):
 
     row_group = models.IntegerField(null=True, blank=True, help_text='Parquet row group')
     row_index = models.IntegerField(null=True, blank=True, help_text='Parquet row index, or JSON[L] object index')
+
+    @classmethod
+    def exists(cls, key, storage):
+        return cls.objects.filter(key=key, storage=storage.id).exists()
 
     @classmethod
     def create(cls, task, key, storage, row_index=None, row_group=None):
