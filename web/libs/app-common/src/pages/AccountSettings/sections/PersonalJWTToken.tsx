@@ -204,7 +204,7 @@ function CreateTokenForm() {
           labelProps={{ className: "flex-1", rawClassName: "flex-1" }}
           className="w-full"
           readOnly
-          value={data}
+          value={data ?? ""}
         />
         <Button onClick={() => copy()} disabled={copied} variant="neutral" look="outlined">
           {copied ? "Copied!" : "Copy"}
