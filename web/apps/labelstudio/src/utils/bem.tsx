@@ -4,6 +4,7 @@ export {
   Elem,
   BemWithSpecificContext,
   useBEM,
-  CNTagName,
-  BemComponent,
+  type CN,
+  type CNTagName,
+  type BemComponent,
 } from "@humansignal/core";
