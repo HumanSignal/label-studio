@@ -22,7 +22,7 @@ import { ActivityObserver } from "../utils/ActivityObserver";
  */
 let networkActivity = null;
 
-const PROJECTS_FETCH_PERIOD = 20 * 1000; // interaction timer fetch period for project api
+const PROJECTS_FETCH_PERIOD = 20 * 1000; // interaction timer for 20 sec fetch period for project api
 
 export const AppStore = types
   .model("AppStore", {
