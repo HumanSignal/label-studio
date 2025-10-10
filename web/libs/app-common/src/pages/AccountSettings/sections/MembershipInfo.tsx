@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import styles from "./MembershipInfo.module.scss";
 import { useQuery } from "@tanstack/react-query";
-import { API } from "apps/labelstudio/src/providers/ApiProvider";
+import { getApiInstance } from "@humansignal/core";
 import { useMemo } from "react";
 import type { WrappedResponse } from "@humansignal/core/lib/api-proxy/types";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
@@ -21,7 +21,8 @@ export const MembershipInfo = () => {
     queryKey: [user?.active_organization, user?.id, "user-membership"],
     async queryFn() {
       if (!user) return {};
-      const response = (await API.invoke("userMemberships", {
+      const api = getApiInstance();
+      const response = (await api.invoke("userMemberships", {
         pk: user.active_organization,
         userPk: user.id,
       })) as WrappedResponse<{
@@ -74,7 +75,8 @@ export const MembershipInfo = () => {
     async queryFn() {
       if (!user) return null;
       if (!window?.APP_SETTINGS?.billing) return null;
-      const organization = (await API.invoke("organization", {
+      const api = getApiInstance();
+      const organization = (await api.invoke("organization", {
         pk: user.active_organization,
       })) as WrappedResponse<{
         id: number;
@@ -89,7 +91,10 @@ export const MembershipInfo = () => {
         return null;
       }
 
-      return { ...organization, createdAt: formatDate(organization.created_at) } as const;
+      return {
+        ...organization,
+        createdAt: formatDate(organization.created_at),
+      } as const;
     },
   });
 

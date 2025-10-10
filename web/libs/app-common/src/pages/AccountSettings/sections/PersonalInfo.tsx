@@ -1,8 +1,7 @@
 import { type FormEventHandler, useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { Button, InputFile, ToastType, useToast, Userpic } from "@humansignal/ui";
-// @todo we should not use anything from `apps` in `libs`
-import { API } from "apps/labelstudio/src/providers/ApiProvider";
+import { getApiInstance } from "@humansignal/core";
 import styles from "../AccountSettings.module.scss";
 import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { atomWithMutation } from "jotai-tanstack-query";
@@ -21,8 +20,9 @@ const updateUserAvatarAtom = atomWithMutation(() => ({
     body,
     isDelete,
   }: { userId: number; body: FormData; isDelete?: never } | { userId: number; isDelete: true; body?: never }) {
+    const api = getApiInstance();
     const method = isDelete ? "deleteUserAvatar" : "updateUserAvatar";
-    const response = await API.invoke(
+    const response = await api.invoke(
       method,
       {
         pk: userId,
