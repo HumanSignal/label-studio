@@ -22,7 +22,7 @@ import { ActivityObserver } from "../utils/ActivityObserver";
  */
 let networkActivity = null;
 
-const PROJECTS_FETCH_PERIOD = 10 * 1000; // 10 seconds
+const PROJECTS_FETCH_PERIOD = 20 * 1000; // 10 seconds
 
 export const AppStore = types
   .model("AppStore", {
