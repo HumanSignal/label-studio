@@ -5,34 +5,34 @@ import { Button, type ButtonProps } from "../Button";
 import { Modal, type ModalProps } from "./ModalPopup";
 
 export type ConfirmProps<T> = ModalProps<T> & {
-	okText?: string;
-	onOk?: () => void;
-	cancelText?: string;
-	onCancel?: () => void;
-	buttonLook?: ButtonProps["variant"];
+  okText?: string;
+  onOk?: () => void;
+  cancelText?: string;
+  onCancel?: () => void;
+  buttonLook?: ButtonProps["variant"];
 };
 
 export type InfoProps<T> = ModalProps<T> & {
-	okText?: string;
-	onOkPress?: () => void;
+  okText?: string;
+  onOkPress?: () => void;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ModalUpdate<Props extends ModalProps<any>> = {
-	update: (newProps: Partial<Props>) => void;
-	close: () => void;
-	visible: boolean;
+  update: (newProps: Partial<Props>) => void;
+  close: () => void;
+  visible: boolean;
 };
 
 export type ExtraProps = {
-	unique?: string;
-	simple?: boolean;
-	onHidden?: () => void;
-	/**
-	 * Optional providers to wrap the modal with.
-	 * Allows applications to inject their own providers (ApiProvider, AuthProvider, etc.)
-	 */
-	providers?: ReactElement[];
+  unique?: string;
+  simple?: boolean;
+  onHidden?: () => void;
+  /**
+   * Optional providers to wrap the modal with.
+   * Allows applications to inject their own providers (ApiProvider, AuthProvider, etc.)
+   */
+  providers?: ReactElement[];
 };
 
 export type ModalUpdateProps<T> = ModalUpdate<ModalProps<T> & ExtraProps>;
@@ -58,158 +58,146 @@ const UNIQUE_MODALS = new Map<string, ModalUpdate<any>>();
  *   ]
  * });
  */
-const standaloneModal = <T,>(
-	props: ModalProps<T> & ExtraProps,
-): ModalUpdateProps<T> => {
-	if (props.unique && UNIQUE_MODALS.has(props.unique)) {
-		return UNIQUE_MODALS.get(props.unique) as ModalUpdate<ModalProps<T>>;
-	}
-	const modalRef = createRef<Modal>();
-	const rootDiv = document.createElement("div");
-	let renderCount = 0;
+const standaloneModal = <T,>(props: ModalProps<T> & ExtraProps): ModalUpdateProps<T> => {
+  if (props.unique && UNIQUE_MODALS.has(props.unique)) {
+    return UNIQUE_MODALS.get(props.unique) as ModalUpdate<ModalProps<T>>;
+  }
+  const modalRef = createRef<Modal>();
+  const rootDiv = document.createElement("div");
+  let renderCount = 0;
 
-	rootDiv.className = cn("modal-holder").toClassName();
+  rootDiv.className = cn("modal-holder").toClassName();
 
-	document.body.appendChild(rootDiv);
+  document.body.appendChild(rootDiv);
 
-	const renderModal = (
-		props: ModalProps<T> & ExtraProps,
-		animate?: boolean,
-	) => {
-		renderCount++;
+  const renderModal = (props: ModalProps<T> & ExtraProps, animate?: boolean) => {
+    renderCount++;
 
-		// Get providers from props or use empty array for simple modals
-		const providers = props.simple ? [] : (props.providers ?? []);
+    // Get providers from props or use empty array for simple modals
+    const providers = props.simple ? [] : (props.providers ?? []);
 
-		// If providers are provided, wrap the modal with a MultiProvider-like structure
-		const wrapWithProviders = (content: ReactElement) => {
-			if (providers.length === 0) {
-				return content;
-			}
+    // If providers are provided, wrap the modal with a MultiProvider-like structure
+    const wrapWithProviders = (content: ReactElement) => {
+      if (providers.length === 0) {
+        return content;
+      }
 
-			// Nest providers from right to left (innermost to outermost)
-			return providers.reduceRight((acc, provider) => {
-				// Clone the provider and add the accumulated content as children
-				return { ...provider, props: { ...provider.props, children: acc } };
-			}, content);
-		};
+      // Nest providers from right to left (innermost to outermost)
+      return providers.reduceRight((acc, provider) => {
+        // Clone the provider and add the accumulated content as children
+        return { ...provider, props: { ...provider.props, children: acc } };
+      }, content);
+    };
 
-		const modalContent = (
-			<Modal
-				ref={modalRef}
-				{...props}
-				onHide={() => {
-					props.onHidden?.();
-					unmountComponentAtNode(rootDiv);
-					rootDiv.remove();
-					if (props.unique) UNIQUE_MODALS.delete(props.unique);
-				}}
-				animateAppearance={animate}
-			/>
-		);
+    const modalContent = (
+      <Modal
+        ref={modalRef}
+        {...props}
+        onHide={() => {
+          props.onHidden?.();
+          unmountComponentAtNode(rootDiv);
+          rootDiv.remove();
+          if (props.unique) UNIQUE_MODALS.delete(props.unique);
+        }}
+        animateAppearance={animate}
+      />
+    );
 
-		render(wrapWithProviders(modalContent), rootDiv);
-	};
+    render(wrapWithProviders(modalContent), rootDiv);
+  };
 
-	renderModal(props, true);
+  renderModal(props, true);
 
-	const modalControls: ModalUpdate<ModalProps<T>> = {
-		update(newProps: ModalProps<T>) {
-			renderModal({ ...props, ...(newProps ?? {}), visible: true }, false);
-		},
-		close() {
-			return modalRef.current?.hide();
-		},
-		get visible() {
-			return modalRef.current?.visible ?? false;
-		},
-	};
+  const modalControls: ModalUpdate<ModalProps<T>> = {
+    update(newProps: ModalProps<T>) {
+      renderModal({ ...props, ...(newProps ?? {}), visible: true }, false);
+    },
+    close() {
+      return modalRef.current?.hide();
+    },
+    get visible() {
+      return modalRef.current?.visible ?? false;
+    },
+  };
 
-	if (props.unique) {
-		UNIQUE_MODALS.set(props.unique, modalControls);
-	}
+  if (props.unique) {
+    UNIQUE_MODALS.set(props.unique, modalControls);
+  }
 
-	return modalControls;
+  return modalControls;
 };
 
 /**
  * Creates a confirmation modal with OK and Cancel buttons.
  */
-export const confirm = <T,>({
-	okText,
-	onOk,
-	cancelText,
-	onCancel,
-	buttonLook,
-	...props
-}: ConfirmProps<T>) => {
-	const modal = standaloneModal({
-		...props,
-		allowClose: false,
-		footer: (
-			<div className="flex gap-2 justify-end">
-				<Button
-					onClick={() => {
-						onCancel?.();
-						modal.close();
-					}}
-					variant="outlined"
-					className="min-w-[120px]"
-					autoFocus
-					aria-label={cancelText ?? "Cancel"}
-				>
-					{cancelText ?? "Cancel"}
-				</Button>
+export const confirm = <T,>({ okText, onOk, cancelText, onCancel, buttonLook, ...props }: ConfirmProps<T>) => {
+  const modal = standaloneModal({
+    ...props,
+    allowClose: false,
+    footer: (
+      <div className="flex gap-2 justify-end">
+        <Button
+          onClick={() => {
+            onCancel?.();
+            modal.close();
+          }}
+          variant="outlined"
+          className="min-w-[120px]"
+          autoFocus
+          aria-label={cancelText ?? "Cancel"}
+        >
+          {cancelText ?? "Cancel"}
+        </Button>
 
-				<Button
-					onClick={() => {
-						onOk?.();
-						modal.close();
-					}}
-					className="min-w-[120px]"
-					variant={buttonLook ?? "default"}
-					aria-label={okText ?? "Confirm"}
-				>
-					{okText ?? "OK"}
-				</Button>
-			</div>
-		),
-	});
+        <Button
+          onClick={() => {
+            onOk?.();
+            modal.close();
+          }}
+          className="min-w-[120px]"
+          variant={buttonLook ?? "default"}
+          aria-label={okText ?? "Confirm"}
+        >
+          {okText ?? "OK"}
+        </Button>
+      </div>
+    ),
+  });
 
-	return modal;
+  return modal;
 };
 
 /**
  * Creates an informational modal with a single OK button.
  */
 export const info = <T,>({ okText, onOkPress, ...props }: InfoProps<T>) => {
-	const modal = standaloneModal({
-		...props,
-		footer: (
-			<div className="flex gap-2 justify-end">
-				<Button
-					onClick={() => {
-						onOkPress?.();
-						modal.close();
-					}}
-					variant="default"
-					className="min-w-[120px]"
-					aria-label={okText ?? "OK"}
-				>
-					{okText ?? "OK"}
-				</Button>
-			</div>
-		),
-	});
+  const modal = standaloneModal({
+    ...props,
+    footer: (
+      <div className="flex gap-2 justify-end">
+        <Button
+          onClick={() => {
+            onOkPress?.();
+            modal.close();
+          }}
+          variant="default"
+          className="min-w-[120px]"
+          aria-label={okText ?? "OK"}
+        >
+          {okText ?? "OK"}
+        </Button>
+      </div>
+    ),
+  });
 
-	return modal;
+  return modal;
 };
 
 export { standaloneModal as modal };
 export { Modal };
 
 Object.assign(Modal, {
-	info,
-	confirm,
-	modal: standaloneModal,
+  info,
+  confirm,
+  modal: standaloneModal,
 });

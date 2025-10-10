@@ -8,9 +8,9 @@ export { useModalControls } from "./ModalPopup";
 
 export type { ModalProps } from "./ModalPopup";
 export type {
-	ModalUpdate,
-	ExtraProps,
-	ConfirmProps,
-	InfoProps,
-	ModalUpdateProps,
+  ModalUpdate,
+  ExtraProps,
+  ConfirmProps,
+  InfoProps,
+  ModalUpdateProps,
 } from "./Modal";
