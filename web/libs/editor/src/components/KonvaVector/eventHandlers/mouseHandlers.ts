@@ -24,7 +24,6 @@ import {
   stageToImageCoordinates,
 } from "./utils";
 import { constrainPointToBounds } from "../utils/boundsChecking";
-import { VectorSelectionTracker } from "../VectorSelectionTracker";
 import { PointType } from "../types";
 
 export function createMouseDownHandler(props: EventHandlerProps, handledSelectionInMouseDown: { current: boolean }) {
@@ -270,9 +269,10 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
     // If we get here, we're not clicking on anything specific
     // Handle deselection based on transformer state
     if (!e.evt.ctrlKey && !e.evt.metaKey) {
-      // Use tracker for global selection management
-      const tracker = VectorSelectionTracker.getInstance();
-      tracker.selectPoints(props.instanceId || "unknown", new Set());
+      // Clear local selection state
+      props.setSelectedPoints?.(new Set());
+      props.setSelectedPointIndex?.(null);
+      props.onPointSelected?.(null);
 
       // Reset active point to the last physically added point when deselecting
       if (props.skeletonEnabled && props.initialPoints.length > 0) {
@@ -991,9 +991,10 @@ function handlePointSelectionFromIndex(
   // For now, just do single selection since we don't have access to modifier keys in mouse up
   // Multi-selection will be handled by the existing point selection logic in mouse down
 
-  // Use tracker for global selection management
-  const tracker = VectorSelectionTracker.getInstance();
-  tracker.selectPoints(props.instanceId || "unknown", new Set([pointIndex]));
+  // Update local selection state
+  props.setSelectedPoints?.(new Set([pointIndex]));
+  props.setSelectedPointIndex?.(pointIndex);
+  props.onPointSelected?.(pointIndex);
 
   // Update activePointId for skeleton mode - set the selected point as the active point
   if (pointIndex >= 0 && pointIndex < props.initialPoints.length) {

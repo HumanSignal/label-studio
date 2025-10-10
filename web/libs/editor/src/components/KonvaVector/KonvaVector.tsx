@@ -15,7 +15,6 @@ import { convertPoint } from "./pointManagement";
 import { normalizePoints, convertBezierToSimplePoints, isPointInPolygon } from "./utils";
 import { findClosestPointOnPath, getDistance } from "./eventHandlers/utils";
 import { PointCreationManager } from "./pointCreationManager";
-import { VectorSelectionTracker, type VectorInstance } from "./VectorSelectionTracker";
 import { calculateShapeBoundingBox } from "./utils/bezierBoundingBox";
 import { shouldClosePathOnPointClick, isActivePointEligibleForClosing } from "./eventHandlers/pointSelection";
 import type { BezierPoint, GhostPoint as GhostPointType, KonvaVectorProps, KonvaVectorRef } from "./types";
@@ -362,9 +361,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Initialize PointCreationManager instance
   const pointCreationManager = useMemo(() => new PointCreationManager(), []);
 
-  // Initialize VectorSelectionTracker
-  const tracker = useMemo(() => VectorSelectionTracker.getInstance(), []);
-
   // Compute if path is closed based on point references
   // A path is closed if the first point's prevPointId points to the last point
   const isPathClosed = useMemo(() => {
@@ -506,61 +502,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     }
   }, [drawingDisabled]);
 
-  // Stabilize functions for tracker registration
-  const getPoints = useCallback(() => initialPoints, [initialPoints]);
-  const updatePoints = useCallback(
-    (points: BezierPoint[]) => {
-      setInitialPoints(points);
-      onPointsChange?.(points);
-    },
-    [onPointsChange],
-  );
-  const setSelectedPointsStable = useCallback((selectedPoints: Set<number>) => {
-    setSelectedPoints(selectedPoints);
-  }, []);
-  const setSelectedPointIndexStable = useCallback((index: number | null) => {
-    setSelectedPointIndex(index);
-  }, []);
-  const getTransformStable = useCallback(() => transform, [transform]);
-  const getFitScaleStable = useCallback(() => fitScale, [fitScale]);
-  const getBoundsStable = useCallback(() => ({ width, height }), [width, height]);
-
-  // Register instance with tracker
-  useEffect(() => {
-    const vectorInstance: VectorInstance = {
-      id: instanceId,
-      getPoints,
-      updatePoints,
-      setSelectedPoints: setSelectedPointsStable,
-      setSelectedPointIndex: setSelectedPointIndexStable,
-      onPointSelected,
-      onTransformationComplete,
-      getTransform: getTransformStable,
-      getFitScale: getFitScaleStable,
-      getBounds: getBoundsStable,
-      constrainToBounds,
-    };
-
-    tracker.registerInstance(vectorInstance);
-
-    return () => {
-      tracker.unregisterInstance(instanceId);
-    };
-  }, [
-    instanceId,
-    tracker,
-    getPoints,
-    updatePoints,
-    setSelectedPointsStable,
-    setSelectedPointIndexStable,
-    onPointSelected,
-    onTransformationComplete,
-    getTransformStable,
-    getFitScaleStable,
-    getBoundsStable,
-    constrainToBounds,
-  ]);
-
   // Clear selection when component is disabled
   useEffect(() => {
     if (disabled) {
@@ -580,14 +521,18 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Handle transform mode - automatically select all points
   useEffect(() => {
     if (transformMode && initialPoints.length > 0) {
-      // Select all points using the tracker
+      // Select all points
       const allPointIndices = new Set(Array.from({ length: initialPoints.length }, (_, i) => i));
-      tracker.selectPoints(instanceId, allPointIndices);
+      setSelectedPoints(allPointIndices);
+      setSelectedPointIndex(null); // Multiple points selected
+      onPointSelected?.(null);
     } else if (!transformMode) {
       // Clear selection when exiting transform mode
-      tracker.selectPoints(instanceId, new Set());
+      setSelectedPoints(new Set());
+      setSelectedPointIndex(null);
+      onPointSelected?.(null);
     }
-  }, [transformMode, initialPoints.length, tracker, instanceId]);
+  }, [transformMode, initialPoints.length, onPointSelected]);
 
   const lastPos = useRef<{ x: number; y: number } | null>(null);
 
@@ -947,11 +892,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       return true;
     },
     selectPointsByIds: (pointIds: string[]) => {
-      // Check if this instance can have selection
-      if (!tracker.canInstanceHaveSelection(instanceId)) {
-        return; // Block the selection
-      }
-
       // Find the indices of the points with the given IDs
       const selectedIndices = new Set<number>();
       let primarySelectedIndex: number | null = null;
@@ -966,12 +906,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }
       }
 
-      // Use tracker for global selection management
-      tracker.selectPoints(instanceId, selectedIndices);
+      // Update local selection state
+      setSelectedPoints(selectedIndices);
+      setSelectedPointIndex(selectedIndices.size === 1 ? primarySelectedIndex : null);
+      onPointSelected?.(selectedIndices.size === 1 ? primarySelectedIndex : null);
     },
     clearSelection: () => {
-      // Use tracker for global selection management
-      tracker.selectPoints(instanceId, new Set());
+      // Clear local selection state
+      setSelectedPoints(new Set());
+      setSelectedPointIndex(null);
+      onPointSelected?.(null);
     },
     getSelectedPointIds: () => {
       const selectedIds: string[] = [];
@@ -1436,7 +1380,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
   // Create event handlers
   const eventHandlers = createEventHandlers({
-    instanceId,
     initialPoints,
     width,
     height,
@@ -1706,11 +1649,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         onPointClick={(e, pointIndex) => {
           // Handle point selection even when disabled (similar to shape clicks)
           if (disabled) {
-            // Check if this instance can have selection
-            if (!tracker.canInstanceHaveSelection(instanceId)) {
-              return; // Block the selection
-            }
-
             // Check if we're about to close the path - prevent point selection in this case
             if (
               shouldClosePathOnPointClick(
@@ -1760,10 +1698,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               // Add to multi-selection
               const newSelection = new Set(selectedPoints);
               newSelection.add(pointIndex);
-              tracker.selectPoints(instanceId, newSelection);
+              setSelectedPoints(newSelection);
+              setSelectedPointIndex(null);
+              onPointSelected?.(null);
             } else {
               // Select only this point
-              tracker.selectPoints(instanceId, new Set([pointIndex]));
+              setSelectedPoints(new Set([pointIndex]));
+              setSelectedPointIndex(pointIndex);
+              onPointSelected?.(pointIndex);
             }
 
             // Call the original onClick handler if provided
