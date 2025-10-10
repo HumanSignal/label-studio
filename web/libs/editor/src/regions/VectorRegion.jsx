@@ -54,6 +54,12 @@ const Model = types
 
     // Internal flag to detect if we converted data back from relative points
     converted: false,
+
+    // Transform mode -- virtual mode to allow transforming the shape as whole (rotate, resize, translate)
+    // - when transforming -- user can resize, translate or rotate entire shape (all points at once)
+    // - when NOT transforming -- user works on individual points, moving them, adding, removing, etc.
+    // Every shape is in transform mode by default except for newly drawn one
+    transformMode: true,
   })
   .volatile(() => ({
     mouseOverStartPoint: false,
@@ -256,6 +262,7 @@ const Model = types
       },
 
       _selectArea(additiveMode = false) {
+        self.transformMode = true;
         const annotation = self.annotation;
         if (!annotation) return;
 
@@ -491,6 +498,14 @@ const Model = types
         }
         tool?.complete();
       },
+
+      toggleTransformMode() {
+        self.setTransformMode(!self.transformMode);
+      },
+
+      setTransformMode(transformMode) {
+        self.transformMode = transformMode;
+      },
     };
   });
 
@@ -515,6 +530,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
   const stageWidth = image?.naturalWidth ?? 0;
   const stageHeight = image?.naturalHeight ?? 0;
   const { x: offsetX, y: offsetY } = item.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
+  const disabled = item.disabled || suggestion || store.annotationStore.selected.isLinkingMode;
 
   // Wait for stage to be properly initialized
   if (!item.parent?.stageWidth || !item.parent?.stageHeight) {
@@ -555,8 +571,10 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               stage.container().style.cursor = Constants.DEFAULT_CURSOR;
             }
 
-            item.setHighlight(false);
-            item.onClickRegion(e);
+            if (!item.selected) {
+              item.setHighlight(false);
+              item.onClickRegion(e);
+            }
           }}
           onMouseEnter={() => {
             if (store.annotationStore.selected.isLinkingMode) {
@@ -571,7 +589,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             item.updateCursor();
           }}
           onDblClick={(e) => {
-            console.log("double click");
+            item.toggleTransformMode();
           }}
           closed={item.closed}
           width={stageWidth}
@@ -593,7 +611,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           opacity={Number.parseFloat(item.control?.opacity || "1")}
           pixelSnapping={item.control?.snap === "pixel"}
           constrainToBounds={item.control?.constrainToBounds ?? true}
-          disabled={item.disabled || suggestion || store.annotationStore.selected.isLinkingMode}
+          disabled={disabled}
+          transformMode={!disabled && item.transformMode}
           // Point styling - customize point appearance based on control settings
           pointRadius={item.pointRadiusFromSize}
           pointFill={item.selected ? "#ffffff" : "#f8fafc"}

@@ -245,6 +245,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     pixelSnapping = false,
     disabled = false,
     constrainToBounds = false,
+    transformMode = false,
     pointRadius,
     pointFill = DEFAULT_POINT_FILL,
     pointStroke = DEFAULT_POINT_STROKE,
@@ -405,9 +406,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Determine if drawing should be disabled based on current interaction context
   const isDrawingDisabled = () => {
     // Disable all interactions when disabled prop is true
+    // Disable drawing when in transform mode
     // Disable drawing when Shift is held (for Shift+click functionality)
     // Disable drawing when multiple points are selected
-    if (disabled || isShiftKeyHeld || selectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
+    if (disabled || transformMode || isShiftKeyHeld || selectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
       return true;
     }
 
@@ -574,6 +576,19 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       setVisibleControlPoints(new Set());
     }
   }, [disabled]);
+
+  // Handle transform mode - automatically select all points
+  useEffect(() => {
+    if (transformMode && initialPoints.length > 0) {
+      // Select all points using the tracker
+      const allPointIndices = new Set(Array.from({ length: initialPoints.length }, (_, i) => i));
+      tracker.selectPoints(instanceId, allPointIndices);
+    } else if (!transformMode) {
+      // Clear selection when exiting transform mode
+      tracker.selectPoints(instanceId, new Set());
+    }
+  }, [transformMode, initialPoints.length, tracker, instanceId]);
+
   const lastPos = useRef<{ x: number; y: number } | null>(null);
 
   // Set up Transformer nodes once when selection changes

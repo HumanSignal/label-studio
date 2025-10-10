@@ -211,6 +211,8 @@ export interface KonvaVectorProps {
   disabled?: boolean;
   /** Constrain points to stay within image bounds */
   constrainToBounds?: boolean;
+  /** Enable transform mode - automatically selects all points and shows transformer */
+  transformMode?: boolean;
   /** Ref to access component methods */
   ref?: React.RefObject<KonvaVectorRef>;
 }
