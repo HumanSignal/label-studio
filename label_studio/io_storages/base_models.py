@@ -545,6 +545,7 @@ class ImportStorage(Storage):
         )
 
         tasks_for_webhook = []
+        keys_for_existed_count = []
         for key in self.iter_keys():
             # w/o Dataflow
             # pubsub.push(topic, key)
@@ -553,9 +554,12 @@ class ImportStorage(Storage):
             self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
 
             # skip if key has already been synced
-            if n_tasks_linked := link_class.n_tasks_linked(key, self):
-                logger.debug(f'{self.__class__.__name__} already has {n_tasks_linked} tasks linked to {key=}')
-                tasks_existed += n_tasks_linked  # update progress counter
+            if link_class.exists(key, self):
+                logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
+                keys_for_existed_count.append(key)
+            if len(keys_for_existed_count) >= settings.STORAGE_EXISTED_COUNT_BATCH_SIZE:
+                tasks_existed += link_class.objects.filter(key__in=keys_for_existed_count, storage=self.id).count()
+                keys_for_existed_count = []
                 continue
 
             logger.debug(f'{self}: found new key {key}')
@@ -625,6 +629,8 @@ class ImportStorage(Storage):
             emit_webhooks_for_instance(
                 self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
             )
+        if keys_for_existed_count:
+            tasks_existed += link_class.objects.filter(key__in=keys_for_existed_count, storage=self.id).count()
 
         self.project.update_tasks_states(
             maximum_annotations_changed=False, overlap_cohort_percentage_changed=False, tasks_number_changed=True
@@ -878,10 +884,6 @@ class ImportStorageLink(models.Model):
 
     row_group = models.IntegerField(null=True, blank=True, help_text='Parquet row group')
     row_index = models.IntegerField(null=True, blank=True, help_text='Parquet row index, or JSON[L] object index')
-
-    @classmethod
-    def n_tasks_linked(cls, key, storage):
-        return cls.objects.filter(key=key, storage=storage.id).count()
 
     @classmethod
     def create(cls, task, key, storage, row_index=None, row_group=None):
