@@ -4,14 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { API } from "apps/labelstudio/src/providers/ApiProvider";
 import { useMemo } from "react";
 import type { WrappedResponse } from "@humansignal/core/lib/api-proxy/types";
-import { useCurrentUserAtom } from "@humansignal/core/lib/hooks/useCurrentUser";
+import { useAuth } from "@humansignal/core/providers/AuthProvider";
 
 function formatDate(date?: string) {
   return format(new Date(date ?? ""), "dd MMM yyyy, KK:mm a");
 }
 
 export const MembershipInfo = () => {
-  const { user } = useCurrentUserAtom();
+  const { user } = useAuth();
   const dateJoined = useMemo(() => {
     if (!user?.date_joined) return null;
     return formatDate(user?.date_joined);
