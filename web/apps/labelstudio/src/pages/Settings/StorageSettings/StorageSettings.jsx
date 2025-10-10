@@ -1,6 +1,8 @@
 import { Typography } from "@humansignal/ui";
 import { useEffect, useRef } from "react";
 import { useHistory, useLocation } from "react-router-dom";
+import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
+import { useProject } from "../../../providers/ProjectProvider";
 import { cn } from "../../../utils/bem";
 import { isInLicense, LF_CLOUD_STORAGE_FOR_MANAGERS } from "../../../utils/license-flags";
 import { StorageSet } from "./StorageSet";
@@ -8,10 +10,13 @@ import { StorageSet } from "./StorageSet";
 const isAllowCloudStorage = !isInLicense(LF_CLOUD_STORAGE_FOR_MANAGERS);
 
 export const StorageSettings = () => {
+  const { project } = useProject();
   const rootClass = cn("storage-settings"); // TODO: Remove in the next BEM cleanup
   const history = useHistory();
   const location = useLocation();
   const sourceStorageRef = useRef();
+
+  useUpdatePageTitle(createTitleFromSegments([project?.title, "Cloud Storage Settings"]));
 
   // Handle auto-open query parameter
   useEffect(() => {

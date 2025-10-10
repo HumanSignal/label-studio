@@ -191,6 +191,7 @@
     },
 
     {% block app_more_settings %}
+      page_title: "Label Studio",
       flags: {
         allow_organization_webhooks: {{settings.ALLOW_ORGANIZATION_WEBHOOKS|yesno:"true,false"}},
         storage_persistence: {{ settings.STORAGE_PERSISTENCE|yesno:"true,false" }}, 

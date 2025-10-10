@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
 import { FF_UNSAVED_CHANGES, isFF } from "../../utils/feature-flags";
@@ -11,6 +12,8 @@ export const LabelingSettings = () => {
   const [essentialDataChanged, setEssentialDataChanged] = useState(false);
   const hasChanges = isFF(FF_UNSAVED_CHANGES) && config !== project.label_config;
   const api = useAPI();
+
+  useUpdatePageTitle(createTitleFromSegments([project?.title, "Labeling Interface Settings"]));
 
   const saveConfig = useCallback(
     isFF(FF_UNSAVED_CHANGES)

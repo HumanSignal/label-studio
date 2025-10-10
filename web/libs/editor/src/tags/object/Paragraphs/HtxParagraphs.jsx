@@ -2,14 +2,7 @@ import React, { Component, useCallback } from "react";
 import { inject, observer } from "mobx-react";
 
 import ObjectTag from "../../../components/Tags/Object";
-import {
-  FF_DEV_2669,
-  FF_DEV_2918,
-  FF_LSDV_4711,
-  FF_LSDV_E_278,
-  FF_NER_SELECT_ALL,
-  isFF,
-} from "../../../utils/feature-flags";
+import { FF_DEV_2669, FF_DEV_2918, FF_LSDV_E_278, FF_NER_SELECT_ALL, isFF } from "../../../utils/feature-flags";
 import { findNodeAt, matchesSelector, splitBoundaries } from "../../../utils/html";
 import { patchPlayPauseMethods } from "../../../utils/patchPlayPauseMethods";
 import { isSelectionContainsSpan } from "../../../utils/selection-tools";
@@ -24,10 +17,8 @@ import { cnm } from "@humansignal/shad/utils";
 import { ff } from "@humansignal/core";
 import { useHotkey } from "../../../hooks/useHotkey";
 
-const audioDefaultProps = {};
+const audioDefaultProps = { crossOrigin: "anonymous" };
 const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
-
-if (isFF(FF_LSDV_4711)) audioDefaultProps.crossOrigin = "anonymous";
 
 // Separate functional component to handle hotkeys
 const ParagraphHotkeys = ({ item }) => {
