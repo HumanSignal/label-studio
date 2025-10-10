@@ -539,9 +539,12 @@ class ImportStorage(Storage):
         max_inner_id = (task.inner_id + 1) if task else 1
         validation_errors = []
 
-        # Check feature flag once for the entire sync process
+        # Check feature flags once for the entire sync process
         check_file_extension = flag_set(
             'fflag_fix_back_plt_804_check_file_extension_11072025_short', user=self.project.organization.created_by
+        )
+        existed_count_flag_set = flag_set(
+            'fflag_root_212_reduce_importstoragelink_counts', user=self.project.organization.created_by
         )
 
         tasks_for_webhook = []
@@ -556,12 +559,15 @@ class ImportStorage(Storage):
             # skip if key has already been synced
             if link_class.exists(key, self):
                 logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
-                keys_for_existed_count.append(key)
-                if len(keys_for_existed_count) >= settings.STORAGE_EXISTED_COUNT_BATCH_SIZE:
-                    tasks_existed += link_class.objects.filter(
-                        key__in=keys_for_existed_count, storage_id=self.id
-                    ).count()
-                    keys_for_existed_count = []
+                if existed_count_flag_set:
+                    keys_for_existed_count.append(key)
+                    if len(keys_for_existed_count) >= settings.STORAGE_EXISTED_COUNT_BATCH_SIZE:
+                        tasks_existed += link_class.objects.filter(
+                            key__in=keys_for_existed_count, storaged=self.id
+                        ).count()
+                        keys_for_existed_count = []
+                else:
+                    tasks_existed += link_class.objects.filter(key=key, storage=self.id).count()
                 continue
 
             logger.debug(f'{self}: found new key {key}')
