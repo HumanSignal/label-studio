@@ -1,6 +1,5 @@
-import { ToastType, useToast } from "@humansignal/ui";
+import { ToastType, useToast, confirm } from "@humansignal/ui";
 // @ts-ignore
-import { confirm } from "apps/labelstudio/src/components/Modal/Modal";
 import { useAPI } from "@humansignal/core";
 import { useCallback, useEffect, useState } from "react";
 import {
