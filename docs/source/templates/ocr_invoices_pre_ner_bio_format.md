@@ -3,7 +3,7 @@ title: OCR Invoices Pre-NER BIO Format
 type: templates
 category: Community Contributions
 cat: community
-order: 1002
+order: 1003
 meta_title: OCR Invoices Pre-NER BIO Format Data Labeling Template
 meta_description: Template for ocr invoices pre-ner bio format with Label Studio
 community: true

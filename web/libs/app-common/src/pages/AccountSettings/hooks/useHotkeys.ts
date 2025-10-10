@@ -1,7 +1,7 @@
 import { ToastType, useToast } from "@humansignal/ui";
 // @ts-ignore
 import { confirm } from "apps/labelstudio/src/components/Modal/Modal";
-import { useAPI } from "apps/labelstudio/src/providers/ApiProvider";
+import { useAPI } from "@humansignal/core";
 import { useCallback, useEffect, useState } from "react";
 import {
   type ApiResponse,

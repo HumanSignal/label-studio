@@ -1,7 +1,6 @@
 import { observer } from "mobx-react";
 import { forwardRef, useCallback, useMemo } from "react";
 import { Block, Elem } from "../../utils/bem";
-import { FF_LSDV_4711, isFF } from "../../utils/feature-flags";
 import messages from "../../utils/messages";
 import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
 import "./Image.scss";
@@ -77,9 +76,7 @@ const ImageProgress = observer(({ downloading, progress, error, src, usedValue }
   ) : null;
 });
 
-const imgDefaultProps = {};
-
-if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = "anonymous";
+const imgDefaultProps = { crossOrigin: "anonymous" };
 
 const ImageRenderer = observer(
   forwardRef(({ src, onLoad, imageTransform, isLoaded }, ref) => {
@@ -95,7 +92,11 @@ const ImageRenderer = observer(
         clip: "rect(1px, 1px, 1px, 1px)",
       };
 
-      return { ...style, maxWidth: "unset", visibility: isLoaded ? "visible" : "hidden" };
+      return {
+        ...style,
+        maxWidth: "unset",
+        visibility: isLoaded ? "visible" : "hidden",
+      };
     }, [imageTransform, isLoaded]);
 
     // biome-ignore lint/a11y/noRedundantAlt: The use of this component justifies this alt text

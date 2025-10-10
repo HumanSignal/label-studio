@@ -199,6 +199,14 @@ export const create = (columns) => {
           getRoot(self).SDK.invoke("assignedStreamFinished");
         }
 
+        const isLabelStream = getRoot(self).SDK?.mode === "labelstream";
+        if (isLabelStream) {
+          const selectedAnnotationID = getRoot(self).annotationStore.selected?.id;
+          console.log(
+            `[LABEL STREAM] ${task.queue}, task ${task.id}, project ${task.project}, user ${getRoot(self).LSF.lsf.user.id}${selectedAnnotationID ? `, annotation ${selectedAnnotationID}` : ""}`,
+          );
+        }
+
         return task;
       }),
 
