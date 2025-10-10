@@ -69,7 +69,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = Task
-        exclude = ('overlap', 'is_labeled')
+        exclude = ('overlap', 'is_labeled', 'precomputed_agreement')
         expandable_fields = {
             'drafts': (AnnotationDraftSerializer, {'many': True}),
             'predictions': (PredictionSerializer, {'many': True}),
