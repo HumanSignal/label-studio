@@ -3,7 +3,7 @@ title: HTML NER Tagging
 type: templates
 category: Community Contributions
 cat: community
-order: 1000
+order: 1001
 meta_title: HTML NER Tagging Data Labeling Template
 meta_description: Template for html ner tagging with Label Studio
 community: true

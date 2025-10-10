@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@humansignal/ui/lib/card-new/card";
 import { useMemo, isValidElement } from "react";
 import { Redirect, Route, Switch, useParams, useRouteMatch } from "react-router-dom";
+import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import styles from "./AccountSettings.module.scss";
 import { accountSettingsSections } from "./sections";
 import { HotkeysHeaderButtons } from "./sections/Hotkeys";
@@ -31,6 +32,26 @@ const AccountSettingsSection = () => {
     () => resolvedSections.find((section) => section.id === sectionId),
     [resolvedSections, sectionId],
   );
+
+  // Update page title to reflect the current section
+  const pageTitleText = useMemo(() => {
+    if (!currentSection) return "My Account";
+
+    // If title is a string, use it directly
+    if (typeof currentSection.title === "string") {
+      return createTitleFromSegments([currentSection.title, "My Account"]);
+    }
+
+    // For non-string titles (like JSX elements), derive from the section ID
+    const titleFromId = currentSection.id
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+
+    return createTitleFromSegments([titleFromId, "My Account"]);
+  }, [currentSection]);
+
+  useUpdatePageTitle(pageTitleText);
 
   if (!currentSection && resolvedSections.length > 0) {
     return <Redirect to={`${AccountSettingsPage.path}/${resolvedSections[0].id}`} />;

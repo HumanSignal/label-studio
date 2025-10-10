@@ -1,5 +1,6 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Button } from "@humansignal/ui";
+import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { Form, TextArea, Toggle } from "../../components/Form";
 import { MenubarContext } from "../../components/Menubar/Menubar";
 import { Block, Elem } from "../../utils/bem";
@@ -13,6 +14,8 @@ export const AnnotationSettings = () => {
   const pageContext = useContext(MenubarContext);
   const formRef = useRef();
   const [collab, setCollab] = useState(null);
+
+  useUpdatePageTitle(createTitleFromSegments([project?.title, "Annotation Settings"]));
 
   useEffect(() => {
     pageContext.setProps({ formRef });

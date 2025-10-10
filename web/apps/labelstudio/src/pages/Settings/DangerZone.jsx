@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useHistory } from "react-router";
 import { Button } from "@humansignal/ui";
+import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { Label } from "../../components/Form";
 import { confirm } from "../../components/Modal/Modal";
 import { Spinner } from "../../components/Spinner/Spinner";
@@ -13,6 +14,8 @@ export const DangerZone = () => {
   const api = useAPI();
   const history = useHistory();
   const [processing, setProcessing] = useState(null);
+
+  useUpdatePageTitle(createTitleFromSegments([project?.title, "Danger Zone"]));
 
   const handleOnClick = (type) => () => {
     confirm({
