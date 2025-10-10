@@ -53,7 +53,7 @@ export const PersonalAccessToken = () => {
         <div>
           <Label text="Access Token" className={styles.label} />
           <div className="flex gap-2 w-full justify-between">
-            <Input name="token" className={styles.input} readOnly value={token} />
+            <Input name="token" className={styles.input} readOnly value={token ?? ""} />
             <Button
               leading={<IconFileCopy />}
               onClick={() => copyToken()}
@@ -77,7 +77,7 @@ export const PersonalAccessToken = () => {
               readOnly
               className={styles.textarea}
               rawClassName={styles.textarea}
-              value={curl}
+              value={curl ?? ""}
             />
             <Button
               leading={<IconFileCopy />}
