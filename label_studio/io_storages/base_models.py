@@ -541,10 +541,10 @@ class ImportStorage(Storage):
 
         # Check feature flags once for the entire sync process
         check_file_extension = flag_set(
-            'fflag_fix_back_plt_804_check_file_extension_11072025_short', user=self.project.organization.created_by
+            'fflag_fix_back_plt_804_check_file_extension_11072025_short', organization=self.project.organization
         )
         existed_count_flag_set = flag_set(
-            'fflag_root_212_reduce_importstoragelink_counts', user=self.project.organization.created_by
+            'fflag_root_212_reduce_importstoragelink_counts', organization=self.project.organization
         )
 
         tasks_for_webhook = []
