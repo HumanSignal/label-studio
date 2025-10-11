@@ -563,7 +563,7 @@ class ImportStorage(Storage):
                     keys_for_existed_count.append(key)
                     if len(keys_for_existed_count) >= settings.STORAGE_EXISTED_COUNT_BATCH_SIZE:
                         tasks_existed += link_class.objects.filter(
-                            key__in=keys_for_existed_count, storaged=self.id
+                            key__in=keys_for_existed_count, storage=self.id
                         ).count()
                         keys_for_existed_count = []
                 else:
