@@ -1543,7 +1543,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       {/* Unified vector shape - renders all lines based on id-prevPointId relationships */}
       {name?.includes('_transformable') ? (
-        <Group name={name}>
+        <Group name={name} onTransformEnd={onTransformEnd}>
           <VectorShape
             segments={getAllLineSegments()}
             allowClose={allowClose}
@@ -1555,7 +1555,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             name={undefined}
-            onTransformEnd={onTransformEnd}
             onClick={(e) => {
               // Mark that VectorShape handled the click
               shapeHandledClick.current = true;

@@ -213,11 +213,87 @@ export default class TransformerComponent extends Component {
             };
           }}
           dragBoundFunc={this.dragBoundFunc}
-          onDragEnd={() => {
+          onDragEnd={(e) => {
+            console.log("ImageTransformer onDragEnd triggered");
+            // Apply translation to each selected region
+            const { item: { selectedRegions } } = this.props;
+
+            if (selectedRegions && selectedRegions.length > 0) {
+              selectedRegions.forEach((region) => {
+                if (region.applyTransform) {
+                  // Get the transformation data from the transformer
+                  const nodes = this.transformer.nodes();
+                  const node = nodes.find(n => n.hasName(region.id));
+
+                  if (node) {
+                    const dx = node.getAttr("x", 0);
+                    const dy = node.getAttr("y", 0);
+                    const scaleX = node.getAttr("scaleX", 1);
+                    const scaleY = node.getAttr("scaleY", 1);
+                    const rotation = node.getAttr("rotation", 0);
+
+                    // Call the region's applyTransform method
+                    region.applyTransform({
+                      dx,
+                      dy,
+                      scaleX,
+                      scaleY,
+                      rotation,
+                    });
+
+                    // Reset transform attributes
+                    node.setAttr("x", 0);
+                    node.setAttr("y", 0);
+                    node.setAttr("scaleX", 1);
+                    node.setAttr("scaleY", 1);
+                    node.setAttr("rotation", 0);
+                  }
+                }
+              });
+            }
+
             this.unfreeze();
             setTimeout(this.checkNode);
           }}
-          onTransformEnd={() => {
+          onTransformEnd={(e) => {
+            console.log("ImageTransformer onTransformEnd triggered");
+            // Apply transformation to each selected region
+            const { item: { selectedRegions } } = this.props;
+
+            if (selectedRegions && selectedRegions.length > 0) {
+              selectedRegions.forEach((region) => {
+                if (region.applyTransform) {
+                  // Get the transformation data from the transformer
+                  const nodes = this.transformer.nodes();
+                  const node = nodes.find(n => n.hasName(region.id));
+
+                  if (node) {
+                    const dx = node.getAttr("x", 0);
+                    const dy = node.getAttr("y", 0);
+                    const scaleX = node.getAttr("scaleX", 1);
+                    const scaleY = node.getAttr("scaleY", 1);
+                    const rotation = node.getAttr("rotation", 0);
+
+                    // Call the region's applyTransform method
+                    region.applyTransform({
+                      dx,
+                      dy,
+                      scaleX,
+                      scaleY,
+                      rotation,
+                    });
+
+                    // Reset transform attributes
+                    node.setAttr("x", 0);
+                    node.setAttr("y", 0);
+                    node.setAttr("scaleX", 1);
+                    node.setAttr("scaleY", 1);
+                    node.setAttr("rotation", 0);
+                  }
+                }
+              });
+            }
+
             setTimeout(this.checkNode);
           }}
           backSelector={this.props.draggableBackgroundSelector}
@@ -261,11 +337,87 @@ export default class TransformerComponent extends Component {
             };
           }}
           dragBoundFunc={this.dragBoundFunc}
-          onDragEnd={() => {
+          onDragEnd={(e) => {
+            console.log("ImageTransformer onDragEnd triggered");
+            // Apply translation to each selected region
+            const { item: { selectedRegions } } = this.props;
+
+            if (selectedRegions && selectedRegions.length > 0) {
+              selectedRegions.forEach((region) => {
+                if (region.applyTransform) {
+                  // Get the transformation data from the transformer
+                  const nodes = this.transformer.nodes();
+                  const node = nodes.find(n => n.hasName(region.id));
+
+                  if (node) {
+                    const dx = node.getAttr("x", 0);
+                    const dy = node.getAttr("y", 0);
+                    const scaleX = node.getAttr("scaleX", 1);
+                    const scaleY = node.getAttr("scaleY", 1);
+                    const rotation = node.getAttr("rotation", 0);
+
+                    // Call the region's applyTransform method
+                    region.applyTransform({
+                      dx,
+                      dy,
+                      scaleX,
+                      scaleY,
+                      rotation,
+                    });
+
+                    // Reset transform attributes
+                    node.setAttr("x", 0);
+                    node.setAttr("y", 0);
+                    node.setAttr("scaleX", 1);
+                    node.setAttr("scaleY", 1);
+                    node.setAttr("rotation", 0);
+                  }
+                }
+              });
+            }
+
             this.unfreeze();
             setTimeout(this.checkNode);
           }}
-          onTransformEnd={() => {
+          onTransformEnd={(e) => {
+            console.log("ImageTransformer onTransformEnd triggered");
+            // Apply transformation to each selected region
+            const { item: { selectedRegions } } = this.props;
+
+            if (selectedRegions && selectedRegions.length > 0) {
+              selectedRegions.forEach((region) => {
+                if (region.applyTransform) {
+                  // Get the transformation data from the transformer
+                  const nodes = this.transformer.nodes();
+                  const node = nodes.find(n => n.hasName(region.id));
+
+                  if (node) {
+                    const dx = node.getAttr("x", 0);
+                    const dy = node.getAttr("y", 0);
+                    const scaleX = node.getAttr("scaleX", 1);
+                    const scaleY = node.getAttr("scaleY", 1);
+                    const rotation = node.getAttr("rotation", 0);
+
+                    // Call the region's applyTransform method
+                    region.applyTransform({
+                      dx,
+                      dy,
+                      scaleX,
+                      scaleY,
+                      rotation,
+                    });
+
+                    // Reset transform attributes
+                    node.setAttr("x", 0);
+                    node.setAttr("y", 0);
+                    node.setAttr("scaleX", 1);
+                    node.setAttr("scaleY", 1);
+                    node.setAttr("rotation", 0);
+                  }
+                }
+              });
+            }
+
             setTimeout(this.checkNode);
           }}
           backSelector={this.props.draggableBackgroundSelector}

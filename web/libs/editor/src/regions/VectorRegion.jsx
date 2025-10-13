@@ -390,6 +390,51 @@ const Model = types
         return selection.length > 1;
       },
 
+      // Apply transformation from ImageTransformer
+      applyTransform(transformation) {
+        console.log("applying transfomations", transformation);
+        if (!self.vectorRef) return;
+
+        const { dx, dy, scaleX, scaleY, rotation } = transformation;
+
+        // Check if transformation values are reasonable (not already applied)
+        // If dx/dy are very large, it means the transformation was already applied by Konva
+        const isTranslationReasonable = Math.abs(dx) < 1000 && Math.abs(dy) < 1000;
+        const isScaleReasonable = scaleX > 0.1 && scaleX < 10 && scaleY > 0.1 && scaleY < 10;
+
+        console.log("transformation check:", { isTranslationReasonable, isScaleReasonable });
+
+        // Only apply transformation if values are reasonable
+        if (!isTranslationReasonable || !isScaleReasonable) {
+          console.log("Skipping transformation - values seem already applied");
+          return;
+        }
+
+        // Get the bounding box center for rotation/scale origin
+        const bbox = self.bboxCoords || self.bbox;
+        if (!bbox) return;
+
+        // Use the same coordinate system as translation - no conversion needed
+        // The bbox is already in the correct coordinate system for KonvaVector
+        const centerX = (bbox.left + bbox.right) / 2;
+        const centerY = (bbox.top + bbox.bottom) / 2;
+
+        console.log("bbox center:", { centerX, centerY });
+        console.log("transformation values:", { dx, dy, scaleX, scaleY, rotation });
+
+        // Apply transformations using the same approach as translation
+        // Use raw values directly - Konva transformer already handled coordinate conversion
+        self.vectorRef.transformPoints({
+          dx: dx,
+          dy: dy,
+          rotation: rotation,
+          scaleX: scaleX,
+          scaleY: scaleY,
+          centerX: centerX,
+          centerY: centerY,
+        });
+      },
+
       segGroupRef(ref) {
         self.groupRef = ref;
       },
@@ -606,6 +651,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             item.toggleTransformMode();
           }}
           onTransformEnd={(e) => {
+            console.log("transform end");
             if (!isMultiRegionSelected) return;
             if (e.target !== e.currentTarget) return;
 
@@ -627,8 +673,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             // Apply transformation using KonvaVector ref methods
             if (item.vectorRef) {
               // Convert canvas coordinates to image coordinates (KonvaVector uses image coords)
-              const imageDx = item.parent.canvasToImageX(dx) - item.parent.canvasToImageX(0);
-              const imageDy = item.parent.canvasToImageY(dy) - item.parent.canvasToImageY(0);
+              const imageDx = item.parent.canvasToInternalX(dx);
+              const imageDy = item.parent.canvasToInternalY(dy);
 
               // Use transformPoints method to apply all transformations at once
               // This ensures onPointsChange is called only once with the final result
