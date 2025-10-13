@@ -73,6 +73,7 @@ const Model = types
     isDrawing: false,
     vectorRef: null,
     groupRef: null,
+    selectedVertices: [],
   }))
   .views((self) => ({
     get store() {
@@ -88,13 +89,21 @@ const Model = types
     get bbox() {
       if (!self.vertices?.length || !isAlive(self)) return {};
 
-      // Calculate bounding box from vector points
-      const bbox = self.vectorRef?.getShapeBoundingBox() ?? {};
-
-      // Ensure we have valid coordinates
-      if (bbox.left === undefined || bbox.top === undefined) {
-        return {};
-      }
+      // Calculate bounding box directly from vertices (similar to PolygonRegion)
+      const bbox = self.vertices.reduce(
+        (bboxCoords, point) => ({
+          left: Math.min(bboxCoords.left, point.x),
+          top: Math.min(bboxCoords.top, point.y),
+          right: Math.max(bboxCoords.right, point.x),
+          bottom: Math.max(bboxCoords.bottom, point.y),
+        }),
+        {
+          left: self.vertices[0].x,
+          top: self.vertices[0].y,
+          right: self.vertices[0].x,
+          bottom: self.vertices[0].y,
+        },
+      );
 
       return bbox;
     },
@@ -258,7 +267,9 @@ const Model = types
           .map((p) => p.id);
 
         const vector = self.vectorRef;
-        vector?.selectPointsByIds(selectedPoints);
+        const selectionSize = self.annotation.regionStore.selection.size;
+
+        self.selectedVertices = selectionSize > 1 ? [] : selectedPoints;
       },
 
       _selectArea(additiveMode = false) {
@@ -609,25 +620,27 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             const bbox = item.bbox;
             if (!bbox) return;
 
-            const centerX = (bbox.left + bbox.right) / 2;
-            const centerY = (bbox.top + bbox.bottom) / 2;
+            // Convert bbox center to image coordinates (KonvaVector uses image coords)
+            const centerX = item.parent.internalToImageX((bbox.left + bbox.right) / 2);
+            const centerY = item.parent.internalToImageY((bbox.top + bbox.bottom) / 2);
 
             // Apply transformation using KonvaVector ref methods
             if (item.vectorRef) {
-              // First apply rotation if any
-              if (rotation !== 0) {
-                item.vectorRef.rotatePoints(rotation, centerX, centerY);
-              }
+              // Convert canvas coordinates to image coordinates (KonvaVector uses image coords)
+              const imageDx = item.parent.canvasToImageX(dx) - item.parent.canvasToImageX(0);
+              const imageDy = item.parent.canvasToImageY(dy) - item.parent.canvasToImageY(0);
 
-              // Then apply scaling if any
-              if (scaleX !== 1 || scaleY !== 1) {
-                item.vectorRef.scalePoints(scaleX, scaleY, centerX, centerY);
-              }
-
-              // Finally apply translation if any
-              if (dx !== 0 || dy !== 0) {
-                item.vectorRef.translatePoints(dx, dy);
-              }
+              // Use transformPoints method to apply all transformations at once
+              // This ensures onPointsChange is called only once with the final result
+              item.vectorRef.transformPoints({
+                dx: imageDx,
+                dy: imageDy,
+                rotation: rotation,
+                scaleX: scaleX,
+                scaleY: scaleY,
+                centerX: centerX,
+                centerY: centerY,
+              });
             }
 
             // Reset transform attributes
@@ -637,6 +650,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             t.setAttr("scaleY", 1);
             t.setAttr("rotation", 0);
           }}
+          selectedPoints={item.annotation.regionStore.selection.size > 1 ? [] : item.selectedVertices}
           closed={item.closed}
           width={stageWidth}
           height={stageHeight}
@@ -658,7 +672,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           pixelSnapping={item.control?.snap === "pixel"}
           constrainToBounds={item.control?.constrainToBounds ?? true}
           disabled={disabled}
-          transformMode={!disabled && !item.inSelection && item.transformMode && !isMultiRegionSelected}
+          transformMode={!disabled && item.transformMode && !isMultiRegionSelected}
           // Point styling - customize point appearance based on control settings
           pointRadius={item.pointRadiusFromSize}
           pointFill={item.selected ? "#ffffff" : "#f8fafc"}

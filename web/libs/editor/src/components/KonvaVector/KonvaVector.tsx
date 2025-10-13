@@ -215,6 +215,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     onPathClosedChange,
     onTransformationComplete,
     onPointSelected,
+    selectedPoints: externalSelectedPoints,
+    onSelectionChange,
     onFinish,
     scaleX,
     scaleY,
@@ -274,9 +276,39 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     }
   }, [initialPoints.length, skeletonEnabled]); // Only run when the number of points changes or skeleton mode changes
 
-  // Use initialPoints directly - this will update when the parent re-renders
-  const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
-  const [selectedPoints, setSelectedPoints] = useState<Set<number>>(new Set());
+  // Internal selection state
+  const [internalSelectedPointIndex, setInternalSelectedPointIndex] = useState<number | null>(null);
+  const [internalSelectedPoints, setInternalSelectedPoints] = useState<Set<number>>(new Set());
+
+  // Use external selection if provided, otherwise use internal state
+  const selectedPointIndex = externalSelectedPoints ?
+    (externalSelectedPoints.length === 1 ?
+      initialPoints.findIndex(p => p.id === externalSelectedPoints[0]) : null) :
+    internalSelectedPointIndex;
+
+  const selectedPoints = externalSelectedPoints ?
+    new Set(externalSelectedPoints.map(id => initialPoints.findIndex(p => p.id === id)).filter(i => i !== -1)) :
+    internalSelectedPoints;
+
+  // Transform mode creates virtual selection (doesn't affect real selection state)
+  const virtualSelectedPoints = transformMode && initialPoints.length > 0 ?
+    new Set(Array.from({ length: initialPoints.length }, (_, i) => i)) :
+    selectedPoints;
+
+  // Helper functions to update selection (works with both internal and external state)
+  const updateSelection = useCallback((newSelectedPoints: Set<number>, newSelectedPointIndex: number | null) => {
+    if (externalSelectedPoints) {
+      // External control - notify parent
+      const selectedIds = Array.from(newSelectedPoints).map(i => initialPoints[i]?.id).filter(Boolean);
+      onSelectionChange?.(selectedIds, newSelectedPointIndex);
+    } else {
+      // Internal control - update internal state
+      setInternalSelectedPoints(newSelectedPoints);
+      setInternalSelectedPointIndex(newSelectedPointIndex);
+    }
+    onPointSelected?.(newSelectedPointIndex);
+  }, [externalSelectedPoints, initialPoints, onSelectionChange, onPointSelected]);
+
   const [lastAddedPointId, setLastAddedPointId] = useState<string | null>(null);
 
   const transformerRef = useRef<Konva.Transformer>(null);
@@ -507,8 +539,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Clear selection when component is disabled
   useEffect(() => {
     if (disabled) {
-      setSelectedPointIndex(null);
-      setSelectedPoints(new Set());
+      updateSelection(new Set(), null);
       setVisibleControlPoints(new Set());
       setDraggedControlPoint(null);
       setGhostPoint(null);
@@ -518,37 +549,23 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Hide all Bezier control points when disabled
       setVisibleControlPoints(new Set());
     }
-  }, [disabled]);
+  }, [disabled, updateSelection]);
 
-  // Handle transform mode - automatically select all points
-  useEffect(() => {
-    if (transformMode && initialPoints.length > 0) {
-      // Select all points
-      const allPointIndices = new Set(Array.from({ length: initialPoints.length }, (_, i) => i));
-      setSelectedPoints(allPointIndices);
-      setSelectedPointIndex(null); // Multiple points selected
-      onPointSelected?.(null);
-    } else if (!transformMode) {
-      // Clear selection when exiting transform mode
-      setSelectedPoints(new Set());
-      setSelectedPointIndex(null);
-      onPointSelected?.(null);
-    }
-  }, [transformMode, initialPoints.length, onPointSelected]);
+  // Transform mode is now virtual - no need to actually select points
 
   const lastPos = useRef<{ x: number; y: number } | null>(null);
 
   // Set up Transformer nodes once when selection changes
   useEffect(() => {
     if (transformerRef.current) {
-      if (selectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
+      if (virtualSelectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
         // Use setTimeout to ensure proxy nodes are rendered first
         setTimeout(() => {
           if (transformerRef.current) {
             // Set up proxy nodes once - transformer will manage them independently
             // Use getAllPoints() to get the correct proxy nodes for all points
             const allPoints = getAllPoints();
-            const nodes = Array.from(selectedPoints)
+            const nodes = Array.from(virtualSelectedPoints)
               .map((index) => {
                 // Ensure the index is within bounds of all points
                 if (index < allPoints.length) {
@@ -575,7 +592,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }, TRANSFORMER_CLEAR_DELAY);
       }
     }
-  }, [selectedPoints]); // Only depend on selectedPoints, not initialPoints
+  }, [virtualSelectedPoints]); // Only depend on virtualSelectedPoints, not initialPoints
 
   // Note: We don't update proxy node positions during transformation
   // The transformer handles positioning the proxy nodes itself
@@ -908,16 +925,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }
       }
 
-      // Update local selection state
-      setSelectedPoints(selectedIndices);
-      setSelectedPointIndex(selectedIndices.size === 1 ? primarySelectedIndex : null);
-      onPointSelected?.(selectedIndices.size === 1 ? primarySelectedIndex : null);
+      // Update selection using the unified system
+      updateSelection(selectedIndices, selectedIndices.size === 1 ? primarySelectedIndex : null);
     },
     clearSelection: () => {
-      // Clear local selection state
-      setSelectedPoints(new Set());
-      setSelectedPointIndex(null);
-      onPointSelected?.(null);
+      // Clear selection using the unified system
+      updateSelection(new Set(), null);
     },
     getSelectedPointIds: () => {
       const selectedIds: string[] = [];
@@ -1388,8 +1401,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     pixelSnapping,
     selectedPoints,
     selectedPointIndex,
-    setSelectedPointIndex,
-    setSelectedPoints,
+    setSelectedPointIndex: (index) => {
+      const newSelectedPoints = index !== null ? new Set([index]) : new Set();
+      updateSelection(newSelectedPoints, index);
+    },
+    setSelectedPoints: (points) => {
+      const newSelectedPointIndex = points.size === 1 ? Array.from(points)[0] : null;
+      updateSelection(points, newSelectedPointIndex);
+    },
     setDraggedPointIndex,
     setDraggedControlPoint,
     setIsDisconnectedMode,
@@ -1702,14 +1721,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               // Add to multi-selection
               const newSelection = new Set(selectedPoints);
               newSelection.add(pointIndex);
-              setSelectedPoints(newSelection);
-              setSelectedPointIndex(null);
-              onPointSelected?.(null);
+              updateSelection(newSelection, null);
             } else {
               // Select only this point
-              setSelectedPoints(new Set([pointIndex]));
-              setSelectedPointIndex(pointIndex);
-              onPointSelected?.(pointIndex);
+              updateSelection(new Set([pointIndex]), pointIndex);
             }
 
             // Call the original onClick handler if provided
@@ -1729,13 +1744,13 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       {/* Proxy nodes for Transformer (positioned at exact point centers) - only show when not in drawing mode */}
       {drawingDisabled && (
-        <ProxyNodes selectedPoints={selectedPoints} initialPoints={getAllPoints()} proxyRefs={proxyRefs} />
+        <ProxyNodes selectedPoints={virtualSelectedPoints} initialPoints={getAllPoints()} proxyRefs={proxyRefs} />
       )}
 
       {/* Transformer for multiselection - only show when not in drawing mode */}
       {drawingDisabled && (
         <VectorTransformer
-          selectedPoints={selectedPoints}
+          selectedPoints={virtualSelectedPoints}
           initialPoints={getAllPoints()}
           transformerRef={transformerRef}
           proxyRefs={proxyRefs}

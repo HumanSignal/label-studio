@@ -132,6 +132,10 @@ export interface KonvaVectorProps {
   }) => void;
   /** Called when a point is selected */
   onPointSelected?: (pointIndex: number | null) => void;
+  /** Array of selected point IDs (controlled selection) */
+  selectedPoints?: string[];
+  /** Called when selection changes */
+  onSelectionChange?: (selectedPointIds: string[], selectedPointIndex: number | null) => void;
   /** Called when drawing is finished (click on last point or double click on empty space) */
   onFinish?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Canvas width */
