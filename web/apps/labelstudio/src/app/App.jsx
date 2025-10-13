@@ -18,7 +18,6 @@ import { FF_UNSAVED_CHANGES, isFF } from "../utils/feature-flags";
 import { TourProvider } from "@humansignal/core";
 import { ToastProvider, ToastViewport } from "@humansignal/ui";
 import { JotaiProvider, JotaiStore } from "../utils/jotai-store";
-import { CurrentUserProvider } from "../providers/CurrentUser";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@humansignal/core/lib/utils/query-client";
 import { RootPage } from "./RootPage";
@@ -72,7 +71,6 @@ const App = ({ content }) => {
             <ConfigProvider key="config" />,
             <RoutesProvider key="rotes" />,
             <ProjectProvider key="project" />,
-            <CurrentUserProvider key="current-user" />,
             ff.isActive(ff.FF_PRODUCT_TOUR) && <TourProvider useAPI={useAPI} />,
           ].filter(Boolean)}
         >
