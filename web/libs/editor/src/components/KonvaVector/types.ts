@@ -207,12 +207,16 @@ export interface KonvaVectorProps {
   onMouseEnter?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse leave event handler */
   onMouseLeave?: (e: KonvaEventObject<MouseEvent>) => void;
+  /** Transform end event handler (for multi-region transformation) */
+  onTransformEnd?: (e: KonvaEventObject<Event>) => void;
   /** Disable all interactions when true */
   disabled?: boolean;
   /** Constrain points to stay within image bounds */
   constrainToBounds?: boolean;
   /** Enable transform mode - automatically selects all points and shows transformer */
   transformMode?: boolean;
+  /** Name to assign to the vector shape (for transformer identification) */
+  name?: string;
   /** Ref to access component methods */
   ref?: React.RefObject<KonvaVectorRef>;
 }

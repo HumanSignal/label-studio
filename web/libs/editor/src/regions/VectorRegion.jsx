@@ -537,11 +537,14 @@ const HtxVectorView = observer(({ item, suggestion }) => {
     return null;
   }
 
+  const isMultiRegionSelected = item.inSelection && item.parent?.selectedRegions?.length > 1;
+
   return (
     <RegionWrapper item={item}>
       <Group ref={(ref) => item.segGroupRef(ref)}>
         <KonvaVector
           ref={(kv) => item.setKonvaVectorRef(kv)}
+          name={isMultiRegionSelected ? `${item.id} _transformable` : undefined}
           initialPoints={Array.from(item.vertices)}
           onFinish={(e) => {
             e.evt.stopPropagation();
@@ -591,6 +594,49 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           onDblClick={(e) => {
             item.toggleTransformMode();
           }}
+          onTransformEnd={(e) => {
+            if (!isMultiRegionSelected) return;
+            if (e.target !== e.currentTarget) return;
+
+            const t = e.target;
+            const dx = t.getAttr("x", 0);
+            const dy = t.getAttr("y", 0);
+            const scaleX = t.getAttr("scaleX", 1);
+            const scaleY = t.getAttr("scaleY", 1);
+            const rotation = t.getAttr("rotation", 0);
+
+            // Get the bounding box center for rotation/scale origin
+            const bbox = item.bbox;
+            if (!bbox) return;
+
+            const centerX = (bbox.left + bbox.right) / 2;
+            const centerY = (bbox.top + bbox.bottom) / 2;
+
+            // Apply transformation using KonvaVector ref methods
+            if (item.vectorRef) {
+              // First apply rotation if any
+              if (rotation !== 0) {
+                item.vectorRef.rotatePoints(rotation, centerX, centerY);
+              }
+
+              // Then apply scaling if any
+              if (scaleX !== 1 || scaleY !== 1) {
+                item.vectorRef.scalePoints(scaleX, scaleY, centerX, centerY);
+              }
+
+              // Finally apply translation if any
+              if (dx !== 0 || dy !== 0) {
+                item.vectorRef.translatePoints(dx, dy);
+              }
+            }
+
+            // Reset transform attributes
+            t.setAttr("x", 0);
+            t.setAttr("y", 0);
+            t.setAttr("scaleX", 1);
+            t.setAttr("scaleY", 1);
+            t.setAttr("rotation", 0);
+          }}
           closed={item.closed}
           width={stageWidth}
           height={stageHeight}
@@ -612,7 +658,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           pixelSnapping={item.control?.snap === "pixel"}
           constrainToBounds={item.control?.constrainToBounds ?? true}
           disabled={disabled}
-          transformMode={!disabled && item.transformMode}
+          transformMode={!disabled && !item.inSelection && item.transformMode && !isMultiRegionSelected}
           // Point styling - customize point appearance based on control settings
           pointRadius={item.pointRadiusFromSize}
           pointFill={item.selected ? "#ffffff" : "#f8fafc"}

@@ -14,10 +14,12 @@ export interface VectorShapeProps {
   opacity?: number;
   transform?: { zoom: number; offsetX: number; offsetY: number };
   fitScale?: number;
+  name?: string;
   onClick?: (e: KonvaEventObject<MouseEvent>) => void;
   onDblClick?: (e: KonvaEventObject<MouseEvent>) => void;
   onMouseEnter?: (e: any) => void;
   onMouseLeave?: (e: any) => void;
+  onTransformEnd?: (e: KonvaEventObject<Event>) => void;
 }
 
 // Convert Bezier segments to SVG path data for a single continuous path
@@ -212,10 +214,12 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
   opacity = 1,
   transform = { zoom: 1, offsetX: 0, offsetY: 0 },
   fitScale = 1,
+  name,
   onClick,
   onDblClick,
   onMouseEnter,
   onMouseLeave,
+  onTransformEnd,
 }) => {
   if (segments.length === 0) return null;
 
@@ -295,6 +299,7 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
         return (
           <Path
             key={`path-${index}`}
+            name={index === 0 ? name : undefined}
             data={pathData}
             stroke={stroke}
             strokeWidth={strokeWidth}
@@ -305,6 +310,7 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
             onDblClick={onDblClick}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onTransformEnd={index === 0 ? onTransformEnd : undefined}
           />
         );
       })}

@@ -232,6 +232,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     onDblClick,
     onMouseEnter,
     onMouseLeave,
+    onTransformEnd,
     allowClose = false,
     closed,
     allowBezier = true,
@@ -245,6 +246,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     disabled = false,
     constrainToBounds = false,
     transformMode = false,
+    name,
     pointRadius,
     pointFill = DEFAULT_POINT_FILL,
     pointStroke = DEFAULT_POINT_STROKE,
@@ -1531,6 +1533,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         opacity={props.opacity}
         transform={transform}
         fitScale={fitScale}
+        name={name}
+        onTransformEnd={onTransformEnd}
         onClick={(e) => {
           // Mark that VectorShape handled the click
           shapeHandledClick.current = true;
