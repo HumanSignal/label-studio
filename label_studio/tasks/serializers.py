@@ -191,7 +191,7 @@ class TaskSimpleSerializer(ModelSerializer):
 
     class Meta:
         model = Task
-        fields = '__all__'
+        exclude = ('precomputed_agreement',)
 
 
 class BaseTaskSerializer(FlexFieldsModelSerializer):
@@ -248,7 +248,7 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
 
     class Meta:
         model = Task
-        fields = '__all__'
+        exclude = ('precomputed_agreement',)
 
 
 class BaseTaskSerializerBulk(serializers.ListSerializer):

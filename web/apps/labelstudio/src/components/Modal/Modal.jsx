@@ -2,7 +2,7 @@ import { createRef } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { ApiProvider } from "../../providers/ApiProvider";
 import { ConfigProvider } from "../../providers/ConfigProvider";
-import { CurrentUserProvider } from "../../providers/CurrentUser";
+import { AuthProvider } from "@humansignal/core/providers/AuthProvider";
 import { MultiProvider } from "../../providers/MultiProvider";
 import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
@@ -34,7 +34,7 @@ const standaloneModal = (props) => {
                 <ConfigProvider key="config" />,
                 <ToastProvider key="toast" />,
                 <ApiProvider key="api" />,
-                <CurrentUserProvider key="current-user" />,
+                <AuthProvider key="auth" />,
                 <QueryClientProvider client={queryClient} />,
               ]
         }

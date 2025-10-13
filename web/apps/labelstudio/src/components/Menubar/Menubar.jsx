@@ -17,7 +17,7 @@ import { LSLogo } from "../../assets/images";
 import { Button, Userpic, ThemeToggle } from "@humansignal/ui";
 import { useConfig } from "../../providers/ConfigProvider";
 import { useContextComponent, useFixedLocation } from "../../providers/RoutesProvider";
-import { useCurrentUser } from "../../providers/CurrentUser";
+import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { cn } from "../../utils/bem";
 import { absoluteURL, isDefined } from "../../utils/helpers";
 import { Breadcrumbs } from "../Breadcrumbs/Breadcrumbs";
@@ -57,7 +57,7 @@ const RightContextMenu = ({ className, ...props }) => {
 export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSidebarToggle, onSidebarPin }) => {
   const menuDropdownRef = useRef();
   const useMenuRef = useRef();
-  const { user, fetch, isInProgress } = useCurrentUser();
+  const { user, isLoading } = useAuth();
   const location = useFixedLocation();
 
   const config = useConfig();
@@ -201,7 +201,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
             }
           >
             <div title={user?.email} className={menubarClass.elem("user")}>
-              <Userpic user={user} isInProgress={isInProgress} />
+              <Userpic user={user} isInProgress={isLoading} />
               {showNewsletterDot && <div className={menubarClass.elem("userpic-badge")} />}
             </div>
           </Dropdown.Trigger>
