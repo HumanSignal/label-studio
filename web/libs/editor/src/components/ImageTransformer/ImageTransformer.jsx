@@ -216,14 +216,16 @@ export default class TransformerComponent extends Component {
           onDragEnd={(e) => {
             console.log("ImageTransformer onDragEnd triggered");
             // Apply translation to each selected region
-            const { item: { selectedRegions } } = this.props;
+            const {
+              item: { selectedRegions },
+            } = this.props;
 
             if (selectedRegions && selectedRegions.length > 0) {
               selectedRegions.forEach((region) => {
                 if (region.applyTransform) {
                   // Get the transformation data from the transformer
                   const nodes = this.transformer.nodes();
-                  const node = nodes.find(n => n.hasName(region.id));
+                  const node = nodes.find((n) => n.hasName(region.id));
 
                   if (node) {
                     const dx = node.getAttr("x", 0);
@@ -256,16 +258,17 @@ export default class TransformerComponent extends Component {
             setTimeout(this.checkNode);
           }}
           onTransformEnd={(e) => {
-            console.log("ImageTransformer onTransformEnd triggered");
             // Apply transformation to each selected region
-            const { item: { selectedRegions } } = this.props;
+            const {
+              item: { selectedRegions },
+            } = this.props;
 
             if (selectedRegions && selectedRegions.length > 0) {
               selectedRegions.forEach((region) => {
                 if (region.applyTransform) {
                   // Get the transformation data from the transformer
                   const nodes = this.transformer.nodes();
-                  const node = nodes.find(n => n.hasName(region.id));
+                  const node = nodes.find((n) => n.hasName(region.id));
 
                   if (node) {
                     const dx = node.getAttr("x", 0);
@@ -340,14 +343,16 @@ export default class TransformerComponent extends Component {
           onDragEnd={(e) => {
             console.log("ImageTransformer onDragEnd triggered");
             // Apply translation to each selected region
-            const { item: { selectedRegions } } = this.props;
+            const {
+              item: { selectedRegions },
+            } = this.props;
 
             if (selectedRegions && selectedRegions.length > 0) {
               selectedRegions.forEach((region) => {
                 if (region.applyTransform) {
                   // Get the transformation data from the transformer
                   const nodes = this.transformer.nodes();
-                  const node = nodes.find(n => n.hasName(region.id));
+                  const node = nodes.find((n) => n.hasName(region.id));
 
                   if (node) {
                     const dx = node.getAttr("x", 0);
@@ -382,14 +387,16 @@ export default class TransformerComponent extends Component {
           onTransformEnd={(e) => {
             console.log("ImageTransformer onTransformEnd triggered");
             // Apply transformation to each selected region
-            const { item: { selectedRegions } } = this.props;
+            const {
+              item: { selectedRegions },
+            } = this.props;
 
             if (selectedRegions && selectedRegions.length > 0) {
               selectedRegions.forEach((region) => {
                 if (region.applyTransform) {
                   // Get the transformation data from the transformer
                   const nodes = this.transformer.nodes();
-                  const node = nodes.find(n => n.hasName(region.id));
+                  const node = nodes.find((n) => n.hasName(region.id));
 
                   if (node) {
                     const dx = node.getAttr("x", 0);

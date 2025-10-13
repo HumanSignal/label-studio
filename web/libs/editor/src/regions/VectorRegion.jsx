@@ -650,52 +650,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           onDblClick={(e) => {
             item.toggleTransformMode();
           }}
-          onTransformEnd={(e) => {
-            console.log("transform end");
-            if (!isMultiRegionSelected) return;
-            if (e.target !== e.currentTarget) return;
-
-            const t = e.target;
-            const dx = t.getAttr("x", 0);
-            const dy = t.getAttr("y", 0);
-            const scaleX = t.getAttr("scaleX", 1);
-            const scaleY = t.getAttr("scaleY", 1);
-            const rotation = t.getAttr("rotation", 0);
-
-            // Get the bounding box center for rotation/scale origin
-            const bbox = item.bbox;
-            if (!bbox) return;
-
-            // Convert bbox center to image coordinates (KonvaVector uses image coords)
-            const centerX = item.parent.internalToImageX((bbox.left + bbox.right) / 2);
-            const centerY = item.parent.internalToImageY((bbox.top + bbox.bottom) / 2);
-
-            // Apply transformation using KonvaVector ref methods
-            if (item.vectorRef) {
-              // Convert canvas coordinates to image coordinates (KonvaVector uses image coords)
-              const imageDx = item.parent.canvasToInternalX(dx);
-              const imageDy = item.parent.canvasToInternalY(dy);
-
-              // Use transformPoints method to apply all transformations at once
-              // This ensures onPointsChange is called only once with the final result
-              item.vectorRef.transformPoints({
-                dx: imageDx,
-                dy: imageDy,
-                rotation: rotation,
-                scaleX: scaleX,
-                scaleY: scaleY,
-                centerX: centerX,
-                centerY: centerY,
-              });
-            }
-
-            // Reset transform attributes
-            t.setAttr("x", 0);
-            t.setAttr("y", 0);
-            t.setAttr("scaleX", 1);
-            t.setAttr("scaleY", 1);
-            t.setAttr("rotation", 0);
-          }}
           selectedPoints={item.annotation.regionStore.selection.size > 1 ? [] : item.selectedVertices}
           closed={item.closed}
           width={stageWidth}
