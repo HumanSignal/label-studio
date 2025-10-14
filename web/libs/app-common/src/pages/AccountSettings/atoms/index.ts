@@ -1,4 +1,4 @@
-import { API } from "apps/labelstudio/src/providers/ApiProvider";
+import { getApiInstance } from "@humansignal/core";
 import { atomWithQuery } from "jotai-tanstack-query";
 
 type AuthTokenSettings = {
@@ -12,7 +12,8 @@ export const TOKEN_SETTINGS_KEY = "api-settings";
 export const settingsAtom = atomWithQuery(() => ({
   queryKey: [TOKEN_SETTINGS_KEY],
   async queryFn() {
-    const result = await API.invoke<AuthTokenSettings>("accessTokenSettings");
+    const api = getApiInstance();
+    const result = await api.invoke<AuthTokenSettings>("accessTokenSettings");
 
     if (!result.$meta.ok) {
       return { error: true };
