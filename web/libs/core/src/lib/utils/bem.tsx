@@ -133,11 +133,17 @@ const assembleClass = (block: string, elem?: string, mix?: CNMix | CNMix[], mod?
   }
 
   const attachNamespace = (cls: string) => {
-    if (typeof cls !== "string") console.error("Non-string classname: ", cls);
-    return String(cls).startsWith(CSS_PREFIX) || CSS_PREFIX === "" ? cls : `${CSS_PREFIX}${cls}`;
+    // Safely convert to string and filter out invalid values
+    if (!cls) return ""; // Empty value null/undefined/""
+    const className = String(cls).trim();
+    if (!className) return ""; // Empty string " "
+    return className.startsWith(CSS_PREFIX) || CSS_PREFIX === "" ? className : `${CSS_PREFIX}${className}`;
   };
 
-  return finalClass.map(attachNamespace).join(" ");
+  return finalClass
+    .map(attachNamespace)
+    .filter((cls) => cls !== "")
+    .join(" ");
 };
 
 export const BlockContext = createContext<CN | null>(null);
