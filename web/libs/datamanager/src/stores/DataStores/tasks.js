@@ -203,7 +203,7 @@ export const create = (columns) => {
         if (isLabelStream) {
           const selectedAnnotationID = getRoot(self).annotationStore.selected?.id;
           console.log(
-            `[LABEL STREAM] ${task.queue}, task ${task.id}, project ${task.project}, user ${getRoot(self).LSF.lsf.user.id}${selectedAnnotationID ? `, annotation ${selectedAnnotationID}` : ""}`,
+            `[LABEL STREAM] ${task.queue}, task ${task.id}, project ${getRoot(self)?.SDK?.project?.id}, user ${getRoot(self).LSF.lsf.user.id}${selectedAnnotationID ? `, annotation ${selectedAnnotationID}` : ""}`,
           );
         }
 
