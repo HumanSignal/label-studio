@@ -65,7 +65,7 @@ const Model = types
     selectedPoint: null,
     hideable: true,
     _supportsTransform: true,
-    useTransformer: true,
+    useTransformer: false,
     preferTransformer: false,
     supportsRotate: true,
     supportsScale: true,
@@ -536,14 +536,51 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
   return (
     <RegionWrapper item={item}>
-      <Group ref={(ref) => item.segGroupRef(ref)}>
+      <Group ref={(ref) => item.segGroupRef(ref)} name={item.id}>
         <KonvaVector
           ref={(kv) => item.setKonvaVectorRef(kv)}
           initialPoints={Array.from(item.vertices)}
+          name="_transformable"
           onFinish={(e) => {
             e.evt.stopPropagation();
             e.evt.preventDefault();
             item.handleFinish();
+          }}
+          onTransformEnd={(e) => {
+            if (e.target !== e.currentTarget) return;
+
+            const t = e.target;
+            const dx = t.getAttr("x", 0);
+            const dy = t.getAttr("y", 0);
+            const scaleX = t.getAttr("scaleX", 1);
+            const scaleY = t.getAttr("scaleY", 1);
+            const rotation = t.getAttr("rotation", 0);
+
+            // Reset transform attributes
+            t.setAttr("x", 0);
+            t.setAttr("y", 0);
+            t.setAttr("scaleX", 1);
+            t.setAttr("scaleY", 1);
+            t.setAttr("rotation", 0);
+
+            // Apply transformation to all points using KonvaVector methods
+            if (item.vectorRef) {
+              // Calculate center point for rotation and scaling
+              const bbox = item.bboxCoords;
+              const centerX = (bbox.left + bbox.right) / 2;
+              const centerY = (bbox.top + bbox.bottom) / 2;
+
+              // Apply transformation
+              item.vectorRef.transformPoints({
+                dx,
+                dy,
+                rotation,
+                scaleX,
+                scaleY,
+                centerX,
+                centerY,
+              });
+            }
           }}
           onPointsChange={(points) => {
             item.updatePointsFromKonvaVector(points);
@@ -590,7 +627,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             console.log("double click");
             item.toggleTransformMode();
           }}
-          transformMode={!disabled && item.transformMode}
+          transformMode={!disabled && item.transformMode && !item.inSelection}
           closed={item.closed}
           width={stageWidth}
           height={stageHeight}

@@ -230,6 +230,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     onMouseUp,
     onClick,
     onDblClick,
+    onTransformEnd,
     onMouseEnter,
     onMouseLeave,
     allowClose = false,
@@ -245,6 +246,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     disabled = false,
     transformMode = false,
     constrainToBounds = false,
+    name,
     pointRadius,
     pointFill = DEFAULT_POINT_FILL,
     pointStroke = DEFAULT_POINT_STROKE,
@@ -1487,6 +1489,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   return (
     <Group
       ref={stageRef}
+      name={name}
       scaleX={scaleX}
       scaleY={scaleY}
       x={x}
@@ -1744,6 +1747,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           onTransformationEnd={() => {
             setIsTransforming(false);
           }}
+          onTransformEnd={onTransformEnd}
         />
       )}
 

@@ -203,6 +203,8 @@ export interface KonvaVectorProps {
   onClick?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Double click event handler */
   onDblClick?: (e: KonvaEventObject<MouseEvent>) => void;
+  /** Transform end event handler */
+  onTransformEnd?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse enter event handler */
   onMouseEnter?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse leave event handler */
@@ -213,6 +215,8 @@ export interface KonvaVectorProps {
   transformMode?: boolean;
   /** Constrain points to stay within image bounds */
   constrainToBounds?: boolean;
+  /** Name attribute for the component */
+  name?: string;
   /** Ref to access component methods */
   ref?: React.RefObject<KonvaVectorRef>;
 }
