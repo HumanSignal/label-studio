@@ -229,6 +229,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     onMouseMove,
     onMouseUp,
     onClick,
+    onDblClick,
     onMouseEnter,
     onMouseLeave,
     allowClose = false,
@@ -1497,6 +1498,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               eventHandlers.handleLayerClick(e);
             }
       }
+      onDblClick={disabled ? undefined : onDblClick}
     >
       {/* Invisible rectangle - always render to capture mouse events for cursor position updates */}
       {!disabled && (
@@ -1522,18 +1524,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         transform={transform}
         fitScale={fitScale}
         onClick={(e) => {
-          // Handle cmd-click to select all points
-          if ((e.evt.ctrlKey || e.evt.metaKey) && !e.evt.altKey && !e.evt.shiftKey) {
-            // Check if this instance can have selection
-            if (!tracker.canInstanceHaveSelection(instanceId)) {
-              return; // Block the selection
-            }
-
-            // Select all points in the path
-            const allPointIndices = Array.from({ length: initialPoints.length }, (_, i) => i);
-            tracker.selectPoints(instanceId, new Set(allPointIndices));
-            return;
-          }
 
           // Check if click is on the last added point by checking cursor position
           if (cursorPosition && lastAddedPointId) {

@@ -555,8 +555,10 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               stage.container().style.cursor = Constants.DEFAULT_CURSOR;
             }
 
-            item.setHighlight(false);
-            item.onClickRegion(e);
+            if (!item.selected) {
+              item.setHighlight(false);
+              item.onClickRegion(e);
+            }
           }}
           onMouseEnter={() => {
             if (store.annotationStore.selected.isLinkingMode) {
@@ -569,6 +571,10 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               item.setHighlight(false);
             }
             item.updateCursor();
+          }}
+          onDblClick={(e) => {
+            e.evt.stopImmediatePropagation();
+            console.log("double click");
           }}
           closed={item.closed}
           width={stageWidth}

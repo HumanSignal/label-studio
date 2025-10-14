@@ -201,6 +201,8 @@ export interface KonvaVectorProps {
   onMouseUp?: (e?: KonvaEventObject<MouseEvent>) => void;
   /** Click event handler */
   onClick?: (e: KonvaEventObject<MouseEvent>) => void;
+  /** Double click event handler */
+  onDblClick?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse enter event handler */
   onMouseEnter?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse leave event handler */
