@@ -6,6 +6,7 @@ from io_storages.base_models import ImportStorage
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .azure_blob.api import AzureBlobExportStorageListAPI, AzureBlobImportStorageListAPI
+from .b2.api import B2ExportStorageListAPI, B2ImportStorageListAPI
 from .gcs.api import GCSExportStorageListAPI, GCSImportStorageListAPI
 from .redis.api import RedisExportStorageListAPI, RedisImportStorageListAPI
 from .s3.api import S3ExportStorageListAPI, S3ImportStorageListAPI
@@ -71,6 +72,12 @@ def get_storage_list():
             'title': 'AWS S3',
             'import_list_api': S3ImportStorageListAPI,
             'export_list_api': S3ExportStorageListAPI,
+        },
+        {
+            'name': 'b2',
+            'title': 'Backblaze B2',
+            'import_list_api': B2ImportStorageListAPI,
+            'export_list_api': B2ExportStorageListAPI,
         },
         {
             'name': 'gcs',

@@ -8,6 +8,12 @@ from .azure_blob.models import (  # noqa: F401
     AzureBlobExportStorage,
     AzureBlobExportStorageLink,
 )
+from .b2.models import (  # noqa: F401
+    B2ImportStorage,
+    B2ImportStorageLink,
+    B2ExportStorage,
+    B2ExportStorageLink,
+)
 from .s3.models import (  # noqa: F401
     S3ImportStorage,
     S3ImportStorageLink,

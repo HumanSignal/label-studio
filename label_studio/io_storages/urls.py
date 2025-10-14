@@ -23,6 +23,19 @@ from io_storages.azure_blob.api import (
     AzureBlobImportStorageSyncAPI,
     AzureBlobImportStorageValidateAPI,
 )
+from io_storages.b2.api import (
+    B2ExportStorageDetailAPI,
+    B2ExportStorageFormLayoutAPI,
+    B2ExportStorageListAPI,
+    B2ExportStorageSyncAPI,
+    B2ExportStorageValidateAPI,
+    B2ImportStorageDetailAPI,
+    B2ImportStorageFormLayoutAPI,
+    B2ImportStorageListAPI,
+    B2ImportStorageSerializer,
+    B2ImportStorageSyncAPI,
+    B2ImportStorageValidateAPI,
+)
 from io_storages.gcs.api import (
     GCSExportStorageDetailAPI,
     GCSExportStorageFormLayoutAPI,
@@ -101,6 +114,22 @@ _api_urlpatterns = [
     path('export/s3/<int:pk>/sync', S3ExportStorageSyncAPI.as_view(), name='export-storage-s3-sync'),
     path('export/s3/validate', S3ExportStorageValidateAPI.as_view(), name='export-storage-s3-validate'),
     path('export/s3/form', S3ExportStorageFormLayoutAPI.as_view(), name='export-storage-s3-form'),
+    # Backblaze B2
+    path('b2/', B2ImportStorageListAPI.as_view(), name='storage-b2-list'),
+    path('b2/<int:pk>', B2ImportStorageDetailAPI.as_view(), name='storage-b2-detail'),
+    path('b2/<int:pk>/sync', B2ImportStorageSyncAPI.as_view(), name='storage-b2-sync'),
+    path('b2/validate', B2ImportStorageValidateAPI.as_view(), name='storage-b2-validate'),
+    path('b2/form', B2ImportStorageFormLayoutAPI.as_view(), name='storage-b2-form'),
+    path(
+        'b2/files',
+        ImportStorageListFilesAPI().as_view(serializer_class=B2ImportStorageSerializer),
+        name='storage-b2-list-files',
+    ),
+    path('export/b2', B2ExportStorageListAPI.as_view(), name='export-storage-b2-list'),
+    path('export/b2/<int:pk>', B2ExportStorageDetailAPI.as_view(), name='export-storage-b2-detail'),
+    path('export/b2/<int:pk>/sync', B2ExportStorageSyncAPI.as_view(), name='export-storage-b2-sync'),
+    path('export/b2/validate', B2ExportStorageValidateAPI.as_view(), name='export-storage-b2-validate'),
+    path('export/b2/form', B2ExportStorageFormLayoutAPI.as_view(), name='export-storage-b2-form'),
     # Microsoft Azure
     path('azure/', AzureBlobImportStorageListAPI.as_view(), name='storage-azure-list'),
     path('azure/<int:pk>', AzureBlobImportStorageDetailAPI.as_view(), name='storage-azure-detail'),

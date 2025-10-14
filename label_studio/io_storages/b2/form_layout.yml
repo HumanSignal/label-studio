@@ -1,0 +1,155 @@
+# Form layout configuration for Backblaze B2 Cloud Storage integration
+# This defines the UI fields shown when creating/editing B2 storage connections
+
+# 1x3 grid - Basic information
+title_bucket_prefix: &title_bucket_prefix
+  - type: text
+    name: title
+    label: Storage Name
+    required: true
+  - type: text
+    name: bucket
+    label: Bucket Name
+    allowEmpty: false
+    required: true
+  - type: text
+    name: prefix
+    label: Bucket Prefix (Folder Path)
+
+# 2x3 grid - B2 specific parameters for import
+b2_params_import: &b2_params_import
+  - type: text
+    name: region_name
+    label: Region Name
+    placeholder: us-west-004
+    tooltip: "B2 region (e.g., us-west-004, us-east-005, eu-central-003)"
+  - type: text
+    name: b2_endpoint_url
+    label: B2 Endpoint URL
+    placeholder: https://s3.us-west-004.backblazeb2.com
+    tooltip: "Your B2 S3-compatible endpoint URL"
+  - null
+  - type: password
+    name: b2_access_key_id
+    label: Application Key ID
+    autoComplete: "off"
+    skipAutofill: true
+    allowEmpty: false
+    protectedValue: true
+    tooltip: "Your B2 Application Key ID. Leave blank if already set up as an Environment Variable (B2_ACCESS_KEY_ID)."
+  - type: password
+    name: b2_secret_access_key
+    label: Application Key
+    autoComplete: "new-password"
+    skipAutofill: true
+    allowEmpty: false
+    protectedValue: true
+    tooltip: "Your B2 Application Key. Leave blank if already set up as an Environment Variable (B2_SECRET_ACCESS_KEY)."
+  - null
+
+# 2x3 grid - B2 specific parameters for export
+b2_params_export: &b2_params_export
+  - type: text
+    name: region_name
+    label: Region Name
+    placeholder: us-west-004
+    tooltip: "B2 region (e.g., us-west-004, us-east-005, eu-central-003)"
+  - type: text
+    name: b2_endpoint_url
+    label: B2 Endpoint URL
+    placeholder: https://s3.us-west-004.backblazeb2.com
+    tooltip: "Your B2 S3-compatible endpoint URL"
+  - null
+  - type: password
+    name: b2_access_key_id
+    label: Application Key ID
+    autoComplete: "off"
+    skipAutofill: true
+    allowEmpty: false
+    protectedValue: true
+    tooltip: "Your B2 Application Key ID"
+  - type: password
+    name: b2_secret_access_key
+    label: Application Key
+    autoComplete: "new-password"
+    skipAutofill: true
+    allowEmpty: false
+    protectedValue: true
+    tooltip: "Your B2 Application Key"
+  - null
+
+
+ImportStorage:
+  # Title, Bucket, Prefix
+  - columnCount: 3
+    fields: *title_bucket_prefix
+  # Regex filter
+  - columnCount: 1
+    fields:
+      - type: text
+        name: regex_filter
+        label: File Filter Regex
+        placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+        validators:
+          - regexp
+  # B2 specific params
+  - columnCount: 3
+    fields: *b2_params_import
+
+  # Import method selection
+  - columnCount: 1
+    fields:
+      - type: select
+        name: use_blob_urls
+        label: Import method
+        description: Choose how to import your data from B2 storage
+        placeholder: "Select an option"
+        required: true
+        options:
+          - value: true
+            label: "Files - Automatically creates a task for each storage object (e.g. JPG, MP3, TXT)"
+          - value: false
+            label: "Tasks - Treat each JSON or JSONL file as a task definition (one or more tasks per file)"
+
+  # 2 column grid - Presigned URLs
+  - columnCount: 2
+    columns:
+      - width: 468
+        fields:
+        - type: toggle
+          name: presign
+          label: "Use pre-signed URLs (On)\n Proxy through the platform (Off)"
+          description: "When pre-signed URLs are enabled, all data bypasses the platform and user browsers directly read data from B2"
+          value: true
+      - fields:
+        - type: counter
+          name: presign_ttl
+          label: Expire pre-signed URLs (minutes)
+          min: 1
+          value: 15
+          dependency: presign
+  # Recursive scan option
+  - columnCount: 1
+    columns:
+      - fields:
+          - type: toggle
+            name: recursive_scan
+            label: Scan all sub-folders
+            description: Include files from all nested folders in the bucket
+
+ExportStorage:
+  # Title, Bucket, Prefix
+  - columnCount: 3
+    fields: *title_bucket_prefix
+  # B2 specific params
+  - columnCount: 3
+    fields: *b2_params_export
+  # Delete objects option
+  - columnCount: 1
+    columns:
+      - fields:
+          - type: toggle
+            name: can_delete_objects
+            label: Can delete objects from storage
+            description: If unchecked, annotations will not be deleted from B2 storage when deleted from Label Studio
+

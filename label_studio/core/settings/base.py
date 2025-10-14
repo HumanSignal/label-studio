@@ -788,6 +788,15 @@ S3_TRUSTED_STORAGE_DOMAINS = get_env_list(
     ],
 )
 
+# Custom B2 endpoints on these domains will get detailed error reporting
+B2_TRUSTED_STORAGE_DOMAINS = get_env_list(
+    'B2_TRUSTED_STORAGE_DOMAINS',
+    [
+        'backblazeb2.com',
+        'backblaze.com',
+    ],
+)
+
 REAL_HOSTNAME = os.getenv('HOSTNAME')  # we have to use getenv, because we don't use LABEL_STUDIO_ prefix
 GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS = get_bool_env('GCS_CLOUD_STORAGE_FORCE_DEFAULT_CREDENTIALS', False)
 PUBLIC_API_DOCS = get_bool_env('PUBLIC_API_DOCS', False)
