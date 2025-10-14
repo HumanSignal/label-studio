@@ -55,11 +55,9 @@ export const ViewControls: FC<ViewControlsProps> = observer(
       const names = regions.annotation?.names;
       if (!names || names.size === 0) return null;
 
-      // Check if any tag combination matches the supported tuples
       const tags = Array.from(names.values());
-
+      // Check if all tag types from the tuple exist in the configuration
       return mediaStartTimeSupportedTags.some((requiredTagTypes) => {
-        // Check if all tag names from the tuple exist in the configuration
         return requiredTagTypes.every((requiredType) => tags.some((tag: any) => tag?.type === requiredType));
       });
     }, [regions.annotation?.names]);
