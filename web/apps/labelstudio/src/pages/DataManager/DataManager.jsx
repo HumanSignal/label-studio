@@ -33,7 +33,7 @@ const initializeDataManager = async (root, props, params) => {
     apiGateway: `${window.APP_SETTINGS.hostname}/api/dm`,
     apiVersion: 2,
     project: params.project,
-    polling: !window.APP_SETTINGS,
+    polling: window.APP_SETTINGS?.polling,
     showPreviews: false,
     apiEndpoints: APIConfig.endpoints,
     interfaces: {

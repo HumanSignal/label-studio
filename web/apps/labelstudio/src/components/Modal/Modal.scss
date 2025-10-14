@@ -76,7 +76,7 @@
   }
 
   &__footer {
-    padding: 1rem 1.5rem;
+    padding: var(--spacing-base) var(--spacing-wider);
     text-align: center;
     font-size: 14px;
     line-height: 22px;
