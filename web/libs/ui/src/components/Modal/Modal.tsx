@@ -154,6 +154,7 @@ export const confirm = <T,>({ okText, onOk, cancelText, onCancel, buttonLook, ..
           className="min-w-[120px]"
           autoFocus
           aria-label={cancelText ?? "Cancel"}
+          data-testid="dialog-cancel-button"
         >
           {cancelText ?? "Cancel"}
         </Button>
@@ -166,6 +167,7 @@ export const confirm = <T,>({ okText, onOk, cancelText, onCancel, buttonLook, ..
           className="min-w-[120px]"
           variant={buttonLook ?? "default"}
           aria-label={okText ?? "Confirm"}
+          data-testid="dialog-ok-button"
         >
           {okText ?? "OK"}
         </Button>
@@ -192,6 +194,7 @@ export const info = <T,>({ okText, onOkPress, ...props }: InfoProps<T>) => {
           variant="default"
           className="min-w-[120px]"
           aria-label={okText ?? "OK"}
+          data-testid="dialog-ok-button"
         >
           {okText ?? "OK"}
         </Button>
