@@ -54,6 +54,11 @@ const Model = types
 
     // Internal flag to detect if we converted data back from relative points
     converted: false,
+
+    // There are two modes: transform and edit
+    // transform -- user can transform the shape as a whole (rotate, translate, resize)
+    // edit -- user works with individual points
+    transformMode: true,
   })
   .volatile(() => ({
     mouseOverStartPoint: false,
@@ -257,6 +262,7 @@ const Model = types
 
       _selectArea(additiveMode = false) {
         const annotation = self.annotation;
+        self.setTransformMode(true);
         if (!annotation) return;
 
         if (additiveMode) {
@@ -491,6 +497,12 @@ const Model = types
         }
         tool?.complete();
       },
+      toggleTransformMode() {
+        self.setTransformMode(!self.transformMode);
+      },
+      setTransformMode(transformMode) {
+        self.transformMode = transformMode;
+      },
     };
   });
 
@@ -515,6 +527,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
   const stageWidth = image?.naturalWidth ?? 0;
   const stageHeight = image?.naturalHeight ?? 0;
   const { x: offsetX, y: offsetY } = item.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
+  const disabled = item.disabled || suggestion || store.annotationStore.selected.isLinkingMode;
 
   // Wait for stage to be properly initialized
   if (!item.parent?.stageWidth || !item.parent?.stageHeight) {
@@ -575,7 +588,9 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           onDblClick={(e) => {
             e.evt.stopImmediatePropagation();
             console.log("double click");
+            item.toggleTransformMode();
           }}
+          transformMode={!disabled && item.transformMode}
           closed={item.closed}
           width={stageWidth}
           height={stageHeight}
@@ -596,7 +611,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           opacity={Number.parseFloat(item.control?.opacity || "1")}
           pixelSnapping={item.control?.snap === "pixel"}
           constrainToBounds={item.control?.constrainToBounds ?? true}
-          disabled={item.disabled || suggestion || store.annotationStore.selected.isLinkingMode}
+          disabled={disabled}
           // Point styling - customize point appearance based on control settings
           pointRadius={item.pointRadiusFromSize}
           pointFill={item.selected ? "#ffffff" : "#f8fafc"}

@@ -243,6 +243,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     fill = DEFAULT_FILL_COLOR,
     pixelSnapping = false,
     disabled = false,
+    transformMode = false,
     constrainToBounds = false,
     pointRadius,
     pointFill = DEFAULT_POINT_FILL,
@@ -274,6 +275,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Use initialPoints directly - this will update when the parent re-renders
   const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
   const [selectedPoints, setSelectedPoints] = useState<Set<number>>(new Set());
+
+  // Compute effective selected points - when transformMode is true, all points are selected
+  const effectiveSelectedPoints = useMemo(() => {
+    if (transformMode && initialPoints.length > 0) {
+      return new Set(Array.from({ length: initialPoints.length }, (_, i) => i));
+    }
+    return selectedPoints;
+  }, [transformMode, initialPoints.length, selectedPoints]);
   const [lastAddedPointId, setLastAddedPointId] = useState<string | null>(null);
 
   const transformerRef = useRef<Konva.Transformer>(null);
@@ -390,8 +399,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   const isDrawingDisabled = () => {
     // Disable all interactions when disabled prop is true
     // Disable drawing when Shift is held (for Shift+click functionality)
-    // Disable drawing when multiple points are selected
-    if (disabled || isShiftKeyHeld || selectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
+    // Disable drawing when multiple points are selected or when in transform mode
+    if (disabled || isShiftKeyHeld || effectiveSelectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN || transformMode) {
       return true;
     }
 
@@ -563,14 +572,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Set up Transformer nodes once when selection changes
   useEffect(() => {
     if (transformerRef.current) {
-      if (selectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
+      if (effectiveSelectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
         // Use setTimeout to ensure proxy nodes are rendered first
         setTimeout(() => {
           if (transformerRef.current) {
             // Set up proxy nodes once - transformer will manage them independently
             // Use getAllPoints() to get the correct proxy nodes for all points
             const allPoints = getAllPoints();
-            const nodes = Array.from(selectedPoints)
+            const nodes = Array.from(effectiveSelectedPoints)
               .map((index) => {
                 // Ensure the index is within bounds of all points
                 if (index < allPoints.length) {
@@ -597,7 +606,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }, TRANSFORMER_CLEAR_DELAY);
       }
     }
-  }, [selectedPoints]); // Only depend on selectedPoints, not initialPoints
+  }, [effectiveSelectedPoints]); // Depend on effectiveSelectedPoints to include transform mode
 
   // Note: We don't update proxy node positions during transformation
   // The transformer handles positioning the proxy nodes itself
@@ -1410,7 +1419,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     width,
     height,
     pixelSnapping,
-    selectedPoints,
+    selectedPoints: effectiveSelectedPoints,
     selectedPointIndex,
     setSelectedPointIndex,
     setSelectedPoints,
@@ -1541,7 +1550,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
                 // Only trigger onFinish if the last added point is already selected (second click)
                 // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-                if (lastAddedPointIndex !== -1 && selectedPoints.has(lastAddedPointIndex) && !disabled) {
+                if (lastAddedPointIndex !== -1 && effectiveSelectedPoints.has(lastAddedPointIndex) && !disabled) {
                   const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
                   if (!hasModifiers) {
                     e.evt.preventDefault();
@@ -1603,7 +1612,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       <VectorPoints
         initialPoints={getAllPoints()}
         selectedPointIndex={selectedPointIndex}
-        selectedPoints={selectedPoints}
+        selectedPoints={effectiveSelectedPoints}
         transform={transform}
         fitScale={fitScale}
         pointRefs={pointRefs}
@@ -1647,8 +1656,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
             }
 
-            // Handle cmd-click to select all points
-            if ((e.evt.ctrlKey || e.evt.metaKey) && !e.evt.altKey && !e.evt.shiftKey) {
+            // Handle cmd-click to select all points (only when not in transform mode)
+            if (!transformMode && (e.evt.ctrlKey || e.evt.metaKey) && !e.evt.altKey && !e.evt.shiftKey) {
               // Select all points in the path
               const allPointIndices = Array.from({ length: initialPoints.length }, (_, i) => i);
               tracker.selectPoints(instanceId, new Set(allPointIndices));
@@ -1659,7 +1668,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
             // Check if this is the last added point and already selected (second click)
             const isLastAddedPoint = lastAddedPointId && initialPoints[pointIndex]?.id === lastAddedPointId;
-            const isAlreadySelected = selectedPoints.has(pointIndex);
+            const isAlreadySelected = effectiveSelectedPoints.has(pointIndex);
 
             // Only fire onFinish if this is the last added point AND it was already selected (second click)
             // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
@@ -1675,15 +1684,17 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               return;
             }
 
-            // Handle regular point selection
-            if (e.evt.ctrlKey || e.evt.metaKey) {
-              // Add to multi-selection
-              const newSelection = new Set(selectedPoints);
-              newSelection.add(pointIndex);
-              tracker.selectPoints(instanceId, newSelection);
-            } else {
-              // Select only this point
-              tracker.selectPoints(instanceId, new Set([pointIndex]));
+            // Handle regular point selection (only when not in transform mode)
+            if (!transformMode) {
+              if (e.evt.ctrlKey || e.evt.metaKey) {
+                // Add to multi-selection
+                const newSelection = new Set(selectedPoints);
+                newSelection.add(pointIndex);
+                tracker.selectPoints(instanceId, newSelection);
+              } else {
+                // Select only this point
+                tracker.selectPoints(instanceId, new Set([pointIndex]));
+              }
             }
 
             // Call the original onClick handler if provided
@@ -1703,13 +1714,13 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       {/* Proxy nodes for Transformer (positioned at exact point centers) - only show when not in drawing mode */}
       {drawingDisabled && (
-        <ProxyNodes selectedPoints={selectedPoints} initialPoints={getAllPoints()} proxyRefs={proxyRefs} />
+        <ProxyNodes selectedPoints={effectiveSelectedPoints} initialPoints={getAllPoints()} proxyRefs={proxyRefs} />
       )}
 
       {/* Transformer for multiselection - only show when not in drawing mode */}
       {drawingDisabled && (
         <VectorTransformer
-          selectedPoints={selectedPoints}
+          selectedPoints={effectiveSelectedPoints}
           initialPoints={getAllPoints()}
           transformerRef={transformerRef}
           proxyRefs={proxyRefs}

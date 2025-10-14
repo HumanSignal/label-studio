@@ -209,6 +209,8 @@ export interface KonvaVectorProps {
   onMouseLeave?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Disable all interactions when true */
   disabled?: boolean;
+  /** Enable transform mode where all points are treated as selected */
+  transformMode?: boolean;
   /** Constrain points to stay within image bounds */
   constrainToBounds?: boolean;
   /** Ref to access component methods */
