@@ -38,7 +38,7 @@
     min-height: 40px;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 32px;
+    padding: var(--spacing-base) var(--spacing-wider);
     box-sizing: content-box;
 
     &_divided {
@@ -54,7 +54,7 @@
   }
 
   &__body {
-    padding: 0 40px 32px;
+    padding: 0 var(--spacing-wider) var(--spacing-wider);
     color: var(--color-neutral-content);
 
     &_bare {

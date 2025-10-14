@@ -175,6 +175,7 @@
     },
     lookupHotkey: lookupHotkey,
     debug: {{settings.DEBUG|yesno:"true,false"}},
+    polling: {% if feature_flags.fflag_dev_disable_polling_killswitch_short %}false{% else %}true{% endif %},
     hostname: "{{settings.HOSTNAME}}",
     version: {{ versions|json_dumps_ensure_ascii|safe }},
     sentry_dsn: {% if settings.FRONTEND_SENTRY_DSN %}"{{ settings.FRONTEND_SENTRY_DSN }}"{% else %}null{% endif %},
