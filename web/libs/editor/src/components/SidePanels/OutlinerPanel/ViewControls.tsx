@@ -36,7 +36,6 @@ interface ViewControlsProps {
   regions: any;
   onOrderingChange: (ordering: OrderingOptions) => void;
   onGroupingChange: (grouping: GroupingOptions) => void;
-  onFilterChange: (filter: any) => void;
 }
 
 const mediaStartTimeSupportedTags = [
