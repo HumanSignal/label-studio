@@ -54,7 +54,6 @@ const _Tool = types
           vertices: [],
           converted: true,
           closed: false,
-          transformMode: false,
         });
       },
 

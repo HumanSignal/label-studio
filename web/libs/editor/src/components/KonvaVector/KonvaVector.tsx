@@ -15,6 +15,7 @@ import { convertPoint } from "./pointManagement";
 import { normalizePoints, convertBezierToSimplePoints, isPointInPolygon } from "./utils";
 import { findClosestPointOnPath, getDistance } from "./eventHandlers/utils";
 import { PointCreationManager } from "./pointCreationManager";
+import { VectorSelectionTracker, type VectorInstance } from "./VectorSelectionTracker";
 import { calculateShapeBoundingBox } from "./utils/bezierBoundingBox";
 import { shouldClosePathOnPointClick, isActivePointEligibleForClosing } from "./eventHandlers/pointSelection";
 import type { BezierPoint, GhostPoint as GhostPointType, KonvaVectorProps, KonvaVectorRef } from "./types";
@@ -34,7 +35,6 @@ import {
   HIT_RADIUS,
   TRANSFORMER_SETUP_DELAY,
   TRANSFORMER_CLEAR_DELAY,
-  CLICK_DELAY,
   MIN_POINTS_FOR_CLOSING,
   MIN_POINTS_FOR_BEZIER_CLOSING,
   INVISIBLE_SHAPE_OPACITY,
@@ -215,8 +215,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     onPathClosedChange,
     onTransformationComplete,
     onPointSelected,
-    selectedPoints: externalSelectedPoints,
-    onSelectionChange,
     onFinish,
     scaleX,
     scaleY,
@@ -231,10 +229,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     onMouseMove,
     onMouseUp,
     onClick,
-    onDblClick,
     onMouseEnter,
     onMouseLeave,
-    onTransformEnd,
     allowClose = false,
     closed,
     allowBezier = true,
@@ -247,8 +243,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     pixelSnapping = false,
     disabled = false,
     constrainToBounds = false,
-    transformMode = false,
-    name,
     pointRadius,
     pointFill = DEFAULT_POINT_FILL,
     pointStroke = DEFAULT_POINT_STROKE,
@@ -276,39 +270,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     }
   }, [initialPoints.length, skeletonEnabled]); // Only run when the number of points changes or skeleton mode changes
 
-  // Internal selection state
-  const [internalSelectedPointIndex, setInternalSelectedPointIndex] = useState<number | null>(null);
-  const [internalSelectedPoints, setInternalSelectedPoints] = useState<Set<number>>(new Set());
-
-  // Use external selection if provided, otherwise use internal state
-  const selectedPointIndex = externalSelectedPoints ?
-    (externalSelectedPoints.length === 1 ?
-      initialPoints.findIndex(p => p.id === externalSelectedPoints[0]) : null) :
-    internalSelectedPointIndex;
-
-  const selectedPoints = externalSelectedPoints ?
-    new Set(externalSelectedPoints.map(id => initialPoints.findIndex(p => p.id === id)).filter(i => i !== -1)) :
-    internalSelectedPoints;
-
-  // Transform mode creates virtual selection (doesn't affect real selection state)
-  const virtualSelectedPoints = transformMode && initialPoints.length > 0 ?
-    new Set(Array.from({ length: initialPoints.length }, (_, i) => i)) :
-    selectedPoints;
-
-  // Helper functions to update selection (works with both internal and external state)
-  const updateSelection = useCallback((newSelectedPoints: Set<number>, newSelectedPointIndex: number | null) => {
-    if (externalSelectedPoints) {
-      // External control - notify parent
-      const selectedIds = Array.from(newSelectedPoints).map(i => initialPoints[i]?.id).filter(Boolean);
-      onSelectionChange?.(selectedIds, newSelectedPointIndex);
-    } else {
-      // Internal control - update internal state
-      setInternalSelectedPoints(newSelectedPoints);
-      setInternalSelectedPointIndex(newSelectedPointIndex);
-    }
-    onPointSelected?.(newSelectedPointIndex);
-  }, [externalSelectedPoints, initialPoints, onSelectionChange, onPointSelected]);
-
+  // Use initialPoints directly - this will update when the parent re-renders
+  const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
+  const [selectedPoints, setSelectedPoints] = useState<Set<number>>(new Set());
   const [lastAddedPointId, setLastAddedPointId] = useState<string | null>(null);
 
   const transformerRef = useRef<Konva.Transformer>(null);
@@ -377,23 +341,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Flag to track if point selection was handled in VectorPoints onClick
   const pointSelectionHandled = useRef(false);
 
-  // Flag to track if VectorShape already handled the click/double-click
-  const shapeHandledClick = useRef(false);
-
-  // Timeout ref for delayed click execution (to prevent clicks during double-click)
-  const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Cleanup click timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (clickTimeoutRef.current) {
-        clearTimeout(clickTimeoutRef.current);
-      }
-    };
-  }, []);
-
   // Initialize PointCreationManager instance
   const pointCreationManager = useMemo(() => new PointCreationManager(), []);
+
+  // Initialize VectorSelectionTracker
+  const tracker = useMemo(() => VectorSelectionTracker.getInstance(), []);
 
   // Compute if path is closed based on point references
   // A path is closed if the first point's prevPointId points to the last point
@@ -436,10 +388,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Determine if drawing should be disabled based on current interaction context
   const isDrawingDisabled = () => {
     // Disable all interactions when disabled prop is true
-    // Disable drawing when in transform mode
     // Disable drawing when Shift is held (for Shift+click functionality)
     // Disable drawing when multiple points are selected
-    if (disabled || transformMode || isShiftKeyHeld || selectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
+    if (disabled || isShiftKeyHeld || selectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
       return true;
     }
 
@@ -536,10 +487,66 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     }
   }, [drawingDisabled]);
 
+  // Stabilize functions for tracker registration
+  const getPoints = useCallback(() => initialPoints, [initialPoints]);
+  const updatePoints = useCallback(
+    (points: BezierPoint[]) => {
+      setInitialPoints(points);
+      onPointsChange?.(points);
+    },
+    [onPointsChange],
+  );
+  const setSelectedPointsStable = useCallback((selectedPoints: Set<number>) => {
+    setSelectedPoints(selectedPoints);
+  }, []);
+  const setSelectedPointIndexStable = useCallback((index: number | null) => {
+    setSelectedPointIndex(index);
+  }, []);
+  const getTransformStable = useCallback(() => transform, [transform]);
+  const getFitScaleStable = useCallback(() => fitScale, [fitScale]);
+  const getBoundsStable = useCallback(() => ({ width, height }), [width, height]);
+
+  // Register instance with tracker
+  useEffect(() => {
+    const vectorInstance: VectorInstance = {
+      id: instanceId,
+      getPoints,
+      updatePoints,
+      setSelectedPoints: setSelectedPointsStable,
+      setSelectedPointIndex: setSelectedPointIndexStable,
+      onPointSelected,
+      onTransformationComplete,
+      getTransform: getTransformStable,
+      getFitScale: getFitScaleStable,
+      getBounds: getBoundsStable,
+      constrainToBounds,
+    };
+
+    tracker.registerInstance(vectorInstance);
+
+    return () => {
+      tracker.unregisterInstance(instanceId);
+    };
+  }, [
+    instanceId,
+    tracker,
+    getPoints,
+    updatePoints,
+    setSelectedPointsStable,
+    setSelectedPointIndexStable,
+    onPointSelected,
+    onTransformationComplete,
+    getTransformStable,
+    getFitScaleStable,
+    getBoundsStable,
+    constrainToBounds,
+  ]);
+
   // Clear selection when component is disabled
   useEffect(() => {
     if (disabled) {
-      updateSelection(new Set(), null);
+      setSelectedPointIndex(null);
+      setSelectedPoints(new Set());
       setVisibleControlPoints(new Set());
       setDraggedControlPoint(null);
       setGhostPoint(null);
@@ -549,23 +556,20 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Hide all Bezier control points when disabled
       setVisibleControlPoints(new Set());
     }
-  }, [disabled, updateSelection]);
-
-  // Transform mode is now virtual - no need to actually select points
-
+  }, [disabled]);
   const lastPos = useRef<{ x: number; y: number } | null>(null);
 
   // Set up Transformer nodes once when selection changes
   useEffect(() => {
     if (transformerRef.current) {
-      if (virtualSelectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
+      if (selectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN) {
         // Use setTimeout to ensure proxy nodes are rendered first
         setTimeout(() => {
           if (transformerRef.current) {
             // Set up proxy nodes once - transformer will manage them independently
             // Use getAllPoints() to get the correct proxy nodes for all points
             const allPoints = getAllPoints();
-            const nodes = Array.from(virtualSelectedPoints)
+            const nodes = Array.from(selectedPoints)
               .map((index) => {
                 // Ensure the index is within bounds of all points
                 if (index < allPoints.length) {
@@ -592,7 +596,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }, TRANSFORMER_CLEAR_DELAY);
       }
     }
-  }, [virtualSelectedPoints]); // Only depend on virtualSelectedPoints, not initialPoints
+  }, [selectedPoints]); // Only depend on selectedPoints, not initialPoints
 
   // Note: We don't update proxy node positions during transformation
   // The transformer handles positioning the proxy nodes itself
@@ -911,6 +915,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       return true;
     },
     selectPointsByIds: (pointIds: string[]) => {
+      // Check if this instance can have selection
+      if (!tracker.canInstanceHaveSelection(instanceId)) {
+        return; // Block the selection
+      }
+
       // Find the indices of the points with the given IDs
       const selectedIndices = new Set<number>();
       let primarySelectedIndex: number | null = null;
@@ -925,12 +934,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }
       }
 
-      // Update selection using the unified system
-      updateSelection(selectedIndices, selectedIndices.size === 1 ? primarySelectedIndex : null);
+      // Use tracker for global selection management
+      tracker.selectPoints(instanceId, selectedIndices);
     },
     clearSelection: () => {
-      // Clear selection using the unified system
-      updateSelection(new Set(), null);
+      // Use tracker for global selection management
+      tracker.selectPoints(instanceId, new Set());
     },
     getSelectedPointIds: () => {
       const selectedIds: string[] = [];
@@ -1395,20 +1404,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
   // Create event handlers
   const eventHandlers = createEventHandlers({
+    instanceId,
     initialPoints,
     width,
     height,
     pixelSnapping,
     selectedPoints,
     selectedPointIndex,
-    setSelectedPointIndex: (index) => {
-      const newSelectedPoints = index !== null ? new Set([index]) : new Set();
-      updateSelection(newSelectedPoints, index);
-    },
-    setSelectedPoints: (points) => {
-      const newSelectedPointIndex = points.size === 1 ? Array.from(points)[0] : null;
-      updateSelection(points, newSelectedPointIndex);
-    },
+    setSelectedPointIndex,
+    setSelectedPoints,
     setDraggedPointIndex,
     setDraggedControlPoint,
     setIsDisconnectedMode,
@@ -1490,42 +1494,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 pointSelectionHandled.current = false;
                 return;
               }
-
-            // Skip if VectorShape already handled the click
-            if (shapeHandledClick.current) {
-              shapeHandledClick.current = false;
-              return;
-            }
-
-            // Clear any existing click timeout
-            if (clickTimeoutRef.current) {
-              clearTimeout(clickTimeoutRef.current);
-            }
-
-            // Delay click execution to check if it's part of a double-click
-            clickTimeoutRef.current = setTimeout(() => {
-                eventHandlers.handleLayerClick(e);
-              }, CLICK_DELAY);
-          }
-      }
-      onDblClick={
-        disabled
-          ? undefined
-          : (e) => {
-            // Skip if VectorShape already handled the double-click
-            if (shapeHandledClick.current) {
-              shapeHandledClick.current = false;
-              return;
-            }
-
-            // Clear the pending click timeout to prevent single click from executing
-            if (clickTimeoutRef.current) {
-              clearTimeout(clickTimeoutRef.current);
-              clickTimeoutRef.current = null;
-            }
-
-            // Execute double click handler
-            onDblClick?.(e);
+              eventHandlers.handleLayerClick(e);
             }
       }
     >
@@ -1542,249 +1511,67 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       )}
 
       {/* Unified vector shape - renders all lines based on id-prevPointId relationships */}
-      {name?.includes('_transformable') ? (
-        <Group name={name} onTransformEnd={onTransformEnd}>
-          <VectorShape
-            segments={getAllLineSegments()}
-            allowClose={allowClose}
-            isPathClosed={finalIsPathClosed}
-            stroke={stroke}
-            fill={fill}
-            strokeWidth={props.strokeWidth}
-            opacity={props.opacity}
-            transform={transform}
-            fitScale={fitScale}
-            name={undefined}
-            onClick={(e) => {
-              // Mark that VectorShape handled the click
-              shapeHandledClick.current = true;
+      <VectorShape
+        segments={getAllLineSegments()}
+        allowClose={allowClose}
+        isPathClosed={finalIsPathClosed}
+        stroke={stroke}
+        fill={fill}
+        strokeWidth={props.strokeWidth}
+        opacity={props.opacity}
+        transform={transform}
+        fitScale={fitScale}
+        onClick={(e) => {
+          // Handle cmd-click to select all points
+          if ((e.evt.ctrlKey || e.evt.metaKey) && !e.evt.altKey && !e.evt.shiftKey) {
+            // Check if this instance can have selection
+            if (!tracker.canInstanceHaveSelection(instanceId)) {
+              return; // Block the selection
+            }
 
-              // Clear any existing click timeout
-              if (clickTimeoutRef.current) {
-                clearTimeout(clickTimeoutRef.current);
-              }
+            // Select all points in the path
+            const allPointIndices = Array.from({ length: initialPoints.length }, (_, i) => i);
+            tracker.selectPoints(instanceId, new Set(allPointIndices));
+            return;
+          }
 
-              // Delay click execution to check if it's part of a double-click
-              clickTimeoutRef.current = setTimeout(() => {
-                // Check if click is on the last added point by checking cursor position
-                if (cursorPosition && lastAddedPointId) {
-                  const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
-                  if (lastAddedPoint) {
-                    const scale = transform.zoom * fitScale;
-                    const hitRadius = 15 / scale; // Same radius as used in event handlers
-                    const distance = Math.sqrt(
-                      (cursorPosition.x - lastAddedPoint.x) ** 2 + (cursorPosition.y - lastAddedPoint.y) ** 2,
-                    );
+          // Check if click is on the last added point by checking cursor position
+          if (cursorPosition && lastAddedPointId) {
+            const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
+            if (lastAddedPoint) {
+              const scale = transform.zoom * fitScale;
+              const hitRadius = 15 / scale; // Same radius as used in event handlers
+              const distance = Math.sqrt(
+                (cursorPosition.x - lastAddedPoint.x) ** 2 + (cursorPosition.y - lastAddedPoint.y) ** 2,
+              );
 
-                    if (distance <= hitRadius) {
-                      // Find the index of the last added point
-                      const lastAddedPointIndex = initialPoints.findIndex((p) => p.id === lastAddedPointId);
+              if (distance <= hitRadius) {
+                // Find the index of the last added point
+                const lastAddedPointIndex = initialPoints.findIndex((p) => p.id === lastAddedPointId);
 
-                      // Only trigger onFinish if the last added point is already selected (second click)
-                      // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-                      if (lastAddedPointIndex !== -1 && selectedPoints.has(lastAddedPointIndex) && !disabled) {
-                        const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
-                        if (!hasModifiers) {
-                          onFinish?.(e);
-                          return;
-                        }
-                        // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
-                        return;
-                      }
-                    }
-                  }
-                }
-
-                // Call the event handler (for drawing/interaction logic)
-                eventHandlers.handleLayerClick(e);
-
-                // Call the original onClick handler (custom callback)
-                onClick?.(e);
-              }, CLICK_DELAY);
-            }}
-            onDblClick={(e) => {
-              // Mark that VectorShape handled the double-click
-              shapeHandledClick.current = true;
-
-              // Clear the pending click timeout to prevent single click from executing
-              if (clickTimeoutRef.current) {
-                clearTimeout(clickTimeoutRef.current);
-                clickTimeoutRef.current = null;
-              }
-
-              // Execute double click handler
-              onDblClick?.(e);
-            }}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-            key={`vector-shape-${initialPoints.length}-${initialPoints.map((p) => p.id).join("-")}`}
-          />
-
-          {/* All vector points - inside the same _transformable group */}
-          <VectorPoints
-            initialPoints={getAllPoints()}
-            selectedPointIndex={selectedPointIndex}
-            selectedPoints={selectedPoints}
-            transform={transform}
-            fitScale={fitScale}
-            pointRefs={pointRefs}
-            disabled={disabled}
-            pointRadius={pointRadius}
-            pointFill={pointFill}
-            pointStroke={pointStroke}
-            pointStrokeSelected={pointStrokeSelected}
-            pointStrokeWidth={pointStrokeWidth}
-            onPointClick={(e, pointIndex) => {
-              // Handle point selection even when disabled (similar to shape clicks)
-              if (disabled) {
-                // Check if we're about to close the path - prevent point selection in this case
-                if (
-                  shouldClosePathOnPointClick(
-                    pointIndex,
-                    {
-                      initialPoints,
-                      allowClose,
-                      isPathClosed: finalIsPathClosed,
-                      skeletonEnabled,
-                      activePointId,
-                    } as any,
-                    e,
-                  ) &&
-                  isActivePointEligibleForClosing({
-                    initialPoints,
-                    skeletonEnabled,
-                    activePointId,
-                  } as any)
-                ) {
-                  // Use the bidirectional closePath function
-                  const success = (ref as React.MutableRefObject<KonvaVectorRef | null>)?.current?.close();
-                  if (success) {
-                    return; // Path was closed, don't select the point
-                  }
-                }
-
-                // Check if this is the last added point and already selected (second click)
-                const isLastAddedPoint = lastAddedPointId && initialPoints[pointIndex]?.id === lastAddedPointId;
-                const isAlreadySelected = selectedPoints.has(pointIndex);
-
-                // Only fire onFinish if this is the last added point AND it was already selected (second click)
+                // Only trigger onFinish if the last added point is already selected (second click)
                 // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-                if (isLastAddedPoint && isAlreadySelected && !disabled) {
+                if (lastAddedPointIndex !== -1 && selectedPoints.has(lastAddedPointIndex) && !disabled) {
                   const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
                   if (!hasModifiers) {
+                    e.evt.preventDefault();
                     onFinish?.(e);
-                    pointSelectionHandled.current = true; // Mark that we handled selection
-                    e.evt.stopImmediatePropagation(); // Prevent all other handlers from running
                     return;
                   }
                   // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
                   return;
                 }
-
-                // Handle regular point selection
-                if (e.evt.ctrlKey || e.evt.metaKey) {
-                  // Add to multi-selection
-                  const newSelection = new Set(selectedPoints);
-                  newSelection.add(pointIndex);
-                  updateSelection(newSelection, null);
-                } else {
-                  // Select only this point
-                  updateSelection(new Set([pointIndex]), pointIndex);
-                }
-
-                // Call the original onClick handler if provided
-                onClick?.(e);
-
-                // Mark that we handled selection and prevent all other handlers from running
-                pointSelectionHandled.current = true;
-                e.evt.stopImmediatePropagation();
-                return;
               }
-
-              // When not disabled, let the normal event handlers handle it
-              // The point click will be detected by the layer-level handlers
-              //
-            }}
-          />
-        </Group>
-      ) : (
-          <VectorShape
-            segments={getAllLineSegments()}
-            allowClose={allowClose}
-            isPathClosed={finalIsPathClosed}
-            stroke={stroke}
-            fill={fill}
-            strokeWidth={props.strokeWidth}
-            opacity={props.opacity}
-            transform={transform}
-            fitScale={fitScale}
-            name={name}
-            onTransformEnd={onTransformEnd}
-            onClick={(e) => {
-              // Mark that VectorShape handled the click
-              shapeHandledClick.current = true;
-
-            // Clear any existing click timeout
-            if (clickTimeoutRef.current) {
-              clearTimeout(clickTimeoutRef.current);
             }
+          }
 
-            // Delay click execution to check if it's part of a double-click
-            clickTimeoutRef.current = setTimeout(() => {
-              // Check if click is on the last added point by checking cursor position
-              if (cursorPosition && lastAddedPointId) {
-                const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
-                if (lastAddedPoint) {
-                  const scale = transform.zoom * fitScale;
-                  const hitRadius = 15 / scale; // Same radius as used in event handlers
-                  const distance = Math.sqrt(
-                    (cursorPosition.x - lastAddedPoint.x) ** 2 + (cursorPosition.y - lastAddedPoint.y) ** 2,
-                  );
-
-                  if (distance <= hitRadius) {
-                    // Find the index of the last added point
-                    const lastAddedPointIndex = initialPoints.findIndex((p) => p.id === lastAddedPointId);
-
-                    // Only trigger onFinish if the last added point is already selected (second click)
-                    // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-                    if (lastAddedPointIndex !== -1 && selectedPoints.has(lastAddedPointIndex) && !disabled) {
-                      const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
-                      if (!hasModifiers) {
-                        onFinish?.(e);
-                        return;
-                      }
-                      // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
-                      return;
-                    }
-                  }
-                }
-              }
-
-              // Call the event handler (for drawing/interaction logic)
-              eventHandlers.handleLayerClick(e);
-
-              // Call the original onClick handler (custom callback)
-              onClick?.(e);
-            }, CLICK_DELAY);
-            }}
-            onDblClick={(e) => {
-              // Mark that VectorShape handled the double-click
-              shapeHandledClick.current = true;
-
-            // Clear the pending click timeout to prevent single click from executing
-            if (clickTimeoutRef.current) {
-              clearTimeout(clickTimeoutRef.current);
-              clickTimeoutRef.current = null;
-            }
-
-              // Execute double click handler
-              onDblClick?.(e);
-            }}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
-            key={`vector-shape-${initialPoints.length}-${initialPoints.map((p) => p.id).join("-")}`}
-          />
-      )}
+          // Call the original onClick handler
+          onClick?.(e);
+        }}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        key={`vector-shape-${initialPoints.length}-${initialPoints.map((p) => p.id).join("-")}`}
+      />
 
       {/* Ghost line - preview from last point to cursor */}
       <GhostLine
@@ -1822,104 +1609,117 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         />
       )}
 
-      {/* All vector points - only render when not in multi-region mode */}
-      {!name?.includes('_transformable') && (
-        <VectorPoints
-          initialPoints={getAllPoints()}
-          selectedPointIndex={selectedPointIndex}
-          selectedPoints={selectedPoints}
-          transform={transform}
-          fitScale={fitScale}
-          pointRefs={pointRefs}
-          disabled={disabled}
-          pointRadius={pointRadius}
-          pointFill={pointFill}
-          pointStroke={pointStroke}
-          pointStrokeSelected={pointStrokeSelected}
-          pointStrokeWidth={pointStrokeWidth}
-          onPointClick={(e, pointIndex) => {
-            // Handle point selection even when disabled (similar to shape clicks)
-            if (disabled) {
-              // Check if we're about to close the path - prevent point selection in this case
-              if (
-                shouldClosePathOnPointClick(
-                  pointIndex,
-                  {
-                    initialPoints,
-                    allowClose,
-                    isPathClosed: finalIsPathClosed,
-                    skeletonEnabled,
-                    activePointId,
-                  } as any,
-                  e,
-                ) &&
-                isActivePointEligibleForClosing({
+      {/* All vector points */}
+      <VectorPoints
+        initialPoints={getAllPoints()}
+        selectedPointIndex={selectedPointIndex}
+        selectedPoints={selectedPoints}
+        transform={transform}
+        fitScale={fitScale}
+        pointRefs={pointRefs}
+        disabled={disabled}
+        pointRadius={pointRadius}
+        pointFill={pointFill}
+        pointStroke={pointStroke}
+        pointStrokeSelected={pointStrokeSelected}
+        pointStrokeWidth={pointStrokeWidth}
+        onPointClick={(e, pointIndex) => {
+          // Handle point selection even when disabled (similar to shape clicks)
+          if (disabled) {
+            // Check if this instance can have selection
+            if (!tracker.canInstanceHaveSelection(instanceId)) {
+              return; // Block the selection
+            }
+
+            // Check if we're about to close the path - prevent point selection in this case
+            if (
+              shouldClosePathOnPointClick(
+                pointIndex,
+                {
                   initialPoints,
+                  allowClose,
+                  isPathClosed: finalIsPathClosed,
                   skeletonEnabled,
                   activePointId,
-                } as any)
-              ) {
-                // Use the bidirectional closePath function
-                const success = (ref as React.MutableRefObject<KonvaVectorRef | null>)?.current?.close();
-                if (success) {
-                  return; // Path was closed, don't select the point
-                }
+                } as any,
+                e,
+              ) &&
+              isActivePointEligibleForClosing({
+                initialPoints,
+                skeletonEnabled,
+                activePointId,
+              } as any)
+            ) {
+              // Use the bidirectional closePath function
+              const success = (ref as React.MutableRefObject<KonvaVectorRef | null>)?.current?.close();
+              if (success) {
+                return; // Path was closed, don't select the point
               }
+            }
 
-              // Check if this is the last added point and already selected (second click)
-              const isLastAddedPoint = lastAddedPointId && initialPoints[pointIndex]?.id === lastAddedPointId;
-              const isAlreadySelected = selectedPoints.has(pointIndex);
-
-              // Only fire onFinish if this is the last added point AND it was already selected (second click)
-              // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-              if (isLastAddedPoint && isAlreadySelected && !disabled) {
-                const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
-                if (!hasModifiers) {
-                  onFinish?.(e);
-                  pointSelectionHandled.current = true; // Mark that we handled selection
-                  e.evt.stopImmediatePropagation(); // Prevent all other handlers from running
-                  return;
-                }
-                // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
-                return;
-              }
-
-              // Handle regular point selection
-              if (e.evt.ctrlKey || e.evt.metaKey) {
-                // Add to multi-selection
-                const newSelection = new Set(selectedPoints);
-                newSelection.add(pointIndex);
-                updateSelection(newSelection, null);
-              } else {
-                // Select only this point
-                updateSelection(new Set([pointIndex]), pointIndex);
-              }
-
-              // Call the original onClick handler if provided
-              onClick?.(e);
-
-              // Mark that we handled selection and prevent all other handlers from running
-              pointSelectionHandled.current = true;
-              e.evt.stopImmediatePropagation();
+            // Handle cmd-click to select all points
+            if ((e.evt.ctrlKey || e.evt.metaKey) && !e.evt.altKey && !e.evt.shiftKey) {
+              // Select all points in the path
+              const allPointIndices = Array.from({ length: initialPoints.length }, (_, i) => i);
+              tracker.selectPoints(instanceId, new Set(allPointIndices));
+              pointSelectionHandled.current = true; // Mark that we handled selection
+              e.evt.stopImmediatePropagation(); // Prevent all other handlers from running
               return;
             }
 
-            // When not disabled, let the normal event handlers handle it
-            // The point click will be detected by the layer-level handlers
-            //
-          }}
-        />
-      )}
+            // Check if this is the last added point and already selected (second click)
+            const isLastAddedPoint = lastAddedPointId && initialPoints[pointIndex]?.id === lastAddedPointId;
+            const isAlreadySelected = selectedPoints.has(pointIndex);
+
+            // Only fire onFinish if this is the last added point AND it was already selected (second click)
+            // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
+            if (isLastAddedPoint && isAlreadySelected && !disabled) {
+              const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
+              if (!hasModifiers) {
+                onFinish?.(e);
+                pointSelectionHandled.current = true; // Mark that we handled selection
+                e.evt.stopImmediatePropagation(); // Prevent all other handlers from running
+                return;
+              }
+              // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
+              return;
+            }
+
+            // Handle regular point selection
+            if (e.evt.ctrlKey || e.evt.metaKey) {
+              // Add to multi-selection
+              const newSelection = new Set(selectedPoints);
+              newSelection.add(pointIndex);
+              tracker.selectPoints(instanceId, newSelection);
+            } else {
+              // Select only this point
+              tracker.selectPoints(instanceId, new Set([pointIndex]));
+            }
+
+            // Call the original onClick handler if provided
+            onClick?.(e);
+
+            // Mark that we handled selection and prevent all other handlers from running
+            pointSelectionHandled.current = true;
+            e.evt.stopImmediatePropagation();
+            return;
+          }
+
+          // When not disabled, let the normal event handlers handle it
+          // The point click will be detected by the layer-level handlers
+          //
+        }}
+      />
 
       {/* Proxy nodes for Transformer (positioned at exact point centers) - only show when not in drawing mode */}
       {drawingDisabled && (
-        <ProxyNodes selectedPoints={virtualSelectedPoints} initialPoints={getAllPoints()} proxyRefs={proxyRefs} />
+        <ProxyNodes selectedPoints={selectedPoints} initialPoints={getAllPoints()} proxyRefs={proxyRefs} />
       )}
 
       {/* Transformer for multiselection - only show when not in drawing mode */}
       {drawingDisabled && (
         <VectorTransformer
-          selectedPoints={virtualSelectedPoints}
+          selectedPoints={selectedPoints}
           initialPoints={getAllPoints()}
           transformerRef={transformerRef}
           proxyRefs={proxyRefs}

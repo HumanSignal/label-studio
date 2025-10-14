@@ -2,6 +2,7 @@ import type { KonvaEventObject } from "konva/lib/Node";
 import type { EventHandlerProps } from "./types";
 import { isPointInHitRadius, stageToImageCoordinates } from "./utils";
 import { closePathBetweenFirstAndLast } from "./drawing";
+import { VectorSelectionTracker } from "../VectorSelectionTracker";
 
 // Helper function to check if a point click should trigger path closing
 export function shouldClosePathOnPointClick(
@@ -98,6 +99,14 @@ export function handlePointSelection(e: KonvaEventObject<MouseEvent>, props: Eve
   const scale = props.transform.zoom * props.fitScale;
   const hitRadius = 10 / scale;
 
+  // Get the tracker instance
+  const tracker = VectorSelectionTracker.getInstance();
+
+  // Check if this instance can have selection
+  if (!tracker.canInstanceHaveSelection(props.instanceId || "unknown")) {
+    return false; // Block selection in this instance
+  }
+
   // Check if we clicked on any point
   for (let i = 0; i < props.initialPoints.length; i++) {
     const point = props.initialPoints[i];
@@ -145,19 +154,15 @@ export function handlePointSelection(e: KonvaEventObject<MouseEvent>, props: Eve
         const newSelection = new Set(currentSelection);
         newSelection.add(i);
 
-        // Update local selection state
-        props.setSelectedPoints?.(newSelection);
-        props.setSelectedPointIndex?.(null); // Multiple points selected
-        props.onPointSelected?.(null);
+        // Use tracker for global selection management
+        tracker.selectPoints(props.instanceId || "unknown", newSelection);
         return true;
       }
 
       // Handle skeleton mode point selection (when not multi-selecting)
       if (props.skeletonEnabled) {
-        // Update local selection state
-        props.setSelectedPoints?.(new Set([i]));
-        props.setSelectedPointIndex?.(i);
-        props.onPointSelected?.(i);
+        // Use tracker for global selection management
+        tracker.selectPoints(props.instanceId || "unknown", new Set([i]));
         // In skeleton mode, update the active point when selecting a different point
         // This ensures onFinish only fires for the currently selected point
         props.setActivePointId?.(point.id);
@@ -165,10 +170,8 @@ export function handlePointSelection(e: KonvaEventObject<MouseEvent>, props: Eve
       }
 
       // If no Cmd/Ctrl and not skeleton mode, clear multi-selection and select only this point
-      // Update local selection state
-      props.setSelectedPoints?.(new Set([i]));
-      props.setSelectedPointIndex?.(i);
-      props.onPointSelected?.(i);
+      // Use tracker for global selection management
+      tracker.selectPoints(props.instanceId || "unknown", new Set([i]));
       // Return true to indicate we handled the selection
       return true;
     }
@@ -186,6 +189,14 @@ export function handlePointDeselection(e: KonvaEventObject<MouseEvent>, props: E
   const scale = props.transform.zoom * props.fitScale;
   const hitRadius = 10 / scale;
 
+  // Get the tracker instance
+  const tracker = VectorSelectionTracker.getInstance();
+
+  // Check if this instance can have selection (deselection is allowed for the active instance)
+  if (!tracker.canInstanceHaveSelection(props.instanceId || "unknown")) {
+    return false; // Block deselection in this instance
+  }
+
   // Check if we clicked on a selected point to unselect it
   for (let i = 0; i < props.initialPoints.length; i++) {
     if (props.selectedPoints.has(i)) {
@@ -195,10 +206,8 @@ export function handlePointDeselection(e: KonvaEventObject<MouseEvent>, props: E
         const newSet = new Set<number>(props.selectedPoints);
         newSet.delete(i);
 
-        // Update local selection state
-        props.setSelectedPoints?.(newSet);
-        props.setSelectedPointIndex?.(newSet.size === 1 ? Array.from(newSet)[0] : null);
-        props.onPointSelected?.(newSet.size === 1 ? Array.from(newSet)[0] : null);
+        // Use tracker for global selection management
+        tracker.selectPoints(props.instanceId || "unknown", newSet);
 
         // Handle skeleton mode reset
         if (newSet.size <= 1 && props.skeletonEnabled && props.initialPoints.length > 0) {

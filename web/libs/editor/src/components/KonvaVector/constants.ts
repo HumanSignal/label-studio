@@ -59,7 +59,6 @@ export const HIT_RADIUS = {
 // Timing constants
 export const TRANSFORMER_SETUP_DELAY = 0;
 export const TRANSFORMER_CLEAR_DELAY = 10;
-export const CLICK_DELAY = 200; // Delay for distinguishing click from double-click
 
 // Point count constraints
 export const MIN_POINTS_FOR_CLOSING = 2;

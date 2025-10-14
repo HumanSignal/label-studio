@@ -132,10 +132,6 @@ export interface KonvaVectorProps {
   }) => void;
   /** Called when a point is selected */
   onPointSelected?: (pointIndex: number | null) => void;
-  /** Array of selected point IDs (controlled selection) */
-  selectedPoints?: string[];
-  /** Called when selection changes */
-  onSelectionChange?: (selectedPointIds: string[], selectedPointIndex: number | null) => void;
   /** Called when drawing is finished (click on last point or double click on empty space) */
   onFinish?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Canvas width */
@@ -205,22 +201,14 @@ export interface KonvaVectorProps {
   onMouseUp?: (e?: KonvaEventObject<MouseEvent>) => void;
   /** Click event handler */
   onClick?: (e: KonvaEventObject<MouseEvent>) => void;
-  /** Double click event handler */
-  onDblClick?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse enter event handler */
   onMouseEnter?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse leave event handler */
   onMouseLeave?: (e: KonvaEventObject<MouseEvent>) => void;
-  /** Transform end event handler (for multi-region transformation) */
-  onTransformEnd?: (e: KonvaEventObject<Event>) => void;
   /** Disable all interactions when true */
   disabled?: boolean;
   /** Constrain points to stay within image bounds */
   constrainToBounds?: boolean;
-  /** Enable transform mode - automatically selects all points and shows transformer */
-  transformMode?: boolean;
-  /** Name to assign to the vector shape (for transformer identification) */
-  name?: string;
   /** Ref to access component methods */
   ref?: React.RefObject<KonvaVectorRef>;
 }

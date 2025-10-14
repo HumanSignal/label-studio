@@ -54,12 +54,6 @@ const Model = types
 
     // Internal flag to detect if we converted data back from relative points
     converted: false,
-
-    // Transform mode -- virtual mode to allow transforming the shape as whole (rotate, resize, translate)
-    // - when transforming -- user can resize, translate or rotate entire shape (all points at once)
-    // - when NOT transforming -- user works on individual points, moving them, adding, removing, etc.
-    // Every shape is in transform mode by default except for newly drawn one
-    transformMode: true,
   })
   .volatile(() => ({
     mouseOverStartPoint: false,
@@ -73,7 +67,6 @@ const Model = types
     isDrawing: false,
     vectorRef: null,
     groupRef: null,
-    selectedVertices: [],
   }))
   .views((self) => ({
     get store() {
@@ -89,21 +82,13 @@ const Model = types
     get bbox() {
       if (!self.vertices?.length || !isAlive(self)) return {};
 
-      // Calculate bounding box directly from vertices (similar to PolygonRegion)
-      const bbox = self.vertices.reduce(
-        (bboxCoords, point) => ({
-          left: Math.min(bboxCoords.left, point.x),
-          top: Math.min(bboxCoords.top, point.y),
-          right: Math.max(bboxCoords.right, point.x),
-          bottom: Math.max(bboxCoords.bottom, point.y),
-        }),
-        {
-          left: self.vertices[0].x,
-          top: self.vertices[0].y,
-          right: self.vertices[0].x,
-          bottom: self.vertices[0].y,
-        },
-      );
+      // Calculate bounding box from vector points
+      const bbox = self.vectorRef?.getShapeBoundingBox() ?? {};
+
+      // Ensure we have valid coordinates
+      if (bbox.left === undefined || bbox.top === undefined) {
+        return {};
+      }
 
       return bbox;
     },
@@ -267,13 +252,10 @@ const Model = types
           .map((p) => p.id);
 
         const vector = self.vectorRef;
-        const selectionSize = self.annotation.regionStore.selection.size;
-
-        self.selectedVertices = selectionSize > 1 ? [] : selectedPoints;
+        vector?.selectPointsByIds(selectedPoints);
       },
 
       _selectArea(additiveMode = false) {
-        self.transformMode = true;
         const annotation = self.annotation;
         if (!annotation) return;
 
@@ -388,51 +370,6 @@ const Model = types
       isTransforming() {
         const selection = self.vectorRef.getSelectedPointIds();
         return selection.length > 1;
-      },
-
-      // Apply transformation from ImageTransformer
-      applyTransform(transformation) {
-        console.log("applying transfomations", transformation);
-        if (!self.vectorRef) return;
-
-        const { dx, dy, scaleX, scaleY, rotation } = transformation;
-
-        // Check if transformation values are reasonable (not already applied)
-        // If dx/dy are very large, it means the transformation was already applied by Konva
-        const isTranslationReasonable = Math.abs(dx) < 1000 && Math.abs(dy) < 1000;
-        const isScaleReasonable = scaleX > 0.1 && scaleX < 10 && scaleY > 0.1 && scaleY < 10;
-
-        console.log("transformation check:", { isTranslationReasonable, isScaleReasonable });
-
-        // Only apply transformation if values are reasonable
-        if (!isTranslationReasonable || !isScaleReasonable) {
-          console.log("Skipping transformation - values seem already applied");
-          return;
-        }
-
-        // Get the bounding box center for rotation/scale origin
-        const bbox = self.bboxCoords || self.bbox;
-        if (!bbox) return;
-
-        // Use the same coordinate system as translation - no conversion needed
-        // The bbox is already in the correct coordinate system for KonvaVector
-        const centerX = (bbox.left + bbox.right) / 2;
-        const centerY = (bbox.top + bbox.bottom) / 2;
-
-        console.log("bbox center:", { centerX, centerY });
-        console.log("transformation values:", { dx, dy, scaleX, scaleY, rotation });
-
-        // Apply transformations using the same approach as translation
-        // Use raw values directly - Konva transformer already handled coordinate conversion
-        self.vectorRef.transformPoints({
-          dx: dx,
-          dy: dy,
-          rotation: rotation,
-          scaleX: scaleX,
-          scaleY: scaleY,
-          centerX: centerX,
-          centerY: centerY,
-        });
       },
 
       segGroupRef(ref) {
@@ -554,14 +491,6 @@ const Model = types
         }
         tool?.complete();
       },
-
-      toggleTransformMode() {
-        self.setTransformMode(!self.transformMode);
-      },
-
-      setTransformMode(transformMode) {
-        self.transformMode = transformMode;
-      },
     };
   });
 
@@ -586,21 +515,17 @@ const HtxVectorView = observer(({ item, suggestion }) => {
   const stageWidth = image?.naturalWidth ?? 0;
   const stageHeight = image?.naturalHeight ?? 0;
   const { x: offsetX, y: offsetY } = item.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
-  const disabled = item.disabled || suggestion || store.annotationStore.selected.isLinkingMode;
 
   // Wait for stage to be properly initialized
   if (!item.parent?.stageWidth || !item.parent?.stageHeight) {
     return null;
   }
 
-  const isMultiRegionSelected = item.inSelection && item.parent?.selectedRegions?.length > 1;
-
   return (
     <RegionWrapper item={item}>
       <Group ref={(ref) => item.segGroupRef(ref)}>
         <KonvaVector
           ref={(kv) => item.setKonvaVectorRef(kv)}
-          name={isMultiRegionSelected ? `${item.id} _transformable` : undefined}
           initialPoints={Array.from(item.vertices)}
           onFinish={(e) => {
             e.evt.stopPropagation();
@@ -630,10 +555,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               stage.container().style.cursor = Constants.DEFAULT_CURSOR;
             }
 
-            if (!item.selected) {
-              item.setHighlight(false);
-              item.onClickRegion(e);
-            }
+            item.setHighlight(false);
+            item.onClickRegion(e);
           }}
           onMouseEnter={() => {
             if (store.annotationStore.selected.isLinkingMode) {
@@ -647,10 +570,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             }
             item.updateCursor();
           }}
-          onDblClick={(e) => {
-            item.toggleTransformMode();
-          }}
-          selectedPoints={item.annotation.regionStore.selection.size > 1 ? [] : item.selectedVertices}
           closed={item.closed}
           width={stageWidth}
           height={stageHeight}
@@ -671,8 +590,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           opacity={Number.parseFloat(item.control?.opacity || "1")}
           pixelSnapping={item.control?.snap === "pixel"}
           constrainToBounds={item.control?.constrainToBounds ?? true}
-          disabled={disabled}
-          transformMode={!disabled && item.transformMode && !isMultiRegionSelected}
+          disabled={item.disabled || suggestion || store.annotationStore.selected.isLinkingMode}
           // Point styling - customize point appearance based on control settings
           pointRadius={item.pointRadiusFromSize}
           pointFill={item.selected ? "#ffffff" : "#f8fafc"}
