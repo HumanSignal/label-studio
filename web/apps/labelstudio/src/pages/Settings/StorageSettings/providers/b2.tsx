@@ -1,6 +1,59 @@
 import { z } from "zod";
 import type { ProviderConfig } from "@humansignal/app-common/blocks/StorageProviderForm/types/provider";
-import { IconCloudCustom } from "@humansignal/icons";
+import React from "react";
+
+/**
+ * Backblaze B2 Logo Component
+ * 
+ * To use the official Backblaze logo:
+ * 1. Download the logo from: https://www.backblaze.com/partners/resources
+ * 2. Save it as: web/apps/labelstudio/public/images/storage-providers/backblaze-b2-logo.png
+ * 3. Rebuild the frontend: cd web && yarn build
+ * 
+ * The logo will automatically be used instead of the fallback icon.
+ */
+const IconBackblazeB2: React.FC<React.SVGProps<SVGSVGElement>> = (props) => {
+  // Try to use the official logo if available, otherwise use fallback SVG
+  const logoPath = "/static/images/storage-providers/backblaze-b2-logo.png";
+  const [useImage, setUseImage] = React.useState(true);
+
+  return useImage ? (
+    <img
+      src={logoPath}
+      alt="Backblaze B2 Cloud Storage"
+      width="24"
+      height="24"
+      onError={() => setUseImage(false)}
+      style={{ objectFit: "contain" }}
+      {...props}
+    />
+  ) : (
+    // Fallback icon with Backblaze brand color (#D9272E)
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      role="img"
+      aria-label="Backblaze B2 Cloud Storage"
+      {...props}
+    >
+      <circle cx="12" cy="12" r="10" fill="#D9272E" />
+      <text
+        x="12"
+        y="16"
+        fontFamily="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        fontSize="10"
+        fontWeight="700"
+        fill="#FFFFFF"
+        textAnchor="middle"
+      >
+        B2
+      </text>
+    </svg>
+  );
+};
 
 /**
  * Backblaze B2 Cloud Storage Provider Configuration
@@ -12,7 +65,7 @@ export const b2Provider: ProviderConfig = {
   name: "b2",
   title: "Backblaze B2",
   description: "Configure your Backblaze B2 Cloud Storage connection with S3-compatible settings",
-  icon: IconCloudCustom, // Using cloud icon - can be replaced with custom B2 icon if created
+  icon: IconBackblazeB2, // Backblaze B2 branded icon with official Backblaze red color
   fields: [
     {
       name: "bucket",
