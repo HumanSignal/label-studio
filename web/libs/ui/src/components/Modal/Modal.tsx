@@ -77,6 +77,11 @@ const standaloneModal = <T,>(props: ModalProps<T> & ExtraProps): ModalUpdateProp
     // Get providers from props or use empty array for simple modals
     const providers = props.simple ? [] : (props.providers ?? []);
 
+    // Check if ToastProvider is in the providers list
+    const hasToastProvider = providers.some(
+      (provider) => provider?.type?.name === "ToastProvider" || provider?.key === "toast",
+    );
+
     // If providers are provided, wrap the modal with a MultiProvider-like structure
     const wrapWithProviders = (content: ReactElement) => {
       if (providers.length === 0) {
@@ -90,7 +95,7 @@ const standaloneModal = <T,>(props: ModalProps<T> & ExtraProps): ModalUpdateProp
       }, content);
     };
 
-    const modalContent = (
+    const wrappedContent = wrapWithProviders(
       <>
         <Modal
           ref={modalRef}
@@ -103,11 +108,11 @@ const standaloneModal = <T,>(props: ModalProps<T> & ExtraProps): ModalUpdateProp
           }}
           animateAppearance={animate}
         />
-        {!props.simple && <ToastViewport />}
-      </>
+        {hasToastProvider && <ToastViewport />}
+      </>,
     );
 
-    render(wrapWithProviders(modalContent), rootDiv);
+    render(wrappedContent, rootDiv);
   };
 
   renderModal(props, true);
