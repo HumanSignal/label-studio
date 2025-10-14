@@ -6,7 +6,7 @@ tier: all
 order: 151
 order_enterprise: 151
 meta_title: Cloud and External Storage Integration
-meta_description: "Label Studio Documentation for integrating Amazon AWS S3, Google Cloud Storage, Microsoft Azure, Redis, and local file directories with Label Studio."
+meta_description: "Label Studio Documentation for integrating Amazon AWS S3, Google Cloud Storage, Microsoft Azure, Backblaze B2, Redis, and local file directories with Label Studio."
 section: "Import & Export"
 
 ---
@@ -23,6 +23,7 @@ Integrate popular cloud and external storage systems with Label Studio to collec
 | [Google Cloud Storage WIF Auth](https://docs.humansignal.com/guide/storage#Google-Cloud-Storage-with-Workload-Identity-Federation-WIF) | ❌ | ✅ |
 | [Microsoft Azure Blob Storage](#Microsoft-Azure-Blob-storage) | ✅ | ✅ |
 | [Microsoft Azure Blob Storage with Service Principal](https://docs.humansignal.com/guide/storage#Azure-Blob-Storage-with-Service-Principal-authentication) | ❌ | ✅ |
+| [Backblaze B2](#Backblaze-B2) | ✅ | ✅ |
 | [Databricks Files (UC Volumes)](https://docs.humansignal.com/guide/storage#Databricks-Files-UC-Volumes) | ❌ | ✅ |
 | [Redis database](#Redis-database)| ✅ | ✅ |
 | [Local storage](#Local-storage) | ✅ | ✅ |
@@ -39,6 +40,7 @@ Integrate popular cloud and external storage systems with Label Studio to collec
 | [Google Cloud Storage WIF Auth](#Google-Cloud-Storage-with-Workload-Identity-Federation-WIF) | ❌ | ✅ |
 | [Microsoft Azure Blob Storage](#Microsoft-Azure-Blob-storage) | ✅ | ✅ |
 | [Microsoft Azure Blob Storage with Service Principal](#Azure-Blob-Storage-with-Service-Principal-authentication) | ❌ | ✅ |
+| [Backblaze B2](#Backblaze-B2) | ✅ | ✅ |
 | [Databricks Files (UC Volumes)](#Databricks-Files-UC-Volumes) | ❌ | ✅ |
 | [Redis database](#Redis-database)| ✅ | ✅ |
 | [Local storage](#Local-storage) (on-prem only) | ✅ | ✅ |
@@ -1347,6 +1349,138 @@ These are included in the built-in **Storage Blob Data Contributor** role.
   - CORS is set when using pre-signed URLs; try proxy mode if testing
 
 </div>
+
+## Backblaze B2
+
+Connect your [Backblaze B2](https://www.backblaze.com/cloud-storage) bucket to Label Studio to retrieve labeling tasks or store completed annotations. Backblaze B2 provides S3-compatible object storage with predictable pricing and no egress fees.
+
+For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html#Secure-access-to-cloud-storage).
+
+### Prerequisites
+
+Before you set up your Backblaze B2 bucket with Label Studio, you need:
+
+1. A Backblaze B2 account
+2. An Application Key with appropriate permissions
+3. Your B2 bucket name and endpoint URL
+
+### Configure access to your Backblaze B2 bucket
+
+1. **Create an Application Key:**
+   - Log in to your Backblaze account
+   - Navigate to **App Keys** in the left sidebar
+   - Click **Add a New Application Key**
+   - Set a name for your key (e.g., "Label Studio")
+   - Choose the bucket you want to use (or "All" for all buckets)
+   - Select capabilities:
+     - For **Source storage**: Enable `listBuckets`, `listFiles`, and `readFiles`
+     - For **Target storage**: Add `writeFiles` and optionally `deleteFiles` (if you want to sync deletions)
+   - Click **Create New Key**
+   - **Important**: Copy both the **Application Key ID** and **Application Key** immediately - the secret key is only shown once
+
+2. **Get your S3-compatible endpoint URL:**
+   - Backblaze B2 provides S3-compatible endpoints in the format:
+     ```
+     https://s3.<region>.backblazeb2.com
+     ```
+   - Common regions:
+     - `us-west-004` (US West)
+     - `us-west-002` (US West - Phoenix)
+     - `us-east-005` (US East)
+     - `eu-central-003` (EU Central - Amsterdam)
+   - You can find your region in the Backblaze B2 bucket details
+
+3. **Set up CORS (for browser access to media files):**
+   - In Backblaze B2, navigate to your bucket settings
+   - Click **Bucket Settings** → **CORS Rules**
+   - Add the following CORS rule:
+   
+   ```json
+   [
+       {
+           "allowedOrigins": [
+               "https://your-label-studio-domain.com"
+           ],
+           "allowedHeaders": [
+               "*"
+           ],
+           "allowedOperations": [
+               "s3_get"
+           ],
+           "maxAgeSeconds": 3600
+       }
+   ]
+   ```
+   
+   Replace `https://your-label-studio-domain.com` with your Label Studio URL. For local development, you can use `http://localhost:8080`.
+
+### Add Backblaze B2 as source storage
+
+1. In the Label Studio UI, open a project.
+2. Go to **Settings > Cloud Storage**.
+3. Click **Add Source Storage**.
+4. Select **Backblaze B2** from the storage type dropdown.
+5. Enter the following:
+   - **Bucket Name**: Your B2 bucket name
+   - **Endpoint URL**: Your S3-compatible endpoint (e.g., `https://s3.us-west-004.backblazeb2.com`)
+   - **Application Key ID**: The Key ID from step 1
+   - **Application Key**: The secret Application Key from step 1  
+   - **Region Name** (optional): The region code (e.g., `us-west-004`)
+   - **Bucket Prefix** (optional): Specify a folder path to import files from a specific subfolder
+   - **File Filter Regex** (optional): Filter files by name pattern
+   - **Import Method**: 
+     - Choose **Files** to automatically create tasks from each file
+     - Choose **Tasks** to import JSON/JSONL files as task definitions
+   - **Use pre-signed URLs**: Toggle on to use presigned URLs (recommended)
+   - **Presigned URL TTL**: Time in minutes before URLs expire (default: 15 minutes)
+6. Click **Test Connection** to verify the settings.
+7. Click **Add Storage**.
+8. Click **Sync Storage** to import tasks from your B2 bucket.
+
+### Add Backblaze B2 as target storage
+
+1. In the Label Studio UI, open a project.
+2. Go to **Settings > Cloud Storage**.
+3. Click **Add Target Storage**.
+4. Select **Backblaze B2** from the storage type dropdown.
+5. Enter the following:
+   - **Bucket Name**: Your B2 bucket name
+   - **Endpoint URL**: Your S3-compatible endpoint (e.g., `https://s3.us-west-004.backblazeb2.com`)
+   - **Application Key ID**: The Key ID with write permissions
+   - **Application Key**: The secret Application Key with write permissions
+   - **Region Name** (optional): The region code (e.g., `us-west-004`)
+   - **Bucket Prefix** (optional): Specify a folder path for exported annotations
+   - **Can delete objects**: Toggle on if you want deletions in Label Studio to sync to B2
+6. Click **Test Connection** to verify the settings.
+7. Click **Add Storage**.
+
+Annotations are exported to B2 automatically when you create or update them.
+
+### Troubleshooting Backblaze B2
+
+If you experience issues with Backblaze B2 storage:
+
+- **Connection test fails**: 
+  - Verify your Application Key ID and Application Key are correct
+  - Ensure the Application Key has the required capabilities for your use case
+  - Check that the endpoint URL matches your bucket's region
+  
+- **Files not appearing**: 
+  - Verify the bucket name is spelled correctly (case-sensitive)
+  - Check that your bucket prefix matches the actual folder structure
+  - Ensure your Application Key has `listFiles` capability
+  
+- **Cannot access media files**:
+  - Verify CORS is configured correctly for your Label Studio domain
+  - If using presigned URLs, ensure the Application Key has `shareFiles` capability
+  - Try toggling "Use pre-signed URLs" off to use proxy mode instead
+  
+- **Annotations not exporting**:
+  - Verify the Application Key has `writeFiles` capability
+  - Check that the target storage is configured (not just source storage)
+  - Look for export errors in the Label Studio logs
+
+For additional support, consult the [Backblaze B2 documentation](https://www.backblaze.com/docs/cloud-storage) or contact Backblaze support.
 
 ## Redis database
 
