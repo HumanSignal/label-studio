@@ -36,11 +36,16 @@ interface ViewControlsProps {
   regions: any;
   onOrderingChange: (ordering: OrderingOptions) => void;
   onGroupingChange: (grouping: GroupingOptions) => void;
-  onFilterChange: (filter: any) => void;
 }
 
+const mediaStartTimeSupportedTags = [
+  ["labels", "audio"],
+  ["timelinelabels", "video"],
+  ["timeserieslabels", "timeseries"],
+];
+
 export const ViewControls: FC<ViewControlsProps> = observer(
-  ({ ordering, regions, orderingDirection, onOrderingChange, onGroupingChange, onFilterChange }) => {
+  ({ ordering, regions, orderingDirection, onOrderingChange, onGroupingChange }) => {
     const grouping = regions.group;
     const context = useContext(SidePanelsContext);
 
@@ -48,10 +53,12 @@ export const ViewControls: FC<ViewControlsProps> = observer(
     const mediaTimeSupport: boolean | null = useMemo(() => {
       const names = regions.annotation?.names;
       if (!names || names.size === 0) return null;
-      // Any object tag of type audio, video, or timeseries enables the option
-      return Array.from(names.values()).some(
-        (tag: any) => tag?.isObjectTag && ["audio", "video", "timeseries"].includes(tag.type),
-      );
+
+      const tags = Array.from(names.values());
+      // Check if all tag types from the tuple exist in the configuration
+      return mediaStartTimeSupportedTags.some((requiredTagTypes) => {
+        return requiredTagTypes.every((requiredType) => tags.some((tag: any) => tag?.type === requiredType));
+      });
     }, [regions.annotation?.names]);
 
     // Auto-fallback to "date" if current ordering is "mediaStartTime" but no media-time support in config
