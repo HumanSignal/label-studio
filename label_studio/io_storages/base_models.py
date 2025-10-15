@@ -557,18 +557,22 @@ class ImportStorage(Storage):
             self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
 
             # skip if key has already been synced
-            if link_class.exists(key, self):
-                logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
-                if existed_count_flag_set:
+            if existed_count_flag_set:
+                if link_class.exists(key, self):
+                    logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
                     keys_for_existed_count.append(key)
                     if len(keys_for_existed_count) >= settings.STORAGE_EXISTED_COUNT_BATCH_SIZE:
                         tasks_existed += link_class.objects.filter(
                             key__in=keys_for_existed_count, storage=self.id
                         ).count()
                         keys_for_existed_count = []
-                else:
-                    tasks_existed += link_class.objects.filter(key=key, storage=self.id).count()
-                continue
+                    continue
+                
+            else:
+                if (n_tasks_existed := link_class.objects.filter(key=key, storage=self.id).count()):
+                    logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
+                    tasks_existed += n_tasks_existed
+                    continue
 
             logger.debug(f'{self}: found new key {key}')
 
