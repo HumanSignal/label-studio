@@ -2,7 +2,7 @@ import { useRefCallback } from "@humansignal/core/hooks/useRefCallback";
 import { useValueRef } from "@humansignal/core/hooks/useValueRef";
 import { forwardRef, memo, type MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Block, Elem } from "../../utils/bem";
-import { FF_LSDV_4711, FF_VIDEO_FRAME_SEEK_PRECISION, isFF } from "../../utils/feature-flags";
+import { FF_VIDEO_FRAME_SEEK_PRECISION, isFF } from "../../utils/feature-flags";
 import { clamp, isDefined } from "../../utils/utilities";
 import { useUpdateBuffering } from "../../hooks/useUpdateBuffering";
 import "./VideoCanvas.scss";
@@ -296,8 +296,6 @@ export const VideoCanvas = memo(
     }, [props.onEnded]);
 
     const handleVideoError = useCallback(() => {
-      if (!isFF(FF_LSDV_4711)) return;
-
       const video = videoRef.current;
 
       if (video?.error && hasLoadedRef.current) {

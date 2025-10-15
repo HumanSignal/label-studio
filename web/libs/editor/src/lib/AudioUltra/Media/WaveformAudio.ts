@@ -1,5 +1,4 @@
 import { ff } from "@humansignal/core";
-import { FF_LSDV_4711, isFF } from "../../../utils/feature-flags";
 import { patchPlayPauseMethods } from "../../../utils/patchPlayPauseMethods";
 import { Events } from "../Common/Events";
 import { audioDecoderPool } from "./AudioDecoderPool";
@@ -158,7 +157,7 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
     this.el.setAttribute("data-testid", "waveform-audio");
     this.el.style.display = "none";
 
-    if (isFF(FF_LSDV_4711)) this.el.crossOrigin = "anonymous";
+    this.el.crossOrigin = "anonymous";
 
     document.body.appendChild(this.el);
 
@@ -177,7 +176,7 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
 
   mediaError = () => {
     // If this source has already loaded, we will retry the source url
-    if (isFF(FF_LSDV_4711) && this.hasLoadedSource && this.el) {
+    if (this.hasLoadedSource && this.el) {
       this.hasLoadedSource = false;
       this.invoke("resetSource");
     } else {

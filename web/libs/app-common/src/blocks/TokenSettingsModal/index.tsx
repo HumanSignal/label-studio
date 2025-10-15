@@ -49,7 +49,7 @@ function TokenSettingsModalView({
           label="Personal Access Tokens"
           name="api_tokens_enabled"
           description="Enable increased token authentication security"
-          checked={settings.api_tokens_enabled ?? false}
+          checked={settings.api_tokens_enabled ?? true}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setEnableTTL(e.target.checked)}
         />
       </Form.Row>
@@ -58,7 +58,7 @@ function TokenSettingsModalView({
           label="Legacy Tokens"
           name="legacy_api_tokens_enabled"
           description="Enable legacy access tokens, these do not expire"
-          checked={settings.legacy_api_tokens_enabled ?? true}
+          checked={settings.legacy_api_tokens_enabled ?? false}
         />
       </Form.Row>
       {showTTL === true && (

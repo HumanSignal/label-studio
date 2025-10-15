@@ -8,11 +8,8 @@ import "./MediaPlayer.scss";
 import { MediaSeeker } from "./MediaSeeker";
 import { Duration } from "./Duration";
 import { forwardRef } from "react";
-import { FF_LSDV_4711, isFF } from "../../../utils/feature-flags";
 
-const mediaDefaultProps = {};
-
-if (isFF(FF_LSDV_4711)) mediaDefaultProps.crossOrigin = "anonymous";
+const mediaDefaultProps = { crossOrigin: "anonymous" };
 
 const initialState = {
   duration: 0,
@@ -119,8 +116,6 @@ export const MediaPlayer = ({ src, video = false }) => {
   };
 
   useEffect(() => {
-    if (!isFF(FF_LSDV_4711)) return;
-
     // force reload on error if the source previously loaded,
     // as it may just require a new presigned url
     if (state.resetSource > 0) {
@@ -131,8 +126,6 @@ export const MediaPlayer = ({ src, video = false }) => {
   }, [state.resetSource]);
 
   useEffect(() => {
-    if (!isFF(FF_LSDV_4711)) return;
-
     // if the source was reloaded due to error, we need to wait for it to load
     // before we can set the current time and play if it was previously playing
     if (hasReloaded.current && state.loaded) {
@@ -143,7 +136,7 @@ export const MediaPlayer = ({ src, video = false }) => {
     }
   }, [state.loaded]);
 
-  const showError = isFF(FF_LSDV_4711) ? !state.resetSource && state.error : state.error;
+  const showError = !state.resetSource && state.error;
 
   return enabled ? (
     <Block name="player" mod={{ video }} onClick={(e) => e.stopPropagation()}>

@@ -11,7 +11,7 @@ import { CreateProject } from "../CreateProject/CreateProject";
 import { DataManagerPage } from "../DataManager/DataManager";
 import { SettingsPage } from "../Settings";
 import { EmptyProjectsList, ProjectsList } from "./ProjectsList";
-import { useAbortController } from "@humansignal/core";
+import { useAbortController, useUpdatePageTitle } from "@humansignal/core";
 import "./Projects.scss";
 
 const getCurrentPage = () => {
@@ -28,6 +28,8 @@ export const ProjectsPage = () => {
   const [currentPage, setCurrentPage] = useState(getCurrentPage());
   const [totalItems, setTotalItems] = useState(1);
   const setContextProps = useContextProps();
+
+  useUpdatePageTitle("Projects");
   const defaultPageSize = Number.parseInt(localStorage.getItem("pages:projects-list") ?? 30);
 
   const [modal, setModal] = React.useState(false);

@@ -25,7 +25,6 @@ import {
   FF_DEV_3077,
   FF_DEV_3793,
   FF_LSDV_4583_6,
-  FF_LSDV_4711,
   FF_LSDV_4930,
   FF_ZOOM_OPTIM,
   isFF,
@@ -36,9 +35,7 @@ import { Image } from "./Image";
 Konva.showWarnings = false;
 
 const hotkeys = Hotkey("Image");
-const imgDefaultProps = {};
-
-if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = "anonymous";
+const imgDefaultProps = { crossOrigin: "anonymous" };
 
 const splitRegions = (regions) => {
   const brushRegions = [];
