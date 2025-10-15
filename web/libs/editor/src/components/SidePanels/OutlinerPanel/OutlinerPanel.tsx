@@ -13,10 +13,6 @@ import { getDocsUrl } from "../../../utils/docs";
 // Local type definitions based on ViewControls and RegionStore
 type GroupingOptions = "manual" | "label" | "type";
 type OrderingOptions = "score" | "date" | "mediaStartTime";
-type Region = {
-  id: string;
-  [key: string]: any; // Allow other properties for flexibility
-};
 
 interface OutlinerPanelProps extends PanelProps {
   regions: any;
@@ -47,13 +43,6 @@ const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) =
     [regions],
   );
 
-  const onFilterChange = useCallback(
-    (value: Region[] | null) => {
-      regions.setFilteredRegions(value);
-    },
-    [regions],
-  );
-
   useEffect(() => {
     setGroup(regions.group);
   }, []);
@@ -68,7 +57,6 @@ const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) =
         orderingDirection={regions.sortOrder}
         onOrderingChange={onOrderingChange}
         onGroupingChange={onGroupingChange}
-        onFilterChange={onFilterChange}
       />
       <OutlinerTreeComponent regions={regions} />
     </PanelBase>
@@ -90,13 +78,6 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
     [regions],
   );
 
-  const onFilterChange = useCallback(
-    (value: Region[] | null) => {
-      regions.setFilteredRegions(value);
-    },
-    [regions],
-  );
-
   return (
     <Block name="outliner" mix={OutlinerFFClasses}>
       <ViewControls
@@ -105,7 +86,6 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
         orderingDirection={regions.sortOrder}
         onOrderingChange={onOrderingChange}
         onGroupingChange={onGroupingChange}
-        onFilterChange={onFilterChange}
       />
       <OutlinerTreeComponent regions={regions} />
     </Block>
