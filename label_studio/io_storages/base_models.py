@@ -567,9 +567,8 @@ class ImportStorage(Storage):
                         ).count()
                         keys_for_existed_count = []
                     continue
-                
             else:
-                if (n_tasks_existed := link_class.objects.filter(key=key, storage=self.id).count()):
+                if n_tasks_existed := link_class.objects.filter(key=key, storage=self.id).count():
                     logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
                     tasks_existed += n_tasks_existed
                     continue
