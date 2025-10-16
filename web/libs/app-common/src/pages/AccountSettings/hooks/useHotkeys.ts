@@ -1,4 +1,4 @@
-import { confirm } from "@humansignal/ui/lib/modal"
+import { confirm } from "@humansignal/ui/lib/modal";
 import { ToastType, useToast } from "@humansignal/ui/lib/toast/toast";
 // @ts-ignore
 import { useAPI } from "@humansignal/core";
