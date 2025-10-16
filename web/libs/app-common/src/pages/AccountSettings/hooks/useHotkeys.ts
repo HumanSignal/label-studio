@@ -1,4 +1,5 @@
-import { ToastType, useToast, confirm } from "@humansignal/ui";
+import { confirm } from "@humansignal/ui/lib/modal"
+import { ToastType, useToast } from "@humansignal/ui/lib/toast/toast";
 // @ts-ignore
 import { useAPI } from "@humansignal/core";
 import { useCallback, useEffect, useState } from "react";
