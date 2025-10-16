@@ -1,10 +1,13 @@
 import { buttonVariant, Space } from "@humansignal/ui";
+import { useUpdatePageTitle } from "@humansignal/core";
 import { Block } from "apps/labelstudio/src/utils/bem";
 import { Link } from "react-router-dom";
 import type { Page } from "../../types/Page";
 import { EmptyList } from "./@components/EmptyList";
 
 export const ModelsPage: Page = () => {
+  useUpdatePageTitle("Models");
+
   return (
     <Block name="prompter">
       <EmptyList />

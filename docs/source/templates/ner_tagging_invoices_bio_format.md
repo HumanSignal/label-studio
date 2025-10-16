@@ -3,7 +3,7 @@ title: NER Tagging for Invoices (BIO Format)
 type: templates
 category: Community Contributions
 cat: community
-order: 1001
+order: 1002
 meta_title: NER Tagging for Invoices (BIO Format) Data Labeling Template
 meta_description: Template for ner tagging for invoices (bio format) with Label Studio
 community: true
