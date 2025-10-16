@@ -1,14 +1,14 @@
 import { observer } from "mobx-react";
 import { IconRedo, IconRemove, IconUndo } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
-import { Block } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import "./HistoryActions.scss";
 
 export const EditingHistory = observer(({ entity }) => {
   const { history } = entity;
 
   return (
-    <Block name="history-buttons">
+    <div className={cn("history-buttons").toClassName()}>
       <Button
         variant="neutral"
         look="string"
@@ -40,6 +40,6 @@ export const EditingHistory = observer(({ entity }) => {
         onClick={() => history?.reset()}
         leading={<IconRemove />}
       />
-    </Block>
+    </div>
   );
 });
