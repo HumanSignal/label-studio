@@ -14,7 +14,7 @@ import { Button } from "@humansignal/ui";
  * each one of these eventually has to be migrated to core/ui
  */
 import { getApiInstance } from "@humansignal/core";
-import { modal, confirm } from "@humansignal/ui";
+import { modal, confirm } from "@humansignal/ui/lib/modal";
 import { Input, Label } from "apps/labelstudio/src/components/Form/Elements";
 import { Tooltip } from "@humansignal/ui";
 
