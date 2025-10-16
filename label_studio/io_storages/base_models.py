@@ -548,7 +548,9 @@ class ImportStorage(Storage):
         )
 
         tasks_for_webhook = []
-        for keys_batch in _batched(self.iter_keys(), settings.STORAGE_EXISTED_COUNT_BATCH_SIZE if existed_count_flag_set else 1):
+        for keys_batch in _batched(
+            self.iter_keys(), settings.STORAGE_EXISTED_COUNT_BATCH_SIZE if existed_count_flag_set else 1
+        ):
             keys_set = set(keys_batch)
             for key in keys_set:
                 logger.debug(f'Scanning key {key}')
@@ -564,7 +566,7 @@ class ImportStorage(Storage):
 
             for key in existing_keys:
                 logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
-                
+
             for key in keys_set - existing_keys:
 
                 logger.debug(f'{self}: found new key {key}')
