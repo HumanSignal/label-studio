@@ -3,16 +3,24 @@ import { OutlinerPanel } from "../OutlinerPanel";
 
 // Mock the dependencies
 jest.mock("../../../../utils/bem", () => ({
-  Block: ({ children, ...props }: any) => (
-    <div data-testid="block" {...props}>
-      {children}
-    </div>
-  ),
-  Elem: ({ children, ...props }: any) => (
-    <div data-testid="elem" {...props}>
-      {children}
-    </div>
-  ),
+  cn: (block: string) => ({
+    elem: (elem: string) => ({
+      toClassName: () => `dm-${block}__${elem}`,
+      mod: (mods: any) => ({
+        toClassName: () => `dm-${block}__${elem}`,
+      }),
+    }),
+    mod: (mods: any) => ({
+      toClassName: () => `dm-${block}`,
+      mix: (...args: any[]) => ({
+        toClassName: () => `dm-${block}`,
+      }),
+    }),
+    toClassName: () => `dm-${block}`,
+    mix: (...args: any[]) => ({
+      toClassName: () => `dm-${block}`,
+    }),
+  }),
 }));
 
 jest.mock("../../PanelBase", () => ({
