@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { inject, observer } from "mobx-react";
 
 import { useWindowSize } from "../../common/Utils/useWindowSize";
-import { Block, cn, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 import { Tool } from "./Tool";
 import { ToolbarProvider } from "./ToolbarContext";
@@ -45,12 +45,12 @@ export const Toolbar = inject("store")(
 
     return (
       <ToolbarProvider value={{ expanded, alignment }}>
-        <Block ref={(el) => setToolbar(el)} name="toolbar" mod={{ alignment, expanded }}>
+        <div ref={(el) => setToolbar(el)} className={cn("toolbar").mod({ alignment, expanded }).toClassName()}>
           {Object.entries(toolGroups).map(([name, tools], i) => {
             const visibleTools = tools.filter((t) => t.viewClass);
 
             return visibleTools.length ? (
-              <Elem name="group" key={`toolset-${name}-${i}`}>
+              <div className={cn("toolbar").elem("group").toClassName()} key={`toolset-${name}-${i}`}>
                 {visibleTools
                   .sort((a, b) => a.index - b.index)
                   .map((tool, i) => {
@@ -58,11 +58,11 @@ export const Toolbar = inject("store")(
 
                     return <ToolComponent key={`${tool.toolName}-${i}`} />;
                   })}
-              </Elem>
+              </div>
             ) : null;
           })}
           {store.autoAnnotation && <SmartTools tools={smartTools} />}
-        </Block>
+        </div>
       </ToolbarProvider>
     );
   }),
@@ -82,7 +82,7 @@ const SmartTools = observer(({ tools }) => {
 
   return (
     tools.length > 0 && (
-      <Elem name="group">
+      <div className={cn("toolbar").elem("group").toClassName()}>
         <Tool
           smart
           label="Auto-Detect"
@@ -91,7 +91,7 @@ const SmartTools = observer(({ tools }) => {
           shortcut="tool:auto-detect"
           extra={
             tools.length > 1 ? (
-              <Elem name="smart">
+              <div className={cn("toolbar").elem("smart").toClassName()}>
                 {tools.map((t, i) => {
                   const ToolView = t.viewClass;
 
@@ -108,7 +108,7 @@ const SmartTools = observer(({ tools }) => {
                     </div>
                   );
                 })}
-              </Elem>
+              </div>
             ) : null
           }
           controls={selected.controls}
@@ -128,7 +128,7 @@ const SmartTools = observer(({ tools }) => {
             nextTool.manager.selectTool(nextTool, true);
           }}
         />
-      </Elem>
+      </div>
     )
   );
 });
