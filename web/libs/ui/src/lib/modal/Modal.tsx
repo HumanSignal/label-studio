@@ -149,6 +149,7 @@ export const confirm = <T,>({ okText, onOk, cancelText, onCancel, buttonLook, ..
             modal.close();
           }}
           look="outlined"
+          variant="neutral"
           autoFocus
           aria-label={cancelText ?? "Cancel"}
           data-testid="dialog-cancel-button"
