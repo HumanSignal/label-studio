@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from "react";
-import { modal } from "@humansignal/ui";
+import { modal } from "@humansignal/ui/lib/modal";
 import clsx from "clsx";
 import { KeyboardKey } from "./Key";
 // @ts-ignore
