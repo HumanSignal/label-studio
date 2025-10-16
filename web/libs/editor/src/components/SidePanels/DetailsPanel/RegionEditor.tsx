@@ -14,7 +14,7 @@ import {
 } from "react";
 import { IconPropertyAngle } from "@humansignal/icons";
 import { Checkbox, Select } from "@humansignal/ui";
-import { Block, Elem, useBEM } from "../../../utils/bem";
+import { cn, useBEM } from "../../../utils/bem";
 import { TimeDurationControl } from "../../TimeDurationControl/TimeDurationControl";
 import { TimelineRegionEditor } from "./TimelineRegionEditor";
 import "./RegionEditor.scss";
@@ -57,9 +57,9 @@ const RegionEditorComponent: FC<RegionEditorProps> = ({ region }) => {
   const Component = isTimelineRegion ? TimelineRegionEditor : isAudioRegion ? AudioRegionProperties : RegionProperties;
 
   return (
-    <Block name="region-editor" mod={{ disabled: region.isReadOnly() }}>
+    <div className={cn("region-editor").mod({ disabled: region.isReadOnly() }).toClassName()}>
       <Component region={region} />
-    </Block>
+    </div>
   );
 };
 
@@ -67,7 +67,7 @@ const RegionProperties = ({ region }: RegionEditorProps) => {
   const fields = region.editableFields ?? [];
 
   return (
-    <Elem name="wrapper">
+    <div className={cn("region-editor").elem("wrapper").toClassName()}>
       {region.editorEnabled &&
         fields.map((field, i) => {
           return (
@@ -79,7 +79,7 @@ const RegionProperties = ({ region }: RegionEditorProps) => {
             />
           );
         })}
-    </Elem>
+    </div>
   );
 };
 
@@ -93,7 +93,7 @@ const AudioRegionProperties = observer(({ region }: { region: any }) => {
   };
 
   return (
-    <Elem name="wrapper-time-control">
+    <div className={cn("region-editor").elem("wrapper-time-control").toClassName()}>
       <TimeDurationControl
         startTime={region.start}
         endTime={region.end}
@@ -105,7 +105,7 @@ const AudioRegionProperties = observer(({ region }: { region: any }) => {
         showLabels
         showDuration
       />
-    </Elem>
+    </div>
   );
 });
 
@@ -182,7 +182,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
   }, [region]);
 
   return (
-    <Elem name="property" mod={{ text: isString }} tag="label">
+    <label className={cn("region-editor").elem("property").mod({ text: isString }).toClassName()}>
       {isBoolean ? (
         <Checkbox
           className={block?.elem("input").toClassName()}
@@ -207,7 +207,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
         />
       ) : null}
       <PropertyLabel label={label} />
-    </Elem>
+    </label>
   );
 };
 
@@ -309,9 +309,9 @@ const PropertyLabel: FC<{ label: string }> = ({ label }) => {
   }, [label]);
 
   return (
-    <Elem name="text" tag="span">
+    <span className={cn("region-editor").elem("text").toClassName()}>
       {IconComponent ? <IconComponent /> : label}
-    </Elem>
+    </span>
   );
 };
 
