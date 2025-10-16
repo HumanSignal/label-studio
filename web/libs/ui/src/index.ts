@@ -20,9 +20,6 @@ export * from "./lib/toggle/toggle";
 export * from "./lib/typography/typography";
 export * from "./lib/accordion/accordion";
 
-// Modal system
-export * from "./components/Modal";
-
 export * from "./assets/icons";
 export * from "./lib/simple-card";
 export * from "./lib/space/space";

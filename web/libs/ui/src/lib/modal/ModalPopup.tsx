@@ -1,6 +1,6 @@
 import { Component, createContext, createRef, type FC, useContext } from "react";
 import { createPortal } from "react-dom";
-import { cnb as cn } from "@humansignal/core";
+import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 import { isDefined } from "@humansignal/core/lib/utils/helpers";
 import { aroundTransition } from "@humansignal/core/lib/utils/transition";
 import { setRef } from "@humansignal/core/lib/utils/unwrapRef";
@@ -15,8 +15,8 @@ import "./Modal.scss";
 
 const ModalContext = createContext<Modal | null>(null);
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type ModalProps<BP = any> = {
+export type ModalProps<BP = unknown> = {
+  children?: React.ReactNode;
   visible?: boolean;
   animateAppearance?: boolean;
   allowClose?: boolean;
@@ -49,7 +49,7 @@ type ModalState = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class Modal<BP = any> extends Component<ModalProps<BP>, ModalState> {
+export class Modal<BP = unknown> extends Component<ModalProps<BP>, ModalState> {
   static Header = ModalHeader;
   static Footer = ModalFooter;
   static Title = ModalTitle;
@@ -58,7 +58,7 @@ export class Modal<BP = any> extends Component<ModalProps<BP>, ModalState> {
 
   modalRef = createRef<HTMLElement>();
 
-  constructor(props: ModalProps) {
+  constructor(props: ModalProps<BP>) {
     super(props);
 
     this.state = {
@@ -85,7 +85,7 @@ export class Modal<BP = any> extends Component<ModalProps<BP>, ModalState> {
     });
   }
 
-  componentDidUpdate(prevProps: ModalProps, prevState: ModalState) {
+  componentDidUpdate(prevProps: ModalProps<BP>, prevState: ModalState) {
     if (prevState.visible !== this.state.visible) {
       document.body.style.overflow = this.state.visible ? "hidden" : "";
     }
@@ -127,8 +127,7 @@ export class Modal<BP = any> extends Component<ModalProps<BP>, ModalState> {
       visible: this.props.visible || this.state.visible,
       optimize: this.props.optimize ?? true,
     };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const styles: Record<string, any> = {};
+    const styles: Record<string, string | number> = {};
 
     const mixes = [this.transitionClass, this.props.className];
 
@@ -257,7 +256,7 @@ export class Modal<BP = any> extends Component<ModalProps<BP>, ModalState> {
 
       return Content instanceof Function ? <Content {...(this.props.bodyProps ?? {})} /> : Content;
     }
-    return this.props.children;
+    return (this.props as ModalProps<BP>).children;
   }
 
   get footer() {
