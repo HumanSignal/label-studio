@@ -117,11 +117,7 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
         className: cn("button").mod(mods).mix(className).toClassName(),
       },
       <>
-        {iconElem && (
-          <span className={cn("button").elem("icon").toClassName()}>
-            {iconElem}
-          </span>
-        )}
+        {iconElem && <span className={cn("button").elem("icon").toClassName()}>{iconElem}</span>}
         {iconElem && children ? <span>{children}</span> : children}
         {extra !== undefined ? <div className={cn("button").elem("extra").toClassName()}>{extra}</div> : null}
       </>,
@@ -153,11 +149,7 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
 Button.displayName = "Button";
 
 const Group: FC<ButtonGroupProps> = ({ className, children, collapsed }) => {
-  return (
-    <div className={cn("button-group").mod({ collapsed }).mix(className).toClassName()}>
-      {children}
-    </div>
-  );
+  return <div className={cn("button-group").mod({ collapsed }).mix(className).toClassName()}>{children}</div>;
 };
 
 Button.Group = Group;

@@ -324,7 +324,10 @@ const HistoryComment: FC<{
 
   return (
     <div className={cn("history-item").elem("comment").mod({ collapsed }).toClassName()} ref={commentRef as any}>
-      <div className={cn("history-item").elem("comment-content").toClassName()} data-reason={`${reason}${comment ? ": " : ""}`}>
+      <div
+        className={cn("history-item").elem("comment-content").toClassName()}
+        data-reason={`${reason}${comment ? ": " : ""}`}
+      >
         {comment}
       </div>
 

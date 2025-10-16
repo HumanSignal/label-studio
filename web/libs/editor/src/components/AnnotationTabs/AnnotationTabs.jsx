@@ -39,7 +39,9 @@ export const EntityTab = observer(
               </div>
             )}
 
-            {displayGroundTruth && entity.ground_truth && <IconStar className={cn("entity-tab").elem("ground-truth").toClassName()} />}
+            {displayGroundTruth && entity.ground_truth && (
+              <IconStar className={cn("entity-tab").elem("ground-truth").toClassName()} />
+            )}
 
             {entity.skipped && <IconBan className={cn("entity-tab").elem("skipped").toClassName()} />}
           </Space>

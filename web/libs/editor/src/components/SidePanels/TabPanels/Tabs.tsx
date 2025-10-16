@@ -160,7 +160,10 @@ const Tab = ({
   const Label = () => (
     <div
       id={`${panelKey}_${tabIndex}_droppable`}
-      className={cn("panel-tabs").elem("tab").mod({ active: locked ? tabIndex === breakPointActiveTab : active }).toClassName()}
+      className={cn("panel-tabs")
+        .elem("tab")
+        .mod({ active: locked ? tabIndex === breakPointActiveTab : active })
+        .toClassName()}
     >
       {!locked && <IconOutlinerDrag className={cn("panel-tabs").elem("icon").toClassName()} />}
       {tabText}
@@ -169,7 +172,11 @@ const Tab = ({
 
   return (
     <div className={cn("panel-tabs").toClassName()}>
-      <div className={cn("panel-tabs").elem("draggable-tab").toClassName()} id={`${tabText}-draggable`} ref={tabRef as any}>
+      <div
+        className={cn("panel-tabs").elem("draggable-tab").toClassName()}
+        id={`${tabText}-draggable`}
+        ref={tabRef as any}
+      >
         <Label />
       </div>
       <div
@@ -210,7 +217,10 @@ export const Tabs = (
             const { component: Component } = view;
 
             return (
-              <div className={cn("tabs").elem("tab-container").mod({ active: view.active }).toClassName()} key={`${view.title}-${index}-tab`}>
+              <div
+                className={cn("tabs").elem("tab-container").mod({ active: view.active }).toClassName()}
+                key={`${view.title}-${index}-tab`}
+              >
                 <Tab
                   name={view.name}
                   rootRef={props.root}
@@ -236,7 +246,10 @@ export const Tabs = (
               </div>
             );
           })}
-          <div id={`${props.name}_${props.panelViews.length}-droppable-space`} className={cn("tabs").elem("drop-space-after").toClassName()} />
+          <div
+            id={`${props.name}_${props.panelViews.length}-droppable-space`}
+            className={cn("tabs").elem("drop-space-after").toClassName()}
+          />
           {props.isBottomPanel && props.settings?.collapsibleBottomPanel && (
             <Button
               className="collapsible-bottom-panel-toggle"

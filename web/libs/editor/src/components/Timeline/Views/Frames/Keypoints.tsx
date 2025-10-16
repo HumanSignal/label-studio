@@ -82,12 +82,13 @@ export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, render
       <div className={cn("keypoints").elem("label").toClassName()} onClick={onSelectRegionHandler}>
         <div className={cn("keypoints").elem("name").toClassName()}>{label}</div>
         <div className={cn("keypoints").elem("data").toClassName()}>
-          <div className={cn("keypoints").elem("data-item").mod({ faded: true }).toClassName()}>
-            {idx}
-          </div>
+          <div className={cn("keypoints").elem("data-item").mod({ faded: true }).toClassName()}>{idx}</div>
         </div>
       </div>
-      <div className={cn("keypoints").elem("keypoints").toClassName()} onClick={(e: any) => onSelectRegionHandler(e, true)}>
+      <div
+        className={cn("keypoints").elem("keypoints").toClassName()}
+        onClick={(e: any) => onSelectRegionHandler(e, true)}
+      >
         <LifespansList lifespans={lifespans} step={step} visible={visible} offset={offset} />
       </div>
     </div>
@@ -147,11 +148,20 @@ const LifespanItem: FC<LifespanItemProps> = memo(
     }, [left, right, finalWidth]);
 
     return (
-      <div className={cn("keypoints").elem("lifespan").mod({ hidden: !visible, instant: !width }).toClassName()} style={style}>
+      <div
+        className={cn("keypoints").elem("lifespan").mod({ hidden: !visible, instant: !width }).toClassName()}
+        style={style}
+      >
         {points.map((frame, i) => {
           const left = (frame - start) * step;
 
-          return <div key={i} className={cn("keypoints").elem("point").mod({ last: !!left, locked }).toClassName()} style={{ left }} />;
+          return (
+            <div
+              key={i}
+              className={cn("keypoints").elem("point").mod({ last: !!left, locked }).toClassName()}
+              style={{ left }}
+            />
+          );
         })}
       </div>
     );

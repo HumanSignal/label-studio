@@ -644,7 +644,9 @@ export const VideoCanvas = memo(
             width={canvasWidth}
             height={canvasHeight}
           />
-          {!isSyncedBuffering && !loading && buffering && <div className={cn("video-canvas").elem("buffering").toClassName()} aria-label="Buffering Media Source" />}
+          {!isSyncedBuffering && !loading && buffering && (
+            <div className={cn("video-canvas").elem("buffering").toClassName()} aria-label="Buffering Media Source" />
+          )}
         </div>
 
         <VirtualVideo

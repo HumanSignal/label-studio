@@ -310,10 +310,18 @@ export const PanelBase: FC<PanelBaseProps> = ({
   );
 
   return (
-    <div ref={panelRef as any} className={cn("panel").mix(name).mod(mods).toClassName()} style={{ ...style, ...coordinates }}>
+    <div
+      ref={panelRef as any}
+      className={cn("panel").mix(name).mod(mods).toClassName()}
+      style={{ ...style, ...coordinates }}
+    >
       <div className={cn("panel").elem("content").toClassName()}>
         {!locked && (
-          <div ref={headerRef as any} className={cn("panel").elem("header").toClassName()} onClick={!detached ? handleExpand : undefined}>
+          <div
+            ref={headerRef as any}
+            className={cn("panel").elem("header").toClassName()}
+            onClick={!detached ? handleExpand : undefined}
+          >
             {(visible || detached) && <div className={cn("panel").elem("title").toClassName()}>{title}</div>}
 
             <div
@@ -327,7 +335,11 @@ export const PanelBase: FC<PanelBaseProps> = ({
         )}
         {visible && (
           <div className={cn("panel").elem("body").toClassName()}>
-            <div className={cn(name).mix(...(Array.isArray(mix) ? mix : [mix])).toClassName()}>
+            <div
+              className={cn(name)
+                .mix(...(Array.isArray(mix) ? mix : [mix]))
+                .toClassName()}
+            >
               {children}
             </div>
           </div>
@@ -335,12 +347,25 @@ export const PanelBase: FC<PanelBaseProps> = ({
       </div>
 
       {visible && !positioning && !locked && (
-        <div className={cn("panel").elem("resizers").mod({ locked: positioning || locked }).toClassName()} ref={resizerRef as any}>
+        <div
+          className={cn("panel")
+            .elem("resizers")
+            .mod({ locked: positioning || locked })
+            .toClassName()}
+          ref={resizerRef as any}
+        >
           {resizers.map((res) => {
             const shouldRender = ((res === "left" || res === "right") && alignment !== res) || detached || detached;
 
             return shouldRender ? (
-              <div key={res} className={cn("panel").elem("resizer").mod({ drag: res === resizing }).toClassName()} data-resize={res} />
+              <div
+                key={res}
+                className={cn("panel")
+                  .elem("resizer")
+                  .mod({ drag: res === resizing })
+                  .toClassName()}
+                data-resize={res}
+              />
             ) : null;
           })}
         </div>

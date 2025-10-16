@@ -38,7 +38,13 @@ export const Minimap: FC<any> = () => {
               const left = connection.start * step;
               const width = isLast && connection.enabled ? "100%" : connection.width;
 
-              return <div key={`${id}${i}`} className={cn("minimap").elem("connection").toClassName()} style={{ left, width }} />;
+              return (
+                <div
+                  key={`${id}${i}`}
+                  className={cn("minimap").elem("connection").toClassName()}
+                  style={{ left, width }}
+                />
+              );
             })}
           </div>
         );

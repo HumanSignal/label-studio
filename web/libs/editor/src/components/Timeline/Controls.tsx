@@ -116,7 +116,11 @@ export const Controls: FC<TimelineControlsProps> = memo(
 
     const renderControls = () => {
       return (
-        <Space className={cn("timeline-controls").elem("group").toClassName()} size="small" style={{ gridAutoColumns: "auto" }}>
+        <Space
+          className={cn("timeline-controls").elem("group").toClassName()}
+          size="small"
+          style={{ gridAutoColumns: "auto" }}
+        >
           <ConfigControl
             onSetModal={onSetConfigModal}
             onAmpChange={props.onAmpChange}
@@ -175,7 +179,12 @@ export const Controls: FC<TimelineControlsProps> = memo(
 
     return (
       <Space className={cn("timeline-controls").toClassName()} spread style={{ gridAutoColumns: "auto" }}>
-        {buffering && <div className={cn("timeline-controls").elem("buffering").toClassName()} aria-label="Buffering Media Source" />}
+        {buffering && (
+          <div
+            className={cn("timeline-controls").elem("buffering").toClassName()}
+            aria-label="Buffering Media Source"
+          />
+        )}
         {mediaType === "audio" ? (
           renderControls()
         ) : (

@@ -55,9 +55,7 @@ export const RegionItem: FC<RegionItemProps> = observer(
               <NodeIcon node={region} />
             </div>
             <div className={cn("detailed-region").elem("index").toClassName()}>
-              <span className={cn("detailed-region").elem("index_value").toClassName()}>
-                {region.region_index}
-              </span>
+              <span className={cn("detailed-region").elem("index_value").toClassName()}>{region.region_index}</span>
             </div>
             <RegionLabels region={region} />
           </div>
@@ -71,7 +69,9 @@ export const RegionItem: FC<RegionItemProps> = observer(
         {region.isDrawing && (
           <div className={cn("detailed-region").elem("warning").toClassName()}>
             <IconWarning />
-            <div className={cn("detailed-region").elem("warning-text").toClassName()}>Incomplete {region.type?.replace("region", "") ?? "region"}</div>
+            <div className={cn("detailed-region").elem("warning-text").toClassName()}>
+              Incomplete {region.type?.replace("region", "") ?? "region"}
+            </div>
           </div>
         )}
         {withActions && (

@@ -309,9 +309,7 @@ const PropertyLabel: FC<{ label: string }> = ({ label }) => {
   }, [label]);
 
   return (
-    <span className={cn("region-editor").elem("text").toClassName()}>
-      {IconComponent ? <IconComponent /> : label}
-    </span>
+    <span className={cn("region-editor").elem("text").toClassName()}>{IconComponent ? <IconComponent /> : label}</span>
   );
 };
 

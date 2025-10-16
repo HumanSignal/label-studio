@@ -78,7 +78,10 @@ export const AudioControl: FC<AudioControlProps> = ({ volume, onVolumeChange, on
   };
 
   return (
-    <div className={cn("audio-control").toClassName()} onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}>
+    <div
+      className={cn("audio-control").toClassName()}
+      onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}
+    >
       <ControlButton look={audioModal ? "filled" : undefined} onClick={onSetModal}>
         {isMuted ? <IconSoundMutedConfig /> : <IconSoundConfig />}
       </ControlButton>

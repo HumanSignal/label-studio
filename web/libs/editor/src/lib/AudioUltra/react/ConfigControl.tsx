@@ -133,7 +133,10 @@ export const ConfigControl: FC<ConfigControlProps> = ({
   };
 
   return (
-    <div className={cn("audio-config").toClassName()} onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}>
+    <div
+      className={cn("audio-config").toClassName()}
+      onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}
+    >
       <ControlButton look={configModal ? "active" : undefined} onClick={onSetModal}>
         {<IconConfig />}
       </ControlButton>

@@ -415,7 +415,9 @@ const RootTitle: FC<any> = observer(
           {!props.isGroup && <div className={cn("outliner-item").elem("index").toClassName()}>{props.idx + 1}</div>}
           <div className={cn("outliner-item").elem("title").toClassName()}>
             {label}
-            {item?.text && <div className={cn("outliner-item").elem("text").toClassName()}>{item.text.replace(/\\n/g, "\n")}</div>}
+            {item?.text && (
+              <div className={cn("outliner-item").elem("text").toClassName()}>{item.text.replace(/\\n/g, "\n")}</div>
+            )}
             {(item?.isDrawing || item?.incomplete) && (
               <span className={cn("outliner-item").elem("incomplete").toClassName()}>
                 <Tooltip title={`Incomplete ${item.type?.replace("region", "") ?? "region"}`}>
@@ -506,7 +508,12 @@ const RegionControls: FC<RegionControlsProps> = injector(
     }, []);
 
     return (
-      <div className={cn("outliner-item").elem("controls").mod({ withControls: hasControls, newUI: isFF(FF_DEV_3873) }).toClassName()}>
+      <div
+        className={cn("outliner-item")
+          .elem("controls")
+          .mod({ withControls: hasControls, newUI: isFF(FF_DEV_3873) })
+          .toClassName()}
+      >
         {isFF(FF_DEV_3873) ? (
           <Tooltip title={"Confidence Score"}>
             <div className={cn("outliner-item").elem("control-wrapper").toClassName()}>
@@ -614,7 +621,9 @@ const RegionItemDesc: FC<RegionItemOCSProps> = observer(({ item, collapsed, setC
 
   return (
     <div
-      className={cn("ocr").mod({ collapsed, empty: !(controls?.length > 0) }).toClassName()}
+      className={cn("ocr")
+        .mod({ collapsed, empty: !(controls?.length > 0) })
+        .toClassName()}
       onClick={onClick}
       onDragStart={(e: any) => e.stopPropagation()}
     >

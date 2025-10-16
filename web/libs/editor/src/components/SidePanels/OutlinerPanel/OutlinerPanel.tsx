@@ -79,7 +79,11 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
   );
 
   return (
-    <div className={cn("outliner").mix(...OutlinerFFClasses).toClassName()}>
+    <div
+      className={cn("outliner")
+        .mix(...OutlinerFFClasses)
+        .toClassName()}
+    >
       <ViewControls
         ordering={regions.sort}
         regions={regions}
@@ -124,7 +128,9 @@ const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ region
         <div className={cn("filters-info").toClassName()}>
           <IconInfo width={21} height={20} />
           <div className={cn("filters-info").elem("filters-title").toClassName()}>All regions hidden</div>
-          <div className={cn("filters-info").elem("filters-description").toClassName()}>Adjust or remove the filters to view</div>
+          <div className={cn("filters-info").elem("filters-description").toClassName()}>
+            Adjust or remove the filters to view
+          </div>
         </div>
       ) : regions?.regions?.length > 0 ? (
         <>
@@ -137,7 +143,9 @@ const OutlinerTreeComponent: FC<OutlinerTreeComponentProps> = observer(({ region
                   <div className={cn("filters-info").elem("filters-title").toClassName()}>
                     There {hiddenRegions === 1 ? "is" : "are"} {hiddenRegions} hidden region{hiddenRegions > 1 && "s"}
                   </div>
-                  <div className={cn("filters-info").elem("filters-description").toClassName()}>Adjust or remove filters to view</div>
+                  <div className={cn("filters-info").elem("filters-description").toClassName()}>
+                    Adjust or remove filters to view
+                  </div>
                 </div>
               )
             }

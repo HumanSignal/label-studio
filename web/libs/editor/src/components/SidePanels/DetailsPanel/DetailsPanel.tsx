@@ -78,7 +78,9 @@ const RelationsTab: FC<any> = inject("store")(
             {hasRelations ? (
               <>
                 <div className={cn("relations").elem("view-control").toClassName()}>
-                  <div className={cn("relations").elem("section-head").toClassName()}>Relations ({relationStore.size})</div>
+                  <div className={cn("relations").elem("section-head").toClassName()}>
+                    Relations ({relationStore.size})
+                  </div>
                   <RelationsControls relationStore={relationStore} />
                 </div>
                 <div className={cn("relations").elem("section-content").toClassName()}>

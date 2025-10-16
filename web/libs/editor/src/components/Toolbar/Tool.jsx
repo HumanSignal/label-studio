@@ -116,6 +116,7 @@ export const Tool = ({
 
   return (
     <button
+      type="button"
       aria-label={ariaLabel}
       className={cn("tool")
         .mod({
@@ -156,7 +157,12 @@ export const Tool = ({
         ) : (
           (isDefined(label) || isDefined(shortcutView)) &&
           !showControls && (
-            <div className={cn("tool").elem("tooltip").mod({ controlled: !!(smart && extra) }).toClassName()}>
+            <div
+              className={cn("tool")
+                .elem("tooltip")
+                .mod({ controlled: !!(smart && extra) })
+                .toClassName()}
+            >
               <div className={cn("tool").elem("tooltip-body").toClassName()}>
                 {extraContent}
                 {label}

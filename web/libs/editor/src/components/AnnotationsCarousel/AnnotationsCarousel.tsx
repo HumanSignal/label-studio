@@ -63,7 +63,9 @@ export const AnnotationsCarousel = observer(({ store, annotationStore }: Annotat
 
   return enableAnnotations || enablePredictions || enableCreateAnnotation ? (
     <div
-      className={cn("annotations-carousel").mod({ scrolled: currentPosition > 0 }).toClassName()}
+      className={cn("annotations-carousel")
+        .mod({ scrolled: currentPosition > 0 })
+        .toClassName()}
       style={{ "--carousel-left": `${currentPosition}px` } as any}
     >
       <div ref={containerRef as any} className={cn("annotations-carousel").elem("container").toClassName()}>

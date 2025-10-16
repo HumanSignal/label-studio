@@ -26,7 +26,11 @@ export const TopBar = observer(({ store }) => {
   if (isFF(FF_DEV_3873) && isBulkMode) return null;
 
   return store ? (
-    <div className={cn("topbar").mod({ newLabelingUI: isFF(FF_DEV_3873) }).toClassName()}>
+    <div
+      className={cn("topbar")
+        .mod({ newLabelingUI: isFF(FF_DEV_3873) })
+        .toClassName()}
+    >
       {isFF(FF_DEV_3873) ? (
         <div className={cn("topbar").elem("group").toClassName()}>
           <CurrentTask store={store} />
@@ -87,7 +91,10 @@ export const TopBar = observer(({ store }) => {
               </div>
             )}
             {!isViewAll && store.hasInterface("controls") && (store.hasInterface("review") || !isPrediction) && (
-              <div className={cn("topbar").elem("section").mod({ flat: true }).toClassName()} style={{ width: 320, boxSizing: "border-box" }}>
+              <div
+                className={cn("topbar").elem("section").mod({ flat: true }).toClassName()}
+                style={{ width: 320, boxSizing: "border-box" }}
+              >
                 <Controls annotation={entity} />
               </div>
             )}

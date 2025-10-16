@@ -88,13 +88,21 @@ export const FlyoutMenu = ({ items, icon }) => {
 
   return (
     <div
-      className={cn("flyoutmenu").mix(isClicked ? "hovered" : "").toClassName()}
+      className={cn("flyoutmenu")
+        .mix(isClicked ? "hovered" : "")
+        .toClassName()}
       onClick={(e) => {
         e.stopPropagation();
         setClicked(!isClicked);
       }}
     >
-      <div className={cn("flyoutmenu").elem("icon").mix(isClicked ? "isClicked" : "").toClassName()} title="Zoom presets (click to see options)">
+      <div
+        className={cn("flyoutmenu")
+          .elem("icon")
+          .mix(isClicked ? "isClicked" : "")
+          .toClassName()}
+        title="Zoom presets (click to see options)"
+      >
         {icon}
       </div>
       <div className={cn("tooltips").toClassName()}>

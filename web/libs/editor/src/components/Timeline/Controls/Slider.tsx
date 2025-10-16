@@ -82,7 +82,7 @@ export const Slider: FC<SliderProps> = ({
               .elem("input")
               .mod(
                 valueError !== undefined &&
-                (typeof valueError === "string" || valueError > max || valueError < min) && { error: "control" }
+                  (typeof valueError === "string" || valueError > max || valueError < min) && { error: "control" },
               )
               .toClassName()}
             type="text"

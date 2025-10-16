@@ -101,7 +101,9 @@ export const Annotations = observer(({ store, annotationStore, commentStore }) =
         extra={
           <div className={cn("annotations-list").elem("icons").toClassName()}>
             <div className={cn("annotations-list").elem("icon-column").toClassName()}>{renderCommentIcon(ent)}</div>
-            <div className={cn("annotations-list").elem("icon-column").toClassName()}>{groundTruthEnabled && <GroundTruth entity={ent} disabled />}</div>
+            <div className={cn("annotations-list").elem("icon-column").toClassName()}>
+              {groundTruthEnabled && <GroundTruth entity={ent} disabled />}
+            </div>
           </div>
         }
       />
@@ -175,7 +177,11 @@ const CreateAnnotation = observer(({ annotationStore, onClick }) => {
   }, [annotationStore, onClick]);
 
   return (
-    <div className={cn("annotations-list").elem("create").toClassName()} aria-label="Create Annotation" onClick={onCreateAnnotation}>
+    <div
+      className={cn("annotations-list").elem("create").toClassName()}
+      aria-label="Create Annotation"
+      onClick={onCreateAnnotation}
+    >
       <Space size="small">
         <Userpic className={cn("annotations-list").elem("userpic").mod({ prediction: true }).toClassName()}>
           <IconPlusCircle />
@@ -208,12 +214,8 @@ const Annotation = observer(({ entity, selected, onClick, extra, ...props }) => 
           </Userpic>
           <Space direction="vertical" size="none">
             <div className={cn("annotations-list").elem("user").toClassName()}>
-              <span className={cn("annotations-list").elem("name").toClassName()}>
-                {username}
-              </span>
-              <span className={cn("annotations-list").elem("entity-id").toClassName()}>
-                #{entity.pk ?? entity.id}
-              </span>
+              <span className={cn("annotations-list").elem("name").toClassName()}>{username}</span>
+              <span className={cn("annotations-list").elem("entity-id").toClassName()}>#{entity.pk ?? entity.id}</span>
             </div>
 
             {isDefined(entity.acceptedState) ? (
@@ -222,7 +224,8 @@ const Annotation = observer(({ entity, selected, onClick, extra, ...props }) => 
               </div>
             ) : (
               <div className={cn("annotations-list").elem("created").toClassName()}>
-                created, <TimeAgo className={cn("annotations-list").elem("date").toClassName()} date={entity.createdDate} />
+                created,{" "}
+                <TimeAgo className={cn("annotations-list").elem("date").toClassName()} date={entity.createdDate} />
               </div>
             )}
           </Space>

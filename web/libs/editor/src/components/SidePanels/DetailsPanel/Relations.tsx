@@ -76,7 +76,11 @@ const RelationItem: FC<{ relation: any }> = observer(({ relation }) => {
   // const;
 
   return (
-    <div className={cn("relations").elem("item").mod({ hidden: !relation.visible }).toClassName()} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+    <div
+      className={cn("relations").elem("item").mod({ hidden: !relation.visible }).toClassName()}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <div className={cn("relations").elem("content").toClassName()}>
         <div className={cn("relations").elem("icon").toClassName()} onClick={relation.rotateDirection}>
           <div className={cn("relations").elem("direction").toClassName()}>{directionIcon}</div>

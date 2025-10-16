@@ -130,7 +130,9 @@ class App extends Component {
         <div className={cn("main-view").elem("annotation").toClassName()}>
           <TreeValidation errors={this.props.store.annotationStore.validation} />
         </div>
-        {!isFF(FF_DEV_3873) && store.hasInterface("infobar") && <div className={cn("main-view").elem("infobar").toClassName()}>Task #{store.task.id}</div>}
+        {!isFF(FF_DEV_3873) && store.hasInterface("infobar") && (
+          <div className={cn("main-view").elem("infobar").toClassName()}>Task #{store.task.id}</div>
+        )}
       </div>
     );
   }
@@ -143,7 +145,11 @@ class App extends Component {
     if (as.viewingAll) return this.renderAllAnnotations();
 
     return (
-      <div key={(as.selectedHistory ?? as.selected)?.id} className={cn("main-view").toClassName()} onScrollCapture={this._notifyScroll}>
+      <div
+        key={(as.selectedHistory ?? as.selected)?.id}
+        className={cn("main-view").toClassName()}
+        onScrollCapture={this._notifyScroll}
+      >
         <div className={cn("main-view").elem("annotation").toClassName()}>
           {<Annotation root={root} annotation={as.selected} />}
           {this.renderRelations(as.selected)}
@@ -221,7 +227,11 @@ class App extends Component {
 
     // tags can be styled in config when user is awaiting for suggestions from ML backend
     const mainContent = (
-      <div className={cn("main-content").mix(...(store.awaitingSuggestions ? ["requesting"] : [])).toClassName()}>
+      <div
+        className={cn("main-content")
+          .mix(...(store.awaitingSuggestions ? ["requesting"] : []))
+          .toClassName()}
+      >
         {as.validation === null
           ? this._renderUI(as.selectedHistory?.root ?? root, as)
           : this.renderConfigValidationException(store)}
@@ -260,11 +270,13 @@ class App extends Component {
 
             {isDefined(store) && store.hasInterface("topbar") && <TopBar store={store} />}
             <div
-              className={cn("wrapper").mod({
-                viewAll: viewingAll,
-                bsp: settings.effectiveBottomSidePanel,
-                showingBottomBar: newUIEnabled,
-              }).toClassName()}
+              className={cn("wrapper")
+                .mod({
+                  viewAll: viewingAll,
+                  bsp: settings.effectiveBottomSidePanel,
+                  showingBottomBar: newUIEnabled,
+                })
+                .toClassName()}
             >
               {newUIEnabled ? (
                 isBulkMode || !store.hasInterface("side-column") ? (

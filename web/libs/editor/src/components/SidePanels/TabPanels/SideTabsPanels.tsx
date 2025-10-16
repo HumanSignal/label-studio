@@ -552,7 +552,13 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
       >
         {initialized && (
           <>
-            <div ref={contentRef} className={cn("sidepanels").elem("content").mod({ resizing: lockPanelContents || positioning }).toClassName()}>
+            <div
+              ref={contentRef}
+              className={cn("sidepanels")
+                .elem("content")
+                .mod({ resizing: lockPanelContents || positioning })
+                .toClassName()}
+            >
               {children}
             </div>
             {panelsHidden !== true && panelBreakPoint ? (
@@ -582,7 +588,10 @@ const SideTabsPanelsComponent: FC<SidePanelsProps> = ({
                   return (
                     <div
                       key={panelType}
-                      className={cn("sidepanels").elem("wrapper").mod({ align: panelType, snap: !lockPanelContents && snap === panelType && snap !== undefined }).toClassName()}
+                      className={cn("sidepanels")
+                        .elem("wrapper")
+                        .mod({ align: panelType, snap: !lockPanelContents && snap === panelType && snap !== undefined })
+                        .toClassName()}
                     >
                       {content}
                     </div>

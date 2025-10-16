@@ -128,8 +128,18 @@ export const Seeker: FC<SeekerProps> = ({
   return (
     <div className={cn("seeker").toClassName()} ref={rootRef as any} onMouseDown={onDrag}>
       <div className={cn("seeker").elem("track").toClassName()} />
-      {showIndicator && <div className={cn("seeker").elem("indicator").toClassName()} ref={viewRef as any} style={{ left: windowOffset, width }} />}
-      <div className={cn("seeker").elem("position").toClassName()} ref={seekerRef as any} style={{ left: `${seekerOffset}%` }} />
+      {showIndicator && (
+        <div
+          className={cn("seeker").elem("indicator").toClassName()}
+          ref={viewRef as any}
+          style={{ left: windowOffset, width }}
+        />
+      )}
+      <div
+        className={cn("seeker").elem("position").toClassName()}
+        ref={seekerRef as any}
+        style={{ left: `${seekerOffset}%` }}
+      />
       <div className={cn("seeker").elem("minimap").toClassName()}>{minimap}</div>
     </div>
   );

@@ -490,14 +490,21 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({ currentEntity, panelsHidden,
             setViewportSizeMatch(el.clientWidth <= maxWindowWidth);
           }
         }}
-        className={cn("sidepanels").mod({ collapsed: sidepanelsCollapsed, newLabelingUI: isFF(FF_DEV_3873) }).toClassName()}
+        className={cn("sidepanels")
+          .mod({ collapsed: sidepanelsCollapsed, newLabelingUI: isFF(FF_DEV_3873) })
+          .toClassName()}
         style={{
           ...padding,
         }}
       >
         {initialized && (
           <>
-            <div className={cn("sidepanels").elem("content").mod({ resizing: resizing || positioning }).toClassName()}>
+            <div
+              className={cn("sidepanels")
+                .elem("content")
+                .mod({ resizing: resizing || positioning })
+                .toClassName()}
+            >
               {children}
             </div>
             {panelsHidden !== true && (
@@ -510,7 +517,13 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({ currentEntity, panelsHidden,
                   }
 
                   return (
-                    <div key={key} className={cn("sidepanels").elem("wrapper").mod({ align: key, snap: snap === key && snap !== undefined }).toClassName()}>
+                    <div
+                      key={key}
+                      className={cn("sidepanels")
+                        .elem("wrapper")
+                        .mod({ align: key, snap: snap === key && snap !== undefined })
+                        .toClassName()}
+                    >
                       {content}
                     </div>
                   );

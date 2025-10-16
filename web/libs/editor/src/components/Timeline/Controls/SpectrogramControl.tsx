@@ -521,9 +521,7 @@ export const SpectrogramControl: FC<SpectrogramControlProps> = ({ waveform }) =>
               min={-120}
               max={displayMaxDb - 10}
             />
-            <span className={cn("spectrogram-controls").elem("separator").toClassName()}>
-              to
-            </span>
+            <span className={cn("spectrogram-controls").elem("separator").toClassName()}>to</span>
             <input
               className={cn("spectrogram-controls").elem("input").toClassName()}
               type="number"

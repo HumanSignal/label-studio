@@ -62,7 +62,10 @@ export const CurrentTask = observer(({ store }) => {
           width: isFF(FF_DEV_3873) && "auto",
         }}
       >
-        <div className={cn("current-task").elem("task-id").toClassName()} style={{ fontSize: isFF(FF_DEV_3873) ? 12 : 14 }}>
+        <div
+          className={cn("current-task").elem("task-id").toClassName()}
+          style={{ fontSize: isFF(FF_DEV_3873) ? 12 : 14 }}
+        >
           {store.task.id ?? guidGenerator()}
           {historyEnabled &&
             showCounter &&
@@ -77,7 +80,12 @@ export const CurrentTask = observer(({ store }) => {
             ))}
         </div>
         {historyEnabled && (
-          <div className={cn("current-task").elem("history-controls").mod({ newui: isFF(FF_DEV_3873) }).toClassName()}>
+          <div
+            className={cn("current-task")
+              .elem("history-controls")
+              .mod({ newui: isFF(FF_DEV_3873) })
+              .toClassName()}
+          >
             <Button
               data-testid="prev-task"
               aria-label="Previous task"

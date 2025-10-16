@@ -69,7 +69,13 @@ const ImageProgress = observer(({ downloading, progress, error, src, usedValue }
   return downloading ? (
     <div className={cn("image-progress").toClassName()}>
       <div className={cn("image-progress").elem("message").toClassName()}>Downloading image</div>
-      <progress className={cn("image-progress").elem("bar").toClassName()} value={progress} min="0" max={1} step={0.0001} />
+      <progress
+        className={cn("image-progress").elem("bar").toClassName()}
+        value={progress}
+        min="0"
+        max={1}
+        step={0.0001}
+      />
     </div>
   ) : error ? (
     <ImageLoadingError src={src} value={usedValue} />
