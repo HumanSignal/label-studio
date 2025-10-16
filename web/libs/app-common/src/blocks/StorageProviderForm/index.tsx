@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useState } from "react";
-import { useModalControls } from "@humansignal/ui";
+import { useModalControls } from "@humansignal/ui/lib/modal";
 import { Stepper, ProviderSelectionStep, ProviderDetailsStep, PreviewStep, ReviewStep } from "./Steps";
 import { FormHeader } from "./components/form-header";
 import { FormFooter } from "./components/form-footer";
