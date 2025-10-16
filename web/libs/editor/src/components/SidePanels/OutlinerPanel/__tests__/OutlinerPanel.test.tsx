@@ -171,7 +171,7 @@ describe("OutlinerPanel", () => {
 
       expect(screen.getByTestId("empty-state")).toBeInTheDocument();
       expect(screen.queryByTestId("outliner-tree")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("block")).not.toBeInTheDocument(); // No filters-info block
+      expect(screen.queryByText("All regions hidden")).not.toBeInTheDocument(); // No filters-info message
     });
 
     it("does not render empty state when regions exist", () => {
@@ -198,15 +198,9 @@ describe("OutlinerPanel", () => {
 
       render(<OutlinerPanel {...defaultProps} regions={regionsAllHidden} />);
 
-      expect(screen.getByTestId("block")).toBeInTheDocument();
       expect(screen.getByTestId("icon-info")).toBeInTheDocument();
-      const titleElem = screen.getAllByTestId("elem").find((elem) => elem.textContent === "All regions hidden");
-      expect(titleElem).toBeInTheDocument();
-
-      const descriptionElem = screen
-        .getAllByTestId("elem")
-        .find((elem) => elem.textContent === "Adjust or remove the filters to view");
-      expect(descriptionElem).toBeInTheDocument();
+      expect(screen.getByText("All regions hidden")).toBeInTheDocument();
+      expect(screen.getByText("Adjust or remove the filters to view")).toBeInTheDocument();
     });
 
     it("shows hidden regions count in footer when some regions are filtered", () => {
