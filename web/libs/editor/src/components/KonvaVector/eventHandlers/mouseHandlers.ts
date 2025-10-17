@@ -23,7 +23,7 @@ import {
   snapToPixel,
   stageToImageCoordinates,
 } from "./utils";
-import { constrainPointToBounds } from "../utils/boundsChecking";
+import { constrainAnchorPointsToBounds } from "../utils/boundsChecking";
 import { VectorSelectionTracker } from "../VectorSelectionTracker";
 import { PointType } from "../types";
 
@@ -469,9 +469,9 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       // Snap to pixel grid if enabled
       const snappedPos = snapToPixel(imagePos, props.pixelSnapping);
 
-      // Apply bounds checking if enabled
-      const finalPos = props.constrainToBounds
-        ? constrainPointToBounds(snappedPos, { width: props.width, height: props.height })
+      // Apply bounds checking to anchor point
+      const finalPos = true
+        ? constrainAnchorPointsToBounds([snappedPos], { width: props.width, height: props.height })[0]
         : snappedPos;
 
       // Update the point position
@@ -481,7 +481,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
         y: finalPos.y,
       };
 
-      // If it's a bezier point, move the control points with it
+      // If it's a bezier point, move the control points with it and apply group constraints
       if (draggedPoint.isBezier) {
         const updatedPoint = newPoints[props.draggedPointIndex];
 
@@ -510,6 +510,14 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
             y: snappedControlPoint2.y,
           };
         }
+
+        // Apply constraints to anchor point only - control points move with it automatically
+        const constrainedPoint = constrainAnchorPointsToBounds([updatedPoint], { width: props.width, height: props.height })[0];
+
+        // Update the point with constrained positions
+        updatedPoint.x = constrainedPoint.x;
+        updatedPoint.y = constrainedPoint.y;
+        // Control points are already positioned correctly relative to the anchor point
       }
 
       props.onPointsChange?.(newPoints);
@@ -534,11 +542,6 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
         // Snap to pixel grid if enabled
         const snappedPos = snapToPixel(imagePos, props.pixelSnapping);
 
-        // Apply bounds checking if enabled
-        const finalPos = props.constrainToBounds
-          ? constrainPointToBounds(snappedPos, { width: props.width, height: props.height })
-          : snappedPos;
-
         // If Alt key is held, disconnect the control points
         if (e.evt.altKey) {
           point.disconnected = true;
@@ -548,7 +551,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
           // Create a new point object with updated control points
           const updatedPoint = {
             ...point,
-            controlPoint1: { x: finalPos.x, y: finalPos.y },
+            controlPoint1: { x: snappedPos.x, y: snappedPos.y },
           };
 
           // If controls are synchronized (not disconnected), update the other control point symmetrically
@@ -571,7 +574,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
           // Create a new point object with updated control points
           const updatedPoint = {
             ...point,
-            controlPoint2: { x: finalPos.x, y: finalPos.y },
+            controlPoint2: { x: snappedPos.x, y: snappedPos.y },
           };
 
           // If controls are synchronized (not disconnected), update the other control point symmetrically

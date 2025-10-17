@@ -207,8 +207,6 @@ export interface KonvaVectorProps {
   onMouseLeave?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Disable all interactions when true */
   disabled?: boolean;
-  /** Constrain points to stay within image bounds */
-  constrainToBounds?: boolean;
   /** Ref to access component methods */
   ref?: React.RefObject<KonvaVectorRef>;
 }
