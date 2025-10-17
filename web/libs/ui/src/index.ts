@@ -15,7 +15,6 @@ export * from "./lib/enterprise-badge/enterprise-badge";
 export * from "./lib/label/label";
 export * from "./lib/select/select";
 export * from "./lib/skeleton/skeleton";
-export * from "./lib/tabs/tabs";
 export * from "./lib/toast/toast";
 export * from "./lib/toggle/toggle";
 export * from "./lib/typography/typography";
