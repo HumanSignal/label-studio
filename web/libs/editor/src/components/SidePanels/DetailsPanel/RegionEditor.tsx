@@ -14,7 +14,7 @@ import {
 } from "react";
 import { IconPropertyAngle } from "@humansignal/icons";
 import { Checkbox, Select } from "@humansignal/ui";
-import { cn, useBEM } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { TimeDurationControl } from "../../TimeDurationControl/TimeDurationControl";
 import { TimelineRegionEditor } from "./TimelineRegionEditor";
 import "./RegionEditor.scss";
@@ -116,7 +116,6 @@ interface RegionPropertyProps {
 }
 
 const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) => {
-  const block = useBEM();
   const [value, setValue] = useState(region.getProperty(property));
 
   const propertyType = useMemo(() => {
@@ -185,7 +184,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
     <label className={cn("region-editor").elem("property").mod({ text: isString }).toClassName()}>
       {isBoolean ? (
         <Checkbox
-          className={block?.elem("input").toClassName()}
+          className={cn("region-editor").elem("input").toClassName()}
           checked={value}
           onChange={(e) => onChangeHandler(e.target.checked)}
         />
@@ -202,7 +201,7 @@ const RegionProperty: FC<RegionPropertyProps> = ({ property, label, region }) =>
         <Select
           value={value}
           onChange={(val) => onChangeHandler(val)}
-          triggerClassName={block?.elem("select").toClassName()}
+          triggerClassName={cn("region-editor").elem("select").toClassName()}
           options={options}
         />
       ) : null}
@@ -217,7 +216,6 @@ interface RegionInputProps extends InputHTMLAttributes<HTMLInputElement | HTMLTe
 }
 
 const RegionInput: FC<RegionInputProps> = ({ onChange: onChangeValue, type, value, step, ...props }) => {
-  const block = useBEM();
   const [currentValue, setValue] = useState(value);
 
   const updateValue = useCallback(
@@ -286,7 +284,7 @@ const RegionInput: FC<RegionInputProps> = ({ onChange: onChangeValue, type, valu
   return (
     <Tag
       {...props}
-      className={block?.elem("input").toClassName()}
+      className={cn("region-editor").elem("input").toClassName()}
       type="text"
       step={step}
       onChange={onChangeHandler}

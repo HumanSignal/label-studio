@@ -1,6 +1,6 @@
 import { observer } from "mobx-react";
 import { type FC, useEffect, useMemo, useRef } from "react";
-import { cn, useBEM } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { RegionEditor } from "./RegionEditor";
 import "./RegionDetails.scss";
 import { Typography } from "@humansignal/ui";
@@ -94,7 +94,7 @@ export const ResultItem: FC<{ result: any }> = observer(({ result }) => {
 export const RegionDetailsMain: FC<{ region: any }> = observer(({ region }) => {
   return (
     <>
-      <div className={cn("region-details").elem("result").toClassName()}>
+      <div className={cn("detailed-region").elem("result").toClassName()}>
         {(region?.results as any[])
           // hide per-regions stored only in this session just for a better UX
           .filter((res) => res.canBeSubmitted)
@@ -127,7 +127,6 @@ type RegionDetailsMetaProps = {
 
 export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(
   ({ region, editMode, cancelEditMode, enterEditMode }) => {
-    const bem = useBEM();
     const input = useRef<HTMLTextAreaElement | null>();
 
     const saveMeta = (value: string) => {
@@ -149,7 +148,7 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(
           <textarea
             ref={(el) => (input.current = el)}
             placeholder="Meta"
-            className={bem.elem("meta-text").toClassName()}
+            className={cn("detailed-region").elem("meta-text").toClassName()}
             value={region.meta.text}
             onChange={(e) => saveMeta(e.target.value)}
             onBlur={(e) => {
@@ -166,7 +165,7 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(
           />
         ) : (
           region.meta?.text && (
-            <div className={cn("region-details").elem("meta-text").toClassName()} onClick={() => enterEditMode?.()}>
+            <div className={cn("detailed-region").elem("meta-text").toClassName()} onClick={() => enterEditMode?.()}>
               {region.meta?.text}
             </div>
           )
