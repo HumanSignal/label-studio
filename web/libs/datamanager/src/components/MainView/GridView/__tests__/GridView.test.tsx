@@ -42,29 +42,77 @@ jest.mock("mobx-state-tree", () => ({
 // Mock the required dependencies
 jest.mock("react-virtualized-auto-sizer", () => ({
   __esModule: true,
-  default: ({ children }: { children: (size: { width: number; height: number }) => React.ReactNode }) =>
-    children({ width: 1000, height: 800 }),
+  default: ({
+    children,
+  }: {
+    children: (size: { width: number; height: number }) => React.ReactNode;
+  }) => children({ width: 1000, height: 800 }),
 }));
 
-jest.mock("react-window", () => ({
-  FixedSizeGrid: ({
-    children,
-    ...props
-  }: {
-    children: (props: { rowIndex: number; columnIndex: number; style: React.CSSProperties }) => React.ReactNode;
-  }) => (
-    <div data-testid="fixed-size-grid" {...props}>
-      {children({ rowIndex: 0, columnIndex: 0, style: {} })}
-    </div>
-  ),
-}));
+jest.mock("react-window", () => {
+  const React = require("react");
+  return {
+    FixedSizeGrid: React.forwardRef(
+      (
+        {
+          children,
+          width,
+          height,
+          rowHeight,
+          columnWidth,
+          rowCount,
+          columnCount,
+          overscanRowCount,
+          onItemsRendered,
+          className,
+          style,
+          ...props
+        }: {
+          children: (props: {
+            rowIndex: number;
+            columnIndex: number;
+            style: React.CSSProperties;
+          }) => React.ReactNode;
+          width?: number;
+          height?: number;
+          rowHeight?: number;
+          columnWidth?: number;
+          rowCount?: number;
+          columnCount?: number;
+          overscanRowCount?: number;
+          onItemsRendered?: () => void;
+          className?: string;
+          style?: React.CSSProperties;
+        },
+        ref: any,
+      ) => (
+        <div
+          ref={ref}
+          data-testid="fixed-size-grid"
+          className={className}
+          style={{ ...style, width, height }}
+          data-column-count={columnCount}
+          data-row-count={rowCount}
+          data-row-height={rowHeight}
+          data-column-width={columnWidth}
+        >
+          {children({ rowIndex: 0, columnIndex: 0, style: {} })}
+        </div>
+      ),
+    ),
+  };
+});
 
 jest.mock("react-window-infinite-loader", () => ({
   __esModule: true,
   default: ({
     children,
-  }: { children: (props: { onItemsRendered: () => void; ref: React.RefObject<unknown> }) => React.ReactNode }) =>
-    children({ onItemsRendered: jest.fn(), ref: jest.fn() }),
+  }: {
+    children: (props: {
+      onItemsRendered: () => void;
+      ref: React.RefObject<unknown>;
+    }) => React.ReactNode;
+  }) => children({ onItemsRendered: jest.fn(), ref: jest.fn() }),
 }));
 
 // Mock data for testing
@@ -182,7 +230,7 @@ describe("GridView", () => {
       );
 
       const grid = screen.getByTestId("fixed-size-grid");
-      expect(grid).toHaveAttribute("columnCount", "3");
+      expect(grid).toHaveAttribute("data-column-count", "3");
     });
   });
 
@@ -382,25 +430,16 @@ describe("GridView", () => {
           view={view}
           fields={mockFields.map((f) => ({ ...f, alias: f.id.split(":")[1] }))}
         >
-          <Block name="grid-view">
-            <GridCell
-              view={view}
-              row={row}
-              fields={mockFields}
-              selected={selected}
-              columnCount={2}
-              onClick={() => {}}
-            />
-          </Block>
+          <GridCell view={view} row={row} fields={mockFields} selected={selected} columnCount={2} onClick={() => {}} />
         </GridViewProvider>,
       );
 
       const cellBody = screen
         .getByText(row.id.toString())
-        .closest(".dm-grid-view__cell")
-        ?.querySelector(".dm-grid-view__cell-body");
+        .closest(".ls-grid-view__cell")
+        ?.querySelector(".ls-grid-view__cell-body");
 
-      expect(cellBody).toHaveClass("dm-grid-view__cell-body_responsive");
+      expect(cellBody).toHaveClass("ls-grid-view__cell-body_responsive");
     });
 
     it("handles different column counts", () => {
@@ -418,7 +457,7 @@ describe("GridView", () => {
         );
 
         const grid = screen.getByTestId("fixed-size-grid");
-        expect(grid).toHaveAttribute("columnCount", count.toString());
+        expect(grid).toHaveAttribute("data-column-count", count.toString());
         unmount();
       });
     });

@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useState } from "react";
-import { useModalControls } from "apps/labelstudio/src/components/Modal/ModalPopup";
+import { useModalControls } from "@humansignal/ui/lib/modal";
 import { Stepper, ProviderSelectionStep, ProviderDetailsStep, PreviewStep, ReviewStep } from "./Steps";
 import { FormHeader } from "./components/form-header";
 import { FormFooter } from "./components/form-footer";
@@ -59,7 +59,10 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
     const effectiveTarget = target || "import"; // Default to import if target is undefined
     const steps = isEditMode
       ? [
-          { title: "Configure Connection", schema: getProviderSchema(type || "s3", isEditMode, effectiveTarget) },
+          {
+            title: "Configure Connection",
+            schema: getProviderSchema(type || "s3", isEditMode, effectiveTarget),
+          },
           // Only include preview and review steps for import storages
           ...(effectiveTarget === "import"
             ? [{ title: "Import Settings & Preview" }, { title: "Review & Confirm" }]
@@ -67,7 +70,10 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
         ]
       : [
           { title: "Select Provider", schema: step1Schema },
-          { title: "Configure Connection", schema: getProviderSchema(type || "s3", isEditMode, effectiveTarget) },
+          {
+            title: "Configure Connection",
+            schema: getProviderSchema(type || "s3", isEditMode, effectiveTarget),
+          },
           // Only include preview and review steps for import storages
           ...(effectiveTarget === "import"
             ? [{ title: "Import Settings & Preview" }, { title: "Review & Confirm" }]
