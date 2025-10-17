@@ -1,11 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Label } from "..";
-import { BemWithSpecifiContext } from "../../../../utils/bem";
+import { BemWithSpecificContext } from "../../../../utils/bem";
 import { FormField } from "../../FormField";
 import "./RadioGroup.scss";
 
 const RadioContext = createContext();
-const { Block, Elem } = BemWithSpecifiContext();
+const { Block, Elem } = BemWithSpecificContext();
 
 export const RadioGroup = ({
   label,
