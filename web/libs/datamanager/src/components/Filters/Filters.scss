@@ -12,6 +12,17 @@
 
   &_sidebar {
     width: 100%;
+
+    .filterLine {
+      .datepicker__output_range {
+        display: flex;
+        width: 100%;
+
+        .input-dm {
+          min-width: 100px;
+        }
+      }
+    }
   }
 
   &__actions {
