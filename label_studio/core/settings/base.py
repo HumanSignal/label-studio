@@ -899,3 +899,7 @@ DM_MAX_USERS_TO_DISPLAY = int(get_env('DM_MAX_USERS_TO_DISPLAY', 10))
 
 # Base FSM (Finite State Machine) Configuration for Label Studio
 FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
+
+# Used for async migrations. In LSE this is set to a real queue name, including here so we
+# can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
+SERVICE_QUEUE_NAME = ''

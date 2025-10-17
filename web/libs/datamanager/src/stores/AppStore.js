@@ -711,6 +711,8 @@ export const AppStore = types
 
     invokeAction: flow(function* (actionId, options = {}) {
       const view = self.currentView ?? {};
+      const viewReloaded = view;
+      let projectFetched = self.project;
 
       const needsLock = self.availableActions.findIndex((a) => a.id === actionId) >= 0;
 
@@ -749,7 +751,13 @@ export const AppStore = types
       }
 
       if (actionCallback instanceof Function) {
-        return actionCallback(actionParams, view);
+        const result = yield actionCallback(actionParams, view);
+        self.SDK.invoke("actionDialogOkComplete", actionId, {
+          result,
+          view: viewReloaded,
+          project: projectFetched,
+        });
+        return result;
       }
 
       const requestParams = {
@@ -774,17 +782,28 @@ export const AppStore = types
 
       if (result.reload) {
         self.SDK.reload();
+        self.SDK.invoke("actionDialogOkComplete", actionId, {
+          result,
+          view: viewReloaded,
+          project: projectFetched,
+        });
         return;
       }
 
       if (options.reload !== false) {
         yield view.reload();
-        self.fetchProject();
+        yield self.fetchProject();
+        projectFetched = self.project;
         view.clearSelection();
       }
 
       view?.unlock?.();
 
+      self.SDK.invoke("actionDialogOkComplete", actionId, {
+        result,
+        view: viewReloaded,
+        project: projectFetched,
+      });
       return result;
     }),
 
