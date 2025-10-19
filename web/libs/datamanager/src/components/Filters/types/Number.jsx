@@ -8,7 +8,8 @@ const valueFilter = (value) => {
       return value;
     }
     if (typeof value === "string") {
-      return value.replace(/([^\d.,]+)/, "");
+      const cleaned = value.replace(/([^\d.,]+)/, "");
+      return cleaned ? Number(cleaned) : null;
     }
     return value || null;
   }
@@ -25,7 +26,6 @@ const RangeInput = observer(({ schema, value, onChange }) => {
   const max = value?.max ?? null;
 
   const onValueChange = (newValue) => {
-    console.log({ newValue });
     onChange(newValue);
   };
 
