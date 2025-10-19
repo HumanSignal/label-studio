@@ -177,7 +177,6 @@ export function handleDrawingModeClick(e: KonvaEventObject<MouseEvent>, props: E
   }
 
   // Only add new points if path is not closed and we haven't reached max points
-
   if (!props.isPathClosed && props.canAddMorePoints?.()) {
     // In skeleton mode, explicitly pass the activePointId as prevPointId
     // to ensure the new point connects to the selected point

@@ -29,6 +29,10 @@ import { PointType } from "../types";
 
 export function createMouseDownHandler(props: EventHandlerProps, handledSelectionInMouseDown: { current: boolean }) {
   return (e: KonvaEventObject<MouseEvent>) => {
+    // Reset the handledSelectionInMouseDown flag at the start of each mousedown
+    // This ensures clean state for each interaction
+    handledSelectionInMouseDown.current = false;
+
     let shiftClickHandled = false;
 
     // Only run Shift+click logic if Shift key is actually held
@@ -268,6 +272,9 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
     }
 
     // If we get here, we're not clicking on anything specific
+    // Reset the handledSelectionInMouseDown flag since we're clicking on empty space
+    handledSelectionInMouseDown.current = false;
+
     // Handle deselection based on transformer state
     if (!e.evt.ctrlKey && !e.evt.metaKey) {
       // Use tracker for global selection management
@@ -614,7 +621,8 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
 
       if (!props.isDraggingNewBezier) {
         // Start Bezier curve creation if we've moved enough
-        if (dragDistance > 5) {
+        // Increased threshold to prevent accidental bezier creation on regular clicks
+        if (dragDistance > 15) {
           // Convert client coordinates to stage coordinates
           const stage = e.target.getStage();
           const stagePos = stage?.getPointerPosition();
@@ -949,12 +957,6 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
     // Handle drawing mode clicks (only when path is not closed)
     // Skip if PointCreationManager is currently creating a point
     if (props.isDrawingMode && !props.isPathClosed && !props.pointCreationManager?.isCreating()) {
-      // Check if we just created a Bezier point - if so, skip regular point creation
-      if (handledSelectionInMouseDown.current) {
-        handledSelectionInMouseDown.current = false;
-        return;
-      }
-
       // Handle regular click (add regular point)
       if (handleDrawingModeClick(e, props)) {
         return;
