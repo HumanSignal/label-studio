@@ -151,6 +151,7 @@ describe("Control Tags - TextArea - Pre-filled Value", () => {
   });
 });
 
+// All annotations have id, so the button for submit is Update
 describe("Control Tags - TextArea - Auto-submit on Annotation Submit", () => {
   it("should auto-submit pre-filled value when annotation is submitted", () => {
     LabelStudio.params().config(textareaConfigWithValue).data(simpleData).withResult([]).init();
