@@ -19,13 +19,20 @@ export function resetTransformState() {
  */
 export function applyTransformationToControlPoints(
   points: BezierPoint[],
-  originalPositions: { [key: number]: { x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } } },
+  originalPositions: {
+    [key: number]: {
+      x: number;
+      y: number;
+      controlPoint1?: { x: number; y: number };
+      controlPoint2?: { x: number; y: number };
+    };
+  },
   currentRotation: number,
   currentScaleX: number,
   currentScaleY: number,
   transformerCenterX: number,
   transformerCenterY: number,
-  isRotation: boolean = false,
+  isRotation = false,
 ): BezierPoint[] {
   const rotationRadians = currentRotation * (Math.PI / 180);
   const cos = Math.cos(rotationRadians);
@@ -45,10 +52,10 @@ export function applyTransformationToControlPoints(
         const cp2OffsetY = originalPos.controlPoint2.y - originalPos.y;
 
         // Apply scaling to the offsets
-        let scaledCP1X = cp1OffsetX * currentScaleX;
-        let scaledCP1Y = cp1OffsetY * currentScaleY;
-        let scaledCP2X = cp2OffsetX * currentScaleX;
-        let scaledCP2Y = cp2OffsetY * currentScaleY;
+        const scaledCP1X = cp1OffsetX * currentScaleX;
+        const scaledCP1Y = cp1OffsetY * currentScaleY;
+        const scaledCP2X = cp2OffsetX * currentScaleX;
+        const scaledCP2Y = cp2OffsetY * currentScaleY;
 
         // Rotate the scaled offsets
         const rotatedCP1X = scaledCP1X * cos - scaledCP1Y * sin;
@@ -106,7 +113,14 @@ export function applyTransformationToControlPoints(
  */
 export function updateOriginalPositions(
   points: BezierPoint[],
-  originalPositions: { [key: number]: { x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } } },
+  originalPositions: {
+    [key: number]: {
+      x: number;
+      y: number;
+      controlPoint1?: { x: number; y: number };
+      controlPoint2?: { x: number; y: number };
+    };
+  },
 ): void {
   points.forEach((point, index) => {
     if (point.isBezier && point.controlPoint1 && point.controlPoint2) {

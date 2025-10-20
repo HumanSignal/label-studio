@@ -2,7 +2,12 @@ import React from "react";
 import { Transformer as KonvaTransformer } from "react-konva";
 import type Konva from "konva";
 import type { BezierPoint } from "../types";
-import { applyTransformationToPoints, resetTransformState, applyTransformationToControlPoints, updateOriginalPositions } from "../utils/transformUtils";
+import {
+  applyTransformationToPoints,
+  resetTransformState,
+  applyTransformationToControlPoints,
+  updateOriginalPositions,
+} from "../utils/transformUtils";
 
 interface VectorTransformerProps {
   selectedPoints: Set<number>;
@@ -59,7 +64,6 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
     };
     initialRotation?: number;
   }>({});
-
 
   // RAF for smooth control point updates
   const rafIdRef = React.useRef<number | null>(null);
@@ -195,7 +199,6 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         // Notify that transformation has started
         onTransformationStart?.();
 
-
         // Store original positions of selected points
         originalPositionsRef.current = {};
         Array.from(selectedPoints).forEach((index) => {
@@ -220,7 +223,6 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         isFirstTransformTickRef.current = true;
       }}
       onDragStart={(_e: any) => {
-
         // Store original positions when dragging starts (for pure drag operations)
         originalPositionsRef.current = {};
         Array.from(selectedPoints).forEach((index) => {

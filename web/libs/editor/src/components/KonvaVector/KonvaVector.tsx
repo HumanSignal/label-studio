@@ -510,11 +510,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   const getBoundsStable = useCallback(() => ({ width, height }), [width, height]);
 
   // Wrapper for onPointSelected to prevent infinite loops during programmatic selection
-  const onPointSelectedWrapper = useCallback((index: number | null) => {
-    if (!isProgrammaticSelection.current && onPointSelected) {
-      onPointSelected(index);
-    }
-  }, [onPointSelected]);
+  const onPointSelectedWrapper = useCallback(
+    (index: number | null) => {
+      if (!isProgrammaticSelection.current && onPointSelected) {
+        onPointSelected(index);
+      }
+    },
+    [onPointSelected],
+  );
 
   // Register instance with tracker
   useEffect(() => {
