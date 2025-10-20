@@ -128,7 +128,6 @@ const _Tool = types
       },
 
       startDrawing(x, y) {
-        console.log("drawing start");
         if (self.mode === "drawing") return;
         if (!self.canStartDrawing()) return;
 
@@ -156,7 +155,6 @@ const _Tool = types
       },
 
       mousedownEv(e, [x, y]) {
-        console.log("down");
         if (self.mode === "drawing") {
           return;
         }
@@ -165,7 +163,6 @@ const _Tool = types
       },
 
       mousemoveEv(_, [x, y]) {
-        console.log("move");
         if (!self.isDrawing) return;
         const { x: rx, y: ry } = self.realCoordsFromCursor(x, y);
         if (down && self.checkDistance(rx, ry)) {
@@ -174,7 +171,6 @@ const _Tool = types
       },
 
       mouseupEv(_, [x, y]) {
-        console.log("up");
         if (!self.isDrawing) return;
         const { x: rx, y: ry } = self.realCoordsFromCursor(x, y);
         down = false;
