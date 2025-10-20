@@ -1,7 +1,7 @@
-import { BemWithSpecifiContext } from "../../utils/bem";
+import { BemWithSpecificContext } from "../../utils/bem";
 import "./Space.scss";
 
-const { Block } = BemWithSpecifiContext();
+const { Block } = BemWithSpecificContext();
 
 export const Space = ({ direction = "horizontal", size, className, style, children, spread, stretch, align }) => {
   return (

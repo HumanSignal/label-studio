@@ -8,7 +8,8 @@ const valueFilter = (value) => {
       return value;
     }
     if (typeof value === "string") {
-      return value.replace(/([^\d.,]+)/, "");
+      const cleaned = value.replace(/([^\d.,]+)/, "");
+      return cleaned ? Number(cleaned) : null;
     }
     return value || null;
   }
@@ -25,7 +26,6 @@ const RangeInput = observer(({ schema, value, onChange }) => {
   const max = value?.max ?? null;
 
   const onValueChange = (newValue) => {
-    console.log({ newValue });
     onChange(newValue);
   };
 
@@ -38,11 +38,11 @@ const RangeInput = observer(({ schema, value, onChange }) => {
   };
 
   return (
-    <>
+    <div className="flex w-full min-w-[100px]">
       <NumberInput placeholder="Min" value={min} onChange={onChangeMin} schema={schema} style={{ flex: 1 }} />
       <span style={{ padding: "0 10px" }}>and</span>
       <NumberInput placeholder="Max" value={max} onChange={onChangeMax} schema={schema} style={{ flex: 1 }} />
-    </>
+    </div>
   );
 });
 

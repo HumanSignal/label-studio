@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useConfig } from "../../providers/ConfigProvider";
 import { useBreadcrumbs, useFindRouteComponent } from "../../providers/RoutesProvider";
-import { BemWithSpecifiContext } from "../../utils/bem";
+import { BemWithSpecificContext } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
 import { Dropdown } from "../Dropdown/Dropdown";
 import { Menu } from "../Menu/Menu";
 import "./Breadcrumbs.scss";
 
-const { Block, Elem } = BemWithSpecifiContext();
+const { Block, Elem } = BemWithSpecificContext();
 
 export const Breadcrumbs = () => {
   const config = useConfig();
