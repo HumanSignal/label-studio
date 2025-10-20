@@ -288,11 +288,7 @@ describe("Control Tags - TextArea - Auto-submit on Annotation Submit", () => {
       },
     ];
 
-    LabelStudio.params()
-      .config(textareaConfigWithMaxSubmissions)
-      .data(simpleData)
-      .withResult(existingResult)
-      .init();
+    LabelStudio.params().config(textareaConfigWithMaxSubmissions).data(simpleData).withResult(existingResult).init();
 
     // Verify both texts are loaded
     Textarea.hasValue("First existing text");
