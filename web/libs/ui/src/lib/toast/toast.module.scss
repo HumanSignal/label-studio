@@ -89,9 +89,9 @@
 .toast {
   --text-color: var(--color-neutral-inverted-content);
   --background-color: var(--color-neutral-inverted-surface);
-  --border-color: var(--color-neutral-inverted-border);
+  --border-color: var(--color-surface-border);
   --hover-color: var(--color-neutral-inverted-surface-hover);
-  --padding: var(--toast-spacing) calc(var(--toast-spacing) * 2);
+  --padding: var(--toast-spacing);
 
   display: flex;
   align-items: center;
@@ -160,7 +160,7 @@
     // Always maintain a dark background for info toasts
     --text-color: var(--color-sand-100);
     --background-color: var(--color-sand-900);
-    --border-color: var(--color-neutral-border);
+    --border-color: var(--color-sand-700);
     --hover-color: var(--color-sand-800);
   }
 
