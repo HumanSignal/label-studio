@@ -581,7 +581,7 @@ DATA_UNDEFINED_NAME = '$undefined$'
 LICENSE = {}
 VERSIONS = {}
 VERSION_EDITION = 'Community'
-LATEST_VERSION_CHECK = True
+LATEST_VERSION_CHECK = get_bool_env('LATEST_VERSION_CHECK', True)
 VERSIONS_CHECK_TIME = 0
 ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
 CONVERTER_DOWNLOAD_RESOURCES = get_bool_env('CONVERTER_DOWNLOAD_RESOURCES', True)
@@ -898,3 +898,7 @@ DM_MAX_USERS_TO_DISPLAY = int(get_env('DM_MAX_USERS_TO_DISPLAY', 10))
 
 # Base FSM (Finite State Machine) Configuration for Label Studio
 FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
+
+# Used for async migrations. In LSE this is set to a real queue name, including here so we
+# can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
+SERVICE_QUEUE_NAME = ''
