@@ -359,7 +359,13 @@ export default types
 
           entity?.submissionInProgress();
 
-          if (isReview) {
+          if (self.hasInterface("annotation:bulk")) {
+            const customButtons = self.customButtons?.get("_replace");
+            const submitButton = customButtons?.find((btn) => btn.name === "submit");
+            if (submitButton && !submitButton.disabled) {
+              self.handleCustomButton?.(submitButton);
+            }
+          } else if (isReview) {
             self.acceptAnnotation();
           } else if (!isUpdate && self.hasInterface("submit")) {
             self.submitAnnotation();

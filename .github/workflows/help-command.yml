@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Update comment if empty
         if: ${{ github.event.client_payload.slash_command.args.all == '' }}
-        uses: peter-evans/create-or-update-comment@v4
+        uses: peter-evans/create-or-update-comment@v5
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: ${{ github.event.client_payload.github.payload.repository.full_name }}
