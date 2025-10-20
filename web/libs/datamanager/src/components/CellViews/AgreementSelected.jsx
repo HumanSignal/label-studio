@@ -34,13 +34,17 @@ export const AgreementSelected = (cell) => {
 
 AgreementSelected.userSelectable = false;
 
-AgreementSelected.HeaderCell = ({ agreementFilters, onSave }) => {
+AgreementSelected.HeaderCell = ({ agreementFilters, onSave, onClose }) => {
   const sdk = useSDK();
   const [content, setContent] = useState(null);
 
   useEffect(() => {
-    sdk.invoke("AgreementSelectedHeaderClick", { agreementFilters, onSave }, (jsx) => setContent(jsx));
+    sdk.invoke("AgreementSelectedHeaderClick", { agreementFilters, onSave, onClose }, (jsx) => setContent(jsx));
   }, []);
 
   return content;
+};
+
+AgreementSelected.style = {
+  minWidth: 210,
 };
