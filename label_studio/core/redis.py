@@ -134,6 +134,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         # Auto-capture request_id from thread local and pass it via job meta
         try:
             from label_studio.core.current_request import _thread_locals
+
             request_id = getattr(_thread_locals, 'request_id', None)
             if request_id:
                 # Store in job meta for worker access
