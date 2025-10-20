@@ -361,18 +361,8 @@ const Model = types
         try {
           const selection = self.vectorRef.getSelectedPointIds();
           const result = selection.length > 1;
-          if (result) {
-            console.log("🔍 VectorRegion.isTransforming() returning true", {
-              regionId: self.id,
-              selected: self.selected,
-              selectionLength: selection.length,
-              selection: selection,
-            });
-          }
           return result;
         } catch (error) {
-          // If there's an error accessing the selection, assume not transforming
-          console.log("🔍 VectorRegion.isTransforming() error", error);
           return false;
         }
       },
