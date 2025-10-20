@@ -11,7 +11,7 @@ categories:
     - Natural Language Processing
     - Named Entity Recognition
     - Hugging Face
-image: "/tutorials/hf-ner.png"
+image: "/guide/ml_tutorials/hf-ner.png"
 ---
 
 # Hugging Face NER model with Label Studio

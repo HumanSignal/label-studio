@@ -13,7 +13,7 @@ categories:
     - Image Annotation
     - OpenMMLab
     - MMDetection
-image: "/tutorials/openmmlab.png"
+image: "/guide/ml_tutorials/openmmlab.png"
 ---
 
 # Object detection with bounding boxes using MMDetection

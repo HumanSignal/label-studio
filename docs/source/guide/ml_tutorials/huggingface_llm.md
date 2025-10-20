@@ -12,7 +12,7 @@ categories:
     - Large Language Model
     - Text Generation
     - Hugging Face
-image: "/tutorials/hf-llm.png"
+image: "/guide/ml_tutorials/hf-llm.png"
 ---
 
 # Hugging Face Large Language Model backend
