@@ -75,33 +75,33 @@ export function applyTransformationToControlPoints(
             y: point.y + rotatedCP2Y,
           },
         };
-      } else {
-        // TRANSLATION/SCALING: Control points maintain their relative positions to anchor points
-        // Calculate the offset from the original anchor to the original control points
-        const originalCP1OffsetX = originalPos.controlPoint1.x - originalPos.x;
-        const originalCP1OffsetY = originalPos.controlPoint1.y - originalPos.y;
-        const originalCP2OffsetX = originalPos.controlPoint2.x - originalPos.x;
-        const originalCP2OffsetY = originalPos.controlPoint2.y - originalPos.y;
-
-        // Apply scaling to the offsets (but not rotation)
-        const scaledCP1X = originalCP1OffsetX * currentScaleX;
-        const scaledCP1Y = originalCP1OffsetY * currentScaleY;
-        const scaledCP2X = originalCP2OffsetX * currentScaleX;
-        const scaledCP2Y = originalCP2OffsetY * currentScaleY;
-
-        // Apply to current anchor position
-        return {
-          ...point,
-          controlPoint1: {
-            x: point.x + scaledCP1X,
-            y: point.y + scaledCP1Y,
-          },
-          controlPoint2: {
-            x: point.x + scaledCP2X,
-            y: point.y + scaledCP2Y,
-          },
-        };
       }
+
+      // TRANSLATION/SCALING: Control points maintain their relative positions to anchor points
+      // Calculate the offset from the original anchor to the original control points
+      const originalCP1OffsetX = originalPos.controlPoint1.x - originalPos.x;
+      const originalCP1OffsetY = originalPos.controlPoint1.y - originalPos.y;
+      const originalCP2OffsetX = originalPos.controlPoint2.x - originalPos.x;
+      const originalCP2OffsetY = originalPos.controlPoint2.y - originalPos.y;
+
+      // Apply scaling to the offsets (but not rotation)
+      const scaledCP1X = originalCP1OffsetX * currentScaleX;
+      const scaledCP1Y = originalCP1OffsetY * currentScaleY;
+      const scaledCP2X = originalCP2OffsetX * currentScaleX;
+      const scaledCP2Y = originalCP2OffsetY * currentScaleY;
+
+      // Apply to current anchor position
+      return {
+        ...point,
+        controlPoint1: {
+          x: point.x + scaledCP1X,
+          y: point.y + scaledCP1Y,
+        },
+        controlPoint2: {
+          x: point.x + scaledCP2X,
+          y: point.y + scaledCP2Y,
+        },
+      };
     }
     return point;
   });
