@@ -103,7 +103,7 @@ jobs:
 
       - name: Create Nightly Release
         id: create_release
-        uses: softprops/action-gh-release@v2.3.3
+        uses: softprops/action-gh-release@v2.4.1
         with:
           token: ${{ secrets.GIT_PAT }}
           body_path: ${{ github.workspace }}-CHANGELOG.txt

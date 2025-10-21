@@ -152,7 +152,7 @@ export const AnnotationButton = observer(
                 This action cannot be undone.
               </>
             ),
-            buttonLook: "destructive",
+            buttonLook: "negative",
             okText: "Delete",
             onOk: () => {
               entity.list.deleteAnnotation(entity);

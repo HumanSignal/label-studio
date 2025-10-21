@@ -16,13 +16,13 @@ import { Dropdown } from "../../../common/Dropdown/Dropdown";
 // eslint-disable-next-line
 // @ts-ignore
 import { Menu } from "../../../common/Menu/Menu";
-import { BemWithSpecifiContext } from "../../../utils/bem";
+import { BemWithSpecificContext } from "../../../utils/bem";
 import { SidePanelsContext } from "../SidePanelsContext";
 import "./ViewControls.scss";
 import { observer } from "mobx-react";
 import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 
-const { Block, Elem } = BemWithSpecifiContext();
+const { Block, Elem } = BemWithSpecificContext();
 
 export type GroupingOptions = "manual" | "label" | "type";
 
