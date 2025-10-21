@@ -339,8 +339,17 @@ const Model = types
       // Checks is the region is being transformed or at least in
       // transformable state (has at least 2 points selected)
       isTransforming() {
-        const selection = self.vectorRef.getSelectedPointIds();
-        return selection.length > 1;
+        // If the region has no vectorRef or is not selected, it's not transforming
+        if (!self.vectorRef || !self.selected) {
+          return false;
+        }
+        try {
+          const selection = self.vectorRef.getSelectedPointIds();
+          const result = selection.length > 1;
+          return result;
+        } catch (error) {
+          return false;
+        }
       },
 
       segGroupRef(ref) {

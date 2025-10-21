@@ -1,6 +1,5 @@
 import { useMemo, useCallback } from "react";
-// @ts-ignore
-import { modal } from "apps/labelstudio/src/components/Modal/Modal";
+import { modal } from "@humansignal/ui/lib/modal";
 import clsx from "clsx";
 import { KeyboardKey } from "./Key";
 // @ts-ignore
@@ -46,7 +45,9 @@ const useCurrentHotkeys = (): Hotkey[] => {
           ...hotkey,
           key: customSetting.key,
           active: customSetting.active,
-          ...(customSetting.description && { description: customSetting.description }),
+          ...(customSetting.description && {
+            description: customSetting.description,
+          }),
         };
       }
       return hotkey;

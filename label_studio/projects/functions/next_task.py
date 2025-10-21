@@ -159,7 +159,12 @@ def _try_uncertainty_sampling(
 
 
 def get_not_solved_tasks_qs(
-    user: User, project: Project, prepared_tasks: QuerySet[Task], assigned_flag: Union[bool, None], queue_info: str
+    user: User,
+    project: Project,
+    prepared_tasks: QuerySet[Task],
+    assigned_flag: Union[bool, None],
+    queue_info: str,
+    allow_gt_first: bool,
 ) -> Tuple[QuerySet[Task], List[int], str, bool]:
     user_solved_tasks_array = user.annotations.filter(project=project, task__isnull=False)
     user_solved_tasks_array = user_solved_tasks_array.distinct().values_list('task__pk', flat=True)
@@ -207,8 +212,8 @@ def get_not_solved_tasks_qs(
 
         # otherwise, filtering out completed tasks is sufficient
         else:
-            # ignore tasks that are already labeled for onboarding mode
-            if not project.show_ground_truth_first:
+            # ignore tasks that are already labeled when GT-first is NOT allowed
+            if not allow_gt_first:
                 not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
     if not flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
@@ -239,6 +244,7 @@ def get_next_task_without_dm_queue(
     not_solved_tasks: QuerySet,
     assigned_flag: Union[bool, None],
     prioritized_low_agreement: bool,
+    allow_gt_first: bool,
 ) -> Tuple[Union[Task, None], bool, str]:
     next_task = None
     use_task_lock = True
@@ -259,8 +265,7 @@ def get_next_task_without_dm_queue(
             use_task_lock = False
             queue_info += (' & ' if queue_info else '') + 'Task lock'
 
-    # Ground truth: label GT first only during onboarding window for user (gated by min tasks and min score)
-    allow_gt_first = should_attempt_ground_truth_first(user, project)
+    # Ground truth: use precomputed gating for GT-first
     if not next_task and allow_gt_first:
         logger.debug(f'User={user} tries ground truth from prepared tasks')
         next_task = _try_ground_truth(not_solved_tasks, project, user)
@@ -373,13 +378,16 @@ def get_next_task(
         use_task_lock = True
         queue_info = ''
 
+        # Ground truth: label GT first only during onboarding window for user (gated by min tasks and min score)
+        allow_gt_first = should_attempt_ground_truth_first(user, project)
+
         not_solved_tasks, user_solved_tasks_array, queue_info, prioritized_low_agreement = get_not_solved_tasks_qs(
-            user, project, prepared_tasks, assigned_flag, queue_info
+            user, project, prepared_tasks, assigned_flag, queue_info, allow_gt_first
         )
 
         if not dm_queue:
             next_task, use_task_lock, queue_info = get_next_task_without_dm_queue(
-                user, project, not_solved_tasks, assigned_flag, prioritized_low_agreement
+                user, project, not_solved_tasks, assigned_flag, prioritized_low_agreement, allow_gt_first
             )
 
         if flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
