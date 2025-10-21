@@ -238,7 +238,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           x: Math.min(p1.x, p2.x, p3.x, p4.x),
           y: Math.min(p1.y, p2.y, p3.y, p4.y),
           width: Math.max(p1.x, p2.x, p3.x, p4.x) - Math.min(p1.x, p2.x, p3.x, p4.x),
-          height: Math.max(p1.y, p2.y, p3.y, p4.y) - Math.min(p1.y, p2.y, p3.y, p4.y)
+          height: Math.max(p1.y, p2.y, p3.y, p4.y) - Math.min(p1.y, p2.y, p3.y, p4.y),
         };
 
         // Convert rotated box to image coordinates

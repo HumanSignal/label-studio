@@ -512,7 +512,10 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
         }
 
         // Apply constraints to anchor point only - control points move with it automatically
-        const constrainedPoint = constrainAnchorPointsToBounds([updatedPoint], { width: props.width, height: props.height })[0];
+        const constrainedPoint = constrainAnchorPointsToBounds([updatedPoint], {
+          width: props.width,
+          height: props.height,
+        })[0];
 
         // Update the point with constrained positions
         updatedPoint.x = constrainedPoint.x;

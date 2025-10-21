@@ -13,7 +13,6 @@ export function constrainPointToBounds(
     y: Math.max(0, Math.min(bounds.height, point.y)),
   };
 
-
   return constrained;
 }
 
@@ -48,7 +47,14 @@ export function isPointWithinBounds(
  * @param points - Array of points (can be simple points or BezierPoint objects)
  * @returns Bounding box {left, top, right, bottom}
  */
-export function calculateGroupBoundingBox(points: Array<{ x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } }>): {
+export function calculateGroupBoundingBox(
+  points: Array<{
+    x: number;
+    y: number;
+    controlPoint1?: { x: number; y: number };
+    controlPoint2?: { x: number; y: number };
+  }>,
+): {
   left: number;
   top: number;
   right: number;
@@ -113,13 +119,18 @@ export function calculateGroupBoundingBox(points: Array<{ x: number; y: number; 
  * @returns Array of constrained points
  */
 export function constrainAnchorPointsToBounds(
-  points: Array<{ x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } }>,
+  points: Array<{
+    x: number;
+    y: number;
+    controlPoint1?: { x: number; y: number };
+    controlPoint2?: { x: number; y: number };
+  }>,
   bounds: { width: number; height: number },
 ): Array<{ x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } }> {
   if (points.length === 0) return points;
 
   // Calculate the bounding box of only the anchor points (not control points)
-  const anchorPoints = points.map(p => ({ x: p.x, y: p.y }));
+  const anchorPoints = points.map((p) => ({ x: p.x, y: p.y }));
   const anchorBbox = calculateGroupBoundingBox(anchorPoints);
 
   // Calculate how much we need to move the anchor points to keep them within bounds
@@ -150,8 +161,13 @@ export function constrainAnchorPointsToBounds(
   }
 
   // Apply the constraint to anchor points and their control points
-  const constrainedPoints = points.map(point => {
-    const constrainedPoint: { x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } } = {
+  const constrainedPoints = points.map((point) => {
+    const constrainedPoint: {
+      x: number;
+      y: number;
+      controlPoint1?: { x: number; y: number };
+      controlPoint2?: { x: number; y: number };
+    } = {
       x: point.x + deltaX,
       y: point.y + deltaY,
     };
@@ -174,17 +190,16 @@ export function constrainAnchorPointsToBounds(
   });
 
   // Debug logging
-  console.log('Anchor points constraint applied:', {
+  console.log("Anchor points constraint applied:", {
     originalAnchorBbox: anchorBbox,
     delta: { x: deltaX, y: deltaY },
     bounds,
-    constrainedAnchorBbox: calculateGroupBoundingBox(constrainedPoints.map(p => ({ x: p.x, y: p.y }))),
-    pointCount: points.length
+    constrainedAnchorBbox: calculateGroupBoundingBox(constrainedPoints.map((p) => ({ x: p.x, y: p.y }))),
+    pointCount: points.length,
   });
 
   return constrainedPoints;
 }
-
 
 /**
  * Calculates the constrained position for a transformer within image bounds
@@ -199,10 +214,10 @@ export function constrainAnchorPointsToBounds(
 export function calculateTransformerConstraints(
   transformer: any,
   bounds: { x: number; y: number; width: number; height: number },
-  scaleX: number = 1,
-  scaleY: number = 1,
+  scaleX = 1,
+  scaleY = 1,
   transform: { zoom: number; offsetX: number; offsetY: number } = { zoom: 1, offsetX: 0, offsetY: 0 },
-  fitScale: number = 1,
+  fitScale = 1,
 ): { x: number; y: number } | null {
   if (!transformer || !bounds) return null;
 
@@ -219,7 +234,7 @@ export function calculateTransformerConstraints(
     x: (transformerBox.x - transform.offsetX) / transform.zoom,
     y: (transformerBox.y - transform.offsetY) / transform.zoom,
     width: transformerBox.width / transform.zoom,
-    height: transformerBox.height / transform.zoom
+    height: transformerBox.height / transform.zoom,
   };
 
   // Use the original bounds (no scaling needed)
@@ -230,7 +245,7 @@ export function calculateTransformerConstraints(
     left: scaledBounds.x,
     top: scaledBounds.y,
     right: scaledBounds.x + scaledBounds.width,
-    bottom: scaledBounds.y + scaledBounds.height
+    bottom: scaledBounds.y + scaledBounds.height,
   };
 
   // Calculate constraints using image coordinates
@@ -268,10 +283,10 @@ export function calculateTransformerConstraints(
 
   // Debug logging (can be removed later)
   if (needsConstraint) {
-    console.log('CONSTRAINT APPLIED:', {
+    console.log("CONSTRAINT APPLIED:", {
       transformerInImageCoords,
       imageBounds,
-      constrained: { x: constrainedX, y: constrainedY }
+      constrained: { x: constrainedX, y: constrainedY },
     });
   }
 
@@ -286,7 +301,12 @@ export function calculateTransformerConstraints(
  * @returns Array of constrained points
  */
 export function constrainGroupToBounds(
-  points: Array<{ x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } }>,
+  points: Array<{
+    x: number;
+    y: number;
+    controlPoint1?: { x: number; y: number };
+    controlPoint2?: { x: number; y: number };
+  }>,
   bounds: { width: number; height: number },
 ): Array<{ x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } }> {
   if (points.length === 0) return points;
