@@ -14,6 +14,128 @@ export function resetTransformState() {
   // No longer needed, but keeping for backward compatibility
 }
 
+/**
+ * Applies delta transformation to control points using RAF for smooth updates
+ */
+export function applyTransformationToControlPoints(
+  points: BezierPoint[],
+  originalPositions: {
+    [key: number]: {
+      x: number;
+      y: number;
+      controlPoint1?: { x: number; y: number };
+      controlPoint2?: { x: number; y: number };
+    };
+  },
+  currentRotation: number,
+  currentScaleX: number,
+  currentScaleY: number,
+  transformerCenterX: number,
+  transformerCenterY: number,
+  isRotation = false,
+): BezierPoint[] {
+  const rotationRadians = currentRotation * (Math.PI / 180);
+  const cos = Math.cos(rotationRadians);
+  const sin = Math.sin(rotationRadians);
+
+  return points.map((point, index) => {
+    if (point.isBezier && point.controlPoint1 && point.controlPoint2) {
+      // Get original positions
+      const originalPos = originalPositions[index];
+      if (!originalPos || !originalPos.controlPoint1 || !originalPos.controlPoint2) return point;
+
+      if (isRotation && Math.abs(currentRotation) > 2.0) {
+        // ROTATION: Use original positions as base and apply full transformation
+        const cp1OffsetX = originalPos.controlPoint1.x - originalPos.x;
+        const cp1OffsetY = originalPos.controlPoint1.y - originalPos.y;
+        const cp2OffsetX = originalPos.controlPoint2.x - originalPos.x;
+        const cp2OffsetY = originalPos.controlPoint2.y - originalPos.y;
+
+        // Apply scaling to the offsets
+        const scaledCP1X = cp1OffsetX * currentScaleX;
+        const scaledCP1Y = cp1OffsetY * currentScaleY;
+        const scaledCP2X = cp2OffsetX * currentScaleX;
+        const scaledCP2Y = cp2OffsetY * currentScaleY;
+
+        // Rotate the scaled offsets
+        const rotatedCP1X = scaledCP1X * cos - scaledCP1Y * sin;
+        const rotatedCP1Y = scaledCP1X * sin + scaledCP1Y * cos;
+        const rotatedCP2X = scaledCP2X * cos - scaledCP2Y * sin;
+        const rotatedCP2Y = scaledCP2X * sin + scaledCP2Y * cos;
+
+        // Apply to current anchor position
+        return {
+          ...point,
+          controlPoint1: {
+            x: point.x + rotatedCP1X,
+            y: point.y + rotatedCP1Y,
+          },
+          controlPoint2: {
+            x: point.x + rotatedCP2X,
+            y: point.y + rotatedCP2Y,
+          },
+        };
+      }
+
+      // TRANSLATION/SCALING: Control points maintain their relative positions to anchor points
+      // Calculate the offset from the original anchor to the original control points
+      const originalCP1OffsetX = originalPos.controlPoint1.x - originalPos.x;
+      const originalCP1OffsetY = originalPos.controlPoint1.y - originalPos.y;
+      const originalCP2OffsetX = originalPos.controlPoint2.x - originalPos.x;
+      const originalCP2OffsetY = originalPos.controlPoint2.y - originalPos.y;
+
+      // Apply scaling to the offsets (but not rotation)
+      const scaledCP1X = originalCP1OffsetX * currentScaleX;
+      const scaledCP1Y = originalCP1OffsetY * currentScaleY;
+      const scaledCP2X = originalCP2OffsetX * currentScaleX;
+      const scaledCP2Y = originalCP2OffsetY * currentScaleY;
+
+      // Apply to current anchor position
+      return {
+        ...point,
+        controlPoint1: {
+          x: point.x + scaledCP1X,
+          y: point.y + scaledCP1Y,
+        },
+        controlPoint2: {
+          x: point.x + scaledCP2X,
+          y: point.y + scaledCP2Y,
+        },
+      };
+    }
+    return point;
+  });
+}
+
+/**
+ * Updates the original positions with the current transformed positions
+ * This should be called after transformation ends to prepare for the next transformation
+ */
+export function updateOriginalPositions(
+  points: BezierPoint[],
+  originalPositions: {
+    [key: number]: {
+      x: number;
+      y: number;
+      controlPoint1?: { x: number; y: number };
+      controlPoint2?: { x: number; y: number };
+    };
+  },
+): void {
+  points.forEach((point, index) => {
+    if (point.isBezier && point.controlPoint1 && point.controlPoint2) {
+      if (originalPositions[index]) {
+        originalPositions[index] = {
+          x: point.x,
+          y: point.y,
+          controlPoint1: { ...point.controlPoint1 },
+          controlPoint2: { ...point.controlPoint2 },
+        };
+      }
+    }
+  });
+}
+
 export function applyTransformationToPoints(
   transformer: Konva.Transformer,
   initialPoints: BezierPoint[],
@@ -71,70 +193,7 @@ export function applyTransformationToPoints(
       // Don't update proxy node position - let transformer manage it
       // This prevents the update loop
 
-      // Apply the same transformation to control points if it's a Bezier point
-      if (
-        updateControlPoints &&
-        point.isBezier &&
-        point.controlPoint1 &&
-        point.controlPoint2 &&
-        originalPoint.controlPoint1 &&
-        originalPoint.controlPoint2
-      ) {
-        // Use stored original control point positions if available
-        const originalCP1 = originalPositions?.[pointIndex]?.controlPoint1 || originalPoint.controlPoint1;
-        const originalCP2 = originalPositions?.[pointIndex]?.controlPoint2 || originalPoint.controlPoint2;
-
-        // Calculate the relative vectors from anchor point to control points (in original state)
-        const originalAnchorX = originalPos.x;
-        const originalAnchorY = originalPos.y;
-
-        const cp1VectorX = originalCP1.x - originalAnchorX;
-        const cp1VectorY = originalCP1.y - originalAnchorY;
-        const cp2VectorX = originalCP2.x - originalAnchorX;
-        const cp2VectorY = originalCP2.y - originalAnchorY;
-
-        // Apply scaling to the control point vectors
-        let finalCP1X = cp1VectorX * scaleX;
-        let finalCP1Y = cp1VectorY * scaleY;
-        let finalCP2X = cp2VectorX * scaleX;
-        let finalCP2Y = cp2VectorY * scaleY;
-
-        // Apply rotation to the control point vectors if there's rotation
-        if (Math.abs(currentRotation) > 0.1) {
-          const cos = Math.cos(rotationRadians);
-          const sin = Math.sin(rotationRadians);
-
-          // Rotate the control point vectors (maintain relative angle to anchor)
-          const rotatedCP1X = finalCP1X * cos - finalCP1Y * sin;
-          const rotatedCP1Y = finalCP1X * sin + finalCP1Y * cos;
-          const rotatedCP2X = finalCP2X * cos - finalCP2Y * sin;
-          const rotatedCP2Y = finalCP2X * sin + finalCP2Y * cos;
-
-          finalCP1X = rotatedCP1X;
-          finalCP1Y = rotatedCP1Y;
-          finalCP2X = rotatedCP2X;
-          finalCP2Y = rotatedCP2Y;
-        }
-
-        // Apply the vectors to the new anchor point position
-        const finalCP1PosX = point.x + finalCP1X;
-        const finalCP1PosY = point.y + finalCP1Y;
-        const finalCP2PosX = point.x + finalCP2X;
-        const finalCP2PosY = point.y + finalCP2Y;
-
-        // Note: We don't apply bounds checking to control points
-        // Only anchor points are constrained to image bounds
-        // Control points can extend outside bounds as they are visual guides
-
-        point.controlPoint1 = {
-          x: finalCP1PosX,
-          y: finalCP1PosY,
-        };
-        point.controlPoint2 = {
-          x: finalCP2PosX,
-          y: finalCP2PosY,
-        };
-      }
+      // Control points will be handled separately using delta transformation
     }
   }
 
