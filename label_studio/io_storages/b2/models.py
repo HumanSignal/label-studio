@@ -8,24 +8,23 @@ from typing import Union
 from urllib.parse import urlparse
 
 import boto3
-from core.feature_flags import flag_set
 from core.redis import start_job_async_or_sync
 from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
+from io_storages.b2.utils import (
+    catch_and_reraise_from_none,
+    get_client_and_resource,
+    resolve_b2_url,
+)
 from io_storages.base_models import (
     ExportStorage,
     ExportStorageLink,
     ImportStorage,
     ImportStorageLink,
     ProjectStorageMixin,
-)
-from io_storages.b2.utils import (
-    catch_and_reraise_from_none,
-    get_client_and_resource,
-    resolve_b2_url,
 )
 from io_storages.utils import StorageObject, load_tasks_json, storage_can_resolve_bucket_url
 from tasks.models import Annotation

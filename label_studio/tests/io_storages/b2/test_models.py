@@ -2,7 +2,6 @@ import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.test import override_settings
 from io_storages.b2.models import B2ExportStorage, B2ImportStorage
 from tasks.models import Annotation
 from tests.utils import make_project, make_task

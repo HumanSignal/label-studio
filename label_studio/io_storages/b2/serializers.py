@@ -102,7 +102,7 @@ class B2StorageSerializerMixin:
             # Handle endpoint errors
             if 'Could not connect to the endpoint URL' in str(e):
                 raise ValidationError(
-                    f'Cannot connect to B2 endpoint. '
+                    'Cannot connect to B2 endpoint. '
                     'Please verify your B2 endpoint URL is correct (e.g., https://s3.us-west-004.backblazeb2.com).'
                 )
             
