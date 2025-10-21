@@ -280,6 +280,15 @@ export default types
           }
         }
 
+        // Handle video rectangle regions - they have sequence with frames
+        if (region.type === "videorectangleregion" && region.sequence && region.sequence.length > 0) {
+          // Get the first keyframe's frame number
+          const firstKeyframe = region.sequence[0];
+          if (firstKeyframe && typeof firstKeyframe.frame === "number") {
+            return firstKeyframe.frame;
+          }
+        }
+
         // Return null for regions without media time information
         return null;
       },
