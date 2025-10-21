@@ -5,6 +5,8 @@ import type { BezierPoint } from "../types";
 import { applyTransformationToPoints, resetTransformState } from "../utils/transformUtils";
 import { calculateTransformerConstraints } from "../utils/boundsChecking";
 
+const BBOX_MIN_WIDTH = 10;
+
 interface VectorTransformerProps {
   selectedPoints: Set<number>;
   initialPoints: BezierPoint[];
@@ -142,7 +144,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           if (constrainedBox.x < bounds.x) {
             const deltaX = bounds.x - constrainedBox.x;
             constrainedBox.x = bounds.x;
-            constrainedBox.width = Math.max(10, constrainedBox.width - deltaX);
+            constrainedBox.width = Math.max(BBOX_MIN_WIDTH, constrainedBox.width - deltaX);
           }
           // Constrain to right edge
           if (constrainedBox.x + constrainedBox.width > bounds.x + bounds.width) {
@@ -152,7 +154,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           if (constrainedBox.y < bounds.y) {
             const deltaY = bounds.y - constrainedBox.y;
             constrainedBox.y = bounds.y;
-            constrainedBox.height = Math.max(10, constrainedBox.height - deltaY);
+            constrainedBox.height = Math.max(BBOX_MIN_WIDTH, constrainedBox.height - deltaY);
           }
           // Constrain to bottom edge
           if (constrainedBox.y + constrainedBox.height > bounds.y + bounds.height) {
