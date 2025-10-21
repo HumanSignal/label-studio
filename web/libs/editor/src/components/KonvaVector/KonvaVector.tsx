@@ -402,7 +402,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     // Disable all interactions when disabled prop is true
     // Disable drawing when Shift is held (for Shift+click functionality)
     // Disable drawing when multiple points are selected or when in transform mode
-    if (disabled || isShiftKeyHeld || effectiveSelectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN || transformMode) {
+    if (
+      disabled ||
+      isShiftKeyHeld ||
+      effectiveSelectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN ||
+      transformMode
+    ) {
       return true;
     }
 
@@ -1536,7 +1541,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         transform={transform}
         fitScale={fitScale}
         onClick={(e) => {
-
           // Check if click is on the last added point by checking cursor position
           if (cursorPosition && lastAddedPointId) {
             const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
