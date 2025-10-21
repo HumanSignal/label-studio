@@ -272,21 +272,13 @@ export default types
         }
 
         // Handle timeline regions (video) - they have ranges with start frame
-        if (region.type === "timelineregion" && region.ranges && region.ranges.length > 0) {
-          // Get the first range's start frame
-          const firstRange = region.ranges[0];
-          if (firstRange && typeof firstRange.start === "number") {
-            return firstRange.start;
-          }
+        if (region.type === "timelineregion" && region.ranges?.[0]) {
+          return region.ranges[0].start;
         }
 
         // Handle video rectangle regions - they have sequence with frames
-        if (region.type === "videorectangleregion" && region.sequence && region.sequence.length > 0) {
-          // Get the first keyframe's frame number
-          const firstKeyframe = region.sequence[0];
-          if (firstKeyframe && typeof firstKeyframe.frame === "number") {
-            return firstKeyframe.frame;
-          }
+        if (region.type === "videorectangleregion" && region.sequence?.[0]) {
+          return region.sequence[0].frame;
         }
 
         // Return null for regions without media time information
