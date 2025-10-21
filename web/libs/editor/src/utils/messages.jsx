@@ -80,7 +80,7 @@ export default {
       <p>
         There was an issue loading URL from <code>${attr}</code> value.
         Most likely that's because static server has wide-open CORS.
-        <a href="${this.URL_CORS_DOCS}" target="_blank">Read more on that here.</a>
+        <a href="${URL_CORS_DOCS}" target="_blank">Read more on that here.</a>
       </p>
       <p>
         Also check that:
@@ -106,7 +106,7 @@ export default {
           <li>URL scheme matches the service scheme, i.e. https and https</li>
           <li>
             The static server has wide-open CORS,
-            <a href=${this.URL_CORS_DOCS} target="_blank">more on that here</a>
+            <a href=${URL_CORS_DOCS} target="_blank">more on that here</a>
           </li>
         </ul>
       </p>

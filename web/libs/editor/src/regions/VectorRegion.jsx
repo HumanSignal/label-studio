@@ -211,20 +211,6 @@ const Model = types
         // For vector regions, we don't need to do anything special here
       },
 
-      deleteRegion() {
-        // Remove this region from the parent object
-        if (self.parent) {
-          const index = self.parent.regions.indexOf(self);
-          if (index > -1) {
-            self.parent.regions.splice(index, 1);
-          }
-        }
-        // Remove from annotation
-        if (self.annotation) {
-          self.annotation.removeArea(self);
-        }
-      },
-
       onSelection(type) {
         if (type === "reset") {
           self.vectorRef.clearSelection();
@@ -368,8 +354,17 @@ const Model = types
       // Checks is the region is being transformed or at least in
       // transformable state (has at least 2 points selected)
       isTransforming() {
-        const selection = self.vectorRef.getSelectedPointIds();
-        return selection.length > 1;
+        // If the region has no vectorRef or is not selected, it's not transforming
+        if (!self.vectorRef || !self.selected) {
+          return false;
+        }
+        try {
+          const selection = self.vectorRef.getSelectedPointIds();
+          const result = selection.length > 1;
+          return result;
+        } catch (error) {
+          return false;
+        }
       },
 
       segGroupRef(ref) {
