@@ -350,11 +350,14 @@ class S3ImportStorageLink(ImportStorageLink):
         super_exists = super(S3ImportStorageLink, cls).exists
         # TODO: this is a workaround to be compatible with old keys version - remove it later
         prefix = str(storage.prefix) or ''
-        return (
-            super_exists(keys, storage)
-            | super_exists([prefix + key for key in keys], storage)
-            | super_exists([prefix + '/' + key for key in keys], storage)
-        )
+        if prefix:
+            return (
+                super_exists(keys, storage)
+                | super_exists([prefix + key for key in keys], storage)
+                | super_exists([prefix + '/' + key for key in keys], storage)
+            )
+        else:
+            return super_exists(keys, storage)
 
 
 class S3ExportStorageLink(ExportStorageLink):
