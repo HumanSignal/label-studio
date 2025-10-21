@@ -2,7 +2,12 @@ import React from "react";
 import { Transformer as KonvaTransformer } from "react-konva";
 import type Konva from "konva";
 import type { BezierPoint } from "../types";
-import { applyTransformationToPoints, resetTransformState } from "../utils/transformUtils";
+import {
+  applyTransformationToPoints,
+  resetTransformState,
+  applyTransformationToControlPoints,
+  updateOriginalPositions,
+} from "../utils/transformUtils";
 
 interface VectorTransformerProps {
   selectedPoints: Set<number>;
@@ -57,7 +62,23 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       controlPoint1?: { x: number; y: number };
       controlPoint2?: { x: number; y: number };
     };
+    initialRotation?: number;
   }>({});
+
+  // RAF for smooth control point updates
+  const rafIdRef = React.useRef<number | null>(null);
+
+  // Track if this is the first transformation tick to avoid control point jumping
+  const isFirstTransformTickRef = React.useRef<boolean>(true);
+
+  // Cleanup RAF on unmount
+  React.useEffect(() => {
+    return () => {
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+    };
+  }, []);
 
   if (selectedPoints.size <= 1 || initialPoints.length === 0) return null;
 
@@ -135,13 +156,40 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               transformer,
               initialPoints,
               proxyRefs,
-              true,
+              false, // Don't update control points here
               originalPositionsRef.current,
               transformerCenter,
               constrainToBounds,
               bounds,
             );
-            onPointsChange?.(newPoints);
+
+            // Skip control point transformations on the first tick to avoid jumping
+            if (isFirstTransformTickRef.current) {
+              isFirstTransformTickRef.current = false;
+              onPointsChange?.(newPoints);
+            } else {
+              // Apply transformation to control points using RAF
+              if (rafIdRef.current) {
+                cancelAnimationFrame(rafIdRef.current);
+              }
+              rafIdRef.current = requestAnimationFrame(() => {
+                // Check if this is actually a rotation operation (not just scaling)
+                const isActualRotation = Math.abs(transformer.rotation()) > 1.0;
+
+                // Apply transformation to control points using original positions as base
+                const updatedPoints = applyTransformationToControlPoints(
+                  newPoints,
+                  originalPositionsRef.current,
+                  transformer.rotation(),
+                  transformer.scaleX(),
+                  transformer.scaleY(),
+                  transformerCenter.x,
+                  transformerCenter.y,
+                  isActualRotation, // Only apply rotation logic if there's actual rotation
+                );
+                onPointsChange?.(updatedPoints);
+              });
+            }
           } catch (error) {
             console.warn("Transform error:", error);
           }
@@ -150,19 +198,6 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       onTransformStart={(_e: any) => {
         // Notify that transformation has started
         onTransformationStart?.();
-
-        // Store the initial state when transformation starts
-        const transformer = transformerRef.current;
-        if (transformer) {
-          const initialState = {
-            rotation: transformer.rotation(),
-            scaleX: transformer.scaleX(),
-            scaleY: transformer.scaleY(),
-            centerX: transformer.x() + transformer.width() / 2,
-            centerY: transformer.y() + transformer.height() / 2,
-          };
-          transformerStateRef.current = initialState;
-        }
 
         // Store original positions of selected points
         originalPositionsRef.current = {};
@@ -178,8 +213,14 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
           }
         });
 
+        // Store initial rotation
+        originalPositionsRef.current.initialRotation = transformerRef.current?.rotation() || 0;
+
         // Reset the first transform flag to ensure proper rotation tracking
         resetTransformState();
+
+        // Reset the first transform tick flag
+        isFirstTransformTickRef.current = true;
       }}
       onDragStart={(_e: any) => {
         // Store original positions when dragging starts (for pure drag operations)
@@ -195,6 +236,12 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             };
           }
         });
+
+        // Store initial rotation
+        originalPositionsRef.current.initialRotation = transformerRef.current?.rotation() || 0;
+
+        // Reset the first transform tick flag
+        isFirstTransformTickRef.current = true;
       }}
       onDragMove={(_e: any) => {
         // Apply drag movement to real points in real-time
@@ -209,13 +256,31 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               transformer,
               initialPoints,
               proxyRefs,
-              true,
+              false, // Don't update control points here
               originalPositionsRef.current,
               transformerCenter,
               constrainToBounds,
               bounds,
             );
-            onPointsChange?.(newPoints);
+
+            // Apply transformation to control points using RAF
+            if (rafIdRef.current) {
+              cancelAnimationFrame(rafIdRef.current);
+            }
+            rafIdRef.current = requestAnimationFrame(() => {
+              // Apply transformation to control points using original positions as base
+              const updatedPoints = applyTransformationToControlPoints(
+                newPoints,
+                originalPositionsRef.current,
+                transformer.rotation(),
+                transformer.scaleX(),
+                transformer.scaleY(),
+                transformerCenter.x,
+                transformerCenter.y,
+                false, // isRotation = false for onDragMove (translation only)
+              );
+              onPointsChange?.(updatedPoints);
+            });
           } catch (error) {
             console.warn("Drag move error:", error);
           }
@@ -244,7 +309,23 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             constrainToBounds,
             bounds,
           );
-          onPointsChange?.(newPoints);
+
+          // Apply control point transformations
+          const updatedPoints = applyTransformationToControlPoints(
+            newPoints,
+            originalPositionsRef.current,
+            transformer.rotation(),
+            transformer.scaleX(),
+            transformer.scaleY(),
+            transformerCenter.x,
+            transformerCenter.y,
+            false, // isRotation = false for drag operations
+          );
+
+          onPointsChange?.(updatedPoints);
+
+          // Update original positions with the final transformed positions
+          updateOriginalPositions(updatedPoints, originalPositionsRef.current);
 
           // Store the transformer state for future updates
           onTransformStateChange?.({
@@ -284,7 +365,24 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             constrainToBounds,
             bounds,
           );
-          onPointsChange?.(newPoints);
+          // Apply control point transformations
+          const isActualRotation = Math.abs(transformer.rotation()) > 1.0;
+          const updatedPoints = applyTransformationToControlPoints(
+            newPoints,
+            originalPositionsRef.current,
+            transformer.rotation(),
+            transformer.scaleX(),
+            transformer.scaleY(),
+            transformerCenter.x,
+            transformerCenter.y,
+            isActualRotation,
+          );
+
+          onPointsChange?.(updatedPoints);
+
+          // Update original positions with the final transformed positions
+          // This ensures that subsequent transformations use the current state as the base
+          updateOriginalPositions(updatedPoints, originalPositionsRef.current);
 
           // Store the transformer state for future updates
           onTransformStateChange?.({
