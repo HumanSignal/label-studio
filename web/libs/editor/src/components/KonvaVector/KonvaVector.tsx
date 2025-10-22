@@ -203,6 +203,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     [],
   );
 
+  // Flag to track programmatic selection to prevent infinite loops
+  const isProgrammaticSelection = useRef(false);
+
   const {
     initialPoints: rawInitialPoints = [],
     onPointsChange,
@@ -505,6 +508,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   const getFitScaleStable = useCallback(() => fitScale, [fitScale]);
   const getBoundsStable = useCallback(() => ({ width, height }), [width, height]);
 
+  // Wrapper for onPointSelected to prevent infinite loops during programmatic selection
+  const onPointSelectedWrapper = useCallback(
+    (index: number | null) => {
+      if (!isProgrammaticSelection.current && onPointSelected) {
+        onPointSelected(index);
+      }
+    },
+    [onPointSelected],
+  );
+
   // Register instance with tracker
   useEffect(() => {
     const vectorInstance: VectorInstance = {
@@ -513,7 +526,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       updatePoints,
       setSelectedPoints: setSelectedPointsStable,
       setSelectedPointIndex: setSelectedPointIndexStable,
-      onPointSelected,
+      onPointSelected: onPointSelectedWrapper,
       onTransformationComplete,
       getTransform: getTransformStable,
       getFitScale: getFitScaleStable,
@@ -532,7 +545,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     updatePoints,
     setSelectedPointsStable,
     setSelectedPointIndexStable,
-    onPointSelected,
+    onPointSelectedWrapper,
     onTransformationComplete,
     getTransformStable,
     getFitScaleStable,
@@ -930,11 +943,19 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       }
 
       // Use tracker for global selection management
+      isProgrammaticSelection.current = true;
       tracker.selectPoints(instanceId, selectedIndices);
+      setTimeout(() => {
+        isProgrammaticSelection.current = false;
+      }, 0);
     },
     clearSelection: () => {
       // Use tracker for global selection management
+      isProgrammaticSelection.current = true;
       tracker.selectPoints(instanceId, new Set());
+      setTimeout(() => {
+        isProgrammaticSelection.current = false;
+      }, 0);
     },
     getSelectedPointIds: () => {
       const selectedIds: string[] = [];

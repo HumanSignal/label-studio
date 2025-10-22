@@ -346,15 +346,18 @@ class S3ImportStorageLink(ImportStorageLink):
     storage = models.ForeignKey(S3ImportStorage, on_delete=models.CASCADE, related_name='links')
 
     @classmethod
-    def exists(cls, key, storage):
-        storage_link_exists = super(S3ImportStorageLink, cls).exists(key, storage)
+    def exists(cls, keys, storage) -> set[str]:
+        super_exists = super(S3ImportStorageLink, cls).exists
         # TODO: this is a workaround to be compatible with old keys version - remove it later
         prefix = str(storage.prefix) or ''
-        return (
-            storage_link_exists
-            or cls.objects.filter(key=prefix + key, storage=storage.id).exists()
-            or cls.objects.filter(key=prefix + '/' + key, storage=storage.id).exists()
-        )
+        if prefix:
+            return (
+                super_exists(keys, storage)
+                | super_exists([prefix + key for key in keys], storage)
+                | super_exists([prefix + '/' + key for key in keys], storage)
+            )
+        else:
+            return super_exists(keys, storage)
 
 
 class S3ExportStorageLink(ExportStorageLink):

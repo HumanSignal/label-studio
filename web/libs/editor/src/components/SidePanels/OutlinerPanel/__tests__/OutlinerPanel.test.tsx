@@ -331,6 +331,34 @@ describe("OutlinerPanel", () => {
       expect(viewControls).toHaveAttribute("ordering", "mediaStartTime");
     });
 
+    it("supports mediaStartTime sorting option when labels, videorectangle and video tags are in config", () => {
+      const regionsWithVideoRectangleConfig = {
+        ...mockRegions,
+        sort: "mediaStartTime",
+        annotation: {
+          names: new Map([
+            ["myLabels", { name: "myLabels", type: "labels" }],
+            ["myVideoRectangle", { name: "myVideoRectangle", type: "videorectangle" }],
+            ["myVideo", { name: "myVideo", type: "video" }],
+          ]),
+        },
+        regions: [
+          { id: "1", type: "videorectangleregion", sequence: [{ frame: 30, enabled: true, x: 10, y: 10 }] },
+          { id: "2", type: "videorectangleregion", sequence: [{ frame: 10, enabled: true, x: 20, y: 20 }] },
+        ],
+        filter: [
+          { id: "1", type: "videorectangleregion", sequence: [{ frame: 30, enabled: true, x: 10, y: 10 }] },
+          { id: "2", type: "videorectangleregion", sequence: [{ frame: 10, enabled: true, x: 20, y: 20 }] },
+        ],
+      };
+
+      render(<OutlinerPanel {...defaultProps} regions={regionsWithVideoRectangleConfig} />);
+
+      const viewControls = screen.getByTestId("view-controls");
+      expect(viewControls).toBeInTheDocument();
+      expect(viewControls).toHaveAttribute("ordering", "mediaStartTime");
+    });
+
     it("does not support mediaStartTime when only labels tag is in config", () => {
       const regionsWithoutMediaConfig = {
         ...mockRegions,

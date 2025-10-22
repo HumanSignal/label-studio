@@ -3,7 +3,6 @@ import * as ToastPrimitive from "@radix-ui/react-toast";
 import styles from "./toast.module.scss";
 import clsx from "clsx";
 import { IconCross } from "../../assets/icons";
-import { Button } from "../button/button";
 import { cn } from "@humansignal/shad/utils";
 
 export type ToastViewportProps = ToastPrimitive.ToastViewportProps & any;
@@ -87,15 +86,9 @@ export interface ToastActionProps extends ToastPrimitive.ToastActionProps {
 }
 export const ToastAction: FC<ToastActionProps> = ({ children, onClose, altText, ...props }) => (
   <ToastPrimitive.Action altText={altText} asChild className="pointer-events-none">
-    <Button
-      look="string"
-      size="small"
-      className={cn(styles.toast__action, "pointer-events-all")}
-      onClick={onClose}
-      {...props}
-    >
+    <button className={cn(styles.toast__action, "pointer-events-all")} onClick={onClose} {...props}>
       {children}
-    </Button>
+    </button>
   </ToastPrimitive.Action>
 );
 export type ToastShowArgs = {
