@@ -356,6 +356,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Flag to track if point selection was handled in VectorPoints onClick
   const pointSelectionHandled = useRef(false);
 
+  // Ref to track the _transformable group for applying transformations
+  const transformableGroupRef = useRef<Konva.Group>(null);
+
+
   // Initialize PointCreationManager instance
   const pointCreationManager = useMemo(() => new PointCreationManager(), []);
 
@@ -1550,7 +1554,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       )}
 
       {/* Transformable group for ImageTransformer */}
-      <Group name="_transformable">
+      <Group name="_transformable" ref={transformableGroupRef}>
         {/* Unified vector shape - renders all lines based on id-prevPointId relationships */}
         <VectorShape
           segments={getAllLineSegments()}

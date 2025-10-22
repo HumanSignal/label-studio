@@ -215,6 +215,8 @@ export interface KonvaVectorProps {
   transformMode?: boolean;
   /** Constrain points to stay within image bounds */
   constrainToBounds?: boolean;
+  /** Whether multiple regions are currently selected (disables internal transformer) */
+  isMultiRegionSelected?: boolean;
   /** Name attribute for the component */
   name?: string;
   /** Ref to access component methods */

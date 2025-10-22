@@ -174,6 +174,50 @@ export default class TransformerComponent extends Component {
     });
   };
 
+  applyTransformToRegions = () => {
+    if (!this.transformer) return;
+
+    const { item } = this.props;
+    const { selectedRegions } = item;
+
+    // Get the transformer's current transform values
+    const nodes = this.transformer.nodes();
+    if (!nodes || nodes.length === 0) return;
+
+    // Get transform from the first node (they should all have the same transform)
+    const firstNode = nodes[0];
+    const transform = {
+      dx: firstNode.x(),
+      dy: firstNode.y(),
+      scaleX: firstNode.scaleX(),
+      scaleY: firstNode.scaleY(),
+      rotation: firstNode.rotation(),
+    };
+
+    console.log('🔄 ImageTransformer applying transform to regions:', {
+      ...transform,
+      regionCount: selectedRegions.length
+    });
+
+    // Apply transform to each selected region
+    selectedRegions.forEach((region) => {
+      if (region.applyTransform && typeof region.applyTransform === 'function') {
+        region.applyTransform(transform);
+      }
+    });
+
+    // Reset the transformer nodes to identity transform
+    nodes.forEach((node) => {
+      node.x(0);
+      node.y(0);
+      node.scaleX(1);
+      node.scaleY(1);
+      node.rotation(0);
+    });
+
+    this.transformer.getLayer()?.batchDraw();
+  };
+
   renderLSTransformer() {
     return (
       <>
@@ -214,10 +258,14 @@ export default class TransformerComponent extends Component {
           }}
           dragBoundFunc={this.dragBoundFunc}
           onDragEnd={() => {
+            // Apply transformations to individual regions
+            this.applyTransformToRegions();
             this.unfreeze();
             setTimeout(this.checkNode);
           }}
           onTransformEnd={() => {
+            // Apply transformations to individual regions
+            this.applyTransformToRegions();
             setTimeout(this.checkNode);
           }}
           backSelector={this.props.draggableBackgroundSelector}
@@ -262,10 +310,14 @@ export default class TransformerComponent extends Component {
           }}
           dragBoundFunc={this.dragBoundFunc}
           onDragEnd={() => {
+            // Apply transformations to individual regions
+            this.applyTransformToRegions();
             this.unfreeze();
             setTimeout(this.checkNode);
           }}
           onTransformEnd={() => {
+            // Apply transformations to individual regions
+            this.applyTransformToRegions();
             setTimeout(this.checkNode);
           }}
           backSelector={this.props.draggableBackgroundSelector}

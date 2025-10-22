@@ -498,6 +498,35 @@ const Model = types
       setTransformMode(transformMode) {
         self.transformMode = transformMode;
       },
+
+      /**
+       * Apply transformations from ImageTransformer to the vector points
+       * Called by ImageTransformer when multi-region transformations complete
+       * @param {Object} transform - Transform object with dx, dy, scaleX, scaleY, rotation
+       */
+      applyTransform(transform) {
+        if (!self.vectorRef) return;
+
+        console.log('🔄 VectorRegion.applyTransform called:', transform);
+
+        // Calculate center point for rotation and scaling
+        const bbox = self.bboxCoords;
+        if (!bbox) return;
+
+        const centerX = (bbox.left + bbox.right) / 2;
+        const centerY = (bbox.top + bbox.bottom) / 2;
+
+        // Apply transformation using KonvaVector's transformPoints method
+        self.vectorRef.transformPoints({
+          dx: transform.dx || 0,
+          dy: transform.dy || 0,
+          rotation: transform.rotation || 0,
+          scaleX: transform.scaleX || 1,
+          scaleY: transform.scaleY || 1,
+          centerX,
+          centerY,
+        });
+      },
     };
   });
 
@@ -536,6 +565,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           ref={(kv) => item.setKonvaVectorRef(kv)}
           initialPoints={Array.from(item.vertices)}
           name="_transformable"
+          isMultiRegionSelected={item.object?.selectedRegions?.length > 1}
           onFinish={(e) => {
             e.evt.stopPropagation();
             e.evt.preventDefault();
