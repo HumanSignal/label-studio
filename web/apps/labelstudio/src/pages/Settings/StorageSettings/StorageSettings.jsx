@@ -4,10 +4,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { useProject } from "../../../providers/ProjectProvider";
 import { cn } from "../../../utils/bem";
-import { isInLicense, LF_CLOUD_STORAGE_FOR_MANAGERS } from "../../../utils/license-flags";
 import { StorageSet } from "./StorageSet";
-
-const isAllowCloudStorage = !isInLicense(LF_CLOUD_STORAGE_FOR_MANAGERS);
 
 export const StorageSettings = () => {
   const { project } = useProject();
@@ -32,7 +29,7 @@ export const StorageSettings = () => {
     }
   }, [location, history]);
 
-  return isAllowCloudStorage ? (
+  return (
     <section className="max-w-[680px]">
       <Typography variant="headline" size="medium" className="mb-base">
         Cloud Storage
@@ -57,7 +54,7 @@ export const StorageSettings = () => {
         />
       </div>
     </section>
-  ) : null;
+  );
 };
 
 StorageSettings.title = "Cloud Storage";
