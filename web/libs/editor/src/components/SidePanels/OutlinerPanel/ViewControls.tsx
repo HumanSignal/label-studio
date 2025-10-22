@@ -38,6 +38,7 @@ interface ViewControlsProps {
 
 const mediaStartTimeSupportedTags = [
   ["labels", "audio"],
+  ["labels", "videorectangle", "video"],
   ["timelinelabels", "video"],
   ["timeserieslabels", "timeseries"],
 ];
