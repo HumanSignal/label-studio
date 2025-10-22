@@ -164,7 +164,7 @@ const Model = types
       }
     },
     get disabled() {
-      const tool = self.parent.getToolsManager().findSelectedTool();
+      const tool = self.parent?.getToolsManager().findSelectedTool();
       return (tool?.disabled ?? false) || self.isReadOnly() || (!self.selected && !self.isDrawing);
     },
   }))
@@ -503,31 +503,62 @@ const Model = types
        * Apply transformations from ImageTransformer to the vector points
        * Called by ImageTransformer when multi-region transformations complete
        * @param {Object} transform - Transform object with dx, dy, scaleX, scaleY, rotation
+       * @param {Object} transformerCenter - Center point used by the ImageTransformer for scaling/rotation
        */
-      applyTransform(transform) {
+      applyTransform(transform, transformerCenter) {
         if (!self.vectorRef) return;
 
-        console.log('🔄 VectorRegion.applyTransform called:', transform);
+        console.log("🔄 VectorRegion.applyTransform called:", { transform, transformerCenter });
 
-        // Calculate center point for rotation and scaling using image coordinates
-        const bbox = self.bbox; // Use bbox (image coordinates) instead of bboxCoords (internal coordinates)
-        if (!bbox || bbox.left === undefined) return;
+        const dx = transform.dx || 0;
+        const dy = transform.dy || 0;
+        const scaleX = transform.scaleX || 1;
+        const scaleY = transform.scaleY || 1;
+        const rotation = transform.rotation || 0;
 
-        const centerX = (bbox.left + bbox.right) / 2;
-        const centerY = (bbox.top + bbox.bottom) / 2;
+        console.log("📊 Applying transformation:", { dx, dy, scaleX, scaleY, rotation });
 
-        console.log('📊 Using center point for transformation:', { centerX, centerY, bbox });
+        // The ImageTransformer applies transforms to the _transformable group which is positioned at (0,0)
+        // in the KonvaVector coordinate system. The transform values (dx, dy, scaleX, scaleY, rotation)
+        // are already in the correct coordinate system for the vector points.
+        // This matches how the single-region onTransformEnd handler works.
 
-        // Apply transformation using KonvaVector's transformPoints method
-        self.vectorRef.transformPoints({
-          dx: transform.dx || 0,
-          dy: transform.dy || 0,
-          rotation: transform.rotation || 0,
-          scaleX: transform.scaleX || 1,
-          scaleY: transform.scaleY || 1,
+        // Convert transformer center from stage coordinates to image coordinates
+        let centerX, centerY;
+        if (transformerCenter) {
+          const internalX = self.parent.canvasToInternalX(transformerCenter.x);
+          const internalY = self.parent.canvasToInternalY(transformerCenter.y);
+          centerX = self.parent.internalToImageX(internalX);
+          centerY = self.parent.internalToImageY(internalY);
+        }
+
+        console.log("📊 Using transform values directly:", {
+          dx,
+          dy,
+          scaleX,
+          scaleY,
+          rotation,
           centerX,
           centerY,
+          transformerCenter
         });
+
+        // Use the KonvaVector's transformPoints method with the transform values directly
+        // No coordinate conversion needed since ImageTransformer already works in the correct coordinate system
+        if (self.vectorRef && typeof self.vectorRef.transformPoints === 'function') {
+          self.vectorRef.transformPoints({
+            dx,
+            dy,
+            scaleX,
+            scaleY,
+            rotation,
+            centerX,
+            centerY,
+          });
+          console.log("📊 transformPoints called successfully");
+        } else {
+          console.error("📊 transformPoints method not available");
+        }
       },
     };
   });

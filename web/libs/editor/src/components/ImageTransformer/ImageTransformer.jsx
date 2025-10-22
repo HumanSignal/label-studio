@@ -194,15 +194,27 @@ export default class TransformerComponent extends Component {
       rotation: firstNode.rotation(),
     };
 
+    // Calculate the center point that the transformer is using
+    // This is the center of the combined bounding box of all selected regions
+    const transformerCenter = {
+      x: this.transformer.x() + this.transformer.width() / 2,
+      y: this.transformer.y() + this.transformer.height() / 2,
+    };
+
     console.log('🔄 ImageTransformer applying transform to regions:', {
       ...transform,
+      transformerCenter,
       regionCount: selectedRegions.length
     });
 
     // Apply transform to each selected region
     selectedRegions.forEach((region) => {
+      console.log('🔄 Processing region:', region.id, 'has applyTransform:', typeof region.applyTransform);
       if (region.applyTransform && typeof region.applyTransform === 'function') {
-        region.applyTransform(transform);
+        console.log('🔄 Calling applyTransform on region:', region.id);
+        region.applyTransform(transform, transformerCenter);
+      } else {
+        console.log('🔄 Region does not have applyTransform method:', region.id);
       }
     });
 

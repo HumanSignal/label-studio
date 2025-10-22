@@ -1536,6 +1536,43 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 pointSelectionHandled.current = false;
                 return;
               }
+
+            // For the first point in drawing mode, we need to ensure the click handler works
+            // The issue is that the flag logic is interfering with first point creation
+            // Let's try calling the drawing mode click handler directly for the first point
+            if (initialPoints.length === 0 && !drawingDisabled) {
+              // For the first point, call the drawing mode click handler directly
+              const pos = e.target.getStage()?.getPointerPosition();
+              if (pos) {
+                const imagePos = {
+                  x: (pos.x - x) / (scaleX * transform.zoom * fitScale),
+                  y: (pos.y - y) / (scaleY * transform.zoom * fitScale),
+                };
+
+                // Check if we're within canvas bounds
+                if (!constrainToBounds || (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height)) {
+                  // Create the first point directly
+                  const newPoint = {
+                    id: `point-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    x: imagePos.x,
+                    y: imagePos.y,
+                    isBezier: false,
+                  };
+
+                  const newPoints = [...initialPoints, newPoint];
+                  onPointsChange?.(newPoints);
+                  onPointAdded?.(newPoint, newPoints.length - 1);
+
+                  // Set as the last added point
+                  setLastAddedPointId(newPoint.id);
+                  setActivePointId(newPoint.id);
+
+                  return;
+                }
+              }
+            }
+
+            // For subsequent points, use the normal event handler
               eventHandlers.handleLayerClick(e);
             }
       }
@@ -1553,8 +1590,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         />
       )}
 
-      {/* Transformable group for ImageTransformer */}
-      <Group name="_transformable" ref={transformableGroupRef}>
+      {/* Conditionally wrap content with _transformable group for ImageTransformer */}
+      {isMultiRegionSelected ? (
+        <Group name="_transformable" ref={transformableGroupRef}>
         {/* Unified vector shape - renders all lines based on id-prevPointId relationships */}
         <VectorShape
           segments={getAllLineSegments()}
@@ -1755,42 +1793,179 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           initialPointsLength={initialPoints.length}
           isDragging={isDragging.current}
         />
-      </Group>
+        </Group>
+      ) : (
+        <>
+          {/* Unified vector shape - renders all lines based on id-prevPointId relationships */}
+          <VectorShape
+            segments={getAllLineSegments()}
+            allowClose={allowClose}
+            isPathClosed={finalIsPathClosed}
+            stroke={stroke}
+            fill={fill}
+            strokeWidth={props.strokeWidth}
+            opacity={props.opacity}
+            transform={transform}
+            fitScale={fitScale}
+            onClick={(e) => {
+              // Check if click is on the last added point by checking cursor position
+              if (cursorPosition && lastAddedPointId) {
+                const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
+                if (lastAddedPoint) {
+                  const scale = transform.zoom * fitScale;
+                  const hitRadius = 15 / scale; // Same radius as used in event handlers
+                  const distance = Math.sqrt(
+                    (cursorPosition.x - lastAddedPoint.x) ** 2 + (cursorPosition.y - lastAddedPoint.y) ** 2,
+                  );
 
-      {/* Proxy nodes for Transformer (positioned at exact point centers) - only show when not in drawing mode and not multi-region selected */}
-      {drawingDisabled && !isMultiRegionSelected && (
-        <ProxyNodes selectedPoints={effectiveSelectedPoints} initialPoints={getAllPoints()} proxyRefs={proxyRefs} />
-      )}
+                  if (distance <= hitRadius) {
+                    // Find the index of the last added point
+                    const lastAddedPointIndex = initialPoints.findIndex((p) => p.id === lastAddedPointId);
 
-      {/* Transformer for multiselection - only show when not in drawing mode and not multi-region selected */}
-      {drawingDisabled && !isMultiRegionSelected && (
-        <VectorTransformer
-          selectedPoints={effectiveSelectedPoints}
-          initialPoints={getAllPoints()}
-          transformerRef={transformerRef}
-          proxyRefs={proxyRefs}
-          constrainToBounds={constrainToBounds}
-          bounds={{
-            x: 0,
-            y: 0,
-            width: width,
-            height: height,
-          }}
-          onPointsChange={(newPoints) => {
-            // Update main path points
-            onPointsChange?.(newPoints);
-          }}
-          onTransformStateChange={(state) => {
-            transformerStateRef.current = state;
-          }}
-          onTransformationStart={() => {
-            setIsTransforming(true);
-          }}
-          onTransformationEnd={() => {
-            setIsTransforming(false);
-          }}
-          onTransformEnd={onTransformEnd}
-        />
+                    // Only trigger onFinish if the last added point is already selected (second click)
+                    // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
+                    if (lastAddedPointIndex !== -1 && effectiveSelectedPoints.has(lastAddedPointIndex) && !disabled) {
+                      const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
+                      if (!hasModifiers) {
+                        e.evt.preventDefault();
+                        onFinish?.(e);
+                        return;
+                      }
+                      // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
+                      return;
+                    }
+                  }
+                }
+              }
+
+              // Call the original onClick handler
+              onClick?.(e);
+            }}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+            key={`vector-shape-${initialPoints.length}-${initialPoints.map((p) => p.id).join("-")}`}
+          />
+
+          {/* Ghost line - preview from last point to cursor */}
+          <GhostLine
+            initialPoints={initialPoints}
+            cursorPosition={cursorPosition}
+            draggedControlPoint={draggedControlPoint}
+            draggedPointIndex={draggedPointIndex}
+            isDraggingNewBezier={isDraggingNewBezier}
+            isPathClosed={finalIsPathClosed}
+            allowClose={allowClose}
+            transform={transform}
+            fitScale={fitScale}
+            maxPoints={maxPoints}
+            minPoints={minPoints}
+            skeletonEnabled={skeletonEnabled}
+            selectedPointIndex={selectedPointIndex}
+            lastAddedPointId={lastAddedPointId}
+            activePointId={activePointId}
+            stroke={stroke}
+            pixelSnapping={pixelSnapping}
+            drawingDisabled={drawingDisabled}
+          />
+
+          {/* Control points - render first so lines appear under main points */}
+          {!disabled && (
+            <ControlPoints
+              initialPoints={getAllPoints()}
+              selectedPointIndex={selectedPointIndex}
+              isDraggingNewBezier={isDraggingNewBezier}
+              draggedControlPoint={draggedControlPoint}
+              visibleControlPoints={visibleControlPoints}
+              transform={transform}
+              fitScale={fitScale}
+              key={`control-points-${initialPoints.length}-${initialPoints.map((p, i) => `${i}-${p.x.toFixed(1)}-${p.y.toFixed(1)}-${p.controlPoint1?.x?.toFixed(1) || "null"}-${p.controlPoint1?.y?.toFixed(1) || "null"}-${p.controlPoint2?.x?.toFixed(1) || "null"}-${p.controlPoint2?.y?.toFixed(1) || "null"}`).join("-")}`}
+            />
+          )}
+
+          {/* All vector points */}
+          <VectorPoints
+            initialPoints={getAllPoints()}
+            selectedPointIndex={selectedPointIndex}
+            selectedPoints={effectiveSelectedPoints}
+            transform={transform}
+            fitScale={fitScale}
+            pointRefs={pointRefs}
+            disabled={disabled}
+            pointRadius={pointRadius}
+            pointFill={pointFill}
+            pointStroke={pointStroke}
+            pointStrokeSelected={pointStrokeSelected}
+            pointStrokeWidth={pointStrokeWidth}
+            onPointClick={(e, pointIndex) => {
+              // Handle point selection even when disabled (similar to shape clicks)
+              if (disabled) {
+                // Check if this instance can have selection
+                if (!tracker.canInstanceHaveSelection(instanceId)) {
+                  return; // Block the selection
+                }
+
+                // Check if we're about to close the path - prevent point selection in this case
+                if (
+                  shouldClosePathOnPointClick(
+                    pointIndex,
+                    {
+                      initialPoints,
+                      allowClose,
+                      isPathClosed: finalIsPathClosed,
+                      skeletonEnabled,
+                      activePointId,
+                    } as any,
+                    e,
+                  )
+                ) {
+                  return; // Block the selection
+                }
+
+                // Allow selection for this instance
+                tracker.allowInstanceSelection(instanceId);
+              }
+
+              // Mark that point selection was handled
+              pointSelectionHandled.current = true;
+
+              eventHandlers.handlePointClick(e, pointIndex);
+            }}
+            onPointDragStart={eventHandlers.handlePointDragStart}
+            onPointDragMove={eventHandlers.handlePointDragMove}
+            onPointDragEnd={eventHandlers.handlePointDragEnd}
+            onPointConvert={eventHandlers.handlePointConvert}
+            onControlPointDragStart={eventHandlers.handleControlPointDragStart}
+            onControlPointDragMove={eventHandlers.handleControlPointDragMove}
+            onControlPointDragEnd={eventHandlers.handleControlPointDragEnd}
+            onControlPointConvert={eventHandlers.handleControlPointConvert}
+            onSegmentClick={eventHandlers.handleSegmentClick}
+            visibleControlPoints={visibleControlPoints}
+            allowBezier={allowBezier}
+            isTransforming={isTransforming}
+            key={`vector-points-${initialPoints.length}-${initialPoints.map((p, i) => `${i}-${p.x.toFixed(1)}-${p.y.toFixed(1)}-${p.controlPoint1?.x?.toFixed(1) || "null"}-${p.controlPoint1?.y?.toFixed(1) || "null"}-${p.controlPoint2?.x?.toFixed(1) || "null"}-${p.controlPoint2?.y?.toFixed(1) || "null"}`).join("-")}`}
+          />
+
+            {/* Proxy nodes for Transformer (positioned at exact point centers) - only show when not in drawing mode and not multi-region selected */}
+            {drawingDisabled && !isMultiRegionSelected && (
+              <ProxyNodes selectedPoints={effectiveSelectedPoints} initialPoints={getAllPoints()} proxyRefs={proxyRefs} />
+            )}
+
+            {/* Transformer for multiselection - only show when not in drawing mode and not multi-region selected */}
+            {drawingDisabled && !isMultiRegionSelected && (
+              <VectorTransformer
+                selectedPoints={effectiveSelectedPoints}
+                initialPoints={getAllPoints()}
+                transformerRef={transformerRef}
+                proxyRefs={proxyRefs}
+                onPointsChange={onPointsChange}
+                onTransformationComplete={notifyTransformationComplete}
+                constrainToBounds={constrainToBounds}
+                bounds={{ width, height }}
+                transform={transform}
+                fitScale={fitScale}
+              />
+            )}
+          </>
       )}
     </Group>
   );
