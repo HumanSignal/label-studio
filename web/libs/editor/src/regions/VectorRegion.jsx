@@ -509,12 +509,14 @@ const Model = types
 
         console.log('🔄 VectorRegion.applyTransform called:', transform);
 
-        // Calculate center point for rotation and scaling
-        const bbox = self.bboxCoords;
-        if (!bbox) return;
+        // Calculate center point for rotation and scaling using image coordinates
+        const bbox = self.bbox; // Use bbox (image coordinates) instead of bboxCoords (internal coordinates)
+        if (!bbox || bbox.left === undefined) return;
 
         const centerX = (bbox.left + bbox.right) / 2;
         const centerY = (bbox.top + bbox.bottom) / 2;
+
+        console.log('📊 Using center point for transformation:', { centerX, centerY, bbox });
 
         // Apply transformation using KonvaVector's transformPoints method
         self.vectorRef.transformPoints({
