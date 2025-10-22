@@ -87,14 +87,6 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
       keepRatio={false}
       shouldOverdrawWholeArea={true}
       // Remove dragBoundFunc - we'll handle constraints in onDragMove instead
-      boundBoxFunc={(oldBox: any, newBox: any) => {
-        // Simple test - prevent any box with negative coordinates
-        if (newBox.x < 0 || newBox.y < 0) {
-          return oldBox; // Return old box to prevent transformation
-        }
-
-        return newBox; // Allow transformation
-      }}
       onTransform={(_e: any) => {
         // Apply proxy coordinates to real points in real-time
         const transformer = transformerRef.current;
