@@ -69,7 +69,7 @@ _common_storage_list = _get_common_storage_list()
     ),
 )
 class AllImportStorageTypesAPI(APIView):
-    permission_required = all_permissions.projects_change
+    permission_required = all_permissions.storages_view
 
     def get(self, request, **kwargs):
         return Response([{'name': s['name'], 'title': s['title']} for s in _common_storage_list])
@@ -104,7 +104,7 @@ class AllImportStorageTypesAPI(APIView):
     ),
 )
 class AllExportStorageTypesAPI(APIView):
-    permission_required = all_permissions.projects_change
+    permission_required = all_permissions.storages_view
 
     def get(self, request, **kwargs):
         return Response([{'name': s['name'], 'title': s['title']} for s in _common_storage_list])
@@ -126,7 +126,7 @@ class AllExportStorageTypesAPI(APIView):
 )
 class AllImportStorageListAPI(generics.ListAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_required = all_permissions.projects_change
+    permission_required = all_permissions.storages_view
 
     def _get_response(self, api, request, *args, **kwargs):
         try:
@@ -164,7 +164,7 @@ class AllImportStorageListAPI(generics.ListAPIView):
 class AllExportStorageListAPI(generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_required = all_permissions.projects_change
+    permission_required = all_permissions.storages_view
 
     def _get_response(self, api, request, *args, **kwargs):
         try:
