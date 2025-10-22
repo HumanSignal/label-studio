@@ -315,10 +315,13 @@ export const Select = forwardRef(
     }, [_options, multiple, isSelected, _onChange]);
 
     const combobox = (
-      <Popover open={isOpen} onOpenChange={(_isOpen) => {
-        setIsOpen(_isOpen);
-        _isOpen ? onOpen?.() : onClose?.();
-      }}>
+      <Popover
+        open={isOpen}
+        onOpenChange={(_isOpen) => {
+          setIsOpen(_isOpen);
+          _isOpen ? onOpen?.() : onClose?.();
+        }}
+      >
         <PopoverTrigger asChild={true} disabled={disabled}>
           <button
             variant="outline"
