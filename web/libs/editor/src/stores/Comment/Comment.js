@@ -3,7 +3,6 @@ import { createRef } from "react";
 import Types from "../../core/Types";
 
 import Utils from "../../utils";
-import { FF_PER_FIELD_COMMENTS } from "../../utils/feature-flags";
 import { camelizeKeys, snakeizeKeys } from "../../utils/utilities";
 import { UserExtended } from "../UserStore";
 
@@ -18,12 +17,8 @@ import { Anchor } from "./Anchor";
 export const CommentBase = types
   .model("CommentBase", {
     text: types.string,
-    ...(isFF(FF_PER_FIELD_COMMENTS)
-      ? {
-          regionRef: types.optional(types.maybeNull(Anchor), null),
-          classifications: types.optional(types.frozen({}), null),
-        }
-      : {}),
+    regionRef: types.optional(types.maybeNull(Anchor), null),
+    classifications: types.optional(types.frozen({}), null),
   })
   .views((self) => ({
     get commentsStore() {

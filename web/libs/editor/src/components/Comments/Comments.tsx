@@ -1,30 +1,20 @@
 import { type FC, useEffect } from "react";
 import { observer } from "mobx-react";
 import { Block } from "../../utils/bem";
-import { CommentForm as CommentFormOld } from "./OldComment/CommentForm";
-import { CommentForm as CommentsFormNew } from "./Comment/CommentForm";
-import { CommentsList as CommentsListOld } from "./OldComment/CommentsList";
-import { CommentsList as CommentsListNew } from "./Comment/CommentsList";
+import { CommentForm } from "./Comment/CommentForm";
+import { CommentsList } from "./Comment/CommentsList";
 import { useMounted } from "../../common/Utils/useMounted";
-import { FF_DEV_3034, FF_PER_FIELD_COMMENTS, isFF } from "../../utils/feature-flags";
+import { FF_DEV_3034, isFF } from "../../utils/feature-flags";
 
 import "./Comments.scss";
-
-const isPerFieldComments = isFF(FF_PER_FIELD_COMMENTS);
-
-const CommentForm = isPerFieldComments ? CommentsFormNew : CommentFormOld;
-const CommentsList = isPerFieldComments ? CommentsListNew : CommentsListOld;
 
 export const Comments: FC<{ annotationStore: any; commentStore: any; cacheKey?: string }> = observer(
   ({ annotationStore, commentStore, cacheKey }) => {
     const mounted = useMounted();
 
     const loadComments = async () => {
-      const listCommentsOptions: any = { mounted };
-      if (isPerFieldComments) {
-        // It prevents blinking on opening comments tab for the same annotation when comments are already there
-        listCommentsOptions.suppressClearComments = commentStore.isRelevantList;
-      }
+      // It prevents blinking on opening comments tab for the same annotation when comments are already there
+      const listCommentsOptions: any = { mounted, suppressClearComments: commentStore.isRelevantList };
       await commentStore.listComments(listCommentsOptions);
       if (!isFF(FF_DEV_3034)) {
         commentStore.restoreCommentsFromCache(cacheKey);
