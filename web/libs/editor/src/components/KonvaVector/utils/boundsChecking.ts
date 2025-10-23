@@ -231,10 +231,10 @@ export function calculateTransformerConstraints(
   // Convert transformer coordinates to image coordinates for comparison
   // The transformer is in stage coordinates, but bounds are in image coordinates
   const transformerInImageCoords = {
-    x: (transformerBox.x - transform.offsetX) / transform.zoom,
-    y: (transformerBox.y - transform.offsetY) / transform.zoom,
-    width: transformerBox.width / transform.zoom,
-    height: transformerBox.height / transform.zoom,
+    x: (transformerBox.x - transform.offsetX) / (transform.zoom * fitScale),
+    y: (transformerBox.y - transform.offsetY) / (transform.zoom * fitScale),
+    width: transformerBox.width / (transform.zoom * fitScale),
+    height: transformerBox.height / (transform.zoom * fitScale),
   };
 
   // Use the original bounds (no scaling needed)
@@ -256,28 +256,28 @@ export function calculateTransformerConstraints(
   // Constrain to left edge
   if (transformerInImageCoords.x < imageBounds.left) {
     // Convert back to stage coordinates
-    constrainedX = imageBounds.left * transform.zoom + transform.offsetX;
+    constrainedX = imageBounds.left * (transform.zoom * fitScale) + transform.offsetX;
     needsConstraint = true;
   }
 
   // Constrain to right edge
   if (transformerInImageCoords.x + transformerInImageCoords.width > imageBounds.right) {
     // Convert back to stage coordinates
-    constrainedX = (imageBounds.right - transformerInImageCoords.width) * transform.zoom + transform.offsetX;
+    constrainedX = (imageBounds.right - transformerInImageCoords.width) * (transform.zoom * fitScale) + transform.offsetX;
     needsConstraint = true;
   }
 
   // Constrain to top edge
   if (transformerInImageCoords.y < imageBounds.top) {
     // Convert back to stage coordinates
-    constrainedY = imageBounds.top * transform.zoom + transform.offsetY;
+    constrainedY = imageBounds.top * (transform.zoom * fitScale) + transform.offsetY;
     needsConstraint = true;
   }
 
   // Constrain to bottom edge
   if (transformerInImageCoords.y + transformerInImageCoords.height > imageBounds.bottom) {
     // Convert back to stage coordinates
-    constrainedY = (imageBounds.bottom - transformerInImageCoords.height) * transform.zoom + transform.offsetY;
+    constrainedY = (imageBounds.bottom - transformerInImageCoords.height) * (transform.zoom * fitScale) + transform.offsetY;
     needsConstraint = true;
   }
 

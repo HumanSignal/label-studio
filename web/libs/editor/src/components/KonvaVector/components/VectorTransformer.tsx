@@ -284,10 +284,10 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
 
         // Convert rotated box to image coordinates
         const imageBox = {
-          x: (rotatedBox.x - transform.offsetX) / transform.zoom,
-          y: (rotatedBox.y - transform.offsetY) / transform.zoom,
-          width: rotatedBox.width / transform.zoom,
-          height: rotatedBox.height / transform.zoom,
+          x: (rotatedBox.x - transform.offsetX) / (transform.zoom * fitScale),
+          y: (rotatedBox.y - transform.offsetY) / (transform.zoom * fitScale),
+          width: rotatedBox.width / (transform.zoom * fitScale),
+          height: rotatedBox.height / (transform.zoom * fitScale),
         };
 
         // Check if the rotated box would go out of bounds
@@ -319,10 +319,10 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
 
             // Convert box to image coordinates
             const imageBox = {
-              x: (box.x - transform.offsetX) / transform.zoom,
-              y: (box.y - transform.offsetY) / transform.zoom,
-              width: box.width / transform.zoom,
-              height: box.height / transform.zoom,
+              x: (box.x - transform.offsetX) / (transform.zoom * fitScale),
+              y: (box.y - transform.offsetY) / (transform.zoom * fitScale),
+              width: box.width / (transform.zoom * fitScale),
+              height: box.height / (transform.zoom * fitScale),
             };
 
             // Check if out of bounds and constrain each shape
@@ -334,16 +334,16 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               const newAbsPos = { ...absPos };
 
               if (imageBox.x < bounds.x) {
-                newAbsPos.x = bounds.x * transform.zoom + transform.offsetX - offsetX;
+                newAbsPos.x = bounds.x * (transform.zoom * fitScale) + transform.offsetX - offsetX;
               }
               if (imageBox.y < bounds.y) {
-                newAbsPos.y = bounds.y * transform.zoom + transform.offsetY - offsetY;
+                newAbsPos.y = bounds.y * (transform.zoom * fitScale) + transform.offsetY - offsetY;
               }
               if (imageBox.x + imageBox.width > bounds.x + bounds.width) {
-                newAbsPos.x = (bounds.x + bounds.width) * transform.zoom + transform.offsetX - box.width - offsetX;
+                newAbsPos.x = (bounds.x + bounds.width) * (transform.zoom * fitScale) + transform.offsetX - box.width - offsetX;
               }
               if (imageBox.y + imageBox.height > bounds.y + bounds.height) {
-                newAbsPos.y = (bounds.y + bounds.height) * transform.zoom + transform.offsetY - box.height - offsetY;
+                newAbsPos.y = (bounds.y + bounds.height) * (transform.zoom * fitScale) + transform.offsetY - box.height - offsetY;
               }
 
               // Apply the constrained position to the individual shape
