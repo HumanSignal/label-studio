@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { IconOutlinerDrag, IconCollapseSmall, IconExpandSmall } from "@humansignal/ui";
 import { useDrag } from "../../../hooks/useDrag";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { DEFAULT_PANEL_HEIGHT } from "../constants";
 import "./Tabs.scss";
 import { type BaseProps, Side, type TabProps } from "./types";
@@ -158,24 +158,30 @@ const Tab = ({
   );
 
   const Label = () => (
-    <Elem
+    <div
       id={`${panelKey}_${tabIndex}_droppable`}
-      name="tab"
-      mod={{ active: locked ? tabIndex === breakPointActiveTab : active }}
+      className={cn("panel-tabs")
+        .elem("tab")
+        .mod({ active: locked ? tabIndex === breakPointActiveTab : active })
+        .toClassName()}
     >
-      {!locked && <Elem name="icon" tag={IconOutlinerDrag} />}
+      {!locked && <IconOutlinerDrag className={cn("panel-tabs").elem("icon").toClassName()} />}
       {tabText}
-    </Elem>
+    </div>
   );
 
   return (
-    <Block name="panel-tabs">
-      <Elem name="draggable-tab" id={`${tabText}-draggable`} ref={tabRef}>
+    <div className={cn("panel-tabs").toClassName()}>
+      <div
+        className={cn("panel-tabs").elem("draggable-tab").toClassName()}
+        id={`${tabText}-draggable`}
+        ref={tabRef as any}
+      >
         <Label />
-      </Elem>
-      <Elem
-        ref={ghostTabRef}
-        name="ghost-tab"
+      </div>
+      <div
+        ref={ghostTabRef as any}
+        className={cn("panel-tabs").elem("ghost-tab").toClassName()}
         style={{
           width: `${panelWidth}px`,
           height: "fit-content",
@@ -184,9 +190,9 @@ const Tab = ({
         }}
       >
         <Label />
-        {shouldShowGhostTab && <Elem name="contents">{children}</Elem>}
-      </Elem>
-    </Block>
+        {shouldShowGhostTab && <div className={cn("panel-tabs").elem("contents").toClassName()}>{children}</div>}
+      </div>
+    </div>
   );
 };
 
@@ -205,13 +211,16 @@ export const Tabs = (
 
   return (
     <>
-      <Block name="tabs">
-        <Elem name="tabs-row">
+      <div className={cn("tabs").toClassName()}>
+        <div className={cn("tabs").elem("tabs-row").toClassName()}>
           {props.panelViews.map((view, index) => {
             const { component: Component } = view;
 
             return (
-              <Elem name="tab-container" key={`${view.title}-${index}-tab`} mod={{ active: view.active }}>
+              <div
+                className={cn("tabs").elem("tab-container").mod({ active: view.active }).toClassName()}
+                key={`${view.title}-${index}-tab`}
+              >
                 <Tab
                   name={view.name}
                   rootRef={props.root}
@@ -230,14 +239,17 @@ export const Tabs = (
                   breakPointActiveTab={props.breakPointActiveTab}
                   setBreakPointActiveTab={props.setBreakPointActiveTab}
                 >
-                  <Elem name="content">
+                  <div className={cn("tabs").elem("content").toClassName()}>
                     <Component key={`${view.title}-${index}-ghost`} {...props} name={"outliner"} />
-                  </Elem>
+                  </div>
                 </Tab>
-              </Elem>
+              </div>
             );
           })}
-          <Elem id={`${props.name}_${props.panelViews.length}-droppable-space`} name="drop-space-after" />
+          <div
+            id={`${props.name}_${props.panelViews.length}-droppable-space`}
+            className={cn("tabs").elem("drop-space-after").toClassName()}
+          />
           {props.isBottomPanel && props.settings?.collapsibleBottomPanel && (
             <Button
               className="collapsible-bottom-panel-toggle"
@@ -261,13 +273,13 @@ export const Tabs = (
               {props.bottomCollapsed ? <IconExpandSmall /> : <IconCollapseSmall />}
             </Button>
           )}
-        </Elem>
+        </div>
         {!props.bottomCollapsed && (
-          <Elem name="contents" style={{ overflow: "auto" }}>
+          <div className={cn("tabs").elem("contents").toClassName()} style={{ overflow: "auto" }}>
             {ActiveComponent && <ActiveComponent {...props} />}
-          </Elem>
+          </div>
         )}
-      </Block>
+      </div>
     </>
   );
 };
