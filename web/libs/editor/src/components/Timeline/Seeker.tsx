@@ -1,6 +1,6 @@
 import clamp from "lodash/clamp";
 import { type FC, type ReactElement, useCallback, useRef } from "react";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import type { TimelineMinimapProps } from "./Types";
 
 import "./Seeker.scss";
@@ -126,11 +126,21 @@ export const Seeker: FC<SeekerProps> = ({
   );
 
   return (
-    <Block name="seeker" ref={rootRef} onMouseDown={onDrag}>
-      <Elem name="track" />
-      {showIndicator && <Elem name="indicator" ref={viewRef} style={{ left: windowOffset, width }} />}
-      <Elem name="position" ref={seekerRef} style={{ left: `${seekerOffset}%` }} />
-      <Elem name="minimap">{minimap}</Elem>
-    </Block>
+    <div className={cn("seeker").toClassName()} ref={rootRef as any} onMouseDown={onDrag}>
+      <div className={cn("seeker").elem("track").toClassName()} />
+      {showIndicator && (
+        <div
+          className={cn("seeker").elem("indicator").toClassName()}
+          ref={viewRef as any}
+          style={{ left: windowOffset, width }}
+        />
+      )}
+      <div
+        className={cn("seeker").elem("position").toClassName()}
+        ref={seekerRef as any}
+        style={{ left: `${seekerOffset}%` }}
+      />
+      <div className={cn("seeker").elem("minimap").toClassName()}>{minimap}</div>
+    </div>
   );
 };
