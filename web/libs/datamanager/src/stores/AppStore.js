@@ -751,7 +751,7 @@ export const AppStore = types
       }
 
       if (actionCallback instanceof Function) {
-        const result = yield actionCallback(actionParams, view);
+        const result = actionCallback(actionParams, view);
         self.SDK.invoke("actionDialogOkComplete", actionId, {
           result,
           view: viewReloaded,
