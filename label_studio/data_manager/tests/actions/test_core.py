@@ -10,7 +10,7 @@ class TestCheckActionPermission(TestCase):
         project = ProjectFactory()
         user = project.created_by
         action = {
-            'permission': all_permissions.tasks_delete,
+            'permission': [all_permissions.tasks_delete, all_permissions.projects_view],
         }
         assert check_action_permission(user, action, project) is True
 
