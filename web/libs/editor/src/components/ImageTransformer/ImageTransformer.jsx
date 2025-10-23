@@ -184,35 +184,31 @@ export default class TransformerComponent extends Component {
     const nodes = this.transformer.nodes();
     if (!nodes || nodes.length === 0) return;
 
-    // Get transform from the first node (they should all have the same transform)
-    const firstNode = nodes[0];
-    const transform = {
-      dx: firstNode.x(),
-      dy: firstNode.y(),
-      scaleX: firstNode.scaleX(),
-      scaleY: firstNode.scaleY(),
-      rotation: firstNode.rotation(),
-    };
+    // Apply transform to each selected region individually
+    // Each node may have different transform values when transforming multiple nodes together
+    selectedRegions.forEach((region, index) => {
+      const node = nodes[index];
+      if (!node) {
+        console.warn('🔄 No node found for region:', region.id);
+        return;
+      }
 
-    // Calculate the center point that the transformer is using
-    // This is the center of the combined bounding box of all selected regions
-    const transformerCenter = {
-      x: this.transformer.x() + this.transformer.width() / 2,
-      y: this.transformer.y() + this.transformer.height() / 2,
-    };
+      // Get the transform for THIS specific node
+      const transform = {
+        dx: node.x(),
+        dy: node.y(),
+        scaleX: node.scaleX(),
+        scaleY: node.scaleY(),
+        rotation: node.rotation(),
+      };
 
-    console.log('🔄 ImageTransformer applying transform to regions:', {
-      ...transform,
-      transformerCenter,
-      regionCount: selectedRegions.length
-    });
+      console.log('🔄 Applying transform to region:', {
+        regionId: region.id,
+        ...transform,
+      });
 
-    // Apply transform to each selected region
-    selectedRegions.forEach((region) => {
-      console.log('🔄 Processing region:', region.id, 'has applyTransform:', typeof region.applyTransform);
       if (region.applyTransform && typeof region.applyTransform === 'function') {
-        console.log('🔄 Calling applyTransform on region:', region.id);
-        region.applyTransform(transform, transformerCenter);
+        region.applyTransform(transform, null);
       } else {
         console.log('🔄 Region does not have applyTransform method:', region.id);
       }
@@ -227,6 +223,9 @@ export default class TransformerComponent extends Component {
       node.rotation(0);
     });
 
+    // Detach transformer temporarily to prevent recalculation during re-render
+    // The transformer will be reattached by checkNode after components update
+    this.transformer.nodes([]);
     this.transformer.getLayer()?.batchDraw();
   };
 
