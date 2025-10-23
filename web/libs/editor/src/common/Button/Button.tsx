@@ -8,10 +8,11 @@ import {
   forwardRef,
   type ForwardRefExoticComponent,
   useMemo,
+  createElement,
 } from "react";
 import { Hotkey } from "../../core/Hotkey";
 import { useHotkey } from "../../hooks/useHotkey";
-import { Block, type CNTagName, Elem } from "../../utils/bem";
+import { cn, type CNTagName } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 import "./Button.scss";
 
@@ -107,18 +108,19 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
 
     useHotkey(hotkey, rest.onClick as unknown as Keymaster.KeyHandler, hotkeyScope);
 
-    const buttonBody = (
-      <Block name="button" mod={mods} mix={className} ref={ref} tag={finalTag} type={type} {...rest}>
-        <>
-          {iconElem && (
-            <Elem tag="span" name="icon">
-              {iconElem}
-            </Elem>
-          )}
-          {iconElem && children ? <span>{children}</span> : children}
-          {extra !== undefined ? <Elem name="extra">{extra}</Elem> : null}
-        </>
-      </Block>
+    const buttonBody = createElement(
+      finalTag as any,
+      {
+        ref,
+        type,
+        ...rest,
+        className: cn("button").mod(mods).mix(className).toClassName(),
+      },
+      <>
+        {iconElem && <span className={cn("button").elem("icon").toClassName()}>{iconElem}</span>}
+        {iconElem && children ? <span>{children}</span> : children}
+        {extra !== undefined ? <div className={cn("button").elem("extra").toClassName()}>{extra}</div> : null}
+      </>,
     );
 
     if (
@@ -147,11 +149,7 @@ export const Button: ButtonType<ButtonProps> = forwardRef(
 Button.displayName = "Button";
 
 const Group: FC<ButtonGroupProps> = ({ className, children, collapsed }) => {
-  return (
-    <Block name="button-group" mod={{ collapsed }} mix={className}>
-      {children}
-    </Block>
-  );
+  return <div className={cn("button-group").mod({ collapsed }).mix(className).toClassName()}>{children}</div>;
 };
 
 Button.Group = Group;

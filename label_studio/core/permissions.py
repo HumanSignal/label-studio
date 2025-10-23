@@ -49,6 +49,10 @@ class AllPermissions(BaseModel):
     webhooks_change: str = 'webhooks.change'
     users_token_any: str = 'users.token.any'
 
+    storages_view: str = 'storages.view'
+    storages_change: str = 'storages.change'
+    storages_sync: str = 'storages.sync'
+
 
 all_permissions = AllPermissions()
 

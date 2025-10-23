@@ -2,7 +2,7 @@ import { observer } from "mobx-react";
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { useLocalStorageState } from "../../hooks/useLocalStorageState";
 import { useMemoizedHandlers } from "../../hooks/useMemoizedHandlers";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { clamp, fixMobxObserve, isDefined } from "../../utils/utilities";
 import { TimelineContextProvider } from "./Context";
 import { Controls } from "./Controls";
@@ -124,7 +124,7 @@ const TimelineComponent: FC<TimelineProps> = ({
   }, [position, length]);
 
   const controls = (
-    <Elem name="topbar">
+    <div className={cn("timeline").elem("topbar").toClassName()}>
       <Controls
         length={length}
         position={currentPosition}
@@ -176,13 +176,13 @@ const TimelineComponent: FC<TimelineProps> = ({
           minimap={View.Minimap ? <View.Minimap /> : null}
         />
       )}
-    </Elem>
+    </div>
   );
 
   regions.map((reg) => fixMobxObserve(reg.sequence));
 
   const view = !viewCollapsed && !disableView && (
-    <Elem name="view">
+    <div className={cn("timeline").elem("view").toClassName()}>
       <View.View
         step={step}
         length={length}
@@ -212,12 +212,12 @@ const TimelineComponent: FC<TimelineProps> = ({
         onSpeedChange={(speed) => handlers.onSpeedChange?.(speed)}
         onZoom={props.onZoom}
       />
-    </Elem>
+    </div>
   );
 
   return (
     <TimelineContextProvider value={contextValue}>
-      <Block name="timeline" className={className}>
+      <div className={cn("timeline").mix(className).toClassName()}>
         {controlsOnTop ? (
           <>
             {controls}
@@ -229,7 +229,7 @@ const TimelineComponent: FC<TimelineProps> = ({
             {controls}
           </>
         )}
-      </Block>
+      </div>
     </TimelineContextProvider>
   );
 };

@@ -5,7 +5,7 @@ import logging
 import os
 import time
 
-from core.permissions import all_permissions
+from core.permissions import ViewClassPermission, all_permissions
 from core.utils.io import read_yaml
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
@@ -15,18 +15,15 @@ from rest_framework import generics, status
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
-from rest_framework.settings import api_settings
-
-from label_studio.core.utils.common import load_func
 
 logger = logging.getLogger(__name__)
 
-StoragePermission = load_func(settings.STORAGE_PERMISSION)
-
 
 class ImportStorageListAPI(generics.ListCreateAPIView):
-    permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
+    permission_required = ViewClassPermission(
+        GET=all_permissions.storages_view,
+        POST=all_permissions.storages_change,
+    )
     parser_classes = (JSONParser, FormParser, MultiPartParser)
 
     serializer_class = ImportStorageSerializer
@@ -46,8 +43,12 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
 
-    permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
+    permission_required = ViewClassPermission(
+        GET=all_permissions.storages_view,
+        PATCH=all_permissions.storages_change,
+        PUT=all_permissions.storages_change,
+        DELETE=all_permissions.storages_change,
+    )
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
 
@@ -58,8 +59,10 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 class ExportStorageListAPI(generics.ListCreateAPIView):
 
-    permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
+    permission_required = ViewClassPermission(
+        GET=all_permissions.storages_view,
+        POST=all_permissions.storages_change,
+    )
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
@@ -91,8 +94,12 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
 class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
 
-    permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
+    permission_required = ViewClassPermission(
+        GET=all_permissions.storages_view,
+        PATCH=all_permissions.storages_change,
+        PUT=all_permissions.storages_change,
+        DELETE=all_permissions.storages_change,
+    )
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
@@ -103,7 +110,9 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 class ImportStorageSyncAPI(generics.GenericAPIView):
 
-    permission_required = all_permissions.projects_change
+    permission_required = ViewClassPermission(
+        POST=all_permissions.storages_sync,
+    )
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
 
@@ -125,7 +134,9 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
 
 class ExportStorageSyncAPI(generics.GenericAPIView):
 
-    permission_required = all_permissions.projects_change
+    permission_required = ViewClassPermission(
+        POST=all_permissions.storages_sync,
+    )
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
 
@@ -147,7 +158,7 @@ class ExportStorageSyncAPI(generics.GenericAPIView):
 
 class StorageValidateAPI(generics.CreateAPIView):
 
-    permission_required = all_permissions.projects_change
+    permission_required = all_permissions.storages_change
     parser_classes = (JSONParser, FormParser, MultiPartParser)
 
     def create(self, request, *args, **kwargs):
@@ -160,8 +171,7 @@ class StorageValidateAPI(generics.CreateAPIView):
 @extend_schema(exclude=True)
 class ImportStorageListFilesAPI(generics.CreateAPIView):
 
-    permission_required = all_permissions.projects_change
-    permission_classes = api_settings.DEFAULT_PERMISSION_CLASSES + [StoragePermission]
+    permission_required = all_permissions.storages_change
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = None  # Default serializer
 
@@ -203,7 +213,7 @@ class ImportStorageListFilesAPI(generics.CreateAPIView):
 @extend_schema(exclude=True)
 class StorageFormLayoutAPI(generics.RetrieveAPIView):
 
-    permission_required = all_permissions.projects_change
+    permission_required = all_permissions.storages_change
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     storage_type = None
 
