@@ -31,8 +31,8 @@ export const Userpic = forwardRef(
       badge = null,
       className,
       faded = false,
-      showUsernameTooltip,
-      showUsername,
+      showUsernameTooltip = false,
+      showUsername = false,
       size,
       src,
       style = {},
@@ -130,7 +130,6 @@ export const Userpic = forwardRef(
         });
     }
 
-    console.log("showUsername", showUsername, displayName);
     const userpic = (
       <div className="flex items-center gap-2">
         <div
