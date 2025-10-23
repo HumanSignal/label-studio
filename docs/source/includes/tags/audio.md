@@ -14,7 +14,7 @@
 | [waveheight] | <code>string</code> | <code>32</code> | Minimum height of a waveform when in `splitchannels` mode with multiple channels to display. |
 | [spectrogram] | <code>boolean</code> | <code>false</code> | Determines whether an audio spectrogram is automatically displayed upon loading. |
 | [splitchannels] | <code>boolean</code> | <code>false</code> | Display multiple audio channels separately, if the audio file has more than one channel. (**NOTE: Requires more memory to operate.**) |
-| [decoder] | <code>string</code> | <code>&quot;webaudio&quot;</code> | Decoder type to use to decode audio data. (`"webaudio"` or `"ffmpeg"`) |
+| [decoder] | <code>string</code> | <code>&quot;webaudio&quot;</code> | Decoder type to use to decode audio data. (`"webaudio"`, `"ffmpeg"`, or `"none"` for no decoding - provides fast loading for large files but disables waveform visualization) |
 | [player] | <code>string</code> | <code>&quot;html5&quot;</code> | Player type to use to play audio data. (`"html5"` or `"webaudio"`) |
 
 ### Result parameters
