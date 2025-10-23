@@ -326,9 +326,8 @@ export class Visualizer extends Events<VisualizerEvents> {
         this.maxZoom = Math.max(1, Math.ceil(this.audio.dataLength / this.width));
       }
     } else {
-      // No decoded data - render placeholder
+      // No decoded data
       this.renderers = [];
-      this.renderNoWaveformPlaceholder();
     }
 
     // Compose all layers together so that we cache the composition of the layers.
@@ -428,32 +427,6 @@ export class Visualizer extends Events<VisualizerEvents> {
       (this._loader as any).error = error;
       (this._loader as any).update();
     }
-  }
-
-  /**
-   * Render a placeholder in the waveform area when decoder is "none"
-   */
-  private renderNoWaveformPlaceholder() {
-    const waveformLayer = this.getLayer("waveform");
-    if (!waveformLayer) return;
-
-    const ctx = waveformLayer.context;
-    if (!ctx) return;
-
-    // Fill with background color
-    ctx.fillStyle = this.backgroundColor.toString();
-    ctx.fillRect(0, 0, waveformLayer.width, waveformLayer.height);
-
-    // Add centered text
-    ctx.fillStyle = "rgba(128, 128, 128, 0.5)";
-    ctx.font = "14px sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(
-      'Waveform rendering disabled (decoder="none" for fast loading)',
-      waveformLayer.width / 2,
-      waveformLayer.height / 2,
-    );
   }
 
   setZoom(value: number) {
