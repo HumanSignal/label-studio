@@ -10,7 +10,7 @@ import logging
 import os
 import traceback as tb
 from importlib import import_module
-from typing import Callable, Optional, Required, TypedDict, Union
+from typing import Callable, Optional, TypedDict, Union
 
 from core.feature_flags import flag_set
 from core.utils.common import load_func
@@ -25,7 +25,7 @@ class DataManagerAction(TypedDict):
     entry_point: Callable
     permission: Union[str, list[str]]
     title: str
-    order: Required[int]
+    order: int
     experimental: Optional[bool]
     dialog: dict
     hidden: Optional[bool]
