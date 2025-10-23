@@ -1,6 +1,6 @@
 import chroma from "chroma-js";
 import { type FC, memo, type MouseEvent, useCallback, useContext, useMemo } from "react";
-import { Block, Elem } from "../../../../utils/bem";
+import { cn } from "../../../../utils/bem";
 import { clamp } from "../../../../utils/utilities";
 import { TimelineContext } from "../../Context";
 import type { TimelineRegion } from "../../Types";
@@ -71,27 +71,27 @@ export const Keypoints: FC<KeypointsProps> = ({ idx, region, startOffset, render
   const range = timeline ? sequence.map((s) => s.frame) : [];
 
   return (
-    <Block
-      name="keypoints"
-      style={styles}
-      mod={{ selected, timeline }}
+    <div
+      className={cn("keypoints").mod({ selected, timeline }).toClassName()}
+      style={styles as any}
       data-id={region.id}
       data-start={range[0]}
       data-end={range[1]}
       data-locked={locked || undefined}
     >
-      <Elem name="label" onClick={onSelectRegionHandler}>
-        <Elem name="name">{label}</Elem>
-        <Elem name="data">
-          <Elem name="data-item" mod={{ faded: true }}>
-            {idx}
-          </Elem>
-        </Elem>
-      </Elem>
-      <Elem name="keypoints" onClick={(e: any) => onSelectRegionHandler(e, true)}>
+      <div className={cn("keypoints").elem("label").toClassName()} onClick={onSelectRegionHandler}>
+        <div className={cn("keypoints").elem("name").toClassName()}>{label}</div>
+        <div className={cn("keypoints").elem("data").toClassName()}>
+          <div className={cn("keypoints").elem("data-item").mod({ faded: true }).toClassName()}>{idx}</div>
+        </div>
+      </div>
+      <div
+        className={cn("keypoints").elem("keypoints").toClassName()}
+        onClick={(e: any) => onSelectRegionHandler(e, true)}
+      >
         <LifespansList lifespans={lifespans} step={step} visible={visible} offset={offset} />
-      </Elem>
-    </Block>
+      </div>
+    </div>
   );
 };
 
@@ -148,13 +148,22 @@ const LifespanItem: FC<LifespanItemProps> = memo(
     }, [left, right, finalWidth]);
 
     return (
-      <Elem name="lifespan" mod={{ hidden: !visible, instant: !width }} style={style}>
+      <div
+        className={cn("keypoints").elem("lifespan").mod({ hidden: !visible, instant: !width }).toClassName()}
+        style={style}
+      >
         {points.map((frame, i) => {
           const left = (frame - start) * step;
 
-          return <Elem key={i} name="point" style={{ left }} mod={{ last: !!left, locked }} />;
+          return (
+            <div
+              key={i}
+              className={cn("keypoints").elem("point").mod({ last: !!left, locked }).toClassName()}
+              style={{ left }}
+            />
+          );
         })}
-      </Elem>
+      </div>
     );
   },
 );

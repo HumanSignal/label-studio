@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { IconBan, IconSparks, IconStar } from "@humansignal/icons";
 import { Userpic } from "@humansignal/ui";
 import { Space } from "../../common/Space/Space";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import "./AnnotationTabs.scss";
 
 export const EntityTab = observer(
@@ -13,10 +13,9 @@ export const EntityTab = observer(
       const infoIsHidden = entity.store.hasInterface("annotations:hide-info");
 
       return (
-        <Block
-          name="entity-tab"
+        <div
           ref={ref}
-          mod={{ selected, bordered }}
+          className={cn("entity-tab").mod({ selected, bordered }).toClassName()}
           style={style}
           onClick={(e) => {
             e.preventDefault();
@@ -25,28 +24,28 @@ export const EntityTab = observer(
           }}
         >
           <Space size="small">
-            <Elem
-              name="userpic"
-              tag={Userpic}
+            <Userpic
+              className={cn("entity-tab").elem("userpic").mod({ prediction }).toClassName()}
               showUsername
               username={prediction ? entity.createdBy : null}
               user={infoIsHidden ? {} : (entity.user ?? { email: entity.createdBy })}
-              mod={{ prediction }}
             >
               {prediction && <IconSparks style={{ width: 16, height: 16 }} />}
-            </Elem>
+            </Userpic>
 
             {!infoIsHidden && (
-              <Elem name="identifier">
+              <div className={cn("entity-tab").elem("identifier").toClassName()}>
                 ID {entity.pk ?? entity.id} {isUnsaved && "*"}
-              </Elem>
+              </div>
             )}
 
-            {displayGroundTruth && entity.ground_truth && <Elem name="ground-truth" tag={IconStar} />}
+            {displayGroundTruth && entity.ground_truth && (
+              <IconStar className={cn("entity-tab").elem("ground-truth").toClassName()} />
+            )}
 
-            {entity.skipped && <Elem name="skipped" tag={IconBan} />}
+            {entity.skipped && <IconBan className={cn("entity-tab").elem("skipped").toClassName()} />}
           </Space>
-        </Block>
+        </div>
       );
     },
   ),
