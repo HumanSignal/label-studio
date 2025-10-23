@@ -5,6 +5,11 @@ steps:
     content: Click on the AI Assistant icon and quickly get answers to any questions regarding Label Studio.
     disableBeacon: true
     disableOverlay: true
-    offset: 8px
+    offset: 8
+    styles:
+      options:
+        backgroundColor: "var(--color-primary-surface)"
+        textColor: "var(--color-primary-surface-content)"
+        primaryColor: "var(--color-neutral-on-dark-surface)"
     locale:
       last: "Got It"
