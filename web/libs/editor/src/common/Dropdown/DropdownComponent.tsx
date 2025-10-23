@@ -12,7 +12,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useFullscreen } from "../../hooks/useFullscreen";
-import { Block, cn } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { alignElements, type Align } from "@humansignal/core/lib/utils/dom";
 import { aroundTransition } from "@humansignal/core/lib/utils/transition";
 import "./Dropdown.scss";
@@ -213,11 +213,10 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     }, [props.style, dropdownIndex, minIndex, offset]);
 
     const result = (
-      <Block
-        ref={dropdown}
-        name="dropdown"
+      <div
+        ref={dropdown as any}
         data-testid={props.dataTestId}
-        mix={[props.className, visibilityClasses]}
+        className={rootName.mix(props.className, visibilityClasses).toClassName()}
         style={{
           ...compositeStyles,
           borderRadius: isFF(FF_DEV_3873) && 4,
@@ -225,7 +224,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         onClick={(e: MouseEvent) => e.stopPropagation()}
       >
         {content}
-      </Block>
+      </div>
     );
 
     return props.inline === true ? result : createPortal(result, document.body);

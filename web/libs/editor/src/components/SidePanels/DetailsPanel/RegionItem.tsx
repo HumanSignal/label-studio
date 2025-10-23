@@ -5,7 +5,7 @@ import { observer } from "mobx-react";
 import { type FC, forwardRef, useMemo, useState } from "react";
 import { WithHotkey } from "../../../common/Hotkey/WithHotkey";
 import { CREATE_RELATION_MODE } from "../../../stores/Annotation/LinkingModes";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
 import { RegionLabels } from "./RegionLabels";
@@ -48,31 +48,31 @@ export const RegionItem: FC<RegionItemProps> = observer(
     }, [region.background, region.style]);
 
     return (
-      <Block name="detailed-region" mod={{ compact }} data-testid="detailed-region">
-        <Elem name="head" style={{ color: color.css() }}>
-          <Elem name="title">
-            <Elem name="icon">
+      <div className={cn("detailed-region").mod({ compact }).toClassName()} data-testid="detailed-region">
+        <div className={cn("detailed-region").elem("head").toClassName()} style={{ color: color.css() }}>
+          <div className={cn("detailed-region").elem("title").toClassName()}>
+            <div className={cn("detailed-region").elem("icon").toClassName()}>
               <NodeIcon node={region} />
-            </Elem>
-            <Elem name="index">
-              <Elem tag="span" name="index_value">
-                {region.region_index}
-              </Elem>
-            </Elem>
+            </div>
+            <div className={cn("detailed-region").elem("index").toClassName()}>
+              <span className={cn("detailed-region").elem("index_value").toClassName()}>{region.region_index}</span>
+            </div>
             <RegionLabels region={region} />
-          </Elem>
+          </div>
           {withIds && <span>{region.cleanId}</span>}
-        </Elem>
+        </div>
         {MainDetails && (
-          <Elem name="content">
+          <div className={cn("detailed-region").elem("content").toClassName()}>
             <MainDetails region={region} />
-          </Elem>
+          </div>
         )}
         {region.isDrawing && (
-          <Elem name="warning">
+          <div className={cn("detailed-region").elem("warning").toClassName()}>
             <IconWarning />
-            <Elem name="warning-text">Incomplete {region.type?.replace("region", "") ?? "region"}</Elem>
-          </Elem>
+            <div className={cn("detailed-region").elem("warning-text").toClassName()}>
+              Incomplete {region.type?.replace("region", "") ?? "region"}
+            </div>
+          </div>
         )}
         {withActions && (
           <RegionAction
@@ -84,16 +84,16 @@ export const RegionItem: FC<RegionItemProps> = observer(
           />
         )}
         {MetaDetails && (
-          <Elem name="content">
+          <div className={cn("detailed-region").elem("content").toClassName()}>
             <MetaDetails
               region={region}
               editMode={editMode}
               enterEditMode={() => setEditMode(true)}
               cancelEditMode={() => setEditMode(false)}
             />
-          </Elem>
+          </div>
         )}
-      </Block>
+      </div>
     );
   },
 );
@@ -138,11 +138,11 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
   );
 
   return (
-    <Block name="region-actions">
-      <Elem name="group" mod={{ align: "left" }}>
+    <div className={cn("region-actions").toClassName()}>
+      <div className={cn("region-actions").elem("group").mod({ align: "left" }).toClassName()}>
         {!region.isReadOnly() && entityButtons}
-      </Elem>
-      <Elem name="group" mod={{ align: "right" }}>
+      </div>
+      <div className={cn("region-actions").elem("group").mod({ align: "right" }).toClassName()}>
         <LockButton
           item={region}
           annotation={region?.annotation}
@@ -176,8 +176,8 @@ const RegionAction: FC<any> = observer(({ region, annotation, editMode, onEditMo
         >
           <IconTrash />
         </RegionActionButton>
-      </Elem>
-    </Block>
+      </div>
+    </div>
   );
 });
 

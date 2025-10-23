@@ -5,7 +5,7 @@
 import { inject, observer } from "mobx-react";
 import { IconBan } from "@humansignal/icons";
 import { Button, Tooltip } from "@humansignal/ui";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 
 import "./Controls.scss";
@@ -121,9 +121,9 @@ export const Controls = controlsInjector(
       );
     } else if (annotation.skipped) {
       buttons.push(
-        <Elem name="skipped-info" key="skipped">
+        <div className={cn("controls").elem("skipped-info").toClassName()} key="skipped">
           <IconBan color="#d00" /> Was skipped
-        </Elem>,
+        </div>,
       );
       buttons.push(
         <ButtonTooltip key="cancel-skip" title="Cancel skip: []">
@@ -170,7 +170,7 @@ export const Controls = controlsInjector(
 
         buttons.push(
           <ButtonTooltip key="submit" title={title}>
-            <Elem name="tooltip-wrapper">
+            <div className={cn("controls").elem("tooltip-wrapper").toClassName()}>
               <Button
                 aria-label="Submit current annotation"
                 disabled={disabled || submitDisabled}
@@ -182,7 +182,7 @@ export const Controls = controlsInjector(
               >
                 Submit
               </Button>
-            </Elem>
+            </div>
           </ButtonTooltip>,
         );
       }
@@ -210,9 +210,9 @@ export const Controls = controlsInjector(
     }
 
     return (
-      <Block name="controls">
+      <div className={cn("controls").toClassName()}>
         <div className="grid grid-flow-col auto-cols-fr gap-tight items-center">{buttons}</div>
-      </Block>
+      </div>
     );
   }),
 );

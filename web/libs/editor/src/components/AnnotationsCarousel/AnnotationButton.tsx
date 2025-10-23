@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { inject, observer } from "mobx-react";
 import { useCopyText } from "@humansignal/core";
 import { isDefined, userDisplayName } from "@humansignal/core/lib/utils/helpers";
-import { Block, cn, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import {
   IconAnnotationGroundTruth,
   IconAnnotationSkipped2,
@@ -212,20 +212,20 @@ export const AnnotationButton = observer(
     );
 
     return (
-      <Block name="annotation-button" mod={{ selected: entity.selected }}>
-        <Elem name="mainSection" onClick={clickHandler}>
-          <Elem name="picSection">
-            <Elem
-              name="userpic"
-              tag={Userpic}
+      <div className={cn("annotation-button").mod({ selected: entity.selected }).toClassName()}>
+        <div className={cn("annotation-button").elem("mainSection").toClassName()} onClick={clickHandler}>
+          <div className={cn("annotation-button").elem("picSection").toClassName()}>
+            <Userpic
+              className={cn("annotation-button").elem("userpic").mod({ prediction: isPrediction }).toClassName()}
               showUsername
               username={isPrediction ? entity.createdBy : null}
               user={hiddenUser ?? entity.user ?? { email: entity.createdBy }}
-              mod={{ prediction: isPrediction }}
               size={24}
+              block="lsf-annotation-button"
             >
               {isPrediction && <IconSparks style={{ width: 18, height: 18 }} />}
-            </Elem>
+            </Userpic>
+            {/* TODO: Remove block. Selenium is using this anchor that was mistakenly propagated into this element. */}
             {/* to do: return these icons when we have a better way to grab the history action type */}
             {/* {historyActionType === 'accepted' && <Elem name='status' mod={{ approved: true }}><IconCheckBold /></Elem>}
           {historyActionType && (
@@ -238,62 +238,62 @@ export const AnnotationButton = observer(
               <IconCheckBold />
             </Elem>
           )} */}
-          </Elem>
-          <Elem name="main">
-            <Elem name="user">
-              <Elem tag="span" name="name">
+          </div>
+          <div className={cn("annotation-button").elem("main").toClassName()}>
+            <div className={cn("annotation-button").elem("user").toClassName()}>
+              <span className={cn("annotation-button").elem("name").toClassName()}>
                 {hiddenUser ? hiddenUser.email : username}
-              </Elem>
+              </span>
               {!infoIsHidden && (
-                <Elem tag="span" name="entity-id">
+                <span className={cn("annotation-button").elem("entity-id").toClassName()}>
                   #{entity.pk ?? entity.id}
-                </Elem>
+                </span>
               )}
-            </Elem>
+            </div>
             {!infoIsHidden && (
-              <Elem name="info">
-                <Elem name="date" component={TimeAgo} date={entity.createdDate} />
+              <div className={cn("annotation-button").elem("info").toClassName()}>
+                <TimeAgo className={cn("annotation-button").elem("date").toClassName()} date={entity.createdDate} />
                 {isPrediction && isDefined(entity.score) && (
                   <span title={`Prediction score = ${entity.score}`}>
                     {" · "} {(entity.score * 100).toFixed(2)}%
                   </span>
                 )}
-              </Elem>
+              </div>
             )}
-          </Elem>
+          </div>
           {!isPrediction && (
-            <Elem name="icons">
+            <div className={cn("annotation-button").elem("icons").toClassName()}>
               {entity.draftId > 0 && (
                 <Tooltip title="Draft">
-                  <Elem name="icon" mod={{ draft: true }}>
+                  <div className={cn("annotation-button").elem("icon").mod({ draft: true }).toClassName()}>
                     <IconDraftCreated2 color="#617ADA" />
-                  </Elem>
+                  </div>
                 </Tooltip>
               )}
               {entity.skipped && (
                 <Tooltip title="Skipped">
-                  <Elem name="icon" mod={{ skipped: true }}>
+                  <div className={cn("annotation-button").elem("icon").mod({ skipped: true }).toClassName()}>
                     <IconAnnotationSkipped2 color="#DD0000" />
-                  </Elem>
+                  </div>
                 </Tooltip>
               )}
               {isGroundTruth && (
                 <Tooltip title="Ground-truth">
-                  <Elem name="icon" mod={{ groundTruth: true }}>
+                  <div className={cn("annotation-button").elem("icon").mod({ groundTruth: true }).toClassName()}>
                     <IconAnnotationGroundTruth />
-                  </Elem>
+                  </div>
                 </Tooltip>
               )}
               {CommentIcon && (
                 <Tooltip title={renderCommentTooltip(entity)}>
-                  <Elem name="icon" mod={{ comments: true }}>
+                  <div className={cn("annotation-button").elem("icon").mod({ comments: true }).toClassName()}>
                     <CommentIcon />
-                  </Elem>
+                  </div>
                 </Tooltip>
               )}
-            </Elem>
+            </div>
           )}
-        </Elem>
+        </div>
         <ContextMenuTrigger
           className={cn("annotation-button").elem("trigger").toClassName()}
           content={
@@ -304,7 +304,7 @@ export const AnnotationButton = observer(
             />
           }
         />
-      </Block>
+      </div>
     );
   },
 );

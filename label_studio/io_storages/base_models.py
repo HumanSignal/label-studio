@@ -551,8 +551,8 @@ class ImportStorage(Storage):
         for keys_batch in _batched(
             self.iter_keys(), settings.STORAGE_EXISTED_COUNT_BATCH_SIZE if existed_count_flag_set else 1
         ):
-            keys_set = set(keys_batch)
-            for key in keys_set:
+            deduplicated_keys = list(dict.fromkeys(keys_batch))  # preserve order
+            for key in deduplicated_keys:
                 logger.debug(f'Scanning key {key}')
 
             # w/o Dataflow
@@ -560,14 +560,14 @@ class ImportStorage(Storage):
             # -> GF.pull(topic, key) + env -> add_task()
 
             # skip if key has already been synced
-            existing_keys = link_class.exists(keys_set, self)
+            existing_keys = link_class.exists(deduplicated_keys, self)
             tasks_existed += link_class.objects.filter(key__in=existing_keys, storage=self.id).count()
             self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
 
-            for key in existing_keys:
-                logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
-
-            for key in keys_set - existing_keys:
+            for key in deduplicated_keys:
+                if key in existing_keys:
+                    logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
+                    continue
 
                 logger.debug(f'{self}: found new key {key}')
 
