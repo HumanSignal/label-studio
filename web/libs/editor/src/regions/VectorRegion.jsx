@@ -508,56 +508,23 @@ const Model = types
       applyTransform(transform, transformerCenter) {
         if (!self.vectorRef) return;
 
-        console.log("🔄 VectorRegion.applyTransform called:", { transform, transformerCenter });
-
-        const dx = transform.dx || 0;
-        const dy = transform.dy || 0;
-        const scaleX = transform.scaleX || 1;
-        const scaleY = transform.scaleY || 1;
-        const rotation = transform.rotation || 0;
-
-        console.log("📊 Applying transformation:", { dx, dy, scaleX, scaleY, rotation });
-
-        // The ImageTransformer applies transforms to the _transformable group which is positioned at (0,0)
-        // in the KonvaVector coordinate system. The transform values (dx, dy, scaleX, scaleY, rotation)
-        // are already in the correct coordinate system for the vector points.
-        // This matches how the single-region onTransformEnd handler works.
-
-        // Convert transformer center from stage coordinates to image coordinates
-        let centerX, centerY;
-        if (transformerCenter) {
-          const internalX = self.parent.canvasToInternalX(transformerCenter.x);
-          const internalY = self.parent.canvasToInternalY(transformerCenter.y);
-          centerX = self.parent.internalToImageX(internalX);
-          centerY = self.parent.internalToImageY(internalY);
-        }
-
-        console.log("📊 Using transform values directly:", {
-          dx,
-          dy,
-          scaleX,
-          scaleY,
-          rotation,
-          centerX,
-          centerY,
-          transformerCenter
+        console.log("🔄 VectorRegion.applyTransform called:", {
+          regionId: self.id,
+          transform,
+          transformerCenter,
+          stageZoom: self.parent.stageZoom,
+          bbox: self.bbox,
+          bboxCoords: self.bboxCoords,
+          vertices: self.vertices.map(v => ({ id: v.id, x: v.x, y: v.y })),
         });
 
-        // Use the KonvaVector's transformPoints method with the transform values directly
-        // No coordinate conversion needed since ImageTransformer already works in the correct coordinate system
-        if (self.vectorRef && typeof self.vectorRef.transformPoints === 'function') {
-          self.vectorRef.transformPoints({
-            dx,
-            dy,
-            scaleX,
-            scaleY,
-            rotation,
-            centerX,
-            centerY,
-          });
-          console.log("📊 transformPoints called successfully");
+        // Delegate to KonvaVector's commitMultiRegionTransform method
+        // This method reads the proxy node coordinates and applies them directly
+        if (typeof self.vectorRef.commitMultiRegionTransform === 'function') {
+          self.vectorRef.commitMultiRegionTransform();
+          console.log("📊 commitMultiRegionTransform called successfully");
         } else {
-          console.error("📊 transformPoints method not available");
+          console.error("📊 commitMultiRegionTransform method not available");
         }
       },
     };
@@ -614,6 +581,19 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             const scaleY = t.getAttr("scaleY", 1);
             const rotation = t.getAttr("rotation", 0);
 
+            console.log("🎯 Single-region onTransformEnd:", {
+              regionId: item.id,
+              dx,
+              dy,
+              scaleX,
+              scaleY,
+              rotation,
+              stageZoom: item.parent.stageZoom,
+              bbox: item.bbox,
+              bboxCoords: item.bboxCoords,
+              vertices: item.vertices.map(v => ({ id: v.id, x: v.x, y: v.y })),
+            });
+
             // Reset transform attributes
             t.setAttr("x", 0);
             t.setAttr("y", 0);
@@ -623,21 +603,70 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
             // Apply transformation to all points using KonvaVector methods
             if (item.vectorRef) {
-              // Calculate center point for rotation and scaling
-              const bbox = item.bboxCoords;
-              const centerX = (bbox.left + bbox.right) / 2;
-              const centerY = (bbox.top + bbox.bottom) / 2;
-
-              // Apply transformation
-              item.vectorRef.transformPoints({
+              console.log("🎯 Calling transformPoints with:", {
                 dx,
                 dy,
-                rotation,
                 scaleX,
                 scaleY,
-                centerX,
-                centerY,
+                rotation,
               });
+
+              // Apply the transformation exactly as Konva did:
+              // 1. Scale around origin (0,0)
+              // 2. Rotate around origin (0,0)  
+              // 3. Translate by (dx, dy)
+              // Don't pass centerX/centerY - transform around origin
+              const radians = rotation * (Math.PI / 180);
+              const cos = Math.cos(radians);
+              const sin = Math.sin(radians);
+
+              const transformedVertices = item.vertices.map((point) => {
+                // Step 1: Scale
+                let x = point.x * scaleX;
+                let y = point.y * scaleY;
+
+                // Step 2: Rotate
+                const rx = x * cos - y * sin;
+                const ry = x * sin + y * cos;
+
+                // Step 3: Translate
+                const result = {
+                  ...point,
+                  x: rx + dx,
+                  y: ry + dy,
+                };
+
+                // Transform control points if bezier
+                if (point.isBezier) {
+                  if (point.controlPoint1) {
+                    let cp1x = point.controlPoint1.x * scaleX;
+                    let cp1y = point.controlPoint1.y * scaleY;
+                    const cp1rx = cp1x * cos - cp1y * sin;
+                    const cp1ry = cp1x * sin + cp1y * cos;
+                    result.controlPoint1 = {
+                      x: cp1rx + dx,
+                      y: cp1ry + dy,
+                    };
+                  }
+                  if (point.controlPoint2) {
+                    let cp2x = point.controlPoint2.x * scaleX;
+                    let cp2y = point.controlPoint2.y * scaleY;
+                    const cp2rx = cp2x * cos - cp2y * sin;
+                    const cp2ry = cp2x * sin + cp2y * cos;
+                    result.controlPoint2 = {
+                      x: cp2rx + dx,
+                      y: cp2ry + dy,
+                    };
+                  }
+                }
+
+                return result;
+              });
+
+              // Update the points
+              item.updatePointsFromKonvaVector(transformedVertices);
+
+              console.log("🎯 After transform, vertices:", transformedVertices.map(v => ({ id: v.id, x: v.x, y: v.y })));
             }
           }}
           onPointsChange={(points) => {

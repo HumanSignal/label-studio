@@ -359,6 +359,33 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Ref to track the _transformable group for applying transformations
   const transformableGroupRef = useRef<Konva.Group>(null);
 
+  // Track initial transform state for delta calculation
+  const initialTransformRef = useRef<{
+    x: number;
+    y: number;
+    scaleX: number;
+    scaleY: number;
+    rotation: number;
+  } | null>(null);
+
+  // Capture initial transform state when group is created
+  useEffect(() => {
+    if (isMultiRegionSelected && transformableGroupRef.current && !initialTransformRef.current) {
+      const group = transformableGroupRef.current;
+      initialTransformRef.current = {
+        x: group.x(),
+        y: group.y(),
+        scaleX: group.scaleX(),
+        scaleY: group.scaleY(),
+        rotation: group.rotation(),
+      };
+      console.log("📊 Captured initial transform state:", initialTransformRef.current);
+    } else if (!isMultiRegionSelected) {
+      // Reset when not in multi-region mode
+      initialTransformRef.current = null;
+    }
+  }, [isMultiRegionSelected]);
+
 
   // Initialize PointCreationManager instance
   const pointCreationManager = useMemo(() => new PointCreationManager(), []);
@@ -1419,6 +1446,116 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       return false;
     },
+    // Multi-region transformation method - applies group transform to points
+    commitMultiRegionTransform: () => {
+      if (!isMultiRegionSelected || !transformableGroupRef.current || !initialTransformRef.current) {
+        return;
+      }
+
+      console.log("🔄 KonvaVector.commitMultiRegionTransform called");
+
+      // Get the _transformable group
+      const transformableGroup = transformableGroupRef.current;
+
+      // Get the group's current transform values
+      const currentX = transformableGroup.x();
+      const currentY = transformableGroup.y();
+      const currentScaleX = transformableGroup.scaleX();
+      const currentScaleY = transformableGroup.scaleY();
+      const currentRotation = transformableGroup.rotation();
+
+      // Calculate deltas from initial state
+      const initial = initialTransformRef.current;
+      const dx = currentX - initial.x;
+      const dy = currentY - initial.y;
+      const scaleX = currentScaleX / initial.scaleX;
+      const scaleY = currentScaleY / initial.scaleY;
+      const rotation = currentRotation - initial.rotation;
+
+      console.log("📊 Transform deltas:", {
+        dx,
+        dy,
+        scaleX,
+        scaleY,
+        rotation,
+        initial,
+        current: { x: currentX, y: currentY, scaleX: currentScaleX, scaleY: currentScaleY, rotation: currentRotation }
+      });
+
+      // Apply the transformation exactly as the single-region onTransformEnd handler does:
+      // 1. Scale around origin (0,0)
+      // 2. Rotate around origin (0,0)  
+      // 3. Translate by (dx, dy)
+      const radians = rotation * (Math.PI / 180);
+      const cos = Math.cos(radians);
+      const sin = Math.sin(radians);
+
+      const transformedVertices = initialPoints.map((point) => {
+        // Step 1: Scale
+        let x = point.x * scaleX;
+        let y = point.y * scaleY;
+
+        // Step 2: Rotate
+        const rx = x * cos - y * sin;
+        const ry = x * sin + y * cos;
+
+        // Step 3: Translate
+        const result = {
+          ...point,
+          x: rx + dx,
+          y: ry + dy,
+        };
+
+        // Transform control points if bezier
+        if (point.isBezier) {
+          if (point.controlPoint1) {
+            let cp1x = point.controlPoint1.x * scaleX;
+            let cp1y = point.controlPoint1.y * scaleY;
+            const cp1rx = cp1x * cos - cp1y * sin;
+            const cp1ry = cp1x * sin + cp1y * cos;
+            result.controlPoint1 = {
+              x: cp1rx + dx,
+              y: cp1ry + dy,
+            };
+          }
+          if (point.controlPoint2) {
+            let cp2x = point.controlPoint2.x * scaleX;
+            let cp2y = point.controlPoint2.y * scaleY;
+            const cp2rx = cp2x * cos - cp2y * sin;
+            const cp2ry = cp2x * sin + cp2y * cos;
+            result.controlPoint2 = {
+              x: cp2rx + dx,
+              y: cp2ry + dy,
+            };
+          }
+        }
+
+        return result;
+      });
+
+      // Update the points
+      onPointsChange?.(transformedVertices);
+
+      console.log("📊 Updated points:", transformedVertices.map(p => ({ id: p.id, x: p.x, y: p.y })));
+
+      // Reset the _transformable group transform to identity
+      transformableGroup.x(0);
+      transformableGroup.y(0);
+      transformableGroup.scaleX(1);
+      transformableGroup.scaleY(1);
+      transformableGroup.rotation(0);
+
+      // Update the initial transform state to reflect the reset
+      initialTransformRef.current = {
+        x: 0,
+        y: 0,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
+      };
+
+      console.log("📊 Reset _transformable group transform to identity");
+    },
   }));
 
   // Handle Shift key for disconnected mode
@@ -1782,6 +1919,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             //
           }}
         />
+
+          {/* Proxy nodes for ImageTransformer - INSIDE the _transformable group for multi-region mode */}
+          {drawingDisabled && (
+            <ProxyNodes selectedPoints={effectiveSelectedPoints} initialPoints={getAllPoints()} proxyRefs={proxyRefs} />
+          )}
 
         {/* Ghost point */}
         <GhostPoint
