@@ -677,7 +677,7 @@ class ProjectActionsAPI(APIView):
         # Build prepare_params but drop ordering for actions to avoid expensive sorts/annotations
         prepare_params = get_prepare_params(request, project)
         prepare_params.ordering = []
-        queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
+        queryset = Task.prepared.only_filtered(prepare_params=prepare_params).order_by()
 
         # wrong action id
         action_id = request.GET.get('id', None)

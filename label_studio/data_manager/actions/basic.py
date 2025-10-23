@@ -147,13 +147,13 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     :param queryset: filtered tasks db queryset
     """
     # Operate on IDs only and drop any ordering to avoid expensive wide DISTINCT + sorts
-    task_ids = queryset.order_by(None).values_list('id', flat=True).distinct()
+    task_ids = queryset.order_by().values_list('id', flat=True).distinct()
 
     # Use subquery directly to avoid materializing large ID lists
     predictions = Prediction.objects.filter(task_id__in=task_ids)
 
     # Compute affected task ids before delete to recalc counters selectively
-    affected_task_ids = predictions.order_by(None).values_list('task_id', flat=True).distinct()
+    affected_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
 
     count = predictions.count()
     predictions.delete()
