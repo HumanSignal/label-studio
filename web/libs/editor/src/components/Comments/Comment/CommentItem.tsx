@@ -167,7 +167,13 @@ export const CommentItem: FC<CommentItemProps> = observer(
       >
         <Space spread size="medium" truncated>
           <Space size="small" truncated>
-            <Elem tag={Userpic} user={hiddenUser ?? createdBy} name="userpic" showUsername username={createdBy} />
+            <Elem
+              tag={Userpic}
+              user={hiddenUser ?? createdBy}
+              name="userpic"
+              showUsernameTooltip
+              username={createdBy}
+            />
             <Elem name="name" tag="span">
               {userDisplayName(hiddenUser ?? createdBy)}
             </Elem>

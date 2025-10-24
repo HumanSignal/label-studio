@@ -156,7 +156,7 @@ export function handleDrawingModeClick(e: KonvaEventObject<MouseEvent>, props: E
   const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
   // Check if we're within canvas bounds (only if bounds checking is enabled)
-  if (props.constrainToBounds && !isPointInCanvasBounds(imagePos, props.width, props.height)) {
+  if (!isPointInCanvasBounds(imagePos, props.width, props.height)) {
     return false;
   }
 

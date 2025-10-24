@@ -1,4 +1,4 @@
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Fragment } from "react";
@@ -40,7 +40,7 @@ export const Tool = ({
     const combos = sc.split(",").map((s) => s.trim());
 
     return (
-      <Elem name="shortcut">
+      <div className={cn("tool").elem("shortcut").toClassName()}>
         {combos.map((combo, index) => {
           const keys = combo.split("+");
 
@@ -48,15 +48,15 @@ export const Tool = ({
             <Fragment key={`${keys.join("-")}-${index}`}>
               {keys.map((key) => {
                 return (
-                  <Elem name="key" tag="kbd" key={key}>
+                  <kbd className={cn("tool").elem("key").toClassName()} key={key}>
                     {keysDictionary[key] ?? key}
-                  </Elem>
+                  </kbd>
                 );
               })}
             </Fragment>
           );
         })}
-      </Elem>
+      </div>
     );
   }, [shortcut]);
 
@@ -107,7 +107,7 @@ export const Tool = ({
   }, [extraShortcuts, active]);
 
   const extraContent = useMemo(() => {
-    return smart && extra ? <Elem name="extra">{extra}</Elem> : null;
+    return smart && extra ? <div className={cn("tool").elem("extra").toClassName()}>{extra}</div> : null;
   }, [smart, extra]);
 
   const showControls = dynamic === false && controls?.length && (active || (controlsOnHover && hovered));
@@ -115,17 +115,18 @@ export const Tool = ({
   const isDisabled = disabled || isAnnotationDrawing;
 
   return (
-    <Block
-      name="tool"
-      tag="button"
+    <button
+      type="button"
       aria-label={ariaLabel}
-      mod={{
-        active,
-        disabled: isDisabled,
-        alignment,
-        expanded: expanded && !dynamic,
-        smart: dynamic || smart,
-      }}
+      className={cn("tool")
+        .mod({
+          active,
+          disabled: isDisabled,
+          alignment,
+          expanded: expanded && !dynamic,
+          smart: dynamic || smart,
+        })
+        .toClassName()}
       onClick={(e) => {
         if (!disabled && !isAnnotationDrawing) {
           e.preventDefault();
@@ -142,34 +143,39 @@ export const Tool = ({
         setHovered(false);
       }}
     >
-      <Elem name="icon">{icon}</Elem>
+      <div className={cn("tool").elem("icon").toClassName()}>{icon}</div>
       {dynamic === false &&
         controlsOnHover === false &&
         (expanded ? (
           <>
-            <Elem name="label">
+            <div className={cn("tool").elem("label").toClassName()}>
               {extraContent}
               {label}
               {shortcutView}
-            </Elem>
+            </div>
           </>
         ) : (
           (isDefined(label) || isDefined(shortcutView)) &&
           !showControls && (
-            <Elem name="tooltip" mod={{ controlled: !!(smart && extra) }}>
-              <Elem name="tooltip-body">
+            <div
+              className={cn("tool")
+                .elem("tooltip")
+                .mod({ controlled: !!(smart && extra) })
+                .toClassName()}
+            >
+              <div className={cn("tool").elem("tooltip-body").toClassName()}>
                 {extraContent}
                 {label}
                 {shortcutView}
-              </Elem>
-            </Elem>
+              </div>
+            </div>
           )
         ))}
       {showControls && (
-        <Elem name="controls" onClickCapture={(e) => e.stopPropagation()}>
-          <Elem name="controls-body">{controls}</Elem>
-        </Elem>
+        <div className={cn("tool").elem("controls").toClassName()} onClickCapture={(e) => e.stopPropagation()}>
+          <div className={cn("tool").elem("controls-body").toClassName()}>{controls}</div>
+        </div>
       )}
-    </Block>
+    </button>
   );
 };

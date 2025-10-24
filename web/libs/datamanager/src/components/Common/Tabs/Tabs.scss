@@ -37,9 +37,14 @@
     overflow: hidden;
     cursor: pointer;
     position: relative;
-    box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border-subtle) inset, 0 -3px 0 var(--color-neutral-border) inset;
+    box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border-subtle) inset, 0 -1px 0 var(--color-neutral-border) inset;
     border-top-left-radius: var(--corner-radius-small);
     border-top-right-radius: var(--corner-radius-small);
+    transition: background-color 150ms ease-out;
+
+    &:hover {
+      background-color: var(--color-neutral-background);
+    }
 
     &_active {
       color: var(--color-neutral-content);
@@ -48,7 +53,7 @@
       box-shadow: -1px 0 0 var(--color-neutral-border) inset, 1px 0 0 var(--color-neutral-border) inset, 0 1px 0 var(--color-neutral-border) inset;
 
       & .tabs-dm__item-right-button {
-        display: flex;
+        opacity: 1;
       }
     }
 
@@ -61,14 +66,14 @@
     }
 
     &_hover .tabs-dm__item-right-button {
-      display: flex;
+      opacity: 1;
     }
   }
 
   &__item-left {
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 36px;
+    height: 35px;
     padding-left: 16px;
     padding-right: 4px;
     display: flex;
@@ -94,11 +99,13 @@
   &__item-right-button {
     align-items: center;
     justify-content: center;
-    display: none;
+    display: flex;
     height: 36px;
     width: 36px;
     margin: none;
     padding: none;
+    opacity: 0;
+    transition: opacity 100ms ease-out;
   }
 
   &__add {
