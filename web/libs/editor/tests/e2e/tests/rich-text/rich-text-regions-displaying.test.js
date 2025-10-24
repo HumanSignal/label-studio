@@ -209,7 +209,7 @@ Scenario("Displaying selected and highlighted regions", async ({ I, LabelStudio,
     }
   }
 
-  I.say("Exit relation mode and unselect region");
+  I.say("Exit relation mode");
   I.pressKey("Escape"); // Exit linking mode
   I.say("Region should be still selected");
   I.seeElement(".htx-highlight.__active");
