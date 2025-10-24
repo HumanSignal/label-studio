@@ -227,7 +227,15 @@ export const ActionsButton = injector(
     return (
       <Dropdown.Trigger
         content={
-          <Menu size="compact">{isLoading ? <Menu.Item disabled>Loading actions...</Menu.Item> : actionButtons}</Menu>
+          <Menu size="compact">
+            {isLoading ? (
+              <Menu.Item disabled data-testid="loading-actions">
+                Loading actions...
+              </Menu.Item>
+            ) : (
+              actionButtons
+            )}
+          </Menu>
         }
         openUpwardForShortViewport={false}
         disabled={!hasSelected}
