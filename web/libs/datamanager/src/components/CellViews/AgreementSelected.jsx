@@ -27,11 +27,11 @@ const formatNumber = (num) => {
 export const AgreementSelected = (cell) => {
   const { value, original: task } = cell;
 
-  const threshold = window.APP_SETTINGS?.data_manager?.agreement_selected_threshold;
+  const threshold = window.APP_SETTINGS?.agreement_selected_threshold;
   const overThreshold = Number(task?.total_annotations) > Number(threshold);
 
   const content = overThreshold ? (
-    <Tooltip title={`Agreement (selected) is not computed for tasks with over ${threshold} annotations`}>
+    <Tooltip title={`Agreement (selected) is not computed for tasks with more than ${threshold} annotations`}>
       <span className="inline-flex items-center text-neutral-content-subtler">
         <IconInfoOutline />
       </span>
