@@ -181,7 +181,7 @@ class ViewAPI(viewsets.ModelViewSet):
             'x-fern-audiences': ['public'],
         },
     )
-    @action(detail=False, methods=['delete'])
+    @action(detail=False, methods=['delete'], permission_required=all_permissions.views_reset)
     def reset(self, request):
         # Note: OpenAPI 3.0 does not support request body for DELETE requests
         # see https://github.com/tfranzel/drf-spectacular/issues/431#issuecomment-862738643
