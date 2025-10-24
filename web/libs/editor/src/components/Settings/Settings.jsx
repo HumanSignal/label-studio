@@ -100,7 +100,9 @@ const GeneralSettings = observer(({ store }) => {
                       <SettingsTag key={tag}>{tag}</SettingsTag>
                     ))}
                   </div>
-                  <div className={cn("settings__label").elem("description").toClassName()}>{EditorSettings[obj].newUI.description}</div>
+                  <div className={cn("settings__label").elem("description").toClassName()}>
+                    {EditorSettings[obj].newUI.description}
+                  </div>
                 </div>
                 <Toggle
                   key={index}
