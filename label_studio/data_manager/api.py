@@ -674,13 +674,16 @@ class ProjectActionsAPI(APIView):
         project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
 
-        # Build prepare_params but drop ordering for actions to avoid expensive sorts/annotations
+        # Build prepare_params; keep ordering for next_task, drop for others to avoid expensive sorts/annotations
+        action_id = request.GET.get('id', None)
         prepare_params = get_prepare_params(request, project)
-        prepare_params.ordering = []
-        queryset = Task.prepared.only_filtered(prepare_params=prepare_params).order_by()
+        if action_id != 'next_task':
+            prepare_params.ordering = []
+        queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
+        if action_id != 'next_task':
+            queryset = queryset.order_by()
 
         # wrong action id
-        action_id = request.GET.get('id', None)
         if action_id is None:
             response = {'detail': 'No action id "' + str(action_id) + '", use ?id=<action-id>'}
             return Response(response, status=422)
