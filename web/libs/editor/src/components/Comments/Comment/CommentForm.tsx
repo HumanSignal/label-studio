@@ -188,7 +188,9 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
           <LinkState linking={linking} region={region} result={result} onUnlink={currentComment?.unsetLink} />
         </div>
       )}
-      {commentStore.tooltipMessage && <div className={cn("comment-form-new").elem("tooltipMessage").toClassName()}>{commentStore.tooltipMessage}</div>}
+      {commentStore.tooltipMessage && (
+        <div className={cn("comment-form-new").elem("tooltipMessage").toClassName()}>{commentStore.tooltipMessage}</div>
+      )}
     </form>
   );
 });

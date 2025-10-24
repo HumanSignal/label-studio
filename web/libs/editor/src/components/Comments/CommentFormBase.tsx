@@ -45,11 +45,7 @@ export const CommentFormBase: FC<CommentFormProps> = observer(
     );
 
     return (
-      <form
-        ref={formRef as any}
-        className={cn("comment-form").mod({ inline }).toClassName()}
-        onSubmit={submitHandler}
-      >
+      <form ref={formRef as any} className={cn("comment-form").mod({ inline }).toClassName()} onSubmit={submitHandler}>
         <TextArea
           actionRef={actionRef}
           name="comment"

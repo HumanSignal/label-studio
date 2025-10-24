@@ -96,7 +96,11 @@ const LinkedRegion: FC<LinkedRegionProps> = observer(({ region, result, interact
           <div className={cn("link-state-region").elem("label").toClassName()}>
             <RegionLabel item={region} />
           </div>
-          {region?.text && <div className={cn("link-state-region").elem("text").toClassName()}>{region.text.replace(/\\n/g, "\n")}</div>}
+          {region?.text && (
+            <div className={cn("link-state-region").elem("text").toClassName()}>
+              {region.text.replace(/\\n/g, "\n")}
+            </div>
+          )}
         </div>
       )}
       {onUnlink && (
