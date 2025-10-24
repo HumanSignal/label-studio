@@ -470,9 +470,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       const snappedPos = snapToPixel(imagePos, props.pixelSnapping);
 
       // Apply bounds checking to anchor point
-      const finalPos = true
-        ? constrainAnchorPointsToBounds([snappedPos], { width: props.width, height: props.height })[0]
-        : snappedPos;
+      const finalPos = constrainAnchorPointsToBounds([snappedPos], { width: props.width, height: props.height })[0];
 
       // Update the point position
       newPoints[props.draggedPointIndex] = {

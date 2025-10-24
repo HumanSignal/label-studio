@@ -263,7 +263,8 @@ export function calculateTransformerConstraints(
   // Constrain to right edge
   if (transformerInImageCoords.x + transformerInImageCoords.width > imageBounds.right) {
     // Convert back to stage coordinates
-    constrainedX = (imageBounds.right - transformerInImageCoords.width) * (transform.zoom * fitScale) + transform.offsetX;
+    constrainedX =
+      (imageBounds.right - transformerInImageCoords.width) * (transform.zoom * fitScale) + transform.offsetX;
     needsConstraint = true;
   }
 
@@ -277,7 +278,8 @@ export function calculateTransformerConstraints(
   // Constrain to bottom edge
   if (transformerInImageCoords.y + transformerInImageCoords.height > imageBounds.bottom) {
     // Convert back to stage coordinates
-    constrainedY = (imageBounds.bottom - transformerInImageCoords.height) * (transform.zoom * fitScale) + transform.offsetY;
+    constrainedY =
+      (imageBounds.bottom - transformerInImageCoords.height) * (transform.zoom * fitScale) + transform.offsetY;
     needsConstraint = true;
   }
 

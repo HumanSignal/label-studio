@@ -340,10 +340,12 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
                 newAbsPos.y = bounds.y * (transform.zoom * fitScale) + transform.offsetY - offsetY;
               }
               if (imageBox.x + imageBox.width > bounds.x + bounds.width) {
-                newAbsPos.x = (bounds.x + bounds.width) * (transform.zoom * fitScale) + transform.offsetX - box.width - offsetX;
+                newAbsPos.x =
+                  (bounds.x + bounds.width) * (transform.zoom * fitScale) + transform.offsetX - box.width - offsetX;
               }
               if (imageBox.y + imageBox.height > bounds.y + bounds.height) {
-                newAbsPos.y = (bounds.y + bounds.height) * (transform.zoom * fitScale) + transform.offsetY - box.height - offsetY;
+                newAbsPos.y =
+                  (bounds.y + bounds.height) * (transform.zoom * fitScale) + transform.offsetY - box.height - offsetY;
               }
 
               // Apply the constrained position to the individual shape
