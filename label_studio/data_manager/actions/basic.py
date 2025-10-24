@@ -154,12 +154,11 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     predictions = Prediction.objects.filter(task_id__in=task_ids)
 
     # Compute affected task ids before delete to recalc counters selectively
-    affected_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
+    real_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
 
     count = predictions.count()
     predictions.delete()
-
-    start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=affected_task_ids))
+    start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=real_task_ids))
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
