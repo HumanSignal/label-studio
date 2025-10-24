@@ -67,6 +67,11 @@ export class MediaLoader extends Destructable {
       return null;
     }
 
+    // Special handling for "none" decoder - skip all decoding
+    if (this.wf.params.decoderType === "none") {
+      return await this.loadWithoutDecoding(options);
+    }
+
     // Create this as soon as possible so that we can
     // update the loading progress from the waveform
     this.decoderPromise = new Promise((resolve) => {
@@ -129,6 +134,72 @@ export class MediaLoader extends Destructable {
     }
 
     return null;
+  }
+
+  /**
+   * Load audio without decoding for fast loading of large files.
+   * Only loads metadata to get duration and basic info.
+   */
+  private async loadWithoutDecoding(options: WaveformAudioOptions): Promise<WaveformAudio | null> {
+    try {
+      // Force HTML5 player when decoder is "none"
+      const playerType = "html5";
+
+      if (this.wf.params.playerType !== playerType) {
+        console.warn(`Decoder "none" requires HTML5 player, switching from "${this.wf.params.playerType}"`);
+      }
+
+      // Create a simple HTML5 audio element to get metadata
+      const audioElement = new Audio();
+      audioElement.preload = "metadata";
+
+      // Wait for metadata to load
+      const metadataPromise = new Promise<void>((resolve, reject) => {
+        audioElement.addEventListener("loadedmetadata", () => resolve(), {
+          once: true,
+        });
+        audioElement.addEventListener("error", (e) => reject(e), {
+          once: true,
+        });
+      });
+
+      audioElement.src = this.options.src;
+      await metadataPromise;
+
+      // Create WaveformAudio instance with minimal setup
+      this.createAnalyzer({
+        ...options,
+        src: this.options.src,
+        decoderType: "none",
+        playerType,
+      });
+
+      if (!this.audio) {
+        throw new Error("MediaLoader: Failed to create audio instance");
+      }
+
+      // Set duration from HTML5 audio element
+      this.duration = audioElement.duration;
+      this.audio.setDurationWithoutDecoding(audioElement.duration);
+
+      // Mark as loaded
+      this.loaded = true;
+
+      // Resolve decoder promise immediately since there's no decoding
+      this.decoderPromise = Promise.resolve();
+      this.decoderResolve?.();
+
+      // Complete loading progress
+      this.wf.setLoadingProgress(undefined, undefined, true);
+
+      return this.audio;
+    } catch (err) {
+      this.wf.setError(
+        `An error occurred while loading the audio file. Please select another file or try again. ${err.message}`,
+      );
+      console.error("An audio loading error occurred", err);
+      return null;
+    }
   }
 
   destroy() {

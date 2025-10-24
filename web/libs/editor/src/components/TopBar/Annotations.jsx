@@ -206,7 +206,7 @@ const Annotation = observer(({ entity, selected, onClick, extra, ...props }) => 
         <Space size="small">
           <Userpic
             className={cn("annotations-list").elem("userpic").mod({ prediction: isPrediction }).toClassName()}
-            showUsername
+            showUsernameTooltip
             username={isPrediction ? entity.createdBy : null}
             user={entity.user ?? { username }}
           >

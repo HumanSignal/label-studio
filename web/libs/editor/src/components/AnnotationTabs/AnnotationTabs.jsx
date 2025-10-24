@@ -26,7 +26,7 @@ export const EntityTab = observer(
           <Space size="small">
             <Userpic
               className={cn("entity-tab").elem("userpic").mod({ prediction }).toClassName()}
-              showUsername
+              showUsernameTooltip
               username={prediction ? entity.createdBy : null}
               user={infoIsHidden ? {} : (entity.user ?? { email: entity.createdBy })}
             >

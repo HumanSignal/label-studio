@@ -270,7 +270,7 @@ const HistoryItemComponent: FC<{
           <Userpic
             className={cn("history-item").elem("userpic").mod({ prediction: isPrediction }).toClassName()}
             user={user}
-            showUsername
+            showUsernameTooltip
             username={isPrediction ? entity.createdBy : null}
           >
             {isPrediction && <IconSparks style={{ width: 16, height: 16 }} />}

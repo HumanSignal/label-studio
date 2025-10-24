@@ -53,6 +53,11 @@ class AllPermissions(BaseModel):
     storages_change: str = 'storages.change'
     storages_sync: str = 'storages.sync'
 
+    views_view: str = 'views.view'
+    views_create: str = 'views.create'
+    views_change: str = 'views.change'
+    views_delete: str = 'views.delete'
+
 
 all_permissions = AllPermissions()
 
