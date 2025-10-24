@@ -583,11 +583,6 @@ export const AppStore = types
       }
 
       if (!isLabelStream || (self.project?.show_annotation_history && task)) {
-        if (self.SDK.type === "dm") {
-          // Fetch actions in background to avoid blocking the main thread
-          setTimeout(() => self.fetchActions(), 0);
-        }
-
         if (self.SDK.settings?.onlyVirtualTabs && self.project?.show_annotation_history && !task) {
           requests.push(
             self.viewsStore.addView(
