@@ -677,10 +677,11 @@ class ProjectActionsAPI(APIView):
         # Build prepare_params; keep ordering for next_task, drop for others to avoid expensive sorts/annotations
         action_id = request.GET.get('id', None)
         prepare_params = get_prepare_params(request, project)
-        if action_id != 'next_task':
+        if action_id == 'next_task':
+            queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
+        else:
             prepare_params.ordering = []
-        queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
-        if action_id != 'next_task':
+            queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
             queryset = queryset.order_by()
 
         # wrong action id
