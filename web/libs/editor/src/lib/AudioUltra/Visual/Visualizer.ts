@@ -305,21 +305,29 @@ export class Visualizer extends Events<VisualizerEvents> {
       regionsLayer.height = this.height;
     }
 
-    // Set renderers array
-    this.renderers = [this.waveformRenderer];
-    if (this.waveformResizeRenderer) {
-      this.renderers.push(this.waveformResizeRenderer);
-    }
-    if (isFF(FF_AUDIO_SPECTROGRAMS) && this.spectrogramRenderer) {
-      this.renderers.push(this.spectrogramRenderer);
-      if (this.spectrogramResizeRenderer) {
-        this.renderers.push(this.spectrogramResizeRenderer);
-      }
-    }
+    // Check if we have decoded data
+    const hasDecodedData = this.wf.params.decoderType !== "none";
 
-    // Dynamically set maxZoom so you can zoom to 1:1 (one sample per pixel)
-    if (this.audio && this.width > 0) {
-      this.maxZoom = Math.max(1, Math.ceil(this.audio.dataLength / this.width));
+    if (hasDecodedData) {
+      // Set renderers array - only add waveform renderers if we have decoded data
+      this.renderers = [this.waveformRenderer];
+      if (this.waveformResizeRenderer) {
+        this.renderers.push(this.waveformResizeRenderer);
+      }
+      if (isFF(FF_AUDIO_SPECTROGRAMS) && this.spectrogramRenderer) {
+        this.renderers.push(this.spectrogramRenderer);
+        if (this.spectrogramResizeRenderer) {
+          this.renderers.push(this.spectrogramResizeRenderer);
+        }
+      }
+
+      // Dynamically set maxZoom so you can zoom to 1:1 (one sample per pixel)
+      if (this.audio && this.width > 0) {
+        this.maxZoom = Math.max(1, Math.ceil(this.audio.dataLength / this.width));
+      }
+    } else {
+      // No decoded data
+      this.renderers = [];
     }
 
     // Compose all layers together so that we cache the composition of the layers.
@@ -663,7 +671,12 @@ export class Visualizer extends Events<VisualizerEvents> {
       isVisible: false,
       height: this.waveformLayerHeight,
     });
-    this.createLayer({ name: "waveform", offscreen: true, zIndex: 100, height: this.waveformLayerHeight });
+    this.createLayer({
+      name: "waveform",
+      offscreen: true,
+      zIndex: 100,
+      height: this.waveformLayerHeight,
+    });
     this.createLayer({
       name: "waveform-resize",
       offscreen: true,
@@ -689,7 +702,13 @@ export class Visualizer extends Events<VisualizerEvents> {
         height: this.spectrogramLayerHeight,
         compositeOperation: "difference", // Use blend mode for better visibility
       });
-      this.createLayer({ name: "progress", offscreen: true, zIndex: 1020, isVisible: true, height: 0 });
+      this.createLayer({
+        name: "progress",
+        offscreen: true,
+        zIndex: 1020,
+        isVisible: true,
+        height: 0,
+      });
       this.createLayer({
         name: "spectrogram-grid",
         offscreen: true,
