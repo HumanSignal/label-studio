@@ -9,6 +9,11 @@ export enum ABILITY {
 
   // webhooks
   can_change_webhooks = "webhooks.change",
+
+  // projects
+  can_delete_projects = "projects.delete",
+  can_reset_project_cache = "projects.reset_cache",
+  can_reset_dm_views = "views.reset",
 }
 
 export type Ability = ABILITY;
