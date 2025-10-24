@@ -3,6 +3,7 @@
 import logging
 from datetime import datetime
 
+from core.feature_flags import flag_set
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
@@ -147,14 +148,19 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     :param project: project instance
     :param queryset: filtered tasks db queryset
     """
-    # Operate on IDs only and drop any ordering to avoid expensive wide DISTINCT + sorts
-    task_ids = queryset.order_by().values_list('id', flat=True).distinct()
+    if flag_set('fflag_root_223_optimize_delete_predictions', organization=project.organization):
+        # Operate on IDs only and drop any ordering to avoid expensive wide DISTINCT + sorts
+        task_ids = queryset.order_by().values_list('id', flat=True).distinct()
 
-    # Use subquery directly to avoid materializing large ID lists
-    predictions = Prediction.objects.filter(task_id__in=task_ids)
+        # Use subquery directly to avoid materializing large ID lists
+        predictions = Prediction.objects.filter(task_id__in=task_ids)
 
-    # Compute affected task ids before delete to recalc counters selectively
-    real_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
+        # Compute affected task ids before delete to recalc counters selectively
+        real_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
+    else:
+        task_ids = queryset.values_list('id', flat=True)
+        predictions = Prediction.objects.filter(task_id__in=task_ids)
+        real_task_ids = set(list(predictions.values_list('task_id', flat=True)))
 
     count = predictions.count()
     predictions.delete()
