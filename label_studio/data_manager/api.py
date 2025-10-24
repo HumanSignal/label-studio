@@ -674,10 +674,10 @@ class ProjectActionsAPI(APIView):
         project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
 
-        # Build prepare_params; keep ordering for next_task, drop for others to avoid expensive sorts/annotations
+        # keep ordering only when needed, otherwise drop to avoid expensive sorts/annotations
         action_id = request.GET.get('id', None)
         prepare_params = get_prepare_params(request, project)
-        if action_id == 'next_task':
+        if action_id in ['next_task', 'remove_duplicates']:
             queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
         else:
             prepare_params.ordering = []
