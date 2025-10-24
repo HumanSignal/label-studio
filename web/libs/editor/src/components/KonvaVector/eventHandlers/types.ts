@@ -85,7 +85,6 @@ export interface EventHandlerProps {
   onMouseMove?: (e: KonvaEventObject<MouseEvent>) => void;
   onMouseUp?: (e?: KonvaEventObject<MouseEvent>) => void;
   onClick?: (e: KonvaEventObject<MouseEvent>) => void;
-  onDblClick?: (e: KonvaEventObject<MouseEvent>) => void;
   notifyTransformationComplete?: () => void;
   canAddMorePoints?: () => boolean;
   maxPoints?: number;
@@ -135,7 +134,6 @@ export interface EventHandlerProps {
 export interface EventHandlers {
   handleLayerMouseDown: (e: KonvaEventObject<MouseEvent>) => void;
   handleLayerClick: (e: KonvaEventObject<MouseEvent>) => void;
-  handleLayerDoubleClick: (e: KonvaEventObject<MouseEvent>) => void;
   handleLayerMouseMove: (e: KonvaEventObject<MouseEvent>) => void;
   handleLayerMouseUp: () => void;
 }

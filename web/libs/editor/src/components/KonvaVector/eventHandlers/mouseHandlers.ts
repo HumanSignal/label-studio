@@ -975,18 +975,6 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
   };
 }
 
-export function createDoubleClickHandler(props: EventHandlerProps) {
-  return (e: KonvaEventObject<MouseEvent>) => {
-    // Prevent the click handler from interfering with double-click
-    e.evt.stopImmediatePropagation();
-
-    // Call the parent's onDblClick handler if provided
-    if (props.onDblClick) {
-      props.onDblClick(e);
-    }
-  };
-}
-
 // Helper function to select a point by index
 function handlePointSelectionFromIndex(
   pointIndex: number,

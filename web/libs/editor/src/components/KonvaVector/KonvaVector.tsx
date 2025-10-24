@@ -1633,7 +1633,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     onMouseMove,
     onMouseUp,
     onClick,
-    onDblClick,
     notifyTransformationComplete,
     canAddMorePoints,
     maxPoints,
@@ -1712,7 +1711,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               eventHandlers.handleLayerClick(e);
             }
       }
-      onDblClick={disabled ? undefined : eventHandlers.handleLayerDoubleClick}
+      onDblClick={disabled ? undefined : onDblClick}
     >
       {/* Invisible rectangle - always render to capture mouse events for cursor position updates */}
       {!disabled && (
