@@ -187,28 +187,13 @@ const Model = types
         self.mouseOverStartPoint = value;
       },
 
-      addPoint() {
-        // KonvaVector managing vector points internally.
-        // This method is just a fallback for compatibility
-      },
-
       setDrawing(drawing) {
         self.isDrawing = drawing;
-      },
-
-      checkSizes() {
-        // This method is called after creation to ensure proper sizing
-        // For vector regions, we don't need to do anything special here
       },
 
       closePoly() {
         if (!self.closable) return;
         self.vectorRef.close();
-      },
-
-      notifyDrawingFinished() {
-        // This method is called when drawing is finished
-        // For vector regions, we don't need to do anything special here
       },
 
       onSelection(type) {
@@ -443,12 +428,6 @@ const Model = types
         self.closed = isClosed;
       },
 
-      // Method to handle selection changes from the Selection tool
-      onSelectionChange() {
-        // This method can be called when the Selection tool changes selection state
-        // We can add any custom logic here if needed
-      },
-
       setKonvaVectorRef(ref) {
         self.vectorRef = ref;
       },
@@ -538,6 +517,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               return;
             }
             // Handle region selection
+            if (item.isReadOnly()) return;
             if (item.parent.getSkipInteractions()) return;
             if (item.isDrawing) return;
             if (e.evt.altKey || e.evt.ctrlKey || e.evt.shiftKey || e.evt.metaKey) return;

@@ -8,7 +8,7 @@ import {
   type ReactNode,
   useEffect,
 } from "react";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -382,7 +382,11 @@ export const PanelTabsBase: FC<BasePropsWithChildren> = ({
   };
 
   return (
-    <Block ref={panelRef} name="tabs-panel" mod={mods} style={{ ...style, ...coordinates }}>
+    <div
+      ref={panelRef as any}
+      className={cn("tabs-panel").mod(mods).toClassName()}
+      style={{ ...style, ...coordinates }}
+    >
       {isBottomPanel && collapsibleBottomPanel && !bottomCollapsed && (
         <div
           className="w-full h-2 absolute -top-2 left-0 cursor-row-resize bg-neutral-emphasis hover:bg-primary-border active:bg-primary-border transition-colors duration-100 select-none z-10"
@@ -393,58 +397,66 @@ export const PanelTabsBase: FC<BasePropsWithChildren> = ({
           tabIndex={-1}
         />
       )}
-      <Elem name="content">
+      <div className={cn("tabs-panel").elem("content").toClassName()}>
         {!locked && collapsedHeader && (
           <>
             {isChildOfGroup && visible && (
-              <Elem
-                name="grouped-top"
-                ref={resizeGroup}
-                mod={{ drag: "grouped-top" === resizing }}
+              <div
+                className={cn("tabs-panel")
+                  .elem("grouped-top")
+                  .mod({ drag: "grouped-top" === resizing })
+                  .toClassName()}
+                ref={resizeGroup as any}
                 data-resize={"grouped-top"}
               />
             )}
-            <Elem
-              ref={headerRef}
+            <div
+              ref={headerRef as any}
               onClick={() => {
                 if (collapsed) handleGroupPanelToggle();
               }}
               id={key}
-              mod={{ collapsed }}
-              name="header"
+              className={cn("tabs-panel").elem("header").mod({ collapsed }).toClassName()}
             >
-              <Elem name="header-left">
-                {!collapsed && <Elem name="icon" style={{ pointerEvents: "none" }} tag={IconOutlinerDrag} />}
-                {!visible && !collapsed && <Elem name="title">{panelViews.map((view) => view.title).join(" ")}</Elem>}
-              </Elem>
-              <Elem name="header-right">
+              <div className={cn("tabs-panel").elem("header-left").toClassName()}>
+                {!collapsed && (
+                  <IconOutlinerDrag
+                    className={cn("tabs-panel").elem("icon").toClassName()}
+                    style={{ pointerEvents: "none" }}
+                  />
+                )}
+                {!visible && !collapsed && (
+                  <div className={cn("tabs-panel").elem("title").toClassName()}>
+                    {panelViews.map((view) => view.title).join(" ")}
+                  </div>
+                )}
+              </div>
+              <div className={cn("tabs-panel").elem("header-right").toClassName()}>
                 {(!detached || collapsed) && (
-                  <Elem
-                    name="toggle"
-                    mod={{ detached, collapsed, alignment }}
+                  <div
+                    className={cn("tabs-panel").elem("toggle").mod({ detached, collapsed, alignment }).toClassName()}
                     onClick={handleGroupPanelToggle}
                     data-tooltip={`${tooltipText} Group`}
                   >
                     {Side.left === alignment ? <IconChevronLeft /> : <IconChevronRight />}
-                  </Elem>
+                  </div>
                 )}
                 {!collapsed && (
-                  <Elem
-                    name="toggle"
-                    mod={{ detached, collapsed, alignment }}
+                  <div
+                    className={cn("tabs-panel").elem("toggle").mod({ detached, collapsed, alignment }).toClassName()}
                     onClick={handlePanelToggle}
                     data-tooltip={tooltipText}
                   >
                     {visible ? <IconCollapseSmall /> : <IconExpandSmall />}
-                  </Elem>
+                  </div>
                 )}
-              </Elem>
-            </Elem>
+              </div>
+            </div>
           </>
         )}
         {visible && !collapsed && (
-          <Elem name="body">
-            {lockPanelContents && <Elem name="shield" />}
+          <div className={cn("tabs-panel").elem("body").toClassName()}>
+            {lockPanelContents && <div className={cn("tabs-panel").elem("shield").toClassName()} />}
             {(() => {
               const onlyChild = React.Children.only(children);
               if (React.isValidElement(onlyChild) && (onlyChild.type as any).displayName === "Tabs") {
@@ -453,26 +465,40 @@ export const PanelTabsBase: FC<BasePropsWithChildren> = ({
                   bottomCollapsed,
                   setBottomCollapsed,
                   settings,
+                  panelHeight,
                 } as Partial<typeof onlyChild.props>);
               }
               return children;
             })()}
-          </Elem>
+          </div>
         )}
-      </Elem>
+      </div>
       {visible && !positioning && !locked && (
-        <Elem name="resizers" ref={resizerRef} mod={{ locked: positioning || locked }}>
+        <div
+          className={cn("tabs-panel")
+            .elem("resizers")
+            .mod({ locked: positioning || locked })
+            .toClassName()}
+          ref={resizerRef as any}
+        >
           {resizers.map((res) => {
             const shouldRender = collapsed
               ? false
               : ((res === "left" || res === "right") && alignment !== res) || detached;
 
             return shouldRender ? (
-              <Elem key={res} name="resizer" mod={{ drag: res === resizing }} data-resize={res} />
+              <div
+                key={res}
+                className={cn("tabs-panel")
+                  .elem("resizer")
+                  .mod({ drag: res === resizing })
+                  .toClassName()}
+                data-resize={res}
+              />
             ) : null;
           })}
-        </Elem>
+        </div>
       )}
-    </Block>
+    </div>
   );
 };

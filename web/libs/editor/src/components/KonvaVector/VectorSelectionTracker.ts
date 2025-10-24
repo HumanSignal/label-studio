@@ -24,7 +24,6 @@ export interface VectorInstance {
   getTransform: () => { zoom: number; offsetX: number; offsetY: number };
   getFitScale: () => number;
   getBounds: () => { width: number; height: number } | undefined;
-  constrainToBounds?: boolean;
 }
 
 export class VectorSelectionTracker {
