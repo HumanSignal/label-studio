@@ -37,6 +37,7 @@ from .openapi_schema import (
                 type=OpenApiTypes.INT,
                 location='query',
                 description='Project ID',
+                required=True,
             ),
         ],
         request=None,
