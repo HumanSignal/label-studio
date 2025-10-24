@@ -19,6 +19,7 @@ import { VectorSelectionTracker, type VectorInstance } from "./VectorSelectionTr
 import { calculateShapeBoundingBox } from "./utils/bezierBoundingBox";
 import { shouldClosePathOnPointClick, isActivePointEligibleForClosing } from "./eventHandlers/pointSelection";
 import { handleShiftClickPointConversion } from "./eventHandlers/drawing";
+import { deletePoint } from "./pointManagement";
 import type { BezierPoint, GhostPoint as GhostPointType, KonvaVectorProps, KonvaVectorRef } from "./types";
 import { ShapeType, ExportFormat, PathType } from "./types";
 import {
@@ -2070,7 +2071,25 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             pointStrokeSelected={pointStrokeSelected}
             pointStrokeWidth={pointStrokeWidth}
             onPointClick={(e, pointIndex) => {
-              // Handle Shift+click point conversion FIRST (before other checks)
+              // Handle Alt+click point deletion FIRST (before other checks)
+              if (e.evt.altKey && !e.evt.shiftKey && !disabled) {
+                deletePoint(
+                  pointIndex,
+                  initialPoints,
+                  selectedPointIndex,
+                  setSelectedPointIndex,
+                  setVisibleControlPoints,
+                  onPointSelected,
+                  onPointRemoved,
+                  onPointsChange,
+                  setLastAddedPointId,
+                  lastAddedPointId,
+                );
+                pointSelectionHandled.current = true;
+                return; // Successfully deleted point
+              }
+
+              // Handle Shift+click point conversion (before other checks)
               if (e.evt.shiftKey && !e.evt.altKey && !disabled) {
                 if (handleShiftClickPointConversion(e, {
                   initialPoints,
