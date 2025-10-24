@@ -18,6 +18,7 @@ import { PointCreationManager } from "./pointCreationManager";
 import { VectorSelectionTracker, type VectorInstance } from "./VectorSelectionTracker";
 import { calculateShapeBoundingBox } from "./utils/bezierBoundingBox";
 import { shouldClosePathOnPointClick, isActivePointEligibleForClosing } from "./eventHandlers/pointSelection";
+import { handleShiftClickPointConversion } from "./eventHandlers/drawing";
 import type { BezierPoint, GhostPoint as GhostPointType, KonvaVectorProps, KonvaVectorRef } from "./types";
 import { ShapeType, ExportFormat, PathType } from "./types";
 import {
@@ -1632,6 +1633,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     onMouseMove,
     onMouseUp,
     onClick,
+    onDblClick,
     notifyTransformationComplete,
     canAddMorePoints,
     maxPoints,
@@ -1677,16 +1679,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 // For the first point, call the drawing mode click handler directly
                 const pos = e.target.getStage()?.getPointerPosition();
                 if (pos) {
+                  // Use the same coordinate transformation as the event handlers
                   const imagePos = {
-                    x: (pos.x - x) / (scaleX * transform.zoom * fitScale),
-                    y: (pos.y - y) / (scaleY * transform.zoom * fitScale),
+                    x: (pos.x - x - transform.offsetX) / (scaleX * transform.zoom * fitScale),
+                    y: (pos.y - y - transform.offsetY) / (scaleY * transform.zoom * fitScale),
                   };
 
                   // Check if we're within canvas bounds
-                  if (
-                    !constrainToBounds ||
-                    (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height)
-                  ) {
+                  if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
                     // Create the first point directly
                     const newPoint = {
                       id: `point-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -1712,7 +1712,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               eventHandlers.handleLayerClick(e);
             }
       }
-      onDblClick={disabled ? undefined : onDblClick}
+      onDblClick={disabled ? undefined : eventHandlers.handleLayerDoubleClick}
     >
       {/* Invisible rectangle - always render to capture mouse events for cursor position updates */}
       {!disabled && (
@@ -1924,8 +1924,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             <ProxyNodes selectedPoints={effectiveSelectedPoints} initialPoints={getAllPoints()} proxyRefs={proxyRefs} />
           )}
 
-          {/* Transformer for multiselection - only show when not in drawing mode */}
-          {drawingDisabled && (
+          {/* Transformer for multiselection - only show when not in drawing mode and not multi-region selected */}
+          {drawingDisabled && !isMultiRegionSelected && (
             <VectorTransformer
               selectedPoints={selectedPoints}
               initialPoints={getAllPoints()}
@@ -2071,6 +2071,25 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             pointStrokeSelected={pointStrokeSelected}
             pointStrokeWidth={pointStrokeWidth}
             onPointClick={(e, pointIndex) => {
+              // Handle Shift+click point conversion FIRST (before other checks)
+              if (e.evt.shiftKey && !e.evt.altKey && !disabled) {
+                if (handleShiftClickPointConversion(e, {
+                  initialPoints,
+                  transform,
+                  fitScale,
+                  x,
+                  y,
+                  allowBezier,
+                  pixelSnapping,
+                  onPointsChange,
+                  onPointEdited,
+                  setVisibleControlPoints,
+                })) {
+                  pointSelectionHandled.current = true;
+                  return; // Successfully converted point
+                }
+              }
+
               // Handle point selection even when disabled (similar to shape clicks)
               if (disabled) {
                 // Check if this instance can have selection
@@ -2094,15 +2113,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 ) {
                   return; // Block the selection
                 }
-
-                // Allow selection for this instance
-                tracker.allowInstanceSelection(instanceId);
               }
 
               // Mark that point selection was handled
               pointSelectionHandled.current = true;
-
-              eventHandlers.handlePointClick(e, pointIndex);
             }}
             onPointDragStart={eventHandlers.handlePointDragStart}
             onPointDragMove={eventHandlers.handlePointDragMove}
@@ -2133,8 +2147,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               proxyRefs={proxyRefs}
               onPointsChange={onPointsChange}
               onTransformationComplete={notifyTransformationComplete}
-              constrainToBounds={constrainToBounds}
-              bounds={{ width, height }}
+                bounds={{ x: 0, y: 0, width, height }}
               transform={transform}
               fitScale={fitScale}
             />

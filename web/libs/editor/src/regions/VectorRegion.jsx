@@ -494,12 +494,12 @@ const Model = types
           stageZoom: self.parent.stageZoom,
           bbox: self.bbox,
           bboxCoords: self.bboxCoords,
-          vertices: self.vertices.map(v => ({ id: v.id, x: v.x, y: v.y })),
+          vertices: self.vertices.map((v) => ({ id: v.id, x: v.x, y: v.y })),
         });
 
         // Delegate to KonvaVector's commitMultiRegionTransform method
         // This method reads the proxy node coordinates and applies them directly
-        if (typeof self.vectorRef.commitMultiRegionTransform === 'function') {
+        if (typeof self.vectorRef.commitMultiRegionTransform === "function") {
           self.vectorRef.commitMultiRegionTransform();
           console.log("📊 commitMultiRegionTransform called successfully");
         } else {
@@ -543,7 +543,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
         <KonvaVector
           ref={(kv) => item.setKonvaVectorRef(kv)}
           initialPoints={Array.from(item.vertices)}
-          name="_transformable"
           isMultiRegionSelected={item.object?.selectedRegions?.length > 1}
           onFinish={(e) => {
             e.evt.stopPropagation();
@@ -570,7 +569,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               stageZoom: item.parent.stageZoom,
               bbox: item.bbox,
               bboxCoords: item.bboxCoords,
-              vertices: item.vertices.map(v => ({ id: v.id, x: v.x, y: v.y })),
+              vertices: item.vertices.map((v) => ({ id: v.id, x: v.x, y: v.y })),
             });
 
             // Reset transform attributes
@@ -592,7 +591,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
               // Apply the transformation exactly as Konva did:
               // 1. Scale around origin (0,0)
-              // 2. Rotate around origin (0,0)  
+              // 2. Rotate around origin (0,0)
               // 3. Translate by (dx, dy)
               // Don't pass centerX/centerY - transform around origin
               const radians = rotation * (Math.PI / 180);
@@ -601,8 +600,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
               const transformedVertices = item.vertices.map((point) => {
                 // Step 1: Scale
-                let x = point.x * scaleX;
-                let y = point.y * scaleY;
+                const x = point.x * scaleX;
+                const y = point.y * scaleY;
 
                 // Step 2: Rotate
                 const rx = x * cos - y * sin;
@@ -618,8 +617,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
                 // Transform control points if bezier
                 if (point.isBezier) {
                   if (point.controlPoint1) {
-                    let cp1x = point.controlPoint1.x * scaleX;
-                    let cp1y = point.controlPoint1.y * scaleY;
+                    const cp1x = point.controlPoint1.x * scaleX;
+                    const cp1y = point.controlPoint1.y * scaleY;
                     const cp1rx = cp1x * cos - cp1y * sin;
                     const cp1ry = cp1x * sin + cp1y * cos;
                     result.controlPoint1 = {
@@ -628,8 +627,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
                     };
                   }
                   if (point.controlPoint2) {
-                    let cp2x = point.controlPoint2.x * scaleX;
-                    let cp2y = point.controlPoint2.y * scaleY;
+                    const cp2x = point.controlPoint2.x * scaleX;
+                    const cp2y = point.controlPoint2.y * scaleY;
                     const cp2rx = cp2x * cos - cp2y * sin;
                     const cp2ry = cp2x * sin + cp2y * cos;
                     result.controlPoint2 = {
@@ -645,7 +644,10 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               // Update the points
               item.updatePointsFromKonvaVector(transformedVertices);
 
-              console.log("🎯 After transform, vertices:", transformedVertices.map(v => ({ id: v.id, x: v.x, y: v.y })));
+              console.log(
+                "🎯 After transform, vertices:",
+                transformedVertices.map((v) => ({ id: v.id, x: v.x, y: v.y })),
+              );
             }
           }}
           onPointsChange={(points) => {
@@ -694,7 +696,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             console.log("double click");
             item.toggleTransformMode();
           }}
-          transformMode={!disabled && item.transformMode && !item.inSelection}
+          transformMode={!disabled && item.transformMode}
           closed={item.closed}
           width={stageWidth}
           height={stageHeight}
@@ -714,7 +716,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           strokeWidth={regionStyles.strokeWidth}
           opacity={Number.parseFloat(item.control?.opacity || "1")}
           pixelSnapping={item.control?.snap === "pixel"}
-          constrainToBounds={item.control?.constrainToBounds ?? true}
           disabled={disabled}
           // Point styling - customize point appearance based on control settings
           pointRadius={item.pointRadiusFromSize}
