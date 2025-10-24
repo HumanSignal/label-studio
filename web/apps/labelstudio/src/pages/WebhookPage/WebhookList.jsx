@@ -105,7 +105,7 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
               variant="primary"
               icon={<IconWebhook />}
               title="Add your first webhook"
-              description={`Setup integrations that subscribe to certain events using Webhooks. When an event is triggered, ${window.APP_SETTINGS.app_name || "Label Studio"} sends an HTTP POST request to the configured webhook URL.`}
+              description="Setup integrations that subscribe to certain events using Webhooks. When an event is triggered, Label Studio sends an HTTP POST request to the configured webhook URL."
               actions={
                 canChangeWebhooks ? (
                   <Button variant="primary" look="filled" onClick={onAddWebhook}>
