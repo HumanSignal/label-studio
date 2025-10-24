@@ -245,7 +245,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     fill = DEFAULT_FILL_COLOR,
     pixelSnapping = false,
     disabled = false,
-    constrainToBounds = false,
     pointRadius,
     pointFill = DEFAULT_POINT_FILL,
     pointStroke = DEFAULT_POINT_STROKE,
@@ -532,7 +531,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       getTransform: getTransformStable,
       getFitScale: getFitScaleStable,
       getBounds: getBoundsStable,
-      constrainToBounds,
     };
 
     tracker.registerInstance(vectorInstance);
@@ -552,7 +550,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     getTransformStable,
     getFitScaleStable,
     getBoundsStable,
-    constrainToBounds,
   ]);
 
   // Clear selection when component is disabled
@@ -677,7 +674,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       initialPoints,
       allowBezier,
       pixelSnapping,
-      constrainToBounds,
       width,
       height,
       onPointsChange,
@@ -698,7 +694,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     initialPoints,
     allowBezier,
     pixelSnapping,
-    constrainToBounds,
     width,
     height,
     onPointsChange,
@@ -1490,7 +1485,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     activePointId,
     setActivePointId,
     isTransforming,
-    constrainToBounds,
     disabled,
     pointCreationManager,
   });
@@ -1744,13 +1738,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           initialPoints={getAllPoints()}
           transformerRef={transformerRef}
           proxyRefs={proxyRefs}
-          constrainToBounds={constrainToBounds}
           bounds={{
             x: 0,
             y: 0,
             width: width,
             height: height,
           }}
+          scaleX={scaleX}
+          scaleY={scaleY}
+          transform={transform}
+          fitScale={fitScale}
           onPointsChange={(newPoints) => {
             // Update main path points
             onPointsChange?.(newPoints);

@@ -5,6 +5,7 @@ import logging
 
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
+from data_manager.actions import DataManagerAction
 from label_studio_sdk.label_interface import LabelInterface
 from tasks.models import Annotation, Prediction, Task
 
@@ -145,7 +146,7 @@ def cache_labels_form(user, project):
     ]
 
 
-actions = [
+actions: list[DataManagerAction] = [
     {
         'entry_point': cache_labels,
         'permission': all_permissions.projects_change,

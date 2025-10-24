@@ -6,6 +6,9 @@ import { currentUserAtom, currentUserUpdateAtom } from "../atoms/user";
 
 export enum ABILITY {
   can_create_tokens = "users.token.any",
+  can_delete_projects = "projects.delete",
+  can_reset_project_cache = "projects.reset_cache",
+  can_reset_dm_views = "views.reset",
 }
 
 export type Ability = ABILITY;
