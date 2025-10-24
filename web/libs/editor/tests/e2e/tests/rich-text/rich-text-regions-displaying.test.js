@@ -209,8 +209,8 @@ Scenario("Displaying selected and highlighted regions", async ({ I, LabelStudio,
     }
   }
 
-  I.say("Unselect region");
-  I.pressKey("u");
+  I.say("Exit relation mode and unselect region");
+  I.pressKey("Escape"); // Escape properly exits linking mode AND unselects
 
   {
     I.say("The background of the element should be visually different on selection");
