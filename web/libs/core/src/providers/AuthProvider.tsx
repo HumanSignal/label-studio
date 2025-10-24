@@ -6,6 +6,9 @@ import { currentUserAtom, currentUserUpdateAtom } from "../atoms/user";
 
 export enum ABILITY {
   can_create_tokens = "users.token.any",
+
+  // webhooks
+  can_change_webhooks = "webhooks.change",
 }
 
 export type Ability = ABILITY;
