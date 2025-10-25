@@ -107,6 +107,13 @@ class ProjectManager(models.Manager):
         return queryset
 
 
+class ProjectVisibleManager(ProjectManager):
+    """Default manager that hides soft-deleted projects (deleted_at IS NULL)."""
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted_at__isnull=True)
+
+
 ProjectMixin = load_func(settings.PROJECT_MIXIN)
 
 
@@ -123,7 +130,9 @@ class Project(ProjectMixin, models.Model):
         # ignore skipped tasks => skip is a valid annotation, task is completed (finished=True)
         IGNORE_SKIPPED = 'IGNORE_SKIPPED', 'Ignore skipped'
 
-    objects = ProjectManager()
+    # Managers: default (visible only) and explicit unfiltered
+    objects = ProjectVisibleManager()
+    all_objects = ProjectManager()
     __original_label_config = None
 
     title = models.CharField(
@@ -289,6 +298,18 @@ class Project(ProjectMixin, models.Model):
         default=None,
         help_text='Custom task lock TTL in seconds. If not set, the default value is used',
     )
+
+    # Soft-delete lifecycle (OSS fields, used by LSE logic)
+    deleted_at = models.DateTimeField(_('deleted at'), null=True, blank=True, db_index=True)
+    deleted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='deleted_projects',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_('deleted by'),
+    )
+    purge_at = models.DateTimeField(_('purge at'), null=True, blank=True, db_index=True)
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
@@ -1212,6 +1233,7 @@ class Project(ProjectMixin, models.Model):
         db_table = 'project'
         indexes = [
             models.Index(fields=['pinned_at', 'created_at']),
+            models.Index(fields=['organization', 'deleted_at']),
         ]
         # This index is added with an async migration
         #     indexes.append(GinIndex(fields=['search_vector'], name='project_search_vector_idx'))
