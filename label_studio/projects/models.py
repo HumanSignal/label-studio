@@ -300,7 +300,7 @@ class Project(ProjectMixin, models.Model):
     )
 
     # Soft-delete lifecycle (OSS fields, used by LSE logic)
-    deleted_at = models.DateTimeField(_('deleted at'), null=True, blank=True, db_index=True)
+    deleted_at = models.DateTimeField(_('deleted at'), null=True, blank=True)
     deleted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name='deleted_projects',
@@ -309,7 +309,7 @@ class Project(ProjectMixin, models.Model):
         blank=True,
         verbose_name=_('deleted by'),
     )
-    purge_at = models.DateTimeField(_('purge at'), null=True, blank=True, db_index=True)
+    purge_at = models.DateTimeField(_('purge at'), null=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
@@ -1233,7 +1233,6 @@ class Project(ProjectMixin, models.Model):
         db_table = 'project'
         indexes = [
             models.Index(fields=['pinned_at', 'created_at']),
-            models.Index(fields=['organization', 'deleted_at']),
         ]
         # This index is added with an async migration
         #     indexes.append(GinIndex(fields=['search_vector'], name='project_search_vector_idx'))

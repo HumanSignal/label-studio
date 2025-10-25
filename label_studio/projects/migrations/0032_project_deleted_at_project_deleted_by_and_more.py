@@ -17,9 +17,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="project",
             name="deleted_at",
-            field=models.DateTimeField(
-                blank=True, db_index=True, null=True, verbose_name="deleted at"
-            ),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="deleted at"),
         ),
         migrations.AddField(
             model_name="project",
@@ -36,14 +34,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="project",
             name="purge_at",
-            field=models.DateTimeField(
-                blank=True, db_index=True, null=True, verbose_name="purge at"
-            ),
-        ),
-        migrations.AddIndex(
-            model_name="project",
-            index=models.Index(
-                fields=["organization", "deleted_at"], name="project_organiz_3e93a3_idx"
-            ),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="purge at"),
         ),
     ]
