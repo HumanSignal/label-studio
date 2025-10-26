@@ -6,6 +6,7 @@ from datetime import datetime
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
+from data_manager.actions import DataManagerAction
 from data_manager.functions import evaluate_predictions
 from django.conf import settings
 from projects.models import Project
@@ -163,7 +164,7 @@ def async_project_summary_recalculation(tasks_ids_list, project_id):
     Task.delete_tasks_without_signals(queryset)
 
 
-actions = [
+actions: list[DataManagerAction] = [
     {
         'entry_point': retrieve_tasks_predictions,
         'permission': all_permissions.predictions_any,
@@ -191,7 +192,7 @@ actions = [
     },
     {
         'entry_point': delete_tasks_annotations,
-        'permission': all_permissions.tasks_delete,
+        'permission': [all_permissions.tasks_change, all_permissions.annotations_delete],
         'title': 'Delete Annotations',
         'order': 101,
         'dialog': {

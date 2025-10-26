@@ -554,7 +554,7 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
     parser_classes = (JSONParser,)
     parent_queryset = Project.objects.all()
     permission_required = ViewClassPermission(
-        POST=all_permissions.projects_change,
+        POST=all_permissions.projects_reset_cache,
     )
 
     @extend_schema(exclude=True)

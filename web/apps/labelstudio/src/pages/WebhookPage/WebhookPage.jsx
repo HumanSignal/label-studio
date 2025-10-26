@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAPI } from "../../providers/ApiProvider";
-import "./WebhookPage.scss";
 
-import WebhookList from "./WebhookList";
-import WebhookDetail from "./WebhookDetail";
-import { useProject } from "../../providers/ProjectProvider";
-import { Block, Elem } from "../../utils/bem";
-import { IconInfo } from "@humansignal/icons";
 import { useHistory } from "react-router";
+import { useProject } from "../../providers/ProjectProvider";
+import WebhookDetail from "./WebhookDetail";
+import WebhookList from "./WebhookList";
+import { createTitleFromSegments, useUpdatePageTitle } from "@humansignal/core";
 
 const Webhook = () => {
   const [activeWebhook, setActiveWebhook] = useState(null);
@@ -19,6 +17,8 @@ const Webhook = () => {
 
   const api = useAPI();
   const { project } = useProject();
+
+  useUpdatePageTitle(createTitleFromSegments([project?.title, "Webhooks Settings"]));
 
   const projectId = useMemo(() => {
     if (history.location.pathname.startsWith("/projects")) {
@@ -109,28 +109,7 @@ const Webhook = () => {
       />
     );
   }
-  return (
-    <Block name="webhook-wrap">
-      {content}
-      <Elem name="footer">
-        <Elem name="footer-icon">
-          <IconInfo width="28" height="28" />
-        </Elem>
-        <Elem name="footer-text">
-          <p>
-            Webhooks allow external services to be notified when certain events happen. When the specified events occur,
-            a POST request is sent to each of the URLs you provide.
-          </p>
-          <p>
-            <a href="https://labelstud.io/guide/webhooks.html" target="_blank" rel="noreferrer">
-              Read more in the documentation
-            </a>
-            .
-          </p>
-        </Elem>
-      </Elem>
-    </Block>
-  );
+  return <section className="w-[42rem]">{content}</section>;
 };
 
 export const WebhookPage = {
