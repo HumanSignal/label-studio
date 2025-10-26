@@ -85,7 +85,7 @@
       },
       "decoder": {
         "name": "decoder",
-        "description": "Decoder type to use to decode audio data. (`\"webaudio\"` or `\"ffmpeg\"`)",
+        "description": "Decoder type to use to decode audio data. (`\"webaudio\"`, `\"ffmpeg\"`, or `\"none\"` for no decoding - provides fast loading for large files but disables waveform visualization)",
         "type": "string",
         "required": false,
         "default": "webaudio"

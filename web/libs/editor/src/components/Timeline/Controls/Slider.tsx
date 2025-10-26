@@ -2,7 +2,7 @@ import type React from "react";
 import { type FC, useEffect, useRef, useState } from "react";
 import { Tooltip } from "@humansignal/ui";
 import { IconInfoConfig } from "@humansignal/icons";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 
 import "./Slider.scss";
 
@@ -67,40 +67,40 @@ export const Slider: FC<SliderProps> = ({
 
   const renderInput = () => {
     return (
-      <Elem name="control">
-        <Elem name="info">
+      <div className={cn("audio-slider").elem("control").toClassName()}>
+        <div className={cn("audio-slider").elem("info").toClassName()}>
           {description}
           {info && (
             <Tooltip title={info}>
               <IconInfoConfig />
             </Tooltip>
           )}
-        </Elem>
+        </div>
         {showInput && (
-          <Elem
-            name="input"
-            tag="input"
+          <input
+            className={cn("audio-slider")
+              .elem("input")
+              .mod(
+                valueError !== undefined &&
+                  (typeof valueError === "string" || valueError > max || valueError < min) && { error: "control" },
+              )
+              .toClassName()}
             type="text"
-            mod={
-              valueError !== undefined &&
-              (typeof valueError === "string" || valueError > max || valueError < min) && { error: "control" }
-            }
             min={min}
             max={max}
             value={valueError === undefined ? value : valueError}
             onChange={handleChangeInputValue}
           />
         )}
-      </Elem>
+      </div>
     );
   };
 
   return (
-    <Block name="audio-slider">
-      <Elem
-        ref={sliderRef}
-        name="range"
-        tag="input"
+    <div className={cn("audio-slider").toClassName()}>
+      <input
+        ref={sliderRef as any}
+        className={cn("audio-slider").elem("range").toClassName()}
         type="range"
         min={min}
         max={max}
@@ -109,6 +109,6 @@ export const Slider: FC<SliderProps> = ({
         onChange={handleChangeInputValue}
       />
       {renderInput()}
-    </Block>
+    </div>
   );
 };

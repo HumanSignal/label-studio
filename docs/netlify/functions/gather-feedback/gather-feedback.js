@@ -4,7 +4,7 @@ const client = sanityClient({
   projectId: 'k7elabj6',
   dataset: 'production',
   apiVersion: '2021-03-25',
-  token: process.env.SANITY_TOKEN,
+  token: process.env.SANITY_CREATE_TOKEN,
 })
 
 const handler = async (event) => {

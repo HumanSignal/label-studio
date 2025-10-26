@@ -152,11 +152,11 @@ class ViewAPI(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['project']
     permission_required = ViewClassPermission(
-        GET=all_permissions.tasks_view,
-        POST=all_permissions.tasks_change,
-        PATCH=all_permissions.tasks_change,
-        PUT=all_permissions.tasks_change,
-        DELETE=all_permissions.tasks_delete,
+        GET=all_permissions.views_view,
+        POST=all_permissions.views_create,
+        PATCH=all_permissions.views_change,
+        PUT=all_permissions.views_change,
+        DELETE=all_permissions.views_delete,
     )
 
     def perform_create(self, serializer):
@@ -181,7 +181,7 @@ class ViewAPI(viewsets.ModelViewSet):
             'x-fern-audiences': ['public'],
         },
     )
-    @action(detail=False, methods=['delete'])
+    @action(detail=False, methods=['delete'], permission_required=all_permissions.views_reset)
     def reset(self, request):
         # Note: OpenAPI 3.0 does not support request body for DELETE requests
         # see https://github.com/tfranzel/drf-spectacular/issues/431#issuecomment-862738643
@@ -550,7 +550,16 @@ class ProjectStateAPI(APIView):
                             'id': {'type': 'string', 'title': 'Action ID'},
                             'title': {'type': 'string', 'title': 'Title'},
                             'order': {'type': 'integer', 'title': 'Order'},
-                            'permission': {'type': 'string', 'title': 'Permission'},
+                            'permission': {
+                                'oneOf': [
+                                    {'type': 'string'},
+                                    {
+                                        'type': 'array',
+                                        'items': {'type': 'string'},
+                                        'description': 'List of permissions (user needs any all of them)',
+                                    },
+                                ]
+                            },
                             'experimental': {'type': 'boolean', 'title': 'Experimental'},
                             'dialog': {
                                 'type': 'object',
