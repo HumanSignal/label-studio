@@ -150,6 +150,8 @@ def has_column_cached(table_name: str, column_name: str) -> bool:
 
 
 @receiver(post_migrate)
-def _clear_column_presence_cache(**_kwargs):
-    logger.info('Clearing column presence cache in post_migrate signal')
+def signal_clear_column_presence_cache(**_kwargs):
+    """If some migration adds a column, we need to clear the column_presence_cache 
+    so that the next migration can introspect the new column using has_column_cached()."""
+    logger.debug('Clearing column presence cache in post_migrate signal')
     _column_presence_cache.clear()
