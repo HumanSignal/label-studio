@@ -16,7 +16,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('tasks', '0029_annotation_project'),
-        ('projects', '0032_project_deleted_at_project_deleted_by_and_more'),
     ]
 
     operations = [
