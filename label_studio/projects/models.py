@@ -311,6 +311,7 @@ class Project(ProjectMixin, models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        db_index=False,
         verbose_name=_('deleted by'),
     )
     purge_at = models.DateTimeField(_('purge at'), null=True, blank=True)

@@ -27,6 +27,7 @@ class Migration(migrations.Migration):
                 null=True,
                 on_delete=django.db.models.deletion.SET_NULL,
                 related_name="deleted_projects",
+                db_index=False,
                 to=settings.AUTH_USER_MODEL,
                 verbose_name="deleted by",
             ),
