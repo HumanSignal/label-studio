@@ -1,7 +1,7 @@
 import itertools
 import logging
 import time
-from typing import Dict, Optional, Tuple, TypeVar
+from typing import Dict, Optional, TypeVar
 
 from django.db import OperationalError, connection, models, transaction
 from django.db.models import Model, QuerySet, Subquery
@@ -140,8 +140,8 @@ def current_db_key() -> str:
         name = str(connection.settings_dict.get('NAME'))
     except Exception as e:
         name = 'unknown'
-        logger.error(f"Error getting current DB key: {e}")
-    return f"{connection.vendor}:{name}"
+        logger.error(f'Error getting current DB key: {e}')
+    return f'{connection.vendor}:{name}'
 
 
 def has_column_cached(table_name: str, column_name: str) -> bool:
@@ -160,7 +160,7 @@ def has_column_cached(table_name: str, column_name: str) -> bool:
     try:
         with connection.cursor() as cursor:
             cols = connection.introspection.get_table_description(cursor, table_name)
-        present = any(getattr(col, "name", "").lower() == col_key for col in cols)
+        present = any(getattr(col, 'name', '').lower() == col_key for col in cols)
     except (DatabaseError, ProgrammingError):
         present = False
 
@@ -170,7 +170,7 @@ def has_column_cached(table_name: str, column_name: str) -> bool:
 
 @receiver(post_migrate)
 def signal_clear_column_presence_cache(**_kwargs):
-    """If some migration adds a column, we need to clear the column_presence_cache 
+    """If some migration adds a column, we need to clear the column_presence_cache
     so that the next migration can introspect the new column using has_column_cached()."""
     logger.debug('Clearing column presence cache in post_migrate signal')
     _column_presence_cache.clear()

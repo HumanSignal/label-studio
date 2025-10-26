@@ -1,15 +1,14 @@
 import types
 
+import projects.models as project_models
 import pytest
 from django.db import connection
+from projects.models import Project
 
+from label_studio.core.utils import db as db_utils
+from label_studio.core.utils.db import has_column_cached
 from label_studio.organizations.tests.factories import OrganizationFactory
 from label_studio.projects.tests.factories import ProjectFactory
-from label_studio.core.utils.db import has_column_cached
-from projects.models import Project
-import projects.models as project_models
-from label_studio.core.utils import db as db_utils
-
 
 pytestmark = pytest.mark.django_db
 
@@ -113,5 +112,3 @@ def test_has_column_cached_memoization_and_clear(monkeypatch):
     # After cache clear, another introspection happens
     assert has_column_cached('project', 'deleted_at') is True
     assert calls['count'] == 2
-
-
