@@ -4,9 +4,9 @@ import time
 from typing import Dict, Optional, Tuple, TypeVar
 
 from django.db import OperationalError, connection, models, transaction
+from django.db.models import Model, QuerySet, Subquery
 from django.db.models.signals import post_migrate
 from django.dispatch import receiver
-from django.db.models import Model, QuerySet, Subquery
 
 logger = logging.getLogger(__name__)
 
