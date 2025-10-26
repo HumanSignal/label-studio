@@ -41,7 +41,7 @@ interface UseActionsOptions {
 /**
  * Hook to fetch available actions from the DataManager API
  * Uses TanStack Query for data fetching and caching
- * 
+ *
  * @param options - Configuration options for the query
  * @returns Object containing actions data, loading state, error state, and refetch function
  */
@@ -89,4 +89,3 @@ export const useActions = (options: UseActionsOptions = {}) => {
     isFetching,
   };
 };
-

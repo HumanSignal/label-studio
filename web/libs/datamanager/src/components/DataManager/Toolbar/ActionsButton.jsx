@@ -232,7 +232,13 @@ export const ActionsButton = injector(
       <Dropdown.Trigger
         content={
           <Menu size="compact">
-            {isLoading || isFetching ? <Menu.Item data-testid="loading-actions" disabled>Loading actions...</Menu.Item> : actionButtons}
+            {isLoading || isFetching ? (
+              <Menu.Item data-testid="loading-actions" disabled>
+                Loading actions...
+              </Menu.Item>
+            ) : (
+              actionButtons
+            )}
           </Menu>
         }
         openUpwardForShortViewport={false}
