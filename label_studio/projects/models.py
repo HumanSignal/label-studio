@@ -113,7 +113,6 @@ class ProjectVisibleManager(ProjectManager):
     def get_queryset(self):
         qs = super().get_queryset()
         # Avoid referencing columns that might not exist during early migrations
-        print(f"=====>>>>>>>>>> has_column_cached('{self.model._meta.db_table}', 'deleted_at'): {has_column_cached(self.model._meta.db_table, 'deleted_at')}")
         if has_column_cached(self.model._meta.db_table, 'deleted_at'):
             return qs.filter(deleted_at__isnull=True)
         return qs
