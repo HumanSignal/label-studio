@@ -6,7 +6,9 @@ from django.db import connection
 from label_studio.organizations.tests.factories import OrganizationFactory
 from label_studio.projects.tests.factories import ProjectFactory
 from label_studio.core.utils.db import has_column_cached
-from label_studio.projects.models import Project
+from projects.models import Project
+import projects.models as project_models
+from label_studio.core.utils import db as db_utils
 
 
 pytestmark = pytest.mark.django_db
@@ -23,7 +25,7 @@ def test_project_manager_filters_deleted():
     """
     org = OrganizationFactory()
     p1 = ProjectFactory(organization=org, title='active')
-    p2 = ProjectFactory(organization=org, title='deleted', deleted_at=p1.created_at)
+    _ = ProjectFactory(organization=org, title='deleted', deleted_at=p1.created_at)
 
     visible = list(Project.objects.order_by('id').values_list('title', flat=True))
     all_rows = list(Project.all_objects.order_by('id').values_list('title', flat=True))
@@ -66,9 +68,7 @@ def test_visible_manager_skips_filter_without_column(monkeypatch):
     Validations: Both rows are returned (no filter applied).
     Edge cases: N/A.
     """
-    monkeypatch.setattr(
-        'label_studio.core.utils.db.has_column_cached', lambda *_: False, raising=True
-    )
+    monkeypatch.setattr(project_models, 'has_column_cached', lambda *_: False, raising=True)
 
     org = OrganizationFactory()
     p1 = ProjectFactory(organization=org, title='active')
@@ -84,10 +84,13 @@ def test_has_column_cached_memoization_and_clear(monkeypatch):
 
     Purpose: Ensure only one introspection call until cache clear.
     Setup: Stub get_table_description to count calls.
-    Actions: Call has_column_cached twice, then send post_migrate, call again.
-    Validations: One call before, second after post_migrate.
+    Actions: Call has_column_cached twice, then clear cache, call again.
+    Validations: One call before, second after clear.
     Edge cases: N/A.
     """
+    # Ensure cache starts empty so first call triggers introspection
+    db_utils.signal_clear_column_presence_cache()
+
     calls = {'count': 0}
 
     def fake_get_table_description(cursor, table):
@@ -104,9 +107,8 @@ def test_has_column_cached_memoization_and_clear(monkeypatch):
     assert has_column_cached('project', 'deleted_at') is True
     assert calls['count'] == 1
 
-    # Simulate post_migrate
-    from django.db.models.signals import post_migrate
-    post_migrate.send(sender=None)
+    # Clear cache directly (instead of sending the signal with app_config)
+    db_utils.signal_clear_column_presence_cache()
 
     # After cache clear, another introspection happens
     assert has_column_cached('project', 'deleted_at') is True

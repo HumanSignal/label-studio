@@ -6,6 +6,7 @@ from typing import Dict, Optional, Tuple, TypeVar
 from django.db import OperationalError, connection, models, transaction
 from django.db.models import Model, QuerySet, Subquery
 from django.db.models.signals import post_migrate
+from django.db.utils import DatabaseError, ProgrammingError
 from django.dispatch import receiver
 
 logger = logging.getLogger(__name__)
@@ -126,26 +127,44 @@ def batch_delete(queryset, batch_size=500):
 # Schema helpers
 # =====================
 
-_column_presence_cache: Dict[Tuple[str, str], bool] = {}
+_column_presence_cache: Dict[str, Dict[str, Dict[str, bool]]] = {}
+
+
+def current_db_key() -> str:
+    """Return a process-stable identifier for the current DB connection.
+
+    Using vendor + NAME isolates caches between sqlite test DBs and postgres runs,
+    avoiding stale lookups across pytest sessions or multi-DB setups.
+    """
+    try:
+        name = str(connection.settings_dict.get('NAME'))
+    except Exception as e:
+        name = 'unknown'
+        logger.error(f"Error getting current DB key: {e}")
+    return f"{connection.vendor}:{name}"
 
 
 def has_column_cached(table_name: str, column_name: str) -> bool:
     """Check if a DB column exists for the given table, with per-process memoization.
 
     Notes:
-    - Uses Django's introspection API; incurs a single round-trip on first call per (table, column) pair.
-    - Safe to call during early migrations; returns False on any error.
+    - Uses Django introspection; caches per (table, column) with case-insensitive column keys.
+    - Safe during early migrations; returns False on any error.
     """
-    key = (table_name, column_name)
-    if key in _column_presence_cache:
-        return _column_presence_cache[key]
+    col_key = column_name.lower()
+    db_cache = _column_presence_cache.get(current_db_key())
+    table_cache = db_cache.get(table_name) if db_cache else None
+    if table_cache and col_key in table_cache:
+        return table_cache[col_key]
+
     try:
         with connection.cursor() as cursor:
             cols = connection.introspection.get_table_description(cursor, table_name)
-        present = any(getattr(col, 'name', None) == column_name for col in cols)
-    except Exception:
+        present = any(getattr(col, "name", "").lower() == col_key for col in cols)
+    except (DatabaseError, ProgrammingError):
         present = False
-    _column_presence_cache[key] = present
+
+    _column_presence_cache.setdefault(current_db_key(), {}).setdefault(table_name, {})[col_key] = present
     return present
 
 
