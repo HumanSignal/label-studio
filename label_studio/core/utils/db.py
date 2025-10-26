@@ -1,9 +1,11 @@
 import itertools
 import logging
 import time
-from typing import Optional, TypeVar
+from typing import Dict, Optional, Tuple, TypeVar
 
-from django.db import OperationalError, models, transaction
+from django.db import OperationalError, connection, models, transaction
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 from django.db.models import Model, QuerySet, Subquery
 
 logger = logging.getLogger(__name__)
@@ -118,3 +120,36 @@ def batch_delete(queryset, batch_size=500):
             total_deleted += deleted
 
     return total_deleted
+
+
+# =====================
+# Schema helpers
+# =====================
+
+_column_presence_cache: Dict[Tuple[str, str], bool] = {}
+
+
+def has_column_cached(table_name: str, column_name: str) -> bool:
+    """Check if a DB column exists for the given table, with per-process memoization.
+
+    Notes:
+    - Uses Django's introspection API; incurs a single round-trip on first call per (table, column) pair.
+    - Safe to call during early migrations; returns False on any error.
+    """
+    key = (table_name, column_name)
+    if key in _column_presence_cache:
+        return _column_presence_cache[key]
+    try:
+        with connection.cursor() as cursor:
+            cols = connection.introspection.get_table_description(cursor, table_name)
+        present = any(getattr(col, 'name', None) == column_name for col in cols)
+    except Exception:
+        present = False
+    _column_presence_cache[key] = present
+    return present
+
+
+@receiver(post_migrate)
+def _clear_column_presence_cache(**_kwargs):
+    logger.info('Clearing column presence cache in post_migrate signal')
+    _column_presence_cache.clear()

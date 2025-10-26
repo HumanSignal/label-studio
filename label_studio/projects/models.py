@@ -25,7 +25,7 @@ from core.utils.common import (
     load_func,
     merge_labels_counters,
 )
-from core.utils.db import batch_update_with_retry, fast_first
+from core.utils.db import batch_update_with_retry, fast_first, has_column_cached
 from django.conf import settings
 from django.contrib.postgres.search import SearchVectorField
 from django.core.validators import MaxLengthValidator, MinLengthValidator
@@ -111,7 +111,11 @@ class ProjectVisibleManager(ProjectManager):
     """Default manager that hides soft-deleted projects (deleted_at IS NULL)."""
 
     def get_queryset(self):
-        return super().get_queryset().filter(deleted_at__isnull=True)
+        qs = super().get_queryset()
+        # Avoid referencing columns that might not exist during early migrations
+        if has_column_cached(self.model._meta.db_table, 'deleted_at'):
+            return qs.filter(deleted_at__isnull=True)
+        return qs
 
 
 ProjectMixin = load_func(settings.PROJECT_MIXIN)
