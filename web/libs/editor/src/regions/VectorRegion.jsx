@@ -598,6 +598,9 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               const cos = Math.cos(radians);
               const sin = Math.sin(radians);
 
+              const imageWidth = image?.naturalWidth ?? 0;
+              const imageHeight = image?.naturalHeight ?? 0;
+
               const transformedVertices = item.vertices.map((point) => {
                 // Step 1: Scale
                 const x = point.x * scaleX;
@@ -607,11 +610,11 @@ const HtxVectorView = observer(({ item, suggestion }) => {
                 const rx = x * cos - y * sin;
                 const ry = x * sin + y * cos;
 
-                // Step 3: Translate
+                // Step 3: Translate and clamp to image bounds
                 const result = {
                   ...point,
-                  x: rx + dx,
-                  y: ry + dy,
+                  x: Math.max(0, Math.min(imageWidth, rx + dx)),
+                  y: Math.max(0, Math.min(imageHeight, ry + dy)),
                 };
 
                 // Transform control points if bezier
@@ -622,8 +625,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
                     const cp1rx = cp1x * cos - cp1y * sin;
                     const cp1ry = cp1x * sin + cp1y * cos;
                     result.controlPoint1 = {
-                      x: cp1rx + dx,
-                      y: cp1ry + dy,
+                      x: Math.max(0, Math.min(imageWidth, cp1rx + dx)),
+                      y: Math.max(0, Math.min(imageHeight, cp1ry + dy)),
                     };
                   }
                   if (point.controlPoint2) {
@@ -632,8 +635,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
                     const cp2rx = cp2x * cos - cp2y * sin;
                     const cp2ry = cp2x * sin + cp2y * cos;
                     result.controlPoint2 = {
-                      x: cp2rx + dx,
-                      y: cp2ry + dy,
+                      x: Math.max(0, Math.min(imageWidth, cp2rx + dx)),
+                      y: Math.max(0, Math.min(imageHeight, cp2ry + dy)),
                     };
                   }
                 }

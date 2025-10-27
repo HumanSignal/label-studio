@@ -1495,11 +1495,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         const rx = x * cos - y * sin;
         const ry = x * sin + y * cos;
 
-        // Step 3: Translate
+        // Step 3: Translate and clamp to image bounds
         const result = {
           ...point,
-          x: rx + dx,
-          y: ry + dy,
+          x: Math.max(0, Math.min(width, rx + dx)),
+          y: Math.max(0, Math.min(height, ry + dy)),
         };
 
         // Transform control points if bezier
@@ -1510,8 +1510,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             const cp1rx = cp1x * cos - cp1y * sin;
             const cp1ry = cp1x * sin + cp1y * cos;
             result.controlPoint1 = {
-              x: cp1rx + dx,
-              y: cp1ry + dy,
+              x: Math.max(0, Math.min(width, cp1rx + dx)),
+              y: Math.max(0, Math.min(height, cp1ry + dy)),
             };
           }
           if (point.controlPoint2) {
@@ -1520,8 +1520,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             const cp2rx = cp2x * cos - cp2y * sin;
             const cp2ry = cp2x * sin + cp2y * cos;
             result.controlPoint2 = {
-              x: cp2rx + dx,
-              y: cp2ry + dy,
+              x: Math.max(0, Math.min(width, cp2rx + dx)),
+              y: Math.max(0, Math.min(height, cp2ry + dy)),
             };
           }
         }
