@@ -165,7 +165,7 @@ The agreement column for this task would show the average of all annotation pair
 
 ### Agreement (Selected)
 
-The agreement (selected) column builds on top of the agreement column, allowing you to get agreement scores between annotators, ground truth, and model versions. The column header is a dropdown where you can make your selection of what to include in the calculation. 
+The agreement (selected) column builds on top of the agreement column, allowing you to get agreement scores between annotators, ground truth, and model versions. The column header is a dropdown where you can make your selection of which pairs you want to include in the calculation.
 
 <img src="/images/project/agreement-selected.png" class="gif-border" style="max-width:679px">
 
@@ -197,7 +197,7 @@ If your project contains ground truth annotations, this allows you to compare ei
 
 #### Limitations
 
-We currently only support calculating Agreement (Selected) for tasks with 20 or less annotations due to performance reasons. If you have a task with more than this threshold, you will see an info icon with a tooltip. 
+We currently only support calculating Agreement (Selected) for tasks with 20 or less annotations. If you have a task with more than this threshold, you will see an info icon with a tooltip.
 
 <img src="/images/project/agreement-selected-threshold.png" class="gif-border" style="max-width:679px">
 
