@@ -72,14 +72,14 @@ jobs:
           fail_ci_if_error: true
 
       - name: Upload coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: cypress coverage
           path: web/libs/editor/coverage
 
       - name: Upload test results and screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: cypress test output
