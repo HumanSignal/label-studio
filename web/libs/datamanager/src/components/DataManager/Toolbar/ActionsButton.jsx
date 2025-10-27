@@ -1,7 +1,7 @@
 import { IconChevronDown, IconChevronRight, IconTrash } from "@humansignal/icons";
 import { Button, Spinner, Tooltip } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Block, Elem } from "../../../utils/bem";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { Dropdown } from "../../Common/Dropdown/DropdownComponent";
@@ -205,19 +205,19 @@ export const ActionsButton = injector(
     const selectedCount = store.currentView.selectedCount;
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const fetchedActionsRef = useRef(false);
 
-    const actions = useMemo(() => {
-      return store.availableActions.filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
-    }, [store.availableActions]);
+    const actions = store.availableActions.filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
 
     useEffect(() => {
-      if (isOpen && actions.length === 0) {
+      if (isOpen && !fetchedActionsRef.current) {
         setIsLoading(true);
         store.fetchActions().finally(() => {
           setIsLoading(false);
         });
+        fetchedActionsRef.current = true;
       }
-    }, [isOpen, actions, store]);
+    }, [isOpen, store]);
 
     const actionButtons = actions.map((action) => (
       <ActionButton key={action.id} action={action} parentRef={formRef} store={store} formRef={formRef} />
@@ -227,7 +227,15 @@ export const ActionsButton = injector(
     return (
       <Dropdown.Trigger
         content={
-          <Menu size="compact">{isLoading ? <Menu.Item disabled>Loading actions...</Menu.Item> : actionButtons}</Menu>
+          <Menu size="compact">
+            {isLoading ? (
+              <Menu.Item disabled data-testid="loading-actions">
+                Loading actions...
+              </Menu.Item>
+            ) : (
+              actionButtons
+            )}
+          </Menu>
         }
         openUpwardForShortViewport={false}
         disabled={!hasSelected}

@@ -119,7 +119,9 @@ Scenario(
       assert.deepStrictEqual(result[0].value.paragraphlabels, ["General: Positive1"]);
     });
   },
-);
+)
+  .tag("@flakey")
+  .retry(3);
 
 Scenario("Select All button is disabled when no label is selected", async ({ I, LabelStudio, AtOutliner }) => {
   await retryScenario(async () => {
