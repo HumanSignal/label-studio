@@ -131,6 +131,20 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         job_timeout = kwargs['job_timeout']
         del kwargs['job_timeout']
     if redis:
+        # Auto-capture request_id from thread local and pass it via job meta
+        try:
+            from label_studio.core.current_request import _thread_locals
+
+            request_id = getattr(_thread_locals, 'request_id', None)
+            if request_id:
+                # Store in job meta for worker access
+                meta = kwargs.get('meta', {})
+                meta['request_id'] = request_id
+                kwargs['meta'] = meta
+        except Exception:
+            # Fail silently if no request context
+            pass
+
         try:
             args_info = _truncate_args_for_logging(args, kwargs)
             logger.info(f'Start async job {job.__name__} on queue {queue_name} with {args_info}.')

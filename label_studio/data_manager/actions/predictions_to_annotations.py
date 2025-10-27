@@ -3,6 +3,7 @@
 import logging
 
 from core.permissions import AllPermissions
+from data_manager.actions import DataManagerAction
 from django.utils.timezone import now
 from tasks.models import Annotation, Prediction, Task
 from tasks.serializers import TaskSerializerBulk
@@ -98,7 +99,7 @@ def predictions_to_annotations_form(user, project):
     ]
 
 
-actions = [
+actions: list[DataManagerAction] = [
     {
         'entry_point': predictions_to_annotations,
         'permission': all_permissions.tasks_change,

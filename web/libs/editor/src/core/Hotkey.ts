@@ -4,7 +4,7 @@ import { observer } from "mobx-react";
 import { createElement, Fragment } from "react";
 import { Tooltip } from "@humansignal/ui";
 import Hint from "../components/Hint/Hint";
-import { Block, Elem } from "../utils/bem";
+import { cn } from "../utils/bem";
 import { FF_MULTI_OBJECT_HOTKEYS, isFF } from "../utils/feature-flags";
 import { isDefined, isMacOS } from "../utils/utilities";
 import defaultKeymap from "./settings/keymap.json";
@@ -464,10 +464,9 @@ Hotkey.Tooltip = inject("store")(
         shortcut.split(",").forEach((combination: string) => {
           const keys = combination.split("+").map((key: string) =>
             createElement(
-              Elem,
+              "kbd",
               {
-                tag: "kbd",
-                name: "key",
+                className: cn("hotkey").elem("key").toClassName(),
               },
               key,
             ),
@@ -475,10 +474,9 @@ Hotkey.Tooltip = inject("store")(
 
           hotkeys.push(
             createElement(
-              Block,
+              "span",
               {
-                name: "key-group",
-                tag: "span",
+                className: cn("key-group").toClassName(),
                 style: { marginLeft: 5 },
               },
               ...keys,
