@@ -175,18 +175,18 @@ Under "Choose What To Calculate" there are two options which can be used for dif
 
 This allows you to select annotators and/or models to compare. You must select at least two items to compare. This can be used in a variety of ways. 
 
-You can select a subset of annotators to compare (versus in the normal 'Agreement' column, all annotators are included in the score). This will average all annotator vs annotator scores for the task. 
+You can select a subset of annotators to compare (versus in the normal 'Agreement' column, all annotators are included in the score). This will average all annotator vs annotator scores for selected annotators.
 
 <img src="/images/project/agreement-selected-annotators.png" class="gif-border" style="max-width:679px">
 
-You can select multiple models to see model consensus in your project. This will average all model vs model scores for the task. 
+You can select multiple models to see model consensus in your project. This will average all model vs model scores for the selected models.
 
 <img src="/images/project/agreement-selected-models.png" class="gif-border" style="max-width:679px">
 
-Other combinations are also possible such as selecting one annotator and multiple models, multiple annotators and multiple models, etc. 
-If multiple annotators are selected, all annotator vs annotator scores will be included in the average.
-If multiple models are selected, all model vs model scores will be included in the average. 
-If one or more annotators are selected along with one or more models, all annotator vs model scores will be included in the average.
+Other combinations are also possible such as selecting one annotator and multiple models, multiple annotators and multiple models, etc. <br>
+If multiple annotators are selected, all annotator vs annotator scores will be included in the average. <br>
+If multiple models are selected, all model vs model scores will be included in the average. <br>
+If one or more annotators are selected along with one or more models, all annotator vs model scores will be included in the average. <br>
 
 #### Ground Truth Match
 
