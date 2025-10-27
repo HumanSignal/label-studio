@@ -74,6 +74,7 @@ export const FieldsButton = injector(
     tooltip,
     tooltipTheme = "dark",
     openUpwardForShortViewport = true,
+    "data-testid": dataTestId,
   }) => {
     const content = [];
 
@@ -81,7 +82,14 @@ export const FieldsButton = injector(
 
     const renderButton = () => {
       return (
-        <Button variant="neutral" size="small" look="outlined" leading={icon} trailing={trailingIcon}>
+        <Button
+          variant="neutral"
+          size="small"
+          look="outlined"
+          leading={icon}
+          trailing={trailingIcon}
+          data-testid={dataTestId}
+        >
           {content.length ? content : null}
         </Button>
       );
@@ -112,6 +120,7 @@ export const FieldsButton = injector(
               look="outlined"
               leading={icon}
               trailing={trailingIcon}
+              data-testid={dataTestId}
             >
               {content.length ? content : null}
             </Button>

@@ -207,8 +207,9 @@ export const Table = observer(
               size="small"
               trailingIcon={<Icon icon={IconChevronDown} />}
               tooltip={"Customize Columns"}
+              data-testid="columns-picker-quickview"
             />
-            <DensityToggle size="small" onChange={onDensityChange} />
+            <DensityToggle size="small" onChange={onDensityChange} data-testid="density-toggle-quickview" />
           </div>
         );
       },
@@ -510,7 +511,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
                 index={index}
                 style={{
                   height: stickyItemsHeight[index],
-                  top: topPosition,
+                  top: isQuickView ? topPosition - 1 : topPosition,
                 }}
               />
             ))}
