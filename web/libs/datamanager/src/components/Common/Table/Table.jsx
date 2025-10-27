@@ -60,10 +60,6 @@ export const Table = observer(
     const toolbarHeight = 41;
     const isQuickView = view.root.isLabeling;
     const [headerTopOffset, setHeaderTopOffset] = useState(isQuickView ? toolbarHeight : 0);
-    const [density, setDensity] = useState(() => {
-      // Use separate storage key for QuickView density
-      return localStorage.getItem("dm:quickview:density") ?? "comfortable";
-    });
 
     // Reset header position when switching between quickview and regular mode
     useEffect(() => {
@@ -79,12 +75,12 @@ export const Table = observer(
       }
     }, [data, isQuickView, toolbarHeight]);
 
-    // Reset virtualizer cache when density changes
+    // Reset virtualizer cache when rowHeight changes
     useEffect(() => {
       if (listRef.current?._listRef) {
         listRef.current._listRef.resetAfterIndex(0);
       }
-    }, [density]);
+    }, [props.rowHeight]);
 
     const headerCheckboxCell = useCallback(() => {
       return (
@@ -194,13 +190,6 @@ export const Table = observer(
 
     const headerHeight = 43;
 
-    const handleDensityChange = useCallback((newDensity) => {
-      setDensity(newDensity);
-    }, []);
-
-    // Calculate row height based on density when in QuickView mode
-    const effectiveRowHeight = isQuickView ? (density === "compact" ? 50 : 70) : props.rowHeight;
-
     const renderTableToolbar = useCallback(
       ({ style }) => {
         return (
@@ -219,11 +208,11 @@ export const Table = observer(
               trailingIcon={<Icon icon={IconChevronDown} />}
               tooltip={"Customize Columns"}
             />
-            <DensityToggle size="small" onChange={handleDensityChange} />
+            <DensityToggle size="small" onChange={onDensityChange} />
           </div>
         );
       },
-      [toolbarHeight, handleDensityChange],
+      [toolbarHeight, onDensityChange],
     );
 
     const renderTableHeader = useCallback(
@@ -281,9 +270,9 @@ export const Table = observer(
               even={isEven}
               onClick={(row, e) => props.onRowClick(row, e)}
               stopInteractions={stopInteractions}
-              wrapperStyle={{ ...style, height: effectiveRowHeight }}
+              wrapperStyle={{ ...style, height: props.rowHeight }}
               style={{
-                height: effectiveRowHeight,
+                height: props.rowHeight,
                 width: props.fitContent ? "fit-content" : "auto",
               }}
               decoration={Decoration}
@@ -302,9 +291,9 @@ export const Table = observer(
             even={isEven}
             onClick={(row, e) => props.onRowClick(row, e)}
             stopInteractions={stopInteractions}
-            wrapperStyle={{ ...style, height: effectiveRowHeight }}
+            wrapperStyle={{ ...style, height: props.rowHeight }}
             style={{
-              height: effectiveRowHeight,
+              height: props.rowHeight,
               width: props.fitContent ? "fit-content" : "auto",
             }}
             decoration={Decoration}
@@ -315,7 +304,7 @@ export const Table = observer(
         data,
         props.fitContent,
         props.onRowClick,
-        effectiveRowHeight,
+        props.rowHeight,
         stopInteractions,
         selectedItems,
         view,
@@ -341,7 +330,7 @@ export const Table = observer(
           return cachedScrollOffset.current;
         }
 
-        const h = effectiveRowHeight;
+        const h = props.rowHeight;
         const index = data.indexOf(focusedItem);
 
         if (index >= 0) {
@@ -351,7 +340,7 @@ export const Table = observer(
         }
         return 0;
       },
-      [effectiveRowHeight, data, focusedItem],
+      [props.rowHeight, data, focusedItem],
     );
 
     const itemKey = useCallback(
@@ -390,7 +379,7 @@ export const Table = observer(
           <StickyList
             ref={listRef}
             overscanCount={10}
-            itemHeight={effectiveRowHeight}
+            itemHeight={props.rowHeight}
             totalCount={props.total}
             itemCount={isQuickView ? data.length + 2 : data.length + 1}
             itemKey={itemKey}
