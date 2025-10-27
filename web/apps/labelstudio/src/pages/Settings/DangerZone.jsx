@@ -198,7 +198,7 @@ export const DangerZone = () => {
 
   return (
     <div className={cn("simple-settings")}>
-      <Typography variant="headline" size="large" className="mb-tighter">
+      <Typography variant="headline" size="medium" className="mb-tighter">
         Danger Zone
       </Typography>
       <Typography variant="body" size="medium" className="text-neutral-content-subtler !mb-base">
