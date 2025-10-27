@@ -43,6 +43,20 @@ jest.mock("../../../../../../editor/src/utils/docs", () => ({
   getDocsUrl: (path: string) => `https://docs.example.com/${path}`,
 }));
 
+// Mock AuthProvider/useAuth
+jest.mock("@humansignal/core/providers/AuthProvider", () => ({
+  useAuth: () => ({
+    user: { id: 1, username: "testuser" },
+    permissions: {
+      can: (ability: string) => ability === "can_manage_storage", // Grant storage management permission by default
+    },
+    isLoading: false,
+  }),
+  ABILITY: {
+    can_manage_storage: "can_manage_storage",
+  },
+}));
+
 // Mock global window.APP_SETTINGS
 Object.defineProperty(window, "APP_SETTINGS", {
   value: { whitelabel_is_active: false },
