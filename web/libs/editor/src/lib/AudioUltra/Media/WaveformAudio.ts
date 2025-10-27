@@ -9,7 +9,7 @@ const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
 export interface WaveformAudioOptions {
   src?: string;
   splitChannels?: boolean;
-  decoderType?: "ffmpeg" | "webaudio";
+  decoderType?: "ffmpeg" | "webaudio" | "none";
   playerType?: "html5" | "webaudio";
 }
 
@@ -31,11 +31,12 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
   // private backed by audio element and getters/setters
   // underscored to keep the public API clean
   private splitChannels = false;
-  private decoderType: "ffmpeg" | "webaudio" = "ffmpeg";
+  private decoderType: "ffmpeg" | "webaudio" | "none" = "ffmpeg";
   private playerType: "html5" | "webaudio" = "html5";
   private src?: string;
   private mediaResolve?: () => void;
   private hasLoadedSource = false;
+  private _durationOverride?: number; // Used when decoder is "none"
 
   constructor(options: WaveformAudioOptions) {
     super();
@@ -52,6 +53,8 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
   }
 
   get duration() {
+    // Use duration override when decoder is "none"
+    if (this._durationOverride !== undefined) return this._durationOverride;
     if (this.el) return this.el?.duration ?? 0;
     return this.decoder?.duration ?? 0;
   }
@@ -79,6 +82,14 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
     this.decoder?.cancel();
   }
 
+  /**
+   * Set duration without decoding for fast loading mode.
+   * Used when decoder type is "none".
+   */
+  setDurationWithoutDecoding(duration: number) {
+    this._durationOverride = duration;
+  }
+
   destroy() {
     super.destroy();
     this.disconnect();
@@ -103,6 +114,9 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
   }
 
   async sourceDecoded() {
+    // When decoder is "none", there's no decoding to wait for
+    if (this.decoderType === "none") return true;
+
     if (!this.decoder) return false;
     try {
       if (this.mediaPromise) {
@@ -134,6 +148,11 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
   }
 
   async decodeAudioData(options: { multiChannel?: boolean; captureAudioBuffer?: boolean } = {}) {
+    // Skip decoding entirely if decoder type is "none"
+    if (this.decoderType === "none") {
+      return;
+    }
+
     if (!this.decoder) return;
 
     // need to capture the actual AudioBuffer from the decoder
@@ -214,6 +233,9 @@ export class WaveformAudio extends Events<WaveformAudioEvents> {
   }
 
   private createAudioDecoder() {
+    // Skip decoder creation when decoderType is "none"
+    if (this.decoderType === "none") return;
+
     if (!this.src || this.decoder) return;
 
     this.decoder = audioDecoderPool.getDecoder(this.src, this.splitChannels, this.decoderType);

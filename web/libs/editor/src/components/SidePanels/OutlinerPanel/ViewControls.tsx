@@ -16,13 +16,11 @@ import { Dropdown } from "../../../common/Dropdown/Dropdown";
 // eslint-disable-next-line
 // @ts-ignore
 import { Menu } from "../../../common/Menu/Menu";
-import { BemWithSpecificContext } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { SidePanelsContext } from "../SidePanelsContext";
 import "./ViewControls.scss";
 import { observer } from "mobx-react";
 import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
-
-const { Block, Elem } = BemWithSpecificContext();
 
 export type GroupingOptions = "manual" | "label" | "type";
 
@@ -145,7 +143,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
     const renderOrderingDirectionIcon = orderingDirection === "asc" ? <IconSortUp /> : <IconSortDown />;
 
     return (
-      <Block name="view-controls" mod={{ collapsed: context.locked }}>
+      <div className={cn("view-controls").mod({ collapsed: context.locked }).toClassName()}>
         <Grouping
           value={grouping}
           options={["manual", "type", "label"]}
@@ -153,7 +151,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
           readableValueForKey={getGroupingLabels}
         />
         {grouping === "manual" && (
-          <Elem name="sort">
+          <div className={cn("view-controls").elem("sort").toClassName()}>
             <Grouping
               value={ordering}
               direction={orderingDirection}
@@ -164,10 +162,10 @@ export const ViewControls: FC<ViewControlsProps> = observer(
               extraIcon={renderOrderingDirectionIcon}
               width={230}
             />
-          </Elem>
+          </div>
         )}
         <ToggleRegionsVisibilityButton regions={regions} />
-      </Block>
+      </div>
     );
   },
 );
@@ -267,10 +265,10 @@ interface GroupingMenuItemProps<T extends string> {
 const GroupingMenuItem = <T extends string>({ value, name, label, direction, onChange }: GroupingMenuItemProps<T>) => {
   return (
     <Menu.Item name={name} onClick={() => onChange(name)}>
-      <Elem name="label">
+      <div className={cn("view-controls").elem("label").toClassName()}>
         {label.label}
         <DirectionIndicator direction={direction} name={name} value={value} />
-      </Elem>
+      </div>
     </Menu.Item>
   );
 };

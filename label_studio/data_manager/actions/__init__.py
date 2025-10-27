@@ -10,22 +10,42 @@ import logging
 import os
 import traceback as tb
 from importlib import import_module
+from typing import Callable, Optional, TypedDict, Union
 
 from core.feature_flags import flag_set
+from core.utils.common import load_func
 from data_manager.functions import DataManagerException
 from django.conf import settings
-from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
+from rest_framework.exceptions import PermissionDenied
 
-logger = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 
-def check_permissions(user, action):
+class DataManagerAction(TypedDict):
+    entry_point: Callable
+    permission: Union[str, list[str]]
+    title: str
+    order: int
+    experimental: Optional[bool]
+    dialog: dict
+    hidden: Optional[bool]
+    disabled: Optional[Callable]
+    disabled_reason: Optional[str]
+
+
+def check_action_permission(user, action, project):
     """Actions must have permissions, if only one is in the user role then the action is allowed"""
     if 'permission' not in action:
         logger.error('Action must have "permission" field: %s', str(action))
         return False
 
-    return user.has_perm(action['permission'])
+    permissions = action['permission']
+    if not isinstance(permissions, list):
+        permissions = [permissions]
+    for permission in permissions:
+        if not user.has_perm(permission):
+            return False
+    return True
 
 
 def get_all_actions(user, project):
@@ -37,11 +57,13 @@ def get_all_actions(user, project):
     # copy and sort by order key
     actions = list(settings.DATA_MANAGER_ACTIONS.values())
     actions = copy.deepcopy(actions)
-    actions = sorted(actions, key=lambda x: x['order'])
+    actions: list[DataManagerAction] = sorted(actions, key=lambda x: x['order'])
+
+    check_permission = load_func(settings.DATA_MANAGER_CHECK_ACTION_PERMISSION)
     actions = [
         {key: action[key] for key in action if key != 'entry_point'}
         for action in actions
-        if not action.get('hidden', False) and check_permissions(user, action)
+        if not action.get('hidden', False) and check_permission(user, action, project)
     ]
     # remove experimental features if they are disabled
     if not (
@@ -109,10 +131,11 @@ def perform_action(action_id, project, queryset, user, **kwargs):
         raise DataManagerException("Can't find '" + action_id + "' in registered actions")
 
     action = settings.DATA_MANAGER_ACTIONS[action_id]
+    check_permission = load_func(settings.DATA_MANAGER_CHECK_ACTION_PERMISSION)
 
     # check user permissions for this action
-    if not check_permissions(user, action):
-        raise DRFPermissionDenied(f'Action is not allowed for the current user: {action["id"]}')
+    if not check_permission(user, action, project):
+        raise PermissionDenied(f'Action is not allowed for the current user: {action["id"]}')
 
     try:
         result = action['entry_point'](project, queryset, **kwargs)
@@ -129,6 +152,11 @@ def get_action_form(action_id, project, user):
         raise DataManagerException("Can't find '" + action_id + "' in registered actions")
 
     action = settings.DATA_MANAGER_ACTIONS[action_id]
+    check_permission = load_func(settings.DATA_MANAGER_CHECK_ACTION_PERMISSION)
+
+    if not check_permission(user, action, project):
+        raise PermissionDenied(f'Action is not allowed for the current user: {action["id"]}')
+
     form = action.get('dialog', {}).get('form')
     if callable(form):
         return form(user, project)

@@ -1,7 +1,7 @@
 import { useRefCallback } from "@humansignal/core/hooks/useRefCallback";
 import { useValueRef } from "@humansignal/core/hooks/useValueRef";
 import { forwardRef, memo, type MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { FF_VIDEO_FRAME_SEEK_PRECISION, isFF } from "../../utils/feature-flags";
 import { clamp, isDefined } from "../../utils/utilities";
 import { useUpdateBuffering } from "../../hooks/useUpdateBuffering";
@@ -620,14 +620,14 @@ export const VideoCanvas = memo(
     }, []);
 
     return (
-      <Block ref={rootRef} name="video-canvas">
+      <div ref={rootRef as any} className={cn("video-canvas").toClassName()}>
         {loading && (
-          <Elem name="loading">
-            <Block name="spinner" />
-          </Elem>
+          <div className={cn("video-canvas").elem("loading").toClassName()}>
+            <div className={cn("spinner").toClassName()} />
+          </div>
         )}
-        <Elem
-          name="view"
+        <div
+          className={cn("video-canvas").elem("view").toClassName()}
           onClick={props.onClick}
           style={{
             width: canvasWidth,
@@ -644,8 +644,10 @@ export const VideoCanvas = memo(
             width={canvasWidth}
             height={canvasHeight}
           />
-          {!isSyncedBuffering && !loading && buffering && <Elem name="buffering" aria-label="Buffering Media Source" />}
-        </Elem>
+          {!isSyncedBuffering && !loading && buffering && (
+            <div className={cn("video-canvas").elem("buffering").toClassName()} aria-label="Buffering Media Source" />
+          )}
+        </div>
 
         <VirtualVideo
           ref={videoRef as MutableRefObject<HTMLVideoElement>}
@@ -683,7 +685,7 @@ export const VideoCanvas = memo(
           onEnded={handleVideoEnded}
           onError={handleVideoError}
         />
-      </Block>
+      </div>
     );
   }),
 );
