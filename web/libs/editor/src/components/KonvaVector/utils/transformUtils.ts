@@ -1,6 +1,5 @@
 import type Konva from "konva";
 import type { BezierPoint } from "../types";
-import { constrainGroupToBounds } from "./boundsChecking";
 
 export interface TransformResult {
   newPoints: BezierPoint[];
