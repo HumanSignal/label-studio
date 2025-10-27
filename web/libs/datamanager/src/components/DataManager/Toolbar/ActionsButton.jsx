@@ -216,13 +216,9 @@ export const ActionsButton = injector(
       projectId: store.SDK.projectId,
     });
 
-    // Merge server actions with any client-side actions from the store
     const actions = useMemo(() => {
-      // If we have server actions, use them; otherwise fall back to store actions
-      const actionsToUse = serverActions.length > 0 ? serverActions : store.availableActions;
-      return actionsToUse.filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
-    }, [serverActions, store.availableActions]);
-
+      return [...store.availableActions, ...serverActions].filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
+    }, [store.availableActions, serverActions]);
     const actionButtons = actions.map((action) => (
       <ActionButton key={action.id} action={action} parentRef={formRef} store={store} formRef={formRef} />
     ));
