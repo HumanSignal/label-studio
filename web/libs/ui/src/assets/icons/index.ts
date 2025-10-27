@@ -63,6 +63,7 @@ export { ReactComponent as IconChevronRightBold } from "./chevron-right-bold.svg
 export { ReactComponent as IconChevronRightSmall } from "./chevron-right-small.svg";
 export { ReactComponent as IconCircleTool } from "./circle-tool.svg";
 export { ReactComponent as IconCircleToolSmart } from "./circle-tool-smart.svg";
+export { ReactComponent as IconClipboardCheck } from "./clipboard-check.svg";
 export { ReactComponent as IconClock } from "./clock.svg";
 export { ReactComponent as IconClockTimeFourOutline } from "./clock-time-four-outline.svg";
 export { ReactComponent as IconClose } from "./close.svg";
