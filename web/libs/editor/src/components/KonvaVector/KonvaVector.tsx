@@ -360,6 +360,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Ref to track the _transformable group for applying transformations
   const transformableGroupRef = useRef<Konva.Group>(null);
 
+  // Ref to track click timeout for click/double-click debouncing
+  const clickTimeoutRef = useRef<number | null>(null);
+
+  // Flag to track if we've handled a double-click through debouncing
+  const doubleClickHandledRef = useRef(false);
+
   // Track initial transform state for delta calculation
   const initialTransformRef = useRef<{
     x: number;
@@ -1618,6 +1624,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     },
   }));
 
+  // Clean up click timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
   // Handle Shift key for disconnected mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -1639,6 +1655,38 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
+  }, []);
+
+  // Click handler with debouncing for single/double-click detection
+  const handleClickWithDebouncing = useCallback((e: any, onClickHandler?: (e: any) => void, onDblClickHandler?: (e: any) => void) => {
+    console.log("🖱️ handleClickWithDebouncing called, timeout exists:", !!clickTimeoutRef.current);
+
+    // Clear any existing timeout
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+      // This is a double-click, handle it
+      console.log("🖱️ Double-click detected, calling onDblClickHandler");
+      doubleClickHandledRef.current = true;
+      if (onDblClickHandler) {
+        onDblClickHandler(e);
+      }
+      // Reset the flag after a short delay
+      setTimeout(() => {
+        doubleClickHandledRef.current = false;
+      }, 100);
+      return;
+    }
+
+    // Set a timeout for single-click handling
+    console.log("🖱️ Single-click detected, setting timeout");
+    clickTimeoutRef.current = setTimeout(() => {
+      clickTimeoutRef.current = null;
+      console.log("🖱️ Single-click timeout fired, calling onClickHandler");
+      if (onClickHandler) {
+        onClickHandler(e);
+      }
+    }, 300);
   }, []);
 
   // Create event handlers
@@ -1773,7 +1821,17 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               eventHandlers.handleLayerClick(e);
             }
       }
-      onDblClick={disabled ? undefined : onDblClick}
+      onDblClick={disabled ? undefined : (e) => {
+        console.log("🖱️ Group onDblClick called, doubleClickHandled:", doubleClickHandledRef.current);
+        // If we've already handled this double-click through debouncing, ignore it
+        if (doubleClickHandledRef.current) {
+          console.log("🖱️ Ignoring Group onDblClick - already handled through debouncing");
+          return;
+        }
+        // Otherwise, call the original onDblClick handler
+        console.log("🖱️ Calling original onDblClick handler");
+        onDblClick?.(e);
+      }}
     >
       {/* Invisible rectangle - always render to capture mouse events for cursor position updates */}
       {!disabled && (
@@ -1903,8 +1961,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 }
               }
 
-              // Call the original onClick handler
-              onClick?.(e);
+              // Use debouncing for click/double-click detection
+              handleClickWithDebouncing(e, onClick, onDblClick);
             }}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
@@ -2144,8 +2202,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 }
               }
 
-              // Call the original onClick handler
-              onClick?.(e);
+              // Use debouncing for click/double-click detection
+              handleClickWithDebouncing(e, onClick, onDblClick);
             }}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
