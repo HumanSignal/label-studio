@@ -31,8 +31,8 @@ export const StorageSettings = () => {
   useUpdatePageTitle(createTitleFromSegments([project?.title, "Cloud Storage Settings"]));
 
   // Fetch storage data at parent level
-  const sourceStorage = useStorageCard("import", project?.id);
-  const targetStorage = useStorageCard("", project?.id);
+  const sourceStorage = useStorageCard("", project?.id);
+  const targetStorage = useStorageCard("export", project?.id);
 
   // Check if any storages exist
   const hasAnyStorages = sourceStorage.storages?.length > 0 || targetStorage.storages?.length > 0;
@@ -137,7 +137,7 @@ export const StorageSettings = () => {
               </div>
             }
             actions={
-              <div className="flex gap-2">
+              <div className="flex gap-base">
                 <Button look="primary" onClick={() => sourceStorageRef.current?.openAddModal()}>
                   Add Source Storage
                 </Button>
