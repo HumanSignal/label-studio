@@ -17,6 +17,10 @@ import { Button } from "@humansignal/ui";
 import { useEffect, useState } from "react";
 import { EmptyState } from "./empty-state";
 
+// DataManager table always uses comfortable density
+// QuickView table manages its own density internally
+const DEFAULT_ROW_HEIGHT = 70;
+
 const injector = inject(({ store }) => {
   const { dataStore, currentView } = store;
   const totalTasks = store.project?.task_count ?? store.project?.task_number ?? 0;
@@ -309,7 +313,7 @@ export const DataView = injector(
         <Table
           view={view}
           data={data}
-          rowHeight={70}
+          rowHeight={DEFAULT_ROW_HEIGHT}
           total={total}
           loadMore={loadMore}
           fitContent={isLabeling}

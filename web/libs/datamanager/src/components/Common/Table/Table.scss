@@ -1,18 +1,16 @@
-.columns__selector {
-  position: absolute;
-  width: 100%;
-  overflow: hidden;
+.table-toolbar {
   display: flex;
-  justify-content: flex-end;
-  top: 0;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 100%;
+  padding: 0 var(--spacing-tight);
+  background-color: var(--color-neutral-surface);
 
-  &__button-new.columns__selector__button-new {
-    z-index: 1000;
+  &__customize-button.table-toolbar__customize-button {
     height: 28px;
     width: 28px;
     background-color: var(--color-neutral-background);
     box-shadow: 0 2px 5px 0 var(--black_20);
-    margin: 6.5px 20px;
     border-radius: 4px;
 
     &:hover {
@@ -40,6 +38,18 @@
   flex-direction: column;
   overflow: auto;
   background-color: var(--color-neutral-background);
+
+  &-head {
+    border-top: 1px solid var(--color-neutral-border);
+  }
+
+  &__auto-size {
+    &_quick-view {
+      & > div {
+        background-color: var(--color-neutral-surface);
+      }
+    }
+  }
 
   &_fit {
     width: max-content;
