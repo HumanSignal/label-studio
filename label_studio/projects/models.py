@@ -25,7 +25,7 @@ from core.utils.common import (
     load_func,
     merge_labels_counters,
 )
-from core.utils.db import batch_update_with_retry, fast_first
+from core.utils.db import batch_update_with_retry, fast_first, has_column_cached
 from django.conf import settings
 from django.contrib.postgres.search import SearchVectorField
 from django.core.validators import MaxLengthValidator, MinLengthValidator
@@ -107,6 +107,17 @@ class ProjectManager(models.Manager):
         return queryset
 
 
+class ProjectVisibleManager(ProjectManager):
+    """Default manager that hides soft-deleted projects (deleted_at IS NULL)."""
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # Avoid referencing columns that might not exist during early migrations
+        if has_column_cached(self.model._meta.db_table, 'deleted_at'):
+            return qs.filter(deleted_at__isnull=True)
+        return qs
+
+
 ProjectMixin = load_func(settings.PROJECT_MIXIN)
 
 
@@ -123,7 +134,9 @@ class Project(ProjectMixin, models.Model):
         # ignore skipped tasks => skip is a valid annotation, task is completed (finished=True)
         IGNORE_SKIPPED = 'IGNORE_SKIPPED', 'Ignore skipped'
 
-    objects = ProjectManager()
+    # Managers: default (visible only) and explicit unfiltered
+    objects = ProjectVisibleManager()
+    all_objects = ProjectManager()
     __original_label_config = None
 
     title = models.CharField(
@@ -289,6 +302,19 @@ class Project(ProjectMixin, models.Model):
         default=None,
         help_text='Custom task lock TTL in seconds. If not set, the default value is used',
     )
+
+    # Soft-delete lifecycle (OSS fields, used by LSE logic)
+    deleted_at = models.DateTimeField(_('deleted at'), null=True, blank=True)
+    deleted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='deleted_projects',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_index=False,
+        verbose_name=_('deleted by'),
+    )
+    purge_at = models.DateTimeField(_('purge at'), null=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
