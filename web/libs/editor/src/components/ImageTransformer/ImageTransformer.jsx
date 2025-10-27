@@ -174,59 +174,19 @@ export default class TransformerComponent extends Component {
     });
   };
 
-  applyTransformToRegions = () => {
+  applyTransformToVectorRegions = () => {
     if (!this.transformer) return;
 
     const { item } = this.props;
     const { selectedRegions } = item;
 
-    // Get the transformer's current transform values
-    const nodes = this.transformer.nodes();
-    if (!nodes || nodes.length === 0) return;
-
-    // Apply transform to each selected region individually
-    // Each node may have different transform values when transforming multiple nodes together
-    selectedRegions.forEach((region, index) => {
-      const node = nodes[index];
-      if (!node) {
-        console.warn('🔄 No node found for region:', region.id);
-        return;
-      }
-
-      // Get the transform for THIS specific node
-      const transform = {
-        dx: node.x(),
-        dy: node.y(),
-        scaleX: node.scaleX(),
-        scaleY: node.scaleY(),
-        rotation: node.rotation(),
-      };
-
-      console.log('🔄 Applying transform to region:', {
-        regionId: region.id,
-        ...transform,
-      });
-
+    // Only apply custom transform logic for VectorRegion instances
+    selectedRegions.forEach((region) => {
       if (region.applyTransform && typeof region.applyTransform === 'function') {
-        region.applyTransform(transform, null);
-      } else {
-        console.log('🔄 Region does not have applyTransform method:', region.id);
+        console.log('🔄 ImageTransformer calling applyTransform on VectorRegion:', region.id);
+        region.applyTransform({}, null);
       }
     });
-
-    // Reset the transformer nodes to identity transform
-    nodes.forEach((node) => {
-      node.x(0);
-      node.y(0);
-      node.scaleX(1);
-      node.scaleY(1);
-      node.rotation(0);
-    });
-
-    // Detach transformer temporarily to prevent recalculation during re-render
-    // The transformer will be reattached by checkNode after components update
-    this.transformer.nodes([]);
-    this.transformer.getLayer()?.batchDraw();
   };
 
   renderLSTransformer() {
@@ -269,14 +229,14 @@ export default class TransformerComponent extends Component {
           }}
           dragBoundFunc={this.dragBoundFunc}
           onDragEnd={() => {
-            // Apply transformations to individual regions
-            this.applyTransformToRegions();
+            // Call applyTransform for VectorRegion instances
+            this.applyTransformToVectorRegions();
             this.unfreeze();
             setTimeout(this.checkNode);
           }}
           onTransformEnd={() => {
-            // Apply transformations to individual regions
-            this.applyTransformToRegions();
+            // Call applyTransform for VectorRegion instances
+            this.applyTransformToVectorRegions();
             setTimeout(this.checkNode);
           }}
           backSelector={this.props.draggableBackgroundSelector}
@@ -321,14 +281,14 @@ export default class TransformerComponent extends Component {
           }}
           dragBoundFunc={this.dragBoundFunc}
           onDragEnd={() => {
-            // Apply transformations to individual regions
-            this.applyTransformToRegions();
+            // Call applyTransform for VectorRegion instances
+            this.applyTransformToVectorRegions();
             this.unfreeze();
             setTimeout(this.checkNode);
           }}
           onTransformEnd={() => {
-            // Apply transformations to individual regions
-            this.applyTransformToRegions();
+            // Call applyTransform for VectorRegion instances
+            this.applyTransformToVectorRegions();
             setTimeout(this.checkNode);
           }}
           backSelector={this.props.draggableBackgroundSelector}

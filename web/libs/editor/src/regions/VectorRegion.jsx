@@ -485,7 +485,10 @@ const Model = types
        * @param {Object} transformerCenter - Center point used by the ImageTransformer for scaling/rotation
        */
       applyTransform(transform, transformerCenter) {
-        if (!self.vectorRef) return;
+        if (!self.vectorRef) {
+          console.log("🔄 VectorRegion.applyTransform: No vectorRef, returning");
+          return;
+        }
 
         console.log("🔄 VectorRegion.applyTransform called:", {
           regionId: self.id,

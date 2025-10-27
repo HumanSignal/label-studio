@@ -1445,6 +1445,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     // Multi-region transformation method - applies group transform to points
     commitMultiRegionTransform: () => {
       if (!isMultiRegionSelected || !transformableGroupRef.current || !initialTransformRef.current) {
+        console.log("🔄 commitMultiRegionTransform: Early return - not multi-region or missing refs");
         return;
       }
 
@@ -1478,18 +1479,57 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         current: { x: currentX, y: currentY, scaleX: currentScaleX, scaleY: currentScaleY, rotation: currentRotation },
       });
 
+      // Apply constraints to the transform before committing
+      const imageWidth = width || 0;
+      const imageHeight = height || 0;
+
+      let constrainedDx = dx;
+      let constrainedDy = dy;
+      let constrainedScaleX = scaleX;
+      let constrainedScaleY = scaleY;
+
+      if (imageWidth > 0 && imageHeight > 0) {
+        // Calculate bounding box of current points after transform
+        const xs = initialPoints.map(p => p.x);
+        const ys = initialPoints.map(p => p.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+
+        // Apply scale and position to get new bounds
+        const scaledMinX = minX * scaleX + dx;
+        const scaledMaxX = maxX * scaleX + dx;
+        const scaledMinY = minY * scaleY + dy;
+        const scaledMaxY = maxY * scaleY + dy;
+
+        // Apply constraints
+        if (scaledMinX < 0) constrainedDx = dx - scaledMinX;
+        if (scaledMaxX > imageWidth) constrainedDx = dx - (scaledMaxX - imageWidth);
+        if (scaledMinY < 0) constrainedDy = dy - scaledMinY;
+        if (scaledMaxY > imageHeight) constrainedDy = dy - (scaledMaxY - imageHeight);
+
+        console.log("🔍 Transform constraints applied:", {
+          original: { dx, dy, scaleX, scaleY },
+          constrained: { dx: constrainedDx, dy: constrainedDy, scaleX: constrainedScaleX, scaleY: constrainedScaleY },
+          bounds: `${imageWidth}x${imageHeight}`,
+          shapeBounds: `(${minX.toFixed(1)}, ${minY.toFixed(1)}) to (${maxX.toFixed(1)}, ${maxY.toFixed(1)})`,
+          newBounds: `(${scaledMinX.toFixed(1)}, ${scaledMinY.toFixed(1)}) to (${scaledMaxX.toFixed(1)}, ${scaledMaxY.toFixed(1)})`,
+        });
+      }
+
       // Apply the transformation exactly as the single-region onTransformEnd handler does:
       // 1. Scale around origin (0,0)
       // 2. Rotate around origin (0,0)
-      // 3. Translate by (dx, dy)
+      // 3. Translate by (constrainedDx, constrainedDy)
       const radians = rotation * (Math.PI / 180);
       const cos = Math.cos(radians);
       const sin = Math.sin(radians);
 
       const transformedVertices = initialPoints.map((point) => {
         // Step 1: Scale
-        const x = point.x * scaleX;
-        const y = point.y * scaleY;
+        const x = point.x * constrainedScaleX;
+        const y = point.y * constrainedScaleY;
 
         // Step 2: Rotate
         const rx = x * cos - y * sin;
@@ -1498,30 +1538,30 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         // Step 3: Translate and clamp to image bounds
         const result = {
           ...point,
-          x: Math.max(0, Math.min(width, rx + dx)),
-          y: Math.max(0, Math.min(height, ry + dy)),
+          x: Math.max(0, Math.min(imageWidth, rx + constrainedDx)),
+          y: Math.max(0, Math.min(imageHeight, ry + constrainedDy)),
         };
 
         // Transform control points if bezier
         if (point.isBezier) {
           if (point.controlPoint1) {
-            const cp1x = point.controlPoint1.x * scaleX;
-            const cp1y = point.controlPoint1.y * scaleY;
+            const cp1x = point.controlPoint1.x * constrainedScaleX;
+            const cp1y = point.controlPoint1.y * constrainedScaleY;
             const cp1rx = cp1x * cos - cp1y * sin;
             const cp1ry = cp1x * sin + cp1y * cos;
             result.controlPoint1 = {
-              x: Math.max(0, Math.min(width, cp1rx + dx)),
-              y: Math.max(0, Math.min(height, cp1ry + dy)),
+              x: Math.max(0, Math.min(imageWidth, cp1rx + constrainedDx)),
+              y: Math.max(0, Math.min(imageHeight, cp1ry + constrainedDy)),
             };
           }
           if (point.controlPoint2) {
-            const cp2x = point.controlPoint2.x * scaleX;
-            const cp2y = point.controlPoint2.y * scaleY;
+            const cp2x = point.controlPoint2.x * constrainedScaleX;
+            const cp2y = point.controlPoint2.y * constrainedScaleY;
             const cp2rx = cp2x * cos - cp2y * sin;
             const cp2ry = cp2x * sin + cp2y * cos;
             result.controlPoint2 = {
-              x: Math.max(0, Math.min(width, cp2rx + dx)),
-              y: Math.max(0, Math.min(height, cp2ry + dy)),
+              x: Math.max(0, Math.min(imageWidth, cp2rx + constrainedDx)),
+              y: Math.max(0, Math.min(imageHeight, cp2ry + constrainedDy)),
             };
           }
         }
@@ -1538,6 +1578,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       );
 
       // Reset the _transformable group transform to identity
+      // This ensures the visual representation matches the committed data
       transformableGroup.x(0);
       transformableGroup.y(0);
       transformableGroup.scaleX(1);
@@ -1554,6 +1595,26 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       };
 
       console.log("📊 Reset _transformable group transform to identity");
+
+      // Detach and reattach the transformer to prevent resizing issues
+      const stage = transformableGroup.getStage();
+      if (stage) {
+        const transformer = stage.findOne('Transformer');
+        if (transformer) {
+          // Temporarily detach the transformer
+          const nodes = transformer.nodes();
+          transformer.nodes([]);
+
+          // Force a redraw
+          stage.batchDraw();
+
+          // Reattach the transformer after a brief delay
+          setTimeout(() => {
+            transformer.nodes(nodes);
+            stage.batchDraw();
+          }, 0);
+        }
+      }
     },
   }));
 
