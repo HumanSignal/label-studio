@@ -83,7 +83,11 @@ This tag must have one or more `Label` tag children, and supports standard param
 
 #### Supported PDFs
 
-If your 
+PDFs that work best with the new OCR labeling are those that already contain a selectable text layer (text overlay). 
+
+In these PDFs, when you draw a bounding box, the tool can read and highlight the underlying text from that layer (see the video below). 
+
+Image-only PDFs such as scans or phone photos without a text layer won’t return text. For those, you may need to use an external OCR tool to add a text layer first. If a PDF’s text layer is misaligned or low quality, captured text may be incomplete or incorrect, and this feature can help you audit and improve those overlays. 
 
 **Results:**
 

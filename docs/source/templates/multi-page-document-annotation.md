@@ -14,7 +14,7 @@ Multi-page document annotation allows you to annotate documents that consist of 
 
 If you just need to classify a PDF document as a whole, you can also use the [PDF Classification template](pdf_classification).
 
-!!! error Enter
+!!! error Enterprise
     If you are performing OCR annotation and you are a Label Studio Enterprise users, see [OCR Labeling for PDFs](pdf_ocr).
 
 <a href="https://app.humansignal.com/b/MTk4"
