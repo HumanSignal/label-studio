@@ -1,3 +1,30 @@
+import logging
+
+from label_studio.core.utils import db as db_utils
+
+
+class _BrokenConnection:
+    vendor = 'testdb'
+
+    @property
+    def settings_dict(self):
+        # Simulate an unexpected error when accessing connection.settings_dict
+        raise RuntimeError('boom')
+
+
+def test_current_db_key_exception_path(monkeypatch, caplog):
+    # Arrange: replace connection with a broken one to trigger the except path
+    monkeypatch.setattr(db_utils, 'connection', _BrokenConnection())
+
+    # Act: call current_db_key and capture error logs
+    with caplog.at_level(logging.ERROR, logger='label_studio.core.utils.db'):
+        key = db_utils.current_db_key()
+
+    # Assert: name fallback used and error message logged
+    assert key == 'testdb:unknown'
+    assert any('Error getting current DB key' in rec.message for rec in caplog.records)
+
+
 """This module contains tests for database utility functions in core/utils/db.py"""
 import pytest
 from core.utils.db import batch_delete

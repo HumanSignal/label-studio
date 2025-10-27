@@ -903,4 +903,4 @@ FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
 
 # Used for async migrations. In LSE this is set to a real queue name, including here so we
 # can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
-SERVICE_QUEUE_NAME = ''
+SERVICE_QUEUE_NAME = get_env('SERVICE_QUEUE_NAME', 'default')
