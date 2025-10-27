@@ -55,7 +55,8 @@ Ideal for document intelligence, QA on OCR output, and structured data capture w
 
   Select the text under the **Regions** panel to correct it. 
 
-  ![Screenshot](/images/templates-misc/ocrlabels.png)
+  <img src="/images/templates-misc/ocrlabels.png" alt="" class="gif-border" style="max-width:400px" />
+
 
 
 ## Input data
@@ -63,7 +64,7 @@ Ideal for document intelligence, QA on OCR output, and structured data capture w
 ```json
 {
     "data": {
-      "pdf": "/static/samples/ocr-receipts.pdf"
+      "pdf": "/static/samples/opossum-cuteness.pdf"
     }
 }
 ```
