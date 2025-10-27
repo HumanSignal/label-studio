@@ -1765,6 +1765,34 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               // Update position if constraints were applied
               if (constrainedX !== x || constrainedY !== y) {
+                // For multi-region selection, apply the same constraint to all selected shapes
+                if (isMultiRegionSelected) {
+                  const stage = node.getStage();
+                  const allTransformableGroups = stage?.find('._transformable');
+                  const allNodes = stage?.getChildren();
+
+
+                  if (allTransformableGroups && allTransformableGroups.length > 1) {
+                    // Calculate the constraint offset
+                    const constraintOffsetX = constrainedX - x;
+                    const constraintOffsetY = constrainedY - y;
+
+                    console.log(`🔍 Multi-region constraint offset: (${constraintOffsetX.toFixed(1)}, ${constraintOffsetY.toFixed(1)})`);
+
+                    // Apply the same constraint to all other transformable groups
+                    allTransformableGroups.forEach(group => {
+                      if (group !== node) {
+                        const currentPos = group.position();
+                        console.log(`🔍 Applying constraint to group ${group.name()}: (${currentPos.x.toFixed(1)}, ${currentPos.y.toFixed(1)}) -> (${(currentPos.x + constraintOffsetX).toFixed(1)}, ${(currentPos.y + constraintOffsetY).toFixed(1)})`);
+                        group.position({
+                          x: currentPos.x + constraintOffsetX,
+                          y: currentPos.y + constraintOffsetY
+                        });
+                      }
+                    });
+                  }
+                }
+
                 node.position({ x: constrainedX, y: constrainedY });
               }
 
