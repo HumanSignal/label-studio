@@ -1728,7 +1728,50 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       {/* Conditionally wrap content with _transformable group for ImageTransformer */}
       {isMultiRegionSelected ? (
-        <Group name="_transformable" ref={transformableGroupRef}>
+        <Group
+          name="_transformable"
+          ref={transformableGroupRef}
+          onDragMove={(e) => {
+            // Apply image coordinate bounds for VectorRegion drag constraints
+            const imageWidth = width || 0;
+            const imageHeight = height || 0;
+
+            if (imageWidth > 0 && imageHeight > 0) {
+              const node = e.target;
+              const { x, y } = node.position();
+
+              // Calculate bounding box of current points
+              const xs = rawInitialPoints.map(p => p.x);
+              const ys = rawInitialPoints.map(p => p.y);
+              const minX = Math.min(...xs);
+              const maxX = Math.max(...xs);
+              const minY = Math.min(...ys);
+              const maxY = Math.max(...ys);
+
+              // Calculate where the shape would be after this drag
+              const newMinX = minX + x;
+              const newMaxX = maxX + x;
+              const newMinY = minY + y;
+              const newMaxY = maxY + y;
+
+              // Apply constraints
+              let constrainedX = x;
+              let constrainedY = y;
+
+              if (newMinX < 0) constrainedX = x - newMinX;
+              if (newMaxX > imageWidth) constrainedX = x - (newMaxX - imageWidth);
+              if (newMinY < 0) constrainedY = y - newMinY;
+              if (newMaxY > imageHeight) constrainedY = y - (newMaxY - imageHeight);
+
+              // Update position if constraints were applied
+              if (constrainedX !== x || constrainedY !== y) {
+                node.position({ x: constrainedX, y: constrainedY });
+              }
+
+              console.log(`🔍 VectorDragConstraint: bounds=${imageWidth}x${imageHeight}, pos=(${constrainedX.toFixed(1)}, ${constrainedY.toFixed(1)})`);
+            }
+          }}
+        >
           {/* Unified vector shape - renders all lines based on id-prevPointId relationships */}
           <VectorShape
             segments={getAllLineSegments()}
