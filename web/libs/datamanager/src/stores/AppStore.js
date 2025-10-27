@@ -591,9 +591,6 @@ export const AppStore = types
       }
 
       if (!isLabelStream || (self.project?.show_annotation_history && task)) {
-        // Note: Actions are now fetched on-demand via the useActions hook in ActionsButton component
-        // This avoids unnecessary API calls and leverages TanStack Query's caching
-
         if (self.SDK.settings?.onlyVirtualTabs && self.project?.show_annotation_history && !task) {
           requests.push(
             self.viewsStore.addView(
@@ -757,7 +754,7 @@ export const AppStore = types
       }
 
       if (actionCallback instanceof Function) {
-        const result = yield actionCallback(actionParams, view);
+        const result = actionCallback(actionParams, view);
         self.SDK.invoke("actionDialogOkComplete", actionId, {
           result,
           view: viewReloaded,
