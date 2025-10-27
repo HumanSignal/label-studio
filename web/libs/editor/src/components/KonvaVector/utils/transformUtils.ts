@@ -150,7 +150,6 @@ export function applyTransformationToPoints(
     };
   },
   transformerCenter?: { x: number; y: number },
-  constrainToBounds = false,
   bounds?: { width: number; height: number },
 ): TransformResult {
   const nodes = transformer.nodes();
@@ -186,7 +185,7 @@ export function applyTransformationToPoints(
       // Use stored original positions if available, otherwise use current positions
       const originalPos = originalPositions?.[pointIndex] || originalPoint;
 
-      // Update the point position - trust what the transformer says
+      // Update the point position (no individual constraints - group constraints handled by transformer)
       point.x = transformedX;
       point.y = transformedY;
 
@@ -196,6 +195,9 @@ export function applyTransformationToPoints(
       // Control points will be handled separately using delta transformation
     }
   }
+
+  // Let Konva's built-in dragBoundFunc and resizeBoundFunc handle all boundary constraints
+  // No need for custom point constraint logic
 
   return { newPoints, transformer };
 }

@@ -128,6 +128,12 @@ class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Webhook.objects.all()
     serializer_class = WebhookSerializer
     permission_classes = [IsAuthenticated]
+    permission_required = ViewClassPermission(
+        GET=all_permissions.webhooks_view,
+        PATCH=all_permissions.webhooks_change,
+        PUT=all_permissions.webhooks_change,
+        DELETE=all_permissions.webhooks_change,
+    )
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
