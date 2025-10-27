@@ -72,3 +72,6 @@ status = 404
 [dev]
 command = "yarn start"
 targetPort = 4000
+
+[build]
+command = "jupyter nbconvert --to markdown source/tutorials/*.ipynb --output-dir source/_posts/tutorials && touch db.json && hexo clean && touch db.json && hexo generate --config opensource.yml,_config.yml"
