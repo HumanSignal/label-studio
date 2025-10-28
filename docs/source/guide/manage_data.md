@@ -191,9 +191,13 @@ This will then average all annotator vs annotator scores for only the selected a
 
 <img src="/images/project/agreement-selected-annotators.png" class="gif-border" style="max-width:679px">
 
+**Subset of models**
+
 You can also select multiple models to see model consensus in your project. This will average all model vs model scores for the selected models.
 
 <img src="/images/project/agreement-selected-models.png" class="gif-border" style="max-width:679px">
+
+**Subset of models and annotators**
 
 Other combinations are also possible such as selecting one annotator and multiple models, multiple annotators and multiple models, etc.
 
