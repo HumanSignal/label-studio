@@ -87,6 +87,8 @@ export const Select = forwardRef(
       pageSize = VARIABLE_LIST_PAGE_SIZE,
       page = 1,
       itemCount,
+      onClose,
+      onOpen,
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
@@ -143,7 +145,10 @@ export const Select = forwardRef(
           valueRef.current = val;
           setValue(val);
         }
-        !multiple && setIsOpen(false);
+        if (!multiple) {
+          setIsOpen(false);
+          onClose?.();
+        }
         props?.onChange?.(valueRef.current);
         setTimeout(() => {
           const changeEvent = new Event("change", {
@@ -310,7 +315,13 @@ export const Select = forwardRef(
     }, [_options, multiple, isSelected, _onChange]);
 
     const combobox = (
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <Popover
+        open={isOpen}
+        onOpenChange={(_isOpen) => {
+          setIsOpen(_isOpen);
+          _isOpen ? onOpen?.() : onClose?.();
+        }}
+      >
         <PopoverTrigger asChild={true} disabled={disabled}>
           <button
             variant="outline"
