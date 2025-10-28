@@ -138,10 +138,20 @@ export const StorageSettings = () => {
             }
             actions={
               <div className="flex gap-base">
-                <Button look="primary" onClick={() => sourceStorageRef.current?.openAddModal()}>
+                <Button
+                  look="primary"
+                  data-testid="add-source-storage-button-empty-state"
+                  aria-label="Add Source Storage"
+                  onClick={() => sourceStorageRef.current?.openAddModal()}
+                >
                   Add Source Storage
                 </Button>
-                <Button look="primary" onClick={() => targetStorageRef.current?.openAddModal()}>
+                <Button
+                  look="primary"
+                  data-testid="add-target-storage-button-empty-state"
+                  aria-label="Add Target Storage"
+                  onClick={() => targetStorageRef.current?.openAddModal()}
+                >
                   Add Target Storage
                 </Button>
               </div>

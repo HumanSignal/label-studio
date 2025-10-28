@@ -1324,6 +1324,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_all_fit_866_analytics_overview_short": {
+      "key": "fflag_feat_all_fit_866_analytics_overview_short",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "c82dcf28900144ec980adbacd0ca5589",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_all_leap_1081_reviewer_flow_updates": {
       "key": "fflag_feat_all_leap_1081_reviewer_flow_updates",
       "on": true,

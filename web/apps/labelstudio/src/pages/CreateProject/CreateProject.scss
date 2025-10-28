@@ -5,7 +5,7 @@
   flex-direction: column;
   overflow-y: auto;
 
-  & > .modal__header {
+  .modal-ls__header {
     border-bottom: 1px solid var(--color-neutral-border);
 
     & h1 {
@@ -13,7 +13,7 @@
       margin-right: auto;
       margin-bottom: 0;
       margin-top: 0;
-      font-size: 20px;
+      font-size: 24px;
       color: var(--color-neutral-content);
     }
 
@@ -26,6 +26,10 @@
       width: 500px;
       margin-right: auto;
       box-sizing: border-box;
+    }
+
+    .space-ls_direction_horizontal {
+      min-width: 224px;
     }
   }
 

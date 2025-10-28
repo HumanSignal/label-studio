@@ -126,7 +126,13 @@ export const StorageSet = forwardRef(
     return (
       <Columns.Column title={title}>
         <div className={rootClass.elem("controls")}>
-          <Button onClick={() => showStorageFormModal()} disabled={loading} look="outlined" aria-label="Add storage">
+          <Button
+            onClick={() => showStorageFormModal()}
+            disabled={loading}
+            look="outlined"
+            data-testid={`add-${target === "export" ? "target" : "source"}-storage-button`}
+            aria-label={`Add ${target === "export" ? "Target" : "Source"} Storage`}
+          >
             {buttonLabel}
           </Button>
         </div>
