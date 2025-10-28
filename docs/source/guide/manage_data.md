@@ -140,7 +140,9 @@ These two columns allow you to see agreement scores at a task level.
 
 ### Agreement
 
-This is the average agreement score between all annotators for a particular task. Each annotation pair's agreement score will be calculated as new annotations are submitted. For example if there are three annotations for a task, there will be three unique annotation pairs, and the agreement column will show the average agreement score of those three pairs. 
+The **Agreement** column displays the average agreement score between all annotators for a particular task. 
+
+Each annotation pair's agreement score will be calculated as new annotations are submitted. For example, if there are three annotations for a task, there will be three unique annotation pairs, and the agreement column will show the average agreement score of those three pairs. 
 
 Here is an example with a simple label config. Let's assume we are using ["Exact matching choices" agreement calculation](stats#Exact-matching-choices-example)
 ```xml
@@ -152,59 +154,71 @@ Here is an example with a simple label config. Let's assume we are using ["Exact
   </Choices>
 </View>
 ```
-Annotation 1: `Cat`
-Annotation 2: `Dog` 
-Annotation 3: `Cat` 
+Annotation 1: `Cat`  
+Annotation 2: `Dog`  
+Annotation 3: `Cat`  
 
 The three unique pairs are
 1. Annotation 1 <> Annotation 2 - agreement score is `0`
 2. Annotation 1 <> Annotation 3 - agreement score is `1`
 3. Annotation 2 <> Annotation 3 - agreement score is `0`
 
-The agreement column for this task would show the average of all annotation pair's agreement score - `33%`
+The agreement column for this task would show the average of all annotation pair's agreement score:
+`33%`
 
 ### Agreement (Selected)
 
-The agreement (selected) column builds on top of the agreement column, allowing you to get agreement scores between annotators, ground truth, and model versions. The column header is a dropdown where you can make your selection of which pairs you want to include in the calculation.
+The **Agreement (Selected)** column builds on top of the agreement column, allowing you to get agreement scores between annotators, ground truth, and model versions. 
+
+The column header is a dropdown where you can make your selection of which pairs you want to include in the calculation.
 
 <img src="/images/project/agreement-selected.png" class="gif-border" style="max-width:679px">
 
-Under "Choose What To Calculate" there are two options which can be used for different use cases. 
+Under **Choose What To Calculate** there are two options, which can be used for different use cases. 
 
 #### Agreement Pairs
 
-This allows you to select annotators and/or models to compare. You must select at least two items to compare. This can be used in a variety of ways. 
+This allows you to select specific annotators and/or models to compare.  
 
-You can select a subset of annotators to compare (versus in the normal 'Agreement' column, all annotators are included in the score). This will average all annotator vs annotator scores for selected annotators.
+
+You must select at least two items to compare. This can be used in a variety of ways. 
+
+**Subset of annotators**
+
+You can select a subset of annotators to compare. This is different and more precise than the **Agreement** column which automatically includes all annotators in the score.
+
+This will then average all annotator vs annotator scores for only the selected annotators.
 
 <img src="/images/project/agreement-selected-annotators.png" class="gif-border" style="max-width:679px">
 
-You can select multiple models to see model consensus in your project. This will average all model vs model scores for the selected models.
+You can also select multiple models to see model consensus in your project. This will average all model vs model scores for the selected models.
 
 <img src="/images/project/agreement-selected-models.png" class="gif-border" style="max-width:679px">
 
-Other combinations are also possible such as selecting one annotator and multiple models, multiple annotators and multiple models, etc. <br>
-If multiple annotators are selected, all annotator vs annotator scores will be included in the average. <br>
-If multiple models are selected, all model vs model scores will be included in the average. <br>
-If one or more annotators are selected along with one or more models, all annotator vs model scores will be included in the average. <br>
+Other combinations are also possible such as selecting one annotator and multiple models, multiple annotators and multiple models, etc.
+
+* If multiple annotators are selected, all annotator vs annotator scores will be included in the average.
+* If multiple models are selected, all model vs model scores will be included in the average. 
+* If one or more annotators are selected along with one or more models, all annotator vs model scores will be included in the average. 
 
 #### Ground Truth Match
 
-If your project contains ground truth annotations, this allows you to compare either a single annotator, or a single model to ground truth annotations. 
+If your project contains ground truth annotations, this allows you to compare either a single annotator or a single model to ground truth annotations. 
 
 <img src="/images/project/agreement-selected-gt.png" class="gif-border" style="max-width:679px">
 
 
 #### Limitations
 
-We currently only support calculating Agreement (Selected) for tasks with 20 or less annotations. If you have a task with more than this threshold, you will see an info icon with a tooltip.
+We currently only support calculating the **Agreement (Selected)** columen for tasks with 20 or less annotations. If you have a task with more than this threshold, you will see an info icon with a tooltip.
 
 <img src="/images/project/agreement-selected-threshold.png" class="gif-border" style="max-width:679px">
 
 
 #### Example Score Calculations
 
-Example using the same simple label config as above
+Example using the same simple label config as above: 
+
 ```xml
 <View>
   <Image name="image_object" value="$image_url"/>
@@ -224,8 +238,9 @@ Lets say for one task we have the following:
 Here is how the score would be calculated for various selections in the dropdown
 
 #### `Agreement Pairs` with `All Annotators` selected
-This will match the behavior of the `Agreement` column - all annotation pair's scores will be averaged
-1. Annotation 1 <> Annotation 2 - agreement score is `0`
+This will match the behavior of the **Agreement** column - all annotation pair's scores will be averaged:
+
+1. Annotation 1 <> Annotation 2: Agreement score is `0`
 
 Score displayed in column for this task: `0%`
 
@@ -240,8 +255,10 @@ This will average all annotation pair's scores, as well as all annotation <> mod
 Score displayed in column for this task: `40%` 
 
 #### `Ground Truth Match` with `model version 2` selected
-This will compare all ground truth annotations with all predictions from `model version 2`
-Annotation 1 is marked as ground truth and Prediction 2 is from `model version 2`
+This will compare all ground truth annotations with all predictions from `model version 2`.
+
+In this example, Annotation 1 is marked as ground truth and Prediction 2 is from `model version 2`:
+
 1. Annotation 1 <> Prediction 2 - agreement score is `1`
 
 Score displayed in column for this task: `100%` 
