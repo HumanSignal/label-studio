@@ -18,7 +18,7 @@ import {
 import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
 import { cn } from "../../../utils/bem";
-import { FF_DEV_2755, FF_DEV_3873, FF_PER_FIELD_COMMENTS, isFF } from "../../../utils/feature-flags";
+import { FF_DEV_2755, FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
 import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
@@ -256,7 +256,7 @@ const useEventHandlers = () => {
       return;
     }
 
-    if (isFF(FF_PER_FIELD_COMMENTS) && !self.isReadOnly() && annotation.isLinkingMode) {
+    if (!self.isReadOnly() && annotation.isLinkingMode) {
       annotation.addLinkedRegion(self);
       annotation.stopLinkingMode();
       annotation.regionStore.unselectAll();

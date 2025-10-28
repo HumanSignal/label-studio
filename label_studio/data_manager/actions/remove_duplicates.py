@@ -8,6 +8,7 @@ import ujson as json
 from core.label_config import replace_task_data_undefined_with_config_field
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
+from data_manager.actions import DataManagerAction
 from data_manager.actions.basic import delete_tasks
 from io_storages.azure_blob.models import AzureBlobImportStorageLink
 from io_storages.gcs.models import GCSImportStorageLink
@@ -212,10 +213,10 @@ def find_duplicated_tasks_by_data(project, queryset):
     return duplicates
 
 
-actions = [
+actions: list[DataManagerAction] = [
     {
         'entry_point': remove_duplicates,
-        'permission': all_permissions.projects_change,
+        'permission': [all_permissions.projects_change, all_permissions.tasks_delete],
         'title': 'Remove Duplicated Tasks',
         'order': 95,
         'experimental': False,

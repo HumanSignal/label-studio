@@ -217,7 +217,7 @@ export const AnnotationButton = observer(
           <div className={cn("annotation-button").elem("picSection").toClassName()}>
             <Userpic
               className={cn("annotation-button").elem("userpic").mod({ prediction: isPrediction }).toClassName()}
-              showUsername
+              showUsernameTooltip
               username={isPrediction ? entity.createdBy : null}
               user={hiddenUser ?? entity.user ?? { email: entity.createdBy }}
               size={24}

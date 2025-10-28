@@ -30,6 +30,9 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
+        if not project_pk:
+            raise ValidationError('query parameter "project" is required')
+
         project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         StorageClass = self.serializer_class.Meta.model
@@ -68,6 +71,9 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
 
     def get_queryset(self):
         project_pk = self.request.query_params.get('project')
+        if not project_pk:
+            raise ValidationError('query parameter "project" is required')
+
         project = generics.get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         StorageClass = self.serializer_class.Meta.model

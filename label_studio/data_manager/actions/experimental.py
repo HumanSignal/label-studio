@@ -7,6 +7,7 @@ import random
 import ujson as json
 from core.permissions import AllPermissions
 from core.utils.db import fast_first
+from data_manager.actions import DataManagerAction
 from data_manager.functions import DataManagerException
 from django.conf import settings
 from tasks.models import Annotation, Task
@@ -288,7 +289,7 @@ def add_data_field_form(user, project):
     ]
 
 
-actions = [
+actions: list[DataManagerAction] = [
     {
         'entry_point': add_data_field,
         'permission': all_permissions.projects_change,

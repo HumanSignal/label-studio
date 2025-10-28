@@ -611,6 +611,7 @@ DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
 DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = 'data_manager.functions.custom_filter_expressions'
 DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
+DATA_MANAGER_CHECK_ACTION_PERMISSION = 'data_manager.actions.check_action_permission'
 BULK_UPDATE_IS_LABELED = 'tasks.functions.bulk_update_is_labeled_by_overlap'
 USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'projects.mixins.ProjectMixin'
@@ -902,4 +903,4 @@ FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
 
 # Used for async migrations. In LSE this is set to a real queue name, including here so we
 # can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
-SERVICE_QUEUE_NAME = ''
+SERVICE_QUEUE_NAME = get_env('SERVICE_QUEUE_NAME', 'default')
