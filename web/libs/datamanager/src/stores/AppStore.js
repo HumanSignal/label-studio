@@ -542,14 +542,22 @@ export const AppStore = types
       return true;
     }),
 
+    /**
+     * @deprecated Use the useActions hook instead for better caching and performance
+     * This method is kept for backward compatibility but is no longer actively used
+     */
     fetchActions: flow(function* () {
-      const serverActions = yield self.apiCall("actions");
+      try {
+        const serverActions = yield self.apiCall("actions");
 
-      const actions = (serverActions ?? []).map((action) => {
-        return [action, undefined];
-      });
+        const actions = (serverActions ?? []).map((action) => {
+          return [action, undefined];
+        });
 
-      self.SDK.updateActions(actions);
+        self.SDK.updateActions(actions);
+      } catch (error) {
+        console.error("Error fetching actions:", error);
+      }
     }),
 
     fetchActionForm: flow(function* (actionId) {
@@ -583,11 +591,6 @@ export const AppStore = types
       }
 
       if (!isLabelStream || (self.project?.show_annotation_history && task)) {
-        if (self.SDK.type === "dm") {
-          // Fetch actions in background to avoid blocking the main thread
-          setTimeout(() => self.fetchActions(), 0);
-        }
-
         if (self.SDK.settings?.onlyVirtualTabs && self.project?.show_annotation_history && !task) {
           requests.push(
             self.viewsStore.addView(
@@ -751,7 +754,7 @@ export const AppStore = types
       }
 
       if (actionCallback instanceof Function) {
-        const result = yield actionCallback(actionParams, view);
+        const result = actionCallback(actionParams, view);
         self.SDK.invoke("actionDialogOkComplete", actionId, {
           result,
           view: viewReloaded,

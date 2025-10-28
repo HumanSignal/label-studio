@@ -1,6 +1,8 @@
 import { useSDK } from "../../providers/SDKProvider";
 import { isDefined } from "../../utils/utils";
 import { useState, useEffect } from "react";
+import { Tooltip } from "@humansignal/ui";
+import { IconInfoOutline } from "@humansignal/icons";
 
 const LOW_AGREEMENT_SCORE = 33;
 const MEDIUM_AGREEMENT_SCORE = 66;
@@ -25,11 +27,20 @@ const formatNumber = (num) => {
 export const AgreementSelected = (cell) => {
   const { value, original: task } = cell;
 
-  const score = (
+  const threshold = window.APP_SETTINGS?.agreement_selected_threshold;
+  const overThreshold = Number(task?.total_annotations) > Number(threshold);
+
+  const content = overThreshold ? (
+    <Tooltip title={`Agreement (Selected) is not computed for tasks with more than ${threshold} annotations`}>
+      <span className="inline-flex items-center text-neutral-content-subtler">
+        <IconInfoOutline />
+      </span>
+    </Tooltip>
+  ) : (
     <span className={agreementScoreTextColor(value)}>{isDefined(value) ? `${formatNumber(value)}%` : ""}</span>
   );
 
-  return <div className="flex items-center">{score}</div>;
+  return <div className="flex items-center">{content}</div>;
 };
 
 AgreementSelected.userSelectable = false;
