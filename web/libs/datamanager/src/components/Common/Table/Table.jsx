@@ -59,21 +59,7 @@ export const Table = observer(
     const { api, type } = useSDK();
     const toolbarHeight = 41;
     const isQuickView = view.root.isLabeling;
-    const [headerTopOffset, setHeaderTopOffset] = useState(isQuickView ? toolbarHeight : 0);
-
-    // Reset header position when switching between quickview and regular mode
-    useEffect(() => {
-      setHeaderTopOffset(isQuickView ? toolbarHeight : 0);
-    }, [isQuickView, toolbarHeight]);
-
-    // Handle initial scroll position from initialScrollOffset
-    useEffect(() => {
-      if (isQuickView && listRef.current?._listRef) {
-        const scrollOffset = listRef.current._listRef.state?.scrollOffset ?? 0;
-        const offset = Math.max(0, toolbarHeight - scrollOffset);
-        setHeaderTopOffset(offset);
-      }
-    }, [data, isQuickView, toolbarHeight]);
+    const [toolbarVisible, setToolbarVisible] = useState(true);
 
     // Reset virtualizer cache when rowHeight changes
     useEffect(() => {
@@ -190,31 +176,22 @@ export const Table = observer(
 
     const headerHeight = 43;
 
-    const renderTableToolbar = useCallback(
-      ({ style }) => {
-        return (
-          <div
-            className={cn("table-toolbar").toString()}
-            style={{
-              ...style,
-              height: toolbarHeight,
-            }}
-          >
-            <FieldsButton
-              className={cn("table-toolbar").elem("customize-button").toString()}
-              wrapper={FieldsButton.Checkbox}
-              title={"Columns"}
-              size="small"
-              trailingIcon={<Icon icon={IconChevronDown} />}
-              tooltip={"Customize Columns"}
-              data-testid="columns-picker-quickview"
-            />
-            <DensityToggle size="small" onChange={onDensityChange} data-testid="density-toggle-quickview" />
-          </div>
-        );
-      },
-      [toolbarHeight, onDensityChange],
-    );
+    const renderTableToolbar = useCallback(() => {
+      return (
+        <div className={cn("table-toolbar").mod({ visible: toolbarVisible }).toString()}>
+          <FieldsButton
+            className={cn("table-toolbar").elem("customize-button").toString()}
+            wrapper={FieldsButton.Checkbox}
+            title={"Columns"}
+            size="small"
+            trailingIcon={<Icon icon={IconChevronDown} />}
+            tooltip={"Customize Columns"}
+            data-testid="columns-picker-quickview"
+          />
+          <DensityToggle size="small" onChange={onDensityChange} data-testid="density-toggle-quickview" />
+        </div>
+      );
+    }, [toolbarVisible, onDensityChange]);
 
     const renderTableHeader = useCallback(
       ({ style }) => (
@@ -251,17 +228,7 @@ export const Table = observer(
     const renderRow = useCallback(
       ({ style, index }) => {
         if (isQuickView) {
-          // QuickView mode: Index 0 is toolbar, Index 1 is header (sticky), Index 2+ are data rows
-          if (index === 0) {
-            return renderTableToolbar({ style });
-          }
-
-          // Skip index 1 as it's the sticky header
-          if (index === 1) {
-            return null;
-          }
-
-          const row = data[index - 2];
+          const row = data[index];
           const isEven = index % 2 === 0;
 
           return (
@@ -311,7 +278,6 @@ export const Table = observer(
         view,
         view.selected.list,
         view.selected.all,
-        renderTableToolbar,
         isQuickView,
       ],
     );
@@ -365,10 +331,8 @@ export const Table = observer(
 
     const handleScroll = useCallback(
       ({ scrollOffset }) => {
-        if (isQuickView) {
-          // Calculate how much the header should move up (max is toolbarHeight)
-          const offset = Math.max(0, toolbarHeight - scrollOffset);
-          setHeaderTopOffset(offset);
+        if (isQuickView && scrollOffset >= 0) {
+          setToolbarVisible(scrollOffset === 0);
         }
       },
       [isQuickView, toolbarHeight],
@@ -376,26 +340,26 @@ export const Table = observer(
 
     return (
       <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toString()}>
+        {isQuickView && renderTableToolbar()}
         <TableContext.Provider value={contextValue}>
           <StickyList
             ref={listRef}
             overscanCount={10}
             itemHeight={props.rowHeight}
             totalCount={props.total}
-            itemCount={isQuickView ? data.length + 2 : data.length + 1}
+            itemCount={data.length}
             itemKey={itemKey}
             innerElementType={innerElementType}
-            stickyItems={isQuickView ? [1] : [0]}
+            stickyItems={[0]}
             stickyItemsHeight={[headerHeight]}
             stickyComponent={renderTableHeader}
             initialScrollOffset={initialScrollOffset}
             isItemLoaded={isItemLoaded}
             loadMore={props.loadMore}
-            toolbarHeight={toolbarHeight}
+            toolbarHeight={0}
             headerHeight={headerHeight}
             isQuickView={isQuickView}
             onScroll={handleScroll}
-            headerTopOffset={headerTopOffset}
           >
             {renderRow}
           </StickyList>
@@ -451,9 +415,9 @@ const StickyList = observer(
     const itemSize = (index) => {
       if (isQuickView) {
         // QuickView mode: Index 0 is toolbar, Index 1 is sticky header
-        if (index === 0) {
-          return toolbarHeight;
-        }
+        // if (index === 0) {
+        //   return toolbarHeight;
+        // }
         if (stickyItems.includes(index)) {
           return headerHeight;
         }
@@ -511,7 +475,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
                 index={index}
                 style={{
                   height: stickyItemsHeight[index],
-                  top: isQuickView ? topPosition - 1 : topPosition,
+                  top: topPosition,
                 }}
               />
             ))}

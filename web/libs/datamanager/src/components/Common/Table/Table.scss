@@ -5,6 +5,15 @@
   min-width: 100%;
   padding: 0 var(--spacing-tight);
   background-color: var(--color-neutral-surface);
+  height: 41px;
+  transition: transform 0.3s ease-in-out;
+  transform: translateY(-41px);
+  position: absolute;
+
+  &_visible {
+    position: relative;
+    transform: translateY(0);
+  }
 
   &__customize-button.table-toolbar__customize-button {
     height: 28px;
