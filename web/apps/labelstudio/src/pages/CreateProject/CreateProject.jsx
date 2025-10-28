@@ -207,7 +207,6 @@ export const CreateProject = ({ onClose }) => {
             <Button
               variant="negative"
               look="outlined"
-              size="small"
               onClick={onDelete}
               waiting={waiting}
               aria-label="Cancel project creation"
@@ -216,9 +215,9 @@ export const CreateProject = ({ onClose }) => {
             </Button>
             <Button
               look="primary"
-              size="small"
               onClick={onCreate}
               waiting={waiting || uploading}
+              waitingClickable={false}
               disabled={!project || uploadDisabled || error}
             >
               Save

@@ -1,7 +1,8 @@
 import { IconChevronDown, IconChevronRight, IconTrash } from "@humansignal/icons";
 import { Button, Spinner, Tooltip } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useActions } from "../../../hooks/useActions";
 import { Block, Elem } from "../../../utils/bem";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { Dropdown } from "../../Common/Dropdown/DropdownComponent";
@@ -204,21 +205,20 @@ export const ActionsButton = injector(
     const formRef = useRef();
     const selectedCount = store.currentView.selectedCount;
     const [isOpen, setIsOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const fetchedActionsRef = useRef(false);
 
-    const actions = store.availableActions.filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
+    // Use TanStack Query hook for fetching actions
+    const {
+      actions: serverActions,
+      isLoading,
+      isFetching,
+    } = useActions({
+      enabled: isOpen,
+      projectId: store.SDK.projectId,
+    });
 
-    useEffect(() => {
-      if (isOpen && !fetchedActionsRef.current) {
-        setIsLoading(true);
-        store.fetchActions().finally(() => {
-          setIsLoading(false);
-        });
-        fetchedActionsRef.current = true;
-      }
-    }, [isOpen, store]);
-
+    const actions = useMemo(() => {
+      return [...store.availableActions, ...serverActions].filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
+    }, [store.availableActions, serverActions]);
     const actionButtons = actions.map((action) => (
       <ActionButton key={action.id} action={action} parentRef={formRef} store={store} formRef={formRef} />
     ));
@@ -228,8 +228,8 @@ export const ActionsButton = injector(
       <Dropdown.Trigger
         content={
           <Menu size="compact">
-            {isLoading ? (
-              <Menu.Item disabled data-testid="loading-actions">
+            {isLoading || isFetching ? (
+              <Menu.Item data-testid="loading-actions" disabled>
                 Loading actions...
               </Menu.Item>
             ) : (
