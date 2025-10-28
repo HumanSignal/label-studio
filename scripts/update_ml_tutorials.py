@@ -57,7 +57,9 @@ def create_tutorial_files():
     files_and_headers = []
     for file in readme_files:
         model_name = file.parts[-2]
-        tutorial_path = Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'guide' / 'ml_tutorials' / f'{model_name}.md'
+        tutorial_path = (
+            Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'guide' / 'ml_tutorials' / f'{model_name}.md'
+        )
         tutorial_dir = os.path.dirname(tutorial_path)
         os.makedirs(tutorial_dir, exist_ok=True)
 
