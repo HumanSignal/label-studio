@@ -169,7 +169,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
             <Userpic
               className={cn("comment-item").elem("userpic").toClassName()}
               user={hiddenUser ?? createdBy}
-              showUsername
+              showUsernameTooltip
               username={createdBy}
             />
             <span className={cn("comment-item").elem("name").toClassName()}>
