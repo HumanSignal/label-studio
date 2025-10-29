@@ -56,7 +56,7 @@ jobs:
           fail_ci_if_error: true
 
       - name: Upload coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: unit coverage

@@ -27,14 +27,7 @@ import { Space } from "../../common/Space/Space";
 import { Button } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
 import { isSelfServe } from "../../utils/billing";
-import {
-  FF_BULK_ANNOTATION,
-  FF_DEV_3873,
-  FF_LSDV_4620_3_ML,
-  FF_PER_FIELD_COMMENTS,
-  FF_SIMPLE_INIT,
-  isFF,
-} from "../../utils/feature-flags";
+import { FF_BULK_ANNOTATION, FF_DEV_3873, FF_LSDV_4620_3_ML, FF_SIMPLE_INIT, isFF } from "../../utils/feature-flags";
 import { sanitizeHtml } from "../../utils/html";
 import { reactCleaner } from "../../utils/reactCleaner";
 import { guidGenerator } from "../../utils/unique";
@@ -153,7 +146,7 @@ class App extends Component {
         <div className={cn("main-view").elem("annotation").toClassName()}>
           {<Annotation root={root} annotation={as.selected} />}
           {this.renderRelations(as.selected)}
-          {isFF(FF_PER_FIELD_COMMENTS) && this.renderCommentsOverlay(as.selected)}
+          {this.renderCommentsOverlay(as.selected)}
         </div>
         {!isFF(FF_DEV_3873) && getRoot(as).hasInterface("infobar") && this._renderInfobar(as)}
       </div>
