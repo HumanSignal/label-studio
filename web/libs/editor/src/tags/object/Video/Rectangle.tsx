@@ -61,7 +61,7 @@ const RectanglePure: FC<RectProps> = ({
   };
 
   return (
-    <Group id={id}>
+    <Group>
       <LabelOnVideoBbox
         reg={reg}
         box={newBox}
@@ -71,6 +71,7 @@ const RectanglePure: FC<RectProps> = ({
         adjacent
       />
       <Rect
+        id={id}
         {...newBox}
         fill={style.fillColor ?? "#fff"}
         stroke={style.strokeColor}
