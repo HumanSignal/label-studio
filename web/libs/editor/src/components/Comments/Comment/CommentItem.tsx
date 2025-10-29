@@ -7,7 +7,7 @@ import { Button } from "@humansignal/ui";
 import { Dropdown } from "../../../common/Dropdown/Dropdown";
 import { Menu } from "../../../common/Menu/Menu";
 import { Space } from "../../../common/Space/Space";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { humanDateDiff, userDisplayName } from "../../../utils/utilities";
 import { CommentFormBase } from "../CommentFormBase";
 import { CommentsContext } from "./CommentsList";
@@ -144,57 +144,55 @@ export const CommentItem: FC<CommentItemProps> = observer(
 
       if (isPersisted && time)
         return (
-          <Elem name="date">
+          <div className={cn("comment-item").elem("date").toClassName()}>
             <Tooltip alignment="top-right" title={new Date(time).toLocaleString()}>
               <span>{`${isEdited ? "updated" : ""} ${humanDateDiff(time)}`}</span>
             </Tooltip>
-          </Elem>
+          </div>
         );
       return null;
     };
 
     return (
-      <Block
-        name="comment-item"
-        mod={{ resolved, highlighted: isHighlighted }}
+      <div
+        className={cn("comment-item").mod({ resolved, highlighted: isHighlighted }).toClassName()}
         onMouseEnter={() => {
           setHighlighted(true);
         }}
         onMouseLeave={() => {
           setHighlighted(false);
         }}
-        ref={_commentRef}
+        ref={_commentRef as any}
       >
         <Space spread size="medium" truncated>
           <Space size="small" truncated>
-            <Elem
-              tag={Userpic}
+            <Userpic
+              className={cn("comment-item").elem("userpic").toClassName()}
               user={hiddenUser ?? createdBy}
-              name="userpic"
               showUsernameTooltip
               username={createdBy}
             />
-            <Elem name="name" tag="span">
+            <span className={cn("comment-item").elem("name").toClassName()}>
               {userDisplayName(hiddenUser ?? createdBy)}
-            </Elem>
+            </span>
           </Space>
 
           <Space size="small">
-            <Elem name="resolved" component={IconCheck} />
-            <Elem name="saving" mod={{ hide: isPersisted }}>
-              <Elem name="dot" />
-            </Elem>
+            <IconCheck className={cn("comment-item").elem("resolved").toClassName()} />
+            <div className={cn("comment-item").elem("saving").mod({ hide: isPersisted }).toClassName()}>
+              <div className={cn("comment-item").elem("dot").toClassName()} />
+            </div>
             {!infoIsHidden && <TimeTracker />}
           </Space>
         </Space>
 
-        <Elem name="content">
-          <Elem name="text">
+        <div className={cn("comment-item").elem("content").toClassName()}>
+          <div className={cn("comment-item").elem("text").toClassName()}>
             {isEditMode ? (
               <>
                 <CommentFormBase value={text} onSubmit={commentFormBaseOnSubmit} classifications={classifications} />
                 {classificationsItems.length > 0 && (
-                  <Elem name="classifications-row">
+                  <div className={cn("comment-item").elem("classifications-row").toClassName()}>
                     <Taxonomy
                       selected={taxonomySelectedItems}
                       items={classificationsItems}
@@ -202,13 +200,13 @@ export const CommentItem: FC<CommentItemProps> = observer(
                       options={COMMENT_TAXONOMY_OPTIONS}
                       defaultSearch={false}
                     />
-                  </Elem>
+                  </div>
                 )}
               </>
             ) : isConfirmDelete ? (
-              <Elem name="confirmForm">
-                <Elem name="question">Are you sure?</Elem>
-                <Elem name="controls">
+              <div className={cn("comment-item").elem("confirmForm").toClassName()}>
+                <div className={cn("comment-item").elem("question").toClassName()}>Are you sure?</div>
+                <div className={cn("comment-item").elem("controls").toClassName()}>
                   <Button
                     onClick={() => deleteComment()}
                     size="small"
@@ -221,29 +219,29 @@ export const CommentItem: FC<CommentItemProps> = observer(
                   <Button onClick={() => setConfirmMode(false)} size="small" aria-label="Cancel delete">
                     No
                   </Button>
-                </Elem>
-              </Elem>
+                </div>
+              </div>
             ) : (
               <>
                 {classifications?.default?.values?.length > 0 && (
-                  <Elem name="classifications" tag="ul">
+                  <ul className={cn("comment-item").elem("classifications").toClassName()}>
                     {classifications?.default?.values?.map((valueArray: string[], index: number) => (
                       <li key={index}>{valueArray.join("/")}</li>
                     ))}
-                  </Elem>
+                  </ul>
                 )}
                 {text}
                 {hasLinkState && (
-                  <Elem name="linkState">
+                  <div className={cn("comment-item").elem("linkState").toClassName()}>
                     <LinkState linking={linking} region={region} result={result} interactive />
-                  </Elem>
+                  </div>
                 )}
               </>
             )}
-          </Elem>
+          </div>
 
-          <Elem
-            name="actions"
+          <div
+            className={cn("comment-item").elem("actions").toClassName()}
             onClick={(e: any) => {
               e.stopPropagation();
               e.preventDefault();
@@ -286,9 +284,9 @@ export const CommentItem: FC<CommentItemProps> = observer(
                 <Button size="small" look="string" icon={<IconEllipsis />} aria-label="Comment options" />
               </Dropdown.Trigger>
             )}
-          </Elem>
-        </Elem>
-      </Block>
+          </div>
+        </div>
+      </div>
     );
   },
 );

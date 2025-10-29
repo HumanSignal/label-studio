@@ -210,6 +210,8 @@ export { ReactComponent as IconRewind } from "./rewind.svg";
 export { ReactComponent as IconRotate } from "./rotate.svg";
 export { ReactComponent as IconRotateLeftTool } from "./rotate-left-tool.svg";
 export { ReactComponent as IconRotateRightTool } from "./rotate-right-tool.svg";
+export { ReactComponent as IconRows3 } from "./rows-3.svg";
+export { ReactComponent as IconRows4 } from "./rows-4.svg";
 export { ReactComponent as IconSearch } from "./search.svg";
 export { ReactComponent as IconSend } from "./send.svg";
 export { ReactComponent as IconSettings } from "./settings.svg";

@@ -22,6 +22,22 @@ nameservers=$(awk '$1=="nameserver" {
 }' /etc/resolv.conf)
 echo "resolver $nameservers;" > $OPT_DIR/nginx/resolv.conf
 
+# Configure nginx error logging
+echo >&3 "=> Configuring nginx error logging..."
+NGINX_ERROR_LOG_LEVEL=${NGINX_ERROR_LOG_LEVEL:-warn}
+
+# Validate log level
+case "$NGINX_ERROR_LOG_LEVEL" in
+  debug|info|notice|warn|error|crit|alert|emerg)
+    echo >&3 "=> Setting error log level to: $NGINX_ERROR_LOG_LEVEL"
+    ;;
+  *)
+    echo >&3 "=> Warning: Invalid log level '$NGINX_ERROR_LOG_LEVEL', using 'warn' as default"
+    NGINX_ERROR_LOG_LEVEL=warn
+    ;;
+esac
+
+sed -i "s|error_log /dev/stderr info;|error_log /dev/stderr $NGINX_ERROR_LOG_LEVEL;|g" $NGINX_CONFIG
 
 if [ -n "${NGINX_SSL_CERT:-}" ]; then
   echo >&3 "=> Replacing nginx certs..."

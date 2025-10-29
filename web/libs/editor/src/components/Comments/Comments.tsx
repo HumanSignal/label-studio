@@ -1,6 +1,7 @@
 import { type FC, useEffect } from "react";
 import { observer } from "mobx-react";
-import { Block } from "../../utils/bem";
+
+import { cn } from "../../utils/bem";
 import { CommentForm } from "./Comment/CommentForm";
 import { CommentsList } from "./Comment/CommentsList";
 import { useMounted } from "../../common/Utils/useMounted";
@@ -45,10 +46,10 @@ export const Comments: FC<{ annotationStore: any; commentStore: any; cacheKey?: 
     }, [commentStore.hasUnsaved]);
 
     return (
-      <Block name="comments">
+      <div className={cn("comments").toClassName()}>
         <CommentForm commentStore={commentStore} annotationStore={annotationStore} inline />
         <CommentsList commentStore={commentStore} />
-      </Block>
+      </div>
     );
   },
 );
