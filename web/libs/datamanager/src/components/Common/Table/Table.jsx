@@ -227,10 +227,12 @@ export const Table = observer(
 
     const renderRow = useCallback(
       ({ style, index }) => {
-        if (isQuickView) {
-          const row = data[index];
-          const isEven = index % 2 === 0;
+        // Both QuickView and Regular mode: Index 0 is header (sticky), Index 1+ are data rows
+        const dataIndex = index - 1;
+        const row = data[dataIndex];
+        const isEven = dataIndex % 2 === 0;
 
+        if (isQuickView) {
           return (
             <TableRow
               key={row.id}
@@ -248,11 +250,7 @@ export const Table = observer(
           );
         }
 
-        // Regular mode: Index 0 is header (sticky), Index 1+ are data rows
-        const row = data[index - 1];
-        const dataIndex = index - 1;
-        const isEven = dataIndex % 2 === 0;
-        // Invert for visual consistency: we want odd rows (2nd, 4th, etc.) to have background
+        // Invert for visual consistency in Regular mode: we want odd rows (2nd, 4th, etc.) to have background
         const shouldApplyBackground = !isEven;
 
         return (
@@ -350,7 +348,7 @@ export const Table = observer(
             overscanCount={10}
             itemHeight={props.rowHeight}
             totalCount={props.total}
-            itemCount={data.length}
+            itemCount={data.length + 1}
             itemKey={itemKey}
             innerElementType={innerElementType}
             stickyItems={[0]}
