@@ -174,18 +174,15 @@ export default class TransformerComponent extends Component {
     });
   };
 
-  applyTransformToVectorRegions = () => {
+  applyRegionsTransform = () => {
     if (!this.transformer) return;
 
     const { item } = this.props;
     const { selectedRegions } = item;
 
-    // Only apply custom transform logic for VectorRegion instances
+  
     selectedRegions.forEach((region) => {
-      if (region.applyTransform && typeof region.applyTransform === 'function') {
-        console.log('🔄 ImageTransformer calling applyTransform on VectorRegion:', region.id);
-        region.applyTransform({}, null);
-      }
+      region.applyTransform?.({}, null);
     });
   };
 
@@ -230,13 +227,13 @@ export default class TransformerComponent extends Component {
           dragBoundFunc={this.dragBoundFunc}
           onDragEnd={() => {
             // Call applyTransform for VectorRegion instances
-            this.applyTransformToVectorRegions();
+            this.applyRegionsTransform();
             this.unfreeze();
             setTimeout(this.checkNode);
           }}
           onTransformEnd={() => {
             // Call applyTransform for VectorRegion instances
-            this.applyTransformToVectorRegions();
+            this.applyRegionsTransform();
             setTimeout(this.checkNode);
           }}
           backSelector={this.props.draggableBackgroundSelector}
@@ -282,13 +279,13 @@ export default class TransformerComponent extends Component {
           dragBoundFunc={this.dragBoundFunc}
           onDragEnd={() => {
             // Call applyTransform for VectorRegion instances
-            this.applyTransformToVectorRegions();
+            this.applyRegionsTransform();
             this.unfreeze();
             setTimeout(this.checkNode);
           }}
           onTransformEnd={() => {
             // Call applyTransform for VectorRegion instances
-            this.applyTransformToVectorRegions();
+            this.applyRegionsTransform();
             setTimeout(this.checkNode);
           }}
           backSelector={this.props.draggableBackgroundSelector}

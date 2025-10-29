@@ -486,25 +486,13 @@ const Model = types
        */
       applyTransform(transform, transformerCenter) {
         if (!self.vectorRef) {
-          console.log("🔄 VectorRegion.applyTransform: No vectorRef, returning");
           return;
         }
-
-        console.log("🔄 VectorRegion.applyTransform called:", {
-          regionId: self.id,
-          transform,
-          transformerCenter,
-          stageZoom: self.parent.stageZoom,
-          bbox: self.bbox,
-          bboxCoords: self.bboxCoords,
-          vertices: self.vertices.map((v) => ({ id: v.id, x: v.x, y: v.y })),
-        });
 
         // Delegate to KonvaVector's commitMultiRegionTransform method
         // This method reads the proxy node coordinates and applies them directly
         if (typeof self.vectorRef.commitMultiRegionTransform === "function") {
           self.vectorRef.commitMultiRegionTransform();
-          console.log("📊 commitMultiRegionTransform called successfully");
         } else {
           console.error("📊 commitMultiRegionTransform method not available");
         }
@@ -562,19 +550,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             const scaleY = t.getAttr("scaleY", 1);
             const rotation = t.getAttr("rotation", 0);
 
-            console.log("🎯 Single-region onTransformEnd:", {
-              regionId: item.id,
-              dx,
-              dy,
-              scaleX,
-              scaleY,
-              rotation,
-              stageZoom: item.parent.stageZoom,
-              bbox: item.bbox,
-              bboxCoords: item.bboxCoords,
-              vertices: item.vertices.map((v) => ({ id: v.id, x: v.x, y: v.y })),
-            });
-
             // Reset transform attributes
             t.setAttr("x", 0);
             t.setAttr("y", 0);
@@ -584,14 +559,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
             // Apply transformation to all points using KonvaVector methods
             if (item.vectorRef) {
-              console.log("🎯 Calling transformPoints with:", {
-                dx,
-                dy,
-                scaleX,
-                scaleY,
-                rotation,
-              });
-
               // Apply the transformation exactly as Konva did:
               // 1. Scale around origin (0,0)
               // 2. Rotate around origin (0,0)
@@ -649,11 +616,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
               // Update the points
               item.updatePointsFromKonvaVector(transformedVertices);
-
-              console.log(
-                "🎯 After transform, vertices:",
-                transformedVertices.map((v) => ({ id: v.id, x: v.x, y: v.y })),
-              );
             }
           }}
           onPointsChange={(points) => {
