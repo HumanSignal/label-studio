@@ -49,7 +49,7 @@ Ideal for document intelligence, QA on OCR output, and structured data capture w
 
     Support for PDFs up to 100 pages. 
 
-* **OcrLabels**
+* **`OcrLabels`**
   
   Used only with the `Pdf` tag, and allows you to draw bounding boxes around text. Note that the PDF must have a text overlay for this to work (for example, verify whether you can highlight text in the PDF using your cursor).
 
