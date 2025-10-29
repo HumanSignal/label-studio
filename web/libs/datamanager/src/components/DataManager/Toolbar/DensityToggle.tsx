@@ -1,4 +1,4 @@
-import { observer } from "mobx-react";
+import { inject, observer } from "mobx-react";
 import { useEffect, useState } from "react";
 // @ts-ignore - RadioGroup is a .jsx file without types
 import { RadioGroup } from "../../Common/RadioGroup/RadioGroup";
@@ -20,49 +20,61 @@ interface DensityToggleProps {
   size?: "small" | "medium" | "large";
   onChange?: (density: Density) => void;
   storageKey?: string;
+  view?: { type: string };
 }
 
-export const DensityToggle = observer(({ size, onChange, storageKey, ...rest }: DensityToggleProps) => {
-  const key = storageKey ?? DENSITY_STORAGE_KEY;
-  const [density, setDensity] = useState<Density>(() => {
-    return (localStorage.getItem(key) as Density) ?? DENSITY_COMFORTABLE;
-  });
+const densityInjector = inject(({ store }: any) => ({
+  view: store.currentView,
+}));
 
-  useEffect(() => {
-    localStorage.setItem(key, density);
-    onChange?.(density);
+export const DensityToggle = densityInjector(
+  observer(({ size, onChange, storageKey, view, ...rest }: DensityToggleProps) => {
+    const key = storageKey ?? DENSITY_STORAGE_KEY;
+    const [density, setDensity] = useState<Density>(() => {
+      return (localStorage.getItem(key) as Density) ?? DENSITY_COMFORTABLE;
+    });
 
-    // Notify other components about density change
-    window.dispatchEvent(new CustomEvent("dm:density:changed", { detail: density }));
-  }, [density, onChange, key]);
+    useEffect(() => {
+      localStorage.setItem(key, density);
+      onChange?.(density);
 
-  return (
-    <RadioGroup
-      size={size}
-      value={density}
-      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDensity(e.target.value as Density)}
-      {...rest}
-      style={{ "--button-padding": "0 var(--spacing-tighter)" } as React.CSSProperties}
-      data-testid="density-toggle"
-    >
-      <Tooltip title="Comfortable density">
-        <div>
-          <RadioGroup.Button
-            value={DENSITY_COMFORTABLE}
-            aria-label="Comfortable density"
-            data-testid="density-comfortable"
-          >
-            <IconRows3 />
-          </RadioGroup.Button>
-        </div>
-      </Tooltip>
-      <Tooltip title="Compact density">
-        <div>
-          <RadioGroup.Button value={DENSITY_COMPACT} aria-label="Compact density" data-testid="density-compact">
-            <IconRows4 />
-          </RadioGroup.Button>
-        </div>
-      </Tooltip>
-    </RadioGroup>
-  );
-});
+      // Notify other components about density change
+      window.dispatchEvent(new CustomEvent("dm:density:changed", { detail: density }));
+    }, [density, onChange, key]);
+
+    // Hide density toggle when in grid view
+    if (view?.type === "grid") {
+      return null;
+    }
+
+    return (
+      <RadioGroup
+        size={size}
+        value={density}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDensity(e.target.value as Density)}
+        {...rest}
+        style={{ "--button-padding": "0 var(--spacing-tighter)" } as React.CSSProperties}
+        data-testid="density-toggle"
+      >
+        <Tooltip title="Comfortable density">
+          <div>
+            <RadioGroup.Button
+              value={DENSITY_COMFORTABLE}
+              aria-label="Comfortable density"
+              data-testid="density-comfortable"
+            >
+              <IconRows3 />
+            </RadioGroup.Button>
+          </div>
+        </Tooltip>
+        <Tooltip title="Compact density">
+          <div>
+            <RadioGroup.Button value={DENSITY_COMPACT} aria-label="Compact density" data-testid="density-compact">
+              <IconRows4 />
+            </RadioGroup.Button>
+          </div>
+        </Tooltip>
+      </RadioGroup>
+    );
+  }),
+);
