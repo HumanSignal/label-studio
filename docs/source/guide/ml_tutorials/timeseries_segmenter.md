@@ -10,7 +10,7 @@ meta_description: Tutorial demonstrating a minimal ML backend that performs time
 categories:
     - Time Series
     - Segmentation
-image: "/tutorials/timeseries.png"
+image: "/guide/ml_tutorials/timeseries.png"
 ---
 # Time Series Segmenter for Label Studio
 
