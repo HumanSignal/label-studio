@@ -36,7 +36,7 @@ export const AutoSizerTable = forwardRef<VariableSizeList, AutoSizerTableProps>(
       <AutoSizer className={clsx(className)}>
         {({ width, height }) => {
           const adjustedHeight = Math.max(0, height - heightAdjustment);
-          
+
           return (
             <InfiniteLoader
               itemCount={totalCount}
