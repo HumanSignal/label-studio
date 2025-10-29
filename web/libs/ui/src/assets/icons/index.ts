@@ -248,6 +248,7 @@ export { ReactComponent as IconTimelineRegion } from "./timeline-region.svg";
 export { ReactComponent as IconTrash } from "./trash.svg";
 export { ReactComponent as IconTrashAlt } from "./trash-alt.svg";
 export { ReactComponent as IconTrashRect } from "./trash-rect.svg";
+export { ReactComponent as IconUI } from "./ui.svg";
 export { ReactComponent as IconUndo } from "./undo.svg";
 export { ReactComponent as IconUpload } from "./upload.svg";
 export { ReactComponent as IconUploadOutline } from "./cloud-upload-outline.svg";
