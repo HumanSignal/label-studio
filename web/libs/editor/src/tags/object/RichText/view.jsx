@@ -561,7 +561,11 @@ class RichTextPieceView extends Component {
         <ObjectTag item={item} className={cn("richtext").toClassName()}>
           <div
             key="root"
-            className={cn("richtext").elem("container").mod({ canResizeSpans: ff.isActive(ff.FF_ADJUSTABLE_SPANS) }).mix("htx-richtext").toClassName()}
+            className={cn("richtext")
+              .elem("container")
+              .mod({ canResizeSpans: ff.isActive(ff.FF_ADJUSTABLE_SPANS) })
+              .mix("htx-richtext")
+              .toClassName()}
             ref={(el) => {
               item.mountNodeRef.current = el;
               el && this.markObjectAsLoaded();
@@ -578,7 +582,7 @@ class RichTextPieceView extends Component {
         <div className={cn("richtext").elem("loading").toClassName()} ref={this.loadingRef}>
           <LoadingOutlined />
         </div>
-
+        {/* biome-ignore lint/a11y/useIframeTitle: As a result from BEM migration */}
         <iframe
           key="root"
           className={cn("richtext").elem("iframe").mix("htx-richtext").toClassName()}

@@ -293,7 +293,9 @@ const ChoicesSelectLayout = observer(({ item }) => {
 const HtxChoices = observer(({ item }) => {
   return (
     <div
-      className={cn("choices").mod({ hidden: !item.isVisible || !item.perRegionVisible(), layout: item.layout }).toClassName()}
+      className={cn("choices")
+        .mod({ hidden: !item.isVisible || !item.perRegionVisible(), layout: item.layout })
+        .toClassName()}
       ref={item.elementRef}
     >
       {item.layout === "select" ? <ChoicesSelectLayout item={item} /> : Tree.renderChildren(item, item.annotation)}
