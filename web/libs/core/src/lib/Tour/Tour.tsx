@@ -117,10 +117,15 @@ export const Tour: React.FC<TourProps> = ({ name, autoStart = false, delay = 0, 
 
   const { key, ...joyrideState } = state;
 
+  // Disable tours when running in Cypress tests
+  const isCypressTest = typeof window !== "undefined" && !!(window as any).Cypress;
+  const shouldRunTour = !isCypressTest && joyrideState.run;
+
   return state.steps.length > 0 ? (
     <JoyRide
       key={key}
       {...joyrideState}
+      run={shouldRunTour}
       {...props}
       callback={handleTourCallback}
       styles={{
