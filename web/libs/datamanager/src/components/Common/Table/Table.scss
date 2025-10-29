@@ -45,17 +45,17 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow: hidden;
   background-color: var(--color-neutral-background);
-
-  &-head {
-    border-top: 1px solid var(--color-neutral-border);
-  }
 
   &__auto-size {
     &_quick-view {
       & > div {
         background-color: var(--color-neutral-surface);
+      }
+
+      & .table-head {
+        border-top: 1px solid var(--color-neutral-border);
       }
     }
   }

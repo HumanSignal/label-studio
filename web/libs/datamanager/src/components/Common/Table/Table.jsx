@@ -250,13 +250,16 @@ export const Table = observer(
 
         // Regular mode: Index 0 is header (sticky), Index 1+ are data rows
         const row = data[index - 1];
-        const isEven = index % 2 === 0;
+        const dataIndex = index - 1;
+        const isEven = dataIndex % 2 === 0;
+        // Invert for visual consistency: we want odd rows (2nd, 4th, etc.) to have background
+        const shouldApplyBackground = !isEven;
 
         return (
           <TableRow
             key={row.id}
             data={row}
-            even={isEven}
+            even={shouldApplyBackground}
             onClick={(row, e) => props.onRowClick(row, e)}
             stopInteractions={stopInteractions}
             wrapperStyle={{ ...style, height: props.rowHeight }}
@@ -356,10 +359,11 @@ export const Table = observer(
             initialScrollOffset={initialScrollOffset}
             isItemLoaded={isItemLoaded}
             loadMore={props.loadMore}
-            toolbarHeight={0}
+            toolbarHeight={toolbarHeight}
             headerHeight={headerHeight}
             isQuickView={isQuickView}
             onScroll={handleScroll}
+            toolbarVisible={toolbarVisible}
           >
             {renderRow}
           </StickyList>
@@ -399,6 +403,7 @@ const StickyList = observer(
       isQuickView,
       onScroll,
       headerTopOffset,
+      toolbarVisible,
       ...rest
     } = props;
 
@@ -414,10 +419,6 @@ const StickyList = observer(
 
     const itemSize = (index) => {
       if (isQuickView) {
-        // QuickView mode: Index 0 is toolbar, Index 1 is sticky header
-        // if (index === 0) {
-        //   return toolbarHeight;
-        // }
         if (stickyItems.includes(index)) {
           return headerHeight;
         }
@@ -431,6 +432,23 @@ const StickyList = observer(
       return rest.itemHeight;
     };
 
+    // Calculate height adjustment for QuickView mode
+    // Subtract toolbar height (when visible) and app header height
+    const heightAdjustment = useMemo(() => {
+      if (!isQuickView) return 0;
+
+      // Get app header height from CSS variable
+      const appHeaderHeight = Number.parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue("--header-height") || "0",
+        10,
+      );
+
+      // Add toolbar height only when toolbar is visible
+      const adjustment = appHeaderHeight + (toolbarVisible ? toolbarHeight : 0);
+
+      return adjustment;
+    }, [isQuickView, toolbarVisible, toolbarHeight]);
+
     return (
       <StickyListContext.Provider value={itemData}>
         <AutoSizerTable
@@ -443,6 +461,7 @@ const StickyList = observer(
           initialScrollOffset={initialScrollOffset}
           className={tableCN.elem("auto-size").mod({ "quick-view": isQuickView }).toString()}
           onScroll={onScroll}
+          heightAdjustment={heightAdjustment}
           {...rest}
         >
           {ItemWrapper}
@@ -459,7 +478,7 @@ const innerElementType = forwardRef(({ children, ...rest }, ref) => {
     <StickyListContext.Consumer>
       {({ stickyItems, stickyItemsHeight, StickyComponent, headerTopOffset, isQuickView, toolbarHeight }) => {
         // Ensure top position is always between 0 and toolbarHeight in QuickView
-        const topPosition = isQuickView ? Math.max(0, Math.min(toolbarHeight, headerTopOffset ?? toolbarHeight)) : 0;
+        const topPosition = isQuickView ? Math.max(0, Math.min(toolbarHeight, headerTopOffset ?? 0)) : 0;
 
         // In QuickView mode, children[0] is the toolbar, children[1+] are data rows
         const childrenArray = Array.isArray(children) ? children : children ? [children] : [];
