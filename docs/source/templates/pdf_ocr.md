@@ -26,7 +26,7 @@ Ideal for document intelligence, QA on OCR output, and structured data capture w
 ```xml
 <View>
   <Style>
-  .htx-pdf { calc(100vh - 250px) }
+    .htx-pdf { calc(100vh - 250px) }
   </Style>
   <Header value="Select text to correct" size="4"/>
   <OcrLabels name="ocr" toName="pdf">
@@ -79,3 +79,4 @@ Ideal for document intelligence, QA on OCR output, and structured data capture w
 ## Related tags
 - [Header](/tags/header.html)
 - [Pdf](/tags/pdf.html)
+- [Style](/tags/style.html)
