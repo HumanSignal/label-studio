@@ -157,7 +157,7 @@ However, they are easier to use with HTTP API and are required for use with the 
 
 ### SDK
 
-There is no difference with how you use legacy tokens and personal access tokens with the Python SDK. See the example above. 
+There is no difference in how you use legacy tokens and personal access tokens with the Python SDK. See the example above. 
 
 
 ### HTTP API
