@@ -9,6 +9,7 @@ import { Interface } from "../../Common/Interface";
 import { ExportButton, ImportButton } from "../../Common/SDKButtons";
 import { Tooltip } from "@humansignal/ui";
 import { ActionsButton } from "./ActionsButton";
+import { DensityToggle } from "./DensityToggle";
 import { GridWidthButton } from "./GridWidthButton";
 import { LabelButton } from "./LabelButton";
 import { LoadingPossum } from "./LoadingPossum";
@@ -68,6 +69,9 @@ const ImportButtonWithChecks = ({ size }) => {
 export const instruments = {
   "view-toggle": ({ size }) => {
     return <ViewToggle size={size} style={style} />;
+  },
+  "density-toggle": ({ size }) => {
+    return <DensityToggle size={size} />;
   },
   columns: ({ size }) => {
     const iconProps = {

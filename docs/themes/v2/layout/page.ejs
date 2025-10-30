@@ -1,22 +1,35 @@
-<% const isEnterpriseTheme = theme.tier === "enterprise" %>
+<% const isEnterpriseTheme=theme.tier==="enterprise" %>
 <% const tocPageTypes = page.type === "guide" || page.type === "blog" || page.type === "templates" || page.type === "tags" || page.type === "plugins" %>
 
-<% const formattedContent = removeContent(page.content) %>
-<% const tocContent = replaceContent(formattedContent) %>
-<% const pageHasHeading = /<h[1-6]\b[^>]*>/i.test(formattedContent); %>
-<% const showToc = tocPageTypes && pageHasHeading %>
+<% const formattedContent=removeContent(page.content) %>
+<% const tocContent=replaceContent(formattedContent) %>
+<% const pageHasHeading=/<h[1-6]\b[^>]*>/i.test(formattedContent); %>
+<% const showToc=tocPageTypes && pageHasHeading %>
 
 <div class="content-grid">
   <div class="content-markdown">
-    <% if(page.type && page.parent !== undefined) { %>
+    <% if(page.type && page.parent !==undefined) { %>
       <%- breadcrumb({pageType: page.type, parentPage: isEnterpriseTheme && page.parent_enterprise ? page.parent_enterprise : page.parent, currentPage: page.title, parentPageExtension: page.parent_page_extension }) %>
-    <% } %>
-    <% if (!page.hide_frontmatter_title && page.title.trim()) { %>
+   <% } %>
+   <% if (!page.hide_frontmatter_title && page.title.trim()) { %>
       <%- partial("component/heading", {text: page.title, size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
-    <% } %>
-    <% if (page.community) { %>
+   <% } %>
+   <% if (page.open_in_collab && page.ipynb_repo_path) { %>
+      <div class="open-in-collab-header">
+        <a target="_blank"
+          href="https://colab.research.google.com/github/humansignal/awesome-label-studio-tutorials/blob/main/<%= page.ipynb_repo_path %>">
+          <img src="https://colab.research.google.com/assets/colab-badge.svg"
+            alt="Open In Colab" />
+        </a>
+      </div>
+   <% } %>
+   <% if (page.community || page.tutorial) { %>
       <div class="community-header">
-        <span class="community-badge">Community</span>
+          <% if (page.community) { %>
+            <span class="community-badge">Community</span>
+          <% } else if (page.tutorial) { %>
+            <span class="community-badge">Tutorial</span>
+          <% } %>
         <div class="template-author">
           <% if (page.community_author) { %>
             <div class="community-people">

@@ -820,8 +820,8 @@ class TimeSeriesVisualizerD3 extends React.Component {
           : item.fixedscale
         : channelItem.fixedscale;
 
-    if (item.timerange) {
-      const timerange = item.timerange.split(",").map(Number);
+    if (channelItem.timerange) {
+      const timerange = channelItem.timerange.split(",").map(Number);
 
       channel.x.domain(timerange);
     }
@@ -842,8 +842,8 @@ class TimeSeriesVisualizerD3 extends React.Component {
         if (max < values[i]) max = values[i];
       }
 
-      if (item.datarange) {
-        const datarange = item.datarange.split(",");
+      if (channelItem.datarange) {
+        const datarange = channelItem.datarange.split(",");
 
         if (datarange[0] !== "") min = new Number(datarange[0]);
         if (datarange[1] !== "") max = new Number(datarange[1]);
