@@ -2196,13 +2196,13 @@
           },
           "subtlest": {
             "$type": "color",
-            "$value": "{@primitives.$color.$sand.100}",
+            "$value": "{@primitives.$color.$sand.000}",
             "$description": "",
             "$variable_metadata": {
               "name": "color/accent/sand/subtlest",
               "figmaId": "VariableID:3333:43250",
               "modes": {
-                "light": "{@primitives.$color.$sand.100}",
+                "light": "{@primitives.$color.$sand.000}",
                 "dark": "{@primitives.$color.$sand.950}"
               }
             }
@@ -3906,6 +3906,30 @@
             }
           }
         },
+        "18": {
+          "$type": "number",
+          "$value": 18,
+          "$description": "",
+          "$variable_metadata": {
+            "name": "typography/font-size/18",
+            "figmaId": "VariableID:4830:11271",
+            "modes": {
+              "value": 18
+            }
+          }
+        },
+        "20": {
+          "$type": "number",
+          "$value": 20,
+          "$description": "",
+          "$variable_metadata": {
+            "name": "typography/font-size/20",
+            "figmaId": "VariableID:4831:11272",
+            "modes": {
+              "value": 20
+            }
+          }
+        },
         "22": {
           "$type": "number",
           "$value": 22,
@@ -4348,13 +4372,13 @@
         },
         "15": {
           "$type": "number",
-          "$value": 0.15000000596046448,
+          "$value": 0.15,
           "$description": "",
           "$variable_metadata": {
             "name": "typography/letter-spacing/15",
             "figmaId": "VariableID:2652:11513",
             "modes": {
-              "value": 0.15000000596046448
+              "value": 0.15
             }
           }
         },
@@ -4384,37 +4408,37 @@
         },
         "-20": {
           "$type": "number",
-          "$value": -0.20000000298023224,
+          "$value": -0.2,
           "$description": "",
           "$variable_metadata": {
             "name": "typography/letter-spacing/-20",
             "figmaId": "VariableID:2652:11509",
             "modes": {
-              "value": -0.20000000298023224
+              "value": -0.2
             }
           }
         },
         "-15": {
           "$type": "number",
-          "$value": -0.15000000596046448,
+          "$value": -0.15,
           "$description": "",
           "$variable_metadata": {
             "name": "typography/letter-spacing/-15",
             "figmaId": "VariableID:2652:11510",
             "modes": {
-              "value": -0.15000000596046448
+              "value": -0.15
             }
           }
         },
         "-10": {
           "$type": "number",
-          "$value": -0.10000000149011612,
+          "$value": -0.1,
           "$description": "",
           "$variable_metadata": {
             "name": "typography/letter-spacing/-10",
             "figmaId": "VariableID:2652:11511",
             "modes": {
-              "value": -0.10000000149011612
+              "value": -0.1
             }
           }
         }
@@ -5330,37 +5354,37 @@
       "$title": {
         "small": {
           "$type": "number",
-          "$value": "{@primitives.$typography.$font-size.14}",
+          "$value": "{@primitives.$typography.$font-size.18}",
           "$description": "",
           "$variable_metadata": {
             "name": "font-size/title/small",
             "figmaId": "VariableID:3139:42787",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.14}"
+              "default": "{@primitives.$typography.$font-size.18}"
             }
           }
         },
         "medium": {
           "$type": "number",
-          "$value": "{@primitives.$typography.$font-size.16}",
+          "$value": "{@primitives.$typography.$font-size.20}",
           "$description": "",
           "$variable_metadata": {
             "name": "font-size/title/medium",
             "figmaId": "VariableID:3139:42788",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.16}"
+              "default": "{@primitives.$typography.$font-size.20}"
             }
           }
         },
         "large": {
           "$type": "number",
-          "$value": "{@primitives.$typography.$font-size.22}",
+          "$value": "{@primitives.$typography.$font-size.24}",
           "$description": "",
           "$variable_metadata": {
             "name": "font-size/title/large",
             "figmaId": "VariableID:3139:42786",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.22}"
+              "default": "{@primitives.$typography.$font-size.24}"
             }
           }
         }
@@ -5368,37 +5392,37 @@
       "$headline": {
         "small": {
           "$type": "number",
-          "$value": "{@primitives.$typography.$font-size.24}",
+          "$value": "{@primitives.$typography.$font-size.28}",
           "$description": "",
           "$variable_metadata": {
             "name": "font-size/headline/small",
             "figmaId": "VariableID:3139:42790",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.24}"
+              "default": "{@primitives.$typography.$font-size.28}"
             }
           }
         },
         "medium": {
           "$type": "number",
-          "$value": "{@primitives.$typography.$font-size.28}",
+          "$value": "{@primitives.$typography.$font-size.32}",
           "$description": "",
           "$variable_metadata": {
             "name": "font-size/headline/medium",
             "figmaId": "VariableID:3139:42791",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.28}"
+              "default": "{@primitives.$typography.$font-size.32}"
             }
           }
         },
         "large": {
           "$type": "number",
-          "$value": "{@primitives.$typography.$font-size.32}",
+          "$value": "{@primitives.$typography.$font-size.36}",
           "$description": "",
           "$variable_metadata": {
             "name": "font-size/headline/large",
             "figmaId": "VariableID:3139:42792",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.32}"
+              "default": "{@primitives.$typography.$font-size.36}"
             }
           }
         }
@@ -5406,37 +5430,37 @@
       "$display": {
         "small": {
           "$type": "number",
-          "$value": "{@primitives.$typography.$font-size.36}",
+          "$value": "{@primitives.$typography.$font-size.48}",
           "$description": "",
           "$variable_metadata": {
             "name": "font-size/display/small",
             "figmaId": "VariableID:3139:42793",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.36}"
+              "default": "{@primitives.$typography.$font-size.48}"
             }
           }
         },
         "medium": {
           "$type": "number",
-          "$value": "{@primitives.$typography.$font-size.48}",
+          "$value": "{@primitives.$typography.$font-size.56}",
           "$description": "",
           "$variable_metadata": {
             "name": "font-size/display/medium",
             "figmaId": "VariableID:3139:42794",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.48}"
+              "default": "{@primitives.$typography.$font-size.56}"
             }
           }
         },
         "large": {
           "$type": "number",
-          "$value": "{@primitives.$typography.$font-size.56}",
+          "$value": "{@primitives.$typography.$font-size.64}",
           "$description": "",
           "$variable_metadata": {
             "name": "font-size/display/large",
             "figmaId": "VariableID:3139:42795",
             "modes": {
-              "default": "{@primitives.$typography.$font-size.56}"
+              "default": "{@primitives.$typography.$font-size.64}"
             }
           }
         }

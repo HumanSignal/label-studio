@@ -542,14 +542,22 @@ export const AppStore = types
       return true;
     }),
 
+    /**
+     * @deprecated Use the useActions hook instead for better caching and performance
+     * This method is kept for backward compatibility but is no longer actively used
+     */
     fetchActions: flow(function* () {
-      const serverActions = yield self.apiCall("actions");
+      try {
+        const serverActions = yield self.apiCall("actions");
 
-      const actions = (serverActions ?? []).map((action) => {
-        return [action, undefined];
-      });
+        const actions = (serverActions ?? []).map((action) => {
+          return [action, undefined];
+        });
 
-      self.SDK.updateActions(actions);
+        self.SDK.updateActions(actions);
+      } catch (error) {
+        console.error("Error fetching actions:", error);
+      }
     }),
 
     fetchActionForm: flow(function* (actionId) {

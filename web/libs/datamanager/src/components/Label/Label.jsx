@@ -106,7 +106,7 @@ export const Labeling = injector(
               <Elem
                 tag={Resizer}
                 name="dataview"
-                minWidth={200}
+                minWidth={202}
                 showResizerLine={false}
                 type={"quickview"}
                 maxWidth={window.innerWidth * 0.35}
