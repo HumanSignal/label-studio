@@ -55,7 +55,7 @@ import { LSFWrapper } from "./lsf-sdk";
 import { taskToLSFormat } from "./lsf-utils";
 
 const DEFAULT_TOOLBAR =
-  "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button grid-size view-toggle";
+  "actions columns filters ordering label-button loading-possum error-box | refresh import-button export-button density-toggle grid-size view-toggle";
 
 const prepareInstruments = (instruments) => {
   const result = Object.entries(instruments).map(([name, builder]) => [name, builder({ inject, observer })]);

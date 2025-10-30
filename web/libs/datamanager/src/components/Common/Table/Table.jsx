@@ -4,7 +4,7 @@ import { useSDK } from "../../../providers/SDKProvider";
 import { isDefined } from "../../../utils/utils";
 import { Icon } from "../Icon/Icon";
 import { modal } from "../Modal/Modal";
-import { IconCode, IconGear, IconGearNewUI, IconCopyOutline } from "@humansignal/icons";
+import { IconCode, IconCopyOutline, IconChevronDown } from "@humansignal/icons";
 import { AutoSizerTable, Tooltip, Button } from "@humansignal/ui";
 import { useCopyText } from "@humansignal/core";
 import "./Table.scss";
@@ -15,7 +15,8 @@ import { TableRow } from "./TableRow/TableRow";
 import { prepareColumns } from "./utils";
 import { cn } from "../../../utils/bem";
 import { FieldsButton } from "../FieldsButton";
-import { FF_DEV_3873, FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
+import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
+import { DensityToggle } from "../../DataManager/Toolbar/DensityToggle";
 
 const Decorator = (decoration) => {
   return {
@@ -47,6 +48,7 @@ export const Table = observer(
     onColumnResize,
     onColumnReset,
     headerExtra,
+    onDensityChange,
     ...props
   }) => {
     const colOrderKey = "dm:columnorder";
@@ -55,6 +57,16 @@ export const Table = observer(
     const listRef = useRef();
     const Decoration = useMemo(() => Decorator(decoration), [decoration]);
     const { api, type } = useSDK();
+    const toolbarHeight = 41;
+    const isQuickView = view.root.isLabeling;
+    const [toolbarVisible, setToolbarVisible] = useState(true);
+
+    // Reset virtualizer cache when rowHeight changes
+    useEffect(() => {
+      if (listRef.current?._listRef) {
+        listRef.current._listRef.resetAfterIndex(0);
+      }
+    }, [props.rowHeight]);
 
     const headerCheckboxCell = useCallback(() => {
       return (
@@ -164,6 +176,23 @@ export const Table = observer(
 
     const headerHeight = 43;
 
+    const renderTableToolbar = useCallback(() => {
+      return (
+        <div className={cn("table-toolbar").mod({ visible: toolbarVisible }).toString()}>
+          <FieldsButton
+            className={cn("table-toolbar").elem("customize-button").toString()}
+            wrapper={FieldsButton.Checkbox}
+            title={"Columns"}
+            size="small"
+            trailingIcon={<Icon icon={IconChevronDown} />}
+            tooltip={"Customize Columns"}
+            data-testid="columns-picker-quickview"
+          />
+          <DensityToggle size="small" onChange={onDensityChange} data-testid="density-toggle-quickview" />
+        </div>
+      );
+    }, [toolbarVisible, onDensityChange]);
+
     const renderTableHeader = useCallback(
       ({ style }) => (
         <TableHead
@@ -198,17 +227,40 @@ export const Table = observer(
 
     const renderRow = useCallback(
       ({ style, index }) => {
-        const row = data[index - 1];
-        const isEven = index % 2 === 0;
+        // Both QuickView and Regular mode: Index 0 is header (sticky), Index 1+ are data rows
+        const dataIndex = index - 1;
+        const row = data[dataIndex];
+        const isEven = dataIndex % 2 === 0;
+
+        if (isQuickView) {
+          return (
+            <TableRow
+              key={row.id}
+              data={row}
+              even={isEven}
+              onClick={(row, e) => props.onRowClick(row, e)}
+              stopInteractions={stopInteractions}
+              wrapperStyle={{ ...style, height: props.rowHeight }}
+              style={{
+                height: props.rowHeight,
+                width: props.fitContent ? "fit-content" : "auto",
+              }}
+              decoration={Decoration}
+            />
+          );
+        }
+
+        // Invert for visual consistency in Regular mode: we want odd rows (2nd, 4th, etc.) to have background
+        const shouldApplyBackground = !isEven;
 
         return (
           <TableRow
             key={row.id}
             data={row}
-            even={isEven}
+            even={shouldApplyBackground}
             onClick={(row, e) => props.onRowClick(row, e)}
             stopInteractions={stopInteractions}
-            wrapperStyle={style}
+            wrapperStyle={{ ...style, height: props.rowHeight }}
             style={{
               height: props.rowHeight,
               width: props.fitContent ? "fit-content" : "auto",
@@ -227,6 +279,7 @@ export const Table = observer(
         view,
         view.selected.list,
         view.selected.all,
+        isQuickView,
       ],
     );
 
@@ -239,21 +292,24 @@ export const Table = observer(
 
     const cachedScrollOffset = useRef();
 
-    const initialScrollOffset = useCallback((height) => {
-      if (isDefined(cachedScrollOffset.current)) {
-        return cachedScrollOffset.current;
-      }
+    const initialScrollOffset = useCallback(
+      (height) => {
+        if (isDefined(cachedScrollOffset.current)) {
+          return cachedScrollOffset.current;
+        }
 
-      const { rowHeight: h } = props;
-      const index = data.indexOf(focusedItem);
+        const h = props.rowHeight;
+        const index = data.indexOf(focusedItem);
 
-      if (index >= 0) {
-        const scrollOffset = index * h - height / 2 + h / 2; // + headerHeight
+        if (index >= 0) {
+          const scrollOffset = index * h - height / 2 + h / 2; // + headerHeight
 
-        return (cachedScrollOffset.current = scrollOffset);
-      }
-      return 0;
-    }, []);
+          return (cachedScrollOffset.current = scrollOffset);
+        }
+        return 0;
+      },
+      [props.rowHeight, data, focusedItem],
+    );
 
     const itemKey = useCallback(
       (index) => {
@@ -274,66 +330,43 @@ export const Table = observer(
     }, [data]);
     const tableWrapper = useRef();
 
-    const right =
-      tableWrapper.current?.firstChild?.firstChild.offsetWidth -
-        tableWrapper.current?.firstChild?.firstChild?.firstChild.offsetWidth || 0;
+    const handleScroll = useCallback(
+      ({ scrollOffset }) => {
+        if (isQuickView && scrollOffset >= 0) {
+          setToolbarVisible(scrollOffset === 0);
+        }
+      },
+      [isQuickView, toolbarHeight],
+    );
 
-    const columnsSelectorCN = cn("columns__selector");
     return (
-      <>
-        {view.root.isLabeling && (
-          <div
-            className={columnsSelectorCN.toString()}
-            style={{
-              right,
-            }}
+      <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toString()}>
+        {isQuickView && renderTableToolbar()}
+        <TableContext.Provider value={contextValue}>
+          <StickyList
+            ref={listRef}
+            overscanCount={10}
+            itemHeight={props.rowHeight}
+            totalCount={props.total}
+            itemCount={data.length + 1}
+            itemKey={itemKey}
+            innerElementType={innerElementType}
+            stickyItems={[0]}
+            stickyItemsHeight={[headerHeight]}
+            stickyComponent={renderTableHeader}
+            initialScrollOffset={initialScrollOffset}
+            isItemLoaded={isItemLoaded}
+            loadMore={props.loadMore}
+            toolbarHeight={toolbarHeight}
+            headerHeight={headerHeight}
+            isQuickView={isQuickView}
+            onScroll={handleScroll}
+            toolbarVisible={toolbarVisible}
           >
-            {isFF(FF_DEV_3873) ? (
-              <FieldsButton
-                className={columnsSelectorCN.elem("button-new").toString()}
-                wrapper={FieldsButton.Checkbox}
-                icon={<IconGearNewUI />}
-                style={{ padding: "0" }}
-                tooltip={"Customize Columns"}
-              />
-            ) : (
-              <FieldsButton
-                wrapper={FieldsButton.Checkbox}
-                icon={<IconGear />}
-                style={{
-                  padding: 0,
-                  zIndex: 1000,
-                  borderRadius: 0,
-                  height: "45px",
-                  width: "45px",
-                  margin: "-1px",
-                }}
-              />
-            )}
-          </div>
-        )}
-        <div ref={tableWrapper} className={tableCN.mod({ fit: props.fitToContent }).toString()}>
-          <TableContext.Provider value={contextValue}>
-            <StickyList
-              ref={listRef}
-              overscanCount={10}
-              itemHeight={props.rowHeight}
-              totalCount={props.total}
-              itemCount={data.length + 1}
-              itemKey={itemKey}
-              innerElementType={innerElementType}
-              stickyItems={[0]}
-              stickyItemsHeight={[headerHeight]}
-              stickyComponent={renderTableHeader}
-              initialScrollOffset={initialScrollOffset}
-              isItemLoaded={isItemLoaded}
-              loadMore={props.loadMore}
-            >
-              {renderRow}
-            </StickyList>
-          </TableContext.Provider>
-        </div>
-      </>
+            {renderRow}
+          </StickyList>
+        </TableContext.Provider>
+      </div>
     );
   },
 );
@@ -363,6 +396,12 @@ const StickyList = observer(
       isItemLoaded,
       loadMore,
       initialScrollOffset,
+      toolbarHeight,
+      headerHeight,
+      isQuickView,
+      onScroll,
+      headerTopOffset,
+      toolbarVisible,
       ...rest
     } = props;
 
@@ -371,14 +410,42 @@ const StickyList = observer(
       StickyComponent: stickyComponent,
       stickyItems,
       stickyItemsHeight,
+      headerTopOffset,
+      isQuickView,
+      toolbarHeight,
     };
 
     const itemSize = (index) => {
-      if (stickyItems.includes(index)) {
-        return stickyItemsHeight[index] ?? rest.itemHeight;
+      if (isQuickView) {
+        if (stickyItems.includes(index)) {
+          return headerHeight;
+        }
+      } else {
+        // Regular mode: Index 0 is sticky header
+        if (stickyItems.includes(index)) {
+          return headerHeight;
+        }
       }
+      // All other indices are data rows
       return rest.itemHeight;
     };
+
+    // Calculate height adjustment for QuickView mode
+    // Subtract toolbar height (when visible) and app header height
+    const heightAdjustment = useMemo(() => {
+      if (!isQuickView) return 0;
+
+      // Get app header height from CSS variable
+      const appHeaderHeight = Number.parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue("--header-height") || "0",
+        10,
+      );
+
+      // Add toolbar height only when toolbar is visible
+      const adjustment = appHeaderHeight + (toolbarVisible ? toolbarHeight : 0);
+
+      return adjustment;
+    }, [isQuickView, toolbarVisible, toolbarHeight]);
 
     return (
       <StickyListContext.Provider value={itemData}>
@@ -390,7 +457,9 @@ const StickyList = observer(
           itemData={itemData}
           itemSize={itemSize}
           initialScrollOffset={initialScrollOffset}
-          className={tableCN.elem("auto-size").toString()}
+          className={tableCN.elem("auto-size").mod({ "quick-view": isQuickView }).toString()}
+          onScroll={onScroll}
+          heightAdjustment={heightAdjustment}
           {...rest}
         >
           {ItemWrapper}
@@ -405,23 +474,40 @@ StickyList.displayName = "StickyList";
 const innerElementType = forwardRef(({ children, ...rest }, ref) => {
   return (
     <StickyListContext.Consumer>
-      {({ stickyItems, stickyItemsHeight, StickyComponent }) => (
-        <div ref={ref} {...rest}>
-          {stickyItems.map((index) => (
-            <StickyComponent
-              className={tableCN.elem("sticky-header").toString()}
-              key={index}
-              index={index}
-              style={{
-                height: stickyItemsHeight[index],
-                top: index * stickyItemsHeight[index],
-              }}
-            />
-          ))}
+      {({ stickyItems, stickyItemsHeight, StickyComponent, headerTopOffset, isQuickView, toolbarHeight }) => {
+        // Ensure top position is always between 0 and toolbarHeight in QuickView
+        const topPosition = isQuickView ? Math.max(0, Math.min(toolbarHeight, headerTopOffset ?? 0)) : 0;
 
-          {children}
-        </div>
-      )}
+        // In QuickView mode, children[0] is the toolbar, children[1+] are data rows
+        const childrenArray = Array.isArray(children) ? children : children ? [children] : [];
+        const toolbar = isQuickView && childrenArray.length > 0 ? childrenArray[0] : null;
+        const bodyRows = isQuickView && childrenArray.length > 0 ? childrenArray.slice(1) : children;
+
+        return (
+          <div ref={ref} {...rest}>
+            {stickyItems.map((index) => (
+              <StickyComponent
+                className={tableCN.elem("sticky-header").toString()}
+                key={index}
+                index={index}
+                style={{
+                  height: stickyItemsHeight[index],
+                  top: topPosition,
+                }}
+              />
+            ))}
+
+            {isQuickView ? (
+              <>
+                {toolbar}
+                <div className={tableCN.elem("body-rows").toString()}>{bodyRows}</div>
+              </>
+            ) : (
+              children
+            )}
+          </div>
+        );
+      }}
     </StickyListContext.Consumer>
   );
 });
