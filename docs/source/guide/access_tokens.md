@@ -39,7 +39,7 @@ Label Studio has personal access tokens and legacy tokens. These tokens are also
         <li>Can be manually revoked
         <li>Do not need to be refreshed with used with HTTP API
         <li> <code>-H 'Authorization: Token  &lt;token&gt;'</code> with HTTP API requests
-        <li>Currently required for use the <a target="_blank" rel="noopener" href="https://github.com/HumanSignal/label-studio-ml-backend">Label Studio ML backend</a>
+        <li>Currently required to use the <a target="_blank" rel="noopener" href="https://github.com/HumanSignal/label-studio-ml-backend">Label Studio ML backend</a>
         <li>Only need to be set once when used with the SDK
     </ul>
   </td>
