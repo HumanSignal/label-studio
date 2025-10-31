@@ -25,6 +25,9 @@ Ideal for document intelligence, QA on OCR output, and structured data capture w
 
 ```xml
 <View>
+  <Style>
+    .htx-pdf { calc(100vh - 250px) }
+  </Style>
   <Header value="Select text to correct" size="4"/>
   <OcrLabels name="ocr" toName="pdf">
     <Label value="Typo" />
@@ -57,6 +60,10 @@ Ideal for document intelligence, QA on OCR output, and structured data capture w
 
   <img src="/images/templates-misc/ocrlabels.png" alt="" class="gif-border" style="max-width:400px" />
 
+* **`Style`**
+
+  Use `.htx-pdf` to apply styling to the PDF. For example, adding a border or changing the size. 
+
 
 
 ## Input data
@@ -72,3 +79,4 @@ Ideal for document intelligence, QA on OCR output, and structured data capture w
 ## Related tags
 - [Header](/tags/header.html)
 - [Pdf](/tags/pdf.html)
+- [Style](/tags/style.html)
