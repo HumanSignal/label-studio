@@ -39,6 +39,16 @@ const resolveLabelStudio = () => {
   }
 };
 
+// Returns true to suppress (swallow) the error, false to bubble to global handler.
+// We allow 403 PAUSED to bubble so the app-level ApiProvider can show the paused modal
+const errorHandlerAllowPaused = (result) => {
+  const isPaused =
+    result?.status === 403 &&
+    typeof result?.response === "object" &&
+    result?.response?.display_context?.reason === "PAUSED";
+  return !isPaused;
+};
+
 // Support portal URL constants used to construct error reporting links
 // These are used in showOperationToast() to create support links with request IDs
 // for better error tracking and customer support
@@ -633,7 +643,7 @@ export class LSFWrapper {
           { taskID },
           { body },
           // errors are displayed by "toast" event - we don't want to show blocking modal
-          { errorHandler: () => true },
+          { errorHandler: errorHandlerAllowPaused },
         );
       },
       false,
@@ -667,7 +677,7 @@ export class LSFWrapper {
           body: serializedAnnotation,
         },
         // errors are displayed by "toast" event - we don't want to show blocking modal
-        { errorHandler: () => true },
+        { errorHandler: errorHandlerAllowPaused },
       );
     });
     const status = result?.$meta?.status;
@@ -817,7 +827,7 @@ export class LSFWrapper {
           id === undefined ? "submitAnnotation" : "updateAnnotation",
           params,
           options,
-          { errorHandler: () => true },
+          { errorHandler: errorHandlerAllowPaused },
         );
       },
       true,

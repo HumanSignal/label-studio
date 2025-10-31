@@ -8,6 +8,7 @@ community_author: yyassi-heartex
 ipynb_repo_path: tutorials/how-to-connect-Hugging-Face-with-Label-Studio-SDK/how_to_connect_Hugging_Face_with_Label_Studio_SDK.ipynb
 repo_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/tree/main/tutorials/how-to-connect-Hugging-Face-with-Label-Studio-SDK
 report_bug_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/issues/new
+thumbnail: /images/tutorials/tutorials-hugging-face-ls-sdk.png
 ---
 **A Complete Guide to Connecting Hugging Face and Label Studio**
 

@@ -8,6 +8,7 @@ community_author: niklub
 ipynb_repo_path: tutorials/how-to-debug-agents-with-LangSmith-and-Label-Studio/how_to_debug_agents_with_LangSmith_and_Label_Studio.ipynb
 repo_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/tree/main/tutorials/how-to-debug-agents-with-LangSmith-and-Label-Studio
 report_bug_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/issues/new
+thumbnail: /images/tutorials/tutorials-debug-agents-langsmith.png
 ---
 ## 0. Label Studio Requirements
 
