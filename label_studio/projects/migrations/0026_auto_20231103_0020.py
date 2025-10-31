@@ -10,30 +10,31 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _fill_label_config_hash(migration_name):
-    project_tuples = Project.objects.all().values_list('id', 'parsed_label_config')
+def _fill_label_config_hash(migration_name, db_alias):
+    project_tuples = Project.objects.using(db_alias).all().values_list('id', 'parsed_label_config')
     for project_id, parsed_label_config in project_tuples:
-        migration = AsyncMigrationStatus.objects.create(
+        migration = AsyncMigrationStatus.objects.using(db_alias).create(
             project_id=project_id,
             name=migration_name,
             status=AsyncMigrationStatus.STATUS_STARTED,
         )
 
         hashed_label_config = hash(str(parsed_label_config))
-        Project.objects.filter(id=project_id).update(label_config_hash=hashed_label_config)
+        Project.objects.using(db_alias).filter(id=project_id).update(label_config_hash=hashed_label_config)
 
         migration.status = AsyncMigrationStatus.STATUS_FINISHED
-        migration.save()
+        migration.save(using=db_alias)
 
 
-def fill_label_config_hash(migration_name):
+def fill_label_config_hash(migration_name, db_alias):
     logger.info('Start filling label config hash')
-    start_job_async_or_sync(_fill_label_config_hash, migration_name=migration_name)
+    start_job_async_or_sync(_fill_label_config_hash, migration_name=migration_name, db_alias=db_alias)
     logger.info('Finished filling label config hash')
 
 
 def forward(apps, schema_editor):
-    fill_label_config_hash('0026_auto_20231103_0020')
+    db_alias = schema_editor.connection.alias
+    fill_label_config_hash('0026_auto_20231103_0020', db_alias)
 
 
 def backwards(apps, schema_editor):
