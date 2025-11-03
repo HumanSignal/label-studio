@@ -25,9 +25,9 @@ export const useDraftProject = () => {
     const draft = await api.callApi("createProject", {
       body: {
         title: projectName,
+        is_draft: true,
       },
     });
-    console.log({ draft });
 
     if (draft) setProject(draft);
   }, []);
