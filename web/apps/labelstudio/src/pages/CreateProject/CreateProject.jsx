@@ -143,7 +143,7 @@ export const CreateProject = ({ onClose }) => {
       params: {
         pk: project.id,
       },
-      body: projectBody,
+      body: { ...projectBody, is_draft: false },
     });
 
     if (response === null) return;

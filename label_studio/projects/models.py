@@ -802,6 +802,12 @@ class Project(ProjectMixin, models.Model):
             if update_fields is not None:
                 update_fields = {'control_weights'}.union(update_fields)
 
+        # If project is published and is draft, set is_draft to False
+        if self.is_published and self.is_draft:
+            self.is_draft = False
+            if update_fields is not None:
+                update_fields = {'is_published', 'is_draft'}.union(update_fields)
+
         super(Project, self).save(*args, update_fields=update_fields, **kwargs)
 
         if label_config_has_changed:
