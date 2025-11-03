@@ -33,18 +33,22 @@ const markdownComponents: Components = {
     return <code className="font-mono text-body-small" {...props} />;
   },
   pre: (props) => (
-    <pre className="bg-neutral-surface-inset border border-neutral-border rounded-small p-base mb-base overflow-x-auto" {...props} />
+    <pre
+      className="bg-neutral-surface-inset border border-neutral-border rounded-small p-base mb-base overflow-x-auto"
+      {...props}
+    />
   ),
 
   // Blockquotes
   blockquote: (props) => (
-    <blockquote className="border-l-4 border-primary-border pl-base ml-base mb-base italic text-neutral-content-subtle" {...props} />
+    <blockquote
+      className="border-l-4 border-primary-border pl-base ml-base mb-base italic text-neutral-content-subtle"
+      {...props}
+    />
   ),
 
   // Links
-  a: (props) => (
-    <a className="text-primary-content hover:text-primary-content-hover underline" {...props} />
-  ),
+  a: (props) => <a className="text-primary-content hover:text-primary-content-hover underline" {...props} />,
 
   // Horizontal rule
   hr: (props) => <hr className="border-neutral-border my-wide" {...props} />,
@@ -77,5 +81,9 @@ interface MarkdownProps {
 }
 
 export const Markdown = ({ text, allowHtml = false }: MarkdownProps) => {
-  return <ReactMarkdown rehypePlugins={allowHtml ? [rehypeRaw] : undefined} components={markdownComponents}>{text}</ReactMarkdown>;
+  return (
+    <ReactMarkdown rehypePlugins={allowHtml ? [rehypeRaw] : undefined} components={markdownComponents}>
+      {text}
+    </ReactMarkdown>
+  );
 };
