@@ -180,7 +180,6 @@ export default class TransformerComponent extends Component {
     const { item } = this.props;
     const { selectedRegions } = item;
 
-  
     selectedRegions.forEach((region) => {
       region.applyTransform?.({}, null);
     });

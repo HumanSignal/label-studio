@@ -1491,13 +1491,13 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       let constrainedDx = dx;
       let constrainedDy = dy;
-      let constrainedScaleX = scaleX;
-      let constrainedScaleY = scaleY;
+      const constrainedScaleX = scaleX;
+      const constrainedScaleY = scaleY;
 
       if (imageWidth > 0 && imageHeight > 0) {
         // Calculate bounding box of current points after transform
-        const xs = initialPoints.map(p => p.x);
-        const ys = initialPoints.map(p => p.y);
+        const xs = initialPoints.map((p) => p.x);
+        const ys = initialPoints.map((p) => p.y);
         const minX = Math.min(...xs);
         const maxX = Math.max(...xs);
         const minY = Math.min(...ys);
@@ -1605,7 +1605,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Detach and reattach the transformer to prevent resizing issues
       const stage = transformableGroup.getStage();
       if (stage) {
-        const transformer = stage.findOne('Transformer');
+        const transformer = stage.findOne("Transformer");
         if (transformer) {
           // Temporarily detach the transformer
           const nodes = transformer.nodes();
@@ -1658,36 +1658,39 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   }, []);
 
   // Click handler with debouncing for single/double-click detection
-  const handleClickWithDebouncing = useCallback((e: any, onClickHandler?: (e: any) => void, onDblClickHandler?: (e: any) => void) => {
-    console.log("🖱️ handleClickWithDebouncing called, timeout exists:", !!clickTimeoutRef.current);
+  const handleClickWithDebouncing = useCallback(
+    (e: any, onClickHandler?: (e: any) => void, onDblClickHandler?: (e: any) => void) => {
+      console.log("🖱 handleClickWithDebouncing called, timeout exists:", !!clickTimeoutRef.current);
 
-    // Clear any existing timeout
-    if (clickTimeoutRef.current) {
-      clearTimeout(clickTimeoutRef.current);
-      clickTimeoutRef.current = null;
-      // This is a double-click, handle it
-      console.log("🖱️ Double-click detected, calling onDblClickHandler");
-      doubleClickHandledRef.current = true;
-      if (onDblClickHandler) {
-        onDblClickHandler(e);
+      // Clear any existing timeout
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
+        // This is a double-click, handle it
+        console.log("🖱 Double-click detected, calling onDblClickHandler");
+        doubleClickHandledRef.current = true;
+        if (onDblClickHandler) {
+          onDblClickHandler(e);
+        }
+        // Reset the flag after a short delay
+        setTimeout(() => {
+          doubleClickHandledRef.current = false;
+        }, 100);
+        return;
       }
-      // Reset the flag after a short delay
-      setTimeout(() => {
-        doubleClickHandledRef.current = false;
-      }, 100);
-      return;
-    }
 
-    // Set a timeout for single-click handling
-    console.log("🖱️ Single-click detected, setting timeout");
-    clickTimeoutRef.current = setTimeout(() => {
-      clickTimeoutRef.current = null;
-      console.log("🖱️ Single-click timeout fired, calling onClickHandler");
-      if (onClickHandler) {
-        onClickHandler(e);
-      }
-    }, 300);
-  }, []);
+      // Set a timeout for single-click handling
+      console.log("🖱 Single-click detected, setting timeout");
+      clickTimeoutRef.current = setTimeout(() => {
+        clickTimeoutRef.current = null;
+        console.log("🖱 Single-click timeout fired, calling onClickHandler");
+        if (onClickHandler) {
+          onClickHandler(e);
+        }
+      }, 300);
+    },
+    [],
+  );
 
   // Create event handlers
   const eventHandlers = createEventHandlers({
@@ -1821,17 +1824,21 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               eventHandlers.handleLayerClick(e);
             }
       }
-      onDblClick={disabled ? undefined : (e) => {
-        console.log("🖱️ Group onDblClick called, doubleClickHandled:", doubleClickHandledRef.current);
-        // If we've already handled this double-click through debouncing, ignore it
-        if (doubleClickHandledRef.current) {
-          console.log("🖱️ Ignoring Group onDblClick - already handled through debouncing");
-          return;
-        }
-        // Otherwise, call the original onDblClick handler
-        console.log("🖱️ Calling original onDblClick handler");
-        onDblClick?.(e);
-      }}
+      onDblClick={
+        disabled
+          ? undefined
+          : (e) => {
+              console.log("🖱 Group onDblClick called, doubleClickHandled:", doubleClickHandledRef.current);
+              // If we've already handled this double-click through debouncing, ignore it
+              if (doubleClickHandledRef.current) {
+                console.log("🖱 Ignoring Group onDblClick - already handled through debouncing");
+                return;
+              }
+              // Otherwise, call the original onDblClick handler
+              console.log("🖱 Calling original onDblClick handler");
+              onDblClick?.(e);
+            }
+      }
     >
       {/* Invisible rectangle - always render to capture mouse events for cursor position updates */}
       {!disabled && (
@@ -1860,8 +1867,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               const { x, y } = node.position();
 
               // Calculate bounding box of current points
-              const xs = rawInitialPoints.map(p => p.x);
-              const ys = rawInitialPoints.map(p => p.y);
+              const xs = rawInitialPoints.map((p) => p.x);
+              const ys = rawInitialPoints.map((p) => p.y);
               const minX = Math.min(...xs);
               const maxX = Math.max(...xs);
               const minY = Math.min(...ys);
@@ -1887,25 +1894,28 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 // For multi-region selection, apply the same constraint to all selected shapes
                 if (isMultiRegionSelected) {
                   const stage = node.getStage();
-                  const allTransformableGroups = stage?.find('._transformable');
+                  const allTransformableGroups = stage?.find("._transformable");
                   const allNodes = stage?.getChildren();
-
 
                   if (allTransformableGroups && allTransformableGroups.length > 1) {
                     // Calculate the constraint offset
                     const constraintOffsetX = constrainedX - x;
                     const constraintOffsetY = constrainedY - y;
 
-                    console.log(`🔍 Multi-region constraint offset: (${constraintOffsetX.toFixed(1)}, ${constraintOffsetY.toFixed(1)})`);
+                    console.log(
+                      `🔍 Multi-region constraint offset: (${constraintOffsetX.toFixed(1)}, ${constraintOffsetY.toFixed(1)})`,
+                    );
 
                     // Apply the same constraint to all other transformable groups
-                    allTransformableGroups.forEach(group => {
+                    allTransformableGroups.forEach((group) => {
                       if (group !== node) {
                         const currentPos = group.position();
-                        console.log(`🔍 Applying constraint to group ${group.name()}: (${currentPos.x.toFixed(1)}, ${currentPos.y.toFixed(1)}) -> (${(currentPos.x + constraintOffsetX).toFixed(1)}, ${(currentPos.y + constraintOffsetY).toFixed(1)})`);
+                        console.log(
+                          `🔍 Applying constraint to group ${group.name()}: (${currentPos.x.toFixed(1)}, ${currentPos.y.toFixed(1)}) -> (${(currentPos.x + constraintOffsetX).toFixed(1)}, ${(currentPos.y + constraintOffsetY).toFixed(1)})`,
+                        );
                         group.position({
                           x: currentPos.x + constraintOffsetX,
-                          y: currentPos.y + constraintOffsetY
+                          y: currentPos.y + constraintOffsetY,
                         });
                       }
                     });
@@ -1915,7 +1925,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 node.position({ x: constrainedX, y: constrainedY });
               }
 
-              console.log(`🔍 VectorDragConstraint: bounds=${imageWidth}x${imageHeight}, pos=(${constrainedX.toFixed(1)}, ${constrainedY.toFixed(1)})`);
+              console.log(
+                `🔍 VectorDragConstraint: bounds=${imageWidth}x${imageHeight}, pos=(${constrainedX.toFixed(1)}, ${constrainedY.toFixed(1)})`,
+              );
             }
           }}
         >
@@ -2281,18 +2293,20 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               // Handle Shift+click point conversion (before other checks)
               if (e.evt.shiftKey && !e.evt.altKey && !disabled) {
-                if (handleShiftClickPointConversion(e, {
-                  initialPoints,
-                  transform,
-                  fitScale,
-                  x,
-                  y,
-                  allowBezier,
-                  pixelSnapping,
-                  onPointsChange,
-                  onPointEdited,
-                  setVisibleControlPoints,
-                })) {
+                if (
+                  handleShiftClickPointConversion(e, {
+                    initialPoints,
+                    transform,
+                    fitScale,
+                    x,
+                    y,
+                    allowBezier,
+                    pixelSnapping,
+                    onPointsChange,
+                    onPointEdited,
+                    setVisibleControlPoints,
+                  })
+                ) {
                   pointSelectionHandled.current = true;
                   return; // Successfully converted point
                 }
@@ -2355,7 +2369,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               proxyRefs={proxyRefs}
               onPointsChange={onPointsChange}
               onTransformationComplete={notifyTransformationComplete}
-                bounds={{ x: 0, y: 0, width, height }}
+              bounds={{ x: 0, y: 0, width, height }}
               transform={transform}
               fitScale={fitScale}
             />
