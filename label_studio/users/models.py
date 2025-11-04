@@ -150,6 +150,14 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
         _('allow newsletters'), null=True, default=None, help_text=_('Allow sending newsletters to user')
     )
 
+    role = models.CharField(
+        _('role'),
+        max_length=32,
+        default='annotator',
+        choices=[('admin', 'Admin'), ('annotator', 'Annotator')],
+        help_text=_('User role for access control'),
+    )
+
     objects = UserManager()
 
     EMAIL_FIELD = 'email'

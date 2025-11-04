@@ -17,6 +17,7 @@ from rest_framework.views import APIView
 from users.functions import check_avatar
 from users.models import User
 from users.serializers import HotkeysSerializer, UserSerializer, UserSerializerUpdate, WhoAmIUserSerializer
+from users.role_permissions import admin_only_method
 
 logger = logging.getLogger(__name__)
 
@@ -211,6 +212,7 @@ class UserAPI(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         return super(UserAPI, self).list(request, *args, **kwargs)
 
+    @admin_only_method
     def create(self, request, *args, **kwargs):
         return super(UserAPI, self).create(request, *args, **kwargs)
 
@@ -241,6 +243,7 @@ class UserAPI(viewsets.ModelViewSet):
             }
         return result
 
+    @admin_only_method
     def destroy(self, request, *args, **kwargs):
         return super(UserAPI, self).destroy(request, *args, **kwargs)
 

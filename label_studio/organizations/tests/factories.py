@@ -20,4 +20,6 @@ class OrganizationFactory(factory.django.DjangoModelFactory):
         if not create or not self.created_by:
             return
         self.created_by.active_organization = self
-        self.created_by.save(update_fields=['active_organization'])
+        # Set the organization creator as admin by default
+        self.created_by.role = 'admin'
+        self.created_by.save(update_fields=['active_organization', 'role'])
