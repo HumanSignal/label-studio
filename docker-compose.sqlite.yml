@@ -9,6 +9,7 @@ services:
     image: heartexlabs/label-studio:latest
     stdin_open: true
     tty: true
+    user: "0:0"
     restart: unless-stopped
     ports:
       # Exposes the app directly on host:8080 -> container:8000 (uwsgi)
