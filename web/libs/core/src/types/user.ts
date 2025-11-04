@@ -17,5 +17,6 @@ export type APIUser = {
   };
   allow_newsletters: boolean;
   date_joined: string;
+  role?: "admin" | "annotator";
   permissions?: Ability[];
 };

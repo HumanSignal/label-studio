@@ -183,6 +183,13 @@ class ProjectListAPI(generics.ListCreateAPIView):
         projects = Project.objects.filter(organization=self.request.user.active_organization).order_by(
             F('pinned_at').desc(nulls_last=True), '-created_at'
         )
+        
+        # Filter projects based on user role
+        user_role = getattr(self.request.user, 'role', 'annotator')
+        if user_role != 'admin':
+            # For non-admin users (annotators), only show projects they're assigned to
+            projects = projects.filter(members__user=self.request.user, members__enabled=True)
+        
         if filter in ['pinned_only', 'exclude_pinned']:
             projects = projects.filter(pinned_at__isnull=filter == 'exclude_pinned')
         return ProjectManager.with_counts_annotate(projects, fields=fields).prefetch_related('members', 'created_by')
@@ -240,7 +247,15 @@ class ProjectCountsListAPI(generics.ListAPIView):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        return Project.objects.with_counts(fields=fields).filter(organization=self.request.user.active_organization)
+        projects = Project.objects.with_counts(fields=fields).filter(organization=self.request.user.active_organization)
+        
+        # Filter projects based on user role
+        user_role = getattr(self.request.user, 'role', 'annotator')
+        if user_role != 'admin':
+            # For non-admin users (annotators), only show projects they're assigned to
+            projects = projects.filter(members__user=self.request.user, members__enabled=True)
+        
+        return projects
 
 
 @method_decorator(
@@ -364,7 +379,15 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        return Project.objects.with_counts(fields=fields).filter(organization=self.request.user.active_organization)
+        projects = Project.objects.with_counts(fields=fields).filter(organization=self.request.user.active_organization)
+        
+        # Filter projects based on user role
+        user_role = getattr(self.request.user, 'role', 'annotator')
+        if user_role != 'admin':
+            # For non-admin users (annotators), only show projects they're assigned to
+            projects = projects.filter(members__user=self.request.user, members__enabled=True)
+        
+        return projects
 
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)
