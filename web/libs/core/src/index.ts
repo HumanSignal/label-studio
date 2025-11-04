@@ -8,6 +8,7 @@ export * from "./lib/utils/string";
 export * from "./lib/utils/bem";
 export * from "./hooks/useAbortController";
 export * from "./lib/hooks/useCopyText";
+export * from "./lib/hooks/useCurrentUser";
 export * from "./hooks/usePageTitle";
 
 // API Provider
