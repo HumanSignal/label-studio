@@ -1,7 +1,7 @@
 # Simplified docker-compose for local/dev: SQLite backend, no nginx, no Postgres.
 # Intended for development or quick local testing only. Do NOT use in production.
 
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -22,7 +22,6 @@ services:
     volumes:
       - ./mydata:/label-studio/data:rw
     command: label-studio-uwsgi
-
 # Notes:
 # - The container stores the SQLite file at /label-studio/data/db.sqlite3 (host: ./mydata/db.sqlite3).
 # - This compose file removes the `db` and `nginx` services from the original setup and exposes the
