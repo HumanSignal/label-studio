@@ -1,0 +1,30 @@
+# Simplified docker-compose for local/dev: SQLite backend, no nginx, no Postgres.
+# Intended for development or quick local testing only. Do NOT use in production.
+
+version: '3.8'
+
+services:
+  app:
+    build: .
+    image: heartexlabs/label-studio:latest
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    ports:
+      # Exposes the app directly on host:8080 -> container:8000 (uwsgi)
+      - "8080:8000"
+    environment:
+      # Use SQLite local DB (persisted inside ./mydata)
+      - DJANGO_DB=sqlite
+      - DATABASE_URL=sqlite:////label-studio/data/db.sqlite3
+      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
+      - JSON_LOG=1
+    volumes:
+      - ./mydata:/label-studio/data:rw
+    command: label-studio-uwsgi
+
+# Notes:
+# - The container stores the SQLite file at /label-studio/data/db.sqlite3 (host: ./mydata/db.sqlite3).
+# - This compose file removes the `db` and `nginx` services from the original setup and exposes the
+#   Django/uwsgi app directly for convenience during development.
+# - For production, use the original `docker-compose.yml` with Postgres and nginx.
