@@ -113,7 +113,10 @@ export const Range = forwardRef(
               </div>
             )}
         <div
-          className={cn("range").elem("body").mod({ "with-icon": isDefined(minIcon) || isDefined(maxIcon) }).toClassName()}
+          className={cn("range")
+            .elem("body")
+            .mod({ "with-icon": isDefined(minIcon) || isDefined(maxIcon) })
+            .toClassName()}
           style={{ [sizeProperty]: size }}
         >
           <div className={cn("range").elem("line").toClassName()} />

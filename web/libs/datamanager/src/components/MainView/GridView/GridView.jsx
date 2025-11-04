@@ -104,7 +104,14 @@ export const GridCell = observer(({ view, selected, row, fields, onClick, column
   );
 
   return (
-    <div {...props} className={cn("grid-view").elem("cell").mod({ selected: selected.isSelected(row.id) }).toClassName()} onClick={onClick}>
+    <div
+      {...props}
+      className={cn("grid-view")
+        .elem("cell")
+        .mod({ selected: selected.isSelected(row.id) })
+        .toClassName()}
+      onClick={onClick}
+    >
       <div className={cn("grid-view").elem("cell-content").toClassName()}>
         <GridHeader
           view={view}
@@ -114,7 +121,7 @@ export const GridCell = observer(({ view, selected, row, fields, onClick, column
           onSelect={view.selected.toggleSelected}
         />
         <div
-          className={cn("grid-view").elem("cell-body").mod({ responsive: !view.gridFitImagesToWidth }).toClassName() + " " + cnm({ "overflow-auto": !hasImage })}
+          className={`${cn("grid-view").elem("cell-body").mod({ responsive: !view.gridFitImagesToWidth }).toClassName()} ${cnm({ "overflow-auto": !hasImage })}`}
           onClick={handleBodyClick}
         >
           <GridBody view={view} row={row} fields={fields} columnCount={columnCount} />

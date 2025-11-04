@@ -176,10 +176,10 @@ export const DataView = injector(
         if (store.SDK.type === "DE" && ["canceled", "failed"].includes(datasetStatusID)) {
           return (
             <div className={cn("syncInProgress").toClassName()}>
-              <h3 className={cn("syncInProgress").elem("title").toClassName()}>
-                Failed to sync data
-              </h3>
-              <div className={cn("syncInProgress").elem("text").toClassName()}>Check your storage settings. You may need to recreate this dataset</div>
+              <h3 className={cn("syncInProgress").elem("title").toClassName()}>Failed to sync data</h3>
+              <div className={cn("syncInProgress").elem("text").toClassName()}>
+                Check your storage settings. You may need to recreate this dataset
+              </div>
             </div>
           );
         }
@@ -190,10 +190,10 @@ export const DataView = injector(
         ) {
           return (
             <div className={cn("syncInProgress").toClassName()}>
-              <h3 className={cn("syncInProgress").elem("title").toClassName()}>
-                Nothing found
-              </h3>
-              <div className={cn("syncInProgress").elem("text").toClassName()}>Try adjusting the filter or similarity search parameters</div>
+              <h3 className={cn("syncInProgress").elem("title").toClassName()}>Nothing found</h3>
+              <div className={cn("syncInProgress").elem("text").toClassName()}>
+                Try adjusting the filter or similarity search parameters
+              </div>
             </div>
           );
         }
@@ -203,7 +203,9 @@ export const DataView = injector(
               <h3 className={cn("syncInProgress").elem("title").toClassName()}>
                 Hang tight! Records are syncing in the background
               </h3>
-              <div className={cn("syncInProgress").elem("text").toClassName()}>Press the button below to see any synced records</div>
+              <div className={cn("syncInProgress").elem("text").toClassName()}>
+                Press the button below to see any synced records
+              </div>
               <Button
                 size="small"
                 look="outlined"
@@ -410,7 +412,10 @@ export const DataView = injector(
 
     // Render the UI for your table
     return (
-      <div className={cn("data-view-dm").mix("dm-content").toClassName()} style={{ pointerEvents: isLocked ? "none" : "auto" }}>
+      <div
+        className={cn("data-view-dm").mix("dm-content").toClassName()}
+        style={{ pointerEvents: isLocked ? "none" : "auto" }}
+      >
         {renderContent(content)}
       </div>
     );

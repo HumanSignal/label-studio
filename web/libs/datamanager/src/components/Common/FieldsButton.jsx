@@ -112,7 +112,7 @@ export const FieldsButton = injector(
         openUpwardForShortViewport={openUpwardForShortViewport}
       >
         {tooltip ? (
-          <div className={cn("field-button").toClassName() + " h-[40px] flex items-center"} style={{ zIndex: 1000 }}>
+          <div className={`${cn("field-button").toClassName()} h-[40px] flex items-center`} style={{ zIndex: 1000 }}>
             <Button
               tooltip={tooltip}
               variant="neutral"

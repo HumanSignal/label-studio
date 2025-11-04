@@ -41,7 +41,10 @@ const DialogContent = ({ text, form, formRef, store, action }) => {
     <div className={cn("dialog-content").toClassName()}>
       <div className={cn("dialog-content").elem("text").toClassName()}>{text}</div>
       {isLoading && (
-        <div className={cn("dialog-content").elem("loading").toClassName()} style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+        <div
+          className={cn("dialog-content").elem("loading").toClassName()}
+          style={{ display: "flex", justifyContent: "center", marginTop: 16 }}
+        >
           <Spinner />
         </div>
       )}
@@ -74,19 +77,24 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
   const titleContainer = (
     <Menu.Item
       key={action.id}
-      className={cn("actionButton").mod({
-        hasSeperator: isDeleteAction,
-        hasSubMenu: action.children?.length > 0,
-        isSeparator: action.isSeparator,
-        isTitle: action.isTitle,
-        danger: isDeleteAction,
-        disabled: action.disabled,
-      }).toClassName()}
+      className={cn("actionButton")
+        .mod({
+          hasSeperator: isDeleteAction,
+          hasSubMenu: action.children?.length > 0,
+          isSeparator: action.isSeparator,
+          isTitle: action.isTitle,
+          danger: isDeleteAction,
+          disabled: action.disabled,
+        })
+        .toClassName()}
       size="small"
       onClick={onClick}
       aria-label={action.title}
     >
-      <div className={cn("actionButton").elem("titleContainer").toClassName()} {...(action.disabled ? { title: action.disabledReason } : {})}>
+      <div
+        className={cn("actionButton").elem("titleContainer").toClassName()}
+        {...(action.disabled ? { title: action.disabledReason } : {})}
+      >
         <div className={cn("actionButton").elem("title").toClassName()}>{action.title}</div>
         {hasChildren ? <IconChevronRight className={cn("actionButton").elem("icon").toClassName()} /> : null}
       </div>

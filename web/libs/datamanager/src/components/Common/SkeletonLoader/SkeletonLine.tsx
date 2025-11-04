@@ -8,7 +8,13 @@ export const SkeletonLine = ({
   const rows = [];
 
   for (let i = 0; i < lineCount; i++) {
-    rows.push(<div className={cn("skeletonLoader").elem("line").toClassName()} key={i} style={{ "--line-width": width, "--line-height": height } as any} />);
+    rows.push(
+      <div
+        className={cn("skeletonLoader").elem("line").toClassName()}
+        key={i}
+        style={{ "--line-width": width, "--line-height": height } as any}
+      />,
+    );
   }
   return <>{rows}</>;
 };

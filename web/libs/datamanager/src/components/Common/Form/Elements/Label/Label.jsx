@@ -28,7 +28,7 @@ const Label = forwardRef(
           {description && <div className={cn("label-dm").elem("description").toClassName()}>{description}</div>}
         </div>
       </div>,
-      <div className={cn("label-dm").elem("field").toClassName()}>{children}</div>
+      <div className={cn("label-dm").elem("field").toClassName()}>{children}</div>,
     );
   },
 );

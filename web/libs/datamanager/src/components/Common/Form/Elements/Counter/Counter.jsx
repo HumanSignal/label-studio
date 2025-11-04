@@ -152,7 +152,10 @@ const Counter = ({
 
         return (
           <CounterContext.Provider value={contextValue}>
-            <div className={cn("counter").mod({ focused, disabled: fieldDisabled }).mix(className).toClassName()} style={style}>
+            <div
+              className={cn("counter").mod({ focused, disabled: fieldDisabled }).mix(className).toClassName()}
+              style={style}
+            >
               <CounterButton type="decrease" />
 
               <input
@@ -192,12 +195,16 @@ const CounterButton = ({ type }) => {
   const compareLimit = type === "increase" ? max : min;
 
   return (
+    // biome-ignore lint/a11y/useValidAnchor: anchor used for styling purposes, todo after bem migration
     <a
       href="#"
-      className={cn("counter").elem("btn").mod({
-        type,
-        disabled: currentValue === compareLimit || disabled,
-      }).toClassName()}
+      className={cn("counter")
+        .elem("btn")
+        .mod({
+          type,
+          disabled: currentValue === compareLimit || disabled,
+        })
+        .toClassName()}
       onClick={onClickHandler(type, ref)}
       onMouseDownCapture={(e) => e.preventDefault()}
     >

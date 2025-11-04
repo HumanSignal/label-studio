@@ -79,7 +79,10 @@ export const Resizer = ({
       </div>
 
       <div
-        className={cn("resizer").elem("handle").mod({ resizing: showResizerLine !== false && isResizing, quickview: type === "quickview" }).toClassName()}
+        className={cn("resizer")
+          .elem("handle")
+          .mod({ resizing: showResizerLine !== false && isResizing, quickview: type === "quickview" })
+          .toClassName()}
         ref={resizeHandler}
         style={handleStyle}
         onMouseDown={handleResize}

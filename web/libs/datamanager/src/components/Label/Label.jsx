@@ -118,9 +118,19 @@ export const Labeling = injector(
             </div>
           )}
 
-          <div className={cn("label-view").elem("lsf-wrapper").mod({ mode: isExplorerMode ? "explorer" : "labeling" }).toClassName()}>
+          <div
+            className={cn("label-view")
+              .elem("lsf-wrapper")
+              .mod({ mode: isExplorerMode ? "explorer" : "labeling" })
+              .toClassName()}
+          >
             {loading && <div className={cn("label-view").elem("waiting").mod({ animated: true }).toClassName()} />}
-            <div ref={lsfRef} id="label-studio-dm" className={cn("label-view").elem("lsf-container").toClassName()} key="label-studio" />
+            <div
+              ref={lsfRef}
+              id="label-studio-dm"
+              className={cn("label-view").elem("lsf-container").toClassName()}
+              key="label-studio"
+            />
           </div>
         </div>
       </div>

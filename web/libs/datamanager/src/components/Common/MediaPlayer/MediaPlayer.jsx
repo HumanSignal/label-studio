@@ -1,4 +1,14 @@
-import { createRef, useCallback, useEffect, useMemo, useReducer, useRef, useState, forwardRef, createElement } from "react";
+import {
+  createRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  forwardRef,
+  createElement,
+} from "react";
 import { IconTimelinePause, IconTimelinePlay } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
 import { filename } from "../../../utils/helpers";
@@ -207,6 +217,6 @@ const MediaSource = forwardRef(({ type = "audio", src, ...props }, ref) => {
       ref,
       ...props,
     },
-    <source src={src} />
+    <source src={src} />,
   );
 });
