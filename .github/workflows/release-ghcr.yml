@@ -1,0 +1,83 @@
+name: Release Docker Image to GHCR
+
+on:
+  release:
+    types:
+      - published
+      - prereleased
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: ghcr-release-${{ github.event.release.tag_name || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-push:
+    name: Build and push multi-arch image
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REGISTRY: ghcr.io
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Collect release metadata
+        id: release_meta
+        run: |
+          echo "repo=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          echo "version=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event.release.prerelease }}" = "true" ]; then
+            echo "latest=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "latest=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.release_meta.outputs.repo }}
+          tags: |
+            type=raw,value=${{ steps.release_meta.outputs.version }}
+            type=raw,value=latest,enable=${{ steps.release_meta.outputs.latest }}
+          labels: |
+            org.opencontainers.image.title=Label Studio
+            org.opencontainers.image.description=Open source data labeling tool
+            org.opencontainers.image.version=${{ steps.release_meta.outputs.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+            org.opencontainers.image.url=${{ github.event.repository.html_url }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          build-args: |
+            VERSION_OVERRIDE=${{ steps.release_meta.outputs.version }}
+            BRANCH_OVERRIDE=${{ github.event.release.target_commitish }}
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
