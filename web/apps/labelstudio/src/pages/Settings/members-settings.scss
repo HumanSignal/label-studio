@@ -1,0 +1,154 @@
+.members-settings {
+  &__wrapper {
+    max-width: 1200px;
+    padding: 24px;
+  }
+
+  .add-member {
+    background: var(--color-neutral-surface);
+    border: 1px solid var(--color-neutral-border-subtle);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 32px;
+
+    &__title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--color-neutral-content);
+    }
+
+    &__form {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+
+      .member-select {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid var(--color-neutral-border);
+        border-radius: 4px;
+        font-size: 14px;
+        background: var(--color-neutral-surface);
+        color: var(--color-neutral-content);
+        min-width: 300px;
+
+        &:focus {
+          outline: none;
+          border-color: var(--color-primary-border);
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+
+  .members-list {
+    &__title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--color-neutral-content);
+    }
+
+    &__loading,
+    &__empty {
+      padding: 40px;
+      text-align: center;
+      color: var(--color-neutral-content-subtler);
+    }
+
+    &__table {
+      overflow-x: auto;
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--color-neutral-surface);
+        border: 1px solid var(--color-neutral-border-subtle);
+        border-radius: 8px;
+        overflow: hidden;
+
+        thead {
+          background: var(--color-neutral-surface-hover);
+          border-bottom: 1px solid var(--color-neutral-border);
+
+          th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-neutral-content);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+        }
+
+        tbody {
+          tr {
+            border-bottom: 1px solid var(--color-neutral-border-subtle);
+
+            &:last-child {
+              border-bottom: none;
+            }
+
+            &:hover {
+              background: var(--color-neutral-surface-hover);
+            }
+
+            td {
+              padding: 12px 16px;
+              font-size: 14px;
+              color: var(--color-neutral-content);
+
+              &:last-child {
+                text-align: center;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .role-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &--admin {
+      background: var(--color-positive-surface-subtle);
+      color: var(--color-positive-content);
+    }
+
+    &--annotator {
+      background: var(--color-accent-grape-subtle);
+      color: var(--color-accent-grape-content);
+    }
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &--enabled {
+      background: var(--color-positive-surface-subtle);
+      color: var(--color-positive-content);
+    }
+
+    &--disabled {
+      background: var(--color-neutral-surface-hover);
+      color: var(--color-neutral-content-subtler);
+    }
+  }
+}

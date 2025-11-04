@@ -11,7 +11,7 @@ import { CreateProject } from "../CreateProject/CreateProject";
 import { DataManagerPage } from "../DataManager/DataManager";
 import { SettingsPage } from "../Settings";
 import { EmptyProjectsList, ProjectsList } from "./ProjectsList";
-import { useAbortController, useUpdatePageTitle } from "@humansignal/core";
+import { useAbortController, useUpdatePageTitle, useCurrentUserAtom } from "@humansignal/core";
 import "./Projects.scss";
 
 const getCurrentPage = () => {
@@ -23,6 +23,7 @@ const getCurrentPage = () => {
 export const ProjectsPage = () => {
   const api = React.useContext(ApiContext);
   const abortController = useAbortController();
+  const { user } = useCurrentUserAtom();
   const [projectsList, setProjectsList] = React.useState([]);
   const [networkState, setNetworkState] = React.useState(null);
   const [currentPage, setCurrentPage] = useState(getCurrentPage());
@@ -37,6 +38,9 @@ export const ProjectsPage = () => {
   const openModal = () => setModal(true);
 
   const closeModal = () => setModal(false);
+  
+  // Check if user is admin
+  const isAdmin = user?.role === "admin";
 
   const fetchProjects = async (page = currentPage, pageSize = defaultPageSize) => {
     setNetworkState("loading");
@@ -112,8 +116,9 @@ export const ProjectsPage = () => {
   React.useEffect(() => {
     // there is a nice page with Create button when list is empty
     // so don't show the context button in that case
-    setContextProps({ openModal, showButton: projectsList.length > 0 });
-  }, [projectsList.length]);
+    // Also only show button if user is admin
+    setContextProps({ openModal, showButton: projectsList.length > 0 && isAdmin });
+  }, [projectsList.length, isAdmin]);
 
   return (
     <Block name="projects-page">
@@ -129,9 +134,10 @@ export const ProjectsPage = () => {
               totalItems={totalItems}
               loadNextPage={loadNextPage}
               pageSize={defaultPageSize}
+              isAdmin={isAdmin}
             />
           ) : (
-            <EmptyProjectsList openModal={openModal} />
+            <EmptyProjectsList openModal={openModal} isAdmin={isAdmin} />
           )}
           {modal && <CreateProject onClose={closeModal} />}
         </Elem>

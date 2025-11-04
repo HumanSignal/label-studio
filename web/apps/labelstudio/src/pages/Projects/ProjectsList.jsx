@@ -7,15 +7,16 @@ import { Userpic, Button } from "@humansignal/ui";
 import { Dropdown, Menu, Pagination } from "../../components";
 import { Block, Elem } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
+import { useCurrentUserAtom } from "@humansignal/core";
 
 const DEFAULT_CARD_COLORS = ["#FFFFFF", "#FDFDFC"];
 
-export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
+export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize, isAdmin }) => {
   return (
     <>
       <Elem name="list">
         {projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
+          <ProjectCard key={project.id} project={project} isAdmin={isAdmin} />
         ))}
       </Elem>
       <Elem name="pages">
@@ -34,22 +35,24 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, 
   );
 };
 
-export const EmptyProjectsList = ({ openModal }) => {
+export const EmptyProjectsList = ({ openModal, isAdmin }) => {
   return (
     <Block name="empty-projects-page">
       <Elem name="heidi" tag="img" src={absoluteURL("/static/images/opossum_looking.png")} />
       <Elem name="header" tag="h1">
-        Heidi doesn’t see any projects here!
+        {isAdmin ? "Heidi doesn't see any projects here!" : "No projects assigned"}
       </Elem>
-      <p>Create one and start labeling your data.</p>
-      <Button onClick={openModal} className="my-8" aria-label="Create new project">
-        Create Project
-      </Button>
+      <p>{isAdmin ? "Create one and start labeling your data." : "Contact your administrator to be assigned to a project."}</p>
+      {isAdmin && (
+        <Button onClick={openModal} className="my-8" aria-label="Create new project">
+          Create Project
+        </Button>
+      )}
     </Block>
   );
 };
 
-const ProjectCard = ({ project }) => {
+const ProjectCard = ({ project, isAdmin }) => {
   const color = useMemo(() => {
     return DEFAULT_CARD_COLORS.includes(project.color) ? null : project.color;
   }, [project]);
@@ -76,26 +79,28 @@ const ProjectCard = ({ project }) => {
           <Elem name="title">
             <Elem name="title-text">{project.title ?? "New project"}</Elem>
 
-            <Elem
-              name="menu"
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-              }}
-            >
-              <Dropdown.Trigger
-                content={
-                  <Menu contextual>
-                    <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item>
-                    <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>Label</Menu.Item>
-                  </Menu>
-                }
+            {isAdmin && (
+              <Elem
+                name="menu"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                }}
               >
-                <Button size="smaller" look="string" aria-label="Project options">
-                  <IconEllipsis />
-                </Button>
-              </Dropdown.Trigger>
-            </Elem>
+                <Dropdown.Trigger
+                  content={
+                    <Menu contextual>
+                      <Menu.Item href={`/projects/${project.id}/settings`}>Settings</Menu.Item>
+                      <Menu.Item href={`/projects/${project.id}/data?labeling=1`}>Label</Menu.Item>
+                    </Menu>
+                  }
+                >
+                  <Button size="smaller" look="string" aria-label="Project options">
+                    <IconEllipsis />
+                  </Button>
+                </Dropdown.Trigger>
+              </Elem>
+            )}
           </Elem>
           <Elem name="summary">
             <Elem name="annotation">
@@ -121,7 +126,7 @@ const ProjectCard = ({ project }) => {
         </Elem>
         <Elem name="description">{project.description}</Elem>
         <Elem name="info">
-          <Elem name="created-date">{format(new Date(project.created_at), "dd MMM ’yy, HH:mm")}</Elem>
+          <Elem name="created-date">{format(new Date(project.created_at), "dd MMM 'yy, HH:mm")}</Elem>
           <Elem name="created-by">
             <Userpic src="#" user={project.created_by} showUsernameTooltip />
           </Elem>
