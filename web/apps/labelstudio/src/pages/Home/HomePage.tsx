@@ -3,7 +3,7 @@ import { Button, SimpleCard, Spinner, Typography } from "@humansignal/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useUpdatePageTitle } from "@humansignal/core";
+import { useUpdatePageTitle, useCurrentUserAtom } from "@humansignal/core";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { useAPI } from "../../providers/ApiProvider";
 import { CreateProject } from "../CreateProject/CreateProject";
@@ -40,11 +40,13 @@ const actions = [
     title: "Create Project",
     icon: IconFolderAdd,
     type: "createProject",
+    adminOnly: true,
   },
   {
     title: "Invite Members",
     icon: IconUserAdd,
     type: "inviteMembers",
+    adminOnly: true,
   },
 ] as const;
 
@@ -52,6 +54,7 @@ type Action = (typeof actions)[number]["type"];
 
 export const HomePage: Page = () => {
   const api = useAPI();
+  const { user } = useCurrentUserAtom();
   const [creationDialogOpen, setCreationDialogOpen] = useState(false);
   const [invitationOpen, setInvitationOpen] = useState(false);
 
@@ -78,6 +81,12 @@ export const HomePage: Page = () => {
     };
   };
 
+  // Check if user is admin
+  const isAdmin = user?.role === "admin";
+  
+  // Filter actions based on user role
+  const availableActions = actions.filter(action => !action.adminOnly || isAdmin);
+
   return (
     <main className="p-6">
       <div className="grid grid-cols-[minmax(0,1fr)_450px] gap-6">
@@ -90,22 +99,24 @@ export const HomePage: Page = () => {
               Let's get you started.
             </Typography>
           </div>
-          <div className="flex justify-start gap-4">
-            {actions.map((action) => {
-              return (
-                <Button
-                  key={action.title}
-                  look="outlined"
-                  align="center"
-                  className="flex-grow-0 text-16/24 gap-2 text-primary-content text-left min-w-[250px] [&_svg]:w-6 [&_svg]:h-6 pl-2"
-                  onClick={handleActions(action.type)}
-                  leading={<action.icon />}
-                >
-                  {action.title}
-                </Button>
-              );
-            })}
-          </div>
+          {availableActions.length > 0 && (
+            <div className="flex justify-start gap-4">
+              {availableActions.map((action) => {
+                return (
+                  <Button
+                    key={action.title}
+                    look="outlined"
+                    align="center"
+                    className="flex-grow-0 text-16/24 gap-2 text-primary-content text-left min-w-[250px] [&_svg]:w-6 [&_svg]:h-6 pl-2"
+                    onClick={handleActions(action.type)}
+                    leading={<action.icon />}
+                  >
+                    {action.title}
+                  </Button>
+                );
+              })}
+            </div>
+          )}
 
           <SimpleCard
             title={
@@ -135,14 +146,19 @@ export const HomePage: Page = () => {
                   <IconFolderOpen />
                 </div>
                 <Typography variant="headline" size="small">
-                  Create your first project
+                  {isAdmin ? "Create your first project" : "No projects assigned"}
                 </Typography>
                 <Typography size="small" className="text-neutral-content-subtler">
-                  Import your data and set up the labeling interface to start annotating
+                  {isAdmin 
+                    ? "Import your data and set up the labeling interface to start annotating"
+                    : "Contact your administrator to be assigned to a project"
+                  }
                 </Typography>
-                <Button className="mt-4" onClick={() => setCreationDialogOpen(true)} aria-label="Create new project">
-                  Create Project
-                </Button>
+                {isAdmin && (
+                  <Button className="mt-4" onClick={() => setCreationDialogOpen(true)} aria-label="Create new project">
+                    Create Project
+                  </Button>
+                )}
               </div>
             ) : isSuccess && data && data.results.length > 0 ? (
               <div className="flex flex-col gap-1">
