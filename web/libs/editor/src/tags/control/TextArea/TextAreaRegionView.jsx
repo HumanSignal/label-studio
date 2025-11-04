@@ -70,14 +70,9 @@ const HtxTextAreaResultLine = forwardRef(
       }
     };
 
-
     return (
       <div className={cn("textarea-tag").elem("item").toClassName()}>
-        {isTextarea ? (
-          <TextArea {...inputProps} ref={ref} />
-        ) : (
-          <Input {...inputProps} ref={ref} />
-        )}
+        {isTextarea ? <TextArea {...inputProps} ref={ref} /> : <Input {...inputProps} ref={ref} />}
         {canDelete && !collapsed && !readOnly && (
           <Button
             className={cn("textarea-tag").elem("action").toClassName()}
@@ -197,7 +192,7 @@ const HtxTextAreaRegionView = observer(({ item, area, collapsed, setCollapsed, o
     ref: mainInputRef,
     value,
     rows: item.rows,
-    className: `is-search ${cn("textarea-tag").elem("input").toClassName()}` ,
+    className: `is-search ${cn("textarea-tag").elem("input").toClassName()}`,
     label: item.label,
     placeholder: item.placeholder,
     autoSize: isTextArea ? { minRows: 1 } : null,
