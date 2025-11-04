@@ -26,7 +26,7 @@ export const MembersSettings = () => {
     
     try {
       setLoading(true);
-      const response = await api.callApi(`projects/${project.id}/annotators`);
+      const response = await api.callApi(`projects/${project.id}/members`);
       setMembers(response || []);
       setError(null);
     } catch (err) {
@@ -73,7 +73,7 @@ export const MembersSettings = () => {
       setError(null);
       setSuccess(null);
 
-      await api.callApi(`projects/${project.id}/annotators`, {
+      await api.callApi(`projects/${project.id}/members`, {
         method: "POST",
         body: {
           user_id: parseInt(selectedUserId),
@@ -103,7 +103,7 @@ export const MembersSettings = () => {
       setError(null);
       setSuccess(null);
 
-      await api.callApi(`projects/${project.id}/annotators/${userId}`, {
+      await api.callApi(`projects/${project.id}/members/${userId}`, {
         method: "DELETE",
       });
 

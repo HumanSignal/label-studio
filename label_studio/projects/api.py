@@ -898,6 +898,23 @@ class ProjectModelVersions(generics.RetrieveAPIView):
         },
     ),
 )
+class ProjectAnnotatorsAPI(generics.RetrieveAPIView):
+    """List users who have completed annotations in a project"""
+    permission_required = all_permissions.projects_view
+    queryset = Project.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        project = self.get_object()
+        annotator_ids = list(
+            Annotation.objects.filter(project=project, completed_by_id__isnull=False)
+            .values_list('completed_by_id', flat=True)
+            .distinct()
+        )
+        users = User.objects.filter(id__in=annotator_ids).prefetch_related('om_through').order_by('id')
+        data = UserSimpleSerializer(users, many=True, context={'request': request}).data
+        return Response(data)
+
+
 @method_decorator(
     name='get',
     decorator=extend_schema(
@@ -906,7 +923,7 @@ class ProjectModelVersions(generics.RetrieveAPIView):
         description='Get a list of all members assigned to a project with their roles',
         extensions={
             'x-fern-sdk-group-name': 'projects',
-            'x-fern-sdk-method-name': 'list_annotators',
+            'x-fern-sdk-method-name': 'list_members',
             'x-fern-audiences': ['public'],
         },
     ),
@@ -919,12 +936,12 @@ class ProjectModelVersions(generics.RetrieveAPIView):
         description='Add a user to a project as a member (admin only)',
         extensions={
             'x-fern-sdk-group-name': 'projects',
-            'x-fern-sdk-method-name': 'add_annotator',
+            'x-fern-sdk-method-name': 'add_member',
             'x-fern-audiences': ['public'],
         },
     ),
 )
-class ProjectAnnotatorsAPI(generics.GenericAPIView):
+class ProjectMembersAPI(generics.GenericAPIView):
     from projects.serializers import AddProjectMemberSerializer, ProjectMemberSerializer
     from projects.models import ProjectMember
     
@@ -1022,12 +1039,12 @@ class ProjectAnnotatorsAPI(generics.GenericAPIView):
         description='Remove a user from a project (admin only)',
         extensions={
             'x-fern-sdk-group-name': 'projects',
-            'x-fern-sdk-method-name': 'remove_annotator',
+            'x-fern-sdk-method-name': 'remove_member',
             'x-fern-audiences': ['public'],
         },
     ),
 )
-class ProjectAnnotatorDetailAPI(generics.GenericAPIView):
+class ProjectMemberDetailAPI(generics.GenericAPIView):
     permission_required = all_permissions.projects_view
     queryset = Project.objects.all()
     
@@ -1051,25 +1068,3 @@ class ProjectAnnotatorDetailAPI(generics.GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        summary='List project members',
-        description='Get a list of all members assigned to a project',
-        extensions={
-            'x-fern-sdk-group-name': 'projects',
-            'x-fern-sdk-method-name': 'list_members',
-            'x-fern-audiences': ['public'],
-        },
-    ),
-)
-@method_decorator(
-    name='post',
-    decorator=extend_schema(
-        tags=['Projects'],
-        summary='Add project member',
-        description='Add a user to a project as a member',
-        extensions={
-            'x-fern-sdk-group-name': 'projects',
-            'x-fern-sdk-method-name': 'add_member',
-            'x-fern-audiences': ['public'],
-        },
-    ),
-)

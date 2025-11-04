@@ -73,7 +73,7 @@ class ProjectMembersAPITestCase(TestCase):
         ProjectMember.objects.create(user=self.annotator1, project=self.project, enabled=True)
         
         self.client.force_authenticate(user=self.admin_user)
-        url = reverse('projects:api:project-annotators', kwargs={'pk': self.project.id})
+        url = reverse('projects:api:project-members', kwargs={'pk': self.project.id})
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -88,7 +88,7 @@ class ProjectMembersAPITestCase(TestCase):
         ProjectMember.objects.create(user=self.annotator2, project=self.project, enabled=True)
         
         self.client.force_authenticate(user=self.annotator1)
-        url = reverse('projects:api:project-annotators', kwargs={'pk': self.project.id})
+        url = reverse('projects:api:project-members', kwargs={'pk': self.project.id})
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -97,7 +97,7 @@ class ProjectMembersAPITestCase(TestCase):
     def test_admin_can_add_member_by_user_id(self):
         """Test that admin can add a member to project by user ID"""
         self.client.force_authenticate(user=self.admin_user)
-        url = reverse('projects:api:project-annotators', kwargs={'pk': self.project.id})
+        url = reverse('projects:api:project-members', kwargs={'pk': self.project.id})
         data = {'user_id': self.annotator1.id}
         response = self.client.post(url, data=data, format='json')
         
@@ -116,7 +116,7 @@ class ProjectMembersAPITestCase(TestCase):
     def test_admin_can_add_member_by_email(self):
         """Test that admin can add a member to project by email"""
         self.client.force_authenticate(user=self.admin_user)
-        url = reverse('projects:api:project-annotators', kwargs={'pk': self.project.id})
+        url = reverse('projects:api:project-members', kwargs={'pk': self.project.id})
         data = {'email': self.annotator1.email}
         response = self.client.post(url, data=data, format='json')
         
@@ -128,7 +128,7 @@ class ProjectMembersAPITestCase(TestCase):
         ProjectMember.objects.create(user=self.annotator1, project=self.project, enabled=True)
         
         self.client.force_authenticate(user=self.annotator1)
-        url = reverse('projects:api:project-annotators', kwargs={'pk': self.project.id})
+        url = reverse('projects:api:project-members', kwargs={'pk': self.project.id})
         data = {'user_id': self.annotator2.id}
         response = self.client.post(url, data=data, format='json')
         
@@ -142,7 +142,7 @@ class ProjectMembersAPITestCase(TestCase):
         
         # Try to add same member again
         self.client.force_authenticate(user=self.admin_user)
-        url = reverse('projects:api:project-annotators', kwargs={'pk': self.project.id})
+        url = reverse('projects:api:project-members', kwargs={'pk': self.project.id})
         data = {'user_id': self.annotator1.id}
         response = self.client.post(url, data=data, format='json')
         
@@ -152,7 +152,7 @@ class ProjectMembersAPITestCase(TestCase):
     def test_adding_nonexistent_user_returns_404(self):
         """Test that adding a non-existent user returns 404"""
         self.client.force_authenticate(user=self.admin_user)
-        url = reverse('projects:api:project-annotators', kwargs={'pk': self.project.id})
+        url = reverse('projects:api:project-members', kwargs={'pk': self.project.id})
         data = {'user_id': 99999}
         response = self.client.post(url, data=data, format='json')
         
@@ -165,7 +165,7 @@ class ProjectMembersAPITestCase(TestCase):
         ProjectMember.objects.create(user=self.annotator1, project=self.project, enabled=True)
         
         self.client.force_authenticate(user=self.admin_user)
-        url = reverse('projects:api:project-annotator-detail', kwargs={
+        url = reverse('projects:api:project-member-detail', kwargs={
             'pk': self.project.id,
             'user_id': self.annotator1.id
         })
@@ -187,7 +187,7 @@ class ProjectMembersAPITestCase(TestCase):
         ProjectMember.objects.create(user=self.annotator2, project=self.project, enabled=True)
         
         self.client.force_authenticate(user=self.annotator1)
-        url = reverse('projects:api:project-annotator-detail', kwargs={
+        url = reverse('projects:api:project-member-detail', kwargs={
             'pk': self.project.id,
             'user_id': self.annotator2.id
         })
@@ -199,7 +199,7 @@ class ProjectMembersAPITestCase(TestCase):
     def test_removing_nonexistent_member_returns_404(self):
         """Test that removing a non-existent member returns 404"""
         self.client.force_authenticate(user=self.admin_user)
-        url = reverse('projects:api:project-annotator-detail', kwargs={
+        url = reverse('projects:api:project-member-detail', kwargs={
             'pk': self.project.id,
             'user_id': self.annotator1.id
         })
@@ -213,7 +213,7 @@ class ProjectMembersAPITestCase(TestCase):
         ProjectMember.objects.create(user=self.annotator1, project=self.project, enabled=True)
         
         self.client.force_authenticate(user=self.admin_user)
-        url = reverse('projects:api:project-annotators', kwargs={'pk': self.project.id})
+        url = reverse('projects:api:project-members', kwargs={'pk': self.project.id})
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)

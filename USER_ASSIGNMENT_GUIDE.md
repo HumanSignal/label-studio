@@ -278,10 +278,12 @@ project.add_collaborator(user)
 
 ## Next Steps
 
-1. **API Enhancement**: The annotators endpoint now supports full CRUD operations:
-   - Listing project members: `GET /api/projects/{id}/annotators/`
-   - Adding users to projects: `POST /api/projects/{id}/annotators/`
-   - Removing users from projects: `DELETE /api/projects/{id}/annotators/{user_id}/`
+1. **API Enhancement**: The members endpoint now supports full CRUD operations:
+   - Listing project members: `GET /api/projects/{id}/members/`
+   - Adding users to projects: `POST /api/projects/{id}/members/`
+   - Removing users from projects: `DELETE /api/projects/{id}/members/{user_id}/`
+   
+   Note: The `/annotators/` endpoint remains for listing users who have completed annotations.
 
 2. **UI Enhancement**: Add a project members management page in the admin interface for easier user assignment
 
