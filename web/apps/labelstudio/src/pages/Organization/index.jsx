@@ -1,3 +1,5 @@
+import { Redirect } from "react-router-dom";
+import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { SidebarMenu } from "../../components/SidebarMenu/SidebarMenu";
 import { PeoplePage } from "./PeoplePage/PeoplePage";
 import { WebhookPage } from "../WebhookPage/WebhookPage";
@@ -13,6 +15,21 @@ const MenuLayout = ({ children, ...routeProps }) => {
   return <SidebarMenu menuItems={menuItems} path={routeProps.match.url} children={children} />;
 };
 
+const ProtectedOrganizationPage = (props) => {
+  const { user, isLoading } = useAuth();
+
+  // Show nothing while loading
+  if (isLoading) return null;
+
+  // Redirect non-admins to home
+  if (user?.role !== "admin") {
+    return <Redirect to="/" />;
+  }
+
+  // Render the MenuLayout with children for admins
+  return <MenuLayout {...props} />;
+};
+
 const organizationPages = {};
 
 if (ALLOW_ORGANIZATION_WEBHOOKS) {
@@ -23,7 +40,7 @@ export const OrganizationPage = {
   title: "Organization",
   path: "/organization",
   exact: true,
-  layout: MenuLayout,
+  layout: ProtectedOrganizationPage,
   component: PeoplePage,
   pages: organizationPages,
 };

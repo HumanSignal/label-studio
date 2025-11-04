@@ -23,10 +23,12 @@ export const MembersSettings = () => {
   // Fetch project members
   const fetchMembers = useCallback(async () => {
     if (!project?.id) return;
-    
+
     try {
       setLoading(true);
-      const response = await api.callApi(`projects/${project.id}/members`);
+      const response = await api.callApi("projectMembers", {
+        params: { pk: project.id },
+      });
       setMembers(response || []);
       setError(null);
     } catch (err) {
@@ -40,15 +42,15 @@ export const MembersSettings = () => {
   // Fetch all users in the organization
   const fetchAvailableUsers = useCallback(async () => {
     if (!isAdmin) return;
-    
+
     try {
       const response = await api.callApi("users");
       const allUsers = response.results || response || [];
-      
+
       // Filter out users who are already members
       const memberIds = new Set(members.map(m => m.user_id));
       const available = allUsers.filter(user => !memberIds.has(user.id));
-      
+
       setAvailableUsers(available);
     } catch (err) {
       console.error("Error fetching users:", err);
@@ -73,8 +75,8 @@ export const MembersSettings = () => {
       setError(null);
       setSuccess(null);
 
-      await api.callApi(`projects/${project.id}/members`, {
-        method: "POST",
+      await api.callApi("addProjectMember", {
+        params: { pk: project.id },
         body: {
           user_id: parseInt(selectedUserId),
         },
@@ -93,7 +95,7 @@ export const MembersSettings = () => {
 
   const handleRemoveMember = async (userId) => {
     if (!isAdmin) return;
-    
+
     if (!confirm("Are you sure you want to remove this user from the project?")) {
       return;
     }
@@ -103,8 +105,8 @@ export const MembersSettings = () => {
       setError(null);
       setSuccess(null);
 
-      await api.callApi(`projects/${project.id}/members/${userId}`, {
-        method: "DELETE",
+      await api.callApi("removeProjectMember", {
+        params: { pk: project.id, userId: userId },
       });
 
       setSuccess("User removed from project successfully");
