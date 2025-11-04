@@ -5,7 +5,7 @@ version: "3.8"
 
 services:
   app:
-    # build: .
+    build: .
     image: ghcr.io/thrombusplus/label-studio:latest
     stdin_open: true
     tty: true
@@ -20,6 +20,9 @@ services:
       - DATABASE_URL=sqlite:////label-studio/data/db.sqlite3
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
       - JSON_LOG=1
+      # - USE_ENFORCE_CSRF_CHECKS=false
+      # - CSRF_COOKIE_SECURE=0
+      # - CSRF_COOKIE_SAMESITE=None
     volumes:
       - ./mydata:/label-studio/data:rw
     command: label-studio-uwsgi
