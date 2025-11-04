@@ -432,3 +432,27 @@ class GetFieldsSerializer(serializers.Serializer):
     def validate_filter(self, value):
         if value in ['all', 'pinned_only', 'exclude_pinned']:
             return value
+
+
+class ProjectMemberSerializer(serializers.Serializer):
+    """Serializer for project member information"""
+    user_id = serializers.IntegerField(help_text='User ID')
+    email = serializers.EmailField(read_only=True, help_text='User email address')
+    username = serializers.CharField(read_only=True, help_text='Username')
+    first_name = serializers.CharField(read_only=True, help_text='First name')
+    last_name = serializers.CharField(read_only=True, help_text='Last name')
+    role = serializers.CharField(read_only=True, help_text='User role (admin or annotator)')
+    enabled = serializers.BooleanField(default=True, help_text='Whether the membership is enabled')
+    created_at = serializers.DateTimeField(read_only=True, help_text='When the user was added to the project')
+
+
+class AddProjectMemberSerializer(serializers.Serializer):
+    """Serializer for adding a user to a project"""
+    user_id = serializers.IntegerField(required=False, help_text='User ID to add')
+    email = serializers.EmailField(required=False, help_text='User email to add')
+    
+    def validate(self, data):
+        if not data.get('user_id') and not data.get('email'):
+            raise serializers.ValidationError('Either user_id or email must be provided')
+        return data
+

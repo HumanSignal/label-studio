@@ -898,17 +898,178 @@ class ProjectModelVersions(generics.RetrieveAPIView):
         },
     ),
 )
-class ProjectAnnotatorsAPI(generics.RetrieveAPIView):
+@method_decorator(
+    name='get',
+    decorator=extend_schema(
+        tags=['Projects'],
+        summary='List project members',
+        description='Get a list of all members assigned to a project with their roles',
+        extensions={
+            'x-fern-sdk-group-name': 'projects',
+            'x-fern-sdk-method-name': 'list_annotators',
+            'x-fern-audiences': ['public'],
+        },
+    ),
+)
+@method_decorator(
+    name='post',
+    decorator=extend_schema(
+        tags=['Projects'],
+        summary='Add project member',
+        description='Add a user to a project as a member (admin only)',
+        extensions={
+            'x-fern-sdk-group-name': 'projects',
+            'x-fern-sdk-method-name': 'add_annotator',
+            'x-fern-audiences': ['public'],
+        },
+    ),
+)
+class ProjectAnnotatorsAPI(generics.GenericAPIView):
+    from projects.serializers import AddProjectMemberSerializer, ProjectMemberSerializer
+    from projects.models import ProjectMember
+    
     permission_required = all_permissions.projects_view
     queryset = Project.objects.all()
+    
+    def get_serializer_class(self):
+        from projects.serializers import AddProjectMemberSerializer, ProjectMemberSerializer
+        if self.request.method == 'POST':
+            return AddProjectMemberSerializer
+        return ProjectMemberSerializer
 
     def get(self, request, *args, **kwargs):
+        """List all members of a project with their roles"""
+        from projects.models import ProjectMember
+        from projects.serializers import ProjectMemberSerializer
+        
         project = self.get_object()
-        annotator_ids = list(
-            Annotation.objects.filter(project=project, completed_by_id__isnull=False)
-            .values_list('completed_by_id', flat=True)
-            .distinct()
-        )
-        users = User.objects.filter(id__in=annotator_ids).prefetch_related('om_through').order_by('id')
-        data = UserSimpleSerializer(users, many=True, context={'request': request}).data
-        return Response(data)
+        members = ProjectMember.objects.filter(project=project).select_related('user').order_by('-created_at')
+        
+        data = []
+        for member in members:
+            data.append({
+                'user_id': member.user.id,
+                'email': member.user.email,
+                'username': member.user.username,
+                'first_name': member.user.first_name,
+                'last_name': member.user.last_name,
+                'role': member.user.role,
+                'enabled': member.enabled,
+                'created_at': member.created_at,
+            })
+        
+        serializer = ProjectMemberSerializer(data, many=True)
+        return Response(serializer.data)
+    
+    @admin_only
+    def post(self, request, *args, **kwargs):
+        """Add a user to a project"""
+        from projects.models import ProjectMember
+        from projects.serializers import AddProjectMemberSerializer
+        
+        project = self.get_object()
+        serializer = AddProjectMemberSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        
+        # Get user by ID or email
+        user = None
+        if serializer.validated_data.get('user_id'):
+            try:
+                user = User.objects.get(id=serializer.validated_data['user_id'])
+            except User.DoesNotExist:
+                return Response(
+                    {'error': 'User not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        elif serializer.validated_data.get('email'):
+            try:
+                user = User.objects.get(email=serializer.validated_data['email'])
+            except User.DoesNotExist:
+                return Response(
+                    {'error': 'User not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        
+        # Add user to project
+        created = project.add_collaborator(user)
+        
+        if created:
+            member = ProjectMember.objects.get(user=user, project=project)
+            response_data = {
+                'user_id': user.id,
+                'email': user.email,
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'role': user.role,
+                'enabled': member.enabled,
+                'created_at': member.created_at,
+                'message': f'User {user.email} added to project'
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(
+                {'message': f'User {user.email} is already a member of this project'},
+                status=status.HTTP_200_OK
+            )
+
+
+@method_decorator(
+    name='delete',
+    decorator=extend_schema(
+        tags=['Projects'],
+        summary='Remove project member',
+        description='Remove a user from a project (admin only)',
+        extensions={
+            'x-fern-sdk-group-name': 'projects',
+            'x-fern-sdk-method-name': 'remove_annotator',
+            'x-fern-audiences': ['public'],
+        },
+    ),
+)
+class ProjectAnnotatorDetailAPI(generics.GenericAPIView):
+    permission_required = all_permissions.projects_view
+    queryset = Project.objects.all()
+    
+    @admin_only
+    def delete(self, request, pk, user_id, *args, **kwargs):
+        """Remove a user from a project"""
+        from projects.models import ProjectMember
+        
+        project = self.get_object()
+        
+        try:
+            member = ProjectMember.objects.get(project=project, user_id=user_id)
+            member.delete()
+            return Response(
+                {'message': 'User removed from project'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except ProjectMember.DoesNotExist:
+            return Response(
+                {'error': 'User is not a member of this project'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        summary='List project members',
+        description='Get a list of all members assigned to a project',
+        extensions={
+            'x-fern-sdk-group-name': 'projects',
+            'x-fern-sdk-method-name': 'list_members',
+            'x-fern-audiences': ['public'],
+        },
+    ),
+)
+@method_decorator(
+    name='post',
+    decorator=extend_schema(
+        tags=['Projects'],
+        summary='Add project member',
+        description='Add a user to a project as a member',
+        extensions={
+            'x-fern-sdk-group-name': 'projects',
+            'x-fern-sdk-method-name': 'add_member',
+            'x-fern-audiences': ['public'],
+        },
+    ),
+)
