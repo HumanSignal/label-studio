@@ -110,6 +110,7 @@ urlpatterns = [
     path('docs/api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('docs/api/schema/json/', SpectacularJSONAPIView.as_view(), name='schema-json'),
     path('docs/api/schema/yaml/', SpectacularYAMLAPIView.as_view(), name='schema-yaml'),
+    path("api/sso/", include("label_studio.sso.urls")),
 ]
 
 if settings.DEBUG:

@@ -77,6 +77,10 @@ dependencies = [
     ## HumanSignal repo dependencies :start
     "label-studio-sdk @ https://github.com/HumanSignal/label-studio-sdk/archive/5c58895028af0e3dc400adcf7116205dad3424ab.zip",
     ## HumanSignal repo dependencies :end
+
+    ## SSO dependencies :start
+    "PyJWT>=2.0.0",
+    ## SSO dependencies :end
 ]
 
 [project.urls]

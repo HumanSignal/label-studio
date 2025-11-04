@@ -904,3 +904,25 @@ FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
 # Used for async migrations. In LSE this is set to a real queue name, including here so we
 # can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
 SERVICE_QUEUE_NAME = get_env('SERVICE_QUEUE_NAME', 'default')
+
+# INSTALLED_APPS += [
+#     'rest_framework',  # Required for API
+#     'rest_framework.authtoken',  # Required for Token authentication
+# ]
+
+MIDDLEWARE += [ 'label_studio.sso.middleware.JWTAutoLoginMiddleware' ]
+AUTHENTICATION_BACKENDS = [
+    'label_studio.sso.backends.JWTAuthenticationBackend',  # Add this FIRST
+    'django.contrib.auth.backends.ModelBackend',
+] + AUTHENTICATION_BACKENDS
+
+JWT_SSO_NATIVE_USER_ID_CLAIM = 'user_id'  # Claim containing user ID
+JWT_SSO_COOKIE_NAME = 'ls_auth_token'  # Cookie-based (recommended)
+JWT_SSO_COOKIE_PATH = '/'  # Cookie path (default: '/')
+JWT_SSO_TOKEN_PARAM = 'token'  # URL parameter (fallback)
+
+SSO_TOKEN_EXPIRY = 600  # 10 minutes
+SSO_AUTO_CREATE_USERS = True  # Auto-create users from API requests
+
+CSRF_COOKIE_PATH = '/'  # Default is '/', do not change to '/label-studio'
+SESSION_COOKIE_PATH = '/'  # Default is '/', do not change to '/label-studio'
