@@ -33,6 +33,10 @@ const AccountSettingsSection = () => {
     [resolvedSections, sectionId],
   );
 
+  // Check if user is trying to access a restricted section (token pages)
+  const isRestrictedSection = sectionId === "personal-access-token" || sectionId === "legacy-token";
+  const hasAccessToSection = currentSection !== undefined;
+
   // Update page title to reflect the current section
   const pageTitleText = useMemo(() => {
     if (!currentSection) return "My Account";
@@ -53,7 +57,8 @@ const AccountSettingsSection = () => {
 
   useUpdatePageTitle(pageTitleText);
 
-  if (!currentSection && resolvedSections.length > 0) {
+  // Redirect if section doesn't exist or user doesn't have access to it
+  if ((!currentSection || (isRestrictedSection && !hasAccessToSection)) && resolvedSections.length > 0) {
     return <Redirect to={`${AccountSettingsPage.path}/${resolvedSections[0].id}`} />;
   }
 

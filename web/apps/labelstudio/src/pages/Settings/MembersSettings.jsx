@@ -1,5 +1,5 @@
 import { IconTrash, IconUserAdd } from "@humansignal/icons";
-import { Button, Typography, Alert } from "@humansignal/ui";
+import { Button, Typography } from "@humansignal/ui";
 import { useCallback, useContext, useState, useEffect } from "react";
 import { ApiContext } from "../../providers/ApiProvider";
 import { ProjectContext } from "../../providers/ProjectProvider";
@@ -10,7 +10,8 @@ import "./members-settings.scss";
 export const MembersSettings = () => {
   const api = useContext(ApiContext);
   const { project } = useContext(ProjectContext);
-  const { user: currentUser } = useCurrentUserAtom();
+  const currentUserAtom = useCurrentUserAtom();
+  const currentUser = currentUserAtom?.user;
   const [members, setMembers] = useState([]);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -22,7 +23,7 @@ export const MembersSettings = () => {
 
   // Fetch project members
   const fetchMembers = useCallback(async () => {
-    if (!project?.id) return;
+    if (!project?.id || !api) return;
 
     try {
       setLoading(true);
@@ -58,27 +59,51 @@ export const MembersSettings = () => {
   }, [api, isAdmin, members]);
 
   useEffect(() => {
-    fetchMembers();
-  }, [fetchMembers]);
+    if (project?.id && api) {
+      fetchMembers();
+    }
+  }, [project?.id, api]);
 
   useEffect(() => {
-    if (isAdmin && members.length >= 0) {
+    if (isAdmin && members.length >= 0 && api) {
       fetchAvailableUsers();
     }
-  }, [fetchAvailableUsers, isAdmin, members.length]);
+  }, [isAdmin, members.length, api]);
+
+  // Early return if required dependencies are not available (after all hooks)
+  if (!api || !project?.id) {
+    return (
+      <Block name="members-settings">
+        <Elem name="wrapper">
+          <h1>Project Members</h1>
+          <Typography size="small" className="text-neutral-content-subtler mb-4">
+            Loading project information...
+          </Typography>
+        </Elem>
+      </Block>
+    );
+  }
 
   const handleAddMember = async () => {
-    if (!selectedUserId || !isAdmin) return;
+    if (!selectedUserId || !isAdmin || !api || !project?.id) return;
 
     try {
       setLoading(true);
       setError(null);
       setSuccess(null);
 
+      const userId = parseInt(selectedUserId, 10);
+
+      if (isNaN(userId)) {
+        setError("Invalid user selection");
+        setLoading(false);
+        return;
+      }
+
       await api.callApi("addProjectMember", {
         params: { pk: project.id },
         body: {
-          user_id: parseInt(selectedUserId),
+          user_id: userId,
         },
       });
 
@@ -87,16 +112,20 @@ export const MembersSettings = () => {
       await fetchMembers();
     } catch (err) {
       console.error("Error adding member:", err);
-      setError(err.response?.data?.error || err.message || "Failed to add user to project");
+      const errorMessage = err?.response?.data?.error ||
+                          err?.response?.data?.detail ||
+                          err?.message ||
+                          "Failed to add user to project. Please try again.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const handleRemoveMember = async (userId) => {
-    if (!isAdmin) return;
+    if (!isAdmin || !api || !project?.id) return;
 
-    if (!confirm("Are you sure you want to remove this user from the project?")) {
+    if (!window.confirm("Are you sure you want to remove this user from the project?")) {
       return;
     }
 
@@ -113,7 +142,11 @@ export const MembersSettings = () => {
       await fetchMembers();
     } catch (err) {
       console.error("Error removing member:", err);
-      setError(err.response?.data?.error || err.message || "Failed to remove user from project");
+      const errorMessage = err?.response?.data?.error ||
+                          err?.response?.data?.detail ||
+                          err?.message ||
+                          "Failed to remove user from project. Please try again.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -139,15 +172,15 @@ export const MembersSettings = () => {
         </Typography>
 
         {error && (
-          <Alert variant="error" className="mb-4">
+          <div className="error-message mb-4" style={{ padding: '12px', backgroundColor: '#fee', border: '1px solid #fcc', borderRadius: '4px', color: '#c00' }}>
             {error}
-          </Alert>
+          </div>
         )}
 
         {success && (
-          <Alert variant="success" className="mb-4">
+          <div className="success-message mb-4" style={{ padding: '12px', backgroundColor: '#efe', border: '1px solid #cfc', borderRadius: '4px', color: '#060' }}>
             {success}
-          </Alert>
+          </div>
         )}
 
         {isAdmin && (
@@ -235,9 +268,8 @@ export const MembersSettings = () => {
                             look="destructive"
                             disabled={loading}
                             aria-label="Remove member"
-                          >
-                            <IconTrash />
-                          </Button>
+                            icon={<IconTrash />}
+                          />
                         </td>
                       )}
                     </tr>

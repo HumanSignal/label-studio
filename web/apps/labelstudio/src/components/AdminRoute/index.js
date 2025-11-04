@@ -1,0 +1,1 @@
+export { AdminRoute } from "./AdminRoute";

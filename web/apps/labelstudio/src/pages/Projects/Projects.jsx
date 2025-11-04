@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useParams as useRouterParams } from "react-router";
 import { Redirect } from "react-router-dom";
 import { Button } from "@humansignal/ui";
+import { AdminRoute } from "../../components/AdminRoute";
 import { Oneof } from "../../components/Oneof/Oneof";
 import { Spinner } from "../../components/Spinner/Spinner";
 import { ApiContext } from "../../providers/ApiProvider";
@@ -38,7 +39,7 @@ export const ProjectsPage = () => {
   const openModal = () => setModal(true);
 
   const closeModal = () => setModal(false);
-  
+
   // Check if user is admin
   const isAdmin = user?.role === "admin";
 
@@ -161,7 +162,23 @@ ProjectsPage.routes = ({ store }) => [
     },
     pages: {
       DataManagerPage,
-      SettingsPage,
+      SettingsPage: {
+        ...SettingsPage,
+        component: () => {
+          const { user } = useCurrentUserAtom();
+          const params = useRouterParams();
+          const isAdmin = user?.role === "admin";
+
+          // Redirect non-admins to data page
+          if (!isAdmin) {
+            return <Redirect to={`/projects/${params.id}/data`} />;
+          }
+
+          // Render SettingsPage for admins
+          const OriginalComponent = SettingsPage.component;
+          return <OriginalComponent />;
+        },
+      },
     },
   },
 ];

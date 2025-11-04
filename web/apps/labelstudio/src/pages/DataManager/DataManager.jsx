@@ -8,6 +8,7 @@ import { Space } from "../../components/Space/Space";
 import { useAPI } from "../../providers/ApiProvider";
 import { useProject } from "../../providers/ProjectProvider";
 import { useContextProps, useParams } from "../../providers/RoutesProvider";
+import { useAuth } from "@humansignal/core/providers/AuthProvider";
 import { addCrumb, deleteCrumb } from "../../services/breadrumbs";
 import { Block, Elem } from "../../utils/bem";
 import { isDefined } from "../../utils/helpers";
@@ -37,8 +38,8 @@ const initializeDataManager = async (root, props, params) => {
     showPreviews: false,
     apiEndpoints: APIConfig.endpoints,
     interfaces: {
-      import: true,
-      export: true,
+      import: params.isAdmin,
+      export: params.isAdmin,
       backButton: false,
       labelingHeader: false,
       autoAnnotation: params.autoAnnotation,
@@ -65,11 +66,13 @@ export const DataManagerPage = ({ ...props }) => {
   const history = useHistory();
   const api = useAPI();
   const { project } = useProject();
+  const { user } = useAuth();
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
   const [loading, setLoading] = useState(!window.DataManager || !window.LabelStudio);
   const dataManagerRef = useRef();
   const projectId = project?.id;
+  const isAdmin = user?.role === "admin";
 
   const init = useCallback(async () => {
     if (!window.LabelStudio) return;
@@ -90,6 +93,7 @@ export const DataManagerPage = ({ ...props }) => {
         ...params,
         project,
         autoAnnotation: isDefined(interactiveBacked),
+        isAdmin,
       })));
 
     Object.assign(window, { dataManager });
@@ -188,7 +192,7 @@ export const DataManagerPage = ({ ...props }) => {
     }
 
     setContextProps({ dmRef: dataManager });
-  }, [projectId]);
+  }, [projectId, isAdmin]);
 
   const destroyDM = useCallback(() => {
     if (dataManagerRef.current) {
@@ -236,11 +240,14 @@ DataManagerPage.pages = {
 };
 DataManagerPage.context = ({ dmRef }) => {
   const { project } = useProject();
+  const { user } = useAuth();
   const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
 
-  const links = {
+  const isAdmin = user?.role === "admin";
+
+  const links = isAdmin ? {
     "/settings": "Settings",
-  };
+  } : {};
 
   const updateCrumbs = (currentMode) => {
     const isExplorer = currentMode === "explorer";
