@@ -34,7 +34,7 @@
     "test:affected": "nx affected --target=test:unit --base=develop",
     "test:watch": "yarn test:unit --all --watch",
     "test:watch:affected": "yarn test --watch",
-    "postinstall": "npx -y copy-files-from-to",
+    "postinstall": "copy-files-from-to",
     "design-tokens": "nx design-tokens ui",
     "extract-antd-no-reset": "nx extract-antd-no-reset editor",
     "storybook:serve": "nx storybook storybook",
@@ -44,7 +44,7 @@
   },
   "husky": {
     "hooks": {
-      "post-checkout": "npx -y copy-files-from-to"
+      "post-checkout": "copy-files-from-to"
     }
   },
   "private": true,
@@ -116,6 +116,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "copy-files-from-to": "3.12.1",
     "@babel/core": "^7.26.10",
     "@babel/plugin-proposal-class-properties": "^7.12.13",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.12.13",
@@ -263,7 +264,9 @@
     "moment": "2.29.4",
     "qs": "6.5.3",
     "@babel/helpers": "^7.26.10",
-    "@babel/runtime": "^7.26.10"
+    "@babel/runtime": "^7.26.10",
+    "yargs": "17.7.2",
+    "yargs-parser": "21.1.1"
   },
   "copyFiles": [
     {
