@@ -13,6 +13,7 @@ type TypographyStory = StoryObj<{
   expandable?: boolean;
   expandLabel?: string;
   collapseLabel?: string;
+  expandToggleClassName?: string;
 }>;
 
 const meta: Meta<typeof Typography> = {
@@ -60,11 +61,15 @@ const meta: Meta<typeof Typography> = {
     },
     expandLabel: {
       control: { type: "text" },
-      description: "Custom label for the expand button (default: 'Read more')",
+      description: "Custom label for the expand button (default: 'Show more')",
     },
     collapseLabel: {
       control: { type: "text" },
       description: "Custom label for the collapse button (default: 'Show less')",
+    },
+    expandToggleClassName: {
+      control: { type: "text" },
+      description: "Custom CSS classes to apply to the expand/collapse toggle button",
     },
   },
   tags: ["autodocs"],
@@ -366,6 +371,18 @@ export const Truncation: TypographyStory = {
       <div>
         <h3 className="text-lg font-semibold mb-4 !text-neutral-content-subtle">Custom Button Labels</h3>
         <Typography variant="body" size="small" truncateLines={3} expandLabel="See more" collapseLabel="See less">
+          {longText}
+        </Typography>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 !text-neutral-content-subtle">Custom Toggle Styles</h3>
+        <Typography
+          variant="body"
+          size="small"
+          truncateLines={3}
+          expandToggleClassName="!text-accent-grape-dark font-semibold hover:underline"
+        >
           {longText}
         </Typography>
       </div>

@@ -56,6 +56,7 @@ type TypographyProps<V extends Variant = Variant> = {
   expandable?: boolean;
   expandLabel?: string;
   collapseLabel?: string;
+  expandToggleClassName?: string;
 } & Omit<React.HTMLAttributes<HTMLElement>, "style" | "className" | "children">;
 
 const DEFAULT_TAG = "p";
@@ -75,6 +76,7 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
       expandable = true,
       expandLabel = "Show more",
       collapseLabel = "Show less",
+      expandToggleClassName,
       ...rest
     },
     ref,
@@ -152,7 +154,11 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
           <button
             type="button"
             onClick={() => setIsExpanded((v) => !v)}
-            className={cnm(styles[baseClass], "text-primary-content hover:text-primary-content-hover block mt-1")}
+            className={cnm(
+              styles[baseClass],
+              "text-primary-content hover:text-primary-content-hover block mt-1",
+              expandToggleClassName,
+            )}
             aria-expanded={isExpanded}
           >
             {isExpanded ? collapseLabel : expandLabel}
