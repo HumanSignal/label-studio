@@ -11,7 +11,7 @@ import { AnnotationMixin } from "../../../mixins/AnnotationMixin";
 import DynamicChildrenMixin from "../../../mixins/DynamicChildrenMixin";
 import LabelMixin from "../../../mixins/LabelMixin";
 import SelectedModelMixin from "../../../mixins/SelectedModel";
-import { Block } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import ControlBase from "../Base";
 import "../Label";
 import "./Labels.scss";
@@ -146,9 +146,9 @@ const LabelsModel = types.compose(
 
 const HtxLabels = observer(({ item }) => {
   return (
-    <Block name="labels" mod={{ hidden: !item.visible, inline: item.showinline }}>
+    <div className={cn("labels").mod({ hidden: !item.visible, inline: item.showinline }).toClassName()}>
       {Tree.renderChildren(item, item.annotation)}
-    </Block>
+    </div>
   );
 });
 
