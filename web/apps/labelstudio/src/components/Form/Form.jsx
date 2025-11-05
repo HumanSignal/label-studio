@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from "rea
 import { shallowEqualObjects } from "shallow-equal";
 import { ApiProvider } from "../../providers/ApiProvider";
 import { MultiProvider } from "../../providers/MultiProvider";
-import { Block, cn, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { debounce } from "../../utils/debounce";
 import { isDefined, objectClean } from "../../utils/helpers";
 import { Button } from "@humansignal/ui";
@@ -550,13 +550,13 @@ Form.Indicator = () => {
   const state = React.useContext(FormStateContext);
 
   return (
-    <Block name="form-indicator">
+    <div className={cn("form-indicator").toClassName()}>
       <Oneof value={state}>
-        <Elem tag="span" mod={{ type: state }} name="item" case="success">
+        <span className={cn("form-indicator").elem("item").mod({ type: state }).toClassName()} case="success">
           Saved!
-        </Elem>
+        </span>
       </Oneof>
-    </Block>
+    </div>
   );
 };
 
