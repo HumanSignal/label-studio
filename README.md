@@ -133,9 +133,10 @@ python label_studio/manage.py runserver
 
 ### Deploy in a cloud instance
 
-You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google Cloud Platform: 
+You can deploy Label Studio with one click in Heroku, Northflank, Microsoft Azure, or Google Cloud Platform: 
 
 <a href="https://www.heroku.com/deploy?template=https://github.com/HumanSignal/label-studio/tree/heroku-persistent-pg"><img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy" height="30px"></a>
+<a href="https://northflank.com/stacks/deploy-label-studio"><img src="https://assets.northflank.com/deploy_to_northflank_smm_36700fb050.svg" alt="Deploy to Northflank" height="30px"></a>
 [<img src="https://aka.ms/deploytoazurebutton" height="30px">](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fhumansignal%2Flabel-studio%2Fdevelop%2Fazuredeploy.json)
 [<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
 
