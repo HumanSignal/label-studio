@@ -21,15 +21,21 @@ config: |
         line-height: 1.6;
         padding-top: var(--spacing-tight);
         padding-bottom: var(--spacing-tight);
-        background-color: var(--color-accent-kiwi-subtlest);
-        color: var(--color-accent-kiwi-bold);
+        background-color: var(--color-accent-canteloupe-subtlest);
+        color: var(--color-accent-canteloupe-bold);
         border-radius: var(--corner-radius-medium);
+        padding: var(--spacing-tight);
+        margin-bottom: var(--spacing-base);
+        border: 1px solid var(--color-accent-canteloupe-subtle);
     }
       <!-- Remove excess height from the chat to allow space for instruction text -->
       .htx-chat { 
         --excess-height: 275px;
       
         background-color: var(--color-neutral-background);
+        border-radius: var(--corner-radius-medium);
+        border: 1px solid var(--color-neutral-border);
+        padding-bottom: var(--spacing-tight);
       }
 
     </Style>

@@ -46,8 +46,9 @@ config: |
       .instructions {
          color: var(--color-accent-kale-bold);
          background-color: var(--color-accent-kale-subtlest);
-         padding-top: var(--spacing-base);
-         padding-bottom: var(--spacing-base);
+         padding: var(--spacing-tight);
+         border-radius: var(--corner-radius-medium);
+         border: 1px solid var(--color-accent-kale-subtle);
       }
       <!-- Allow enlarging the instruction text -->
       .lsf-richtext__container.lsf-htx-richtext {

@@ -27,15 +27,16 @@ config: |
           background-color: var(--color-accent-kale-subtlest);
           color: var(--color-accent-kale-bold);
           padding: var(--spacing-tight);
-          border-radius: 5px;
-          margin-bottom: 20px;
+          border-radius: var(--corner-radius-medium);
+          margin-bottom: var(--spacing-base);
       }
       
       .instructions {
         color: var(--color-accent-kale-bold);
         background-color: var(--color-accent-kale-subtlest);
-        padding-top: var(--spacing-base);
-        padding-bottom: var(--spacing-base);
+        padding: var(--spacing-tight);
+        border: 1px solid var(--color-accent-kale-subtle);
+        border-radius: var(--corner-radius-medium);
       }
       <!-- Allow enlarging the instruction text -->
       .lsf-richtext__container.lsf-htx-richtext {
