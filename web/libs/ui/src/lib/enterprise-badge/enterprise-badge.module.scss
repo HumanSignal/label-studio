@@ -9,12 +9,12 @@
 .filled {
   .label {
     background: none;
-    color: var(--color-accent-persimmon-base);
+    color: var(--color-neutral-on-dark-content);
   }
 
   .icon {
     path {
-      fill: var(--color-accent-persimmon-base);
+      fill: var(--color-neutral-on-dark-content);
     }
   }
 }
@@ -31,4 +31,5 @@
   align-items: center;
   line-height: 100%;
   font-weight: 500;
+  cursor: default;
 }

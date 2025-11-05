@@ -6,17 +6,19 @@ from django.db import migrations
 logger = logging.getLogger(__name__)
 
 
-def update_storage(storage):
+def update_storage(storage, db_alias=None):
     logger.info(f'=> Migration for {storage._meta.label} statuses started')
-    storage.objects.update(status='initialized')
-    instances = list(storage.objects.all().only('id', 'meta', 'status', 'last_sync_count'))
+    manager = storage.objects.using(db_alias) if db_alias else storage.objects
+    manager.update(status='initialized')
+    instances = list(manager.all().only('id', 'meta', 'status', 'last_sync_count', 'project_id'))
 
     for instance in instances:
-        prefix = f'Project ID={instance.project.id} {instance}'
+        prefix = f'Project ID={instance.project_id} {instance}'
 
         # import source storages
         if 'import' in storage._meta.label_lower:
-            count = instance.links.count() - instance.last_sync_count if instance.last_sync_count else 0
+            links_manager = instance.links.using(db_alias) if db_alias else instance.links
+            count = links_manager.count() - instance.last_sync_count if instance.last_sync_count else 0
             instance.meta['tasks_existed'] = count if count > 0 else 0
             if instance.meta['tasks_existed'] and instance.meta['tasks_existed'] > 0:
                 instance.status = 'completed'
@@ -29,11 +31,12 @@ def update_storage(storage):
                 instance.status = 'completed'
             logger.info(f'{prefix} total_annotations = {instance.last_sync_count}')
 
-    storage.objects.bulk_update(instances, fields=['meta', 'status'], batch_size=100)
+    manager.bulk_update(instances, fields=['meta', 'status'], batch_size=100)
     logger.info(f'=> Migration for {storage._meta.label} statuses finished')
 
 
 def forwards(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
     storages = [
         apps.get_model('io_storages', 'AzureBlobImportStorage'),
         apps.get_model('io_storages', 'AzureBlobExportStorage'),
@@ -48,7 +51,7 @@ def forwards(apps, schema_editor):
     ]
 
     for storage in storages:
-        update_storage(storage)
+        update_storage(storage, db_alias)
 
 
 def backwards(apps, schema_editor):

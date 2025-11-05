@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { IconPlus, IconMinus } from "@humansignal/icons";
-import { Block, Elem } from "../../../../../utils/bem";
+import { cn } from "../../../../../utils/bem";
 import { isDefined } from "../../../../../utils/utils";
 import { Oneof } from "../../../Oneof/Oneof";
 import { FormField } from "../../FormField";
@@ -152,15 +152,16 @@ const Counter = ({
 
         return (
           <CounterContext.Provider value={contextValue}>
-            <Block name="counter" mod={{ focused, disabled: fieldDisabled }} mix={className} style={style}>
+            <div
+              className={cn("counter").mod({ focused, disabled: fieldDisabled }).mix(className).toClassName()}
+              style={style}
+            >
               <CounterButton type="decrease" />
 
-              <Elem
+              <input
                 ref={ref}
-                tag="input"
-                name="input"
+                className={cn("counter").elem("input").mod({ withPostfix: !!postfix }).toClassName()}
                 type="text"
-                mod={{ withPostfix: !!postfix }}
                 readOnly={editable === false}
                 disabled={fieldDisabled}
                 value={currentValue}
@@ -172,13 +173,13 @@ const Counter = ({
               />
 
               {postfix && (
-                <Elem name="input" mod={{ under: true, withPostfix: !!postfix }}>
+                <div className={cn("counter").elem("input").mod({ under: true, withPostfix: !!postfix }).toClassName()}>
                   {displayValue.join(" ")}
-                </Elem>
+                </div>
               )}
 
               <CounterButton type="increase" />
-            </Block>
+            </div>
           </CounterContext.Provider>
         );
       }}
@@ -194,14 +195,16 @@ const CounterButton = ({ type }) => {
   const compareLimit = type === "increase" ? max : min;
 
   return (
-    <Elem
-      tag="a"
+    // biome-ignore lint/a11y/useValidAnchor: anchor used for styling purposes, todo after bem migration
+    <a
       href="#"
-      name="btn"
-      mod={{
-        type,
-        disabled: currentValue === compareLimit || disabled,
-      }}
+      className={cn("counter")
+        .elem("btn")
+        .mod({
+          type,
+          disabled: currentValue === compareLimit || disabled,
+        })
+        .toClassName()}
       onClick={onClickHandler(type, ref)}
       onMouseDownCapture={(e) => e.preventDefault()}
     >
@@ -209,7 +212,7 @@ const CounterButton = ({ type }) => {
         <IconMinus case="decrease" />
         <IconPlus case="increase" />
       </Oneof>
-    </Elem>
+    </a>
   );
 };
 

@@ -1,5 +1,5 @@
 import { IconChevronDown } from "@humansignal/icons";
-import { Block } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { FF_SELF_SERVE, isFF } from "../../../utils/feature-flags";
 import { ErrorBox } from "../../Common/ErrorBox";
 import { FieldsButton } from "../../Common/FieldsButton";
@@ -57,11 +57,11 @@ const ImportButtonWithChecks = ({ size }) => {
         textAlign: "center",
       }}
     >
-      <Block name="button-wrapper">
+      <div className={cn("button-wrapper").toClassName()}>
         <ImportButton disabled size={size}>
           Import
         </ImportButton>
-      </Block>
+      </div>
     </Tooltip>
   );
 };

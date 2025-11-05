@@ -1,5 +1,5 @@
-import { Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 
 export const SkeletonGap = ({ height = "4px" }: { height?: string }) => {
-  return <Elem name="gap" style={{ "--height": height }} />;
+  return <div className={cn("skeletonLoader").elem("gap").toClassName()} style={{ "--height": height } as any} />;
 };

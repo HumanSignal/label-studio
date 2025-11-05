@@ -3,7 +3,7 @@ import { Button, Spinner, Tooltip } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useActions } from "../../../hooks/useActions";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { Dropdown } from "../../Common/Dropdown/DropdownComponent";
 import Form from "../../Common/Form/Form";
@@ -38,19 +38,22 @@ const DialogContent = ({ text, form, formRef, store, action }) => {
   const fields = formData?.toJSON ? formData.toJSON() : formData;
 
   return (
-    <Block name="dialog-content">
-      <Elem name="text">{text}</Elem>
+    <div className={cn("dialog-content").toClassName()}>
+      <div className={cn("dialog-content").elem("text").toClassName()}>{text}</div>
       {isLoading && (
-        <Elem name="loading" style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+        <div
+          className={cn("dialog-content").elem("loading").toClassName()}
+          style={{ display: "flex", justifyContent: "center", marginTop: 16 }}
+        >
           <Spinner />
-        </Elem>
+        </div>
       )}
       {formData && (
-        <Elem name="form" style={{ paddingTop: 16 }}>
+        <div className={cn("dialog-content").elem("form").toClassName()} style={{ paddingTop: 16 }}>
           <Form.Builder ref={formRef} fields={fields} autosubmit={false} withActions={false} />
-        </Elem>
+        </div>
       )}
-    </Block>
+    </div>
   );
 };
 
@@ -72,27 +75,30 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
   );
 
   const titleContainer = (
-    <Block
+    <Menu.Item
       key={action.id}
-      tag={Menu.Item}
+      className={cn("actionButton")
+        .mod({
+          hasSeperator: isDeleteAction,
+          hasSubMenu: action.children?.length > 0,
+          isSeparator: action.isSeparator,
+          isTitle: action.isTitle,
+          danger: isDeleteAction,
+          disabled: action.disabled,
+        })
+        .toClassName()}
       size="small"
       onClick={onClick}
-      mod={{
-        hasSeperator: isDeleteAction,
-        hasSubMenu: action.children?.length > 0,
-        isSeparator: action.isSeparator,
-        isTitle: action.isTitle,
-        danger: isDeleteAction,
-        disabled: action.disabled,
-      }}
-      name="actionButton"
       aria-label={action.title}
     >
-      <Elem name="titleContainer" {...(action.disabled ? { title: action.disabledReason } : {})}>
-        <Elem name="title">{action.title}</Elem>
-        {hasChildren ? <Elem name="icon" tag={IconChevronRight} /> : null}
-      </Elem>
-    </Block>
+      <div
+        className={cn("actionButton").elem("titleContainer").toClassName()}
+        {...(action.disabled ? { title: action.disabledReason } : {})}
+      >
+        <div className={cn("actionButton").elem("title").toClassName()}>{action.title}</div>
+        {hasChildren ? <IconChevronRight className={cn("actionButton").elem("icon").toClassName()} /> : null}
+      </div>
+    </Menu.Item>
   );
 
   if (hasChildren) {
@@ -103,7 +109,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
         toggle={false}
         ref={submenuRef}
         content={
-          <Block name="actionButton-submenu" tag="ul">
+          <ul className={cn("actionButton-submenu").toClassName()}>
             {action.children.map((childAction) => (
               <ActionButton
                 key={childAction.id}
@@ -113,7 +119,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
                 formRef={formRef}
               />
             ))}
-          </Block>
+          </ul>
         }
       >
         {titleContainer}
