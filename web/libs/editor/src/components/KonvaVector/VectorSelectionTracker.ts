@@ -65,10 +65,8 @@ export class VectorSelectionTracker {
 
   // Selection Management
   selectPoints(instanceId: string, pointIndices: Set<number>): void {
-    // If trying to select points and there's already an active instance that's different
-    if (pointIndices.size > 0 && this.state.activeInstanceId && this.state.activeInstanceId !== instanceId) {
-      return; // Block the selection
-    }
+    // Allow multiple instances to have selections simultaneously
+    // Removed the blocking logic that prevented multiple vector regions from being selected
 
     if (pointIndices.size === 0) {
       this.state.selectedInstances.delete(instanceId);
@@ -78,7 +76,8 @@ export class VectorSelectionTracker {
       }
     } else {
       this.state.selectedInstances.set(instanceId, new Set(pointIndices));
-      // Set this as the active instance (first to select wins)
+      // Set this as the active instance for transformation purposes
+      // Multiple instances can now have selections, but only one can be actively transforming
       this.state.activeInstanceId = instanceId;
     }
 
@@ -95,7 +94,8 @@ export class VectorSelectionTracker {
 
   // Check if an instance can have selection
   canInstanceHaveSelection(instanceId: string): boolean {
-    return this.state.activeInstanceId === null || this.state.activeInstanceId === instanceId;
+    // Allow all instances to have selections simultaneously
+    return true;
   }
 
   // Get the currently active instance ID

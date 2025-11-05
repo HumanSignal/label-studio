@@ -27,6 +27,7 @@ interface VectorTransformerProps {
   }) => void;
   onTransformationStart?: () => void;
   onTransformationEnd?: () => void;
+  onTransformEnd?: (e: any) => void;
   bounds?: { x: number; y: number; width: number; height: number };
   scaleX?: number;
   scaleY?: number;
@@ -43,6 +44,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
   onTransformStateChange,
   onTransformationStart,
   onTransformationEnd,
+  onTransformEnd,
   bounds,
   scaleX = 1,
   scaleY = 1,
@@ -503,6 +505,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
 
         // Notify that transformation has ended
         onTransformationEnd?.();
+
+        // Call external onTransformEnd handler
+        onTransformEnd?.(_e);
       }}
     />
   );

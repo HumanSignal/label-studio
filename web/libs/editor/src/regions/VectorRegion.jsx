@@ -54,13 +54,18 @@ const Model = types
 
     // Internal flag to detect if we converted data back from relative points
     converted: false,
+
+    // There are two modes: transform and edit
+    // transform -- user can transform the shape as a whole (rotate, translate, resize)
+    // edit -- user works with individual points
+    transformMode: true,
   })
   .volatile(() => ({
     mouseOverStartPoint: false,
     selectedPoint: null,
     hideable: true,
     _supportsTransform: true,
-    useTransformer: true,
+    useTransformer: false,
     preferTransformer: false,
     supportsRotate: true,
     supportsScale: true,
@@ -159,7 +164,7 @@ const Model = types
       }
     },
     get disabled() {
-      const tool = self.parent.getToolsManager().findSelectedTool();
+      const tool = self.parent?.getToolsManager().findSelectedTool();
       return (tool?.disabled ?? false) || self.isReadOnly() || (!self.selected && !self.isDrawing);
     },
   }))
@@ -228,6 +233,7 @@ const Model = types
 
       _selectArea(additiveMode = false) {
         const annotation = self.annotation;
+        self.setTransformMode(true);
         if (!annotation) return;
 
         if (additiveMode) {
@@ -465,6 +471,32 @@ const Model = types
         }
         tool?.complete();
       },
+      toggleTransformMode() {
+        self.setTransformMode(!self.transformMode);
+      },
+      setTransformMode(transformMode) {
+        self.transformMode = transformMode;
+      },
+
+      /**
+       * Apply transformations from ImageTransformer to the vector points
+       * Called by ImageTransformer when multi-region transformations complete
+       * @param {Object} transform - Transform object with dx, dy, scaleX, scaleY, rotation
+       * @param {Object} transformerCenter - Center point used by the ImageTransformer for scaling/rotation
+       */
+      applyTransform(transform, transformerCenter) {
+        if (!self.vectorRef) {
+          return;
+        }
+
+        // Delegate to KonvaVector's commitMultiRegionTransform method
+        // This method reads the proxy node coordinates and applies them directly
+        if (typeof self.vectorRef.commitMultiRegionTransform === "function") {
+          self.vectorRef.commitMultiRegionTransform();
+        } else {
+          console.error("📊 commitMultiRegionTransform method not available");
+        }
+      },
     };
   });
 
@@ -489,6 +521,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
   const stageWidth = image?.naturalWidth ?? 0;
   const stageHeight = image?.naturalHeight ?? 0;
   const { x: offsetX, y: offsetY } = item.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
+  const disabled = item.disabled || suggestion || store.annotationStore.selected.isLinkingMode;
 
   // Wait for stage to be properly initialized
   if (!item.parent?.stageWidth || !item.parent?.stageHeight) {
@@ -497,14 +530,93 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
   return (
     <RegionWrapper item={item}>
-      <Group ref={(ref) => item.segGroupRef(ref)}>
+      <Group ref={(ref) => item.segGroupRef(ref)} name={item.id}>
         <KonvaVector
           ref={(kv) => item.setKonvaVectorRef(kv)}
           initialPoints={Array.from(item.vertices)}
+          isMultiRegionSelected={item.object?.selectedRegions?.length > 1}
           onFinish={(e) => {
             e.evt.stopPropagation();
             e.evt.preventDefault();
             item.handleFinish();
+          }}
+          onTransformEnd={(e) => {
+            if (e.target !== e.currentTarget) return;
+
+            const t = e.target;
+            const dx = t.getAttr("x", 0);
+            const dy = t.getAttr("y", 0);
+            const scaleX = t.getAttr("scaleX", 1);
+            const scaleY = t.getAttr("scaleY", 1);
+            const rotation = t.getAttr("rotation", 0);
+
+            // Reset transform attributes
+            t.setAttr("x", 0);
+            t.setAttr("y", 0);
+            t.setAttr("scaleX", 1);
+            t.setAttr("scaleY", 1);
+            t.setAttr("rotation", 0);
+
+            // Apply transformation to all points using KonvaVector methods
+            if (item.vectorRef) {
+              // Apply the transformation exactly as Konva did:
+              // 1. Scale around origin (0,0)
+              // 2. Rotate around origin (0,0)
+              // 3. Translate by (dx, dy)
+              // Don't pass centerX/centerY - transform around origin
+              const radians = rotation * (Math.PI / 180);
+              const cos = Math.cos(radians);
+              const sin = Math.sin(radians);
+
+              const imageWidth = image?.naturalWidth ?? 0;
+              const imageHeight = image?.naturalHeight ?? 0;
+
+              const transformedVertices = item.vertices.map((point) => {
+                // Step 1: Scale
+                const x = point.x * scaleX;
+                const y = point.y * scaleY;
+
+                // Step 2: Rotate
+                const rx = x * cos - y * sin;
+                const ry = x * sin + y * cos;
+
+                // Step 3: Translate and clamp to image bounds
+                const result = {
+                  ...point,
+                  x: Math.max(0, Math.min(imageWidth, rx + dx)),
+                  y: Math.max(0, Math.min(imageHeight, ry + dy)),
+                };
+
+                // Transform control points if bezier
+                if (point.isBezier) {
+                  if (point.controlPoint1) {
+                    const cp1x = point.controlPoint1.x * scaleX;
+                    const cp1y = point.controlPoint1.y * scaleY;
+                    const cp1rx = cp1x * cos - cp1y * sin;
+                    const cp1ry = cp1x * sin + cp1y * cos;
+                    result.controlPoint1 = {
+                      x: Math.max(0, Math.min(imageWidth, cp1rx + dx)),
+                      y: Math.max(0, Math.min(imageHeight, cp1ry + dy)),
+                    };
+                  }
+                  if (point.controlPoint2) {
+                    const cp2x = point.controlPoint2.x * scaleX;
+                    const cp2y = point.controlPoint2.y * scaleY;
+                    const cp2rx = cp2x * cos - cp2y * sin;
+                    const cp2ry = cp2x * sin + cp2y * cos;
+                    result.controlPoint2 = {
+                      x: Math.max(0, Math.min(imageWidth, cp2rx + dx)),
+                      y: Math.max(0, Math.min(imageHeight, cp2ry + dy)),
+                    };
+                  }
+                }
+
+                return result;
+              });
+
+              // Update the points
+              item.updatePointsFromKonvaVector(transformedVertices);
+            }
           }}
           onPointsChange={(points) => {
             item.updatePointsFromKonvaVector(points);
@@ -545,6 +657,13 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             }
             item.updateCursor();
           }}
+          onDblClick={(e) => {
+            e.evt.stopImmediatePropagation();
+            e.evt.stopPropagation();
+            e.evt.preventDefault();
+            item.toggleTransformMode();
+          }}
+          transformMode={!disabled && item.transformMode}
           closed={item.closed}
           width={stageWidth}
           height={stageHeight}
@@ -564,8 +683,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           strokeWidth={regionStyles.strokeWidth}
           opacity={Number.parseFloat(item.control?.opacity || "1")}
           pixelSnapping={item.control?.snap === "pixel"}
-          constrainToBounds={item.control?.constrainToBounds ?? true}
-          disabled={item.disabled || suggestion || store.annotationStore.selected.isLinkingMode}
+          disabled={disabled}
           // Point styling - customize point appearance based on control settings
           pointRadius={item.pointRadiusFromSize}
           pointFill={item.selected ? "#ffffff" : "#f8fafc"}

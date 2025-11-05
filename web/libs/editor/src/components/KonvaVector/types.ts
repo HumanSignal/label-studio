@@ -201,12 +201,22 @@ export interface KonvaVectorProps {
   onMouseUp?: (e?: KonvaEventObject<MouseEvent>) => void;
   /** Click event handler */
   onClick?: (e: KonvaEventObject<MouseEvent>) => void;
+  /** Double click event handler */
+  onDblClick?: (e: KonvaEventObject<MouseEvent>) => void;
+  /** Transform end event handler */
+  onTransformEnd?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse enter event handler */
   onMouseEnter?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse leave event handler */
   onMouseLeave?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Disable all interactions when true */
   disabled?: boolean;
+  /** Enable transform mode where all points are treated as selected */
+  transformMode?: boolean;
+  /** Whether multiple regions are currently selected (disables internal transformer) */
+  isMultiRegionSelected?: boolean;
+  /** Name attribute for the component */
+  name?: string;
   /** Ref to access component methods */
   ref?: React.RefObject<KonvaVectorRef>;
 }

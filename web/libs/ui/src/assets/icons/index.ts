@@ -14,6 +14,10 @@ export { ReactComponent as IconAnnotationSkipped2 } from "./annotation-skipped2.
 export { ReactComponent as IconAnnotationSubmitted } from "./annotation-submitted.svg";
 export { ReactComponent as IconAnthropic } from "./anthropic.svg";
 export { ReactComponent as IconArrow } from "./arrow.svg";
+export { ReactComponent as IconArrowDownCircleFilled } from "./arrow-down-circle-filled.svg";
+export { ReactComponent as IconArrowUpCircleFilled } from "./arrow-up-circle-filled.svg";
+export { ReactComponent as IconArrowLeftCircleFilled } from "./arrow-left-circle-filled.svg";
+export { ReactComponent as IconArrowRightCircleFilled } from "./arrow-right-circle-filled.svg";
 export { ReactComponent as IconArrowLeft } from "./arrow-left.svg";
 export { ReactComponent as IconArrowRight } from "./arrow-right.svg";
 export { ReactComponent as IconArrowRightBlue } from "./arrow-right-blue.svg";
