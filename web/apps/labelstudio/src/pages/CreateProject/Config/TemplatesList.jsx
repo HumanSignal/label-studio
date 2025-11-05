@@ -40,7 +40,7 @@ const TemplatesInGroup = ({ templates, group, onSelectRecipe, isEdition }) => {
             <div className="flex w-full relative">
               <h3 className="flex flex-1 justify-center text-center">{recipe.title}</h3>
               {isEnterpriseTemplate && isCommunityEdition && (
-                <EnterpriseBadge className="absolute top-[-10px] left-1/2 translate-x-[-40px]" />
+                <EnterpriseBadge className="absolute bottom-[-10px] left-1/2 translate-x-[-40px]" />
               )}
             </div>
           </li>
