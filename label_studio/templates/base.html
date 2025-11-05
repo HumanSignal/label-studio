@@ -184,6 +184,7 @@
     editor_keymap: mergedEditorKeymap,
     feature_flags: {{ feature_flags|json_dumps_ensure_ascii|safe }},
     feature_flags_default_value: {{ settings.FEATURE_FLAGS_DEFAULT_VALUE|json_dumps_ensure_ascii|safe }},
+    version_edition: "{{ settings.VERSION_EDITION }}",
     server_id: {{ request.server_id|json_dumps_ensure_ascii|safe }},
     collect_analytics: {{ settings.COLLECT_ANALYTICS|yesno:"true,false" }},
 
