@@ -6,7 +6,7 @@ import { Space } from "../../../components/Space/Space";
 import { useAPI } from "../../../providers/ApiProvider";
 import { ProjectProvider, useProject } from "../../../providers/ProjectProvider";
 import { useFixedLocation } from "../../../providers/RoutesProvider";
-import { Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { useRefresh } from "../../../utils/hooks";
 import { ImportPage } from "./Import";
 import { useImportPage } from "./useImportPage";
@@ -72,9 +72,9 @@ export const Inner = () => {
       bare
     >
       <Modal.Header divided>
-        <Elem block="modal" name="title">
+        <div className={cn("modal").elem("title").toClassName()}>
           Import Data
-        </Elem>
+        </div>
 
         <Space>
           <Button
