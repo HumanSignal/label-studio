@@ -34,3 +34,23 @@ export const textareaResultsPerRegion = [
     },
   },
 ];
+
+export const textareaConfigWithValue = `<View>
+  <Text name="text"/>
+  <TextArea name="desc" toName="text" value="Pre-filled text" />
+</View>`;
+
+export const textareaConfigWithValueAndRows = `<View>
+  <Text name="text"/>
+  <TextArea name="desc" toName="text" value="Pre-filled text" rows="3" />
+</View>`;
+
+export const textareaConfigWithMaxSubmissions = `<View>
+  <Text name="text"/>
+  <TextArea name="desc" toName="text" maxSubmissions="2" />
+</View>`;
+
+export const textareaConfigWithValueAndMaxSubmissions = `<View>
+  <Text name="text"/>
+  <TextArea name="desc" toName="text" value="Pre-filled text" maxSubmissions="2" />
+</View>`;

@@ -16,6 +16,13 @@ import "./Table.scss";
 import { Button } from "@humansignal/ui";
 import { useEffect, useState } from "react";
 import { EmptyState } from "./empty-state";
+import {
+  DENSITY_STORAGE_KEY,
+  DENSITY_COMFORTABLE,
+  DENSITY_COMPACT,
+  ROW_HEIGHT_COMFORTABLE,
+  ROW_HEIGHT_COMPACT,
+} from "../../DataManager/Toolbar/DensityToggle";
 
 const injector = inject(({ store }) => {
   const { dataStore, currentView } = store;
@@ -71,9 +78,22 @@ export const DataView = injector(
     ...props
   }) => {
     const [datasetStatusID, setDatasetStatusID] = useState(store.SDK.dataset?.status?.id);
+    const [density, setDensity] = useState(() => {
+      return localStorage.getItem(DENSITY_STORAGE_KEY) ?? DENSITY_COMFORTABLE;
+    });
     const focusedItem = useMemo(() => {
       return props.focusedItem;
     }, [props.focusedItem]);
+
+    // Listen for density changes from any DensityToggle component
+    useEffect(() => {
+      const handleDensityChange = (e) => {
+        setDensity(e.detail);
+      };
+
+      window.addEventListener("dm:density:changed", handleDensityChange);
+      return () => window.removeEventListener("dm:density:changed", handleDensityChange);
+    }, []);
 
     const loadMore = useCallback(async () => {
       if (!dataStore.hasNextPage || dataStore.loading) return Promise.resolve();
@@ -304,12 +324,14 @@ export const DataView = injector(
       [commonDecoration],
     );
 
+    const rowHeight = density === DENSITY_COMPACT ? ROW_HEIGHT_COMPACT : ROW_HEIGHT_COMFORTABLE;
+
     const content =
       view.root.isLabeling || viewType === "list" ? (
         <Table
           view={view}
           data={data}
-          rowHeight={70}
+          rowHeight={rowHeight}
           total={total}
           loadMore={loadMore}
           fitContent={isLabeling}
@@ -334,6 +356,7 @@ export const DataView = injector(
           onColumnReset={(col) => {
             col.original.resetWidth();
           }}
+          onDensityChange={setDensity}
         />
       ) : (
         <GridView

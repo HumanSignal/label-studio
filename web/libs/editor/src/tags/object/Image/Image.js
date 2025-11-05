@@ -22,7 +22,6 @@ import {
   FF_DEV_3793,
   FF_LSDV_4583,
   FF_LSDV_4583_6,
-  FF_LSDV_4711,
   FF_ZOOM_OPTIM,
   isFF,
 } from "../../../utils/feature-flags";
@@ -314,11 +313,8 @@ const Model = types
     get imageCrossOrigin() {
       const value = self.crossorigin.toLowerCase();
 
-      if (isFF(FF_LSDV_4711) && (!value || value === "none")) return "anonymous";
+      if (!value || value === "none") return "anonymous";
 
-      if (!value || value === "none") {
-        return null;
-      }
       return value;
     },
 

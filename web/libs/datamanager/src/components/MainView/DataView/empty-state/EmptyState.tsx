@@ -12,6 +12,7 @@ import {
 } from "@humansignal/icons";
 import { Button, IconExternal, Typography, Tooltip } from "@humansignal/ui";
 import { getDocsUrl } from "../../../../../../editor/src/utils/docs";
+import { ABILITY, useAuth } from "@humansignal/core/providers/AuthProvider";
 
 declare global {
   interface Window {
@@ -213,6 +214,7 @@ export const EmptyState: FC<EmptyStateProps> = ({
   onClearFilters,
 }) => {
   const isImportEnabled = Boolean(canImport);
+  const { permissions } = useAuth();
 
   // If filters are applied, show the filter-specific empty state (regardless of user role)
   if (hasFilters) {
@@ -295,15 +297,17 @@ export const EmptyState: FC<EmptyStateProps> = ({
     additionalContent: <StorageProviderIcons />,
     actions: (
       <>
-        <Button
-          variant="primary"
-          look="filled"
-          className="flex-1"
-          onClick={onOpenSourceStorageModal}
-          data-testid="dm-connect-source-storage-button"
-        >
-          Connect Cloud Storage
-        </Button>
+        {permissions.can(ABILITY.can_manage_storage) && (
+          <Button
+            variant="primary"
+            look="filled"
+            className="flex-1"
+            onClick={onOpenSourceStorageModal}
+            data-testid="dm-connect-source-storage-button"
+          >
+            Connect Cloud Storage
+          </Button>
+        )}
 
         {isImportEnabled && (
           <Button

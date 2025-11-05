@@ -3,7 +3,7 @@ title: OCR Invoices Pre-NER BIO Format
 type: templates
 category: Community Contributions
 cat: community
-order: 1002
+order: 1003
 meta_title: OCR Invoices Pre-NER BIO Format Data Labeling Template
 meta_description: Template for ocr invoices pre-ner bio format with Label Studio
 community: true
@@ -11,6 +11,7 @@ community_author: redeipirati
 community_contributors: carly-bartel
 community_repo: awesome-label-studio-config
 github_repo: humanSignal/awesome-label-studio-config
+report_bug_url: https://github.com/humanSignal/awesome-label-studio-config/issues/new?template=bug_report.yml&config-name=ocr-invoices-pre-ner-bio-format&title=Bug%20in%20ocr-invoices-pre-ner-bio-format&body=I%20found%20a%20bug%20in%20the%20ocr-invoices-pre-ner-bio-format%20template.%0A%0A%23%23%20Steps%20to%20Reproduce%0A1.%20...%0A2.%20...%0A%0A%23%23%20Expected%20Behavior%0A...%0A%0A%23%23%20Actual%20Behavior%0A...%0A%0A%23%23%20Environment%0A-%20Label%20Studio%20Version:...%0A-%20Browser%20(if%20applicable):...%0A-%20Operating%20System:...%0A%0A%23%23%20Additional%20Context%0A...%0A
 repo_url: https://github.com/HumanSignal/awesome-label-studio-config/tree/main/label-configs/ocr-invoices-pre-ner-bio-format
 ---
 

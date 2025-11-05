@@ -3,16 +3,24 @@ import { OutlinerPanel } from "../OutlinerPanel";
 
 // Mock the dependencies
 jest.mock("../../../../utils/bem", () => ({
-  Block: ({ children, ...props }: any) => (
-    <div data-testid="block" {...props}>
-      {children}
-    </div>
-  ),
-  Elem: ({ children, ...props }: any) => (
-    <div data-testid="elem" {...props}>
-      {children}
-    </div>
-  ),
+  cn: (block: string) => ({
+    elem: (elem: string) => ({
+      toClassName: () => `dm-${block}__${elem}`,
+      mod: (mods: any) => ({
+        toClassName: () => `dm-${block}__${elem}`,
+      }),
+    }),
+    mod: (mods: any) => ({
+      toClassName: () => `dm-${block}`,
+      mix: (...args: any[]) => ({
+        toClassName: () => `dm-${block}`,
+      }),
+    }),
+    toClassName: () => `dm-${block}`,
+    mix: (...args: any[]) => ({
+      toClassName: () => `dm-${block}`,
+    }),
+  }),
 }));
 
 jest.mock("../../PanelBase", () => ({
@@ -163,7 +171,7 @@ describe("OutlinerPanel", () => {
 
       expect(screen.getByTestId("empty-state")).toBeInTheDocument();
       expect(screen.queryByTestId("outliner-tree")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("block")).not.toBeInTheDocument(); // No filters-info block
+      expect(screen.queryByText("All regions hidden")).not.toBeInTheDocument(); // No filters-info message
     });
 
     it("does not render empty state when regions exist", () => {
@@ -190,15 +198,9 @@ describe("OutlinerPanel", () => {
 
       render(<OutlinerPanel {...defaultProps} regions={regionsAllHidden} />);
 
-      expect(screen.getByTestId("block")).toBeInTheDocument();
       expect(screen.getByTestId("icon-info")).toBeInTheDocument();
-      const titleElem = screen.getAllByTestId("elem").find((elem) => elem.textContent === "All regions hidden");
-      expect(titleElem).toBeInTheDocument();
-
-      const descriptionElem = screen
-        .getAllByTestId("elem")
-        .find((elem) => elem.textContent === "Adjust or remove the filters to view");
-      expect(descriptionElem).toBeInTheDocument();
+      expect(screen.getByText("All regions hidden")).toBeInTheDocument();
+      expect(screen.getByText("Adjust or remove the filters to view")).toBeInTheDocument();
     });
 
     it("shows hidden regions count in footer when some regions are filtered", () => {
@@ -277,52 +279,139 @@ describe("OutlinerPanel", () => {
   });
 
   describe("Media time sorting", () => {
-    it("supports mediaStartTime sorting option when media regions are present", () => {
-      const regionsWithMediaTime = {
+    it("supports mediaStartTime sorting option when labels and audio tags are in config", () => {
+      const regionsWithAudioConfig = {
         ...mockRegions,
         sort: "mediaStartTime",
+        annotation: {
+          names: new Map([
+            ["myLabels", { name: "myLabels", type: "labels" }],
+            ["myAudio", { name: "myAudio", type: "audio" }],
+          ]),
+        },
         regions: [
           { id: "1", type: "audioregion", start: 5.0, end: 10.0 },
           { id: "2", type: "audioregion", start: 2.0, end: 7.0 },
-          { id: "3", type: "timelineregion", ranges: [{ start: 15, end: 20 }] },
-          { id: "4", type: "timelineregion", ranges: [{ start: 8, end: 12 }] },
         ],
         filter: [
           { id: "1", type: "audioregion", start: 5.0, end: 10.0 },
           { id: "2", type: "audioregion", start: 2.0, end: 7.0 },
-          { id: "3", type: "timelineregion", ranges: [{ start: 15, end: 20 }] },
-          { id: "4", type: "timelineregion", ranges: [{ start: 8, end: 12 }] },
         ],
       };
 
-      render(<OutlinerPanel {...defaultProps} regions={regionsWithMediaTime} />);
+      render(<OutlinerPanel {...defaultProps} regions={regionsWithAudioConfig} />);
 
       const viewControls = screen.getByTestId("view-controls");
       expect(viewControls).toBeInTheDocument();
       expect(viewControls).toHaveAttribute("ordering", "mediaStartTime");
     });
 
-    it("hides mediaStartTime sorting option when no media regions are present", () => {
-      const regionsWithoutMediaTime = {
+    it("supports mediaStartTime sorting option when timelinelabels and video tags are in config", () => {
+      const regionsWithVideoConfig = {
+        ...mockRegions,
+        sort: "mediaStartTime",
+        annotation: {
+          names: new Map([
+            ["myTimelineLabels", { name: "myTimelineLabels", type: "timelinelabels" }],
+            ["myVideo", { name: "myVideo", type: "video" }],
+          ]),
+        },
+        regions: [
+          { id: "1", type: "timelineregion", ranges: [{ start: 15, end: 20 }] },
+          { id: "2", type: "timelineregion", ranges: [{ start: 8, end: 12 }] },
+        ],
+        filter: [
+          { id: "1", type: "timelineregion", ranges: [{ start: 15, end: 20 }] },
+          { id: "2", type: "timelineregion", ranges: [{ start: 8, end: 12 }] },
+        ],
+      };
+
+      render(<OutlinerPanel {...defaultProps} regions={regionsWithVideoConfig} />);
+
+      const viewControls = screen.getByTestId("view-controls");
+      expect(viewControls).toBeInTheDocument();
+      expect(viewControls).toHaveAttribute("ordering", "mediaStartTime");
+    });
+
+    it("supports mediaStartTime sorting option when labels, videorectangle and video tags are in config", () => {
+      const regionsWithVideoRectangleConfig = {
+        ...mockRegions,
+        sort: "mediaStartTime",
+        annotation: {
+          names: new Map([
+            ["myLabels", { name: "myLabels", type: "labels" }],
+            ["myVideoRectangle", { name: "myVideoRectangle", type: "videorectangle" }],
+            ["myVideo", { name: "myVideo", type: "video" }],
+          ]),
+        },
+        regions: [
+          { id: "1", type: "videorectangleregion", sequence: [{ frame: 30, enabled: true, x: 10, y: 10 }] },
+          { id: "2", type: "videorectangleregion", sequence: [{ frame: 10, enabled: true, x: 20, y: 20 }] },
+        ],
+        filter: [
+          { id: "1", type: "videorectangleregion", sequence: [{ frame: 30, enabled: true, x: 10, y: 10 }] },
+          { id: "2", type: "videorectangleregion", sequence: [{ frame: 10, enabled: true, x: 20, y: 20 }] },
+        ],
+      };
+
+      render(<OutlinerPanel {...defaultProps} regions={regionsWithVideoRectangleConfig} />);
+
+      const viewControls = screen.getByTestId("view-controls");
+      expect(viewControls).toBeInTheDocument();
+      expect(viewControls).toHaveAttribute("ordering", "mediaStartTime");
+    });
+
+    it("does not support mediaStartTime when only labels tag is in config", () => {
+      const regionsWithoutMediaConfig = {
         ...mockRegions,
         sort: "date",
+        annotation: {
+          names: new Map([["myLabels", { name: "myLabels", type: "labels" }]]),
+        },
         regions: [
           { id: "1", type: "rectangle" },
           { id: "2", type: "polygon" },
-          { id: "3", type: "ellipse" },
         ],
         filter: [
           { id: "1", type: "rectangle" },
           { id: "2", type: "polygon" },
-          { id: "3", type: "ellipse" },
         ],
       };
 
-      render(<OutlinerPanel {...defaultProps} regions={regionsWithoutMediaTime} />);
+      render(<OutlinerPanel {...defaultProps} regions={regionsWithoutMediaConfig} />);
 
       const viewControls = screen.getByTestId("view-controls");
       expect(viewControls).toBeInTheDocument();
       expect(viewControls).toHaveAttribute("ordering", "date");
+      expect(viewControls).not.toHaveAttribute("ordering", "mediaStartTime");
+
+      // Verify setSort was not called (mediaStartTime option should not be available/attempted)
+      expect(regionsWithoutMediaConfig.setSort).not.toHaveBeenCalled();
+    });
+
+    it("does not support mediaStartTime when tags are mismatched (labels + video)", () => {
+      const regionsWithMismatchedConfig = {
+        ...mockRegions,
+        sort: "date",
+        annotation: {
+          names: new Map([
+            ["myLabels", { name: "myLabels", type: "labels" }],
+            ["myVideo", { name: "myVideo", type: "video" }],
+          ]),
+        },
+        regions: [],
+        filter: [],
+      };
+
+      render(<OutlinerPanel {...defaultProps} regions={regionsWithMismatchedConfig} />);
+
+      const viewControls = screen.getByTestId("view-controls");
+      expect(viewControls).toBeInTheDocument();
+      expect(viewControls).toHaveAttribute("ordering", "date");
+      expect(viewControls).not.toHaveAttribute("ordering", "mediaStartTime");
+
+      // Verify setSort was not called (mediaStartTime option should not be available/attempted)
+      expect(regionsWithMismatchedConfig.setSort).not.toHaveBeenCalled();
     });
   });
 });

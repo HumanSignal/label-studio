@@ -2,7 +2,7 @@ import { createContext, type FC, useCallback, useMemo } from "react";
 import { observer } from "mobx-react";
 
 import { LINK_COMMENT_MODE } from "../../../stores/Annotation/LinkingModes";
-import { Block } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { CommentItem } from "./CommentItem";
 
 export type CommentContextType = {
@@ -39,7 +39,7 @@ export const CommentsList: FC<{ commentStore: any }> = observer(({ commentStore 
 
 export const CommentsListInner: FC<{ commentStore: any }> = observer(({ commentStore }) => {
   return (
-    <Block name="comments-list">
+    <div className={cn("comments-list").toClassName()}>
       {commentStore.comments.map((comment: any) => (
         <CommentItem
           key={comment.id}
@@ -48,6 +48,6 @@ export const CommentsListInner: FC<{ commentStore: any }> = observer(({ commentS
           classificationsItems={commentStore.commentClassificationsItems}
         />
       ))}
-    </Block>
+    </div>
   );
 });

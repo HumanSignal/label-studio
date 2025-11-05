@@ -444,6 +444,8 @@ const designTokens = {
       12: "var(--font-size-12)",
       14: "var(--font-size-14)",
       16: "var(--font-size-16)",
+      18: "var(--font-size-18)",
+      20: "var(--font-size-20)",
       22: "var(--font-size-22)",
       24: "var(--font-size-24)",
       28: "var(--font-size-28)",

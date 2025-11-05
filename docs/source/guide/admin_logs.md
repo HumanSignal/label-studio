@@ -13,7 +13,7 @@ date: 2024-02-05 16:40:16
 
 You can view user logs from the **Organization > Activity Log** page. Only users with the Administrator or Owner role can access this page. 
 
-Currently, there is no limit for how long activity logs are retained. 
+Activity logs are retained for 180 days. 
 
 Logs include user ID, IP address, a timestamp, and the type of action performed by logging the API request. You can find out more about each action being performed by clicking the API request. 
 

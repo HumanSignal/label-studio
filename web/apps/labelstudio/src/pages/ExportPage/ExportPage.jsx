@@ -6,7 +6,7 @@ import { Modal } from "../../components/Modal/Modal";
 import { Space } from "../../components/Space/Space";
 import { useAPI } from "../../providers/ApiProvider";
 import { useFixedLocation, useParams } from "../../providers/RoutesProvider";
-import { BemWithSpecifiContext } from "../../utils/bem";
+import { BemWithSpecificContext } from "../../utils/bem";
 import { isDefined } from "../../utils/helpers";
 import "./ExportPage.scss";
 
@@ -23,7 +23,7 @@ const downloadFile = (blob, filename) => {
   link.click();
 };
 
-const { Block, Elem } = BemWithSpecifiContext();
+const { Block, Elem } = BemWithSpecificContext();
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 5000));
 

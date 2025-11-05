@@ -16,13 +16,11 @@ import { Dropdown } from "../../../common/Dropdown/Dropdown";
 // eslint-disable-next-line
 // @ts-ignore
 import { Menu } from "../../../common/Menu/Menu";
-import { BemWithSpecifiContext } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { SidePanelsContext } from "../SidePanelsContext";
 import "./ViewControls.scss";
 import { observer } from "mobx-react";
 import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
-
-const { Block, Elem } = BemWithSpecifiContext();
 
 export type GroupingOptions = "manual" | "label" | "type";
 
@@ -36,11 +34,17 @@ interface ViewControlsProps {
   regions: any;
   onOrderingChange: (ordering: OrderingOptions) => void;
   onGroupingChange: (grouping: GroupingOptions) => void;
-  onFilterChange: (filter: any) => void;
 }
 
+const mediaStartTimeSupportedTags = [
+  ["labels", "audio"],
+  ["labels", "videorectangle", "video"],
+  ["timelinelabels", "video"],
+  ["timeserieslabels", "timeseries"],
+];
+
 export const ViewControls: FC<ViewControlsProps> = observer(
-  ({ ordering, regions, orderingDirection, onOrderingChange, onGroupingChange, onFilterChange }) => {
+  ({ ordering, regions, orderingDirection, onOrderingChange, onGroupingChange }) => {
     const grouping = regions.group;
     const context = useContext(SidePanelsContext);
 
@@ -48,10 +52,12 @@ export const ViewControls: FC<ViewControlsProps> = observer(
     const mediaTimeSupport: boolean | null = useMemo(() => {
       const names = regions.annotation?.names;
       if (!names || names.size === 0) return null;
-      // Any object tag of type audio, video, or timeseries enables the option
-      return Array.from(names.values()).some(
-        (tag: any) => tag?.isObjectTag && ["audio", "video", "timeseries"].includes(tag.type),
-      );
+
+      const tags = Array.from(names.values());
+      // Check if all tag types from the tuple exist in the configuration
+      return mediaStartTimeSupportedTags.some((requiredTagTypes) => {
+        return requiredTagTypes.every((requiredType) => tags.some((tag: any) => tag?.type === requiredType));
+      });
     }, [regions.annotation?.names]);
 
     // Auto-fallback to "date" if current ordering is "mediaStartTime" but no media-time support in config
@@ -137,7 +143,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
     const renderOrderingDirectionIcon = orderingDirection === "asc" ? <IconSortUp /> : <IconSortDown />;
 
     return (
-      <Block name="view-controls" mod={{ collapsed: context.locked }}>
+      <div className={cn("view-controls").mod({ collapsed: context.locked }).toClassName()}>
         <Grouping
           value={grouping}
           options={["manual", "type", "label"]}
@@ -145,7 +151,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
           readableValueForKey={getGroupingLabels}
         />
         {grouping === "manual" && (
-          <Elem name="sort">
+          <div className={cn("view-controls").elem("sort").toClassName()}>
             <Grouping
               value={ordering}
               direction={orderingDirection}
@@ -156,10 +162,10 @@ export const ViewControls: FC<ViewControlsProps> = observer(
               extraIcon={renderOrderingDirectionIcon}
               width={230}
             />
-          </Elem>
+          </div>
         )}
         <ToggleRegionsVisibilityButton regions={regions} />
-      </Block>
+      </div>
     );
   },
 );
@@ -259,10 +265,10 @@ interface GroupingMenuItemProps<T extends string> {
 const GroupingMenuItem = <T extends string>({ value, name, label, direction, onChange }: GroupingMenuItemProps<T>) => {
   return (
     <Menu.Item name={name} onClick={() => onChange(name)}>
-      <Elem name="label">
+      <div className={cn("view-controls").elem("label").toClassName()}>
         {label.label}
         <DirectionIndicator direction={direction} name={name} value={value} />
-      </Elem>
+      </div>
     </Menu.Item>
   );
 };

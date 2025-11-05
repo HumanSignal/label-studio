@@ -108,11 +108,6 @@ export const FF_LEAD_TIME = "fflag_fix_front_lsdv_4600_lead_time_27072023_short"
 export const FF_LSDV_4620_3_ML = "fflag_fix_front_lsdv_4620_memory_leaks_100723_short";
 
 /**
- * Fixes how presigned urls are generated and accessed to remove possibility of CORS errors.
- */
-export const FF_LSDV_4711 = "fflag_fix_all_lsdv_4711_cors_errors_accessing_task_data_short";
-
-/**
  * Fixing issues related to selection tool functional (selecting hidden regions, onClick in Konva, interaction with regions inside selection area)
  *
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4930_selection_tool_fixes_240423_short
@@ -183,8 +178,6 @@ export const FF_BULK_ANNOTATION = "fflag_feat_all_leap_1181_bulk_annotation_shor
  * @link https://app.launchdarkly.com/projects/default/flags/fflag_feat_front_leap_1173_disable_postpone_skip_short
  */
 export const FF_LEAP_1173 = "fflag_feat_front_leap_1173_disable_postpone_skip_short";
-
-export const FF_PER_FIELD_COMMENTS = "fflag_feat_all_leap_1430_per_field_comments_100924_short";
 
 export const FF_IMAGE_MEMORY_USAGE = "fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short";
 

@@ -90,7 +90,7 @@ const isSyncedBuffering = ff.isActive(ff.FF_SYNCED_BUFFERING);
  * @param {string} [waveheight=32] - Minimum height of a waveform when in `splitchannels` mode with multiple channels to display.
  * @param {boolean} [spectrogram=false] - Determines whether an audio spectrogram is automatically displayed upon loading.
  * @param {boolean} [splitchannels=false] - Display multiple audio channels separately, if the audio file has more than one channel. (**NOTE: Requires more memory to operate.**)
- * @param {string} [decoder=webaudio] - Decoder type to use to decode audio data. (`"webaudio"` or `"ffmpeg"`)
+ * @param {string} [decoder=webaudio] - Decoder type to use to decode audio data. (`"webaudio"`, `"ffmpeg"`, or `"none"` for no decoding - provides fast loading for large files but disables waveform visualization)
  * @param {string} [player=html5] - Player type to use to play audio data. (`"html5"` or `"webaudio"`)
  */
 const TagAttrs = types.model({
@@ -114,7 +114,7 @@ const TagAttrs = types.model({
   autocenter: types.optional(types.boolean, true),
   scrollparent: types.optional(types.boolean, true),
   splitchannels: types.optional(types.boolean, false),
-  decoder: types.optional(types.enumeration(["ffmpeg", "webaudio"]), "webaudio"),
+  decoder: types.optional(types.enumeration(["ffmpeg", "webaudio", "none"]), "webaudio"),
   player: types.optional(types.enumeration(["html5", "webaudio"]), "html5"),
   spectrogram: types.optional(types.boolean, false),
 });

@@ -217,9 +217,8 @@ The manager respects all the same constraints as manual point creation:
 - `maxPoints` limit
 - `minPoints` requirement
 - `allowBezier` setting
-- `constrainToBounds` setting
 - `skeletonEnabled` mode
-- Canvas bounds when `constrainToBounds` is true
+- Canvas bounds (always enforced)
 
 ### Skeleton Mode Support
 

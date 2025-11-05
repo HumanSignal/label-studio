@@ -57,7 +57,9 @@ def create_tutorial_files():
     files_and_headers = []
     for file in readme_files:
         model_name = file.parts[-2]
-        tutorial_path = Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'tutorials' / f'{model_name}.md'
+        tutorial_path = (
+            Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'guide' / 'ml_tutorials' / f'{model_name}.md'
+        )
         tutorial_dir = os.path.dirname(tutorial_path)
         os.makedirs(tutorial_dir, exist_ok=True)
 
@@ -93,7 +95,7 @@ def update_ml_tutorials_index(files_and_headers: List):
             logging.error(f'No dict header found in {f} file. Skipping ...')
             continue
         print('Processing', f['model_name'])
-        card = {'title': h.get('title') or f['model_name'], 'url': f'/tutorials/{f["model_name"]}.html'}
+        card = {'title': h.get('title') or f['model_name'], 'url': f'/guide/ml_tutorials/{f["model_name"]}.html'}
         card.update(h)
         data['cards'].append(card)
 

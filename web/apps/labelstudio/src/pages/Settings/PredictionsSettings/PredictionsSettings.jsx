@@ -2,6 +2,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { Divider } from "../../../components/Divider/Divider";
 import { EmptyState, SimpleCard } from "@humansignal/ui";
 import { IconPredictions, Typography, IconExternal } from "@humansignal/ui";
+import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { useAPI } from "../../../providers/ApiProvider";
 import { ProjectContext } from "../../../providers/ProjectProvider";
 import { Spinner } from "../../../components/Spinner/Spinner";
@@ -13,6 +14,8 @@ export const PredictionsSettings = () => {
   const [versions, setVersions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
+
+  useUpdatePageTitle(createTitleFromSegments([project?.title, "Predictions Settings"]));
 
   const fetchVersions = useCallback(async () => {
     setLoading(true);

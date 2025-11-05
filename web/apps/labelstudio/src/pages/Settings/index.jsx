@@ -7,10 +7,7 @@ import { LabelingSettings } from "./LabelingSettings";
 import { MachineLearningSettings } from "./MachineLearningSettings/MachineLearningSettings";
 import { PredictionsSettings } from "./PredictionsSettings/PredictionsSettings";
 import { StorageSettings } from "./StorageSettings/StorageSettings";
-import { isInLicense, LF_CLOUD_STORAGE_FOR_MANAGERS } from "../../utils/license-flags";
 import "./settings.scss";
-
-const isAllowCloudStorage = !isInLicense(LF_CLOUD_STORAGE_FOR_MANAGERS);
 
 export const MenuLayout = ({ children, ...routeProps }) => {
   return (
@@ -21,7 +18,7 @@ export const MenuLayout = ({ children, ...routeProps }) => {
         AnnotationSettings,
         MachineLearningSettings,
         PredictionsSettings,
-        isAllowCloudStorage && StorageSettings,
+        StorageSettings,
         WebhookPage,
         DangerZone,
       ].filter(Boolean)}
@@ -36,11 +33,10 @@ const pages = {
   LabelingSettings,
   MachineLearningSettings,
   PredictionsSettings,
+  StorageSettings,
   WebhookPage,
   DangerZone,
 };
-
-isAllowCloudStorage && (pages.StorageSettings = StorageSettings);
 
 export const SettingsPage = {
   title: "Settings",

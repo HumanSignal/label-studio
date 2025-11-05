@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { observer } from "mobx-react";
 import { Button, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import { FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
@@ -23,23 +23,23 @@ export const CurrentTask = observer(({ store }) => {
     store.hasInterface("postpone");
 
   return (
-    <Elem name="section">
-      <Block name="current-task" mod={{ "with-history": historyEnabled }}>
-        <Elem name="task-id">
+    <div className={cn("bottombar").elem("section").toClassName()}>
+      <div className={cn("current-task").mod({ "with-history": historyEnabled }).toClassName()}>
+        <div className={cn("current-task").elem("task-id").toClassName()}>
           {store.task.id ?? guidGenerator()}
           {historyEnabled &&
             (isFF(FF_TASK_COUNT_FIX) ? (
-              <Elem name="task-count">
+              <div className={cn("current-task").elem("task-count").toClassName()}>
                 {store.queuePosition} of {store.queueTotal}
-              </Elem>
+              </div>
             ) : (
-              <Elem name="task-count">
+              <div className={cn("current-task").elem("task-count").toClassName()}>
                 {currentIndex} of {store.taskHistory.length}
-              </Elem>
+              </div>
             ))}
-        </Elem>
+        </div>
         {historyEnabled && (
-          <Elem name="history-controls">
+          <div className={cn("current-task").elem("history-controls").toClassName()}>
             <Button
               variant="neutral"
               data-testid="prev-task"
@@ -56,9 +56,9 @@ export const CurrentTask = observer(({ store }) => {
             >
               <IconChevronRight />
             </Button>
-          </Elem>
+          </div>
         )}
-      </Block>
-    </Elem>
+      </div>
+    </div>
   );
 });

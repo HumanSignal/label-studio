@@ -1,7 +1,6 @@
 import { observer } from "mobx-react";
 import { forwardRef, useCallback, useMemo } from "react";
-import { Block, Elem } from "../../utils/bem";
-import { FF_LSDV_4711, isFF } from "../../utils/feature-flags";
+import { cn } from "../../utils/bem";
 import messages from "../../utils/messages";
 import { ErrorMessage } from "../ErrorMessage/ErrorMessage";
 import "./Image.scss";
@@ -42,7 +41,7 @@ export const Image = observer(
     );
 
     return (
-      <Block name="image" style={imageSize}>
+      <div className={cn("image").toClassName()} style={imageSize}>
         {overlay}
         <ImageProgress
           downloading={imageEntity.downloading}
@@ -61,25 +60,29 @@ export const Image = observer(
             imageTransform={imageTransform}
           />
         ) : null}
-      </Block>
+      </div>
     );
   }),
 );
 
 const ImageProgress = observer(({ downloading, progress, error, src, usedValue }) => {
   return downloading ? (
-    <Block name="image-progress">
-      <Elem name="message">Downloading image</Elem>
-      <Elem tag="progress" name="bar" value={progress} min="0" max={1} step={0.0001} />
-    </Block>
+    <div className={cn("image-progress").toClassName()}>
+      <div className={cn("image-progress").elem("message").toClassName()}>Downloading image</div>
+      <progress
+        className={cn("image-progress").elem("bar").toClassName()}
+        value={progress}
+        min="0"
+        max={1}
+        step={0.0001}
+      />
+    </div>
   ) : error ? (
     <ImageLoadingError src={src} value={usedValue} />
   ) : null;
 });
 
-const imgDefaultProps = {};
-
-if (isFF(FF_LSDV_4711)) imgDefaultProps.crossOrigin = "anonymous";
+const imgDefaultProps = { crossOrigin: "anonymous" };
 
 const ImageRenderer = observer(
   forwardRef(({ src, onLoad, imageTransform, isLoaded }, ref) => {
@@ -95,7 +98,11 @@ const ImageRenderer = observer(
         clip: "rect(1px, 1px, 1px, 1px)",
       };
 
-      return { ...style, maxWidth: "unset", visibility: isLoaded ? "visible" : "hidden" };
+      return {
+        ...style,
+        maxWidth: "unset",
+        visibility: isLoaded ? "visible" : "hidden",
+      };
     }, [imageTransform, isLoaded]);
 
     // biome-ignore lint/a11y/noRedundantAlt: The use of this component justifies this alt text

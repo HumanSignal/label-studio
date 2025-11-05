@@ -581,7 +581,7 @@ DATA_UNDEFINED_NAME = '$undefined$'
 LICENSE = {}
 VERSIONS = {}
 VERSION_EDITION = 'Community'
-LATEST_VERSION_CHECK = True
+LATEST_VERSION_CHECK = get_bool_env('LATEST_VERSION_CHECK', True)
 VERSIONS_CHECK_TIME = 0
 ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
 CONVERTER_DOWNLOAD_RESOURCES = get_bool_env('CONVERTER_DOWNLOAD_RESOURCES', True)
@@ -611,6 +611,7 @@ DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
 DATA_MANAGER_CUSTOM_FILTER_EXPRESSIONS = 'data_manager.functions.custom_filter_expressions'
 DATA_MANAGER_PREPROCESS_FILTER = 'data_manager.functions.preprocess_filter'
+DATA_MANAGER_CHECK_ACTION_PERMISSION = 'data_manager.actions.check_action_permission'
 BULK_UPDATE_IS_LABELED = 'tasks.functions.bulk_update_is_labeled_by_overlap'
 USER_LOGIN_FORM = 'users.forms.LoginForm'
 PROJECT_MIXIN = 'projects.mixins.ProjectMixin'
@@ -630,7 +631,6 @@ STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerial
 TASK_SERIALIZER_BULK = 'tasks.serializers.BaseTaskSerializerBulk'
 PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
 INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
-STORAGE_PERMISSION = 'io_storages.permissions.StoragePermission'
 PROJECT_IMPORT_PERMISSION = 'projects.permissions.ProjectImportPermission'
 DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
 FEATURE_FLAGS_GET_USER_REPR = 'core.feature_flags.utils.get_user_repr'
@@ -711,6 +711,7 @@ FUTURE_SAVE_TASK_TO_STORAGE_JSON_EXT = get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE
 STORAGE_IN_PROGRESS_TIMER = float(get_env('STORAGE_IN_PROGRESS_TIMER', 5.0))
 STORAGE_EXPORT_CHUNK_SIZE = int(get_env('STORAGE_EXPORT_CHUNK_SIZE', 100))
 DEFAULT_STORAGE_LIST_LIMIT = int(get_env('DEFAULT_STORAGE_LIST_LIMIT', 100))
+STORAGE_EXISTED_COUNT_BATCH_SIZE = int(get_env('STORAGE_EXISTED_COUNT_BATCH_SIZE', 1000))
 
 USE_NGINX_FOR_EXPORT_DOWNLOADS = get_bool_env('USE_NGINX_FOR_EXPORT_DOWNLOADS', False)
 USE_NGINX_FOR_UPLOADS = get_bool_env('USE_NGINX_FOR_UPLOADS', True)
@@ -899,3 +900,7 @@ DM_MAX_USERS_TO_DISPLAY = int(get_env('DM_MAX_USERS_TO_DISPLAY', 10))
 
 # Base FSM (Finite State Machine) Configuration for Label Studio
 FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
+
+# Used for async migrations. In LSE this is set to a real queue name, including here so we
+# can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
+SERVICE_QUEUE_NAME = get_env('SERVICE_QUEUE_NAME', 'default')
