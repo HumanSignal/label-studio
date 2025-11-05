@@ -17,29 +17,25 @@ config: |
   <View>
     <Style>
       .chat {
-        border: 1px solid #ccc;
-        padding: 10px;
-        border-radius: 5px;
+        border: 1px solid var(--color-neutral-border);
+        padding: var(--spacing-tight);
+        border-radius: var(--corner-radius-medium);
+        background-color: var(--color-neutral-background);
       }
       .evaluation {
-          border: 2px solid var(--color-kale-600);
-          background-color: var(--color-kale-100);
-          color: var(--color-kale-900);
-          padding: 10px;
+          border: 2px solid var(--color-accent-kale-base);
+          background-color: var(--color-accent-kale-subtlest);
+          color: var(--color-accent-kale-bold);
+          padding: var(--spacing-tight);
           border-radius: 5px;
           margin-bottom: 20px;
       }
-     
-      <!-- Ensure choice text is visible in dark mode -->
-      .evaluation span {
-         color: var(--color-kale-900);
-      }
       
       .instructions {
-        color: var(--color-kale-900);
-        background-color: var(--color-kale-100);
-        padding-top: 15px;
-        padding-bottom: 15px;
+        color: var(--color-accent-kale-bold);
+        background-color: var(--color-accent-kale-subtlest);
+        padding-top: var(--spacing-base);
+        padding-bottom: var(--spacing-base);
       }
       <!-- Allow enlarging the instruction text -->
       .lsf-richtext__container.lsf-htx-richtext {
@@ -49,10 +45,11 @@ config: |
       
       <!-- Remove excess height from the chat to allow space for instruction text -->
       .htx-chat { 
-        --excess-height: 275px 
+        --excess-height: 275px;
+        background-color: var(--color-neutral-background);
       }
     </Style>
-    <View style="display: flex; gap: 24px;">
+    <View style="display: flex; gap: var(--spacing-wide);">
       
       <!-- Left: conversation -->
       <View className="chat" style="flex: 2;">
@@ -69,7 +66,7 @@ config: |
 
       <!-- Right: message-level evaluation -->
       <View style="flex: 1;" className="evaluation">
-        <View style="position:sticky;top:14px">
+        <View style="position:sticky;top: var(--spacing-base);">
           
           <!-- Only visible when no message is selected -->
           <View visibleWhen="no-region-selected">
@@ -125,4 +122,6 @@ config: |
       "chat": []
     }
   } -->
+
+
 

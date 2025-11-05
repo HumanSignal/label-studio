@@ -1,4 +1,4 @@
-title: Fine-tune an Agent without an LLM
+title: Fine-Tune an Agent without an LLM
 type: enterprise
 group: Chat
 order: 3
@@ -19,17 +19,20 @@ config: |
       .lsf-richtext__container.lsf-htx-richtext {
         font-size: 16px !important;
         line-height: 1.6;
-        padding-top: 10px;
-        padding-bottom: 10px;
-        background-color: var(--color-kiwi-100);
-        color: var(--color-kiwi-800);
+        padding-top: var(--spacing-tight);
+        padding-bottom: var(--spacing-tight);
+        background-color: var(--color-accent-kiwi-subtlest);
+        color: var(--color-accent-kiwi-bold);
+        border-radius: var(--corner-radius-medium);
     }
-    <!-- Remove excess height from the chat to allow space for instruction text -->
+      <!-- Remove excess height from the chat to allow space for instruction text -->
       .htx-chat { 
-        --excess-height: 275px 
+        --excess-height: 275px;
+      
+        background-color: var(--color-neutral-background);
       }
 
-  </Style>
+    </Style>
     
     <Text name="instructions" value="$text" />
     
@@ -45,4 +48,6 @@ config: |
       "chat": []
     }
   } -->
+
+
 

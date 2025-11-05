@@ -16,7 +16,7 @@ details: |
 config: |
   <View>
     <Style>
-      .htx-pdf { calc(100vh - 250px) }
+      .htx-pdf { calc(100vh - 250px); }
     </Style>
     <Header value="Select text to correct" size="4"/>
     <OcrLabels name="ocr" toName="pdf">
@@ -32,4 +32,6 @@ config: |
       "pdf": "/static/samples/opossum-cuteness.pdf"
     }
   } -->
+
+
 

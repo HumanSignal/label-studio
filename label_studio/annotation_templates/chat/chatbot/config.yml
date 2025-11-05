@@ -17,33 +17,34 @@ config: |
   <View>
     <Style>
       .chat {
-        border: 1px solid #ccc;
-        padding: 10px;
-        border-radius: 5px;
+        border: 1px solid var(--color-neutral-border);
+        padding: var(--spacing-tight);
+        border-radius: var(--corner-radius-medium);
+        background-color: var(--color-neutral-background);
       }
       .evaluation {
-          border: 2px solid var(--color-blueberry-800);
-          background: var(--color-blueberry-100);
-          color: var(--color-blueberry-900);
-          padding: 10px;
-          border-radius: 5px;
-          margin-bottom: 20px;
+          border: 2px solid var(--color-accent-blueberry-base);
+          background: var(--color-accent-blueberry-subtlest);
+          color: var(--color-accent-blueberry-bold);
+          padding: var(--spacing-tight);
+          border-radius: var(--corner-radius-medium);
+          margin-bottom: var(--spacing-base);
       }
       /* Choice text */
       .evaluation span {
-          color: var(--color-blueberry-900);
+          color: var(--color-accent-blueberry-bold);
           line-height: 1.1;
       }
       /* Star rating */
       .evaluation .ant-rate-star.ant-rate-star-full span {
-        color: #f4aa2a;
+        color: var(--color-accent-blueberry-base);
       }
       
       .instructions {
-          color: var(--color-blueberry-900);
-          background-color: var(--color-blueberry-100);
-          padding-top: 15px;
-          padding-bottom: 15px;
+          color: var(--color-accent-blueberry-bold);
+          background-color: var(--color-accent-blueberry-subtlest);
+          padding-top: var(--spacing-base);
+          padding-bottom: var(--spacing-base);
       }
       /* Allow enlarging the instruction text */
       .lsf-richtext__container.lsf-htx-richtext {
@@ -53,15 +54,15 @@ config: |
       
       /* Remove excess height from the chat to allow space for instruction text */
       .htx-chat { 
-        --excess-height: 275px 
+        --excess-height: 275px;
       }
     </Style>
-    <View style="display: flex; gap: 24px;">
+    <View style="display: flex; gap: var(--spacing-base);">
       
       <!-- Left: conversation -->
       <View className="chat" style="flex: 2;">
         <View className="instructions">
-          <Text name="instructions" value="Review the conversation in detail. As you read through it, click on individual messages to provide feedback about accuracy, clarity, and intent." />
+          <Text name="instructions" value="Review the conversation in detail. As you read through it, click on individual assistant messages to provide feedback about accuracy, clarity, and intent." />
         </View>
         
         <Chat name="chat" value="$chat" 
@@ -99,9 +100,23 @@ config: |
               <Choice value="Too technical" />
             </Choices>
             
-          </View>
         </View>
       </View>
     </View>
   </View>
+
+  <!-- { "data": {
+    "instructions": "Review the conversation in detail. As you read through it, click on individual messages to provide feedback about accuracy, clarity, and intent.",
+    "chat": [
+      {
+        "role": "user",
+        "content": "I'm onboarding a new annotator. What are the first steps to ensure quality and speed?"
+      },
+      {
+        "role": "assistant",
+        "content": "Start by creating their account and assigning the Annotator role so permissions are scoped correctly. Add concise labeling instructions that appear before labeling. Use a small ground-truth set and require overlap (e.g., 2 annotators per task) with a reviewer to resolve disagreements. Enable comments so reviewers can leave precise, in-task feedback."
+      }
+    ],
+    "max": 10
+  }} -->
 

@@ -17,37 +17,28 @@ config: |
   <View>
   <Style>
       .chat {
-        border: 1px solid #ccc;
-        padding: 10px;
-        border-radius: 5px;
+        border: 1px solid var(--color-neutral-border);
+        padding: var(--spacing-tight);
+        border-radius: var(--corner-radius-medium);
+        background-color: var(--color-neutral-background);
       }
 
       <!-- Styling for evaluation panel on the right-->
       .evaluation {
-          border: 2px solid var(--color-plum-800);
-          background-color: var(--color-plum-000);
-          color: var(--color-plum-900);
-          padding: 10px;
-          border-radius: 5px;
-          margin-bottom: 20px;
-      }
-
-      <!-- Styling for choices text color so that it is visible in dark mode-->
-      .evaluation .lsf-choices span {
-          color: var(--color-plum-900);
+          border: 2px solid var(--color-accent-plum-base);
+          background-color: var(--color-accent-plum-subtlest);
+          color: var(--color-accent-plum-bold);
+          padding: var(--spacing-tight);
+          border-radius: var(--corner-radius-medium);
+          margin-bottom: var(--spacing-base);
       }
 
       <!-- Styling for the instructions above the chat interface-->
       .instructions {
-        color: var(--color-plum-900);
-        background-color: var(--color-plum-000);
-        padding-top: 15px;
-        padding-bottom: 15px;
-      }
-      
-      <!-- Ensure submitted comment text is still readable in dark mode -->
-      [data-color-scheme="dark"] .lsf-row p {
-          color: var(--color-sand-100);
+        color: var(--color-accent-plum-bold);
+        background-color: var(--color-accent-plum-subtlest);
+        padding-top: var(--spacing-base);
+        padding-bottom: var(--spacing-base);
       }
       
       <!-- Allow enlarging the instruction text to better differentiate it-->
@@ -60,7 +51,7 @@ config: |
         --excess-height: 300px 
       }
     </Style>
-    <View style="display: flex; gap: 24px;">
+    <View style="display: flex; gap: var(--spacing-wide);">
       
       <!-- Left: chat and instructions -->
       <View className="chat" style="flex: 2;">
