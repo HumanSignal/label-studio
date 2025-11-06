@@ -72,9 +72,7 @@ export const Inner = () => {
       bare
     >
       <Modal.Header divided>
-        <div className={cn("modal").elem("title").toClassName()}>
-          Import Data
-        </div>
+        <div className={cn("modal").elem("title").toClassName()}>Import Data</div>
 
         <Space>
           <Button

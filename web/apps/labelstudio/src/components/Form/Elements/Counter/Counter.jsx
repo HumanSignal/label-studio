@@ -152,11 +152,15 @@ const CounterButton = ({ type }) => {
   const compareLimit = type === "increase" ? max : min;
 
   return (
+    // biome-ignore lint/a11y/useValidAnchor: Legacy counter design uses anchor for styling
     <a
-      className={cn("counter").elem("btn").mod({
-        type,
-        disabled: currentValue === compareLimit || disabled,
-      }).toClassName()}
+      className={cn("counter")
+        .elem("btn")
+        .mod({
+          type,
+          disabled: currentValue === compareLimit || disabled,
+        })
+        .toClassName()}
       href="#"
       onClick={onClickHandler(type, ref)}
       onMouseDownCapture={(e) => e.preventDefault()}

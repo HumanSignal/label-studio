@@ -551,9 +551,7 @@ const Configurator = ({
           <Form.Actions size="small" extra={configure === "code" && extra} valid>
             {saved && (
               <div className={cn("form-indicator").toClassName()}>
-                <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()}>
-                  Saved!
-                </span>
+                <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()}>Saved!</span>
               </div>
             )}
             <Button

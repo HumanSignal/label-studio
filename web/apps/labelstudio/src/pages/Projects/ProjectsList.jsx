@@ -37,10 +37,12 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, 
 export const EmptyProjectsList = ({ openModal }) => {
   return (
     <div className={cn("empty-projects-page").toClassName()}>
-      <img className={cn("empty-projects-page").elem("heidi").toClassName()} src={absoluteURL("/static/images/opossum_looking.png")} />
-      <h1 className={cn("empty-projects-page").elem("header").toClassName()}>
-        Heidi doesn't see any projects here!
-      </h1>
+      <img
+        alt="Heidi looking for projects"
+        className={cn("empty-projects-page").elem("heidi").toClassName()}
+        src={absoluteURL("/static/images/opossum_looking.png")}
+      />
+      <h1 className={cn("empty-projects-page").elem("header").toClassName()}>Heidi doesn't see any projects here!</h1>
       <p>Create one and start labeling your data.</p>
       <Button onClick={openModal} className="my-8" aria-label="Create new project">
         Create Project
@@ -70,7 +72,11 @@ const ProjectCard = ({ project }) => {
   }, [color]);
 
   return (
-    <NavLink className={cn("projects-page").elem("link").toClassName()} to={`/projects/${project.id}/data`} data-external>
+    <NavLink
+      className={cn("projects-page").elem("link").toClassName()}
+      to={`/projects/${project.id}/data`}
+      data-external
+    >
       <div className={cn("project-card").mod({ colored: !!color }).toClassName()} style={projectColors}>
         <div className={cn("project-card").elem("header").toClassName()}>
           <div className={cn("project-card").elem("title").toClassName()}>
@@ -121,7 +127,9 @@ const ProjectCard = ({ project }) => {
         </div>
         <div className={cn("project-card").elem("description").toClassName()}>{project.description}</div>
         <div className={cn("project-card").elem("info").toClassName()}>
-          <div className={cn("project-card").elem("created-date").toClassName()}>{format(new Date(project.created_at), "dd MMM 'yy, HH:mm")}</div>
+          <div className={cn("project-card").elem("created-date").toClassName()}>
+            {format(new Date(project.created_at), "dd MMM 'yy, HH:mm")}
+          </div>
           <div className={cn("project-card").elem("created-by").toClassName()}>
             <Userpic src="#" user={project.created_by} showUsernameTooltip />
           </div>

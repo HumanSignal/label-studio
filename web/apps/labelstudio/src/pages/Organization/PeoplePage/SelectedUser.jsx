@@ -43,9 +43,7 @@ export const SelectedUser = ({ user, onClose }) => {
         <Userpic user={user} style={{ width: 64, height: 64, fontSize: 28 }} />
         <div className={cn("user-info").elem("info-wrapper").toClassName()}>
           {fullName && <div className={cn("user-info").elem("full-name").toClassName()}>{fullName}</div>}
-          <p className={cn("user-info").elem("email").toClassName()}>
-            {user.email}
-          </p>
+          <p className={cn("user-info").elem("email").toClassName()}>{user.email}</p>
         </div>
       </div>
 

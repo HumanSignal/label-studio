@@ -65,30 +65,26 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
             <div className={cn("people-list").elem("users").toClassName()}>
               <div className={cn("people-list").elem("header").toClassName()}>
                 <div className={cn("people-list").elem("column").mix("avatar").toClassName()} />
-                <div className={cn("people-list").elem("column").mix("email").toClassName()}>
-                  Email
-                </div>
-                <div className={cn("people-list").elem("column").mix("name").toClassName()}>
-                  Name
-                </div>
-                <div className={cn("people-list").elem("column").mix("last-activity").toClassName()}>
-                  Last Activity
-                </div>
+                <div className={cn("people-list").elem("column").mix("email").toClassName()}>Email</div>
+                <div className={cn("people-list").elem("column").mix("name").toClassName()}>Name</div>
+                <div className={cn("people-list").elem("column").mix("last-activity").toClassName()}>Last Activity</div>
               </div>
               <div className={cn("people-list").elem("body").toClassName()}>
                 {usersList.map(({ user }) => {
                   const active = user.id === selectedUser?.id;
 
                   return (
-                    <div key={`user-${user.id}`} className={cn("people-list").elem("user").mod({ active }).toClassName()} onClick={() => selectUser(user)}>
+                    <div
+                      key={`user-${user.id}`}
+                      className={cn("people-list").elem("user").mod({ active }).toClassName()}
+                      onClick={() => selectUser(user)}
+                    >
                       <div className={cn("people-list").elem("field").mix("avatar").toClassName()}>
                         <CopyableTooltip title={`User ID: ${user.id}`} textForCopy={user.id}>
                           <Userpic user={user} style={{ width: 28, height: 28 }} />
                         </CopyableTooltip>
                       </div>
-                      <div className={cn("people-list").elem("field").mix("email").toClassName()}>
-                        {user.email}
-                      </div>
+                      <div className={cn("people-list").elem("field").mix("email").toClassName()}>{user.email}</div>
                       <div className={cn("people-list").elem("field").mix("name").toClassName()}>
                         {user.first_name} {user.last_name}
                       </div>

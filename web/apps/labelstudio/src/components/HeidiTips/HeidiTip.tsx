@@ -16,7 +16,13 @@ const HeidiLink: FC<{ link: Tip["link"]; onClick: () => void }> = ({ link, onCli
   }, [link]);
 
   return (
-    <a className={cn("heidy-tip").elem("link").toClassName()} href={url} target="_blank" onClick={onClick}>
+    <a
+      className={cn("heidy-tip").elem("link").toClassName()}
+      href={url}
+      target="_blank"
+      onClick={onClick}
+      rel="noreferrer"
+    >
       {link.label}
     </a>
   );

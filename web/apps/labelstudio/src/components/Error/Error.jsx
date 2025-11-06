@@ -69,7 +69,11 @@ export const ErrorWrapper = ({
           {validation.map(([field, errors]) => (
             <Fragment key={field}>
               {[].concat(errors).map((err, i) => (
-                <li key={i} className={cn("error-message").elem("message").toClassName()} dangerouslySetInnerHTML={{ __html: sanitizeHtml(err) }} />
+                <li
+                  key={i}
+                  className={cn("error-message").elem("message").toClassName()}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(err) }}
+                />
               ))}
             </Fragment>
           ))}
@@ -88,7 +92,12 @@ export const ErrorWrapper = ({
       {!minimal && (
         <div className={cn("error-message").elem("actions").toClassName()}>
           <Space spread>
-            <Button className={cn("error-message").elem("action-slack").toClassName()} target="_blank" icon={<IconSlack />} href={SLACK_INVITE_URL}>
+            <Button
+              className={cn("error-message").elem("action-slack").toClassName()}
+              target="_blank"
+              icon={<IconSlack />}
+              href={SLACK_INVITE_URL}
+            >
               Ask on Slack
             </Button>
 
