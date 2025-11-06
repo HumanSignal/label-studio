@@ -12,7 +12,6 @@ from django.test import TestCase
 from fsm.registry import (
     register_state_model,
     register_state_transition,
-    state_choices_registry,
     state_model_registry,
     transition_registry,
 )
@@ -35,11 +34,6 @@ class RegistryTests(TestCase):
     """Tests for registry functionality and edge cases"""
 
     def setUp(self):
-        # Clear registries to ensure clean state
-        state_choices_registry.clear()
-        state_model_registry.clear()
-        transition_registry.clear()
-
         self.entity = MockEntity()
 
     def test_registry_state_model_with_denormalizer(self):

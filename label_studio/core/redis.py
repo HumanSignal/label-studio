@@ -4,9 +4,11 @@ import logging
 import sys
 from datetime import timedelta
 from functools import partial
+from typing import Any
 
 import django_rq
 import redis
+from core.current_request import CurrentContext
 from django.conf import settings
 from django_rq import get_connection
 from rq.command import send_stop_job_command
@@ -80,6 +82,40 @@ def redis_connected():
     return redis_healthcheck()
 
 
+def _is_serializable(value: Any) -> bool:
+    """Check if a value can be serialized for job context."""
+    return isinstance(value, (str, int, float, bool, list, dict, type(None)))
+
+
+def _capture_context() -> dict:
+    """
+    Capture the current context for passing to a job.
+    Returns a dictionary of context data that can be serialized.
+    """
+    context_data = {}
+
+    # Get user information
+    if user := CurrentContext.get_user():
+        context_data['user_id'] = user.id
+
+    # Get organization if set separately
+    if org_id := CurrentContext.get_organization_id():
+        context_data['organization_id'] = org_id
+
+    # If organization_id is not set, try to get it from the user, this ensures that we have an organization_id for the job
+    # And it prefers the original requesting user's organization_id over the current active organization_id of the user which could change during async jobs
+    if not org_id and user and hasattr(user, 'active_organization_id') and user.active_organization_id:
+        context_data['organization_id'] = user.active_organization_id
+
+    # Get any custom context values (exclude non-serializable objects)
+    job_data = CurrentContext.get_job_data()
+    for key, value in job_data.items():
+        if key not in ['user', 'request'] and _is_serializable(value):
+            context_data[key] = value
+
+    return context_data
+
+
 def redis_get(key):
     if not redis_healthcheck():
         return
@@ -112,7 +148,9 @@ def redis_delete(key):
 
 def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     """
-    Start job async with redis or sync if redis is not connected
+    Start job async with redis or sync if redis is not connected.
+    Automatically preserves context for async jobs and clears it after completion.
+
     :param job: Job function
     :param args: Function arguments
     :param in_seconds: Job will be delayed for in_seconds
@@ -122,28 +160,29 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
 
     redis = redis_connected() and kwargs.get('redis', True)
     queue_name = kwargs.get('queue_name', 'default')
+
     if 'queue_name' in kwargs:
         del kwargs['queue_name']
     if 'redis' in kwargs:
         del kwargs['redis']
+
     job_timeout = None
     if 'job_timeout' in kwargs:
         job_timeout = kwargs['job_timeout']
         del kwargs['job_timeout']
-    if redis:
-        # Auto-capture request_id from thread local and pass it via job meta
-        try:
-            from label_studio.core.current_request import _thread_locals
 
-            request_id = getattr(_thread_locals, 'request_id', None)
-            if request_id:
-                # Store in job meta for worker access
+    if redis:
+        # Async execution with Redis - wrap job for context management
+        try:
+            context_data = _capture_context()
+
+            if context_data:
                 meta = kwargs.get('meta', {})
-                meta['request_id'] = request_id
+                # Store context data in job meta for worker access
+                meta.update(context_data)
                 kwargs['meta'] = meta
         except Exception:
-            # Fail silently if no request context
-            pass
+            logger.info(f'Failed to capture context for job {job.__name__} on queue {queue_name}')
 
         try:
             args_info = _truncate_args_for_logging(args, kwargs)
@@ -154,6 +193,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         enqueue_method = queue.enqueue
         if in_seconds > 0:
             enqueue_method = partial(queue.enqueue_in, timedelta(seconds=in_seconds))
+
         job = enqueue_method(
             job,
             *args,
@@ -164,8 +204,10 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
         return job
     else:
         on_failure = kwargs.pop('on_failure', None)
+
         try:
-            return job(*args, **kwargs)
+            result = job(*args, **kwargs)
+            return result
         except Exception:
             exc_info = sys.exc_info()
             if on_failure:

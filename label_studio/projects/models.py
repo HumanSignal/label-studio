@@ -34,6 +34,7 @@ from django.db.models import Avg, BooleanField, Case, Count, GeneratedField, JSO
 from django.db.models.expressions import RawSQL
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from fsm.models import FsmHistoryStateModel
 from label_studio_sdk._extensions.label_studio_tools.core.label_config import parse_config
 from labels_manager.models import Label
 from projects.functions import (
@@ -125,7 +126,7 @@ ProjectMixin = load_func(settings.PROJECT_MIXIN)
 recalculate_all_stats = load_func(settings.RECALCULATE_ALL_STATS)
 
 
-class Project(ProjectMixin, models.Model):
+class Project(ProjectMixin, FsmHistoryStateModel):
     class SkipQueue(models.TextChoices):
         # requeue to the end of the same annotator’s queue => annotator gets this task at the end of the queue
         REQUEUE_FOR_ME = 'REQUEUE_FOR_ME', 'Requeue for me'
@@ -851,6 +852,12 @@ class Project(ProjectMixin, models.Model):
                     summary.reset()
                 elif self.num_annotations == 0 and self.num_drafts == 0:
                     summary.reset(tasks_data_based=False)
+
+    # ============================================================================
+    # FSM Integration
+    # ============================================================================
+    # Project uses FsmHistoryStateModel for FSM integration. All transition logic is defined
+    # in projects/transitions.py with declarative triggers. No custom methods needed.
 
     def get_member_ids(self):
         if hasattr(self, 'team_link'):

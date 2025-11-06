@@ -1,17 +1,29 @@
 """
-UUID7 utilities for time-series optimization.
+FSM utility functions.
+
+This module provides:
+1. UUID7 utilities for time-series optimization (uses uuid-utils library)
+2. FSM-specific helper functions for organization resolution and state management
 
 UUID7 provides natural time ordering and global uniqueness, making it ideal
 for INSERT-only architectures with millions of records.
-
-Uses the uuid-utils library for RFC 9562 compliant UUID7 generation.
 """
 
+import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Optional, Tuple
 
 import uuid_utils
+from core.current_request import CurrentContext
+from core.feature_flags import flag_set
+
+logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# UUID7 Utilities (using uuid-utils library)
+# =============================================================================
 
 
 def generate_uuid7() -> uuid.UUID:
@@ -188,3 +200,308 @@ class UUID7Generator:
         # UUID7 format: timestamp_ms(48) + ver(4) + rand_a(12) + var(2) + rand_b(62)
         uuid_int = (timestamp_ms << 80) | (0x7 << 76) | ((self._counter & 0xFFF) << 64) | (0b10 << 62)
         return uuid.UUID(int=uuid_int)
+
+
+# =============================================================================
+# FSM Helper Utilities
+# =============================================================================
+
+
+def resolve_organization_id(entity=None, user=None):
+    """
+    Resolve organization_id using consistent logic without additional queries.
+
+    This provides organization_id resolution for logging and state tracking
+    without duplicating database queries.
+
+    Args:
+        entity: The entity to resolve organization_id for
+        user: Optional user for fallback organization resolution
+
+    Returns:
+        organization_id or None
+    """
+    # Try context cache first
+    organization_id = CurrentContext.get_organization_id()
+    if organization_id:
+        return organization_id
+
+    # Allow for function calls without entity
+    if entity is None:
+        return None
+
+    # Try direct organization_id attribute first
+    organization_id = getattr(entity, 'organization_id', None)
+
+    # If entity doesn't have direct organization_id, try relationships
+    if not organization_id:
+        # For entities with project relationship (most common case)
+        if hasattr(entity, 'project') and entity.project:
+            organization_id = getattr(entity.project, 'organization_id', None)
+        # For entities with task.project relationship
+        elif hasattr(entity, 'task') and entity.task and hasattr(entity.task, 'project') and entity.task.project:
+            organization_id = getattr(entity.task.project, 'organization_id', None)
+
+    # Fallback to user's active organization
+    if not organization_id and user and hasattr(user, 'active_organization') and user.active_organization:
+        organization_id = user.active_organization.id
+
+    # Cache the result in current context if we found an organization_id
+    if organization_id is not None:
+        CurrentContext.set_organization_id(organization_id)
+
+    return organization_id
+
+
+def is_fsm_enabled(user=None) -> bool:
+    """
+    Check if FSM is enabled via feature flags and thread-local override.
+
+    The check order is:
+    1. Check thread-local override (for test cleanup, bulk operations)
+    2. Check feature flag
+
+    Args:
+        user: User for feature flag evaluation (optional)
+
+    Returns:
+        True if FSM should be active
+    """
+    # Check thread-local override first
+    if CurrentContext.is_fsm_disabled():
+        return False
+
+    # Then check feature flag
+    return flag_set('fflag_feat_fit_568_finite_state_management', user=user)
+
+
+def get_current_state_safe(entity, user=None) -> Optional[str]:
+    """
+    Safely get current state with error handling.
+
+    Args:
+        entity: The entity to get state for
+        user: The user making the request (for feature flag checking)
+
+    Returns:
+        Current state string or None if failed
+    """
+    if not is_fsm_enabled(user):
+        return None
+
+    try:
+        from fsm.state_manager import get_state_manager
+
+        StateManager = get_state_manager()
+        return StateManager.get_current_state_value(entity)
+    except Exception as e:
+        logger.warning(
+            f'Failed to get current state for {entity._meta.label_lower} {entity.pk}: {str(e)}',
+            extra={
+                'event': 'fsm.get_state_error',
+                'entity_type': entity._meta.label_lower,
+                'entity_id': entity.pk,
+                'organization_id': resolve_organization_id(entity, user),
+                'error': str(e),
+            },
+        )
+        return None
+
+
+def infer_entity_state_from_data(entity) -> Optional[str]:
+    """
+    Infer what the FSM state should be based on entity's current data.
+
+    This is used for "cold start" scenarios where entities exist in the database
+    but don't have FSM state records yet (e.g., after FSM deployment to production
+    with pre-existing data).
+
+    Args:
+        entity: The entity to infer state for (Task, Project, or Annotation)
+
+    Returns:
+        Inferred state value, or None if entity type not supported
+
+    Examples:
+        >>> task = Task.objects.get(id=123)
+        >>> task.is_labeled = True
+        >>> infer_entity_state_from_data(task)
+        'COMPLETED'
+
+        >>> project = Project.objects.get(id=456)
+        >>> infer_entity_state_from_data(project)
+        'CREATED'
+    """
+    from fsm.state_choices import AnnotationStateChoices, ProjectStateChoices, TaskStateChoices
+
+    entity_type = entity._meta.model_name.lower()
+
+    if entity_type == 'task':
+        # Task state depends on whether it has been labeled
+        return TaskStateChoices.COMPLETED if entity.is_labeled else TaskStateChoices.CREATED
+    elif entity_type == 'project':
+        # Project state depends on task completion
+        # If no tasks exist, project is CREATED
+        # If any tasks are completed, project is at least IN_PROGRESS
+        # If all tasks are completed, project is COMPLETED
+        tasks = entity.tasks.all()
+        if not tasks.exists():
+            return ProjectStateChoices.CREATED
+
+        # Count labeled tasks to determine project state
+        total_tasks = tasks.count()
+        labeled_tasks = tasks.filter(is_labeled=True).count()
+
+        if labeled_tasks == 0:
+            return ProjectStateChoices.CREATED
+        elif labeled_tasks == total_tasks:
+            return ProjectStateChoices.COMPLETED
+        else:
+            return ProjectStateChoices.IN_PROGRESS
+    elif entity_type == 'annotation':
+        # Annotations are SUBMITTED when created
+        return AnnotationStateChoices.SUBMITTED
+    else:
+        logger.warning(
+            f'Cannot infer state for unknown entity type: {entity_type}',
+            extra={
+                'event': 'fsm.infer_state_unknown_type',
+                'entity_type': entity_type,
+                'entity_id': entity.pk,
+            },
+        )
+        return None
+
+
+def get_or_initialize_state(entity, user=None, inferred_state=None) -> Optional[str]:
+    """
+    Get current state, or initialize it if it doesn't exist.
+
+    This function handles "cold start" scenarios where pre-existing entities
+    don't have FSM state records. It will:
+    1. Try to get the current state
+    2. If None, infer the state from entity data
+    3. Initialize the state with an appropriate transition
+    4. Return the state value (never returns None if initialization succeeds)
+
+    Args:
+        entity: The entity to get or initialize state for
+        user: User for FSM context (optional)
+        inferred_state: Pre-computed inferred state (optional, will compute if not provided)
+
+    Returns:
+        Current or newly initialized state value, or None if FSM disabled or failed
+
+    Examples:
+        >>> task = Task.objects.get(id=123)  # Pre-existing task without state
+        >>> state = get_or_initialize_state(task, user=request.user)
+        >>> # state is now 'COMPLETED' or 'CREATED' based on task.is_labeled
+        >>> # and a state record has been created
+    """
+    if not is_fsm_enabled(user):
+        return None
+
+    try:
+        from fsm.state_manager import get_state_manager
+
+        StateManager = get_state_manager()
+
+        # Try to get existing state
+        current_state = StateManager.get_current_state_value(entity)
+
+        if current_state is not None:
+            # State already exists, return it
+            return current_state
+
+        # No state exists - need to initialize it
+        if inferred_state is None:
+            inferred_state = infer_entity_state_from_data(entity)
+
+        if inferred_state is None:
+            logger.warning(
+                f'Cannot initialize state for {entity._meta.model_name} {entity.pk} - inference failed',
+                extra={
+                    'event': 'fsm.initialize_state_failed',
+                    'entity_type': entity._meta.model_name,
+                    'entity_id': entity.pk,
+                },
+            )
+            return None
+
+        # Initialize state with appropriate transition
+        entity_type = entity._meta.model_name.lower()
+        transition_name = _get_initialization_transition_name(entity_type, inferred_state)
+
+        if transition_name:
+            logger.info(
+                f'Initializing FSM state for pre-existing {entity_type} {entity.pk}',
+                extra={
+                    'event': 'fsm.cold_start_initialization',
+                    'entity_type': entity_type,
+                    'entity_id': entity.pk,
+                    'inferred_state': inferred_state,
+                    'transition_name': transition_name,
+                },
+            )
+            StateManager.execute_transition(entity=entity, transition_name=transition_name, user=user)
+            return inferred_state
+        else:
+            logger.warning(
+                f'No initialization transition found for {entity_type} -> {inferred_state}',
+                extra={
+                    'event': 'fsm.no_initialization_transition',
+                    'entity_type': entity_type,
+                    'entity_id': entity.pk,
+                    'inferred_state': inferred_state,
+                },
+            )
+            return None
+
+    except Exception as e:
+        logger.error(
+            f'Failed to get or initialize state for {entity._meta.model_name} {entity.pk}: {str(e)}',
+            extra={
+                'event': 'fsm.get_or_initialize_error',
+                'entity_type': entity._meta.model_name,
+                'entity_id': entity.pk,
+                'error': str(e),
+            },
+            exc_info=True,
+        )
+        return None
+
+
+def _get_initialization_transition_name(entity_type: str, target_state: str) -> Optional[str]:
+    """
+    Get the appropriate transition name for initializing an entity to a target state.
+
+    Args:
+        entity_type: Type of entity ('task', 'project', 'annotation')
+        target_state: The target state to initialize to
+
+    Returns:
+        Transition name, or None if no appropriate transition exists
+    """
+    from fsm.state_choices import AnnotationStateChoices, ProjectStateChoices, TaskStateChoices
+
+    if entity_type == 'task':
+        if target_state == TaskStateChoices.CREATED:
+            return 'task_created'
+        elif target_state == TaskStateChoices.COMPLETED:
+            return 'task_completed'
+        elif target_state == TaskStateChoices.IN_PROGRESS:
+            return 'task_in_progress'
+    elif entity_type == 'project':
+        if target_state == ProjectStateChoices.CREATED:
+            return 'project_created'
+        elif target_state == ProjectStateChoices.IN_PROGRESS:
+            return 'project_in_progress'
+        elif target_state == ProjectStateChoices.COMPLETED:
+            return 'project_completed'
+    elif entity_type == 'annotation':
+        if target_state == AnnotationStateChoices.SUBMITTED:
+            return 'annotation_submitted'
+        elif target_state == AnnotationStateChoices.COMPLETED:
+            return 'annotation_submitted'  # Use submitted transition for initialization
+
+    return None
