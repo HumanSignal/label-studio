@@ -23,20 +23,20 @@ config: |
         background-color: var(--color-neutral-background);
       }
       .evaluation {
-          border: 2px solid var(--color-accent-kale-base);
-          background-color: var(--color-accent-kale-subtlest);
-          color: var(--color-accent-kale-bold);
+          border: 2px solid var(--color-accent-canteloupe-base);
+          background-color: var(--color-accent-canteloupe-subtlest);
+          color: var(--color-accent-canteloupe-bold);
           padding: var(--spacing-tight);
           border-radius: var(--corner-radius-medium);
           margin-bottom: var(--spacing-base);
       }
       <!-- Choice text -->
       .evaluation span {
-          color: var(--color-accent-kale-bold);
+          color: var(--color-accent-canteloupe-bold);
       }
       <!-- Star rating -->
       .evaluation .ant-rate-star.ant-rate-star-full span {
-        color: var(--color-accent-kale-base);
+        color: var(--color-accent-canteloupe-base);
        }
      
       .overall-chat {
@@ -44,11 +44,11 @@ config: |
          margin-bottom: var(--spacing-base);
       }
       .instructions {
-         color: var(--color-accent-kale-bold);
-         background-color: var(--color-accent-kale-subtlest);
+         color: var(--color-accent-canteloupe-bold);
+         background-color: var(--color-accent-canteloupe-subtlest);
          padding: var(--spacing-tight);
          border-radius: var(--corner-radius-medium);
-         border: 1px solid var(--color-accent-kale-subtle);
+         border: 1px solid var(--color-accent-canteloupe-subtle);
       }
       <!-- Allow enlarging the instruction text -->
       .lsf-richtext__container.lsf-htx-richtext {
