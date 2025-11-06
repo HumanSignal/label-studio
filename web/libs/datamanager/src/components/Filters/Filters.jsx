@@ -1,6 +1,6 @@
 import { inject } from "mobx-react";
 import React from "react";
-import { Block, cn, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { FilterLine } from "./FilterLine/FilterLine";
 import { IconChevronRight, IconPlus } from "@humansignal/icons";
@@ -48,8 +48,8 @@ export const Filters = injector(({ views, currentView, filters }) => {
   );
 
   return (
-    <Block name="filters" mod={{ sidebar: sidebarEnabled }}>
-      <Elem name="list" mod={{ withFilters: !!filters.length }}>
+    <div className={cn("filters").mod({ sidebar: sidebarEnabled }).toClassName()}>
+      <div className={cn("filters").elem("list").mod({ withFilters: !!filters.length }).toClassName()}>
         {filters.length ? (
           filters.map((filter, i) => (
             <FilterLine
@@ -60,14 +60,14 @@ export const Filters = injector(({ views, currentView, filters }) => {
               value={filter.currentValue}
               key={`${filter.filter.id}-${i}`}
               availableFilters={Object.values(fields)}
-              dropdownClassName={cn("filters").elem("selector")}
+              dropdownClassName={cn("filters").elem("selector").toClassName()}
             />
           ))
         ) : (
-          <Elem name="empty">No filters applied</Elem>
+          <div className={cn("filters").elem("empty").toClassName()}>No filters applied</div>
         )}
-      </Elem>
-      <Elem name="actions">
+      </div>
+      <div className={cn("filters").elem("actions").toClassName()}>
         <Button
           size="small"
           look="string"
@@ -89,7 +89,7 @@ export const Filters = injector(({ views, currentView, filters }) => {
             <IconChevronRight className="!w-4 !h-4" />
           </Button>
         ) : null}
-      </Elem>
-    </Block>
+      </div>
+    </div>
   );
 });

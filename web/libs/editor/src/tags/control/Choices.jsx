@@ -12,7 +12,7 @@ import Types from "../../core/Types";
 import { guidGenerator } from "../../core/Helpers";
 import ControlBase from "./Base";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
-import { Block } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import "./Choices/Choices.scss";
 
 import "./Choice";
@@ -292,13 +292,14 @@ const ChoicesSelectLayout = observer(({ item }) => {
 
 const HtxChoices = observer(({ item }) => {
   return (
-    <Block
-      name="choices"
-      mod={{ hidden: !item.isVisible || !item.perRegionVisible(), layout: item.layout }}
+    <div
+      className={cn("choices")
+        .mod({ hidden: !item.isVisible || !item.perRegionVisible(), layout: item.layout })
+        .toClassName()}
       ref={item.elementRef}
     >
       {item.layout === "select" ? <ChoicesSelectLayout item={item} /> : Tree.renderChildren(item, item.annotation)}
-    </Block>
+    </div>
   );
 });
 

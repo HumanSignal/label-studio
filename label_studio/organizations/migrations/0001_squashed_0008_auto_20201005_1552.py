@@ -9,8 +9,9 @@ import django.db.models.deletion
 
 
 def rename_disabled_to_off0006(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
     OrganizationMember = apps.get_model('organizations', 'OrganizationMember')
-    OrganizationMember.objects.filter(role="Disabled").update(role="Off")
+    OrganizationMember.objects.using(db_alias).filter(role="Disabled").update(role="Off")
 
     migrations.AlterField(
         model_name='organizationmember',
@@ -23,8 +24,9 @@ def rename_disabled_to_off0006(apps, schema_editor):
 
 
 def rename_disabled_to_off0007(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
     OrganizationMember = apps.get_model('organizations', 'OrganizationMember')
-    OrganizationMember.objects.filter(role="Off").update(role="Deactivated")
+    OrganizationMember.objects.using(db_alias).filter(role="Off").update(role="Deactivated")
 
     migrations.AlterField(
         model_name='organizationmember',

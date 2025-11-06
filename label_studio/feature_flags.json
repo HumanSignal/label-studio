@@ -2553,6 +2553,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_fit_710_fsm_state_fields": {
+      "key": "fflag_feat_fit_710_fsm_state_fields",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "406c3f0910444278b06394ee33773d9d",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_front_bros58_timeseries_multichannel_short": {
       "key": "fflag_feat_front_bros58_timeseries_multichannel_short",
       "on": true,

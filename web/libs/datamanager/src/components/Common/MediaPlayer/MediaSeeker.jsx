@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Block, cn, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import "./MediaSeeker.scss";
 
 export const MediaSeeker = ({ currentTime, duration, buffer, onSeekStart, onSeekEnd, onChange, video }) => {
@@ -61,11 +61,11 @@ export const MediaSeeker = ({ currentTime, duration, buffer, onSeekStart, onSeek
   }, [buffer, duration, currentTime]);
 
   return (
-    <Block name="audio-seeker" ref={seekerRef} onMouseDownCapture={handleMouseDown}>
-      <Elem name="wrapper" mod={{ video }}>
-        <Elem name="progress" style={{ width: `${progress}%` }} />
-        <Elem name="buffer" style={{ width: `${buffered}%` }} />
-      </Elem>
-    </Block>
+    <div className={cn("audio-seeker").toClassName()} ref={seekerRef} onMouseDownCapture={handleMouseDown}>
+      <div className={cn("audio-seeker").elem("wrapper").mod({ video }).toClassName()}>
+        <div className={cn("audio-seeker").elem("progress").toClassName()} style={{ width: `${progress}%` }} />
+        <div className={cn("audio-seeker").elem("buffer").toClassName()} style={{ width: `${buffered}%` }} />
+      </div>
+    </div>
   );
 };

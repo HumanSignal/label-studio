@@ -1,6 +1,6 @@
 import { inject } from "mobx-react";
 import { IconChevronLeft } from "@humansignal/icons";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { Filters } from "../Filters";
 import "./FilterSidebar.scss";
@@ -17,9 +17,9 @@ const sidebarInjector = inject(({ store }) => {
 
 export const FiltersSidebar = sidebarInjector(({ viewsStore, sidebarEnabled, sidebarVisible }) => {
   return sidebarEnabled && sidebarVisible ? (
-    <Block name="filters-sidebar">
-      <Elem name="header">
-        <Elem name="extra">
+    <div className={cn("filters-sidebar").toClassName()}>
+      <div className={cn("filters-sidebar").elem("header").toClassName()}>
+        <div className={cn("filters-sidebar").elem("extra").toClassName()}>
           <Button
             look="string"
             onClick={() => viewsStore.collapseFilters()}
@@ -28,11 +28,11 @@ export const FiltersSidebar = sidebarInjector(({ viewsStore, sidebarEnabled, sid
           >
             <IconChevronLeft width={24} height={24} />
           </Button>
-          <Elem name="title">Filters</Elem>
-        </Elem>
-      </Elem>
+          <div className={cn("filters-sidebar").elem("title").toClassName()}>Filters</div>
+        </div>
+      </div>
       <Filters sidebar={true} />
-    </Block>
+    </div>
   ) : null;
 });
 FiltersSidebar.displayName = "FiltersSidebar";
