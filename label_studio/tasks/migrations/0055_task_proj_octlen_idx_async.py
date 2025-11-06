@@ -20,8 +20,8 @@ sql_drop_index = (
     'DROP INDEX CONCURRENTLY IF EXISTS task_proj_octlen_idx;'
 )
 
-def forward_migration(migration_name):
-    migration, created = AsyncMigrationStatus.objects.get_or_create(
+def forward_migration(migration_name, db_alias):
+    migration, created = AsyncMigrationStatus.objects.using(db_alias).get_or_create(
         name=migration_name,
         defaults={'status': AsyncMigrationStatus.STATUS_STARTED},
     )
@@ -29,24 +29,24 @@ def forward_migration(migration_name):
         return
     
     logger.info(f'Start async migration {migration_name}')
-    from django.db import connection
-    cursor = connection.cursor()
+    from django.db import connections
+    cursor = connections[db_alias].cursor()
     cursor.execute(sql_create_index)
     migration.status = AsyncMigrationStatus.STATUS_FINISHED
-    migration.save()
+    migration.save(using=db_alias)
     logger.info(f'Async migration {migration_name} complete')
 
-def backward_migration(migration_name):
-    migration = AsyncMigrationStatus.objects.create(
+def backward_migration(migration_name, db_alias):
+    migration = AsyncMigrationStatus.objects.using(db_alias).create(
         name=migration_name,
         status=AsyncMigrationStatus.STATUS_STARTED,
     )
     logger.info(f'Start revert of async migration {migration_name}')
-    from django.db import connection
-    cursor = connection.cursor()
+    from django.db import connections
+    cursor = connections[db_alias].cursor()
     cursor.execute(sql_drop_index)
     migration.status = AsyncMigrationStatus.STATUS_FINISHED
-    migration.save()
+    migration.save(using=db_alias)
     logger.info(f'Async migration {migration_name} revert complete')
 
 def forwards(apps, schema_editor):
@@ -55,10 +55,12 @@ def forwards(apps, schema_editor):
         logger.info('Skipping async index creation for non-PostgreSQL databases')
         return
 
-    start_job_async_or_sync(forward_migration, migration_name=migration_name)
+    db_alias = schema_editor.connection.alias
+    start_job_async_or_sync(forward_migration, migration_name=migration_name, db_alias=db_alias)
 
 def backwards(apps, schema_editor):
-    start_job_async_or_sync(backward_migration, migration_name=migration_name)
+    db_alias = schema_editor.connection.alias
+    start_job_async_or_sync(backward_migration, migration_name=migration_name, db_alias=db_alias)
 
 class Migration(migrations.Migration):
     atomic = False

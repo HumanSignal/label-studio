@@ -3,7 +3,7 @@ import { useCallback, useContext, useMemo, useEffect, useRef } from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeGrid } from "react-window";
 import InfiniteLoader from "react-window-infinite-loader";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { Checkbox, cnm } from "@humansignal/ui";
 import { Space } from "../../Common/Space/Space";
 import { getProperty, prepareColumns } from "../../Common/Table/utils";
@@ -21,7 +21,7 @@ const CELL_HEADER_HEIGHT = 32;
 export const GridHeader = observer(({ row, selected, onSelect }) => {
   const isSelected = selected.isSelected(row.id);
   return (
-    <Elem name="cell-header">
+    <div className={cn("grid-view").elem("cell-header").toClassName()}>
       <Space>
         <Checkbox
           checked={isSelected}
@@ -30,7 +30,7 @@ export const GridHeader = observer(({ row, selected, onSelect }) => {
         />
         <span>{row.id}</span>
       </Space>
-    </Elem>
+    </div>
   );
 });
 
@@ -104,8 +104,15 @@ export const GridCell = observer(({ view, selected, row, fields, onClick, column
   );
 
   return (
-    <Elem {...props} name="cell" onClick={onClick} mod={{ selected: selected.isSelected(row.id) }}>
-      <Elem name="cell-content">
+    <div
+      {...props}
+      className={cn("grid-view")
+        .elem("cell")
+        .mod({ selected: selected.isSelected(row.id) })
+        .toClassName()}
+      onClick={onClick}
+    >
+      <div className={cn("grid-view").elem("cell-content").toClassName()}>
         <GridHeader
           view={view}
           row={row}
@@ -113,16 +120,14 @@ export const GridCell = observer(({ view, selected, row, fields, onClick, column
           selected={view.selected}
           onSelect={view.selected.toggleSelected}
         />
-        <Elem
-          name="cell-body"
-          rawClassName={cnm({ "overflow-auto": !hasImage })}
+        <div
+          className={`${cn("grid-view").elem("cell-body").mod({ responsive: !view.gridFitImagesToWidth }).toClassName()} ${cnm({ "overflow-auto": !hasImage })}`}
           onClick={handleBodyClick}
-          mod={{ responsive: !view.gridFitImagesToWidth }}
         >
           <GridBody view={view} row={row} fields={fields} columnCount={columnCount} />
-        </Elem>
-      </Elem>
-    </Elem>
+        </div>
+      </div>
+    </div>
   );
 });
 
@@ -298,8 +303,8 @@ export const GridView = observer(({ data, view, loadMore, fields, onChange, hidd
 
   return (
     <GridViewProvider data={data} view={view} fields={fieldsData}>
-      <Block name="grid-view" mod={{ columnCount }}>
-        <Elem tag={AutoSizer} name="resize">
+      <div className={cn("grid-view").mod({ columnCount }).toClassName()}>
+        <AutoSizer className={cn("grid-view").elem("resize").toClassName()}>
           {({ width, height }) => (
             <InfiniteLoader
               itemCount={itemCount}
@@ -309,12 +314,11 @@ export const GridView = observer(({ data, view, loadMore, fields, onChange, hidd
               minimumBatchSize={Math.max(1, Math.floor(view.dataStore.pageSize / 2))}
             >
               {({ onItemsRendered, ref }) => (
-                <Elem
-                  tag={FixedSizeGrid}
+                <FixedSizeGrid
+                  className={cn("grid-view").elem("list").toClassName()}
                   ref={ref}
                   width={width}
                   height={height}
-                  name="list"
                   rowHeight={finalRowHeight}
                   overscanRowCount={Math.max(2, Math.floor(view.dataStore.pageSize / 2))}
                   columnCount={columnCount}
@@ -324,12 +328,12 @@ export const GridView = observer(({ data, view, loadMore, fields, onChange, hidd
                   style={{ overflowX: "hidden" }}
                 >
                   {renderItem}
-                </Elem>
+                </FixedSizeGrid>
               )}
             </InfiniteLoader>
           )}
-        </Elem>
-      </Block>
+        </AutoSizer>
+      </div>
     </GridViewProvider>
   );
 });

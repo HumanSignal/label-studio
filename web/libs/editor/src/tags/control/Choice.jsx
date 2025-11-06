@@ -11,7 +11,7 @@ import Types from "../../core/Types";
 import { AnnotationMixin } from "../../mixins/AnnotationMixin";
 import { TagParentMixin } from "../../mixins/TagParentMixin";
 import { FF_DEV_3391, isFF } from "../../utils/feature-flags";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import "./Choice/Choice.scss";
 import { IconChevron } from "@humansignal/ui";
 import { HintTooltip } from "../../components/Taxonomy/Taxonomy";
@@ -194,16 +194,17 @@ const HtxNewChoiceView = ({ item, store }) => {
   const [collapsed, setCollapsed] = useState(false);
   const toogleCollapsed = useCallback(() => setCollapsed((collapsed) => !collapsed), []);
 
+  const CheckboxComponent = nameWrapper(item.isCheckbox ? Checkbox : Radio, item._value);
+
   return (
-    <Block
-      name="choice"
-      mod={{ layout: item.parent.layout, leaf: item.isLeaf, notLeaf: !item.isLeaf, hidden: !item.visible }}
+    <div
+      className={cn("choice")
+        .mod({ layout: item.parent.layout, leaf: item.isLeaf, notLeaf: !item.isLeaf, hidden: !item.visible })
+        .toClassName()}
     >
-      <Elem name="item" mod={{ notLeaf: !item.isLeaf }} style={style}>
-        <Elem
-          name="checkbox"
-          component={nameWrapper(item.isCheckbox ? Checkbox : Radio, item._value)}
-          mod={{ notLeaf: !item.isLeaf }}
+      <div className={cn("choice").elem("item").mod({ notLeaf: !item.isLeaf }).toClassName()} style={style}>
+        <CheckboxComponent
+          className={cn("choice").elem("checkbox").mod({ notLeaf: !item.isLeaf }).toClassName()}
           checked={item.sel}
           indeterminate={!item.sel && item.indeterminate}
           disabled={item.isReadOnly()}
@@ -213,21 +214,25 @@ const HtxNewChoiceView = ({ item, store }) => {
             {item.html ? <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(item.html) }} /> : item._value}
             {showHotkey && <Hint>[{item.hotkey}]</Hint>}
           </HintTooltip>
-        </Elem>
+        </CheckboxComponent>
         {!item.isLeaf ? (
-          <Elem name="toggle" mod={{ collapsed }} component={Button} type="text" onClick={toogleCollapsed}>
+          <Button
+            className={cn("choice").elem("toggle").mod({ collapsed }).toClassName()}
+            type="text"
+            onClick={toogleCollapsed}
+          >
             <IconChevron />
-          </Elem>
+          </Button>
         ) : (
           false
         )}
-      </Elem>
+      </div>
       {item.nestedResults && item.children?.length ? (
-        <Elem name="children" mod={{ collapsed }}>
+        <div className={cn("choice").elem("children").mod({ collapsed }).toClassName()}>
           {Tree.renderChildren(item, item.annotation)}
-        </Elem>
+        </div>
       ) : null}
-    </Block>
+    </div>
   );
 };
 

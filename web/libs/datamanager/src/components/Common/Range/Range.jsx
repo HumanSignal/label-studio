@@ -1,5 +1,5 @@
 import { forwardRef, useCallback } from "react";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/utils";
 import { clamp } from "../../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
@@ -85,7 +85,7 @@ export const Range = forwardRef(
     const sizeProperty = align === "horizontal" ? "minWidth" : "minHeight";
 
     return (
-      <Block name="range" mod={{ align }}>
+      <div className={cn("range").mod({ align }).toClassName()}>
         <input
           ref={ref}
           type="hidden"
@@ -103,21 +103,23 @@ export const Range = forwardRef(
 
         {reverse
           ? maxIcon && (
-              <Elem name="icon" onMouseDown={increase}>
+              <div className={cn("range").elem("icon").toClassName()} onMouseDown={increase}>
                 {maxIcon}
-              </Elem>
+              </div>
             )
           : minIcon && (
-              <Elem name="icon" onMouseDown={decrease}>
+              <div className={cn("range").elem("icon").toClassName()} onMouseDown={decrease}>
                 {minIcon}
-              </Elem>
+              </div>
             )}
-        <Elem
-          name="body"
-          mod={{ "with-icon": isDefined(minIcon) || isDefined(maxIcon) }}
+        <div
+          className={cn("range")
+            .elem("body")
+            .mod({ "with-icon": isDefined(minIcon) || isDefined(maxIcon) })
+            .toClassName()}
           style={{ [sizeProperty]: size }}
         >
-          <Elem name="line" />
+          <div className={cn("range").elem("line").toClassName()} />
           <RangeIndicator align={align} reverse={reverse} value={currentValue} valueConvert={valueToPercentage} />
           {multi ? (
             arrayReverse(currentValue, reverse).map((value, i, list) => {
@@ -161,9 +163,9 @@ export const Range = forwardRef(
               onChange={(val) => updateValue(val, true, true)}
             />
           )}
-        </Elem>
+        </div>
         {}
-      </Block>
+      </div>
     );
   },
 );
@@ -209,8 +211,8 @@ const RangeHandle = ({
   };
 
   return (
-    <Elem
-      name="range-handle"
+    <div
+      className={cn("range").elem("range-handle").toClassName()}
       style={{ [offsetProperty]: `${valueConvert(value)}%` }}
       onMouseDownCapture={handleMouseDown}
     />
@@ -243,5 +245,5 @@ const RangeIndicator = ({ value, valueConvert, align, reverse }) => {
     if (reverse && !multi) [style.top, style.bottom] = [style.bottom, style.top];
   }
 
-  return <Elem name="indicator" style={style} />;
+  return <div className={cn("range").elem("indicator").toClassName()} style={style} />;
 };

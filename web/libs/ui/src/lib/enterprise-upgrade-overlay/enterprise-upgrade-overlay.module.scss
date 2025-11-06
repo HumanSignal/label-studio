@@ -1,0 +1,75 @@
+.overlay {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  backdrop-filter: blur(2px) grayscale(80%);
+  background: rgb(var(--color-neutral-background-raw) / 70%);
+  inset: -16px -24px;
+}
+
+.container {
+  // Gradient border effect using padding + background + pseudo-element
+  padding: 2px;
+  background: linear-gradient(109.47deg, var(--color-accent-canteloupe-base) 0%, var(--color-accent-persimmon-base) 50%, var(--color-accent-plum-base) 100%);
+  border-radius: 12px;
+  width: 780px;
+  box-shadow: 0 8px 24px rgb(var(--color-neutral-shadow-raw) / 24%),  0 4px 16px rgb(var(--color-neutral-shadow-raw) / 32%);
+  position: relative;
+  transform: translateY(-3rem);
+
+  // Inner content container with actual background
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 2px;
+    background: var(--color-neutral-background);
+    opacity: 0.95;
+    border-radius: 10px;
+    z-index: 0;
+  }
+
+  // All children need to be above the pseudo-element
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.content {
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--spacing-base);
+}
+
+.badge {
+  transform: scale(1.4);
+}
+
+.title {
+  // Typography component handles font styles
+  margin: 0;
+}
+
+.description {
+  // Typography component handles font styles
+  max-width: 600px;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-base);
+  margin-top: var(--spacing-tight);
+  flex-wrap: wrap;
+  justify-content: center;
+
+  button {
+    white-space: nowrap;
+  }
+}
+

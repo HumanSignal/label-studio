@@ -4,7 +4,7 @@ import { inject } from "mobx-react";
 import { getRoot } from "mobx-state-tree";
 import { useCallback, useMemo } from "react";
 import { useShortcut } from "../../../sdk/hotkeys";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { FF_DEV_2536, isFF } from "../../../utils/feature-flags";
 import * as CellViews from "../../CellViews";
 import { Icon } from "../../Common/Icon/Icon";
@@ -168,19 +168,19 @@ export const DataView = injector(
       (content) => {
         if (isLoading && total === 0 && !isLabeling) {
           return (
-            <Block name="fill-container">
+            <div className={cn("fill-container").toClassName()}>
               <Spinner size="large" />
-            </Block>
+            </div>
           );
         }
         if (store.SDK.type === "DE" && ["canceled", "failed"].includes(datasetStatusID)) {
           return (
-            <Block name="syncInProgress">
-              <Elem name="title" tag="h3">
-                Failed to sync data
-              </Elem>
-              <Elem name="text">Check your storage settings. You may need to recreate this dataset</Elem>
-            </Block>
+            <div className={cn("syncInProgress").toClassName()}>
+              <h3 className={cn("syncInProgress").elem("title").toClassName()}>Failed to sync data</h3>
+              <div className={cn("syncInProgress").elem("text").toClassName()}>
+                Check your storage settings. You may need to recreate this dataset
+              </div>
+            </div>
           );
         }
         if (
@@ -189,21 +189,23 @@ export const DataView = injector(
           datasetStatusID === "completed"
         ) {
           return (
-            <Block name="syncInProgress">
-              <Elem name="title" tag="h3">
-                Nothing found
-              </Elem>
-              <Elem name="text">Try adjusting the filter or similarity search parameters</Elem>
-            </Block>
+            <div className={cn("syncInProgress").toClassName()}>
+              <h3 className={cn("syncInProgress").elem("title").toClassName()}>Nothing found</h3>
+              <div className={cn("syncInProgress").elem("text").toClassName()}>
+                Try adjusting the filter or similarity search parameters
+              </div>
+            </div>
           );
         }
         if (store.SDK.type === "DE" && (total === 0 || data.length === 0 || !hasData)) {
           return (
-            <Block name="syncInProgress">
-              <Elem name="title" tag="h3">
+            <div className={cn("syncInProgress").toClassName()}>
+              <h3 className={cn("syncInProgress").elem("title").toClassName()}>
                 Hang tight! Records are syncing in the background
-              </Elem>
-              <Elem name="text">Press the button below to see any synced records</Elem>
+              </h3>
+              <div className={cn("syncInProgress").elem("text").toClassName()}>
+                Press the button below to see any synced records
+              </div>
               <Button
                 size="small"
                 look="outlined"
@@ -217,14 +219,14 @@ export const DataView = injector(
               >
                 Refresh
               </Button>
-            </Block>
+            </div>
           );
         }
         // Unified empty state handling - EmptyState now handles all cases internally
         if (total === 0 || !hasData) {
           // Use unified EmptyState for all cases
           return (
-            <Block name="no-results">
+            <div className={cn("no-results").toClassName()}>
               <EmptyState
                 // Import functionality props
                 canImport={!!store.interfaces.get("import")}
@@ -258,7 +260,7 @@ export const DataView = injector(
                   }
                 }}
               />
-            </Block>
+            </div>
           );
         }
 
@@ -410,9 +412,12 @@ export const DataView = injector(
 
     // Render the UI for your table
     return (
-      <Block name="data-view-dm" className="dm-content" style={{ pointerEvents: isLocked ? "none" : "auto" }}>
+      <div
+        className={cn("data-view-dm").mix("dm-content").toClassName()}
+        style={{ pointerEvents: isLocked ? "none" : "auto" }}
+      >
         {renderContent(content)}
-      </Block>
+      </div>
     );
   },
 );

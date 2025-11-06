@@ -1,5 +1,5 @@
 import color from "chroma-js";
-import { Block } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { colors } from "../../../utils/colors";
 import "./Tag.scss";
 
@@ -29,8 +29,8 @@ export const Tag = ({ className, style, size, color, children }) => {
   const styles = { ...(style ?? {}), ...finalColor };
 
   return (
-    <Block tag="span" name="tag-dm" mod={{ size }} mix={className} style={styles}>
+    <span className={cn("tag-dm").mod({ size }).mix(className).toClassName()} style={styles}>
       {children}
-    </Block>
+    </span>
   );
 };
