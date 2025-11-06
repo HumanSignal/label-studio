@@ -1,8 +1,6 @@
-import inspect
 import logging
 from typing import Callable, Tuple
 
-from core.models import AsyncMigrationStatus
 from core.redis import start_job_async_or_sync
 from django.conf import settings
 from django.db import connection
@@ -10,25 +8,9 @@ from django.db import connection
 logger = logging.getLogger(__name__)
 
 
-def _infer_migration_key(explicit: str | None) -> str:
-    if explicit:
-        return explicit
-    try:
-        frame = inspect.stack()[2].frame
-        module = inspect.getmodule(frame)
-        if module and getattr(module, '__name__', None):
-            parts = module.__name__.split('.')
-            # ... <app> . migrations . <module>
-            if len(parts) >= 3 and parts[-2] == 'migrations':
-                return f'{parts[-3]}:{parts[-1]}'
-            return parts[-1]
-    except Exception:
-        pass
-    return 'unknown_migration'
-
-
 def execute_sql_job(*, migration_name: str, sql: str, apply_on_sqlite: bool = False, reverse: bool = False) -> None:
-    """Execute raw SQL inside a job context and update AsyncMigrationStatus."""
+    from core.models import AsyncMigrationStatus
+
     if not reverse:
         migration, created = AsyncMigrationStatus.objects.get_or_create(
             name=migration_name,
@@ -83,7 +65,9 @@ def make_sql_migration(
     - forwards: either schedules job or marks as SCHEDULED
     - backwards: always schedules job to execute reverse SQL
     """
-    mig_key = _infer_migration_key(migration_name)
+    if not migration_name:
+        raise ValueError("make_sql_migration requires explicit migration_name like 'app_label:migration_module'")
+    mig_key = migration_name
 
     def forwards(apps, schema_editor):  # noqa: ARG001
         if schema_editor.connection.vendor == 'sqlite' and not apply_on_sqlite:
@@ -102,7 +86,7 @@ def make_sql_migration(
             AsyncMigrationStatus = apps.get_model('core', 'AsyncMigrationStatus')
             AsyncMigrationStatus.objects.get_or_create(
                 name=mig_key,
-                defaults={'status': AsyncMigrationStatus.STATUS_SCHEDULED},
+                defaults={'status': 'SCHEDULED'},
             )
 
     def backwards(apps, schema_editor):  # noqa: ARG001

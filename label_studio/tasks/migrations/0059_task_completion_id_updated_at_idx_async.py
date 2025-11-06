@@ -22,6 +22,7 @@ class Migration(migrations.Migration):
                 sql_backwards,
                 apply_on_sqlite=False,
                 execute_immediately=False,
+                migration_name=f"{__name__.split('.')[-3]}:{__name__.split('.')[-1]}",
             )
         ),
     ]
