@@ -99,6 +99,7 @@ def make_sql_migration(
                 reverse=False,
             )
         else:
+            AsyncMigrationStatus = apps.get_model('core', 'AsyncMigrationStatus')
             AsyncMigrationStatus.objects.get_or_create(
                 name=mig_key,
                 defaults={'status': AsyncMigrationStatus.STATUS_SCHEDULED},
