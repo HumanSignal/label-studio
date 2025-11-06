@@ -18,7 +18,7 @@ class TestAdminRunScheduledMigrations(TestCase):
     @patch('core.redis.start_job_async_or_sync')
     def test_success_dispatches_job_and_updates_status(self, mock_start):
         m = AsyncMigrationStatus.objects.create(
-            name='tasks:0059_task_completion_id_updated_at_idx_async',
+            name='label_studio.tasks.migrations.0059_task_completion_id_updated_at_idx_async',
             status=AsyncMigrationStatus.STATUS_SCHEDULED,
         )
 
@@ -37,7 +37,7 @@ class TestAdminRunScheduledMigrations(TestCase):
         assert kwargs.get('reverse') is False
 
     @patch('core.redis.start_job_async_or_sync')
-    def test_ambiguous_name_marks_error(self, mock_start):
+    def test_invalid_path_marks_error(self, mock_start):
         m = AsyncMigrationStatus.objects.create(
             name='0059_task_completion_id_updated_at_idx_async',
             status=AsyncMigrationStatus.STATUS_SCHEDULED,
@@ -48,13 +48,13 @@ class TestAdminRunScheduledMigrations(TestCase):
 
         m.refresh_from_db()
         assert m.status == AsyncMigrationStatus.STATUS_ERROR
-        assert 'Ambiguous name' in (m.meta or {}).get('error', '')
+        assert 'import path' in (m.meta or {}).get('error', '')
         mock_start.assert_not_called()
 
     @patch('core.redis.start_job_async_or_sync')
     def test_import_error_marks_error(self, mock_start):
         m = AsyncMigrationStatus.objects.create(
-            name='nonexistentapp:nonexistent_migration',
+            name='label_studio.nonexistentapp.migrations.nonexistent_migration',
             status=AsyncMigrationStatus.STATUS_SCHEDULED,
         )
 

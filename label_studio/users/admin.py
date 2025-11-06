@@ -83,34 +83,20 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
         skipped_count = 0
         error_count = 0
 
-        def resolve_import_path(name: str) -> tuple[list[str] | None, str | None]:
+        def resolve_import_path(name: str) -> tuple[str | None, str | None]:
             s = (name or '').strip()
             if not s:
-                return None, 'Empty migration name'
-            # app:module
-            if ':' in s:
-                app, module = s.split(':', 1)
-                app, module = app.strip(), module.strip()
-                if not app or not module:
-                    return None, 'Invalid format; use "<app>:<migration_module>"'
-                return [f'{app}.migrations.{module}', f'label_studio.{app}.migrations.{module}'], None
-            # full dotted path
-            if '.migrations.' in s:
-                return [s], None
-            # app.module -> app.migrations.module
-            parts = s.split('.')
-            if len(parts) == 2:
-                app, module = parts
-                return [f'{app}.migrations.{module}', f'label_studio.{app}.migrations.{module}'], None
-            # only module -> ambiguous
-            return None, 'Ambiguous name; specify app as "<app>:<migration_module>"'
+                return None, 'Empty migration import path'
+            if '.migrations.' not in s:
+                return None, 'Migration import path must include ".migrations." (use full dotted path)'
+            return s, None
 
         for migration in queryset:
             if migration.status != migration.STATUS_SCHEDULED:
                 skipped_count += 1
                 continue
 
-            import_paths, err = resolve_import_path(migration.name)
+            import_path, err = resolve_import_path(migration.name)
             if err:
                 meta = migration.meta or {}
                 meta['error'] = err
@@ -119,31 +105,18 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
                 migration.save()
                 error_count += 1
                 continue
-
-            module = None
-            last_err = None
-            for import_path in import_paths:
-                try:
-                    module = importlib.import_module(import_path)
-                    break
-                except Exception as e:
-                    last_err = e
-                    continue
-            if module is None:
+            try:
+                module = importlib.import_module(import_path)
+            except Exception as e:
                 meta = migration.meta or {}
-                meta['error'] = f'Import error: {last_err}'
+                meta['error'] = f'Import error: {e}'
                 migration.meta = meta
                 migration.status = migration.STATUS_ERROR
                 migration.save()
                 error_count += 1
                 continue
 
-            # Extract SQL and apply_on_sqlite flag from module
             sql_fw = getattr(module, 'sql_forwards', None)
-            if sql_fw is None:
-                sql_fw = getattr(module, 'sql_forward', None)
-            if sql_fw is None:
-                sql_fw = getattr(module, 'sql_create_index', None)
             if sql_fw is None:
                 meta = migration.meta or {}
                 meta['error'] = 'sql_forwards not found in migration module'
@@ -153,14 +126,11 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
                 error_count += 1
                 continue
 
-            apply_on_sqlite = getattr(module, 'apply_on_sqlite', False)
-
             try:
                 start_job_async_or_sync(
                     execute_sql_job,
                     migration_name=migration.name,
                     sql=sql_fw,
-                    apply_on_sqlite=apply_on_sqlite,
                     reverse=False,
                     queue_name='default',
                 )
