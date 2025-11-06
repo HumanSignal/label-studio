@@ -88,7 +88,7 @@ class JWTAutoLoginMiddleware(MiddlewareMixin):
 
             # Attempt to authenticate with JWT token (Method 1 or 2)
             user = self.jwt_backend.authenticate(request, token=token)
-            auth_backend = "label_studio_sso.backends.JWTAuthenticationBackend"
+            auth_backend = "label_studio.sso.backends.JWTAuthenticationBackend"
 
             print(f"[SSO Middleware] JWT authentication result: {user}")
 

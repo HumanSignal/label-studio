@@ -285,6 +285,8 @@ elif allowed_origin_regexes := get_env_list('CORS_ALLOWED_ORIGIN_REGEXES'):
 else:
     CORS_ALLOW_ALL_ORIGINS = get_bool_env('CORS_ALLOW_ALL_ORIGINS', True)
 
+CORS_ALLOW_CREDENTIALS = True
+
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -298,6 +300,8 @@ ALLOWED_HOSTS = get_env_list('ALLOWED_HOSTS', default=['*'])
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
 AUTHENTICATION_BACKENDS = [
+    'label_studio.sso.backends.JWTAuthenticationBackend',  # Add this FIRST
+    'django.contrib.auth.backends.ModelBackend',
     'rules.permissions.ObjectPermissionBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
@@ -911,10 +915,6 @@ SERVICE_QUEUE_NAME = get_env('SERVICE_QUEUE_NAME', 'default')
 # ]
 
 MIDDLEWARE += [ 'label_studio.sso.middleware.JWTAutoLoginMiddleware' ]
-AUTHENTICATION_BACKENDS = [
-    'label_studio.sso.backends.JWTAuthenticationBackend',  # Add this FIRST
-    'django.contrib.auth.backends.ModelBackend',
-] + AUTHENTICATION_BACKENDS
 
 JWT_SSO_NATIVE_USER_ID_CLAIM = 'user_id'  # Claim containing user ID
 JWT_SSO_COOKIE_NAME = 'ls_auth_token'  # Cookie-based (recommended)
@@ -924,5 +924,7 @@ JWT_SSO_TOKEN_PARAM = 'token'  # URL parameter (fallback)
 SSO_TOKEN_EXPIRY = 600  # 10 minutes
 SSO_AUTO_CREATE_USERS = True  # Auto-create users from API requests
 
-CSRF_COOKIE_PATH = '/'  # Default is '/', do not change to '/label-studio'
-SESSION_COOKIE_PATH = '/'  # Default is '/', do not change to '/label-studio'
+SESSION_COOKIE_NAME = "ls_sessionid"
+
+# CSRF_COOKIE_PATH = '/'  # Default is '/', do not change to '/label-studio'
+# SESSION_COOKIE_PATH = '/'  # Default is '/', do not change to '/label-studio'
