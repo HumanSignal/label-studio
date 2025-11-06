@@ -61,7 +61,129 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
         self.list_display = ('id', 'name', 'project', 'status', 'created_at', 'updated_at', 'meta')
         self.list_filter = ('name', 'status')
         self.search_fields = ('name', 'project__id')
-        self.ordering = ('id',)
+        self.ordering = ('-id',)
+        self.actions = ['run_scheduled_migrations']
+
+    def run_scheduled_migrations(self, request, queryset):
+        """Run selected scheduled migrations manually.
+
+        Expects AsyncMigrationStatus.name in one of forms:
+        - "<app>:<migration_module>"
+        - "<app>.migrations.<migration_module>"
+        - Full dotted path "label_studio.<app>.migrations.<migration_module>"
+
+        Does not scan all apps. If app is not provided, marks error.
+        """
+        import importlib
+
+        from core.migration_helpers import execute_sql_job
+        from core.redis import start_job_async_or_sync
+
+        executed_count = 0
+        skipped_count = 0
+        error_count = 0
+
+        def resolve_import_path(name: str) -> tuple[list[str] | None, str | None]:
+            s = (name or '').strip()
+            if not s:
+                return None, 'Empty migration name'
+            # app:module
+            if ':' in s:
+                app, module = s.split(':', 1)
+                app, module = app.strip(), module.strip()
+                if not app or not module:
+                    return None, 'Invalid format; use "<app>:<migration_module>"'
+                return [f'{app}.migrations.{module}', f'label_studio.{app}.migrations.{module}'], None
+            # full dotted path
+            if '.migrations.' in s:
+                return [s], None
+            # app.module -> app.migrations.module
+            parts = s.split('.')
+            if len(parts) == 2:
+                app, module = parts
+                return [f'{app}.migrations.{module}', f'label_studio.{app}.migrations.{module}'], None
+            # only module -> ambiguous
+            return None, 'Ambiguous name; specify app as "<app>:<migration_module>"'
+
+        for migration in queryset:
+            if migration.status != migration.STATUS_SCHEDULED:
+                skipped_count += 1
+                continue
+
+            import_paths, err = resolve_import_path(migration.name)
+            if err:
+                meta = migration.meta or {}
+                meta['error'] = err
+                migration.meta = meta
+                migration.status = migration.STATUS_ERROR
+                migration.save()
+                error_count += 1
+                continue
+
+            module = None
+            last_err = None
+            for import_path in import_paths:
+                try:
+                    module = importlib.import_module(import_path)
+                    break
+                except Exception as e:
+                    last_err = e
+                    continue
+            if module is None:
+                meta = migration.meta or {}
+                meta['error'] = f'Import error: {last_err}'
+                migration.meta = meta
+                migration.status = migration.STATUS_ERROR
+                migration.save()
+                error_count += 1
+                continue
+
+            # Extract SQL and apply_on_sqlite flag from module
+            sql_fw = getattr(module, 'sql_forwards', None)
+            if sql_fw is None:
+                sql_fw = getattr(module, 'sql_forward', None)
+            if sql_fw is None:
+                sql_fw = getattr(module, 'sql_create_index', None)
+            if sql_fw is None:
+                meta = migration.meta or {}
+                meta['error'] = 'sql_forwards not found in migration module'
+                migration.meta = meta
+                migration.status = migration.STATUS_ERROR
+                migration.save()
+                error_count += 1
+                continue
+
+            apply_on_sqlite = getattr(module, 'apply_on_sqlite', False)
+
+            try:
+                start_job_async_or_sync(
+                    execute_sql_job,
+                    migration_name=migration.name,
+                    sql=sql_fw,
+                    apply_on_sqlite=apply_on_sqlite,
+                    reverse=False,
+                    queue_name='default',
+                )
+                migration.status = migration.STATUS_STARTED
+                migration.save()
+                executed_count += 1
+            except Exception as e:
+                meta = migration.meta or {}
+                meta['error'] = str(e)
+                migration.meta = meta
+                migration.status = migration.STATUS_ERROR
+                migration.save()
+                error_count += 1
+
+        message = f'Executed: {executed_count}, Skipped: {skipped_count}, Errors: {error_count}'
+        if executed_count > 0:
+            self.message_user(request, message, level='SUCCESS')
+        elif error_count > 0:
+            self.message_user(request, message, level='ERROR')
+        else:
+            self.message_user(request, message, level='WARNING')
+
+    run_scheduled_migrations.short_description = 'Run selected SCHEDULED migrations'
 
 
 class OrganizationMemberAdmin(admin.ModelAdmin):
