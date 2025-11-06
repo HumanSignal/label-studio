@@ -3,7 +3,7 @@ import { GridView, GridCell, GridHeader, GridDataGroup } from "../GridView";
 import { configure } from "mobx";
 import "@testing-library/jest-dom";
 import type React from "react";
-import { Block } from "../../../../utils/bem";
+import { cn } from "../../../../utils/bem";
 import { GridViewProvider } from "../GridPreview";
 
 // Configure mobx to work with jest
@@ -194,7 +194,7 @@ const mockView = {
 
 // Wrap components with BEM context for testing
 const renderWithBEM = (ui: React.ReactElement) => {
-  return render(<Block name="grid-view">{ui}</Block>);
+  return render(<div className={cn("grid-view").toClassName()}>{ui}</div>);
 };
 
 describe("GridView", () => {

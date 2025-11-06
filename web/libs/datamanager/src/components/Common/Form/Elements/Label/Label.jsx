@@ -1,5 +1,5 @@
-import { forwardRef } from "react";
-import { Block, Elem } from "../../../../../utils/bem";
+import { forwardRef, createElement } from "react";
+import { cn } from "../../../../../utils/bem";
 import "./Label.scss";
 /** @deprecated - needs to be replaced with @humansignal/ui Label - visualizes differently currently */
 const Label = forwardRef(
@@ -14,16 +14,21 @@ const Label = forwardRef(
       empty: !children,
     };
 
-    return (
-      <Block ref={ref} name="label-dm" tag={tagName} style={style} mod={mods} data-required={required}>
-        <Elem name="text">
-          <Elem name="content">
-            {text}
-            {description && <Elem name="description">{description}</Elem>}
-          </Elem>
-        </Elem>
-        <Elem name="field">{children}</Elem>
-      </Block>
+    return createElement(
+      tagName,
+      {
+        ref,
+        className: cn("label-dm").mod(mods).toClassName(),
+        style,
+        "data-required": required,
+      },
+      <div className={cn("label-dm").elem("text").toClassName()}>
+        <div className={cn("label-dm").elem("content").toClassName()}>
+          {text}
+          {description && <div className={cn("label-dm").elem("description").toClassName()}>{description}</div>}
+        </div>
+      </div>,
+      <div className={cn("label-dm").elem("field").toClassName()}>{children}</div>,
     );
   },
 );

@@ -78,13 +78,6 @@ class CoreFrameworkTests(TestCase):
         self.user = User.objects.create_user(email='test@example.com', password='test123')
         self.mock_entity = MockEntity()
 
-        # Clear registry to avoid test pollution
-        transition_registry.clear()
-
-    def tearDown(self):
-        """Clean up after tests"""
-        transition_registry.clear()
-
     def test_base_transition_class(self):
         """Test BaseTransition abstract functionality"""
 
@@ -335,13 +328,6 @@ class TransitionUtilsTests(TestCase):
         self.user = User.objects.create_user(email='test@example.com', password='test123')
         self.mock_entity = MockEntity()
 
-        # Clear registry to avoid test pollution
-        transition_registry.clear()
-
-    def tearDown(self):
-        """Clean up after tests"""
-        transition_registry.clear()
-
     def test_get_available_transitions(self):
         """Test get_available_transitions utility"""
 
@@ -484,13 +470,6 @@ class ComprehensiveUsageExampleTests(TestCase):
         self.user = Mock()
         self.user.id = 123
         self.user.username = 'testuser'
-
-        # Clear registry to avoid conflicts
-        transition_registry.clear()
-
-    def tearDown(self):
-        """Clean up after tests"""
-        transition_registry.clear()
 
     def test_basic_transition_implementation(self):
         """
@@ -673,11 +652,6 @@ class ValidationAndErrorHandlingTests(TestCase):
 
     def setUp(self):
         self.task = MockTask()
-        transition_registry.clear()
-
-    def tearDown(self):
-        """Clean up after tests"""
-        transition_registry.clear()
 
     def test_pydantic_validation_errors(self):
         """Test Pydantic field validation errors"""

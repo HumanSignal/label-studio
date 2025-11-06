@@ -1,5 +1,5 @@
 import React from "react";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import "./RadioGroup.scss";
 
 const RadioContext = React.createContext();
@@ -16,9 +16,9 @@ export const RadioGroup = ({ size, value, onChange, children, ...rest }) => {
         onChange: onRadioChange,
       }}
     >
-      <Block name="radio-group-dm" mod={{ size }} {...rest}>
-        <Elem name="buttons">{children}</Elem>
-      </Block>
+      <div className={cn("radio-group-dm").mod({ size }).toClassName()} {...rest}>
+        <div className={cn("radio-group-dm").elem("buttons").toClassName()}>{children}</div>
+      </div>
     </RadioContext.Provider>
   );
 };
@@ -28,10 +28,9 @@ const RadioButton = ({ value, disabled, children, ...props }) => {
   const checked = value === currentValue;
 
   return (
-    <Elem {...props} tag="label" name="button" mod={{ checked, disabled }}>
-      <Elem
-        name="input"
-        tag="input"
+    <label {...props} className={cn("radio-group-dm").elem("button").mod({ checked, disabled }).toClassName()}>
+      <input
+        className={cn("radio-group-dm").elem("input").toClassName()}
         type="radio"
         value={value}
         checked={value === currentValue}
@@ -39,7 +38,7 @@ const RadioButton = ({ value, disabled, children, ...props }) => {
         disabled={disabled}
       />
       {children}
-    </Elem>
+    </label>
   );
 };
 

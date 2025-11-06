@@ -1,6 +1,6 @@
 import { Component, createRef, forwardRef, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { shallowEqualObjects } from "shallow-equal";
-import { Block, cn, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { objectClean } from "../../../utils/helpers";
 import { Button } from "@humansignal/ui";
 import { Oneof } from "../Oneof/Oneof";
@@ -565,13 +565,13 @@ Form.Indicator = () => {
   const state = useContext(FormStateContext);
 
   return (
-    <Block name="form-indicator-dm">
+    <div className={cn("form-indicator-dm").toClassName()}>
       <Oneof value={state}>
-        <Elem tag="span" mod={{ type: state }} name="item" case="success">
+        <span className={cn("form-indicator-dm").elem("item").mod({ type: state }).toClassName()} case="success">
           Saved!
-        </Elem>
+        </span>
       </Oneof>
-    </Block>
+    </div>
   );
 };
 

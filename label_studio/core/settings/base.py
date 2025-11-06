@@ -216,6 +216,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
     'drf_generators',
+    'fsm',  # MUST be before apps that register FSM transitions (projects, tasks)
     'core',
     'users',
     'organizations',
@@ -232,7 +233,6 @@ INSTALLED_APPS = [
     'ml_model_providers',
     'jwt_auth',
     'session_policy',
-    'fsm',
 ]
 
 MIDDLEWARE = [

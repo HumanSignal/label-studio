@@ -14,9 +14,16 @@ class TokenAuthenticationPhaseout(TokenAuthentication):
 
     def authenticate(self, request):
         """Authenticate the request and log if successful."""
+        from core.current_request import CurrentContext
         from core.feature_flags import flag_set
 
         auth_result = super().authenticate(request)
+
+        # Update CurrentContext with authenticated user
+        if auth_result is not None:
+            user, _ = auth_result
+            CurrentContext.set_user(user)
+
         JWT_ACCESS_TOKEN_ENABLED = flag_set('fflag__feature_develop__prompts__dia_1829_jwt_token_auth')
         if JWT_ACCESS_TOKEN_ENABLED and (auth_result is not None):
             user, _ = auth_result

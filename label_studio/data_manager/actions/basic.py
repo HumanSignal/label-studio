@@ -99,7 +99,9 @@ def delete_tasks_annotations(project, queryset, **kwargs):
         drafts = drafts.filter(user=int(annotator_id))
     project.summary.remove_created_drafts_and_labels(drafts)
 
-    count, _ = annotations.delete()
+    # count before delete to return the number of deleted items, not including cascade deletions
+    count = annotations.count()
+    annotations.delete()
     drafts.delete()  # since task-level annotation drafts will not have been deleted by CASCADE
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
     request = kwargs['request']

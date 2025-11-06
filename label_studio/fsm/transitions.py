@@ -10,14 +10,11 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, Generic, Optional, TypeVar
 
-from django.contrib.auth import get_user_model
 from django.db.models import Model
 from pydantic import BaseModel, ConfigDict, Field
 
-User = get_user_model()
-
 if TYPE_CHECKING:
-    from fsm.models import BaseState
+    from fsm.state_models import BaseState
 
     # Type variables for generic transition context
     EntityType = TypeVar('EntityType', bound=Model)
@@ -135,10 +132,15 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
         """
         Name of this transition for audit purposes.
 
-        Defaults to the class name in snake_case.
+        Returns the registered transition name from the decorator, or falls back
+        to the class name in snake_case.
         """
+        # Use the registered name if available (set by @register_state_transition decorator)
+        if hasattr(self.__class__, '_transition_name'):
+            return self.__class__._transition_name
+
+        # Fallback to class name in snake_case for backward compatibility
         class_name = self.__class__.__name__
-        # Convert CamelCase to snake_case
         result = ''
         for i, char in enumerate(class_name):
             if char.isupper() and i > 0:
@@ -322,3 +324,146 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
         finally:
             # Always clear context when done
             self.context = None
+
+
+class ModelChangeTransition(BaseTransition, Generic[EntityType, StateModelType]):
+    """
+    Specialized transition class for model-triggered state changes.
+
+    This class extends BaseTransition with additional context about model changes,
+    making it ideal for transitions triggered by FsmHistoryStateModel.save() operations.
+
+    Features:
+    - Access to changed fields (old vs new values)
+    - Knowledge of whether entity is being created or updated
+    - Automatic integration with FsmHistoryStateModel lifecycle
+    - Declarative trigger field specification
+
+    Example usage:
+        @register_state_transition('task', 'task_created', triggers_on_create=True)
+        class TaskCreatedTransition(ModelChangeTransition[Task, TaskState]):
+            @property
+            def target_state(self) -> str:
+                return 'CREATED'
+
+            def transition(self, context: TransitionContext) -> Dict[str, Any]:
+                return {'reason': 'Task created'}
+
+        @register_state_transition('task', 'task_labeled', triggers_on=['is_labeled'])
+        class TaskLabeledTransition(ModelChangeTransition[Task, TaskState]):
+            @property
+            def target_state(self) -> str:
+                return 'ANNOTATION_COMPLETE'
+
+            def transition(self, context: TransitionContext) -> Dict[str, Any]:
+                return {'reason': 'Task became labeled'}
+    """
+
+    # Additional fields specific to model changes
+    changed_fields: Dict[str, Dict[str, Any]] = Field(
+        default_factory=dict, description="Fields that changed: {field_name: {'old': value, 'new': value}}"
+    )
+    is_creating: bool = Field(default=False, description='Whether this is a new entity creation')
+
+    # Class-level metadata for trigger configuration (set by decorator)
+    _triggers_on_create: bool = False
+    _triggers_on_update: bool = True
+    _trigger_fields: list = []  # Fields that trigger this transition
+
+    def should_execute(self, context: TransitionContext[EntityType, StateModelType]) -> bool:
+        """
+        Determine if this transition should execute based on model changes.
+
+        Override in subclasses to provide specific logic based on:
+        - Whether entity is being created (is_creating)
+        - Which fields changed (changed_fields)
+        - Current and target states
+
+        Default implementation always returns True.
+
+        Args:
+            context: The transition context with entity and state information
+
+        Returns:
+            True if transition should execute, False to skip
+
+        Example:
+            def should_execute(self, context: TransitionContext) -> bool:
+                # Only execute if is_labeled changed to True
+                if 'is_labeled' in self.changed_fields:
+                    old_val = self.changed_fields['is_labeled']['old']
+                    new_val = self.changed_fields['is_labeled']['new']
+                    return not old_val and new_val
+                return False
+        """
+        return True
+
+    def validate_transition(self, context: TransitionContext[EntityType, StateModelType]) -> bool:
+        """
+        Validate whether this transition should execute.
+
+        Extends parent validation with should_execute() check.
+
+        Args:
+            context: The transition context
+
+        Returns:
+            True if transition is valid and should execute
+
+        Raises:
+            TransitionValidationError: If validation fails
+        """
+        # First check parent validation
+        if not super().validate_transition(context):
+            return False
+
+        # Then check if we should execute based on model changes
+        if not self.should_execute(context):
+            return False
+
+        return True
+
+    @classmethod
+    def from_model_change(
+        cls, is_creating: bool, changed_fields: Dict[str, tuple], **extra_data
+    ) -> 'ModelChangeTransition':
+        """
+        Factory method to create a transition from model change data.
+
+        This is called by FsmHistoryStateModel when a transition needs to be executed.
+
+        Args:
+            is_creating: Whether the model is being created
+            changed_fields: Dict of changed fields (field_name -> (old, new))
+            **extra_data: Additional data to pass to the transition
+
+        Returns:
+            Configured transition instance
+        """
+        # Convert changed_fields from tuple format to dict format
+        converted_fields = {
+            field_name: {'old': old_val, 'new': new_val} for field_name, (old_val, new_val) in changed_fields.items()
+        }
+
+        return cls(is_creating=is_creating, changed_fields=converted_fields, **extra_data)
+
+    def get_reason(self, context: TransitionContext[EntityType, StateModelType]) -> str:
+        """
+        Get a human-readable reason for this model change transition.
+
+        Override to provide more specific reasons based on model changes.
+
+        Args:
+            context: The transition context
+
+        Returns:
+            Human-readable reason string
+        """
+        if self.is_creating:
+            return f'{context.entity.__class__.__name__} created'
+
+        if self.changed_fields:
+            fields = ', '.join(self.changed_fields.keys())
+            return f'{context.entity.__class__.__name__} updated ({fields} changed)'
+
+        return f'{context.entity.__class__.__name__} modified'

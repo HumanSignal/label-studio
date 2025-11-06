@@ -2,7 +2,7 @@ import { inject } from "mobx-react";
 import { observer } from "mobx-react-lite";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { IconChevronDown, IconChevronLeft, IconGearNewUI } from "@humansignal/icons";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { Button } from "@humansignal/ui";
 import { FieldsButton } from "../Common/FieldsButton";
 import { Icon } from "../Common/Icon/Icon";
@@ -14,7 +14,7 @@ import "./Label.scss";
 // Todo: consider renaming this file to something like LabelingWrapper as it is not a Label component
 const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
   return (
-    <Elem name="header" mod={{ labelStream: !isExplorerMode }}>
+    <div className={cn("label-view").elem("header").mod({ labelStream: !isExplorerMode }).toClassName()}>
       <Space size="large">
         {SDK.interfaceEnabled("backButton") && (
           <Button
@@ -36,7 +36,7 @@ const LabelingHeader = ({ SDK, onClick, isExplorerMode }) => {
           />
         ) : null}
       </Space>
-    </Elem>
+    </div>
   );
 };
 
@@ -95,17 +95,16 @@ export const Labeling = injector(
     }, []);
 
     return (
-      <Block name="label-view" mod={{ loading }}>
+      <div className={cn("label-view").mod({ loading }).toClassName()}>
         {SDK.interfaceEnabled("labelingHeader") && (
           <LabelingHeader SDK={SDK} onClick={closeLabeling} isExplorerMode={isExplorerMode} />
         )}
 
-        <Elem name="content">
+        <div className={cn("label-view").elem("content").toClassName()}>
           {isExplorerMode && (
-            <Elem name="table">
-              <Elem
-                tag={Resizer}
-                name="dataview"
+            <div className={cn("label-view").elem("table").toClassName()}>
+              <Resizer
+                className={cn("label-view").elem("dataview").toClassName()}
                 minWidth={202}
                 showResizerLine={false}
                 type={"quickview"}
@@ -115,16 +114,26 @@ export const Labeling = injector(
                 style={{ display: "flex", flex: 1, width: "100%" }}
               >
                 <DataView />
-              </Elem>
-            </Elem>
+              </Resizer>
+            </div>
           )}
 
-          <Elem name="lsf-wrapper" mod={{ mode: isExplorerMode ? "explorer" : "labeling" }}>
-            {loading && <Elem name="waiting" mod={{ animated: true }} />}
-            <Elem ref={lsfRef} id="label-studio-dm" name="lsf-container" key="label-studio" />
-          </Elem>
-        </Elem>
-      </Block>
+          <div
+            className={cn("label-view")
+              .elem("lsf-wrapper")
+              .mod({ mode: isExplorerMode ? "explorer" : "labeling" })
+              .toClassName()}
+          >
+            {loading && <div className={cn("label-view").elem("waiting").mod({ animated: true }).toClassName()} />}
+            <div
+              ref={lsfRef}
+              id="label-studio-dm"
+              className={cn("label-view").elem("lsf-container").toClassName()}
+              key="label-studio"
+            />
+          </div>
+        </div>
+      </div>
     );
   }),
 );

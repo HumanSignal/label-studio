@@ -12,7 +12,7 @@ from typing import Dict, Optional, Type
 from django.db.models import Model, TextChoices
 
 if typing.TYPE_CHECKING:
-    from fsm.models import BaseState
+    from fsm.state_models import BaseState
     from fsm.transitions import BaseTransition
 
 logger = logging.getLogger(__name__)
@@ -300,21 +300,54 @@ class TransitionRegistry:
 transition_registry = TransitionRegistry()
 
 
-def register_state_transition(entity_name: str, transition_name: str):
+def register_state_transition(
+    entity_name: str,
+    transition_name: str,
+    triggers_on_create: bool = False,
+    triggers_on_update: bool = True,
+    triggers_on: list = None,
+    force_state_record: bool = False,
+):
     """
-    Decorator to register a state transition class.
+    Decorator to register a state transition class with trigger metadata.
+
+    This decorator not only registers the transition but also configures when
+    it should be triggered based on model changes.
 
     Args:
-        entity_name: Name of the entity type
-        transition_name: Name of the transition (defaults to class name in snake_case)
+        entity_name: Name of the entity type (e.g., 'task', 'project')
+        transition_name: Name of the transition (e.g., 'task_created')
+        triggers_on_create: If True, triggers when entity is created
+        triggers_on_update: If True, can trigger on updates (default: True)
+        triggers_on: List of field names that trigger this transition
+        force_state_record: If True, creates state record even if state doesn't change (for audit trails)
 
     Example:
-        @register_state_transition('task', 'start_task')
-        class StartTaskTransition(BaseTransition[Task, TaskState]):
-            # ... implementation
+        # Trigger only on creation
+        @register_state_transition('task', 'task_created', triggers_on_create=True)
+        class TaskCreatedTransition(ModelChangeTransition):
+            pass
+
+        # Trigger when specific fields change
+        @register_state_transition('project', 'project_published', triggers_on=['is_published'])
+        class ProjectPublishedTransition(ModelChangeTransition):
+            pass
+
+        # Trigger when any of several fields change
+        @register_state_transition('project', 'settings_changed',
+                                   triggers_on=['maximum_annotations', 'overlap_cohort_percentage'])
+        class ProjectSettingsChangedTransition(ModelChangeTransition):
+            pass
     """
 
     def decorator(transition_class: 'BaseTransition') -> 'BaseTransition':
+        # Store trigger metadata and transition name on the class
+        transition_class._triggers_on_create = triggers_on_create
+        transition_class._triggers_on_update = triggers_on_update
+        transition_class._trigger_fields = triggers_on or []
+        transition_class._transition_name = transition_name  # Store the registered transition name
+        transition_class._force_state_record = force_state_record  # Store whether to force state record creation
+
         transition_registry.register(entity_name, transition_name, transition_class)
         return transition_class
 
