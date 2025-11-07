@@ -66,50 +66,80 @@ class FsmHistoryStateModel(models.Model):
     @classmethod
     def from_db(cls, db, field_names, values):
         """
-        Override from_db to capture original values when loading from database.
+        Override from_db to store raw DB values for lazy capture.
 
         Django calls this method instead of __init__ when loading models from the database.
-        We need to capture the original field values here for change detection.
+
+        PERFORMANCE: We store the raw field values here without processing them.
+        This avoids accessing any ForeignKey fields (which would trigger queries).
+        We only process these values into _original_values in save() when we actually
+        need them for change detection.
+
+        For a dashboard loading 100 tasks that are never modified:
+        - Before: 100 calls to _capture_original_values() with field access
+        - After: 100 lightweight stores of raw values (no field access, no queries)
+        - Processing only happens for models that are actually saved
         """
         instance = super().from_db(db, field_names, values)
         # Initialize as empty dict for safe access
         instance._original_values = {}
-        # Capture original values immediately after loading from DB
-        # This ensures we have the baseline for change detection on the first save
-        instance._capture_original_values()
+
+        # Store raw DB values for lazy processing (avoids any field access/queries)
+        # We'll process these in save() only if FSM is enabled and we need change detection
+        instance._raw_db_values = dict(zip(field_names, values))
+        instance._loaded_from_db = True
+
         return instance
+
+    def _process_raw_db_values(self):
+        """
+        Process raw DB values into _original_values for change detection.
+
+        PERFORMANCE: This is only called when we're about to save and need change
+        detection. For read-only queries, this is never called, avoiding any overhead.
+
+        Uses the raw values stored in from_db() without accessing any model fields,
+        so it never triggers database queries.
+        """
+        if not hasattr(self, '_raw_db_values'):
+            # Not loaded from DB, nothing to process
+            return
+
+        self._original_values = {}
+
+        # Process raw DB values - these are already the column values (including _id for FKs)
+        # so we don't need to access any fields, completely avoiding N+1 queries
+        for field in self._meta.fields:
+            # Use attname (column name) to get the raw value
+            if field.attname in self._raw_db_values:
+                # Store using field.name as key for consistency with _get_changed_fields()
+                self._original_values[field.name] = self._raw_db_values[field.attname]
+
+        # Clean up raw values after processing to free memory
+        delattr(self, '_raw_db_values')
 
     def _capture_original_values(self):
         """
         Capture current field values for change detection.
 
-        This allows us to detect which fields changed during save operations,
-        which is crucial for determining appropriate FSM transitions.
+        This is called after save() to refresh the baseline for the next save.
 
-        For ForeignKey fields, we store the PK instead of the object to avoid
-        circular references and recursion issues.
-
-        Deferred fields (not yet loaded from DB) are skipped to prevent infinite
-        recursion when accessing them would trigger refresh_from_db().
-
-        This is called after each save to refresh the baseline for the next save.
+        PERFORMANCE: For ForeignKey fields, we access the _id column directly
+        (field.attname) to avoid triggering N+1 queries.
         """
         self._original_values = {}
-
-        # Get deferred fields to avoid triggering recursive database loads
-        # Deferred fields haven't been loaded yet, so they can't have changed
         deferred_fields = self.get_deferred_fields()
 
         for field in self._meta.fields:
-            # Skip deferred fields to prevent recursion via refresh_from_db()
             if field.attname in deferred_fields:
                 continue
 
-            value = getattr(self, field.name, None)
-            # For ForeignKey fields, store PK to avoid circular references
-            if field.is_relation and field.many_to_one and value is not None:
-                self._original_values[field.name] = value.pk if hasattr(value, 'pk') else value
+            # PERFORMANCE: For ForeignKey fields, access the _id column directly
+            if field.is_relation and field.many_to_one:
+                value = getattr(self, field.attname, None)
+                self._original_values[field.name] = value
             else:
+                value = getattr(self, field.name, None)
                 self._original_values[field.name] = value
 
     def __reduce_ex__(self, protocol):
@@ -117,7 +147,7 @@ class FsmHistoryStateModel(models.Model):
         Override serialization to exclude internal FSM tracking fields.
 
         Django's serialization uses pickle which calls __reduce_ex__.
-        We exclude _original_values since it's only needed for runtime
+        We exclude FSM tracking fields since they're only needed for runtime
         change detection, not for serialization/restoration.
         """
         # Get the default reduction
@@ -129,6 +159,8 @@ class FsmHistoryStateModel(models.Model):
             state = reduction[2].copy()
             # Remove internal FSM fields from serialization
             state.pop('_original_values', None)
+            state.pop('_raw_db_values', None)
+            state.pop('_loaded_from_db', None)
             # Return new reduction with cleaned state
             return (reduction[0], reduction[1], state) + reduction[3:]
 
@@ -353,56 +385,26 @@ class FsmHistoryStateModel(models.Model):
         Check if FSM processing should be executed.
 
         Returns False if:
-        - Feature flag is disabled
-        - User context is unavailable (tests must set CurrentContext explicitly)
+        - Feature flag is disabled (cached at request level)
+        - Manually disabled via set_fsm_disabled() (for tests/bulk operations)
         - Explicitly skipped via instance attribute
 
         Returns:
             True if FSM should execute, False otherwise
 
-        Note:
-            CurrentContext is available in web requests and background jobs.
-            In tests, it must be set explicitly for the user/organization.
+        PERFORMANCE: Uses cached FSM enabled state from CurrentContext that was set
+        once per request when user was initialized. This is a simple boolean check
+        instead of repeated feature flag lookups and user authentication checks.
         """
         # Check for instance-level skip flag
         if getattr(self, '_skip_fsm', False):
             return False
 
-        # Use the centralized FSM enabled check from utils
-        # This handles feature flag and thread-local overrides
-        try:
-            from core.current_request import CurrentContext
-            from fsm.utils import is_fsm_enabled
+        # Fast path: Check cached FSM enabled state
+        # This was set once per request in CurrentContext.set_user()
+        from core.current_request import CurrentContext
 
-            # Get user from CurrentContext - don't fall back to AnonymousUser
-            # If no user in context (e.g., tests without explicit setup), return False
-            try:
-                user = CurrentContext.get_user()
-                user_type = type(user).__name__ if user else None
-                user_authenticated = getattr(user, 'is_authenticated', None) if user else None
-                logger.info(
-                    f'FSM check for {self.__class__.__name__}(id={getattr(self, "pk", None)}): '
-                    f'user_type={user_type}, authenticated={user_authenticated}'
-                )
-                if user is None:
-                    logger.info(f'FSM check: User is None, skipping FSM for {self.__class__.__name__}')
-                    return False
-                # Check if user is authenticated (not AnonymousUser)
-                if not user.is_authenticated:
-                    logger.info(
-                        f'FSM check: User {user_type} not authenticated, skipping FSM for {self.__class__.__name__}'
-                    )
-                    return False
-            except Exception:
-                # CurrentContext not available or no user set
-                # This is expected in tests that don't set up context
-                logger.info(f'FSM check: Exception getting user, skipping FSM for {self.__class__.__name__}')
-                return False
-
-            return is_fsm_enabled(user=user)
-        except Exception as e:
-            logger.debug(f'FSM check failed: {e}')
-            return False
+        return CurrentContext.is_fsm_enabled()
 
     def save(self, *args, **kwargs):
         """
@@ -435,8 +437,15 @@ class FsmHistoryStateModel(models.Model):
         # Check if this is a creation vs update
         is_creating = self._state.adding
 
+        # PERFORMANCE: Process raw DB values into _original_values ONLY when needed
+        # This is the key optimization - for read-only queries, we never process the values
+        # Only when we're about to save and FSM is enabled do we pay the cost
+        if not skip_fsm and not is_creating and self._should_execute_fsm():
+            # Only process if we haven't already (for subsequent saves)
+            if not self._original_values and hasattr(self, '_raw_db_values'):
+                self._process_raw_db_values()
+
         # Capture changed fields before save (only for updates)
-        # Note: _original_values should already be populated by from_db() or previous save()
         changed_fields = {} if is_creating else self._get_changed_fields()
 
         # Perform the actual save
@@ -500,8 +509,10 @@ class FsmHistoryStateModel(models.Model):
                     exc_info=True,
                 )
 
-        # Update original values after save for next time
-        self._capture_original_values()
+        # Update original values after save for next time (only if FSM is actually running)
+        # This prevents unnecessary field access when FSM is disabled
+        if not skip_fsm and should_execute:
+            self._capture_original_values()
 
         return result
 
