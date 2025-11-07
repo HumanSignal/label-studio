@@ -144,8 +144,10 @@ const Typography = forwardRef<HTMLElement, TypographyProps>(
           ref={elementRef}
           className={cnm(styles[baseClass], fontStyle === "italic" && "italic", className)}
           style={clampStyles}
-          data-tmp-collapse={hasTruncation && !isExpanded ? undefined : ""}
-          aria-expanded={isExpanded}
+          {...(hasTruncation && {
+            "data-tmp-collapse": !isExpanded ? undefined : "",
+            "aria-expanded": isExpanded,
+          })}
           {...rest}
         >
           {children}
