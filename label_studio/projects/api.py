@@ -745,10 +745,6 @@ def read_templates_and_groups():
             if config.get('group', '').lower() == 'community contributions':
                 continue
 
-        if settings.VERSION_EDITION == 'Community':
-            if config.get('type', 'community').lower() != 'community':
-                continue
-
         if config.get('image', '').startswith('/static') and settings.HOSTNAME:
             # if hostname set manually, create full image urls
             config['image'] = settings.HOSTNAME + config['image']

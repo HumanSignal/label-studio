@@ -141,6 +141,10 @@ logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 # This indicates whether the code is running in a Continuous Integration environment.
 CI = get_bool_env('CI', False)
 
+# Control whether async SQL migrations can be scheduled (SCHEDULED status) instead of running immediately.
+# If False, migrations that would normally be scheduled will be executed immediately.
+ALLOW_SCHEDULED_MIGRATIONS = get_bool_env('ALLOW_SCHEDULED_MIGRATIONS', False)
+
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DJANGO_DB_MYSQL = 'mysql'

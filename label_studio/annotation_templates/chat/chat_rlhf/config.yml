@@ -1,0 +1,153 @@
+title: Evaluate Production Conversations for RLHF
+type: enterprise
+group: Chat
+order: 5
+image: /static/templates/chat-rlhf.png
+details: |
+  <h1>Bring production chats into this template to learn why your agent succeeds or fails</h1>
+  <dl>
+    <dt>Industry Applications</dt>
+    <dd>RLHF data collection, production conversation analysis, agent improvement, user preference learning, failure analysis, success pattern identification, fine-tuning data generation, quality monitoring, real-world behavior evaluation, feedback collection</dd>
+    <dt>Associated Models</dt>
+    <dd>RLHF training, preference learning, conversation evaluation, quality metrics</dd>
+    <dt>Domain Terminology</dt>
+    <dd>RLHF, human feedback, preference labels, conversation-level evaluation, per-message evaluation, production conversations, agent performance, success patterns</dd>
+  </dl>
+config: |
+  <View>
+    <Style>
+      .chat {
+        border: 1px solid var(--color-neutral-border);
+        padding: var(--spacing-tight);
+        border-radius: var(--corner-radius-medium);
+        background-color: var(--color-neutral-background);
+      }
+      .evaluation {
+          border: 2px solid var(--color-accent-canteloupe-base);
+          background-color: var(--color-accent-canteloupe-subtlest);
+          color: var(--color-accent-canteloupe-bold);
+          padding: var(--spacing-tight);
+          border-radius: var(--corner-radius-medium);
+          margin-bottom: var(--spacing-base);
+      }
+      <!-- Choice text -->
+      .evaluation span {
+          color: var(--color-accent-canteloupe-bold);
+      }
+      <!-- Star rating -->
+      .evaluation .ant-rate-star.ant-rate-star-full span {
+        color: var(--color-accent-canteloupe-base);
+       }
+     
+      .overall-chat {
+         border-bottom: 1px solid var(--color-neutral-border);
+         margin-bottom: var(--spacing-base);
+      }
+      .instructions {
+         color: var(--color-accent-canteloupe-bold);
+         background-color: var(--color-accent-canteloupe-subtlest);
+         padding: var(--spacing-tight);
+         border-radius: var(--corner-radius-medium);
+         border: 1px solid var(--color-accent-canteloupe-subtle);
+      }
+      <!-- Allow enlarging the instruction text -->
+      .lsf-richtext__container.lsf-htx-richtext {
+        font-size: 16px !important;
+        line-height: 1.6;
+      }
+      
+      <!-- Remove excess height from the chat to allow space for instruction text -->
+      .htx-chat { 
+        --excess-height: 275px;
+        background-color: var(--color-neutral-background);
+      }
+    </Style>
+    <View style="display: flex; gap: var(--spacing-wide);">
+      
+      <!-- Left: conversation -->
+      <View className="chat" style="flex: 2;">
+        <View className="instructions">
+          <Text name="instructions" value="Review the conversation in detail. 
+                                           As you read through it, click on individual messages to 
+                                           provide feedback about accuracy, clarity, and intent." />
+        </View>
+        
+        <Chat name="chat" value="$chat" 
+              minMessages="2" 
+              editable="false" />
+      </View>
+
+      <!-- Right: conversation and message evaluation -->
+      <View style="flex: 1; display: flex; flex-direction: column;" className="evaluation">
+        
+        <!-- Evaluate the whole conversation -->
+        <View className="overall-chat">
+          <Header size="4">Overall quality of this conversation</Header>
+          <Rating name="rating" toName="chat" />
+          
+          <View style="padding-top: var(--spacing-base);">
+            <Text name="add_comment" value="Add a comment (optional)" />
+            <TextArea name="conversation_comment" toName="chat" />
+          </View>
+        </View>
+
+        <!-- Per-message evaluation -->
+        <View style="flex: 1; overflow: auto;">
+        
+          <!-- Only visible when no message is selected -->
+          <View visibleWhen="no-region-selected">
+            <Header value="Click on a message to evaluate" size="3"/>
+          </View>
+
+          <!-- Only visible when an assistant message is selected -->
+          <View visibleWhen="region-selected" whenRole="assistant">
+            <Header value="Response Accuracy"/>
+            <Rating name="assistant_response_accuracy" toName="chat" perRegion="true" maxRating="5" icon="star"/>
+            
+            <Header value="Relevance"/>
+            <Choices name="relevance" toName="chat" perRegion="true" >
+              <Choice value="Highly relevant" />
+              <Choice value="Somewhat relevant" />
+              <Choice value="Not relevant" />
+            </Choices>
+            
+            <Header value="Correctness"/>
+            <Choices name="correctness" toName="chat" perRegion="true" >
+              <Choice value="Accurate and factual" />
+              <Choice value="Mostly accurate with minor issues" />
+              <Choice value="Contains significant errors" />
+            </Choices>
+            
+            <Header value="Tone"/>
+            <Choices name="tone" toName="chat" perRegion="true" choice="multiple" >
+              <Choice value="Too formal" />
+              <Choice value="Too casual" />
+              <Choice value="Appropriate" />
+            </Choices>
+            
+            <Header value="Add a comment (optional)"/>
+            <TextArea perRegion="true" name="message_comment" toName="chat" />
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+
+  <!-- {
+    "data": {
+      "text": "Review the conversation in detail. As you read through it, click on individual messages to provide feedback about accuracy, clarity, and intent.",
+      "chat": [
+        {
+          "role": "user",
+          "content": "I'm onboarding a new annotator. What are the first steps to ensure quality and speed?"
+        },
+        {
+          "role": "assistant",
+          "content": "Start by creating their account and assigning the Annotator role so permissions are scoped correctly. Add concise labeling instructions that appear before labeling. Use a small ground-truth set and require overlap (e.g., 2 annotators per task) with a reviewer to resolve disagreements. Enable comments so reviewers can leave precise, in-task feedback."
+        }
+      ]
+    }
+  } -->
+
+
+
