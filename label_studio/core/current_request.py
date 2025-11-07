@@ -1,7 +1,6 @@
 from threading import local
 from typing import Any
 
-from core.feature_flags import flag_set
 from django.core.signals import request_finished
 from django.dispatch import receiver
 from django.middleware.common import CommonMiddleware
@@ -93,6 +92,8 @@ class CurrentContext:
             user: The user to check FSM feature flag for
         """
         try:
+            from core.feature_flags import flag_set
+
             # Only import when needed to avoid circular imports
 
             # Check feature flag once and cache the result
