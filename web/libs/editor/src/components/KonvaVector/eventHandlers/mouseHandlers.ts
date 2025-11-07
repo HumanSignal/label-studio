@@ -35,8 +35,13 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
 
     let shiftClickHandled = false;
 
-    // Only run Shift+click logic if Shift key is actually held
-    if (e.evt.shiftKey === true && props.cursorPosition && props.initialPoints.length >= 2) {
+    // Set up ghost point drag info when Shift is held (for UI feedback)
+    // This works even when internal point addition is disabled
+    if (
+      e.evt.shiftKey === true &&
+      props.cursorPosition &&
+      props.initialPoints.length >= 2
+    ) {
       // Check if cursor is over an existing point
       const scale = props.transform.zoom * props.fitScale;
       const hitRadius = 10 / scale;
@@ -81,7 +86,8 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
             nextPointId = props.initialPoints[closestPathPoint.segmentIndex]?.id || "";
           }
 
-          // Store ghost point info for potential drag
+          // Store ghost point info for potential drag (UI feedback)
+          // This is stored even when internal point addition is disabled
           props.setGhostPointDragInfo({
             ghostPoint: {
               x: closestPathPoint.point.x,
@@ -92,13 +98,18 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
             isDragging: false,
             dragDistance: 0,
           });
-          shiftClickHandled = true; // Mark that Shift+click was handled
+          
+          // Only mark as handled if internal point addition is enabled
+          // This prevents other handlers from interfering when we want to add points
+          if (!props.disableInternalPointAddition) {
+            shiftClickHandled = true; // Mark that Shift+click was handled
+          }
         }
       }
       // If we're over a point while holding Shift, allow normal point interactions to continue
     }
 
-    // Skip the rest of mouse down logic if Shift+click was handled
+    // Skip the rest of mouse down logic if Shift+click was handled (only when internal addition is enabled)
     if (shiftClickHandled) {
       return;
     }
@@ -300,7 +311,10 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
     props.setCursorPosition(imagePos);
 
     // Set ghost point when Shift is held - snap to path (but not when dragging or creating bezier points)
+    // When disableInternalPointAddition is true, ghost point is handled by stage-level events
+    // So we skip this logic to avoid conflicts
     if (
+      !props.disableInternalPointAddition &&
       e.evt.shiftKey &&
       props.cursorPosition &&
       props.initialPoints.length >= 2 &&
@@ -373,8 +387,8 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
           props.setGhostPoint(null);
         }
       }
-    } else if (!e.evt.shiftKey) {
-      // Clear ghost point when Shift is not held
+    } else if (!props.disableInternalPointAddition && !e.evt.shiftKey) {
+      // Clear ghost point when Shift is not held (only when not using stage-level events)
       props.setGhostPoint(null);
     }
 
@@ -645,7 +659,13 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
     }
 
     // Handle shift-click-drag bezier creation (start dragging detection) - only when shift key is held
-    if (props.ghostPointDragInfo && !props.ghostPointDragInfo.isDragging && e.evt.shiftKey && props.allowBezier) {
+    // Ghost point drag info is tracked for UI feedback even when internal point addition is disabled
+    if (
+      props.ghostPointDragInfo &&
+      !props.ghostPointDragInfo.isDragging &&
+      e.evt.shiftKey &&
+      props.allowBezier
+    ) {
       // Check if we should start dragging (mouse moved enough)
       const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
@@ -656,46 +676,50 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
 
       // Start dragging if we've moved more than 5 pixels
       if (dragDistance > 5) {
-        // Create a bezier point at the ghost point location
-        const ghostPoint = props.ghostPointDragInfo.ghostPoint;
-        const prevPoint = props.initialPoints.find((p) => p.id === ghostPoint.prevPointId);
-        const nextPoint = props.initialPoints.find((p) => p.id === ghostPoint.nextPointId);
+        // Only create actual bezier point if internal point addition is enabled
+        if (!props.disableInternalPointAddition) {
+          // Create a bezier point at the ghost point location
+          const ghostPoint = props.ghostPointDragInfo.ghostPoint;
+          const prevPoint = props.initialPoints.find((p) => p.id === ghostPoint.prevPointId);
+          const nextPoint = props.initialPoints.find((p) => p.id === ghostPoint.nextPointId);
 
-        if (prevPoint && nextPoint) {
-          // Snap to pixel grid if enabled
-          const snappedPos = snapToPixel(imagePos, props.pixelSnapping);
+          if (prevPoint && nextPoint) {
+            // Snap to pixel grid if enabled
+            const snappedPos = snapToPixel(imagePos, props.pixelSnapping);
 
-          // Create initial control points - control point 1 will follow cursor, control point 2 will be opposite
-          const controlPoint1 = { x: snappedPos.x, y: snappedPos.y };
-          const controlPoint2 = {
-            x: ghostPoint.x - (snappedPos.x - ghostPoint.x),
-            y: ghostPoint.y - (snappedPos.y - ghostPoint.y),
-          };
+            // Create initial control points - control point 1 will follow cursor, control point 2 will be opposite
+            const controlPoint1 = { x: snappedPos.x, y: snappedPos.y };
+            const controlPoint2 = {
+              x: ghostPoint.x - (snappedPos.x - ghostPoint.x),
+              y: ghostPoint.y - (snappedPos.y - ghostPoint.y),
+            };
 
-          // Insert the bezier point
-          const result = props.pointCreationManager?.insertPointBetween(
-            ghostPoint.x,
-            ghostPoint.y,
-            prevPoint.id,
-            nextPoint.id,
-            PointType.BEZIER,
-            controlPoint1,
-            controlPoint2,
-          ) || { success: false };
+            // Insert the bezier point
+            const result = props.pointCreationManager?.insertPointBetween(
+              ghostPoint.x,
+              ghostPoint.y,
+              prevPoint.id,
+              nextPoint.id,
+              PointType.BEZIER,
+              controlPoint1,
+              controlPoint2,
+            ) || { success: false };
 
-          if (result.success && result.newPointIndex !== undefined) {
-            // Store the index of the newly created bezier point
-            props.setNewPointDragIndex(result.newPointIndex);
-            // Set dragging state for bezier control point manipulation
-            props.setIsDraggingNewBezier(true);
-            // Mark that we've handled this interaction to prevent click handler from running
-            handledSelectionInMouseDown.current = true;
-          } else {
-            // Failed to insert bezier point
+            if (result.success && result.newPointIndex !== undefined) {
+              // Store the index of the newly created bezier point
+              props.setNewPointDragIndex(result.newPointIndex);
+              // Set dragging state for bezier control point manipulation
+              props.setIsDraggingNewBezier(true);
+              // Mark that we've handled this interaction to prevent click handler from running
+              handledSelectionInMouseDown.current = true;
+            } else {
+              // Failed to insert bezier point
+            }
           }
         }
 
-        // Update ghost point drag info to indicate we're now dragging
+        // Update ghost point drag info to indicate we're now dragging (for UI feedback)
+        // This happens even when internal point addition is disabled
         props.setGhostPointDragInfo({
           ...props.ghostPointDragInfo,
           isDragging: true,
@@ -707,12 +731,15 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       }
     } else if (props.ghostPointDragInfo?.isDragging && props.isDraggingNewBezier) {
       // Continue shift-click-drag bezier point creation - update control points to follow cursor
+      // Only update actual control points if internal point addition is enabled
+      if (!props.disableInternalPointAddition) {
+        const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
+        // Use the shared utility for continuing bezier drag
+        continueBezierDrag(props);
+      }
+
+      // Update ghost point drag info (for UI feedback)
       const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
-
-      // Use the shared utility for continuing bezier drag
-      continueBezierDrag(props);
-
-      // Update ghost point drag info
       props.setGhostPointDragInfo({
         ...props.ghostPointDragInfo,
         dragDistance: Math.sqrt(
@@ -791,7 +818,8 @@ export function createMouseUpHandler(props: EventHandlerProps) {
     }
 
     // Handle ghost point drag completion
-    if (wasGhostDrag && props.ghostPointDragInfo?.ghostPoint) {
+    // Skip if internal point addition is disabled
+    if (!props.disableInternalPointAddition && wasGhostDrag && props.ghostPointDragInfo?.ghostPoint) {
       const { ghostPoint, dragDistance } = props.ghostPointDragInfo;
 
       // If we were creating a bezier point, it was already created during the drag
@@ -840,7 +868,9 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
     // Handle Shift+click functionality (before other checks)
     if (e.evt.shiftKey && !e.evt.altKey) {
       // First, check if we're near a ghost point to add a point
+      // Skip if internal point addition is disabled
       if (
+        !props.disableInternalPointAddition &&
         props.cursorPosition &&
         !props.isDraggingNewBezier &&
         !props.ghostPointDragInfo?.isDragging &&
@@ -960,7 +990,13 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
 
     // Handle drawing mode clicks (only when path is not closed)
     // Skip if PointCreationManager is currently creating a point
-    if (props.isDrawingMode && !props.isPathClosed && !props.pointCreationManager?.isCreating()) {
+    // Skip if internal point addition is disabled
+    if (
+      !props.disableInternalPointAddition &&
+      props.isDrawingMode &&
+      !props.isPathClosed &&
+      !props.pointCreationManager?.isCreating()
+    ) {
       // Handle regular click (add regular point)
       if (handleDrawingModeClick(e, props)) {
         return;

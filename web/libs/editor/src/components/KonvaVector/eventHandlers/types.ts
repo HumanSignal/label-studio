@@ -104,6 +104,7 @@ export interface EventHandlerProps {
   setLastAddedPointId?: (pointId: string | null) => void;
   isTransforming?: boolean;
   disabled?: boolean;
+  disableInternalPointAddition?: boolean;
   pointCreationManager?: {
     isCreating: () => boolean;
     createRegularPointAt: (x: number, y: number, prevPointId?: string) => boolean;

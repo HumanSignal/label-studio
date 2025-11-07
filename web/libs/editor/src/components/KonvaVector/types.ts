@@ -215,6 +215,8 @@ export interface KonvaVectorProps {
   transformMode?: boolean;
   /** Whether multiple regions are currently selected (disables internal transformer) */
   isMultiRegionSelected?: boolean;
+  /** Disable internal point addition - when true, prevents KonvaVector from adding points internally and disables the invisible shape */
+  disableInternalPointAddition?: boolean;
   /** Name attribute for the component */
   name?: string;
   /** Ref to access component methods */

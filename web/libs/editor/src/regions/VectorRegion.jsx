@@ -438,6 +438,31 @@ const Model = types
         self.vectorRef = ref;
       },
 
+      addPoint(x, y) {
+        const image = self.parent.currentImageEntity;
+        const width = image.naturalWidth;
+        const height = image.naturalHeight;
+
+        const realX = (x / 100) * width;
+        const realY = (y / 100) * height;
+
+        if (!self.vectorRef) {
+          return;
+        }
+        if (self.closed) {
+          return;
+        }
+
+        // Use KonvaVector's programmatic point creation methods
+        // Start a point, then immediately commit it to create a regular point
+        const startResult = self.vectorRef.startPoint(realX, realY);
+        if (startResult) {
+          const commitResult = self.vectorRef.commitPoint(realX, realY);
+          return commitResult;
+        }
+        return null;
+      },
+
       // Uses KonvaVector startPoint to start drawing
       // This will only initiate point drawing, but won't create actual point
       startPoint(x, y) {
@@ -663,7 +688,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             e.evt.preventDefault();
             item.toggleTransformMode();
           }}
-          transformMode={!disabled && item.transformMode}
           closed={item.closed}
           width={stageWidth}
           height={stageHeight}
@@ -690,6 +714,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           pointStroke={item.selected ? "#ff0000" : regionStyles.strokeColor}
           pointStrokeSelected="#ff6b35"
           pointStrokeWidth={item.selected ? 2 : 1}
+          disableInternalPointAddition={true}
         />
 
         {item.vertices.length > 0 && (

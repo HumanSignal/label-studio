@@ -13,7 +13,9 @@ import {
 import { createEventHandlers } from "./eventHandlers";
 import { convertPoint } from "./pointManagement";
 import { normalizePoints, convertBezierToSimplePoints, isPointInPolygon } from "./utils";
-import { findClosestPointOnPath, getDistance } from "./eventHandlers/utils";
+import { findClosestPointOnPath, getDistance, snapToPixel } from "./eventHandlers/utils";
+import { constrainAnchorPointsToBounds, constrainPointToBounds } from "./utils/boundsChecking";
+import { stageToImageCoordinates } from "./eventHandlers/utils";
 import { PointCreationManager } from "./pointCreationManager";
 import { VectorSelectionTracker, type VectorInstance } from "./VectorSelectionTracker";
 import { calculateShapeBoundingBox } from "./utils/bezierBoundingBox";
@@ -251,6 +253,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     disabled = false,
     transformMode = false,
     isMultiRegionSelected = false,
+    disableInternalPointAddition = false,
     pointRadius,
     pointFill = DEFAULT_POINT_FILL,
     pointStroke = DEFAULT_POINT_STROKE,
@@ -1634,6 +1637,475 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     };
   }, []);
 
+  // Set up stage-level event listeners for cursor position, ghost point, and point dragging
+  // This allows these features to work even when the invisible shape is disabled
+  useEffect(() => {
+    const group = stageRef.current;
+    if (!group) return;
+
+    const stage = group.getStage();
+    if (!stage) return;
+
+    // Only set up stage-level dragging when disableInternalPointAddition is true
+    // Otherwise, let the layer handlers handle it
+    if (!disableInternalPointAddition) {
+      // Still handle cursor position and ghost point
+      const handleStageMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        const pos = stage.getPointerPosition();
+        if (!pos) return;
+
+        const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+
+        if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
+          setCursorPosition(imagePos);
+
+          // Handle ghost point when Shift is held
+          if (
+            isShiftKeyHeld &&
+            imagePos &&
+            initialPoints.length >= 2 &&
+            !isDragging.current &&
+            !isDraggingNewBezier &&
+            !ghostPointDragInfo?.isDragging
+          ) {
+            const scale = transform.zoom * fitScale;
+            const hitRadius = 10 / scale;
+            let isOverPoint = false;
+
+            for (let i = 0; i < initialPoints.length; i++) {
+              const point = initialPoints[i];
+              const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
+
+              if (distance <= hitRadius) {
+                isOverPoint = true;
+                break;
+              }
+            }
+
+            if (isOverPoint) {
+              setGhostPoint(null);
+            } else {
+              const closestPathPoint = findClosestPointOnPath(
+                imagePos,
+                initialPoints,
+                allowClose,
+                finalIsPathClosed,
+              );
+
+              if (closestPathPoint) {
+                const snappedGhostPoint = snapToPixel(closestPathPoint.point, pixelSnapping);
+
+                if (closestPathPoint.segmentIndex === initialPoints.length) {
+                  const lastPoint = initialPoints[initialPoints.length - 1];
+                  const firstPoint = initialPoints[0];
+
+                  setGhostPoint({
+                    x: snappedGhostPoint.x,
+                    y: snappedGhostPoint.y,
+                    prevPointId: lastPoint.id,
+                    nextPointId: firstPoint.id,
+                  });
+                } else {
+                  const currentPoint = initialPoints[closestPathPoint.segmentIndex];
+                  const prevPoint = currentPoint?.prevPointId
+                    ? initialPoints.find((p) => p.id === currentPoint.prevPointId)
+                    : null;
+
+                  if (currentPoint && prevPoint) {
+                    setGhostPoint({
+                      x: snappedGhostPoint.x,
+                      y: snappedGhostPoint.y,
+                      prevPointId: prevPoint.id,
+                      nextPointId: currentPoint.id,
+                    });
+                  }
+                }
+              } else {
+                setGhostPoint(null);
+              }
+            }
+          } else if (!isShiftKeyHeld) {
+            setGhostPoint(null);
+          }
+        } else {
+          setCursorPosition(null);
+          setGhostPoint(null);
+        }
+      };
+
+      const handleStageMouseLeave = () => {
+        setCursorPosition(null);
+        setGhostPoint(null);
+      };
+
+      stage.on("mousemove", handleStageMouseMove);
+      stage.on("mouseleave", handleStageMouseLeave);
+
+      return () => {
+        stage.off("mousemove", handleStageMouseMove);
+        stage.off("mouseleave", handleStageMouseLeave);
+      };
+    }
+
+    // When disableInternalPointAddition is true, handle point dragging at stage level
+    const handleStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
+      const pos = stage.getPointerPosition();
+      if (!pos) return;
+
+      const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+
+      // Check if clicking on a point (by checking if target is a Circle with name starting with "point-")
+      const target = e.target;
+      const targetName = target.name();
+      if (targetName && targetName.startsWith("point-")) {
+        // Extract point index from name (format: "point-{index}")
+        const match = targetName.match(/^point-(\d+)$/);
+        if (match) {
+          const pointIndex = parseInt(match[1], 10);
+          if (pointIndex >= 0 && pointIndex < initialPoints.length) {
+            const point = initialPoints[pointIndex];
+            // Set up for dragging
+            setDraggedPointIndex(pointIndex);
+            lastPos.current = {
+              x: e.evt.clientX,
+              y: e.evt.clientY,
+              originalX: point.x,
+              originalY: point.y,
+              originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
+              originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
+            };
+            return;
+          }
+        }
+      }
+
+      // Check if clicking on a control point (by checking target name)
+      if (targetName && targetName.startsWith("control-point-")) {
+        const match = targetName.match(/^control-point-(\d+)-(\d+)$/);
+        if (match) {
+          const pointIndex = parseInt(match[1], 10);
+          const controlIndex = parseInt(match[2], 10);
+          if (pointIndex >= 0 && pointIndex < initialPoints.length) {
+            const point = initialPoints[pointIndex];
+            if (point.isBezier && controlIndex >= 1 && controlIndex <= 2) {
+              const controlPoint = controlIndex === 1 ? point.controlPoint1 : point.controlPoint2;
+              if (controlPoint) {
+                setDraggedControlPoint({ pointIndex, controlIndex });
+                isDragging.current = true;
+                lastPos.current = {
+                  x: e.evt.clientX,
+                  y: e.evt.clientY,
+                  originalX: controlPoint.x,
+                  originalY: controlPoint.y,
+                };
+                return;
+              }
+            }
+          }
+        }
+      }
+
+      // Fallback: check by distance (in case names don't match)
+      const scale = transform.zoom * fitScale;
+      const hitRadius = 10 / scale;
+
+      for (let i = 0; i < initialPoints.length; i++) {
+        const point = initialPoints[i];
+        const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
+
+        if (distance <= hitRadius) {
+          // Set up for dragging
+          setDraggedPointIndex(i);
+          lastPos.current = {
+            x: e.evt.clientX,
+            y: e.evt.clientY,
+            originalX: point.x,
+            originalY: point.y,
+            originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
+            originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
+          };
+          return;
+        }
+      }
+
+      // Check if clicking on a control point
+      for (let i = 0; i < initialPoints.length; i++) {
+        const point = initialPoints[i];
+        if (point.isBezier) {
+          if (point.controlPoint1) {
+            const distance = Math.sqrt(
+              (imagePos.x - point.controlPoint1.x) ** 2 + (imagePos.y - point.controlPoint1.y) ** 2,
+            );
+            if (distance <= hitRadius) {
+              setDraggedControlPoint({ pointIndex: i, controlIndex: 1 });
+              isDragging.current = true;
+              lastPos.current = {
+                x: e.evt.clientX,
+                y: e.evt.clientY,
+                originalX: point.controlPoint1.x,
+                originalY: point.controlPoint1.y,
+              };
+              return;
+            }
+          }
+
+          if (point.controlPoint2) {
+            const distance = Math.sqrt(
+              (imagePos.x - point.controlPoint2.x) ** 2 + (imagePos.y - point.controlPoint2.y) ** 2,
+            );
+            if (distance <= hitRadius) {
+              setDraggedControlPoint({ pointIndex: i, controlIndex: 2 });
+              isDragging.current = true;
+              lastPos.current = {
+                x: e.evt.clientX,
+                y: e.evt.clientY,
+                originalX: point.controlPoint2.x,
+                originalY: point.controlPoint2.y,
+              };
+              return;
+            }
+          }
+        }
+      }
+    };
+
+    const handleStageMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+      const pos = stage.getPointerPosition();
+      if (!pos) return;
+
+      const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+
+      if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
+        setCursorPosition(imagePos);
+
+        // Handle ghost point when Shift is held
+        if (
+          isShiftKeyHeld &&
+          imagePos &&
+          initialPoints.length >= 2 &&
+          !isDragging.current &&
+          !isDraggingNewBezier &&
+          !ghostPointDragInfo?.isDragging
+        ) {
+          const scale = transform.zoom * fitScale;
+          const hitRadius = 10 / scale;
+          let isOverPoint = false;
+
+          for (let i = 0; i < initialPoints.length; i++) {
+            const point = initialPoints[i];
+            const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
+
+            if (distance <= hitRadius) {
+              isOverPoint = true;
+              break;
+            }
+          }
+
+          if (isOverPoint) {
+            setGhostPoint(null);
+          } else {
+            const closestPathPoint = findClosestPointOnPath(
+              imagePos,
+              initialPoints,
+              allowClose,
+              finalIsPathClosed,
+            );
+
+            if (closestPathPoint) {
+              const snappedGhostPoint = snapToPixel(closestPathPoint.point, pixelSnapping);
+
+              if (closestPathPoint.segmentIndex === initialPoints.length) {
+                const lastPoint = initialPoints[initialPoints.length - 1];
+                const firstPoint = initialPoints[0];
+
+                setGhostPoint({
+                  x: snappedGhostPoint.x,
+                  y: snappedGhostPoint.y,
+                  prevPointId: lastPoint.id,
+                  nextPointId: firstPoint.id,
+                });
+              } else {
+                const currentPoint = initialPoints[closestPathPoint.segmentIndex];
+                const prevPoint = currentPoint?.prevPointId
+                  ? initialPoints.find((p) => p.id === currentPoint.prevPointId)
+                  : null;
+
+                if (currentPoint && prevPoint) {
+                  setGhostPoint({
+                    x: snappedGhostPoint.x,
+                    y: snappedGhostPoint.y,
+                    prevPointId: prevPoint.id,
+                    nextPointId: currentPoint.id,
+                  });
+                }
+              }
+            } else {
+              setGhostPoint(null);
+            }
+          }
+        } else if (!isShiftKeyHeld) {
+          setGhostPoint(null);
+        }
+
+        // Handle point dragging
+        if (draggedPointIndex !== null && lastPos.current) {
+          if (effectiveSelectedPoints.size > 1) {
+            return; // Don't drag when transformer is active
+          }
+
+          // Check if we should start dragging
+          const dragThreshold = 5;
+          const mouseDeltaX = Math.abs(e.evt.clientX - lastPos.current.x);
+          const mouseDeltaY = Math.abs(e.evt.clientY - lastPos.current.y);
+
+          if (!isDragging.current && (mouseDeltaX > dragThreshold || mouseDeltaY > dragThreshold)) {
+            isDragging.current = true;
+          }
+
+          if (!isDragging.current) {
+            return;
+          }
+
+          const newPoints = [...initialPoints];
+          const draggedPoint = newPoints[draggedPointIndex];
+
+          const originalX = lastPos.current.originalX ?? draggedPoint.x;
+          const originalY = lastPos.current.originalY ?? draggedPoint.y;
+
+          const snappedPos = snapToPixel(imagePos, pixelSnapping);
+          const finalPos = constrainAnchorPointsToBounds([snappedPos], { width, height })[0];
+
+          newPoints[draggedPointIndex] = {
+            ...draggedPoint,
+            x: finalPos.x,
+            y: finalPos.y,
+          };
+
+          // Handle bezier control points
+          if (draggedPoint.isBezier) {
+            const updatedPoint = newPoints[draggedPointIndex];
+
+            if (updatedPoint.controlPoint1 && lastPos.current.originalControlPoint1) {
+              const deltaX = finalPos.x - originalX;
+              const deltaY = finalPos.y - originalY;
+              updatedPoint.controlPoint1 = {
+                x: lastPos.current.originalControlPoint1.x + deltaX,
+                y: lastPos.current.originalControlPoint1.y + deltaY,
+              };
+            }
+
+            if (updatedPoint.controlPoint2 && lastPos.current.originalControlPoint2) {
+              const deltaX = finalPos.x - originalX;
+              const deltaY = finalPos.y - originalY;
+              updatedPoint.controlPoint2 = {
+                x: lastPos.current.originalControlPoint2.x + deltaX,
+                y: lastPos.current.originalControlPoint2.y + deltaY,
+              };
+            }
+
+            const constrainedPoint = constrainAnchorPointsToBounds([updatedPoint], { width, height })[0];
+            newPoints[draggedPointIndex] = constrainedPoint;
+          }
+
+          onPointsChange?.(newPoints);
+          onPointRepositioned?.(newPoints[draggedPointIndex], draggedPointIndex);
+        }
+
+        // Handle control point dragging
+        if (draggedControlPoint && lastPos.current) {
+          const newPoints = [...initialPoints];
+          const point = newPoints[draggedControlPoint.pointIndex];
+
+          if (point.isBezier) {
+            const snappedPos = snapToPixel(imagePos, pixelSnapping);
+            const finalPos = constrainPointToBounds(snappedPos, { width, height });
+
+            if (draggedControlPoint.controlIndex === 1) {
+              point.controlPoint1 = finalPos;
+            } else if (draggedControlPoint.controlIndex === 2) {
+              point.controlPoint2 = finalPos;
+            }
+
+            newPoints[draggedControlPoint.pointIndex] = point;
+            onPointsChange?.(newPoints);
+            onPointEdited?.(point, draggedControlPoint.pointIndex);
+          }
+        }
+      } else {
+        setCursorPosition(null);
+        setGhostPoint(null);
+      }
+    };
+
+    const handleStageMouseUp = () => {
+      // Handle point selection if we clicked but didn't drag
+      if (draggedPointIndex !== null && !isDragging.current) {
+        setSelectedPointIndex(draggedPointIndex);
+        onPointSelected?.(draggedPointIndex);
+      }
+
+      // Reset dragging state
+      isDragging.current = false;
+      setDraggedPointIndex(null);
+      setDraggedControlPoint(null);
+    };
+
+    const handleStageMouseLeave = () => {
+      setCursorPosition(null);
+      setGhostPoint(null);
+    };
+
+    if (disableInternalPointAddition) {
+      stage.on("mousedown", handleStageMouseDown);
+      stage.on("mousemove", handleStageMouseMove);
+      stage.on("mouseup", handleStageMouseUp);
+      stage.on("mouseleave", handleStageMouseLeave);
+
+      return () => {
+        stage.off("mousedown", handleStageMouseDown);
+        stage.off("mousemove", handleStageMouseMove);
+        stage.off("mouseup", handleStageMouseUp);
+        stage.off("mouseleave", handleStageMouseLeave);
+      };
+    } else {
+      // Only handle cursor position and ghost point
+      stage.on("mousemove", handleStageMouseMove);
+      stage.on("mouseleave", handleStageMouseLeave);
+
+      return () => {
+        stage.off("mousemove", handleStageMouseMove);
+        stage.off("mouseleave", handleStageMouseLeave);
+      };
+    }
+  }, [
+    x,
+    y,
+    transform,
+    fitScale,
+    width,
+    height,
+    isShiftKeyHeld,
+    initialPoints,
+    allowClose,
+    finalIsPathClosed,
+    pixelSnapping,
+    isDragging,
+    isDraggingNewBezier,
+    ghostPointDragInfo,
+    disableInternalPointAddition,
+    draggedPointIndex,
+    draggedControlPoint,
+    effectiveSelectedPoints,
+    setDraggedPointIndex,
+    setDraggedControlPoint,
+    setSelectedPointIndex,
+    onPointSelected,
+    onPointsChange,
+    onPointRepositioned,
+    onPointEdited,
+    lastPos,
+  ]);
+
   // Handle Shift key for disconnected mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -1760,6 +2232,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     setActivePointId,
     isTransforming,
     disabled,
+    disableInternalPointAddition,
     pointCreationManager,
   });
 
@@ -1787,7 +2260,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               // For the first point in drawing mode, we need to ensure the click handler works
               // The issue is that the flag logic is interfering with first point creation
               // Let's try calling the drawing mode click handler directly for the first point
-              if (initialPoints.length === 0 && !drawingDisabled) {
+              // Skip if internal point addition is disabled
+              if (initialPoints.length === 0 && !drawingDisabled && !disableInternalPointAddition) {
                 // For the first point, call the drawing mode click handler directly
                 const pos = e.target.getStage()?.getPointerPosition();
                 if (pos) {
@@ -1840,8 +2314,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             }
       }
     >
-      {/* Invisible rectangle - always render to capture mouse events for cursor position updates */}
-      {!disabled && (
+      {/* Invisible rectangle - render to capture mouse events for cursor position updates */}
+      {/* Disabled when disableInternalPointAddition is true or when component is disabled */}
+      {!disabled && !disableInternalPointAddition && (
         <Shape
           sceneFunc={(ctx, shape) => {
             ctx.beginPath();
