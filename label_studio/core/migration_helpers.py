@@ -32,7 +32,7 @@ def execute_sql_job(*, migration_name: str, sql: str, apply_on_sqlite: bool = Fa
             migration.status = AsyncMigrationStatus.STATUS_FINISHED
             migration.save()
         except Exception as e:
-            logger.error(f'Migration {migration_name} failed: {e}')
+            logger.exception(f'Migration {migration_name} failed: {e}')
             migration.status = AsyncMigrationStatus.STATUS_ERROR
             if not migration.meta:
                 migration.meta = {}
@@ -48,7 +48,7 @@ def execute_sql_job(*, migration_name: str, sql: str, apply_on_sqlite: bool = Fa
             with connection.cursor() as cursor:
                 cursor.execute(sql)
         except Exception as e:
-            logger.error(f'Reverse migration {migration_name} failed: {e}')
+            logger.exception(f'Reverse migration {migration_name} failed: {e}')
             raise
 
 

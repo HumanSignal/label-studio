@@ -64,6 +64,14 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
         self.ordering = ('-id',)
         self.actions = ['run_scheduled_migrations']
 
+    def _mark_migration_error(self, migration, error_message):
+        """Helper to mark migration as ERROR with error message in meta."""
+        meta = migration.meta or {}
+        meta['error'] = error_message
+        migration.meta = meta
+        migration.status = migration.STATUS_ERROR
+        migration.save()
+
     def run_scheduled_migrations(self, request, queryset):
         """Run selected scheduled migrations manually.
 
@@ -98,31 +106,19 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
 
             import_path, err = resolve_import_path(migration.name)
             if err:
-                meta = migration.meta or {}
-                meta['error'] = err
-                migration.meta = meta
-                migration.status = migration.STATUS_ERROR
-                migration.save()
+                self._mark_migration_error(migration, err)
                 error_count += 1
                 continue
             try:
                 module = importlib.import_module(import_path)
             except Exception as e:
-                meta = migration.meta or {}
-                meta['error'] = f'Import error: {e}'
-                migration.meta = meta
-                migration.status = migration.STATUS_ERROR
-                migration.save()
+                self._mark_migration_error(migration, f'Import error: {e}')
                 error_count += 1
                 continue
 
             sql_fw = getattr(module, 'sql_forwards', None)
             if sql_fw is None:
-                meta = migration.meta or {}
-                meta['error'] = 'sql_forwards not found in migration module'
-                migration.meta = meta
-                migration.status = migration.STATUS_ERROR
-                migration.save()
+                self._mark_migration_error(migration, 'sql_forwards not found in migration module')
                 error_count += 1
                 continue
 
@@ -138,11 +134,7 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
                 migration.save()
                 executed_count += 1
             except Exception as e:
-                meta = migration.meta or {}
-                meta['error'] = str(e)
-                migration.meta = meta
-                migration.status = migration.STATUS_ERROR
-                migration.save()
+                self._mark_migration_error(migration, str(e))
                 error_count += 1
 
         message = f'Executed: {executed_count}, Skipped: {skipped_count}, Errors: {error_count}'
