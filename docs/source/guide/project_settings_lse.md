@@ -535,34 +535,77 @@ Use these settings to determine task completeness and agreement metrics.
 !!! note
     Overlap settings only apply when the project is using Automatic distribution mode. If you are using Manual distribution mode, all tasks must be manually assigned - meaning that you are also manually determining overlap.  
 
-By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, increase the **Annotations per task minimum**.
+By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, increase the **Annotations per task**.
 
-Us the slider below this field to indicate how the overlap should be enforced. For example, if you want all tasks to be annotated by at least 2 annotators:
+<table>
+<thead>
+    <tr>
+      <th>Field</th>
+      <th>Description</th>
+    </tr>
+</thead>
+<tr>
+<td>
 
-- Set the minimum number of annotations to **2**
+**Annotations per task**
+</td>
+<td>
+
+The number of annotations you want to allow per task. 
+
+Note that in certain situations, this may be exceeded. For example, if there are long-standing drafts within a project or you have a very low [task reservation](#task-lock) time. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Annotations per task coverage**
+</td>
+<td>
+
+Only available if **Annotations per task** is ≥ 2. 
+
+This setting controls how the overlap should be enforced. 
+
+For example, if you want all tasks to be annotated by at least 2 annotators:
+
+- Set the number of annotations to **2**
 - Enforce the overlap for 100% of tasks.
 
-If you want at least half of the tasks to be annotated by at least 3 people:
+If you want half of the tasks to be annotated by at least 3 people:
 
-- Set the minimum number of annotations to **3**
+- Set the number of annotations to **3**
 - Enforce the overlap for 50% of tasks.
 
-The following options supersede what you specified under [**Annotations > Task Sampling**](#task-sampling). 
+</td>
+</tr>
+<tr>
+<td>
 
-| Field          | Description    |
-| ------------- | ------------ |
-| **Show tasks with overlap first**         | If your overlap enforcement is less than 100% (meaning that only some tasks require multiple annotators), then the tasks that *do* require multiple annotations are shown first. <br /><br />If your overlap is 100%, then this setting has no effect.   |
+**Show tasks with overlap first** 
+</td>
+<td>
 
+If your overlap enforcement is less than 100% (meaning that only some tasks require multiple annotators), then the tasks that *do* require multiple annotations are shown first. <br /><br />If your overlap is 100%, then this setting has no effect.
+
+Note that if enabled, this setting supersedes what you specified under [**Annotations > Task Ordering**](#task-ordering)
+
+</td>
+</tr>
+</table> 
 
 </dd>
 
-<dt id="annotation-limit">Annotation Limit <span class="badge"></span></dt>
+<dt id="annotation-limit">Tasks Per Annotator Limit <span class="badge"></span></dt>
 
 <dd>
 
 Set limits on how many tasks each individual user can annotate. This can be useful if you are concerned with preventing any potential bias that might arise from a small set of power users completing a majority of project tasks. 
 
 When an annotator reaches their limit, they will see a notification telling them that they have been paused. When paused, an annotator can no longer access the project. 
+
+When **Limit tasks per annotator** is enabled, you will see the following options:
 
 | Field          | Description    |
 | ------------- | ------------ |
@@ -579,9 +622,11 @@ To unpause annotators:
 For more information about pausing annotators, including how to manually pause specific annotators, see [Pause an annotator](quality#Pause-an-annotator).
 
 !!! note
-    Pauses affect users in Annotator and Reviewer roles. So, for example, if a Reviewer is also annotating tasks and they hit the annotation limit, they will be unable to regain access to the project to review annotations unless they are unpaused. 
+    Pauses are enforced for users in Annotator and Reviewer roles. 
+    
+    So, for example, if a Reviewer is also annotating tasks and they hit the annotation limit, they will be unable to regain access to the project to review annotations unless they are unpaused. 
 
-    Users in the Manager, Administrator, or Owner role are unaffected by pause settings.
+    Users in the Manager, Administrator, or Owner role are unaffected by the task limit.
 
 </dd>
 
@@ -610,7 +655,7 @@ When configured, this setting looks at the agreement score for the annotator whe
 
 Use this option to determine what types of tasks annotators will see first. 
 
-* **Ongoing** - Annotators are presented with tasks in the order that is configured under [**Task Sampling**](#task-sampling). 
+* **Ongoing** - Annotators are presented with tasks in the order that is configured under [**Task Ordering**](#task-ordering ). 
 
     Keep in mind that ongoing evaluation respects the [annotator overlap](#overlap) you set above. For example, if you set overlap to `2`, then only 2 annotators will be able to complete annotations on ground truth tasks before the task is considered complete and removed from the labeling stream for other users.  
 * **Onboarding** - Annotators are first presented with tasks that have a ground truth annotation. This ensures that all annotators are evaluated and that they meet your evaluation standards before progressing through the remaining project tasks. 
@@ -624,35 +669,41 @@ Use this option to determine what types of tasks annotators will see first.
 <tr>
 <td>
 
-**Minimum number of tasks for evaluation** <br /><span class="badge"></span>
-</td>
-<td>
-
-The desired ground truth score threshold will not be assessed until the annotator has completed at least the specified number of ground truth tasks. 
-
-</td>
-</tr>
-<tr>
-<td>
-
-**Desired ground truth score threshold** <br /><span class="badge"></span>
-</td>
-<td>
-
-The agreement threshold the annotator must meet when evaluated against ground truth annotations. 
-
-</td>
-</tr>
-<tr>
-<td>
-
 **Pause annotator on failed evaluation** <br /><span class="badge"></span>
 </td>
 <td>
 
-If, after completing the minimum number of tasks, the annotator does not meet the ground truth agreement threshold, they will be immediately paused and unable to access the project. 
+Determines whether annotators should be paused if they do not meet the required score set below. If they fail to meet the score, they are immediately paused and unable to access the project. 
 
-If you do not enable pausing, the other **Annotator Evaluation** options are calculated in the background and can be seen in the Members Dashboard, but annotators are not paused.
+If you do not enable pausing, the other **Annotator Evaluation** options are simply calculated in the background and can be reviewed in the [Members Dashboard](dashboard_members).
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Score required to pass evaluation** <br /><span class="badge"></span>
+</td>
+<td>
+
+This is the agreement score threshold that an annotator must meet when evaluated against ground truth annotations. How agreement is calculate depends on what you select in the [**Agreement** section](#task-agreement). 
+
+If they do not meet this score, they are paused. 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Number of tasks for evaluation** <br /><span class="badge"></span>
+</td>
+<td>
+
+This is the number of tasks a user has to complete before they can potentially be paused.  
+
+For example, if you set this to `10`, even if the annotator gets every single task wrong, they will not be paused until after they have completed 10 ground truth tasks. 
+
+If they reach 10 tasks and meet the required score, they will continue progressing through the remaining ground truth tasks until they either fall below the score (in which case they are paused), or they finish their evaluation and continue on to the rest of the project queue. 
 
 </td>
 </tr>
@@ -663,13 +714,15 @@ You can see which users are paused from the **Members** page. To unpause a user,
 For more information about pausing annotators, including how to manually pause specific annotators, see [Pause an annotator](quality#Pause-an-annotator).
 
 !!! note
-    Pauses affect users in Annotator and Reviewer roles. So, for example, if a Reviewer is also annotating tasks and they hit the annotation limit, they will be unable to regain access to the project to review annotations unless they are unpaused. 
+    Pauses are enforced for users in Annotator and Reviewer roles.  
+    
+    So, for example, if a Reviewer is also annotating tasks and they fail to meet the required ground truth agreement score, they will be unable to regain access to the project to review annotations unless they are unpaused. 
 
-    Users in the Manager, Administrator, or Owner role are unaffected by pause settings. 
+    Users in the Manager, Administrator, or Owner role are unaffected by evaluation requirements. 
 
 </dd>
 
-<dt id="task-agreement">Task Agreement</dt>
+<dt id="task-agreement">Agreement</dt>
 
 <dd>
 
@@ -700,27 +753,25 @@ Select the [metric](stats#Available-agreement-metrics) that should determine tas
 <tr>
 <td>
 
-**Low agreement strategy**
+**Assign additional annotator**
 </td>
 <td>
+Enable this option to automatically assign an additional annotator to any tasks that have a low agreement score. 
 
-Note that to see these options, the project must be set up to [automatically distribute tasks](#distribute-tasks).
+This will ensure that the task is not marked complete until 1) it meets the required [overlap](#overlap) and 2) a minimum agreement score is achieved (this is specified below).
 
-You can set a low agreement strategy to ensure that a task is not marked complete until it meets 1) the required [overlap](#overlap) and 2) a minimum agreement level.  
-
-* **Do nothing** - Tasks with a low agreement can be marked complete; no additional actions are taken. 
-* **Assign additional annotator** - Automatically assign an additional annotator to tasks with low agreement. 
+Note that to see this setting, the project must be set up with [automatic task assignments](#distribute-tasks).
 
 </td>
 </tr>
 <tr>
 <td>
 
-**Desired agreement threshold**
+**Agreement threshold**
 </td>
 <td>
 
-Enter the agreement threshold as a percentage (1-100) that a task must have before it can be considered complete.
+Enter the agreement score that a task must meet before it can be considered complete.
 
 </td>
 </tr>
@@ -748,7 +799,7 @@ Annotators are assigned one at a time until the agreement threshold is achieved.
 
 <dd>
 
-Set custom weights for labels to change the agreement calculation. The options you are given are automatically generated from your labeling interface setup. 
+Set custom weights for tags and labels to change the agreement calculation. The options you are given are automatically generated from your labeling interface setup. 
 
 Weights set to zero are ignored from calculation.
 
