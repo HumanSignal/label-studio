@@ -22,10 +22,10 @@ SQL_CREATE_INDEX = (
 
 SQL_DROP_INDEX = "DROP INDEX CONCURRENTLY IF EXISTS tasks_predictions_result_proj_gin;"
 
-def _forward(migration_name: str):
+def _forward(migration_name: str, db_alias: str):
     """Create the GIN index inside a dedicated job."""
     # If the migration has already been executed, do nothing
-    migration, created = AsyncMigrationStatus.objects.get_or_create(
+    migration, created = AsyncMigrationStatus.objects.using(db_alias).get_or_create(
         name=migration_name,
         defaults={"status": AsyncMigrationStatus.STATUS_STARTED},
     )
@@ -34,28 +34,28 @@ def _forward(migration_name: str):
         return
 
     logger.info("Starting async migration %s", migration_name)
-    from django.db import connection
+    from django.db import connections
 
-    with connection.cursor() as cursor:
+    with connections[db_alias].cursor() as cursor:
         cursor.execute(SQL_CREATE_INDEX)
     migration.status = AsyncMigrationStatus.STATUS_FINISHED
-    migration.save()
+    migration.save(using=db_alias)
     logger.info("Async migration %s complete", migration_name)
 
 
-def _backward(migration_name: str):
+def _backward(migration_name: str, db_alias: str):
     """Revert the GIN index creation."""
-    migration = AsyncMigrationStatus.objects.create(
+    migration = AsyncMigrationStatus.objects.using(db_alias).create(
         name=migration_name,
         status=AsyncMigrationStatus.STATUS_STARTED,
     )
     logger.info("Reverting async migration %s", migration_name)
-    from django.db import connection
+    from django.db import connections
 
-    with connection.cursor() as cursor:
+    with connections[db_alias].cursor() as cursor:
         cursor.execute(SQL_DROP_INDEX)
     migration.status = AsyncMigrationStatus.STATUS_FINISHED
-    migration.save()
+    migration.save(using=db_alias)
     logger.info("Revert of async migration %s complete", migration_name)
 
 
@@ -69,7 +69,8 @@ def forwards(apps, schema_editor):
         logger.info("Database vendor: %s. Skipping index creation", schema_editor.connection.vendor)
         return
 
-    start_job_async_or_sync(_forward, migration_name=migration_name)
+    db_alias = schema_editor.connection.alias
+    start_job_async_or_sync(_forward, migration_name=migration_name, db_alias=db_alias)
 
 
 def backwards(apps, schema_editor):
@@ -81,7 +82,8 @@ def backwards(apps, schema_editor):
         logger.info("Database vendor: %s. Skipping index drop", schema_editor.connection.vendor)
         return
 
-    start_job_async_or_sync(_backward, migration_name=migration_name)
+    db_alias = schema_editor.connection.alias
+    start_job_async_or_sync(_backward, migration_name=migration_name, db_alias=db_alias)
 
 
 

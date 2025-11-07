@@ -42,7 +42,7 @@ Key capabilities of workspaces:
 
 ## Multi-tenant SaaS architecture
 
-Organizations provide complete isolation between different Label Studio Enterprise SaaS customers, ensuring data segregation and independent user management. Workspaces within organizations group related projects by team, department, or product line. Label Studio Enterprise may also be deployed on-prem (see [Enterprise Deployment Options](https://docs.google.com/document/d/18c0DU4LCz5-KoSpYb8xXtAZTphoFtnUY3PTsqCOiohE/edit?ouid=117018906396712310210&tab=t.gclw7dpayxrq)).
+Organizations provide complete isolation between different Label Studio Enterprise SaaS customers, ensuring data segregation and independent user management. Workspaces within organizations group related projects by team, department, or product line. Label Studio Enterprise may also be deployed on-prem (see [Enterprise Deployment Options](#Enterprise-deployment-options)). 
 
 ## User management and role-based access control
 

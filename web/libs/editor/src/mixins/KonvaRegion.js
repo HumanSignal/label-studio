@@ -51,6 +51,9 @@ export const KonvaRegionMixin = types
   })
   .actions((self) => {
     let deferredSelectId = null;
+    const Super = {
+      deleteRegion: self.deleteRegion,
+    };
 
     return {
       updateCursor(isHovered = false) {
@@ -165,6 +168,11 @@ export const KonvaRegionMixin = types
         // `selectArea` does nothing when there's a selected region already, but it should rerender to make `requestPerRegionFocus` work,
         // so it needs to use `selectAreas` instead. It contains `unselectAll` for this purpose.
         self.annotation.selectAreas([self]);
+      },
+      deleteRegion() {
+        const selectedTool = self.parent?.getToolsManager().findSelectedTool();
+        selectedTool?.enable?.();
+        Super.deleteRegion();
       },
     };
   });

@@ -21,15 +21,55 @@ See the [API reference documentation](https://api.labelstud.io/api-reference/int
 
 ### Authenticate to the API
 
-You must retrieve your access token so that you can authenticate to the API.
+You must retrieve your access token so that you can authenticate to the API. 
 
-1. In the Label Studio UI, click the user icon in the upper right.
-2. Click **Account & Settings**.
-3. Copy the access token. For more information, see [Access tokens](access_tokens). 
+Whether you can create a token, and which types of tokens you can create, depends on your org settings.
 
-In your first API call, specify the access token in the headers: 
+!!! note "API keys vs. Access tokens"
+    In Label Studio, **"access tokens"** and **"API keys"** mean the same thing and are used interchangeably.  
+
+There are two types of access tokens/API keys: **Personal Access Tokens (PATs)** and **Legacy Tokens**. 
+
+You can read more about the differences between them here: [Access Tokens](access_tokens). 
+
+#### Find your access token
+
+1. Open Label Studio and click your user icon in the upper right. Select **Account & Settings**. 
+2. Select **Personal Access Token** or **Legacy Token** on the left. 
+
+Depending on which one you select, you will need to either generate a new token or copy the one that is displayed. 
+
+
+#### Authenticate HTTP API requests with a personal access token
+
+PATs use `'Authorization: Bearer <token>'` when used with HTTP API requests, for example:
+
 ```bash
 curl -X <method> <Label Studio URL>/api/<endpoint> -H 'Authorization: Bearer <token>'
+```
+
+#### Authenticate HTTP API requests with a legacy token
+
+Legacy tokens use `'Authorization: Token <token>'` when used with HTTP API requests, for example:
+
+```bash
+curl -X <method> <Label Studio URL>/api/<endpoint> -H 'Authorization: Token <token>
+```
+
+#### Authenticate Python SDK requests
+
+When used with the SDK, you do not need to distinguish between legacy tokens or personal access tokens. 
+
+```python
+# Define the URL where Label Studio is accessible
+LABEL_STUDIO_URL = 'YOUR_BASE_URL'
+
+# API key can be either your PAT or legacy access token
+LABEL_STUDIO_API_KEY = 'YOUR_API_KEY'
+
+# Import the SDK and the client module
+from label_studio_sdk import LabelStudio
+client = LabelStudio(base_url=LABEL_STUDIO_URL, api_key=LABEL_STUDIO_API_KEY)
 ```
 
 See [API documentation for authentication](https://api.labelstud.io/api-reference/introduction/getting-started#authentication).
@@ -56,4 +96,3 @@ Retrieve a paginated list of tasks for a specific project. If you want, you can 
 To export annotations, first see [which formats are available to export for your project](https://api.labelstud.io/api-reference/api-reference/projects/exports/list-formats). 
 
 Choose your selected format from the response and then call the export endpoint. See the [export annotations](https://api.labelstud.io/api-reference/api-reference/projects/exports/download-sync) endpoint documentation for more details.
-

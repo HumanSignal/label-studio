@@ -8,9 +8,9 @@ from core.utils.common import btree_gin_migration_operations
 logger = logging.getLogger(__name__)
 
 
-def async_index_creation():
-    from django.db import connection
-    with connection.schema_editor(atomic=False) as schema_editor:
+def async_index_creation(db_alias):
+    from django.db import connections
+    with connections[db_alias].schema_editor(atomic=False) as schema_editor:
         schema_editor.execute('create index concurrently if not exists tasks_annotations_result_proj_gin '
             'on task_completion using gin (project_id, cast(result as text) gin_trgm_ops);'
         )
@@ -23,7 +23,8 @@ def forwards(apps, schema_editor):
 
     schema_editor.execute('drop index if exists tasks_annotations_result_idx;')
     schema_editor.execute('drop index if exists tasks_annotations_result_idx2;')
-    start_job_async_or_sync(async_index_creation)
+    db_alias = schema_editor.connection.alias
+    start_job_async_or_sync(async_index_creation, db_alias=db_alias)
 
 
 def backwards(apps, schema_editor):

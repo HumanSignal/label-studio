@@ -105,8 +105,9 @@ export interface WaveformOptions {
 
   /**
    * Decoder used to decode the audio to waveform data.
+   * Use "none" to skip decoding for fast loading of large files (disables waveform visualization).
    */
-  decoderType?: "webaudio" | "ffmpeg";
+  decoderType?: "webaudio" | "ffmpeg" | "none";
 
   /**
    * Player used to play the audio data.
@@ -300,6 +301,16 @@ export class Waveform extends Events<WaveformEventTypes> {
 
   async load() {
     if (this.isDestroyed) return;
+
+    // Warn about incompatible features when decoder is "none"
+    if (this.params.decoderType === "none") {
+      if (this.params.splitChannels) {
+        console.warn('splitChannels is not available when decoder="none" (requires decoded audio data)');
+      }
+      if (this.params.playerType === "webaudio") {
+        console.warn('playerType="webaudio" is not available when decoder="none", forcing HTML5 player');
+      }
+    }
 
     const loader = this.media.load({
       muted: this.params.muted ?? false,

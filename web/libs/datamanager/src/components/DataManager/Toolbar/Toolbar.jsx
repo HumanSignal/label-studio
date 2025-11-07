@@ -1,5 +1,5 @@
 import { inject, observer } from "mobx-react";
-import { Block } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { Space } from "../../Common/Space/Space";
 import "./TabPanel.scss";
 
@@ -12,7 +12,7 @@ const injector = inject(({ store }) => {
 export const Toolbar = injector(
   observer(({ store }) => {
     return (
-      <Block name="tab-panel">
+      <div className={cn("tab-panel").toClassName()}>
         {store.SDK.toolbarInstruments.map((section, i) => {
           return (
             <Space size="small" key={`section-${i}`}>
@@ -24,7 +24,7 @@ export const Toolbar = injector(
             </Space>
           );
         })}
-      </Block>
+      </div>
     );
   }),
 );

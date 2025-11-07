@@ -4,16 +4,19 @@ These tests demonstrate how the transition system integrates with actual
 Django models and the StateManager, providing realistic usage examples.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict
 from unittest.mock import Mock, patch
 
+from core.current_request import CurrentContext
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from fsm.models import TaskState
-from fsm.registry import register_state_transition, transition_registry
+from fsm.registry import register_state_transition
 from fsm.state_choices import AnnotationStateChoices, TaskStateChoices
+from fsm.state_models import TaskState
 from fsm.transitions import BaseTransition, TransitionContext, TransitionValidationError
+from organizations.models import Organization
+from projects.models import Project
 from pydantic import Field
 
 
@@ -72,8 +75,6 @@ class DjangoModelIntegrationTests(TestCase):
         self.user = Mock()
         self.user.id = 123
         self.user.username = 'integration_test_user'
-
-        transition_registry.clear()
 
     @patch('fsm.registry.get_state_model_for_entity')
     @patch('fsm.state_manager.StateManager.get_current_state_object')
@@ -668,3 +669,50 @@ class DjangoModelIntegrationTests(TestCase):
             valid_transition.validate_transition(context_no_user)
 
         assert 'User authentication required' in str(cm.value)
+
+
+class TestBaseStatePropertiesCoverage(TestCase):
+    """Test coverage for BaseState model properties and methods"""
+
+    def setUp(self):
+        """Set up test fixtures"""
+        self.user = User.objects.create(email='test_coverage@example.com')
+        self.org = Organization.objects.create(title='Test Org Coverage', created_by=self.user)
+
+        # Set CurrentContext BEFORE creating entities that need FSM
+        CurrentContext.set_user(self.user)
+        CurrentContext.set_organization_id(self.org.id)
+
+        self.project = Project.objects.create(
+            title='Test Project Coverage', created_by=self.user, organization=self.org
+        )
+
+    def tearDown(self):
+        """Clean up after tests"""
+        CurrentContext.clear()
+
+    def test_base_state_entity_property(self):
+        """Test BaseState.entity property retrieves related entity"""
+        from fsm.state_models import ProjectState
+
+        # Get the auto-created state
+        state_record = ProjectState.objects.filter(project=self.project).first()
+        assert state_record is not None
+
+        # Test entity property
+        retrieved_entity = state_record.entity
+        assert retrieved_entity.id == self.project.id
+
+    def test_base_state_timestamp_from_uuid(self):
+        """Test BaseState.timestamp_from_uuid property extracts timestamp from UUID7"""
+        from fsm.state_models import ProjectState
+
+        before = datetime.now(timezone.utc)
+        state_record = ProjectState.objects.filter(project=self.project).first()
+        datetime.now(timezone.utc)
+
+        # Test timestamp extraction
+        timestamp = state_record.timestamp_from_uuid
+        assert isinstance(timestamp, datetime)
+        # Timestamp should be within reasonable range
+        assert timestamp.year == before.year

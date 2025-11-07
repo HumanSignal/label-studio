@@ -156,7 +156,7 @@ export function handleDrawingModeClick(e: KonvaEventObject<MouseEvent>, props: E
   const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
   // Check if we're within canvas bounds (only if bounds checking is enabled)
-  if (props.constrainToBounds && !isPointInCanvasBounds(imagePos, props.width, props.height)) {
+  if (!isPointInCanvasBounds(imagePos, props.width, props.height)) {
     return false;
   }
 
@@ -177,7 +177,6 @@ export function handleDrawingModeClick(e: KonvaEventObject<MouseEvent>, props: E
   }
 
   // Only add new points if path is not closed and we haven't reached max points
-
   if (!props.isPathClosed && props.canAddMorePoints?.()) {
     // In skeleton mode, explicitly pass the activePointId as prevPointId
     // to ensure the new point connects to the selected point

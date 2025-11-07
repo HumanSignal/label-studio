@@ -16,7 +16,6 @@ export interface PointCreationManagerProps {
   initialPoints: BezierPoint[];
   allowBezier: boolean;
   pixelSnapping?: boolean;
-  constrainToBounds?: boolean;
   width?: number;
   height?: number;
   onPointsChange?: (points: BezierPoint[]) => void;
@@ -65,7 +64,7 @@ export class PointCreationManager {
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
     // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.constrainToBounds && this.props.width && this.props.height) {
+    if (this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -98,7 +97,7 @@ export class PointCreationManager {
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
     // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.constrainToBounds && this.props.width && this.props.height) {
+    if (this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -149,7 +148,7 @@ export class PointCreationManager {
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
     // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.constrainToBounds && this.props.width && this.props.height) {
+    if (this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -211,7 +210,7 @@ export class PointCreationManager {
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
     // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.constrainToBounds && this.props.width && this.props.height) {
+    if (this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -248,7 +247,7 @@ export class PointCreationManager {
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
     // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.constrainToBounds && this.props.width && this.props.height) {
+    if (this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||
@@ -293,7 +292,7 @@ export class PointCreationManager {
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
     // Check if we're within canvas bounds (only if bounds checking is enabled)
-    if (this.props.constrainToBounds && this.props.width && this.props.height) {
+    if (this.props.width && this.props.height) {
       if (
         snappedCoords.x < 0 ||
         snappedCoords.x > this.props.width ||

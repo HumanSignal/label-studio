@@ -78,8 +78,9 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
         {!childFilter ? (
           <div className={cn("filterLine").elem("remove")}>
             <Button
-              look="danger"
-              size="smaller"
+              look="string"
+              size="small"
+              style={{ border: "none" }}
               onClick={(e) => {
                 e.stopPropagation();
                 filter.delete();

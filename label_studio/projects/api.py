@@ -554,7 +554,7 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
     parser_classes = (JSONParser,)
     parent_queryset = Project.objects.all()
     permission_required = ViewClassPermission(
-        POST=all_permissions.projects_change,
+        POST=all_permissions.projects_reset_cache,
     )
 
     @extend_schema(exclude=True)
@@ -743,10 +743,6 @@ def read_templates_and_groups():
 
         if settings.VERSION_EDITION != 'Community':
             if config.get('group', '').lower() == 'community contributions':
-                continue
-
-        if settings.VERSION_EDITION == 'Community':
-            if config.get('type', 'community').lower() != 'community':
                 continue
 
         if config.get('image', '').startswith('/static') and settings.HOSTNAME:

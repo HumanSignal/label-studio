@@ -1,5 +1,5 @@
 import React, { type FC, useCallback, useEffect, useState } from "react";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { MaskUtil } from "../../utils/InputMask";
 import Label from "../../common/Label/Label";
 
@@ -76,10 +76,9 @@ export const TimeBox: FC<TimerProps> = ({ sidepanel = false, value, readonly = f
 
   const renderInputTime = () => {
     return (
-      <Elem
-        name={"input-time"}
+      <input
+        className={cn("time-box").elem("input-time").toClassName()}
         maxLength={12}
-        tag={"input"}
         ref={inputRef}
         type="text"
         readOnly={readonly}
@@ -92,9 +91,9 @@ export const TimeBox: FC<TimerProps> = ({ sidepanel = false, value, readonly = f
   };
 
   const timeBoxContent = (
-    <Block name="time-box" mod={{ sidepanel }} {...props}>
+    <div className={cn("time-box").mod({ sidepanel }).toClassName()} {...props}>
       {renderInputTime()}
-    </Block>
+    </div>
   );
 
   return label ? (

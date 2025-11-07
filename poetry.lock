@@ -753,14 +753,14 @@ files = [
 
 [[package]]
 name = "django"
-version = "5.1.13"
+version = "5.1.14"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "django-5.1.13-py3-none-any.whl", hash = "sha256:06f257f79dc4c17f3f9e23b106a4c5ed1335abecbe731e83c598c941d14fbeed"},
-    {file = "django-5.1.13.tar.gz", hash = "sha256:543ff21679f15e80edfc01fe7ea35f8291b6d4ea589433882913626a7c1cf929"},
+    {file = "django-5.1.14-py3-none-any.whl", hash = "sha256:2a4b9c20404fd1bf50aaaa5542a19d860594cba1354f688f642feb271b91df27"},
+    {file = "django-5.1.14.tar.gz", hash = "sha256:b98409fb31fdd6e8c3a6ba2eef3415cc5c0020057b43b21ba7af6eff5f014831"},
 ]
 
 [package.dependencies]
@@ -2137,13 +2137,13 @@ testing = ["pytest (>=6)", "pytest-black (>=0.3.7) ; platform_python_implementat
 
 [[package]]
 name = "label-studio-sdk"
-version = "2.0.13"
+version = "2.0.14"
 description = ""
 optional = false
 python-versions = ">=3.9,<4"
 groups = ["main"]
 files = [
-    {file = "a97616e1932388d234f0794eddef419bdb9e29c8.zip", hash = "sha256:20fd8fd95a74d692d4406ada974d20e23b8e0d7910a14b3a0d3f76c131b785ae"},
+    {file = "465dc5960f2476929f6aca4aacce73905eb553cb.zip", hash = "sha256:9cdefdab1669c2493bb565c7b561d53addd804b7253bb0cb7487b579827d725a"},
 ]
 
 [package.dependencies]
@@ -2171,7 +2171,7 @@ xmljson = "0.2.1"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/a97616e1932388d234f0794eddef419bdb9e29c8.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/465dc5960f2476929f6aca4aacce73905eb553cb.zip"
 
 [[package]]
 name = "launchdarkly-server-sdk"
@@ -5117,4 +5117,4 @@ uwsgi = ["pyuwsgi", "uwsgitop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "79b631cf280d44b19acd76bf02d8d56013360116c4d6a5b704e218eddd53fcb4"
+content-hash = "59b23982f7f61ff2fd1b1737d483ed6cb9409beed086b23f7f5185043467f0d0"

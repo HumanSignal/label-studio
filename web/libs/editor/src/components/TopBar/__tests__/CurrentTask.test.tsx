@@ -1,6 +1,5 @@
 import { render } from "@testing-library/react";
 import { CurrentTask } from "../CurrentTask";
-import { BlockContext, cn } from "../../../utils/bem.ts";
 import { FF_LEAP_1173 } from "../../../utils/feature-flags";
 import { mockFF } from "../../../../__mocks__/global";
 
@@ -53,11 +52,7 @@ describe("CurrentTask", () => {
       ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
     );
 
-    const { rerender, getByTestId } = render(
-      <BlockContext.Provider value={cn("block-name")}>
-        <CurrentTask store={store} />
-      </BlockContext.Provider>,
-    );
+    const { rerender, getByTestId } = render(<CurrentTask store={store} />);
 
     expect(getByTestId("next-task").disabled).toBe(false);
 
@@ -71,11 +66,7 @@ describe("CurrentTask", () => {
         ),
     };
 
-    rerender(
-      <BlockContext.Provider value={cn("block-name")}>
-        <CurrentTask store={store} />
-      </BlockContext.Provider>,
-    );
+    rerender(<CurrentTask store={store} />);
 
     expect(getByTestId("next-task").disabled).toBe(true);
 
@@ -89,11 +80,7 @@ describe("CurrentTask", () => {
         ),
     };
 
-    rerender(
-      <BlockContext.Provider value={cn("block-name")}>
-        <CurrentTask store={store} />
-      </BlockContext.Provider>,
-    );
+    rerender(<CurrentTask store={store} />);
 
     expect(getByTestId("next-task").disabled).toBe(true);
 
@@ -107,11 +94,7 @@ describe("CurrentTask", () => {
         ),
     };
 
-    rerender(
-      <BlockContext.Provider value={cn("block-name")}>
-        <CurrentTask store={store} />
-      </BlockContext.Provider>,
-    );
+    rerender(<CurrentTask store={store} />);
 
     expect(getByTestId("next-task").disabled).toBe(true);
 
@@ -125,11 +108,7 @@ describe("CurrentTask", () => {
         ),
     };
 
-    rerender(
-      <BlockContext.Provider value={cn("block-name")}>
-        <CurrentTask store={store} />
-      </BlockContext.Provider>,
-    );
+    rerender(<CurrentTask store={store} />);
 
     expect(getByTestId("next-task").disabled).toBe(true);
   });

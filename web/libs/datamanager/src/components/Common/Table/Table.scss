@@ -1,18 +1,25 @@
-.columns__selector {
-  position: absolute;
-  width: 100%;
-  overflow: hidden;
+.table-toolbar {
   display: flex;
-  justify-content: flex-end;
-  top: 0;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 100%;
+  padding: 0 var(--spacing-tight);
+  background-color: var(--color-neutral-surface);
+  height: 41px;
+  transition: transform 0.3s ease-in-out;
+  transform: translateY(-41px);
+  position: absolute;
 
-  &__button-new.columns__selector__button-new {
-    z-index: 1000;
+  &_visible {
+    position: relative;
+    transform: translateY(0);
+  }
+
+  &__customize-button.table-toolbar__customize-button {
     height: 28px;
     width: 28px;
     background-color: var(--color-neutral-background);
     box-shadow: 0 2px 5px 0 var(--black_20);
-    margin: 6.5px 20px;
     border-radius: 4px;
 
     &:hover {
@@ -38,8 +45,20 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow: hidden;
   background-color: var(--color-neutral-background);
+
+  &__auto-size {
+    &_quick-view {
+      & > div {
+        background-color: var(--color-neutral-surface);
+      }
+
+      & .table-head {
+        border-top: 1px solid var(--color-neutral-border);
+      }
+    }
+  }
 
   &_fit {
     width: max-content;

@@ -80,7 +80,7 @@
     content: "";
     position: absolute;
     height: 4px;
-    background: linear-gradient(to bottom, var(--black_15), transparent);
+    background: linear-gradient(to bottom, rgba(var(--color-neutral-shadow-raw) / 20%) 0%, transparent 100%);
   }
 }
 

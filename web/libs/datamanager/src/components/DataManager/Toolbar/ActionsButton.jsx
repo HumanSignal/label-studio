@@ -2,7 +2,8 @@ import { IconChevronDown, IconChevronRight, IconTrash } from "@humansignal/icons
 import { Button, Spinner, Tooltip } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Block, Elem } from "../../../utils/bem";
+import { useActions } from "../../../hooks/useActions";
+import { cn } from "../../../utils/bem";
 import { FF_LOPS_E_3, isFF } from "../../../utils/feature-flags";
 import { Dropdown } from "../../Common/Dropdown/DropdownComponent";
 import Form from "../../Common/Form/Form";
@@ -37,19 +38,22 @@ const DialogContent = ({ text, form, formRef, store, action }) => {
   const fields = formData?.toJSON ? formData.toJSON() : formData;
 
   return (
-    <Block name="dialog-content">
-      <Elem name="text">{text}</Elem>
+    <div className={cn("dialog-content").toClassName()}>
+      <div className={cn("dialog-content").elem("text").toClassName()}>{text}</div>
       {isLoading && (
-        <Elem name="loading" style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+        <div
+          className={cn("dialog-content").elem("loading").toClassName()}
+          style={{ display: "flex", justifyContent: "center", marginTop: 16 }}
+        >
           <Spinner />
-        </Elem>
+        </div>
       )}
       {formData && (
-        <Elem name="form" style={{ paddingTop: 16 }}>
+        <div className={cn("dialog-content").elem("form").toClassName()} style={{ paddingTop: 16 }}>
           <Form.Builder ref={formRef} fields={fields} autosubmit={false} withActions={false} />
-        </Elem>
+        </div>
       )}
-    </Block>
+    </div>
   );
 };
 
@@ -71,27 +75,30 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
   );
 
   const titleContainer = (
-    <Block
+    <Menu.Item
       key={action.id}
-      tag={Menu.Item}
+      className={cn("actionButton")
+        .mod({
+          hasSeperator: isDeleteAction,
+          hasSubMenu: action.children?.length > 0,
+          isSeparator: action.isSeparator,
+          isTitle: action.isTitle,
+          danger: isDeleteAction,
+          disabled: action.disabled,
+        })
+        .toClassName()}
       size="small"
       onClick={onClick}
-      mod={{
-        hasSeperator: isDeleteAction,
-        hasSubMenu: action.children?.length > 0,
-        isSeparator: action.isSeparator,
-        isTitle: action.isTitle,
-        danger: isDeleteAction,
-        disabled: action.disabled,
-      }}
-      name="actionButton"
       aria-label={action.title}
     >
-      <Elem name="titleContainer" {...(action.disabled ? { title: action.disabledReason } : {})}>
-        <Elem name="title">{action.title}</Elem>
-        {hasChildren ? <Elem name="icon" tag={IconChevronRight} /> : null}
-      </Elem>
-    </Block>
+      <div
+        className={cn("actionButton").elem("titleContainer").toClassName()}
+        {...(action.disabled ? { title: action.disabledReason } : {})}
+      >
+        <div className={cn("actionButton").elem("title").toClassName()}>{action.title}</div>
+        {hasChildren ? <IconChevronRight className={cn("actionButton").elem("icon").toClassName()} /> : null}
+      </div>
+    </Menu.Item>
   );
 
   if (hasChildren) {
@@ -102,7 +109,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
         toggle={false}
         ref={submenuRef}
         content={
-          <Block name="actionButton-submenu" tag="ul">
+          <ul className={cn("actionButton-submenu").toClassName()}>
             {action.children.map((childAction) => (
               <ActionButton
                 key={childAction.id}
@@ -112,7 +119,7 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
                 formRef={formRef}
               />
             ))}
-          </Block>
+          </ul>
         }
       >
         {titleContainer}
@@ -204,21 +211,20 @@ export const ActionsButton = injector(
     const formRef = useRef();
     const selectedCount = store.currentView.selectedCount;
     const [isOpen, setIsOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+
+    // Use TanStack Query hook for fetching actions
+    const {
+      actions: serverActions,
+      isLoading,
+      isFetching,
+    } = useActions({
+      enabled: isOpen,
+      projectId: store.SDK.projectId,
+    });
 
     const actions = useMemo(() => {
-      return store.availableActions.filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
-    }, [store.availableActions]);
-
-    useEffect(() => {
-      if (isOpen && actions.length === 0) {
-        setIsLoading(true);
-        store.fetchActions().finally(() => {
-          setIsLoading(false);
-        });
-      }
-    }, [isOpen, actions, store]);
-
+      return [...store.availableActions, ...serverActions].filter((a) => !a.hidden).sort((a, b) => a.order - b.order);
+    }, [store.availableActions, serverActions]);
     const actionButtons = actions.map((action) => (
       <ActionButton key={action.id} action={action} parentRef={formRef} store={store} formRef={formRef} />
     ));
@@ -227,7 +233,15 @@ export const ActionsButton = injector(
     return (
       <Dropdown.Trigger
         content={
-          <Menu size="compact">{isLoading ? <Menu.Item disabled>Loading actions...</Menu.Item> : actionButtons}</Menu>
+          <Menu size="compact">
+            {isLoading || isFetching ? (
+              <Menu.Item data-testid="loading-actions" disabled>
+                Loading actions...
+              </Menu.Item>
+            ) : (
+              actionButtons
+            )}
+          </Menu>
         }
         openUpwardForShortViewport={false}
         disabled={!hasSelected}

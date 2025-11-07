@@ -3,9 +3,11 @@
 import logging
 from datetime import datetime
 
+from core.feature_flags import flag_set
 from core.permissions import AllPermissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import load_func
+from data_manager.actions import DataManagerAction
 from data_manager.functions import evaluate_predictions
 from django.conf import settings
 from projects.models import Project
@@ -97,7 +99,9 @@ def delete_tasks_annotations(project, queryset, **kwargs):
         drafts = drafts.filter(user=int(annotator_id))
     project.summary.remove_created_drafts_and_labels(drafts)
 
-    count, _ = annotations.delete()
+    # count before delete to return the number of deleted items, not including cascade deletions
+    count = annotations.count()
+    annotations.delete()
     drafts.delete()  # since task-level annotation drafts will not have been deleted by CASCADE
     emit_webhooks_for_instance(project.organization, project, WebhookAction.ANNOTATIONS_DELETED, annotations_ids)
     request = kwargs['request']
@@ -148,7 +152,11 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     """
     task_ids = queryset.values_list('id', flat=True)
     predictions = Prediction.objects.filter(task__id__in=task_ids)
-    real_task_ids = set(list(predictions.values_list('task__id', flat=True)))
+    if flag_set('fflag_root_223_optimize_delete_predictions', organization=project.organization):
+        real_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
+    else:
+        real_task_ids = set(list(predictions.values_list('task_id', flat=True)))
+
     count = predictions.count()
     predictions.delete()
     start_job_async_or_sync(update_tasks_counters, Task.objects.filter(id__in=real_task_ids))
@@ -163,7 +171,7 @@ def async_project_summary_recalculation(tasks_ids_list, project_id):
     Task.delete_tasks_without_signals(queryset)
 
 
-actions = [
+actions: list[DataManagerAction] = [
     {
         'entry_point': retrieve_tasks_predictions,
         'permission': all_permissions.predictions_any,
@@ -191,7 +199,7 @@ actions = [
     },
     {
         'entry_point': delete_tasks_annotations,
-        'permission': all_permissions.tasks_delete,
+        'permission': [all_permissions.tasks_change, all_permissions.annotations_delete],
         'title': 'Delete Annotations',
         'order': 101,
         'dialog': {

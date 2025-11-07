@@ -25,7 +25,7 @@ from core.utils.common import (
     load_func,
     merge_labels_counters,
 )
-from core.utils.db import batch_update_with_retry, fast_first
+from core.utils.db import batch_update_with_retry, fast_first, has_column_cached
 from django.conf import settings
 from django.contrib.postgres.search import SearchVectorField
 from django.core.validators import MaxLengthValidator, MinLengthValidator
@@ -34,6 +34,7 @@ from django.db.models import Avg, BooleanField, Case, Count, GeneratedField, JSO
 from django.db.models.expressions import RawSQL
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from fsm.models import FsmHistoryStateModel
 from label_studio_sdk._extensions.label_studio_tools.core.label_config import parse_config
 from labels_manager.models import Label
 from projects.functions import (
@@ -107,6 +108,17 @@ class ProjectManager(models.Manager):
         return queryset
 
 
+class ProjectVisibleManager(ProjectManager):
+    """Default manager that hides soft-deleted projects (deleted_at IS NULL)."""
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # Avoid referencing columns that might not exist during early migrations
+        if has_column_cached(self.model._meta.db_table, 'deleted_at'):
+            return qs.filter(deleted_at__isnull=True)
+        return qs
+
+
 ProjectMixin = load_func(settings.PROJECT_MIXIN)
 
 
@@ -114,7 +126,7 @@ ProjectMixin = load_func(settings.PROJECT_MIXIN)
 recalculate_all_stats = load_func(settings.RECALCULATE_ALL_STATS)
 
 
-class Project(ProjectMixin, models.Model):
+class Project(ProjectMixin, FsmHistoryStateModel):
     class SkipQueue(models.TextChoices):
         # requeue to the end of the same annotator’s queue => annotator gets this task at the end of the queue
         REQUEUE_FOR_ME = 'REQUEUE_FOR_ME', 'Requeue for me'
@@ -123,7 +135,9 @@ class Project(ProjectMixin, models.Model):
         # ignore skipped tasks => skip is a valid annotation, task is completed (finished=True)
         IGNORE_SKIPPED = 'IGNORE_SKIPPED', 'Ignore skipped'
 
-    objects = ProjectManager()
+    # Managers: default (visible only) and explicit unfiltered
+    objects = ProjectVisibleManager()
+    all_objects = ProjectManager()
     __original_label_config = None
 
     title = models.CharField(
@@ -289,6 +303,19 @@ class Project(ProjectMixin, models.Model):
         default=None,
         help_text='Custom task lock TTL in seconds. If not set, the default value is used',
     )
+
+    # Soft-delete lifecycle (OSS fields, used by LSE logic)
+    deleted_at = models.DateTimeField(_('deleted at'), null=True, blank=True)
+    deleted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='deleted_projects',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_index=False,
+        verbose_name=_('deleted by'),
+    )
+    purge_at = models.DateTimeField(_('purge at'), null=True, blank=True)
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
@@ -776,6 +803,12 @@ class Project(ProjectMixin, models.Model):
             if update_fields is not None:
                 update_fields = {'control_weights'}.union(update_fields)
 
+        # If project is published and is draft, set is_draft to False
+        if self.is_published and self.is_draft:
+            self.is_draft = False
+            if update_fields is not None:
+                update_fields = {'is_published', 'is_draft'}.union(update_fields)
+
         super(Project, self).save(*args, update_fields=update_fields, **kwargs)
 
         if label_config_has_changed:
@@ -819,6 +852,12 @@ class Project(ProjectMixin, models.Model):
                     summary.reset()
                 elif self.num_annotations == 0 and self.num_drafts == 0:
                     summary.reset(tasks_data_based=False)
+
+    # ============================================================================
+    # FSM Integration
+    # ============================================================================
+    # Project uses FsmHistoryStateModel for FSM integration. All transition logic is defined
+    # in projects/transitions.py with declarative triggers. No custom methods needed.
 
     def get_member_ids(self):
         if hasattr(self, 'team_link'):

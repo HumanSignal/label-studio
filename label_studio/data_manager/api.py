@@ -8,7 +8,7 @@ from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import int_from_request, load_func
 from core.utils.params import bool_from_request
 from data_manager.actions import get_action_form, get_all_actions, perform_action
-from data_manager.functions import evaluate_predictions, get_prepare_params, get_prepared_queryset
+from data_manager.functions import evaluate_predictions, get_prepare_params
 from data_manager.managers import get_fields_for_evaluation
 from data_manager.models import View
 from data_manager.prepare_params import filters_schema, ordering_schema, prepare_params_schema
@@ -152,11 +152,11 @@ class ViewAPI(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['project']
     permission_required = ViewClassPermission(
-        GET=all_permissions.tasks_view,
-        POST=all_permissions.tasks_change,
-        PATCH=all_permissions.tasks_change,
-        PUT=all_permissions.tasks_change,
-        DELETE=all_permissions.tasks_delete,
+        GET=all_permissions.views_view,
+        POST=all_permissions.views_create,
+        PATCH=all_permissions.views_change,
+        PUT=all_permissions.views_change,
+        DELETE=all_permissions.views_delete,
     )
 
     def perform_create(self, serializer):
@@ -181,7 +181,7 @@ class ViewAPI(viewsets.ModelViewSet):
             'x-fern-audiences': ['public'],
         },
     )
-    @action(detail=False, methods=['delete'])
+    @action(detail=False, methods=['delete'], permission_required=all_permissions.views_reset)
     def reset(self, request):
         # Note: OpenAPI 3.0 does not support request body for DELETE requests
         # see https://github.com/tfranzel/drf-spectacular/issues/431#issuecomment-862738643
@@ -550,7 +550,16 @@ class ProjectStateAPI(APIView):
                             'id': {'type': 'string', 'title': 'Action ID'},
                             'title': {'type': 'string', 'title': 'Title'},
                             'order': {'type': 'integer', 'title': 'Order'},
-                            'permission': {'type': 'string', 'title': 'Permission'},
+                            'permission': {
+                                'oneOf': [
+                                    {'type': 'string'},
+                                    {
+                                        'type': 'array',
+                                        'items': {'type': 'string'},
+                                        'description': 'List of permissions (user needs any all of them)',
+                                    },
+                                ]
+                            },
                             'experimental': {'type': 'boolean', 'title': 'Experimental'},
                             'dialog': {
                                 'type': 'object',
@@ -674,10 +683,19 @@ class ProjectActionsAPI(APIView):
         project = generics.get_object_or_404(Project, pk=pk)
         self.check_object_permissions(request, project)
 
-        queryset = get_prepared_queryset(request, project)
+        # keep ordering only when needed, otherwise drop to avoid expensive sorts/annotations
+        action_id = request.GET.get('id', None)
+        prepare_params = get_prepare_params(request, project)
+        if not flag_set(
+            'fflag_root_223_optimize_delete_predictions', organization=project.organization
+        ) or action_id in ['next_task', 'remove_duplicates']:
+            queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
+        else:
+            prepare_params.ordering = []
+            queryset = Task.prepared.only_filtered(prepare_params=prepare_params)
+            queryset = queryset.order_by()
 
         # wrong action id
-        action_id = request.GET.get('id', None)
         if action_id is None:
             response = {'detail': 'No action id "' + str(action_id) + '", use ?id=<action-id>'}
             return Response(response, status=422)

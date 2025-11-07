@@ -59,6 +59,12 @@ status = 301
 force = true
 
 [[redirects]]
+from = "/tags/pdf-beta"
+to = "/tags/pdf"
+status = 301
+force = true
+
+[[redirects]]
 from = "/"
 to = "/guide"
 status = 301

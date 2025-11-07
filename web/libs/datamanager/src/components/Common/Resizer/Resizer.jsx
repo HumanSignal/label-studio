@@ -1,5 +1,5 @@
 import React from "react";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import "./Resizer.scss";
 
 const calculateWidth = (width, minWidth, maxWidth, initialX, currentX) => {
@@ -73,19 +73,21 @@ export const Resizer = ({
   );
 
   return (
-    <Block name="resizer" mix={className} style={{ width }}>
-      <Elem name="content" style={style ?? {}}>
+    <div className={cn("resizer").mix(className).toClassName()} style={{ width }}>
+      <div className={cn("resizer").elem("content").toClassName()} style={style ?? {}}>
         {children}
-      </Elem>
+      </div>
 
-      <Elem
-        name="handle"
+      <div
+        className={cn("resizer")
+          .elem("handle")
+          .mod({ resizing: showResizerLine !== false && isResizing, quickview: type === "quickview" })
+          .toClassName()}
         ref={resizeHandler}
         style={handleStyle}
-        mod={{ resizing: showResizerLine !== false && isResizing, quickview: type === "quickview" }}
         onMouseDown={handleResize}
         onDoubleClick={() => onReset?.()}
       />
-    </Block>
+    </div>
   );
 };
