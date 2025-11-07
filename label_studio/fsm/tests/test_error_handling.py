@@ -490,11 +490,21 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
         except Exception as e:
             pytest.fail(f'Context creation with None entity should not fail: {e}')
 
-        # Test context with missing required fields
+        # Test context with None target_state (allowed for side-effect only transitions)
+        try:
+            context = TransitionContext(
+                entity=self.mock_entity,
+                target_state=None,  # Allowed for side-effect only transitions
+            )
+            assert context.target_state is None
+        except Exception as e:
+            pytest.fail(f'Context creation with None target_state should not fail: {e}')
+
+        # Test context with missing required fields (entity is required)
         with pytest.raises(ValidationError):
             TransitionContext(
-                entity=self.mock_entity,
-                # Missing target_state
+                # Missing entity
+                target_state='PROCESSED',
             )
 
         # Test context with extreme timestamp
