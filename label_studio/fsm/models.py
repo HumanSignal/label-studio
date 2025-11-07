@@ -74,73 +74,12 @@ class FsmHistoryStateModel(models.Model):
         This avoids accessing any ForeignKey fields (which would trigger queries).
         We only process these values into _original_values in save() when we actually
         need them for change detection.
-
-        For a dashboard loading 100 tasks that are never modified:
-        - Before: 100 calls to _capture_original_values() with field access
-        - After: 100 lightweight stores of raw values (no field access, no queries)
-        - Processing only happens for models that are actually saved
         """
         instance = super().from_db(db, field_names, values)
         # Initialize as empty dict for safe access
-        instance._original_values = {}
-
-        # Store raw DB values for lazy processing (avoids any field access/queries)
-        # We'll process these in save() only if FSM is enabled and we need change detection
-        instance._raw_db_values = dict(zip(field_names, values))
-        instance._loaded_from_db = True
+        instance._original_values = dict(zip(field_names, values))
 
         return instance
-
-    def _process_raw_db_values(self):
-        """
-        Process raw DB values into _original_values for change detection.
-
-        PERFORMANCE: This is only called when we're about to save and need change
-        detection. For read-only queries, this is never called, avoiding any overhead.
-
-        Uses the raw values stored in from_db() without accessing any model fields,
-        so it never triggers database queries.
-        """
-        if not hasattr(self, '_raw_db_values'):
-            # Not loaded from DB, nothing to process
-            return
-
-        self._original_values = {}
-
-        # Process raw DB values - these are already the column values (including _id for FKs)
-        # so we don't need to access any fields, completely avoiding N+1 queries
-        for field in self._meta.fields:
-            # Use attname (column name) to get the raw value
-            if field.attname in self._raw_db_values:
-                # Store using field.name as key for consistency with _get_changed_fields()
-                self._original_values[field.name] = self._raw_db_values[field.attname]
-
-        # Clean up raw values after processing to free memory
-        delattr(self, '_raw_db_values')
-
-    def _capture_original_values(self):
-        """
-        Capture current field values for change detection.
-
-        This is called after save() to refresh the baseline for the next save.
-
-        PERFORMANCE: For ForeignKey fields, we access the _id column directly
-        (field.attname) to avoid triggering N+1 queries.
-        """
-        self._original_values = {}
-        deferred_fields = self.get_deferred_fields()
-
-        for field in self._meta.fields:
-            if field.attname in deferred_fields:
-                continue
-
-            # PERFORMANCE: For ForeignKey fields, access the _id column directly
-            if field.is_relation and field.many_to_one:
-                value = getattr(self, field.attname, None)
-                self._original_values[field.name] = value
-            else:
-                value = getattr(self, field.name, None)
-                self._original_values[field.name] = value
 
     def __reduce_ex__(self, protocol):
         """
@@ -159,8 +98,6 @@ class FsmHistoryStateModel(models.Model):
             state = reduction[2].copy()
             # Remove internal FSM fields from serialization
             state.pop('_original_values', None)
-            state.pop('_raw_db_values', None)
-            state.pop('_loaded_from_db', None)
             # Return new reduction with cleaned state
             return (reduction[0], reduction[1], state) + reduction[3:]
 
@@ -192,19 +129,16 @@ class FsmHistoryStateModel(models.Model):
             # Only check fields that were captured in _original_values
             # Fields that were deferred during capture won't be in _original_values
             # and should be considered unchanged
-            if field.name not in self._original_values:
+            if field.attname not in self._original_values:
+                continue
+            if field.is_relation and field.many_to_many:
                 continue
 
-            old_value = self._original_values[field.name]
-            new_value = getattr(self, field.name, None)
+            old_value = self._original_values[field.attname]
+            new_value = getattr(self, field.attname, None)
 
-            # For ForeignKey fields, old_value is stored as PK, so compare PK to PK
-            if field.is_relation and field.many_to_one:
-                new_pk = new_value.pk if new_value and hasattr(new_value, 'pk') else new_value
-                if old_value != new_pk:
-                    changed[field.name] = (old_value, new_value)
-            elif old_value != new_value:
-                changed[field.name] = (old_value, new_value)
+            if old_value != new_value:
+                changed[field.attname] = (old_value, new_value)
         return changed
 
     def _determine_fsm_transitions(self, is_creating: bool = None, changed_fields: dict = None) -> list:
@@ -425,25 +359,13 @@ class FsmHistoryStateModel(models.Model):
         Returns:
             Whatever super().save() returns
         """
+        from core.current_request import CurrentContext
+
         # Check for explicit FSM skip flag
-        skip_fsm = kwargs.pop('skip_fsm', False)
-
-        # Also check CurrentContext for skip_fsm flag (for context manager usage)
-        if not skip_fsm:
-            from core.current_request import CurrentContext
-
-            skip_fsm = CurrentContext.get('skip_fsm', False)
+        skip_fsm = kwargs.pop('skip_fsm', CurrentContext.is_fsm_disabled())
 
         # Check if this is a creation vs update
         is_creating = self._state.adding
-
-        # PERFORMANCE: Process raw DB values into _original_values ONLY when needed
-        # This is the key optimization - for read-only queries, we never process the values
-        # Only when we're about to save and FSM is enabled do we pay the cost
-        if not skip_fsm and not is_creating and self._should_execute_fsm():
-            # Only process if we haven't already (for subsequent saves)
-            if not self._original_values and hasattr(self, '_raw_db_values'):
-                self._process_raw_db_values()
 
         # Capture changed fields before save (only for updates)
         changed_fields = {} if is_creating else self._get_changed_fields()
@@ -508,11 +430,6 @@ class FsmHistoryStateModel(models.Model):
                     },
                     exc_info=True,
                 )
-
-        # Update original values after save for next time (only if FSM is actually running)
-        # This prevents unnecessary field access when FSM is disabled
-        if not skip_fsm and should_execute:
-            self._capture_original_values()
 
         return result
 
