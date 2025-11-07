@@ -80,7 +80,7 @@ Select how you want to distribute tasks to annotators for labeling.
 
 <dd>
 
-*Only available when using Automatic task distribution.* 
+*Only available when using Automatic task assignment.* 
 
 Select the order in which tasks are presented to annotators.  
 
@@ -97,7 +97,7 @@ Select the order in which tasks are presented to annotators.
 
 <dd>
 
-*Only available when using Automatic task distribution.* 
+*Only available when using Automatic task assignment.* 
 
 Control how long tasks are reserved for annotators. 
 
@@ -105,9 +105,9 @@ Task reservation ensures that the tasks an annotator starts working on are tempo
 
 !!! note
 
-    Task reservation takes the [**Annotations per task minimum**](#overlap) into consideration. For example, if your overlap is `2`, then two annotators can reserve a task simultaneously. 
+    Task reservation takes overlap ([**Quality > Annotations per task**](#overlap)) into consideration. For example, if your overlap is `2`, then two annotators can reserve a task simultaneously. 
 
-    When [**Distribute Labeling Tasks**](#distribute-tasks) is set to **Manual**, the Task Reservation setting is hidden because it does not apply. 
+    When [**Task Assignment**](#distribute-tasks) is set to **Manual**, the Task Reservation setting is hidden because it does not apply. 
 
 A task reservation is put in place as soon as an annotator opens the task. The reservation remains until one of the following happens (whichever happens first):
 
@@ -148,7 +148,7 @@ Configure additional settings for annotators.
 | Field          | Description    |
 | ------------- | ------------ |
 | **Allow empty annotations** | This determines whether annotators can submit a task without making any annotations on it. If enabled, annotators can submit a task even if they haven't added any labels or regions, resulting in an empty annotation. |
-| **Show the Data Manager to annotators** | When disabled, annotators can only enter the label stream. When enabled, annotators can access the Data Manager. The tasks that are available to them depend on the labeling distribution mode: <ul><li>Automatic distribution: Annotators can only see tasks that they have already completed or have created a draft.</li><li>Manual distribution: Annotators can only see the tasks that they have been assigned.</li></ul>Note that some information is still hidden from annotators and they can only view a subset of the Data Manager columns. For example, they cannot see columns such as Annotators, Agreement, Reviewers, and more. |
+| **Show the Data Manager to annotators** | When disabled, annotators can only enter the label stream. When enabled, annotators can access the Data Manager. The tasks that are available to them depend on the how task are assigned: <ul><li>Automatic task assignment: Annotators can only see tasks that they have already completed or have created a draft for.</li><li>Manual task assignment: Annotators can only see the tasks that they have been assigned.</li></ul>Note that some information is still hidden from annotators and they can only view a subset of the Data Manager columns. For example, they cannot see columns such as Annotators, Agreement, Reviewers, and more. |
 | **Show only columns used in labeling configuration to Annotators** | (Only available if the previous setting is enabled)<br><br /> Hide unused Data Manager columns from Annotators. <br><br />Unused Data Manager columns are columns that contain data that is not being used in the labeling configuration. <br><br />For example, you may include meta or system data that you want to view as part of a project, but you don't necessarily want to expose that data to Annotators. |
 
 
@@ -190,10 +190,10 @@ Select how you want to handle skipped tasks. To disallow skipping tasks, you can
 
 If an annotator skips a task, the task is moved to the bottom of their queue. They see the task again as they reach the end of their queue. 
 
-If the annotator exits the label stream without labeling the skipped task, and then later re-enters the label stream, whether they see the task again depends on how task distribution is set up. 
+If the annotator exits the label stream without labeling the skipped task, and then later re-enters the label stream, whether they see the task again depends on how task assignments are set up. 
 
-* Automatic distribution: Whether they see the task again depends on if other annotators have since completed the task. If the task is still incomplete when the annotator re-enters the labeling stream, they can update label and re-submit the task. 
-* Manual distribution: The annotator will continue to see the skipped task until it is completed.  
+* Automatic task assignment: Whether they see the task again depends on if other annotators have since completed the task. If the task is still incomplete when the annotator re-enters the labeling stream, they can update label and re-submit the task. 
+* Manual task assignment: The annotator will continue to see the skipped task until it is completed.  
 
 Skipped tasks are not marked as completed, and affect the Overall Project Progress calculation visible from the project Dashboard. (Meaning that the progress for a project that has skipped tasks will be less than 100%.)  
 
@@ -206,7 +206,7 @@ Skipped tasks are not marked as completed, and affect the Overall Project Progre
 </td>
 <td>
 
-*Only applies when using Automatic task distribution.*
+*Only applies when using Automatic task assignment.*
 
 If an annotator skips a task, the task is removed from their queue and automatically assigned to a different annotator.
 
@@ -227,17 +227,17 @@ Note that if you select this option before switching to Manual mode, this option
 </td>
 <td>
 
-How this setting works depends on your labeling distribution method. 
+How this setting works depends on your task assignment method. 
 
-* Automatic distribution: If an annotator skips a task, the task is removed from the annotator's queue. 
+* Automatic task assignment: If an annotator skips a task, the task is removed from the annotator's queue. 
 
-    If task overlap (as defined in [**Annotations per task minimum**](#overlap)) is set to 1, then the skipped task is marked as Completed and is not seen again by an annotator. However, if the overlap is greater than 1, then the task is shown to other annotators until the minimum annotations are reached. 
+    If task overlap (as defined in [**Quality > Annotations per task**](#overlap)) is set to 1, then the skipped task is marked as Completed and is not seen again by an annotator. However, if the overlap is greater than 1, then the task is shown to other annotators until the minimum annotations are reached. 
 
-* Manual distribution: If the annotator skips a task, it is removed from their queue. But other annotators assigned to the task will still see it in their queue.  
+* Manual task assignment: If the annotator skips a task, it is removed from their queue. But other annotators assigned to the task will still see it in their queue.  
 
-For both distribution methods, **Ignore skipped** treats skipped tasks differently when it comes to calculating progress. 
+For both assignment methods, **Ignore skipped** treats skipped tasks differently when it comes to calculating progress. 
 
-Unlike the other skip queue options, in this case skipped tasks do not adversely affect the Overall Project Progress calculation visible from the project Dashboard. (Meaning that the progress for a project that has skipped tasks can still be 100%, assuming all tasks are otherwise completed.)
+Unlike the other skip queue options, in this case skipped tasks do not adversely affect the Overall Project Progress calculation visible from the project dashboard. (Meaning that the progress for a project that has skipped tasks can still be 100%, assuming all tasks are otherwise completed.)
 
 </td>
 </tr>
