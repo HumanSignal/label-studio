@@ -373,6 +373,15 @@ class FsmHistoryStateModel(models.Model):
         # Perform the actual save
         result = super().save(*args, **kwargs)
 
+        # After successful save, update _original_values to current values
+        # This ensures subsequent saves can detect changes correctly
+        # Store attname values (raw PK for ForeignKey fields) to match from_db() format
+        self._original_values = {}
+        for field in self._meta.fields:
+            if field.is_relation and field.many_to_many:
+                continue
+            self._original_values[field.attname] = getattr(self, field.attname, None)
+
         # After successful save, trigger FSM transitions if enabled and not skipped
         should_execute = not skip_fsm and self._should_execute_fsm()
 
