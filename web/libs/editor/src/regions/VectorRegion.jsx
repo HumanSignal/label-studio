@@ -58,7 +58,7 @@ const Model = types
     // There are two modes: transform and edit
     // transform -- user can transform the shape as a whole (rotate, translate, resize)
     // edit -- user works with individual points
-    transformMode: true,
+    transformMode: false,
   })
   .volatile(() => ({
     mouseOverStartPoint: false,
@@ -233,7 +233,7 @@ const Model = types
 
       _selectArea(additiveMode = false) {
         const annotation = self.annotation;
-        self.setTransformMode(true);
+        self.setTransformMode(false);
         if (!annotation) return;
 
         if (additiveMode) {
@@ -698,6 +698,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           scaleY={item.parent.stageZoom}
           x={0}
           y={0}
+          transformMode={item.selected && item.transformMode}
           transform={{ zoom: item.parent.stageZoom, offsetX, offsetY }}
           fitScale={item.parent.zoomScale}
           allowClose={item.control?.closable ?? false}
