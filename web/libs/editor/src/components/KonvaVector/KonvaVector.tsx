@@ -19,7 +19,13 @@ import { stageToImageCoordinates } from "./eventHandlers/utils";
 import { PointCreationManager } from "./pointCreationManager";
 import { VectorSelectionTracker, type VectorInstance } from "./VectorSelectionTracker";
 import { calculateShapeBoundingBox } from "./utils/bezierBoundingBox";
-import { shouldClosePathOnPointClick, isActivePointEligibleForClosing, handlePointDeselection, handlePointSelection, handlePointSelectionFromIndex } from "./eventHandlers/pointSelection";
+import {
+  shouldClosePathOnPointClick,
+  isActivePointEligibleForClosing,
+  handlePointDeselection,
+  handlePointSelection,
+  handlePointSelectionFromIndex,
+} from "./eventHandlers/pointSelection";
 import { handleShiftClickPointConversion } from "./eventHandlers/drawing";
 import { deletePoint } from "./pointManagement";
 import type { BezierPoint, GhostPoint as GhostPointType, KonvaVectorProps, KonvaVectorRef } from "./types";
@@ -404,7 +410,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   } | null>(null);
   const [isDraggingShape, setIsDraggingShape] = useState(false);
   const shapeDragStartPos = useRef<{ x: number; y: number; imageX: number; imageY: number } | null>(null);
-  const originalPointsPositions = useRef<Array<{ x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } }>>([]);
+  const originalPointsPositions = useRef<
+    Array<{ x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } }>
+  >([]);
   const justFinishedShapeDrag = useRef(false);
   const shapeDragDistance = useRef(0);
   const [isDisconnectedMode, setIsDisconnectedMode] = useState(false);
@@ -417,7 +425,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     dragDistance: number;
   } | null>(null);
 
-  const [cursorPosition, setCursorPosition] = useState<{
+  const cursorPositionRef = useRef<{
     x: number;
     y: number;
   } | null>(null);
@@ -508,6 +516,61 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   );
 
   const isDragging = useRef(false);
+  
+  // Ref to prevent effect from running multiple times
+  const handlersAttachedRef = useRef(false);
+  
+  // Refs to access current values in event handlers without recreating them
+  const currentValuesRef = useRef({
+    initialPoints,
+    effectiveSelectedPoints,
+    allowClose,
+    finalIsPathClosed,
+    pixelSnapping,
+    isDraggingNewBezier,
+    ghostPointDragInfo,
+    draggedPointIndex,
+    draggedControlPoint,
+    isDraggingShape,
+    instanceId,
+    transform,
+    fitScale,
+    x,
+    y,
+    width,
+    height,
+    skeletonEnabled,
+    activePointId,
+    lastAddedPointId,
+    disabled,
+    onFinish,
+  });
+  
+  // Update refs on every render
+  currentValuesRef.current = {
+    initialPoints,
+    effectiveSelectedPoints,
+    allowClose,
+    finalIsPathClosed,
+    pixelSnapping,
+    isDraggingNewBezier,
+    ghostPointDragInfo,
+    draggedPointIndex,
+    draggedControlPoint,
+    isDraggingShape,
+    instanceId,
+    transform,
+    fitScale,
+    x,
+    y,
+    width,
+    height,
+    skeletonEnabled,
+    activePointId,
+    lastAddedPointId,
+    disabled,
+    onFinish,
+  };
 
   // Determine if drawing should be disabled based on current interaction context
   const isDrawingDisabled = () => {
@@ -524,7 +587,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     }
 
     // Dynamically check control point hover
-    if (cursorPosition && initialPoints.length > 0) {
+    if (cursorPositionRef.current && initialPoints.length > 0) {
       const scale = transform.zoom * fitScale;
       const controlPointHitRadius = HIT_RADIUS.CONTROL_POINT / scale;
 
@@ -534,7 +597,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           // Check control point 1
           if (point.controlPoint1) {
             const distance = Math.sqrt(
-              (cursorPosition.x - point.controlPoint1.x) ** 2 + (cursorPosition.y - point.controlPoint1.y) ** 2,
+              (cursorPositionRef.current.x - point.controlPoint1.x) ** 2 + (cursorPositionRef.current.y - point.controlPoint1.y) ** 2,
             );
             if (distance <= controlPointHitRadius) {
               return true; // Disable drawing when hovering over control points
@@ -543,7 +606,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           // Check control point 2
           if (point.controlPoint2) {
             const distance = Math.sqrt(
-              (cursorPosition.x - point.controlPoint2.x) ** 2 + (cursorPosition.y - point.controlPoint2.y) ** 2,
+              (cursorPositionRef.current.x - point.controlPoint2.x) ** 2 + (cursorPositionRef.current.y - point.controlPoint2.y) ** 2,
             );
             if (distance <= controlPointHitRadius) {
               return true; // Disable drawing when hovering over control points
@@ -554,13 +617,13 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     }
 
     // Dynamically check point hover
-    if (cursorPosition && initialPoints.length > 0) {
+    if (cursorPositionRef.current && initialPoints.length > 0) {
       const scale = transform.zoom * fitScale;
       const selectionHitRadius = HIT_RADIUS.SELECTION / scale;
 
       for (let i = 0; i < initialPoints.length; i++) {
         const point = initialPoints[i];
-        const distance = Math.sqrt((cursorPosition.x - point.x) ** 2 + (cursorPosition.y - point.y) ** 2);
+        const distance = Math.sqrt((cursorPositionRef.current.x - point.x) ** 2 + (cursorPositionRef.current.y - point.y) ** 2);
         if (distance <= selectionHitRadius) {
           // If exactly one point is selected and this is that point, allow drawing
           if (selectedPoints.size === SELECTION_SIZE.MULTI_SELECTION_MIN && selectedPoints.has(i)) {
@@ -585,14 +648,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     }
 
     // Dynamically check segment hover (to hide ghost line when hovering over path segments)
-    if (cursorPosition && initialPoints.length >= 2) {
+    if (cursorPositionRef.current && initialPoints.length >= 2) {
       const scale = transform.zoom * fitScale;
       const segmentHitRadius = HIT_RADIUS.SEGMENT / scale; // Slightly larger than point hit radius
 
       // Use the same logic as findClosestPointOnPath for consistent Bezier curve detection
-      const closestPathPoint = findClosestPointOnPath(cursorPosition, initialPoints, allowClose, finalIsPathClosed);
+      const closestPathPoint = findClosestPointOnPath(cursorPositionRef.current, initialPoints, allowClose, finalIsPathClosed);
 
-      if (closestPathPoint && getDistance(cursorPosition, closestPathPoint.point) <= segmentHitRadius) {
+      if (closestPathPoint && getDistance(cursorPositionRef.current, closestPathPoint.point) <= segmentHitRadius) {
         return true; // Disable drawing when hovering over segments
       }
     }
@@ -1721,11 +1784,29 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Set up stage-level event listeners for cursor position, ghost point, and point dragging
   // This allows these features to work even when the invisible shape is disabled
   useEffect(() => {
+    console.log("🔵 useEffect called, handlersAttached:", handlersAttachedRef.current, "disableInternalPointAddition:", disableInternalPointAddition);
+    
+    // Prevent running if handlers are already attached
+    // This stops the infinite loop caused by state updates triggering re-renders
+    if (handlersAttachedRef.current) {
+      console.log("🟢 Handlers already attached, returning early");
+      return () => {}; // Return empty cleanup function
+    }
+    
     const group = stageRef.current;
-    if (!group) return;
+    if (!group) {
+      console.log("🔴 No group, returning");
+      return;
+    }
 
     const stage = group.getStage();
-    if (!stage) return;
+    if (!stage) {
+      console.log("🔴 No stage, returning");
+      return;
+    }
+    
+    console.log("🟣 Setting up stage-level handlers (disableInternalPointAddition=true)");
+    handlersAttachedRef.current = true;
 
     // Only set up stage-level dragging when disableInternalPointAddition is true
     // Otherwise, let the layer handlers handle it
@@ -1744,11 +1825,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
 
         // Always update cursor position (even outside bounds) so ghost line can work
-        setCursorPosition(imagePos);
+        cursorPositionRef.current = imagePos;
 
         // Only process ghost point logic if within bounds
         if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
-
           // Handle ghost point when Shift is held (check event directly for real-time updates)
           if (
             e.evt.shiftKey &&
@@ -1775,12 +1855,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             if (isOverPoint) {
               setGhostPoint(null);
             } else {
-              const closestPathPoint = findClosestPointOnPath(
-                imagePos,
-                initialPoints,
-                allowClose,
-                finalIsPathClosed,
-              );
+              const closestPathPoint = findClosestPointOnPath(imagePos, initialPoints, allowClose, finalIsPathClosed);
 
               if (closestPathPoint) {
                 const snappedGhostPoint = snapToPixel(closestPathPoint.point, pixelSnapping);
@@ -1824,7 +1899,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       };
 
       const handleStageMouseLeave = () => {
-        setCursorPosition(null);
+        cursorPositionRef.current = null;
         setGhostPoint(null);
       };
 
@@ -1839,6 +1914,24 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
     // When disableInternalPointAddition is true, handle point dragging at stage level
     const handleStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
+      // Get current values from ref to avoid stale closures
+      const {
+        initialPoints,
+        effectiveSelectedPoints,
+        instanceId,
+        transform,
+        fitScale,
+        x,
+        y,
+        skeletonEnabled,
+        activePointId,
+        lastAddedPointId,
+        allowClose,
+        finalIsPathClosed,
+        disabled,
+        onFinish,
+      } = currentValuesRef.current;
+      
       // Check if event target belongs to this instance's group
       const target = e.target;
       let targetGroup: Konva.Node | null = target;
@@ -1860,67 +1953,71 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         // Extract point index from name (format: "point-{index}")
         const match = targetName.match(/^point-(\d+)$/);
         if (match) {
-          const pointIndex = parseInt(match[1], 10);
+          const pointIndex = Number.parseInt(match[1], 10);
           if (pointIndex >= 0 && pointIndex < initialPoints.length) {
             const point = initialPoints[pointIndex];
-            
+
             // If cmd-click, handle selection immediately and don't set up dragging
             if (e.evt.ctrlKey || e.evt.metaKey) {
               // Prevent event from propagating to avoid region deselection
               e.evt.stopPropagation();
-              
+
               // Create a mock event object for the selection handlers
               const mockEvent = {
                 ...e,
                 target: e.target,
                 evt: e.evt,
               } as Konva.KonvaEventObject<MouseEvent>;
-              
+
               // Try deselection first
-              if (handlePointDeselection(mockEvent, {
-                instanceId,
-                initialPoints,
-                transform,
-                fitScale,
-                x,
-                y,
-                selectedPoints: effectiveSelectedPoints,
-                setSelectedPoints,
-                skeletonEnabled,
-                setActivePointId,
-                setLastAddedPointId,
-                lastAddedPointId,
-                activePointId,
-              } as any)) {
+              if (
+                handlePointDeselection(mockEvent, {
+                  instanceId,
+                  initialPoints,
+                  transform,
+                  fitScale,
+                  x,
+                  y,
+                  selectedPoints: effectiveSelectedPoints,
+                  setSelectedPoints,
+                  skeletonEnabled,
+                  setActivePointId,
+                  setLastAddedPointId,
+                  lastAddedPointId,
+                  activePointId,
+                } as any)
+              ) {
                 return;
               }
               // If not deselection, try selection (adding to multi-selection)
-              if (handlePointSelection(mockEvent, {
-                instanceId,
-                initialPoints,
-                transform,
-                fitScale,
-                x,
-                y,
-                selectedPoints: effectiveSelectedPoints,
-                setSelectedPoints,
-                setSelectedPointIndex,
-                skeletonEnabled,
-                setActivePointId,
-                setLastAddedPointId,
-                lastAddedPointId,
-                activePointId,
-                allowClose,
-                isPathClosed: finalIsPathClosed,
-                disabled,
-                onFinish,
-              } as any)) {
+              if (
+                handlePointSelection(mockEvent, {
+                  instanceId,
+                  initialPoints,
+                  transform,
+                  fitScale,
+                  x,
+                  y,
+                  selectedPoints: effectiveSelectedPoints,
+                  setSelectedPoints,
+                  setSelectedPointIndex,
+                  skeletonEnabled,
+                  setActivePointId,
+                  setLastAddedPointId,
+                  lastAddedPointId,
+                  activePointId,
+                  allowClose,
+                  isPathClosed: finalIsPathClosed,
+                  disabled,
+                  onFinish,
+                } as any)
+              ) {
                 return;
               }
             } else {
               // Normal click - prevent event propagation to avoid region deselection
               e.evt.stopPropagation();
-              
+
               // Store the potential drag target but don't start dragging yet
               // We'll start dragging only if the mouse moves beyond a threshold
               setDraggedPointIndex(pointIndex);
@@ -1942,8 +2039,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       if (targetName && targetName.startsWith("control-point-")) {
         const match = targetName.match(/^control-point-(\d+)-(\d+)$/);
         if (match) {
-          const pointIndex = parseInt(match[1], 10);
-          const controlIndex = parseInt(match[2], 10);
+          const pointIndex = Number.parseInt(match[1], 10);
+          const controlIndex = Number.parseInt(match[2], 10);
           if (pointIndex >= 0 && pointIndex < initialPoints.length) {
             const point = initialPoints[pointIndex];
             if (point.isBezier && controlIndex >= 1 && controlIndex <= 2) {
@@ -1977,59 +2074,63 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           if (e.evt.ctrlKey || e.evt.metaKey) {
             // Prevent event from propagating to avoid region deselection
             e.evt.stopPropagation();
-            
+
             // Create a mock event object for the selection handlers
             const mockEvent = {
               ...e,
               target: e.target,
               evt: e.evt,
             } as Konva.KonvaEventObject<MouseEvent>;
-            
+
             // Try deselection first
-            if (handlePointDeselection(mockEvent, {
-              instanceId,
-              initialPoints,
-              transform,
-              fitScale,
-              x,
-              y,
-              selectedPoints: effectiveSelectedPoints,
-              setSelectedPoints,
-              skeletonEnabled,
-              setActivePointId,
-              setLastAddedPointId,
-              lastAddedPointId,
-              activePointId,
-            } as any)) {
+            if (
+              handlePointDeselection(mockEvent, {
+                instanceId,
+                initialPoints,
+                transform,
+                fitScale,
+                x,
+                y,
+                selectedPoints: effectiveSelectedPoints,
+                setSelectedPoints,
+                skeletonEnabled,
+                setActivePointId,
+                setLastAddedPointId,
+                lastAddedPointId,
+                activePointId,
+              } as any)
+            ) {
               return;
             }
             // If not deselection, try selection (adding to multi-selection)
-            if (handlePointSelection(mockEvent, {
-              instanceId,
-              initialPoints,
-              transform,
-              fitScale,
-              x,
-              y,
-              selectedPoints: effectiveSelectedPoints,
-              setSelectedPoints,
-              setSelectedPointIndex,
-              skeletonEnabled,
-              setActivePointId,
-              setLastAddedPointId,
-              lastAddedPointId,
-              activePointId,
-              allowClose,
-              isPathClosed: finalIsPathClosed,
-              disabled,
-              onFinish,
-            } as any)) {
+            if (
+              handlePointSelection(mockEvent, {
+                instanceId,
+                initialPoints,
+                transform,
+                fitScale,
+                x,
+                y,
+                selectedPoints: effectiveSelectedPoints,
+                setSelectedPoints,
+                setSelectedPointIndex,
+                skeletonEnabled,
+                setActivePointId,
+                setLastAddedPointId,
+                lastAddedPointId,
+                activePointId,
+                allowClose,
+                isPathClosed: finalIsPathClosed,
+                disabled,
+                onFinish,
+              } as any)
+            ) {
               return;
             }
           } else {
             // Normal click - prevent event propagation to avoid region deselection
             e.evt.stopPropagation();
-            
+
             // Store the potential drag target but don't start dragging yet
             // We'll start dragging only if the mouse moves beyond a threshold
             setDraggedPointIndex(i);
@@ -2088,6 +2189,26 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     };
 
     const handleStageMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+      // Get current values from ref to avoid stale closures
+      const {
+        initialPoints,
+        allowClose,
+        finalIsPathClosed,
+        pixelSnapping,
+        isDraggingNewBezier,
+        ghostPointDragInfo,
+        draggedPointIndex,
+        draggedControlPoint,
+        isDraggingShape,
+        effectiveSelectedPoints,
+        transform,
+        fitScale,
+        x,
+        y,
+        width,
+        height,
+      } = currentValuesRef.current;
+      
       // Always update cursor position first (for ghost line to work everywhere)
       const pos = e.target.getStage()?.getPointerPosition();
       if (!pos) return;
@@ -2100,7 +2221,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
       
       // Always update cursor position (even outside bounds) so ghost line can work
-      setCursorPosition(imagePos);
+      cursorPositionRef.current = imagePos;
 
       // Handle shape dragging first (if active, allow dragging to continue even outside bounds)
       if (isDraggingShape && shapeDragStartPos.current) {
@@ -2154,7 +2275,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // If we're dragging a point from this instance, allow dragging to continue
       // even if mouse moves outside our group (user might drag outside bounds)
       const isDraggingFromThisInstance = draggedPointIndex !== null || draggedControlPoint !== null;
-      
+
       // Check if event target belongs to this instance's group
       // This prevents ghost point snapping from working for other regions
       // But we still update cursor position above so ghost line can work
@@ -2166,10 +2287,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       const isTargetInGroup = targetGroup === group;
       // Also allow when hovering over empty space (stage or layer)
       const isStageOrLayer = target === stage || target.getParent() === stage;
-      
+
       // Only process ghost point snapping and dragging if:
       // - Target is in our group, OR
-      // - We're hovering over empty space (stage/layer), OR  
+      // - We're hovering over empty space (stage/layer), OR
       // - We're dragging from this instance
       if (!isDraggingFromThisInstance && !isTargetInGroup && !isStageOrLayer) {
         // Clear ghost point when hovering over other regions, but keep cursor position for ghost line
@@ -2179,7 +2300,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       // Only process ghost point and other logic if within bounds
       if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
-
         // Handle ghost point when Shift is held (check event directly for real-time updates)
         console.log("🔵 Stage mouse move:", {
           shiftKey: e.evt.shiftKey,
@@ -2216,8 +2336,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             isOverPoint,
             hitRadius,
             imagePos,
-            pointsSample: initialPoints.slice(0, 2).map(p => ({ x: p.x, y: p.y })),
-            distances: initialPoints.slice(0, 2).map(p => Math.sqrt((imagePos.x - p.x) ** 2 + (imagePos.y - p.y) ** 2)),
+            pointsSample: initialPoints.slice(0, 2).map((p) => ({ x: p.x, y: p.y })),
+            distances: initialPoints
+              .slice(0, 2)
+              .map((p) => Math.sqrt((imagePos.x - p.x) ** 2 + (imagePos.y - p.y) ** 2)),
           });
 
           if (isOverPoint) {
@@ -2227,16 +2349,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             console.log("🔵 Calling findClosestPointOnPath with:", {
               cursorPos: imagePos,
               pointsLength: initialPoints.length,
-              points: initialPoints.map(p => ({ id: p.id, x: p.x, y: p.y, prevPointId: p.prevPointId })),
+              points: initialPoints.map((p) => ({ id: p.id, x: p.x, y: p.y, prevPointId: p.prevPointId })),
               allowClose,
               finalIsPathClosed,
             });
-            const closestPathPoint = findClosestPointOnPath(
-              imagePos,
-              initialPoints,
-              allowClose,
-              finalIsPathClosed,
-            );
+            const closestPathPoint = findClosestPointOnPath(imagePos, initialPoints, allowClose, finalIsPathClosed);
 
             if (closestPathPoint) {
               const snappedGhostPoint = snapToPixel(closestPathPoint.point, pixelSnapping);
@@ -2245,7 +2362,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 snapped: snappedGhostPoint,
                 imagePos,
                 segmentIndex: closestPathPoint.segmentIndex,
-                pointsSample: initialPoints.slice(0, 2).map(p => ({ x: p.x, y: p.y })),
+                pointsSample: initialPoints.slice(0, 2).map((p) => ({ x: p.x, y: p.y })),
               });
 
               if (closestPathPoint.segmentIndex === initialPoints.length) {
@@ -2383,15 +2500,27 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     };
 
     const handleStageMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
+      // Get current values from ref to avoid stale closures
+      const {
+        isDraggingShape,
+        draggedPointIndex,
+        initialPoints,
+        effectiveSelectedPoints,
+        instanceId,
+        skeletonEnabled,
+        activePointId,
+        onFinish,
+      } = currentValuesRef.current;
+      
       // Handle shape dragging end
       if (isDraggingShape) {
         const dragThreshold = 5; // Only prevent clicks if we actually dragged
         const actuallyDragged = shapeDragDistance.current > dragThreshold;
-        
+
         setIsDraggingShape(false);
         shapeDragStartPos.current = null;
         originalPointsPositions.current = [];
-        
+
         // Only prevent click handler from adding a point if we actually dragged
         if (actuallyDragged) {
           justFinishedShapeDrag.current = true;
@@ -2400,7 +2529,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           e.evt.preventDefault();
           // Don't use setTimeout - let the click handlers clear the flag
         }
-        
+
         shapeDragDistance.current = 0;
         return; // Don't process point selection when ending shape drag
       }
@@ -2408,16 +2537,20 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Handle point selection if we clicked but didn't drag
       if (draggedPointIndex !== null && !isDragging.current) {
         // Use handlePointSelectionFromIndex to properly handle selection through tracker
-        handlePointSelectionFromIndex(draggedPointIndex, {
-          instanceId,
-          initialPoints,
-          selectedPoints: effectiveSelectedPoints,
-          setSelectedPoints,
-          skeletonEnabled,
-          setActivePointId,
-          activePointId,
-          onFinish,
-        } as any, e);
+        handlePointSelectionFromIndex(
+          draggedPointIndex,
+          {
+            instanceId,
+            initialPoints,
+            selectedPoints: effectiveSelectedPoints,
+            setSelectedPoints,
+            skeletonEnabled,
+            setActivePointId,
+            activePointId,
+            onFinish,
+          } as any,
+          e,
+        );
         onPointSelected?.(draggedPointIndex);
       }
 
@@ -2428,19 +2561,19 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     };
 
     const handleStageMouseLeave = () => {
-      setCursorPosition(null);
+      cursorPositionRef.current = null;
       setGhostPoint(null);
     };
 
     if (disableInternalPointAddition) {
-      console.log("🟣 Setting up stage-level handlers (disableInternalPointAddition=true)");
       stage.on("mousedown", handleStageMouseDown);
       stage.on("mousemove", handleStageMouseMove);
       stage.on("mouseup", handleStageMouseUp);
       stage.on("mouseleave", handleStageMouseLeave);
 
       return () => {
-        console.log("🟣 Cleaning up stage-level handlers");
+        console.log("🔴 CLEANUP CALLED - Cleaning up stage-level handlers");
+        handlersAttachedRef.current = false;
         stage.off("mousedown", handleStageMouseDown);
         stage.off("mousemove", handleStageMouseMove);
         stage.off("mouseup", handleStageMouseUp);
@@ -2453,43 +2586,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       stage.on("mouseleave", handleStageMouseLeave);
 
       return () => {
+        console.log("🟣 Cleanup: removing stage handlers");
+        handlersAttachedRef.current = false;
         stage.off("mousemove", handleStageMouseMove);
         stage.off("mouseup", handleStageMouseUp);
         stage.off("mouseleave", handleStageMouseLeave);
       };
     }
-  }, [
-    x,
-    y,
-    transform,
-    fitScale,
-    width,
-    height,
-    isShiftKeyHeld,
-    initialPoints,
-    allowClose,
-    finalIsPathClosed,
-    pixelSnapping,
-    isDragging,
-    isDraggingNewBezier,
-    ghostPointDragInfo,
-    disableInternalPointAddition,
-    draggedPointIndex,
-    draggedControlPoint,
-    isDraggingShape,
-    effectiveSelectedPoints,
-    setDraggedPointIndex,
-    setDraggedControlPoint,
-    setIsDraggingShape,
-    setSelectedPointIndex,
-    onPointSelected,
-    onPointsChange,
-    onPointRepositioned,
-    onPointEdited,
-    lastPos,
-    originalPointsPositions,
-    shapeDragStartPos,
-  ]);
+    
+  }, []); // Empty dependency array - only run once on mount
 
   // Handle Shift key for disconnected mode
   useEffect(() => {
@@ -2567,7 +2672,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     setNewPointDragIndex,
     setIsDraggingNewBezier,
     setGhostPointDragInfo,
-    setCursorPosition,
     setVisibleControlPoints,
     setIsPathClosed,
     isDragging,
@@ -2587,7 +2691,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     draggedControlPoint,
     isDraggingNewBezier,
     newPointDragIndex: _newPointDragIndex,
-    cursorPosition,
     visibleControlPoints,
     isDisconnectedMode,
     onPointsChange,
@@ -2822,13 +2925,13 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
 
               // Check if click is on the last added point by checking cursor position
-              if (cursorPosition && lastAddedPointId) {
+              if (cursorPositionRef.current && lastAddedPointId) {
                 const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
                 if (lastAddedPoint) {
                   const scale = transform.zoom * fitScale;
                   const hitRadius = 15 / scale; // Same radius as used in event handlers
                   const distance = Math.sqrt(
-                    (cursorPosition.x - lastAddedPoint.x) ** 2 + (cursorPosition.y - lastAddedPoint.y) ** 2,
+                    (cursorPositionRef.current.x - lastAddedPoint.x) ** 2 + (cursorPositionRef.current.y - lastAddedPoint.y) ** 2,
                   );
 
                   if (distance <= hitRadius) {
@@ -2931,7 +3034,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           {/* Ghost line - preview from last point to cursor */}
           <GhostLine
             initialPoints={initialPoints}
-            cursorPosition={cursorPosition}
+            cursorPosition={cursorPositionRef.current}
             draggedControlPoint={draggedControlPoint}
             draggedPointIndex={draggedPointIndex}
             isDraggingNewBezier={isDraggingNewBezier}
@@ -3141,13 +3244,13 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
 
               // Check if click is on the last added point by checking cursor position
-              if (cursorPosition && lastAddedPointId) {
+              if (cursorPositionRef.current && lastAddedPointId) {
                 const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
                 if (lastAddedPoint) {
                   const scale = transform.zoom * fitScale;
                   const hitRadius = 15 / scale; // Same radius as used in event handlers
                   const distance = Math.sqrt(
-                    (cursorPosition.x - lastAddedPoint.x) ** 2 + (cursorPosition.y - lastAddedPoint.y) ** 2,
+                    (cursorPositionRef.current.x - lastAddedPoint.x) ** 2 + (cursorPositionRef.current.y - lastAddedPoint.y) ** 2,
                   );
 
                   if (distance <= hitRadius) {
@@ -3250,7 +3353,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           {/* Ghost line - preview from last point to cursor */}
           <GhostLine
             initialPoints={initialPoints}
-            cursorPosition={cursorPosition}
+            cursorPosition={cursorPositionRef.current}
             draggedControlPoint={draggedControlPoint}
             draggedPointIndex={draggedPointIndex}
             isDraggingNewBezier={isDraggingNewBezier}

@@ -307,8 +307,9 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
     if (!pos) return;
 
     // Update cursor position
+    // Note: cursor position is now handled by stage-level events when disableInternalPointAddition is true
     const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
-    props.setCursorPosition(imagePos);
+    // props.setCursorPosition(imagePos); // Removed - handled elsewhere
 
     // Set ghost point when Shift is held - snap to path (but not when dragging or creating bezier points)
     // When disableInternalPointAddition is true, ghost point is handled by stage-level events

@@ -39,7 +39,7 @@ export interface EventHandlerProps {
           dragDistance: number;
         } | null),
   ) => void;
-  setCursorPosition: (position: Point | null) => void;
+  // setCursorPosition: (position: Point | null) => void; // Removed - now handled via ref
   setVisibleControlPoints: (points: Set<number> | ((prev: Set<number>) => Set<number>)) => void;
   setIsPathClosed: (closed: boolean) => void;
   isDragging: React.MutableRefObject<boolean>;
