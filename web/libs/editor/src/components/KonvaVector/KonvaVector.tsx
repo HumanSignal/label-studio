@@ -338,6 +338,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     pointIndex: number;
     controlIndex: number;
   } | null>(null);
+  const [isDraggingShape, setIsDraggingShape] = useState(false);
+  const shapeDragStartPos = useRef<{ x: number; y: number; imageX: number; imageY: number } | null>(null);
+  const originalPointsPositions = useRef<Array<{ x: number; y: number; controlPoint1?: { x: number; y: number }; controlPoint2?: { x: number; y: number } }>>([]);
+  const justFinishedShapeDrag = useRef(false);
+  const shapeDragDistance = useRef(0);
   const [isDisconnectedMode, setIsDisconnectedMode] = useState(false);
   const [ghostPoint, setGhostPoint] = useState<GhostPointType | null>(null);
   const [_newPointDragIndex, setNewPointDragIndex] = useState<number | null>(null);
@@ -2025,6 +2030,55 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Always update cursor position (even outside bounds) so ghost line can work
       setCursorPosition(imagePos);
 
+      // Handle shape dragging first (if active, allow dragging to continue even outside bounds)
+      if (isDraggingShape && shapeDragStartPos.current) {
+        // Calculate delta from start position
+        const deltaX = imagePos.x - shapeDragStartPos.current.imageX;
+        const deltaY = imagePos.y - shapeDragStartPos.current.imageY;
+
+        // Track drag distance
+        shapeDragDistance.current = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        // Apply delta to all points
+        const newPoints = initialPoints.map((point, index) => {
+          const original = originalPointsPositions.current[index];
+          if (!original) return point;
+
+          const newX = original.x + deltaX;
+          const newY = original.y + deltaY;
+
+          const updatedPoint = {
+            ...point,
+            x: newX,
+            y: newY,
+          };
+
+          // Move control points with the anchor point
+          if (point.isBezier) {
+            if (original.controlPoint1) {
+              updatedPoint.controlPoint1 = {
+                x: original.controlPoint1.x + deltaX,
+                y: original.controlPoint1.y + deltaY,
+              };
+            }
+            if (original.controlPoint2) {
+              updatedPoint.controlPoint2 = {
+                x: original.controlPoint2.x + deltaX,
+                y: original.controlPoint2.y + deltaY,
+              };
+            }
+          }
+
+          return updatedPoint;
+        });
+
+        // Apply bounds checking to all points
+        const constrainedPoints = constrainAnchorPointsToBounds(newPoints, { width, height });
+
+        onPointsChange?.(constrainedPoints);
+        return; // Don't process other logic when dragging shape
+      }
+
       // If we're dragging a point from this instance, allow dragging to continue
       // even if mouse moves outside our group (user might drag outside bounds)
       const isDraggingFromThisInstance = draggedPointIndex !== null || draggedControlPoint !== null;
@@ -2257,6 +2311,28 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     };
 
     const handleStageMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
+      // Handle shape dragging end
+      if (isDraggingShape) {
+        const dragThreshold = 5; // Only prevent clicks if we actually dragged
+        const actuallyDragged = shapeDragDistance.current > dragThreshold;
+        
+        setIsDraggingShape(false);
+        shapeDragStartPos.current = null;
+        originalPointsPositions.current = [];
+        
+        // Only prevent click handler from adding a point if we actually dragged
+        if (actuallyDragged) {
+          justFinishedShapeDrag.current = true;
+          // Prevent event propagation to avoid triggering click handlers
+          e.evt.stopPropagation();
+          e.evt.preventDefault();
+          // Don't use setTimeout - let the click handlers clear the flag
+        }
+        
+        shapeDragDistance.current = 0;
+        return; // Don't process point selection when ending shape drag
+      }
+
       // Handle point selection if we clicked but didn't drag
       if (draggedPointIndex !== null && !isDragging.current) {
         // Use handlePointSelectionFromIndex to properly handle selection through tracker
@@ -2299,12 +2375,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         stage.off("mouseleave", handleStageMouseLeave);
       };
     } else {
-      // Only handle cursor position and ghost point
+      // Handle cursor position, ghost point, and shape dragging
       stage.on("mousemove", handleStageMouseMove);
+      stage.on("mouseup", handleStageMouseUp);
       stage.on("mouseleave", handleStageMouseLeave);
 
       return () => {
         stage.off("mousemove", handleStageMouseMove);
+        stage.off("mouseup", handleStageMouseUp);
         stage.off("mouseleave", handleStageMouseLeave);
       };
     }
@@ -2326,15 +2404,19 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     disableInternalPointAddition,
     draggedPointIndex,
     draggedControlPoint,
+    isDraggingShape,
     effectiveSelectedPoints,
     setDraggedPointIndex,
     setDraggedControlPoint,
+    setIsDraggingShape,
     setSelectedPointIndex,
     onPointSelected,
     onPointsChange,
     onPointRepositioned,
     onPointEdited,
     lastPos,
+    originalPointsPositions,
+    shapeDragStartPos,
   ]);
 
   // Handle Shift key for disconnected mode
@@ -2482,6 +2564,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         disabled
           ? undefined
           : (e) => {
+              // Don't add points if we just finished shape dragging
+              if (justFinishedShapeDrag.current) {
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true; // Also set cancelBubble for Konva
+                justFinishedShapeDrag.current = false; // Clear flag immediately
+                return;
+              }
+
               // Skip if point selection was already handled by VectorPoints onClick
               if (pointSelectionHandled.current) {
                 pointSelectionHandled.current = false;
@@ -2649,6 +2740,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             onClick={(e) => {
+              // Don't add points if we just finished shape dragging
+              if (justFinishedShapeDrag.current) {
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true; // Also set cancelBubble for Konva
+                justFinishedShapeDrag.current = false; // Clear flag immediately
+                return;
+              }
+
               // Check if click is on the last added point by checking cursor position
               if (cursorPosition && lastAddedPointId) {
                 const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
@@ -2681,6 +2781,75 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               // Use debouncing for click/double-click detection
               handleClickWithDebouncing(e, onClick, onDblClick);
+            }}
+            onMouseDown={(e) => {
+              // Don't start shape drag if we're already dragging a point or control point
+              if (draggedPointIndex !== null || draggedControlPoint !== null) {
+                return;
+              }
+
+              // Don't start shape drag if transformer is active
+              if (effectiveSelectedPoints.size > 1) {
+                return;
+              }
+
+              // Don't start shape drag if clicking on a point
+              const pos = e.target.getStage()?.getPointerPosition();
+              if (!pos) return;
+
+              const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+              const scale = transform.zoom * fitScale;
+              const hitRadius = 10 / scale;
+
+              // Check if clicking on any point
+              for (let i = 0; i < initialPoints.length; i++) {
+                const point = initialPoints[i];
+                const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
+                if (distance <= hitRadius) {
+                  return; // Let point dragging handle it
+                }
+              }
+
+              // Check if clicking on any control point
+              for (let i = 0; i < initialPoints.length; i++) {
+                const point = initialPoints[i];
+                if (point.isBezier) {
+                  if (point.controlPoint1) {
+                    const distance = Math.sqrt(
+                      (imagePos.x - point.controlPoint1.x) ** 2 + (imagePos.y - point.controlPoint1.y) ** 2,
+                    );
+                    if (distance <= hitRadius) {
+                      return; // Let control point dragging handle it
+                    }
+                  }
+                  if (point.controlPoint2) {
+                    const distance = Math.sqrt(
+                      (imagePos.x - point.controlPoint2.x) ** 2 + (imagePos.y - point.controlPoint2.y) ** 2,
+                    );
+                    if (distance <= hitRadius) {
+                      return; // Let control point dragging handle it
+                    }
+                  }
+                }
+              }
+
+              // Start shape dragging (don't stop propagation yet - we'll do it on mouseup if we actually drag)
+              setIsDraggingShape(true);
+              shapeDragDistance.current = 0; // Reset drag distance
+              shapeDragStartPos.current = {
+                x: e.evt.clientX,
+                y: e.evt.clientY,
+                imageX: imagePos.x,
+                imageY: imagePos.y,
+              };
+
+              // Store original positions of all points
+              originalPointsPositions.current = initialPoints.map((point) => ({
+                x: point.x,
+                y: point.y,
+                controlPoint1: point.controlPoint1 ? { x: point.controlPoint1.x, y: point.controlPoint1.y } : undefined,
+                controlPoint2: point.controlPoint2 ? { x: point.controlPoint2.x, y: point.controlPoint2.y } : undefined,
+              }));
             }}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
@@ -2890,6 +3059,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             onClick={(e) => {
+              // Don't add points if we just finished shape dragging
+              if (justFinishedShapeDrag.current) {
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true; // Also set cancelBubble for Konva
+                justFinishedShapeDrag.current = false; // Clear flag immediately
+                return;
+              }
+
               // Check if click is on the last added point by checking cursor position
               if (cursorPosition && lastAddedPointId) {
                 const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
@@ -2922,6 +3100,75 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               // Use debouncing for click/double-click detection
               handleClickWithDebouncing(e, onClick, onDblClick);
+            }}
+            onMouseDown={(e) => {
+              // Don't start shape drag if we're already dragging a point or control point
+              if (draggedPointIndex !== null || draggedControlPoint !== null) {
+                return;
+              }
+
+              // Don't start shape drag if transformer is active
+              if (effectiveSelectedPoints.size > 1) {
+                return;
+              }
+
+              // Don't start shape drag if clicking on a point
+              const pos = e.target.getStage()?.getPointerPosition();
+              if (!pos) return;
+
+              const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+              const scale = transform.zoom * fitScale;
+              const hitRadius = 10 / scale;
+
+              // Check if clicking on any point
+              for (let i = 0; i < initialPoints.length; i++) {
+                const point = initialPoints[i];
+                const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
+                if (distance <= hitRadius) {
+                  return; // Let point dragging handle it
+                }
+              }
+
+              // Check if clicking on any control point
+              for (let i = 0; i < initialPoints.length; i++) {
+                const point = initialPoints[i];
+                if (point.isBezier) {
+                  if (point.controlPoint1) {
+                    const distance = Math.sqrt(
+                      (imagePos.x - point.controlPoint1.x) ** 2 + (imagePos.y - point.controlPoint1.y) ** 2,
+                    );
+                    if (distance <= hitRadius) {
+                      return; // Let control point dragging handle it
+                    }
+                  }
+                  if (point.controlPoint2) {
+                    const distance = Math.sqrt(
+                      (imagePos.x - point.controlPoint2.x) ** 2 + (imagePos.y - point.controlPoint2.y) ** 2,
+                    );
+                    if (distance <= hitRadius) {
+                      return; // Let control point dragging handle it
+                    }
+                  }
+                }
+              }
+
+              // Start shape dragging (don't stop propagation yet - we'll do it on mouseup if we actually drag)
+              setIsDraggingShape(true);
+              shapeDragDistance.current = 0; // Reset drag distance
+              shapeDragStartPos.current = {
+                x: e.evt.clientX,
+                y: e.evt.clientY,
+                imageX: imagePos.x,
+                imageY: imagePos.y,
+              };
+
+              // Store original positions of all points
+              originalPointsPositions.current = initialPoints.map((point) => ({
+                x: point.x,
+                y: point.y,
+                controlPoint1: point.controlPoint1 ? { x: point.controlPoint1.x, y: point.controlPoint1.y } : undefined,
+                controlPoint2: point.controlPoint2 ? { x: point.controlPoint2.x, y: point.controlPoint2.y } : undefined,
+              }));
             }}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}

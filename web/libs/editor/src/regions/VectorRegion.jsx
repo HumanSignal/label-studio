@@ -334,12 +334,15 @@ const Model = types
       },
 
       isHovered() {
+        if (!self.groupRef) return false;
         const stage = self.groupRef.getStage();
+        if (!stage) return false;
         const pointer = stage.getPointerPosition();
+        if (!pointer) return false;
 
         // Convert to pixel coords in the canvas backing the image
         const { x, y } = self.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
-        return self.vectorRef.isPointOverShape(pointer.x, pointer.y);
+        return self.vectorRef?.isPointOverShape(pointer.x, pointer.y) ?? false;
       },
 
       // Checks is the region is being transformed or at least in

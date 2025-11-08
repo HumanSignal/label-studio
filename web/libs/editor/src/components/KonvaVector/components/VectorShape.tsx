@@ -17,6 +17,9 @@ interface VectorShapeProps {
   onClick?: (e: KonvaEventObject<MouseEvent>) => void;
   onMouseEnter?: (e: any) => void;
   onMouseLeave?: (e: any) => void;
+  onMouseDown?: (e: KonvaEventObject<MouseEvent>) => void;
+  onMouseMove?: (e: KonvaEventObject<MouseEvent>) => void;
+  onMouseUp?: (e: KonvaEventObject<MouseEvent>) => void;
 }
 
 // Convert Bezier segments to SVG path data for a single continuous path
@@ -214,6 +217,9 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
   onClick,
   onMouseEnter,
   onMouseLeave,
+  onMouseDown,
+  onMouseMove,
+  onMouseUp,
 }) => {
   if (segments.length === 0) return null;
 
@@ -272,6 +278,9 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
               onClick={onClick}
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
+              onMouseDown={onMouseDown}
+              onMouseMove={onMouseMove}
+              onMouseUp={onMouseUp}
             />
           );
         })}
@@ -301,6 +310,9 @@ export const VectorShape: React.FC<VectorShapeProps> = ({
             onClick={onClick}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
           />
         );
       })}
