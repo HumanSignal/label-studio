@@ -19,7 +19,7 @@ import { stageToImageCoordinates } from "./eventHandlers/utils";
 import { PointCreationManager } from "./pointCreationManager";
 import { VectorSelectionTracker, type VectorInstance } from "./VectorSelectionTracker";
 import { calculateShapeBoundingBox } from "./utils/bezierBoundingBox";
-import { shouldClosePathOnPointClick, isActivePointEligibleForClosing } from "./eventHandlers/pointSelection";
+import { shouldClosePathOnPointClick, isActivePointEligibleForClosing, handlePointDeselection, handlePointSelection, handlePointSelectionFromIndex } from "./eventHandlers/pointSelection";
 import { handleShiftClickPointConversion } from "./eventHandlers/drawing";
 import { deletePoint } from "./pointManagement";
 import type { BezierPoint, GhostPoint as GhostPointType, KonvaVectorProps, KonvaVectorRef } from "./types";
@@ -310,14 +310,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Handle Shift key state
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Shift") {
+      if (e.shiftKey) {
         setIsShiftKeyHeld(true);
         setIsDisconnectedMode(true);
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === "Shift") {
+      if (!e.shiftKey) {
         setIsShiftKeyHeld(false);
         setIsDisconnectedMode(false);
       }
@@ -734,6 +734,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       pixelSnapping,
       width,
       height,
+      transform,
+      fitScale,
       onPointsChange,
       onPointAdded,
       onPointEdited,
@@ -754,6 +756,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     pixelSnapping,
     width,
     height,
+    transform,
+    fitScale,
     onPointsChange,
     onPointAdded,
     onPointEdited,
@@ -1651,17 +1655,26 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     if (!disableInternalPointAddition) {
       // Still handle cursor position and ghost point
       const handleStageMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        const pos = stage.getPointerPosition();
+        // Use e.target.getStage() to match how layer handlers get pointer position
+        const pos = e.target.getStage()?.getPointerPosition();
         if (!pos) return;
+
+        // Update Shift key state from the event to keep it in sync
+        if (e.evt.shiftKey !== isShiftKeyHeld) {
+          setIsShiftKeyHeld(e.evt.shiftKey);
+        }
 
         const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
 
-        if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
-          setCursorPosition(imagePos);
+        // Always update cursor position (even outside bounds) so ghost line can work
+        setCursorPosition(imagePos);
 
-          // Handle ghost point when Shift is held
+        // Only process ghost point logic if within bounds
+        if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
+
+          // Handle ghost point when Shift is held (check event directly for real-time updates)
           if (
-            isShiftKeyHeld &&
+            e.evt.shiftKey &&
             imagePos &&
             initialPoints.length >= 2 &&
             !isDragging.current &&
@@ -1724,11 +1737,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 setGhostPoint(null);
               }
             }
-          } else if (!isShiftKeyHeld) {
+          } else if (!e.evt.shiftKey) {
             setGhostPoint(null);
           }
         } else {
-          setCursorPosition(null);
+          // When outside bounds, clear ghost point but keep cursor position for ghost line
           setGhostPoint(null);
         }
       };
@@ -1749,13 +1762,22 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
     // When disableInternalPointAddition is true, handle point dragging at stage level
     const handleStageMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
-      const pos = stage.getPointerPosition();
+      // Check if event target belongs to this instance's group
+      const target = e.target;
+      let targetGroup: Konva.Node | null = target;
+      while (targetGroup && targetGroup !== group) {
+        targetGroup = targetGroup.getParent();
+      }
+      // If target is not within our group, ignore this event
+      if (targetGroup !== group) return;
+
+      // Use e.target.getStage() to match how layer handlers get pointer position
+      const pos = e.target.getStage()?.getPointerPosition();
       if (!pos) return;
 
       const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
 
       // Check if clicking on a point (by checking if target is a Circle with name starting with "point-")
-      const target = e.target;
       const targetName = target.name();
       if (targetName && targetName.startsWith("point-")) {
         // Extract point index from name (format: "point-{index}")
@@ -1764,16 +1786,76 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           const pointIndex = parseInt(match[1], 10);
           if (pointIndex >= 0 && pointIndex < initialPoints.length) {
             const point = initialPoints[pointIndex];
-            // Set up for dragging
-            setDraggedPointIndex(pointIndex);
-            lastPos.current = {
-              x: e.evt.clientX,
-              y: e.evt.clientY,
-              originalX: point.x,
-              originalY: point.y,
-              originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
-              originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
-            };
+            
+            // If cmd-click, handle selection immediately and don't set up dragging
+            if (e.evt.ctrlKey || e.evt.metaKey) {
+              // Prevent event from propagating to avoid region deselection
+              e.evt.stopPropagation();
+              
+              // Create a mock event object for the selection handlers
+              const mockEvent = {
+                ...e,
+                target: e.target,
+                evt: e.evt,
+              } as Konva.KonvaEventObject<MouseEvent>;
+              
+              // Try deselection first
+              if (handlePointDeselection(mockEvent, {
+                instanceId,
+                initialPoints,
+                transform,
+                fitScale,
+                x,
+                y,
+                selectedPoints: effectiveSelectedPoints,
+                setSelectedPoints,
+                skeletonEnabled,
+                setActivePointId,
+                setLastAddedPointId,
+                lastAddedPointId,
+                activePointId,
+              } as any)) {
+                return;
+              }
+              // If not deselection, try selection (adding to multi-selection)
+              if (handlePointSelection(mockEvent, {
+                instanceId,
+                initialPoints,
+                transform,
+                fitScale,
+                x,
+                y,
+                selectedPoints: effectiveSelectedPoints,
+                setSelectedPoints,
+                setSelectedPointIndex,
+                skeletonEnabled,
+                setActivePointId,
+                setLastAddedPointId,
+                lastAddedPointId,
+                activePointId,
+                allowClose,
+                isPathClosed: finalIsPathClosed,
+                disabled,
+                onFinish,
+              } as any)) {
+                return;
+              }
+            } else {
+              // Normal click - prevent event propagation to avoid region deselection
+              e.evt.stopPropagation();
+              
+              // Store the potential drag target but don't start dragging yet
+              // We'll start dragging only if the mouse moves beyond a threshold
+              setDraggedPointIndex(pointIndex);
+              lastPos.current = {
+                x: e.evt.clientX,
+                y: e.evt.clientY,
+                originalX: point.x,
+                originalY: point.y,
+                originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
+                originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
+              };
+            }
             return;
           }
         }
@@ -1814,16 +1896,75 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
 
         if (distance <= hitRadius) {
-          // Set up for dragging
-          setDraggedPointIndex(i);
-          lastPos.current = {
-            x: e.evt.clientX,
-            y: e.evt.clientY,
-            originalX: point.x,
-            originalY: point.y,
-            originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
-            originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
-          };
+          // If cmd-click, handle selection immediately and don't set up dragging
+          if (e.evt.ctrlKey || e.evt.metaKey) {
+            // Prevent event from propagating to avoid region deselection
+            e.evt.stopPropagation();
+            
+            // Create a mock event object for the selection handlers
+            const mockEvent = {
+              ...e,
+              target: e.target,
+              evt: e.evt,
+            } as Konva.KonvaEventObject<MouseEvent>;
+            
+            // Try deselection first
+            if (handlePointDeselection(mockEvent, {
+              instanceId,
+              initialPoints,
+              transform,
+              fitScale,
+              x,
+              y,
+              selectedPoints: effectiveSelectedPoints,
+              setSelectedPoints,
+              skeletonEnabled,
+              setActivePointId,
+              setLastAddedPointId,
+              lastAddedPointId,
+              activePointId,
+            } as any)) {
+              return;
+            }
+            // If not deselection, try selection (adding to multi-selection)
+            if (handlePointSelection(mockEvent, {
+              instanceId,
+              initialPoints,
+              transform,
+              fitScale,
+              x,
+              y,
+              selectedPoints: effectiveSelectedPoints,
+              setSelectedPoints,
+              setSelectedPointIndex,
+              skeletonEnabled,
+              setActivePointId,
+              setLastAddedPointId,
+              lastAddedPointId,
+              activePointId,
+              allowClose,
+              isPathClosed: finalIsPathClosed,
+              disabled,
+              onFinish,
+            } as any)) {
+              return;
+            }
+          } else {
+            // Normal click - prevent event propagation to avoid region deselection
+            e.evt.stopPropagation();
+            
+            // Store the potential drag target but don't start dragging yet
+            // We'll start dragging only if the mouse moves beyond a threshold
+            setDraggedPointIndex(i);
+            lastPos.current = {
+              x: e.evt.clientX,
+              y: e.evt.clientY,
+              originalX: point.x,
+              originalY: point.y,
+              originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
+              originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
+            };
+          }
           return;
         }
       }
@@ -1870,23 +2011,67 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     };
 
     const handleStageMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
-      const pos = stage.getPointerPosition();
+      // Always update cursor position first (for ghost line to work everywhere)
+      const pos = e.target.getStage()?.getPointerPosition();
       if (!pos) return;
 
+      // Update Shift key state from the event to keep it in sync
+      if (e.evt.shiftKey !== isShiftKeyHeld) {
+        setIsShiftKeyHeld(e.evt.shiftKey);
+      }
+
       const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+      
+      // Always update cursor position (even outside bounds) so ghost line can work
+      setCursorPosition(imagePos);
 
+      // If we're dragging a point from this instance, allow dragging to continue
+      // even if mouse moves outside our group (user might drag outside bounds)
+      const isDraggingFromThisInstance = draggedPointIndex !== null || draggedControlPoint !== null;
+      
+      // Check if event target belongs to this instance's group
+      // This prevents ghost point snapping from working for other regions
+      // But we still update cursor position above so ghost line can work
+      const target = e.target;
+      let targetGroup: Konva.Node | null = target;
+      while (targetGroup && targetGroup !== group && targetGroup.getParent()) {
+        targetGroup = targetGroup.getParent();
+      }
+      const isTargetInGroup = targetGroup === group;
+      // Also allow when hovering over empty space (stage or layer)
+      const isStageOrLayer = target === stage || target.getParent() === stage;
+      
+      // Only process ghost point snapping and dragging if:
+      // - Target is in our group, OR
+      // - We're hovering over empty space (stage/layer), OR  
+      // - We're dragging from this instance
+      if (!isDraggingFromThisInstance && !isTargetInGroup && !isStageOrLayer) {
+        // Clear ghost point when hovering over other regions, but keep cursor position for ghost line
+        setGhostPoint(null);
+        return;
+      }
+
+      // Only process ghost point and other logic if within bounds
       if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
-        setCursorPosition(imagePos);
 
-        // Handle ghost point when Shift is held
+        // Handle ghost point when Shift is held (check event directly for real-time updates)
+        console.log("🔵 Stage mouse move:", {
+          shiftKey: e.evt.shiftKey,
+          pointsLength: initialPoints.length,
+          isDragging: isDragging.current,
+          isDraggingNewBezier,
+          ghostPointDragInfo: !!ghostPointDragInfo?.isDragging,
+        });
+
         if (
-          isShiftKeyHeld &&
+          e.evt.shiftKey &&
           imagePos &&
           initialPoints.length >= 2 &&
           !isDragging.current &&
           !isDraggingNewBezier &&
           !ghostPointDragInfo?.isDragging
         ) {
+          console.log("🟢 Setting ghost point, finding closest path point...");
           const scale = transform.zoom * fitScale;
           const hitRadius = 10 / scale;
           let isOverPoint = false;
@@ -1901,9 +2086,25 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             }
           }
 
+          console.log("🔵 Point hover check:", {
+            isOverPoint,
+            hitRadius,
+            imagePos,
+            pointsSample: initialPoints.slice(0, 2).map(p => ({ x: p.x, y: p.y })),
+            distances: initialPoints.slice(0, 2).map(p => Math.sqrt((imagePos.x - p.x) ** 2 + (imagePos.y - p.y) ** 2)),
+          });
+
           if (isOverPoint) {
+            console.log("🔴 Hovering over point, clearing ghost point");
             setGhostPoint(null);
           } else {
+            console.log("🔵 Calling findClosestPointOnPath with:", {
+              cursorPos: imagePos,
+              pointsLength: initialPoints.length,
+              points: initialPoints.map(p => ({ id: p.id, x: p.x, y: p.y, prevPointId: p.prevPointId })),
+              allowClose,
+              finalIsPathClosed,
+            });
             const closestPathPoint = findClosestPointOnPath(
               imagePos,
               initialPoints,
@@ -1913,17 +2114,26 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
             if (closestPathPoint) {
               const snappedGhostPoint = snapToPixel(closestPathPoint.point, pixelSnapping);
+              console.log("🟢 Found closest path point:", {
+                raw: closestPathPoint.point,
+                snapped: snappedGhostPoint,
+                imagePos,
+                segmentIndex: closestPathPoint.segmentIndex,
+                pointsSample: initialPoints.slice(0, 2).map(p => ({ x: p.x, y: p.y })),
+              });
 
               if (closestPathPoint.segmentIndex === initialPoints.length) {
                 const lastPoint = initialPoints[initialPoints.length - 1];
                 const firstPoint = initialPoints[0];
 
-                setGhostPoint({
+                const ghostPointData = {
                   x: snappedGhostPoint.x,
                   y: snappedGhostPoint.y,
                   prevPointId: lastPoint.id,
                   nextPointId: firstPoint.id,
-                });
+                };
+                console.log("🟢 Setting ghost point (closing segment):", ghostPointData);
+                setGhostPoint(ghostPointData);
               } else {
                 const currentPoint = initialPoints[closestPathPoint.segmentIndex];
                 const prevPoint = currentPoint?.prevPointId
@@ -1931,19 +2141,28 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   : null;
 
                 if (currentPoint && prevPoint) {
-                  setGhostPoint({
+                  const ghostPointData = {
                     x: snappedGhostPoint.x,
                     y: snappedGhostPoint.y,
                     prevPointId: prevPoint.id,
                     nextPointId: currentPoint.id,
+                  };
+                  console.log("🟢 Setting ghost point (regular segment):", {
+                    ghostPointData,
+                    currentPoint: { x: currentPoint.x, y: currentPoint.y },
+                    prevPoint: { x: prevPoint.x, y: prevPoint.y },
                   });
+                  setGhostPoint(ghostPointData);
+                } else {
+                  console.log("🔴 No prevPoint found for currentPoint:", { currentPoint, prevPoint });
                 }
               }
             } else {
+              console.log("🔴 No closest path point found");
               setGhostPoint(null);
             }
           }
-        } else if (!isShiftKeyHeld) {
+        } else if (!e.evt.shiftKey) {
           setGhostPoint(null);
         }
 
@@ -2032,15 +2251,25 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           }
         }
       } else {
-        setCursorPosition(null);
+        // When outside bounds, clear ghost point but keep cursor position for ghost line
         setGhostPoint(null);
       }
     };
 
-    const handleStageMouseUp = () => {
+    const handleStageMouseUp = (e: Konva.KonvaEventObject<MouseEvent>) => {
       // Handle point selection if we clicked but didn't drag
       if (draggedPointIndex !== null && !isDragging.current) {
-        setSelectedPointIndex(draggedPointIndex);
+        // Use handlePointSelectionFromIndex to properly handle selection through tracker
+        handlePointSelectionFromIndex(draggedPointIndex, {
+          instanceId,
+          initialPoints,
+          selectedPoints: effectiveSelectedPoints,
+          setSelectedPoints,
+          skeletonEnabled,
+          setActivePointId,
+          activePointId,
+          onFinish,
+        } as any, e);
         onPointSelected?.(draggedPointIndex);
       }
 
@@ -2056,12 +2285,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     };
 
     if (disableInternalPointAddition) {
+      console.log("🟣 Setting up stage-level handlers (disableInternalPointAddition=true)");
       stage.on("mousedown", handleStageMouseDown);
       stage.on("mousemove", handleStageMouseMove);
       stage.on("mouseup", handleStageMouseUp);
       stage.on("mouseleave", handleStageMouseLeave);
 
       return () => {
+        console.log("🟣 Cleaning up stage-level handlers");
         stage.off("mousedown", handleStageMouseDown);
         stage.off("mousemove", handleStageMouseMove);
         stage.off("mouseup", handleStageMouseUp);

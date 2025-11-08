@@ -37,6 +37,7 @@ export const GhostLine: React.FC<GhostLineProps> = ({
   maxPoints,
   minPoints,
   skeletonEnabled,
+  selectedPointIndex = null,
   lastAddedPointId,
   activePointId = null,
   stroke = DEFAULT_STROKE_COLOR,
@@ -61,7 +62,12 @@ export const GhostLine: React.FC<GhostLineProps> = ({
       }
     }
 
-    // In non-skeleton mode, always use the last added point
+    // If a point is selected, use that point for the ghost line
+    if (selectedPointIndex !== null && selectedPointIndex !== undefined && selectedPointIndex >= 0 && selectedPointIndex < initialPoints.length) {
+      return initialPoints[selectedPointIndex];
+    }
+
+    // In non-skeleton mode, use the last added point
     // Fallback to lastAddedPointId for backward compatibility
     if (lastAddedPointId) {
       const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
@@ -141,7 +147,6 @@ export const GhostLine: React.FC<GhostLineProps> = ({
 
   // Check if we should show the ghost line
   const shouldShowGhostLine =
-    !drawingDisabled &&
     cursorPosition &&
     !draggedControlPoint &&
     draggedPointIndex === null &&
@@ -149,7 +154,8 @@ export const GhostLine: React.FC<GhostLineProps> = ({
     !isPathClosed &&
     (maxPoints === undefined || initialPoints.length < maxPoints) &&
     activePoint &&
-    !getClosingTarget(); // Hide ghost line when green closing line is visible
+    !getClosingTarget() && // Hide ghost line when green closing line is visible
+    (!drawingDisabled || selectedPointIndex !== null); // Show ghost line if drawing is enabled OR if a point is selected
 
   // Always render if we have the necessary conditions for ghost line or closing indicator
   // But allow rendering even when drawing is disabled if we're near a closing target

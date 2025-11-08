@@ -200,6 +200,18 @@ export function findClosestPointOnPath(
 
   // Only return if we're within a reasonable distance (e.g., 50 pixels)
   const maxSnapDistance = 50;
+  if (closestDistance > 100) {
+    // Only log if distance is suspiciously large to avoid spam
+    console.log("🔍 findClosestPointOnPath result (large distance):", {
+      closestDistance,
+      maxSnapDistance,
+      withinRange: closestDistance <= maxSnapDistance,
+      cursorPos,
+      pointsCount: points.length,
+      pointsSample: points.slice(0, 2).map(p => ({ id: p.id, x: p.x, y: p.y })),
+      allPoints: points.map(p => ({ id: p.id, x: p.x, y: p.y })),
+    });
+  }
   if (closestDistance <= maxSnapDistance) {
     return {
       point: closestPoint,

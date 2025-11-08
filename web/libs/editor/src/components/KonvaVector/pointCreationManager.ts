@@ -1,6 +1,6 @@
 import type { BezierPoint } from "./types";
 import { PointType } from "./types";
-import { snapToPixel } from "./eventHandlers/utils";
+import { snapToPixel, getDistance } from "./eventHandlers/utils";
 import { generatePointId } from "./utils";
 
 export interface PointCreationState {
@@ -18,6 +18,8 @@ export interface PointCreationManagerProps {
   pixelSnapping?: boolean;
   width?: number;
   height?: number;
+  transform?: { zoom: number; offsetX: number; offsetY: number };
+  fitScale?: number;
   onPointsChange?: (points: BezierPoint[]) => void;
   onPointAdded?: (point: BezierPoint, index: number) => void;
   onPointEdited?: (point: BezierPoint, index: number) => void;
@@ -72,6 +74,20 @@ export class PointCreationManager {
         snappedCoords.y > this.props.height
       ) {
         return false;
+      }
+    }
+
+    // Check if hovering over an existing point - if so, don't create a new point
+    if (this.props.initialPoints.length > 0 && this.props.transform && this.props.fitScale !== undefined) {
+      const scale = this.props.transform.zoom * this.props.fitScale;
+      const hitRadius = 10 / scale;
+
+      for (const point of this.props.initialPoints) {
+        const distance = getDistance(snappedCoords, point);
+        if (distance <= hitRadius) {
+          // Hovering over an existing point - don't create a new one
+          return false;
+        }
       }
     }
 
