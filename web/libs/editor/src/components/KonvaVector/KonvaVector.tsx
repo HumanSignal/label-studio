@@ -264,10 +264,74 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Normalize input points to BezierPoint format
   const [initialPoints, setInitialPoints] = useState(() => normalizePoints(rawInitialPoints));
 
-  // Update initialPoints when rawInitialPoints changes
+  // Ref to track if we're updating points internally to prevent infinite loops
+  const isInternalUpdateRef = useRef(false);
+  // Ref to track the last normalized points to prevent unnecessary updates
+  const lastNormalizedPointsRef = useRef<BezierPoint[]>(initialPoints);
+  // Ref to track the last points we sent to parent to detect circular updates
+  const lastSentToParentRef = useRef<BezierPoint[] | null>(null);
+
+  // Helper function to compare points by their actual data (ignoring IDs)
+  const arePointsEqual = useCallback((points1: BezierPoint[], points2: BezierPoint[]): boolean => {
+    if (points1.length !== points2.length) return false;
+
+    for (let i = 0; i < points1.length; i++) {
+      const p1 = points1[i];
+      const p2 = points2[i];
+
+      if (
+        p1.x !== p2.x ||
+        p1.y !== p2.y ||
+        p1.isBezier !== p2.isBezier ||
+        p1.disconnected !== p2.disconnected ||
+        p1.isBranching !== p2.isBranching
+      ) {
+        return false;
+      }
+
+      // Compare control points if bezier
+      if (p1.isBezier) {
+        if (!!p1.controlPoint1 !== !!p2.controlPoint1) return false;
+        if (!!p1.controlPoint2 !== !!p2.controlPoint2) return false;
+
+        if (p1.controlPoint1 && p2.controlPoint1) {
+          if (p1.controlPoint1.x !== p2.controlPoint1.x || p1.controlPoint1.y !== p2.controlPoint1.y) {
+            return false;
+          }
+        }
+
+        if (p1.controlPoint2 && p2.controlPoint2) {
+          if (p1.controlPoint2.x !== p2.controlPoint2.x || p1.controlPoint2.y !== p2.controlPoint2.y) {
+            return false;
+          }
+        }
+      }
+    }
+
+    return true;
+  }, []);
+
+  // Update initialPoints when rawInitialPoints changes (only if different)
   useEffect(() => {
-    setInitialPoints(normalizePoints(rawInitialPoints));
-  }, [rawInitialPoints]);
+    // Skip if this is an internal update
+    if (isInternalUpdateRef.current) {
+      return;
+    }
+
+    const normalized = normalizePoints(rawInitialPoints);
+
+    // Skip if this matches what we just sent to parent (circular update prevention)
+    if (lastSentToParentRef.current && arePointsEqual(lastSentToParentRef.current, normalized)) {
+      lastSentToParentRef.current = null; // Clear after handling
+      return;
+    }
+
+    // Only update if points actually changed (compare by data, not IDs)
+    if (!arePointsEqual(lastNormalizedPointsRef.current, normalized)) {
+      lastNormalizedPointsRef.current = normalized;
+      setInitialPoints(normalized);
+    }
+  }, [rawInitialPoints, arePointsEqual]);
 
   // Initialize lastAddedPointId and activePointId when component loads with existing points
   useEffect(() => {
@@ -556,7 +620,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   const getPoints = useCallback(() => initialPoints, [initialPoints]);
   const updatePoints = useCallback(
     (points: BezierPoint[]) => {
+      // Set flag to prevent useEffect from running when we update internally
+      isInternalUpdateRef.current = true;
+      // Update the ref to track the last normalized points
+      lastNormalizedPointsRef.current = points;
       setInitialPoints(points);
+      // Clear flag immediately - it only needs to prevent the current useEffect run
+      isInternalUpdateRef.current = false;
+      // Track what we're sending to parent to detect circular updates
+      lastSentToParentRef.current = points;
       onPointsChange?.(points);
     },
     [onPointsChange],
