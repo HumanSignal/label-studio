@@ -459,11 +459,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Define commitMultiRegionTransform as a useCallback so we can use it in both useImperativeHandle and onDragEnd
   const commitMultiRegionTransform = useCallback(() => {
     if (!isMultiRegionSelected || !transformableGroupRef.current || !initialTransformRef.current) {
-      console.log("🔄 commitMultiRegionTransform: Early return - not multi-region or missing refs");
       return;
     }
-
-    console.log("🔄 KonvaVector.commitMultiRegionTransform called");
 
     // Get the _transformable group
     const transformableGroup = transformableGroupRef.current;
@@ -482,16 +479,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     const scaleX = currentScaleX / initial.scaleX;
     const scaleY = currentScaleY / initial.scaleY;
     const rotation = currentRotation - initial.rotation;
-
-    console.log("📊 Transform deltas:", {
-      dx,
-      dy,
-      scaleX,
-      scaleY,
-      rotation,
-      initial,
-      current: { x: currentX, y: currentY, scaleX: currentScaleX, scaleY: currentScaleY, rotation: currentRotation },
-    });
 
     // Apply constraints to the transform before committing
     const imageWidth = width || 0;
@@ -522,14 +509,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       if (scaledMaxX > imageWidth) constrainedDx = dx - (scaledMaxX - imageWidth);
       if (scaledMinY < 0) constrainedDy = dy - scaledMinY;
       if (scaledMaxY > imageHeight) constrainedDy = dy - (scaledMaxY - imageHeight);
-
-      console.log("🔍 Transform constraints applied:", {
-        original: { dx, dy, scaleX, scaleY },
-        constrained: { dx: constrainedDx, dy: constrainedDy, scaleX: constrainedScaleX, scaleY: constrainedScaleY },
-        bounds: `${imageWidth}x${imageHeight}`,
-        shapeBounds: `(${minX.toFixed(1)}, ${minY.toFixed(1)}) to (${maxX.toFixed(1)}, ${maxY.toFixed(1)})`,
-        newBounds: `(${scaledMinX.toFixed(1)}, ${scaledMinY.toFixed(1)}) to (${scaledMaxX.toFixed(1)}, ${scaledMaxY.toFixed(1)})`,
-      });
     }
 
     // Apply the transformation exactly as the single-region onTransformEnd handler does:
@@ -586,11 +565,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     // Update the points
     onPointsChange?.(transformedVertices);
 
-    console.log(
-      "📊 Updated points:",
-      transformedVertices.map((p) => ({ id: p.id, x: p.x, y: p.y })),
-    );
-
     // Reset the _transformable group transform to identity
     // This ensures the visual representation matches the committed data
     transformableGroup.x(0);
@@ -607,8 +581,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       scaleY: 1,
       rotation: 0,
     };
-
-    console.log("📊 Reset _transformable group transform to identity");
 
     // Detach and reattach the transformer to prevent resizing issues
     const stage = transformableGroup.getStage();
@@ -642,7 +614,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         scaleY: group.scaleY(),
         rotation: group.rotation(),
       };
-      console.log("📊 Captured initial transform state:", initialTransformRef.current);
     } else if (!isMultiRegionSelected) {
       // Reset when not in multi-region mode
       initialTransformRef.current = null;
@@ -692,10 +663,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   );
 
   const isDragging = useRef(false);
-  
+
   // Ref to prevent effect from running multiple times
   const handlersAttachedRef = useRef(false);
-  
+
   // Refs to access current values in event handlers without recreating them
   const currentValuesRef = useRef({
     initialPoints,
@@ -721,7 +692,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     disabled,
     onFinish,
   });
-  
+
   // Update refs on every render
   currentValuesRef.current = {
     initialPoints,
@@ -773,7 +744,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           // Check control point 1
           if (point.controlPoint1) {
             const distance = Math.sqrt(
-              (cursorPositionRef.current.x - point.controlPoint1.x) ** 2 + (cursorPositionRef.current.y - point.controlPoint1.y) ** 2,
+              (cursorPositionRef.current.x - point.controlPoint1.x) ** 2 +
+                (cursorPositionRef.current.y - point.controlPoint1.y) ** 2,
             );
             if (distance <= controlPointHitRadius) {
               return true; // Disable drawing when hovering over control points
@@ -782,7 +754,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           // Check control point 2
           if (point.controlPoint2) {
             const distance = Math.sqrt(
-              (cursorPositionRef.current.x - point.controlPoint2.x) ** 2 + (cursorPositionRef.current.y - point.controlPoint2.y) ** 2,
+              (cursorPositionRef.current.x - point.controlPoint2.x) ** 2 +
+                (cursorPositionRef.current.y - point.controlPoint2.y) ** 2,
             );
             if (distance <= controlPointHitRadius) {
               return true; // Disable drawing when hovering over control points
@@ -799,7 +772,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       for (let i = 0; i < initialPoints.length; i++) {
         const point = initialPoints[i];
-        const distance = Math.sqrt((cursorPositionRef.current.x - point.x) ** 2 + (cursorPositionRef.current.y - point.y) ** 2);
+        const distance = Math.sqrt(
+          (cursorPositionRef.current.x - point.x) ** 2 + (cursorPositionRef.current.y - point.y) ** 2,
+        );
         if (distance <= selectionHitRadius) {
           // If exactly one point is selected and this is that point, allow drawing
           if (selectedPoints.size === SELECTION_SIZE.MULTI_SELECTION_MIN && selectedPoints.has(i)) {
@@ -829,7 +804,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       const segmentHitRadius = HIT_RADIUS.SEGMENT / scale; // Slightly larger than point hit radius
 
       // Use the same logic as findClosestPointOnPath for consistent Bezier curve detection
-      const closestPathPoint = findClosestPointOnPath(cursorPositionRef.current, initialPoints, allowClose, finalIsPathClosed);
+      const closestPathPoint = findClosestPointOnPath(
+        cursorPositionRef.current,
+        initialPoints,
+        allowClose,
+        finalIsPathClosed,
+      );
 
       if (closestPathPoint && getDistance(cursorPositionRef.current, closestPathPoint.point) <= segmentHitRadius) {
         return true; // Disable drawing when hovering over segments
@@ -950,7 +930,17 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       clearTimeout(timeout);
       stage.off("mousemove", handleOneTimeMouseMove);
     };
-  }, [initialPoints.length, transform, fitScale, x, y, disabled, instanceId, selectedPoints.size, effectiveSelectedPoints.size]); // Re-run when points change, transform changes, or selection changes
+  }, [
+    initialPoints.length,
+    transform,
+    fitScale,
+    x,
+    y,
+    disabled,
+    instanceId,
+    selectedPoints.size,
+    effectiveSelectedPoints.size,
+  ]); // Re-run when points change, transform changes, or selection changes
 
   // Stabilize functions for tracker registration
   const getPoints = useCallback(() => initialPoints, [initialPoints]);
@@ -1882,7 +1872,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       const group = transformableGroupRef.current;
       const currentX = group.x();
       const currentY = group.y();
-      
+
       // If there's a pending transform, commit it before the Group is unmounted/reset
       if ((currentX !== 0 || currentY !== 0) && initialTransformRef.current) {
         commitMultiRegionTransform();
@@ -1903,28 +1893,22 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Set up stage-level event listeners for cursor position, ghost point, and point dragging
   // This allows these features to work even when the invisible shape is disabled
   useEffect(() => {
-    console.log("🔵 useEffect called, handlersAttached:", handlersAttachedRef.current, "disableInternalPointAddition:", disableInternalPointAddition);
-    
     // Prevent running if handlers are already attached
     // This stops the infinite loop caused by state updates triggering re-renders
     if (handlersAttachedRef.current) {
-      console.log("🟢 Handlers already attached, returning early");
       return () => {}; // Return empty cleanup function
     }
-    
+
     const group = stageRef.current;
     if (!group) {
-      console.log("🔴 No group, returning");
       return;
     }
 
     const stage = group.getStage();
     if (!stage) {
-      console.log("🔴 No stage, returning");
       return;
     }
-    
-    console.log("🟣 Setting up stage-level handlers (disableInternalPointAddition=true)");
+
     handlersAttachedRef.current = true;
 
     // Only set up stage-level dragging when disableInternalPointAddition is true
@@ -1932,8 +1916,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     if (!disableInternalPointAddition) {
       // Still handle cursor position and ghost point
       const handleStageMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
-        // Use e.target.getStage() to match how layer handlers get pointer position
-        const pos = e.target.getStage()?.getPointerPosition();
+        // Use stage.getPointerPosition() directly for consistent coordinate space
+        const pos = stage.getPointerPosition();
         if (!pos) return;
 
         // Get current values from ref to avoid stale closures
@@ -1955,11 +1939,29 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           setIsShiftKeyHeld(e.evt.shiftKey);
         }
 
+        // Debug: Log coordinate conversion
+        console.log("🔍 Coordinate conversion:", {
+          stagePos: pos,
+          transform,
+          fitScale,
+          groupPos: { x, y },
+        });
+
         const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+        
+        console.log("🔍 Converted to image coordinates:", {
+          stagePos: pos,
+          imagePos,
+          calculation: {
+            scale: transform.zoom * fitScale,
+            x: `(${pos.x} - ${x} - ${transform.offsetX}) / ${transform.zoom * fitScale} = ${imagePos.x}`,
+            y: `(${pos.y} - ${y} - ${transform.offsetY}) / ${transform.zoom * fitScale} = ${imagePos.y}`,
+          },
+        });
 
         // Always update cursor position (even outside bounds) so ghost line can work
         cursorPositionRef.current = imagePos;
-        
+
         // Use RAF to batch redraw calls for performance
         if (ghostLineRafRef.current) {
           cancelAnimationFrame(ghostLineRafRef.current);
@@ -1994,6 +1996,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             }
 
             if (isOverPoint) {
+              console.log("🔴 GhostPoint: Over point, clearing");
               setGhostPoint(null);
             } else {
               const closestPathPoint = findClosestPointOnPath(imagePos, initialPoints, allowClose, finalIsPathClosed);
@@ -2005,12 +2008,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   const lastPoint = initialPoints[initialPoints.length - 1];
                   const firstPoint = initialPoints[0];
 
-                  setGhostPoint({
+                  const newGhostPoint = {
                     x: snappedGhostPoint.x,
                     y: snappedGhostPoint.y,
                     prevPointId: lastPoint.id,
                     nextPointId: firstPoint.id,
-                  });
+                  };
+                  console.log("🟢 GhostPoint: Setting (closing path)", newGhostPoint);
+                  setGhostPoint(newGhostPoint);
                 } else {
                   const currentPoint = initialPoints[closestPathPoint.segmentIndex];
                   const prevPoint = currentPoint?.prevPointId
@@ -2018,23 +2023,57 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                     : null;
 
                   if (currentPoint && prevPoint) {
-                    setGhostPoint({
+                    const newGhostPoint = {
                       x: snappedGhostPoint.x,
                       y: snappedGhostPoint.y,
                       prevPointId: prevPoint.id,
                       nextPointId: currentPoint.id,
+                    };
+                    // Debug: Compare ghost point coordinates with actual point coordinates
+                    const coordinateComparison = {
+                      ghostPointX: newGhostPoint.x,
+                      currentPointX: currentPoint.x,
+                      prevPointX: prevPoint.x,
+                      ghostPointY: newGhostPoint.y,
+                      currentPointY: currentPoint.y,
+                      prevPointY: prevPoint.y,
+                      xDiff: Math.abs(newGhostPoint.x - currentPoint.x),
+                      yDiff: Math.abs(newGhostPoint.y - currentPoint.y),
+                      // Check if coordinates are in similar ranges
+                      xInRange: Math.abs(newGhostPoint.x - currentPoint.x) < 1000,
+                      yInRange: Math.abs(newGhostPoint.y - currentPoint.y) < 1000,
+                    };
+                    
+                    console.log("🟢 GhostPoint: Setting (segment)", {
+                      ghostPoint: newGhostPoint,
+                      currentPoint: { x: currentPoint.x, y: currentPoint.y },
+                      prevPoint: { x: prevPoint.x, y: prevPoint.y },
+                      snappedGhostPoint,
+                      closestPathPoint: closestPathPoint.point,
+                      imagePos,
+                      stagePos: pos,
+                      transform,
+                      fitScale,
+                      groupPos: { x, y },
+                      coordinateComparison,
                     });
+                    setGhostPoint(newGhostPoint);
+                  } else {
+                    console.log("🔴 GhostPoint: Missing currentPoint or prevPoint", { currentPoint, prevPoint });
                   }
                 }
               } else {
+                console.log("🔴 GhostPoint: No closestPathPoint found");
                 setGhostPoint(null);
               }
             }
           } else if (!e.evt.shiftKey) {
+            console.log("🔴 GhostPoint: Shift key released, clearing");
             setGhostPoint(null);
           }
         } else {
           // When outside bounds, clear ghost point but keep cursor position for ghost line
+          console.log("🔴 GhostPoint: Outside bounds, clearing", { imagePos, width, height });
           setGhostPoint(null);
         }
       };
@@ -2043,12 +2082,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         // Capture cursor position when mouse enters stage so ghost line can render immediately
         const pos = e.target.getStage()?.getPointerPosition();
         if (pos) {
-          const {
-            transform,
-            fitScale,
-            x,
-            y,
-          } = currentValuesRef.current;
+          const { transform, fitScale, x, y } = currentValuesRef.current;
           const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
           cursorPositionRef.current = imagePos;
           // Trigger a redraw to show ghost line
@@ -2075,12 +2109,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       const tryInitializeCursorPosition = () => {
         const pos = stage.getPointerPosition();
         if (pos) {
-          const {
-            transform,
-            fitScale,
-            x,
-            y,
-          } = currentValuesRef.current;
+          const { transform, fitScale, x, y } = currentValuesRef.current;
           const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
           cursorPositionRef.current = imagePos;
           // Trigger a redraw to show ghost line
@@ -2131,7 +2160,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         disabled,
         onFinish,
       } = currentValuesRef.current;
-      
+
       // Check if event target belongs to this instance's group
       const target = e.target;
       let targetGroup: Konva.Node | null = target;
@@ -2408,7 +2437,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         width,
         height,
       } = currentValuesRef.current;
-      
+
       // Always update cursor position first (for ghost line to work everywhere)
       const pos = e.target.getStage()?.getPointerPosition();
       if (!pos) return;
@@ -2419,10 +2448,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       }
 
       const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
-      
+
       // Always update cursor position (even outside bounds) so ghost line can work
       cursorPositionRef.current = imagePos;
-      
+
       // Use RAF to batch redraw calls for performance
       if (ghostLineRafRef.current) {
         cancelAnimationFrame(ghostLineRafRef.current);
@@ -2510,13 +2539,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Only process ghost point and other logic if within bounds
       if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
         // Handle ghost point when Shift is held (check event directly for real-time updates)
-        console.log("🔵 Stage mouse move:", {
-          shiftKey: e.evt.shiftKey,
-          pointsLength: initialPoints.length,
-          isDragging: isDragging.current,
-          isDraggingNewBezier,
-          ghostPointDragInfo: !!ghostPointDragInfo?.isDragging,
-        });
 
         if (
           e.evt.shiftKey &&
@@ -2720,7 +2742,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         activePointId,
         onFinish,
       } = currentValuesRef.current;
-      
+
       // Handle shape dragging end
       if (isDraggingShape) {
         const dragThreshold = 5; // Only prevent clicks if we actually dragged
@@ -2773,12 +2795,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Capture cursor position when mouse enters stage so ghost line can render immediately
       const pos = e.target.getStage()?.getPointerPosition();
       if (pos) {
-        const {
-          transform,
-          fitScale,
-          x,
-          y,
-        } = currentValuesRef.current;
+        const { transform, fitScale, x, y } = currentValuesRef.current;
         const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
         cursorPositionRef.current = imagePos;
         // Trigger a redraw to show ghost line
@@ -2808,12 +2825,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       const tryInitializeCursorPosition = () => {
         const pos = stage.getPointerPosition();
         if (pos) {
-          const {
-            transform,
-            fitScale,
-            x,
-            y,
-          } = currentValuesRef.current;
+          const { transform, fitScale, x, y } = currentValuesRef.current;
           const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
           cursorPositionRef.current = imagePos;
           // Trigger a redraw to show ghost line
@@ -2856,12 +2868,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       const tryInitializeCursorPosition = () => {
         const pos = stage.getPointerPosition();
         if (pos) {
-          const {
-            transform,
-            fitScale,
-            x,
-            y,
-          } = currentValuesRef.current;
+          const { transform, fitScale, x, y } = currentValuesRef.current;
           const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
           cursorPositionRef.current = imagePos;
           // Trigger a redraw to show ghost line
@@ -2895,7 +2902,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         stage.off("mouseleave", handleStageMouseLeave);
       };
     }
-    
   }, []); // Empty dependency array - only run once on mount
 
   // Handle Shift key for disconnected mode
@@ -3168,7 +3174,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   const scale = transform.zoom * fitScale;
                   const hitRadius = 15 / scale; // Same radius as used in event handlers
                   const distance = Math.sqrt(
-                    (cursorPositionRef.current.x - lastAddedPoint.x) ** 2 + (cursorPositionRef.current.y - lastAddedPoint.y) ** 2,
+                    (cursorPositionRef.current.x - lastAddedPoint.x) ** 2 +
+                      (cursorPositionRef.current.y - lastAddedPoint.y) ** 2,
                   );
 
                   if (distance <= hitRadius) {
@@ -3456,17 +3463,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }}
             />
           )}
-
-          {/* Ghost point */}
-          <GhostPoint
-            ghostPoint={ghostPoint}
-            transform={transform}
-            fitScale={fitScale}
-            isShiftKeyHeld={isShiftKeyHeld}
-            maxPoints={maxPoints}
-            initialPointsLength={initialPoints.length}
-            isDragging={isDragging.current}
-          />
         </Group>
       ) : (
         <>
@@ -3498,7 +3494,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   const scale = transform.zoom * fitScale;
                   const hitRadius = 15 / scale; // Same radius as used in event handlers
                   const distance = Math.sqrt(
-                    (cursorPositionRef.current.x - lastAddedPoint.x) ** 2 + (cursorPositionRef.current.y - lastAddedPoint.y) ** 2,
+                    (cursorPositionRef.current.x - lastAddedPoint.x) ** 2 +
+                      (cursorPositionRef.current.y - lastAddedPoint.y) ** 2,
                   );
 
                   if (distance <= hitRadius) {
@@ -3761,6 +3758,17 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               fitScale={fitScale}
             />
           )}
+
+          {/* Ghost point */}
+          <GhostPoint
+            ghostPoint={ghostPoint}
+            transform={transform}
+            fitScale={fitScale}
+            isShiftKeyHeld={isShiftKeyHeld}
+            maxPoints={maxPoints}
+            initialPointsLength={initialPoints.length}
+            isDragging={isDragging.current}
+          />
         </>
       )}
     </Group>

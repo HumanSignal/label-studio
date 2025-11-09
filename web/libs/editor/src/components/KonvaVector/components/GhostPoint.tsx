@@ -21,27 +21,101 @@ export const GhostPoint: React.FC<GhostPointProps> = ({
   initialPointsLength,
   isDragging = false,
 }) => {
-  // Only show the visual ghost point when Shift is held, but don't clear the ghostPoint state
-  if (!ghostPoint) return null;
+  // Debug logging
+  console.log("🔵 GhostPoint render:", {
+    hasGhostPoint: !!ghostPoint,
+    ghostPoint: ghostPoint ? { x: ghostPoint.x, y: ghostPoint.y } : null,
+    isShiftKeyHeld,
+    maxPoints,
+    initialPointsLength,
+    isDragging,
+    transform,
+    fitScale,
+  });
 
-  // Only render the visual element when Shift is held
-  // If isShiftKeyHeld is not provided, assume true (since ghostPoint is only set when Shift is held)
-  if (isShiftKeyHeld !== undefined && !isShiftKeyHeld) return null;
+  // TEMPORARY: Force render to debug - remove all conditions
+  if (!ghostPoint) {
+    console.log("🔴 GhostPoint: No ghostPoint, returning null");
+    return null;
+  }
 
-  // Hide ghost point when max points reached
-  if (maxPoints !== undefined && initialPointsLength >= maxPoints) return null;
+  // TEMPORARY: Comment out all conditions to force rendering
+  // if (isShiftKeyHeld !== undefined && !isShiftKeyHeld) {
+  //   console.log("🔴 GhostPoint: Shift not held, returning null");
+  //   return null;
+  // }
 
-  // Hide ghost point when dragging
-  if (isDragging) return null;
+  // if (maxPoints !== undefined && initialPointsLength >= maxPoints) {
+  //   console.log("🔴 GhostPoint: Max points reached, returning null");
+  //   return null;
+  // }
+
+  // if (isDragging) {
+  //   console.log("🔴 GhostPoint: Dragging, returning null");
+  //   return null;
+  // }
 
   // Scale up radius to compensate for Layer scaling
   const scale = transform.zoom * fitScale;
   const outerRadius = 4 / scale;
   const innerRadius = 2 / scale;
 
+  // Debug: Check if coordinates are reasonable
+  const isCoordinateReasonable = (coord: number) => coord >= -10000 && coord <= 100000;
+  const coordsReasonable = isCoordinateReasonable(ghostPoint.x) && isCoordinateReasonable(ghostPoint.y);
+  
+  console.log("🟢 GhostPoint: Rendering at", { 
+    x: ghostPoint.x, 
+    y: ghostPoint.y, 
+    outerRadius, 
+    innerRadius, 
+    scale,
+    coordsReasonable,
+    transform,
+    fitScale,
+  });
+  
+  if (!coordsReasonable) {
+    console.warn("⚠️ GhostPoint: Coordinates seem unreasonable!", { x: ghostPoint.x, y: ghostPoint.y });
+  }
+
+  // TEMPORARY: Use fixed large radius to make it super visible
+  const debugRadius = 50; // Fixed large radius for debugging
+  
+  console.log("🟢🟢🟢 FORCING GHOST POINT RENDER 🟢🟢🟢", {
+    x: ghostPoint.x,
+    y: ghostPoint.y,
+    outerRadius,
+    innerRadius,
+    scale,
+    debugRadius,
+  });
+  
   return (
     <>
-      {/* Outer ring */}
+      {/* TEMPORARY: Huge red circle to verify it's rendering */}
+      <Circle
+        x={ghostPoint.x}
+        y={ghostPoint.y}
+        radius={debugRadius}
+        fill="rgba(255, 0, 0, 0.5)" // Bright red, 50% opacity
+        stroke="#ff0000"
+        strokeWidth={5}
+        strokeScaleEnabled={false}
+        listening={false}
+      />
+      {/* TEMPORARY: Even larger circle */}
+      <Circle
+        x={ghostPoint.x}
+        y={ghostPoint.y}
+        radius={debugRadius * 2}
+        fill="rgba(0, 0, 255, 0.3)" // Blue circle
+        stroke="#0000ff"
+        strokeWidth={3}
+        strokeScaleEnabled={false}
+        listening={false}
+      />
+      {/* Original outer ring */}
       <Circle
         x={ghostPoint.x}
         y={ghostPoint.y}
@@ -52,7 +126,7 @@ export const GhostPoint: React.FC<GhostPointProps> = ({
         strokeScaleEnabled={false}
         listening={false}
       />
-      {/* White center */}
+      {/* Original white center */}
       <Circle
         x={ghostPoint.x}
         y={ghostPoint.y}
