@@ -456,6 +456,181 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     rotation: number;
   } | null>(null);
 
+  // Define commitMultiRegionTransform as a useCallback so we can use it in both useImperativeHandle and onDragEnd
+  const commitMultiRegionTransform = useCallback(() => {
+    if (!isMultiRegionSelected || !transformableGroupRef.current || !initialTransformRef.current) {
+      console.log("🔄 commitMultiRegionTransform: Early return - not multi-region or missing refs");
+      return;
+    }
+
+    console.log("🔄 KonvaVector.commitMultiRegionTransform called");
+
+    // Get the _transformable group
+    const transformableGroup = transformableGroupRef.current;
+
+    // Get the group's current transform values
+    const currentX = transformableGroup.x();
+    const currentY = transformableGroup.y();
+    const currentScaleX = transformableGroup.scaleX();
+    const currentScaleY = transformableGroup.scaleY();
+    const currentRotation = transformableGroup.rotation();
+
+    // Calculate deltas from initial state
+    const initial = initialTransformRef.current;
+    const dx = currentX - initial.x;
+    const dy = currentY - initial.y;
+    const scaleX = currentScaleX / initial.scaleX;
+    const scaleY = currentScaleY / initial.scaleY;
+    const rotation = currentRotation - initial.rotation;
+
+    console.log("📊 Transform deltas:", {
+      dx,
+      dy,
+      scaleX,
+      scaleY,
+      rotation,
+      initial,
+      current: { x: currentX, y: currentY, scaleX: currentScaleX, scaleY: currentScaleY, rotation: currentRotation },
+    });
+
+    // Apply constraints to the transform before committing
+    const imageWidth = width || 0;
+    const imageHeight = height || 0;
+
+    let constrainedDx = dx;
+    let constrainedDy = dy;
+    const constrainedScaleX = scaleX;
+    const constrainedScaleY = scaleY;
+
+    if (imageWidth > 0 && imageHeight > 0) {
+      // Calculate bounding box of current points after transform
+      const xs = initialPoints.map((p) => p.x);
+      const ys = initialPoints.map((p) => p.y);
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+
+      // Apply scale and position to get new bounds
+      const scaledMinX = minX * scaleX + dx;
+      const scaledMaxX = maxX * scaleX + dx;
+      const scaledMinY = minY * scaleY + dy;
+      const scaledMaxY = maxY * scaleY + dy;
+
+      // Apply constraints
+      if (scaledMinX < 0) constrainedDx = dx - scaledMinX;
+      if (scaledMaxX > imageWidth) constrainedDx = dx - (scaledMaxX - imageWidth);
+      if (scaledMinY < 0) constrainedDy = dy - scaledMinY;
+      if (scaledMaxY > imageHeight) constrainedDy = dy - (scaledMaxY - imageHeight);
+
+      console.log("🔍 Transform constraints applied:", {
+        original: { dx, dy, scaleX, scaleY },
+        constrained: { dx: constrainedDx, dy: constrainedDy, scaleX: constrainedScaleX, scaleY: constrainedScaleY },
+        bounds: `${imageWidth}x${imageHeight}`,
+        shapeBounds: `(${minX.toFixed(1)}, ${minY.toFixed(1)}) to (${maxX.toFixed(1)}, ${maxY.toFixed(1)})`,
+        newBounds: `(${scaledMinX.toFixed(1)}, ${scaledMinY.toFixed(1)}) to (${scaledMaxX.toFixed(1)}, ${scaledMaxY.toFixed(1)})`,
+      });
+    }
+
+    // Apply the transformation exactly as the single-region onTransformEnd handler does:
+    // 1. Scale around origin (0,0)
+    // 2. Rotate around origin (0,0)
+    // 3. Translate by (constrainedDx, constrainedDy)
+    const radians = rotation * (Math.PI / 180);
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+
+    const transformedVertices = initialPoints.map((point) => {
+      // Step 1: Scale
+      const x = point.x * constrainedScaleX;
+      const y = point.y * constrainedScaleY;
+
+      // Step 2: Rotate
+      const rx = x * cos - y * sin;
+      const ry = x * sin + y * cos;
+
+      // Step 3: Translate and clamp to image bounds
+      const result = {
+        ...point,
+        x: Math.max(0, Math.min(imageWidth, rx + constrainedDx)),
+        y: Math.max(0, Math.min(imageHeight, ry + constrainedDy)),
+      };
+
+      // Transform control points if bezier
+      if (point.isBezier) {
+        if (point.controlPoint1) {
+          const cp1x = point.controlPoint1.x * constrainedScaleX;
+          const cp1y = point.controlPoint1.y * constrainedScaleY;
+          const cp1rx = cp1x * cos - cp1y * sin;
+          const cp1ry = cp1x * sin + cp1y * cos;
+          result.controlPoint1 = {
+            x: Math.max(0, Math.min(imageWidth, cp1rx + constrainedDx)),
+            y: Math.max(0, Math.min(imageHeight, cp1ry + constrainedDy)),
+          };
+        }
+        if (point.controlPoint2) {
+          const cp2x = point.controlPoint2.x * constrainedScaleX;
+          const cp2y = point.controlPoint2.y * constrainedScaleY;
+          const cp2rx = cp2x * cos - cp2y * sin;
+          const cp2ry = cp2x * sin + cp2y * cos;
+          result.controlPoint2 = {
+            x: Math.max(0, Math.min(imageWidth, cp2rx + constrainedDx)),
+            y: Math.max(0, Math.min(imageHeight, cp2ry + constrainedDy)),
+          };
+        }
+      }
+
+      return result;
+    });
+
+    // Update the points
+    onPointsChange?.(transformedVertices);
+
+    console.log(
+      "📊 Updated points:",
+      transformedVertices.map((p) => ({ id: p.id, x: p.x, y: p.y })),
+    );
+
+    // Reset the _transformable group transform to identity
+    // This ensures the visual representation matches the committed data
+    transformableGroup.x(0);
+    transformableGroup.y(0);
+    transformableGroup.scaleX(1);
+    transformableGroup.scaleY(1);
+    transformableGroup.rotation(0);
+
+    // Update the initial transform state to reflect the reset
+    initialTransformRef.current = {
+      x: 0,
+      y: 0,
+      scaleX: 1,
+      scaleY: 1,
+      rotation: 0,
+    };
+
+    console.log("📊 Reset _transformable group transform to identity");
+
+    // Detach and reattach the transformer to prevent resizing issues
+    const stage = transformableGroup.getStage();
+    if (stage) {
+      const transformer = stage.findOne("Transformer");
+      if (transformer) {
+        // Temporarily detach the transformer
+        const nodes = transformer.nodes();
+        transformer.nodes([]);
+
+        // Force a redraw
+        stage.batchDraw();
+
+        // Reattach the transformer after a brief delay
+        setTimeout(() => {
+          transformer.nodes(nodes);
+          stage.batchDraw();
+        }, 0);
+      }
+    }
+  }, [isMultiRegionSelected, initialPoints, width, height, onPointsChange]);
+
   // Capture initial transform state when group is created
   useEffect(() => {
     if (isMultiRegionSelected && transformableGroupRef.current && !initialTransformRef.current) {
@@ -1597,180 +1772,26 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       return false;
     },
     // Multi-region transformation method - applies group transform to points
-    commitMultiRegionTransform: () => {
-      if (!isMultiRegionSelected || !transformableGroupRef.current || !initialTransformRef.current) {
-        console.log("🔄 commitMultiRegionTransform: Early return - not multi-region or missing refs");
-        return;
-      }
-
-      console.log("🔄 KonvaVector.commitMultiRegionTransform called");
-
-      // Get the _transformable group
-      const transformableGroup = transformableGroupRef.current;
-
-      // Get the group's current transform values
-      const currentX = transformableGroup.x();
-      const currentY = transformableGroup.y();
-      const currentScaleX = transformableGroup.scaleX();
-      const currentScaleY = transformableGroup.scaleY();
-      const currentRotation = transformableGroup.rotation();
-
-      // Calculate deltas from initial state
-      const initial = initialTransformRef.current;
-      const dx = currentX - initial.x;
-      const dy = currentY - initial.y;
-      const scaleX = currentScaleX / initial.scaleX;
-      const scaleY = currentScaleY / initial.scaleY;
-      const rotation = currentRotation - initial.rotation;
-
-      console.log("📊 Transform deltas:", {
-        dx,
-        dy,
-        scaleX,
-        scaleY,
-        rotation,
-        initial,
-        current: { x: currentX, y: currentY, scaleX: currentScaleX, scaleY: currentScaleY, rotation: currentRotation },
-      });
-
-      // Apply constraints to the transform before committing
-      const imageWidth = width || 0;
-      const imageHeight = height || 0;
-
-      let constrainedDx = dx;
-      let constrainedDy = dy;
-      const constrainedScaleX = scaleX;
-      const constrainedScaleY = scaleY;
-
-      if (imageWidth > 0 && imageHeight > 0) {
-        // Calculate bounding box of current points after transform
-        const xs = initialPoints.map((p) => p.x);
-        const ys = initialPoints.map((p) => p.y);
-        const minX = Math.min(...xs);
-        const maxX = Math.max(...xs);
-        const minY = Math.min(...ys);
-        const maxY = Math.max(...ys);
-
-        // Apply scale and position to get new bounds
-        const scaledMinX = minX * scaleX + dx;
-        const scaledMaxX = maxX * scaleX + dx;
-        const scaledMinY = minY * scaleY + dy;
-        const scaledMaxY = maxY * scaleY + dy;
-
-        // Apply constraints
-        if (scaledMinX < 0) constrainedDx = dx - scaledMinX;
-        if (scaledMaxX > imageWidth) constrainedDx = dx - (scaledMaxX - imageWidth);
-        if (scaledMinY < 0) constrainedDy = dy - scaledMinY;
-        if (scaledMaxY > imageHeight) constrainedDy = dy - (scaledMaxY - imageHeight);
-
-        console.log("🔍 Transform constraints applied:", {
-          original: { dx, dy, scaleX, scaleY },
-          constrained: { dx: constrainedDx, dy: constrainedDy, scaleX: constrainedScaleX, scaleY: constrainedScaleY },
-          bounds: `${imageWidth}x${imageHeight}`,
-          shapeBounds: `(${minX.toFixed(1)}, ${minY.toFixed(1)}) to (${maxX.toFixed(1)}, ${maxY.toFixed(1)})`,
-          newBounds: `(${scaledMinX.toFixed(1)}, ${scaledMinY.toFixed(1)}) to (${scaledMaxX.toFixed(1)}, ${scaledMaxY.toFixed(1)})`,
-        });
-      }
-
-      // Apply the transformation exactly as the single-region onTransformEnd handler does:
-      // 1. Scale around origin (0,0)
-      // 2. Rotate around origin (0,0)
-      // 3. Translate by (constrainedDx, constrainedDy)
-      const radians = rotation * (Math.PI / 180);
-      const cos = Math.cos(radians);
-      const sin = Math.sin(radians);
-
-      const transformedVertices = initialPoints.map((point) => {
-        // Step 1: Scale
-        const x = point.x * constrainedScaleX;
-        const y = point.y * constrainedScaleY;
-
-        // Step 2: Rotate
-        const rx = x * cos - y * sin;
-        const ry = x * sin + y * cos;
-
-        // Step 3: Translate and clamp to image bounds
-        const result = {
-          ...point,
-          x: Math.max(0, Math.min(imageWidth, rx + constrainedDx)),
-          y: Math.max(0, Math.min(imageHeight, ry + constrainedDy)),
-        };
-
-        // Transform control points if bezier
-        if (point.isBezier) {
-          if (point.controlPoint1) {
-            const cp1x = point.controlPoint1.x * constrainedScaleX;
-            const cp1y = point.controlPoint1.y * constrainedScaleY;
-            const cp1rx = cp1x * cos - cp1y * sin;
-            const cp1ry = cp1x * sin + cp1y * cos;
-            result.controlPoint1 = {
-              x: Math.max(0, Math.min(imageWidth, cp1rx + constrainedDx)),
-              y: Math.max(0, Math.min(imageHeight, cp1ry + constrainedDy)),
-            };
-          }
-          if (point.controlPoint2) {
-            const cp2x = point.controlPoint2.x * constrainedScaleX;
-            const cp2y = point.controlPoint2.y * constrainedScaleY;
-            const cp2rx = cp2x * cos - cp2y * sin;
-            const cp2ry = cp2x * sin + cp2y * cos;
-            result.controlPoint2 = {
-              x: Math.max(0, Math.min(imageWidth, cp2rx + constrainedDx)),
-              y: Math.max(0, Math.min(imageHeight, cp2ry + constrainedDy)),
-            };
-          }
-        }
-
-        return result;
-      });
-
-      // Update the points
-      onPointsChange?.(transformedVertices);
-
-      console.log(
-        "📊 Updated points:",
-        transformedVertices.map((p) => ({ id: p.id, x: p.x, y: p.y })),
-      );
-
-      // Reset the _transformable group transform to identity
-      // This ensures the visual representation matches the committed data
-      transformableGroup.x(0);
-      transformableGroup.y(0);
-      transformableGroup.scaleX(1);
-      transformableGroup.scaleY(1);
-      transformableGroup.rotation(0);
-
-      // Update the initial transform state to reflect the reset
-      initialTransformRef.current = {
-        x: 0,
-        y: 0,
-        scaleX: 1,
-        scaleY: 1,
-        rotation: 0,
-      };
-
-      console.log("📊 Reset _transformable group transform to identity");
-
-      // Detach and reattach the transformer to prevent resizing issues
-      const stage = transformableGroup.getStage();
-      if (stage) {
-        const transformer = stage.findOne("Transformer");
-        if (transformer) {
-          // Temporarily detach the transformer
-          const nodes = transformer.nodes();
-          transformer.nodes([]);
-
-          // Force a redraw
-          stage.batchDraw();
-
-          // Reattach the transformer after a brief delay
-          setTimeout(() => {
-            transformer.nodes(nodes);
-            stage.batchDraw();
-          }, 0);
-        }
-      }
-    },
+    commitMultiRegionTransform,
   }));
+
+  // Ensure commitMultiRegionTransform is called when ImageTransformer's onDragEnd fires
+  // ImageTransformer will call applyTransform which calls commitMultiRegionTransform
+  // But we also need to ensure the Group position is preserved when selection is cleared
+  // by committing the transform before the selection is cleared
+  useEffect(() => {
+    if (!isMultiRegionSelected && transformableGroupRef.current) {
+      // When selection is cleared, commit any pending transform first
+      const group = transformableGroupRef.current;
+      const currentX = group.x();
+      const currentY = group.y();
+      
+      // If there's a pending transform, commit it before the Group is unmounted/reset
+      if ((currentX !== 0 || currentY !== 0) && initialTransformRef.current) {
+        commitMultiRegionTransform();
+      }
+    }
+  }, [isMultiRegionSelected, commitMultiRegionTransform]);
 
   // Clean up click timeout on unmount
   useEffect(() => {
@@ -2244,7 +2265,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       });
 
       // Handle shape dragging first (if active, allow dragging to continue even outside bounds)
-      if (isDraggingShape && shapeDragStartPos.current) {
+      // Skip individual shape dragging if in multi-region mode (ImageTransformer handles it)
+      if (isDraggingShape && shapeDragStartPos.current && !isMultiRegionSelected) {
         // Calculate delta from start position
         const deltaX = imagePos.x - shapeDragStartPos.current.imageX;
         const deltaY = imagePos.y - shapeDragStartPos.current.imageY;
@@ -2852,77 +2874,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         <Group
           name="_transformable"
           ref={transformableGroupRef}
-          onDragMove={(e) => {
-            // Apply image coordinate bounds for VectorRegion drag constraints
-            const imageWidth = width || 0;
-            const imageHeight = height || 0;
-
-            if (imageWidth > 0 && imageHeight > 0) {
-              const node = e.target;
-              const { x, y } = node.position();
-
-              // Calculate bounding box of current points
-              const xs = rawInitialPoints.map((p) => p.x);
-              const ys = rawInitialPoints.map((p) => p.y);
-              const minX = Math.min(...xs);
-              const maxX = Math.max(...xs);
-              const minY = Math.min(...ys);
-              const maxY = Math.max(...ys);
-
-              // Calculate where the shape would be after this drag
-              const newMinX = minX + x;
-              const newMaxX = maxX + x;
-              const newMinY = minY + y;
-              const newMaxY = maxY + y;
-
-              // Apply constraints
-              let constrainedX = x;
-              let constrainedY = y;
-
-              if (newMinX < 0) constrainedX = x - newMinX;
-              if (newMaxX > imageWidth) constrainedX = x - (newMaxX - imageWidth);
-              if (newMinY < 0) constrainedY = y - newMinY;
-              if (newMaxY > imageHeight) constrainedY = y - (newMaxY - imageHeight);
-
-              // Update position if constraints were applied
-              if (constrainedX !== x || constrainedY !== y) {
-                // For multi-region selection, apply the same constraint to all selected shapes
-                if (isMultiRegionSelected) {
-                  const stage = node.getStage();
-                  const allTransformableGroups = stage?.find("._transformable");
-                  const allNodes = stage?.getChildren();
-
-                  if (allTransformableGroups && allTransformableGroups.length > 1) {
-                    // Calculate the constraint offset
-                    const constraintOffsetX = constrainedX - x;
-                    const constraintOffsetY = constrainedY - y;
-
-                    console.log(
-                      `🔍 Multi-region constraint offset: (${constraintOffsetX.toFixed(1)}, ${constraintOffsetY.toFixed(1)})`,
-                    );
-
-                    // Apply the same constraint to all other transformable groups
-                    allTransformableGroups.forEach((group) => {
-                      if (group !== node) {
-                        const currentPos = group.position();
-                        console.log(
-                          `🔍 Applying constraint to group ${group.name()}: (${currentPos.x.toFixed(1)}, ${currentPos.y.toFixed(1)}) -> (${(currentPos.x + constraintOffsetX).toFixed(1)}, ${(currentPos.y + constraintOffsetY).toFixed(1)})`,
-                        );
-                        group.position({
-                          x: currentPos.x + constraintOffsetX,
-                          y: currentPos.y + constraintOffsetY,
-                        });
-                      }
-                    });
-                  }
-                }
-
-                node.position({ x: constrainedX, y: constrainedY });
-              }
-
-              console.log(
-                `🔍 VectorDragConstraint: bounds=${imageWidth}x${imageHeight}, pos=(${constrainedX.toFixed(1)}, ${constrainedY.toFixed(1)})`,
-              );
+          draggable={true}
+          onTransformEnd={(e) => {
+            // This is called when ImageTransformer finishes transforming the Group
+            // Commit the transform immediately to prevent position reset
+            if (e.target === e.currentTarget && transformableGroupRef.current && initialTransformRef.current) {
+              commitMultiRegionTransform();
             }
           }}
         >
@@ -2981,6 +2938,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               handleClickWithDebouncing(e, onClick, onDblClick);
             }}
             onMouseDown={(e) => {
+              // Don't start shape drag if in multi-region selection mode
+              // ImageTransformer will handle dragging in this case
+              if (isMultiRegionSelected) {
+                return;
+              }
+
               // Don't start shape drag if we're already dragging a point or control point
               if (draggedPointIndex !== null || draggedControlPoint !== null) {
                 return;
@@ -3300,6 +3263,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               handleClickWithDebouncing(e, onClick, onDblClick);
             }}
             onMouseDown={(e) => {
+              // Don't start shape drag if in multi-region selection mode
+              // ImageTransformer will handle dragging in this case
+              if (isMultiRegionSelected) {
+                return;
+              }
+
               // Don't start shape drag if we're already dragging a point or control point
               if (draggedPointIndex !== null || draggedControlPoint !== null) {
                 return;
