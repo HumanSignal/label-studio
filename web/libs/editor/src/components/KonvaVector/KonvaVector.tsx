@@ -429,6 +429,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     x: number;
     y: number;
   } | null>(null);
+  const ghostLineRafRef = useRef<number | null>(null);
   const lastCallbackTime = useRef<number>(DEFAULT_CALLBACK_TIME);
   const [visibleControlPoints, setVisibleControlPoints] = useState<Set<number>>(new Set());
   const [activePointId, setActivePointId] = useState<string | null>(null);
@@ -1826,6 +1827,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
         // Always update cursor position (even outside bounds) so ghost line can work
         cursorPositionRef.current = imagePos;
+        
+        // Use RAF to batch redraw calls for performance
+        if (ghostLineRafRef.current) {
+          cancelAnimationFrame(ghostLineRafRef.current);
+        }
+        ghostLineRafRef.current = requestAnimationFrame(() => {
+          stage.batchDraw();
+        });
 
         // Only process ghost point logic if within bounds
         if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
@@ -1907,6 +1916,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       stage.on("mouseleave", handleStageMouseLeave);
 
       return () => {
+        if (ghostLineRafRef.current) {
+          cancelAnimationFrame(ghostLineRafRef.current);
+        }
         stage.off("mousemove", handleStageMouseMove);
         stage.off("mouseleave", handleStageMouseLeave);
       };
@@ -2222,6 +2234,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       
       // Always update cursor position (even outside bounds) so ghost line can work
       cursorPositionRef.current = imagePos;
+      
+      // Use RAF to batch redraw calls for performance
+      if (ghostLineRafRef.current) {
+        cancelAnimationFrame(ghostLineRafRef.current);
+      }
+      ghostLineRafRef.current = requestAnimationFrame(() => {
+        stage.batchDraw();
+      });
 
       // Handle shape dragging first (if active, allow dragging to continue even outside bounds)
       if (isDraggingShape && shapeDragStartPos.current) {
@@ -2588,6 +2608,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       return () => {
         console.log("🟣 Cleanup: removing stage handlers");
         handlersAttachedRef.current = false;
+        if (ghostLineRafRef.current) {
+          cancelAnimationFrame(ghostLineRafRef.current);
+        }
         stage.off("mousemove", handleStageMouseMove);
         stage.off("mouseup", handleStageMouseUp);
         stage.off("mouseleave", handleStageMouseLeave);
@@ -3034,7 +3057,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           {/* Ghost line - preview from last point to cursor */}
           <GhostLine
             initialPoints={initialPoints}
-            cursorPosition={cursorPositionRef.current}
+            cursorPositionRef={cursorPositionRef}
             draggedControlPoint={draggedControlPoint}
             draggedPointIndex={draggedPointIndex}
             isDraggingNewBezier={isDraggingNewBezier}
@@ -3353,7 +3376,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           {/* Ghost line - preview from last point to cursor */}
           <GhostLine
             initialPoints={initialPoints}
-            cursorPosition={cursorPositionRef.current}
+            cursorPositionRef={cursorPositionRef}
             draggedControlPoint={draggedControlPoint}
             draggedPointIndex={draggedPointIndex}
             isDraggingNewBezier={isDraggingNewBezier}
