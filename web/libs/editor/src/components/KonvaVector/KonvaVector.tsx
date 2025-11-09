@@ -3295,6 +3295,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               stroke={stroke}
               pixelSnapping={pixelSnapping}
               drawingDisabled={drawingDisabled}
+              isShiftKeyHeld={isShiftKeyHeld}
+              transformMode={transformMode}
+              effectiveSelectedPointsSize={effectiveSelectedPoints.size}
             />
           )}
 
@@ -3622,6 +3625,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               stroke={stroke}
               pixelSnapping={pixelSnapping}
               drawingDisabled={drawingDisabled}
+              isShiftKeyHeld={isShiftKeyHeld}
+              transformMode={transformMode}
+              effectiveSelectedPointsSize={effectiveSelectedPoints.size}
             />
           )}
 

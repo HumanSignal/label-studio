@@ -23,6 +23,10 @@ interface GhostLineProps {
   stroke?: string;
   pixelSnapping?: boolean;
   drawingDisabled?: boolean;
+  // Non-hover-related disabled states (for real-time checks)
+  isShiftKeyHeld?: boolean;
+  transformMode?: boolean;
+  effectiveSelectedPointsSize?: number;
 }
 
 export const GhostLine: React.FC<GhostLineProps> = ({
@@ -44,6 +48,9 @@ export const GhostLine: React.FC<GhostLineProps> = ({
   stroke = DEFAULT_STROKE_COLOR,
   pixelSnapping = false,
   drawingDisabled = false,
+  isShiftKeyHeld = false,
+  transformMode = false,
+  effectiveSelectedPointsSize = 0,
 }) => {
   // Helper function to snap coordinates to pixel grid
   const snapToPixel = (point: { x: number; y: number }) => {
@@ -181,11 +188,15 @@ export const GhostLine: React.FC<GhostLineProps> = ({
               }
             }
             
-            // Hide ghost line when drawing is disabled (for other reasons like Shift key, transform mode, etc.)
+            // Hide ghost line when drawing is disabled for non-hover reasons (Shift key, transform mode, etc.)
+            // Note: Hover detection (points, control points, segments) is handled above in real-time
+            // Check non-hover-related disabled states directly (not from drawingDisabled which includes hover state)
             // Only show ghost line if drawing is enabled OR if we have a selected point (for editing)
-            if (drawingDisabled) {
+            const isNonHoverDisabled = isShiftKeyHeld || transformMode || effectiveSelectedPointsSize > 1;
+            if (isNonHoverDisabled) {
               // If we have a selected point, still show ghost line (useful for editing)
-              // Otherwise, hide it when drawing is disabled
+              // Otherwise, hide it when drawing is disabled (but only for non-hover reasons)
+              // Hover detection is already handled above, so this only checks Shift key, transform mode, etc.
               if (selectedPointIndex === null) {
                 return; // Don't draw anything - drawing is disabled and no point is selected
               }
