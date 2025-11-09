@@ -1,7 +1,8 @@
 import type React from "react";
 import { Shape } from "react-konva";
 import type { BezierPoint } from "../types";
-import { GHOST_LINE_STYLING, DEFAULT_STROKE_COLOR } from "../constants";
+import { GHOST_LINE_STYLING, DEFAULT_STROKE_COLOR, HIT_RADIUS } from "../constants";
+import { findClosestPointOnPath, getDistance } from "../eventHandlers/utils";
 
 interface GhostLineProps {
   initialPoints: BezierPoint[];
@@ -110,7 +111,7 @@ export const GhostLine: React.FC<GhostLineProps> = ({
             // - We're dragging something
             // - Path is closed
             // - Max points reached
-            // - Drawing is disabled AND no point is selected AND we have no points (can't draw from nothing)
+            // - Drawing is disabled (includes hovering over points, control points, or segments)
             if (!cursorPos || 
                 draggedControlPoint ||
                 draggedPointIndex !== null ||
@@ -120,14 +121,74 @@ export const GhostLine: React.FC<GhostLineProps> = ({
               return; // Don't draw anything
             }
             
-            // If we have points, always show ghost line (even if drawing is disabled)
-            // This allows users to see where they're pointing when editing existing regions
-            // Only hide if drawing is disabled AND no point is selected AND we have no points
-            if (initialPoints.length > 0) {
-              // Always show ghost line when we have points - it's useful for editing
-            } else if (drawingDisabled && selectedPointIndex === null) {
-              // Hide ghost line only if we have no points AND drawing is disabled AND no point is selected
-              return; // Don't draw anything - can't show ghost line from nothing
+            // Real-time hover detection: check if cursor is over points, control points, or segments
+            // This runs inside sceneFunc for real-time updates without React re-renders
+            const scale = transform.zoom * fitScale;
+            
+            // Check if hovering over control points
+            if (cursorPos && initialPoints.length > 0) {
+              const controlPointHitRadius = HIT_RADIUS.CONTROL_POINT / scale;
+              for (let i = 0; i < initialPoints.length; i++) {
+                const point = initialPoints[i];
+                if (point.isBezier) {
+                  if (point.controlPoint1) {
+                    const distance = Math.sqrt(
+                      (cursorPos.x - point.controlPoint1.x) ** 2 + (cursorPos.y - point.controlPoint1.y) ** 2,
+                    );
+                    if (distance <= controlPointHitRadius) {
+                      return; // Hide ghost line when hovering over control points
+                    }
+                  }
+                  if (point.controlPoint2) {
+                    const distance = Math.sqrt(
+                      (cursorPos.x - point.controlPoint2.x) ** 2 + (cursorPos.y - point.controlPoint2.y) ** 2,
+                    );
+                    if (distance <= controlPointHitRadius) {
+                      return; // Hide ghost line when hovering over control points
+                    }
+                  }
+                }
+              }
+            }
+            
+            // Check if hovering over points (except last point and first point when closing is possible)
+            if (cursorPos && initialPoints.length > 0) {
+              const selectionHitRadius = HIT_RADIUS.SELECTION / scale;
+              for (let i = 0; i < initialPoints.length; i++) {
+                const point = initialPoints[i];
+                const distance = Math.sqrt((cursorPos.x - point.x) ** 2 + (cursorPos.y - point.y) ** 2);
+                if (distance <= selectionHitRadius) {
+                  // Allow ghost line when hovering over the last point (so you can continue drawing)
+                  if (i === initialPoints.length - 1) {
+                    continue; // Don't hide ghost line for the last point
+                  }
+                  // Allow ghost line when hovering over the first point if path closing is possible
+                  if (i === 0 && allowClose && !isPathClosed) {
+                    continue; // Don't hide ghost line for the first point when closing is possible
+                  }
+                  // Hide ghost line when hovering over other points
+                  return;
+                }
+              }
+            }
+            
+            // Check if hovering over path segments
+            if (cursorPos && initialPoints.length >= 2) {
+              const segmentHitRadius = HIT_RADIUS.SEGMENT / scale;
+              const closestPathPoint = findClosestPointOnPath(cursorPos, initialPoints, allowClose, isPathClosed);
+              if (closestPathPoint && getDistance(cursorPos, closestPathPoint.point) <= segmentHitRadius) {
+                return; // Hide ghost line when hovering over segments
+              }
+            }
+            
+            // Hide ghost line when drawing is disabled (for other reasons like Shift key, transform mode, etc.)
+            // Only show ghost line if drawing is enabled OR if we have a selected point (for editing)
+            if (drawingDisabled) {
+              // If we have a selected point, still show ghost line (useful for editing)
+              // Otherwise, hide it when drawing is disabled
+              if (selectedPointIndex === null) {
+                return; // Don't draw anything - drawing is disabled and no point is selected
+              }
             }
             
             // Check if we should hide ghost line when closing indicator is visible
