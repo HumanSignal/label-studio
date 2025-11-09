@@ -855,6 +855,103 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     }
   }, [drawingDisabled]);
 
+  // Initialize cursor position when points are available or component becomes active
+  // This ensures ghost line can render immediately
+  useEffect(() => {
+    const group = stageRef.current;
+    if (!group) return;
+
+    const stage = group.getStage();
+    if (!stage) return;
+
+    // Try to get current mouse position and set cursor position
+    const initializeCursorPosition = () => {
+      const pos = stage.getPointerPosition();
+      if (pos) {
+        const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+        // Always update cursor position when points are available (not just when null)
+        // This ensures ghost line can render immediately after region selection
+        cursorPositionRef.current = imagePos;
+        // Trigger a redraw to show ghost line
+        if (ghostLineRafRef.current) {
+          cancelAnimationFrame(ghostLineRafRef.current);
+        }
+        ghostLineRafRef.current = requestAnimationFrame(() => {
+          stage.batchDraw();
+        });
+        return true;
+      }
+      return false;
+    };
+
+    // Try immediately
+    const gotPosition = initializeCursorPosition();
+
+    // Only set fallback position if this instance is active/selected and not disabled
+    // Check if this instance is the active one using the tracker
+    const isActiveInstance = tracker.getActiveInstanceId() === instanceId;
+    const hasSelection = selectedPoints.size > 0 || effectiveSelectedPoints.size > 0;
+    const isInstanceSelected = tracker.isInstanceSelected(instanceId);
+    // Show ghost line only if not disabled AND (active OR has selection)
+    const shouldShowGhostLine = !disabled && (isActiveInstance || hasSelection || isInstanceSelected);
+
+    // If we couldn't get the position and we have points, set a fallback position
+    // Use the last point or center of the region as a fallback until mouse moves
+    // Only do this for the active/selected instance that is not disabled
+    if (!gotPosition && initialPoints.length > 0 && !cursorPositionRef.current && shouldShowGhostLine) {
+      const lastPoint = initialPoints[initialPoints.length - 1];
+      // Set cursor position to a small offset from the last point so ghost line is visible
+      cursorPositionRef.current = {
+        x: lastPoint.x + 50,
+        y: lastPoint.y + 50,
+      };
+      // Trigger a redraw to show ghost line
+      if (ghostLineRafRef.current) {
+        cancelAnimationFrame(ghostLineRafRef.current);
+      }
+      ghostLineRafRef.current = requestAnimationFrame(() => {
+        stage.batchDraw();
+      });
+    } else if (!shouldShowGhostLine && cursorPositionRef.current) {
+      // Clear cursor position if this instance shouldn't show ghost line
+      cursorPositionRef.current = null;
+    }
+
+    // Also try after a short delay to ensure stage is ready
+    const timeout = setTimeout(() => {
+      if (!cursorPositionRef.current) {
+        initializeCursorPosition();
+      }
+    }, 0);
+
+    // Add a one-time mousemove listener to capture cursor position immediately when mouse moves
+    // This ensures we get the position even if getPointerPosition() returns null initially
+    const handleOneTimeMouseMove = (e: Konva.KonvaEventObject<MouseEvent>) => {
+      const pos = e.target.getStage()?.getPointerPosition();
+      if (pos) {
+        const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+        cursorPositionRef.current = imagePos;
+        // Trigger a redraw to show ghost line
+        if (ghostLineRafRef.current) {
+          cancelAnimationFrame(ghostLineRafRef.current);
+        }
+        ghostLineRafRef.current = requestAnimationFrame(() => {
+          stage.batchDraw();
+        });
+        // Remove listener after first capture
+        stage.off("mousemove", handleOneTimeMouseMove);
+      }
+    };
+
+    // Add one-time listener
+    stage.on("mousemove", handleOneTimeMouseMove);
+
+    return () => {
+      clearTimeout(timeout);
+      stage.off("mousemove", handleOneTimeMouseMove);
+    };
+  }, [initialPoints.length, transform, fitScale, x, y, disabled, instanceId, selectedPoints.size, effectiveSelectedPoints.size]); // Re-run when points change, transform changes, or selection changes
+
   // Stabilize functions for tracker registration
   const getPoints = useCallback(() => initialPoints, [initialPoints]);
   const updatePoints = useCallback(
@@ -1839,6 +1936,20 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         const pos = e.target.getStage()?.getPointerPosition();
         if (!pos) return;
 
+        // Get current values from ref to avoid stale closures
+        const {
+          transform,
+          fitScale,
+          x,
+          y,
+          initialPoints,
+          allowClose,
+          finalIsPathClosed,
+          pixelSnapping,
+          isDraggingNewBezier,
+          ghostPointDragInfo,
+        } = currentValuesRef.current;
+
         // Update Shift key state from the event to keep it in sync
         if (e.evt.shiftKey !== isShiftKeyHeld) {
           setIsShiftKeyHeld(e.evt.shiftKey);
@@ -1928,19 +2039,75 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }
       };
 
+      const handleStageMouseEnter = (e: Konva.KonvaEventObject<MouseEvent>) => {
+        // Capture cursor position when mouse enters stage so ghost line can render immediately
+        const pos = e.target.getStage()?.getPointerPosition();
+        if (pos) {
+          const {
+            transform,
+            fitScale,
+            x,
+            y,
+          } = currentValuesRef.current;
+          const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+          cursorPositionRef.current = imagePos;
+          // Trigger a redraw to show ghost line
+          if (ghostLineRafRef.current) {
+            cancelAnimationFrame(ghostLineRafRef.current);
+          }
+          ghostLineRafRef.current = requestAnimationFrame(() => {
+            stage.batchDraw();
+          });
+        }
+      };
+
       const handleStageMouseLeave = () => {
         cursorPositionRef.current = null;
         setGhostPoint(null);
       };
 
       stage.on("mousemove", handleStageMouseMove);
+      stage.on("mouseenter", handleStageMouseEnter);
       stage.on("mouseleave", handleStageMouseLeave);
 
+      // Try to initialize cursor position if mouse is already over the stage
+      // This ensures ghost line can render immediately even if mouseenter didn't fire
+      const tryInitializeCursorPosition = () => {
+        const pos = stage.getPointerPosition();
+        if (pos) {
+          const {
+            transform,
+            fitScale,
+            x,
+            y,
+          } = currentValuesRef.current;
+          const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+          cursorPositionRef.current = imagePos;
+          // Trigger a redraw to show ghost line
+          if (ghostLineRafRef.current) {
+            cancelAnimationFrame(ghostLineRafRef.current);
+          }
+          ghostLineRafRef.current = requestAnimationFrame(() => {
+            stage.batchDraw();
+          });
+        }
+      };
+
+      // Try to initialize immediately
+      tryInitializeCursorPosition();
+
+      // Also try after a short delay in case the stage isn't ready yet
+      const initTimeout = setTimeout(() => {
+        tryInitializeCursorPosition();
+      }, 0);
+
       return () => {
+        clearTimeout(initTimeout);
         if (ghostLineRafRef.current) {
           cancelAnimationFrame(ghostLineRafRef.current);
         }
         stage.off("mousemove", handleStageMouseMove);
+        stage.off("mouseenter", handleStageMouseEnter);
         stage.off("mouseleave", handleStageMouseLeave);
       };
     }
@@ -2602,6 +2769,28 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       setDraggedControlPoint(null);
     };
 
+    const handleStageMouseEnter = (e: Konva.KonvaEventObject<MouseEvent>) => {
+      // Capture cursor position when mouse enters stage so ghost line can render immediately
+      const pos = e.target.getStage()?.getPointerPosition();
+      if (pos) {
+        const {
+          transform,
+          fitScale,
+          x,
+          y,
+        } = currentValuesRef.current;
+        const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+        cursorPositionRef.current = imagePos;
+        // Trigger a redraw to show ghost line
+        if (ghostLineRafRef.current) {
+          cancelAnimationFrame(ghostLineRafRef.current);
+        }
+        ghostLineRafRef.current = requestAnimationFrame(() => {
+          stage.batchDraw();
+        });
+      }
+    };
+
     const handleStageMouseLeave = () => {
       cursorPositionRef.current = null;
       setGhostPoint(null);
@@ -2611,23 +2800,90 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       stage.on("mousedown", handleStageMouseDown);
       stage.on("mousemove", handleStageMouseMove);
       stage.on("mouseup", handleStageMouseUp);
+      stage.on("mouseenter", handleStageMouseEnter);
       stage.on("mouseleave", handleStageMouseLeave);
 
+      // Try to initialize cursor position if mouse is already over the stage
+      // This ensures ghost line can render immediately even if mouseenter didn't fire
+      const tryInitializeCursorPosition = () => {
+        const pos = stage.getPointerPosition();
+        if (pos) {
+          const {
+            transform,
+            fitScale,
+            x,
+            y,
+          } = currentValuesRef.current;
+          const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+          cursorPositionRef.current = imagePos;
+          // Trigger a redraw to show ghost line
+          if (ghostLineRafRef.current) {
+            cancelAnimationFrame(ghostLineRafRef.current);
+          }
+          ghostLineRafRef.current = requestAnimationFrame(() => {
+            stage.batchDraw();
+          });
+        }
+      };
+
+      // Try to initialize immediately
+      tryInitializeCursorPosition();
+
+      // Also try after a short delay in case the stage isn't ready yet
+      const initTimeout = setTimeout(() => {
+        tryInitializeCursorPosition();
+      }, 0);
+
       return () => {
+        clearTimeout(initTimeout);
         console.log("🔴 CLEANUP CALLED - Cleaning up stage-level handlers");
         handlersAttachedRef.current = false;
         stage.off("mousedown", handleStageMouseDown);
         stage.off("mousemove", handleStageMouseMove);
         stage.off("mouseup", handleStageMouseUp);
+        stage.off("mouseenter", handleStageMouseEnter);
         stage.off("mouseleave", handleStageMouseLeave);
       };
     } else {
       // Handle cursor position, ghost point, and shape dragging
       stage.on("mousemove", handleStageMouseMove);
       stage.on("mouseup", handleStageMouseUp);
+      stage.on("mouseenter", handleStageMouseEnter);
       stage.on("mouseleave", handleStageMouseLeave);
 
+      // Try to initialize cursor position if mouse is already over the stage
+      // This ensures ghost line can render immediately even if mouseenter didn't fire
+      const tryInitializeCursorPosition = () => {
+        const pos = stage.getPointerPosition();
+        if (pos) {
+          const {
+            transform,
+            fitScale,
+            x,
+            y,
+          } = currentValuesRef.current;
+          const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+          cursorPositionRef.current = imagePos;
+          // Trigger a redraw to show ghost line
+          if (ghostLineRafRef.current) {
+            cancelAnimationFrame(ghostLineRafRef.current);
+          }
+          ghostLineRafRef.current = requestAnimationFrame(() => {
+            stage.batchDraw();
+          });
+        }
+      };
+
+      // Try to initialize immediately
+      tryInitializeCursorPosition();
+
+      // Also try after a short delay in case the stage isn't ready yet
+      const initTimeout = setTimeout(() => {
+        tryInitializeCursorPosition();
+      }, 0);
+
       return () => {
+        clearTimeout(initTimeout);
         console.log("🟣 Cleanup: removing stage handlers");
         handlersAttachedRef.current = false;
         if (ghostLineRafRef.current) {
@@ -2635,6 +2891,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }
         stage.off("mousemove", handleStageMouseMove);
         stage.off("mouseup", handleStageMouseUp);
+        stage.off("mouseenter", handleStageMouseEnter);
         stage.off("mouseleave", handleStageMouseLeave);
       };
     }
@@ -3018,26 +3275,28 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           />
 
           {/* Ghost line - preview from last point to cursor */}
-          <GhostLine
-            initialPoints={initialPoints}
-            cursorPositionRef={cursorPositionRef}
-            draggedControlPoint={draggedControlPoint}
-            draggedPointIndex={draggedPointIndex}
-            isDraggingNewBezier={isDraggingNewBezier}
-            isPathClosed={finalIsPathClosed}
-            allowClose={allowClose}
-            transform={transform}
-            fitScale={fitScale}
-            maxPoints={maxPoints}
-            minPoints={minPoints}
-            skeletonEnabled={skeletonEnabled}
-            selectedPointIndex={selectedPointIndex}
-            lastAddedPointId={lastAddedPointId}
-            activePointId={activePointId}
-            stroke={stroke}
-            pixelSnapping={pixelSnapping}
-            drawingDisabled={drawingDisabled}
-          />
+          {!disabled && (
+            <GhostLine
+              initialPoints={initialPoints}
+              cursorPositionRef={cursorPositionRef}
+              draggedControlPoint={draggedControlPoint}
+              draggedPointIndex={draggedPointIndex}
+              isDraggingNewBezier={isDraggingNewBezier}
+              isPathClosed={finalIsPathClosed}
+              allowClose={allowClose}
+              transform={transform}
+              fitScale={fitScale}
+              maxPoints={maxPoints}
+              minPoints={minPoints}
+              skeletonEnabled={skeletonEnabled}
+              selectedPointIndex={selectedPointIndex}
+              lastAddedPointId={lastAddedPointId}
+              activePointId={activePointId}
+              stroke={stroke}
+              pixelSnapping={pixelSnapping}
+              drawingDisabled={drawingDisabled}
+            />
+          )}
 
           {/* Control points - render first so lines appear under main points */}
           {!disabled && (
@@ -3343,26 +3602,28 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           />
 
           {/* Ghost line - preview from last point to cursor */}
-          <GhostLine
-            initialPoints={initialPoints}
-            cursorPositionRef={cursorPositionRef}
-            draggedControlPoint={draggedControlPoint}
-            draggedPointIndex={draggedPointIndex}
-            isDraggingNewBezier={isDraggingNewBezier}
-            isPathClosed={finalIsPathClosed}
-            allowClose={allowClose}
-            transform={transform}
-            fitScale={fitScale}
-            maxPoints={maxPoints}
-            minPoints={minPoints}
-            skeletonEnabled={skeletonEnabled}
-            selectedPointIndex={selectedPointIndex}
-            lastAddedPointId={lastAddedPointId}
-            activePointId={activePointId}
-            stroke={stroke}
-            pixelSnapping={pixelSnapping}
-            drawingDisabled={drawingDisabled}
-          />
+          {!disabled && (
+            <GhostLine
+              initialPoints={initialPoints}
+              cursorPositionRef={cursorPositionRef}
+              draggedControlPoint={draggedControlPoint}
+              draggedPointIndex={draggedPointIndex}
+              isDraggingNewBezier={isDraggingNewBezier}
+              isPathClosed={finalIsPathClosed}
+              allowClose={allowClose}
+              transform={transform}
+              fitScale={fitScale}
+              maxPoints={maxPoints}
+              minPoints={minPoints}
+              skeletonEnabled={skeletonEnabled}
+              selectedPointIndex={selectedPointIndex}
+              lastAddedPointId={lastAddedPointId}
+              activePointId={activePointId}
+              stroke={stroke}
+              pixelSnapping={pixelSnapping}
+              drawingDisabled={drawingDisabled}
+            />
+          )}
 
           {/* Control points - render first so lines appear under main points */}
           {!disabled && (

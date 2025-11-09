@@ -106,14 +106,28 @@ export const GhostLine: React.FC<GhostLineProps> = ({
             const cursorPos = cursorPositionRef.current;
             
             // Check all conditions for showing ghost line
+            // Show ghost line when we have points and cursor position, unless:
+            // - We're dragging something
+            // - Path is closed
+            // - Max points reached
+            // - Drawing is disabled AND no point is selected AND we have no points (can't draw from nothing)
             if (!cursorPos || 
                 draggedControlPoint ||
                 draggedPointIndex !== null ||
                 isDraggingNewBezier ||
                 isPathClosed ||
-                (maxPoints !== undefined && initialPoints.length >= maxPoints) ||
-                drawingDisabled && selectedPointIndex === null) {
+                (maxPoints !== undefined && initialPoints.length >= maxPoints)) {
               return; // Don't draw anything
+            }
+            
+            // If we have points, always show ghost line (even if drawing is disabled)
+            // This allows users to see where they're pointing when editing existing regions
+            // Only hide if drawing is disabled AND no point is selected AND we have no points
+            if (initialPoints.length > 0) {
+              // Always show ghost line when we have points - it's useful for editing
+            } else if (drawingDisabled && selectedPointIndex === null) {
+              // Hide ghost line only if we have no points AND drawing is disabled AND no point is selected
+              return; // Don't draw anything - can't show ghost line from nothing
             }
             
             // Check if we should hide ghost line when closing indicator is visible
