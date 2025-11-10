@@ -37,11 +37,7 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
 
     // Set up ghost point drag info when Shift is held (for UI feedback)
     // This works even when internal point addition is disabled
-    if (
-      e.evt.shiftKey === true &&
-      props.cursorPosition &&
-      props.initialPoints.length >= 2
-    ) {
+    if (e.evt.shiftKey === true && props.cursorPosition && props.initialPoints.length >= 2) {
       // Check if cursor is over an existing point
       const scale = props.transform.zoom * props.fitScale;
       const hitRadius = 10 / scale;
@@ -98,7 +94,7 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
             isDragging: false,
             dragDistance: 0,
           });
-          
+
           // Only mark as handled if internal point addition is enabled
           // This prevents other handlers from interfering when we want to add points
           if (!props.disableInternalPointAddition) {
@@ -661,12 +657,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
 
     // Handle shift-click-drag bezier creation (start dragging detection) - only when shift key is held
     // Ghost point drag info is tracked for UI feedback even when internal point addition is disabled
-    if (
-      props.ghostPointDragInfo &&
-      !props.ghostPointDragInfo.isDragging &&
-      e.evt.shiftKey &&
-      props.allowBezier
-    ) {
+    if (props.ghostPointDragInfo && !props.ghostPointDragInfo.isDragging && e.evt.shiftKey && props.allowBezier) {
       // Check if we should start dragging (mouse moved enough)
       const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
@@ -896,7 +887,7 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
               });
               return; // Let parent handle point addition
             }
-            
+
             // Otherwise, insert a regular point internally between the two points that form the segment
             if (!props.disableInternalPointAddition) {
               const insertResult = insertPointBetween(

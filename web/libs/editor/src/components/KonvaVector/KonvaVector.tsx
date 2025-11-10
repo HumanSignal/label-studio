@@ -977,7 +977,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   const updateCurrentPointsRef = useCallback((points: BezierPoint[]) => {
     currentPointsRef.current = points;
   }, []);
-  
+
   // Function to get current points ref - used by VectorTransformer during transformation
   const getCurrentPointsRef = useCallback(() => {
     return currentPointsRef.current;
@@ -1969,24 +1969,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }
 
         // Debug: Log coordinate conversion
-        console.log("🔍 Coordinate conversion:", {
-          stagePos: pos,
-          transform,
-          fitScale,
-          groupPos: { x, y },
-        });
-
         const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
-        
-        console.log("🔍 Converted to image coordinates:", {
-          stagePos: pos,
-          imagePos,
-          calculation: {
-            scale: transform.zoom * fitScale,
-            x: `(${pos.x} - ${x} - ${transform.offsetX}) / ${transform.zoom * fitScale} = ${imagePos.x}`,
-            y: `(${pos.y} - ${y} - ${transform.offsetY}) / ${transform.zoom * fitScale} = ${imagePos.y}`,
-          },
-        });
 
         // Always update cursor position (even outside bounds) so ghost line can work
         cursorPositionRef.current = imagePos;
@@ -2595,7 +2578,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 }
               }
             } else {
-              console.log("🔴 No closest path point found");
               setGhostPoint(null);
             }
           }
@@ -2811,7 +2793,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       return () => {
         clearTimeout(initTimeout);
-        console.log("🔴 CLEANUP CALLED - Cleaning up stage-level handlers");
         handlersAttachedRef.current = false;
         stage.off("mousedown", handleStageMouseDown);
         stage.off("mousemove", handleStageMouseMove);
@@ -2854,7 +2835,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       return () => {
         clearTimeout(initTimeout);
-        console.log("🟣 Cleanup: removing stage handlers");
         handlersAttachedRef.current = false;
         if (ghostLineRafRef.current) {
           cancelAnimationFrame(ghostLineRafRef.current);
@@ -2893,14 +2873,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Click handler with debouncing for single/double-click detection
   const handleClickWithDebouncing = useCallback(
     (e: any, onClickHandler?: (e: any) => void, onDblClickHandler?: (e: any) => void) => {
-      console.log("🖱 handleClickWithDebouncing called, timeout exists:", !!clickTimeoutRef.current);
-
       // Clear any existing timeout
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
         clickTimeoutRef.current = null;
         // This is a double-click, handle it
-        console.log("🖱 Double-click detected, calling onDblClickHandler");
         doubleClickHandledRef.current = true;
         if (onDblClickHandler) {
           onDblClickHandler(e);
@@ -2913,10 +2890,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       }
 
       // Set a timeout for single-click handling
-      console.log("🖱 Single-click detected, setting timeout");
       clickTimeoutRef.current = setTimeout(() => {
         clickTimeoutRef.current = null;
-        console.log("🖱 Single-click timeout fired, calling onClickHandler");
         if (onClickHandler) {
           onClickHandler(e);
         }
@@ -3071,14 +3046,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         disabled
           ? undefined
           : (e) => {
-              console.log("🖱 Group onDblClick called, doubleClickHandled:", doubleClickHandledRef.current);
               // If we've already handled this double-click through debouncing, ignore it
               if (doubleClickHandledRef.current) {
-                console.log("🖱 Ignoring Group onDblClick - already handled through debouncing");
                 return;
               }
               // Otherwise, call the original onDblClick handler
-              console.log("🖱 Calling original onDblClick handler");
               onDblClick?.(e);
             }
       }
@@ -3418,10 +3390,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               updateCurrentPointsRef={updateCurrentPointsRef}
               onPointsChange={(newPoints) => {
                 // Update main path points
-                console.log("📥 VectorTransformer onPointsChange callback:", {
-                  newPointsLength: newPoints.length,
-                  firstPoint: newPoints[0] ? { x: newPoints[0].x, y: newPoints[0].y } : null,
-                });
                 onPointsChange?.(newPoints);
               }}
               onTransformStateChange={(state) => {
@@ -3796,10 +3764,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               updateCurrentPointsRef={updateCurrentPointsRef}
               onPointsChange={(newPoints) => {
                 // Update main path points
-                console.log("📥 VectorTransformer onPointsChange callback (second instance):", {
-                  newPointsLength: newPoints.length,
-                  firstPoint: newPoints[0] ? { x: newPoints[0].x, y: newPoints[0].y } : null,
-                });
                 onPointsChange?.(newPoints);
               }}
               onTransformationComplete={notifyTransformationComplete}

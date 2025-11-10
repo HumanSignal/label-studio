@@ -662,7 +662,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             if (!item.isDrawing) {
               return;
             }
-            
+
             if (item.vectorRef) {
               // Start and immediately commit to insert the point at ghost location
               const startResult = item.vectorRef.startPoint(ghostPoint.x, ghostPoint.y);
@@ -675,7 +675,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             if (e.evt.defaultPrevented) {
               return;
             }
-            
+
             // Handle region selection
             if (item.isReadOnly()) return;
             if (item.parent.getSkipInteractions()) return;

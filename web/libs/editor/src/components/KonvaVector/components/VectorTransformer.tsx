@@ -158,7 +158,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               getCurrentPointsRef,
               updateCurrentPointsRef,
             );
-            
+
             // Update the ref immediately so next transformation tick uses latest points
             if (updateCurrentPointsRef) {
               updateCurrentPointsRef(newPoints);
@@ -397,7 +397,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               getCurrentPointsRef,
               updateCurrentPointsRef,
             );
-            
+
             // Update the ref immediately so next transformation tick uses latest points
             if (updateCurrentPointsRef) {
               updateCurrentPointsRef(newPoints);
@@ -450,7 +450,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             getCurrentPointsRef,
             updateCurrentPointsRef,
           );
-          
+
           // Update the ref immediately so next transformation uses latest points
           if (updateCurrentPointsRef) {
             updateCurrentPointsRef(newPoints);
@@ -512,7 +512,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             getCurrentPointsRef,
             updateCurrentPointsRef,
           );
-          
+
           // Update the ref immediately so next transformation uses latest points
           if (updateCurrentPointsRef) {
             updateCurrentPointsRef(newPoints);

@@ -155,7 +155,7 @@ export function applyTransformationToPoints(
   updateCurrentPointsRef?: (points: BezierPoint[]) => void,
 ): TransformResult {
   const nodes = transformer.nodes();
-  
+
   // Use current points ref if available, otherwise use initialPoints prop
   // This ensures we always use the latest points during transformation
   const currentPoints = getCurrentPointsRef ? getCurrentPointsRef() : initialPoints;
@@ -191,17 +191,6 @@ export function applyTransformationToPoints(
 
       // Use stored original positions if available, otherwise use current positions
       const originalPos = originalPositions?.[pointIndex] || originalPoint;
-
-      // DEBUG: Log the transformation
-      console.log("🔄 applyTransformationToPoints:", {
-        pointIndex,
-        nodeName: node.name(),
-        originalPos: { x: originalPos.x, y: originalPos.y },
-        transformedPos: { x: transformedX, y: transformedY },
-        delta: { x: transformedX - originalPos.x, y: transformedY - originalPos.y },
-        transformerRotation: currentRotation,
-        transformerScale: { x: scaleX, y: scaleY },
-      });
 
       // Update the point position (no individual constraints - group constraints handled by transformer)
       point.x = transformedX;
