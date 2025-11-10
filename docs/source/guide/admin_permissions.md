@@ -29,7 +29,7 @@ Note the following:
 
 Permissions that can be restricted include the following:
 
-| Permission | Roles |
+| Permission | Default Roles |
 |------------|-------------|
 | **Invite members to organization** | Manager+ |
 | **Create API Tokens** | All roles |
