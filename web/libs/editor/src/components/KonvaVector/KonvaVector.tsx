@@ -2000,7 +2000,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         // Only process ghost point logic if within bounds
         if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
           // Handle ghost point when Shift is held (check event directly for real-time updates)
-          // Only show ghost point when region is not disabled
+          // Only show ghost point when region is selected (not disabled)
           if (
             e.evt.shiftKey &&
             imagePos &&
@@ -2533,8 +2533,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Only process ghost point and other logic if within bounds
       if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
         // Handle ghost point when Shift is held (check event directly for real-time updates)
-        // Only show ghost point when region is not disabled
-
+        // Only show ghost point when region is selected (not disabled)
         if (
           e.evt.shiftKey &&
           imagePos &&
