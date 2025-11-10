@@ -25,8 +25,8 @@ import {
   isActivePointEligibleForClosing,
   handlePointDeselection,
   handlePointSelection,
-  handlePointSelectionFromIndex,
 } from "./eventHandlers/pointSelection";
+import { handlePointSelectionFromIndex } from "./eventHandlers/mouseHandlers";
 import { handleShiftClickPointConversion } from "./eventHandlers/drawing";
 import { deletePoint } from "./pointManagement";
 import type { BezierPoint, GhostPoint as GhostPointType, KonvaVectorProps, KonvaVectorRef } from "./types";

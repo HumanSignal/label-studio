@@ -1021,7 +1021,7 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
 }
 
 // Helper function to select a point by index
-function handlePointSelectionFromIndex(
+export function handlePointSelectionFromIndex(
   pointIndex: number,
   props: EventHandlerProps,
   event: KonvaEventObject<MouseEvent>,
