@@ -782,7 +782,7 @@ Enter the agreement score that a task must meet before it can be considered comp
 </td>
 <td>
 
-Enter a maximum number of annotators that can be automatically assigned to the task. If left blank, there is no limit to additional annotators.
+Enter a maximum number of annotators that can be automatically assigned to the task. 
 
 Annotators are assigned one at a time until the agreement threshold is achieved. 
 
