@@ -59,7 +59,13 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
         // Active point should only be rendered as selected if:
         // - It's explicitly selected, OR
         // - (Not disabled AND maxPoints not reached AND not in multi-selection AND it's the active point)
-        const isSelected = isExplicitlySelected || (!disabled && !isMaxPointsReached && !isMultiSelection && activePointId !== null && point.id === activePointId);
+        const isSelected =
+          isExplicitlySelected ||
+          (!disabled &&
+            !isMaxPointsReached &&
+            !isMultiSelection &&
+            activePointId !== null &&
+            point.id === activePointId);
         // Make selected points larger
         const radiusMultiplier = isSelected ? 1.3 : 1;
         const scaledRadius = (baseRadius * radiusMultiplier) / scale;
@@ -67,7 +73,7 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
         return (
           <>
             {/* White outline ring for selected points - rendered outside the colored stroke */}
-            {isSelected && (
+            {!disabled && isSelected && (
               <Circle
                 key={`point-outline-${index}-${point.x}-${point.y}`}
                 x={point.x}
@@ -94,7 +100,7 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
               stroke={pointStroke}
               strokeScaleEnabled={false}
               strokeWidth={pointStrokeWidth}
-              listening={true}
+              listening={!disabled}
               name={`point-${index}`}
               onClick={onPointClick ? (e) => onPointClick(e, index) : undefined}
             />
