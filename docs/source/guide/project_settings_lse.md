@@ -338,7 +338,7 @@ If enabled, a reviewer can only see tasks to which they've been assigned. Otherw
 
 When enabled, a reviewer only sees tasks that have been completed by all required annotators. 
 
-If your project is using auto distribution, then this means a reviewer only sees tasks that have met the **Annotations per task minimum** threshold. 
+If your project is using auto distribution, then this means a reviewer only sees tasks that have met the **Annotations per task** threshold. 
 
 If your project is using manual distribution, then this means a reviewer only sees tasks in which all assigned annotators have submitted an annotation. 
 
@@ -589,7 +589,7 @@ If you want half of the tasks to be annotated by at least 3 people:
 
 If your overlap enforcement is less than 100% (meaning that only some tasks require multiple annotators), then the tasks that *do* require multiple annotations are shown first. <br /><br />If your overlap is 100%, then this setting has no effect.
 
-Note that if enabled, this setting supersedes what you specified under [**Annotations > Task Ordering**](#task-ordering)
+Note that if enabled, this setting supersedes what you specified under [**Annotations > Task Ordering Method**](#task-ordering)
 
 </td>
 </tr>
@@ -662,7 +662,7 @@ Use this option to determine what types of tasks annotators will see first.
 
     Onboarding evaluation disregards the [annotator overlap](#overlap) for ground truth tasks. For example, if you set overlap to `2`, but you have 10 annotators, all 10 will still be able to add annotations to ground truth tasks. 
 
-**Note:** This setting only appears when the project is configured to [automatically distribute tasks](#distribute-tasks). If you are using Manual distribution, annotators will see tasks ordered by ID number. If you would like them to see ground truth tasks first, you should add ground truth annotations in the same order. 
+**Note:** This setting only appears when the project is configured to [automatically assign tasks](#distribute-tasks). If you are using Manual distribution, annotators will see tasks ordered by ID number. If you would like them to see ground truth tasks first, you should add ground truth annotations in the same order. 
 
 </td>
 </tr>
@@ -791,7 +791,7 @@ Annotators are assigned one at a time until the agreement threshold is achieved.
 </table>
 
 !!! note
-    When configuring **Maximum additional annotators**, be mindful of the number of annotators available in your project. If you have fewer annotators available than the sum of [**Annotations per task minimum**](#overlap) + **Maximum additional annotators**, you might encounter a scenario in which a task with a low agreement score cannot be marked complete.
+    When configuring **Maximum additional annotators**, be mindful of the number of annotators available in your project. If you have fewer annotators available than the sum of [**Annotations per task**](#overlap) + **Maximum additional annotators**, you might encounter a scenario in which a task with a low agreement score cannot be marked complete.
 
 </dd>
 
