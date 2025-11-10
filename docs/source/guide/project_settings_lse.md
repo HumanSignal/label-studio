@@ -382,7 +382,10 @@ Tasks are ordered by their numeric ID (ascending). Annotation order within a tas
 </td>
 <td>
 
-Tasks are shown in randomized task order while preserving the stable order of annotations within each task. This mode enables **Task limit (%)** (see below).
+Tasks are shown in randomized task order while preserving the stable order of annotations within each task. This mode enables **Task limit (%)** (see below). 
+
+!!! note
+    If any tasks are selected in the Data Manager or reviewers use Quickview, this limit will not be applied. You can disable the Data Manager for reviewers in the project settings to avoid these situations.
 
 </td>
 </tr>

@@ -52,7 +52,7 @@ Use the carousel to click through the KPI cards which you can drag and drop to k
 
 - **Remaining Tasks**: Sum of tasks left to be completed (for the time period selected) which is dependent on several project settings: quality overlap (consensus) settings, review options for tasks marked as reviewed, and skipped queue settings for annotators. This card also displays the total tasks available in the project (at that point in time) and the percentage of tasks completed for the project for the time period selected.
 
-- **Tasks Pending Review**: Remaining tasks that have not been reviewed for annotations submitted during the time period specified. This card also displays the annotation count for annotations submitted but not yet reviewed.
+- **Tasks Pending Review**: Remaining tasks that have not been reviewed for annotations submitted during the time period specified. This card also displays the annotation count for annotations submitted but not yet reviewed. When the Review Stream uses Random sampling with a configured Task limit (%), this KPI respects the same limit (it won’t exceed the remaining capacity defined by the limit).
 
 - **Lead Time**: The average time in hours it has taken to complete all annotations for the time period selected.
 
