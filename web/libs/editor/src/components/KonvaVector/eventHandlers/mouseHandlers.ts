@@ -944,6 +944,10 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
               props.setLastAddedPointId,
               props.lastAddedPointId,
             );
+            // Stop event propagation to prevent point addition
+            e.evt.stopPropagation();
+            e.evt.preventDefault();
+            e.cancelBubble = true;
             return;
           }
         }

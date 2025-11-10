@@ -34,7 +34,7 @@ export const DEFAULT_FILL_COLOR = "rgba(239, 68, 68, 0.3)";
 // Default point styling
 export const DEFAULT_POINT_FILL = "#ffffff";
 export const DEFAULT_POINT_STROKE = "#3b82f6";
-export const DEFAULT_POINT_STROKE_SELECTED = "#fbbf24";
+export const DEFAULT_POINT_STROKE_SELECTED = "#ffffff";
 export const DEFAULT_POINT_STROKE_WIDTH = 2;
 
 // Default point radius values

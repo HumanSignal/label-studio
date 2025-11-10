@@ -3642,6 +3642,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   lastAddedPointId,
                 );
                 pointSelectionHandled.current = true;
+                // Stop event propagation to prevent point addition
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true;
                 return; // Successfully deleted point
               }
 

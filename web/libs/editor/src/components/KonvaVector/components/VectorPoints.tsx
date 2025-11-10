@@ -33,7 +33,7 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
   pointRadius,
   pointFill = "#ffffff",
   pointStroke = "#3b82f6",
-  pointStrokeSelected = "#fbbf24",
+  pointStrokeSelected = "#ffffff",
   pointStrokeWidth = 2,
   onPointClick,
 }) => {
