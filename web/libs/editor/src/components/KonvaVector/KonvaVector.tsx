@@ -3664,6 +3664,44 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 }
               }
 
+              // Handle cmd/ctrl-click for multi-selection (when not disabled)
+              if (!disabled && (e.evt.ctrlKey || e.evt.metaKey) && !e.evt.altKey && !e.evt.shiftKey) {
+                // Check if this instance can have selection
+                if (!tracker.canInstanceHaveSelection(instanceId)) {
+                  return; // Block the selection
+                }
+
+                // Try deselection first
+                if (
+                  handlePointDeselection(e, {
+                    instanceId,
+                    initialPoints,
+                    transform,
+                    fitScale,
+                    x,
+                    y,
+                    selectedPoints: effectiveSelectedPoints,
+                    setSelectedPoints,
+                    skeletonEnabled,
+                    setActivePointId,
+                    setLastAddedPointId,
+                    lastAddedPointId,
+                    activePointId,
+                  } as any)
+                ) {
+                  pointSelectionHandled.current = true;
+                  return;
+                }
+
+                // If not deselection, add to multi-selection
+                const newSelection = new Set(effectiveSelectedPoints);
+                newSelection.add(pointIndex);
+                tracker.selectPoints(instanceId, newSelection);
+                pointSelectionHandled.current = true;
+                e.evt.stopImmediatePropagation();
+                return;
+              }
+
               // Handle point selection even when disabled (similar to shape clicks)
               if (disabled) {
                 // Check if this instance can have selection
