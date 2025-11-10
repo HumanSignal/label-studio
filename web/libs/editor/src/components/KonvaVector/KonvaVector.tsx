@@ -3224,7 +3224,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               // Use debouncing for click/double-click detection
               // This will call the onClick handler from VectorRegion.jsx which handles shape selection/unselection
               // Only call if we didn't just finish dragging (to allow shape dragging to work)
-              if (!justFinishedShapeDrag.current) {
+              // Don't call if Shift is held (to allow shift-click for ghost point insertion without unselecting)
+              if (!justFinishedShapeDrag.current && !e.evt.shiftKey) {
                 // Stop propagation to prevent the Group onClick handler from also processing the click
                 // This prevents the shape from being selected and then immediately unselected
                 e.evt.stopPropagation();
@@ -3564,7 +3565,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               // Use debouncing for click/double-click detection
               // This will call the onClick handler from VectorRegion.jsx which handles shape selection/unselection
               // Only call if we didn't just finish dragging (to allow shape dragging to work)
-              if (!justFinishedShapeDrag.current) {
+              // Don't call if Shift is held (to allow shift-click for ghost point insertion without unselecting)
+              if (!justFinishedShapeDrag.current && !e.evt.shiftKey) {
                 // Stop propagation to prevent the Group onClick handler from also processing the click
                 // This prevents the shape from being selected and then immediately unselected
                 e.evt.stopPropagation();

@@ -106,13 +106,9 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
       // If we're over a point while holding Shift, allow normal point interactions to continue
     }
 
-    // Skip the rest of mouse down logic if Shift+click was handled (only when internal addition is enabled)
-    if (shiftClickHandled) {
-      return;
-    }
-
     // Check if transformer is active first - this blocks drawing and most point interactions
-    if (props.selectedPoints.size > 1) {
+    // But allow shift-click for ghost point insertion even when transformer is active
+    if (props.selectedPoints.size > 1 && !e.evt.shiftKey) {
       const pos = e.target.getStage()?.getPointerPosition();
       if (pos) {
         const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
