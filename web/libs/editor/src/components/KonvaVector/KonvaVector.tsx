@@ -3300,6 +3300,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             pointStroke={pointStroke}
             pointStrokeSelected={pointStrokeSelected}
             pointStrokeWidth={pointStrokeWidth}
+            activePointId={activePointId}
+            maxPoints={maxPoints}
             onPointClick={(e, pointIndex) => {
               // Handle point selection even when disabled (similar to shape clicks)
               if (disabled) {
@@ -3626,6 +3628,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             pointStroke={pointStroke}
             pointStrokeSelected={pointStrokeSelected}
             pointStrokeWidth={pointStrokeWidth}
+            activePointId={activePointId}
+            maxPoints={maxPoints}
             onPointClick={(e, pointIndex) => {
               // Handle Alt+click point deletion FIRST (before other checks)
               if (e.evt.altKey && !e.evt.shiftKey && !disabled) {
@@ -3731,6 +3735,31 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 ) {
                   return; // Block the selection
                 }
+
+                // For disabled mode, still allow point selection
+                tracker.selectPoints(instanceId, new Set([pointIndex]));
+                pointSelectionHandled.current = true;
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true;
+                return;
+              }
+
+              // Handle regular point selection (when not disabled and not in transform mode)
+              if (!transformMode) {
+                // Check if this instance can have selection
+                if (!tracker.canInstanceHaveSelection(instanceId)) {
+                  return; // Block the selection
+                }
+
+                // Select only this point (single selection for regular click)
+                tracker.selectPoints(instanceId, new Set([pointIndex]));
+                pointSelectionHandled.current = true;
+                // Stop event propagation to prevent shape deselection
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true;
+                return;
               }
 
               // Mark that point selection was handled

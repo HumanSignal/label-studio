@@ -19,6 +19,8 @@ interface VectorPointsProps {
   pointStroke?: string;
   pointStrokeSelected?: string;
   pointStrokeWidth?: number;
+  activePointId?: string | null;
+  maxPoints?: number;
   onPointClick?: (e: Konva.KonvaEventObject<MouseEvent>, pointIndex: number) => void;
 }
 
@@ -35,6 +37,8 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
   pointStroke = "#3b82f6",
   pointStrokeSelected = "#ffffff",
   pointStrokeWidth = 2,
+  activePointId = null,
+  maxPoints,
   onPointClick,
 }) => {
   return (
@@ -46,26 +50,55 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
         const enabledRadius = pointRadius?.enabled ?? 6;
         const disabledRadius = pointRadius?.disabled ?? 4;
         const baseRadius = disabled ? disabledRadius : enabledRadius;
-        const scaledRadius = baseRadius / scale;
-        const isSelected = selectedPointIndex === index || selectedPoints.has(index);
+        // Check if maxPoints is reached
+        const isMaxPointsReached = maxPoints !== undefined && initialPoints.length >= maxPoints;
+        // Check if multiple points are selected
+        const isMultiSelection = selectedPoints.size > 1;
+        // Point is explicitly selected if it's in selectedPoints or is the selectedPointIndex
+        const isExplicitlySelected = selectedPointIndex === index || selectedPoints.has(index);
+        // Active point should only be rendered as selected if:
+        // - It's explicitly selected, OR
+        // - (Not disabled AND maxPoints not reached AND not in multi-selection AND it's the active point)
+        const isSelected = isExplicitlySelected || (!disabled && !isMaxPointsReached && !isMultiSelection && activePointId !== null && point.id === activePointId);
+        // Make selected points larger
+        const radiusMultiplier = isSelected ? 1.3 : 1;
+        const scaledRadius = (baseRadius * radiusMultiplier) / scale;
 
         return (
-          <Circle
-            key={`point-${index}-${point.x}-${point.y}`}
-            ref={(node) => {
-              pointRefs.current[index] = node;
-            }}
-            x={point.x}
-            y={point.y}
-            radius={scaledRadius}
-            fill={pointFill}
-            stroke={isSelected ? pointStrokeSelected : pointStroke}
-            strokeScaleEnabled={false}
-            strokeWidth={pointStrokeWidth}
-            listening={true}
-            name={`point-${index}`}
-            onClick={onPointClick ? (e) => onPointClick(e, index) : undefined}
-          />
+          <>
+            {/* White outline ring for selected points - rendered outside the colored stroke */}
+            {isSelected && (
+              <Circle
+                key={`point-outline-${index}-${point.x}-${point.y}`}
+                x={point.x}
+                y={point.y}
+                radius={scaledRadius + pointStrokeWidth / scale}
+                fill="transparent"
+                stroke={pointStrokeSelected}
+                strokeScaleEnabled={false}
+                strokeWidth={pointStrokeWidth / scale}
+                listening={false}
+                name={`point-outline-${index}`}
+              />
+            )}
+            {/* Main point circle with colored stroke */}
+            <Circle
+              key={`point-${index}-${point.x}-${point.y}`}
+              ref={(node) => {
+                pointRefs.current[index] = node;
+              }}
+              x={point.x}
+              y={point.y}
+              radius={scaledRadius}
+              fill={pointFill}
+              stroke={pointStroke}
+              strokeScaleEnabled={false}
+              strokeWidth={pointStrokeWidth}
+              listening={true}
+              name={`point-${index}`}
+              onClick={onPointClick ? (e) => onPointClick(e, index) : undefined}
+            />
+          </>
         );
       })}
     </>
