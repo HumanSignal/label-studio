@@ -1,0 +1,59 @@
+title: Fine-Tune an Agent without an LLM
+type: enterprise
+group: Chat
+order: 3
+image: /static/templates/chat-eval.png
+details: |
+  <h1>Simulate multi-turn chats by playing both user and assistant</h1>
+  <dl>
+    <dt>Industry Applications</dt>
+    <dd>LLM fine-tuning, agent training, human-written dialogue collection, tone and persona development, chatbot improvement, conversational AI training, brand voice development, dialogue simulation, interaction pattern learning</dd>
+    <dt>Associated Models</dt>
+    <dd>LLM fine-tuning, conversational agents, dialogue models, persona-based systems</dd>
+    <dt>Domain Terminology</dt>
+    <dd>multi-turn conversations, human-written dialogs, tone and style, persona development, dialogue simulation, agent voice, brand alignment</dd>
+  </dl>
+config: |
+  <View>
+    <Style>
+      .lsf-richtext__container.lsf-htx-richtext {
+        font-size: 16px !important;
+        line-height: 1.6;
+        padding-top: var(--spacing-tight);
+        padding-bottom: var(--spacing-tight);
+        background-color: var(--color-accent-canteloupe-subtlest);
+        color: var(--color-accent-canteloupe-bold);
+        border-radius: var(--corner-radius-medium);
+        padding: var(--spacing-tight);
+        margin-bottom: var(--spacing-base);
+        border: 1px solid var(--color-accent-canteloupe-subtle);
+    }
+      <!-- Remove excess height from the chat to allow space for instruction text -->
+      .htx-chat { 
+        --excess-height: 275px;
+      
+        background-color: var(--color-neutral-background);
+        border-radius: var(--corner-radius-medium);
+        border: 1px solid var(--color-neutral-border);
+        padding-bottom: var(--spacing-tight);
+      }
+
+    </Style>
+    
+    <Text name="instructions" value="$text" />
+    
+    <Chat name="chat" value="$chat" toName="chat"
+          minMessages="4" 
+          messageroles="user,assistant"
+          editable="true" />
+  </View>
+
+  <!-- {
+    "data": {
+      "text": "Simulate a conversation between a curious customer ('user') and a helpful agent ('assistant'). Experiment with tone and personality—make the agent sound human, natural, and aligned with our brand voice. Try out different quirks (humor, warmth, brevity) while avoiding overly 'AI-ish' habits like excessive emojis, filler words, or generic phrases.",
+      "chat": []
+    }
+  } -->
+
+
+

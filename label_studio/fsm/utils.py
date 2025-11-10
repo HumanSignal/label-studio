@@ -16,7 +16,6 @@ from typing import Optional, Tuple
 
 import uuid_utils
 from core.current_request import CurrentContext
-from core.feature_flags import flag_set
 
 logger = logging.getLogger(__name__)
 
@@ -257,22 +256,24 @@ def is_fsm_enabled(user=None) -> bool:
     """
     Check if FSM is enabled via feature flags and thread-local override.
 
+    PERFORMANCE: This function now checks the cached FSM state that was set
+    when the user was first initialized in CurrentContext. This avoids repeated
+    feature flag lookups throughout the request.
+
     The check order is:
     1. Check thread-local override (for test cleanup, bulk operations)
-    2. Check feature flag
+    2. Check cached feature flag state (set once per request)
+    3. Fallback to direct feature flag check (for edge cases without context)
 
     Args:
-        user: User for feature flag evaluation (optional)
+        user: User for feature flag evaluation (optional, used as fallback only)
 
     Returns:
         True if FSM should be active
     """
-    # Check thread-local override first
-    if CurrentContext.is_fsm_disabled():
-        return False
-
-    # Then check feature flag
-    return flag_set('fflag_feat_fit_568_finite_state_management', user=user)
+    # Fast path: Check cached state from CurrentContext
+    # This is set once per request when user is initialized
+    return CurrentContext.is_fsm_enabled()
 
 
 def get_current_state_safe(entity, user=None) -> Optional[str]:

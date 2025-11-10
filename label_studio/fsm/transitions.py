@@ -39,7 +39,9 @@ class TransitionContext(BaseModel, Generic[EntityType, StateModelType]):
     current_user: Optional[Any] = Field(None, description='User triggering the transition')
     current_state_object: Optional[Any] = Field(None, description='Full current state object')
     current_state: Optional[str] = Field(None, description='Current state as string')
-    target_state: str = Field(..., description='Target state for this transition')
+    target_state: Optional[str] = Field(
+        None, description='Target state for this transition (None for side-effect only transitions)'
+    )
 
     # Timing and metadata
     timestamp: datetime = Field(default_factory=datetime.now, description='When transition was initiated')
@@ -118,12 +120,13 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
 
     @property
     @abstractmethod
-    def target_state(self) -> str:
+    def target_state(self) -> Optional[str]:
         """
         The target state this transition leads to.
 
         Returns:
-            String representation of the target state
+            String representation of the target state, or None for side-effect only transitions
+            that don't create state records (e.g., audit-only or notification-only transitions)
         """
         pass
 

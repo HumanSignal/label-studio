@@ -1,0 +1,123 @@
+title: Chatbot Evaluation
+type: enterprise
+group: Chat
+order: 1
+image: /static/templates/chat-evaluate-agent.png
+details: |
+  <h1>Assess whether your chatbot is ready for production</h1>
+  <dl>
+    <dt>Industry Applications</dt>
+    <dd>chatbot quality assurance, conversational AI evaluation, customer service AI, virtual assistant evaluation, LLM evaluation, production readiness assessment, response quality validation, customer support automation, enterprise chatbots, AI safety assessment, RLHF data collection</dd>
+    <dt>Associated Models</dt>
+    <dd>human evaluation, conversational AI assessment, quality metrics, response grading, safety evaluation</dd>
+    <dt>Domain Terminology</dt>
+    <dd>gen AI, conversation evaluation, chatbot grading, response accuracy, answer quality, documentation coverage, tone analysis</dd>
+  </dl>
+config: |
+  <View>
+    <Style>
+      .chat {
+        border: 1px solid var(--color-neutral-border);
+        padding: var(--spacing-tight);
+        border-radius: var(--corner-radius-medium);
+        background-color: var(--color-neutral-background);
+      }
+      .evaluation {
+          border: 2px solid var(--color-accent-blueberry-base);
+          background: var(--color-accent-blueberry-subtlest);
+          color: var(--color-accent-blueberry-bold);
+          padding: var(--spacing-tight);
+          border-radius: var(--corner-radius-medium);
+          margin-bottom: var(--spacing-base);
+      }
+      /* Choice text */
+      .evaluation span {
+          color: var(--color-accent-blueberry-bold);
+          line-height: 1.1;
+      }
+      /* Star rating */
+      .evaluation .ant-rate-star.ant-rate-star-full span {
+        color: var(--color-accent-blueberry-base);
+      }
+      
+      .instructions {
+          color: var(--color-accent-blueberry-bold);
+          background-color: var(--color-accent-blueberry-subtlest);
+          padding: var(--spacing-tight);
+          border-radius: var(--corner-radius-medium);
+          border: 1px solid var(--color-accent-blueberry-subtle);
+      }
+      /* Allow enlarging the instruction text */
+      .lsf-richtext__container.lsf-htx-richtext {
+        font-size: 16px !important;
+        line-height: 1.3;
+      }
+      
+      /* Remove excess height from the chat to allow space for instruction text */
+      .htx-chat { 
+        --excess-height: 275px;
+      }
+    </Style>
+    <View style="display: flex; gap: var(--spacing-base);">
+      
+      <!-- Left: conversation -->
+      <View className="chat" style="flex: 2;">
+        <View className="instructions">
+          <Text name="instructions" value="Review the conversation in detail. As you read through it, click on individual assistant messages to provide feedback about accuracy, clarity, and intent." />
+        </View>
+        
+        <Chat name="chat" value="$chat" 
+              minMessages="2"
+              maxMessages="$max"
+              editable="false" />
+      </View>
+      
+      <!-- Right: evaluation controls -->
+      <View style="flex: 1; overflow: auto;">
+      
+          <!-- Per message evaluation -->
+          <View visibleWhen="region-selected" whenRole="assistant" className="evaluation">
+            <Header value="Response Accuracy"/>
+            <Rating name="accuracy" toName="chat" perRegion="true" maxRating="5" icon="star"/>
+            
+            <Header value="Documentation Provided"/>
+            <Choices name="documentation" toName="chat" perRegion="true" >
+              <Choice value="Comprehensive documentation provided" />
+              <Choice value="Provided some documentation, missing some" />
+              <Choice value="Missing critical documentation, provided incorrect or irrelevant documentation" />
+            </Choices>
+            
+            <Header value="Answered question"/>
+            <Choices name="questions_answered" toName="chat" perRegion="true" >
+              <Choice value="Yes" />
+              <Choice value="No" />
+              <Choice value="Partial" />
+            </Choices>
+            
+            <Header value="Tone/Style"/>
+            <Choices name="style" toName="chat" perRegion="true" choice="multiple" >
+              <Choice value="Too verbose" />
+              <Choice value="Too friendly" />
+              <Choice value="Too technical" />
+            </Choices>
+            
+        </View>
+      </View>
+    </View>
+  </View>
+
+  <!-- { "data": {
+    "instructions": "Review the conversation in detail. As you read through it, click on individual messages to provide feedback about accuracy, clarity, and intent.",
+    "chat": [
+      {
+        "role": "user",
+        "content": "I'm onboarding a new annotator. What are the first steps to ensure quality and speed?"
+      },
+      {
+        "role": "assistant",
+        "content": "Start by creating their account and assigning the Annotator role so permissions are scoped correctly. Add concise labeling instructions that appear before labeling. Use a small ground-truth set and require overlap (e.g., 2 annotators per task) with a reviewer to resolve disagreements. Enable comments so reviewers can leave precise, in-task feedback."
+      }
+    ],
+    "max": 10
+  }} -->
+

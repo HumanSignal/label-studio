@@ -7,7 +7,7 @@ patterns to serve as both tests and documentation.
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from unittest.mock import Mock, patch
 
 import pytest
@@ -820,3 +820,39 @@ def test_pydantic_validation():
     # Invalid data should raise validation error
     with pytest.raises(ValidationError):  # Pydantic validation error
         SampleTransition()  # Missing required field
+
+
+def test_side_effect_only_transition():
+    """Test side-effect only transitions (target_state=None)"""
+
+    class SideEffectTransition(BaseTransition):
+        action_performed: str = 'notification_sent'
+
+        @property
+        def target_state(self) -> Optional[str]:
+            # Return None to indicate no state change, only side effects
+            return None
+
+        def transition(self, context: TransitionContext) -> dict:
+            # Perform side effect (e.g., send notification, log event)
+            return {'action': self.action_performed}
+
+        def post_transition_hook(self, context: TransitionContext, state_record) -> None:
+            # State record should be None for side-effect only transitions
+            assert state_record is None
+
+    # Test instantiation
+    transition = SideEffectTransition(action_performed='email_sent')
+    assert transition.target_state is None
+
+    # Test context creation with None target_state
+    mock_entity = type('MockEntity', (), {'pk': 1, '_meta': type('Meta', (), {'model_name': 'test'})})()
+    context = TransitionContext(
+        entity=mock_entity,
+        target_state=None,  # Should be allowed for side-effect only transitions
+    )
+    assert context.target_state is None
+
+    # Test transition execution
+    result = transition.transition(context)
+    assert result['action'] == 'email_sent'

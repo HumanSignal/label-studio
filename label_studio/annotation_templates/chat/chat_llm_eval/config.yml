@@ -1,0 +1,99 @@
+title: Fine-Tune an Agent with an LLM
+type: enterprise
+group: Chat
+order: 2
+image: /static/templates/chat-llm-eval.png
+details: |
+  <h1>Run live, interactive chats with any OpenAI-compatible LLM</h1>
+  <dl>
+    <dt>Industry Applications</dt>
+    <dd>LLM fine-tuning, agent training, conversation collection, chatbot improvement, task specialization, context handling, behavior evaluation, real-world scenario testing, RLHF data collection, conversational AI development</dd>
+    <dt>Associated Models</dt>
+    <dd>OpenAI GPT models, fine-tuned LLMs, conversational agents, multi-turn dialogue systems</dd>
+    <dt>Domain Terminology</dt>
+    <dd>multi-turn conversations, LLM fine-tuning, agent specialization, context shifts, conversation-level evaluation, realistic dialogue</dd>
+  </dl>
+config: |
+  <View>
+  <Style>
+      .chat {
+        border: 1px solid var(--color-neutral-border);
+        padding: var(--spacing-tight);
+        border-radius: var(--corner-radius-medium);
+        background-color: var(--color-neutral-background);
+      }
+
+      <!-- Styling for evaluation panel on the right-->
+      .evaluation {
+          border: 2px solid var(--color-accent-plum-base);
+          background-color: var(--color-accent-plum-subtlest);
+          color: var(--color-accent-plum-bold);
+          padding: var(--spacing-tight);
+          border-radius: var(--corner-radius-medium);
+          margin-bottom: var(--spacing-base);
+      }
+
+      <!-- Styling for the instructions above the chat interface-->
+      .instructions {
+        color: var(--color-accent-plum-bold);
+        background-color: var(--color-accent-plum-subtlest);
+        padding: var(--spacing-tight);
+        border: 1px solid var(--color-accent-plum-subtle);
+        border-radius: var(--corner-radius-medium);
+      }
+      
+      <!-- Allow enlarging the instruction text to better differentiate it-->
+      .lsf-richtext__container.lsf-htx-richtext {
+        font-size: 16px !important;
+        line-height: 1.6;
+      }
+      <!-- Remove excess height from the chat to allow space for instruction text -->
+      .htx-chat { 
+        --excess-height: 300px 
+      }
+    </Style>
+    <View style="display: flex; gap: var(--spacing-wide);">
+      
+      <!-- Left: chat and instructions -->
+      <View className="chat" style="flex: 2;">
+        
+        <View className="instructions">
+          <Text name="instructions" value="$text" />
+        </View>
+              
+        <Chat name="chat" value="$chat" 
+              llm="openai/gpt-4.1-nano" 
+              minMessages="4" 
+              editable="true" />
+      </View>
+
+      <!-- Right: conversation-level evaluation -->
+      <View style="flex: 1;" className="evaluation">
+        <Header value="Chat evaluation" size="2"/>
+
+        <Header value="Did the agent answer the user's question(s)?"/>
+        <Choices name="answered_rating" toName="chat" choice="single" showInline="true" required="true">
+          <Choice value="5 - Yes - all of them were answered"/>
+          <Choice value="4 - Mostly yes - most of them were answered"/>
+          <Choice value="3 - Mixed - some yes, some no"/>
+          <Choice value="2 - Mostly no - very few were answered"/>
+          <Choice value="1 - No - none of them were answered"/>
+        </Choices>
+
+        <Header value="What types of questions were asked?"/>
+        <Choices name="topics" toName="chat" choice="multiple" showInline="true">
+          <Choice value="Project Setup"/>
+          <Choice value="Billing"/>
+          <Choice value="Request Live Support"/>
+          <Choice value="Labeling Config"/>
+          <Choice value="Integrations/SDK"/>
+          <Choice value="Bug/Issue"/>
+          <Choice value="Other"/>
+        </Choices>
+
+        <Header value="Comments (optional)"/>
+        <TextArea name="comments" toName="chat" rows="4" placeholder="Add any notes or edge cases..."/>
+      </View>
+    </View>
+  </View>
+
