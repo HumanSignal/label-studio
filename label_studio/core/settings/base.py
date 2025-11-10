@@ -926,5 +926,8 @@ SSO_AUTO_CREATE_USERS = True  # Auto-create users from API requests
 
 SESSION_COOKIE_NAME = "ls_sessionid"
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_AGE = 12 * 60 * 60  # seconds till cookie expiry, set to 12 hrs
+
 # CSRF_COOKIE_PATH = '/'  # Default is '/', do not change to '/label-studio'
 # SESSION_COOKIE_PATH = '/'  # Default is '/', do not change to '/label-studio'
