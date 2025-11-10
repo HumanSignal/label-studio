@@ -38,6 +38,7 @@ from django.utils.timesince import timesince
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from fsm.models import FsmHistoryStateModel
+from fsm.queryset_mixins import FSMStateQuerySetMixin
 from label_studio_sdk.label_interface.objects import PredictionValue
 from rest_framework.exceptions import ValidationError
 from tasks.choices import ActionType
@@ -565,9 +566,40 @@ pre_bulk_create = Signal()   # providing args 'objs' and 'batch_size'
 post_bulk_create = Signal()   # providing args 'objs' and 'batch_size'
 
 
+class AnnotationQuerySet(models.QuerySet):
+    pass
+
+
+class AnnotationQuerySetWithFSM(FSMStateQuerySetMixin, AnnotationQuerySet):
+    """
+    Custom QuerySet for Annotation model with FSM state annotation support.
+    """
+
+    pass
+
+
 class AnnotationManager(models.Manager):
+    """
+    Manager for Annotation model with FSM state support.
+
+    Provides:
+    - User-scoped filtering
+    - Bulk creation with signals
+    - FSM state annotation support
+    """
+
+    def get_queryset(self):
+        """Return AnnotationQuerySet with FSM state annotation support"""
+        # Create a dynamic class that mixes FSM support into the queryset
+
+        return AnnotationQuerySetWithFSM(self.model, using=self._db)
+
     def for_user(self, user):
-        return self.filter(project__organization=user.active_organization)
+        return self.get_queryset().filter(project__organization=user.active_organization)
+
+    def with_state(self):
+        """Return queryset with FSM state annotated."""
+        return self.get_queryset().annotate_fsm_state()
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -575,12 +607,6 @@ class AnnotationManager(models.Manager):
         post_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
         return res
 
-
-GET_UNIQUE_IDS = """
-with tt as (
-    select jsonb_array_elements(tch.result) as item from task_completion_history tch
-    where task=%(t_id)s and task_annotation=%(tc_id)s
-) select count( distinct tt.item -> 'id') from tt"""
 
 AnnotationMixin = load_func(settings.ANNOTATION_MIXIN)
 
@@ -814,7 +840,30 @@ class Annotation(AnnotationMixin, FsmHistoryStateModel):
         self.decrease_project_summary_counters()
 
 
+class TaskLockQuerySet(models.QuerySet):
+    """Custom QuerySet for TaskLock model"""
+
+    pass
+
+
+class TaskLockManager(models.Manager):
+    """Manager for TaskLock with FSM state support"""
+
+    def get_queryset(self):
+        """Return QuerySet with FSM state annotation support"""
+        # Create a dynamic class that mixes FSM support into the queryset
+        class TaskLockQuerySetWithFSM(FSMStateQuerySetMixin, TaskLockQuerySet):
+            pass
+
+        return TaskLockQuerySetWithFSM(self.model, using=self._db)
+
+    def with_state(self):
+        """Return queryset with FSM state annotated."""
+        return self.get_queryset().annotate_fsm_state()
+
+
 class TaskLock(FsmHistoryStateModel):
+    objects = TaskLockManager()
     task = models.ForeignKey(
         'tasks.Task',
         on_delete=models.CASCADE,
@@ -832,7 +881,30 @@ class TaskLock(FsmHistoryStateModel):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time', null=True)
 
 
+class AnnotationDraftQuerySet(models.QuerySet):
+    """Custom QuerySet for AnnotationDraft model"""
+
+    pass
+
+
+class AnnotationDraftManager(models.Manager):
+    """Manager for AnnotationDraft with FSM state support"""
+
+    def get_queryset(self):
+        """Return QuerySet with FSM state annotation support"""
+        # Create a dynamic class that mixes FSM support into the queryset
+        class AnnotationDraftQuerySetWithFSM(FSMStateQuerySetMixin, AnnotationDraftQuerySet):
+            pass
+
+        return AnnotationDraftQuerySetWithFSM(self.model, using=self._db)
+
+    def with_state(self):
+        """Return queryset with FSM state annotated."""
+        return self.get_queryset().annotate_fsm_state()
+
+
 class AnnotationDraft(FsmHistoryStateModel):
+    objects = AnnotationDraftManager()
     result = JSONField(_('result'), help_text='Draft result in JSON format')
     lead_time = models.FloatField(
         _('lead time'),
