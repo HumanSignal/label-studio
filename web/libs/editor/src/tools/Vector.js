@@ -75,11 +75,11 @@ const _Tool = types
         if (self.currentArea) {
           return self.getActiveVector;
         }
-        
+
         // If currentArea is null, try to find an active drawing vector region
         // This handles the case when continuing to draw an existing region
         const obj = self.obj;
-        
+
         // Try obj.regs first
         let regionsToSearch = [];
         if (obj?.regs && obj.regs.length > 0) {
@@ -87,41 +87,35 @@ const _Tool = types
         } else if (self.annotation?.regions && self.annotation.regions.length > 0) {
           regionsToSearch = Array.from(self.annotation.regions);
         }
-        
+
         if (regionsToSearch.length > 0) {
           // Priority 1: Check for highlighted/selected vector region that's not closed
           const highlighted = self.annotation?.regionStore?.selection?.highlighted;
-          if (highlighted && 
-              highlighted.type === "vectorregion" && 
-              !highlighted.closed && 
-              isAlive(highlighted)) {
+          if (highlighted && highlighted.type === "vectorregion" && !highlighted.closed && isAlive(highlighted)) {
             return highlighted;
           }
-          
+
           // Priority 2: Check selected regions - if only one vector region is selected and not closed
           const selectedRegions = self.annotation?.selectedRegions || [];
           const selectedVectorRegions = selectedRegions.filter(
-            (reg) => reg.type === "vectorregion" && !reg.closed && isAlive(reg)
+            (reg) => reg.type === "vectorregion" && !reg.closed && isAlive(reg),
           );
           if (selectedVectorRegions.length === 1) {
             return selectedVectorRegions[0];
           }
-          
+
           // Priority 3: Try to find a region that's actively drawing
           // Only allow continuing to draw if the region is actively being drawn (isDrawing: true)
           // This prevents drawing on unselected regions that are just not closed
           const activeDrawingVector = regionsToSearch.find(
-            (reg) => reg.type === "vectorregion" &&
-              reg.isDrawing &&
-              !reg.closed &&
-              isAlive(reg)
+            (reg) => reg.type === "vectorregion" && reg.isDrawing && !reg.closed && isAlive(reg),
           );
-          
+
           if (activeDrawingVector) {
             return activeDrawingVector;
           }
         }
-        
+
         return self.getActiveVector;
       },
 
@@ -139,7 +133,7 @@ const _Tool = types
   .actions((self) => {
     // Store the MultipleClicksDrawingTool's canStartDrawing before we override it
     const MultipleClicksCanStartDrawing = self.canStartDrawing;
-    
+
     const Super = {
       startDrawing: self.startDrawing,
       _finishDrawing: self._finishDrawing,
@@ -162,7 +156,7 @@ const _Tool = types
         // For Vector tool, allow shift-key events to pass through
         // This enables shift-click for inserting points on segments
         if (ev.button > 0) return; // Still filter right clicks and middle clicks
-        
+
         let fn = `${name}Ev`;
 
         if (typeof self[fn] !== "undefined") self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
@@ -183,14 +177,14 @@ const _Tool = types
         // This is Vector-specific behavior - other tools should use the default behavior from MultipleClicksDrawingTool
         // First call the MultipleClicksDrawingTool's canStartDrawing (which includes selection check)
         const mixinResult = MultipleClicksCanStartDrawing();
-        
+
         // If mixin allows drawing, we're good
         if (mixinResult) return true;
-        
+
         // Otherwise, check if we have a current drawing region that should allow continuing
         const currentRegion = self.current();
         const hasCurrentDrawing = currentRegion && (currentRegion.isDrawing || !currentRegion.closed);
-        
+
         // Allow continuing to draw if there's a current drawing region, even with selection
         if (hasCurrentDrawing) {
           // Still need to check base conditions
@@ -202,7 +196,7 @@ const _Tool = types
             !self.annotation.isDrawing
           );
         }
-        
+
         return false;
       },
       handleToolSwitch(tool) {
@@ -253,17 +247,13 @@ const _Tool = types
 
         // Try to find existing drawing region first
         let area = self.getCurrentArea();
-        
+
         // If no currentArea but there's an active drawing region, use it
         if (!area) {
           const obj = self.obj;
           if (obj && obj.regs) {
             const activeDrawingVector = obj.regs.find(
-              (reg) =>
-                reg.type === "vectorregion" &&
-                reg.isDrawing &&
-                !reg.closed &&
-                isAlive(reg)
+              (reg) => reg.type === "vectorregion" && reg.isDrawing && !reg.closed && isAlive(reg),
             );
             if (activeDrawingVector) {
               area = activeDrawingVector;
@@ -271,9 +261,9 @@ const _Tool = types
             }
           }
         }
-        
+
         const currentArea = area && isAlive(area) ? area : null;
-        
+
         // Only create new region if we don't have an existing one
         if (!currentArea) {
           self.currentArea = self.createRegion(self.createRegionOptions(), true);
@@ -342,6 +332,8 @@ const _Tool = types
       _finishDrawing() {
         const { currentArea, control } = self;
 
+        if (currentArea === null) return;
+
         down = false;
         self.currentArea?.notifyDrawingFinished();
         self.setDrawing(false);
@@ -371,20 +363,16 @@ const _Tool = types
       addPoint(x, y) {
         // Convert from percentage (0-100) to real coordinates using the same formula as startDrawing
         const { x: rx, y: ry } = self.realCoordsFromCursor(x, y);
-        
+
         // Try to find the area - first check getCurrentArea, then look in annotation store
         let area = self.getCurrentArea();
-        
+
         // If no currentArea but there's an active drawing region, use it
         if (!area) {
           const obj = self.obj;
           if (obj && obj.regs) {
             const activeDrawingVector = obj.regs.find(
-              (reg) =>
-                reg.type === "vectorregion" &&
-                reg.isDrawing &&
-                !reg.closed &&
-                isAlive(reg)
+              (reg) => reg.type === "vectorregion" && reg.isDrawing && !reg.closed && isAlive(reg),
             );
             if (activeDrawingVector) {
               area = activeDrawingVector;
@@ -392,7 +380,7 @@ const _Tool = types
             }
           }
         }
-        
+
         if (area) {
           area.addPoint(rx, ry);
         }

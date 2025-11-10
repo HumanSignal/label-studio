@@ -102,7 +102,19 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
               strokeWidth={pointStrokeWidth}
               listening={!disabled}
               name={`point-${index}`}
-              onClick={onPointClick ? (e) => onPointClick(e, index) : undefined}
+              onClick={
+                onPointClick
+                  ? (e) => {
+                      // Stop propagation immediately to prevent the event from bubbling to VectorShape onClick
+                      // This prevents the shape from being selected/unselected when clicking on points
+                      e.evt.stopImmediatePropagation();
+                      e.evt.stopPropagation();
+                      e.evt.preventDefault();
+                      e.cancelBubble = true;
+                      onPointClick(e, index);
+                    }
+                  : undefined
+              }
             />
           </>
         );

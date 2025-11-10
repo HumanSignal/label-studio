@@ -2983,7 +2983,20 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         // This is a double-click, handle it
         doubleClickHandledRef.current = true;
         if (onDblClickHandler) {
-          onDblClickHandler(e);
+          // Create a new event object to avoid defaultPrevented issues
+          // Preserve all event methods by copying the original evt object and only resetting defaultPrevented
+          const newEvent = {
+            ...e,
+            evt: {
+              ...e.evt,
+              defaultPrevented: false,
+              // Preserve all methods from the original event
+              stopImmediatePropagation: e.evt.stopImmediatePropagation?.bind(e.evt) || (() => {}),
+              stopPropagation: e.evt.stopPropagation?.bind(e.evt) || (() => {}),
+              preventDefault: e.evt.preventDefault?.bind(e.evt) || (() => {}),
+            },
+          };
+          onDblClickHandler(newEvent);
         }
         // Reset the flag after a short delay
         setTimeout(() => {
@@ -2996,7 +3009,22 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       clickTimeoutRef.current = setTimeout(() => {
         clickTimeoutRef.current = null;
         if (onClickHandler) {
-          onClickHandler(e);
+          // Create a new event object to avoid defaultPrevented issues
+          // This ensures the onClick handler in VectorRegion.jsx can fire even if
+          // the event was prevented elsewhere (e.g., by onFinish handler)
+          // Preserve all event methods by copying the original evt object and only resetting defaultPrevented
+          const newEvent = {
+            ...e,
+            evt: {
+              ...e.evt,
+              defaultPrevented: false,
+              // Preserve all methods from the original event
+              stopImmediatePropagation: e.evt.stopImmediatePropagation?.bind(e.evt) || (() => {}),
+              stopPropagation: e.evt.stopPropagation?.bind(e.evt) || (() => {}),
+              preventDefault: e.evt.preventDefault?.bind(e.evt) || (() => {}),
+            },
+          };
+          onClickHandler(newEvent);
         }
       }, 300);
     },
@@ -3101,6 +3129,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               // Skip if point selection was already handled by VectorPoints onClick
               if (pointSelectionHandled.current) {
                 pointSelectionHandled.current = false;
+                // Don't prevent propagation - let the event bubble to VectorShape onClick
                 return;
               }
 
@@ -3142,7 +3171,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
 
               // For subsequent points, use the normal event handler
+              // But don't prevent propagation - let the event bubble to VectorShape onClick
+              // so that shape selection/unselection can work when clicking on segments
               eventHandlers.handleLayerClick(e);
+              // Don't call preventDefault or stopPropagation here - let the event bubble
             }
       }
       onDblClick={
@@ -3238,7 +3270,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
 
               // Use debouncing for click/double-click detection
-              handleClickWithDebouncing(e, onClick, onDblClick);
+              // This will call the onClick handler from VectorRegion.jsx which handles shape selection/unselection
+              // Only call if we didn't just finish dragging (to allow shape dragging to work)
+              if (!justFinishedShapeDrag.current) {
+                // Stop propagation to prevent the Group onClick handler from also processing the click
+                // This prevents the shape from being selected and then immediately unselected
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true;
+                handleClickWithDebouncing(e, onClick, onDblClick);
+              }
             }}
             onMouseDown={(e) => {
               // Don't start shape drag if in multi-region selection mode
@@ -3422,21 +3463,24 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 }
 
                 // Check if this is the last added point and already selected (second click)
-                const isLastAddedPoint = lastAddedPointId && initialPoints[pointIndex]?.id === lastAddedPointId;
-                const isAlreadySelected = effectiveSelectedPoints.has(pointIndex);
+                // Only check if the shape is NOT disabled - disabled shapes should not trigger onFinish
+                if (!disabled) {
+                  const isLastAddedPoint = lastAddedPointId && initialPoints[pointIndex]?.id === lastAddedPointId;
+                  const isAlreadySelected = effectiveSelectedPoints.has(pointIndex);
 
-                // Only fire onFinish if this is the last added point AND it was already selected (second click)
-                // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-                if (isLastAddedPoint && isAlreadySelected && !disabled) {
-                  const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
-                  if (!hasModifiers) {
-                    onFinish?.(e);
-                    pointSelectionHandled.current = true; // Mark that we handled selection
-                    e.evt.stopImmediatePropagation(); // Prevent all other handlers from running
+                  // Only fire onFinish if this is the last added point AND it was already selected (second click)
+                  // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
+                  if (isLastAddedPoint && isAlreadySelected) {
+                    const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
+                    if (!hasModifiers) {
+                      onFinish?.(e);
+                      pointSelectionHandled.current = true; // Mark that we handled selection
+                      e.evt.stopImmediatePropagation(); // Prevent all other handlers from running
+                      return;
+                    }
+                    // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
                     return;
                   }
-                  // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
-                  return;
                 }
 
                 // Handle regular point selection (only when not in transform mode)
@@ -3452,12 +3496,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   }
                 }
 
-                // Call the original onClick handler if provided
-                onClick?.(e);
+                // Don't call onClick here - clicking on points should NOT select/unselect the shape
+                // Only clicking on segments should select/unselect the shape
 
                 // Mark that we handled selection and prevent all other handlers from running
+                // This prevents the VectorShape onClick handler from firing, which would call onFinish
                 pointSelectionHandled.current = true;
                 e.evt.stopImmediatePropagation();
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true;
                 return;
               }
 
@@ -3562,7 +3610,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
 
               // Use debouncing for click/double-click detection
-              handleClickWithDebouncing(e, onClick, onDblClick);
+              // This will call the onClick handler from VectorRegion.jsx which handles shape selection/unselection
+              // Only call if we didn't just finish dragging (to allow shape dragging to work)
+              if (!justFinishedShapeDrag.current) {
+                // Stop propagation to prevent the Group onClick handler from also processing the click
+                // This prevents the shape from being selected and then immediately unselected
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true;
+                handleClickWithDebouncing(e, onClick, onDblClick);
+              }
             }}
             onMouseDown={(e) => {
               // Don't start shape drag if in multi-region selection mode
@@ -3826,7 +3883,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 // Select only this point (single selection for regular click)
                 tracker.selectPoints(instanceId, new Set([pointIndex]));
                 pointSelectionHandled.current = true;
-                // Stop event propagation to prevent shape deselection
+                // Don't call onClick here - clicking on points should NOT select/unselect the shape
+                // Only clicking on segments should select/unselect the shape
+                // Always stop event propagation to prevent the VectorShape onClick handler from firing
+                // This prevents the shape from being selected/unselected when clicking on points
+                e.evt.stopImmediatePropagation();
                 e.evt.stopPropagation();
                 e.evt.preventDefault();
                 e.cancelBubble = true;
