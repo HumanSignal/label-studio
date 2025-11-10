@@ -30,6 +30,7 @@ from django.db.models import (
 )
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Coalesce, Concat
+from fsm.queryset_mixins import FSMStateQuerySetMixin
 from pydantic import BaseModel
 
 from label_studio.core.utils.common import load_func
@@ -488,7 +489,16 @@ def apply_filters(queryset, filters, project, request):
     return queryset
 
 
-class TaskQuerySet(models.QuerySet):
+class TaskQuerySet(FSMStateQuerySetMixin, models.QuerySet):
+    """
+    QuerySet for Task model with FSM state annotation support.
+
+    Extends Django's QuerySet with:
+    - FSM state annotation (via FSMStateQuerySetMixin)
+    - Data Manager filters and ordering
+    - Selected items handling
+    """
+
     def prepared(self, prepare_params=None):
         """Apply filters, ordering and selected items to queryset
 
@@ -700,6 +710,29 @@ def dummy(queryset):
     return queryset
 
 
+def annotate_state(queryset):
+    """
+    Annotate queryset with FSM state as 'state' field.
+
+    Uses FSMStateQuerySetMixin.annotate_fsm_state() to efficiently annotate
+    the current state without causing N+1 queries. Aliases 'current_state' to
+    'state' to match the Data Manager column name.
+
+    Note: Feature flag checks and user context validation are handled by
+    annotate_fsm_state() itself, so no additional checks are needed here.
+    """
+    # Use the mixin's annotate_fsm_state() method which creates 'current_state' annotation
+    # (includes feature flag and user context checks)
+    queryset = queryset.annotate_fsm_state()
+
+    # Alias 'current_state' to 'state' for Data Manager column compatibility
+    # Only add the alias if current_state was actually added (feature flags enabled)
+    if 'current_state' in queryset.query.annotations:
+        return queryset.annotate(state=F('current_state'))
+
+    return queryset
+
+
 settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     'avg_lead_time': annotate_avg_lead_time,
     'completed_at': annotate_completed_at,
@@ -712,6 +745,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     'file_upload': file_upload,
     'draft_exists': annotate_draft_exists,
     'storage_filename': annotate_storage_filename,
+    'state': annotate_state,
 }
 
 
@@ -724,6 +758,19 @@ def update_annotation_map(obj):
 
 
 class PreparedTaskManager(models.Manager):
+    """
+    Manager for Task model with Data Manager annotations.
+
+    Provides:
+    - Advanced query annotations for Data Manager
+    - Filter and ordering support
+    - FSM state annotation support (via TaskQuerySet)
+
+    Note: Overrides the base get_queryset() to return TaskQuerySet. Also has
+    a custom get_queryset(fields_for_evaluation, prepare_params, ...) method
+    for Data Manager-specific functionality.
+    """
+
     @staticmethod
     def annotate_queryset(
         queryset, fields_for_evaluation=None, all_fields=False, excluded_fields_for_evaluation=None, request=None
@@ -754,6 +801,11 @@ class PreparedTaskManager(models.Manager):
         self, fields_for_evaluation=None, prepare_params=None, all_fields=False, excluded_fields_for_evaluation=None
     ):
         """
+        Get queryset with optional Data Manager annotations and filters.
+
+        When called without parameters (Django internal use), returns TaskQuerySet.
+        When called with parameters (Data Manager use), returns annotated and filtered queryset.
+
         :param fields_for_evaluation: list of annotated fields in task
         :param prepare_params: filters, ordering, selected items
         :param all_fields: evaluate all fields for task
@@ -761,6 +813,11 @@ class PreparedTaskManager(models.Manager):
         :param request: request for user extraction
         :return: task queryset with annotated fields
         """
+        # If called without parameters, return base TaskQuerySet (for Django internal use)
+        if prepare_params is None:
+            return TaskQuerySet(self.model, using=self._db)
+
+        # Otherwise, use Data Manager filtering and annotation
         queryset = self.only_filtered(prepare_params=prepare_params)
         # Expose view data to annotation functions for column-specific configuration
         queryset.view_data = getattr(prepare_params, 'data', None)
@@ -781,5 +838,24 @@ class PreparedTaskManager(models.Manager):
 
 
 class TaskManager(models.Manager):
+    """
+    Default manager for Task model.
+
+    Provides:
+    - User-scoped filtering
+    - Custom QuerySet with FSM state support
+
+    Note: Overrides get_queryset() to return TaskQuerySet, which includes
+    FSMStateQuerySetMixin for state annotation support.
+    """
+
+    def get_queryset(self):
+        """Return TaskQuerySet which includes FSM state annotation support"""
+        return TaskQuerySet(self.model, using=self._db)
+
     def for_user(self, user):
-        return self.filter(project__organization=user.active_organization)
+        return self.get_queryset().filter(project__organization=user.active_organization)
+
+    def with_state(self):
+        """Return queryset with FSM state annotated."""
+        return self.get_queryset().annotate_fsm_state()
