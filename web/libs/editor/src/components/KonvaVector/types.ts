@@ -148,6 +148,8 @@ export interface KonvaVectorProps {
   x: number;
   /** Y offset */
   y: number;
+  /** Disable ghost line rendering */
+  disableGhostLine?: boolean;
   /** Enable image smoothing */
   imageSmoothingEnabled?: boolean;
 

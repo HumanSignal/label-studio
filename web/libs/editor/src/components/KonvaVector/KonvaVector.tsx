@@ -261,6 +261,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     transformMode = false,
     isMultiRegionSelected = false,
     disableInternalPointAddition = false,
+    disableGhostLine = false,
     pointRadius,
     pointFill = DEFAULT_POINT_FILL,
     pointStroke = DEFAULT_POINT_STROKE,
@@ -3244,7 +3245,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           />
 
           {/* Ghost line - preview from last point to cursor */}
-          {!disabled && (
+          {!disabled && !disableGhostLine && (
             <GhostLine
               initialPoints={initialPoints}
               cursorPositionRef={cursorPositionRef}
@@ -3570,7 +3571,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           />
 
           {/* Ghost line - preview from last point to cursor */}
-          {!disabled && (
+          {!disabled && !disableGhostLine && (
             <GhostLine
               initialPoints={initialPoints}
               cursorPositionRef={cursorPositionRef}

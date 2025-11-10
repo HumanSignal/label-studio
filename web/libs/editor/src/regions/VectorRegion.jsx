@@ -556,6 +556,10 @@ const HtxVectorView = observer(({ item, suggestion }) => {
     return null;
   }
 
+  // Check if move tool is selected (disable ghost line when move tool is active)
+  const selectedTool = item.parent?.getToolsManager()?.findSelectedTool();
+  const disableGhostLine = selectedTool?.fullName === "MoveTool";
+
   return (
     <RegionWrapper item={item}>
       <Group ref={(ref) => item.segGroupRef(ref)} name={item.id}>
@@ -563,6 +567,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           ref={(kv) => item.setKonvaVectorRef(kv)}
           initialPoints={Array.from(item.vertices)}
           isMultiRegionSelected={item.object?.selectedRegions?.length > 1}
+          disableGhostLine={disableGhostLine}
           onFinish={(e) => {
             e.evt.stopPropagation();
             e.evt.preventDefault();
