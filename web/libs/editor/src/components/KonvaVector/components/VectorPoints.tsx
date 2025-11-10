@@ -78,11 +78,11 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
                 key={`point-outline-${index}-${point.x}-${point.y}`}
                 x={point.x}
                 y={point.y}
-                radius={scaledRadius + pointStrokeWidth}
+                radius={scaledRadius}
                 fill="transparent"
                 stroke={pointStrokeSelected}
                 strokeScaleEnabled={false}
-                strokeWidth={pointStrokeWidth / scale}
+                strokeWidth={pointStrokeWidth + 5}
                 listening={false}
                 name={`point-outline-${index}`}
               />
