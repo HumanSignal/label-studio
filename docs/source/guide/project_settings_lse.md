@@ -566,7 +566,7 @@ Note that in certain situations, this may be exceeded. For example, if there are
 
 Only available if **Annotations per task** is ≥ 2. 
 
-This setting controls how the overlap should be enforced. 
+This setting controls the percentage of the project tasks for which the overlap is enforced. 
 
 For example, if you want all tasks to be annotated by at least 2 annotators:
 
