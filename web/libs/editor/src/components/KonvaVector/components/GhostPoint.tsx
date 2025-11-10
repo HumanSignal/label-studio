@@ -31,9 +31,10 @@ export const GhostPoint: React.FC<GhostPointProps> = ({
   //   return null;
   // }
 
-  // if (maxPoints !== undefined && initialPointsLength >= maxPoints) {
-  //   return null;
-  // }
+  // Hide ghost point when maxPoints is reached
+  if (maxPoints !== undefined && initialPointsLength >= maxPoints) {
+    return null;
+  }
 
   // if (isDragging) {
   //   return null;

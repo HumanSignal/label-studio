@@ -907,6 +907,8 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
                 ghostPoint.nextPointId,
               );
               if (insertResult.success) {
+                // Clear ghost point immediately after adding a real point
+                props.setGhostPoint(null);
                 return; // Successfully added point
               }
             }

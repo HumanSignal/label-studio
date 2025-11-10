@@ -34,6 +34,7 @@ export interface PointCreationManagerProps {
   setIsDraggingNewBezier?: (dragging: boolean) => void;
   ghostPoint?: GhostPoint | null;
   isShiftKeyHeld?: boolean;
+  setGhostPoint?: (point: GhostPoint | null) => void;
 }
 
 export class PointCreationManager {
@@ -221,6 +222,11 @@ export class PointCreationManager {
         nextPointId,
         PointType.REGULAR,
       );
+
+      // Clear ghost point immediately after adding a real point
+      if (result.success && this.props.setGhostPoint) {
+        this.props.setGhostPoint(null);
+      }
 
       return result.success;
     }

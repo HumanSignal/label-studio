@@ -1176,6 +1176,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       setIsDraggingNewBezier,
       ghostPoint,
       isShiftKeyHeld,
+      setGhostPoint,
     });
   }, [
     pointCreationManager,
@@ -1200,6 +1201,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     setIsDraggingNewBezier,
     ghostPoint,
     isShiftKeyHeld,
+    setGhostPoint,
   ]);
 
   // Helper function to get all points for rendering and interactions
