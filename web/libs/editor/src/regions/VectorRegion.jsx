@@ -497,7 +497,7 @@ const Model = types
           const annotation = self.parent?.annotation;
           annotation?.toggleRegionSelection(self);
         }
-        tool?.complete();
+        tool?.complete?.();
       },
       toggleTransformMode() {
         self.setTransformMode(!self.transformMode);

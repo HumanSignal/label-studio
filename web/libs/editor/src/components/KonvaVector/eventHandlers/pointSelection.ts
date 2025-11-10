@@ -1,5 +1,6 @@
 import type { KonvaEventObject } from "konva/lib/Node";
 import type { EventHandlerProps } from "./types";
+import { HIT_RADIUS } from "../constants";
 import { isPointInHitRadius, stageToImageCoordinates } from "./utils";
 import { closePathBetweenFirstAndLast } from "./drawing";
 import { VectorSelectionTracker } from "../VectorSelectionTracker";

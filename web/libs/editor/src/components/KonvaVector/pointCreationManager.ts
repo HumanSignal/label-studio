@@ -36,6 +36,7 @@ export interface PointCreationManagerProps {
   ghostPoint?: GhostPoint | null;
   isShiftKeyHeld?: boolean;
   setGhostPoint?: (point: GhostPoint | null) => void;
+  selectedPoints?: Set<number>;
 }
 
 export class PointCreationManager {
@@ -58,6 +59,11 @@ export class PointCreationManager {
 
   startPoint(x: number, y: number): boolean {
     if (!this.props || this.state.isCreating) {
+      return false;
+    }
+
+    // Don't allow drawing when transformer is active (two or more points are selected)
+    if (this.props.selectedPoints && this.props.selectedPoints.size > 1) {
       return false;
     }
 
@@ -113,6 +119,11 @@ export class PointCreationManager {
       return false;
     }
 
+    // Don't allow drawing when transformer is active (two or more points are selected)
+    if (this.props.selectedPoints && this.props.selectedPoints.size > 1) {
+      return false;
+    }
+
     // Snap to pixel grid if enabled
     const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
 
@@ -161,6 +172,11 @@ export class PointCreationManager {
 
   commitPoint(x: number, y: number): boolean {
     if (!this.props || !this.state.isCreating) {
+      return false;
+    }
+
+    // Don't allow drawing when transformer is active (two or more points are selected)
+    if (this.props.selectedPoints && this.props.selectedPoints.size > 1) {
       return false;
     }
 

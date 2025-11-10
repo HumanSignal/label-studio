@@ -111,8 +111,43 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
       return;
     }
 
-    // Handle drawing mode setup (only when path is not closed)
-    if (props.isDrawingMode && !props.isPathClosed) {
+    // Check if transformer is active first - this blocks drawing and most point interactions
+    if (props.selectedPoints.size > 1) {
+      const pos = e.target.getStage()?.getPointerPosition();
+      if (pos) {
+        const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
+        const scale = props.transform.zoom * props.fitScale;
+        const hitRadius = HIT_RADIUS.SELECTION / scale;
+
+        // Check if we're clicking on a point
+        for (let i = 0; i < props.initialPoints.length; i++) {
+          const point = props.initialPoints[i];
+          const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
+
+          if (distance <= hitRadius) {
+            // If cmd-click, don't handle it here - let the onClick handler on the Circle component handle it
+            // The onClick handler has the correct pointIndex, while this handler would need to find it by distance
+            // which could select the wrong point when multiple points are close together
+            if (e.evt.ctrlKey || e.evt.metaKey) {
+              // Just mark that we're over a point, but let onClick handle the selection
+              handledSelectionInMouseDown.current = true;
+              return;
+            } else {
+              // Regular click on point when transformer is active - do nothing
+              // This prevents the click from falling through to deselection logic
+              return;
+            }
+          }
+        }
+      }
+
+      // If we get here, we're not clicking on a point
+      // Allow deselection by clicking outside the shape
+      return;
+    }
+
+    // Handle drawing mode setup (only when path is not closed and transformer is not active)
+    if (props.isDrawingMode && !props.isPathClosed && props.selectedPoints.size <= 1) {
       // Handle Shift+panning even in drawing mode
       if (e.evt.shiftKey) {
         props.isDragging.current = true;
@@ -133,46 +168,6 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
       // Don't return here - let the handler continue to set up drawing state
     }
 
-    // Check if transformer is active first - this blocks most point interactions
-    if (props.selectedPoints.size > 1) {
-      const pos = e.target.getStage()?.getPointerPosition();
-      if (pos) {
-        const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
-        const scale = props.transform.zoom * props.fitScale;
-        const hitRadius = HIT_RADIUS.SELECTION / scale;
-
-        // Check if we're clicking on a point
-        for (let i = 0; i < props.initialPoints.length; i++) {
-          const point = props.initialPoints[i];
-          const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
-
-          if (distance <= hitRadius) {
-            // If cmd-click, handle multi-selection management
-            if (e.evt.ctrlKey || e.evt.metaKey) {
-              // Try deselection first
-              if (handlePointDeselection(e, props)) {
-                handledSelectionInMouseDown.current = true;
-                return;
-              }
-              // If not deselection, try selection (adding to multi-selection)
-              if (handlePointSelection(e, props)) {
-                handledSelectionInMouseDown.current = true;
-                return;
-              }
-            } else {
-              // Regular click on point when transformer is active - do nothing
-              // This prevents the click from falling through to deselection logic
-              return;
-            }
-          }
-        }
-      }
-
-      // If we get here, we're not clicking on a point
-      // Allow deselection by clicking outside the shape
-      return;
-    }
-
     // Handle point interactions (selection, dragging) regardless of drawing mode
     // This allows point interaction even when drawing is disabled due to hovering
     const pos = e.target.getStage()?.getPointerPosition();
@@ -188,18 +183,13 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
         const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
 
         if (distance <= hitRadius) {
-          // If cmd-click, handle selection immediately and don't set up dragging
+          // If cmd-click, don't handle it here - let the onClick handler on the Circle component handle it
+          // The onClick handler has the correct pointIndex, while this handler would need to find it by distance
+          // which could select the wrong point when multiple points are close together
           if (e.evt.ctrlKey || e.evt.metaKey) {
-            // Try deselection first
-            if (handlePointDeselection(e, props)) {
-              handledSelectionInMouseDown.current = true;
-              return;
-            }
-            // If not deselection, try selection (adding to multi-selection)
-            if (handlePointSelection(e, props)) {
-              handledSelectionInMouseDown.current = true;
-              return;
-            }
+            // Just mark that we're over a point, but let onClick handle the selection
+            handledSelectionInMouseDown.current = true;
+            return;
           } else {
             // Normal click - store the potential drag target but don't start dragging yet
             // We'll start dragging only if the mouse moves beyond a threshold
@@ -621,11 +611,12 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       return;
     }
 
-    // Handle Bezier curve creation in drawing mode (click-drag without shift key) - only when path is not closed
+    // Handle Bezier curve creation in drawing mode (click-drag without shift key) - only when path is not closed and transformer is not active
     // Skip if PointCreationManager is currently creating a point
     if (
       props.isDrawingMode &&
       !props.isPathClosed &&
+      props.selectedPoints.size <= 1 &&
       props.lastPos.current &&
       !e.evt.shiftKey &&
       props.allowBezier &&
@@ -998,13 +989,14 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
       }
     }
 
-    // Handle drawing mode clicks (only when path is not closed)
+    // Handle drawing mode clicks (only when path is not closed and transformer is not active)
     // Skip if PointCreationManager is currently creating a point
     // Skip if internal point addition is disabled
     if (
       !props.disableInternalPointAddition &&
       props.isDrawingMode &&
       !props.isPathClosed &&
+      props.selectedPoints.size <= 1 &&
       !props.pointCreationManager?.isCreating()
     ) {
       // Handle regular click (add regular point)

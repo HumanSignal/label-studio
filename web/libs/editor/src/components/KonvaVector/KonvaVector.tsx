@@ -1205,12 +1205,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       setNewPointDragIndex,
       setIsDraggingNewBezier,
       ghostPoint,
+      selectedPoints: effectiveSelectedPoints,
       isShiftKeyHeld,
       setGhostPoint,
     });
   }, [
     pointCreationManager,
     initialPoints,
+    effectiveSelectedPoints,
     allowBezier,
     pixelSnapping,
     width,
@@ -2262,63 +2264,13 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           if (pointIndex >= 0 && pointIndex < initialPoints.length) {
             const point = initialPoints[pointIndex];
 
-            // If cmd-click, handle selection immediately and don't set up dragging
+            // If cmd-click, don't handle it here - let the onClick handler on the Circle component handle it
+            // The onClick handler has the correct pointIndex, while this handler would need to find it by distance
+            // which could select the wrong point when multiple points are close together
             if (e.evt.ctrlKey || e.evt.metaKey) {
-              // Prevent event from propagating to avoid region deselection
+              // Just prevent event propagation and return - let onClick handle the selection
               e.evt.stopPropagation();
-
-              // Create a mock event object for the selection handlers
-              const mockEvent = {
-                ...e,
-                target: e.target,
-                evt: e.evt,
-              } as Konva.KonvaEventObject<MouseEvent>;
-
-              // Try deselection first
-              if (
-                handlePointDeselection(mockEvent, {
-                  instanceId,
-                  initialPoints,
-                  transform,
-                  fitScale,
-                  x,
-                  y,
-                  selectedPoints: effectiveSelectedPoints,
-                  setSelectedPoints,
-                  skeletonEnabled,
-                  setActivePointId,
-                  setLastAddedPointId,
-                  lastAddedPointId,
-                  activePointId,
-                } as any)
-              ) {
-                return;
-              }
-              // If not deselection, try selection (adding to multi-selection)
-              if (
-                handlePointSelection(mockEvent, {
-                  instanceId,
-                  initialPoints,
-                  transform,
-                  fitScale,
-                  x,
-                  y,
-                  selectedPoints: effectiveSelectedPoints,
-                  setSelectedPoints,
-                  setSelectedPointIndex,
-                  skeletonEnabled,
-                  setActivePointId,
-                  setLastAddedPointId,
-                  lastAddedPointId,
-                  activePointId,
-                  allowClose,
-                  isPathClosed: finalIsPathClosed,
-                  disabled,
-                  onFinish,
-                } as any)
-              ) {
-                return;
-              }
+              return;
             } else {
               // Normal click - prevent event propagation to avoid region deselection
               e.evt.stopPropagation();
@@ -3809,25 +3761,13 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   return; // Block the selection
                 }
 
-                // Try deselection first
-                if (
-                  handlePointDeselection(e, {
-                    instanceId,
-                    initialPoints,
-                    transform,
-                    fitScale,
-                    x,
-                    y,
-                    selectedPoints: effectiveSelectedPoints,
-                    setSelectedPoints,
-                    skeletonEnabled,
-                    setActivePointId,
-                    setLastAddedPointId,
-                    lastAddedPointId,
-                    activePointId,
-                  } as any)
-                ) {
+                // Check if this point is already selected - if so, deselect it
+                if (effectiveSelectedPoints.has(pointIndex)) {
+                  const newSelection = new Set(effectiveSelectedPoints);
+                  newSelection.delete(pointIndex);
+                  tracker.selectPoints(instanceId, newSelection);
                   pointSelectionHandled.current = true;
+                  e.evt.stopImmediatePropagation();
                   return;
                 }
 
