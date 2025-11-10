@@ -1,4 +1,4 @@
-import type { BezierPoint } from "./types";
+import type { BezierPoint, GhostPoint } from "./types";
 import { PointType } from "./types";
 import { snapToPixel, getDistance } from "./eventHandlers/utils";
 import { generatePointId } from "./utils";
@@ -32,6 +32,8 @@ export interface PointCreationManagerProps {
   setVisibleControlPoints?: (points: Set<number> | ((prev: Set<number>) => Set<number>)) => void;
   setNewPointDragIndex?: (index: number | null) => void;
   setIsDraggingNewBezier?: (dragging: boolean) => void;
+  ghostPoint?: GhostPoint | null;
+  isShiftKeyHeld?: boolean;
 }
 
 export class PointCreationManager {
@@ -160,8 +162,31 @@ export class PointCreationManager {
       return false;
     }
 
+    // Check if Shift is held and we have a ghost point
+    let finalX = x;
+    let finalY = y;
+    let insertBetween = false;
+    let prevPointId: string | undefined;
+    let nextPointId: string | undefined;
+
+    if (this.props.isShiftKeyHeld && this.props.ghostPoint) {
+      // Use ghost point coordinates instead of provided coordinates
+      finalX = this.props.ghostPoint.x;
+      finalY = this.props.ghostPoint.y;
+      insertBetween = true;
+      prevPointId = this.props.ghostPoint.prevPointId;
+      nextPointId = this.props.ghostPoint.nextPointId;
+      
+      console.log("🟢 PointCreationManager: Using ghost point for insertion", {
+        providedCoords: { x, y },
+        ghostCoords: { x: finalX, y: finalY },
+        prevPointId,
+        nextPointId,
+      });
+    }
+
     // Snap to pixel grid if enabled
-    const snappedCoords = snapToPixel({ x, y }, this.props.pixelSnapping);
+    const snappedCoords = snapToPixel({ x: finalX, y: finalY }, this.props.pixelSnapping);
 
     // Check if we're within canvas bounds (only if bounds checking is enabled)
     if (this.props.width && this.props.height) {
@@ -175,6 +200,39 @@ export class PointCreationManager {
       }
     }
 
+    // If we need to insert between points (shift-click on segment)
+    if (insertBetween && prevPointId && nextPointId) {
+      // Cancel the current creation state
+      this.state = {
+        isCreating: false,
+        startX: 0,
+        startY: 0,
+        currentPointIndex: null,
+        isBezier: false,
+        hasCreatedPoint: false,
+      };
+
+      // Clear dragging state
+      if (this.props.setNewPointDragIndex) {
+        this.props.setNewPointDragIndex(null);
+      }
+      if (this.props.setIsDraggingNewBezier) {
+        this.props.setIsDraggingNewBezier(false);
+      }
+
+      // Insert the point between the two points
+      const result = this.insertPointBetween(
+        snappedCoords.x,
+        snappedCoords.y,
+        prevPointId,
+        nextPointId,
+        PointType.REGULAR,
+      );
+
+      return result.success;
+    }
+
+    // Normal point creation flow
     // If we haven't created a point yet (no point was created during updatePoint), create a regular point
     if (!this.state.hasCreatedPoint) {
       this.createRegularPoint(snappedCoords.x, snappedCoords.y);

@@ -134,6 +134,8 @@ export interface KonvaVectorProps {
   onPointSelected?: (pointIndex: number | null) => void;
   /** Called when drawing is finished (click on last point or double click on empty space) */
   onFinish?: (e: KonvaEventObject<MouseEvent>) => void;
+  /** Called when shift-clicking on a ghost point (for programmatic point insertion when disableInternalPointAddition is true) */
+  onGhostPointClick?: (ghostPoint: { x: number; y: number; prevPointId: string; nextPointId: string }) => void;
   /** Canvas width */
   width: number;
   /** Canvas height */

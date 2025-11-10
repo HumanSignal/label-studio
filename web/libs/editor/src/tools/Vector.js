@@ -144,13 +144,40 @@ const _Tool = types
       startDrawing: self.startDrawing,
       _finishDrawing: self._finishDrawing,
       deleteRegion: self.deleteRegion,
+      event: self.event,
     };
 
     const disposers = [];
     let down = false;
     let initialCursorPosition = null;
+    let lastClick = {
+      ts: 0,
+      x: 0,
+      y: 0,
+    };
 
     return {
+      // Override event() to allow shift-key events through for ghost point insertion
+      event(name, ev, [x, y, canvasX, canvasY]) {
+        // For Vector tool, allow shift-key events to pass through
+        // This enables shift-click for inserting points on segments
+        if (ev.button > 0) return; // Still filter right clicks and middle clicks
+        
+        let fn = `${name}Ev`;
+
+        if (typeof self[fn] !== "undefined") self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
+
+        // Emulating of dblclick event
+        if (name === "click") {
+          const ts = ev.timeStamp;
+
+          if (ts - lastClick.ts < 300 && self.comparePointsWithThreshold(lastClick, { x, y })) {
+            fn = `dbl${fn}`;
+            if (typeof self[fn] !== "undefined") self[fn].call(self, ev, [x, y], [canvasX, canvasY]);
+          }
+          lastClick = { ts, x, y };
+        }
+      },
       canStartDrawing() {
         // Override to allow continuing to draw on selected/highlighted regions even if there's a selection
         // This is Vector-specific behavior - other tools should use the default behavior from MultipleClicksDrawingTool

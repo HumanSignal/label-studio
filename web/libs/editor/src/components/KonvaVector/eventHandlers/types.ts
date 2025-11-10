@@ -81,6 +81,7 @@ export interface EventHandlerProps {
   onPathShapeChanged?: (points: BezierPoint[]) => void;
   onPointSelected?: (pointIndex: number | null) => void;
   onFinish?: (e: KonvaEventObject<MouseEvent>) => void;
+  onGhostPointClick?: (ghostPoint: { x: number; y: number; prevPointId: string; nextPointId: string }) => void;
   onMouseDown?: (e: KonvaEventObject<MouseEvent>) => void;
   onMouseMove?: (e: KonvaEventObject<MouseEvent>) => void;
   onMouseUp?: (e?: KonvaEventObject<MouseEvent>) => void;

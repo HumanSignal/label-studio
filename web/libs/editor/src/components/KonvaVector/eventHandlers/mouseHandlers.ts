@@ -869,9 +869,7 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
     // Handle Shift+click functionality (before other checks)
     if (e.evt.shiftKey && !e.evt.altKey) {
       // First, check if we're near a ghost point to add a point
-      // Skip if internal point addition is disabled
       if (
-        !props.disableInternalPointAddition &&
         props.cursorPosition &&
         !props.isDraggingNewBezier &&
         !props.ghostPointDragInfo?.isDragging &&
@@ -888,16 +886,29 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
           const clickRadius = 15 / (props.transform.zoom * props.fitScale);
 
           if (distance <= clickRadius) {
-            // Insert a regular point between the two points that form the segment
-            const insertResult = insertPointBetween(
-              props,
-              ghostPoint.x,
-              ghostPoint.y,
-              ghostPoint.prevPointId,
-              ghostPoint.nextPointId,
-            );
-            if (insertResult.success) {
-              return; // Successfully added point
+            // If internal point addition is disabled, call the callback for programmatic handling
+            if (props.disableInternalPointAddition && props.onGhostPointClick) {
+              props.onGhostPointClick({
+                x: ghostPoint.x,
+                y: ghostPoint.y,
+                prevPointId: ghostPoint.prevPointId,
+                nextPointId: ghostPoint.nextPointId,
+              });
+              return; // Let parent handle point addition
+            }
+            
+            // Otherwise, insert a regular point internally between the two points that form the segment
+            if (!props.disableInternalPointAddition) {
+              const insertResult = insertPointBetween(
+                props,
+                ghostPoint.x,
+                ghostPoint.y,
+                ghostPoint.prevPointId,
+                ghostPoint.nextPointId,
+              );
+              if (insertResult.success) {
+                return; // Successfully added point
+              }
             }
           }
         }
