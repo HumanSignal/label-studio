@@ -15,6 +15,7 @@ import {
   isActivePointEligibleForClosing,
 } from "./pointSelection";
 import type { EventHandlerProps } from "./types";
+import { HIT_RADIUS } from "../constants";
 import {
   continueBezierDrag,
   findClosestPointOnPath,
@@ -40,7 +41,7 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
     if (e.evt.shiftKey === true && props.cursorPosition && props.initialPoints.length >= 2) {
       // Check if cursor is over an existing point
       const scale = props.transform.zoom * props.fitScale;
-      const hitRadius = 10 / scale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
       let isOverPoint = false;
 
       for (let i = 0; i < props.initialPoints.length; i++) {
@@ -138,7 +139,7 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
       if (pos) {
         const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
         const scale = props.transform.zoom * props.fitScale;
-        const hitRadius = 10 / scale;
+        const hitRadius = HIT_RADIUS.SELECTION / scale;
 
         // Check if we're clicking on a point
         for (let i = 0; i < props.initialPoints.length; i++) {
@@ -179,7 +180,7 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
       const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
       const scale = props.transform.zoom * props.fitScale;
-      const hitRadius = 10 / scale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
 
       // Check if we're clicking on a point to select or drag it (only when transformer is not active)
       for (let i = 0; i < props.initialPoints.length; i++) {
@@ -321,7 +322,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
     ) {
       // Check if cursor is over an existing point
       const scale = props.transform.zoom * props.fitScale;
-      const hitRadius = 10 / scale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
       let isOverPoint = false;
 
       for (let i = 0; i < props.initialPoints.length; i++) {
@@ -915,7 +916,7 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
         const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
         const scale = props.transform.zoom * props.fitScale;
-        const hitRadius = 10 / scale;
+        const hitRadius = HIT_RADIUS.SELECTION / scale;
 
         // Check if we clicked on any point to delete it
         for (let i = 0; i < props.initialPoints.length; i++) {
@@ -982,7 +983,7 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
       const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
       const scale = props.transform.zoom * props.fitScale;
-      const hitRadius = 10 / scale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
 
       // Check if we clicked on any existing point
       for (let i = 0; i < props.initialPoints.length; i++) {

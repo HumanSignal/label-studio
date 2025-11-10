@@ -52,7 +52,7 @@ export const KEYPOINT_POINT_RADIUS = {
 // Hit detection radii (in pixels)
 export const HIT_RADIUS = {
   CONTROL_POINT: 6,
-  SELECTION: 5,
+  SELECTION: 20, // Increased from 5 to 20 to make points easier to click
   SEGMENT: 8,
 } as const;
 

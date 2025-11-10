@@ -2028,7 +2028,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         const currentShiftState = shiftKeyState !== undefined ? shiftKeyState : refShiftState ?? false;
         if (initialPoints.length >= 2 && currentShiftState) {
           const scale = transform.zoom * fitScale;
-          const hitRadius = 10 / scale;
+          const hitRadius = HIT_RADIUS.SELECTION / scale;
           let isOverPoint = false;
 
           for (let i = 0; i < initialPoints.length; i++) {
@@ -2368,7 +2368,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       // Fallback: check by distance (in case names don't match)
       const scale = transform.zoom * fitScale;
-      const hitRadius = 10 / scale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
 
       for (let i = 0; i < initialPoints.length; i++) {
         const point = initialPoints[i];
@@ -2632,7 +2632,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           !disabled
         ) {
           const scale = transform.zoom * fitScale;
-          const hitRadius = 10 / scale;
+          const hitRadius = HIT_RADIUS.SELECTION / scale;
           let isOverPoint = false;
 
           for (let i = 0; i < initialPoints.length; i++) {
@@ -3243,7 +3243,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
                 if (lastAddedPoint) {
                   const scale = transform.zoom * fitScale;
-                  const hitRadius = 15 / scale; // Same radius as used in event handlers
+                  const hitRadius = HIT_RADIUS.SELECTION / scale; // Use constant for consistent hit detection
                   const distance = Math.sqrt(
                     (cursorPositionRef.current.x - lastAddedPoint.x) ** 2 +
                       (cursorPositionRef.current.y - lastAddedPoint.y) ** 2,
@@ -3304,7 +3304,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
               const scale = transform.zoom * fitScale;
-              const hitRadius = 10 / scale;
+              const hitRadius = HIT_RADIUS.SELECTION / scale;
 
               // Check if clicking on any point
               for (let i = 0; i < initialPoints.length; i++) {
@@ -3583,7 +3583,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 const lastAddedPoint = initialPoints.find((p) => p.id === lastAddedPointId);
                 if (lastAddedPoint) {
                   const scale = transform.zoom * fitScale;
-                  const hitRadius = 15 / scale; // Same radius as used in event handlers
+                  const hitRadius = HIT_RADIUS.SELECTION / scale; // Use constant for consistent hit detection
                   const distance = Math.sqrt(
                     (cursorPositionRef.current.x - lastAddedPoint.x) ** 2 +
                       (cursorPositionRef.current.y - lastAddedPoint.y) ** 2,
@@ -3644,7 +3644,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
               const scale = transform.zoom * fitScale;
-              const hitRadius = 10 / scale;
+              const hitRadius = HIT_RADIUS.SELECTION / scale;
 
               // Check if clicking on any point
               for (let i = 0; i < initialPoints.length; i++) {

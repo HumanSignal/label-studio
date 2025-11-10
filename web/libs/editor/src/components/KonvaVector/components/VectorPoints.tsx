@@ -2,6 +2,7 @@ import type React from "react";
 import { Circle } from "react-konva";
 import type Konva from "konva";
 import type { BezierPoint } from "../types";
+import { HIT_RADIUS } from "../constants";
 
 interface VectorPointsProps {
   initialPoints: BezierPoint[];
@@ -102,6 +103,15 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
               strokeWidth={pointStrokeWidth}
               listening={!disabled}
               name={`point-${index}`}
+              // Use custom hit function to create a larger clickable area around the point
+              // This makes points easier to click even when the cursor is not exactly over the point
+              hitFunc={(context, shape) => {
+                // Calculate a larger hit radius using the constant (scaled for current zoom)
+                const hitRadius = HIT_RADIUS.SELECTION / scale;
+                context.beginPath();
+                context.arc(0, 0, hitRadius, 0, Math.PI * 2);
+                context.fillStrokeShape(shape);
+              }}
               onClick={
                 onPointClick
                   ? (e) => {

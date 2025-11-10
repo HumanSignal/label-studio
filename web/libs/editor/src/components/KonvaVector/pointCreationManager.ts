@@ -1,5 +1,6 @@
 import type { BezierPoint, GhostPoint } from "./types";
 import { PointType } from "./types";
+import { HIT_RADIUS } from "./constants";
 import { snapToPixel, getDistance } from "./eventHandlers/utils";
 import { generatePointId } from "./utils";
 
@@ -83,7 +84,7 @@ export class PointCreationManager {
     // Check if hovering over an existing point - if so, don't create a new point
     if (this.props.initialPoints.length > 0 && this.props.transform && this.props.fitScale !== undefined) {
       const scale = this.props.transform.zoom * this.props.fitScale;
-      const hitRadius = 10 / scale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
 
       for (const point of this.props.initialPoints) {
         const distance = getDistance(snappedCoords, point);

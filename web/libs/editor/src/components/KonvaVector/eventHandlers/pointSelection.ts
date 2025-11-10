@@ -97,7 +97,7 @@ export function handlePointSelection(e: KonvaEventObject<MouseEvent>, props: Eve
   const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
   const scale = props.transform.zoom * props.fitScale;
-  const hitRadius = 10 / scale;
+  const hitRadius = HIT_RADIUS.SELECTION / scale;
 
   // Get the tracker instance
   const tracker = VectorSelectionTracker.getInstance();
@@ -187,7 +187,7 @@ export function handlePointDeselection(e: KonvaEventObject<MouseEvent>, props: E
   const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
   const scale = props.transform.zoom * props.fitScale;
-  const hitRadius = 10 / scale;
+  const hitRadius = HIT_RADIUS.SELECTION / scale;
 
   // Get the tracker instance
   const tracker = VectorSelectionTracker.getInstance();
