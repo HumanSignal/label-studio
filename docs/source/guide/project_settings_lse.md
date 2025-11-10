@@ -535,7 +535,7 @@ Use these settings to determine task completeness and agreement metrics.
 !!! note
     Overlap settings only apply when the project is using Automatic distribution mode. If you are using Manual distribution mode, all tasks must be manually assigned - meaning that you are also manually determining overlap.  
 
-By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, increase the **Annotations per task**.
+By default, each task only needs to be annotated by one annotator. If you want multiple annotators to annotate the same tasks, increase the **Annotations per task**.
 
 <table>
 <thead>
