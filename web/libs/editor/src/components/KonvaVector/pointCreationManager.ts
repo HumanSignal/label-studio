@@ -176,13 +176,6 @@ export class PointCreationManager {
       insertBetween = true;
       prevPointId = this.props.ghostPoint.prevPointId;
       nextPointId = this.props.ghostPoint.nextPointId;
-      
-      console.log("🟢 PointCreationManager: Using ghost point for insertion", {
-        providedCoords: { x, y },
-        ghostCoords: { x: finalX, y: finalY },
-        prevPointId,
-        nextPointId,
-      });
     }
 
     // Snap to pixel grid if enabled

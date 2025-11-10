@@ -653,22 +653,16 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             item.onPathClosedChange(isClosed);
           }}
           onGhostPointClick={(ghostPoint) => {
-            console.log("🟢 VectorRegion onGhostPointClick", ghostPoint);
-            
             // Only handle if we're drawing
             if (!item.isDrawing) {
-              console.log("🔴 Not drawing, ignoring ghost point click");
               return;
             }
             
             if (item.vectorRef) {
-              console.log("🟢 Calling vectorRef.startPoint and commitPoint with ghost point coordinates");
               // Start and immediately commit to insert the point at ghost location
               const startResult = item.vectorRef.startPoint(ghostPoint.x, ghostPoint.y);
-              console.log("🔵 startPoint result:", startResult);
               if (startResult) {
-                const commitResult = item.vectorRef.commitPoint(ghostPoint.x, ghostPoint.y);
-                console.log("🔵 commitPoint result:", commitResult);
+                item.vectorRef.commitPoint(ghostPoint.x, ghostPoint.y);
               }
             }
           }}

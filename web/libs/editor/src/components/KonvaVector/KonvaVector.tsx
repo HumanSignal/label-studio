@@ -1978,13 +1978,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         // Only process ghost point logic if within bounds
         if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
           // Handle ghost point when Shift is held (check event directly for real-time updates)
+          // Only show ghost point when region is not disabled
           if (
             e.evt.shiftKey &&
             imagePos &&
             initialPoints.length >= 2 &&
             !isDragging.current &&
             !isDraggingNewBezier &&
-            !ghostPointDragInfo?.isDragging
+            !ghostPointDragInfo?.isDragging &&
+            !disabled
           ) {
             const scale = transform.zoom * fitScale;
             const hitRadius = 10 / scale;
@@ -2001,7 +2003,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             }
 
             if (isOverPoint) {
-              console.log("🔴 GhostPoint: Over point, clearing");
               setGhostPoint(null);
             } else {
               const closestPathPoint = findClosestPointOnPath(imagePos, initialPoints, allowClose, finalIsPathClosed);
@@ -2019,7 +2020,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                     prevPointId: lastPoint.id,
                     nextPointId: firstPoint.id,
                   };
-                  console.log("🟢 GhostPoint: Setting (closing path)", newGhostPoint);
                   setGhostPoint(newGhostPoint);
                 } else {
                   const currentPoint = initialPoints[closestPathPoint.segmentIndex];
@@ -2034,51 +2034,18 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                       prevPointId: prevPoint.id,
                       nextPointId: currentPoint.id,
                     };
-                    // Debug: Compare ghost point coordinates with actual point coordinates
-                    const coordinateComparison = {
-                      ghostPointX: newGhostPoint.x,
-                      currentPointX: currentPoint.x,
-                      prevPointX: prevPoint.x,
-                      ghostPointY: newGhostPoint.y,
-                      currentPointY: currentPoint.y,
-                      prevPointY: prevPoint.y,
-                      xDiff: Math.abs(newGhostPoint.x - currentPoint.x),
-                      yDiff: Math.abs(newGhostPoint.y - currentPoint.y),
-                      // Check if coordinates are in similar ranges
-                      xInRange: Math.abs(newGhostPoint.x - currentPoint.x) < 1000,
-                      yInRange: Math.abs(newGhostPoint.y - currentPoint.y) < 1000,
-                    };
-                    
-                    console.log("🟢 GhostPoint: Setting (segment)", {
-                      ghostPoint: newGhostPoint,
-                      currentPoint: { x: currentPoint.x, y: currentPoint.y },
-                      prevPoint: { x: prevPoint.x, y: prevPoint.y },
-                      snappedGhostPoint,
-                      closestPathPoint: closestPathPoint.point,
-                      imagePos,
-                      stagePos: pos,
-                      transform,
-                      fitScale,
-                      groupPos: { x, y },
-                      coordinateComparison,
-                    });
                     setGhostPoint(newGhostPoint);
-                  } else {
-                    console.log("🔴 GhostPoint: Missing currentPoint or prevPoint", { currentPoint, prevPoint });
                   }
                 }
               } else {
-                console.log("🔴 GhostPoint: No closestPathPoint found");
                 setGhostPoint(null);
               }
             }
           } else if (!e.evt.shiftKey) {
-            console.log("🔴 GhostPoint: Shift key released, clearing");
             setGhostPoint(null);
           }
         } else {
           // When outside bounds, clear ghost point but keep cursor position for ghost line
-          console.log("🔴 GhostPoint: Outside bounds, clearing", { imagePos, width, height });
           setGhostPoint(null);
         }
       };
@@ -2544,6 +2511,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Only process ghost point and other logic if within bounds
       if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
         // Handle ghost point when Shift is held (check event directly for real-time updates)
+        // Only show ghost point when region is not disabled
 
         if (
           e.evt.shiftKey &&
@@ -2551,9 +2519,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           initialPoints.length >= 2 &&
           !isDragging.current &&
           !isDraggingNewBezier &&
-          !ghostPointDragInfo?.isDragging
+          !ghostPointDragInfo?.isDragging &&
+          !disabled
         ) {
-          console.log("🟢 Setting ghost point, finding closest path point...");
           const scale = transform.zoom * fitScale;
           const hitRadius = 10 / scale;
           let isOverPoint = false;
@@ -2568,38 +2536,13 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             }
           }
 
-          console.log("🔵 Point hover check:", {
-            isOverPoint,
-            hitRadius,
-            imagePos,
-            pointsSample: initialPoints.slice(0, 2).map((p) => ({ x: p.x, y: p.y })),
-            distances: initialPoints
-              .slice(0, 2)
-              .map((p) => Math.sqrt((imagePos.x - p.x) ** 2 + (imagePos.y - p.y) ** 2)),
-          });
-
           if (isOverPoint) {
-            console.log("🔴 Hovering over point, clearing ghost point");
             setGhostPoint(null);
           } else {
-            console.log("🔵 Calling findClosestPointOnPath with:", {
-              cursorPos: imagePos,
-              pointsLength: initialPoints.length,
-              points: initialPoints.map((p) => ({ id: p.id, x: p.x, y: p.y, prevPointId: p.prevPointId })),
-              allowClose,
-              finalIsPathClosed,
-            });
             const closestPathPoint = findClosestPointOnPath(imagePos, initialPoints, allowClose, finalIsPathClosed);
 
             if (closestPathPoint) {
               const snappedGhostPoint = snapToPixel(closestPathPoint.point, pixelSnapping);
-              console.log("🟢 Found closest path point:", {
-                raw: closestPathPoint.point,
-                snapped: snappedGhostPoint,
-                imagePos,
-                segmentIndex: closestPathPoint.segmentIndex,
-                pointsSample: initialPoints.slice(0, 2).map((p) => ({ x: p.x, y: p.y })),
-              });
 
               if (closestPathPoint.segmentIndex === initialPoints.length) {
                 const lastPoint = initialPoints[initialPoints.length - 1];
@@ -2611,7 +2554,6 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   prevPointId: lastPoint.id,
                   nextPointId: firstPoint.id,
                 };
-                console.log("🟢 Setting ghost point (closing segment):", ghostPointData);
                 setGhostPoint(ghostPointData);
               } else {
                 const currentPoint = initialPoints[closestPathPoint.segmentIndex];
@@ -2626,14 +2568,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                     prevPointId: prevPoint.id,
                     nextPointId: currentPoint.id,
                   };
-                  console.log("🟢 Setting ghost point (regular segment):", {
-                    ghostPointData,
-                    currentPoint: { x: currentPoint.x, y: currentPoint.y },
-                    prevPoint: { x: prevPoint.x, y: prevPoint.y },
-                  });
                   setGhostPoint(ghostPointData);
-                } else {
-                  console.log("🔴 No prevPoint found for currentPoint:", { currentPoint, prevPoint });
                 }
               }
             } else {
