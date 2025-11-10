@@ -853,12 +853,5 @@ class TaskManager(models.Manager):
         return self.get_queryset().filter(project__organization=user.active_organization)
 
     def with_state(self):
-        """
-        Convenience method to return queryset with FSM state annotated.
-
-        Example:
-            tasks = Task.objects.with_state().filter(project=project)
-            for task in tasks:
-                print(task.current_state)  # No N+1 queries!
-        """
+        """Return queryset with FSM state annotated."""
         return self.get_queryset().annotate_fsm_state()

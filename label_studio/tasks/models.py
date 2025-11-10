@@ -598,14 +598,7 @@ class AnnotationManager(models.Manager):
         return self.get_queryset().filter(project__organization=user.active_organization)
 
     def with_state(self):
-        """
-        Return queryset with FSM state annotated.
-
-        Example:
-            annotations = Annotation.objects.with_state().filter(task=task)
-            for annotation in annotations:
-                print(annotation.current_state)  # No N+1 queries!
-        """
+        """Return queryset with FSM state annotated."""
         return self.get_queryset().annotate_fsm_state()
 
     def bulk_create(self, objs, batch_size=None):
@@ -865,14 +858,7 @@ class TaskLockManager(models.Manager):
         return TaskLockQuerySetWithFSM(self.model, using=self._db)
 
     def with_state(self):
-        """
-        Convenience method to return queryset with FSM state annotated.
-
-        Example:
-            locks = TaskLock.objects.with_state().filter(task=task)
-            for lock in locks:
-                print(lock.current_state)  # No N+1 queries!
-        """
+        """Return queryset with FSM state annotated."""
         return self.get_queryset().annotate_fsm_state()
 
 
@@ -913,14 +899,7 @@ class AnnotationDraftManager(models.Manager):
         return AnnotationDraftQuerySetWithFSM(self.model, using=self._db)
 
     def with_state(self):
-        """
-        Convenience method to return queryset with FSM state annotated.
-
-        Example:
-            drafts = AnnotationDraft.objects.with_state().filter(task=task)
-            for draft in drafts:
-                print(draft.current_state)  # No N+1 queries!
-        """
+        """Return queryset with FSM state annotated."""
         return self.get_queryset().annotate_fsm_state()
 
 
