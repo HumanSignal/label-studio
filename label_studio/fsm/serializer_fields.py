@@ -69,6 +69,8 @@ class FSMStateField(serializers.ReadOnlyField):
     """
 
     def __init__(self, **kwargs):
+        # Set source='*' to pass the entire object instance to to_representation()
+        # instead of a specific attribute, since we check multiple possible attributes
         kwargs.setdefault('source', '*')
         super().__init__(**kwargs)
 
