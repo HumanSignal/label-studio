@@ -5,6 +5,7 @@ import {
   ControlPoints,
   GhostLine,
   GhostPoint,
+  type GhostPointRef,
   VectorPoints,
   VectorShape,
   VectorTransformer,
@@ -394,6 +395,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       if (e.shiftKey) {
         setIsShiftKeyHeld(true);
         setIsDisconnectedMode(true);
+        // Recalculate ghost point when Shift is pressed
+        // Use a small delay to ensure state is updated
+        setTimeout(() => {
+          if (calculateGhostPointRef.current) {
+            // Pass true for shiftKeyState since Shift is being pressed
+            calculateGhostPointRef.current(true);
+          }
+        }, 0);
       }
     };
 
@@ -401,6 +410,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       if (!e.shiftKey) {
         setIsShiftKeyHeld(false);
         setIsDisconnectedMode(false);
+        // Clear ghost point when Shift is released
+        setGhostPoint(null);
       }
     };
 
@@ -428,6 +439,21 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   const shapeDragDistance = useRef(0);
   const [isDisconnectedMode, setIsDisconnectedMode] = useState(false);
   const [ghostPoint, setGhostPoint] = useState<GhostPointType | null>(null);
+
+  // Clear ghost point when conditions change that should hide it
+  useEffect(() => {
+    // Clear ghost point when:
+    // - Shape is disabled
+    // - Max points reached
+    // Note: Shift key release is handled in handleKeyUp, not here
+    if (
+      disabled ||
+      (maxPoints !== undefined && initialPoints.length >= maxPoints)
+    ) {
+      setGhostPoint(null);
+    }
+  }, [disabled, maxPoints, initialPoints.length]);
+
   const [_newPointDragIndex, setNewPointDragIndex] = useState<number | null>(null);
   const [isDraggingNewBezier, setIsDraggingNewBezier] = useState(false);
   const [ghostPointDragInfo, setGhostPointDragInfo] = useState<{
@@ -674,6 +700,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   );
 
   const isDragging = useRef(false);
+  const [stageReadyRetry, setStageReadyRetry] = useState(0);
+  const calculateGhostPointRef = useRef<(() => void) | null>(null);
+  const ghostPointRef = useRef<GhostPointRef | null>(null);
 
   // Ref to prevent effect from running multiple times
   const handlersAttachedRef = useRef(false);
@@ -728,6 +757,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     lastAddedPointId,
     disabled,
     onFinish,
+    isShiftKeyHeld,
   };
 
   // Determine if drawing should be disabled based on current interaction context
@@ -1930,15 +1960,149 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
     const group = stageRef.current;
     if (!group) {
-      return;
+      // If stageRef is not available yet, try again after a short delay
+      const retryTimeout = setTimeout(() => {
+        if (!handlersAttachedRef.current) {
+          // Force re-run by incrementing retry counter
+          setStageReadyRetry((prev) => prev + 1);
+        }
+      }, 100);
+      return () => {
+        clearTimeout(retryTimeout);
+      };
     }
 
     const stage = group.getStage();
     if (!stage) {
-      return;
+      // If stage is not available yet, try again after a short delay
+      const retryTimeout = setTimeout(() => {
+        if (!handlersAttachedRef.current) {
+          // Force re-run by incrementing retry counter
+          setStageReadyRetry((prev) => prev + 1);
+        }
+      }, 100);
+      return () => {
+        clearTimeout(retryTimeout);
+      };
     }
 
     handlersAttachedRef.current = true;
+
+    // Helper function to calculate and set ghost point based on current cursor position
+    const calculateGhostPoint = (shiftKeyState?: boolean, eventPos?: { x: number; y: number }) => {
+      const group = stageRef.current;
+      if (!group) return;
+      const stage = group.getStage();
+      if (!stage) return;
+
+      // Use event position if provided, otherwise fall back to stage.getPointerPosition()
+      const pos = eventPos || stage.getPointerPosition();
+      if (!pos) return;
+
+      const {
+        transform,
+        fitScale,
+        x,
+        y,
+        width,
+        height,
+        initialPoints,
+        allowClose,
+        finalIsPathClosed,
+        pixelSnapping,
+        isDraggingNewBezier,
+        ghostPointDragInfo,
+        disabled,
+        isShiftKeyHeld: refShiftState,
+      } = currentValuesRef.current;
+
+      if (disabled || isDragging.current || isDraggingNewBezier || ghostPointDragInfo?.isDragging) {
+        return;
+      }
+
+      const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+
+      // Only process ghost point logic if within bounds
+      if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
+        // Use provided shiftKeyState or fall back to ref value
+        const currentShiftState = shiftKeyState !== undefined ? shiftKeyState : refShiftState ?? false;
+        if (initialPoints.length >= 2 && currentShiftState) {
+          const scale = transform.zoom * fitScale;
+          const hitRadius = 10 / scale;
+          let isOverPoint = false;
+
+          for (let i = 0; i < initialPoints.length; i++) {
+            const point = initialPoints[i];
+            const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
+
+            if (distance <= hitRadius) {
+              isOverPoint = true;
+              break;
+            }
+          }
+
+          if (isOverPoint) {
+            setGhostPoint(null);
+          } else {
+            const closestPathPoint = findClosestPointOnPath(imagePos, initialPoints, allowClose, finalIsPathClosed);
+
+            if (closestPathPoint) {
+              const snappedGhostPoint = snapToPixel(closestPathPoint.point, pixelSnapping);
+
+              // Always create a new ghost point object to ensure React detects the change
+              let newGhostPoint: { x: number; y: number; prevPointId: string; nextPointId: string };
+              
+              if (closestPathPoint.segmentIndex === initialPoints.length) {
+                const lastPoint = initialPoints[initialPoints.length - 1];
+                const firstPoint = initialPoints[0];
+
+                newGhostPoint = {
+                  x: snappedGhostPoint.x,
+                  y: snappedGhostPoint.y,
+                  prevPointId: lastPoint.id,
+                  nextPointId: firstPoint.id,
+                };
+              } else {
+                const currentPoint = initialPoints[closestPathPoint.segmentIndex];
+                const prevPoint = currentPoint?.prevPointId
+                  ? initialPoints.find((p) => p.id === currentPoint.prevPointId)
+                  : null;
+
+                if (currentPoint && prevPoint) {
+                  newGhostPoint = {
+                    x: snappedGhostPoint.x,
+                    y: snappedGhostPoint.y,
+                    prevPointId: prevPoint.id,
+                    nextPointId: currentPoint.id,
+                  };
+                } else {
+                  setGhostPoint(null);
+                  return;
+                }
+              }
+
+              // Always update the ghost point with a new object reference
+              // This ensures React detects the change and re-renders
+              setGhostPoint({ ...newGhostPoint });
+              
+              // Also update directly via ref for immediate visual update
+              if (ghostPointRef.current) {
+                ghostPointRef.current.updatePosition(newGhostPoint.x, newGhostPoint.y);
+              }
+            } else {
+              setGhostPoint(null);
+            }
+          }
+        } else {
+          setGhostPoint(null);
+        }
+      } else {
+        setGhostPoint(null);
+      }
+    };
+
+    // Store the function in a ref so it can be accessed from handleKeyDown
+    calculateGhostPointRef.current = calculateGhostPoint;
 
     // Only set up stage-level dragging when disableInternalPointAddition is true
     // Otherwise, let the layer handlers handle it
@@ -1955,12 +2119,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           fitScale,
           x,
           y,
+          width,
+          height,
           initialPoints,
           allowClose,
           finalIsPathClosed,
           pixelSnapping,
           isDraggingNewBezier,
           ghostPointDragInfo,
+          disabled,
         } = currentValuesRef.current;
 
         // Update Shift key state from the event to keep it in sync
@@ -1982,79 +2149,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           stage.batchDraw();
         });
 
-        // Only process ghost point logic if within bounds
-        if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
-          // Handle ghost point when Shift is held (check event directly for real-time updates)
-          // Only show ghost point when region is selected (not disabled)
-          if (
-            e.evt.shiftKey &&
-            imagePos &&
-            initialPoints.length >= 2 &&
-            !isDragging.current &&
-            !isDraggingNewBezier &&
-            !ghostPointDragInfo?.isDragging &&
-            !disabled
-          ) {
-            const scale = transform.zoom * fitScale;
-            const hitRadius = 10 / scale;
-            let isOverPoint = false;
-
-            for (let i = 0; i < initialPoints.length; i++) {
-              const point = initialPoints[i];
-              const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
-
-              if (distance <= hitRadius) {
-                isOverPoint = true;
-                break;
-              }
-            }
-
-            if (isOverPoint) {
-              setGhostPoint(null);
-            } else {
-              const closestPathPoint = findClosestPointOnPath(imagePos, initialPoints, allowClose, finalIsPathClosed);
-
-              if (closestPathPoint) {
-                const snappedGhostPoint = snapToPixel(closestPathPoint.point, pixelSnapping);
-
-                if (closestPathPoint.segmentIndex === initialPoints.length) {
-                  const lastPoint = initialPoints[initialPoints.length - 1];
-                  const firstPoint = initialPoints[0];
-
-                  const newGhostPoint = {
-                    x: snappedGhostPoint.x,
-                    y: snappedGhostPoint.y,
-                    prevPointId: lastPoint.id,
-                    nextPointId: firstPoint.id,
-                  };
-                  setGhostPoint(newGhostPoint);
-                } else {
-                  const currentPoint = initialPoints[closestPathPoint.segmentIndex];
-                  const prevPoint = currentPoint?.prevPointId
-                    ? initialPoints.find((p) => p.id === currentPoint.prevPointId)
-                    : null;
-
-                  if (currentPoint && prevPoint) {
-                    const newGhostPoint = {
-                      x: snappedGhostPoint.x,
-                      y: snappedGhostPoint.y,
-                      prevPointId: prevPoint.id,
-                      nextPointId: currentPoint.id,
-                    };
-                    setGhostPoint(newGhostPoint);
-                  }
-                }
-              } else {
-                setGhostPoint(null);
-              }
-            }
-          } else if (!e.evt.shiftKey) {
-            setGhostPoint(null);
-          }
-        } else {
-          // When outside bounds, clear ghost point but keep cursor position for ghost line
-          setGhostPoint(null);
-        }
+        // Recalculate ghost point using the helper function
+        // Pass the event's shiftKey state and position for real-time updates
+        calculateGhostPoint(e.evt.shiftKey, pos);
       };
 
       const handleStageMouseEnter = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -2438,6 +2535,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       ghostLineRafRef.current = requestAnimationFrame(() => {
         stage.batchDraw();
       });
+
+      // Recalculate ghost point using the helper function
+      // Pass the event's shiftKey state and position for real-time updates
+      if (calculateGhostPointRef.current) {
+        calculateGhostPointRef.current(e.evt.shiftKey, pos);
+      }
 
       // Handle shape dragging first (if active, allow dragging to continue even outside bounds)
       // Skip individual shape dragging if in multi-region mode (ImageTransformer handles it)
@@ -2845,7 +2948,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         stage.off("mouseleave", handleStageMouseLeave);
       };
     }
-  }, []); // Empty dependency array - only run once on mount
+  }, [disableInternalPointAddition, stageReadyRetry]); // Re-run when disableInternalPointAddition changes or when retrying
 
   // Handle Shift key for disconnected mode
   useEffect(() => {
@@ -3775,6 +3878,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
           {/* Ghost point */}
           <GhostPoint
+            ref={ghostPointRef}
             ghostPoint={ghostPoint}
             transform={transform}
             fitScale={fitScale}
