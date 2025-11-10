@@ -437,13 +437,7 @@ class PredictionsDMFieldSerializer(serializers.SerializerMethodField):
 
 
 class DataManagerTaskSerializer(TaskSerializer):
-    """
-    Data Manager Task Serializer with FSM state support.
-
-    Note: The 'state' field will be populated from the queryset annotation
-    if present, preventing N+1 queries. Ensure your queryset uses .with_state()
-    or .annotate_fsm_state() for optimal performance.
-    """
+    """Data Manager Task Serializer with FSM state support."""
 
     predictions = PredictionsDMFieldSerializer(required=False, read_only=True)
     annotations = AnnotationsDMFieldSerializer(required=False, many=True, default=[], read_only=True)
