@@ -119,14 +119,6 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         const transformer = transformerRef.current;
         if (transformer && bounds) {
           try {
-            console.log("🎯 onTransform called", {
-              transformerPos: { x: transformer.x(), y: transformer.y() },
-              transformerSize: { width: transformer.width(), height: transformer.height() },
-              transformerRotation: transformer.rotation(),
-              transformerScale: { x: transformer.scaleX(), y: transformer.scaleY() },
-              nodesCount: transformer.nodes().length,
-            });
-
             // Check if we need to constrain the transformer position
             const constraints = calculateTransformerConstraints(
               transformer,
@@ -164,17 +156,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               updateCurrentPointsRef(newPoints);
             }
 
-            console.log("📊 After applyTransformationToPoints:", {
-              initialPointsLength: initialPoints.length,
-              newPointsLength: newPoints.length,
-              firstPoint: newPoints[0] ? { x: newPoints[0].x, y: newPoints[0].y } : null,
-              isFirstTick: isFirstTransformTickRef.current,
-            });
-
             // Skip control point transformations on the first tick to avoid jumping
             if (isFirstTransformTickRef.current) {
               isFirstTransformTickRef.current = false;
-              console.log("✅ First tick - calling onPointsChange with newPoints");
               onPointsChange?.(newPoints);
             } else {
               // Apply transformation to control points using RAF
@@ -196,7 +180,6 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
                   transformerCenter.y,
                   isActualRotation, // Only apply rotation logic if there's actual rotation
                 );
-                console.log("✅ RAF tick - calling onPointsChange with updatedPoints");
                 onPointsChange?.(updatedPoints);
               });
             }
