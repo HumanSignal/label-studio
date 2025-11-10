@@ -726,7 +726,11 @@ def annotate_state(queryset):
     queryset = queryset.annotate_fsm_state()
 
     # Alias 'current_state' to 'state' for Data Manager column compatibility
-    return queryset.annotate(state=F('current_state'))
+    # Only add the alias if current_state was actually added (feature flags enabled)
+    if 'current_state' in queryset.query.annotations:
+        return queryset.annotate(state=F('current_state'))
+
+    return queryset
 
 
 settings.DATA_MANAGER_ANNOTATIONS_MAP = {
