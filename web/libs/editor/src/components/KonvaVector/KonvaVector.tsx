@@ -271,6 +271,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Normalize input points to BezierPoint format
   const [initialPoints, setInitialPoints] = useState(() => normalizePoints(rawInitialPoints));
 
+  // Ref to track current points for immediate access during transformation
+  // This ensures applyTransformationToPoints always uses the latest points
+  const currentPointsRef = useRef<BezierPoint[]>(initialPoints);
+
+  // Update ref whenever initialPoints state changes
+  useEffect(() => {
+    currentPointsRef.current = initialPoints;
+  }, [initialPoints]);
+
   // Ref to track if we're updating points internally to prevent infinite loops
   const isInternalUpdateRef = useRef(false);
   // Ref to track the last normalized points to prevent unnecessary updates
@@ -368,7 +377,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   const transformerRef = useRef<Konva.Transformer>(null);
   const stageRef = useRef<Konva.Layer>(null);
   const pointRefs = useRef<{ [key: number]: Konva.Circle | null }>({});
-  const proxyRefs = useRef<{ [key: number]: Konva.Rect | null }>({});
+  const proxyRefs = useRef<{ [key: number]: Konva.Circle | null }>({});
   // Store transformer state to preserve rotation, scale, and center when updating selection
   const transformerStateRef = useRef<{
     rotation: number;
@@ -951,6 +960,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       isInternalUpdateRef.current = true;
       // Update the ref to track the last normalized points
       lastNormalizedPointsRef.current = points;
+      // Update current points ref immediately for transformation callbacks
+      currentPointsRef.current = points;
       setInitialPoints(points);
       // Clear flag immediately - it only needs to prevent the current useEffect run
       isInternalUpdateRef.current = false;
@@ -960,6 +971,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     },
     [onPointsChange],
   );
+
+  // Function to update current points ref - used by VectorTransformer during transformation
+  const updateCurrentPointsRef = useCallback((points: BezierPoint[]) => {
+    currentPointsRef.current = points;
+  }, []);
+  
+  // Function to get current points ref - used by VectorTransformer during transformation
+  const getCurrentPointsRef = useCallback(() => {
+    return currentPointsRef.current;
+  }, []);
   const setSelectedPointsStable = useCallback((selectedPoints: Set<number>) => {
     setSelectedPoints(selectedPoints);
   }, []);
@@ -3389,8 +3410,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               scaleY={scaleY}
               transform={transform}
               fitScale={fitScale}
+              getCurrentPointsRef={getCurrentPointsRef}
+              updateCurrentPointsRef={updateCurrentPointsRef}
               onPointsChange={(newPoints) => {
                 // Update main path points
+                console.log("📥 VectorTransformer onPointsChange callback:", {
+                  newPointsLength: newPoints.length,
+                  firstPoint: newPoints[0] ? { x: newPoints[0].x, y: newPoints[0].y } : null,
+                });
                 onPointsChange?.(newPoints);
               }}
               onTransformStateChange={(state) => {
@@ -3692,7 +3719,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               initialPoints={getAllPoints()}
               transformerRef={transformerRef}
               proxyRefs={proxyRefs}
-              onPointsChange={onPointsChange}
+              getCurrentPointsRef={getCurrentPointsRef}
+              updateCurrentPointsRef={updateCurrentPointsRef}
+              onPointsChange={(newPoints) => {
+                // Update main path points
+                console.log("📥 VectorTransformer onPointsChange callback (second instance):", {
+                  newPointsLength: newPoints.length,
+                  firstPoint: newPoints[0] ? { x: newPoints[0].x, y: newPoints[0].y } : null,
+                });
+                onPointsChange?.(newPoints);
+              }}
               onTransformationComplete={notifyTransformationComplete}
               bounds={{ x: 0, y: 0, width, height }}
               transform={transform}

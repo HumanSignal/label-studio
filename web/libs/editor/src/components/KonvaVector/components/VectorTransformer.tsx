@@ -16,7 +16,7 @@ interface VectorTransformerProps {
   selectedPoints: Set<number>;
   initialPoints: BezierPoint[];
   transformerRef: React.RefObject<any>;
-  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Rect | null }>;
+  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Circle | null }>;
   onPointsChange?: (points: BezierPoint[]) => void;
   onTransformStateChange?: (state: {
     rotation: number;
@@ -33,6 +33,8 @@ interface VectorTransformerProps {
   scaleY?: number;
   transform?: { zoom: number; offsetX: number; offsetY: number };
   fitScale?: number;
+  updateCurrentPointsRef?: (points: BezierPoint[]) => void;
+  getCurrentPointsRef?: () => BezierPoint[];
 }
 
 export const VectorTransformer: React.FC<VectorTransformerProps> = ({
@@ -50,6 +52,8 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
   scaleY = 1,
   transform = { zoom: 1, offsetX: 0, offsetY: 0 },
   fitScale = 1,
+  updateCurrentPointsRef,
+  getCurrentPointsRef,
 }) => {
   const transformerStateRef = React.useRef<{
     rotation: number;
@@ -115,6 +119,14 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         const transformer = transformerRef.current;
         if (transformer && bounds) {
           try {
+            console.log("🎯 onTransform called", {
+              transformerPos: { x: transformer.x(), y: transformer.y() },
+              transformerSize: { width: transformer.width(), height: transformer.height() },
+              transformerRotation: transformer.rotation(),
+              transformerScale: { x: transformer.scaleX(), y: transformer.scaleY() },
+              nodesCount: transformer.nodes().length,
+            });
+
             // Check if we need to constrain the transformer position
             const constraints = calculateTransformerConstraints(
               transformer,
@@ -143,11 +155,26 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               originalPositionsRef.current,
               transformerCenter,
               bounds,
+              getCurrentPointsRef,
+              updateCurrentPointsRef,
             );
+            
+            // Update the ref immediately so next transformation tick uses latest points
+            if (updateCurrentPointsRef) {
+              updateCurrentPointsRef(newPoints);
+            }
+
+            console.log("📊 After applyTransformationToPoints:", {
+              initialPointsLength: initialPoints.length,
+              newPointsLength: newPoints.length,
+              firstPoint: newPoints[0] ? { x: newPoints[0].x, y: newPoints[0].y } : null,
+              isFirstTick: isFirstTransformTickRef.current,
+            });
 
             // Skip control point transformations on the first tick to avoid jumping
             if (isFirstTransformTickRef.current) {
               isFirstTransformTickRef.current = false;
+              console.log("✅ First tick - calling onPointsChange with newPoints");
               onPointsChange?.(newPoints);
             } else {
               // Apply transformation to control points using RAF
@@ -169,6 +196,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
                   transformerCenter.y,
                   isActualRotation, // Only apply rotation logic if there's actual rotation
                 );
+                console.log("✅ RAF tick - calling onPointsChange with updatedPoints");
                 onPointsChange?.(updatedPoints);
               });
             }
@@ -366,7 +394,14 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               originalPositionsRef.current,
               transformerCenter,
               bounds,
+              getCurrentPointsRef,
+              updateCurrentPointsRef,
             );
+            
+            // Update the ref immediately so next transformation tick uses latest points
+            if (updateCurrentPointsRef) {
+              updateCurrentPointsRef(newPoints);
+            }
 
             // Apply transformation to control points using RAF
             if (rafIdRef.current) {
@@ -412,7 +447,14 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             originalPositionsRef.current,
             transformerCenter,
             bounds,
+            getCurrentPointsRef,
+            updateCurrentPointsRef,
           );
+          
+          // Update the ref immediately so next transformation uses latest points
+          if (updateCurrentPointsRef) {
+            updateCurrentPointsRef(newPoints);
+          }
 
           // Apply control point transformations
           const updatedPoints = applyTransformationToControlPoints(
@@ -467,7 +509,14 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             originalPositionsRef.current,
             transformerCenter,
             bounds,
+            getCurrentPointsRef,
+            updateCurrentPointsRef,
           );
+          
+          // Update the ref immediately so next transformation uses latest points
+          if (updateCurrentPointsRef) {
+            updateCurrentPointsRef(newPoints);
+          }
           // Apply control point transformations
           const isActualRotation = Math.abs(transformer.rotation()) > 1.0;
           const updatedPoints = applyTransformationToControlPoints(
