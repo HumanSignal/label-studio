@@ -9,6 +9,7 @@ meta_title: Access tokens
 meta_description: Access tokens to interact with the Label Studio API and SDK. 
 section: "Manage Your Organization"
 date: 2025-02-18 12:03:59
+parent_enterprise: "admin_settings"
 ---
 
 Label Studio has personal access tokens and legacy tokens. These tokens are also referred to as your "API keys." 
