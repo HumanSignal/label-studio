@@ -19,7 +19,7 @@ const CustomInterfaceModel = types.compose(
 if (!APP_SETTINGS?.billing?.enterprise && !Registry.models.custominterface) {
   const CustomComponentWrapper = observer(({ item }) => {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 py-base">
         <EnterpriseBadge />
         CustomInterface tag is only available in the enterprise.
       </div>
