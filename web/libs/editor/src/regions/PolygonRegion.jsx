@@ -441,29 +441,10 @@ const Poly = memo(
               }, []),
             );
 
-            // Reset transform attributes
             t.setAttr("x", 0);
             t.setAttr("y", 0);
             t.setAttr("scaleX", 1);
             t.setAttr("scaleY", 1);
-
-            // CRITICAL: Update the Line's points to match the updated data points
-            // After resetting transform, the Line's internal points array still has old coordinates
-            // This causes hit detection to be off after resize - clicking where the shape WAS instead of where it IS
-            // Use setTimeout to ensure MobX has updated item.points before we read it
-            setTimeout(() => {
-              const updatedFlattenedPoints = item.points.reduce((flattened, point) => {
-                flattened.push(point.canvasX, point.canvasY);
-                return flattened;
-              }, []);
-              t.setAttr("points", updatedFlattenedPoints);
-              
-              // Force a redraw to ensure hit detection cache is updated
-              const layer = t.getLayer();
-              if (layer) {
-                layer.batchDraw();
-              }
-            }, 0);
           }}
           draggable={draggable}
         />
