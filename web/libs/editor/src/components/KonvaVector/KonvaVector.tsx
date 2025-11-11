@@ -245,6 +245,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     onMouseUp,
     onClick,
     onDblClick,
+    onTransformStart,
     onTransformEnd,
     onMouseEnter,
     onMouseLeave,
@@ -483,6 +484,25 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
   // Flag to track if we've handled a double-click through debouncing
   const doubleClickHandledRef = useRef(false);
+
+  // Track if we're currently transforming to avoid duplicate onTransformStart calls
+  const isTransformingRef = useRef(false);
+
+  // Helper function to call onTransformStart (only if not already transforming)
+  const handleTransformStart = useCallback(() => {
+    if (!isTransformingRef.current && onTransformStart) {
+      isTransformingRef.current = true;
+      onTransformStart();
+    }
+  }, [onTransformStart]);
+
+  // Helper function to call onTransformEnd (only if currently transforming)
+  const handleTransformEnd = useCallback((e?: Konva.KonvaEventObject<MouseEvent>) => {
+    if (isTransformingRef.current && onTransformEnd) {
+      isTransformingRef.current = false;
+      onTransformEnd(e);
+    }
+  }, [onTransformEnd]);
 
   // Track initial transform state for delta calculation
   const initialTransformRef = useRef<{
@@ -1937,9 +1957,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // If there's a pending transform, commit it before the Group is unmounted/reset
       if ((currentX !== 0 || currentY !== 0) && initialTransformRef.current) {
         commitMultiRegionTransform();
+        handleTransformEnd();
       }
     }
-  }, [isMultiRegionSelected, commitMultiRegionTransform]);
+  }, [isMultiRegionSelected, commitMultiRegionTransform, handleTransformEnd]);
 
   // Clean up click timeout on unmount
   useEffect(() => {
@@ -2305,6 +2326,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               if (controlPoint) {
                 setDraggedControlPoint({ pointIndex, controlIndex });
                 isDragging.current = true;
+                handleTransformStart();
                 lastPos.current = {
                   x: e.evt.clientX,
                   y: e.evt.clientY,
@@ -2415,6 +2437,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             if (distance <= hitRadius) {
               setDraggedControlPoint({ pointIndex: i, controlIndex: 1 });
               isDragging.current = true;
+              handleTransformStart();
               lastPos.current = {
                 x: e.evt.clientX,
                 y: e.evt.clientY,
@@ -2432,6 +2455,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             if (distance <= hitRadius) {
               setDraggedControlPoint({ pointIndex: i, controlIndex: 2 });
               isDragging.current = true;
+              handleTransformStart();
               lastPos.current = {
                 x: e.evt.clientX,
                 y: e.evt.clientY,
@@ -2653,6 +2677,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
           if (!isDragging.current && (mouseDeltaX > dragThreshold || mouseDeltaY > dragThreshold)) {
             isDragging.current = true;
+            handleTransformStart();
           }
 
           if (!isDragging.current) {
@@ -2749,6 +2774,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         const actuallyDragged = shapeDragDistance.current > dragThreshold;
 
         setIsDraggingShape(false);
+        handleTransformEnd(e);
         shapeDragStartPos.current = null;
         originalPointsPositions.current = [];
 
@@ -2787,6 +2813,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
       // Reset dragging state
       isDragging.current = false;
+      handleTransformEnd(e);
       setDraggedPointIndex(null);
       setDraggedControlPoint(null);
     };
@@ -3166,6 +3193,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             // Commit the transform immediately to prevent position reset
             if (e.target === e.currentTarget && transformableGroupRef.current && initialTransformRef.current) {
               commitMultiRegionTransform();
+              handleTransformEnd(e);
             }
           }}
         >
@@ -3293,6 +3321,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               // Start shape dragging (don't stop propagation yet - we'll do it on mouseup if we actually drag)
               setIsDraggingShape(true);
+              handleTransformStart();
               shapeDragDistance.current = 0; // Reset drag distance
               shapeDragStartPos.current = {
                 x: e.evt.clientX,
@@ -3501,9 +3530,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }}
               onTransformationStart={() => {
                 setIsTransforming(true);
+                handleTransformStart();
               }}
               onTransformationEnd={() => {
                 setIsTransforming(false);
+                handleTransformEnd();
               }}
             />
           )}
@@ -3634,6 +3665,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               // Start shape dragging (don't stop propagation yet - we'll do it on mouseup if we actually drag)
               setIsDraggingShape(true);
+              handleTransformStart();
               shapeDragDistance.current = 0; // Reset drag distance
               shapeDragStartPos.current = {
                 x: e.evt.clientX,
@@ -3873,6 +3905,12 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 onPointsChange?.(newPoints);
               }}
               onTransformationComplete={notifyTransformationComplete}
+              onTransformationStart={() => {
+                handleTransformStart();
+              }}
+              onTransformationEnd={() => {
+                handleTransformEnd();
+              }}
               bounds={{ x: 0, y: 0, width, height }}
               transform={transform}
               fitScale={fitScale}

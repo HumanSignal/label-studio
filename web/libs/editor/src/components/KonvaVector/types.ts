@@ -207,8 +207,11 @@ export interface KonvaVectorProps {
   onClick?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Double click event handler */
   onDblClick?: (e: KonvaEventObject<MouseEvent>) => void;
-  /** Transform end event handler */
-  onTransformEnd?: (e: KonvaEventObject<MouseEvent>) => void;
+  /** Called when transformation starts (point dragging, multi-point transformation, etc.) */
+  onTransformStart?: () => void;
+  /** Called when transformation ends (point dragging, multi-point transformation, etc.) */
+  /** Can be called with an optional event parameter for backward compatibility */
+  onTransformEnd?: (e?: KonvaEventObject<MouseEvent>) => void;
   /** Mouse enter event handler */
   onMouseEnter?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse leave event handler */

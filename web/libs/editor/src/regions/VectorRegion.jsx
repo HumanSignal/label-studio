@@ -573,7 +573,12 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             e.evt.preventDefault();
             item.handleFinish();
           }}
+          onTransformStart={() => {
+            item.parent.annotation.history.freeze();
+          }}
           onTransformEnd={(e) => {
+            item.parent.annotation.history.unfreeze();
+
             if (e.target !== e.currentTarget) return;
 
             const t = e.target;
