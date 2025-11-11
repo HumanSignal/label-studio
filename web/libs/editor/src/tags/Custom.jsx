@@ -6,7 +6,9 @@ import { observer } from "mobx-react";
 import { EnterpriseBadge } from "@humansignal/ui";
 import Registry from "../core/Registry";
 
-const CustomInterfaceModel = types.model("CustomInterfaceModel", {});
+const CustomInterfaceModel = types.model("CustomInterfaceModel", {
+  type: "custominterface",
+});
 
 // Register custom tag placeholder for opensource
 if (!APP_SETTINGS?.billing?.enterprise && !Registry.models.custominterface) {
