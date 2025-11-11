@@ -640,22 +640,32 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     };
 
     // Detach and reattach the transformer to prevent resizing issues
+    // BUT: Delay this when multiple regions are selected to allow other regions'
+    // onTransformEnd handlers to fire first (e.g., PolygonRegion's Line onTransformEnd)
     const stage = transformableGroup.getStage();
     if (stage) {
       const transformer = stage.findOne("Transformer");
       if (transformer) {
-        // Temporarily detach the transformer
+        // Check if there are multiple nodes attached (multiple regions selected)
         const nodes = transformer.nodes();
-        transformer.nodes([]);
-
-        // Force a redraw
-        stage.batchDraw();
-
-        // Reattach the transformer after a brief delay
+        const hasMultipleRegions = nodes.length > 1;
+        
+        // If multiple regions, delay the detach/reattach to allow other onTransformEnd handlers to fire
+        const delay = hasMultipleRegions ? 50 : 0;
+        
         setTimeout(() => {
-          transformer.nodes(nodes);
+          // Temporarily detach the transformer
+          transformer.nodes([]);
+
+          // Force a redraw
           stage.batchDraw();
-        }, 0);
+
+          // Reattach the transformer after a brief delay
+          setTimeout(() => {
+            transformer.nodes(nodes);
+            stage.batchDraw();
+          }, 0);
+        }, delay);
       }
     }
   }, [isMultiRegionSelected, initialPoints, width, height, onPointsChange]);
