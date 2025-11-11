@@ -5,10 +5,15 @@ import { types } from "mobx-state-tree";
 import { observer } from "mobx-react";
 import { EnterpriseBadge } from "@humansignal/ui";
 import Registry from "../core/Registry";
+import ControlBase from "./control/Base";
 
-const CustomInterfaceModel = types.model("CustomInterfaceModel", {
-  type: "custominterface",
-});
+const CustomInterfaceModel = types.compose(
+  "CustomInterfaceModel",
+  ControlBase,
+  types.model({
+    type: "custominterface",
+  }),
+);
 
 // Register custom tag placeholder for opensource
 if (!APP_SETTINGS?.billing?.enterprise && !Registry.models.custominterface) {
