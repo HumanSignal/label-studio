@@ -657,6 +657,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             }
           }}
           onPointsChange={(points) => {
+            console.log("change");
             item.updatePointsFromKonvaVector(points);
           }}
           onPathClosedChange={(isClosed) => {
