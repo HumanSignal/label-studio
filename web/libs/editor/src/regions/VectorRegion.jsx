@@ -579,6 +579,9 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           onTransformEnd={(e) => {
             item.parent.annotation.history.unfreeze();
 
+            // Handle case where event might be undefined (e.g., from onTransformationEnd)
+            if (!e || !e.target || !e.currentTarget) return;
+
             if (e.target !== e.currentTarget) return;
 
             const t = e.target;

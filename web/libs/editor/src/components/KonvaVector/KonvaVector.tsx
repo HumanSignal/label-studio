@@ -2965,6 +2965,24 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Click handler with debouncing for single/double-click detection
   const handleClickWithDebouncing = useCallback(
     (e: any, onClickHandler?: (e: any) => void, onDblClickHandler?: (e: any) => void) => {
+      // If disabled, fire onClick immediately (no need to wait for double-click detection)
+      if (disabled) {
+        if (onClickHandler) {
+          const newEvent = {
+            ...e,
+            evt: {
+              ...e.evt,
+              defaultPrevented: false,
+              stopImmediatePropagation: e.evt.stopImmediatePropagation?.bind(e.evt) || (() => {}),
+              stopPropagation: e.evt.stopPropagation?.bind(e.evt) || (() => {}),
+              preventDefault: e.evt.preventDefault?.bind(e.evt) || (() => {}),
+            },
+          };
+          onClickHandler(newEvent);
+        }
+        return;
+      }
+
       // Clear any existing timeout
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
@@ -2994,7 +3012,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         return;
       }
 
-      // Set a timeout for single-click handling
+      // Set a timeout for single-click handling (only when not disabled, to detect double-clicks)
       clickTimeoutRef.current = setTimeout(() => {
         clickTimeoutRef.current = null;
         if (onClickHandler) {
@@ -3015,9 +3033,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           };
           onClickHandler(newEvent);
         }
-      }, 300);
+      }, 200);
     },
-    [],
+    [disabled],
   );
 
   // Create event handlers
