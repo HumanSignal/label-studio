@@ -1,6 +1,3 @@
-// Function-based CustomInterface available only in Label Studio Enterprise
-import React from "react";
-
 import { types } from "mobx-state-tree";
 import { observer } from "mobx-react";
 import { EnterpriseBadge } from "@humansignal/ui";
