@@ -8,12 +8,7 @@ import {
   closePathBetweenFirstAndLast,
 } from "./drawing";
 import { deletePoint } from "../pointManagement";
-import {
-  handlePointDeselection,
-  handlePointSelection,
-  shouldClosePathOnPointClick,
-  isActivePointEligibleForClosing,
-} from "./pointSelection";
+import { handlePointSelection, shouldClosePathOnPointClick, isActivePointEligibleForClosing } from "./pointSelection";
 import type { EventHandlerProps } from "./types";
 import { HIT_RADIUS } from "../constants";
 import {
@@ -128,11 +123,10 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
               // Just mark that we're over a point, but let onClick handle the selection
               handledSelectionInMouseDown.current = true;
               return;
-            } else {
-              // Regular click on point when transformer is active - do nothing
-              // This prevents the click from falling through to deselection logic
-              return;
             }
+            // Regular click on point when transformer is active - do nothing
+            // This prevents the click from falling through to deselection logic
+            return;
           }
         }
       }
@@ -186,19 +180,19 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
             // Just mark that we're over a point, but let onClick handle the selection
             handledSelectionInMouseDown.current = true;
             return;
-          } else {
-            // Normal click - store the potential drag target but don't start dragging yet
-            // We'll start dragging only if the mouse moves beyond a threshold
-            props.setDraggedPointIndex(i);
-            props.lastPos.current = {
-              x: e.evt.clientX,
-              y: e.evt.clientY,
-              originalX: point.x,
-              originalY: point.y,
-              originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
-              originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
-            };
           }
+
+          // Normal click - store the potential drag target but don't start dragging yet
+          // We'll start dragging only if the mouse moves beyond a threshold
+          props.setDraggedPointIndex(i);
+          props.lastPos.current = {
+            x: e.evt.clientX,
+            y: e.evt.clientY,
+            originalX: point.x,
+            originalY: point.y,
+            originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
+            originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
+          };
           return;
         }
       }
