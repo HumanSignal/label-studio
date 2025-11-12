@@ -530,22 +530,30 @@ const Model = types
        * Override deleteRegion to handle selected points deletion
        * If points are selected (but not all), delete only those points
        * If all points are selected or none, delete the entire region
+       * If region is part of multi-selection, always delete the entire region
        */
       deleteRegion() {
-        // Check if we have selected points and if vectorRef is available
-        if (self.vectorRef && typeof self.vectorRef.getSelectedPointIds === "function") {
-          const selectedPointIds = self.vectorRef.getSelectedPointIds();
-          const totalPoints = self.vertices.length;
+        // Check if this region is part of multi-selection
+        // If so, always delete the entire region (don't check for selected points)
+        const isMultiRegionSelected = self.object?.selectedRegions?.length > 1;
+        
+        if (!isMultiRegionSelected) {
+          // Only check for selected points if NOT part of multi-selection
+          // Check if we have selected points and if vectorRef is available
+          if (self.vectorRef && typeof self.vectorRef.getSelectedPointIds === "function") {
+            const selectedPointIds = self.vectorRef.getSelectedPointIds();
+            const totalPoints = self.vertices.length;
 
-          // If we have selected points AND not all points are selected, delete only those points
-          if (selectedPointIds.length > 0 && selectedPointIds.length < totalPoints) {
-            // Delete only the selected points
-            if (typeof self.vectorRef.deletePointsByIds === "function") {
-              self.vectorRef.deletePointsByIds(selectedPointIds);
-              return; // Don't delete the entire region
+            // If we have selected points AND not all points are selected, delete only those points
+            if (selectedPointIds.length > 0 && selectedPointIds.length < totalPoints) {
+              // Delete only the selected points
+              if (typeof self.vectorRef.deletePointsByIds === "function") {
+                self.vectorRef.deletePointsByIds(selectedPointIds);
+                return; // Don't delete the entire region
+              }
             }
+            // Otherwise, fall through to delete the entire region
           }
-          // Otherwise, fall through to delete the entire region
         }
 
         // Delete the entire region (original behavior)
