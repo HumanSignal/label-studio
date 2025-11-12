@@ -56,7 +56,7 @@ class OrderStateChoices(models.TextChoices):
 ### 2. Create State Model
 
 ```python
-from fsm.models import BaseState
+from fsm.state_models import BaseState
 from fsm.registry import register_state_model
 
 @register_state_model('order')

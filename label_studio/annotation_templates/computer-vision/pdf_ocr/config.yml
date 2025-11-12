@@ -1,0 +1,37 @@
+title: OCR Labeling for PDFs
+type: enterprise
+group: Computer Vision
+order: 10
+image: /static/templates/pdf-ocr.png
+details: |
+  <h1>Perform region-level OCR directly on native PDFs</h1>
+  <dl>
+    <dt>Industry Applications</dt>
+    <dd>document intelligence, invoice processing, form extraction, contract analysis, receipt digitization, document QA, structured data capture, automated data entry, compliance document review, financial document processing</dd>
+    <dt>Associated Models</dt>
+    <dd>OCR text detection, bounding box detection, document classification, text recognition</dd>
+    <dt>Domain Terminology</dt>
+    <dd>PDF text extraction, region-based OCR, bounding boxes, text correction, document parsing, normalized coordinates, multi-page documents</dd>
+  </dl>
+config: |
+  <View>
+    <Style>
+      .htx-pdf { calc(100vh - 250px); }
+    </Style>
+    <Header value="Select text to correct" size="4"/>
+    <OcrLabels name="ocr" toName="pdf">
+      <Label value="Typo" />
+      <Label value="Incorrect Amount" />
+      <Label value="Incorrect Name" />
+    </OcrLabels>
+    <Pdf name="pdf" value="$pdf"/>
+  </View>
+
+  <!-- {
+    "data": {
+      "pdf": "/static/samples/opossum-cuteness.pdf"
+    }
+  } -->
+
+
+

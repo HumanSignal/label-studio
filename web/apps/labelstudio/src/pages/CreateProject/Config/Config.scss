@@ -115,36 +115,53 @@ $scroll-width: 5px;
 
     ul {
       display: grid;
-      flex-wrap: wrap;
       padding: 0;
       margin: 16px 8px;
-      grid-template-columns: repeat(auto-fill, 276px);
-      grid-auto-columns: 276px;
-      grid-gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--spacing-wide);
+
+      // Better space utilization on larger screens
+      @media (width >= 1200px) {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      }
+
+      @media (width >= 1600px) {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      }
     }
   }
 
   &__template {
     display: flex;
     flex-direction: column;
-    border-radius: 4px;
+    align-items: flex-start;
+    border-radius: 8px;
     cursor: pointer;
     position: relative;
-    width: 276px;
+    width: 100%;
     border: 1px solid var(--color-neutral-border);
-    box-sizing: content-box;
-    transition: all 300ms ease-out;
-    overflow: hidden;
+    background: var(--color-neutral-background);
+    box-shadow: 0 4px 8px 0 rgb(var(--color-neutral-shadow-raw) / 8%);
+    
+    // Smooth transitions for hover/focus interactions
+    transition: 
+      transform 0.2s ease-in-out,
+      border-color 0.15s ease-in-out,
+      background-color 0.15s ease-in-out,
+      box-shadow 0.15s ease-in-out;
 
-    &_active,
-    &:hover {
-      box-shadow: 0 0 0 6px var(--color-primary-focus-outline);
-      background: var(--color-neutral-surface-hover);
-      border-color: var(--color-primary-border-bolder);
+    &_disabled {
+      cursor: not-allowed;
+      pointer-events: none;
     }
 
-    &:hover {
-      opacity: 0.9;
+    &_active,
+    &:hover,
+    &:focus {
+      border: 1px solid var(--color-primary-border);
+      box-shadow: 0 0 0 4px var(--color-primary-focus-outline);
+      background: var(--color-primary-background);
+      transform: translateY(-1px); // Subtle lift effect
     }
 
     h3 {
@@ -152,14 +169,14 @@ $scroll-width: 5px;
       padding: 12px;
       font-size: 14px;
       font-weight: 500;
-      border-top: 1px solid var(--color-neutral-content);
+      border-top: 1px solid var(--color-neutral-border);
       color: var(--color-neutral-content);
     }
 
     img {
       width: 100%;
       object-fit: cover;
-      border-radius: 4px 4px 0 0;
+      border-radius: 8px 8px 0 0;
       aspect-ratio: 8 / 5;
     }
   }

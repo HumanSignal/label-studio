@@ -199,13 +199,6 @@ class TransitionUtilsTests(TestCase):
     """Tests for transition_utils module edge cases and error handling"""
 
     def setUp(self):
-        # Clear registries to ensure clean state
-        from fsm.registry import state_choices_registry, state_model_registry
-
-        state_choices_registry.clear()
-        state_model_registry.clear()
-        transition_registry.clear()
-
         self.entity = MockEntity()
 
     def test_transition_utils_unexpected_validation_error(self):
@@ -368,3 +361,178 @@ class TransitionUtilsTests(TestCase):
         flows = get_entity_state_flow(self.entity)
         # Should not include the transition that requires fields
         assert not any(f['transition_name'] == 'required_transition' for f in flows)
+
+
+class TestUUID7FieldCoverage(TestCase):
+    """Test coverage for UUID7Field utility methods"""
+
+    def test_get_latest_by_uuid7(self):
+        """Test UUID7Field.get_latest_by_uuid7 utility method"""
+        from fsm.utils import UUID7Field
+
+        mock_first = Mock()
+        mock_queryset = Mock()
+        mock_queryset.order_by.return_value.first.return_value = mock_first
+
+        result = UUID7Field.get_latest_by_uuid7(mock_queryset)
+
+        mock_queryset.order_by.assert_called_once_with('-id')
+        assert result == mock_first
+
+    def test_filter_by_time_range(self):
+        """Test UUID7Field.filter_by_time_range utility method"""
+        from fsm.utils import UUID7Field
+
+        start_time = datetime(2024, 1, 1, tzinfo=timezone.utc)
+        end_time = datetime(2024, 1, 2, tzinfo=timezone.utc)
+
+        mock_filtered = Mock()
+        mock_queryset = Mock()
+        mock_queryset.filter.return_value = mock_filtered
+
+        result = UUID7Field.filter_by_time_range(mock_queryset, start_time, end_time)
+
+        assert mock_queryset.filter.called
+        assert result == mock_filtered
+
+    def test_filter_since_time(self):
+        """Test UUID7Field.filter_since_time utility method"""
+        from fsm.utils import UUID7Field
+
+        since_time = datetime(2024, 1, 1, tzinfo=timezone.utc)
+
+        mock_filtered = Mock()
+        mock_queryset = Mock()
+        mock_queryset.filter.return_value = mock_filtered
+
+        result = UUID7Field.filter_since_time(mock_queryset, since_time)
+
+        assert mock_queryset.filter.called
+        assert result == mock_filtered
+
+
+class TestResolveOrganizationIdCoverage(TestCase):
+    """Test coverage for resolve_organization_id edge cases"""
+
+    def setUp(self):
+        from core.current_request import CurrentContext
+
+        CurrentContext.clear()
+
+    def tearDown(self):
+        from core.current_request import CurrentContext
+
+        CurrentContext.clear()
+
+    def test_resolve_organization_id_with_none_entity(self):
+        """Test resolve_organization_id when entity is None"""
+        from fsm.utils import resolve_organization_id
+
+        result = resolve_organization_id(entity=None, user=None)
+        assert result is None
+
+    def test_resolve_organization_id_from_context(self):
+        """Test resolve_organization_id returns cached context value"""
+        from core.current_request import CurrentContext
+        from fsm.utils import resolve_organization_id
+
+        CurrentContext.set_organization_id(999)
+
+        # Even with entity, should return context value
+        mock_entity = Mock()
+        mock_entity.organization_id = 123
+
+        result = resolve_organization_id(entity=mock_entity)
+        assert result == 999
+
+    def test_resolve_organization_id_from_entity_direct(self):
+        """Test resolve_organization_id from entity.organization_id"""
+        from fsm.utils import resolve_organization_id
+
+        mock_entity = Mock()
+        mock_entity.organization_id = 456
+
+        result = resolve_organization_id(entity=mock_entity)
+        assert result == 456
+
+    def test_resolve_organization_id_from_project_relationship(self):
+        """Test resolve_organization_id via entity.project.organization_id"""
+        from fsm.utils import resolve_organization_id
+
+        mock_project = Mock()
+        mock_project.organization_id = 789
+
+        mock_entity = Mock()
+        mock_entity.organization_id = None
+        mock_entity.project = mock_project
+
+        result = resolve_organization_id(entity=mock_entity)
+        assert result == 789
+
+    def test_resolve_organization_id_from_task_project_relationship(self):
+        """Test resolve_organization_id via entity.task.project.organization_id"""
+        from fsm.utils import resolve_organization_id
+
+        mock_project = Mock()
+        mock_project.organization_id = 321
+
+        mock_task = Mock()
+        mock_task.project = mock_project
+
+        mock_entity = Mock()
+        mock_entity.organization_id = None
+        mock_entity.project = None
+        mock_entity.task = mock_task
+
+        result = resolve_organization_id(entity=mock_entity)
+        assert result == 321
+
+    def test_resolve_organization_id_from_user_active_organization(self):
+        """Test resolve_organization_id from user.active_organization"""
+        from fsm.utils import resolve_organization_id
+
+        mock_active_org = Mock()
+        mock_active_org.id = 654
+
+        mock_user = Mock()
+        mock_user.active_organization = mock_active_org
+
+        mock_entity = Mock()
+        mock_entity.organization_id = None
+        mock_entity.project = None
+        mock_entity.task = None
+
+        result = resolve_organization_id(entity=mock_entity, user=mock_user)
+        assert result == 654
+
+    def test_resolve_organization_id_caches_result(self):
+        """Test that resolve_organization_id caches the result in CurrentContext"""
+        from core.current_request import CurrentContext
+        from fsm.utils import resolve_organization_id
+
+        mock_entity = Mock()
+        mock_entity.organization_id = 987
+
+        result = resolve_organization_id(entity=mock_entity)
+        assert result == 987
+
+        # Verify it's cached
+        cached = CurrentContext.get_organization_id()
+        assert cached == 987
+
+
+class TestGetCurrentStateSafeCoverage(TestCase):
+    """Test coverage for get_current_state_safe error handling"""
+
+    def test_get_current_state_safe_when_fsm_disabled(self):
+        """Test get_current_state_safe returns None when FSM is disabled"""
+        from fsm.utils import get_current_state_safe
+
+        mock_entity = Mock()
+        mock_entity.pk = 1
+        mock_entity._meta = Mock()
+        mock_entity._meta.label_lower = 'test.entity'
+
+        with patch('fsm.utils.is_fsm_enabled', return_value=False):
+            result = get_current_state_safe(mock_entity)
+            assert result is None

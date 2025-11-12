@@ -27,11 +27,13 @@ class AsyncMigrationStatus(models.Model):
 
     name = models.TextField('migration_name', help_text='Migration name')
 
+    STATUS_SCHEDULED = 'SCHEDULED'
     STATUS_STARTED = 'STARTED'
     STATUS_IN_PROGRESS = 'IN PROGRESS'
     STATUS_FINISHED = 'FINISHED'
     STATUS_ERROR = 'ERROR'
     STATUS_CHOICES = (
+        (STATUS_SCHEDULED, 'Migration is scheduled but not yet started.'),
         (STATUS_STARTED, 'Migration is started or queued.'),
         (STATUS_IN_PROGRESS, 'Migration is in progress. Check meta for job_id or status.'),
         (STATUS_FINISHED, 'Migration completed successfully.'),
