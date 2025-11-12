@@ -429,6 +429,18 @@ const Model = types
         self.vectorRef = ref;
       },
 
+      /**
+       * Override selectRegion to reset transform mode when selecting from sidebar
+       * This ensures transform mode is reset whether selecting by clicking on the shape
+       * or selecting from the sidebar/outliner
+       */
+      selectRegion() {
+        // Reset transform mode when region is selected (from sidebar or elsewhere)
+        self.setTransformMode(false);
+        // Call parent selectRegion to handle scrolling
+        self.scrollToRegion();
+      },
+
       addPoint(x, y) {
         const image = self.parent.currentImageEntity;
         const width = image.naturalWidth;
