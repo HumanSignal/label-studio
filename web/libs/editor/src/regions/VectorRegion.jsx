@@ -333,18 +333,6 @@ const Model = types
         });
       },
 
-      isHovered() {
-        if (!self.groupRef) return false;
-        const stage = self.groupRef.getStage();
-        if (!stage) return false;
-        const pointer = stage.getPointerPosition();
-        if (!pointer) return false;
-
-        // Convert to pixel coords in the canvas backing the image
-        const { x, y } = self.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
-        return self.vectorRef?.isPointOverShape(pointer.x, pointer.y) ?? false;
-      },
-
       // Checks is the region is being transformed or at least in
       // transformable state (has at least 2 points selected)
       isTransforming() {
@@ -703,12 +691,14 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             item.onClickRegion(e);
           }}
           onMouseEnter={() => {
+            console.log("enter");
             if (store.annotationStore.selected.isLinkingMode) {
               item.setHighlight(true);
             }
             item.updateCursor(true);
           }}
           onMouseLeave={() => {
+            console.log("leave");
             if (store.annotationStore.selected.isLinkingMode) {
               item.setHighlight(false);
             }
@@ -736,7 +726,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           maxPoints={item.maxPoints}
           skeletonEnabled={item.control?.skeleton ?? false}
           stroke={item.selected ? "#ff0000" : regionStyles.strokeColor}
-          fill={item.selected ? "rgba(255, 0, 0, 0.3)" : regionStyles.fillColor}
+          fill={regionStyles.fillColor}
           strokeWidth={regionStyles.strokeWidth}
           opacity={Number.parseFloat(item.control?.opacity || "1")}
           pixelSnapping={item.control?.snap === "pixel"}
