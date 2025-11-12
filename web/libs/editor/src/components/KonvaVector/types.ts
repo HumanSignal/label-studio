@@ -94,6 +94,8 @@ export interface KonvaVectorRef {
   };
   // Hit testing method
   isPointOverShape: (x: number, y: number, hitRadius?: number) => boolean;
+  // Delete multiple points by their IDs
+  deletePointsByIds: (pointIds: string[]) => void;
 }
 
 /**

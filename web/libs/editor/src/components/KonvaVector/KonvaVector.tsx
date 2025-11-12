@@ -1951,6 +1951,115 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     },
     // Multi-region transformation method - applies group transform to points
     commitMultiRegionTransform,
+    // Delete multiple points by their IDs
+    deletePointsByIds: (pointIds: string[]) => {
+      if (!pointIds || pointIds.length === 0) return;
+
+      // Find indices of points to delete (in reverse order to maintain correct indices)
+      const indicesToDelete = pointIds
+        .map((id) => initialPoints.findIndex((p) => p.id === id))
+        .filter((idx) => idx >= 0)
+        .sort((a, b) => b - a); // Sort descending to delete from end to start
+
+      if (indicesToDelete.length === 0) return;
+
+      // Create a set of deleted point IDs for quick lookup
+      const deletedPointIds = new Set(pointIds);
+
+      // Delete points one by one in reverse order (from highest index to lowest)
+      // This ensures indices remain valid as we delete
+      let updatedPoints = [...initialPoints];
+      let updatedSelectedPointIndex = selectedPointIndex;
+      let updatedLastAddedPointId = lastAddedPointId;
+
+      for (const index of indicesToDelete) {
+        if (index < 0 || index >= updatedPoints.length) continue;
+
+        const deletedPoint = updatedPoints[index];
+        const newPoints = [...updatedPoints];
+        newPoints.splice(index, 1);
+
+        // Reconnect points after deletion (same logic as deletePoint function)
+        // For skeleton mode: use deleted point's prevPointId
+        for (let i = 0; i < newPoints.length; i++) {
+          const point = newPoints[i];
+          if (point.prevPointId === deletedPoint.id) {
+            let newPrevPointId: string | undefined = deletedPoint.prevPointId;
+            
+            // Edge cases:
+            if (index === 0) {
+              // If we deleted the first point, this point becomes the new first point
+              newPrevPointId = undefined;
+            } else if (!deletedPoint.prevPointId) {
+              // If deleted point had no prevPointId (was a root point), this point becomes a root
+              newPrevPointId = undefined;
+            } else if (deletedPointIds.has(deletedPoint.prevPointId)) {
+              // If the previous point is also being deleted, we need to find the next valid ancestor
+              // This handles cascading deletions in skeleton mode
+              let ancestorId = deletedPoint.prevPointId;
+              while (ancestorId && deletedPointIds.has(ancestorId)) {
+                const ancestorIndex = updatedPoints.findIndex((p) => p.id === ancestorId);
+                if (ancestorIndex >= 0 && ancestorIndex < updatedPoints.length) {
+                  ancestorId = updatedPoints[ancestorIndex].prevPointId;
+                } else {
+                  ancestorId = undefined;
+                  break;
+                }
+              }
+              newPrevPointId = ancestorId;
+            }
+            // Otherwise, use deletedPoint.prevPointId which is correct for both linear and skeleton modes
+
+            newPoints[i] = {
+              ...point,
+              prevPointId: newPrevPointId,
+            };
+          }
+        }
+
+        // Update selection state
+        if (updatedSelectedPointIndex === index) {
+          updatedSelectedPointIndex = null;
+          onPointSelected?.(null);
+        } else if (updatedSelectedPointIndex !== null && updatedSelectedPointIndex > index) {
+          updatedSelectedPointIndex = updatedSelectedPointIndex - 1;
+        }
+
+        // Handle active point
+        if (updatedLastAddedPointId === deletedPoint.id) {
+          if (newPoints.length > 0) {
+            const newLastPoint = newPoints[newPoints.length - 1];
+            updatedLastAddedPointId = newLastPoint.id;
+          } else {
+            updatedLastAddedPointId = null;
+          }
+        }
+
+        // Update visible control points
+        setVisibleControlPoints((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(index);
+          const adjustedSet = new Set<number>();
+          for (const pointIndex of Array.from(newSet)) {
+            if (pointIndex > index) {
+              adjustedSet.add(pointIndex - 1);
+            } else {
+              adjustedSet.add(pointIndex);
+            }
+          }
+          return adjustedSet;
+        });
+
+        onPointRemoved?.(deletedPoint, index);
+        updatedPoints = newPoints;
+      }
+
+      // Clear selection after deleting all selected points
+      setSelectedPointIndex(updatedSelectedPointIndex);
+      setLastAddedPointId(updatedLastAddedPointId);
+      tracker.selectPoints(instanceId, new Set());
+      onPointsChange?.(updatedPoints);
+    },
   }));
 
   // Ensure commitMultiRegionTransform is called when ImageTransformer's onDragEnd fires
