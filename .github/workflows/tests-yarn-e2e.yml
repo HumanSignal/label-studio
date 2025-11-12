@@ -6,6 +6,13 @@ on:
       head_sha:
         required: true
         type: string
+  workflow_dispatch:
+    inputs:
+      head_sha:
+        description: "ref or SHA"
+        required: false
+        type: string
+        default: ""
 
 env:
   NODE: "22"
@@ -29,7 +36,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ inputs.head_sha || github.ref }}
 
       - name: Setup frontend environment
         uses: ./.github/actions/setup-frontend-environment
@@ -40,6 +47,10 @@ jobs:
       - name: Install e2e dependencies
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/tests/e2e
         run: yarn install
+
+      - name: Install Playwright browsers
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/tests/e2e
+        run: yarn playwright install --with-deps
 
       - name: Run LSF server
         id: run-lsf-server
