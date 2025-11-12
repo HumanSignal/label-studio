@@ -46,3 +46,4 @@ Permissions that can be configured include the following:
 
 !!! tip
     You can click **Reset to Defaults** to return all permissions to their default value. 
+
