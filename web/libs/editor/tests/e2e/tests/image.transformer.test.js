@@ -4,7 +4,8 @@ const Helpers = require("./helpers");
 
 Feature("Image transformer");
 
-const IMAGE = "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg";
+const IMAGE =
+  "https://data.heartex.net/open-images/train_0/mini/0030019819f25b28.jpg";
 
 const annotationEmpty = {
   id: "1000",
@@ -146,7 +147,10 @@ Data(shapesTable).Scenario(
       width: 200,
       height: 200,
     };
-    const getCenter = (bbox) => [bbox.x + bbox.width / 2, bbox.y + bbox.height / 2];
+    const getCenter = (bbox) => [
+      bbox.x + bbox.width / 2,
+      bbox.y + bbox.height / 2,
+    ];
     let isTransformerExist;
     const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
@@ -159,10 +163,24 @@ Data(shapesTable).Scenario(
 
     // Draw two regions
     I.pressKey("1");
-    drawShapeByBbox(Shape, bbox1.x, bbox1.y, bbox1.width, bbox1.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox1.x,
+      bbox1.y,
+      bbox1.width,
+      bbox1.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(1);
     I.pressKey("1");
-    drawShapeByBbox(Shape, bbox2.x, bbox2.y, bbox2.width, bbox2.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox2.x,
+      bbox2.y,
+      bbox2.width,
+      bbox2.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(2);
 
     // Check that it wasn't a cause to show a transformer
@@ -211,7 +229,11 @@ Data(shapesTable).Scenario(
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMoveToolTransformer)).Scenario(
+Data(
+  shapesTable.filter(
+    ({ shapeName }) => shapes[shapeName].hasMoveToolTransformer,
+  ),
+).Scenario(
   "Resizing a single region",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
     const { shapeName } = current;
@@ -225,7 +247,10 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMoveToolTransfor
     AtOutliner.seeRegions(0);
     await AtImageView.lookForStage();
     const canvasSize = await AtImageView.getCanvasSize();
-    const convertToImageSize = Helpers.getSizeConvertor(canvasSize.width, canvasSize.height);
+    const convertToImageSize = Helpers.getSizeConvertor(
+      canvasSize.width,
+      canvasSize.height,
+    );
 
     // Draw a region in bbox {x1:50,y1:50,x2:150,y2:150}
     I.pressKey(Shape.hotKey);
@@ -258,7 +283,10 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMoveToolTransfor
     const rectangleResult = await LabelStudio.serialize();
     const exceptedResult = Shape.byBBox(0, 0, 300, 300).result;
 
-    Asserts.deepEqualWithTolerance(rectangleResult[0].value, convertToImageSize(exceptedResult));
+    Asserts.deepEqualWithTolerance(
+      rectangleResult[0].value,
+      convertToImageSize(exceptedResult),
+    );
   },
 );
 
@@ -277,7 +305,10 @@ Data(shapesTable.filter(({ shapeName }) => shapeName === "Rectangle")).Scenario(
     AtOutliner.seeRegions(0);
     await AtImageView.lookForStage();
     const canvasSize = await AtImageView.getCanvasSize();
-    const convertToImageSize = Helpers.getSizeConvertor(canvasSize.width, canvasSize.height);
+    const convertToImageSize = Helpers.getSizeConvertor(
+      canvasSize.width,
+      canvasSize.height,
+    );
     let rectangleResult;
 
     // Draw a region in bbox {x1:50,y1:50,x2:150,y2:150}
@@ -302,7 +333,10 @@ Data(shapesTable.filter(({ shapeName }) => shapeName === "Rectangle")).Scenario(
     // Check resulting sizes
     rectangleResult = await LabelStudio.serialize();
     const exceptedResult = Shape.byBBox(150, 50, 50, 100).result;
-    Asserts.deepEqualWithTolerance(rectangleResult[0].value, convertToImageSize(exceptedResult));
+    Asserts.deepEqualWithTolerance(
+      rectangleResult[0].value,
+      convertToImageSize(exceptedResult),
+    );
 
     // new center of the region
     const center = [150 + 25, 50 + 50];
@@ -315,7 +349,12 @@ Data(shapesTable.filter(({ shapeName }) => shapeName === "Rectangle")).Scenario(
     Asserts.deepEqualWithTolerance(rectangleResult[0].value.rotation, 45);
     // Flip the shape horizontally with non-zero rotation
     const shift = (50 * 2) / Math.SQRT2;
-    AtImageView.drawByDrag(center[0] - 25 / Math.SQRT2, center[1] - 25 / Math.SQRT2, shift, shift);
+    AtImageView.drawByDrag(
+      center[0] - 25 / Math.SQRT2,
+      center[1] - 25 / Math.SQRT2,
+      shift,
+      shift,
+    );
 
     const secondFlipResult = {
       ...convertToImageSize(
@@ -331,13 +370,29 @@ Data(shapesTable.filter(({ shapeName }) => shapeName === "Rectangle")).Scenario(
 
     rectangleResult = await LabelStudio.serialize();
     // flipping is not very precise, so we have to increase the tolerance
-    Asserts.deepEqualWithTolerance(rectangleResult[0].value, secondFlipResult, 0);
+    Asserts.deepEqualWithTolerance(
+      rectangleResult[0].value,
+      secondFlipResult,
+      0,
+    );
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMoveToolTransformer)).Scenario(
+Data(
+  shapesTable.filter(
+    ({ shapeName }) => shapes[shapeName].hasMoveToolTransformer,
+  ),
+).Scenario(
   "Resizing a single region with zoom",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, Regions, current }) => {
+  async ({
+    I,
+    LabelStudio,
+    AtImageView,
+    AtOutliner,
+    AtPanels,
+    Regions,
+    current,
+  }) => {
     const { shapeName } = current;
     const Shape = shapes[shapeName];
     const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
@@ -394,7 +449,11 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMoveToolTransfor
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator)).Scenario(
+Data(
+  shapesTable.filter(
+    ({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator,
+  ),
+).Scenario(
   "Simple rotating",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
     const { shapeName } = current;
@@ -422,7 +481,14 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     };
 
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, rectangle.x, rectangle.y, rectangle.width, rectangle.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      rectangle.x,
+      rectangle.y,
+      rectangle.width,
+      rectangle.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(1);
 
     // Select the shape and check that transformer appears
@@ -454,11 +520,18 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     // Check resulting rotation
     const rectangleResult = await LabelStudio.serialize();
 
-    Asserts.deepEqualWithTolerance(Math.round(rectangleResult[0].value.rotation), 45);
+    Asserts.deepEqualWithTolerance(
+      Math.round(rectangleResult[0].value.rotation),
+      45,
+    );
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator)).Scenario(
+Data(
+  shapesTable.filter(
+    ({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator,
+  ),
+).Scenario(
   "Rotating of unrotatable region",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
     const { shapeName } = current;
@@ -486,7 +559,14 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     };
 
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, rectangle.x, rectangle.y, rectangle.width, rectangle.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      rectangle.x,
+      rectangle.y,
+      rectangle.width,
+      rectangle.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(1);
 
     // Select the shape and check that transformer appears
@@ -506,7 +586,12 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     };
 
     // Rotate for 45 degrees clockwise
-    AtImageView.drawByDrag(rotatorPosition.x, rotatorPosition.y, rectangleCenter.y - rotatorPosition.y + 100, -100);
+    AtImageView.drawByDrag(
+      rotatorPosition.x,
+      rotatorPosition.y,
+      rectangleCenter.y - rotatorPosition.y + 100,
+      -100,
+    );
 
     // Check the region hasn't been rotated
     const rectangleResult = await LabelStudio.serialize();
@@ -515,7 +600,11 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator)).Scenario(
+Data(
+  shapesTable.filter(
+    ({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator,
+  ),
+).Scenario(
   "Broke the limits with rotation",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
     const { shapeName } = current;
@@ -544,7 +633,14 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       };
 
       I.pressKey(Shape.hotKey);
-      drawShapeByBbox(Shape, rectangle.x, rectangle.y, rectangle.width, rectangle.height, AtImageView);
+      drawShapeByBbox(
+        Shape,
+        rectangle.x,
+        rectangle.y,
+        rectangle.width,
+        rectangle.height,
+        AtImageView,
+      );
       AtOutliner.seeRegions(1);
 
       // Select the shape and check that transformer appears
@@ -576,8 +672,16 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       // Check that we cannot rotate it like this
       let rectangleResult = await LabelStudio.serialize();
 
-      assert.notStrictEqual(Math.round(rectangleResult[0].value.rotation), 0, "Region must be rotated");
-      assert.notStrictEqual(Math.round(rectangleResult[0].value.rotation), 45, "Angle must not be 45 degrees");
+      assert.notStrictEqual(
+        Math.round(rectangleResult[0].value.rotation),
+        0,
+        "Region must be rotated",
+      );
+      assert.notStrictEqual(
+        Math.round(rectangleResult[0].value.rotation),
+        45,
+        "Angle must not be 45 degrees",
+      );
 
       // Undo changes
       I.pressKey(["CommandOrControl", "z"]);
@@ -596,7 +700,11 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       // Check the resulted rotation
       rectangleResult = await LabelStudio.serialize();
 
-      Asserts.deepEqualWithTolerance(rectangleResult[0].value.rotation, 90, "Angle must be 90 degrees");
+      Asserts.deepEqualWithTolerance(
+        rectangleResult[0].value.rotation,
+        90,
+        "Angle must be 90 degrees",
+      );
       // remove region
       I.pressKey("Backspace");
     }
@@ -617,7 +725,14 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       };
 
       I.pressKey(Shape.hotKey);
-      drawShapeByBbox(Shape, rectangle.x, rectangle.y, rectangle.width, rectangle.height, AtImageView);
+      drawShapeByBbox(
+        Shape,
+        rectangle.x,
+        rectangle.y,
+        rectangle.width,
+        rectangle.height,
+        AtImageView,
+      );
       AtOutliner.seeRegions(1);
 
       // Select the shape and check that transformer appears
@@ -674,7 +789,11 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator)).Scenario(
+Data(
+  shapesTable.filter(
+    ({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator,
+  ),
+).Scenario(
   "Check the initial rotation of transformer for the single region",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
     const { shapeName } = current;
@@ -701,7 +820,14 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
 
     // Draw a region
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, bbox.x, bbox.y, bbox.width, bbox.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox.x,
+      bbox.y,
+      bbox.width,
+      bbox.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(1);
 
     // Select it
@@ -739,6 +865,9 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     AtImageView.clickAt(bboxCenter.x, bboxCenter.y);
     AtOutliner.seeSelectedRegion();
 
+    // Wait for transformer to be properly initialized after re-selection
+    I.waitTicks(3);
+
     // The trick is that we turn it further, based on the assumption that transformer appears in rotated state on region selection
     // So let's try to rotate it
     // The rotator anchor must be to the right of the right anchor by 50 pixels
@@ -766,7 +895,11 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator)).Scenario(
+Data(
+  shapesTable.filter(
+    ({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator,
+  ),
+).Scenario(
   "Check the initial rotation of transformer for the couple of regions",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
     const { shapeName } = current;
@@ -807,19 +940,36 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
 
     // Draw the first region
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, bbox1.x, bbox1.y, bbox1.width, bbox1.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox1.x,
+      bbox1.y,
+      bbox1.width,
+      bbox1.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(1);
 
     // Draw the second region
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, bbox2.x, bbox2.y, bbox2.width, bbox2.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox2.x,
+      bbox2.y,
+      bbox2.width,
+      bbox2.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(2);
 
     // Switch to move tool and select them
     I.pressKey("v");
     AtImageView.drawThroughPoints([
       [transformerBbox.x - 20, transformerBbox.y - 20],
-      [transformerBbox.x + transformerBbox.width + 20, transformerBbox.y + transformerBbox.height + 20],
+      [
+        transformerBbox.x + transformerBbox.width + 20,
+        transformerBbox.y + transformerBbox.height + 20,
+      ],
     ]);
     AtOutliner.seeSelectedRegion();
 
@@ -848,9 +998,15 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     // Select them again
     AtImageView.drawThroughPoints([
       [transformerBbox.x - 20, transformerBbox.y - 20],
-      [transformerBbox.x + transformerBbox.width + 20, transformerBbox.y + transformerBbox.height + 20],
+      [
+        transformerBbox.x + transformerBbox.width + 20,
+        transformerBbox.y + transformerBbox.height + 20,
+      ],
     ]);
     AtOutliner.seeSelectedRegion();
+
+    // Wait for transformer to be properly initialized after re-selection
+    I.waitTicks(3);
 
     // So we have couple of rotated regions, let's check if rotates still appears above the top anchor
 
@@ -874,7 +1030,11 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
 
 // KeyPoints are transformed unpredictable so for now just skip them
 Data(
-  shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionTransformer && shapeName !== "KeyPoint"),
+  shapesTable.filter(
+    ({ shapeName }) =>
+      shapes[shapeName].hasMultiSelectionTransformer &&
+      shapeName !== "KeyPoint",
+  ),
 ).Scenario(
   "Transforming of multiple regions",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
@@ -889,7 +1049,10 @@ Data(
     AtOutliner.seeRegions(0);
     await AtImageView.lookForStage();
     const canvasSize = await AtImageView.getCanvasSize();
-    const convertToImageSize = Helpers.getSizeConvertor(canvasSize.width, canvasSize.height);
+    const convertToImageSize = Helpers.getSizeConvertor(
+      canvasSize.width,
+      canvasSize.height,
+    );
 
     const bbox1 = {
       x: 100,
@@ -922,13 +1085,27 @@ Data(
 
     // Draw the first region
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, bbox1.x, bbox1.y, bbox1.width, bbox1.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox1.x,
+      bbox1.y,
+      bbox1.width,
+      bbox1.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(1);
 
     // Draw the second region
     I.pressKey(Shape.hotKey);
     I.pressKeyDown("CommandOrControl");
-    drawShapeByBbox(Shape, bbox2.x, bbox2.y, bbox2.width, bbox2.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox2.x,
+      bbox2.y,
+      bbox2.width,
+      bbox2.height,
+      AtImageView,
+    );
     I.pressKeyUp("CommandOrControl");
     AtOutliner.seeRegions(2);
 
@@ -936,15 +1113,28 @@ Data(
     I.pressKey("v");
     AtImageView.drawThroughPoints([
       [transformerBbox.x - 20, transformerBbox.y - 20],
-      [transformerBbox.x + transformerBbox.width + 20, transformerBbox.y + transformerBbox.height + 20],
+      [
+        transformerBbox.x + transformerBbox.width + 20,
+        transformerBbox.y + transformerBbox.height + 20,
+      ],
     ]);
     AtOutliner.seeSelectedRegion();
     // Scale the shapes vertically
-    AtImageView.drawByDrag(transformerBboxCenter.x, transformerBbox.y + transformerBbox.height, 0, 50);
+    AtImageView.drawByDrag(
+      transformerBboxCenter.x,
+      transformerBbox.y + transformerBbox.height,
+      0,
+      50,
+    );
     transformerBbox.height += 50;
     AtOutliner.seeSelectedRegion();
     // Scale the shapes horizontally
-    AtImageView.drawByDrag(transformerBbox.x + transformerBbox.width, transformerBboxCenter.y, 50, 0);
+    AtImageView.drawByDrag(
+      transformerBbox.x + transformerBbox.width,
+      transformerBboxCenter.y,
+      50,
+      0,
+    );
     transformerBbox.width += 50;
     AtOutliner.seeSelectedRegion();
     // Scale the shapes in both directions
@@ -960,15 +1150,35 @@ Data(
 
     // Check resulting sizes
     const rectangleResult = await LabelStudio.serialize();
-    const exceptedResult1 = Shape.byBBox(bbox1.x, bbox1.y, bbox1.width + 50, bbox1.height + 50).result;
-    const exceptedResult2 = Shape.byBBox(bbox2.x + 50, bbox2.y + 50, bbox2.width + 50, bbox2.height + 50).result;
+    const exceptedResult1 = Shape.byBBox(
+      bbox1.x,
+      bbox1.y,
+      bbox1.width + 50,
+      bbox1.height + 50,
+    ).result;
+    const exceptedResult2 = Shape.byBBox(
+      bbox2.x + 50,
+      bbox2.y + 50,
+      bbox2.width + 50,
+      bbox2.height + 50,
+    ).result;
 
-    Asserts.deepEqualWithTolerance(rectangleResult[0].value, convertToImageSize(exceptedResult1));
-    Asserts.deepEqualWithTolerance(rectangleResult[1].value, convertToImageSize(exceptedResult2));
+    Asserts.deepEqualWithTolerance(
+      rectangleResult[0].value,
+      convertToImageSize(exceptedResult1),
+    );
+    Asserts.deepEqualWithTolerance(
+      rectangleResult[1].value,
+      convertToImageSize(exceptedResult2),
+    );
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionTransformer)).Scenario(
+Data(
+  shapesTable.filter(
+    ({ shapeName }) => shapes[shapeName].hasMultiSelectionTransformer,
+  ),
+).Scenario(
   "Move regions by drag",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
     const { shapeName } = current;
@@ -982,7 +1192,10 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionTr
     AtOutliner.seeRegions(0);
     await AtImageView.lookForStage();
     const canvasSize = await AtImageView.getCanvasSize();
-    const convertToImageSize = Helpers.getSizeConvertor(canvasSize.width, canvasSize.height);
+    const convertToImageSize = Helpers.getSizeConvertor(
+      canvasSize.width,
+      canvasSize.height,
+    );
 
     const bbox1 = {
       x: 100,
@@ -1019,12 +1232,26 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionTr
 
     // Draw the first region
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, bbox1.x, bbox1.y, bbox1.width, bbox1.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox1.x,
+      bbox1.y,
+      bbox1.width,
+      bbox1.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(1);
 
     // Draw the second region
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, bbox2.x, bbox2.y, bbox2.width, bbox2.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox2.x,
+      bbox2.y,
+      bbox2.width,
+      bbox2.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(2);
 
     if (shapeName === "KeyPoint") {
@@ -1034,7 +1261,14 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionTr
       AtOutliner.seeRegions(3);
 
       I.pressKey(Shape.hotKey);
-      drawShapeByBbox(Shape, bbox2.x + bbox2.width, bbox2.y + bbox2.height, 0, 0, AtImageView);
+      drawShapeByBbox(
+        Shape,
+        bbox2.x + bbox2.width,
+        bbox2.y + bbox2.height,
+        0,
+        0,
+        AtImageView,
+      );
       AtOutliner.seeRegions(4);
     }
 
@@ -1042,7 +1276,10 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionTr
     I.pressKey("v");
     AtImageView.drawThroughPoints([
       [transformerBbox.x - 20, transformerBbox.y - 20],
-      [transformerBbox.x + transformerBbox.width + 20, transformerBbox.y + transformerBbox.height + 20],
+      [
+        transformerBbox.x + transformerBbox.width + 20,
+        transformerBbox.y + transformerBbox.height + 20,
+      ],
     ]);
     AtOutliner.seeSelectedRegion();
 
@@ -1081,15 +1318,35 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionTr
 
     // Check that dragging was successful
     const rectangleResult = await LabelStudio.serialize();
-    const exceptedResult1 = Shape.byBBox(bbox1.x + 200, bbox1.y + 200, bbox1.width, bbox1.height).result;
-    const exceptedResult2 = Shape.byBBox(bbox2.x + 200, bbox2.y + 200, bbox2.width, bbox2.height).result;
+    const exceptedResult1 = Shape.byBBox(
+      bbox1.x + 200,
+      bbox1.y + 200,
+      bbox1.width,
+      bbox1.height,
+    ).result;
+    const exceptedResult2 = Shape.byBBox(
+      bbox2.x + 200,
+      bbox2.y + 200,
+      bbox2.width,
+      bbox2.height,
+    ).result;
 
-    Asserts.deepEqualWithTolerance(rectangleResult[0].value, convertToImageSize(exceptedResult1));
-    Asserts.deepEqualWithTolerance(rectangleResult[1].value, convertToImageSize(exceptedResult2));
+    Asserts.deepEqualWithTolerance(
+      rectangleResult[0].value,
+      convertToImageSize(exceptedResult1),
+    );
+    Asserts.deepEqualWithTolerance(
+      rectangleResult[1].value,
+      convertToImageSize(exceptedResult2),
+    );
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator)).Scenario(
+Data(
+  shapesTable.filter(
+    ({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator,
+  ),
+).Scenario(
   "Limitation of dragging a single rotated region",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
     const { shapeName } = current;
@@ -1117,7 +1374,14 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
 
     // Draw a region
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, bbox.x, bbox.y, bbox.width, bbox.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox.x,
+      bbox.y,
+      bbox.width,
+      bbox.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(1);
 
     // Select it
@@ -1165,7 +1429,8 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     rectangleResult = await LabelStudio.serialize();
     Asserts.deepEqualWithTolerance(
       (rectangleResult[0].value.x * canvasSize.width) / 100,
-      Shape.byBBox(bbox.width, bbox.y + bbox.height, -bbox.width, -bbox.height).result.x,
+      Shape.byBBox(bbox.width, bbox.y + bbox.height, -bbox.width, -bbox.height)
+        .result.x,
     );
     // reset position by undo
     I.pressKey(["CommandOrControl", "z"]);
@@ -1184,7 +1449,8 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     rectangleResult = await LabelStudio.serialize();
     Asserts.deepEqualWithTolerance(
       (rectangleResult[0].value.y * canvasSize.height) / 100,
-      Shape.byBBox(bbox.x + bbox.width, bbox.height, -bbox.width, -bbox.height).result.y,
+      Shape.byBBox(bbox.x + bbox.width, bbox.height, -bbox.width, -bbox.height)
+        .result.y,
     );
     // reset position by undo
     I.pressKey(["CommandOrControl", "z"]);
@@ -1204,7 +1470,12 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
 
     Asserts.deepEqualWithTolerance(
       (rectangleResult[0].value.x * canvasSize.width) / 100,
-      Shape.byBBox(canvasSize.width, bbox.y + bbox.height, -bbox.width, -bbox.height).result.x,
+      Shape.byBBox(
+        canvasSize.width,
+        bbox.y + bbox.height,
+        -bbox.width,
+        -bbox.height,
+      ).result.x,
     );
     // reset position by undo
     I.pressKey(["CommandOrControl", "z"]);
@@ -1223,12 +1494,21 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     rectangleResult = await LabelStudio.serialize();
     Asserts.deepEqualWithTolerance(
       (rectangleResult[0].value.y * canvasSize.height) / 100,
-      Shape.byBBox(bbox.x + bbox.width, canvasSize.height, -bbox.width, -bbox.height).result.y,
+      Shape.byBBox(
+        bbox.x + bbox.width,
+        canvasSize.height,
+        -bbox.width,
+        -bbox.height,
+      ).result.y,
     );
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator)).Scenario(
+Data(
+  shapesTable.filter(
+    ({ shapeName }) => shapes[shapeName].hasMultiSelectionRotator,
+  ),
+).Scenario(
   "Limitation of dragging a couple of rotated regions",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
     const { shapeName } = current;
@@ -1274,13 +1554,27 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
 
     // Draw the first region
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, bbox1.x, bbox1.y, bbox1.width, bbox1.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox1.x,
+      bbox1.y,
+      bbox1.width,
+      bbox1.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(1);
 
     // Draw the second region
     I.pressKey(Shape.hotKey);
     I.pressKeyDown("CommandOrControl");
-    drawShapeByBbox(Shape, bbox2.x, bbox2.y, bbox2.width, bbox2.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox2.x,
+      bbox2.y,
+      bbox2.width,
+      bbox2.height,
+      AtImageView,
+    );
     I.pressKeyUp("CommandOrControl");
     AtOutliner.seeRegions(2);
 
@@ -1289,7 +1583,10 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     AtImageView.drawThroughPoints(
       [
         [transformerBbox.x - 50, transformerBbox.y - 50],
-        [transformerBbox.x + transformerBbox.width + 50, transformerBbox.y + transformerBbox.height + 50],
+        [
+          transformerBbox.x + transformerBbox.width + 50,
+          transformerBbox.y + transformerBbox.height + 50,
+        ],
       ],
       "steps",
       10,
@@ -1331,12 +1628,21 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     rectangleResult = await LabelStudio.serialize();
     Asserts.deepEqualWithTolerance(
       (rectangleResult[0].value.x * canvasSize.width) / 100,
-      Shape.byBBox(transformerBbox.width, transformerBbox.y + transformerBbox.height, -bbox1.width, -bbox1.height)
-        .result.x,
+      Shape.byBBox(
+        transformerBbox.width,
+        transformerBbox.y + transformerBbox.height,
+        -bbox1.width,
+        -bbox1.height,
+      ).result.x,
     );
     Asserts.deepEqualWithTolerance(
       (rectangleResult[1].value.x * canvasSize.width) / 100,
-      Shape.byBBox(bbox2.width, transformerBbox.y + bbox2.height, -bbox2.width, -bbox2.height).result.x,
+      Shape.byBBox(
+        bbox2.width,
+        transformerBbox.y + bbox2.height,
+        -bbox2.width,
+        -bbox2.height,
+      ).result.x,
     );
     // reset position by undo
     I.pressKey(["CommandOrControl", "z"]);
@@ -1355,12 +1661,21 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     rectangleResult = await LabelStudio.serialize();
     Asserts.deepEqualWithTolerance(
       (rectangleResult[0].value.y * canvasSize.height) / 100,
-      Shape.byBBox(transformerBbox.x + transformerBbox.width, transformerBbox.height, -bbox1.width, -bbox1.height)
-        .result.y,
+      Shape.byBBox(
+        transformerBbox.x + transformerBbox.width,
+        transformerBbox.height,
+        -bbox1.width,
+        -bbox1.height,
+      ).result.y,
     );
     Asserts.deepEqualWithTolerance(
       (rectangleResult[1].value.y * canvasSize.height) / 100,
-      Shape.byBBox(transformerBbox.x + bbox2.width, bbox2.height, -bbox2.width, -bbox2.height).result.y,
+      Shape.byBBox(
+        transformerBbox.x + bbox2.width,
+        bbox2.height,
+        -bbox2.width,
+        -bbox2.height,
+      ).result.y,
     );
     // reset position by undo
     I.pressKey(["CommandOrControl", "z"]);
@@ -1380,7 +1695,12 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
 
     Asserts.deepEqualWithTolerance(
       (rectangleResult[0].value.x * canvasSize.width) / 100,
-      Shape.byBBox(canvasSize.width, transformerBbox.y + transformerBbox.height, -bbox1.width, -bbox1.height).result.x,
+      Shape.byBBox(
+        canvasSize.width,
+        transformerBbox.y + transformerBbox.height,
+        -bbox1.width,
+        -bbox1.height,
+      ).result.x,
     );
     Asserts.deepEqualWithTolerance(
       (rectangleResult[1].value.x * canvasSize.width) / 100,
@@ -1408,7 +1728,12 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     rectangleResult = await LabelStudio.serialize();
     Asserts.deepEqualWithTolerance(
       (rectangleResult[0].value.y * canvasSize.height) / 100,
-      Shape.byBBox(transformerBbox.x + transformerBbox.width, canvasSize.height, -bbox1.width, -bbox1.height).result.y,
+      Shape.byBBox(
+        transformerBbox.x + transformerBbox.width,
+        canvasSize.height,
+        -bbox1.width,
+        -bbox1.height,
+      ).result.y,
     );
     Asserts.deepEqualWithTolerance(
       (rectangleResult[1].value.y * canvasSize.height) / 100,
@@ -1422,7 +1747,9 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
   },
 );
 
-Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator)).Scenario(
+Data(
+  shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator),
+).Scenario(
   "Rotating the region near the border",
   async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
     const { shapeName } = current;
@@ -1451,7 +1778,14 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator)).Scenar
 
     // Draw the region
     I.pressKey(Shape.hotKey);
-    drawShapeByBbox(Shape, bbox.x, bbox.y, bbox.width, bbox.height, AtImageView);
+    drawShapeByBbox(
+      Shape,
+      bbox.x,
+      bbox.y,
+      bbox.width,
+      bbox.height,
+      AtImageView,
+    );
     AtOutliner.seeRegions(1);
 
     // Select it
@@ -1471,8 +1805,14 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator)).Scenar
     for (let i = 0; i < 8; i++) {
       const angle = angle45 * i;
 
-      rotatorWayPoints.push([bboxCenter.x + Math.sin(angle) * 100, bboxCenter.y - Math.cos(angle) * 100]);
-      rotatorWayPoints.push([bboxCenter.x + Math.sin(angle) * 1000, bboxCenter.y - Math.cos(angle) * 1000]);
+      rotatorWayPoints.push([
+        bboxCenter.x + Math.sin(angle) * 100,
+        bboxCenter.y - Math.cos(angle) * 100,
+      ]);
+      rotatorWayPoints.push([
+        bboxCenter.x + Math.sin(angle) * 1000,
+        bboxCenter.y - Math.cos(angle) * 1000,
+      ]);
 
       // Rotate clockwise by 45 * i degrees
       AtImageView.drawThroughPoints(rotatorWayPoints, "steps", 10);
@@ -1480,7 +1820,10 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasRotator)).Scenar
       // Check that rotating was successful
       const rectangleResult = await LabelStudio.serialize();
 
-      Asserts.deepEqualWithTolerance(Math.round(rectangleResult[0].value.rotation), 45 * i);
+      Asserts.deepEqualWithTolerance(
+        Math.round(rectangleResult[0].value.rotation),
+        45 * i,
+      );
 
       // undo rotation
       I.pressKey(["CommandOrControl", "z"]);
