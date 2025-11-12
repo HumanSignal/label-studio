@@ -10,6 +10,9 @@ services:
       - app
     environment:
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
+    #   Optional: Set nginx error log level (default: warn)
+    #   Use 'warn' or higher to reduce noisy "client closed keepalive connection" messages
+    #      - NGINX_ERROR_LOG_LEVEL=warn
     #   Optional: Specify SSL termination certificate & key
     #   Just drop your cert.pem and cert.key into folder 'deploy/nginx/certs'
     #      - NGINX_SSL_CERT=/certs/cert.pem

@@ -11,7 +11,7 @@ import { useWaveform } from "../../../lib/AudioUltra/react";
 import type { Region } from "../../../lib/AudioUltra/Regions/Region";
 import type { Segment } from "../../../lib/AudioUltra/Regions/Segment";
 import type { Regions } from "../../../lib/AudioUltra/Regions/Regions";
-import { Block } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { useSpectrogramControls as useSpectrogramControlsHook } from "../../../lib/AudioUltra/hooks/useSpectrogramControls";
 import { getCurrentTheme } from "@humansignal/ui";
 import { FF_AUDIO_SPECTROGRAMS, isFF } from "../../../utils/feature-flags";
@@ -182,7 +182,7 @@ const AudioView: FC<AudioProps> = observer(
     }, []);
 
     return (
-      <Block name="audio-tag">
+      <div className={cn("audio-tag").toClassName()}>
         {children}
         <div
           ref={(el) => {
@@ -242,7 +242,7 @@ const AudioView: FC<AudioProps> = observer(
           }}
           layerVisibility={controls.layerVisibility}
         />
-      </Block>
+      </div>
     );
   },
 );

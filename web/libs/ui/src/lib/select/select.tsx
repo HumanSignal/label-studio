@@ -87,6 +87,8 @@ export const Select = forwardRef(
       pageSize = VARIABLE_LIST_PAGE_SIZE,
       page = 1,
       itemCount,
+      onClose,
+      onOpen,
       ...props
     }: SelectProps<T, A>,
     _ref: ForwardedRef<HTMLSelectElement>,
@@ -143,7 +145,10 @@ export const Select = forwardRef(
           valueRef.current = val;
           setValue(val);
         }
-        !multiple && setIsOpen(false);
+        if (!multiple) {
+          setIsOpen(false);
+          onClose?.();
+        }
         props?.onChange?.(valueRef.current);
         setTimeout(() => {
           const changeEvent = new Event("change", {
@@ -310,7 +315,13 @@ export const Select = forwardRef(
     }, [_options, multiple, isSelected, _onChange]);
 
     const combobox = (
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <Popover
+        open={isOpen}
+        onOpenChange={(_isOpen) => {
+          setIsOpen(_isOpen);
+          _isOpen ? onOpen?.() : onClose?.();
+        }}
+      >
         <PopoverTrigger asChild={true} disabled={disabled}>
           <button
             variant="outline"
@@ -382,12 +393,17 @@ export const Select = forwardRef(
                         onItemsRendered,
                         ref: infiniteLoaderRef,
                       }: { onItemsRendered: (params: any) => void; ref: any }) => {
+                        // Calculate height based on actual item count, max 5 items
+                        const actualItemCount = renderedOptions.length;
+                        const maxVisibleItems = VARIABLE_LIST_COUNT_RENDERED;
+                        const listHeight = Math.min(actualItemCount, maxVisibleItems) * VARIABLE_LIST_ITEM_HEIGHT;
+
                         return (
                           <VariableSizeList
                             itemData={renderedOptions}
                             itemSize={() => VARIABLE_LIST_ITEM_HEIGHT}
                             itemCount={renderedOptions.length}
-                            height={5 * VARIABLE_LIST_ITEM_HEIGHT} // only render 5 items
+                            height={listHeight}
                             // width={VARIABLE_LIST_WIDTH}
                             onItemsRendered={onItemsRendered}
                             ref={infiniteLoaderRef}

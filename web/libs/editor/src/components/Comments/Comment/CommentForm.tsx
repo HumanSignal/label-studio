@@ -5,7 +5,7 @@ import { LINK_COMMENT_MODE } from "../../../stores/Annotation/LinkingModes";
 import { CommentBase } from "../../../stores/Comment/Comment";
 import { TextArea } from "../../../common/TextArea/TextArea";
 import type { ActionRefValue } from "../../../common/TextArea/TextArea";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { FF_DEV_3873, isFF } from "../../../utils/feature-flags";
 
 import { LinkState } from "./LinkState";
@@ -148,8 +148,12 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
   );
 
   return (
-    <Block ref={formRef} tag="form" name="comment-form-new" mod={{ inline, linked: !!region }} onSubmit={onSubmit}>
-      <Elem name="text-row">
+    <form
+      ref={formRef as any}
+      className={cn("comment-form-new").mod({ inline, linked: !!region }).toClassName()}
+      onSubmit={onSubmit}
+    >
+      <div className={cn("comment-form-new").elem("text-row").toClassName()}>
         <TextArea
           actionRef={actionRef}
           name="comment"
@@ -164,10 +168,10 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
         {classificationsItems.length === 0 && (
           <CommentFormButtons region={region} linking={linking} onLinkTo={linkToHandler} />
         )}
-      </Elem>
+      </div>
       {classificationsItems.length > 0 && (
-        <Elem name="classifications-row">
-          <Elem name="category-selector">
+        <div className={cn("comment-form-new").elem("classifications-row").toClassName()}>
+          <div className={cn("comment-form-new").elem("category-selector").toClassName()}>
             <Taxonomy
               selected={selections}
               items={classificationsItems}
@@ -175,16 +179,18 @@ export const CommentForm: FC<CommentFormProps> = observer(({ commentStore, annot
               options={COMMENT_TAXONOMY_OPTIONS}
               defaultSearch={false}
             />
-          </Elem>
+          </div>
           <CommentFormButtons region={region} linking={linking} onLinkTo={linkToHandler} />
-        </Elem>
+        </div>
       )}
       {hasLinkState && (
-        <Elem name="link-state">
+        <div className={cn("comment-form-new").elem("link-state").toClassName()}>
           <LinkState linking={linking} region={region} result={result} onUnlink={currentComment?.unsetLink} />
-        </Elem>
+        </div>
       )}
-      {commentStore.tooltipMessage && <Elem name="tooltipMessage">{commentStore.tooltipMessage}</Elem>}
-    </Block>
+      {commentStore.tooltipMessage && (
+        <div className={cn("comment-form-new").elem("tooltipMessage").toClassName()}>{commentStore.tooltipMessage}</div>
+      )}
+    </form>
   );
 });

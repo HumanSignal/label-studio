@@ -10,6 +10,10 @@
   &__dt {
     font-weight: 500;
     min-width: 300px;
+    color: var(--color-neutral-content);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-tighter);
   }
 
   &__dd {
@@ -18,9 +22,10 @@
 }
 
 .help-icon {
-  opacity: 0.5;
-  top: 1px;
   position: relative;
   display: inline;
   vertical-align: baseline;
+  color: var(--color-primary-icon);
+  width: 20px;
+  height: 20px;
 }

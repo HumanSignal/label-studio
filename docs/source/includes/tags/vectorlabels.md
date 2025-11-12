@@ -19,7 +19,6 @@
 | [skeleton] | <code>boolean</code> | <code>false</code> | Enables skeleton mode to allow branch paths |
 | [minPoints] | <code>number</code> \| <code>none</code> | <code>none</code> | Minimum allowed number of points |
 | [maxPoints] | <code>number</code> \| <code>none</code> | <code>none</code> | Maximum allowed number of points |
-| [constrainToBounds] | <code>boolean</code> | <code>false</code> | Whether to keep shapes inside image bounds |
 | [pointsizeenabled] | <code>number</code> | <code>5</code> | Size of a point in pixels when shape is selected |
 | [pointsizedisabled] | <code>number</code> | <code>5</code> | Size of a point in pixels when shape is not selected |
 

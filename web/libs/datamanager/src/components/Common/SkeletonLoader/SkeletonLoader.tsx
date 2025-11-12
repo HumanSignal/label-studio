@@ -1,6 +1,6 @@
 import type { ReactChildren } from "react";
 import "./SkeletonLoader.scss";
-import { Block } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { SkeletonLine } from "./SkeletonLine";
 import { SkeletonGap } from "./SkeletonGap";
 
@@ -18,7 +18,7 @@ export const SkeletonLoader = ({ children, gap = "4px", lightColor, darkColor }:
   darkColor && (styles["--skeleton-dark-color"] = darkColor);
 
   return (
-    <Block name="skeletonLoader" style={styles}>
+    <div className={cn("skeletonLoader").toClassName()} style={styles}>
       {children ? (
         children
       ) : (
@@ -29,6 +29,6 @@ export const SkeletonLoader = ({ children, gap = "4px", lightColor, darkColor }:
           <SkeletonLine width="50%" height="12px" />
         </>
       )}
-    </Block>
+    </div>
   );
 };

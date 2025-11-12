@@ -1,0 +1,13 @@
+<%- partial("component/heading", {text: "Tutorials", size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
+
+<div class="templates-grid">
+  <% site.pages
+    .filter(p => p.source.startsWith('tutorials/') && p.source !== 'tutorials/index.md')
+    .sort((a,b) => (a.order || 9999) - (b.order || 9999))
+    .forEach(function(p){ %>
+    <div class="templates-card">
+      <% if (p.thumbnail) { %><img src="<%= p.thumbnail %>" alt="<%= p.title %>" /><% } %>
+      <a href="<%= url_for(p.path) %>"><%- partial("component/heading", {text: p.title, size: "XXSmall", tag: "span" }) %></a>
+    </div>
+  <% }); %>
+</div>

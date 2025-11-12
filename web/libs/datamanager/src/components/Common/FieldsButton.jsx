@@ -1,7 +1,7 @@
 import { Button, Checkbox } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import React from "react";
-import { Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { Dropdown } from "./Dropdown/Dropdown";
 import { Menu } from "./Menu/Menu";
 
@@ -74,6 +74,7 @@ export const FieldsButton = injector(
     tooltip,
     tooltipTheme = "dark",
     openUpwardForShortViewport = true,
+    "data-testid": dataTestId,
   }) => {
     const content = [];
 
@@ -81,7 +82,14 @@ export const FieldsButton = injector(
 
     const renderButton = () => {
       return (
-        <Button variant="neutral" size="small" look="outlined" leading={icon} trailing={trailingIcon}>
+        <Button
+          variant="neutral"
+          size="small"
+          look="outlined"
+          leading={icon}
+          trailing={trailingIcon}
+          data-testid={dataTestId}
+        >
           {content.length ? content : null}
         </Button>
       );
@@ -104,7 +112,7 @@ export const FieldsButton = injector(
         openUpwardForShortViewport={openUpwardForShortViewport}
       >
         {tooltip ? (
-          <Elem name={"field-button"} style={{ zIndex: 1000 }} rawClassName="h-[40px] flex items-center">
+          <div className={`${cn("field-button").toClassName()} h-[40px] flex items-center`} style={{ zIndex: 1000 }}>
             <Button
               tooltip={tooltip}
               variant="neutral"
@@ -112,10 +120,11 @@ export const FieldsButton = injector(
               look="outlined"
               leading={icon}
               trailing={trailingIcon}
+              data-testid={dataTestId}
             >
               {content.length ? content : null}
             </Button>
-          </Elem>
+          </div>
         ) : (
           renderButton()
         )}

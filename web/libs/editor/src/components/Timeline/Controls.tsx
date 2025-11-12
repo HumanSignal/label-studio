@@ -18,7 +18,7 @@ import { Button, type ButtonProps, Space } from "@humansignal/ui";
 import { type FC, memo, type MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { WithHotkey } from "../../common/Hotkey/WithHotkey";
 import { Hotkey, type HotkeyList } from "../../core/Hotkey";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
 import { TimelineContext } from "./Context";
 import "./Controls.scss";
@@ -116,7 +116,11 @@ export const Controls: FC<TimelineControlsProps> = memo(
 
     const renderControls = () => {
       return (
-        <Elem name="group" tag={Space} size="small" style={{ gridAutoColumns: "auto" }}>
+        <Space
+          className={cn("timeline-controls").elem("group").toClassName()}
+          size="small"
+          style={{ gridAutoColumns: "auto" }}
+        >
           <ConfigControl
             onSetModal={onSetConfigModal}
             onAmpChange={props.onAmpChange}
@@ -137,7 +141,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
             onSetModal={onSetVolumeModal}
             audioModal={audioModal}
           />
-        </Elem>
+        </Space>
       );
     };
 
@@ -174,8 +178,13 @@ export const Controls: FC<TimelineControlsProps> = memo(
     };
 
     return (
-      <Block name="timeline-controls" tag={Space} spread style={{ gridAutoColumns: "auto" }}>
-        {buffering && <Elem name="buffering" aria-label="Buffering Media Source" />}
+      <Space className={cn("timeline-controls").toClassName()} spread style={{ gridAutoColumns: "auto" }}>
+        {buffering && (
+          <div
+            className={cn("timeline-controls").elem("buffering").toClassName()}
+            aria-label="Buffering Media Source"
+          />
+        )}
         {mediaType === "audio" ? (
           renderControls()
         ) : (
@@ -307,7 +316,7 @@ export const Controls: FC<TimelineControlsProps> = memo(
             />
             {customControls?.rightCenter}
           </Space>
-          <Elem name="group" tag={Space} collapsed>
+          <Space className={cn("timeline-controls").elem("group").toClassName()} collapsed>
             {!disableFrames && allowViewCollapse && (
               <ControlButton tooltip="Toggle Timeline" onClick={() => onToggleCollapsed?.(!collapsed)}>
                 {collapsed ? <IconExpand /> : <IconCollapse />}
@@ -318,10 +327,10 @@ export const Controls: FC<TimelineControlsProps> = memo(
                 {fullscreen ? <IconFullscreenExit /> : <IconFullscreen />}
               </ControlButton>
             )}
-          </Elem>
+          </Space>
         </Space>
 
-        <Elem name="group" tag={Space} size="small">
+        <Space className={cn("timeline-controls").elem("group").toClassName()} size="small">
           {mediaType === "audio" ? (
             <>
               {customControls?.right}
@@ -348,8 +357,8 @@ export const Controls: FC<TimelineControlsProps> = memo(
               />
             </>
           )}
-        </Elem>
-      </Block>
+        </Space>
+      </Space>
     );
   },
 );
@@ -381,14 +390,14 @@ const TimeDisplay: FC<TimeDisplay> = ({ currentTime, position, duration, framera
   const totalTimeFormatted = formatter({ time: duration, ...commonOptions });
 
   return (
-    <Elem name="time">
-      <Elem name="time-section">
+    <div className={cn("timeline-controls").elem("time").toClassName()}>
+      <div className={cn("timeline-controls").elem("time-section").toClassName()}>
         <Time time={currentTime} position={currentTimeFormatted} />
-      </Elem>
-      <Elem name="time-section">
+      </div>
+      <div className={cn("timeline-controls").elem("time-section").toClassName()}>
         <Time time={Math.max(duration, 0)} position={totalTimeFormatted} />
-      </Elem>
-    </Elem>
+      </div>
+    </div>
   );
 };
 

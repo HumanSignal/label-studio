@@ -1,5 +1,5 @@
 import { observer } from "mobx-react";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { Actions } from "./Actions";
 import { Controls } from "./Controls";
 import "./BottomBar.scss";
@@ -13,17 +13,20 @@ export const BottomBar = observer(({ store }) => {
   const isViewAll = annotationStore?.viewingAll === true;
 
   return store && !isViewAll ? (
-    <Block name="bottombar" style={{ borderTop: isFF(FF_DEV_3873) && "1px solid rgba(0,0,0,0.1)" }}>
-      <Elem name="group">
+    <div
+      className={cn("bottombar").toClassName()}
+      style={{ borderTop: isFF(FF_DEV_3873) && "1px solid rgba(0,0,0,0.1)" }}
+    >
+      <div className={cn("bottombar").elem("group").toClassName()}>
         <Actions store={store} />
-      </Elem>
-      <Elem name="group">
+      </div>
+      <div className={cn("bottombar").elem("group").toClassName()}>
         {store.hasInterface("controls") && (store.hasInterface("review") || !isPrediction) && (
-          <Elem name="section" mod={{ flat: true }}>
+          <div className={cn("bottombar").elem("section").mod({ flat: true }).toClassName()}>
             <Controls annotation={entity} />
-          </Elem>
+          </div>
         )}
-      </Elem>
-    </Block>
+      </div>
+    </div>
   ) : null;
 });

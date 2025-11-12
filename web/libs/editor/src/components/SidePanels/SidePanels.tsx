@@ -3,7 +3,7 @@
 
 import { observer } from "mobx-react";
 import { type CSSProperties, type FC, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { DetailsPanel } from "./DetailsPanel/DetailsPanel";
 import { OutlinerPanel } from "./OutlinerPanel/OutlinerPanel";
 
@@ -483,24 +483,30 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({ currentEntity, panelsHidden,
 
   return (
     <SidePanelsContext.Provider value={contextValue}>
-      <Block
+      <div
         ref={(el: HTMLDivElement | null) => {
           if (el) {
             rootRef.current = el;
             setViewportSizeMatch(el.clientWidth <= maxWindowWidth);
           }
         }}
-        name="sidepanels"
+        className={cn("sidepanels")
+          .mod({ collapsed: sidepanelsCollapsed, newLabelingUI: isFF(FF_DEV_3873) })
+          .toClassName()}
         style={{
           ...padding,
         }}
-        mod={{ collapsed: sidepanelsCollapsed, newLabelingUI: isFF(FF_DEV_3873) }}
       >
         {initialized && (
           <>
-            <Elem name="content" mod={{ resizing: resizing || positioning }}>
+            <div
+              className={cn("sidepanels")
+                .elem("content")
+                .mod({ resizing: resizing || positioning })
+                .toClassName()}
+            >
               {children}
-            </Elem>
+            </div>
             {panelsHidden !== true && (
               <>
                 {Object.entries(panels).map(([key, panel]) => {
@@ -511,16 +517,22 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({ currentEntity, panelsHidden,
                   }
 
                   return (
-                    <Elem key={key} name="wrapper" mod={{ align: key, snap: snap === key && snap !== undefined }}>
+                    <div
+                      key={key}
+                      className={cn("sidepanels")
+                        .elem("wrapper")
+                        .mod({ align: key, snap: snap === key && snap !== undefined })
+                        .toClassName()}
+                    >
                       {content}
-                    </Elem>
+                    </div>
                   );
                 })}
               </>
             )}
           </>
         )}
-      </Block>
+      </div>
     </SidePanelsContext.Provider>
   );
 };

@@ -4,8 +4,9 @@ from django.db import migrations
 
 
 def remove(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
     View = apps.get_model('data_manager', 'View')
-    views = View.objects.all()
+    views = View.objects.using(db_alias).all()
 
     for view in views:
         if 'hiddenColumns' in view.data:
@@ -16,7 +17,7 @@ def remove(apps, schema_editor):
                 view.data['hiddenColumns']['labeling'].append('tasks:annotations_ids')
                 view.data['hiddenColumns']['labeling'] = list(set(view.data['hiddenColumns']['labeling']))
 
-        view.save()
+        view.save(using=db_alias)
 
 
 class Migration(migrations.Migration):

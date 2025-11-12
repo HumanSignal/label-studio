@@ -4,10 +4,11 @@ short: Usage & License
 type: guide
 tier: enterprise
 order: 0
-order_enterprise: 357
+order_enterprise: 358
 meta_title: Usage & License
 meta_description: Find information about your Label Studio account and configure organization settings.  
 section: "Manage Your Organization"
+parent_enterprise: "admin_settings"
 ---
 
 You can find information about your plan and seat usage on this page. 

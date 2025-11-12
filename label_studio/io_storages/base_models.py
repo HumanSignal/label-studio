@@ -18,7 +18,7 @@ import django_rq
 import rq
 import rq.exceptions
 from core.feature_flags import flag_set
-from core.redis import is_job_in_queue, is_job_on_worker, redis_connected
+from core.redis import is_job_in_queue, is_job_on_worker, redis_connected, start_job_async_or_sync
 from core.utils.common import load_func
 from core.utils.iterators import iterate_queryset
 from data_export.serializers import ExportDataSerializer
@@ -474,7 +474,8 @@ class ImportStorage(Storage):
                 data.pop('data')
 
         with transaction.atomic():
-            task = Task.objects.create(
+            # Create task without skip_fsm (it's not a model field)
+            task = Task(
                 data=data,
                 project=project,
                 overlap=maximum_annotations,
@@ -484,6 +485,8 @@ class ImportStorage(Storage):
                 cancelled_annotations=cancelled_annotations,
                 inner_id=max_inner_id,
             )
+            # Save with skip_fsm flag to bypass FSM during bulk import
+            task.save(skip_fsm=True)
 
             link_class.create(task, storage=storage, **link_kwargs)
             logger.debug(f'Create {storage.__class__.__name__} link with {link_kwargs} for {task=}')
@@ -539,92 +542,112 @@ class ImportStorage(Storage):
         max_inner_id = (task.inner_id + 1) if task else 1
         validation_errors = []
 
-        # Check feature flag once for the entire sync process
+        # Check feature flags once for the entire sync process
         check_file_extension = flag_set(
-            'fflag_fix_back_plt_804_check_file_extension_11072025_short', user=self.project.organization.created_by
+            'fflag_fix_back_plt_804_check_file_extension_11072025_short', organization=self.project.organization
+        )
+        existed_count_flag_set = flag_set(
+            'fflag_root_212_reduce_importstoragelink_counts', organization=self.project.organization
         )
 
         tasks_for_webhook = []
-        for key in self.iter_keys():
+        for keys_batch in _batched(
+            self.iter_keys(), settings.STORAGE_EXISTED_COUNT_BATCH_SIZE if existed_count_flag_set else 1
+        ):
+            deduplicated_keys = list(dict.fromkeys(keys_batch))  # preserve order
+            for key in deduplicated_keys:
+                logger.debug(f'Scanning key {key}')
+
             # w/o Dataflow
             # pubsub.push(topic, key)
             # -> GF.pull(topic, key) + env -> add_task()
-            logger.debug(f'Scanning key {key}')
-            self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
 
             # skip if key has already been synced
-            if n_tasks_linked := link_class.n_tasks_linked(key, self):
-                logger.debug(f'{self.__class__.__name__} already has {n_tasks_linked} tasks linked to {key=}')
-                tasks_existed += n_tasks_linked  # update progress counter
-                continue
+            existing_keys = link_class.exists(deduplicated_keys, self)
+            tasks_existed += link_class.objects.filter(key__in=existing_keys, storage=self.id).count()
+            self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
 
-            logger.debug(f'{self}: found new key {key}')
-
-            # Check if file should be processed as JSON based on extension
-            # Skip non-JSON files if use_blob_urls is False
-            if check_file_extension and not self.use_blob_urls:
-                _, ext = os.path.splitext(key.lower())
-                # Only process files with JSON/JSONL/PARQUET extensions
-                json_extensions = {'.json', '.jsonl', '.parquet'}
-
-                if ext and ext not in json_extensions:
-                    raise UnsupportedFileFormatError(
-                        f'File "{key}" is not a JSON/JSONL/Parquet file. Only .json, .jsonl, and .parquet files can be processed.\n'
-                        f"If you're trying to import non-JSON data (images, audio, text, etc.), "
-                        f'edit storage settings and enable "Tasks" import method'
-                    )
-
-            try:
-                link_objects = self.get_data(key)
-            except (UnicodeDecodeError, json.decoder.JSONDecodeError) as exc:
-                logger.debug(exc, exc_info=True)
-                raise ValueError(
-                    f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
-                    f'(images, audio, text, etc.), edit storage settings and enable '
-                    f'"Tasks" import method'
-                )
-
-            for link_object in link_objects:
-                # TODO: batch this loop body with add_task -> add_tasks in a single bulk write.
-                # See DIA-2062 for prerequisites
-                try:
-                    task = self.add_task(
-                        self.project,
-                        maximum_annotations,
-                        max_inner_id,
-                        self,
-                        link_object,
-                        link_class=link_class,
-                    )
-                    max_inner_id += 1
-
-                    # update progress counters for storage info
-                    tasks_created += 1
-
-                    # add task to webhook list
-                    tasks_for_webhook.append(task.id)
-                except ValidationError as e:
-                    # Log validation errors but continue processing other tasks
-                    error_message = f'Validation error for task from {link_object.key}: {e}'
-                    logger.error(error_message)
-                    validation_errors.append(error_message)
+            for key in deduplicated_keys:
+                if key in existing_keys:
+                    logger.debug(f'{self.__class__.__name__} already has tasks linked to {key=}')
                     continue
 
-                # settings.WEBHOOK_BATCH_SIZE
-                # `WEBHOOK_BATCH_SIZE` sets the maximum number of tasks sent in a single webhook call, ensuring manageable payload sizes.
-                # When `tasks_for_webhook` accumulates tasks equal to/exceeding `WEBHOOK_BATCH_SIZE`, they're sent in a webhook via
-                # `emit_webhooks_for_instance`, and `tasks_for_webhook` is cleared for new tasks.
-                # If tasks remain in `tasks_for_webhook` at process end (less than `WEBHOOK_BATCH_SIZE`), they're sent in a final webhook
-                # call to ensure all tasks are processed and no task is left unreported in the webhook.
-                if len(tasks_for_webhook) >= settings.WEBHOOK_BATCH_SIZE:
-                    emit_webhooks_for_instance(
-                        self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
+                logger.debug(f'{self}: found new key {key}')
+
+                # Check if file should be processed as JSON based on extension
+                # Skip non-JSON files if use_blob_urls is False
+                if check_file_extension and not self.use_blob_urls:
+                    _, ext = os.path.splitext(key.lower())
+                    # Only process files with JSON/JSONL/PARQUET extensions
+                    json_extensions = {'.json', '.jsonl', '.parquet'}
+
+                    if ext and ext not in json_extensions:
+                        raise UnsupportedFileFormatError(
+                            f'File "{key}" is not a JSON/JSONL/Parquet file. Only .json, .jsonl, and .parquet files can be processed.\n'
+                            f"If you're trying to import non-JSON data (images, audio, text, etc.), "
+                            f'edit storage settings and enable "Tasks" import method'
+                        )
+
+                try:
+                    link_objects = self.get_data(key)
+                except (UnicodeDecodeError, json.decoder.JSONDecodeError) as exc:
+                    logger.debug(exc, exc_info=True)
+                    raise ValueError(
+                        f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
+                        f'(images, audio, text, etc.), edit storage settings and enable '
+                        f'"Tasks" import method'
                     )
-                    tasks_for_webhook = []
+
+                for link_object in link_objects:
+                    # TODO: batch this loop body with add_task -> add_tasks in a single bulk write.
+                    # See DIA-2062 for prerequisites
+                    try:
+                        task = self.add_task(
+                            self.project,
+                            maximum_annotations,
+                            max_inner_id,
+                            self,
+                            link_object,
+                            link_class=link_class,
+                        )
+                        max_inner_id += 1
+
+                        # update progress counters for storage info
+                        tasks_created += 1
+
+                        # add task to webhook list
+                        tasks_for_webhook.append(task.id)
+                    except ValidationError as e:
+                        # Log validation errors but continue processing other tasks
+                        error_message = f'Validation error for task from {link_object.key}: {e}'
+                        logger.error(error_message)
+                        validation_errors.append(error_message)
+                        continue
+
+                    # settings.WEBHOOK_BATCH_SIZE
+                    # `WEBHOOK_BATCH_SIZE` sets the maximum number of tasks sent in a single webhook call, ensuring manageable payload sizes.
+                    # When `tasks_for_webhook` accumulates tasks equal to/exceeding `WEBHOOK_BATCH_SIZE`, they're sent in a webhook via
+                    # `emit_webhooks_for_instance`, and `tasks_for_webhook` is cleared for new tasks.
+                    # If tasks remain in `tasks_for_webhook` at process end (less than `WEBHOOK_BATCH_SIZE`), they're sent in a final webhook
+                    # call to ensure all tasks are processed and no task is left unreported in the webhook.
+                    if len(tasks_for_webhook) >= settings.WEBHOOK_BATCH_SIZE:
+                        emit_webhooks_for_instance(
+                            self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
+                        )
+                        tasks_for_webhook = []
+
+                self.info_update_progress(last_sync_count=tasks_created, tasks_existed=tasks_existed)
+
         if tasks_for_webhook:
             emit_webhooks_for_instance(
                 self.project.organization, self.project, WebhookAction.TASKS_CREATED, tasks_for_webhook
             )
+
+        # Create initial FSM states for all tasks created during storage sync
+        # CurrentContext is now available because we use start_job_async_or_sync
+        from fsm.functions import backfill_fsm_states_for_tasks
+
+        backfill_fsm_states_for_tasks(self.id, tasks_created, link_class)
 
         self.project.update_tasks_states(
             maximum_annotations_changed=False, overlap_cohort_percentage_changed=False, tasks_number_changed=True
@@ -651,10 +674,13 @@ class ImportStorage(Storage):
             ):
                 if not self.info_set_queued():
                     return
-                sync_job = queue.enqueue(
+                # Use start_job_async_or_sync to automatically capture and restore CurrentContext
+                # This ensures user_id, organization_id, and request_id are available in the worker
+                sync_job = start_job_async_or_sync(
                     import_sync_background,
                     self.__class__,
                     self.id,
+                    queue_name='low',
                     meta=meta,
                     project_id=self.project.id,
                     organization_id=self.project.organization.id,
@@ -880,8 +906,8 @@ class ImportStorageLink(models.Model):
     row_index = models.IntegerField(null=True, blank=True, help_text='Parquet row index, or JSON[L] object index')
 
     @classmethod
-    def n_tasks_linked(cls, key, storage):
-        return cls.objects.filter(key=key, storage=storage.id).count()
+    def exists(cls, keys, storage) -> set[str]:
+        return set(cls.objects.filter(key__in=keys, storage=storage.id).values_list('key', flat=True).distinct())
 
     @classmethod
     def create(cls, task, key, storage, row_index=None, row_group=None):

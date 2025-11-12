@@ -23,12 +23,16 @@ import {
   snapToPixel,
   stageToImageCoordinates,
 } from "./utils";
-import { constrainPointToBounds } from "../utils/boundsChecking";
+import { constrainAnchorPointsToBounds } from "../utils/boundsChecking";
 import { VectorSelectionTracker } from "../VectorSelectionTracker";
 import { PointType } from "../types";
 
 export function createMouseDownHandler(props: EventHandlerProps, handledSelectionInMouseDown: { current: boolean }) {
   return (e: KonvaEventObject<MouseEvent>) => {
+    // Reset the handledSelectionInMouseDown flag at the start of each mousedown
+    // This ensures clean state for each interaction
+    handledSelectionInMouseDown.current = false;
+
     let shiftClickHandled = false;
 
     // Only run Shift+click logic if Shift key is actually held
@@ -268,6 +272,9 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
     }
 
     // If we get here, we're not clicking on anything specific
+    // Reset the handledSelectionInMouseDown flag since we're clicking on empty space
+    handledSelectionInMouseDown.current = false;
+
     // Handle deselection based on transformer state
     if (!e.evt.ctrlKey && !e.evt.metaKey) {
       // Use tracker for global selection management
@@ -469,10 +476,8 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       // Snap to pixel grid if enabled
       const snappedPos = snapToPixel(imagePos, props.pixelSnapping);
 
-      // Apply bounds checking if enabled
-      const finalPos = props.constrainToBounds
-        ? constrainPointToBounds(snappedPos, { width: props.width, height: props.height })
-        : snappedPos;
+      // Apply bounds checking to anchor point
+      const finalPos = constrainAnchorPointsToBounds([snappedPos], { width: props.width, height: props.height })[0];
 
       // Update the point position
       newPoints[props.draggedPointIndex] = {
@@ -481,7 +486,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
         y: finalPos.y,
       };
 
-      // If it's a bezier point, move the control points with it
+      // If it's a bezier point, move the control points with it and apply group constraints
       if (draggedPoint.isBezier) {
         const updatedPoint = newPoints[props.draggedPointIndex];
 
@@ -510,6 +515,17 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
             y: snappedControlPoint2.y,
           };
         }
+
+        // Apply constraints to anchor point only - control points move with it automatically
+        const constrainedPoint = constrainAnchorPointsToBounds([updatedPoint], {
+          width: props.width,
+          height: props.height,
+        })[0];
+
+        // Update the point with constrained positions
+        updatedPoint.x = constrainedPoint.x;
+        updatedPoint.y = constrainedPoint.y;
+        // Control points are already positioned correctly relative to the anchor point
       }
 
       props.onPointsChange?.(newPoints);
@@ -534,11 +550,6 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
         // Snap to pixel grid if enabled
         const snappedPos = snapToPixel(imagePos, props.pixelSnapping);
 
-        // Apply bounds checking if enabled
-        const finalPos = props.constrainToBounds
-          ? constrainPointToBounds(snappedPos, { width: props.width, height: props.height })
-          : snappedPos;
-
         // If Alt key is held, disconnect the control points
         if (e.evt.altKey) {
           point.disconnected = true;
@@ -548,7 +559,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
           // Create a new point object with updated control points
           const updatedPoint = {
             ...point,
-            controlPoint1: { x: finalPos.x, y: finalPos.y },
+            controlPoint1: { x: snappedPos.x, y: snappedPos.y },
           };
 
           // If controls are synchronized (not disconnected), update the other control point symmetrically
@@ -571,7 +582,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
           // Create a new point object with updated control points
           const updatedPoint = {
             ...point,
-            controlPoint2: { x: finalPos.x, y: finalPos.y },
+            controlPoint2: { x: snappedPos.x, y: snappedPos.y },
           };
 
           // If controls are synchronized (not disconnected), update the other control point symmetrically
@@ -614,7 +625,8 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
 
       if (!props.isDraggingNewBezier) {
         // Start Bezier curve creation if we've moved enough
-        if (dragDistance > 5) {
+        // Increased threshold to prevent accidental bezier creation on regular clicks
+        if (dragDistance > 15) {
           // Convert client coordinates to stage coordinates
           const stage = e.target.getStage();
           const stagePos = stage?.getPointerPosition();
@@ -949,12 +961,6 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
     // Handle drawing mode clicks (only when path is not closed)
     // Skip if PointCreationManager is currently creating a point
     if (props.isDrawingMode && !props.isPathClosed && !props.pointCreationManager?.isCreating()) {
-      // Check if we just created a Bezier point - if so, skip regular point creation
-      if (handledSelectionInMouseDown.current) {
-        handledSelectionInMouseDown.current = false;
-        return;
-      }
-
       // Handle regular click (add regular point)
       if (handleDrawingModeClick(e, props)) {
         return;

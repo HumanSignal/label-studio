@@ -4,7 +4,7 @@ import { useAPI } from "../../../providers/ApiProvider";
 import { cn } from "../../../utils/bem";
 import "./Config.scss";
 import { IconInfo } from "@humansignal/icons";
-import { Button } from "@humansignal/ui";
+import { Button, EnterpriseBadge } from "@humansignal/ui";
 
 const listClass = cn("templates-list");
 
@@ -15,20 +15,37 @@ const Arrow = () => (
   </svg>
 );
 
-const TemplatesInGroup = ({ templates, group, onSelectRecipe }) => {
+const TemplatesInGroup = ({ templates, group, onSelectRecipe, isEdition }) => {
   const picked = templates
     .filter((recipe) => recipe.group === group)
     // templates without `order` go to the end of the list
     .sort((a, b) => (a.order ?? Number.POSITIVE_INFINITY) - (b.order ?? Number.POSITIVE_INFINITY));
 
+  const isCommunityEdition = isEdition === "Community";
+
   return (
     <ul>
-      {picked.map((recipe) => (
-        <li key={recipe.title} onClick={() => onSelectRecipe(recipe)} className={listClass.elem("template")}>
-          <img src={recipe.image} alt={""} />
-          <h3>{recipe.title}</h3>
-        </li>
-      ))}
+      {picked.map((recipe) => {
+        const isEnterpriseTemplate = recipe.type === "enterprise";
+        const isDisabled = isCommunityEdition && isEnterpriseTemplate;
+
+        return (
+          <li
+            key={recipe.title}
+            onClick={() => !isDisabled && onSelectRecipe(recipe)}
+            className={listClass.elem("template").mod({ disabled: isDisabled })}
+            title={isDisabled ? "Enterprise feature - Available in Label Studio Enterprise" : ""}
+          >
+            <img src={recipe.image} alt={""} />
+            <div className="flex w-full relative">
+              <h3 className="flex flex-1 justify-center text-center">{recipe.title}</h3>
+              {isEnterpriseTemplate && isCommunityEdition && (
+                <EnterpriseBadge className="absolute bottom-[-10px] left-1/2 translate-x-[-40px]" />
+              )}
+            </div>
+          </li>
+        );
+      })}
     </ul>
   );
 };
@@ -37,6 +54,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
   const [groups, setGroups] = React.useState([]);
   const [templates, setTemplates] = React.useState();
   const api = useAPI();
+  const isEdition = window?.APP_SETTINGS?.version_edition;
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -85,7 +103,12 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
       </aside>
       <main>
         {!templates && <Spinner style={{ width: "100%", height: 200 }} />}
-        <TemplatesInGroup templates={templates || []} group={selected} onSelectRecipe={onSelectRecipe} />
+        <TemplatesInGroup
+          templates={templates || []}
+          group={selected}
+          onSelectRecipe={onSelectRecipe}
+          isEdition={isEdition}
+        />
       </main>
       <footer className="flex items-center justify-center gap-1">
         <IconInfo className={listClass.elem("info-icon")} width="20" height="20" />

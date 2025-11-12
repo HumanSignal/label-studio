@@ -8,20 +8,25 @@ from ml_models.models import ThirdPartyModelVersion
 from ml_model_providers.models import ModelProviderConnection, ModelProviders
 
 
-def _fill_model_version_model_provider_connection():
+def _fill_model_version_model_provider_connection(db_alias: str):
     for provider in [ModelProviders.OPENAI, ModelProviders.AZURE_OPENAI]:
-        this_provider_model_versions = ThirdPartyModelVersion.objects.filter(provider=provider).values('id', 'organization_id', 'provider_model_id')
+        this_provider_model_versions = (
+            ThirdPartyModelVersion.objects.using(db_alias)
+            .filter(provider=provider)
+            .values('id', 'organization_id', 'provider_model_id')
+        )
         for provider_model_version in this_provider_model_versions:
-            connection_ids = ModelProviderConnection.objects.filter(
+            connection_ids = ModelProviderConnection.objects.using(db_alias).filter(
                 organization_id=provider_model_version['organization_id'],
                 provider=provider,
                 **({'deployment_name': provider_model_version['provider_model_id']} if provider == ModelProviders.AZURE_OPENAI else {}),
             ).values_list('id', flat=True)[:1]
             connection_id = connection_ids[0] if connection_ids else None
-            ThirdPartyModelVersion.objects.filter(id=provider_model_version['id']).update(model_provider_connection_id=connection_id)
+            ThirdPartyModelVersion.objects.using(db_alias).filter(id=provider_model_version['id']).update(model_provider_connection_id=connection_id)
 
 def forwards(apps, schema_editor):
-    start_job_async_or_sync(_fill_model_version_model_provider_connection)
+    db_alias = schema_editor.connection.alias
+    start_job_async_or_sync(_fill_model_version_model_provider_connection, db_alias=db_alias)
 
 
 def backwards(apps, schema_editor):

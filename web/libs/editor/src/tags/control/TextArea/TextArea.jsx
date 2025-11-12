@@ -148,10 +148,10 @@ const Model = types
     hasResult(text) {
       if (!self.result) return false;
       let value = self.result.mainValue;
+      const normalized = text.toLowerCase();
 
       if (!Array.isArray(value)) value = [value];
-      text = text.toLowerCase();
-      return value.some((val) => val.toLowerCase() === text);
+      return value.some((val) => val.toLowerCase() === normalized);
     },
   }))
   .actions(() => (isFF(FF_LEAD_TIME) ? {} : { countTime: () => {} }))
@@ -192,7 +192,7 @@ const Model = types
       setResult(value) {
         const values = Array.isArray(value) ? value : [value];
 
-        values.forEach((v) => self.createRegion(v));
+        for (const v of values) self.createRegion(v);
       },
 
       updateFromResult(value) {
@@ -277,7 +277,7 @@ const Model = types
       },
 
       beforeSend() {
-        if (self._value && self._value.length) {
+        if (self._value?.length && self.showSubmit) {
           self.addText(self._value);
           self._value = "";
         }

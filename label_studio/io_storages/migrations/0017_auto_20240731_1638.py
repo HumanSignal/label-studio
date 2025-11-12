@@ -69,8 +69,8 @@ tables = [
 ]
 
 
-def forward_migration(migration_name):
-    migration = AsyncMigrationStatus.objects.create(
+def forward_migration(migration_name, db_alias):
+    migration = AsyncMigrationStatus.objects.using(db_alias).create(
         name=migration_name,
         status=AsyncMigrationStatus.STATUS_STARTED,
     )
@@ -79,7 +79,8 @@ def forward_migration(migration_name):
     )
 
     # Get db cursor
-    cursor = connection.cursor()
+    from django.db import connections
+    cursor = connections[db_alias].cursor()
     for table in tables:
         index_sql = create_index_sql(table['table_name'], table['index_name'], table['column_name'])
         fk_sql = create_fk_sql(table['table_name'], table['fk_constraint'], table['column_name'], "task_completion",
@@ -90,13 +91,13 @@ def forward_migration(migration_name):
         cursor.execute(fk_sql)
 
     migration.status = AsyncMigrationStatus.STATUS_FINISHED
-    migration.save()
+    migration.save(using=db_alias)
     logger.debug(
         f'Async migration {migration_name} complete'
     )
 
-def reverse_migration(migration_name):
-    migration = AsyncMigrationStatus.objects.create(
+def reverse_migration(migration_name, db_alias):
+    migration = AsyncMigrationStatus.objects.using(db_alias).create(
         name=migration_name,
         status=AsyncMigrationStatus.STATUS_STARTED,
     )
@@ -105,14 +106,15 @@ def reverse_migration(migration_name):
     )
 
     # Get db cursor
-    cursor = connection.cursor()
+    from django.db import connections
+    cursor = connections[db_alias].cursor()
     for table in tables:
         reverse_sql = drop_index_sql(table['table_name'], table['index_name'], table['column_name'])
         # Run reverse_sql
         cursor.execute(reverse_sql)
 
     migration.status = AsyncMigrationStatus.STATUS_FINISHED
-    migration.save()
+    migration.save(using=db_alias)
     logger.debug(
         f'Async migration {migration_name} complete'
     )
@@ -120,11 +122,13 @@ def reverse_migration(migration_name):
 
 def forwards(apps, schema_editor):
     # Dispatch migrations to rqworkers
-    start_job_async_or_sync(forward_migration, migration_name=migration_name)
+    db_alias = schema_editor.connection.alias
+    start_job_async_or_sync(forward_migration, migration_name=migration_name, db_alias=db_alias)
 
 
 def backwards(apps, schema_editor):
-    start_job_async_or_sync(reverse_migration, migration_name=migration_name)
+    db_alias = schema_editor.connection.alias
+    start_job_async_or_sync(reverse_migration, migration_name=migration_name, db_alias=db_alias)
 
 
 def get_operations():
@@ -158,4 +162,3 @@ class Migration(migrations.Migration):
     ]
 
     operations = get_operations()
-

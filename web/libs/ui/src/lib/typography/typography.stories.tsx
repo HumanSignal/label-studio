@@ -9,6 +9,11 @@ type TypographyStory = StoryObj<{
   as?: keyof JSX.IntrinsicElements;
   className?: string;
   children: React.ReactNode;
+  truncateLines?: number;
+  expandable?: boolean;
+  expandLabel?: string;
+  collapseLabel?: string;
+  expandToggleClassName?: string;
 }>;
 
 const meta: Meta<typeof Typography> = {
@@ -44,6 +49,27 @@ const meta: Meta<typeof Typography> = {
     className: {
       control: { type: "text" },
       description: "Additional CSS classes to apply",
+    },
+    truncateLines: {
+      control: { type: "number" },
+      description:
+        "Number of lines to show before truncating. When set, content will be clamped to this many lines with an expand/collapse toggle.",
+    },
+    expandable: {
+      control: { type: "boolean" },
+      description: "Whether to show expand/collapse toggle button when content is truncated",
+    },
+    expandLabel: {
+      control: { type: "text" },
+      description: "Custom label for the expand button (default: 'Show more')",
+    },
+    collapseLabel: {
+      control: { type: "text" },
+      description: "Custom label for the collapse button (default: 'Show less')",
+    },
+    expandToggleClassName: {
+      control: { type: "text" },
+      description: "Custom CSS classes to apply to the expand/collapse toggle button",
     },
   },
   tags: ["autodocs"],
@@ -301,6 +327,91 @@ export const Composition: TypographyStory = {
     docs: {
       description: {
         story: "A composition example showing how typography components work together in a real-world context.",
+      },
+    },
+  },
+};
+
+// Truncation examples
+const longText =
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+
+const htmlText =
+  "<p>This is <strong>HTML content</strong> with various formatting.</p><p>It includes <em>italic text</em>, <strong>bold text</strong>, and multiple paragraphs.</p><p>The truncation works seamlessly with HTML markup, preserving all formatting while still allowing expand/collapse functionality.</p>";
+
+export const Truncation: TypographyStory = {
+  args: {
+    variant: "body",
+    size: "small",
+    children: longText,
+  },
+  render: () => (
+    <div className="space-y-8 max-w-2xl">
+      <div>
+        <h3 className="text-lg font-semibold mb-4 !text-neutral-content-subtle">Basic Truncation (3 lines)</h3>
+        <Typography variant="body" size="small" truncateLines={3}>
+          {longText}
+        </Typography>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 !text-neutral-content-subtle">Truncation (2 lines)</h3>
+        <Typography variant="body" size="small" truncateLines={2}>
+          {longText}
+        </Typography>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 !text-neutral-content-subtle">Truncation (5 lines)</h3>
+        <Typography variant="body" size="small" truncateLines={5}>
+          {longText}
+        </Typography>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 !text-neutral-content-subtle">Custom Button Labels</h3>
+        <Typography variant="body" size="small" truncateLines={3} expandLabel="See more" collapseLabel="See less">
+          {longText}
+        </Typography>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 !text-neutral-content-subtle">Custom Toggle Styles</h3>
+        <Typography
+          variant="body"
+          size="small"
+          truncateLines={3}
+          expandToggleClassName="!text-accent-grape-dark font-semibold hover:underline"
+        >
+          {longText}
+        </Typography>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 !text-neutral-content-subtle">HTML Content Truncation</h3>
+        <Typography variant="body" size="small" truncateLines={2} dangerouslySetInnerHTML={{ __html: htmlText }} />
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 !text-neutral-content-subtle">Non-Expandable Truncation</h3>
+        <Typography variant="body" size="small" truncateLines={3} expandable={false}>
+          {longText}
+        </Typography>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-4 !text-neutral-content-subtle">Short Text (no truncation needed)</h3>
+        <Typography variant="body" size="small" truncateLines={3}>
+          This is a short text that doesn't need truncation, so no button appears.
+        </Typography>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Typography supports text truncation with expand/collapse functionality. Use `truncateLines` to specify the number of lines to show before truncating. The component automatically detects if content overflows and only shows the toggle button when needed. Supports custom button labels, HTML content, and non-expandable mode.",
       },
     },
   },

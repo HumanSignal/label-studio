@@ -18,6 +18,9 @@ class TestDeletedRow(TestCase):
         original_dict.pop('_state')
         original_created_at = original_dict.pop('created_at')
         original_updated_at = original_dict.pop('updated_at')
+        # Pop _original_values - this is an internal FSM field that's recreated on __init__
+        # and shouldn't be compared
+        original_dict.pop('_original_values', None)
         original.delete()
 
         for deserialized_object in serializers.deserialize('json', json.dumps([drow.data])):
@@ -28,6 +31,9 @@ class TestDeletedRow(TestCase):
         new_dict.pop('_state')
         new_created_at = new_dict.pop('created_at')
         new_updated_at = new_dict.pop('updated_at')
+        # Pop _original_values - this is an internal FSM field that's recreated on __init__
+        # and shouldn't be compared
+        new_dict.pop('_original_values', None)
 
         assert new_dict == original_dict
         # Datetime loses microsecond precision, so we can't compare them directly

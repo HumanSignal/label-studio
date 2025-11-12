@@ -3,7 +3,7 @@
 import logging
 
 import ujson as json
-from core.current_request import get_current_request
+from core.current_request import CurrentContext, get_current_request
 from core.feature_flags import flag_set
 from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func, retry_database_locked
@@ -11,6 +11,7 @@ from core.utils.db import fast_first
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema_field
+from fsm.serializer_fields import FSMStateField
 from label_studio_sdk.label_interface import LabelInterface
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -121,7 +122,15 @@ class CompletedByDMSerializer(UserSerializer):
 
 
 class AnnotationSerializer(FlexFieldsModelSerializer):
-    """ """
+    """
+    Annotation Serializer with FSM state support.
+
+    Note: The 'state' field will be populated from the queryset annotation
+    if present, preventing N+1 queries. Use .with_state() on your queryset.
+    """
+
+    state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
+    """"""
 
     result = AnnotationResultField(required=False)
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
@@ -167,6 +176,17 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
 
         name += f' {user.email}, {user.id}'
         return name
+
+    def to_representation(self, obj):
+        """Remove state field if feature flags are disabled"""
+        ret = super().to_representation(obj)
+        user = CurrentContext.get_user()
+        if not (
+            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
+            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
+        ):
+            ret.pop('state', None)
+        return ret
 
     class Meta:
         model = Annotation
@@ -710,7 +730,14 @@ class TaskWithAnnotationsSerializer(TaskSerializer):
 
 
 class AnnotationDraftSerializer(ModelSerializer):
+    """
+    AnnotationDraft Serializer with FSM state support.
 
+    Note: The 'state' field will be populated from the queryset annotation
+    if present, preventing N+1 queries. Use .with_state() on your queryset.
+    """
+
+    state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
     user = serializers.CharField(default=serializers.CurrentUserDefault())
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
@@ -726,6 +753,17 @@ class AnnotationDraftSerializer(ModelSerializer):
             name = name + ' ' + last_name
         name += (' ' if name else '') + f'{user.email}, {user.id}'
         return name
+
+    def to_representation(self, obj):
+        """Remove state field if feature flags are disabled"""
+        ret = super().to_representation(obj)
+        user = CurrentContext.get_user()
+        if not (
+            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
+            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
+        ):
+            ret.pop('state', None)
+        return ret
 
     class Meta:
         model = AnnotationDraft
