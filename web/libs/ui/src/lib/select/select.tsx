@@ -394,23 +394,8 @@ export const Select = forwardRef(
                         ref: infiniteLoaderRef,
                       }: { onItemsRendered: (params: any) => void; ref: any }) => {
                         // Calculate height based on actual item count from flatOptions
-                        // When searching, _options is already flattened; when not searching, we need to count children
-                        const actualItemCount =
-                          searchable && query.trim()
-                            ? _options.length // Already flattened when searching
-                            : flatOptions.filter((flatOption) => {
-                                // Find which flat options are part of the current _options
-                                return _options.some((opt) => {
-                                  const optValue = opt?.value ?? opt;
-                                  const flatValue = flatOption?.value ?? flatOption;
-                                  if (optValue === flatValue) return true;
-                                  // Check if this flat option is a child of an option group
-                                  return opt?.children?.some((child) => {
-                                    const childValue = child?.value ?? child;
-                                    return childValue === flatValue;
-                                  });
-                                });
-                              }).length;
+                        // When searching, _options is filtered and flat; when not searching, _options === options (all items)
+                        const actualItemCount = searchable && query.trim() ? _options.length : flatOptions.length;
                         const maxVisibleItems = VARIABLE_LIST_COUNT_RENDERED;
                         const listHeight = Math.min(actualItemCount, maxVisibleItems) * VARIABLE_LIST_ITEM_HEIGHT;
 
