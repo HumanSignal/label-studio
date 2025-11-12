@@ -6,13 +6,6 @@ on:
       head_sha:
         required: true
         type: string
-  workflow_dispatch:
-    inputs:
-      head_sha:
-        description: "ref or SHA"
-        required: false
-        type: string
-        default: ""
 
 env:
   NODE: "22"
