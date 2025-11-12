@@ -44,6 +44,6 @@ Permissions that can be configured include the following:
 !!! note
     Permissions for Annotators, Reviewers, and Managers are already restricted to projects that they created (if a Manager) or have explicitly been granted access to. 
 
-!!! tip
+!!! info tip
     You can click **Reset to Defaults** to return all permissions to their default value. 
 
