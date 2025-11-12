@@ -20,14 +20,11 @@ You can use this page to customize certain permissions for roles. For informatio
 Note the following:
 
 * Permissions for the Owner role are not configurable. 
-* You can use the options on this page to restrict permissions, but you cannot extend permissions. 
-
-    For example, if an action is typically available to Managers, Admins, and Owners, you can restrict it to Admins and Owners, but you cannot *extend* it to Annotators or Reviewers. 
-
-* Restrictions will also apply to the API. For example, if you restrict Managers' ability to configure cloud storage, they will not be able to complete those actions through the UI or the API. 
+* You can use the options on this page to have a more fined-grained control on which roles can execute certain actions. 
+* Any restrictions you configure will also apply to the API. For example, if you restrict Managers' ability to configure cloud storage, they will not be able to complete those actions through the UI or the API. 
 
 
-Permissions that can be restricted include the following:
+Permissions that can be configured include the following:
 
 | Permission | Default Roles |
 |------------|-------------|
@@ -47,4 +44,5 @@ Permissions that can be restricted include the following:
 !!! note
     Permissions for Annotators, Reviewers, and Managers are already restricted to projects that they created (if a Manager) or have explicitly been granted access to. 
 
-
+!!! tip
+    You can click **Reset to Defaults** to return all permissions to their default value. 
