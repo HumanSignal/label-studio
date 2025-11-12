@@ -925,22 +925,50 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
           }
         }
 
-        // If we didn't click on a point, check if we clicked on a segment to break the path
-        if (props.isPathClosed && props.allowClose) {
-          const segmentHitRadius = 15 / scale; // Slightly larger than point hit radius
+        // If we didn't click on a point, check if we clicked on a segment to break/delete it
+        const segmentHitRadius = 15 / scale; // Slightly larger than point hit radius
 
-          // Find the closest point on the path
-          const closestPathPoint = findClosestPointOnPath(
-            imagePos,
-            props.initialPoints,
-            props.allowClose,
-            props.isPathClosed,
-          );
+        // Find the closest point on the path
+        const closestPathPoint = findClosestPointOnPath(
+          imagePos,
+          props.initialPoints,
+          props.allowClose,
+          props.isPathClosed,
+        );
 
-          if (closestPathPoint && getDistance(imagePos, closestPathPoint.point) <= segmentHitRadius) {
-            // We clicked on a segment, break the closed path
+        if (closestPathPoint && getDistance(imagePos, closestPathPoint.point) <= segmentHitRadius) {
+          // For closed paths, break the path at the segment
+          if (props.isPathClosed && props.allowClose) {
             if (breakPathAtSegment(props, closestPathPoint.segmentIndex)) {
+              e.evt.stopPropagation();
+              e.evt.preventDefault();
+              e.cancelBubble = true;
               return;
+            }
+          } else {
+            // For unclosed paths, delete the segment by removing the connection
+            // This splits the path into two separate paths
+            const segmentIndex = closestPathPoint.segmentIndex;
+            if (segmentIndex >= 0 && segmentIndex < props.initialPoints.length) {
+              const pointToBreak = props.initialPoints[segmentIndex];
+              if (pointToBreak.prevPointId) {
+                // Remove the prevPointId to break the connection
+                const updatedPoints = props.initialPoints.map((point, idx) => {
+                  if (idx === segmentIndex) {
+                    return {
+                      ...point,
+                      prevPointId: undefined,
+                    };
+                  }
+                  return point;
+                });
+
+                props.onPointsChange?.(updatedPoints);
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true;
+                return;
+              }
             }
           }
         }

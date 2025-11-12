@@ -3237,6 +3237,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             onClick={(e) => {
+              // CRITICAL: Handle Alt+click FIRST (for point deletion and segment breaking)
+              // This must happen before any other click handling to ensure deletion works
+              if (e.evt.altKey && !e.evt.shiftKey && !disabled) {
+                // Let the event bubble to the Group onClick handler which has the Alt+click logic
+                // Don't stop propagation or prevent default - let it reach createClickHandler
+                return;
+              }
+
               // Don't add points if we just finished shape dragging
               if (justFinishedShapeDrag.current) {
                 e.evt.stopPropagation();
@@ -3581,6 +3589,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             onClick={(e) => {
+              // CRITICAL: Handle Alt+click FIRST (for point deletion and segment breaking)
+              // This must happen before any other click handling to ensure deletion works
+              if (e.evt.altKey && !e.evt.shiftKey && !disabled) {
+                // Let the event bubble to the Group onClick handler which has the Alt+click logic
+                // Don't stop propagation or prevent default - let it reach createClickHandler
+                return;
+              }
+
               // Don't add points if we just finished shape dragging
               if (justFinishedShapeDrag.current) {
                 e.evt.stopPropagation();

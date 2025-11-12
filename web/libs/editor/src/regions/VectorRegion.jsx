@@ -648,7 +648,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             }
           }}
           onPointsChange={(points) => {
-            console.log("change");
             item.updatePointsFromKonvaVector(points);
           }}
           onPathClosedChange={(isClosed) => {
@@ -691,14 +690,12 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             item.onClickRegion(e);
           }}
           onMouseEnter={() => {
-            console.log("enter");
             if (store.annotationStore.selected.isLinkingMode) {
               item.setHighlight(true);
             }
             item.updateCursor(true);
           }}
           onMouseLeave={() => {
-            console.log("leave");
             if (store.annotationStore.selected.isLinkingMode) {
               item.setHighlight(false);
             }
