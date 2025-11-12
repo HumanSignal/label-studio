@@ -393,12 +393,17 @@ export const Select = forwardRef(
                         onItemsRendered,
                         ref: infiniteLoaderRef,
                       }: { onItemsRendered: (params: any) => void; ref: any }) => {
+                        // Calculate height based on actual item count, max 5 items
+                        const actualItemCount = renderedOptions.length;
+                        const maxVisibleItems = VARIABLE_LIST_COUNT_RENDERED;
+                        const listHeight = Math.min(actualItemCount, maxVisibleItems) * VARIABLE_LIST_ITEM_HEIGHT;
+
                         return (
                           <VariableSizeList
                             itemData={renderedOptions}
                             itemSize={() => VARIABLE_LIST_ITEM_HEIGHT}
                             itemCount={renderedOptions.length}
-                            height={5 * VARIABLE_LIST_ITEM_HEIGHT} // only render 5 items
+                            height={listHeight}
                             // width={VARIABLE_LIST_WIDTH}
                             onItemsRendered={onItemsRendered}
                             ref={infiniteLoaderRef}
