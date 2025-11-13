@@ -6,7 +6,7 @@ import { Oneof } from "../../components/Oneof/Oneof";
 import { Spinner } from "../../components/Spinner/Spinner";
 import { ApiContext } from "../../providers/ApiProvider";
 import { useContextProps } from "../../providers/RoutesProvider";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { CreateProject } from "../CreateProject/CreateProject";
 import { DataManagerPage } from "../DataManager/DataManager";
 import { SettingsPage } from "../Settings";
@@ -116,12 +116,12 @@ export const ProjectsPage = () => {
   }, [projectsList.length]);
 
   return (
-    <Block name="projects-page">
+    <div className={cn("projects-page").toClassName()}>
       <Oneof value={networkState}>
-        <Elem name="loading" case="loading">
+        <div className={cn("projects-page").elem("loading").toClassName()} case="loading">
           <Spinner size={64} />
-        </Elem>
-        <Elem name="content" case="loaded">
+        </div>
+        <div className={cn("projects-page").elem("content").toClassName()} case="loaded">
           {projectsList.length ? (
             <ProjectsList
               projects={projectsList}
@@ -134,9 +134,9 @@ export const ProjectsPage = () => {
             <EmptyProjectsList openModal={openModal} />
           )}
           {modal && <CreateProject onClose={closeModal} />}
-        </Elem>
+        </div>
       </Oneof>
-    </Block>
+    </div>
   );
 };
 

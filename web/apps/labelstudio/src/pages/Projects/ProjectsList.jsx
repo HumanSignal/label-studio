@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 import { IconCheck, IconEllipsis, IconMinus, IconSparks } from "@humansignal/icons";
 import { Userpic, Button } from "@humansignal/ui";
 import { Dropdown, Menu, Pagination } from "../../components";
-import { Block, Elem } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
 
 const DEFAULT_CARD_COLORS = ["#FFFFFF", "#FDFDFC"];
@@ -13,12 +13,12 @@ const DEFAULT_CARD_COLORS = ["#FFFFFF", "#FDFDFC"];
 export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, pageSize }) => {
   return (
     <>
-      <Elem name="list">
+      <div className={cn("projects-page").elem("list").toClassName()}>
         {projects.map((project) => (
           <ProjectCard key={project.id} project={project} />
         ))}
-      </Elem>
-      <Elem name="pages">
+      </div>
+      <div className={cn("projects-page").elem("pages").toClassName()}>
         <Pagination
           name="projects-list"
           label="Projects"
@@ -29,23 +29,25 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, 
           pageSizeOptions={[10, 30, 50, 100]}
           onPageLoad={(page, pageSize) => loadNextPage(page, pageSize)}
         />
-      </Elem>
+      </div>
     </>
   );
 };
 
 export const EmptyProjectsList = ({ openModal }) => {
   return (
-    <Block name="empty-projects-page">
-      <Elem name="heidi" tag="img" src={absoluteURL("/static/images/opossum_looking.png")} />
-      <Elem name="header" tag="h1">
-        Heidi doesn’t see any projects here!
-      </Elem>
+    <div className={cn("empty-projects-page").toClassName()}>
+      <img
+        alt="Heidi looking for projects"
+        className={cn("empty-projects-page").elem("heidi").toClassName()}
+        src={absoluteURL("/static/images/opossum_looking.png")}
+      />
+      <h1 className={cn("empty-projects-page").elem("header").toClassName()}>Heidi doesn't see any projects here!</h1>
       <p>Create one and start labeling your data.</p>
       <Button onClick={openModal} className="my-8" aria-label="Create new project">
         Create Project
       </Button>
-    </Block>
+    </div>
   );
 };
 
@@ -70,14 +72,18 @@ const ProjectCard = ({ project }) => {
   }, [color]);
 
   return (
-    <Elem tag={NavLink} name="link" to={`/projects/${project.id}/data`} data-external>
-      <Block name="project-card" mod={{ colored: !!color }} style={projectColors}>
-        <Elem name="header">
-          <Elem name="title">
-            <Elem name="title-text">{project.title ?? "New project"}</Elem>
+    <NavLink
+      className={cn("projects-page").elem("link").toClassName()}
+      to={`/projects/${project.id}/data`}
+      data-external
+    >
+      <div className={cn("project-card").mod({ colored: !!color }).toClassName()} style={projectColors}>
+        <div className={cn("project-card").elem("header").toClassName()}>
+          <div className={cn("project-card").elem("title").toClassName()}>
+            <div className={cn("project-card").elem("title-text").toClassName()}>{project.title ?? "New project"}</div>
 
-            <Elem
-              name="menu"
+            <div
+              className={cn("project-card").elem("menu").toClassName()}
               onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
@@ -95,38 +101,40 @@ const ProjectCard = ({ project }) => {
                   <IconEllipsis />
                 </Button>
               </Dropdown.Trigger>
-            </Elem>
-          </Elem>
-          <Elem name="summary">
-            <Elem name="annotation">
-              <Elem name="total">
+            </div>
+          </div>
+          <div className={cn("project-card").elem("summary").toClassName()}>
+            <div className={cn("project-card").elem("annotation").toClassName()}>
+              <div className={cn("project-card").elem("total").toClassName()}>
                 {project.finished_task_number} / {project.task_number}
-              </Elem>
-              <Elem name="detail">
-                <Elem name="detail-item" mod={{ type: "completed" }}>
-                  <Elem tag={IconCheck} name="icon" />
+              </div>
+              <div className={cn("project-card").elem("detail").toClassName()}>
+                <div className={cn("project-card").elem("detail-item").mod({ type: "completed" }).toClassName()}>
+                  <IconCheck className={cn("project-card").elem("icon").toClassName()} />
                   {project.total_annotations_number}
-                </Elem>
-                <Elem name="detail-item" mod={{ type: "rejected" }}>
-                  <Elem tag={IconMinus} name="icon" />
+                </div>
+                <div className={cn("project-card").elem("detail-item").mod({ type: "rejected" }).toClassName()}>
+                  <IconMinus className={cn("project-card").elem("icon").toClassName()} />
                   {project.skipped_annotations_number}
-                </Elem>
-                <Elem name="detail-item" mod={{ type: "predictions" }}>
-                  <Elem tag={IconSparks} name="icon" />
+                </div>
+                <div className={cn("project-card").elem("detail-item").mod({ type: "predictions" }).toClassName()}>
+                  <IconSparks className={cn("project-card").elem("icon").toClassName()} />
                   {project.total_predictions_number}
-                </Elem>
-              </Elem>
-            </Elem>
-          </Elem>
-        </Elem>
-        <Elem name="description">{project.description}</Elem>
-        <Elem name="info">
-          <Elem name="created-date">{format(new Date(project.created_at), "dd MMM ’yy, HH:mm")}</Elem>
-          <Elem name="created-by">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className={cn("project-card").elem("description").toClassName()}>{project.description}</div>
+        <div className={cn("project-card").elem("info").toClassName()}>
+          <div className={cn("project-card").elem("created-date").toClassName()}>
+            {format(new Date(project.created_at), "dd MMM 'yy, HH:mm")}
+          </div>
+          <div className={cn("project-card").elem("created-by").toClassName()}>
             <Userpic src="#" user={project.created_by} showUsernameTooltip />
-          </Elem>
-        </Elem>
-      </Block>
-    </Elem>
+          </div>
+        </div>
+      </div>
+    </NavLink>
   );
 };

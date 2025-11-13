@@ -9,6 +9,7 @@ order_enterprise: 361
 meta_title: Model providers
 meta_description: How to set up model providers for AI features in Label Studio. 
 section: "Manage Your Organization"
+parent_enterprise: "admin_settings"
 date: 2025-02-18 12:03:59
 ---
 

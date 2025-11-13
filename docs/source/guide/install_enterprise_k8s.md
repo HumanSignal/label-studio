@@ -57,7 +57,7 @@ If you use a proxy to access the internet from your Kubernetes cluster, or it is
 - Kubernetes and kubectl version 1.17 or higher
 - Helm version 3.6.3 or higher
 - Redis version 6.0.5 or higher
-- PostgreSQL version 11.9 or higher
+- PostgreSQL version 13.0 or higher
 
 This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/). See [Set up an ingress controller for Label Studio Kubernetes deployments](ingress_config.html) for more on ingress settings with Label Studio. 
 
