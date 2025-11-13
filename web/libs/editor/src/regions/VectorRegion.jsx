@@ -536,7 +536,7 @@ const Model = types
         // Check if this region is part of multi-selection
         // If so, always delete the entire region (don't check for selected points)
         const isMultiRegionSelected = self.object?.selectedRegions?.length > 1;
-        
+
         if (!isMultiRegionSelected) {
           // Only check for selected points if NOT part of multi-selection
           // Check if we have selected points and if vectorRef is available
@@ -612,6 +612,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           isMultiRegionSelected={item.object?.selectedRegions?.length > 1}
           disableGhostLine={disableGhostLine}
           onFinish={(e) => {
+            if (disabled) return;
             e.evt.stopPropagation();
             e.evt.preventDefault();
             item.handleFinish();
