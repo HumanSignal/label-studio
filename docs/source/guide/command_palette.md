@@ -13,7 +13,7 @@ date: 2025-01-28 16:40:16
 
 The command palette is an enhanced search and command tool. 
 
-To open it, click the search icon in the upper right or press `Ctrl+K`/`Cmd+K`
+To open it, click the search icon in the upper right or press `Ctrl+K` (`Cmd+K` on Mac)
 
 ![Screenshot](/images/admin/command-palette1.png)
 
