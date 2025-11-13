@@ -18,24 +18,14 @@ export interface GhostPointRef {
 
 export const GhostPoint = forwardRef<GhostPointRef, GhostPointProps>(
   ({ ghostPoint, transform, fitScale, isShiftKeyHeld, maxPoints, initialPointsLength, isDragging = false }, ref) => {
-    // TEMPORARY: Force render to debug - remove all conditions
     if (!ghostPoint) {
       return null;
     }
-
-    // TEMPORARY: Comment out all conditions to force rendering
-    // if (isShiftKeyHeld !== undefined && !isShiftKeyHeld) {
-    //   return null;
-    // }
 
     // Hide ghost point when maxPoints is reached
     if (maxPoints !== undefined && initialPointsLength >= maxPoints) {
       return null;
     }
-
-    // if (isDragging) {
-    //   return null;
-    // }
 
     // Scale radius to compensate for Layer scaling
     const scale = transform.zoom * fitScale;

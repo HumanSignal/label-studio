@@ -2168,6 +2168,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
         // Use provided shiftKeyState or fall back to ref value
         const currentShiftState = shiftKeyState !== undefined ? shiftKeyState : (refShiftState ?? false);
+
         if (initialPoints.length >= 2 && currentShiftState) {
           const scale = transform.zoom * fitScale;
           const hitRadius = HIT_RADIUS.SELECTION / scale;
@@ -4109,19 +4110,20 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             />
           )}
 
-          {/* Ghost point */}
-          <GhostPoint
-            ref={ghostPointRef}
-            ghostPoint={ghostPoint}
-            transform={transform}
-            fitScale={fitScale}
-            isShiftKeyHeld={isShiftKeyHeld}
-            maxPoints={maxPoints}
-            initialPointsLength={initialPoints.length}
-            isDragging={isDragging.current}
-          />
         </>
       )}
+
+      {/* Ghost point - ALWAYS render if ghostPoint exists, outside any conditionals */}
+      <GhostPoint
+        ref={ghostPointRef}
+        ghostPoint={ghostPoint}
+        transform={transform}
+        fitScale={fitScale}
+        isShiftKeyHeld={isShiftKeyHeld}
+        maxPoints={maxPoints}
+        initialPointsLength={initialPoints.length}
+        isDragging={isDragging.current}
+      />
     </Group>
   );
 });
