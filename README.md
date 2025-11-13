@@ -239,7 +239,7 @@ You can use Label Studio as an independent part of your machine learning workflo
 Include a citation for Label Studio in the **References** section of your articles:
 
 ```tex
-@misc{Label Studio,
+@misc{labelStudio,
   title={{Label Studio}: Data labeling software},
   url={https://github.com/HumanSignal/label-studio},
   note={Open source software available from https://github.com/HumanSignal/label-studio},
