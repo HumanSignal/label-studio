@@ -380,9 +380,6 @@ const _Annotation = types
     submissionStarted: 0,
     versions: {},
     resultSnapshot: "",
-    // Guards against double execution from multiple hotkey handlers
-    _lastUndoTimestamp: 0,
-    _lastRedoTimestamp: 0,
   }))
   .volatile(() =>
     isFF(FF_DEV_3391)
@@ -660,60 +657,38 @@ const _Annotation = types
     undo() {
       const { history, regionStore } = self;
 
-      if (!history?.canUndo) {
-        return;
-      }
+      if (history?.canUndo) {
+        let stopDrawingAfterNextUndo = false;
+        const selectedIds = regionStore.selectedIds;
+        const currentRegion = regionStore.findRegion(
+          selectedIds[selectedIds.length - 1] ?? regionStore.regions[regionStore.regions.length - 1]?.id,
+        );
 
-      // Guard against double execution from multiple hotkey handlers
-      // This can happen when both annotation:undo and vector:undo/polygon:undo
-      // are registered for the same key (cmd+z) and keymaster calls both handlers
-      // Use timestamp-based debouncing: if undo was called within the last 100ms, skip it
-      const now = Date.now();
-      if (now - self._lastUndoTimestamp < 100) {
-        return;
-      }
-      self._lastUndoTimestamp = now;
+        if (currentRegion?.type === "polygonregion") {
+          const points = currentRegion?.points?.length ?? 0;
 
-      let stopDrawingAfterNextUndo = false;
-      const selectedIds = regionStore.selectedIds;
-      const currentRegion = regionStore.findRegion(
-        selectedIds[selectedIds.length - 1] ?? regionStore.regions[regionStore.regions.length - 1]?.id,
-      );
+          stopDrawingAfterNextUndo = points <= 1;
+        }
 
-      if (currentRegion?.type === "polygonregion") {
-        const points = currentRegion?.points?.length ?? 0;
+        history.undo();
+        regionStore.selectRegionsByIds(selectedIds);
 
-        stopDrawingAfterNextUndo = points <= 1;
-      }
-
-      history.undo();
-      regionStore.selectRegionsByIds(selectedIds);
-
-      if (stopDrawingAfterNextUndo) {
-        currentRegion.setDrawing(false);
-        self.setIsDrawing(false);
+        if (stopDrawingAfterNextUndo) {
+          currentRegion.setDrawing(false);
+          self.setIsDrawing(false);
+        }
       }
     },
 
     redo() {
       const { history, regionStore } = self;
 
-      if (!history?.canRedo) {
-        return;
+      if (history?.canRedo) {
+        const selectedIds = regionStore.selectedIds;
+
+        history.redo();
+        regionStore.selectRegionsByIds(selectedIds);
       }
-
-      // Guard against double execution from multiple hotkey handlers
-      // Use timestamp-based debouncing: if redo was called within the last 100ms, skip it
-      const now = Date.now();
-      if (now - self._lastRedoTimestamp < 100) {
-        return;
-      }
-      self._lastRedoTimestamp = now;
-
-      const selectedIds = regionStore.selectedIds;
-
-      history.redo();
-      regionStore.selectRegionsByIds(selectedIds);
     },
 
     /**
