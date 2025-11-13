@@ -44,8 +44,8 @@ export const CurrentTask = observer(({ store }) => {
   // @todo some interface?
   let canPostpone =
     !isDefined(store.annotationStore.selected.pk) &&
-    (!isFF(FF_LEAP_1173) || store.hasInterface("skip")) &&
     !store.canGoNextTask &&
+    (!isFF(FF_LEAP_1173) || store.hasInterface("skip")) &&
     !store.hasInterface("review") &&
     store.hasInterface("postpone");
 

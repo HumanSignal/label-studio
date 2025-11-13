@@ -39,12 +39,14 @@ export const AutoAcceptToggle = injector(
                   <Button
                     className={cn("auto-accept").elem("action").mod({ type: "reject" }).toClassName()}
                     onClick={() => annotation.rejectAllSuggestions()}
+                    data-testid="bottombar-reject-suggestions-button"
                   >
                     <IconCross />
                   </Button>
                   <Button
                     className={cn("auto-accept").elem("action").mod({ type: "accept" }).toClassName()}
                     onClick={() => annotation.acceptAllSuggestions()}
+                    data-testid="bottombar-accept-suggestions-button"
                   >
                     <IconCheck />
                   </Button>

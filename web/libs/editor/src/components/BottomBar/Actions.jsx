@@ -32,6 +32,7 @@ export const Actions = ({ store }) => {
             onClick={() => store.toggleDescription()}
             className="!p-0 aspect-square"
             leading={<IconInfoOutline />}
+            data-testid="bottombar-instructions-button"
           />
         )}
         <Button
@@ -44,6 +45,7 @@ export const Actions = ({ store }) => {
           tooltip="Settings"
           className="!p-0aspect-square"
           leading={<IconSettings />}
+          data-testid="bottombar-settings-button"
         />
       </div>
 

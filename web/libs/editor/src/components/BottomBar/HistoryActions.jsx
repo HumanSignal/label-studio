@@ -19,6 +19,7 @@ export const EditingHistory = observer(({ entity }) => {
           onClick={() => entity.undo()}
           className="!p-0 aspect-square"
           leading={<IconUndo />}
+          data-testid="bottombar-undo-button"
         />
       </Tooltip>
       <Tooltip title="Redo">
@@ -31,6 +32,7 @@ export const EditingHistory = observer(({ entity }) => {
           onClick={() => entity.redo()}
           className="!p-0 aspect-square"
           leading={<IconRedo />}
+          data-testid="bottombar-redo-button"
         />
       </Tooltip>
       <Tooltip title="Reset">
@@ -43,6 +45,7 @@ export const EditingHistory = observer(({ entity }) => {
           onClick={() => history?.reset()}
           className="!p-0 aspect-square"
           leading={<IconReset />}
+          data-testid="bottombar-reset-button"
         />
       </Tooltip>
     </div>
