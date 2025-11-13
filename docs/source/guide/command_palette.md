@@ -26,7 +26,7 @@ From here you can:
 - Search across your Label Studio org. For example, you can search for projects and workspaces.
 - Navigate to pages within the app. 
 - Find quick links to Label Studio documentation and resources, such as the API docs and the changelog. 
-- When you are in a project, you can quickly jump to settings pages or individual settings. 
+- When you are in a project, you can search for settings pages or individual settings to quickly jump to them. 
 
 ## Role-aware results 
 
