@@ -3214,6 +3214,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     setActivePointId,
     isTransforming,
     disabled,
+    transformMode,
     disableInternalPointAddition,
     pointCreationManager,
   });
@@ -3230,9 +3231,18 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       onMouseMove={disabled ? undefined : eventHandlers.handleLayerMouseMove}
       onMouseUp={disabled ? undefined : eventHandlers.handleLayerMouseUp}
       onClick={
-        disabled
+        disabled || transformMode
           ? undefined
           : (e) => {
+            // Prevent all clicks when in transform mode (already checked above, but double-check)
+            if (transformMode) {
+              e.evt.stopPropagation();
+              e.evt.preventDefault();
+              e.evt.stopImmediatePropagation();
+              e.cancelBubble = true;
+              return;
+            }
+
               // Don't add points if we just finished shape dragging
               if (justFinishedShapeDrag.current) {
                 e.evt.stopPropagation();
@@ -3346,6 +3356,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             onClick={(e) => {
+              // Prevent all clicks when in transform mode
+              if (transformMode) {
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.evt.stopImmediatePropagation();
+                e.cancelBubble = true;
+                return;
+              }
+
               // CRITICAL: Handle Alt+click FIRST (for point deletion and segment breaking)
               // This must happen before any other click handling to ensure deletion works
               if (e.evt.altKey && !e.evt.shiftKey && !disabled) {
@@ -3380,7 +3399,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
                     // Only trigger onFinish if the last added point is already selected (second click)
                     // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-                    if (lastAddedPointIndex !== -1 && effectiveSelectedPoints.has(lastAddedPointIndex) && !disabled) {
+                    // and not in transform mode
+                    if (lastAddedPointIndex !== -1 && effectiveSelectedPoints.has(lastAddedPointIndex) && !disabled && !transformMode) {
                       const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
                       if (!hasModifiers) {
                         e.evt.preventDefault();
@@ -3538,6 +3558,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             fitScale={fitScale}
             pointRefs={pointRefs}
             disabled={disabled}
+            transformMode={transformMode}
             pointRadius={pointRadius}
             pointFill={pointFill}
             pointStroke={pointStroke}
@@ -3546,15 +3567,23 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             activePointId={activePointId}
             maxPoints={maxPoints}
             onPointClick={(e, pointIndex) => {
+              // Prevent all clicks when in transform mode
+              if (transformMode) {
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.evt.stopImmediatePropagation();
+                e.cancelBubble = true;
+                return;
+              }
+
               // CRITICAL: For single-point regions, directly call onClick handler so the region can be selected
               // Single-point regions have no segments to click on, so clicking the point must trigger region selection
               // Check this FIRST before any other logic
+              // BUT: Don't do this in transform mode - clicks must be completely disabled
               const isSinglePointRegion = initialPoints.length === 1;
-              if (isSinglePointRegion && !e.evt.altKey && !e.evt.shiftKey && !e.evt.ctrlKey && !e.evt.metaKey) {
+              if (isSinglePointRegion && !e.evt.altKey && !e.evt.shiftKey && !e.evt.ctrlKey && !e.evt.metaKey && !transformMode) {
                 // Select the point first
-                if (!transformMode) {
-                  tracker.selectPoints(instanceId, new Set([pointIndex]));
-                }
+                tracker.selectPoints(instanceId, new Set([pointIndex]));
                 // Directly call handleClickWithDebouncing to trigger region selection
                 // This works even when disabled=true (Group onClick is undefined)
                 pointSelectionHandled.current = true;
@@ -3613,7 +3642,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
                   // Only fire onFinish if this is the last added point AND it was already selected (second click)
                   // and no modifiers are pressed (ctrl, meta, shift, alt) and we're in drawing mode
-                  if (isLastAddedPoint && isAlreadySelected && !drawingDisabled) {
+                  // and not in transform mode
+                  if (isLastAddedPoint && isAlreadySelected && !drawingDisabled && !transformMode) {
                     const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
                     if (!hasModifiers) {
                       onFinish?.(e);
@@ -3715,6 +3745,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             onClick={(e) => {
+              // Prevent all clicks when in transform mode
+              if (transformMode) {
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.evt.stopImmediatePropagation();
+                e.cancelBubble = true;
+                return;
+              }
+
               // CRITICAL: Handle Alt+click FIRST (for point deletion and segment breaking)
               // This must happen before any other click handling to ensure deletion works
               if (e.evt.altKey && !e.evt.shiftKey && !disabled) {
@@ -3749,7 +3788,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
                     // Only trigger onFinish if the last added point is already selected (second click)
                     // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-                    if (lastAddedPointIndex !== -1 && effectiveSelectedPoints.has(lastAddedPointIndex) && !disabled) {
+                    // and not in transform mode
+                    if (lastAddedPointIndex !== -1 && effectiveSelectedPoints.has(lastAddedPointIndex) && !disabled && !transformMode) {
                       const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
                       if (!hasModifiers) {
                         e.evt.preventDefault();
@@ -3907,6 +3947,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             fitScale={fitScale}
             pointRefs={pointRefs}
             disabled={disabled}
+              transformMode={transformMode}
             pointRadius={pointRadius}
             pointFill={pointFill}
             pointStroke={pointStroke}

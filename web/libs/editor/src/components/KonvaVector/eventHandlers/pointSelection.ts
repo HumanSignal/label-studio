@@ -138,14 +138,23 @@ export function handlePointSelection(e: KonvaEventObject<MouseEvent>, props: Eve
       }
 
       // Check if this is the active point (the one user is currently drawing from)
-      // Only trigger onFinish if no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-      if (props.activePointId && point.id === props.activePointId && !props.disabled) {
+      // Only trigger onFinish if:
+      // 1. We're in drawing mode (isDrawingMode is true)
+      // 2. No modifiers are pressed (ctrl, meta, shift, alt)
+      // 3. Component is not disabled
+      // 4. Point was already selected before this click (to prevent firing when selecting region)
+      if (props.activePointId && point.id === props.activePointId && !props.disabled && !props.transformMode) {
         const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
-        if (!hasModifiers) {
+        const isDrawingMode = props.isDrawingMode === true;
+        const wasPointAlreadySelected = props.selectedPoints?.has(i) ?? false;
+
+        // Only fire onFinish if we're in drawing mode AND point was already selected
+        // This prevents onFinish from firing when clicking on a point to select the region
+        if (!hasModifiers && isDrawingMode && wasPointAlreadySelected) {
           props.onFinish?.(e);
           return true; // Don't proceed with selection
         }
-        // If modifiers are held, skip onFinish entirely and let normal modifier handling take over
+        // If modifiers are held or not in drawing mode or point wasn't selected, skip onFinish
         return false;
       }
 

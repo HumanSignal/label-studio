@@ -12,6 +12,7 @@ interface VectorPointsProps {
   fitScale: number;
   pointRefs: React.MutableRefObject<{ [key: number]: Konva.Circle | null }>;
   disabled?: boolean;
+  transformMode?: boolean;
   pointRadius?: {
     enabled?: number;
     disabled?: number;
@@ -33,6 +34,7 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
   fitScale,
   pointRefs,
   disabled = false,
+  transformMode = false,
   pointRadius,
   pointFill = "#ffffff",
   pointStroke = "#3b82f6",
@@ -44,8 +46,9 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
 }) => {
   // CRITICAL: For single-point regions, we need to allow clicks even when disabled
   // Single-point regions have no segments to click on, so clicking the point must trigger region selection
+  // BUT: Never allow clicks when in transform mode
   const isSinglePointRegion = initialPoints.length === 1;
-  const shouldListenToClicks = !disabled || isSinglePointRegion;
+  const shouldListenToClicks = !transformMode && (!disabled || isSinglePointRegion);
 
   return (
     <>

@@ -1038,15 +1038,28 @@ export function handlePointSelectionFromIndex(
   event: KonvaEventObject<MouseEvent>,
 ) {
   // Check if this is the active point (the one user is currently drawing from)
+  // Only trigger onFinish if:
+  // 1. We're in drawing mode (isDrawingMode is true)
+  // 2. No modifiers are pressed (ctrl, meta, shift, alt)
+  // 3. Point was already selected before this click (to prevent firing when selecting region)
   if (
+    !props.transformMode &&
     props.activePointId &&
     pointIndex < props.initialPoints.length &&
     !(event.evt.ctrlKey || event.evt.shiftKey || event.evt.metaKey || event.evt.altKey)
   ) {
     const point = props.initialPoints[pointIndex];
     if (point.id === props.activePointId) {
-      props.onFinish?.(event!);
-      return; // Don't proceed with selection
+      const isDrawingMode = props.isDrawingMode === true;
+      const wasPointAlreadySelected = props.selectedPoints?.has(pointIndex) ?? false;
+
+      // Only fire onFinish if we're in drawing mode AND point was already selected
+      // This prevents onFinish from firing when clicking on a point to select the region
+      if (isDrawingMode && wasPointAlreadySelected) {
+        props.onFinish?.(event!);
+        return; // Don't proceed with selection
+      }
+      // If not in drawing mode or point wasn't selected, skip onFinish and proceed with selection
     }
   }
 

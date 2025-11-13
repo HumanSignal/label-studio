@@ -612,6 +612,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           isMultiRegionSelected={item.object?.selectedRegions?.length > 1}
           disableGhostLine={disableGhostLine}
           onFinish={(e) => {
+            console.log("on finish");
             if (disabled) return;
             e.evt.stopPropagation();
             e.evt.preventDefault();
