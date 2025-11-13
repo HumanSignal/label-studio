@@ -35,6 +35,7 @@ from django.db.models.expressions import RawSQL
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from fsm.models import FsmHistoryStateModel
+from fsm.queryset_mixins import FSMStateQuerySetMixin
 from label_studio_sdk._extensions.label_studio_tools.core.label_config import parse_config
 from labels_manager.models import Label
 from projects.functions import (
@@ -62,7 +63,28 @@ from tasks.models import (
 logger = logging.getLogger(__name__)
 
 
+class ProjectQuerySet(models.QuerySet):
+    pass
+
+
+class ProjectQuerySetWithFSM(FSMStateQuerySetMixin, ProjectQuerySet):
+    """
+    Custom QuerySet for Project model with FSM state annotation support.
+    """
+
+    pass
+
+
 class ProjectManager(models.Manager):
+    """
+    Manager for Project model.
+
+    Provides:
+    - User-scoped filtering
+    - Counter annotations for project statistics
+    - FSM state annotation support
+    """
+
     COUNTER_FIELDS = [
         'task_number',
         'finished_task_number',
@@ -85,11 +107,26 @@ class ProjectManager(models.Manager):
         'skipped_annotations_number': annotate_skipped_annotations_number,
     }
 
+    def get_queryset(self):
+        """Return ProjectQuerySet with FSM state annotation support"""
+        return ProjectQuerySetWithFSM(self.model, using=self._db)
+
     def for_user(self, user):
-        return self.filter(organization=user.active_organization)
+        return self.get_queryset().filter(organization=user.active_organization)
+
+    def with_state(self):
+        """
+        Return queryset with FSM state annotated.
+
+        Example:
+            projects = Project.objects.with_state().filter(organization=org)
+            for project in projects:
+                print(project.current_state)  # No N+1 queries!
+        """
+        return self.get_queryset().annotate_fsm_state()
 
     def with_counts(self, fields=None):
-        return self.with_counts_annotate(self, fields=fields)
+        return self.with_counts_annotate(self.get_queryset(), fields=fields)
 
     @staticmethod
     def with_counts_annotate(queryset, fields=None, exclude=None):

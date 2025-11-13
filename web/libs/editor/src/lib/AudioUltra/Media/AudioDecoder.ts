@@ -1,7 +1,7 @@
-import { type AudioDecoderWorker, getAudioDecoderWorker } from "@martel/audio-file-decoder";
+import { type AudioDecoderWorker, getAudioDecoderWorker } from "@humansignal/audio-file-decoder";
 // eslint-disable-next-line
 // @ts-ignore
-import DecodeAudioWasm from "@martel/audio-file-decoder/decode-audio.wasm";
+import DecodeAudioWasm from "@humansignal/audio-file-decoder/decode-audio.wasm";
 import { BaseAudioDecoder } from "./BaseAudioDecoder";
 import { clamp, info } from "../Common/Utils";
 import { SplitChannel } from "./SplitChannel";

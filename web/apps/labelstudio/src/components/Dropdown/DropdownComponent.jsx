@@ -1,6 +1,6 @@
 import { cloneElement, forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { Block, cn } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { alignElements } from "@humansignal/core/lib/utils/dom";
 import { aroundTransition } from "@humansignal/core/lib/utils/transition";
 import "./Dropdown.scss";
@@ -159,15 +159,14 @@ export const Dropdown = forwardRef(({ animated = true, visible = false, ...props
   };
 
   const result = (
-    <Block
+    <div
       ref={dropdown}
-      name="dropdown-ls"
-      mix={[props.className, visibilityClasses]}
+      className={rootName.mix([props.className, visibilityClasses]).toClassName()}
       style={compositeStyles}
       onClick={(e) => e.stopPropagation()}
     >
       {content}
-    </Block>
+    </div>
   );
 
   return renderable ? (props.inline === true ? result : ReactDOM.createPortal(result, document.body)) : null;
