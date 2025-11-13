@@ -113,4 +113,3 @@ describe("CurrentTask", () => {
     expect(getByTestId("next-task").disabled).toBe(true);
   });
 });
-
