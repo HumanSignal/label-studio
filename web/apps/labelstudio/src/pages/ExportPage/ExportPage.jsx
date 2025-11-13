@@ -145,15 +145,20 @@ export const ExportPage = () => {
 const FormatInfo = ({ availableFormats, selected, onClick }) => {
   return (
     <div className={cn("formats").toClassName()}>
-      <div className={cn("formats").elem("info").toClassName()}>You can export dataset in one of the following formats:</div>
+      <div className={cn("formats").elem("info").toClassName()}>
+        You can export dataset in one of the following formats:
+      </div>
       <div className={cn("formats").elem("list").toClassName()}>
         {availableFormats.map((format) => (
           <div
             key={format.name}
-            className={cn("formats").elem("item").mod({
-              active: !format.disabled,
-              selected: format.name === selected,
-            }).toClassName()}
+            className={cn("formats")
+              .elem("item")
+              .mod({
+                active: !format.disabled,
+                selected: format.name === selected,
+              })
+              .toClassName()}
             onClick={!format.disabled ? () => onClick(format) : null}
           >
             <div className={cn("formats").elem("name").toClassName()}>
@@ -168,7 +173,9 @@ const FormatInfo = ({ availableFormats, selected, onClick }) => {
               </Space>
             </div>
 
-            {format.description && <div className={cn("formats").elem("description").toClassName()}>{format.description}</div>}
+            {format.description && (
+              <div className={cn("formats").elem("description").toClassName()}>{format.description}</div>
+            )}
           </div>
         ))}
       </div>

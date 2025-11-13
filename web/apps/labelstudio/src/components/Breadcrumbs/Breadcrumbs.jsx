@@ -35,7 +35,12 @@ export const Breadcrumbs = () => {
           const isInternal = findComponent(href) !== null;
 
           const title = (
-            <span className={cn("breadcrumbs").elem("label").mod({ faded: index === item.length - 1 }).toClassName()}>
+            <span
+              className={cn("breadcrumbs")
+                .elem("label")
+                .mod({ faded: index === item.length - 1 })
+                .toClassName()}
+            >
               {item.title}
             </span>
           );

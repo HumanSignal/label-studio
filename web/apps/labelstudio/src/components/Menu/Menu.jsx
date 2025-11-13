@@ -84,9 +84,7 @@ Menu.Group = ({ children, title, className, style }) => {
   return (
     <div className={cn("menu-group").mix(className).toClassName()} style={style}>
       <div className={cn("menu-group").elem("title").toClassName()}>{title}</div>
-      <ul className={cn("menu-group").elem("list").toClassName()}>
-        {children}
-      </ul>
+      <ul className={cn("menu-group").elem("list").toClassName()}>{children}</ul>
     </div>
   );
 };

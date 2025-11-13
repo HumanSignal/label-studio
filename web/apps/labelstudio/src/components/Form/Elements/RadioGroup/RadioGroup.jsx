@@ -89,7 +89,10 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
   }, [props.checked]);
 
   return (
-    <div className={cn("radio-group-ls").elem("button").mod({ checked, disabled }).toClassName()} onClickCapture={clickHandler}>
+    <div
+      className={cn("radio-group-ls").elem("button").mod({ checked, disabled }).toClassName()}
+      onClickCapture={clickHandler}
+    >
       {isSimple ? (
         <Label placement="right" text={label} description={description}>
           <input
