@@ -5,7 +5,7 @@ import { IconTrash } from "@humansignal/icons";
 import { ToggleItems } from "../../../components";
 import { Form, Input } from "../../../components/Form";
 import { useAPI } from "../../../providers/ApiProvider";
-import { Block, cn, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { Palette } from "../../../utils/colors";
 import { FF_UNSAVED_CHANGES, isFF } from "../../../utils/feature-flags";
 import { colorNames } from "./colors";
@@ -550,11 +550,9 @@ const Configurator = ({
         {disableSaveButton !== true && onSaveClick && (
           <Form.Actions size="small" extra={configure === "code" && extra} valid>
             {saved && (
-              <Block name="form-indicator">
-                <Elem tag="span" mod={{ type: "success" }} name="item">
-                  Saved!
-                </Elem>
-              </Block>
+              <div className={cn("form-indicator").toClassName()}>
+                <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()}>Saved!</span>
+              </div>
             )}
             <Button
               size="small"

@@ -36,8 +36,8 @@ Make sure you have an authorization token to retrieve Docker images and a curren
 Make sure [Docker Compose](https://docs.docker.com/compose/install/) is installed on your system.
 
 After you install Label Studio Enterprise, the app is automatically connected to the following running services:
-- PostgresSQL (versions 11, 12, 13)
-- Redis (version 5)
+- PostgresSQL (versions >=13)
+- Redis (version >=6.0)
 
 ### Log in to a Docker registry
 

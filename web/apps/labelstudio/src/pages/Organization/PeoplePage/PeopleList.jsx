@@ -4,7 +4,7 @@ import { Userpic } from "@humansignal/ui";
 import { Pagination, Spinner } from "../../../components";
 import { usePage, usePageSize } from "../../../components/Pagination/Pagination";
 import { useAPI } from "../../../providers/ApiProvider";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import { isDefined } from "../../../utils/helpers";
 import "./PeopleList.scss";
 import { CopyableTooltip } from "../../../components/CopyableTooltip/CopyableTooltip";
@@ -59,53 +59,49 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
 
   return (
     <>
-      <Block name="people-list">
-        <Elem name="wrapper">
+      <div className={cn("people-list").toClassName()}>
+        <div className={cn("people-list").elem("wrapper").toClassName()}>
           {usersList ? (
-            <Elem name="users">
-              <Elem name="header">
-                <Elem name="column" mix="avatar" />
-                <Elem name="column" mix="email">
-                  Email
-                </Elem>
-                <Elem name="column" mix="name">
-                  Name
-                </Elem>
-                <Elem name="column" mix="last-activity">
-                  Last Activity
-                </Elem>
-              </Elem>
-              <Elem name="body">
+            <div className={cn("people-list").elem("users").toClassName()}>
+              <div className={cn("people-list").elem("header").toClassName()}>
+                <div className={cn("people-list").elem("column").mix("avatar").toClassName()} />
+                <div className={cn("people-list").elem("column").mix("email").toClassName()}>Email</div>
+                <div className={cn("people-list").elem("column").mix("name").toClassName()}>Name</div>
+                <div className={cn("people-list").elem("column").mix("last-activity").toClassName()}>Last Activity</div>
+              </div>
+              <div className={cn("people-list").elem("body").toClassName()}>
                 {usersList.map(({ user }) => {
                   const active = user.id === selectedUser?.id;
 
                   return (
-                    <Elem key={`user-${user.id}`} name="user" mod={{ active }} onClick={() => selectUser(user)}>
-                      <Elem name="field" mix="avatar">
+                    <div
+                      key={`user-${user.id}`}
+                      className={cn("people-list").elem("user").mod({ active }).toClassName()}
+                      onClick={() => selectUser(user)}
+                    >
+                      <div className={cn("people-list").elem("field").mix("avatar").toClassName()}>
                         <CopyableTooltip title={`User ID: ${user.id}`} textForCopy={user.id}>
                           <Userpic user={user} style={{ width: 28, height: 28 }} />
                         </CopyableTooltip>
-                      </Elem>
-                      <Elem name="field" mix="email">
-                        {user.email}
-                      </Elem>
-                      <Elem name="field" mix="name">
+                      </div>
+                      <div className={cn("people-list").elem("field").mix("email").toClassName()}>{user.email}</div>
+                      <div className={cn("people-list").elem("field").mix("name").toClassName()}>
                         {user.first_name} {user.last_name}
-                      </Elem>
-                      <Elem name="field" mix="last-activity">
+                      </div>
+                      <div className={cn("people-list").elem("field").mix("last-activity").toClassName()}>
                         {formatDistance(new Date(user.last_activity), new Date(), { addSuffix: true })}
-                      </Elem>
-                    </Elem>
+                      </div>
+                    </div>
                   );
                 })}
-              </Elem>
-            </Elem>
+              </div>
+            </div>
           ) : (
-            <Elem name="loading">
+            <div className={cn("people-list").elem("loading").toClassName()}>
               <Spinner size={36} />
-            </Elem>
+            </div>
           )}
-        </Elem>
+        </div>
         <Pagination
           page={currentPage}
           urlParamName="page"
@@ -115,7 +111,7 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
           onPageLoad={fetchUsers}
           style={{ paddingTop: 16 }}
         />
-      </Block>
+      </div>
     </>
   );
 };
