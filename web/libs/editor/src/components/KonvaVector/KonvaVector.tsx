@@ -3546,6 +3546,22 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             activePointId={activePointId}
             maxPoints={maxPoints}
             onPointClick={(e, pointIndex) => {
+              // CRITICAL: For single-point regions, directly call onClick handler so the region can be selected
+              // Single-point regions have no segments to click on, so clicking the point must trigger region selection
+              // Check this FIRST before any other logic
+              const isSinglePointRegion = initialPoints.length === 1;
+              if (isSinglePointRegion && !e.evt.altKey && !e.evt.shiftKey && !e.evt.ctrlKey && !e.evt.metaKey) {
+                // Select the point first
+                if (!transformMode) {
+                  tracker.selectPoints(instanceId, new Set([pointIndex]));
+                }
+                // Directly call handleClickWithDebouncing to trigger region selection
+                // This works even when disabled=true (Group onClick is undefined)
+                pointSelectionHandled.current = true;
+                handleClickWithDebouncing(e, onClick, onDblClick);
+                return;
+              }
+
               // Handle point selection even when disabled (similar to shape clicks)
               if (disabled) {
                 // Check if this instance can have selection
@@ -3596,8 +3612,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                   const isAlreadySelected = effectiveSelectedPoints.has(pointIndex);
 
                   // Only fire onFinish if this is the last added point AND it was already selected (second click)
-                  // and no modifiers are pressed (ctrl, meta, shift, alt) and component is not disabled
-                  if (isLastAddedPoint && isAlreadySelected) {
+                  // and no modifiers are pressed (ctrl, meta, shift, alt) and we're in drawing mode
+                  if (isLastAddedPoint && isAlreadySelected && !drawingDisabled) {
                     const hasModifiers = e.evt.ctrlKey || e.evt.metaKey || e.evt.shiftKey || e.evt.altKey;
                     if (!hasModifiers) {
                       onFinish?.(e);
@@ -3625,6 +3641,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
                 // Don't call onClick here - clicking on points should NOT select/unselect the shape
                 // Only clicking on segments should select/unselect the shape
+                // EXCEPTION: Single-point regions (handled above)
 
                 // Mark that we handled selection and prevent all other handlers from running
                 // This prevents the VectorShape onClick handler from firing, which would call onFinish
@@ -3994,6 +4011,17 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 // For disabled mode, still allow point selection
                 tracker.selectPoints(instanceId, new Set([pointIndex]));
                 pointSelectionHandled.current = true;
+
+                // CRITICAL: For single-point regions, directly call onClick handler so the region can be selected
+                // Single-point regions have no segments to click on, so clicking the point must trigger region selection
+                const isSinglePointRegion = initialPoints.length === 1;
+                if (isSinglePointRegion && !e.evt.altKey && !e.evt.shiftKey && !e.evt.ctrlKey && !e.evt.metaKey) {
+                  // Directly call handleClickWithDebouncing to trigger region selection
+                  // This works even when disabled=true (Group onClick is undefined)
+                  handleClickWithDebouncing(e, onClick, onDblClick);
+                  return;
+                }
+
                 e.evt.stopPropagation();
                 e.evt.preventDefault();
                 e.cancelBubble = true;
@@ -4010,8 +4038,20 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 // Select only this point (single selection for regular click)
                 tracker.selectPoints(instanceId, new Set([pointIndex]));
                 pointSelectionHandled.current = true;
+
+                // CRITICAL: For single-point regions, directly call onClick handler so the region can be selected
+                // Single-point regions have no segments to click on, so clicking the point must trigger region selection
+                const isSinglePointRegion = initialPoints.length === 1;
+                if (isSinglePointRegion && !e.evt.altKey && !e.evt.shiftKey && !e.evt.ctrlKey && !e.evt.metaKey) {
+                  // Directly call handleClickWithDebouncing to trigger region selection
+                  // This works even when disabled=true (Group onClick is undefined)
+                  handleClickWithDebouncing(e, onClick, onDblClick);
+                  return;
+                }
+
                 // Don't call onClick here - clicking on points should NOT select/unselect the shape
                 // Only clicking on segments should select/unselect the shape
+                // EXCEPTION: Single-point regions (handled above)
                 // Always stop event propagation to prevent the VectorShape onClick handler from firing
                 // This prevents the shape from being selected/unselected when clicking on points
                 e.evt.stopImmediatePropagation();

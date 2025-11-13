@@ -42,6 +42,11 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
   maxPoints,
   onPointClick,
 }) => {
+  // CRITICAL: For single-point regions, we need to allow clicks even when disabled
+  // Single-point regions have no segments to click on, so clicking the point must trigger region selection
+  const isSinglePointRegion = initialPoints.length === 1;
+  const shouldListenToClicks = !disabled || isSinglePointRegion;
+
   return (
     <>
       {initialPoints.map((point, index) => {
@@ -101,7 +106,7 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
               stroke={pointStroke}
               strokeScaleEnabled={false}
               strokeWidth={pointStrokeWidth}
-              listening={!disabled}
+              listening={shouldListenToClicks}
               name={`point-${index}`}
               // Use custom hit function to create a larger clickable area around the point
               // This makes points easier to click even when the cursor is not exactly over the point
@@ -115,6 +120,15 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
               onClick={
                 onPointClick
                   ? (e) => {
+                      // For single-point regions, call onPointClick but don't stop propagation
+                      // The onPointClick handler in KonvaVector will directly call handleClickWithDebouncing
+                      // to trigger region selection
+                      if (isSinglePointRegion && !e.evt.altKey && !e.evt.shiftKey && !e.evt.ctrlKey && !e.evt.metaKey) {
+                        // Don't stop propagation - let onPointClick handle it and call onClick directly
+                        onPointClick(e, index);
+                        return;
+                      }
+                      
                       // Stop propagation immediately to prevent the event from bubbling to VectorShape onClick
                       // This prevents the shape from being selected/unselected when clicking on points
                       e.evt.stopImmediatePropagation();
