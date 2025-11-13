@@ -128,7 +128,7 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
                         onPointClick(e, index);
                         return;
                       }
-                      
+
                       // Stop propagation immediately to prevent the event from bubbling to VectorShape onClick
                       // This prevents the shape from being selected/unselected when clicking on points
                       e.evt.stopImmediatePropagation();

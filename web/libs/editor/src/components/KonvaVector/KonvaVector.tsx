@@ -447,10 +447,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     // - Shape is disabled
     // - Max points reached
     // Note: Shift key release is handled in handleKeyUp, not here
-    if (
-      disabled ||
-      (maxPoints !== undefined && initialPoints.length >= maxPoints)
-    ) {
+    if (disabled || (maxPoints !== undefined && initialPoints.length >= maxPoints)) {
       setGhostPoint(null);
     }
   }, [disabled, maxPoints, initialPoints.length]);
@@ -497,12 +494,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   }, [onTransformStart]);
 
   // Helper function to call onTransformEnd (only if currently transforming)
-  const handleTransformEnd = useCallback((e?: Konva.KonvaEventObject<MouseEvent>) => {
-    if (isTransformingRef.current && onTransformEnd) {
-      isTransformingRef.current = false;
-      onTransformEnd(e);
-    }
-  }, [onTransformEnd]);
+  const handleTransformEnd = useCallback(
+    (e?: Konva.KonvaEventObject<MouseEvent>) => {
+      if (isTransformingRef.current && onTransformEnd) {
+        isTransformingRef.current = false;
+        onTransformEnd(e);
+      }
+    },
+    [onTransformEnd],
+  );
 
   // Track initial transform state for delta calculation
   const initialTransformRef = useRef<{
@@ -649,10 +649,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         // Check if there are multiple nodes attached (multiple regions selected)
         const nodes = transformer.nodes();
         const hasMultipleRegions = nodes.length > 1;
-        
+
         // If multiple regions, delay the detach/reattach to allow other onTransformEnd handlers to fire
         const delay = hasMultipleRegions ? 50 : 0;
-        
+
         setTimeout(() => {
           // Temporarily detach the transformer
           transformer.nodes([]);
@@ -1985,7 +1985,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           const point = newPoints[i];
           if (point.prevPointId === deletedPoint.id) {
             let newPrevPointId: string | undefined = deletedPoint.prevPointId;
-            
+
             // Edge cases:
             if (index === 0) {
               // If we deleted the first point, this point becomes the new first point
@@ -2167,7 +2167,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Only process ghost point logic if within bounds
       if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
         // Use provided shiftKeyState or fall back to ref value
-        const currentShiftState = shiftKeyState !== undefined ? shiftKeyState : refShiftState ?? false;
+        const currentShiftState = shiftKeyState !== undefined ? shiftKeyState : (refShiftState ?? false);
         if (initialPoints.length >= 2 && currentShiftState) {
           const scale = transform.zoom * fitScale;
           const hitRadius = HIT_RADIUS.SELECTION / scale;
@@ -2193,7 +2193,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               // Always create a new ghost point object to ensure React detects the change
               let newGhostPoint: { x: number; y: number; prevPointId: string; nextPointId: string };
-              
+
               if (closestPathPoint.segmentIndex === initialPoints.length) {
                 const lastPoint = initialPoints[initialPoints.length - 1];
                 const firstPoint = initialPoints[0];
@@ -2226,7 +2226,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               // Always update the ghost point with a new object reference
               // This ensures React detects the change and re-renders
               setGhostPoint({ ...newGhostPoint });
-              
+
               // Also update directly via ref for immediate visual update
               if (ghostPointRef.current) {
                 ghostPointRef.current.updatePosition(newGhostPoint.x, newGhostPoint.y);
