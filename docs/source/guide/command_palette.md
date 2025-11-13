@@ -39,7 +39,7 @@ If AI assistant is enabled, you can enter a query and then press Tab. The assist
 ## Keyboard shortcuts
 
 - `Ctrl+K` or `Cmd+K` to open the command palette 
-- Use the arrow keys to navigate through the results
-- Enter to select an option
-- Esc to close
+- Use the `Up` and `Down` arrow keys to navigate through the results
+- `Enter` to select an option
+- `Esc` to close
 - Tab to open the AI assistant
