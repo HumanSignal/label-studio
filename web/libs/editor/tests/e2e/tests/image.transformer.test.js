@@ -739,6 +739,9 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
     AtImageView.clickAt(bboxCenter.x, bboxCenter.y);
     AtOutliner.seeSelectedRegion();
 
+    // Wait for transformer to be properly initialized after re-selection
+    I.waitTicks(3);
+
     // The trick is that we turn it further, based on the assumption that transformer appears in rotated state on region selection
     // So let's try to rotate it
     // The rotator anchor must be to the right of the right anchor by 50 pixels
@@ -851,6 +854,9 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMultiSelectionRo
       [transformerBbox.x + transformerBbox.width + 20, transformerBbox.y + transformerBbox.height + 20],
     ]);
     AtOutliner.seeSelectedRegion();
+
+    // Wait for transformer to be properly initialized after re-selection
+    I.waitTicks(3);
 
     // So we have couple of rotated regions, let's check if rotates still appears above the top anchor
 

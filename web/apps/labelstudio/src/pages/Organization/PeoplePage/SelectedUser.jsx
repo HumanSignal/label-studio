@@ -2,24 +2,23 @@ import { format } from "date-fns";
 import { NavLink } from "react-router-dom";
 import { IconCross } from "@humansignal/icons";
 import { Userpic, Button } from "@humansignal/ui";
-import { Block, Elem } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 import "./SelectedUser.scss";
 
 const UserProjectsLinks = ({ projects }) => {
   return (
-    <Elem name="links-list">
+    <div className={cn("user-info").elem("links-list").toClassName()}>
       {projects.map((project) => (
-        <Elem
-          tag={NavLink}
-          name="project-link"
+        <NavLink
+          className={cn("user-info").elem("project-link").toClassName()}
           key={`project-${project.id}`}
           to={`/projects/${project.id}`}
           data-external
         >
           {project.title}
-        </Elem>
+        </NavLink>
       ))}
-    </Elem>
+    </div>
   );
 };
 
@@ -30,7 +29,7 @@ export const SelectedUser = ({ user, onClose }) => {
     .trim();
 
   return (
-    <Block name="user-info">
+    <div className={cn("user-info").toClassName()}>
       <Button
         look="string"
         onClick={onClose}
@@ -40,41 +39,39 @@ export const SelectedUser = ({ user, onClose }) => {
         <IconCross />
       </Button>
 
-      <Elem name="header">
+      <div className={cn("user-info").elem("header").toClassName()}>
         <Userpic user={user} style={{ width: 64, height: 64, fontSize: 28 }} />
-        <Elem name="info-wrapper">
-          {fullName && <Elem name="full-name">{fullName}</Elem>}
-          <Elem tag="p" name="email">
-            {user.email}
-          </Elem>
-        </Elem>
-      </Elem>
+        <div className={cn("user-info").elem("info-wrapper").toClassName()}>
+          {fullName && <div className={cn("user-info").elem("full-name").toClassName()}>{fullName}</div>}
+          <p className={cn("user-info").elem("email").toClassName()}>{user.email}</p>
+        </div>
+      </div>
 
       {user.phone && (
-        <Elem name="section">
+        <div className={cn("user-info").elem("section").toClassName()}>
           <a href={`tel:${user.phone}`}>{user.phone}</a>
-        </Elem>
+        </div>
       )}
 
       {!!user.created_projects.length && (
-        <Elem name="section">
-          <Elem name="section-title">Created Projects</Elem>
+        <div className={cn("user-info").elem("section").toClassName()}>
+          <div className={cn("user-info").elem("section-title").toClassName()}>Created Projects</div>
 
           <UserProjectsLinks projects={user.created_projects} />
-        </Elem>
+        </div>
       )}
 
       {!!user.contributed_to_projects.length && (
-        <Elem name="section">
-          <Elem name="section-title">Contributed to</Elem>
+        <div className={cn("user-info").elem("section").toClassName()}>
+          <div className={cn("user-info").elem("section-title").toClassName()}>Contributed to</div>
 
           <UserProjectsLinks projects={user.contributed_to_projects} />
-        </Elem>
+        </div>
       )}
 
-      <Elem tag="p" name="last-active">
+      <p className={cn("user-info").elem("last-active").toClassName()}>
         Last activity on: {format(new Date(user.last_activity), "dd MMM yyyy, KK:mm a")}
-      </Elem>
-    </Block>
+      </p>
+    </div>
   );
 };

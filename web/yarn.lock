@@ -2661,6 +2661,13 @@
   resolved "https://registry.yarnpkg.com/@gilbarbara/deep-equal/-/deep-equal-0.3.1.tgz#9c72ed0b2e6f8edb1580217e28d78b5b03ad4aee"
   integrity sha512-I7xWjLs2YSVMc5gGx1Z3ZG1lgFpITPndpi8Ku55GeEIKpACCPQNS/OTqQbxgTCfq0Ncvcc+CrFov96itVh6Qvw==
 
+"@humansignal/audio-file-decoder@0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@humansignal/audio-file-decoder/-/audio-file-decoder-0.1.5.tgz#e9857f012402fe6b9d52de7bd0b6ec8712aef769"
+  integrity sha512-oQ46MWo/QdNvNEc9rP8tuivsCn1341tNpBMQVo9CuARWCNAveuisTDWBvkNhI4k+1L7/xdV0C45lSTZfhEe/gw==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+
 "@hypnosphi/create-react-context@^0.3.1":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@hypnosphi/create-react-context/-/create-react-context-0.3.1.tgz#f8bfebdc7665f5d426cba3753e0e9c7d3154d7c6"
@@ -3003,13 +3010,6 @@
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@leichtgewicht/ip-codec/-/ip-codec-2.0.4.tgz#b2ac626d6cb9c8718ab459166d4bb405b8ffa78b"
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
-
-"@martel/audio-file-decoder@^2.3.15":
-  version "2.3.15"
-  resolved "https://registry.yarnpkg.com/@martel/audio-file-decoder/-/audio-file-decoder-2.3.15.tgz#7d9ada5211de65cc9e02e2f41ab86497bf7b3885"
-  integrity sha512-tqfmxy2RohqFzOPq/2Kdskt3PvjJ7UzraAtOOwXbhV13XoeMIP/y7YybvfzluyFz9jQUSU94PCiN2IsUAKaOAg==
-  dependencies:
-    "@babel/runtime" "^7.13.10"
 
 "@mdx-js/react@^3.0.0":
   version "3.1.0"
@@ -11676,11 +11676,6 @@ human-signals@^4.3.0:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-4.3.1.tgz#ab7f811e851fca97ffbd2c1fe9a958964de321b2"
   integrity sha512-nZXjEF2nbo7lIw3mgYjItAfgQXog3OjJogSbKa2CQIIvSGWcKgeJnQlNXip6NglNzYH45nSRiEVimMvYL8DDqQ==
-
-husky@^8.0.3:
-  version "8.0.3"
-  resolved "https://registry.yarnpkg.com/husky/-/husky-8.0.3.tgz#4936d7212e46d1dea28fef29bb3a108872cd9184"
-  integrity sha512-+dQSyqPh4x1hlO1swXBiNb2HzTDN1I2IGLQx1GrBuiqFJfoMrnZWwVmatvSiO+Iz8fBUnf+lekwNo4c2LlXItg==
 
 iconv-lite@0.4, iconv-lite@0.4.24:
   version "0.4.24"

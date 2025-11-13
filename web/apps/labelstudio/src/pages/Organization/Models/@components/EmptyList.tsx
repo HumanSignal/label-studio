@@ -1,20 +1,22 @@
 import { Button } from "@humansignal/ui";
-import { Block, Elem } from "apps/labelstudio/src/utils/bem";
+import { cn } from "apps/labelstudio/src/utils/bem";
 import type { FC } from "react";
 import "./EmptyList.scss";
 import { HeidiAi } from "apps/labelstudio/src/assets/images";
 
 export const EmptyList: FC = () => {
   return (
-    <Block name="empty-models-list">
-      <Elem name="content">
-        <Elem name="heidy">
+    <div className={cn("empty-models-list").toClassName()}>
+      <div className={cn("empty-models-list").elem("content").toClassName()}>
+        <div className={cn("empty-models-list").elem("heidy").toClassName()}>
           <HeidiAi />
-        </Elem>
-        <Elem name="title">Create a Model</Elem>
-        <Elem name="caption">Build a high quality model to auto-label your data using LLMs</Elem>
+        </div>
+        <div className={cn("empty-models-list").elem("title").toClassName()}>Create a Model</div>
+        <div className={cn("empty-models-list").elem("caption").toClassName()}>
+          Build a high quality model to auto-label your data using LLMs
+        </div>
         <Button aria-label="Create new model">Create a Model</Button>
-      </Elem>
-    </Block>
+      </div>
+    </div>
   );
 };

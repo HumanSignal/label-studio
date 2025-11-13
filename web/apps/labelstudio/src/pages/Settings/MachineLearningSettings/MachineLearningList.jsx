@@ -9,7 +9,7 @@ import { Oneof } from "../../../components/Oneof/Oneof";
 import { IconEllipsis } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
 import { ApiContext } from "../../../providers/ApiProvider";
-import { Block, cn } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 
 import "./MachineLearningList.scss";
 
@@ -62,7 +62,7 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
   const rootClass = cn("backend-card");
 
   return (
-    <Block name="backend-card">
+    <div className={rootClass.toClassName()}>
       <div className={rootClass.elem("title-container")}>
         <div>
           <BackendState backend={backend} />
@@ -99,7 +99,7 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
           </Tooltip>
         </div>
       </div>
-    </Block>
+    </div>
   );
 };
 
