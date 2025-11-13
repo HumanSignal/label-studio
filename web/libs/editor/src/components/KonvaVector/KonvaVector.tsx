@@ -2411,22 +2411,22 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               // Just prevent event propagation and return - let onClick handle the selection
               e.evt.stopPropagation();
               return;
-            } else {
-              // Normal click - prevent event propagation to avoid region deselection
-              e.evt.stopPropagation();
-
-              // Store the potential drag target but don't start dragging yet
-              // We'll start dragging only if the mouse moves beyond a threshold
-              setDraggedPointIndex(pointIndex);
-              lastPos.current = {
-                x: e.evt.clientX,
-                y: e.evt.clientY,
-                originalX: point.x,
-                originalY: point.y,
-                originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
-                originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
-              };
             }
+
+            // Normal click - prevent event propagation to avoid region deselection
+            e.evt.stopPropagation();
+
+            // Store the potential drag target but don't start dragging yet
+            // We'll start dragging only if the mouse moves beyond a threshold
+            setDraggedPointIndex(pointIndex);
+            lastPos.current = {
+              x: e.evt.clientX,
+              y: e.evt.clientY,
+              originalX: point.x,
+              originalY: point.y,
+              originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
+              originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
+            };
             return;
           }
         }
@@ -3001,51 +3001,50 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         stage.off("mouseenter", handleStageMouseEnter);
         stage.off("mouseleave", handleStageMouseLeave);
       };
-    } else {
-      // Handle cursor position, ghost point, and shape dragging
-      stage.on("mousemove", handleStageMouseMove);
-      stage.on("mouseup", handleStageMouseUp);
-      stage.on("mouseenter", handleStageMouseEnter);
-      stage.on("mouseleave", handleStageMouseLeave);
+    }
+    // Handle cursor position, ghost point, and shape dragging
+    stage.on("mousemove", handleStageMouseMove);
+    stage.on("mouseup", handleStageMouseUp);
+    stage.on("mouseenter", handleStageMouseEnter);
+    stage.on("mouseleave", handleStageMouseLeave);
 
-      // Try to initialize cursor position if mouse is already over the stage
-      // This ensures ghost line can render immediately even if mouseenter didn't fire
-      const tryInitializeCursorPosition = () => {
-        const pos = stage.getPointerPosition();
-        if (pos) {
-          const { transform, fitScale, x, y } = currentValuesRef.current;
-          const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
-          cursorPositionRef.current = imagePos;
-          // Trigger a redraw to show ghost line
-          if (ghostLineRafRef.current) {
-            cancelAnimationFrame(ghostLineRafRef.current);
-          }
-          ghostLineRafRef.current = requestAnimationFrame(() => {
-            stage.batchDraw();
-          });
-        }
-      };
-
-      // Try to initialize immediately
-      tryInitializeCursorPosition();
-
-      // Also try after a short delay in case the stage isn't ready yet
-      const initTimeout = setTimeout(() => {
-        tryInitializeCursorPosition();
-      }, 0);
-
-      return () => {
-        clearTimeout(initTimeout);
-        handlersAttachedRef.current = false;
+    // Try to initialize cursor position if mouse is already over the stage
+    // This ensures ghost line can render immediately even if mouseenter didn't fire
+    const tryInitializeCursorPosition = () => {
+      const pos = stage.getPointerPosition();
+      if (pos) {
+        const { transform, fitScale, x, y } = currentValuesRef.current;
+        const imagePos = stageToImageCoordinates(pos, transform, fitScale, x, y);
+        cursorPositionRef.current = imagePos;
+        // Trigger a redraw to show ghost line
         if (ghostLineRafRef.current) {
           cancelAnimationFrame(ghostLineRafRef.current);
         }
-        stage.off("mousemove", handleStageMouseMove);
-        stage.off("mouseup", handleStageMouseUp);
-        stage.off("mouseenter", handleStageMouseEnter);
-        stage.off("mouseleave", handleStageMouseLeave);
-      };
-    }
+        ghostLineRafRef.current = requestAnimationFrame(() => {
+          stage.batchDraw();
+        });
+      }
+    };
+
+    // Try to initialize immediately
+    tryInitializeCursorPosition();
+
+    // Also try after a short delay in case the stage isn't ready yet
+    const initTimeout = setTimeout(() => {
+      tryInitializeCursorPosition();
+    }, 0);
+
+    return () => {
+      clearTimeout(initTimeout);
+      handlersAttachedRef.current = false;
+      if (ghostLineRafRef.current) {
+        cancelAnimationFrame(ghostLineRafRef.current);
+      }
+      stage.off("mousemove", handleStageMouseMove);
+      stage.off("mouseup", handleStageMouseUp);
+      stage.off("mouseenter", handleStageMouseEnter);
+      stage.off("mouseleave", handleStageMouseLeave);
+    };
   }, [disableInternalPointAddition, stageReadyRetry]); // Re-run when disableInternalPointAddition changes or when retrying
 
   // Handle Shift key for disconnected mode
