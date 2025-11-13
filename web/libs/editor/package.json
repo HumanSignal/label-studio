@@ -6,7 +6,7 @@
   "dependencies": {
     "@ant-design/colors": "6.0.0",
     "@ant-design/icons": "4.8.1",
-    "@humansignal/audio-file-decoder": "0.1.15",
+    "@humansignal/audio-file-decoder": "0.1.5",
     "@thi.ng/rle-pack": "^3.1.30",
     "antd": "^4.3.3",
     "chroma-js": "^2.1.1",
