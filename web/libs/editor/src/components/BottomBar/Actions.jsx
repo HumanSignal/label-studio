@@ -30,7 +30,7 @@ export const Actions = ({ store }) => {
             look="string"
             tooltip="Show instructions"
             onClick={() => store.toggleDescription()}
-            className="!p-0 aspect-square"
+            className="aspect-square"
             leading={<IconInfoOutline />}
             data-testid="bottombar-instructions-button"
           />
@@ -43,7 +43,7 @@ export const Actions = ({ store }) => {
           variant="neutral"
           onClick={() => store.toggleSettings()}
           tooltip="Settings"
-          className="!p-0aspect-square"
+          className="aspect-square"
           leading={<IconSettings />}
           data-testid="bottombar-settings-button"
         />
