@@ -257,7 +257,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
           </thead>
           <tbody>
             {/* Aggregation Row */}
-            <tr className={cnm("relative z-2", styles.aggregationRow)}>
+            <tr className={cnm("relative z-2", styles["aggregation-row"])}>
               {table.getHeaderGroups()[0]?.headers.map((header, index) =>
                 index === 0 ? (
                   <td

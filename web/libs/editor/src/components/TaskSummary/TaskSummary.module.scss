@@ -1,5 +1,6 @@
 .aggregation-row {
   box-shadow: 0 2px 8px rgba(var(--color-neutral-shadow-raw) / 10%);
+  z-index: 2;
 
   // @todo add a better comment
   // cells in first column overlap shadows for cells from previous row,
