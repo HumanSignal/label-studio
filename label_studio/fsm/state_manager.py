@@ -376,13 +376,12 @@ class StateManager:
             raise StateManagerError(f'Failed to transition state: {e}') from e
 
     @classmethod
-    def get_state_history(cls, entity: Model, limit: int = 100) -> QuerySet[BaseState]:
+    def get_state_history(cls, entity: Model) -> QuerySet[BaseState]:
         """
         Get complete state history for an entity.
 
         Args:
             entity: Entity to get history for
-            limit: Maximum number of state records to return
 
         Returns:
             QuerySet of state records ordered by most recent first
@@ -393,7 +392,7 @@ class StateManager:
                 f'No state model registered for {entity._meta.model_name} when getting state history'
             )
 
-        return state_model.get_state_history(entity, limit)
+        return state_model.get_state_history(entity)
 
     @classmethod
     def get_states_in_time_range(

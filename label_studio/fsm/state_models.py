@@ -157,10 +157,10 @@ class BaseState(models.Model):
         return current_state.state if current_state else None
 
     @classmethod
-    def get_state_history(cls, entity, limit: int = 100) -> QuerySet['BaseState']:
+    def get_state_history(cls, entity) -> QuerySet['BaseState']:
         """Get complete state history for an entity"""
         entity_field = f'{cls._get_entity_field_name()}'
-        return cls.objects.filter(**{entity_field: entity}).order_by('-id')[:limit]
+        return cls.objects.filter(**{entity_field: entity}).order_by('-id')
 
     @classmethod
     def get_states_in_range(cls, entity, start_time: datetime, end_time: datetime) -> QuerySet['BaseState']:
@@ -208,6 +208,12 @@ class BaseState(models.Model):
                 }
         """
         return {}
+
+    @classmethod
+    def get_entity_model(cls) -> models.Model:
+        """Get the entity model for the state model"""
+        field_name = cls._get_entity_field_name()
+        return cls._meta.get_field(field_name).related_model
 
     @classmethod
     def _get_entity_field_name(cls) -> str:

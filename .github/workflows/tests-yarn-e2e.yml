@@ -41,6 +41,10 @@ jobs:
         working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/tests/e2e
         run: yarn install
 
+      - name: Install Playwright browsers
+        working-directory: ${{ env.FRONTEND_MONOREPO_DIR }}/libs/editor/tests/e2e
+        run: yarn playwright install --with-deps
+
       - name: Run LSF server
         id: run-lsf-server
         timeout-minutes: 2

@@ -1,8 +1,11 @@
+from datetime import timedelta
+
 import factory
 from core.utils.common import load_func
 from django.conf import settings
+from django.utils import timezone
 from faker import Faker
-from tasks.models import Annotation, AnnotationDraft, Prediction, Task
+from tasks.models import Annotation, AnnotationDraft, Prediction, Task, TaskLock
 
 
 class TaskFactory(factory.django.DjangoModelFactory):
@@ -72,3 +75,12 @@ class PredictionFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Prediction
+
+
+class TaskLockFactory(factory.django.DjangoModelFactory):
+    task = factory.SubFactory(TaskFactory)
+    user = factory.SubFactory(load_func(settings.USER_FACTORY))
+    expire_at = factory.LazyFunction(lambda: timezone.now() + timedelta(seconds=10))
+
+    class Meta:
+        model = TaskLock

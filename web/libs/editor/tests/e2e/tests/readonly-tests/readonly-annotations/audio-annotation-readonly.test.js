@@ -28,10 +28,12 @@ Data(imageExamples).Scenario(
     LabelStudio.init(params);
 
     await AtAudioView.waitForAudio();
+    I.waitTicks(3); // Wait for audio regions to be fully interactive
 
     I.say("Check region is selectable");
     AtOutliner.seeRegions(regions.length);
     AtOutliner.clickRegion(current.regionName);
+    I.waitTicks(3); // Wait for region selection to complete
 
     const regionId = regions[0].id;
 
