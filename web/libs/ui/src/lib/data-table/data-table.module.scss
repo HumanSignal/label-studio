@@ -3,29 +3,28 @@
 
   font-family: var(--font-sans);
 
-  // Container grows to fit content (fit-content)
-  // But is constrained by parent when parent is smaller (max-height: 100%)
-  // Body will scroll when content exceeds available space
-  // overflow-hidden ensures content respects border radius
-  height: fit-content;
+  // Let parent control height; we grow until constrained
   max-height: 100%;
 }
 
 .head {
-  @apply sticky top-0 z-[2] bg-neutral-background min-w-min flex justify-stretch border-b border-neutral-border flex-shrink-0;
+  @apply bg-neutral-background min-w-min flex justify-stretch border-b border-neutral-border flex-shrink-0;
 
-  // Ensure header respects top border radius
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
 }
 
 .headRow {
   @apply relative min-w-min flex justify-start;
+
+  width: 100%;
 }
 
 .headCell {
   @apply relative font-medium bg-neutral-background text-neutral-content select-none cursor-default;
-  @apply flex items-center w-full min-h-[28px] box-content p-tight;
+  @apply flex items-center min-h-[28px] box-content p-tight;
+
+  min-width: 0;
 
   > * {
     @apply min-w-0 truncate;
@@ -47,19 +46,16 @@
 .body {
   @apply z-[1] relative overflow-auto;
 
-  // Body grows to fit all rows when not constrained
-  // But shrinks when container is constrained, showing scrollbar
-  // flex: 0 1 auto means: don't grow, can shrink, auto size (fit-content)
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-height: 0;
-
-  // Ensure body respects bottom border radius
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
 }
 
 .bodyRow {
   @apply min-w-min flex justify-start transition-all duration-150 ease-out;
+
+  width: 100%;
 
   &:nth-child(2n) {
     @apply bg-neutral-surface;
@@ -81,7 +77,9 @@
 }
 
 .bodyCell {
-  @apply flex items-center w-full min-h-[28px] box-content p-tight;
+  @apply flex items-center min-h-[28px] box-content p-tight;
+
+  min-width: 0;
 
   > * {
     @apply min-w-0 truncate;
@@ -91,4 +89,3 @@
 .bodyCellPinned {
   @apply sticky right-0 border-l border-neutral-border bg-neutral-background;
 }
-

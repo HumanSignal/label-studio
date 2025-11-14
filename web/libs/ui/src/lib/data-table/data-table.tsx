@@ -1,103 +1,36 @@
-import { type Table, flexRender, getCoreRowModel, useReactTable, type Row } from "@tanstack/react-table";
+import {
+  type Table,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  type Row,
+  type ColumnDef,
+  type TableMeta,
+  type VisibilityState,
+} from "@tanstack/react-table";
 import { memo } from "react";
 import { cn } from "../../utils/utils";
-import { createColumnSizeKey } from "./tools";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
 import styles from "./data-table.module.scss";
 
-// Types
-import type {
-  CellContext,
-  ColumnDef,
-  ColumnDefTemplate,
-  ColumnSizingColumnDef,
-  StringOrTemplateHeader,
-  TableMeta,
-  VisibilityState,
-} from "@tanstack/react-table";
-
 export type DataShape = Record<string, any>[];
 
-export type DataTableHeaders<T extends DataShape> = {
-  [key in keyof T[number]]?: StringOrTemplateHeader<T[number], unknown>;
-};
-
-export type DataTableCells<T extends DataShape> = {
-  [key in keyof T[number]]?: ColumnDefTemplate<CellContext<T[number], T[number][key]>>;
-};
-
-export type DataTableSizes<T extends DataShape> = {
-  [key in keyof T[number]]?: ColumnSizingColumnDef;
-};
-
-/**
- * Props for the DataTable component
- */
 export type DataTableProps<T extends DataShape> = {
-  /** Array of data objects to display in the table */
   data: T;
-  /** Optional metadata to pass to the table instance */
   meta?: TableMeta<any>;
-  /** Pre-defined column definitions. If not provided, columns will be auto-generated from data */
   columns?: ColumnDef<T[number]>[];
-  /** Custom headers for columns. Used when auto-generating columns */
-  headers?: DataTableHeaders<T>;
-  /** Custom cell renderers for columns. Used when auto-generating columns */
-  cells?: DataTableCells<
-    T & {
-      restCells?: ColumnDefTemplate<CellContext<T[number], T[number][string]>>;
-    }
-  >;
-  /** Column size configurations. Used when auto-generating columns */
-  sizes?: DataTableSizes<
-    T & {
-      restColumns?: ColumnSizingColumnDef;
-    }
-  >;
-  /** Additional columns to append to the table */
   extraColumns?: ColumnDef<any>[];
-  /** Only include these columns (when auto-generating) */
   includeColumns?: (keyof T[number])[];
-  /** Exclude these columns (when auto-generating) */
   excludeColumns?: (keyof T[number])[];
-  /** Columns to pin to the right side of the table */
   pinColumns?: (keyof T[number])[];
-  /** Custom column order (when auto-generating) */
   columnOrder?: (keyof T[number])[];
-  /** Column visibility state */
   columnVisibility?: VisibilityState;
-  /** Callback when column visibility changes */
   onColumnVisibilityChange?: (updater: VisibilityState | ((state: VisibilityState) => VisibilityState)) => void;
-  /** localStorage key to persist column sizes */
   cellSizesStorageKey?: string;
-  /** Callback when a row is clicked */
   onRowClick?: (row?: Row<T[number]>) => void;
-  /** Function to generate custom className for rows */
   rowClassName?: (row: Row<T[number]>) => string | undefined;
 };
 
-/**
- * DataTable - A reusable data table component
- *
- * Features:
- * - Column resizing with persistence
- * - Column visibility control
- * - Column pinning (right-side sticky columns)
- * - Row click handlers
- * - Custom row styling
- * - Flexible column definitions
- * - CSS-only scrolling (body scrolls when parent constrains height)
- *
- * @example
- * ```tsx
- * <DataTable
- *   data={myData}
- *   columns={columns}
- *   onRowClick={(row) => console.log(row.original)}
- *   cellSizesStorageKey="my-table-sizes"
- * />
- * ```
- */
 export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const columns = props.columns ?? useDataColumns(props);
 
@@ -121,90 +54,100 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const columnSizes = useColumnSizing(table, props.cellSizesStorageKey);
+  // just for persistence; don't use this as layout input
+  useColumnSizing(table, props.cellSizesStorageKey);
 
+  const { columnSizing } = table.getState();
   const rows = table.getRowModel().rows;
+
   return (
-    <div className={styles.container} style={columnSizes}>
+    <div className={styles.container}>
       <DataTableHead table={table} />
       <MemoizedDataTableBody
         rows={rows}
         rowClassName={props.rowClassName}
         onRowClick={props.onRowClick}
         columnVisibility={props.columnVisibility}
+        columnSizing={columnSizing}
       />
     </div>
   );
 };
 
-const DataTableHead = <T extends Record<string, unknown>>({
-  table,
-}: {
+interface DataTableHeadProps<T> {
   table: Table<T>;
-}) => (
-  <div className={styles.head}>
-    {table.getHeaderGroups().map((group) => {
-      return (
-        <div className={styles.headRow} key={group.id}>
-          {group.headers.map((header) => {
-            const { column } = header;
-            const headerSizeKey = createColumnSizeKey("header", header.id);
-            const isPinned = column.getIsPinned();
+}
 
-            return (
-              <div
-                className={cn(styles.headCell, isPinned && styles.headCellPinned)}
-                key={header.id}
-                style={{
-                  width: `calc(var(${headerSizeKey}) * 1px)`,
-                }}
-              >
-                {header.isPlaceholder ? null : flexRender(column.columnDef.header, header.getContext())}
-                {group.headers[group.headers.length - 1]?.id !== header.id && (
-                  <div
-                    className={styles.headCellResizer}
-                    onDoubleClick={() => header.column.resetSize()}
-                    onMouseDown={header.getResizeHandler()}
-                    onTouchStart={header.getResizeHandler()}
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      );
-    })}
+const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHeadProps<T>) => (
+  <div className={styles.head}>
+    {table.getHeaderGroups().map((group) => (
+      <div className={styles.headRow} key={group.id}>
+        {group.headers.map((header) => {
+          const { column } = header;
+          const isPinned = column.getIsPinned();
+          const columnDef = column.columnDef;
+          const minSize = columnDef.minSize ?? 50;
+          const maxSize = columnDef.maxSize ?? 1200;
+          const size = header.getSize();
+
+          // super simple: everything uses TanStack's size
+          const style = {
+            width: `${size}px`,
+            minWidth: `${minSize}px`,
+            maxWidth: maxSize ? `${maxSize}px` : undefined,
+            flex: "0 0 auto",
+          };
+
+          return (
+            <div className={cn(styles.headCell, isPinned && styles.headCellPinned)} key={header.id} style={style}>
+              {header.isPlaceholder ? null : flexRender(column.columnDef.header, header.getContext())}
+
+              {group.headers[group.headers.length - 1]?.id !== header.id && (
+                <div
+                  className={styles.headCellResizer}
+                  onDoubleClick={() => header.column.resetSize()}
+                  onMouseDown={header.getResizeHandler()}
+                  onTouchStart={header.getResizeHandler()}
+                />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    ))}
   </div>
 );
 
-const DataTableRow = <T,>({
-  row,
-  className,
-  onRowClick,
-}: {
+interface DataTableRowProps<T> {
   row: Row<T>;
   className?: string;
   onRowClick?: (row?: Row<T>) => void;
-}) => {
+}
+
+const DataTableRow = <T,>({ row, className, onRowClick }: DataTableRowProps<T>) => {
   const isError = className?.includes("error") || className?.includes("bodyRowError");
+
   return (
     <div
       className={cn(styles.bodyRow, onRowClick && styles.bodyRowClickable, isError && styles.bodyRowError, className)}
-      key={row.id}
       onClick={() => onRowClick?.(row)}
     >
       {row.getVisibleCells().map((cell) => {
-        const colSizeKey = createColumnSizeKey("col", cell.column.id);
         const isPinned = cell.column.getIsPinned();
+        const columnDef = cell.column.columnDef;
+        const minSize = columnDef.minSize ?? 50;
+        const maxSize = columnDef.maxSize ?? 1200;
+        const size = cell.column.getSize();
+
+        const style = {
+          width: `${size}px`,
+          minWidth: `${minSize}px`,
+          maxWidth: maxSize ? `${maxSize}px` : undefined,
+          flex: "0 0 auto",
+        };
 
         return (
-          <div
-            className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)}
-            key={cell.id}
-            style={{
-              width: `calc(var(${colSizeKey}) * 1px)`,
-            }}
-          >
+          <div className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)} key={cell.id} style={style}>
             {flexRender(cell.column.columnDef.cell, cell.getContext())}
           </div>
         );
@@ -213,17 +156,21 @@ const DataTableRow = <T,>({
   );
 };
 
-const DataTableBody = <T,>({
-  rows,
-  onRowClick,
-  rowClassName,
-  columnVisibility: _columnVisibility, // this parameter is used to trigger the re-render of the high-order component 'MemoizedDataTableBody'
-}: {
+interface DataTableBodyProps<T> {
   rows: Row<T>[];
   onRowClick?: (row?: Row<T>) => void;
   rowClassName?: (row: Row<T>) => string | undefined;
   columnVisibility?: Record<string, boolean>;
-}) => {
+  columnSizing?: Record<string, number>;
+}
+
+const DataTableBody = <T,>({
+  rows,
+  onRowClick,
+  rowClassName,
+  columnVisibility: _columnVisibility, // used to retrigger memo
+  columnSizing: _columnSizing,
+}: DataTableBodyProps<T>) => {
   return (
     <div className={styles.body}>
       {rows.map((row) => (
@@ -234,5 +181,9 @@ const DataTableBody = <T,>({
 };
 
 const MemoizedDataTableBody = memo(DataTableBody, (prev, next) => {
-  return prev.rows === next.rows && JSON.stringify(prev.columnVisibility) === JSON.stringify(next.columnVisibility);
+  return (
+    prev.rows === next.rows &&
+    JSON.stringify(prev.columnVisibility) === JSON.stringify(next.columnVisibility) &&
+    JSON.stringify(prev.columnSizing) === JSON.stringify(next.columnSizing)
+  );
 }) as typeof DataTableBody;
