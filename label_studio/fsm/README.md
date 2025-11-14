@@ -142,7 +142,7 @@ StateManager = get_state_manager()
 current_state = StateManager.get_current_state_value(order)
 
 # Get state history
-history = StateManager.get_state_history(order, limit=10)
+history = StateManager.get_state_history(order)
 
 # Get current state object (full details)
 current_state_obj = StateManager.get_current_state_object(order)

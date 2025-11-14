@@ -880,6 +880,9 @@ class TaskLock(FsmHistoryStateModel):
     )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time', null=True)
 
+    def has_permission(self, user):
+        return self.task.has_permission(user)
+
 
 class AnnotationDraftQuerySet(models.QuerySet):
     """Custom QuerySet for AnnotationDraft model"""
