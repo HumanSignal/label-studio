@@ -49,7 +49,7 @@ export const Chip = ({ children, prefix, colors, style, thickBorder = false, cla
     <span
       className={cnm(
         "inline-flex items-center whitespace-nowrap rounded-4 px-2 py-0.5",
-        "text-xs font-medium border",
+        "text-xs border",
         !colors?.background && "bg-neutral-surface-subtle",
         !colors?.border && "border-neutral-border",
         !colors?.color && "text-neutral-content",
@@ -59,8 +59,8 @@ export const Chip = ({ children, prefix, colors, style, thickBorder = false, cla
     >
       {prefix && (
         <>
-          <span className="font-semibold mr-1.5">{prefix}</span>
-          {children && <span className="opacity-30 mr-1.5">|</span>}
+          <span className="font-semibold">{prefix}</span>
+          {children && <span className="opacity-50 mx-tightest">×</span>}
         </>
       )}
       {children}

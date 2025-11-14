@@ -90,7 +90,7 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
   ];
 
   return (
-    <div className="p-6 bg-neutral-surface">
+    <div className="p-6">
       <div className="mb-base">
         <h2 className="mb-base text-headline-small font-semibold text-neutral-content">Review Summary</h2>
         <NumbersSummary values={values} />

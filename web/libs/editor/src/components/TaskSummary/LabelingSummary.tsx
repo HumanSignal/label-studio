@@ -11,6 +11,8 @@ import { renderers } from "./labelings";
 import { ResizeHandler } from "./ResizeHandler";
 import type { AnnotationSummary, ControlTag, RendererType } from "./types";
 
+import styles from "./TaskSummary.module.scss";
+
 type Props = {
   annotations: MSTAnnotation[];
   controls: ControlTag[];
@@ -225,7 +227,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
           }}
         >
           {/* Sticky Header */}
-          <thead className="sticky top-0 z-10 bg-neutral-surface">
+          <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="border-b border-neutral-border">
                 {headerGroup.headers.map((header, index) => (
@@ -255,13 +257,13 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
           </thead>
           <tbody>
             {/* Aggregation Row */}
-            <tr className="bg-accent-grape-subtlest border-b-2 border-neutral-border">
+            <tr className={cnm("relative z-2", styles.aggregationRow)}>
               {table.getHeaderGroups()[0]?.headers.map((header, index) =>
                 index === 0 ? (
                   <td
                     key={header.id}
                     className={cnm(
-                      "px-4 py-2.5 overflow-hidden border-r border-y-2 border-neutral-border bg-accent-grape-subtlest",
+                      "px-4 py-2.5 overflow-hidden border-r border-r-neutral-border border-l border-y-2 border-neutral-border-bold bg-white",
                       "sticky left-0 z-20",
                     )}
                     style={{ width: header.getSize(), borderTopWidth: 2, borderBottomWidth: 2 }}
@@ -269,7 +271,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
                     <button
                       type="button"
                       onClick={() => setIsAggregationExpanded(!isAggregationExpanded)}
-                      className="flex items-center gap-2 text-xs font-semibold text-neutral-content-subtle hover:text-neutral-content transition-colors cursor-pointer"
+                      className="flex items-center gap-2 font-semibold text-neutral-content hover:text-neutral-content transition-colors cursor-pointer"
                     >
                       <IconChevronDown
                         size={16}
@@ -281,7 +283,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
                 ) : (
                   <td
                     key={header.id}
-                    className="px-4 py-2.5 overflow-hidden border-y-2"
+                    className="px-4 py-2.5 overflow-hidden border-y-2 border-neutral-border-bold"
                     style={{ width: header.getSize(), borderTopWidth: 2, borderBottomWidth: 2 }}
                   >
                     <AggregationRow

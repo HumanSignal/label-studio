@@ -142,7 +142,7 @@ export const AggregationRow = ({
 
     const avgRating = ratings.reduce((sum, val) => sum + val, 0) / (countEmpty ? totalAnnotations : ratings.length);
     return (
-      <span className="text-sm font-medium text-neutral-content">
+      <span className="text-sm font-medium text-neutral-content-subtle">
         Avg: <span className="font-bold">{avgRating.toFixed(1)}</span> <span className="text-yellow-500">★</span>
       </span>
     );
@@ -155,12 +155,12 @@ export const AggregationRow = ({
 
     const avg = numbers.reduce((sum, val) => sum + Number(val), 0) / (countEmpty ? totalAnnotations : numbers.length);
     return (
-      <span className="text-sm font-medium text-neutral-content">
+      <span className="text-sm font-medium text-neutral-content-subtle">
         Avg: <span className="font-bold">{avg.toFixed(1)}</span>
       </span>
     );
   }
 
   // Default: show N/A
-  return <span className="text-sm font-medium text-neutral-content">N/A</span>;
+  return <span className="text-sm font-medium text-neutral-content-subtler">N/A</span>;
 };
