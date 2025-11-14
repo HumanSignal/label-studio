@@ -29,6 +29,7 @@ export const ViewColumnType = types.enumeration([
   "TimeSeries",
   "Unknown",
   "AgreementSelected",
+  "TaskState",
 ]);
 
 const typeShortMap = {

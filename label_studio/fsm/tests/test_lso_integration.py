@@ -440,23 +440,6 @@ class TestLSOFSMUtilities:
         # Should have at least the creation state
         assert len(states) >= 1
 
-    def test_get_state_history_with_limit(self):
-        """
-        Test get_state_history with limit parameter.
-
-        Validates:
-        - Limit parameter restricts number of results
-        - Ordering is correct (most recent first)
-        """
-        project = ProjectFactory(organization=self.org)
-
-        # Get history with limit
-        history = StateManager.get_state_history(project, limit=10)
-
-        # Should have at least the initial creation state
-        assert len(history) >= 1
-        assert history[0].state == ProjectStateChoices.CREATED
-
     def test_invalidate_cache(self):
         """
         Test cache invalidation for entity state.

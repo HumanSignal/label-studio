@@ -1128,6 +1128,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/fsm/entities/<str:entity_name>/<int:entity_id>/history",
+        "module": "fsm.api.FSMEntityHistoryAPI",
+        "name": "fsm:fsm-entity-history",
+        "decorators": ""
+    },
+    {
         "url": "/data/local-files/",
         "module": "core.views.localfiles_data",
         "name": "localfiles_data",
