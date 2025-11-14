@@ -26,6 +26,19 @@
 
   min-width: 0;
 
+  // Add divider between header cells (except first, pinned, and noDivider)
+  &:not(:first-child, .headCellPinned, .headCellNoDivider)::after {
+    content: "";
+    display: block;
+    width: 1px;
+    height: 60%;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--color-neutral-border);
+  }
+
   > * {
     @apply min-w-0 truncate;
   }
