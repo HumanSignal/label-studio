@@ -44,6 +44,9 @@ export const Chip = ({ children, prefix, colors, style, thickBorder = false, cla
     ...(colors?.color && { color: colors.color }),
     ...(thickBorder && colors?.border && { borderLeft: `3px solid ${colors.border}` }),
   };
+  const isPercentage = typeof prefix === "string" && prefix.endsWith("%");
+
+  if (!children) return null;
 
   return (
     <span
@@ -60,7 +63,7 @@ export const Chip = ({ children, prefix, colors, style, thickBorder = false, cla
       {prefix && (
         <>
           <span className="font-semibold">{prefix}</span>
-          {children && <span className="opacity-50 mx-tightest">×</span>}
+          {isPercentage ? <span className="opacity-50 mx-tighter">|</span> : <span className="opacity-50 mx-tightest">×</span>}
         </>
       )}
       {children}

@@ -98,7 +98,7 @@ export const AggregationRow = ({
           return (
             <Chip
               key={choice}
-              prefix={count}
+              prefix={`${((count / totalAnnotations) * 100).toFixed(1)}%`}
               colors={{ background: control.label_attrs[choice]?.background }}
               className="mr-tighter mb-tighter"
             >
@@ -126,7 +126,7 @@ export const AggregationRow = ({
       <div className={cnm("text-ellipsis", !isExpanded && "line-clamp-2")}>
         {sortedPaths.map(([path, count]) => {
           return (
-            <Chip key={path} prefix={count} className="mr-tighter mb-tighter">
+            <Chip key={path} prefix={`${((count / totalAnnotations) * 100).toFixed(1)}%`} className="mr-tighter mb-tighter">
               {path}
             </Chip>
           );
