@@ -139,7 +139,7 @@ export function updateOriginalPositions(
 export function applyTransformationToPoints(
   transformer: Konva.Transformer,
   initialPoints: BezierPoint[],
-  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Rect | null }>,
+  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Circle | null }>,
   updateControlPoints = true,
   originalPositions?: {
     [key: number]: {
@@ -151,9 +151,15 @@ export function applyTransformationToPoints(
   },
   transformerCenter?: { x: number; y: number },
   bounds?: { width: number; height: number },
+  getCurrentPointsRef?: () => BezierPoint[],
+  updateCurrentPointsRef?: (points: BezierPoint[]) => void,
 ): TransformResult {
   const nodes = transformer.nodes();
-  const newPoints = [...initialPoints];
+
+  // Use current points ref if available, otherwise use initialPoints prop
+  // This ensures we always use the latest points during transformation
+  const currentPoints = getCurrentPointsRef ? getCurrentPointsRef() : initialPoints;
+  const newPoints = currentPoints.map((point) => ({ ...point })); // Create new objects to avoid mutation
 
   // Safety check - ensure we have valid nodes
   if (!nodes || nodes.length === 0) {
@@ -175,7 +181,8 @@ export function applyTransformationToPoints(
 
     const pointIndex = Number.parseInt(node.name().split("-")[1]); // proxy-{index}
     const point = newPoints[pointIndex];
-    const originalPoint = initialPoints[pointIndex];
+    // Use currentPoints to get original point, not initialPoints prop (which might be stale)
+    const originalPoint = currentPoints[pointIndex];
 
     if (point && originalPoint) {
       // Get the node's transformed position - trust the transformer

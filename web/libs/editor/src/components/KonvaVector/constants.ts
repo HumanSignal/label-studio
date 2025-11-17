@@ -34,7 +34,7 @@ export const DEFAULT_FILL_COLOR = "rgba(239, 68, 68, 0.3)";
 // Default point styling
 export const DEFAULT_POINT_FILL = "#ffffff";
 export const DEFAULT_POINT_STROKE = "#3b82f6";
-export const DEFAULT_POINT_STROKE_SELECTED = "#fbbf24";
+export const DEFAULT_POINT_STROKE_SELECTED = "#ffffff";
 export const DEFAULT_POINT_STROKE_WIDTH = 2;
 
 // Default point radius values
@@ -52,7 +52,7 @@ export const KEYPOINT_POINT_RADIUS = {
 // Hit detection radii (in pixels)
 export const HIT_RADIUS = {
   CONTROL_POINT: 6,
-  SELECTION: 5,
+  SELECTION: 20, // Increased from 5 to 20 to make points easier to click
   SEGMENT: 8,
 } as const;
 

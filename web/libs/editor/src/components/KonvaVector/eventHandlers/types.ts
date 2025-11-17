@@ -39,7 +39,7 @@ export interface EventHandlerProps {
           dragDistance: number;
         } | null),
   ) => void;
-  setCursorPosition: (position: Point | null) => void;
+  // setCursorPosition: (position: Point | null) => void; // Removed - now handled via ref
   setVisibleControlPoints: (points: Set<number> | ((prev: Set<number>) => Set<number>)) => void;
   setIsPathClosed: (closed: boolean) => void;
   isDragging: React.MutableRefObject<boolean>;
@@ -81,6 +81,7 @@ export interface EventHandlerProps {
   onPathShapeChanged?: (points: BezierPoint[]) => void;
   onPointSelected?: (pointIndex: number | null) => void;
   onFinish?: (e: KonvaEventObject<MouseEvent>) => void;
+  onGhostPointClick?: (ghostPoint: { x: number; y: number; prevPointId: string; nextPointId: string }) => void;
   onMouseDown?: (e: KonvaEventObject<MouseEvent>) => void;
   onMouseMove?: (e: KonvaEventObject<MouseEvent>) => void;
   onMouseUp?: (e?: KonvaEventObject<MouseEvent>) => void;
@@ -104,6 +105,8 @@ export interface EventHandlerProps {
   setLastAddedPointId?: (pointId: string | null) => void;
   isTransforming?: boolean;
   disabled?: boolean;
+  transformMode?: boolean;
+  disableInternalPointAddition?: boolean;
   pointCreationManager?: {
     isCreating: () => boolean;
     createRegularPointAt: (x: number, y: number, prevPointId?: string) => boolean;

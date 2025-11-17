@@ -114,7 +114,7 @@ export const AnnotationButton = observer(
         if (type === "prediction") {
           annotationStore.selectPrediction(id);
         } else {
-          annotationStore.selectAnnotation(id);
+          annotationStore.selectAnnotation(id, { exitViewAll: true });
         }
       }
     }, [entity]);
