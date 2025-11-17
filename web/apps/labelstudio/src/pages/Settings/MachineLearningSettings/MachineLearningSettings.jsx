@@ -11,6 +11,8 @@ import { MachineLearningList } from "./MachineLearningList";
 import { CustomBackendForm } from "./Forms";
 import { TestRequest } from "./TestRequest";
 import { StartModelTraining } from "./StartModelTraining";
+import { modal as modalFactory } from "../../../components/Modal/Modal";
+import MLConfigPanel from "./MLConfigPanel";
 import "./MachineLearningSettings.scss";
 
 export const MachineLearningSettings = () => {
@@ -89,6 +91,17 @@ export const MachineLearningSettings = () => {
     [project, fetchBackends],
   );
 
+    const showMLConfigModal = useCallback(() => {
+      const modalProps = {
+        title: "Configure ML Hot-Reload",
+        style: { width: 760 },
+        closeOnClickOutside: true,
+        body: <MLConfigPanel />,
+      };
+
+      modalFactory(modalProps);
+    }, []);
+
   useEffect(() => {
     if (project.id) {
       fetchBackends();
@@ -147,6 +160,12 @@ export const MachineLearningSettings = () => {
           fetchBackends={fetchBackends}
           backends={backends}
         />
+
+        <div className="mt-base">
+          <Button variant="secondary" look="outlined" onClick={showMLConfigModal} aria-label="Open ML config">
+            Configure Hot-Reload Model
+          </Button>
+        </div>
 
         {backends.length > 0 && (
           <div className="my-wide">
