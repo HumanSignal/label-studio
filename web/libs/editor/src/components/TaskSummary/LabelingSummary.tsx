@@ -138,7 +138,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
     columns.unshift({
       header: "Annotator",
       accessorKey: "id",
-      size: columnWidths["id"] || 180,
+      size: columnWidths.id || 180,
       minSize: 150,
       maxSize: 300,
       cell: ({ row }) => {
