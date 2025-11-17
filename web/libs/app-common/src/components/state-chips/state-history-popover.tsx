@@ -6,47 +6,16 @@
 import type React from "react";
 import { Popover, Badge, Button } from "@humansignal/ui";
 import { IconSync, IconError, IconHistoryRewind } from "@humansignal/icons";
-import { useStateHistory, type StateHistoryItem } from "@humansignal/app-common";
-import { formatStateName, formatTimestamp, formatUserName } from "./formatters";
+import { useStateHistory, type StateHistoryItem } from "../../hooks/useStateHistory";
+import { getStateColorClass, formatStateName, formatTimestamp, formatUserName } from "./utils";
 
-interface StateHistoryPopoverProps {
+export interface StateHistoryPopoverProps {
   trigger: React.ReactNode;
   entityType: "task" | "annotation" | "project";
   entityId: number;
   currentState: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-}
-
-// State color mapping following the 4-color system
-const STATE_COLORS = {
-  // Grey - Initial
-  CREATED: "grey",
-  // Blue - In Progress
-  ANNOTATION_IN_PROGRESS: "blue",
-  REVIEW_IN_PROGRESS: "blue",
-  ARBITRATION_IN_PROGRESS: "blue",
-  IN_PROGRESS: "blue",
-  // Yellow - Attention/Churn
-  ARBITRATION_NEEDED: "yellow",
-  // Green - Complete/Terminal
-  ANNOTATION_COMPLETE: "green",
-  REVIEW_COMPLETE: "green",
-  ARBITRATION_COMPLETE: "green",
-  COMPLETED: "green",
-};
-
-// Map colors to Tailwind CSS classes for chip styling
-const colorToClasses: Record<string, string> = {
-  grey: "bg-neutral-emphasis border-neutral-border text-neutral-content",
-  blue: "bg-primary-emphasis border-primary-border-subtlest text-primary-content",
-  yellow: "bg-warning-emphasis border-warning-border-subtlest text-warning-content",
-  green: "bg-positive-emphasis border-positive-border-subtlest text-positive-content",
-};
-
-function getStateColorClass(state: string): string {
-  const color = STATE_COLORS[state as keyof typeof STATE_COLORS] || "grey";
-  return colorToClasses[color];
 }
 
 export function StateHistoryPopover({
@@ -138,3 +107,4 @@ export function StateHistoryPopover({
     </Popover>
   );
 }
+
