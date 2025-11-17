@@ -63,7 +63,11 @@ export const Chip = ({ children, prefix, colors, style, thickBorder = false, cla
       {prefix && (
         <>
           <span className="font-semibold">{prefix}</span>
-          {isPercentage ? <span className="opacity-50 mx-tighter">|</span> : <span className="opacity-50 mx-tightest">×</span>}
+          {isPercentage ? (
+            <span className="opacity-50 mx-tighter">|</span>
+          ) : (
+            <span className="opacity-50 mx-tightest">×</span>
+          )}
         </>
       )}
       {children}

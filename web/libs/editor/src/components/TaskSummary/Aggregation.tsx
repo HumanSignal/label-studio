@@ -128,7 +128,11 @@ export const AggregationCell = ({
     return (
       <div className={cnm("text-ellipsis", !isExpanded && "line-clamp-2")}>
         {sortedPaths.map(([path, count]) => (
-          <Chip key={path} prefix={`${((count / totalAnnotations) * 100).toFixed(1)}%`} className="mr-tighter mb-tighter">
+          <Chip
+            key={path}
+            prefix={`${((count / totalAnnotations) * 100).toFixed(1)}%`}
+            className="mr-tighter mb-tighter"
+          >
             {path}
           </Chip>
         ))}
