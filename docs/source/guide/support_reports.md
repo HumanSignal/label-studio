@@ -31,9 +31,9 @@ These reports bundle together anonymized operational metrics and environment det
 
 3. The report status is displayed under reports and moves from **Pending** → **Running** → **Completed**. 
 
-  For large organizations with lots of data, this may take several minutes. 
+    For large organizations with lots of data, this may take several minutes. 
 
-Once completed, you can use the actions icons to:
+Once completed, you can use the action icons to:
 
 * Download the ZIP directly and inspect its contents
 * Trigger delivery via email or HTTPS 
@@ -96,7 +96,7 @@ If you need even stricter controls (for example, internal review and approval wo
 - Fully inspectable by your security and compliance teams
 
 
-## When should you generate a support report?
+## When to generate a report
 
 We recommend generating a support report when:
 
