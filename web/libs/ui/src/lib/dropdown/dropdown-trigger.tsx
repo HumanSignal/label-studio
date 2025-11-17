@@ -10,7 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { cn } from "@humansignal/core/lib/utils/bem";
+import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 import { Dropdown, type DropdownProps, type DropdownRef } from "./dropdown";
 import { DropdownContext, type DropdownContextValue } from "./dropdown-context";
 

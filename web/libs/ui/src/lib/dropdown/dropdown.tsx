@@ -12,7 +12,7 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { cn } from "@humansignal/core/lib/utils/bem";
+import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 import { alignElements, type Align } from "@humansignal/core/lib/utils/dom";
 import { aroundTransition } from "@humansignal/core/lib/utils/transition";
 import { DropdownContext } from "./dropdown-context";
@@ -106,7 +106,8 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
 
     const calculatePosition = useCallback(() => {
       const dropdownEl = dropdown.current!;
-      const parent = (triggerRef?.current ?? dropdownEl.parentNode) as HTMLElement;
+      const parent = (triggerRef?.current ??
+        dropdownEl.parentNode) as HTMLElement;
       const { left, top } = alignElements(
         parent!,
         dropdownEl,
@@ -211,7 +212,11 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
 
     useEffect(() => {
       // Only calculate position manually if anchor positioning is not supported
-      if (!isInline && visibility === "before-appear" && !supportsAnchorPositioning) {
+      if (
+        !isInline &&
+        visibility === "before-appear" &&
+        !supportsAnchorPositioning
+      ) {
         calculatePosition();
       }
     }, [visibility, calculatePosition, isInline, supportsAnchorPositioning]);
@@ -263,13 +268,21 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         ...(!supportsAnchorPositioning ? (offset ?? {}) : {}),
         zIndex: (minIndex ?? 0) + dropdownZIndex,
       };
-    }, [props.style, dropdownZIndex, minIndex, offset, supportsAnchorPositioning]);
+    }, [
+      props.style,
+      dropdownZIndex,
+      minIndex,
+      offset,
+      supportsAnchorPositioning,
+    ]);
 
     const result = (
       <div
         ref={dropdown as any}
         data-testid={props.dataTestId}
-        className={rootName.mix(props.className, dropdownClassName, visibilityClasses).toClassName()}
+        className={rootName
+          .mix(props.className, dropdownClassName, visibilityClasses)
+          .toClassName()}
         style={compositeStyles}
         onClick={(e: MouseEvent) => e.stopPropagation()}
       >
