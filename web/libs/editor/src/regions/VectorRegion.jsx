@@ -404,7 +404,7 @@ const Model = types
           });
         }
 
-        if (!self.annotation.sentUserGenerate && self.coordstype === "perc") {
+        if (self.annotation && !self.annotation.sentUserGenerate && self.coordstype === "perc") {
           self.vertices.forEach((p) => {
             const x = (sw * p.x) / RELATIVE_STAGE_WIDTH;
             const y = (sh * p.y) / RELATIVE_STAGE_HEIGHT;
