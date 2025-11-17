@@ -1,6 +1,6 @@
 ---
-title: Support reports
-short: Support reports
+title: Support reports - Beta 🧪
+short: Support reports 🧪
 type: guide
 tier: enterprise
 order: 0

@@ -18,4 +18,4 @@ There are several places where you can configure org-wide settings:
 | [**Access Token**](access_tokens) | Owner<br />Admin | Control which types of access tokens are available in the organization.  | 
 | [**Model Providers**](model_providers)         | Owner<br />Admin | Set up model providers that can be used with [Prompts](prompts_overview) and [Chat](/tags/chat). | 
 | [**Permissions**](admin_permissions)        |  Owner | Customize certain permissions for roles.  | 
-| [**Support reports**](support_reports)      | Owner | Generate anonymized operational reports that help HumanSignal support understand your deployment, diagnose issues, and recommend workflow and performance improvements. |
+| [**Support reports**](support_reports)      | Owner<br />Admin | Generate anonymized operational reports that help HumanSignal support understand your deployment, diagnose issues, and recommend workflow and performance improvements. |
