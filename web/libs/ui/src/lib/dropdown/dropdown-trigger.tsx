@@ -65,11 +65,13 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
       closeOnClickOutside = true,
       disabled = false,
       isChildValid = () => false,
+      dropdown,
       ...props
     },
     ref,
   ) => {
-    const dropdownRef = (ref ??
+    const dropdownRef = (dropdown ??
+      ref ??
       useRef<DropdownRef>()) as RefObject<DropdownRef>;
     const triggerEL = Children.only(children);
     const childset = useRef(new Set<DropdownContextValue>());
@@ -142,7 +144,9 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
             setMinIndex(Math.max(minIndex, getMinIndex(triggerRef.current)));
           }
         },
-        className: cn("dropdown").elem("trigger").mix(props.className),
+        className: cn("dropdown")
+          .elem("trigger")
+          .mix((triggerEL as any).props.className, props.className),
         onClickCapture: handleToggle,
       };
     }, [triggerEL, triggerRef, props.className, handleToggle, tag, minIndex]);
