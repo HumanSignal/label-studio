@@ -52,6 +52,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     onRowSelectionChange: controlledOnRowSelectionChange,
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
+  const [activeRowId, setActiveRowId] = useState<string | undefined>(undefined);
 
   // Use controlled selection if provided, otherwise use internal state
   const rowSelection = controlledRowSelection ?? internalRowSelection;
@@ -155,6 +156,10 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
 
   const handleRowClick = useCallback(
     (row?: Row<T[number]>) => {
+      // Toggle active row ID: if clicking the same row, deactivate it
+      if (row) {
+        setActiveRowId((currentActiveId) => (currentActiveId === row.id ? undefined : row.id));
+      }
       // Only call onRowClick if selectable is false, or if selectable is true but the click wasn't on the checkbox
       // The checkbox click is already handled by stopPropagation in the checkbox onChange
       props.onRowClick?.(row);
@@ -172,6 +177,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         columnVisibility={props.columnVisibility}
         columnSizing={columnSizing}
         rowSelection={rowSelection}
+        activeRowId={activeRowId}
       />
     </div>
   );
@@ -240,9 +246,11 @@ interface DataTableRowProps<T> {
   row: Row<T>;
   className?: string;
   onRowClick?: (row?: Row<T>) => void;
+  isSelected?: boolean;
+  isActive?: boolean;
 }
 
-const DataTableRow = <T,>({ row, className, onRowClick }: DataTableRowProps<T>) => {
+const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: DataTableRowProps<T>) => {
   const isError = className?.includes("error") || className?.includes("bodyRowError");
 
   const handleRowClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -256,7 +264,14 @@ const DataTableRow = <T,>({ row, className, onRowClick }: DataTableRowProps<T>) 
 
   return (
     <div
-      className={cn(styles.bodyRow, onRowClick && styles.bodyRowClickable, isError && styles.bodyRowError, className)}
+      className={cn(
+        styles.bodyRow,
+        onRowClick && styles.bodyRowClickable,
+        isError && styles.bodyRowError,
+        isSelected && styles.bodyRowSelected,
+        isActive && styles.bodyRowActive,
+        className,
+      )}
       onClick={handleRowClick}
     >
       {row.getVisibleCells().map((cell) => {
@@ -290,6 +305,7 @@ interface DataTableBodyProps<T> {
   columnVisibility?: Record<string, boolean>;
   columnSizing?: Record<string, number>;
   rowSelection?: Record<string, boolean>;
+  activeRowId?: string;
 }
 
 const DataTableBody = <T,>({
@@ -298,12 +314,20 @@ const DataTableBody = <T,>({
   rowClassName,
   columnVisibility: _columnVisibility, // used to retrigger memo
   columnSizing: _columnSizing,
-  rowSelection: _rowSelection, // used to retrigger memo when selection changes
+  rowSelection, // used to retrigger memo when selection changes
+  activeRowId,
 }: DataTableBodyProps<T>) => {
   return (
     <div className={styles.body}>
       {rows.map((row) => (
-        <DataTableRow key={row.id} row={row} className={rowClassName?.(row) ?? ""} onRowClick={onRowClick} />
+        <DataTableRow
+          key={row.id}
+          row={row}
+          className={rowClassName?.(row) ?? ""}
+          onRowClick={onRowClick}
+          isSelected={rowSelection?.[row.id] === true}
+          isActive={activeRowId === row.id}
+        />
       ))}
     </div>
   );
@@ -314,6 +338,7 @@ const MemoizedDataTableBody = memo(DataTableBody, (prev, next) => {
     prev.rows === next.rows &&
     JSON.stringify(prev.columnVisibility) === JSON.stringify(next.columnVisibility) &&
     JSON.stringify(prev.columnSizing) === JSON.stringify(next.columnSizing) &&
-    JSON.stringify(prev.rowSelection) === JSON.stringify(next.rowSelection)
+    JSON.stringify(prev.rowSelection) === JSON.stringify(next.rowSelection) &&
+    prev.activeRowId === next.activeRowId
   );
 }) as typeof DataTableBody;

@@ -89,6 +89,18 @@
   @apply bg-primary-emphasis-subtle;
 }
 
+.bodyRowSelected:not(.bodyRowError) {
+  @apply bg-primary-emphasis-subtle;
+}
+
+.bodyRowActive:not(.bodyRowError) {
+  @apply bg-primary-emphasis;
+}
+
+.bodyRowSelected.bodyRowActive:not(.bodyRowError) {
+  @apply bg-primary-emphasis;
+}
+
 .bodyCell {
   @apply flex items-center min-h-[28px] box-content p-tight;
 
