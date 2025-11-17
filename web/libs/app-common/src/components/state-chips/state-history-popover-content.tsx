@@ -24,14 +24,14 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen }: Sta
 
   return (
     <div
-      className="flex flex-col w-[320px] max-h-[400px] bg-white dark:bg-gray-900 rounded-lg shadow-lg"
+      className="flex flex-col w-[320px] max-h-[400px] bg-primary-background rounded-lg shadow-lg"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+      <div className="px-4 py-3 border-b border-neutral-border">
         <div className="flex items-center gap-2">
-          <IconHistoryRewind className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">State History</span>
+          <IconHistoryRewind className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-neutral-foreground">State History</span>
         </div>
       </div>
 
@@ -47,7 +47,7 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen }: Sta
         {isError && (
           <div className="flex flex-col items-center justify-center py-8 gap-3">
             <IconError className="w-8 h-8 text-red-500" />
-            <span className="text-sm text-gray-900 dark:text-gray-100">Failed to load history</span>
+            <span className="text-sm text-neutral-foreground">Failed to load history</span>
             <span className="text-xs text-gray-500 text-center">
               {error instanceof Error ? error.message : "Unknown error"}
             </span>
@@ -76,12 +76,12 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen }: Sta
         {!isLoading && !isError && history.length > 0 && (
           <div className="space-y-3">
             {history.map((item: StateHistoryItem, index: number) => (
-              <div key={index} className="pb-3 border-b border-gray-100 dark:border-gray-800 last:border-0 last:pb-0">
+              <div key={index} className="pb-3 border-b border-neutral-border last:border-0 last:pb-0">
                 <div className="flex items-center justify-between mb-2">
                   <Badge className={getStateColorClass(item.state)}>{formatStateName(item.state)}</Badge>
                   <span className="text-xs text-gray-500">{formatTimestamp(item.created_at)}</span>
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-xs text-muted-foreground">
                   <div>By: {formatUserName(item.triggered_by)}</div>
                 </div>
               </div>
