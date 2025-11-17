@@ -3,15 +3,13 @@ import { flexRender, getCoreRowModel, useReactTable, createColumnHelper } from "
 import type { ColumnDef, Row } from "@tanstack/react-table";
 
 import { userDisplayName } from "@humansignal/core";
-import { cnm, IconSparks, Userpic, IconChevronDown } from "@humansignal/ui";
+import { cnm, IconSparks, Userpic } from "@humansignal/ui";
 import type { MSTAnnotation, MSTResult, RawResult } from "../../stores/types";
-import { AggregationRow } from "./Aggregation";
+import { AggregationTableRow } from "./Aggregation";
 import { Chip } from "./Chip";
 import { renderers } from "./labelings";
 import { ResizeHandler } from "./ResizeHandler";
 import type { AnnotationSummary, ControlTag, RendererType } from "./types";
-
-import styles from "./TaskSummary.module.scss";
 
 type Props = {
   annotations: MSTAnnotation[];
@@ -51,7 +49,6 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
   const [showEmpty, setShowEmpty] = useState(false);
   const [countEmpty, setCountEmpty] = useState(false);
   const [popularFirst, setPopularFirst] = useState(false);
-  const [isAggregationExpanded, setIsAggregationExpanded] = useState(false);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const tableRef = useRef<HTMLTableElement>(null);
 
@@ -224,6 +221,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
             tableLayout: Object.keys(columnWidths).length > 0 ? "fixed" : "auto",
             borderCollapse: "separate",
             borderSpacing: 0,
+            width: "calc(100% - 2px)", // account for border
           }}
         >
           {/* Sticky Header */}
@@ -256,47 +254,14 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
             ))}
           </thead>
           <tbody>
-            {/* Aggregation Row */}
-            <tr className={cnm("relative z-2", styles["aggregation-row"])}>
-              {table.getHeaderGroups()[0]?.headers.map((header, index) =>
-                index === 0 ? (
-                  <td
-                    key={header.id}
-                    className={cnm(
-                      "px-4 py-2.5 overflow-hidden border-r border-r-neutral-border border-l border-y-2 border-neutral-border-bold bg-white",
-                      "sticky left-0 z-20",
-                    )}
-                    style={{ width: header.getSize(), borderTopWidth: 2, borderBottomWidth: 2 }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setIsAggregationExpanded(!isAggregationExpanded)}
-                      className="flex items-center gap-2 font-semibold text-neutral-content hover:text-neutral-content transition-colors cursor-pointer"
-                    >
-                      <IconChevronDown
-                        size={16}
-                        className={cnm("transition-transform", isAggregationExpanded && "rotate-180")}
-                      />
-                      Distribution
-                    </button>
-                  </td>
-                ) : (
-                  <td
-                    key={header.id}
-                    className="px-4 py-2.5 overflow-hidden border-y-2 border-neutral-border-bold"
-                    style={{ width: header.getSize(), borderTopWidth: 2, borderBottomWidth: 2 }}
-                  >
-                    <AggregationRow
-                      control={processedControls[index - 1]}
-                      annotations={annotations}
-                      countEmpty={countEmpty}
-                      isExpanded={isAggregationExpanded}
-                    />
-                  </td>
-                ),
-              )}
-            </tr>
-            {/* Table Body */}
+            {/* Distribution/Aggregation Row */}
+            <AggregationTableRow
+              headers={table.getHeaderGroups()[0]?.headers ?? []}
+              processedControls={processedControls}
+              annotations={annotations}
+              countEmpty={countEmpty}
+            />
+            {/* Annotation Rows */}
             {table.getRowModel().rows.map((row, rowIndex) => (
               <tr key={row.id} className="group">
                 {row.getVisibleCells().map((cell, cellIndex) => {
