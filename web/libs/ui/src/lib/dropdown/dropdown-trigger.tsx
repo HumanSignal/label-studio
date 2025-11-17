@@ -69,24 +69,36 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
     },
     ref,
   ) => {
-    const dropdownRef = (ref ?? useRef<DropdownRef>()) as RefObject<DropdownRef>;
+    const dropdownRef = (ref ??
+      useRef<DropdownRef>()) as RefObject<DropdownRef>;
     const triggerEL = Children.only(children);
     const childset = useRef(new Set<DropdownContextValue>());
     const [minIndex, setMinIndex] = useState(1000);
 
-    const triggerRef = useRef<HTMLElement>((triggerEL as any)?.props?.ref?.current);
+    const triggerRef = useRef<HTMLElement>(
+      (triggerEL as any)?.props?.ref?.current,
+    );
     const parentDropdown = useContext(DropdownContext);
 
     const targetIsInsideDropdown = useCallback(
       (target: HTMLElement) => {
         const triggerClicked = triggerRef.current?.contains?.(target);
-        const dropdownClicked = dropdownRef.current?.dropdown?.contains?.(target);
+        const dropdownClicked =
+          dropdownRef.current?.dropdown?.contains?.(target);
 
-        const childDropdownClicked = Array.from(childset.current).reduce((res, child) => {
-          return res || child.hasTarget(target);
-        }, false);
+        const childDropdownClicked = Array.from(childset.current).reduce(
+          (res, child) => {
+            return res || child.hasTarget(target);
+          },
+          false,
+        );
 
-        return triggerClicked || dropdownClicked || childDropdownClicked || isChildValid(target);
+        return (
+          triggerClicked ||
+          dropdownClicked ||
+          childDropdownClicked ||
+          isChildValid(target)
+        );
       },
       [triggerRef, dropdownRef, isChildValid],
     );
@@ -137,15 +149,16 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
       return cloneElement(triggerEL as any, cloneProps);
     }, [triggerEL, cloneProps]);
 
-    const dropdownClone = content ? (
+    const dropdownClone = (
       <Dropdown {...props} ref={dropdownRef}>
         {content}
       </Dropdown>
-    ) : null;
+    );
 
     useEffect(() => {
       document.addEventListener("click", handleClick, { capture: true });
-      return () => document.removeEventListener("click", handleClick, { capture: true });
+      return () =>
+        document.removeEventListener("click", handleClick, { capture: true });
     }, [handleClick]);
 
     const contextValue = useMemo((): DropdownContextValue => {
