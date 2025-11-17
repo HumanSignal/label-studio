@@ -1,12 +1,23 @@
 import { forwardRef, useCallback, useMemo } from "react";
 import { cn } from "../../utils/bem";
-import { useDropdown } from "../Dropdown/Dropdown";
+import { useDropdown } from "@humansignal/ui";
 import "./Menu.scss";
 import { Block, Elem, MenuContext } from "./MenuContext";
 import { MenuItem } from "./MenuItem";
 
 export const Menu = forwardRef(
-  ({ children, className, style, size, selectedKeys, closeDropdownOnItemClick, contextual }, ref) => {
+  (
+    {
+      children,
+      className,
+      style,
+      size,
+      selectedKeys,
+      closeDropdownOnItemClick,
+      contextual,
+    },
+    ref,
+  ) => {
     const dropdown = useDropdown();
 
     const selected = useMemo(() => {
