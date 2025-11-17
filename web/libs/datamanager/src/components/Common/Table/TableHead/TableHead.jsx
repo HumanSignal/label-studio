@@ -116,9 +116,7 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
             align="left"
             onClose={closeHandler}
           />
-        ) : (
-          <></>
-        )
+        ) : null
       }
       onToggle={onToggle}
     >

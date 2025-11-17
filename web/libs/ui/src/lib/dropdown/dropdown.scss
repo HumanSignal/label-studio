@@ -54,6 +54,7 @@
   top: calc(100% + 1px);
 
   z-index: 500;
+  /* Hidden by default - will be shown with animation classes */
   display: none;
   box-sizing: border-box;
   background-color: var(--color-neutral-background);
@@ -126,6 +127,15 @@
     transition-property: opacity, transform;
     transition-duration: var(--menu-animation-duration);
     transition-timing-function: var(--menu-animation-curve);
+  }
+
+  /* Mount state - keeps element in DOM for ref/anchor initialization but invisible */
+  &.mounted {
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate3d(0, var(--menu-animation-start), 0);
   }
 
   &.before-appear {

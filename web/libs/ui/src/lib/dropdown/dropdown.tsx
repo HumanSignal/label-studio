@@ -132,33 +132,22 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
       async (visible = false, disableAnimation?: boolean) => {
         if (props.enabled === false && visible === true) return;
 
-        console.log("[Dropdown] performAnimation:", {
-          visible,
-          hasMenu: !!dropdown.current,
-          animated,
-        });
-
         return new Promise<void>((resolve) => {
           const menu = dropdown.current;
 
           // Guard: if dropdown ref isn't set yet, skip animation and set visibility directly
           if (!menu) {
-            console.log(
-              "[Dropdown] No menu element, setting visibility directly",
-            );
             setVisibility(visible ? "visible" : null);
             resolve();
             return;
           }
 
           if (animated === false || disableAnimation === true) {
-            console.log("[Dropdown] Animation disabled");
             setVisibility(visible ? "visible" : null);
             resolve();
             return;
           }
 
-          console.log("[Dropdown] Starting aroundTransition");
           aroundTransition(menu, {
             transition: () => {
               setVisibility(visible ? "appear" : "disappear");
@@ -179,13 +168,6 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     const toggle = useCallback(
       async (updatedState?: boolean, disableAnimation?: boolean) => {
         const newState = updatedState ?? !currentVisible;
-
-        console.log("[Dropdown] toggle called:", {
-          currentVisible,
-          newState,
-          willUpdate: currentVisible !== newState,
-          hasMenu: !!dropdown.current,
-        });
 
         if (currentVisible !== newState) {
           props.onToggle?.(newState);
@@ -210,15 +192,6 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
       },
       [toggle],
     );
-
-    useEffect(() => {
-      console.log(
-        "[Dropdown] isInline useEffect calling toggle(false), isInline:",
-        isInline,
-      );
-      console.trace();
-      toggle(false);
-    }, [isInline, toggle]);
 
     useEffect(() => {
       if (!ref) return;
@@ -281,7 +254,8 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         case "visible":
           return "visible";
         default:
-          return visible ? "visible" : null;
+          // Use 'mounted' class when visibility is null to keep element in DOM for anchor positioning
+          return visible ? "visible" : "mounted";
       }
     }, [visibility, visible]);
 
@@ -300,6 +274,10 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
       supportsAnchorPositioning,
     ]);
 
+    // Only render content when dropdown has been opened at least once
+    // This improves performance and ensures autofocus works correctly
+    const shouldRenderContent = currentVisible || visibility !== null;
+
     const result = (
       <div
         ref={dropdown as any}
@@ -310,7 +288,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         style={compositeStyles}
         onClick={(e: MouseEvent) => e.stopPropagation()}
       >
-        {content}
+        {shouldRenderContent ? content : null}
       </div>
     );
 
