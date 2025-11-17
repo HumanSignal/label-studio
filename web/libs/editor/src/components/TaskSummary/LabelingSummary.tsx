@@ -46,7 +46,7 @@ const columnHelper = createColumnHelper<AnnotationSummary>();
 
 export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect }: Props) => {
   const currentUser = window.APP_SETTINGS?.user;
-  const [showEmpty, setShowEmpty] = useState(false);
+  const [showEmpty, setShowEmpty] = useState(true);
   const [countEmpty, setCountEmpty] = useState(false);
   const [popularFirst, setPopularFirst] = useState(false);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
