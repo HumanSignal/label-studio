@@ -212,8 +212,13 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     );
 
     useEffect(() => {
+      console.log(
+        "[Dropdown] isInline useEffect calling toggle(false), isInline:",
+        isInline,
+      );
+      console.trace();
       toggle(false);
-    }, [isInline]);
+    }, [isInline, toggle]);
 
     useEffect(() => {
       if (!ref) return;
