@@ -782,7 +782,8 @@ export function createMouseUpHandler(props: EventHandlerProps) {
     }
 
     // Fire transform end event if we were dragging (point or control point)
-    const wasDragging = props.isDragging.current || props.draggedPointIndex !== null || props.draggedControlPoint !== null;
+    const wasDragging =
+      props.isDragging.current || props.draggedPointIndex !== null || props.draggedControlPoint !== null;
     if (wasDragging) {
       props.handleTransformEnd?.(e);
     }
