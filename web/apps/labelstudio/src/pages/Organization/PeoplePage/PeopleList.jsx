@@ -16,8 +16,6 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
   const [currentPageSize] = usePageSize("page_size", 30);
   const [totalItems, setTotalItems] = useState(0);
 
-  console.log({ currentPage, currentPageSize });
-
   const fetchUsers = useCallback(async (page, pageSize) => {
     const response = await api.callApi("memberships", {
       params: {

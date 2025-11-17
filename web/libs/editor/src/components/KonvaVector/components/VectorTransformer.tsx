@@ -16,7 +16,7 @@ interface VectorTransformerProps {
   selectedPoints: Set<number>;
   initialPoints: BezierPoint[];
   transformerRef: React.RefObject<any>;
-  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Rect | null }>;
+  proxyRefs?: React.MutableRefObject<{ [key: number]: Konva.Circle | null }>;
   onPointsChange?: (points: BezierPoint[]) => void;
   onTransformStateChange?: (state: {
     rotation: number;
@@ -33,6 +33,8 @@ interface VectorTransformerProps {
   scaleY?: number;
   transform?: { zoom: number; offsetX: number; offsetY: number };
   fitScale?: number;
+  updateCurrentPointsRef?: (points: BezierPoint[]) => void;
+  getCurrentPointsRef?: () => BezierPoint[];
 }
 
 export const VectorTransformer: React.FC<VectorTransformerProps> = ({
@@ -50,6 +52,8 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
   scaleY = 1,
   transform = { zoom: 1, offsetX: 0, offsetY: 0 },
   fitScale = 1,
+  updateCurrentPointsRef,
+  getCurrentPointsRef,
 }) => {
   const transformerStateRef = React.useRef<{
     rotation: number;
@@ -143,7 +147,14 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               originalPositionsRef.current,
               transformerCenter,
               bounds,
+              getCurrentPointsRef,
+              updateCurrentPointsRef,
             );
+
+            // Update the ref immediately so next transformation tick uses latest points
+            if (updateCurrentPointsRef) {
+              updateCurrentPointsRef(newPoints);
+            }
 
             // Skip control point transformations on the first tick to avoid jumping
             if (isFirstTransformTickRef.current) {
@@ -366,7 +377,14 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               originalPositionsRef.current,
               transformerCenter,
               bounds,
+              getCurrentPointsRef,
+              updateCurrentPointsRef,
             );
+
+            // Update the ref immediately so next transformation tick uses latest points
+            if (updateCurrentPointsRef) {
+              updateCurrentPointsRef(newPoints);
+            }
 
             // Apply transformation to control points using RAF
             if (rafIdRef.current) {
@@ -412,7 +430,14 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             originalPositionsRef.current,
             transformerCenter,
             bounds,
+            getCurrentPointsRef,
+            updateCurrentPointsRef,
           );
+
+          // Update the ref immediately so next transformation uses latest points
+          if (updateCurrentPointsRef) {
+            updateCurrentPointsRef(newPoints);
+          }
 
           // Apply control point transformations
           const updatedPoints = applyTransformationToControlPoints(
@@ -467,7 +492,14 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             originalPositionsRef.current,
             transformerCenter,
             bounds,
+            getCurrentPointsRef,
+            updateCurrentPointsRef,
           );
+
+          // Update the ref immediately so next transformation uses latest points
+          if (updateCurrentPointsRef) {
+            updateCurrentPointsRef(newPoints);
+          }
           // Apply control point transformations
           const isActualRotation = Math.abs(transformer.rotation()) > 1.0;
           const updatedPoints = applyTransformationToControlPoints(

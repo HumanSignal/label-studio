@@ -192,20 +192,21 @@ export const deletePoint = (
 
     // If this point was connected to the deleted point, reconnect it
     if (point.prevPointId === deletedPoint.id) {
-      // Find the new previous point (the one that was before the deleted point)
-      let newPrevPointId: string | undefined;
+      // Find the new previous point
+      // CRITICAL: Use the deleted point's prevPointId (the point it was connected FROM)
+      // This ensures correct reconnection in skeleton mode where branches exist
+      // For example: C -> E -> F, when deleting E, F should reconnect to C (E's prevPointId)
+      let newPrevPointId: string | undefined = deletedPoint.prevPointId;
 
+      // Edge cases:
       if (index === 0) {
-        // If we deleted the first point, this point becomes the new first point
+        // If we deleted the first point (no prevPointId), this point becomes the new first point
         newPrevPointId = undefined;
-      } else if (index === initialPoints.length - 1) {
-        // If we deleted the last point, this point should connect to the second-to-last point
-        newPrevPointId = newPoints[newPoints.length - 1]?.id;
-      } else {
-        // Find the point that was before the deleted point
-        const prevPoint = initialPoints[index - 1];
-        newPrevPointId = prevPoint.id;
+      } else if (!deletedPoint.prevPointId) {
+        // If deleted point had no prevPointId (was a root point), this point becomes a root
+        newPrevPointId = undefined;
       }
+      // Otherwise, use deletedPoint.prevPointId which is correct for both linear and skeleton modes
 
       newPoints[i] = {
         ...point,
