@@ -46,9 +46,6 @@ const columnHelper = createColumnHelper<AnnotationSummary>();
 
 export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect }: Props) => {
   const currentUser = window.APP_SETTINGS?.user;
-  const [showEmpty, setShowEmpty] = useState(true);
-  const [countEmpty, setCountEmpty] = useState(false);
-  const [popularFirst, setPopularFirst] = useState(false);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const tableRef = useRef<HTMLTableElement>(null);
 
@@ -70,34 +67,6 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
         : (annotation.versions.result ?? []),
   }));
 
-  // Filter and sort controls based on toggles
-  const processedControls = useMemo(() => {
-    let result = [...controls];
-
-    // Filter out empty columns if showEmpty is false
-    if (!showEmpty) {
-      result = result.filter((control) => {
-        const hasResults = annotations.some((ann) => ann.results.some((r) => r.from_name === control.name));
-        return hasResults;
-      });
-    }
-
-    // Sort by popularity if enabled
-    if (popularFirst) {
-      result = result.sort((a, b) => {
-        const aCount = annotations.reduce((sum, ann) => {
-          return sum + ann.results.filter((r) => r.from_name === a.name).length;
-        }, 0);
-        const bCount = annotations.reduce((sum, ann) => {
-          return sum + ann.results.filter((r) => r.from_name === b.name).length;
-        }, 0);
-        return bCount - aCount;
-      });
-    }
-
-    return result;
-  }, [controls, annotations, showEmpty, popularFirst]);
-
   // Measure initial column widths after first render
   useEffect(() => {
     if (tableRef.current && Object.keys(columnWidths).length === 0) {
@@ -105,7 +74,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
       const widths: Record<string, number> = {};
 
       headers.forEach((header, index) => {
-        const columnId = index === 0 ? "id" : processedControls[index - 1]?.name;
+        const columnId = index === 0 ? "id" : controls[index - 1]?.name;
         if (columnId) {
           // Get the computed width
           const width = header.getBoundingClientRect().width;
@@ -115,10 +84,10 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
 
       setColumnWidths(widths);
     }
-  }, [processedControls, columnWidths]);
+  }, [controls, columnWidths]);
 
   const columns = useMemo(() => {
-    const columns: ColumnDef<AnnotationSummary, unknown>[] = processedControls.map((control) =>
+    const columns: ColumnDef<AnnotationSummary, unknown>[] = controls.map((control) =>
       columnHelper.display({
         id: control.name,
         header: () => (
@@ -165,7 +134,7 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
       },
     });
     return columns;
-  }, [processedControls, onSelect, hideInfo, columnWidths]);
+  }, [controls, onSelect, hideInfo, columnWidths]);
 
   const table = useReactTable<AnnotationSummary>({
     data: annotations,
@@ -182,37 +151,6 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
 
   return (
     <div className="mb-base">
-      {/* Controls */}
-      <div className="hidden gap-base mb-base p-tight bg-neutral-surface-subtle border border-neutral-border rounded-small">
-        <label className="flex items-center gap-2 cursor-pointer hover:bg-neutral-surface px-2 py-1 rounded-small transition-colors">
-          <input
-            type="checkbox"
-            checked={showEmpty}
-            onChange={(e) => setShowEmpty(e.target.checked)}
-            className="cursor-pointer"
-          />
-          <span className="text-sm font-medium">Show empty</span>
-        </label>
-        <label className="flex items-center gap-2 cursor-pointer hover:bg-neutral-surface px-2 py-1 rounded-small transition-colors">
-          <input
-            type="checkbox"
-            checked={countEmpty}
-            onChange={(e) => setCountEmpty(e.target.checked)}
-            className="cursor-pointer"
-          />
-          <span className="text-sm font-medium">Count empty</span>
-        </label>
-        <label className="flex items-center gap-2 cursor-pointer hover:bg-neutral-surface px-2 py-1 rounded-small transition-colors">
-          <input
-            type="checkbox"
-            checked={popularFirst}
-            onChange={(e) => setPopularFirst(e.target.checked)}
-            className="cursor-pointer"
-          />
-          <span className="text-sm font-medium">Popular first</span>
-        </label>
-      </div>
-
       <div className="overflow-x-auto pb-tight">
         <table
           ref={tableRef}
@@ -257,9 +195,8 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
             {/* Distribution/Aggregation Row */}
             <AggregationTableRow
               headers={table.getHeaderGroups()[0]?.headers ?? []}
-              processedControls={processedControls}
+              controls={controls}
               annotations={annotations}
-              countEmpty={countEmpty}
             />
             {/* Annotation Rows */}
             {table.getRowModel().rows.map((row, rowIndex) => (
