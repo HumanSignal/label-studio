@@ -16,7 +16,9 @@ import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 import { alignElements, type Align } from "@humansignal/core/lib/utils/dom";
 import { aroundTransition } from "@humansignal/core/lib/utils/transition";
 import { DropdownContext } from "./dropdown-context";
-import styles from "./dropdown.module.scss";
+import { DropdownTrigger } from "./dropdown-trigger";
+
+import "./dropdown.scss";
 
 let zIndexCounter = 0;
 
@@ -130,15 +132,33 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
       async (visible = false, disableAnimation?: boolean) => {
         if (props.enabled === false && visible === true) return;
 
-        return new Promise<void>((resolve) => {
-          const menu = dropdown.current!;
+        console.log("[Dropdown] performAnimation:", {
+          visible,
+          hasMenu: !!dropdown.current,
+          animated,
+        });
 
-          if (animated === false || disableAnimation === true) {
+        return new Promise<void>((resolve) => {
+          const menu = dropdown.current;
+
+          // Guard: if dropdown ref isn't set yet, skip animation and set visibility directly
+          if (!menu) {
+            console.log(
+              "[Dropdown] No menu element, setting visibility directly",
+            );
             setVisibility(visible ? "visible" : null);
             resolve();
             return;
           }
 
+          if (animated === false || disableAnimation === true) {
+            console.log("[Dropdown] Animation disabled");
+            setVisibility(visible ? "visible" : null);
+            resolve();
+            return;
+          }
+
+          console.log("[Dropdown] Starting aroundTransition");
           aroundTransition(menu, {
             transition: () => {
               setVisibility(visible ? "appear" : "disappear");
@@ -159,6 +179,13 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     const toggle = useCallback(
       async (updatedState?: boolean, disableAnimation?: boolean) => {
         const newState = updatedState ?? !currentVisible;
+
+        console.log("[Dropdown] toggle called:", {
+          currentVisible,
+          newState,
+          willUpdate: currentVisible !== newState,
+          hasMenu: !!dropdown.current,
+        });
 
         if (currentVisible !== newState) {
           props.onToggle?.(newState);
@@ -295,3 +322,6 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
 );
 
 Dropdown.displayName = "Dropdown";
+
+// @ts-ignore Re-export Dropdown.Trigger for backwards compatibility
+Dropdown.Trigger = DropdownTrigger;

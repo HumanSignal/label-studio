@@ -115,14 +115,24 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
 
     const handleToggle = useCallback(
       (e: any) => {
+        console.log("[DropdownTrigger] handleToggle:", {
+          disabled,
+          hasRef: !!dropdownRef.current,
+          hasToggleFn: !!dropdownRef.current?.toggle,
+        });
+
         if (disabled) return;
 
         const inDropdown = dropdownRef.current?.dropdown?.contains?.(e.target);
 
         if (inDropdown) return e.stopPropagation();
 
-        if (toggle === false) return dropdownRef?.current?.open();
+        if (toggle === false) {
+          console.log("[DropdownTrigger] Calling open()");
+          return dropdownRef?.current?.open();
+        }
 
+        console.log("[DropdownTrigger] Calling toggle()");
         dropdownRef?.current?.toggle();
       },
       [dropdownRef, disabled, toggle],
