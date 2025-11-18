@@ -49,7 +49,7 @@ export interface StateChipProps {
 export function StateChip({
   label,
   description,
-  colorClasses,
+  className,
   interactive = false,
   popoverContent,
   open: controlledOpen,
