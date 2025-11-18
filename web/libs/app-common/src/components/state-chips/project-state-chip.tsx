@@ -39,7 +39,7 @@ export function ProjectStateChip({ state, projectId, interactive = true }: Proje
     <StateChip
       label={label}
       description={description}
-      colorClasses={colorClasses}
+      className={colorClasses}
       interactive={interactive && !!projectId}
       popoverContent={popoverContent}
       open={open}
