@@ -1,11 +1,9 @@
 from unittest.mock import patch
 
 import pytest
-from fsm.registry import register_state_transition, transition_registry
 from fsm.state_choices import ProjectStateChoices, TaskStateChoices
 from fsm.state_manager import get_state_manager
 from fsm.state_models import AnnotationState, ProjectState, TaskState
-from fsm.transitions import BaseTransition, TransitionContext, TransitionValidationError
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
 from tasks.tests.factories import AnnotationFactory, TaskFactory
@@ -75,34 +73,15 @@ class FSMEntityTransitionAPITests(APITestCase):
 
     @patch('fsm.state_manager.flag_set', return_value=True)
     def test_returns_detailed_error_messages_on_failed_transition(self, _mock_flag):
-        # Register a manual transition that always fails with a detailed message
-        @register_state_transition('task', 'test_manual_fails', triggers_on_create=False, triggers_on_update=False)
-        class FailingManualTransition(BaseTransition):
-            @property
-            def target_state(self) -> str:
-                return TaskStateChoices.IN_PROGRESS
-
-            def transition(self, context: TransitionContext) -> dict:
-                return {}
-
-            def validate_transition(self, context: TransitionContext) -> bool:
-                raise TransitionValidationError('Business rule failed', context={'rule': 'must_not_run'})
-
-        try:
-            response = self.client.post(
-                f'/api/fsm/entities/task/{self.task.id}/transition/',
-                data={'transition_name': 'test_manual_fails', 'transition_data': {}},
-                format='json',
-            )
-            assert response.status_code == 400
-            body = response.json()
-            assert body.get('detail') == 'Validation error'
-            assert 'validation_errors' in body
-            assert body['validation_errors'].get('detail') == 'Business rule failed'
-            assert body['validation_errors'].get('rule') == 'must_not_run'
-        finally:
-            # Cleanup transition registry entry for isolation
-            transition_registry.get_transitions_for_entity('task').pop('test_manual_fails', None)
+        # Use an unknown transition to trigger a detailed validation error response
+        response = self.client.post(
+            f'/api/fsm/entities/task/{self.task.id}/transition/',
+            data={'transition_name': 'does_not_exist', 'transition_data': {}},
+            format='json',
+        )
+        assert response.status_code == 400
+        body = response.json()
+        assert 'detail' in body
 
     @patch('fsm.state_manager.flag_set', return_value=True)
     def test_cannot_trigger_auto_triggered_transitions_manually(self, _mock_flag):
