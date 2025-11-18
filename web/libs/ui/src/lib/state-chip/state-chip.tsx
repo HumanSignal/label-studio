@@ -23,7 +23,7 @@ export interface StateChipProps {
   /**
    * Tailwind CSS classes for styling the chip
    */
-  colorClasses: string;
+  className: string;
 
   /**
    * Whether the chip should be interactive (clickable with popover)
