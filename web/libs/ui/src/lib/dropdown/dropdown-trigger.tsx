@@ -105,6 +105,9 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
 
     const handleClick = useCallback(
       (e: any) => {
+        // If dropdown is not visible, bail out immediately - this is critical for performance
+        // when there are many nested dropdowns (e.g., 84+ in notifications list)
+        if (!dropdownRef.current?.visible) return;
         if (!closeOnClickOutside) return;
 
         // Fast path: check our own trigger and dropdown first before expensive child iteration
@@ -171,13 +174,10 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
     );
 
     useEffect(() => {
-      // Only add click listener when dropdown is actually open
-      if (!dropdownRef.current?.visible) return;
-
       document.addEventListener("click", handleClick, { capture: true });
       return () =>
         document.removeEventListener("click", handleClick, { capture: true });
-    }, [handleClick, dropdownRef.current?.visible]);
+    }, [handleClick]);
 
     const contextValue = useMemo((): DropdownContextValue => {
       return {
