@@ -222,7 +222,7 @@ class TestStateManager(TestCase):
                 entity=self.task, new_state=state, user=self.user, transition_name=transition
             )
 
-        history = self.StateManager.get_state_history(self.task, limit=10)
+        history = self.StateManager.get_state_history(self.task)
 
         # Should have 3 state records
         assert len(history) == 3

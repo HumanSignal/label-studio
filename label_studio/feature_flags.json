@@ -2148,6 +2148,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_bros_12_support_reports": {
+      "key": "fflag_feat_bros_12_support_reports",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "6f7074ba239341a6b20502b7d3e7255b",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_bros_193_new_cloud_storage_providers_short": {
       "key": "fflag_feat_bros_193_new_cloud_storage_providers_short",
       "on": false,
@@ -3951,6 +3978,33 @@
       },
       "clientSide": false,
       "salt": "fef16ee5a09c498886b62eb1935c5c53",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
+    "fflag_feat_utc_384_manage_members_v2": {
+      "key": "fflag_feat_utc_384_manage_members_v2",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "5de71047836a4339b34bd9d5bd6c5b5c",
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,

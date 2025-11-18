@@ -15,7 +15,8 @@ date: 2024-02-05 17:19:21
 
 Your user role determines your level of access to actions and information in Label Studio. 
 
-Access can be further refined through workspace and project membership. For more information, see [Project setup](setup_project). 
+* Access for Annotators, Reviewers, and Managers is restricted based on which projects and workspaces they have access to. For more information, see [Project setup](setup_project). 
+* Owners can further restrict permissions within their organization using the [Permissions page](admin_permissions). 
 
 ## Roles in Label Studio Enterprise
 

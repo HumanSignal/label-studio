@@ -7,7 +7,7 @@ import { IconInfoOutline, IconPredictions, IconEllipsis } from "@humansignal/ico
 import { Tooltip } from "@humansignal/ui";
 import { confirm } from "../../../components/Modal/Modal";
 import { ApiContext } from "../../../providers/ApiProvider";
-import { Block, cn } from "../../../utils/bem";
+import { cn } from "../../../utils/bem";
 
 import "./PredictionsList.scss";
 
@@ -56,7 +56,7 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
   );
 
   return (
-    <Block name="prediction-card">
+    <div className={rootClass.toClassName()}>
       <div>
         <div className={rootClass.elem("title")}>
           {version.model_version}
@@ -95,6 +95,6 @@ const VersionCard = ({ version, selected, onSelect, editable, onDelete }) => {
           </Button>
         </Dropdown.Trigger>
       </div>
-    </Block>
+    </div>
   );
 };

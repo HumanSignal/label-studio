@@ -8,13 +8,9 @@ import {
   closePathBetweenFirstAndLast,
 } from "./drawing";
 import { deletePoint } from "../pointManagement";
-import {
-  handlePointDeselection,
-  handlePointSelection,
-  shouldClosePathOnPointClick,
-  isActivePointEligibleForClosing,
-} from "./pointSelection";
+import { handlePointSelection, shouldClosePathOnPointClick, isActivePointEligibleForClosing } from "./pointSelection";
 import type { EventHandlerProps } from "./types";
+import { HIT_RADIUS } from "../constants";
 import {
   continueBezierDrag,
   findClosestPointOnPath,
@@ -35,11 +31,12 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
 
     let shiftClickHandled = false;
 
-    // Only run Shift+click logic if Shift key is actually held
+    // Set up ghost point drag info when Shift is held (for UI feedback)
+    // This works even when internal point addition is disabled
     if (e.evt.shiftKey === true && props.cursorPosition && props.initialPoints.length >= 2) {
       // Check if cursor is over an existing point
       const scale = props.transform.zoom * props.fitScale;
-      const hitRadius = 10 / scale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
       let isOverPoint = false;
 
       for (let i = 0; i < props.initialPoints.length; i++) {
@@ -81,7 +78,8 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
             nextPointId = props.initialPoints[closestPathPoint.segmentIndex]?.id || "";
           }
 
-          // Store ghost point info for potential drag
+          // Store ghost point info for potential drag (UI feedback)
+          // This is stored even when internal point addition is disabled
           props.setGhostPointDragInfo({
             ghostPoint: {
               x: closestPathPoint.point.x,
@@ -92,19 +90,54 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
             isDragging: false,
             dragDistance: 0,
           });
-          shiftClickHandled = true; // Mark that Shift+click was handled
+
+          // Only mark as handled if internal point addition is enabled
+          // This prevents other handlers from interfering when we want to add points
+          if (!props.disableInternalPointAddition) {
+            shiftClickHandled = true; // Mark that Shift+click was handled
+          }
         }
       }
       // If we're over a point while holding Shift, allow normal point interactions to continue
     }
 
-    // Skip the rest of mouse down logic if Shift+click was handled
-    if (shiftClickHandled) {
+    // Check if transformer is active first - this blocks drawing and most point interactions
+    // But allow shift-click for ghost point insertion even when transformer is active
+    if (props.selectedPoints.size > 1 && !e.evt.shiftKey) {
+      const pos = e.target.getStage()?.getPointerPosition();
+      if (pos) {
+        const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
+        const scale = props.transform.zoom * props.fitScale;
+        const hitRadius = HIT_RADIUS.SELECTION / scale;
+
+        // Check if we're clicking on a point
+        for (let i = 0; i < props.initialPoints.length; i++) {
+          const point = props.initialPoints[i];
+          const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
+
+          if (distance <= hitRadius) {
+            // If cmd-click, don't handle it here - let the onClick handler on the Circle component handle it
+            // The onClick handler has the correct pointIndex, while this handler would need to find it by distance
+            // which could select the wrong point when multiple points are close together
+            if (e.evt.ctrlKey || e.evt.metaKey) {
+              // Just mark that we're over a point, but let onClick handle the selection
+              handledSelectionInMouseDown.current = true;
+              return;
+            }
+            // Regular click on point when transformer is active - do nothing
+            // This prevents the click from falling through to deselection logic
+            return;
+          }
+        }
+      }
+
+      // If we get here, we're not clicking on a point
+      // Allow deselection by clicking outside the shape
       return;
     }
 
-    // Handle drawing mode setup (only when path is not closed)
-    if (props.isDrawingMode && !props.isPathClosed) {
+    // Handle drawing mode setup (only when path is not closed and transformer is not active)
+    if (props.isDrawingMode && !props.isPathClosed && props.selectedPoints.size <= 1) {
       // Handle Shift+panning even in drawing mode
       if (e.evt.shiftKey) {
         props.isDragging.current = true;
@@ -125,46 +158,6 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
       // Don't return here - let the handler continue to set up drawing state
     }
 
-    // Check if transformer is active first - this blocks most point interactions
-    if (props.selectedPoints.size > 1) {
-      const pos = e.target.getStage()?.getPointerPosition();
-      if (pos) {
-        const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
-        const scale = props.transform.zoom * props.fitScale;
-        const hitRadius = 10 / scale;
-
-        // Check if we're clicking on a point
-        for (let i = 0; i < props.initialPoints.length; i++) {
-          const point = props.initialPoints[i];
-          const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
-
-          if (distance <= hitRadius) {
-            // If cmd-click, handle multi-selection management
-            if (e.evt.ctrlKey || e.evt.metaKey) {
-              // Try deselection first
-              if (handlePointDeselection(e, props)) {
-                handledSelectionInMouseDown.current = true;
-                return;
-              }
-              // If not deselection, try selection (adding to multi-selection)
-              if (handlePointSelection(e, props)) {
-                handledSelectionInMouseDown.current = true;
-                return;
-              }
-            } else {
-              // Regular click on point when transformer is active - do nothing
-              // This prevents the click from falling through to deselection logic
-              return;
-            }
-          }
-        }
-      }
-
-      // If we get here, we're not clicking on a point
-      // Allow deselection by clicking outside the shape
-      return;
-    }
-
     // Handle point interactions (selection, dragging) regardless of drawing mode
     // This allows point interaction even when drawing is disabled due to hovering
     const pos = e.target.getStage()?.getPointerPosition();
@@ -172,7 +165,7 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
       const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
       const scale = props.transform.zoom * props.fitScale;
-      const hitRadius = 10 / scale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
 
       // Check if we're clicking on a point to select or drag it (only when transformer is not active)
       for (let i = 0; i < props.initialPoints.length; i++) {
@@ -180,31 +173,26 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
         const distance = Math.sqrt((imagePos.x - point.x) ** 2 + (imagePos.y - point.y) ** 2);
 
         if (distance <= hitRadius) {
-          // If cmd-click, handle selection immediately and don't set up dragging
+          // If cmd-click, don't handle it here - let the onClick handler on the Circle component handle it
+          // The onClick handler has the correct pointIndex, while this handler would need to find it by distance
+          // which could select the wrong point when multiple points are close together
           if (e.evt.ctrlKey || e.evt.metaKey) {
-            // Try deselection first
-            if (handlePointDeselection(e, props)) {
-              handledSelectionInMouseDown.current = true;
-              return;
-            }
-            // If not deselection, try selection (adding to multi-selection)
-            if (handlePointSelection(e, props)) {
-              handledSelectionInMouseDown.current = true;
-              return;
-            }
-          } else {
-            // Normal click - store the potential drag target but don't start dragging yet
-            // We'll start dragging only if the mouse moves beyond a threshold
-            props.setDraggedPointIndex(i);
-            props.lastPos.current = {
-              x: e.evt.clientX,
-              y: e.evt.clientY,
-              originalX: point.x,
-              originalY: point.y,
-              originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
-              originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
-            };
+            // Just mark that we're over a point, but let onClick handle the selection
+            handledSelectionInMouseDown.current = true;
+            return;
           }
+
+          // Normal click - store the potential drag target but don't start dragging yet
+          // We'll start dragging only if the mouse moves beyond a threshold
+          props.setDraggedPointIndex(i);
+          props.lastPos.current = {
+            x: e.evt.clientX,
+            y: e.evt.clientY,
+            originalX: point.x,
+            originalY: point.y,
+            originalControlPoint1: point.isBezier ? point.controlPoint1 : undefined,
+            originalControlPoint2: point.isBezier ? point.controlPoint2 : undefined,
+          };
           return;
         }
       }
@@ -296,11 +284,15 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
     if (!pos) return;
 
     // Update cursor position
+    // Note: cursor position is now handled by stage-level events when disableInternalPointAddition is true
     const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
-    props.setCursorPosition(imagePos);
+    // props.setCursorPosition(imagePos); // Removed - handled elsewhere
 
     // Set ghost point when Shift is held - snap to path (but not when dragging or creating bezier points)
+    // When disableInternalPointAddition is true, ghost point is handled by stage-level events
+    // So we skip this logic to avoid conflicts
     if (
+      !props.disableInternalPointAddition &&
       e.evt.shiftKey &&
       props.cursorPosition &&
       props.initialPoints.length >= 2 &&
@@ -310,7 +302,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
     ) {
       // Check if cursor is over an existing point
       const scale = props.transform.zoom * props.fitScale;
-      const hitRadius = 10 / scale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
       let isOverPoint = false;
 
       for (let i = 0; i < props.initialPoints.length; i++) {
@@ -373,8 +365,8 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
           props.setGhostPoint(null);
         }
       }
-    } else if (!e.evt.shiftKey) {
-      // Clear ghost point when Shift is not held
+    } else if (!props.disableInternalPointAddition && !e.evt.shiftKey) {
+      // Clear ghost point when Shift is not held (only when not using stage-level events)
       props.setGhostPoint(null);
     }
 
@@ -609,11 +601,12 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       return;
     }
 
-    // Handle Bezier curve creation in drawing mode (click-drag without shift key) - only when path is not closed
+    // Handle Bezier curve creation in drawing mode (click-drag without shift key) - only when path is not closed and transformer is not active
     // Skip if PointCreationManager is currently creating a point
     if (
       props.isDrawingMode &&
       !props.isPathClosed &&
+      props.selectedPoints.size <= 1 &&
       props.lastPos.current &&
       !e.evt.shiftKey &&
       props.allowBezier &&
@@ -645,6 +638,7 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
     }
 
     // Handle shift-click-drag bezier creation (start dragging detection) - only when shift key is held
+    // Ghost point drag info is tracked for UI feedback even when internal point addition is disabled
     if (props.ghostPointDragInfo && !props.ghostPointDragInfo.isDragging && e.evt.shiftKey && props.allowBezier) {
       // Check if we should start dragging (mouse moved enough)
       const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
@@ -656,46 +650,50 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
 
       // Start dragging if we've moved more than 5 pixels
       if (dragDistance > 5) {
-        // Create a bezier point at the ghost point location
-        const ghostPoint = props.ghostPointDragInfo.ghostPoint;
-        const prevPoint = props.initialPoints.find((p) => p.id === ghostPoint.prevPointId);
-        const nextPoint = props.initialPoints.find((p) => p.id === ghostPoint.nextPointId);
+        // Only create actual bezier point if internal point addition is enabled
+        if (!props.disableInternalPointAddition) {
+          // Create a bezier point at the ghost point location
+          const ghostPoint = props.ghostPointDragInfo.ghostPoint;
+          const prevPoint = props.initialPoints.find((p) => p.id === ghostPoint.prevPointId);
+          const nextPoint = props.initialPoints.find((p) => p.id === ghostPoint.nextPointId);
 
-        if (prevPoint && nextPoint) {
-          // Snap to pixel grid if enabled
-          const snappedPos = snapToPixel(imagePos, props.pixelSnapping);
+          if (prevPoint && nextPoint) {
+            // Snap to pixel grid if enabled
+            const snappedPos = snapToPixel(imagePos, props.pixelSnapping);
 
-          // Create initial control points - control point 1 will follow cursor, control point 2 will be opposite
-          const controlPoint1 = { x: snappedPos.x, y: snappedPos.y };
-          const controlPoint2 = {
-            x: ghostPoint.x - (snappedPos.x - ghostPoint.x),
-            y: ghostPoint.y - (snappedPos.y - ghostPoint.y),
-          };
+            // Create initial control points - control point 1 will follow cursor, control point 2 will be opposite
+            const controlPoint1 = { x: snappedPos.x, y: snappedPos.y };
+            const controlPoint2 = {
+              x: ghostPoint.x - (snappedPos.x - ghostPoint.x),
+              y: ghostPoint.y - (snappedPos.y - ghostPoint.y),
+            };
 
-          // Insert the bezier point
-          const result = props.pointCreationManager?.insertPointBetween(
-            ghostPoint.x,
-            ghostPoint.y,
-            prevPoint.id,
-            nextPoint.id,
-            PointType.BEZIER,
-            controlPoint1,
-            controlPoint2,
-          ) || { success: false };
+            // Insert the bezier point
+            const result = props.pointCreationManager?.insertPointBetween(
+              ghostPoint.x,
+              ghostPoint.y,
+              prevPoint.id,
+              nextPoint.id,
+              PointType.BEZIER,
+              controlPoint1,
+              controlPoint2,
+            ) || { success: false };
 
-          if (result.success && result.newPointIndex !== undefined) {
-            // Store the index of the newly created bezier point
-            props.setNewPointDragIndex(result.newPointIndex);
-            // Set dragging state for bezier control point manipulation
-            props.setIsDraggingNewBezier(true);
-            // Mark that we've handled this interaction to prevent click handler from running
-            handledSelectionInMouseDown.current = true;
-          } else {
-            // Failed to insert bezier point
+            if (result.success && result.newPointIndex !== undefined) {
+              // Store the index of the newly created bezier point
+              props.setNewPointDragIndex(result.newPointIndex);
+              // Set dragging state for bezier control point manipulation
+              props.setIsDraggingNewBezier(true);
+              // Mark that we've handled this interaction to prevent click handler from running
+              handledSelectionInMouseDown.current = true;
+            } else {
+              // Failed to insert bezier point
+            }
           }
         }
 
-        // Update ghost point drag info to indicate we're now dragging
+        // Update ghost point drag info to indicate we're now dragging (for UI feedback)
+        // This happens even when internal point addition is disabled
         props.setGhostPointDragInfo({
           ...props.ghostPointDragInfo,
           isDragging: true,
@@ -707,12 +705,15 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       }
     } else if (props.ghostPointDragInfo?.isDragging && props.isDraggingNewBezier) {
       // Continue shift-click-drag bezier point creation - update control points to follow cursor
+      // Only update actual control points if internal point addition is enabled
+      if (!props.disableInternalPointAddition) {
+        const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
+        // Use the shared utility for continuing bezier drag
+        continueBezierDrag(props);
+      }
+
+      // Update ghost point drag info (for UI feedback)
       const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
-
-      // Use the shared utility for continuing bezier drag
-      continueBezierDrag(props);
-
-      // Update ghost point drag info
       props.setGhostPointDragInfo({
         ...props.ghostPointDragInfo,
         dragDistance: Math.sqrt(
@@ -791,7 +792,8 @@ export function createMouseUpHandler(props: EventHandlerProps) {
     }
 
     // Handle ghost point drag completion
-    if (wasGhostDrag && props.ghostPointDragInfo?.ghostPoint) {
+    // Skip if internal point addition is disabled
+    if (!props.disableInternalPointAddition && wasGhostDrag && props.ghostPointDragInfo?.ghostPoint) {
       const { ghostPoint, dragDistance } = props.ghostPointDragInfo;
 
       // If we were creating a bezier point, it was already created during the drag
@@ -857,16 +859,31 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
           const clickRadius = 15 / (props.transform.zoom * props.fitScale);
 
           if (distance <= clickRadius) {
-            // Insert a regular point between the two points that form the segment
-            const insertResult = insertPointBetween(
-              props,
-              ghostPoint.x,
-              ghostPoint.y,
-              ghostPoint.prevPointId,
-              ghostPoint.nextPointId,
-            );
-            if (insertResult.success) {
-              return; // Successfully added point
+            // If internal point addition is disabled, call the callback for programmatic handling
+            if (props.disableInternalPointAddition && props.onGhostPointClick) {
+              props.onGhostPointClick({
+                x: ghostPoint.x,
+                y: ghostPoint.y,
+                prevPointId: ghostPoint.prevPointId,
+                nextPointId: ghostPoint.nextPointId,
+              });
+              return; // Let parent handle point addition
+            }
+
+            // Otherwise, insert a regular point internally between the two points that form the segment
+            if (!props.disableInternalPointAddition) {
+              const insertResult = insertPointBetween(
+                props,
+                ghostPoint.x,
+                ghostPoint.y,
+                ghostPoint.prevPointId,
+                ghostPoint.nextPointId,
+              );
+              if (insertResult.success) {
+                // Clear ghost point immediately after adding a real point
+                props.setGhostPoint(null);
+                return; // Successfully added point
+              }
             }
           }
         }
@@ -880,7 +897,7 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
         const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
         const scale = props.transform.zoom * props.fitScale;
-        const hitRadius = 10 / scale;
+        const hitRadius = HIT_RADIUS.SELECTION / scale;
 
         // Check if we clicked on any point to delete it
         for (let i = 0; i < props.initialPoints.length; i++) {
@@ -900,26 +917,58 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
               props.setLastAddedPointId,
               props.lastAddedPointId,
             );
+            // Stop event propagation to prevent point addition
+            e.evt.stopPropagation();
+            e.evt.preventDefault();
+            e.cancelBubble = true;
             return;
           }
         }
 
-        // If we didn't click on a point, check if we clicked on a segment to break the path
-        if (props.isPathClosed && props.allowClose) {
-          const segmentHitRadius = 15 / scale; // Slightly larger than point hit radius
+        // If we didn't click on a point, check if we clicked on a segment to break/delete it
+        const segmentHitRadius = 15 / scale; // Slightly larger than point hit radius
 
-          // Find the closest point on the path
-          const closestPathPoint = findClosestPointOnPath(
-            imagePos,
-            props.initialPoints,
-            props.allowClose,
-            props.isPathClosed,
-          );
+        // Find the closest point on the path
+        const closestPathPoint = findClosestPointOnPath(
+          imagePos,
+          props.initialPoints,
+          props.allowClose,
+          props.isPathClosed,
+        );
 
-          if (closestPathPoint && getDistance(imagePos, closestPathPoint.point) <= segmentHitRadius) {
-            // We clicked on a segment, break the closed path
+        if (closestPathPoint && getDistance(imagePos, closestPathPoint.point) <= segmentHitRadius) {
+          // For closed paths, break the path at the segment
+          if (props.isPathClosed && props.allowClose) {
             if (breakPathAtSegment(props, closestPathPoint.segmentIndex)) {
+              e.evt.stopPropagation();
+              e.evt.preventDefault();
+              e.cancelBubble = true;
               return;
+            }
+          } else {
+            // For unclosed paths, delete the segment by removing the connection
+            // This splits the path into two separate paths
+            const segmentIndex = closestPathPoint.segmentIndex;
+            if (segmentIndex >= 0 && segmentIndex < props.initialPoints.length) {
+              const pointToBreak = props.initialPoints[segmentIndex];
+              if (pointToBreak.prevPointId) {
+                // Remove the prevPointId to break the connection
+                const updatedPoints = props.initialPoints.map((point, idx) => {
+                  if (idx === segmentIndex) {
+                    return {
+                      ...point,
+                      prevPointId: undefined,
+                    };
+                  }
+                  return point;
+                });
+
+                props.onPointsChange?.(updatedPoints);
+                e.evt.stopPropagation();
+                e.evt.preventDefault();
+                e.cancelBubble = true;
+                return;
+              }
             }
           }
         }
@@ -943,7 +992,7 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
       const imagePos = stageToImageCoordinates(pos, props.transform, props.fitScale, props.x, props.y);
 
       const scale = props.transform.zoom * props.fitScale;
-      const hitRadius = 10 / scale;
+      const hitRadius = HIT_RADIUS.SELECTION / scale;
 
       // Check if we clicked on any existing point
       for (let i = 0; i < props.initialPoints.length; i++) {
@@ -958,9 +1007,16 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
       }
     }
 
-    // Handle drawing mode clicks (only when path is not closed)
+    // Handle drawing mode clicks (only when path is not closed and transformer is not active)
     // Skip if PointCreationManager is currently creating a point
-    if (props.isDrawingMode && !props.isPathClosed && !props.pointCreationManager?.isCreating()) {
+    // Skip if internal point addition is disabled
+    if (
+      !props.disableInternalPointAddition &&
+      props.isDrawingMode &&
+      !props.isPathClosed &&
+      props.selectedPoints.size <= 1 &&
+      !props.pointCreationManager?.isCreating()
+    ) {
       // Handle regular click (add regular point)
       if (handleDrawingModeClick(e, props)) {
         return;
@@ -976,21 +1032,34 @@ export function createClickHandler(props: EventHandlerProps, handledSelectionInM
 }
 
 // Helper function to select a point by index
-function handlePointSelectionFromIndex(
+export function handlePointSelectionFromIndex(
   pointIndex: number,
   props: EventHandlerProps,
   event: KonvaEventObject<MouseEvent>,
 ) {
   // Check if this is the active point (the one user is currently drawing from)
+  // Only trigger onFinish if:
+  // 1. We're in drawing mode (isDrawingMode is true)
+  // 2. No modifiers are pressed (ctrl, meta, shift, alt)
+  // 3. Point was already selected before this click (to prevent firing when selecting region)
   if (
+    !props.transformMode &&
     props.activePointId &&
     pointIndex < props.initialPoints.length &&
     !(event.evt.ctrlKey || event.evt.shiftKey || event.evt.metaKey || event.evt.altKey)
   ) {
     const point = props.initialPoints[pointIndex];
     if (point.id === props.activePointId) {
-      props.onFinish?.(event!);
-      return; // Don't proceed with selection
+      const isDrawingMode = props.isDrawingMode === true;
+      const wasPointAlreadySelected = props.selectedPoints?.has(pointIndex) ?? false;
+
+      // Only fire onFinish if we're in drawing mode AND point was already selected
+      // This prevents onFinish from firing when clicking on a point to select the region
+      if (isDrawingMode && wasPointAlreadySelected) {
+        props.onFinish?.(event!);
+        return; // Don't proceed with selection
+      }
+      // If not in drawing mode or point wasn't selected, skip onFinish and proceed with selection
     }
   }
 

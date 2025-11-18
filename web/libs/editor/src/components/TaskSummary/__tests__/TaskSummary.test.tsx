@@ -248,7 +248,16 @@ describe("TaskSummary", () => {
   });
 
   it("renders labeling summary table with control tags", () => {
-    const annotations = [createMockAnnotation()];
+    const annotations = [
+      createMockAnnotation({
+        versions: {
+          result: [
+            { from_name: "sentiment", to_name: "text", type: "choices", value: { choices: ["positive"] } },
+            { from_name: "category", to_name: "text", type: "choices", value: { choices: ["news"] } },
+          ],
+        },
+      }),
+    ];
     const store = createMockStore({
       names: new Map([
         createMockControlTag("sentiment", "choices"),
@@ -259,7 +268,7 @@ describe("TaskSummary", () => {
 
     render(<TaskSummary annotations={annotations} store={store} />);
 
-    expect(screen.getByText("Annotation ID")).toBeInTheDocument();
+    expect(screen.getByText("Annotator")).toBeInTheDocument();
     expect(screen.getByText("sentiment")).toBeInTheDocument();
     expect(screen.getByText("category")).toBeInTheDocument();
   });
@@ -320,7 +329,13 @@ describe("TaskSummary", () => {
   });
 
   it("processes control tags with per_region setting", () => {
-    const annotations = [createMockAnnotation()];
+    const annotations = [
+      createMockAnnotation({
+        versions: {
+          result: [{ from_name: "regionLabel", to_name: "text", type: "choices", value: { choices: ["label1"] } }],
+        },
+      }),
+    ];
     const controlWithPerRegion: [string, MockControlTag] = [
       "regionLabel",
       {

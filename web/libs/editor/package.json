@@ -6,7 +6,7 @@
   "dependencies": {
     "@ant-design/colors": "6.0.0",
     "@ant-design/icons": "4.8.1",
-    "@martel/audio-file-decoder": "^2.3.15",
+    "@humansignal/audio-file-decoder": "0.1.5",
     "@thi.ng/rle-pack": "^3.1.30",
     "antd": "^4.3.3",
     "chroma-js": "^2.1.1",
@@ -35,7 +35,6 @@
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-window": "^1.8.9",
     "sanitize-html": "^2.12.1",
-
     "webfft": "^1.0.3",
     "xpath-range": "^1.1.1"
   },
