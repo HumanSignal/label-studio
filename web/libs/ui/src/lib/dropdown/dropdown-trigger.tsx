@@ -171,10 +171,13 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
     );
 
     useEffect(() => {
+      // Only add click listener when dropdown is actually open
+      if (!dropdownRef.current?.visible) return;
+
       document.addEventListener("click", handleClick, { capture: true });
       return () =>
         document.removeEventListener("click", handleClick, { capture: true });
-    }, [handleClick]);
+    }, [handleClick, dropdownRef.current?.visible]);
 
     const contextValue = useMemo((): DropdownContextValue => {
       return {
