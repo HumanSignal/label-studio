@@ -69,7 +69,9 @@ class FSMEntityTransitionAPITests(APITestCase):
         )
         assert response.status_code == 400
         body = response.json()
-        assert 'transition_name' in body
+        assert body.get('detail') == 'Validation error'
+        assert 'validation_errors' in body
+        assert 'transition_name' in body['validation_errors']
 
     @patch('fsm.state_manager.flag_set', return_value=True)
     def test_returns_detailed_error_messages_on_failed_transition(self, _mock_flag):
@@ -94,8 +96,10 @@ class FSMEntityTransitionAPITests(APITestCase):
             )
             assert response.status_code == 400
             body = response.json()
-            assert body.get('detail') == 'Business rule failed'
-            assert body.get('rule') == 'must_not_run'
+            assert body.get('detail') == 'Validation error'
+            assert 'validation_errors' in body
+            assert body['validation_errors'].get('detail') == 'Business rule failed'
+            assert body['validation_errors'].get('rule') == 'must_not_run'
         finally:
             # Cleanup transition registry entry for isolation
             transition_registry.get_transitions_for_entity('task').pop('test_manual_fails', None)
@@ -110,7 +114,9 @@ class FSMEntityTransitionAPITests(APITestCase):
         )
         assert response.status_code == 400
         body = response.json()
-        assert 'transition_name' in body
+        assert body.get('detail') == 'Validation error'
+        assert 'validation_errors' in body
+        assert 'transition_name' in body['validation_errors']
 
     def test_permission_checks_masked_as_not_found(self):
         # Authenticate as another user without access to the project/org

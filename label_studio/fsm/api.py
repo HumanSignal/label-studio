@@ -205,10 +205,18 @@ class FSMEntityTransitionAPI(generics.GenericAPIView):
             # Unexpected failure
             raise APIException(detail='Transition execution failed') from e
 
-        state_record_data = StateModelSerializer(state_record).data
-        response_payload = {
-            'success': True,
-            'new_state': state_record.state,
-            'state_record': state_record_data,
-        }
+        # Handle feature-flag disabled path (no state record created)
+        if state_record is None:
+            response_payload = {
+                'success': True,
+                'new_state': None,
+                'state_record': None,
+            }
+        else:
+            state_record_data = StateModelSerializer(state_record).data
+            response_payload = {
+                'success': True,
+                'new_state': state_record.state,
+                'state_record': state_record_data,
+            }
         return Response(response_payload, status=status.HTTP_200_OK)
