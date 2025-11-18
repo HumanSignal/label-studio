@@ -1,0 +1,160 @@
+from unittest.mock import patch
+
+import pytest
+from fsm.registry import register_state_transition, transition_registry
+from fsm.state_choices import ProjectStateChoices, TaskStateChoices
+from fsm.state_manager import get_state_manager
+from fsm.state_models import AnnotationState, ProjectState, TaskState
+from fsm.transitions import BaseTransition, TransitionContext, TransitionValidationError
+from projects.tests.factories import ProjectFactory
+from rest_framework.test import APITestCase
+from tasks.tests.factories import AnnotationFactory, TaskFactory
+from users.tests.factories import UserFactory
+
+pytestmark = pytest.mark.django_db
+
+
+class FSMEntityTransitionAPITests(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.project = ProjectFactory()
+        cls.user = cls.project.created_by
+        cls.task = TaskFactory(project=cls.project)
+        cls.annotation = AnnotationFactory(task=cls.task, completed_by=cls.user)
+        # Clean any pre-existing FSM state to have a known baseline
+        ProjectState.objects.all().delete()
+        TaskState.objects.all().delete()
+        AnnotationState.objects.all().delete()
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+        self.StateManager = get_state_manager()
+
+    @patch('fsm.state_manager.flag_set', return_value=True)
+    def test_success_task_manual_transition(self, _mock_flag):
+        response = self.client.post(
+            f'/api/fsm/entities/task/{self.task.id}/transition/',
+            data={'transition_name': 'task_completed', 'transition_data': {'reason': 'test complete'}},
+            format='json',
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data['success'] is True
+        assert data['new_state'] == TaskStateChoices.COMPLETED
+        assert data['state_record']['triggered_by']['id'] == self.user.id
+
+        # Ensure a state record exists
+        current_state = self.StateManager.get_current_state_value(self.task)
+        assert current_state == TaskStateChoices.COMPLETED
+
+    @patch('fsm.state_manager.flag_set', return_value=True)
+    def test_success_project_manual_transition(self, _mock_flag):
+        response = self.client.post(
+            f'/api/fsm/entities/project/{self.project.id}/transition/',
+            data={'transition_name': 'project_in_progress'},
+            format='json',
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data['success'] is True
+        assert data['new_state'] == ProjectStateChoices.IN_PROGRESS
+        assert data['state_record']['triggered_by']['id'] == self.user.id
+
+    @patch('fsm.state_manager.flag_set', return_value=True)
+    def test_request_body_validation_missing_transition_name(self, _mock_flag):
+        response = self.client.post(
+            f'/api/fsm/entities/task/{self.task.id}/transition/',
+            data={},
+            format='json',
+        )
+        assert response.status_code == 400
+        body = response.json()
+        assert 'transition_name' in body
+
+    @patch('fsm.state_manager.flag_set', return_value=True)
+    def test_returns_detailed_error_messages_on_failed_transition(self, _mock_flag):
+        # Register a manual transition that always fails with a detailed message
+        @register_state_transition('task', 'test_manual_fails', triggers_on_create=False, triggers_on_update=False)
+        class FailingManualTransition(BaseTransition):
+            @property
+            def target_state(self) -> str:
+                return TaskStateChoices.IN_PROGRESS
+
+            def transition(self, context: TransitionContext) -> dict:
+                return {}
+
+            def validate_transition(self, context: TransitionContext) -> bool:
+                raise TransitionValidationError('Business rule failed', context={'rule': 'must_not_run'})
+
+        try:
+            response = self.client.post(
+                f'/api/fsm/entities/task/{self.task.id}/transition/',
+                data={'transition_name': 'test_manual_fails', 'transition_data': {}},
+                format='json',
+            )
+            assert response.status_code == 400
+            body = response.json()
+            assert body.get('detail') == 'Business rule failed'
+            assert body.get('rule') == 'must_not_run'
+        finally:
+            # Cleanup transition registry entry for isolation
+            transition_registry.get_transitions_for_entity('task').pop('test_manual_fails', None)
+
+    @patch('fsm.state_manager.flag_set', return_value=True)
+    def test_cannot_trigger_auto_triggered_transitions_manually(self, _mock_flag):
+        # 'annotation_submitted' is auto-triggered on create
+        response = self.client.post(
+            f'/api/fsm/entities/annotation/{self.annotation.id}/transition/',
+            data={'transition_name': 'annotation_submitted'},
+            format='json',
+        )
+        assert response.status_code == 400
+        body = response.json()
+        assert 'transition_name' in body
+
+    def test_permission_checks_masked_as_not_found(self):
+        # Authenticate as another user without access to the project/org
+        other_user = UserFactory()
+        self.client.force_authenticate(user=other_user)
+        response = self.client.post(
+            f'/api/fsm/entities/project/{self.project.id}/transition/',
+            data={'transition_name': 'project_in_progress'},
+            format='json',
+        )
+        # Should not leak existence (masked as 404)
+        assert response.status_code == 404
+
+    @patch('fsm.state_manager.flag_set', return_value=False)
+    def test_feature_flag_respected_no_state_record_created(self, _mock_flag):
+        # Execute a manual transition with FSM disabled
+        response = self.client.post(
+            f'/api/fsm/entities/task/{self.task.id}/transition/',
+            data={'transition_name': 'task_completed'},
+            format='json',
+        )
+        # Endpoint should still respond; state should not be created
+        assert response.status_code == 200
+        current_state = self.StateManager.get_current_state_value(self.task)
+        assert current_state is None
+
+    @patch('fsm.state_manager.flag_set', return_value=True)
+    def test_audit_trail_captures_triggered_by(self, _mock_flag):
+        response = self.client.post(
+            f'/api/fsm/entities/project/{self.project.id}/transition/',
+            data={'transition_name': 'project_in_progress'},
+            format='json',
+        )
+        assert response.status_code == 200
+        body = response.json()
+        assert body['state_record']['triggered_by']['id'] == self.user.id
+
+    @patch('fsm.state_manager.flag_set', return_value=True)
+    def test_unknown_transition_returns_400(self, _mock_flag):
+        response = self.client.post(
+            f'/api/fsm/entities/task/{self.task.id}/transition/',
+            data={'transition_name': 'does_not_exist', 'transition_data': {}},
+            format='json',
+        )
+        assert response.status_code == 400
+        body = response.json()
+        assert 'detail' in body
