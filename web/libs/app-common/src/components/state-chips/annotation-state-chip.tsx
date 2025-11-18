@@ -39,7 +39,7 @@ export function AnnotationStateChip({ state, annotationId, interactive = true }:
     <StateChip
       label={label}
       description={description}
-      colorClasses={colorClasses}
+      className={colorClasses}
       interactive={interactive && !!annotationId}
       popoverContent={popoverContent}
       open={open}

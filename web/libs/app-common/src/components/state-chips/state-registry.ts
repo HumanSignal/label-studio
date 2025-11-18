@@ -178,6 +178,45 @@ class StateRegistry {
   }
 
   /**
+   * Get states that apply to a specific entity type.
+   * A state applies to an entity if it has a tooltip defined for that entity type.
+   *
+   * @param entityType - Type of entity (task, annotation, project, annotationreview)
+   * @returns Array of state constants applicable to the entity type
+   */
+  getStatesByEntityType(entityType: EntityType): string[] {
+    return Array.from(this.states.entries())
+      .filter(([_, metadata]) => metadata.tooltips && entityType in metadata.tooltips)
+      .sort((a, b) => {
+        // Sort by logical workflow order: INITIAL → IN_PROGRESS → ATTENTION → TERMINAL
+        const workflowOrder = [StateType.INITIAL, StateType.IN_PROGRESS, StateType.ATTENTION, StateType.TERMINAL];
+        const aType = this.getType(a[0]);
+        const bType = this.getType(b[0]);
+        const typeDiff = workflowOrder.indexOf(aType) - workflowOrder.indexOf(bType);
+        if (typeDiff !== 0) return typeDiff;
+
+        // Within each type, sort by label alphabetically
+        // BUT: Special cases for specific states
+        const aState = a[0];
+        const bState = b[0];
+
+        // Special case: IN_PROGRESS state should be first in its type group
+        if (aState === "IN_PROGRESS") return -1;
+        if (bState === "IN_PROGRESS") return 1;
+
+        // Special case: COMPLETED (Done) should always be last
+        if (aState === "COMPLETED") return 1;
+        if (bState === "COMPLETED") return -1;
+
+        // Otherwise sort by label alphabetically
+        const aLabel = this.getLabel(aState);
+        const bLabel = this.getLabel(bState);
+        return aLabel.localeCompare(bLabel);
+      })
+      .map(([state]) => state);
+  }
+
+  /**
    * Format a state constant into a human-readable name.
    * Converts SNAKE_CASE to Title Case.
    *
@@ -203,7 +242,8 @@ export const stateRegistry = new StateRegistry();
 // ============================================================================
 
 /**
- * Task states covering annotation, review, and arbitration workflow.
+ * Minimal LSO states - just the basics.
+ * All review, arbitration, and advanced workflow states are in LSE.
  */
 stateRegistry.registerBatch({
   CREATED: {
@@ -223,56 +263,6 @@ stateRegistry.registerBatch({
     },
   },
 
-  ANNOTATION_COMPLETE: {
-    type: StateType.TERMINAL,
-    label: "Annotated",
-    tooltips: {
-      task: "Annotation has been completed and is ready for review",
-    },
-  },
-
-  REVIEW_IN_PROGRESS: {
-    type: StateType.IN_PROGRESS,
-    label: "In Review",
-    tooltips: {
-      task: "Task is currently being reviewed",
-      annotationreview: "Review is in progress",
-    },
-  },
-
-  REVIEW_COMPLETE: {
-    type: StateType.TERMINAL,
-    label: "Reviewed",
-    tooltips: {
-      task: "Review has been completed",
-      annotationreview: "Review has been completed",
-    },
-  },
-
-  ARBITRATION_NEEDED: {
-    type: StateType.ATTENTION,
-    label: "Needs Arbitration",
-    tooltips: {
-      task: "Task requires arbitration due to conflicting annotations or reviews",
-    },
-  },
-
-  ARBITRATION_IN_PROGRESS: {
-    type: StateType.IN_PROGRESS,
-    label: "In Arbitration",
-    tooltips: {
-      task: "Arbitration is currently in progress to resolve conflicts",
-    },
-  },
-
-  ARBITRATION_COMPLETE: {
-    type: StateType.TERMINAL,
-    label: "Arbitrated",
-    tooltips: {
-      task: "Arbitration has been completed",
-    },
-  },
-
   COMPLETED: {
     type: StateType.TERMINAL,
     label: "Done",
@@ -280,78 +270,6 @@ stateRegistry.registerBatch({
       task: "Task is fully completed and no further work is needed",
       annotation: "Annotation is completed and finalized",
       project: "Project is completed - all tasks are done",
-    },
-  },
-});
-
-/**
- * Annotation states for individual annotation lifecycle.
- */
-stateRegistry.registerBatch({
-  SUBMITTED: {
-    type: StateType.IN_PROGRESS,
-    label: "Submitted",
-    tooltips: {
-      annotation: "Annotation has been submitted for review",
-    },
-  },
-
-  IN_REVIEW: {
-    type: StateType.IN_PROGRESS,
-    label: "In Review",
-    tooltips: {
-      annotation: "Annotation is currently being reviewed",
-    },
-  },
-
-  APPROVED: {
-    type: StateType.TERMINAL,
-    label: "Approved",
-    tooltips: {
-      annotation: "Annotation has been approved by reviewer",
-    },
-  },
-
-  REJECTED: {
-    type: StateType.ATTENTION,
-    label: "Rejected",
-    tooltips: {
-      annotation: "Annotation has been rejected and needs revision",
-    },
-  },
-});
-
-/**
- * Project states for project lifecycle (LSO base states).
- */
-stateRegistry.registerBatch({
-  PUBLISHED: {
-    type: StateType.IN_PROGRESS,
-    label: "Published",
-    tooltips: {
-      project: "Project is published and available for annotation work",
-    },
-  },
-
-  IN_PROGRESS: {
-    type: StateType.IN_PROGRESS,
-    label: "In Progress",
-    tooltips: {
-      task: "Task is in progress",
-      project: "Annotation work is in progress on this project",
-    },
-  },
-});
-
-/**
- * Annotation Review states.
- */
-stateRegistry.registerBatch({
-  PENDING: {
-    type: StateType.INITIAL,
-    label: "Pending",
-    tooltips: {
-      annotationreview: "Review is pending",
     },
   },
 });

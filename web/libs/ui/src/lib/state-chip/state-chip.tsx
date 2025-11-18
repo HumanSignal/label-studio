@@ -66,7 +66,7 @@ export function StateChip({
     return (
       <Tooltip title={description || label}>
         <span>
-          <Badge className={colorClasses}>{label}</Badge>
+          <Badge className={className}>{label}</Badge>
         </span>
       </Tooltip>
     );

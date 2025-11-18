@@ -5,7 +5,7 @@ import { useMemo } from "react";
 
 const BaseInput = observer(({ value, onChange, placeholder }) => {
   const options = useMemo(() => {
-    return stateRegistry.getAllStates().map((state) => {
+    return stateRegistry.getStatesByEntityType("task").map((state) => {
       const textLabel = formatStateName(state);
       const colorClasses = getStateColorClass(state);
 
