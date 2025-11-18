@@ -106,11 +106,25 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
     const handleClick = useCallback(
       (e: any) => {
         if (!closeOnClickOutside) return;
-        if (targetIsInsideDropdown(e.target)) return;
+
+        // Fast path: check our own trigger and dropdown first before expensive child iteration
+        const target = e.target;
+        if (triggerRef.current?.contains?.(target)) return;
+        if (dropdownRef.current?.dropdown?.contains?.(target)) return;
+        if (isChildValid(target)) return;
+
+        // Only check children if we didn't match trigger/dropdown
+        if (targetIsInsideDropdown(target)) return;
 
         dropdownRef.current?.close?.();
       },
-      [closeOnClickOutside, targetIsInsideDropdown],
+      [
+        closeOnClickOutside,
+        targetIsInsideDropdown,
+        triggerRef,
+        dropdownRef,
+        isChildValid,
+      ],
     );
 
     const handleToggle = useCallback(
