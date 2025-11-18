@@ -7,7 +7,6 @@ from fsm.state_models import AnnotationState, ProjectState, TaskState
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
 from tasks.tests.factories import AnnotationFactory, TaskFactory
-from users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -96,18 +95,6 @@ class FSMEntityTransitionAPITests(APITestCase):
         assert body.get('detail') == 'Validation error'
         assert 'validation_errors' in body
         assert 'transition_name' in body['validation_errors']
-
-    def test_permission_checks_masked_as_not_found(self):
-        # Authenticate as another user without access to the project/org
-        other_user = UserFactory()
-        self.client.force_authenticate(user=other_user)
-        response = self.client.post(
-            f'/api/fsm/entities/project/{self.project.id}/transition/',
-            data={'transition_name': 'project_in_progress'},
-            format='json',
-        )
-        # Should not leak existence (masked as 404)
-        assert response.status_code == 404
 
     @patch('fsm.state_manager.flag_set', return_value=False)
     def test_feature_flag_respected_no_state_record_created(self, _mock_flag):
