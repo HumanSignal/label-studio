@@ -1,0 +1,13 @@
+.aggregation-row {
+  box-shadow: 0 2px 8px rgba(var(--color-neutral-shadow-raw) / 10%);
+  z-index: 2;
+
+  // @todo add a better comment
+  // cells in first column overlap shadows for cells from previous row,
+  // z-index doesn't work here, so we just reimplement shadow of aggregation row
+  // in this exact cell as inset; also we had to expand and shift the shadow
+  // to only drop from the top of the cell
+  &+tr td:first-child {
+    box-shadow: 0 10px 8px -8px rgba(var(--color-neutral-shadow-raw) / 10%) inset;
+  }
+}
