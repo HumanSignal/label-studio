@@ -39,7 +39,7 @@ export function TaskStateChip({ state, taskId, interactive = true }: TaskStateCh
     <StateChip
       label={label}
       description={description}
-      colorClasses={colorClasses}
+      className={colorClasses}
       interactive={interactive && !!taskId}
       popoverContent={popoverContent}
       open={open}
