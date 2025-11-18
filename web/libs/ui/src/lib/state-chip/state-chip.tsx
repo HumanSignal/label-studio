@@ -83,7 +83,7 @@ export function StateChip({
       type="button"
       title="Click to view history"
     >
-      <Badge className={colorClasses}>{label}</Badge>
+      <Badge className={className}>{label}</Badge>
     </button>
   );
 
