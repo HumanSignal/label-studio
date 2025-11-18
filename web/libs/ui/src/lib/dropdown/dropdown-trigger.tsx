@@ -85,22 +85,20 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
     const targetIsInsideDropdown = useCallback(
       (target: HTMLElement) => {
         const triggerClicked = triggerRef.current?.contains?.(target);
+        if (triggerClicked) return true;
+
         const dropdownClicked =
           dropdownRef.current?.dropdown?.contains?.(target);
+        if (dropdownClicked) return true;
 
-        const childDropdownClicked = Array.from(childset.current).reduce(
-          (res, child) => {
-            return res || child.hasTarget(target);
-          },
-          false,
-        );
+        if (isChildValid(target)) return true;
 
-        return (
-          triggerClicked ||
-          dropdownClicked ||
-          childDropdownClicked ||
-          isChildValid(target)
-        );
+        // Check child dropdowns - short-circuit on first match
+        for (const child of childset.current) {
+          if (child.hasTarget(target)) return true;
+        }
+
+        return false;
       },
       [triggerRef, dropdownRef, isChildValid],
     );
