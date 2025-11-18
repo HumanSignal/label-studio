@@ -175,11 +175,10 @@ export const AnnotationButton = observer(
           if (entity.user?.id) {
             url.searchParams.set("user", entity.user.id);
           }
-          if (annotationStore.store?.project?.id) {
-            url.searchParams.set("project", annotationStore.store.project.id);
-          }
-          if (entity.pk) {
-            url.searchParams.set("annotation", entity.pk);
+
+          const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
+          if (projectMatch) {
+            url.searchParams.set("project", projectMatch[1]);
           }
 
           window.open(url.toString(), "_blank");
@@ -212,6 +211,10 @@ export const AnnotationButton = observer(
         const showGroundTruth = capabilities.groundTruthEnabled && !isPrediction && !isDraft;
         const showDuplicateAnnotation = capabilities.enableCreateAnnotation && !isDraft;
         const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
+
+        // Check if project ID is available (from store or URL)
+        const hasProjectId = !!window.location.pathname.match(/\/projects\/(\d+)/);
+
         const actions = useMemo<ContextMenuAction[]>(
           () => [
             {
@@ -246,7 +249,7 @@ export const AnnotationButton = observer(
               label: "Open Performance Dashboard",
               onClick: openPerformanceDashboard,
               icon: <IconAnalytics width={20} height={20} />,
-              enabled: isLSE && !isDraft && !isPrediction,
+              enabled: isLSE && hasProjectId && !isDraft && !isPrediction,
             },
             {
               label: "Show Other Annotations",
@@ -269,6 +272,7 @@ export const AnnotationButton = observer(
             isPrediction,
             isDraft,
             isLSE,
+            hasProjectId,
             capabilities.enableAnnotationDelete,
             capabilities.enableCreateAnnotation,
             capabilities.groundTruthEnabled,
