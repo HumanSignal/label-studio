@@ -229,11 +229,7 @@ export const AggregationTableRow = ({
             className="px-4 py-2.5 overflow-hidden border-y-2 border-neutral-border-bold"
             style={{ width: header.getSize() }}
           >
-            <AggregationCell
-              control={controls[index - 1]}
-              annotations={annotations}
-              isExpanded={isExpanded}
-            />
+            <AggregationCell control={controls[index - 1]} annotations={annotations} isExpanded={isExpanded} />
           </td>
         ),
       )}
