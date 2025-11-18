@@ -28,7 +28,7 @@ export function AnnotationStateChip({ state, annotationId, interactive = true }:
   const [open, setOpen] = useState(false);
 
   const label = formatStateName(state);
-  const description = getStateDescription(state);
+  const description = getStateDescription(state, "annotation");
   const colorClasses = getStateColorClass(state);
 
   const popoverContent = annotationId ? (

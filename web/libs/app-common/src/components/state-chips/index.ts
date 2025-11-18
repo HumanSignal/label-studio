@@ -4,3 +4,4 @@ export { ProjectStateChip, type ProjectStateChipProps } from "./project-state-ch
 export { StateHistoryPopoverContent, type StateHistoryPopoverContentProps } from "./state-history-popover-content";
 export { StateHistoryPopover, type StateHistoryPopoverProps } from "./state-history-popover";
 export * from "./utils";
+export { stateRegistry, StateType, type EntityType, type StateMetadata } from "./state-registry";

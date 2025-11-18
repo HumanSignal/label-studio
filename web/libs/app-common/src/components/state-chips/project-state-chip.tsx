@@ -28,7 +28,7 @@ export function ProjectStateChip({ state, projectId, interactive = true }: Proje
   const [open, setOpen] = useState(false);
 
   const label = formatStateName(state);
-  const description = getStateDescription(state);
+  const description = getStateDescription(state, "project");
   const colorClasses = getStateColorClass(state);
 
   const popoverContent = projectId ? (

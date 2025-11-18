@@ -28,7 +28,7 @@ export function TaskStateChip({ state, taskId, interactive = true }: TaskStateCh
   const [open, setOpen] = useState(false);
 
   const label = formatStateName(state);
-  const description = getStateDescription(state);
+  const description = getStateDescription(state, "task");
   const colorClasses = getStateColorClass(state);
 
   const popoverContent = taskId ? (

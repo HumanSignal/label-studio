@@ -1,92 +1,23 @@
 /**
  * Shared utilities for state chip components
+ *
+ * This file re-exports the state registry functions for backward compatibility.
+ * The actual implementation is in state-registry.ts which provides an extensible
+ * semantic type system that LSE can extend.
  */
 
-// State color mapping following the 4-color system
-// Grey: Initial states, Blue: In-progress, Yellow: Attention/Churn, Green: Terminal/Complete
-export const STATE_COLORS: Record<string, string> = {
-  // Grey - Initial
-  CREATED: "grey",
-
-  // Blue - In Progress
-  ANNOTATION_IN_PROGRESS: "blue",
-  REVIEW_IN_PROGRESS: "blue",
-  ARBITRATION_IN_PROGRESS: "blue",
-  IN_PROGRESS: "blue",
-
-  // Yellow - Attention/Churn
-  ARBITRATION_NEEDED: "yellow",
-
-  // Green - Complete/Terminal
-  ANNOTATION_COMPLETE: "green",
-  REVIEW_COMPLETE: "green",
-  ARBITRATION_COMPLETE: "green",
-  COMPLETED: "green",
-};
-
-// Map colors to Tailwind CSS classes for chip styling
-export const colorToClasses: Record<string, string> = {
-  grey: "bg-neutral-emphasis border-neutral-border text-neutral-content",
-  blue: "bg-primary-emphasis border-primary-border-subtlest text-primary-content",
-  yellow: "bg-warning-emphasis border-warning-border-subtlest text-warning-content",
-  green: "bg-positive-emphasis border-positive-border-subtlest text-positive-content",
-};
-
-/**
- * Get the color class for a given state
- */
-export function getStateColorClass(state: string): string {
-  const color = STATE_COLORS[state] || "grey";
-  return colorToClasses[color];
-}
-
-// Human-readable labels for task states
-export const stateLabels: Record<string, string> = {
-  CREATED: "Created",
-  ANNOTATION_IN_PROGRESS: "Annotating",
-  ANNOTATION_COMPLETE: "Annotated",
-  REVIEW_IN_PROGRESS: "In Review",
-  REVIEW_COMPLETE: "Reviewed",
-  ARBITRATION_NEEDED: "Needs Arbitration",
-  ARBITRATION_IN_PROGRESS: "In Arbitration",
-  ARBITRATION_COMPLETE: "Arbitrated",
-  COMPLETED: "Done",
-  IN_PROGRESS: "In Progress",
-};
-
-/**
- * Format state name to human-readable label
- */
-export function formatStateName(state: string): string {
-  if (stateLabels[state]) {
-    return stateLabels[state];
-  }
-
-  return state
-    .split("_")
-    .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
-    .join(" ");
-}
-
-/**
- * Get state description for tooltip
- */
-export function getStateDescription(state: string): string {
-  const stateDescriptions: Record<string, string> = {
-    CREATED: "Task has been created and is ready for annotation",
-    ANNOTATION_IN_PROGRESS: "Task is currently being annotated",
-    ANNOTATION_COMPLETE: "Annotation has been completed",
-    REVIEW_IN_PROGRESS: "Task is under review",
-    REVIEW_COMPLETE: "Review has been completed",
-    ARBITRATION_NEEDED: "Task requires arbitration due to disagreements",
-    ARBITRATION_IN_PROGRESS: "Task is currently in arbitration",
-    ARBITRATION_COMPLETE: "Arbitration has been completed",
-    COMPLETED: "Task is fully complete",
-    IN_PROGRESS: "In progress",
-  };
-
-  return stateDescriptions[state] || state;
-}
+export {
+  stateRegistry,
+  StateType,
+  getStateColorClass,
+  formatStateName,
+  getStateDescription,
+  getStateType,
+  isTerminalState,
+  requiresAttention,
+  type EntityType,
+  type StateMetadata,
+} from "./state-registry";
 
 /**
  * Format timestamp to human-readable string
