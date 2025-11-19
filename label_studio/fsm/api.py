@@ -182,8 +182,9 @@ class FSMEntityTransitionAPI(FSMAPIMixin, generics.GenericAPIView):
             raise ValidationError({'detail': str(e)})
         except TransitionValidationError as e:
             # Explicit validation failure
-            raise ValidationError({'detail': str(e), **(e.context or {})})
-
+            data = dict(e.context or {})
+            data['non_field_errors'] = [str(e)]
+            raise ValidationError(data)
         # Handle feature-flag disabled path (no state record created)
         if state_record is None:
             response_payload = {
