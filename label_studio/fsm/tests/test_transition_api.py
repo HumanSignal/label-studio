@@ -96,19 +96,6 @@ class FSMEntityTransitionAPITests(APITestCase):
         assert 'validation_errors' in body
         assert 'transition_name' in body['validation_errors']
 
-    @patch('fsm.state_manager.flag_set', return_value=False)
-    def test_feature_flag_respected_no_state_record_created(self, _mock_flag):
-        # Execute a manual transition with FSM disabled
-        response = self.client.post(
-            f'/api/fsm/entities/task/{self.task.id}/transition/',
-            data={'transition_name': 'task_completed'},
-            format='json',
-        )
-        # Endpoint should still respond; state should not be created
-        assert response.status_code == 200
-        current_state = self.StateManager.get_current_state_value(self.task)
-        assert current_state is None
-
     @patch('fsm.state_manager.flag_set', return_value=True)
     def test_audit_trail_captures_triggered_by(self, _mock_flag):
         response = self.client.post(
@@ -130,3 +117,20 @@ class FSMEntityTransitionAPITests(APITestCase):
         assert response.status_code == 400
         body = response.json()
         assert 'detail' in body
+
+class LsoFSMEntityTransitionAPITests(FSMEntityTransitionAPITests, APITestCase):
+    """Tests for LSO only that should not be inherited in LSE"""
+    
+    @patch('fsm.state_manager.flag_set', return_value=False)
+    def test_feature_flag_respected_no_state_record_created(self, _mock_flag):
+        """LSE State manager infers missing states, LSO does not"""
+        # Execute a manual transition with FSM disabled
+        response = self.client.post(
+            f'/api/fsm/entities/task/{self.task.id}/transition/',
+            data={'transition_name': 'task_completed'},
+            format='json',
+        )
+        # Endpoint should still respond; state should not be created
+        assert response.status_code == 200
+        current_state = self.StateManager.get_current_state_value(self.task)
+        assert current_state is None
