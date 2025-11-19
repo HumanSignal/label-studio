@@ -118,9 +118,10 @@ class FSMEntityTransitionAPITests(APITestCase):
         body = response.json()
         assert 'detail' in body
 
+
 class LsoFSMEntityTransitionAPITests(FSMEntityTransitionAPITests, APITestCase):
     """Tests for LSO only that should not be inherited in LSE"""
-    
+
     @patch('fsm.state_manager.flag_set', return_value=False)
     def test_feature_flag_respected_no_state_record_created(self, _mock_flag):
         """LSE State manager infers missing states, LSO does not"""
