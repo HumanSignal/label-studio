@@ -15,10 +15,33 @@ from fsm.state_manager import get_state_manager
 from fsm.transitions import ModelChangeTransition, TransitionValidationError
 from pydantic import ValidationError as PydanticValidationError
 from rest_framework import generics, status
-from rest_framework.exceptions import APIException, NotFound, PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
+
+
+class FSMAPIMixin:
+    def get_permission_required(self):
+
+        entity_name = self.kwargs['entity_name']
+        permission = self.permission_map.get(entity_name)
+        if not permission:
+            raise ValueError(f'Invalid entity name: {entity_name}')
+        return permission
+
+    def get_entity(self):
+        state_model = get_state_model(self.kwargs['entity_name'])
+        if not state_model:
+            raise NotFound()
+        entity_model = state_model.get_entity_model()
+        entity = get_object_or_404(entity_model.objects, id=self.kwargs['entity_id'])
+        try:
+            self.check_object_permissions(self.request, entity)
+        except PermissionDenied as e:
+            # Return 404 instead of 403 to avoid leaking entity existence
+            raise NotFound() from e
+        return entity
 
 
 class FSMEntityHistoryPagination(PageNumberPagination):
@@ -62,7 +85,7 @@ class FSMEntityHistoryFilterSet(FilterSet):
         },
     ),
 )
-class FSMEntityHistoryAPI(generics.ListAPIView):
+class FSMEntityHistoryAPI(FSMAPIMixin, generics.ListAPIView):
     serializer_class = StateModelSerializer
     pagination_class = FSMEntityHistoryPagination
     filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -74,24 +97,6 @@ class FSMEntityHistoryAPI(generics.ListAPIView):
         'annotation': all_permissions.annotations_view,
         'project': all_permissions.projects_view,
     }
-
-    def get_permission_required(self):
-        entity_name = self.kwargs['entity_name']
-        permission = self.permission_map.get(entity_name)
-        if not permission:
-            raise ValueError(f'Invalid entity name: {entity_name}')
-        return permission
-
-    def get_entity(self):
-        state_model = get_state_model(self.kwargs['entity_name'])
-        entity_model = state_model.get_entity_model()
-        entity = get_object_or_404(entity_model.objects, id=self.kwargs['entity_id'])
-        try:
-            self.check_object_permissions(self.request, entity)
-        except PermissionDenied as e:
-            # Returning 404 instead of 403 to avoid leaking information about the existence of the entity
-            raise NotFound() from e
-        return entity
 
     def get_queryset(self):
         entity = self.get_entity()
@@ -123,7 +128,7 @@ class FSMEntityHistoryAPI(generics.ListAPIView):
         },
     ),
 )
-class FSMEntityTransitionAPI(generics.GenericAPIView):
+class FSMEntityTransitionAPI(FSMAPIMixin, generics.GenericAPIView):
     """
     POST /api/fsm/entities/{entity_type}/{entity_id}/transition/
     """
@@ -135,26 +140,6 @@ class FSMEntityTransitionAPI(generics.GenericAPIView):
         'annotation': all_permissions.annotations_change,
         'project': all_permissions.projects_change,
     }
-
-    def get_permission_required(self):
-        entity_name = self.kwargs['entity_name']
-        permission = self.permission_map.get(entity_name)
-        if not permission:
-            raise ValueError(f'Invalid entity name: {entity_name}')
-        return permission
-
-    def get_entity(self):
-        state_model = get_state_model(self.kwargs['entity_name'])
-        if not state_model:
-            raise NotFound()
-        entity_model = state_model.get_entity_model()
-        entity = get_object_or_404(entity_model.objects, id=self.kwargs['entity_id'])
-        try:
-            self.check_object_permissions(self.request, entity)
-        except PermissionDenied as e:
-            # Return 404 instead of 403 to avoid leaking entity existence
-            raise NotFound() from e
-        return entity
 
     def post(self, request, *args, **kwargs):
         entity_name = kwargs['entity_name']
@@ -198,12 +183,6 @@ class FSMEntityTransitionAPI(generics.GenericAPIView):
         except TransitionValidationError as e:
             # Explicit validation failure
             raise ValidationError({'detail': str(e), **(e.context or {})})
-        except ValueError as e:
-            # Unknown transition or similar issues
-            raise ValidationError({'detail': str(e)})
-        except Exception as e:
-            # Unexpected failure
-            raise APIException(detail='Transition execution failed') from e
 
         # Handle feature-flag disabled path (no state record created)
         if state_record is None:
@@ -219,4 +198,4 @@ class FSMEntityTransitionAPI(generics.GenericAPIView):
                 'new_state': state_record.state,
                 'state_record': state_record_data,
             }
-        return Response(response_payload, status=status.HTTP_200_OK)
+        return Response(FSMTransitionExecuteResponseSerializer(response_payload).data, status=status.HTTP_200_OK)

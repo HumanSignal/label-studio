@@ -39,5 +39,5 @@ class FSMTransitionExecuteResponseSerializer(serializers.Serializer):
     """
 
     success = serializers.BooleanField(read_only=True)
-    new_state = serializers.CharField(read_only=True)
-    state_record = StateModelSerializer(read_only=True)
+    new_state = serializers.CharField(read_only=True, allow_null=True)
+    state_record = StateModelSerializer(read_only=True, allow_null=True)
