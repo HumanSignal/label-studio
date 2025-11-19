@@ -129,8 +129,15 @@
     align-items: center;
     row-gap: 0.25rem;
 
+    &-text-wrapper {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+    }
+
     &-text {
-      max-width: 250px;
+      flex: 1;
+      min-width: 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
