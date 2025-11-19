@@ -1,5 +1,5 @@
 .container {
-  @apply w-full text-base text-left text-neutral-content border border-neutral-border rounded-lg flex flex-col overflow-hidden;
+  @apply w-full text-base text-left text-neutral-content border border-neutral-border rounded-lg flex flex-col overflow-x-auto overflow-y-hidden;
 
   font-family: var(--font-sans);
 
@@ -8,7 +8,7 @@
 }
 
 .head {
-  @apply bg-neutral-background min-w-min flex justify-stretch border-b border-neutral-border flex-shrink-0;
+  @apply bg-neutral-background min-w-min flex justify-stretch border-b border-neutral-border flex-shrink-0 sticky top-0 z-[2];
 
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
@@ -16,8 +16,6 @@
 
 .headRow {
   @apply relative min-w-min flex justify-start;
-
-  width: 100%;
 }
 
 .headCell {
@@ -57,18 +55,18 @@
 }
 
 .body {
-  @apply z-[1] relative overflow-auto;
+  @apply z-[1] relative overflow-y-auto;
 
   flex: 1 1 auto;
   min-height: 0;
+  width: max-content;
+  min-width: 100%;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
 }
 
 .bodyRow {
   @apply min-w-min flex justify-start transition-all duration-150 ease-out;
-
-  width: 100%;
 
   &:nth-child(2n) {
     @apply bg-neutral-surface;
