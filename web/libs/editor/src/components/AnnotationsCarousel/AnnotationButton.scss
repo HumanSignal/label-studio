@@ -42,6 +42,10 @@
     letter-spacing: 0.4px;
     text-align: left;
     color: var(--color-neutral-content-subtle);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 150px;
   }
 
   &__entity-id {
