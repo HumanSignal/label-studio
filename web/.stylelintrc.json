@@ -27,7 +27,7 @@
     "function-no-unknown": [
       true,
       {
-        "ignoreFunctions": ["anchor-size"]
+        "ignoreFunctions": ["anchor-size", "anchor", "map-get", "unquote"]
       }
     ],
     "declaration-block-no-redundant-longhand-properties": [
