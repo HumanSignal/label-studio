@@ -52,8 +52,8 @@
   /* Default positioning for fallback (no anchor support) */
   position: absolute;
   top: calc(100% + 1px);
-
   z-index: 500;
+
   /* Hidden by default - will be shown with animation classes */
   display: none;
   box-sizing: border-box;
