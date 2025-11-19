@@ -20,9 +20,10 @@
 
 .headCell {
   @apply relative font-medium bg-neutral-background text-neutral-content select-none cursor-default;
-  @apply flex items-center min-h-[28px] box-content p-tight;
+  @apply flex items-center box-content p-tight;
 
   min-width: 0;
+  height: 32px;
 
   // Add divider between header cells (except first, pinned, and noDivider)
   &:not(:first-child, .headCellPinned, .headCellNoDivider)::after {
@@ -44,6 +45,34 @@
 
 .headCellPinned {
   @apply sticky right-0 border-l border-neutral-border bg-neutral-background;
+}
+
+.headCellSortable {
+  @apply cursor-pointer;
+
+  &:hover {
+    @apply bg-neutral-surface;
+
+    .headerIcon {
+      @apply opacity-100;
+    }
+  }
+}
+
+.headerContent {
+  @apply flex items-center justify-between w-full;
+}
+
+.headerTextSorted {
+  @apply text-neutral-content;
+}
+
+.headerIcon {
+  @apply ml-2 flex items-center shrink-0 opacity-0 transition-opacity duration-150;
+}
+
+.headerIconVisible {
+  @apply opacity-100;
 }
 
 .headCellResizer {
@@ -103,6 +132,7 @@
   @apply flex items-center min-h-[28px] box-content p-tight;
 
   min-width: 0;
+  height: 32px;
 
   > * {
     @apply min-w-0 truncate;

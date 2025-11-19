@@ -76,43 +76,28 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
 
   const baseColumns = props.columns ?? useDataColumns(props);
 
-  // Wrap sortable headers automatically
-  const columnsWithSorting = useMemo(() => {
-    if (!enableSorting) {
-      return baseColumns;
-    }
-
+  // Wrap all headers with unified Header component
+  const columnsWithHeaders = useMemo(() => {
     return baseColumns.map((col) => {
-      // Only wrap if enableSorting is true (default is true, but can be explicitly false)
-      const columnSortingEnabled = col.enableSorting !== false;
-      if (!columnSortingEnabled) {
-        return col;
-      }
-
       // Get current sort state for this column
       const currentSort = sorting.length > 0 ? sorting[0] : null;
       const isSorted = currentSort?.id === col.id;
       const isDesc = currentSort?.desc ?? false;
 
+      // Determine if sorting is enabled for this column
+      const columnSortingEnabled = enableSorting && col.enableSorting !== false;
+
       // Preserve original header - extract string if it's a string
       const originalHeader = typeof col.header === "string" ? col.header : undefined;
 
-      // Wrap header with SortableHeader
+      // Wrap all headers with unified Header component
       return {
         ...col,
-        header: (header: HeaderContext<T[number], unknown>) => (
-          <SortableHeader
-            header={header}
+        header: (headerContext: HeaderContext<T[number], unknown>) => (
+          <Header
+            header={headerContext}
             isSorted={isSorted}
             isDesc={isDesc}
-            onSort={(columnId, desc) => {
-              const newSorting: SortingState = [{ id: columnId, desc }];
-              if (isSortingControlled && controlledOnSortingChange) {
-                controlledOnSortingChange(newSorting);
-              } else {
-                setInternalSorting(newSorting);
-              }
-            }}
             enableSorting={columnSortingEnabled}
             originalHeader={originalHeader}
           />
@@ -125,7 +110,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   // Include rowSelection in deps so cells re-render when selection changes
   const columns = useMemo(() => {
     if (!selectable) {
-      return columnsWithSorting as ColumnDef<T[number]>[];
+      return columnsWithHeaders as ColumnDef<T[number]>[];
     }
 
     const selectionColumn: ColumnDef<T[number]> = {
@@ -168,8 +153,8 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       },
     };
 
-    return [selectionColumn, ...columnsWithSorting];
-  }, [columnsWithSorting, selectable]);
+    return [selectionColumn, ...columnsWithHeaders];
+  }, [columnsWithHeaders, selectable]);
 
   const table = useReactTable({
     data: props.data,
@@ -259,60 +244,79 @@ interface DataTableHeadProps<T> {
   table: Table<T>;
 }
 
-const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHeadProps<T>) => (
-  <div className={styles.head}>
-    {table.getHeaderGroups().map((group) => (
-      <div className={styles.headRow} key={group.id}>
-        {group.headers.map((header, index) => {
-          const { column } = header;
-          const isPinned = column.getIsPinned();
-          const columnDef = column.columnDef;
-          const minSize = columnDef.minSize ?? 50;
-          const maxSize = columnDef.maxSize ?? 1200;
-          const size = header.getSize();
+const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHeadProps<T>) => {
+  return (
+    <div className={styles.head}>
+      {table.getHeaderGroups().map((group) => (
+        <div className={styles.headRow} key={group.id}>
+          {group.headers.map((header, index) => {
+            const { column } = header;
+            const isPinned = column.getIsPinned();
+            const columnDef = column.columnDef;
+            const minSize = columnDef.minSize ?? 50;
+            const maxSize = columnDef.maxSize ?? 1200;
+            const size = header.getSize();
 
-          // super simple: everything uses TanStack's size
-          const style = {
-            width: `${size}px`,
-            minWidth: `${minSize}px`,
-            maxWidth: maxSize ? `${maxSize}px` : undefined,
-            flex: "0 0 auto",
-          };
+            // Check if this column is sortable
+            const isSortable = column.getCanSort();
 
-          const noDivider = column.columnDef.meta?.noDivider;
-          // Also check if previous column has noDivider to prevent divider between them
-          const prevHeader = index > 0 ? group.headers[index - 1] : null;
-          const prevNoDivider = prevHeader?.column.columnDef.meta?.noDivider;
-          // Don't show divider if this column or previous column has noDivider
-          const hideDivider = noDivider || prevNoDivider;
+            // super simple: everything uses TanStack's size
+            const style = {
+              width: `${size}px`,
+              minWidth: `${minSize}px`,
+              maxWidth: maxSize ? `${maxSize}px` : undefined,
+              flex: "0 0 auto",
+            };
 
-          return (
-            <div
-              className={cn(
-                styles.headCell,
-                isPinned && styles.headCellPinned,
-                hideDivider && styles.headCellNoDivider,
-              )}
-              key={header.id}
-              style={style}
-            >
-              {header.isPlaceholder ? null : flexRender(column.columnDef.header, header.getContext())}
+            const noDivider = column.columnDef.meta?.noDivider;
+            // Also check if previous column has noDivider to prevent divider between them
+            const prevHeader = index > 0 ? group.headers[index - 1] : null;
+            const prevNoDivider = prevHeader?.column.columnDef.meta?.noDivider;
+            // Don't show divider if this column or previous column has noDivider
+            const hideDivider = noDivider || prevNoDivider;
 
-              {group.headers[group.headers.length - 1]?.id !== header.id && (
-                <div
-                  className={styles.headCellResizer}
-                  onDoubleClick={() => header.column.resetSize()}
-                  onMouseDown={header.getResizeHandler()}
-                  onTouchStart={header.getResizeHandler()}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
-    ))}
-  </div>
-);
+            // Custom click handler for sorting that only toggles between asc/desc (doesn't clear)
+            const handleHeaderClick = isSortable
+              ? () => {
+                  const currentSort = column.getIsSorted();
+                  if (currentSort === "asc") {
+                    column.toggleSorting(true); // Sort descending
+                  } else {
+                    column.toggleSorting(false); // Sort ascending
+                  }
+                }
+              : undefined;
+
+            return (
+              <div
+                className={cn(
+                  styles.headCell,
+                  isPinned && styles.headCellPinned,
+                  hideDivider && styles.headCellNoDivider,
+                  isSortable && styles.headCellSortable,
+                )}
+                key={header.id}
+                style={style}
+                onClick={handleHeaderClick}
+              >
+                {header.isPlaceholder ? null : flexRender(column.columnDef.header, header.getContext())}
+
+                {group.headers[group.headers.length - 1]?.id !== header.id && (
+                  <div
+                    className={styles.headCellResizer}
+                    onDoubleClick={() => header.column.resetSize()}
+                    onMouseDown={header.getResizeHandler()}
+                    onTouchStart={header.getResizeHandler()}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 interface DataTableRowProps<T> {
   row: Row<T>;
@@ -416,34 +420,27 @@ const MemoizedDataTableBody = memo(DataTableBody, (prev, next) => {
 }) as typeof DataTableBody;
 
 /**
- * SortableHeader - Header component with optional sort icons
- * Shows sort icon on hover for sortable columns (indicating next sort direction)
- * Shows sort icon always for currently sorted column with direction indicator
- * Works for both sortable and non-sortable columns
- * Follows the same pattern as PeopleList: IconSortUp for desc, IconSortDown for asc
+ * Header - Unified header component for all columns
+ * Renders the complete header cell structure with optional sorting
+ * All headers use the same structure, only hover styles and sort icons differ
  */
-export type SortableHeaderProps<T> = {
+export type HeaderProps<T> = {
   header: HeaderContext<T, unknown>;
-  isSorted: boolean;
-  isDesc: boolean;
-  onSort: (columnId: string, desc: boolean) => void;
-  enableSorting: boolean;
+  isSorted?: boolean;
+  isDesc?: boolean;
+  enableSorting?: boolean;
   originalHeader?: string | React.ReactNode;
 };
 
-export const SortableHeader = <T,>({
+export const Header = <T,>({
   header,
-  isSorted,
-  isDesc,
-  onSort,
-  enableSorting,
+  isSorted = false,
+  isDesc = false,
+  enableSorting = false,
   originalHeader,
-}: SortableHeaderProps<T>) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const columnId = header.column.id;
-
+}: HeaderProps<T>) => {
   // Get header label - use originalHeader if provided, otherwise try to extract from columnDef
-  let headerLabel: string | React.ReactNode = columnId;
+  let headerLabel: string | React.ReactNode = header.column.id;
   if (originalHeader) {
     headerLabel = originalHeader;
   } else {
@@ -453,8 +450,13 @@ export const SortableHeader = <T,>({
     }
   }
 
-  // Show icon on hover or when sorted
-  const showSortIcon = enableSorting && (isSorted || isHovered);
+  if (!enableSorting) {
+    return (
+      <Typography variant="body" size="small">
+        {headerLabel}
+      </Typography>
+    );
+  }
 
   // Determine icon: when sorted, show current direction; when hovering unsorted, show next direction (asc)
   let sortIcon: React.ReactNode;
@@ -466,47 +468,12 @@ export const SortableHeader = <T,>({
     sortIcon = <IconSortDown />;
   }
 
-  const handleClick = () => {
-    if (!enableSorting) return;
-
-    if (isSorted) {
-      // Toggle direction if already sorted
-      onSort(columnId, !isDesc);
-    } else {
-      // Start sorting ascending
-      onSort(columnId, false);
-    }
-  };
-
   return (
-    <div
-      className={`flex items-center justify-between w-full transition-colors duration-150 ${
-        enableSorting ? "cursor-pointer hover:bg-neutral-surface-subtler rounded-sm px-1 -mx-1" : ""
-      }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={handleClick}
-    >
-      <Typography
-        variant="body"
-        size="small"
-        className={`font-medium transition-colors duration-150 ${
-          enableSorting ? "hover:text-neutral-content" : ""
-        } ${isSorted ? "text-neutral-content" : ""}`}
-      >
+    <div className={styles.headerContent}>
+      <Typography variant="body" size="small" className={cn(isSorted && styles.headerTextSorted)}>
         {headerLabel}
       </Typography>
-      {showSortIcon && (
-        <div
-          className="ml-2 flex items-center shrink-0 transition-all duration-150"
-          style={{
-            color:
-              isHovered || isSorted ? "var(--color-neutral-content-subtler)" : "var(--color-neutral-content-subtlest)",
-          }}
-        >
-          {sortIcon}
-        </div>
-      )}
+      <div className={cn(styles.headerIcon, isSorted && styles.headerIconVisible)}>{sortIcon}</div>
     </div>
   );
 };
