@@ -192,10 +192,13 @@ class FSMEntityTransitionAPI(FSMAPIMixin, generics.GenericAPIView):
                 'state_record': None,
             }
         else:
-            state_record_data = StateModelSerializer(state_record).data
             response_payload = {
                 'success': True,
                 'new_state': state_record.state,
-                'state_record': state_record_data,
+                # Pass model instance; nested serializer will handle representation
+                'state_record': state_record,
             }
-        return Response(FSMTransitionExecuteResponseSerializer(response_payload).data, status=status.HTTP_200_OK)
+        return Response(
+            FSMTransitionExecuteResponseSerializer(response_payload, context={'request': request}).data,
+            status=status.HTTP_200_OK,
+        )
