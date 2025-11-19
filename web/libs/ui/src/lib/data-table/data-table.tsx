@@ -7,19 +7,23 @@ import {
   type ColumnDef,
   type TableMeta,
   type VisibilityState,
+  type HeaderContext,
+  type SortingState,
 } from "@tanstack/react-table";
 
-// Extend ColumnMeta to include noDivider
+// Extend ColumnMeta to include noDivider and sortParam
 declare module "@tanstack/react-table" {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface ColumnMeta<TData, TValue> {
     noDivider?: boolean;
+    sortParam?: string; // API field name for sorting (e.g., "user__first_name")
   }
 }
 import { memo, useState, useMemo, useCallback } from "react";
 import { cn } from "../../utils/utils";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
 import { Checkbox } from "../checkbox/checkbox";
+import { Typography } from "../typography/typography";
+import { IconSortUp, IconSortDown } from "@humansignal/icons";
 import styles from "./data-table.module.scss";
 
 export type DataShape = Record<string, any>[];
@@ -43,6 +47,10 @@ export type DataTableProps<T extends DataShape> = {
   onRowSelectionChange?: (
     updater: Record<string, boolean> | ((old: Record<string, boolean>) => Record<string, boolean>),
   ) => void;
+  // Sorting props
+  sorting?: SortingState;
+  onSortingChange?: (updater: SortingState | ((old: SortingState) => SortingState)) => void;
+  enableSorting?: boolean; // Global enable/disable sorting
 };
 
 export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
@@ -50,21 +58,74 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     selectable = false,
     rowSelection: controlledRowSelection,
     onRowSelectionChange: controlledOnRowSelectionChange,
+    sorting: controlledSorting,
+    onSortingChange: controlledOnSortingChange,
+    enableSorting = true,
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
+  const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const [activeRowId, setActiveRowId] = useState<string | undefined>(undefined);
 
   // Use controlled selection if provided, otherwise use internal state
   const rowSelection = controlledRowSelection ?? internalRowSelection;
   const isControlled = controlledRowSelection !== undefined;
 
+  // Use controlled sorting if provided, otherwise use internal state
+  const sorting = controlledSorting ?? internalSorting;
+  const isSortingControlled = controlledSorting !== undefined;
+
   const baseColumns = props.columns ?? useDataColumns(props);
+
+  // Wrap sortable headers automatically
+  const columnsWithSorting = useMemo(() => {
+    if (!enableSorting) {
+      return baseColumns;
+    }
+
+    return baseColumns.map((col) => {
+      // Only wrap if enableSorting is true (default is true, but can be explicitly false)
+      const columnSortingEnabled = col.enableSorting !== false;
+      if (!columnSortingEnabled) {
+        return col;
+      }
+
+      // Get current sort state for this column
+      const currentSort = sorting.length > 0 ? sorting[0] : null;
+      const isSorted = currentSort?.id === col.id;
+      const isDesc = currentSort?.desc ?? false;
+
+      // Preserve original header - extract string if it's a string
+      const originalHeader = typeof col.header === "string" ? col.header : undefined;
+
+      // Wrap header with SortableHeader
+      return {
+        ...col,
+        header: (header: HeaderContext<T[number], unknown>) => (
+          <SortableHeader
+            header={header}
+            isSorted={isSorted}
+            isDesc={isDesc}
+            onSort={(columnId, desc) => {
+              const newSorting: SortingState = [{ id: columnId, desc }];
+              if (isSortingControlled && controlledOnSortingChange) {
+                controlledOnSortingChange(newSorting);
+              } else {
+                setInternalSorting(newSorting);
+              }
+            }}
+            enableSorting={columnSortingEnabled}
+            originalHeader={originalHeader}
+          />
+        ),
+      };
+    }) as ColumnDef<T[number]>[];
+  }, [baseColumns, enableSorting, sorting, isSortingControlled, controlledOnSortingChange]);
 
   // Add selection column if selectable
   // Include rowSelection in deps so cells re-render when selection changes
-  const columns = useMemo<ColumnDef<T[number]>[]>(() => {
+  const columns = useMemo(() => {
     if (!selectable) {
-      return baseColumns;
+      return columnsWithSorting as ColumnDef<T[number]>[];
     }
 
     const selectionColumn: ColumnDef<T[number]> = {
@@ -107,8 +168,8 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       },
     };
 
-    return [selectionColumn, ...baseColumns];
-  }, [baseColumns, selectable]);
+    return [selectionColumn, ...columnsWithSorting];
+  }, [columnsWithSorting, selectable]);
 
   const table = useReactTable({
     data: props.data,
@@ -125,6 +186,17 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       },
       columnVisibility: props.columnVisibility,
       rowSelection,
+      sorting,
+    },
+    onSortingChange: (updater) => {
+      if (isSortingControlled && controlledOnSortingChange) {
+        controlledOnSortingChange(updater);
+      } else {
+        setInternalSorting((old) => {
+          const newState = typeof updater === "function" ? updater(old) : updater;
+          return newState;
+        });
+      }
     },
     onColumnVisibilityChange: props.onColumnVisibilityChange,
     onRowSelectionChange: (updater) => {
@@ -342,3 +414,99 @@ const MemoizedDataTableBody = memo(DataTableBody, (prev, next) => {
     prev.activeRowId === next.activeRowId
   );
 }) as typeof DataTableBody;
+
+/**
+ * SortableHeader - Header component with optional sort icons
+ * Shows sort icon on hover for sortable columns (indicating next sort direction)
+ * Shows sort icon always for currently sorted column with direction indicator
+ * Works for both sortable and non-sortable columns
+ * Follows the same pattern as PeopleList: IconSortUp for desc, IconSortDown for asc
+ */
+export type SortableHeaderProps<T> = {
+  header: HeaderContext<T, unknown>;
+  isSorted: boolean;
+  isDesc: boolean;
+  onSort: (columnId: string, desc: boolean) => void;
+  enableSorting: boolean;
+  originalHeader?: string | React.ReactNode;
+};
+
+export const SortableHeader = <T,>({
+  header,
+  isSorted,
+  isDesc,
+  onSort,
+  enableSorting,
+  originalHeader,
+}: SortableHeaderProps<T>) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const columnId = header.column.id;
+
+  // Get header label - use originalHeader if provided, otherwise try to extract from columnDef
+  let headerLabel: string | React.ReactNode = columnId;
+  if (originalHeader) {
+    headerLabel = originalHeader;
+  } else {
+    const headerDef = header.column.columnDef.header;
+    if (typeof headerDef === "string") {
+      headerLabel = headerDef;
+    }
+  }
+
+  // Show icon on hover or when sorted
+  const showSortIcon = enableSorting && (isSorted || isHovered);
+
+  // Determine icon: when sorted, show current direction; when hovering unsorted, show next direction (asc)
+  let sortIcon: React.ReactNode;
+  if (isSorted) {
+    // Currently sorted: show direction (IconSortUp for desc, IconSortDown for asc - matching PeopleList)
+    sortIcon = isDesc ? <IconSortUp /> : <IconSortDown />;
+  } else {
+    // Hovering unsorted column: show next direction (ascending)
+    sortIcon = <IconSortDown />;
+  }
+
+  const handleClick = () => {
+    if (!enableSorting) return;
+
+    if (isSorted) {
+      // Toggle direction if already sorted
+      onSort(columnId, !isDesc);
+    } else {
+      // Start sorting ascending
+      onSort(columnId, false);
+    }
+  };
+
+  return (
+    <div
+      className={`flex items-center justify-between w-full transition-colors duration-150 ${
+        enableSorting ? "cursor-pointer hover:bg-neutral-surface-subtler rounded-sm px-1 -mx-1" : ""
+      }`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={handleClick}
+    >
+      <Typography
+        variant="body"
+        size="small"
+        className={`font-medium transition-colors duration-150 ${
+          enableSorting ? "hover:text-neutral-content" : ""
+        } ${isSorted ? "text-neutral-content" : ""}`}
+      >
+        {headerLabel}
+      </Typography>
+      {showSortIcon && (
+        <div
+          className="ml-2 flex items-center shrink-0 transition-all duration-150"
+          style={{
+            color:
+              isHovered || isSorted ? "var(--color-neutral-content-subtler)" : "var(--color-neutral-content-subtlest)",
+          }}
+        >
+          {sortIcon}
+        </div>
+      )}
+    </div>
+  );
+};
