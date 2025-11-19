@@ -101,6 +101,21 @@
     }
   }
 
+  /* Height constraint using available space calculation for anchor positioning */
+  &.constrain-height {
+    overflow: auto;
+
+    /* For browsers with anchor positioning, calculate max-height based on available viewport space */
+    @supports (anchor-name: --test) {
+      /* When positioned below trigger: available space = viewport height - dropdown top - padding */
+      /* anchor(bottom) gives us the bottom edge of trigger, which is our top position */
+      max-height: calc(100vh - anchor(bottom) - 20px);
+
+      /* position-try-fallbacks will automatically reposition if there's not enough space
+         and the new position will recalculate max-height accordingly */
+    }
+  }
+
   &_align {
     &_left {
       left: -20px;

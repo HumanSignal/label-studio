@@ -76,6 +76,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     const [offset, setOffset] = useState({});
     const [visibility, setVisibility] = useState(visible ? "visible" : null);
     const [triggerWidth, setTriggerWidth] = useState<number | undefined>(undefined);
+    const [maxHeight, setMaxHeight] = useState<number | undefined>(undefined);
 
     // Check if browser supports CSS anchor positioning
     const supportsAnchorPositioning = useMemo(() => {
@@ -134,7 +135,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     const calculatePosition = useCallback(() => {
       const dropdownEl = dropdown.current!;
       const parent = (triggerRef?.current ?? dropdownEl.parentNode) as HTMLElement;
-      const { left, top } = alignElements(
+      const result = alignElements(
         parent!,
         dropdownEl,
         props.alignment || "bottom-left",
@@ -143,7 +144,12 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         props.openUpwardForShortViewport ?? true,
       );
 
-      setOffset({ left, top });
+      setOffset({ left: result.left, top: result.top });
+
+      // Store maxHeight from alignElements for fallback positioning
+      if (props.constrainHeight && result.maxHeight) {
+        setMaxHeight(result.maxHeight);
+      }
     }, [triggerRef, minIndex, props.alignment, props.constrainHeight, props.openUpwardForShortViewport]);
 
     const performAnimation = useCallback(
@@ -284,8 +290,20 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         ...(!supportsAnchorPositioning && props.syncWidth && triggerWidth
           ? { width: triggerWidth, minWidth: triggerWidth }
           : {}),
+        // Apply height constraint if enabled (only for fallback when anchor positioning is not supported)
+        ...(!supportsAnchorPositioning && props.constrainHeight && maxHeight ? { maxHeight } : {}),
       };
-    }, [props.style, dropdownZIndex, minIndex, offset, supportsAnchorPositioning, props.syncWidth, triggerWidth]);
+    }, [
+      props.style,
+      dropdownZIndex,
+      minIndex,
+      offset,
+      supportsAnchorPositioning,
+      props.syncWidth,
+      triggerWidth,
+      props.constrainHeight,
+      maxHeight,
+    ]);
 
     // Only render content when dropdown has been opened at least once
     // This improves performance and ensures autofocus works correctly
@@ -296,7 +314,13 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         ref={dropdown as any}
         data-testid={props.dataTestId}
         className={rootName
-          .mix(props.className, dropdownClassName, visibilityClasses, props.syncWidth ? "sync-width" : null)
+          .mix(
+            props.className,
+            dropdownClassName,
+            visibilityClasses,
+            props.syncWidth ? "sync-width" : null,
+            props.constrainHeight ? "constrain-height" : null,
+          )
           .toClassName()}
         style={compositeStyles}
         onClick={(e: MouseEvent) => e.stopPropagation()}
