@@ -9,6 +9,8 @@ ipynb_repo_path: tutorials/how-to-debug-agents-with-LangSmith-and-Label-Studio/h
 repo_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/tree/main/tutorials/how-to-debug-agents-with-LangSmith-and-Label-Studio
 report_bug_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/issues/new
 thumbnail: /images/tutorials/tutorials-debug-agents-langsmith.png
+meta_title: How to Debug Agents with LangSmith and Label Studio
+meta_description: Learn how LangSmith and Label Studio can work together to debug and evaluate AI Agents.
 ---
 ## 0. Label Studio Requirements
 

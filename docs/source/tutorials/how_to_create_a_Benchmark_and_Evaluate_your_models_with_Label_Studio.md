@@ -9,6 +9,8 @@ ipynb_repo_path: tutorials/how-to-create-benchmark-and-evaluate-your-models/how_
 repo_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/tree/main/tutorials/how-to-create-benchmark-and-evaluate-your-models
 report_bug_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/issues/new
 thumbnail: /images/tutorials/tutorials-ai-benchmark-and-eval.png
+meta_title: How to Connect Hugging Face with Label Studio SDK
+meta_description: Learn how to use the Label Studio SDK to create a high-quality benchmark dataset to evaluate multiple AI models
 ---
 Evaluating models is only as good as the benchmark you test them against.  
 In this tutorial, you'll learn how to use **Label Studio** to create a high-quality benchmark dataset, label it with human expertise, and then evaluate multiple AI models against it — all using the **Label Studio SDK**.  
@@ -371,19 +373,6 @@ wait_for_runs_to_complete(versions)
     version  46549  completed
 
 
-
-```python
-project = ls.projects.get(193733)
-prompt = ls.prompts.get(37050)
-versions = ls.prompts.versions.list(prompt_id=prompt.id)
-```
-
-    /usr/local/lib/python3.12/dist-packages/pydantic/main.py:463: UserWarning: Pydantic serializer warnings:
-      PydanticSerializationUnexpectedValue(Expected `str` - serialized value may not be as expected [input_value=[], input_type=list])
-      PydanticSerializationUnexpectedValue(Expected `str` - serialized value may not be as expected [input_value=90367, input_type=int])
-      return self.__pydantic_serializer__.to_python(
-
-
 ### Collect Run Costs
 
 Let’s retrieve the **costs for each model run** to include them as additional data points.  
@@ -548,4 +537,4 @@ Keep iterating on what you built today:
 - [Blog: Why Benchmarks Matter for Evaluating LLMs](https://labelstud.io/blog/why-benchmarks-matter-for-evaluating-llms/)  
 - [Blog: How to Build AI Benchmarks That Evolve with Your Models](https://labelstud.io/blog/how-to-build-ai-benchmarks-that-evolve-with-your-models/)  
 - [Blog: Evaluating the GPT-5 Series on Custom Benchmarks](https://labelstud.io/blog/evaluating-the-gpt-5-series-on-custom-benchmarks/)  
-- [Blog: How LegalBenchmarks.AI Built a Domain-Specific AI Benchmark](https://labelstud.io/blog/how-legalbenchmarks-ai-built-a-domain-specific-ai-benchmark/)  
+- [Blog: How LegalBenchmarks.AI Built a Domain-Specific AI Benchmark](https://labelstud.io/blog/how-legalbenchmarks-ai-built-a-domain-specific-ai-benchmark/)
