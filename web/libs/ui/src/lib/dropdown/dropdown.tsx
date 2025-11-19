@@ -108,8 +108,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
 
     const calculatePosition = useCallback(() => {
       const dropdownEl = dropdown.current!;
-      const parent = (triggerRef?.current ??
-        dropdownEl.parentNode) as HTMLElement;
+      const parent = (triggerRef?.current ?? dropdownEl.parentNode) as HTMLElement;
       const { left, top } = alignElements(
         parent!,
         dropdownEl,
@@ -120,13 +119,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
       );
 
       setOffset({ left, top });
-    }, [
-      triggerRef,
-      minIndex,
-      props.alignment,
-      props.constrainHeight,
-      props.openUpwardForShortViewport,
-    ]);
+    }, [triggerRef, minIndex, props.alignment, props.constrainHeight, props.openUpwardForShortViewport]);
 
     const performAnimation = useCallback(
       async (visible = false, disableAnimation?: boolean) => {
@@ -171,6 +164,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
 
         if (currentVisible !== newState) {
           props.onToggle?.(newState);
+          const animStart = performance.now();
           await performAnimation(newState, disableAnimation);
           setVisible(newState);
           props.onVisibilityChanged?.(newState);
@@ -217,11 +211,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
 
     useEffect(() => {
       // Only calculate position manually if anchor positioning is not supported
-      if (
-        !isInline &&
-        visibility === "before-appear" &&
-        !supportsAnchorPositioning
-      ) {
+      if (!isInline && visibility === "before-appear" && !supportsAnchorPositioning) {
         calculatePosition();
       }
     }, [visibility, calculatePosition, isInline, supportsAnchorPositioning]);
@@ -266,13 +256,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         ...(!supportsAnchorPositioning ? (offset ?? {}) : {}),
         zIndex: (minIndex ?? 0) + dropdownZIndex,
       };
-    }, [
-      props.style,
-      dropdownZIndex,
-      minIndex,
-      offset,
-      supportsAnchorPositioning,
-    ]);
+    }, [props.style, dropdownZIndex, minIndex, offset, supportsAnchorPositioning]);
 
     // Only render content when dropdown has been opened at least once
     // This improves performance and ensures autofocus works correctly
@@ -282,9 +266,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
       <div
         ref={dropdown as any}
         data-testid={props.dataTestId}
-        className={rootName
-          .mix(props.className, dropdownClassName, visibilityClasses)
-          .toClassName()}
+        className={rootName.mix(props.className, dropdownClassName, visibilityClasses).toClassName()}
         style={compositeStyles}
         onClick={(e: MouseEvent) => e.stopPropagation()}
       >

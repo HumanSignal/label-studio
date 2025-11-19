@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { IconEllipsisVertical, IconPlus } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
@@ -67,20 +60,12 @@ export const Tabs = ({
             </Droppable>
           </DragDropContext>
           {allowedActions.add !== false && (
-            <Button
-              size="small"
-              look="string"
-              variant="neutral"
-              onClick={onAdd}
-              data-leave
-            >
+            <Button size="small" look="string" variant="neutral" onClick={onAdd} data-leave>
               <IconPlus className="!h-3 !w-3" />
             </Button>
           )}
         </span>
-        <span className={tabsCN.elem("extra").toString()}>
-          {tabBarExtraContent}
-        </span>
+        <span className={tabsCN.elem("extra").toString()}>{tabBarExtraContent}</span>
       </div>
     </TabsContext.Provider>
   );
@@ -99,18 +84,14 @@ export const TabsItem = ({
   managable = true,
   virtual = false,
 }) => {
-  const { switchTab, selectedTab, lastTab, allowedActions } =
-    useContext(TabsContext);
+  const { switchTab, selectedTab, lastTab, allowedActions } = useContext(TabsContext);
   const [currentTitle, setCurrentTitle] = useState(title);
   const [renameMode, setRenameMode] = useState(false);
   const [hover, setHover] = useState(false);
 
   const active = tab === selectedTab;
 
-  const tabIsEditable = useMemo(
-    () => editable && allowedActions.edit,
-    [editable, allowedActions],
-  );
+  const tabIsEditable = useMemo(() => editable && allowedActions.edit, [editable, allowedActions]);
 
   const tabIsDeletable = useMemo(
     () => !lastTab && deletable && allowedActions.delete,

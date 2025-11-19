@@ -11,14 +11,8 @@ import { cn } from "../../../utils/bem";
 import { humanDateDiff, userDisplayName } from "../../../utils/utilities";
 import { CommentFormBase } from "../CommentFormBase";
 import { CommentsContext } from "./CommentsList";
-import {
-  NewTaxonomy as Taxonomy,
-  type TaxonomyPath,
-} from "../../../components/NewTaxonomy/NewTaxonomy";
-import {
-  taxonomyPathsToSelectedItems,
-  COMMENT_TAXONOMY_OPTIONS,
-} from "../../../utils/commentClassification";
+import { NewTaxonomy as Taxonomy, type TaxonomyPath } from "../../../components/NewTaxonomy/NewTaxonomy";
+import { taxonomyPathsToSelectedItems, COMMENT_TAXONOMY_OPTIONS } from "../../../utils/commentClassification";
 
 import "./CommentItem.scss";
 import { LinkState } from "./LinkState";
@@ -81,29 +75,17 @@ export const CommentItem: FC<CommentItemProps> = observer(
       setHighlighted,
       _commentRef,
     } = comment;
-    const {
-      startLinkingMode: _startLinkingMode,
-      currentComment,
-      globalLinking,
-    } = useContext(CommentsContext);
+    const { startLinkingMode: _startLinkingMode, currentComment, globalLinking } = useContext(CommentsContext);
     const currentUser = window.APP_SETTINGS?.user;
     const isCreator = currentUser?.id === createdBy.id;
-    const infoIsHidden = comment.commentsStore?.store?.hasInterface(
-      "annotations:hide-info",
-    );
-    const hiddenUser = infoIsHidden
-      ? { email: isCreator ? "Me" : "User" }
-      : null;
+    const infoIsHidden = comment.commentsStore?.store?.hasInterface("annotations:hide-info");
+    const hiddenUser = infoIsHidden ? { email: isCreator ? "Me" : "User" } : null;
     const [text, setText] = useState(initialText);
 
     const [linkingComment, setLinkingComment] = useState();
     const region = regionRef?.region;
     const result = regionRef?.result;
-    const linking = !!(
-      linkingComment &&
-      currentComment === linkingComment &&
-      globalLinking
-    );
+    const linking = !!(linkingComment && currentComment === linkingComment && globalLinking);
     const hasLinkState = linking || region;
 
     const startLinkingMode = useCallback(
@@ -167,10 +149,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
       if (isPersisted && time)
         return (
           <div className={cn("comment-item").elem("date").toClassName()}>
-            <Tooltip
-              alignment="top-right"
-              title={new Date(time).toLocaleString()}
-            >
+            <Tooltip alignment="top-right" title={new Date(time).toLocaleString()}>
               <span>{`${isEdited ? "updated" : ""} ${humanDateDiff(time)}`}</span>
             </Tooltip>
           </div>
@@ -180,9 +159,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
 
     return (
       <div
-        className={cn("comment-item")
-          .mod({ resolved, highlighted: isHighlighted })
-          .toClassName()}
+        className={cn("comment-item").mod({ resolved, highlighted: isHighlighted }).toClassName()}
         onMouseEnter={() => {
           setHighlighted(true);
         }}
@@ -205,15 +182,8 @@ export const CommentItem: FC<CommentItemProps> = observer(
           </Space>
 
           <Space size="small">
-            <IconCheck
-              className={cn("comment-item").elem("resolved").toClassName()}
-            />
-            <div
-              className={cn("comment-item")
-                .elem("saving")
-                .mod({ hide: isPersisted })
-                .toClassName()}
-            >
+            <IconCheck className={cn("comment-item").elem("resolved").toClassName()} />
+            <div className={cn("comment-item").elem("saving").mod({ hide: isPersisted }).toClassName()}>
               <div className={cn("comment-item").elem("dot").toClassName()} />
             </div>
             {!infoIsHidden && <TimeTracker />}
@@ -224,17 +194,9 @@ export const CommentItem: FC<CommentItemProps> = observer(
           <div className={cn("comment-item").elem("text").toClassName()}>
             {isEditMode ? (
               <>
-                <CommentFormBase
-                  value={text}
-                  onSubmit={commentFormBaseOnSubmit}
-                  classifications={classifications}
-                />
+                <CommentFormBase value={text} onSubmit={commentFormBaseOnSubmit} classifications={classifications} />
                 {classificationsItems.length > 0 && (
-                  <div
-                    className={cn("comment-item")
-                      .elem("classifications-row")
-                      .toClassName()}
-                  >
+                  <div className={cn("comment-item").elem("classifications-row").toClassName()}>
                     <Taxonomy
                       selected={taxonomySelectedItems}
                       items={classificationsItems}
@@ -246,17 +208,9 @@ export const CommentItem: FC<CommentItemProps> = observer(
                 )}
               </>
             ) : isConfirmDelete ? (
-              <div
-                className={cn("comment-item").elem("confirmForm").toClassName()}
-              >
-                <div
-                  className={cn("comment-item").elem("question").toClassName()}
-                >
-                  Are you sure?
-                </div>
-                <div
-                  className={cn("comment-item").elem("controls").toClassName()}
-                >
+              <div className={cn("comment-item").elem("confirmForm").toClassName()}>
+                <div className={cn("comment-item").elem("question").toClassName()}>Are you sure?</div>
+                <div className={cn("comment-item").elem("controls").toClassName()}>
                   <Button
                     onClick={() => deleteComment()}
                     size="small"
@@ -266,11 +220,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
                   >
                     Yes
                   </Button>
-                  <Button
-                    onClick={() => setConfirmMode(false)}
-                    size="small"
-                    aria-label="Cancel delete"
-                  >
+                  <Button onClick={() => setConfirmMode(false)} size="small" aria-label="Cancel delete">
                     No
                   </Button>
                 </div>
@@ -278,31 +228,16 @@ export const CommentItem: FC<CommentItemProps> = observer(
             ) : (
               <>
                 {classifications?.default?.values?.length > 0 && (
-                  <ul
-                    className={cn("comment-item")
-                      .elem("classifications")
-                      .toClassName()}
-                  >
-                    {classifications?.default?.values?.map(
-                      (valueArray: string[], index: number) => (
-                        <li key={index}>{valueArray.join("/")}</li>
-                      ),
-                    )}
+                  <ul className={cn("comment-item").elem("classifications").toClassName()}>
+                    {classifications?.default?.values?.map((valueArray: string[], index: number) => (
+                      <li key={index}>{valueArray.join("/")}</li>
+                    ))}
                   </ul>
                 )}
                 {text}
                 {hasLinkState && (
-                  <div
-                    className={cn("comment-item")
-                      .elem("linkState")
-                      .toClassName()}
-                  >
-                    <LinkState
-                      linking={linking}
-                      region={region}
-                      result={result}
-                      interactive
-                    />
+                  <div className={cn("comment-item").elem("linkState").toClassName()}>
+                    <LinkState linking={linking} region={region} result={result} interactive />
                   </div>
                 )}
               </>
@@ -320,9 +255,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
               <Dropdown.Trigger
                 content={
                   <Menu size="auto">
-                    <Menu.Item onClick={toggleResolve}>
-                      {resolved ? "Unresolve" : "Resolve"}
-                    </Menu.Item>
+                    <Menu.Item onClick={toggleResolve}>{resolved ? "Unresolve" : "Resolve"}</Menu.Item>
                     {isCreator && (
                       <>
                         <Menu.Item
@@ -337,9 +270,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
                         >
                           {isEditMode ? "Cancel edit" : "Edit"}
                         </Menu.Item>
-                        <Menu.Item onClick={toggleLink}>
-                          {regionRef?.region ? "Unlink" : "Link to..."}
-                        </Menu.Item>
+                        <Menu.Item onClick={toggleLink}>{regionRef?.region ? "Unlink" : "Link to..."}</Menu.Item>
                         {!isConfirmDelete && (
                           <Menu.Item
                             onClick={() => {
@@ -354,12 +285,7 @@ export const CommentItem: FC<CommentItemProps> = observer(
                   </Menu>
                 }
               >
-                <Button
-                  size="small"
-                  look="string"
-                  icon={<IconEllipsis />}
-                  aria-label="Comment options"
-                />
+                <Button size="small" look="string" icon={<IconEllipsis />} aria-label="Comment options" />
               </Dropdown.Trigger>
             )}
           </div>

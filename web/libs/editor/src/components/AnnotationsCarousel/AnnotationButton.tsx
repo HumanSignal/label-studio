@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { inject, observer } from "mobx-react";
 import { useCopyText } from "@humansignal/core";
-import {
-  isDefined,
-  userDisplayName,
-} from "@humansignal/core/lib/utils/helpers";
+import { isDefined, userDisplayName } from "@humansignal/core/lib/utils/helpers";
 import { cn } from "../../utils/bem";
 import {
   IconAnnotationGroundTruth,
@@ -26,12 +23,7 @@ import { useDropdown } from "@humansignal/ui";
 // eslint-disable-next-line
 // @ts-ignore
 import { confirm } from "../../common/Modal/Modal";
-import {
-  type ContextMenuAction,
-  ContextMenu,
-  ContextMenuTrigger,
-  type MenuActionOnClick,
-} from "../ContextMenu";
+import { type ContextMenuAction, ContextMenu, ContextMenuTrigger, type MenuActionOnClick } from "../ContextMenu";
 import "./AnnotationButton.scss";
 
 interface AnnotationButtonInterface {
@@ -71,12 +63,7 @@ const injector = inject(({ store }) => {
 });
 
 export const AnnotationButton = observer(
-  ({
-    entity,
-    capabilities,
-    annotationStore,
-    onAnnotationChange,
-  }: AnnotationButtonInterface) => {
+  ({ entity, capabilities, annotationStore, onAnnotationChange }: AnnotationButtonInterface) => {
     const iconSize = 32;
     const isPrediction = entity.type === "prediction";
     const username = userDisplayName(
@@ -85,17 +72,13 @@ export const AnnotationButton = observer(
       },
     );
     const [isGroundTruth, setIsGroundTruth] = useState<boolean>();
-    const infoIsHidden = annotationStore.store?.hasInterface(
-      "annotations:hide-info",
-    );
+    const infoIsHidden = annotationStore.store?.hasInterface("annotations:hide-info");
     let hiddenUser = null;
 
     if (infoIsHidden) {
       // this data can be missing in tests, but we don't have `infoIsHidden` there, so hiding logic like this
       const currentUser = annotationStore.store.user;
-      const isCurrentUser =
-        entity.user?.id === currentUser.id ||
-        entity.createdBy === currentUser.email;
+      const isCurrentUser = entity.user?.id === currentUser.id || entity.createdBy === currentUser.email;
       hiddenUser = { email: isCurrentUser ? "Me" : "User" };
     }
 
@@ -164,8 +147,7 @@ export const AnnotationButton = observer(
             title: "Delete annotation?",
             body: (
               <>
-                This will <strong>delete all existing regions</strong>. Are you
-                sure you want to delete them?
+                This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
                 <br />
                 This action cannot be undone.
               </>
@@ -179,10 +161,8 @@ export const AnnotationButton = observer(
         }, [entity]);
         const isPrediction = entity.type === "prediction";
         const isDraft = !isDefined(entity.pk);
-        const showGroundTruth =
-          capabilities.groundTruthEnabled && !isPrediction && !isDraft;
-        const showDuplicateAnnotation =
-          capabilities.enableCreateAnnotation && !isDraft;
+        const showGroundTruth = capabilities.groundTruthEnabled && !isPrediction && !isDraft;
+        const showDuplicateAnnotation = capabilities.enableCreateAnnotation && !isDraft;
         const actions = useMemo<ContextMenuAction[]>(
           () => [
             {
@@ -232,23 +212,11 @@ export const AnnotationButton = observer(
     );
 
     return (
-      <div
-        className={cn("annotation-button")
-          .mod({ selected: entity.selected })
-          .toClassName()}
-      >
-        <div
-          className={cn("annotation-button").elem("mainSection").toClassName()}
-          onClick={clickHandler}
-        >
-          <div
-            className={cn("annotation-button").elem("picSection").toClassName()}
-          >
+      <div className={cn("annotation-button").mod({ selected: entity.selected }).toClassName()}>
+        <div className={cn("annotation-button").elem("mainSection").toClassName()} onClick={clickHandler}>
+          <div className={cn("annotation-button").elem("picSection").toClassName()}>
             <Userpic
-              className={cn("annotation-button")
-                .elem("userpic")
-                .mod({ prediction: isPrediction })
-                .toClassName()}
+              className={cn("annotation-button").elem("userpic").mod({ prediction: isPrediction }).toClassName()}
               showUsernameTooltip
               username={isPrediction ? entity.createdBy : null}
               user={hiddenUser ?? entity.user ?? { email: entity.createdBy }}
@@ -273,29 +241,18 @@ export const AnnotationButton = observer(
           </div>
           <div className={cn("annotation-button").elem("main").toClassName()}>
             <div className={cn("annotation-button").elem("user").toClassName()}>
-              <span
-                className={cn("annotation-button").elem("name").toClassName()}
-              >
+              <span className={cn("annotation-button").elem("name").toClassName()}>
                 {hiddenUser ? hiddenUser.email : username}
               </span>
               {!infoIsHidden && (
-                <span
-                  className={cn("annotation-button")
-                    .elem("entity-id")
-                    .toClassName()}
-                >
+                <span className={cn("annotation-button").elem("entity-id").toClassName()}>
                   #{entity.pk ?? entity.id}
                 </span>
               )}
             </div>
             {!infoIsHidden && (
-              <div
-                className={cn("annotation-button").elem("info").toClassName()}
-              >
-                <TimeAgo
-                  className={cn("annotation-button").elem("date").toClassName()}
-                  date={entity.createdDate}
-                />
+              <div className={cn("annotation-button").elem("info").toClassName()}>
+                <TimeAgo className={cn("annotation-button").elem("date").toClassName()} date={entity.createdDate} />
                 {isPrediction && isDefined(entity.score) && (
                   <span title={`Prediction score = ${entity.score}`}>
                     {" · "} {(entity.score * 100).toFixed(2)}%
@@ -305,53 +262,31 @@ export const AnnotationButton = observer(
             )}
           </div>
           {!isPrediction && (
-            <div
-              className={cn("annotation-button").elem("icons").toClassName()}
-            >
+            <div className={cn("annotation-button").elem("icons").toClassName()}>
               {entity.draftId > 0 && (
                 <Tooltip title="Draft">
-                  <div
-                    className={cn("annotation-button")
-                      .elem("icon")
-                      .mod({ draft: true })
-                      .toClassName()}
-                  >
+                  <div className={cn("annotation-button").elem("icon").mod({ draft: true }).toClassName()}>
                     <IconDraftCreated2 color="#617ADA" />
                   </div>
                 </Tooltip>
               )}
               {entity.skipped && (
                 <Tooltip title="Skipped">
-                  <div
-                    className={cn("annotation-button")
-                      .elem("icon")
-                      .mod({ skipped: true })
-                      .toClassName()}
-                  >
+                  <div className={cn("annotation-button").elem("icon").mod({ skipped: true }).toClassName()}>
                     <IconAnnotationSkipped2 color="#DD0000" />
                   </div>
                 </Tooltip>
               )}
               {isGroundTruth && (
                 <Tooltip title="Ground-truth">
-                  <div
-                    className={cn("annotation-button")
-                      .elem("icon")
-                      .mod({ groundTruth: true })
-                      .toClassName()}
-                  >
+                  <div className={cn("annotation-button").elem("icon").mod({ groundTruth: true }).toClassName()}>
                     <IconAnnotationGroundTruth />
                   </div>
                 </Tooltip>
               )}
               {CommentIcon && (
                 <Tooltip title={renderCommentTooltip(entity)}>
-                  <div
-                    className={cn("annotation-button")
-                      .elem("icon")
-                      .mod({ comments: true })
-                      .toClassName()}
-                  >
+                  <div className={cn("annotation-button").elem("icon").mod({ comments: true }).toClassName()}>
                     <CommentIcon />
                   </div>
                 </Tooltip>

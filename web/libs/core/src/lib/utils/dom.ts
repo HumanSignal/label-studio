@@ -77,11 +77,7 @@ const positioner = (source: HTMLElement, target: HTMLElement) => {
       return sourcePosition.top + sourcePosition.height;
     },
     get horizontalCenter() {
-      return (
-        sourcePosition.left +
-        sourcePosition.width / 2 -
-        targetPosition.width / 2
-      );
+      return sourcePosition.left + sourcePosition.width / 2 - targetPosition.width / 2;
     },
     get horizontalLeft() {
       return sourcePosition.left;
@@ -92,13 +88,7 @@ const positioner = (source: HTMLElement, target: HTMLElement) => {
   } as const;
 };
 
-export type Align =
-  | "top-left"
-  | "top-center"
-  | "top-right"
-  | "bottom-left"
-  | "bottom-center"
-  | "bottom-right";
+export type Align = "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right";
 
 export const alignElements = (
   elem: HTMLElement,
@@ -117,23 +107,17 @@ export const alignElements = (
 
   switch (align) {
     case "top-center":
-      offsetTop = constrainHeight
-        ? Math.max(pos.top - padding, 0)
-        : pos.top - padding;
+      offsetTop = constrainHeight ? Math.max(pos.top - padding, 0) : pos.top - padding;
       offsetLeft = pos.horizontalCenter;
       maxHeight = pos.source.top - offsetTop;
       break;
     case "top-left":
-      offsetTop = constrainHeight
-        ? Math.max(pos.top - padding, 0)
-        : pos.top - padding;
+      offsetTop = constrainHeight ? Math.max(pos.top - padding, 0) : pos.top - padding;
       offsetLeft = pos.horizontalLeft;
       maxHeight = pos.source.top - offsetTop;
       break;
     case "top-right":
-      offsetTop = constrainHeight
-        ? Math.max(pos.top - padding, 0)
-        : pos.top - padding;
+      offsetTop = constrainHeight ? Math.max(pos.top - padding, 0) : pos.top - padding;
       offsetLeft = pos.horizontalRight;
       maxHeight = pos.source.top - offsetTop;
       break;
@@ -163,14 +147,8 @@ export const alignElements = (
   }
   // If the dropdown has more space on the top, then we should align it to the top
   // of the trigger element instead of the bottom.
-  else if (
-    (maxHeight ?? 0) <
-    pos.source.top -
-      (constrainHeight ? Math.max(pos.top - padding, 0) : pos.top - padding)
-  ) {
-    offsetTop = constrainHeight
-      ? Math.max(pos.top - padding, 0)
-      : pos.top - padding;
+  else if ((maxHeight ?? 0) < pos.source.top - (constrainHeight ? Math.max(pos.top - padding, 0) : pos.top - padding)) {
+    offsetTop = constrainHeight ? Math.max(pos.top - padding, 0) : pos.top - padding;
     maxHeight = pos.source.top - offsetTop;
     resultAlign[0] = "top";
   }
@@ -206,10 +184,7 @@ export const alignElements = (
   // Ensure dropdown doesn't go off the bottom edge
   const maxBottom = scrollY + window.innerHeight;
   if (offsetTop + (pos.target.height || 0) > maxBottom) {
-    offsetTop = Math.max(
-      scrollY + 10,
-      maxBottom - (pos.target.height || 300) - 10,
-    );
+    offsetTop = Math.max(scrollY + 10, maxBottom - (pos.target.height || 300) - 10);
   }
 
   return {

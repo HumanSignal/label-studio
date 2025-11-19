@@ -10,29 +10,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { cnb as cn } from "@humansignal/core/lib/utils/bem";
 import { Dropdown, type DropdownProps, type DropdownRef } from "./dropdown";
 import { DropdownContext, type DropdownContextValue } from "./dropdown-context";
 
-const getMinIndex = (element?: HTMLElement) => {
-  let index = 1000;
-
-  if (element) {
-    let parent = element.parentElement;
-
-    while (parent) {
-      const parentIndex = Number.parseInt(getComputedStyle(parent).zIndex);
-
-      if (!isNaN(parentIndex)) {
-        index = Math.max(index, parentIndex);
-      }
-
-      parent = parent?.parentElement ?? null;
-    }
-  }
-
-  return index;
-};
+// Simple incrementing counter for z-index stacking
+// Dropdowns are portaled to document.body, so parent z-index doesn't matter
+let zIndexCounter = 0;
 
 interface DropdownTriggerProps extends DropdownProps {
   /** HTML tag to use for the trigger wrapper */
@@ -70,25 +53,34 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
     },
     ref,
   ) => {
-    const dropdownRef = (dropdown ??
-      ref ??
-      useRef<DropdownRef>()) as RefObject<DropdownRef>;
+    const dropdownRef = (dropdown ?? ref ?? useRef<DropdownRef>()) as RefObject<DropdownRef>;
     const triggerEL = Children.only(children);
     const childset = useRef(new Set<DropdownContextValue>());
-    const [minIndex, setMinIndex] = useState(1000);
+    const [isOpen, setIsOpen] = useState(false);
 
-    const triggerRef = useRef<HTMLElement>(
-      (triggerEL as any)?.props?.ref?.current,
-    );
+    // Assign a unique z-index for this dropdown
+    const minIndex = useMemo(() => 1000 + zIndexCounter++, []);
+
+    const triggerRef = useRef<HTMLElement>((triggerEL as any)?.props?.ref?.current);
     const parentDropdown = useContext(DropdownContext);
+
+    useEffect(() => {
+      return () => {
+        const unmountStart = performance.now();
+        console.log(`[DropdownTrigger] Starting unmount`);
+        // Cleanup will happen here
+        requestAnimationFrame(() => {
+          console.log(`[DropdownTrigger] Unmount completed in ${performance.now() - unmountStart}ms`);
+        });
+      };
+    }, []);
 
     const targetIsInsideDropdown = useCallback(
       (target: HTMLElement) => {
         const triggerClicked = triggerRef.current?.contains?.(target);
         if (triggerClicked) return true;
 
-        const dropdownClicked =
-          dropdownRef.current?.dropdown?.contains?.(target);
+        const dropdownClicked = dropdownRef.current?.dropdown?.contains?.(target);
         if (dropdownClicked) return true;
 
         if (isChildValid(target)) return true;
@@ -121,13 +113,7 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
 
         dropdownRef.current?.close?.();
       },
-      [
-        closeOnClickOutside,
-        targetIsInsideDropdown,
-        triggerRef,
-        dropdownRef,
-        isChildValid,
-      ],
+      [closeOnClickOutside, targetIsInsideDropdown, triggerRef, dropdownRef, isChildValid],
     );
 
     const handleToggle = useCallback(
@@ -154,50 +140,81 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
         key: "dd-trigger",
         ref: (el: HTMLElement) => {
           triggerRef.current = triggerRef.current ?? el;
-
-          if (triggerRef.current) {
-            setMinIndex(Math.max(minIndex, getMinIndex(triggerRef.current)));
-          }
         },
         onClickCapture: handleToggle,
       };
-    }, [triggerEL, triggerRef, handleToggle, tag, minIndex]);
+    }, [triggerEL, triggerRef, handleToggle, tag]);
 
     const triggerClone = useMemo(() => {
       return cloneElement(triggerEL as any, cloneProps);
     }, [triggerEL, cloneProps]);
 
     const dropdownClone = (
-      <Dropdown {...props} ref={dropdownRef}>
+      <Dropdown
+        {...props}
+        ref={dropdownRef}
+        onToggle={(visible) => {
+          setIsOpen(visible);
+          props.onToggle?.(visible);
+        }}
+      >
         {content}
       </Dropdown>
     );
 
     useEffect(() => {
+      // Only add the event listener when the dropdown is visible
+      // This is critical for performance when there are many nested dropdowns (e.g., 84+ in notifications)
+      // Closed dropdowns don't need to listen for clicks
+      if (!isOpen) return;
+
+      const start = performance.now();
       document.addEventListener("click", handleClick, { capture: true });
-      return () =>
+      console.log(`[DropdownTrigger] Added listener in ${performance.now() - start}ms`);
+
+      return () => {
+        const cleanupStart = performance.now();
         document.removeEventListener("click", handleClick, { capture: true });
-    }, [handleClick]);
+        console.log(`[DropdownTrigger] Removed listener in ${performance.now() - cleanupStart}ms`);
+      };
+    }, [handleClick, isOpen]);
 
     const contextValue = useMemo((): DropdownContextValue => {
       return {
         minIndex,
         triggerRef,
         dropdown: dropdownRef,
-        hasTarget: targetIsInsideDropdown,
+        hasTarget: (target: HTMLElement) => {
+          // Inline the function to avoid dependency issues
+          const triggerClicked = triggerRef.current?.contains?.(target);
+          if (triggerClicked) return true;
+
+          const dropdownClicked = dropdownRef.current?.dropdown?.contains?.(target);
+          if (dropdownClicked) return true;
+
+          if (isChildValid(target)) return true;
+
+          for (const child of childset.current) {
+            if (child.hasTarget(target)) return true;
+          }
+
+          return false;
+        },
         addChild: (child) => childset.current.add(child),
         removeChild: (child) => childset.current.delete(child),
         open: () => dropdownRef?.current?.open?.(),
         close: () => dropdownRef?.current?.close?.(),
       };
-    }, [triggerRef, dropdownRef, minIndex, targetIsInsideDropdown]);
+    }, [triggerRef, dropdownRef, minIndex, isChildValid]);
 
     useEffect(() => {
       if (!parentDropdown) return;
 
       parentDropdown.addChild(contextValue);
-      return () => parentDropdown.removeChild(contextValue);
-    }, [parentDropdown, contextValue]);
+      return () => {
+        parentDropdown.removeChild(contextValue);
+      };
+    }, []); // Empty deps - only register once on mount, unregister on unmount
 
     return (
       <DropdownContext.Provider value={contextValue}>

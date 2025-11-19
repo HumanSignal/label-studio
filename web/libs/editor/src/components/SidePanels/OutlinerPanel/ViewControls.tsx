@@ -44,13 +44,7 @@ const mediaStartTimeSupportedTags = [
 ];
 
 export const ViewControls: FC<ViewControlsProps> = observer(
-  ({
-    ordering,
-    regions,
-    orderingDirection,
-    onOrderingChange,
-    onGroupingChange,
-  }) => {
+  ({ ordering, regions, orderingDirection, onOrderingChange, onGroupingChange }) => {
     const grouping = regions.group;
     const context = useContext(SidePanelsContext);
 
@@ -62,9 +56,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
       const tags = Array.from(names.values());
       // Check if all tag types from the tuple exist in the configuration
       return mediaStartTimeSupportedTags.some((requiredTagTypes) => {
-        return requiredTagTypes.every((requiredType) =>
-          tags.some((tag: any) => tag?.type === requiredType),
-        );
+        return requiredTagTypes.every((requiredType) => tags.some((tag: any) => tag?.type === requiredType));
       });
     }, [regions.annotation?.names]);
 
@@ -75,96 +67,83 @@ export const ViewControls: FC<ViewControlsProps> = observer(
       }
     }, [ordering, mediaTimeSupport, onOrderingChange]);
 
-    const getGroupingLabels = useCallback(
-      (value: GroupingOptions): LabelInfo => {
-        switch (value) {
-          case "manual":
-            return {
-              label: (
-                <>
-                  <IconList /> Group Manually
-                </>
-              ),
-              selectedLabel: isFF(FF_DEV_3873) ? "Manual" : "Manual Grouping",
-              icon: <IconList width={16} height={16} />,
-              tooltip: "Manually Grouped",
-            };
-          case "label":
-            return {
-              label: (
-                <>
-                  <IconBoundingBox /> Group by Label
-                </>
-              ),
-              selectedLabel: isFF(FF_DEV_3873)
-                ? "By Label"
-                : "Grouped by Label",
-              icon: <IconBoundingBox width={16} height={16} />,
-              tooltip: "Grouped by Label",
-            };
-          case "type":
-            return {
-              label: (
-                <>
-                  <IconCursor /> Group by Tool
-                </>
-              ),
-              selectedLabel: isFF(FF_DEV_3873) ? "By Tool" : "Grouped by Tool",
-              icon: <IconCursor width={16} height={16} />,
-              tooltip: "Grouped by Tool",
-            };
-        }
-      },
-      [],
-    );
+    const getGroupingLabels = useCallback((value: GroupingOptions): LabelInfo => {
+      switch (value) {
+        case "manual":
+          return {
+            label: (
+              <>
+                <IconList /> Group Manually
+              </>
+            ),
+            selectedLabel: isFF(FF_DEV_3873) ? "Manual" : "Manual Grouping",
+            icon: <IconList width={16} height={16} />,
+            tooltip: "Manually Grouped",
+          };
+        case "label":
+          return {
+            label: (
+              <>
+                <IconBoundingBox /> Group by Label
+              </>
+            ),
+            selectedLabel: isFF(FF_DEV_3873) ? "By Label" : "Grouped by Label",
+            icon: <IconBoundingBox width={16} height={16} />,
+            tooltip: "Grouped by Label",
+          };
+        case "type":
+          return {
+            label: (
+              <>
+                <IconCursor /> Group by Tool
+              </>
+            ),
+            selectedLabel: isFF(FF_DEV_3873) ? "By Tool" : "Grouped by Tool",
+            icon: <IconCursor width={16} height={16} />,
+            tooltip: "Grouped by Tool",
+          };
+      }
+    }, []);
 
-    const getOrderingLabels = useCallback(
-      (value: OrderingOptions): LabelInfo => {
-        switch (value) {
-          case "date":
-            return {
-              label: (
-                <>
-                  <IconClockTimeFourOutline /> Order by Time
-                </>
-              ),
-              selectedLabel: "By Time",
-              icon: <IconClockTimeFourOutline width={16} height={16} />,
-            };
-          case "score":
-            return {
-              label: (
-                <>
-                  <IconPredictions /> Order by Score
-                </>
-              ),
-              selectedLabel: "By Score",
-              icon: <IconPredictions width={16} height={16} />,
-            };
-          case "mediaStartTime":
-            return {
-              label: (
-                <>
-                  <IconTimelineRegion /> Order by Media Start Time
-                </>
-              ),
-              selectedLabel: "By Media Start Time",
-              icon: <IconTimelineRegion width={16} height={16} />,
-            };
-        }
-      },
-      [],
-    );
+    const getOrderingLabels = useCallback((value: OrderingOptions): LabelInfo => {
+      switch (value) {
+        case "date":
+          return {
+            label: (
+              <>
+                <IconClockTimeFourOutline /> Order by Time
+              </>
+            ),
+            selectedLabel: "By Time",
+            icon: <IconClockTimeFourOutline width={16} height={16} />,
+          };
+        case "score":
+          return {
+            label: (
+              <>
+                <IconPredictions /> Order by Score
+              </>
+            ),
+            selectedLabel: "By Score",
+            icon: <IconPredictions width={16} height={16} />,
+          };
+        case "mediaStartTime":
+          return {
+            label: (
+              <>
+                <IconTimelineRegion /> Order by Media Start Time
+              </>
+            ),
+            selectedLabel: "By Media Start Time",
+            icon: <IconTimelineRegion width={16} height={16} />,
+          };
+      }
+    }, []);
 
-    const renderOrderingDirectionIcon =
-      orderingDirection === "asc" ? <IconSortUp /> : <IconSortDown />;
+    const renderOrderingDirectionIcon = orderingDirection === "asc" ? <IconSortUp /> : <IconSortDown />;
 
     return (
-      <div
-        className={cn("view-controls")
-          .mod({ collapsed: context.locked })
-          .toClassName()}
-      >
+      <div className={cn("view-controls").mod({ collapsed: context.locked }).toClassName()}>
         <Grouping
           value={grouping}
           options={["manual", "type", "label"]}
@@ -176,11 +155,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             <Grouping
               value={ordering}
               direction={orderingDirection}
-              options={
-                mediaTimeSupport
-                  ? ["score", "date", "mediaStartTime"]
-                  : ["score", "date"]
-              }
+              options={mediaTimeSupport ? ["score", "date", "mediaStartTime"] : ["score", "date"]}
               onChange={(value) => onOrderingChange(value)}
               readableValueForKey={getOrderingLabels}
               allowClickSelected
@@ -269,12 +244,7 @@ const Grouping = <T extends string>({
           isFF(FF_DEV_3873) ? (
             extraIcon
           ) : (
-            <DirectionIndicator
-              direction={direction}
-              name={value}
-              value={value}
-              wrap={false}
-            />
+            <DirectionIndicator direction={direction} name={value} value={value} wrap={false} />
           )
         }
       >
@@ -292,13 +262,7 @@ interface GroupingMenuItemProps<T extends string> {
   onChange: (key: T) => void;
 }
 
-const GroupingMenuItem = <T extends string>({
-  value,
-  name,
-  label,
-  direction,
-  onChange,
-}: GroupingMenuItemProps<T>) => {
+const GroupingMenuItem = <T extends string>({ value, name, label, direction, onChange }: GroupingMenuItemProps<T>) => {
   return (
     <Menu.Item name={name} onClick={() => onChange(name)}>
       <div className={cn("view-controls").elem("label").toClassName()}>
@@ -316,12 +280,7 @@ interface DirectionIndicator {
   wrap?: boolean;
 }
 
-const DirectionIndicator: FC<DirectionIndicator> = ({
-  direction,
-  value,
-  name,
-  wrap = true,
-}) => {
+const DirectionIndicator: FC<DirectionIndicator> = ({ direction, value, name, wrap = true }) => {
   const content = direction === "asc" ? <IconSortUp /> : <IconSortDown />;
 
   if (!direction || value !== name || isFF(FF_DEV_3873)) return null;
@@ -334,9 +293,7 @@ interface ToggleRegionsVisibilityButton {
   regions: any;
 }
 
-const ToggleRegionsVisibilityButton = observer<
-  FC<ToggleRegionsVisibilityButton>
->(({ regions }) => {
+const ToggleRegionsVisibilityButton = observer<FC<ToggleRegionsVisibilityButton>>(({ regions }) => {
   const toggleRegionsVisibility = useCallback(
     (e) => {
       e.preventDefault();

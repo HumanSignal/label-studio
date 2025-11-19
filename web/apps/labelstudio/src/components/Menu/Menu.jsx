@@ -6,18 +6,7 @@ import { Block, Elem, MenuContext } from "./MenuContext";
 import { MenuItem } from "./MenuItem";
 
 export const Menu = forwardRef(
-  (
-    {
-      children,
-      className,
-      style,
-      size,
-      selectedKeys,
-      closeDropdownOnItemClick,
-      contextual,
-    },
-    ref,
-  ) => {
+  ({ children, className, style, size, selectedKeys, closeDropdownOnItemClick, contextual }, ref) => {
     const dropdown = useDropdown();
 
     const selected = useMemo(() => {

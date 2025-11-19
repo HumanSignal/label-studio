@@ -7,10 +7,7 @@ import styles from "./ContextMenu.module.scss";
 export interface ContextMenuContext {
   dropdown: ReturnType<typeof useDropdown>;
 }
-export type MenuActionOnClick = (
-  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  ctx: ContextMenuContext,
-) => void;
+export type MenuActionOnClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, ctx: ContextMenuContext) => void;
 export interface ContextMenuAction {
   label: React.ReactNode;
   onClick: MenuActionOnClick;
@@ -32,10 +29,7 @@ export interface ContextMenuTriggerProps {
   onToggle?: (isOpen: boolean) => void;
 }
 
-export const ContextMenu: React.FC<ContextMenuProps> = ({
-  actions,
-  className,
-}) => {
+export const ContextMenu: React.FC<ContextMenuProps> = ({ actions, className }) => {
   const dropdown = useDropdown();
 
   return (
@@ -49,11 +43,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                 className={clsx(styles.option, action.danger && styles.danger)}
                 onClick={(e) => action.onClick(e, { dropdown })}
               >
-                {action.icon && (
-                  <span className={clsx(styles.icon, action.iconClassName)}>
-                    {action.icon}
-                  </span>
-                )}
+                {action.icon && <span className={clsx(styles.icon, action.iconClassName)}>{action.icon}</span>}
                 {action.label}
               </div>
             </React.Fragment>
@@ -63,18 +53,10 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
   );
 };
 
-export const ContextMenuTrigger: React.FC<ContextMenuTriggerProps> = ({
-  children,
-  content,
-  onToggle,
-  className,
-}) => {
+export const ContextMenuTrigger: React.FC<ContextMenuTriggerProps> = ({ children, content, onToggle, className }) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div
-      className={clsx(styles.trigger, isOpen && styles.open, className)}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className={clsx(styles.trigger, isOpen && styles.open, className)} onClick={(e) => e.stopPropagation()}>
       <Dropdown.Trigger
         content={content || undefined}
         onToggle={(isOpen) => {

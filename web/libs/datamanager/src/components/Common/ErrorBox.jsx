@@ -20,9 +20,7 @@ const injector = inject(({ store }) => {
 
 export const ErrorBox = injector(({ errors }) => {
   return errors?.size > 0 ? (
-    <Dropdown.Trigger
-      content={<Menu>{Array.from(errors.values()).map(ErrorRenderer)}</Menu>}
-    >
+    <Dropdown.Trigger content={<Menu>{Array.from(errors.values()).map(ErrorRenderer)}</Menu>}>
       <Button type="text" leading={<IconInfo />}>
         Errors occurred
       </Button>
