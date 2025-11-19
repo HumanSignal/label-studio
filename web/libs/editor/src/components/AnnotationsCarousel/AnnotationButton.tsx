@@ -15,10 +15,14 @@ import {
   IconSparks,
   IconStar,
   IconStarOutline,
+  IconAnalytics,
+  IconViewAll,
+  IconClipboardCheck,
 } from "@humansignal/icons";
 import { Tooltip, Userpic, ToastType, useToast } from "@humansignal/ui";
 import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
 import { useDropdown } from "../../common/Dropdown/DropdownTrigger";
+import { isFF } from "../../utils/feature-flags";
 
 // eslint-disable-next-line
 // @ts-ignore
@@ -82,6 +86,8 @@ export const AnnotationButton = observer(
       hiddenUser = { email: isCurrentUser ? "Me" : "User" };
     }
 
+    const displayUsername = hiddenUser ? hiddenUser.email : username;
+
     const CommentIcon = renderCommentIcon(entity);
     // need to find a more reliable way to grab this value
     // const historyActionType = annotationStore.history.toJSON()?.[0]?.actionType;
@@ -136,11 +142,52 @@ export const AnnotationButton = observer(
         const linkAnnotation = useCallback<MenuActionOnClick>(() => {
           copyLink();
           dropdown?.close();
-          toast.show({
+          toast?.show({
             message: "Annotation link copied to clipboard",
             type: ToastType.info,
           });
         }, [entity, copyLink]);
+        const [copyAnnotationId] = useCopyText({ defaultText: entity.pk?.toString() ?? entity.id?.toString() ?? "" });
+        const copyAnnotationIdHandler = useCallback<MenuActionOnClick>(() => {
+          copyAnnotationId();
+          dropdown?.close();
+          toast?.show({
+            message: "Annotation ID copied to clipboard",
+            type: ToastType.info,
+          });
+        }, [entity, copyAnnotationId]);
+        const openPerformanceDashboard = useCallback<MenuActionOnClick>(() => {
+          // Only available in LSE
+          const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
+          if (!isLSE) return;
+
+          const url = new URL(window.location.origin);
+          const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
+
+          // Route to different dashboards based on feature flag
+          if (useNewAnalytics) {
+            url.pathname = "/analytics/member-performance";
+          } else {
+            url.pathname = "/performance";
+          }
+
+          // Add user, project, and annotation context
+          if (entity.user?.id) {
+            url.searchParams.set("user", entity.user.id);
+          }
+
+          const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
+          if (projectMatch) {
+            url.searchParams.set("project", projectMatch[1]);
+          }
+
+          window.open(url.toString(), "_blank");
+          dropdown?.close();
+        }, [entity, annotationStore]);
+        const showOtherAnnotations = useCallback<MenuActionOnClick>(() => {
+          annotationStore.toggleViewingAllAnnotations();
+          clickHandler();
+        }, [annotationStore]);
         const deleteAnnotation = useCallback(() => {
           clickHandler();
           confirm({
@@ -163,8 +210,19 @@ export const AnnotationButton = observer(
         const isDraft = !isDefined(entity.pk);
         const showGroundTruth = capabilities.groundTruthEnabled && !isPrediction && !isDraft;
         const showDuplicateAnnotation = capabilities.enableCreateAnnotation && !isDraft;
+        const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
+
+        // Check if project ID is available (from store or URL)
+        const hasProjectId = !!window.location.pathname.match(/\/projects\/(\d+)/);
+
         const actions = useMemo<ContextMenuAction[]>(
           () => [
+            {
+              label: "Copy Annotation ID",
+              onClick: copyAnnotationIdHandler,
+              icon: <IconClipboardCheck width={20} height={20} />,
+              enabled: !isDraft,
+            },
             {
               label: `${isGroundTruth ? "Unset " : "Set "} as Ground Truth`,
               onClick: setGroundTruth,
@@ -188,6 +246,18 @@ export const AnnotationButton = observer(
               enabled: !isDraft && store.hasInterface("annotations:copy-link"),
             },
             {
+              label: "Open Performance Dashboard",
+              onClick: openPerformanceDashboard,
+              icon: <IconAnalytics width={20} height={20} />,
+              enabled: isLSE && hasProjectId && !isDraft && !isPrediction,
+            },
+            {
+              label: "Show Other Annotations",
+              onClick: showOtherAnnotations,
+              icon: <IconViewAll width={20} height={20} />,
+              enabled: true,
+            },
+            {
               label: "Delete Annotation",
               onClick: deleteAnnotation,
               icon: <IconTrashRect />,
@@ -201,9 +271,14 @@ export const AnnotationButton = observer(
             isGroundTruth,
             isPrediction,
             isDraft,
+            isLSE,
+            hasProjectId,
             capabilities.enableAnnotationDelete,
             capabilities.enableCreateAnnotation,
             capabilities.groundTruthEnabled,
+            copyAnnotationIdHandler,
+            openPerformanceDashboard,
+            showOtherAnnotations,
           ],
         );
 
@@ -241,14 +316,9 @@ export const AnnotationButton = observer(
           </div>
           <div className={cn("annotation-button").elem("main").toClassName()}>
             <div className={cn("annotation-button").elem("user").toClassName()}>
-              <span className={cn("annotation-button").elem("name").toClassName()}>
-                {hiddenUser ? hiddenUser.email : username}
-              </span>
-              {!infoIsHidden && (
-                <span className={cn("annotation-button").elem("entity-id").toClassName()}>
-                  #{entity.pk ?? entity.id}
-                </span>
-              )}
+              <Tooltip title={displayUsername}>
+                <span className={cn("annotation-button").elem("name").toClassName()}>{displayUsername}</span>
+              </Tooltip>
             </div>
             {!infoIsHidden && (
               <div className={cn("annotation-button").elem("info").toClassName()}>

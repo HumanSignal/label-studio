@@ -9,6 +9,8 @@ ipynb_repo_path: tutorials/how-to-connect-Hugging-Face-with-Label-Studio-SDK/how
 repo_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/tree/main/tutorials/how-to-connect-Hugging-Face-with-Label-Studio-SDK
 report_bug_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/issues/new
 thumbnail: /images/tutorials/tutorials-hugging-face-ls-sdk.png
+meta_title: How to Connect Hugging Face with Label Studio SDK
+meta_description: Learn how to create a NLP workflow by integrating Hugging Face datasets and models with Label Studio for annotation and active learning.
 ---
 **A Complete Guide to Connecting Hugging Face and Label Studio**
 
