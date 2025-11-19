@@ -252,6 +252,18 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
       if (props.enabled === false) performAnimation(false);
     }, [props.enabled, performAnimation]);
 
+    // Recalculate position on window resize when constrainHeight is enabled
+    useEffect(() => {
+      if (!props.constrainHeight || !currentVisible) return;
+
+      const handleResize = () => {
+        calculatePosition();
+      };
+
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, [props.constrainHeight, currentVisible, calculatePosition]);
+
     const content = useMemo(() => {
       const ch = children as any;
 
@@ -293,7 +305,8 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
           : {}),
         // Apply height constraint when enabled
         // Always apply maxHeight for constrainHeight since CSS can't do dynamic calculations
-        ...(props.constrainHeight && maxHeight ? { maxHeight } : {}),
+        // Subtract 8px for bottom padding when constrainHeight is enabled
+        ...(props.constrainHeight && maxHeight ? { maxHeight: maxHeight - 8 } : {}),
       };
     }, [
       props.style,
