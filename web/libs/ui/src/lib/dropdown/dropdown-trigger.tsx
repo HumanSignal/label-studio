@@ -64,17 +64,6 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
     const triggerRef = useRef<HTMLElement>((triggerEL as any)?.props?.ref?.current);
     const parentDropdown = useContext(DropdownContext);
 
-    useEffect(() => {
-      return () => {
-        const unmountStart = performance.now();
-        console.log(`[DropdownTrigger] Starting unmount`);
-        // Cleanup will happen here
-        requestAnimationFrame(() => {
-          console.log(`[DropdownTrigger] Unmount completed in ${performance.now() - unmountStart}ms`);
-        });
-      };
-    }, []);
-
     const targetIsInsideDropdown = useCallback(
       (target: HTMLElement) => {
         const triggerClicked = triggerRef.current?.contains?.(target);
@@ -149,7 +138,7 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
       return cloneElement(triggerEL as any, cloneProps);
     }, [triggerEL, cloneProps]);
 
-    const dropdownClone = (
+    const dropdownClone = content ? (
       <Dropdown
         {...props}
         ref={dropdownRef}
@@ -160,24 +149,21 @@ export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(
       >
         {content}
       </Dropdown>
-    );
+    ) : null;
 
     useEffect(() => {
-      // Only add the event listener when the dropdown is visible
-      // This is critical for performance when there are many nested dropdowns (e.g., 84+ in notifications)
-      // Closed dropdowns don't need to listen for clicks
-      if (!isOpen) return;
+      // For external dropdowns (no content), always add listener since we can't track visibility via onToggle
+      // For internal dropdowns (with content), only add when open for performance
+      const shouldAddListener = content ? isOpen : true;
 
-      const start = performance.now();
+      if (!shouldAddListener) return;
+
       document.addEventListener("click", handleClick, { capture: true });
-      console.log(`[DropdownTrigger] Added listener in ${performance.now() - start}ms`);
 
       return () => {
-        const cleanupStart = performance.now();
         document.removeEventListener("click", handleClick, { capture: true });
-        console.log(`[DropdownTrigger] Removed listener in ${performance.now() - cleanupStart}ms`);
       };
-    }, [handleClick, isOpen]);
+    }, [handleClick, isOpen, content]);
 
     const contextValue = useMemo((): DropdownContextValue => {
       return {
