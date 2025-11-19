@@ -101,14 +101,9 @@
     }
   }
 
-  /* Height constraint using available space calculation for anchor positioning */
+  /* Height constraint using available space calculation */
   &.constrain-height {
     overflow-y: auto;
-
-    /* For browsers with anchor positioning, constrain to viewport bounds */
-    @supports (anchor-name: --test) {
-      bottom: 20px;
-    }
   }
 
   &_align {

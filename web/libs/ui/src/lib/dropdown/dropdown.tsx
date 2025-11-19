@@ -241,11 +241,12 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     }, [visible]);
 
     useEffect(() => {
-      // Only calculate position manually if anchor positioning is not supported
-      if (!isInline && visibility === "before-appear" && !supportsAnchorPositioning) {
+      // Calculate position if anchor positioning is not supported
+      // OR if constrainHeight is enabled (we need maxHeight calculation)
+      if (!isInline && visibility === "before-appear" && (!supportsAnchorPositioning || props.constrainHeight)) {
         calculatePosition();
       }
-    }, [visibility, calculatePosition, isInline, supportsAnchorPositioning]);
+    }, [visibility, calculatePosition, isInline, supportsAnchorPositioning, props.constrainHeight]);
 
     useEffect(() => {
       if (props.enabled === false) performAnimation(false);
@@ -290,8 +291,9 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         ...(!supportsAnchorPositioning && props.syncWidth && triggerWidth
           ? { width: triggerWidth, minWidth: triggerWidth }
           : {}),
-        // Apply height constraint if enabled (only for fallback when anchor positioning is not supported)
-        ...(!supportsAnchorPositioning && props.constrainHeight && maxHeight ? { maxHeight } : {}),
+        // Apply height constraint when enabled
+        // Always apply maxHeight for constrainHeight since CSS can't do dynamic calculations
+        ...(props.constrainHeight && maxHeight ? { maxHeight } : {}),
       };
     }, [
       props.style,
