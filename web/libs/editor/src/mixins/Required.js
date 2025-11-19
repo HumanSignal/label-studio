@@ -13,6 +13,8 @@ const RequiredMixin = types
 
     return {
       validate() {
+        const whenRoles = self.whenrole ? self.whenrole.split(",") : null;
+
         if (!Super.validate()) return false;
         if (!self.required) return true;
 
@@ -32,6 +34,8 @@ const RequiredMixin = types
 
                 if (label && label !== self.whentagname) continue;
               }
+
+              if (whenRoles && !whenRoles.includes(reg.chatmessage?.role)) continue;
             }
 
             if (self.whenlabelvalue && !reg.hasLabel(self.whenlabelvalue)) {
