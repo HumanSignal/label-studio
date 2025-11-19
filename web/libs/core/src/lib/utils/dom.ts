@@ -161,31 +161,7 @@ export const alignElements = (
     resultAlign[1] = "right";
   }
 
-  // Get scroll values before using them in boundary checks
   const { scrollY, scrollX } = window;
-
-  // Additional boundary checks to prevent overflow
-  // Ensure dropdown doesn't go off the left edge
-  if (offsetLeft < scrollX) {
-    offsetLeft = scrollX + 10; // 10px padding from edge
-  }
-
-  // Ensure dropdown doesn't go off the right edge
-  const maxRight = scrollX + window.innerWidth;
-  if (offsetLeft + pos.target.width > maxRight) {
-    offsetLeft = Math.max(scrollX + 10, maxRight - pos.target.width - 10);
-  }
-
-  // Ensure dropdown doesn't go off the top edge
-  if (offsetTop < scrollY) {
-    offsetTop = scrollY + 10; // 10px padding from edge
-  }
-
-  // Ensure dropdown doesn't go off the bottom edge
-  const maxBottom = scrollY + window.innerHeight;
-  if (offsetTop + (pos.target.height || 0) > maxBottom) {
-    offsetTop = Math.max(scrollY + 10, maxBottom - (pos.target.height || 300) - 10);
-  }
 
   return {
     top: offsetTop + scrollY,
