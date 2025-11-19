@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "stylelint-config-tailwindcss/scss",
-    "stylelint-config-standard-scss"
-  ],
+  "extends": ["stylelint-config-tailwindcss/scss", "stylelint-config-standard-scss"],
   "rules": {
     "selector-class-pattern": null,
     "custom-property-pattern": null,
@@ -25,11 +22,7 @@
     "property-no-unknown": [
       true,
       {
-        "ignoreProperties": [
-          "position-try-fallbacks",
-          "anchor-name",
-          "position-anchor"
-        ]
+        "ignoreProperties": ["position-try-fallbacks", "anchor-name", "position-anchor"]
       }
     ],
     "declaration-block-no-redundant-longhand-properties": [
