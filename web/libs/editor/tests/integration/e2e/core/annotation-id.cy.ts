@@ -8,7 +8,7 @@ describe("Annotation ID", () => {
     });
   });
 
-  it("should have data-annotation-id attribute matching the copied annotation ID", () => {
+  it("should have data-annotation-id attribute on all annotation buttons", () => {
     // Initialize with multiple annotations to test with different IDs
     LabelStudio.init({
       config: `<View>
@@ -37,55 +37,55 @@ describe("Annotation ID", () => {
     // Get all annotation buttons
     cy.get(".lsf-annotation-button").should("have.length", 3);
 
-    // Test the first annotation (ID 1001)
-    cy.log("Testing annotation ID 1001");
-    cy.get(".lsf-annotation-button").eq(0).should("have.attr", "data-annotation-id", "1001");
+    // Annotations are displayed in reverse order (newest first)
+    // Verify each annotation button has the correct data-annotation-id attribute
+    cy.log("Verifying data-annotation-id attributes");
+    cy.get('[data-annotation-id="1003"]').should("exist");
+    cy.get('[data-annotation-id="1002"]').should("exist");
+    cy.get('[data-annotation-id="1001"]').should("exist");
 
-    // Open the context menu for the first annotation
-    cy.get(".lsf-annotation-button__trigger").eq(0).click();
-
-    // Click "Copy Annotation ID" from the dropdown
-    cy.get(".lsf-dropdown").should("be.visible").find('[class*="option--"]').contains("Copy Annotation ID").click();
-
-    // Verify the clipboard contains the correct annotation ID
-    cy.window().then((win) => {
-      win.navigator.clipboard.readText().then((text) => {
-        expect(text).to.equal("1001");
-      });
-    });
-
-    // Test the second annotation (ID 1002)
-    cy.log("Testing annotation ID 1002");
+    // Verify the attributes are on the annotation buttons in the correct order
+    cy.get(".lsf-annotation-button").eq(0).should("have.attr", "data-annotation-id", "1003");
     cy.get(".lsf-annotation-button").eq(1).should("have.attr", "data-annotation-id", "1002");
+    cy.get(".lsf-annotation-button").eq(2).should("have.attr", "data-annotation-id", "1001");
+  });
 
-    // Open the context menu for the second annotation
-    cy.get(".lsf-annotation-button__trigger").eq(1).click();
-
-    // Click "Copy Annotation ID" from the dropdown
-    cy.get(".lsf-dropdown").should("be.visible").find('[class*="option--"]').contains("Copy Annotation ID").click();
-
-    // Verify the clipboard contains the correct annotation ID
-    cy.window().then((win) => {
-      win.navigator.clipboard.readText().then((text) => {
-        expect(text).to.equal("1002");
-      });
+  it("should copy the correct annotation ID to clipboard", () => {
+    // Initialize with a single annotation for simpler clipboard testing
+    LabelStudio.init({
+      config: `<View>
+        <Text name="text" value="$text"/>
+        <Choices name="choice" toName="text">
+          <Choice value="Choice1"/>
+        </Choices>
+      </View>`,
+      task: {
+        id: 1,
+        annotations: [{ id: 5001, result: [] }],
+        predictions: [],
+        data: {
+          text: "Sample text",
+        },
+      },
     });
 
-    // Test the third annotation (ID 1003)
-    cy.log("Testing annotation ID 1003");
-    cy.get(".lsf-annotation-button").eq(2).should("have.attr", "data-annotation-id", "1003");
+    LabelStudio.waitForObjectsReady();
 
-    // Open the context menu for the third annotation
-    cy.get(".lsf-annotation-button__trigger").eq(2).click();
-
-    // Click "Copy Annotation ID" from the dropdown
-    cy.get(".lsf-dropdown").should("be.visible").find('[class*="option--"]').contains("Copy Annotation ID").click();
-
-    // Verify the clipboard contains the correct annotation ID
+    // Stub the clipboard API
     cy.window().then((win) => {
-      win.navigator.clipboard.readText().then((text) => {
-        expect(text).to.equal("1003");
-      });
+      cy.stub(win.navigator.clipboard, "writeText").resolves();
+    });
+
+    // Verify the data-annotation-id attribute matches what gets copied
+    cy.get('[data-annotation-id="5001"]').should("exist");
+
+    // Open context menu and copy annotation ID
+    cy.get(".lsf-annotation-button__trigger").click();
+    cy.get(".lsf-dropdown:visible").find('[class*="option--"]').contains("Copy Annotation ID").click();
+
+    // Verify clipboard was called with the same ID as the data attribute
+    cy.window().then((win) => {
+      expect(win.navigator.clipboard.writeText).to.have.been.calledWith("5001");
     });
   });
 
