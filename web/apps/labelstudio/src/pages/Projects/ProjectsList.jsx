@@ -7,6 +7,7 @@ import { Userpic, Button } from "@humansignal/ui";
 import { Dropdown, Menu, Pagination } from "../../components";
 import { cn } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
+import { ProjectStateChip } from "@humansignal/app-common";
 
 const DEFAULT_CARD_COLORS = ["#FFFFFF", "#FDFDFC"];
 
@@ -80,7 +81,9 @@ const ProjectCard = ({ project }) => {
       <div className={cn("project-card").mod({ colored: !!color }).toClassName()} style={projectColors}>
         <div className={cn("project-card").elem("header").toClassName()}>
           <div className={cn("project-card").elem("title").toClassName()}>
-            <div className={cn("project-card").elem("title-text").toClassName()}>{project.title ?? "New project"}</div>
+            <div className={cn("project-card").elem("title-text").toClassName()}>
+              {project.title ?? "New project"}
+            </div>
 
             <div
               className={cn("project-card").elem("menu").toClassName()}
@@ -102,6 +105,12 @@ const ProjectCard = ({ project }) => {
                 </Button>
               </Dropdown.Trigger>
             </div>
+
+            {project.current_state && (
+              <div className={cn("project-card").elem("state-chip").toClassName()}>
+                <ProjectStateChip state={project.current_state} projectId={project.id} interactive={false} />
+              </div>
+            )}
           </div>
           <div className={cn("project-card").elem("summary").toClassName()}>
             <div className={cn("project-card").elem("annotation").toClassName()}>

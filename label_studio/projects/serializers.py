@@ -33,6 +33,8 @@ from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
 from tasks.models import Task
 from users.serializers import UserSimpleSerializer
+from fsm.state_manager import get_state_manager
+from fsm.state_inference import infer_project_state
 
 
 class CreatedByFromContext:
@@ -97,6 +99,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
 
     queue_total = serializers.SerializerMethodField()
     queue_done = serializers.SerializerMethodField()
+    current_state = serializers.SerializerMethodField()
 
     @property
     def user_id(self):
@@ -197,6 +200,24 @@ class ProjectSerializer(FlexFieldsModelSerializer):
                 pass
         raise serializers.ValidationError('Color must be in "#RRGGBB" format')
 
+    def get_current_state(self, project):
+        """
+        Get the current FSM state of the project.
+        Uses StateManager to retrieve the state, falling back to inference if needed.
+        """
+        try:
+            StateManager = get_state_manager()
+            state_value = StateManager.get_current_state_value(project)
+            
+            # If no state record exists, infer the state
+            if state_value is None:
+                state_value = infer_project_state(project)
+            
+            return state_value
+        except Exception:
+            # Log the error but don't fail serialization
+            return None
+
     class Meta:
         model = Project
         extra_kwargs = {
@@ -249,6 +270,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             'queue_total',
             'queue_done',
             'config_suitable_for_bulk_annotation',
+            'current_state',
         ]
 
     def validate_label_config(self, value):
