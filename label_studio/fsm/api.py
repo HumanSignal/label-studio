@@ -206,7 +206,7 @@ class FSMEntityTransitionAPI(generics.GenericAPIView):
             raise APIException(detail='Transition execution failed') from e
 
         # Handle feature-flag disabled path (no state record created)
-        if state_record is True:
+        if state_record is None:
             response_payload = {
                 'success': True,
                 'new_state': None,
