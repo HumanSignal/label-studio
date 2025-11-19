@@ -16,6 +16,7 @@ export * from "./lib/enterprise-upgrade-overlay/enterprise-upgrade-overlay";
 export * from "./lib/label/label";
 export * from "./lib/select/select";
 export * from "./lib/skeleton/skeleton";
+export * from "./lib/state-chip/state-chip";
 export * from "./lib/toast/toast";
 export * from "./lib/toggle/toggle";
 export * from "./lib/typography/typography";
