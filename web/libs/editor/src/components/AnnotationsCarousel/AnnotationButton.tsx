@@ -176,6 +176,7 @@ export const AnnotationButton = observer(
             url.searchParams.set("user", entity.user.id);
           }
 
+          
           const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
           if (projectMatch) {
             url.searchParams.set("project", projectMatch[1]);
