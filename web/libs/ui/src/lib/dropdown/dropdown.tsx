@@ -316,13 +316,11 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         ref={dropdown as any}
         data-testid={props.dataTestId}
         className={rootName
-          .mix(
-            props.className,
-            dropdownClassName,
-            visibilityClasses,
-            props.syncWidth ? "sync-width" : null,
-            props.constrainHeight ? "constrain-height" : null,
-          )
+          .mod({
+            "sync-width": props.syncWidth,
+            "constrain-height": props.constrainHeight,
+          })
+          .mix(props.className, dropdownClassName, visibilityClasses)
           .toClassName()}
         style={compositeStyles}
         onClick={(e: MouseEvent) => e.stopPropagation()}

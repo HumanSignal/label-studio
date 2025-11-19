@@ -93,7 +93,7 @@
   }
 
   /* Width syncing with trigger using anchor-size() for anchor positioning */
-  &.sync-width {
+  &_sync-width {
     @supports (width: anchor-size(width)) {
       /* Use anchor-size() to automatically match trigger width */
       width: anchor-size(width);
@@ -101,8 +101,8 @@
     }
   }
 
-  /* Height constraint using available space calculation */
-  &.constrain-height {
+  /* Height constraint using available space calculation of the viewport performed in JS */
+  &_constrain-height {
     overflow-y: auto;
   }
 
