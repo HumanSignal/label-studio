@@ -81,9 +81,7 @@ const ProjectCard = ({ project }) => {
       <div className={cn("project-card").mod({ colored: !!color }).toClassName()} style={projectColors}>
         <div className={cn("project-card").elem("header").toClassName()}>
           <div className={cn("project-card").elem("title").toClassName()}>
-            <div className={cn("project-card").elem("title-text").toClassName()}>
-              {project.title ?? "New project"}
-            </div>
+            <div className={cn("project-card").elem("title-text").toClassName()}>{project.title ?? "New project"}</div>
 
             <div
               className={cn("project-card").elem("menu").toClassName()}

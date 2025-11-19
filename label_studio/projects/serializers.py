@@ -3,6 +3,8 @@
 import bleach
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 from django.db.models import Q
+from fsm.state_inference import infer_project_state
+from fsm.state_manager import get_state_manager
 from label_studio_sdk.label_interface import LabelInterface
 from label_studio_sdk.label_interface.control_tags import (
     BrushLabelsTag,
@@ -33,8 +35,6 @@ from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
 from tasks.models import Task
 from users.serializers import UserSimpleSerializer
-from fsm.state_manager import get_state_manager
-from fsm.state_inference import infer_project_state
 
 
 class CreatedByFromContext:
@@ -208,11 +208,11 @@ class ProjectSerializer(FlexFieldsModelSerializer):
         try:
             StateManager = get_state_manager()
             state_value = StateManager.get_current_state_value(project)
-            
+
             # If no state record exists, infer the state
             if state_value is None:
                 state_value = infer_project_state(project)
-            
+
             return state_value
         except Exception:
             # Log the error but don't fail serialization
