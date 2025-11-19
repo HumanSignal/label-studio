@@ -215,6 +215,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
 
             return state_value
         except Exception:
+          
             # Log the error but don't fail serialization
             return None
 
