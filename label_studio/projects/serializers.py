@@ -3,8 +3,6 @@
 import bleach
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 from django.db.models import Q
-from fsm.state_inference import infer_project_state
-from fsm.state_manager import get_state_manager
 from label_studio_sdk.label_interface import LabelInterface
 from label_studio_sdk.label_interface.control_tags import (
     BrushLabelsTag,
@@ -203,19 +201,20 @@ class ProjectSerializer(FlexFieldsModelSerializer):
     def get_current_state(self, project):
         """
         Get the current FSM state of the project.
-        Uses StateManager to retrieve the state, falling back to inference if needed.
+        Uses StateManager to retrieve the stored state value.
+
+        Note: This returns only stored states. State inference is an enterprise
+        feature and should be overridden in LSE's project serializer.
         """
         try:
+            from fsm.state_manager import get_state_manager
+
             StateManager = get_state_manager()
             state_value = StateManager.get_current_state_value(project)
-
-            # If no state record exists, infer the state
-            if state_value is None:
-                state_value = infer_project_state(project)
-
             return state_value
         except Exception:
-            # Log the error but don't fail serialization
+            # FSM may not be enabled or error occurred
+            # Don't fail serialization
             return None
 
     class Meta:

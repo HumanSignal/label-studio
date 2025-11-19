@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { IconCheck, IconEllipsis, IconMinus, IconSparks } from "@humansignal/icons";
-import { Userpic, Button } from "@humansignal/ui";
+import { Userpic, Button, Tooltip } from "@humansignal/ui";
 import { Dropdown, Menu, Pagination } from "../../components";
 import { cn } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
@@ -81,7 +81,11 @@ const ProjectCard = ({ project }) => {
       <div className={cn("project-card").mod({ colored: !!color }).toClassName()} style={projectColors}>
         <div className={cn("project-card").elem("header").toClassName()}>
           <div className={cn("project-card").elem("title").toClassName()}>
-            <div className={cn("project-card").elem("title-text").toClassName()}>{project.title ?? "New project"}</div>
+            <Tooltip title={project.title ?? "New project"}>
+              <div className={cn("project-card").elem("title-text").toClassName()}>
+                {project.title ?? "New project"}
+              </div>
+            </Tooltip>
 
             <div
               className={cn("project-card").elem("menu").toClassName()}
