@@ -59,6 +59,8 @@ export interface DropdownProps {
   openUpwardForShortViewport?: boolean;
   /** Constrain dropdown height to prevent overflow (from DataManager) */
   constrainHeight?: boolean;
+  /** Sync dropdown width to match trigger width */
+  syncWidth?: boolean;
 }
 
 export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
@@ -73,6 +75,7 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     const [currentVisible, setVisible] = useState(visible);
     const [offset, setOffset] = useState({});
     const [visibility, setVisibility] = useState(visible ? "visible" : null);
+    const [triggerWidth, setTriggerWidth] = useState<number | undefined>(undefined);
 
     // Check if browser supports CSS anchor positioning
     const supportsAnchorPositioning = useMemo(() => {
@@ -105,6 +108,28 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         (dropdown.current as HTMLElement).style.positionAnchor = anchorName;
       }
     }, [supportsAnchorPositioning, anchorName, visibility]);
+
+    // Sync dropdown width with trigger width when syncWidth is enabled
+    // Only use JavaScript measurement as fallback when anchor positioning is not supported
+    useEffect(() => {
+      if (!props.syncWidth || !triggerRef?.current || supportsAnchorPositioning) return;
+
+      const updateWidth = () => {
+        const width = (triggerRef.current as HTMLElement).offsetWidth;
+        setTriggerWidth(width);
+      };
+
+      // Update width initially and when visibility changes
+      updateWidth();
+
+      // Use ResizeObserver to track trigger size changes
+      const resizeObserver = new ResizeObserver(updateWidth);
+      resizeObserver.observe(triggerRef.current as HTMLElement);
+
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }, [props.syncWidth, triggerRef, visibility, supportsAnchorPositioning]);
 
     const calculatePosition = useCallback(() => {
       const dropdownEl = dropdown.current!;
@@ -255,8 +280,12 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
         // Only apply JS-calculated offset when anchor positioning is not supported
         ...(!supportsAnchorPositioning ? (offset ?? {}) : {}),
         zIndex: (minIndex ?? 0) + dropdownZIndex,
+        // Apply width sync if enabled (only for fallback when anchor positioning is not supported)
+        ...(!supportsAnchorPositioning && props.syncWidth && triggerWidth
+          ? { width: triggerWidth, minWidth: triggerWidth }
+          : {}),
       };
-    }, [props.style, dropdownZIndex, minIndex, offset, supportsAnchorPositioning]);
+    }, [props.style, dropdownZIndex, minIndex, offset, supportsAnchorPositioning, props.syncWidth, triggerWidth]);
 
     // Only render content when dropdown has been opened at least once
     // This improves performance and ensures autofocus works correctly
@@ -266,7 +295,9 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
       <div
         ref={dropdown as any}
         data-testid={props.dataTestId}
-        className={rootName.mix(props.className, dropdownClassName, visibilityClasses).toClassName()}
+        className={rootName
+          .mix(props.className, dropdownClassName, visibilityClasses, props.syncWidth ? "sync-width" : null)
+          .toClassName()}
         style={compositeStyles}
         onClick={(e: MouseEvent) => e.stopPropagation()}
       >

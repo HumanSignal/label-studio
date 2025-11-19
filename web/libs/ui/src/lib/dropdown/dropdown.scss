@@ -92,6 +92,15 @@
     position-visibility: anchors-visible;
   }
 
+  /* Width syncing with trigger using anchor-size() for anchor positioning */
+  &.sync-width {
+    @supports (width: anchor-size(width)) {
+      /* Use anchor-size() to automatically match trigger width */
+      width: anchor-size(width);
+      min-width: anchor-size(width);
+    }
+  }
+
   &_align {
     &_left {
       left: -20px;

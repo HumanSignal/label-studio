@@ -4,7 +4,6 @@
     "selector-class-pattern": null,
     "custom-property-pattern": null,
     "no-descending-specificity": null,
-    "function-no-unknown": null,
     "scss/no-global-function-names": null,
     "scss/function-no-unknown": null,
     "selector-pseudo-class-no-unknown": [
@@ -22,7 +21,13 @@
     "property-no-unknown": [
       true,
       {
-        "ignoreProperties": ["position-try-fallbacks", "anchor-name", "position-anchor"]
+        "ignoreProperties": ["position-try-fallbacks", "anchor-name", "position-anchor", "position-visibility"]
+      }
+    ],
+    "function-no-unknown": [
+      true,
+      {
+        "ignoreFunctions": ["anchor-size"]
       }
     ],
     "declaration-block-no-redundant-longhand-properties": [
