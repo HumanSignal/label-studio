@@ -9,6 +9,8 @@ ipynb_repo_path: tutorials/how-to-compare-two-ai-models-with-label-studio/how_to
 repo_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/tree/main/tutorials/how-to-compare-two-ai-models-with-label-studio
 report_bug_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/issues/new
 thumbnail: /images/tutorials/tutorials-compare-ai-models.png
+meta_title: How to Compare Two AI Models with Label Studio
+meta_description: Learn how to compare and evaluate two AI models with the Label Studio SDK.
 ---
 
 ## Why this matters

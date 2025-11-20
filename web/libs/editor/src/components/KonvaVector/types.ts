@@ -94,6 +94,8 @@ export interface KonvaVectorRef {
   };
   // Hit testing method
   isPointOverShape: (x: number, y: number, hitRadius?: number) => boolean;
+  // Delete multiple points by their IDs
+  deletePointsByIds: (pointIds: string[]) => void;
 }
 
 /**
@@ -134,6 +136,8 @@ export interface KonvaVectorProps {
   onPointSelected?: (pointIndex: number | null) => void;
   /** Called when drawing is finished (click on last point or double click on empty space) */
   onFinish?: (e: KonvaEventObject<MouseEvent>) => void;
+  /** Called when shift-clicking on a ghost point (for programmatic point insertion when disableInternalPointAddition is true) */
+  onGhostPointClick?: (ghostPoint: { x: number; y: number; prevPointId: string; nextPointId: string }) => void;
   /** Canvas width */
   width: number;
   /** Canvas height */
@@ -146,6 +150,8 @@ export interface KonvaVectorProps {
   x: number;
   /** Y offset */
   y: number;
+  /** Disable ghost line rendering */
+  disableGhostLine?: boolean;
   /** Enable image smoothing */
   imageSmoothingEnabled?: boolean;
 
@@ -203,8 +209,11 @@ export interface KonvaVectorProps {
   onClick?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Double click event handler */
   onDblClick?: (e: KonvaEventObject<MouseEvent>) => void;
-  /** Transform end event handler */
-  onTransformEnd?: (e: KonvaEventObject<MouseEvent>) => void;
+  /** Called when transformation starts (point dragging, multi-point transformation, etc.) */
+  onTransformStart?: () => void;
+  /** Called when transformation ends (point dragging, multi-point transformation, etc.) */
+  /** Can be called with an optional event parameter for backward compatibility */
+  onTransformEnd?: (e?: KonvaEventObject<MouseEvent>) => void;
   /** Mouse enter event handler */
   onMouseEnter?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse leave event handler */
@@ -215,6 +224,8 @@ export interface KonvaVectorProps {
   transformMode?: boolean;
   /** Whether multiple regions are currently selected (disables internal transformer) */
   isMultiRegionSelected?: boolean;
+  /** Disable internal point addition - when true, prevents KonvaVector from adding points internally and disables the invisible shape */
+  disableInternalPointAddition?: boolean;
   /** Name attribute for the component */
   name?: string;
   /** Ref to access component methods */

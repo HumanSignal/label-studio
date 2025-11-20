@@ -9,6 +9,9 @@ ipynb_repo_path: tutorials/how-to-measure-inter-annotator-agreement-and-build-hu
 repo_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/tree/main/tutorials/how-to-measure-inter-annotator-agreement-and-build-human-consensus
 report_bug_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/issues/new
 thumbnail: /images/tutorials/tutorials-inter-annotator-agreement-and-consensus.png
+meta_title: "How to Measure Inter-Annotator Agreement and Build Human Consensus with Label Studio"
+meta_description: Learn how to measure inter-annotator agreement, build human consensus, establish ground truth and
+compare model predictions using the Label Studio SDK.
 ---
 
 This tutorial walks through a practical workflow to measure inter-annotator agreement, build human consensus, establish ground truth and
