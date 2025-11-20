@@ -594,6 +594,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
   const { x: offsetX, y: offsetY } = item.parent?.layerZoomScalePosition ?? { x: 0, y: 0 };
   const disabled = item.disabled || suggestion || store.annotationStore.selected.isLinkingMode;
   const selected = !disabled; // Invert disabled to selected for KonvaVector
+  const isDisabled = item.locked; // Completely disable all interactions when locked
 
   // Wait for stage to be properly initialized
   if (!item.parent?.stageWidth || !item.parent?.stageHeight) {
@@ -772,7 +773,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           scaleY={item.parent.stageZoom}
           x={0}
           y={0}
-          transformMode={item.selected && item.transformMode}
+          transformMode={item.selected && item.transformMode && !isDisabled}
           transform={{ zoom: item.parent.stageZoom, offsetX, offsetY }}
           fitScale={item.parent.zoomScale}
           allowClose={item.control?.closable ?? false}
@@ -786,6 +787,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
           opacity={Number.parseFloat(item.control?.opacity || "1")}
           pixelSnapping={item.control?.snap === "pixel"}
           selected={selected}
+          disabled={isDisabled}
           // Point styling - customize point appearance based on control settings
           pointRadius={item.pointRadiusFromSize}
           pointFill={item.selected ? "#ffffff" : "#f8fafc"}

@@ -260,6 +260,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     fill = DEFAULT_FILL_COLOR,
     pixelSnapping = false,
     selected = true,
+    disabled = false,
     transformMode = false,
     isMultiRegionSelected = false,
     disableInternalPointAddition = false,
@@ -444,13 +445,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Clear ghost point when conditions change that should hide it
   useEffect(() => {
     // Clear ghost point when:
+    // - Shape is disabled
     // - Shape is not selected
     // - Max points reached
     // Note: Shift key release is handled in handleKeyUp, not here
-    if (!selected || (maxPoints !== undefined && initialPoints.length >= maxPoints)) {
+    if (disabled || !selected || (maxPoints !== undefined && initialPoints.length >= maxPoints)) {
       setGhostPoint(null);
     }
-  }, [selected, maxPoints, initialPoints.length]);
+  }, [disabled, selected, maxPoints, initialPoints.length]);
 
   const [_newPointDragIndex, setNewPointDragIndex] = useState<number | null>(null);
   const [isDraggingNewBezier, setIsDraggingNewBezier] = useState(false);
@@ -644,7 +646,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     // onTransformEnd handlers to fire first (e.g., PolygonRegion's Line onTransformEnd)
     const stage = transformableGroup.getStage();
     if (stage) {
-      const transformer = stage.findOne("Transformer");
+      const transformer = stage.findOne("Transformer") as Konva.Transformer | undefined;
       if (transformer) {
         // Check if there are multiple nodes attached (multiple regions selected)
         const nodes = transformer.nodes();
@@ -731,7 +733,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
   const isDragging = useRef(false);
   const [stageReadyRetry, setStageReadyRetry] = useState(0);
-  const calculateGhostPointRef = useRef<(() => void) | null>(null);
+  const calculateGhostPointRef = useRef<((shiftKeyState?: boolean, eventPos?: { x: number; y: number }) => void) | null>(null);
   const ghostPointRef = useRef<GhostPointRef | null>(null);
 
   // Ref to prevent effect from running multiple times
@@ -760,7 +762,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     activePointId,
     lastAddedPointId,
     selected,
+    disabled,
     onFinish,
+    isShiftKeyHeld,
   });
 
   // Update refs on every render
@@ -786,16 +790,19 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     activePointId,
     lastAddedPointId,
     selected,
+    disabled,
     onFinish,
     isShiftKeyHeld,
   };
 
   // Determine if drawing should be disabled based on current interaction context
   const isDrawingDisabled = () => {
+    // Disable all interactions when disabled prop is true
     // Disable all interactions when selected prop is false
     // Disable drawing when Shift is held (for Shift+click functionality)
     // Disable drawing when multiple points are selected or when in transform mode
     if (
+      disabled ||
       !selected ||
       isShiftKeyHeld ||
       effectiveSelectedPoints.size > SELECTION_SIZE.MULTI_SELECTION_MIN ||
@@ -943,8 +950,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     const isActiveInstance = tracker.getActiveInstanceId() === instanceId;
     const hasSelection = selectedPoints.size > 0 || effectiveSelectedPoints.size > 0;
     const isInstanceSelected = tracker.isInstanceSelected(instanceId);
-    // Show ghost line only if selected AND (active OR has selection)
-    const shouldShowGhostLine = selected && (isActiveInstance || hasSelection || isInstanceSelected);
+    // Show ghost line only if not disabled AND selected AND (active OR has selection)
+    const shouldShowGhostLine = !disabled && selected && (isActiveInstance || hasSelection || isInstanceSelected);
 
     // If we couldn't get the position and we have points, set a fallback position
     // Use the last point or center of the region as a fallback until mouse moves
@@ -1096,9 +1103,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     getBoundsStable,
   ]);
 
-  // Clear selection when component is not selected
+  // Clear selection when component is disabled or not selected
   useEffect(() => {
-    if (!selected) {
+    if (disabled || !selected) {
       setSelectedPointIndex(null);
       setSelectedPoints(new Set());
       setVisibleControlPoints(new Set());
@@ -1111,7 +1118,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       setVisibleControlPoints(new Set());
     }
   }, [selected]);
-  const lastPos = useRef<{ x: number; y: number } | null>(null);
+  const lastPos = useRef<{
+    x: number;
+    y: number;
+    originalX?: number;
+    originalY?: number;
+    originalControlPoint1?: { x: number; y: number };
+    originalControlPoint2?: { x: number; y: number };
+  } | null>(null);
 
   // Set up Transformer nodes once when selection changes
   useEffect(() => {
@@ -1415,7 +1429,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       );
 
       // Make control points visible for the converted point
-      setVisibleControlPoints((prev) => new Set([...prev, pointIndex]));
+      setVisibleControlPoints((prev) => {
+        const newSet = new Set(prev);
+        newSet.add(pointIndex);
+        return newSet;
+      });
     }
 
     // Notify transformation complete after point conversion
@@ -1515,11 +1533,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     },
     getSelectedPointIds: () => {
       const selectedIds: string[] = [];
-      for (const index of selectedPoints) {
+      selectedPoints.forEach((index) => {
         if (index < initialPoints.length) {
           selectedIds.push(initialPoints[index].id);
         }
-      }
+      });
       return selectedIds;
     },
     exportShape: () => {
@@ -2158,7 +2176,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         isShiftKeyHeld: refShiftState,
       } = currentValuesRef.current;
 
-      if (!selected || isDragging.current || isDraggingNewBezier || ghostPointDragInfo?.isDragging) {
+      if (disabled || !selected || isDragging.current || isDraggingNewBezier || ghostPointDragInfo?.isDragging) {
         return;
       }
 
@@ -2377,8 +2395,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         allowClose,
         finalIsPathClosed,
         selected,
+        disabled,
         onFinish,
       } = currentValuesRef.current;
+
+      // Prevent all interactions when disabled
+      if (disabled) {
+        return;
+      }
 
       // Check if event target belongs to this instance's group
       const target = e.target;
@@ -2608,7 +2632,18 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         y,
         width,
         height,
+        disabled,
       } = currentValuesRef.current;
+
+      // Prevent all interactions when disabled (but allow cursor position updates for ghost line)
+      // Only block dragging and point interactions
+      if (disabled && (draggedPointIndex !== null || draggedControlPoint !== null || isDraggingShape)) {
+        // Stop any ongoing drags when disabled
+        setDraggedPointIndex(null);
+        setDraggedControlPoint(null);
+        setIsDraggingShape(false);
+        return;
+      }
 
       // Always update cursor position first (for ghost line to work everywhere)
       const pos = e.target.getStage()?.getPointerPosition();
@@ -2639,8 +2674,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       }
 
       // Handle shape dragging first (if active, allow dragging to continue even outside bounds)
-      // Skip individual shape dragging if in multi-region mode (ImageTransformer handles it)
-      if (isDraggingShape && shapeDragStartPos.current && !isMultiRegionSelected) {
+      // Skip individual shape dragging if disabled, in multi-region mode (ImageTransformer handles it)
+      if (isDraggingShape && shapeDragStartPos.current && !disabled && !isMultiRegionSelected) {
         // Calculate delta from start position
         const deltaX = imagePos.x - shapeDragStartPos.current.imageX;
         const deltaY = imagePos.y - shapeDragStartPos.current.imageY;
@@ -2682,9 +2717,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         });
 
         // Apply bounds checking to all points
-        const constrainedPoints = constrainAnchorPointsToBounds(newPoints, { width, height });
+        const constrainedPoints = constrainAnchorPointsToBounds(newPoints as BezierPoint[], { width, height });
 
-        onPointsChange?.(constrainedPoints);
+        onPointsChange?.(constrainedPoints as BezierPoint[]);
         return; // Don't process other logic when dragging shape
       }
 
@@ -2717,7 +2752,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Only process ghost point and other logic if within bounds
       if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
         // Handle ghost point when Shift is held (check event directly for real-time updates)
-          // Only show ghost point when region is selected
+          // Only show ghost point when region is selected and not disabled
           if (
             e.evt.shiftKey &&
             imagePos &&
@@ -2725,7 +2760,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             !isDragging.current &&
             !isDraggingNewBezier &&
             !ghostPointDragInfo?.isDragging &&
-            selected
+            selected &&
+            !disabled
           ) {
           const scale = transform.zoom * fitScale;
           const hitRadius = HIT_RADIUS.SELECTION / scale;
@@ -2785,7 +2821,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }
 
         // Handle point dragging
-        if (draggedPointIndex !== null && lastPos.current) {
+        if (draggedPointIndex !== null && lastPos.current && !disabled) {
           if (effectiveSelectedPoints.size > 1) {
             return; // Don't drag when transformer is active
           }
@@ -2850,7 +2886,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }
 
         // Handle control point dragging
-        if (draggedControlPoint && lastPos.current) {
+        if (draggedControlPoint && lastPos.current && !disabled) {
           const newPoints = [...initialPoints];
           const point = newPoints[draggedControlPoint.pointIndex];
 
@@ -2885,8 +2921,14 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         instanceId,
         skeletonEnabled,
         activePointId,
+        disabled,
         onFinish,
       } = currentValuesRef.current;
+
+      // Prevent all interactions when disabled
+      if (disabled) {
+        return;
+      }
 
       // Handle shape dragging end
       if (isDraggingShape) {
@@ -3074,8 +3116,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Click handler with debouncing for single/double-click detection
   const handleClickWithDebouncing = useCallback(
     (e: any, onClickHandler?: (e: any) => void, onDblClickHandler?: (e: any) => void) => {
-      // If not selected, fire onClick immediately (no need to wait for double-click detection)
-      if (!selected) {
+      // If disabled or not selected, fire onClick immediately (no need to wait for double-click detection)
+      if (disabled || !selected) {
         if (onClickHandler) {
           const newEvent = {
             ...e,
@@ -3144,7 +3186,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         }
       }, 200);
     },
-    [selected],
+    [selected, disabled],
   );
 
   // Create event handlers
@@ -3214,6 +3256,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     setActivePointId,
     isTransforming,
     selected,
+    disabled,
     transformMode,
     disableInternalPointAddition,
     pointCreationManager,
@@ -3227,15 +3270,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       x={x}
       y={y}
       imageSmoothingEnabled={imageSmoothingEnabled}
-      onMouseDown={selected ? eventHandlers.handleLayerMouseDown : undefined}
-      onMouseMove={selected ? eventHandlers.handleLayerMouseMove : undefined}
-      onMouseUp={selected ? eventHandlers.handleLayerMouseUp : undefined}
+      onMouseDown={selected && !disabled ? eventHandlers.handleLayerMouseDown : undefined}
+      onMouseMove={selected && !disabled ? eventHandlers.handleLayerMouseMove : undefined}
+      onMouseUp={selected && !disabled ? eventHandlers.handleLayerMouseUp : undefined}
       onClick={
-        !selected || transformMode
+        !selected || disabled || transformMode
           ? undefined
           : (e) => {
-              // Prevent all clicks when in transform mode (already checked above, but double-check)
-              if (transformMode) {
+              // Prevent all clicks when disabled or in transform mode (already checked above, but double-check)
+              if (disabled || transformMode) {
                 e.evt.stopPropagation();
                 e.evt.preventDefault();
                 e.evt.stopImmediatePropagation();
@@ -3304,7 +3347,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             }
       }
       onDblClick={
-        !selected
+        !selected || disabled
           ? undefined
           : (e) => {
               // If we've already handled this double-click through debouncing, ignore it
@@ -3317,8 +3360,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       }
     >
       {/* Invisible rectangle - render to capture mouse events for cursor position updates */}
-      {/* Disabled when disableInternalPointAddition is true or when component is not selected */}
-      {selected && !disableInternalPointAddition && (
+      {/* Disabled when disableInternalPointAddition is true, component is not selected, or disabled */}
+      {selected && !disabled && !disableInternalPointAddition && (
         <Shape
           sceneFunc={(ctx, shape) => {
             ctx.beginPath();
@@ -3334,8 +3377,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         <Group
           name="_transformable"
           ref={transformableGroupRef}
-          draggable={true}
+          draggable={!disabled}
           onTransformEnd={(e) => {
+            // Prevent transform when disabled
+            if (disabled) return;
             // This is called when ImageTransformer finishes transforming the Group
             // Commit the transform immediately to prevent position reset
             if (e.target === e.currentTarget && transformableGroupRef.current && initialTransformRef.current) {
@@ -3356,8 +3401,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             onClick={(e) => {
-              // Prevent all clicks when in transform mode
-              if (transformMode) {
+              // Prevent all clicks when disabled or in transform mode
+              if (disabled || transformMode) {
                 e.evt.stopPropagation();
                 e.evt.preventDefault();
                 e.evt.stopImmediatePropagation();
@@ -3367,7 +3412,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               // CRITICAL: Handle Alt+click FIRST (for point deletion and segment breaking)
               // This must happen before any other click handling to ensure deletion works
-              if (e.evt.altKey && !e.evt.shiftKey && selected) {
+              // Don't allow deletion when disabled
+              if (e.evt.altKey && !e.evt.shiftKey && selected && !disabled) {
                 // Let the event bubble to the Group onClick handler which has the Alt+click logic
                 // Don't stop propagation or prevent default - let it reach createClickHandler
                 return;
@@ -3433,6 +3479,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
             }}
             onMouseDown={(e) => {
+              // Don't start shape drag if disabled
+              if (disabled) {
+                return;
+              }
               // Don't start shape drag if in multi-region selection mode
               // ImageTransformer will handle dragging in this case
               if (isMultiRegionSelected) {
@@ -3514,7 +3564,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           />
 
           {/* Ghost line - preview from last point to cursor */}
-          {selected && !disableGhostLine && (
+          {selected && !disabled && !disableGhostLine && (
             <GhostLine
               initialPoints={initialPoints}
               cursorPositionRef={cursorPositionRef}
@@ -3541,7 +3591,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           )}
 
           {/* Control points - render first so lines appear under main points */}
-          {selected && (
+          {selected && !disabled && (
             <ControlPoints
               initialPoints={getAllPoints()}
               selectedPointIndex={selectedPointIndex}
@@ -3563,6 +3613,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             fitScale={fitScale}
             pointRefs={pointRefs}
             selected={selected}
+            disabled={disabled}
             transformMode={transformMode}
             pointRadius={pointRadius}
             pointFill={pointFill}
@@ -3572,8 +3623,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             activePointId={activePointId}
             maxPoints={maxPoints}
             onPointClick={(e, pointIndex) => {
-              // Prevent all clicks when in transform mode
-              if (transformMode) {
+              // Prevent all clicks when disabled or in transform mode
+              if (disabled || transformMode) {
                 e.evt.stopPropagation();
                 e.evt.preventDefault();
                 e.evt.stopImmediatePropagation();
@@ -3604,6 +3655,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
 
               // Handle point selection even when not selected (similar to shape clicks)
+              // But never allow selection when disabled
+              if (disabled) {
+                return;
+              }
               if (!selected) {
                 // Check if this instance can have selection
                 if (!tracker.canInstanceHaveSelection(instanceId)) {
@@ -3757,8 +3812,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             onClick={(e) => {
-              // Prevent all clicks when in transform mode
-              if (transformMode) {
+              // Prevent all clicks when disabled or in transform mode
+              if (disabled || transformMode) {
                 e.evt.stopPropagation();
                 e.evt.preventDefault();
                 e.evt.stopImmediatePropagation();
@@ -3768,7 +3823,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
               // CRITICAL: Handle Alt+click FIRST (for point deletion and segment breaking)
               // This must happen before any other click handling to ensure deletion works
-              if (e.evt.altKey && !e.evt.shiftKey && selected) {
+              // Don't allow deletion when disabled
+              if (e.evt.altKey && !e.evt.shiftKey && selected && !disabled) {
                 // Let the event bubble to the Group onClick handler which has the Alt+click logic
                 // Don't stop propagation or prevent default - let it reach createClickHandler
                 return;
@@ -3834,6 +3890,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
             }}
             onMouseDown={(e) => {
+              // Don't start shape drag if disabled
+              if (disabled) {
+                return;
+              }
               // Don't start shape drag if in multi-region selection mode
               // ImageTransformer will handle dragging in this case
               if (isMultiRegionSelected) {
@@ -3915,7 +3975,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           />
 
           {/* Ghost line - preview from last point to cursor */}
-          {selected && !disableGhostLine && (
+          {selected && !disabled && !disableGhostLine && (
             <GhostLine
               initialPoints={initialPoints}
               cursorPositionRef={cursorPositionRef}
@@ -3942,7 +4002,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           )}
 
           {/* Control points - render first so lines appear under main points */}
-          {selected && (
+          {selected && !disabled && (
             <ControlPoints
               initialPoints={getAllPoints()}
               selectedPointIndex={selectedPointIndex}
@@ -3964,6 +4024,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             fitScale={fitScale}
             pointRefs={pointRefs}
             selected={selected}
+            disabled={disabled}
             transformMode={transformMode}
             pointRadius={pointRadius}
             pointFill={pointFill}
@@ -3996,7 +4057,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
 
               // Handle Shift+click point conversion (before other checks)
-              if (e.evt.shiftKey && !e.evt.altKey && selected) {
+              if (e.evt.shiftKey && !e.evt.altKey && selected && !disabled) {
                 if (
                   handleShiftClickPointConversion(e, {
                     initialPoints,
@@ -4009,15 +4070,15 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                     onPointsChange,
                     onPointEdited,
                     setVisibleControlPoints,
-                  })
+                  } as any)
                 ) {
                   pointSelectionHandled.current = true;
                   return; // Successfully converted point
                 }
               }
 
-              // Handle cmd/ctrl-click for multi-selection (when selected)
-              if (selected && (e.evt.ctrlKey || e.evt.metaKey) && !e.evt.altKey && !e.evt.shiftKey) {
+              // Handle cmd/ctrl-click for multi-selection (when selected and not disabled)
+              if (selected && !disabled && (e.evt.ctrlKey || e.evt.metaKey) && !e.evt.altKey && !e.evt.shiftKey) {
                 // Check if this instance can have selection
                 if (!tracker.canInstanceHaveSelection(instanceId)) {
                   return; // Block the selection
@@ -4043,6 +4104,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               }
 
               // Handle point selection even when not selected (similar to shape clicks)
+              // But never allow selection when disabled
+              if (disabled) {
+                return;
+              }
               if (!selected) {
                 // Check if this instance can have selection
                 if (!tracker.canInstanceHaveSelection(instanceId)) {
@@ -4086,8 +4151,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 return;
               }
 
-              // Handle regular point selection (when selected and not in transform mode)
-              if (selected && !transformMode) {
+              // Handle regular point selection (when selected, not disabled, and not in transform mode)
+              if (selected && !disabled && !transformMode) {
                 // Check if this instance can have selection
                 if (!tracker.canInstanceHaveSelection(instanceId)) {
                   return; // Block the selection
