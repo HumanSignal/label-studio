@@ -15,6 +15,7 @@ export const EntityTab = observer(
       return (
         <div
           ref={ref}
+          data-annotation-id={entity.pk ?? entity.id}
           className={cn("entity-tab").mod({ selected, bordered }).toClassName()}
           style={style}
           onClick={(e) => {

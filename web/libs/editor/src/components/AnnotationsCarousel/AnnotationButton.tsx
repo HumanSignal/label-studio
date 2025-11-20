@@ -287,7 +287,10 @@ export const AnnotationButton = observer(
     );
 
     return (
-      <div className={cn("annotation-button").mod({ selected: entity.selected }).toClassName()}>
+      <div
+        className={cn("annotation-button").mod({ selected: entity.selected }).toClassName()}
+        data-annotation-id={entity.pk ?? entity.id}
+      >
         <div className={cn("annotation-button").elem("mainSection").toClassName()} onClick={clickHandler}>
           <div className={cn("annotation-button").elem("picSection").toClassName()}>
             <Userpic
