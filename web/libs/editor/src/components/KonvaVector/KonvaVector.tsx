@@ -2674,7 +2674,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       }
 
       // Handle shape dragging first (if active, allow dragging to continue even outside bounds)
-      // Skip individual shape dragging if disabled, in multi-region mode (ImageTransformer handles it)
+      // Skip individual shape dragging if disabled or in multi-region mode (ImageTransformer handles it)
       if (isDraggingShape && shapeDragStartPos.current && !disabled && !isMultiRegionSelected) {
         // Calculate delta from start position
         const deltaX = imagePos.x - shapeDragStartPos.current.imageX;
