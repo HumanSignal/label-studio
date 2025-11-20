@@ -218,8 +218,8 @@ export interface KonvaVectorProps {
   onMouseEnter?: (e: KonvaEventObject<MouseEvent>) => void;
   /** Mouse leave event handler */
   onMouseLeave?: (e: KonvaEventObject<MouseEvent>) => void;
-  /** Disable all interactions when true */
-  disabled?: boolean;
+  /** Enable all interactions when true (default: true) */
+  selected?: boolean;
   /** Enable transform mode where all points are treated as selected */
   transformMode?: boolean;
   /** Whether multiple regions are currently selected (disables internal transformer) */
