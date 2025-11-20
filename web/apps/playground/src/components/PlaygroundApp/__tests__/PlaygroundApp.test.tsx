@@ -53,8 +53,7 @@ describe("PlaygroundApp", () => {
       return [null, mockSetInterfaces];
     });
     (useSetAtom as jest.Mock).mockImplementation((atom) => {
-      if (atom === configAtom)
-        return (c: string) => mockSetConfig(removeAllSpaceLikeCharacters(c));
+      if (atom === configAtom) return (c: string) => mockSetConfig(removeAllSpaceLikeCharacters(c));
       if (atom === errorAtom) return mockSetError;
       if (atom === loadingAtom) return mockSetLoading;
       return mockSetInterfaces;
@@ -81,9 +80,7 @@ describe("PlaygroundApp", () => {
     render(<PlaygroundApp />);
 
     await waitFor(() => {
-      expect(mockSetConfig).toHaveBeenCalledWith(
-        removeAllSpaceLikeCharacters(mockConfig),
-      );
+      expect(mockSetConfig).toHaveBeenCalledWith(removeAllSpaceLikeCharacters(mockConfig));
       expect(mockSetError).not.toHaveBeenCalled();
     });
   });
@@ -109,9 +106,7 @@ describe("PlaygroundApp", () => {
     // Mock URL with configUrl parameter
     const mockConfig = '<View><Text name="text" value="$text"/></View>';
     Object.defineProperty(window, "location", {
-      value: new URL(
-        "http://localhost?configUrl=http://example.com/config.xml",
-      ),
+      value: new URL("http://localhost?configUrl=http://example.com/config.xml"),
       writable: true,
       configurable: true,
     });
@@ -129,9 +124,7 @@ describe("PlaygroundApp", () => {
     });
 
     await waitFor(() => {
-      expect(mockSetConfig).toHaveBeenCalledWith(
-        removeAllSpaceLikeCharacters(mockConfig),
-      );
+      expect(mockSetConfig).toHaveBeenCalledWith(removeAllSpaceLikeCharacters(mockConfig));
       expect(mockSetLoading).toHaveBeenCalledWith(false);
     });
   });
@@ -139,17 +132,13 @@ describe("PlaygroundApp", () => {
   it("should handle failed configUrl fetch", async () => {
     // Mock URL with configUrl parameter
     Object.defineProperty(window, "location", {
-      value: new URL(
-        "http://localhost?configUrl=http://example.com/config.xml",
-      ),
+      value: new URL("http://localhost?configUrl=http://example.com/config.xml"),
       writable: true,
       configurable: true,
     });
 
     // Mock failed fetch response
-    (global.fetch as jest.Mock).mockRejectedValueOnce(
-      new Error("Failed to fetch"),
-    );
+    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error("Failed to fetch"));
 
     render(<PlaygroundApp />);
 
@@ -158,9 +147,7 @@ describe("PlaygroundApp", () => {
     });
 
     await waitFor(() => {
-      expect(mockSetError).toHaveBeenCalledWith(
-        "Failed to fetch config from URL.",
-      );
+      expect(mockSetError).toHaveBeenCalledWith("Failed to fetch config from URL.");
       expect(mockSetLoading).toHaveBeenCalledWith(false);
     });
   });
@@ -168,9 +155,7 @@ describe("PlaygroundApp", () => {
   it("should handle non-200 configUrl response", async () => {
     // Mock URL with configUrl parameter
     Object.defineProperty(window, "location", {
-      value: new URL(
-        "http://localhost?configUrl=http://example.com/config.xml",
-      ),
+      value: new URL("http://localhost?configUrl=http://example.com/config.xml"),
       writable: true,
       configurable: true,
     });
@@ -187,9 +172,7 @@ describe("PlaygroundApp", () => {
     });
 
     await waitFor(() => {
-      expect(mockSetError).toHaveBeenCalledWith(
-        "Failed to fetch config from URL.",
-      );
+      expect(mockSetError).toHaveBeenCalledWith("Failed to fetch config from URL.");
       expect(mockSetLoading).toHaveBeenCalledWith(false);
     });
   });
@@ -1281,9 +1264,7 @@ describe("PlaygroundApp", () => {
 
       await waitFor(() => {
         expect(mockSetError).not.toHaveBeenCalled();
-        expect(mockSetConfig).toHaveBeenCalledWith(
-          removeAllSpaceLikeCharacters(expectedConfig),
-        );
+        expect(mockSetConfig).toHaveBeenCalledWith(removeAllSpaceLikeCharacters(expectedConfig));
       });
     });
   });
