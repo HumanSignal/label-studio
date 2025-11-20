@@ -3274,15 +3274,24 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       onMouseMove={selected && !disabled ? eventHandlers.handleLayerMouseMove : undefined}
       onMouseUp={selected && !disabled ? eventHandlers.handleLayerMouseUp : undefined}
       onClick={
-        !selected || disabled || transformMode
+        !selected || transformMode
           ? undefined
           : (e) => {
-              // Prevent all clicks when disabled or in transform mode (already checked above, but double-check)
-              if (disabled || transformMode) {
+              // Prevent editing when disabled, but allow selection clicks
+              // Prevent all clicks when in transform mode (already checked above, but double-check)
+              if (transformMode) {
                 e.evt.stopPropagation();
                 e.evt.preventDefault();
                 e.evt.stopImmediatePropagation();
                 e.cancelBubble = true;
+                return;
+              }
+
+              // When disabled, only allow selection clicks - skip all editing logic
+              if (disabled) {
+                // Call handleClickWithDebouncing to trigger selection via onClick handler
+                // This allows the shape to be selected even when disabled
+                handleClickWithDebouncing(e, onClick, onDblClick);
                 return;
               }
 
@@ -3401,8 +3410,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             onClick={(e) => {
-              // Prevent all clicks when disabled or in transform mode
-              if (disabled || transformMode) {
+              // Prevent editing clicks when disabled, but allow selection clicks
+              // Prevent all clicks when in transform mode
+              if (transformMode) {
                 e.evt.stopPropagation();
                 e.evt.preventDefault();
                 e.evt.stopImmediatePropagation();
@@ -3410,10 +3420,19 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 return;
               }
 
+              // When disabled, only allow selection clicks - skip all editing logic
+              if (disabled) {
+                // Allow the click to bubble for selection - don't prevent propagation
+                // Use debouncing for click/double-click detection for selection
+                if (!justFinishedShapeDrag.current && !e.evt.shiftKey) {
+                  handleClickWithDebouncing(e, onClick, onDblClick);
+                }
+                return;
+              }
+
               // CRITICAL: Handle Alt+click FIRST (for point deletion and segment breaking)
               // This must happen before any other click handling to ensure deletion works
-              // Don't allow deletion when disabled
-              if (e.evt.altKey && !e.evt.shiftKey && selected && !disabled) {
+              if (e.evt.altKey && !e.evt.shiftKey && selected) {
                 // Let the event bubble to the Group onClick handler which has the Alt+click logic
                 // Don't stop propagation or prevent default - let it reach createClickHandler
                 return;
@@ -3812,8 +3831,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             transform={transform}
             fitScale={fitScale}
             onClick={(e) => {
-              // Prevent all clicks when disabled or in transform mode
-              if (disabled || transformMode) {
+              // Prevent editing clicks when disabled, but allow selection clicks
+              // Prevent all clicks when in transform mode
+              if (transformMode) {
                 e.evt.stopPropagation();
                 e.evt.preventDefault();
                 e.evt.stopImmediatePropagation();
@@ -3821,10 +3841,19 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 return;
               }
 
+              // When disabled, only allow selection clicks - skip all editing logic
+              if (disabled) {
+                // Allow the click to bubble for selection - don't prevent propagation
+                // Use debouncing for click/double-click detection for selection
+                if (!justFinishedShapeDrag.current && !e.evt.shiftKey) {
+                  handleClickWithDebouncing(e, onClick, onDblClick);
+                }
+                return;
+              }
+
               // CRITICAL: Handle Alt+click FIRST (for point deletion and segment breaking)
               // This must happen before any other click handling to ensure deletion works
-              // Don't allow deletion when disabled
-              if (e.evt.altKey && !e.evt.shiftKey && selected && !disabled) {
+              if (e.evt.altKey && !e.evt.shiftKey && selected) {
                 // Let the event bubble to the Group onClick handler which has the Alt+click logic
                 // Don't stop propagation or prevent default - let it reach createClickHandler
                 return;
