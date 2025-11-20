@@ -213,13 +213,14 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
 
   const handleRowClick = useCallback(
     (row?: Row<T[number]>) => {
-      // Toggle active row ID: if clicking the same row, deactivate it
-      if (row) {
-        setActiveRowId((currentActiveId) => (currentActiveId === row.id ? undefined : row.id));
+      // Only toggle active row ID and call onRowClick if onRowClick is defined
+      if (props.onRowClick) {
+        // Toggle active row ID: if clicking the same row, deactivate it
+        if (row) {
+          setActiveRowId((currentActiveId) => (currentActiveId === row.id ? undefined : row.id));
+        }
+        props.onRowClick(row);
       }
-      // Only call onRowClick if selectable is false, or if selectable is true but the click wasn't on the checkbox
-      // The checkbox click is already handled by stopPropagation in the checkbox onChange
-      props.onRowClick?.(row);
     },
     [props.onRowClick],
   );

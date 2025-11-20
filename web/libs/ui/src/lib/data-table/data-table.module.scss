@@ -104,16 +104,16 @@
 
 .bodyRowClickable {
   @apply cursor-pointer;
+
+  &:hover:not(.bodyRowError) {
+    @apply bg-primary-emphasis-subtle;
+  }
 }
 
 .bodyRowError {
   @apply bg-negative-background;
 
   border-bottom-color: var(--color-negative-accent-light);
-}
-
-.bodyRow:hover:not(.bodyRowError) {
-  @apply bg-primary-emphasis-subtle;
 }
 
 .bodyRowSelected:not(.bodyRowError) {
