@@ -1,6 +1,8 @@
-import { act } from "react";
-import { renderHook } from "@testing-library/react-hooks";
-import { usePersistentState, usePersistentJSONState } from "./usePersistentState";
+import { renderHook, act } from "@testing-library/react";
+import {
+  usePersistentState,
+  usePersistentJSONState,
+} from "./usePersistentState";
 
 describe("usePersistentState", () => {
   const key = "test-key";
@@ -10,14 +12,18 @@ describe("usePersistentState", () => {
   });
 
   it("should return default value when localStorage is empty", () => {
-    const { result } = renderHook(() => usePersistentState<string>(key, "default"));
+    const { result } = renderHook(() =>
+      usePersistentState<string>(key, "default"),
+    );
     expect(result.current[0]).toBe("default");
   });
 
   it("should initialize from localStorage if value exists without using decoder", () => {
     // Save a string value directly to localStorage
     localStorage.setItem(key, "storedValue");
-    const { result } = renderHook(() => usePersistentState<string>(key, "default"));
+    const { result } = renderHook(() =>
+      usePersistentState<string>(key, "default"),
+    );
     // Since no decoder is provided, localStorage value is taken as is.
     expect(result.current[0]).toBe("storedValue");
   });
@@ -53,7 +59,9 @@ describe("usePersistentState", () => {
 
     // Save a value using custom encoder
     localStorage.setItem(key, encoder(20));
-    const { result } = renderHook(() => usePersistentState<number>(key, 0, { encoder, decoder }));
+    const { result } = renderHook(() =>
+      usePersistentState<number>(key, 0, { encoder, decoder }),
+    );
     expect(result.current[0]).toBe(20);
 
     act(() => {
@@ -72,26 +80,34 @@ describe("usePersistentJSONState", () => {
   });
 
   it("should return default value when localStorage is empty", () => {
-    const { result } = renderHook(() => usePersistentJSONState<{ count: number }>(key, { count: 0 }));
+    const { result } = renderHook(() =>
+      usePersistentJSONState<{ count: number }>(key, { count: 0 }),
+    );
     expect(result.current[0]).toEqual({ count: 0 });
   });
 
   it("should initialize state from valid JSON found in localStorage", () => {
     const storedObject = { count: 5 };
     localStorage.setItem(key, JSON.stringify(storedObject));
-    const { result } = renderHook(() => usePersistentJSONState<{ count: number }>(key, { count: 0 }));
+    const { result } = renderHook(() =>
+      usePersistentJSONState<{ count: number }>(key, { count: 0 }),
+    );
     expect(result.current[0]).toEqual(storedObject);
   });
 
   it("should use default value when stored JSON is invalid", () => {
     // Set an invalid JSON value
     localStorage.setItem(key, "invalid json");
-    const { result } = renderHook(() => usePersistentJSONState<{ count: number }>(key, { count: 100 }));
+    const { result } = renderHook(() =>
+      usePersistentJSONState<{ count: number }>(key, { count: 100 }),
+    );
     expect(result.current[0]).toEqual({ count: 100 });
   });
 
   it("should update JSON state and persist new value to localStorage", () => {
-    const { result } = renderHook(() => usePersistentJSONState<{ count: number }>(key, { count: 0 }));
+    const { result } = renderHook(() =>
+      usePersistentJSONState<{ count: number }>(key, { count: 0 }),
+    );
     act(() => {
       result.current[1]({ count: 42 });
     });
@@ -100,7 +116,9 @@ describe("usePersistentJSONState", () => {
   });
 
   it("should update JSON state using a callback updater", () => {
-    const { result } = renderHook(() => usePersistentJSONState<{ count: number }>(key, { count: 10 }));
+    const { result } = renderHook(() =>
+      usePersistentJSONState<{ count: number }>(key, { count: 10 }),
+    );
     act(() => {
       result.current[1]((prev) => ({ count: prev.count * 2 }));
     });
