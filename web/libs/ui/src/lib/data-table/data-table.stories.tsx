@@ -85,16 +85,38 @@ const baseColumns: ColumnDef<User>[] = [
   },
 ];
 
+/**
+ * Basic DataTable
+ *
+ * Shows a simple table with data and columns.
+ * Sorting is enabled with controlled state starting as empty (no sort applied).
+ * Only columns with explicit `enableSorting: true` will be sortable (Name, Email, Last Active).
+ */
 export const Default: Story = {
-  args: {
-    data: sampleData,
-    columns: baseColumns,
+  render: () => {
+    const [sorting, setSorting] = useState<SortingState>([]);
+
+    return (
+      <DataTable
+        data={sampleData}
+        columns={baseColumns}
+        enableSorting
+        sorting={sorting}
+        onSortingChange={setSorting}
+      />
+    );
   },
 };
 
+/**
+ * Table with Sorting
+ *
+ * Default sorted by "name" ascending.
+ * Click on sortable column headers to change sort direction.
+ */
 export const WithSorting: Story = {
   render: () => {
-    const [sorting, setSorting] = useState<SortingState>([]);
+    const [sorting, setSorting] = useState<SortingState>([{ id: "name", desc: false }]);
 
     return (
       <div className="flex flex-col gap-4">
@@ -230,6 +252,8 @@ export const EmptyState: Story = {
 
 export const LargeDataset: Story = {
   render: () => {
+    const [sorting, setSorting] = useState<SortingState>([]);
+
     // Generate 100 users
     const largeDataset = Array.from({ length: 100 }, (_, i) => ({
       id: i + 1,
@@ -248,7 +272,14 @@ export const LargeDataset: Story = {
           </p>
         </div>
         <div className="max-h-[500px] overflow-auto">
-          <DataTable data={largeDataset} columns={baseColumns} enableSorting selectable />
+          <DataTable
+            data={largeDataset}
+            columns={baseColumns}
+            enableSorting
+            sorting={sorting}
+            onSortingChange={setSorting}
+            selectable
+          />
         </div>
       </div>
     );

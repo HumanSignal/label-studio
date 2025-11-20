@@ -54,7 +54,7 @@
     @apply bg-neutral-surface;
 
     .headerIcon {
-      @apply opacity-100;
+      opacity: 1;
     }
   }
 }
@@ -68,11 +68,12 @@
 }
 
 .headerIcon {
-  @apply ml-2 flex items-center shrink-0 opacity-0 transition-opacity duration-150;
+  @apply ml-2 flex items-center shrink-0 transition-opacity duration-150;
+  opacity: 0;
 }
 
 .headerIconVisible {
-  @apply opacity-100;
+  opacity: 1;
 }
 
 .headCellResizer {

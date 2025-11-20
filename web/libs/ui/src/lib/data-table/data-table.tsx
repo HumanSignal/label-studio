@@ -2,6 +2,7 @@ import {
   type Table,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
   type Row,
   type ColumnDef,
@@ -81,13 +82,16 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   // Wrap all headers with unified Header component
   const columnsWithHeaders = useMemo(() => {
     return baseColumns.map((col) => {
+      // TanStack Table uses accessorKey as id if id is not explicitly set
+      const columnId = col.id || (col as any).accessorKey;
+
       // Get current sort state for this column
       const currentSort = sorting.length > 0 ? sorting[0] : null;
-      const isSorted = currentSort?.id === col.id;
+      const isSorted = currentSort?.id === columnId;
       const isDesc = currentSort?.desc ?? false;
 
       // Determine if sorting is enabled for this column
-      const columnSortingEnabled = enableSorting && col.enableSorting !== false;
+      const columnSortingEnabled = enableSorting && col.enableSorting === true;
 
       // Preserve original header - extract string if it's a string
       const originalHeader = typeof col.header === "string" ? col.header : undefined;
@@ -95,6 +99,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       // Wrap all headers with unified Header component
       return {
         ...col,
+        enableSorting: columnSortingEnabled, // Explicitly set enableSorting on column definition for TanStack
         header: (headerContext: HeaderContext<T[number], unknown>) => (
           <Header
             header={headerContext}
@@ -233,7 +238,9 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       return (row as any)?.id?.toString() ?? index.toString();
     },
     columnResizeMode: "onChange",
+    enableSorting: enableSorting,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   // just for persistence; don't use this as layout input
@@ -491,21 +498,15 @@ export const Header = <T,>({
   }
 
   // Determine icon: when sorted, show current direction; when hovering unsorted, show next direction (asc)
-  let sortIcon: React.ReactNode;
-  if (isSorted) {
-    // Currently sorted: show direction (IconSortUp for desc, IconSortDown for asc - matching PeopleList)
-    sortIcon = isDesc ? <IconSortUp /> : <IconSortDown />;
-  } else {
-    // Hovering unsorted column: show next direction (ascending)
-    sortIcon = <IconSortDown />;
-  }
+  const sortIcon = isSorted ? isDesc ? <IconSortUp /> : <IconSortDown /> : <IconSortDown />;
 
   return (
     <div className={styles.headerContent}>
       <Typography variant="body" size="small" className={cn(isSorted && styles.headerTextSorted)}>
         {headerLabel}
       </Typography>
-      <div className={cn(styles.headerIcon, isSorted && styles.headerIconVisible)}>{sortIcon}</div>
+      {/* Always render icon container for sortable columns - CSS handles visibility */}
+      <div className={cn(styles.headerIcon, isSorted === true && styles.headerIconVisible)}>{sortIcon}</div>
     </div>
   );
 };
