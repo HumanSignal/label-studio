@@ -338,3 +338,39 @@ export const FullFeatured: Story = {
   },
 };
 
+/**
+ * Conditional Row Selection
+ *
+ * Use `isRowSelectable` to control which rows can be selected.
+ * The checkbox will be hidden for non-selectable rows.
+ *
+ * In this example, inactive users cannot be selected.
+ */
+export const ConditionalRowSelection: Story = {
+  render: () => {
+    const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+    const selectedCount = Object.keys(rowSelection).length;
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="p-4 bg-neutral-surface rounded-md">
+          <p className="text-sm text-neutral-content-subtle mb-2">
+            Selected: <strong>{selectedCount}</strong> user{selectedCount !== 1 ? "s" : ""}
+          </p>
+          <p className="text-sm text-neutral-content-subtle">
+            💡 Inactive users (Bob Johnson) cannot be selected - their checkbox is hidden
+          </p>
+        </div>
+        <DataTable
+          data={sampleData}
+          columns={baseColumns}
+          selectable
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
+          isRowSelectable={(row) => row.original.status === "active"}
+        />
+      </div>
+    );
+  },
+};
+

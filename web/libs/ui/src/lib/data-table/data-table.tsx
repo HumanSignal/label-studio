@@ -47,7 +47,7 @@ export type DataTableProps<T extends DataShape> = {
   onRowSelectionChange?: (
     updater: Record<string, boolean> | ((old: Record<string, boolean>) => Record<string, boolean>),
   ) => void;
-  isRowDisabled?: (row: Row<T[number]>) => boolean; // Function to determine if a row should be disabled
+  isRowSelectable?: (row: Row<T[number]>) => boolean; // Function to determine if a row checkbox should be shown/selectable
   // Sorting props
   sorting?: SortingState;
   onSortingChange?: (updater: SortingState | ((old: SortingState) => SortingState)) => void;
@@ -62,7 +62,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     sorting: controlledSorting,
     onSortingChange: controlledOnSortingChange,
     enableSorting = true,
-    isRowDisabled,
+    isRowSelectable,
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
@@ -224,8 +224,8 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       }
     },
     enableRowSelection: selectable
-      ? isRowDisabled
-        ? (row) => !isRowDisabled(row) // If isRowDisabled is provided, enable selection only for non-disabled rows
+      ? isRowSelectable
+        ? (row) => isRowSelectable(row) // If isRowSelectable is provided, enable selection based on the function
         : true
       : undefined,
     getRowId: (row, index) => {
