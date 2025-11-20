@@ -212,6 +212,8 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
                 controlIndex: 1,
               });
               props.isDragging.current = true;
+              // Fire transform start event when control point dragging begins
+              props.handleTransformStart?.();
               props.lastPos.current = {
                 x: e.evt.clientX,
                 y: e.evt.clientY,
@@ -233,6 +235,8 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
                 controlIndex: 2,
               });
               props.isDragging.current = true;
+              // Fire transform start event when control point dragging begins
+              props.handleTransformStart?.();
               props.lastPos.current = {
                 x: e.evt.clientX,
                 y: e.evt.clientY,
@@ -448,6 +452,8 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       // If we haven't started dragging yet, check if we should start
       if (!props.isDragging.current && (mouseDeltaX > dragThreshold || mouseDeltaY > dragThreshold)) {
         props.isDragging.current = true;
+        // Fire transform start event when point dragging begins
+        props.handleTransformStart?.();
       }
 
       // Only proceed with dragging if we're actually dragging
@@ -773,6 +779,13 @@ export function createMouseUpHandler(props: EventHandlerProps) {
         // Normal point selection
         handlePointSelectionFromIndex(pointIndex, props, e);
       }
+    }
+
+    // Fire transform end event if we were dragging (point or control point)
+    const wasDragging =
+      props.isDragging.current || props.draggedPointIndex !== null || props.draggedControlPoint !== null;
+    if (wasDragging) {
+      props.handleTransformEnd?.(e);
     }
 
     // Reset dragging state
