@@ -22,16 +22,14 @@ const resultValue = (result: RawResult) => {
 export const AggregationCell = ({
   control,
   annotations,
-  countEmpty,
   isExpanded,
-}: { control: ControlTag; annotations: AnnotationSummary[]; countEmpty: boolean; isExpanded: boolean }) => {
+}: { control: ControlTag; annotations: AnnotationSummary[]; isExpanded: boolean }) => {
   const allResults = annotations.flatMap((ann) => ann.results.filter((r) => r.from_name === control.name));
+  const totalAnnotations = annotations.length;
 
   if (!allResults.length) {
     return <span className="text-neutral-content-subtler text-xs italic">No data</span>;
   }
-
-  const totalAnnotations = countEmpty ? annotations.length : allResults.length;
 
   // Handle labels-type controls (rectanglelabels, polygonlabels, labels, etc.)
   if (control.type.endsWith("labels")) {
@@ -145,7 +143,7 @@ export const AggregationCell = ({
     const ratings = allResults.map((r) => resultValue(r)).filter(Boolean);
     if (!ratings.length) return <span className="text-neutral-content-subtler text-xs italic">No ratings</span>;
 
-    const avgRating = ratings.reduce((sum, val) => sum + val, 0) / (countEmpty ? totalAnnotations : ratings.length);
+    const avgRating = ratings.reduce((sum, val) => sum + val, 0) / totalAnnotations;
     return (
       <span className="text-sm font-medium text-neutral-content-subtle">
         Avg: <span className="font-bold">{avgRating.toFixed(1)}</span> <span className="text-yellow-500">★</span>
@@ -158,7 +156,7 @@ export const AggregationCell = ({
     const numbers = allResults.map((r) => resultValue(r)).filter((v) => v !== null && v !== undefined);
     if (!numbers.length) return <span className="text-neutral-content-subtler text-xs italic">No data</span>;
 
-    const avg = numbers.reduce((sum, val) => sum + Number(val), 0) / (countEmpty ? totalAnnotations : numbers.length);
+    const avg = numbers.reduce((sum, val) => sum + Number(val), 0) / totalAnnotations;
     return (
       <span className="text-sm font-medium text-neutral-content-subtle">
         Avg: <span className="font-bold">{avg.toFixed(1)}</span>
@@ -167,7 +165,7 @@ export const AggregationCell = ({
   }
 
   // Default: show N/A
-  return <span className="text-sm font-medium text-neutral-content-subtler">N/A</span>;
+  return <span className="text-neutral-content-subtler text-xs italic">N/A</span>;
 };
 
 /**
@@ -177,14 +175,12 @@ export const AggregationCell = ({
  */
 export const AggregationTableRow = ({
   headers,
-  processedControls,
+  controls,
   annotations,
-  countEmpty,
 }: {
   headers: Header<AnnotationSummary, unknown>[];
-  processedControls: ControlTag[];
+  controls: ControlTag[];
   annotations: AnnotationSummary[];
-  countEmpty: boolean;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasOverflow, setHasOverflow] = useState(false);
@@ -200,7 +196,7 @@ export const AggregationTableRow = ({
     });
 
     setHasOverflow(hasOverflowingCells);
-  }, [annotations, processedControls]);
+  }, [annotations, controls]);
 
   return (
     <tr ref={rowRef} className={cnm("relative z-2", styles["aggregation-row"])}>
@@ -233,12 +229,7 @@ export const AggregationTableRow = ({
             className="px-4 py-2.5 overflow-hidden border-y-2 border-neutral-border-bold"
             style={{ width: header.getSize() }}
           >
-            <AggregationCell
-              control={processedControls[index - 1]}
-              annotations={annotations}
-              countEmpty={countEmpty}
-              isExpanded={isExpanded}
-            />
+            <AggregationCell control={controls[index - 1]} annotations={annotations} isExpanded={isExpanded} />
           </td>
         ),
       )}

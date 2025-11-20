@@ -107,6 +107,8 @@ export interface EventHandlerProps {
   disabled?: boolean;
   transformMode?: boolean;
   disableInternalPointAddition?: boolean;
+  handleTransformStart?: () => void;
+  handleTransformEnd?: (e?: KonvaEventObject<MouseEvent>) => void;
   pointCreationManager?: {
     isCreating: () => boolean;
     createRegularPointAt: (x: number, y: number, prevPointId?: string) => boolean;

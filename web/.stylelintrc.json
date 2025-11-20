@@ -4,13 +4,50 @@
     "selector-class-pattern": null,
     "custom-property-pattern": null,
     "no-descending-specificity": null,
-    "function-no-unknown": null,
     "scss/no-global-function-names": null,
     "scss/function-no-unknown": null,
     "selector-pseudo-class-no-unknown": [
       true,
       {
         "ignorePseudoClasses": ["global"]
+      }
+    ],
+    "scss/at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["position-try"]
+      }
+    ],
+    "property-no-unknown": [
+      true,
+      {
+        "ignoreProperties": ["position-try-fallbacks", "anchor-name", "position-anchor", "position-visibility"]
+      }
+    ],
+    "function-no-unknown": [
+      true,
+      {
+        "ignoreFunctions": ["anchor-size", "anchor", "map-get", "unquote"]
+      }
+    ],
+    "declaration-block-no-redundant-longhand-properties": [
+      true,
+      {
+        "ignoreShorthands": ["inset"]
+      }
+    ],
+    "comment-empty-line-before": [
+      "always",
+      {
+        "except": ["first-nested"],
+        "ignore": ["stylelint-commands", "after-comment"]
+      }
+    ],
+    "declaration-empty-line-before": [
+      "always",
+      {
+        "except": ["first-nested", "after-comment", "after-declaration"],
+        "ignore": ["inside-single-line-block"]
       }
     ]
   }
