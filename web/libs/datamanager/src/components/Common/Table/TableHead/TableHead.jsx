@@ -3,7 +3,7 @@ import { toJS } from "mobx";
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { ViewColumnType, ViewColumnTypeName, ViewColumnTypeShort } from "../../../../stores/Tabs/tab_column";
 import { Button } from "@humansignal/ui";
-import { Dropdown } from "../../Dropdown/Dropdown";
+import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../../Menu/Menu";
 import { Resizer } from "../../Resizer/Resizer";
 import { Space } from "../../Space/Space";
@@ -97,9 +97,7 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
             align="left"
             onClose={closeHandler}
           />
-        ) : (
-          <></>
-        )
+        ) : null
       }
       onToggle={onToggle}
     >
