@@ -8,6 +8,9 @@ export default function MLConfigPanel(){
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [config, setConfig] = useState({model_path:'', conf:0.25, version:'', labels:{}});
+  const [configFile, setConfigFile] = useState('');
+  const [originalConfig, setOriginalConfig] = useState(null);
+  const [labelsText, setLabelsText] = useState(JSON.stringify({}, null, 2));
   const [error, setError] = useState(null);
 
   useEffect(()=>{
@@ -16,8 +19,14 @@ export default function MLConfigPanel(){
       try{
         const res = await fetch('/api/ml/config', { credentials: 'same-origin' });
         if(res && res.ok){
-          const data = await res.json();
-          if(mounted) setConfig(data);
+          const payload = await res.json();
+          if(mounted) {
+            const cfg = payload.config || payload;
+            setConfig(cfg);
+            setOriginalConfig(cfg);
+            setLabelsText(JSON.stringify(cfg.labels || {}, null, 2));
+            setConfigFile(payload.config_file || '');
+          }
         } else {
           const txt = res ? await res.text() : 'no response';
           setError(txt);
@@ -36,12 +45,44 @@ export default function MLConfigPanel(){
     setConfig(prev=> ({...prev, [key]: key==='conf' ? parseFloat(v) : v}));
   }
 
+  const onConfigFileChange = (e) => setConfigFile(e.target.value);
+
+  // When configFile changes, fetch that file from backend and populate fields
+  useEffect(()=>{
+    if(!configFile) return;
+    let mounted = true;
+    (async ()=>{
+      try{
+        const url = '/api/ml/config?config_file=' + encodeURIComponent(configFile);
+        const res = await fetch(url, { credentials: 'same-origin' });
+        if(res && res.ok){
+          const payload = await res.json();
+          if(mounted){
+            const cfg = payload.config || payload;
+            setConfig(cfg);
+            setOriginalConfig(cfg);
+            setLabelsText(JSON.stringify(cfg.labels || {}, null, 2));
+            setError(null);
+          }
+        }else{
+          const txt = res ? await res.text() : 'no response';
+          if(mounted) setError('Failed to load config file: ' + txt);
+        }
+      }catch(err){
+        if(mounted) setError(String(err));
+      }
+    })();
+    return ()=>{mounted=false}
+  },[configFile]);
+
   const onLabelsChange = (e) => {
+    const txt = e.target.value;
+    setLabelsText(txt);
     try{
-      const parsed = JSON.parse(e.target.value);
+      const parsed = JSON.parse(txt);
       setConfig(prev=> ({...prev, labels: parsed}));
+      setError(null);
     }catch(err){
-      // keep raw text until valid JSON
       setError('Labels must be valid JSON mapping like {"0":"label"}');
     }
   }
@@ -50,11 +91,37 @@ export default function MLConfigPanel(){
     setSaving(true);
     setError(null);
     try{
+      // Only send changed fields to avoid accidental overwrites
+      const allowed = ['model_path','conf','version','labels'];
+      const payload = {};
+      if(configFile) payload.config_file = configFile;
+      if(originalConfig){
+        allowed.forEach((k)=>{
+          // compare JSON-stringified for objects
+          const a = originalConfig[k];
+          const b = config[k];
+          const equal = (typeof a === 'object') ? JSON.stringify(a) === JSON.stringify(b) : String(a) === String(b);
+          if(!equal) payload[k] = b;
+        });
+      } else {
+        // no original to compare, send what we have but avoid empty strings
+        allowed.forEach((k)=>{
+          const v = config[k];
+          if(v !== undefined && v !== null && !(typeof v === 'string' && v.trim()==='')) payload[k] = v;
+        });
+      }
+
+      if(Object.keys(payload).length === 0){
+        setError('No changes to apply');
+        setSaving(false);
+        return;
+      }
+
       const res = await fetch('/api/ml/config', {
         method: 'POST',
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config),
+        body: JSON.stringify(payload),
       });
 
       if(res && res.ok){
@@ -77,6 +144,10 @@ export default function MLConfigPanel(){
     <div className="p-base">
       {error && <div className="text-red-600 mb-tight">{error}</div>}
       <div className="mb-base">
+        <Label text="Config File Path" />
+        <Input value={configFile||''} onChange={(e)=>onConfigFileChange(e)} placeholder="/path/to/config.json" />
+      </div>
+      <div className="mb-base">
         <Label text="Model Path" />
         <Input value={config.model_path||''} onChange={onChange('model_path')} placeholder="/path/to/model.pt" />
       </div>
@@ -90,7 +161,7 @@ export default function MLConfigPanel(){
       </div>
       <div className="mb-base">
         <Label text="Labels (JSON)" />
-        <TextArea defaultValue={JSON.stringify(config.labels||{}, null, 2)} onChange={onLabelsChange} />
+        <TextArea value={labelsText} onChange={onLabelsChange} />
       </div>
       <div className="flex gap-2">
         <Button variant="primary" look="filled" onClick={apply} disabled={saving}>

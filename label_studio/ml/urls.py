@@ -20,6 +20,7 @@ _api_urlpatterns = [
     ),
     path('<int:pk>/versions', api.MLBackendVersionsAPI.as_view(), name='ml-versions'),
     path('config', api.MLHotReloadConfigAPI.as_view(), name='ml-config'),
+    path('resources', api.MLResourcesAPI.as_view(), name='ml-resources'),
 ]
 
 urlpatterns = [

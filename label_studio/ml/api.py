@@ -542,8 +542,26 @@ class MLHotReloadConfigAPI(APIView):
 
         return getattr(settings, 'HOT_RELOAD_CONFIG_FILE', None)
 
+    def _resolve_config_file(self, request, payload_config_file=None):
+        """Resolve config file path from query param, payload or backend defaults.
+
+        Priority: query param `config_file` > payload `config_file` > known backend constant/env/settings
+        Returns absolute path or None.
+        """
+        # prefer explicit query param
+        q = request.query_params.get('config_file') if hasattr(request, 'query_params') else None
+        if q:
+            return os.path.abspath(q)
+
+        # next prefer payload value passed from POST body
+        if payload_config_file:
+            return os.path.abspath(payload_config_file)
+
+        # last, fallback to backend-discovered path
+        return self._config_path_from_backend()
+
     def get(self, request, *args, **kwargs):
-        config_file = self._config_path_from_backend()
+        config_file = self._resolve_config_file(request)
         if not config_file:
             return Response({'error': 'HOT_RELOAD_CONFIG_FILE not found'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -552,11 +570,13 @@ class MLHotReloadConfigAPI(APIView):
                 data = json.load(f)
         except Exception as e:
             return Response({'error': f'Failed to read config: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response(data, status=status.HTTP_200_OK)
+        # return both config contents and the resolved path for the frontend UI
+        return Response({'config': data, 'config_file': config_file}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         payload = request.data
+        # allow passing config_file in payload to select which file to update
+        payload_config_file = payload.get('config_file') if isinstance(payload, dict) else None
         allowed_keys = {'model_path', 'conf', 'version', 'labels'}
         data = {k: v for k, v in payload.items() if k in allowed_keys}
 
@@ -577,9 +597,17 @@ class MLHotReloadConfigAPI(APIView):
             if not os.path.exists(model_path):
                 return Response({'error': f'model_path does not exist: {model_path}'}, status=status.HTTP_400_BAD_REQUEST)
 
-        config_file = self._config_path_from_backend()
+        config_file = self._resolve_config_file(request, payload_config_file=payload_config_file)
         if not config_file:
             return Response({'error': 'HOT_RELOAD_CONFIG_FILE not found'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Ensure config_file is absolute path
+        config_file = os.path.abspath(config_file)
+
+        # Basic permission/validations: parent dir must exist
+        parent = os.path.dirname(config_file)
+        if not os.path.isdir(parent):
+            return Response({'error': f'Config parent directory does not exist: {parent}'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             if os.path.exists(config_file):
@@ -598,3 +626,38 @@ class MLHotReloadConfigAPI(APIView):
             return Response({'error': f'Failed to write config: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({'status': 'ok', 'config': current}, status=status.HTTP_200_OK)
+
+
+class MLResourcesAPI(APIView):
+    permission_required = all_permissions.projects_view
+
+    def get(self, request, *args, **kwargs):
+        """Return GPU info using nvidia-smi if available."""
+        try:
+            import subprocess
+
+            cmd = ["nvidia-smi", "--query-gpu=index,name,memory.total,memory.used,utilization.gpu,temperature.gpu", "--format=csv,noheader,nounits"]
+            proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=5)
+            if proc.returncode != 0:
+                return Response({'error': 'nvidia-smi failed', 'detail': proc.stderr.strip()}, status=status.HTTP_200_OK)
+
+            gpus = []
+            for line in proc.stdout.strip().splitlines():
+                parts = [p.strip() for p in line.split(',')]
+                if len(parts) >= 6:
+                    idx, name, mem_total, mem_used, util, temp = parts[:6]
+                    gpus.append({
+                        'index': int(idx),
+                        'name': name,
+                        'memory_total_mb': float(mem_total),
+                        'memory_used_mb': float(mem_used),
+                        'utilization_percent': float(util),
+                        'temperature_c': float(temp),
+                    })
+
+            return Response({'gpus': gpus}, status=status.HTTP_200_OK)
+        except FileNotFoundError:
+            return Response({'error': 'nvidia-smi not found on server'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.exception('Failed to query GPU status')
+            return Response({'error': f'Failed to query GPU status: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

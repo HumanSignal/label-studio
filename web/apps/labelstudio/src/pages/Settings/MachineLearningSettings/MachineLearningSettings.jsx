@@ -13,6 +13,7 @@ import { TestRequest } from "./TestRequest";
 import { StartModelTraining } from "./StartModelTraining";
 import { modal as modalFactory } from "../../../components/Modal/Modal";
 import MLConfigPanel from "./MLConfigPanel";
+import MLResourcesPanel from "./MLResourcesPanel";
 import "./MachineLearningSettings.scss";
 
 export const MachineLearningSettings = () => {
@@ -164,6 +165,11 @@ export const MachineLearningSettings = () => {
         <div className="mt-base">
           <Button variant="secondary" look="outlined" onClick={showMLConfigModal} aria-label="Open ML config">
             Configure Hot-Reload Model
+          </Button>
+          <Button variant="secondary" look="outlined" onClick={() => {
+            modalFactory({ title: 'Resources', style: { width: 760 }, closeOnClickOutside: true, body: <MLResourcesPanel /> })
+          }} className="ml-2">
+            Show Resources
           </Button>
         </div>
 
