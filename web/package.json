@@ -224,7 +224,7 @@
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",
     "typescript": "5.8.3",
-    "typescript-plugin-css-modules": "^5.1.0",
+    "typescript-plugin-css-modules": "^5.2.0",
     "url-loader": "^4.1.1",
     "webpack": "5.98.0",
     "webpack-cli": "^5.0.1",
