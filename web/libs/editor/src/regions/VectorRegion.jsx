@@ -605,7 +605,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
   return (
     <RegionWrapper item={item}>
-      <Group ref={(ref) => item.segGroupRef(ref)} name={item.id}>
+      <Group ref={(ref) => item.segGroupRef(ref)} name={item.id} visible={!item.hidden}>
         <KonvaVector
           ref={(kv) => item.setKonvaVectorRef(kv)}
           initialPoints={Array.from(item.vertices)}
