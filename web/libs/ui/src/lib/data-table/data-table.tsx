@@ -47,6 +47,7 @@ export type DataTableProps<T extends DataShape> = {
   onRowSelectionChange?: (
     updater: Record<string, boolean> | ((old: Record<string, boolean>) => Record<string, boolean>),
   ) => void;
+  isRowDisabled?: (row: Row<T[number]>) => boolean; // Function to determine if a row should be disabled
   // Sorting props
   sorting?: SortingState;
   onSortingChange?: (updater: SortingState | ((old: SortingState) => SortingState)) => void;
@@ -61,6 +62,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     sorting: controlledSorting,
     onSortingChange: controlledOnSortingChange,
     enableSorting = true,
+    isRowDisabled,
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
@@ -116,22 +118,47 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     const selectionColumn: ColumnDef<T[number]> = {
       id: "select",
       header: ({ table }) => {
-        const isAllSelected = table.getIsAllRowsSelected();
-        const isSomeSelected = table.getIsSomeRowsSelected();
+        // Get all rows that can be selected (excluding disabled rows)
+        const selectableRows = table.getRowModel().rows.filter((row) => row.getCanSelect());
+        const selectedSelectableRows = selectableRows.filter((row) => row.getIsSelected());
+
+        const isAllSelected = selectableRows.length > 0 && selectedSelectableRows.length === selectableRows.length;
+        const isSomeSelected =
+          selectedSelectableRows.length > 0 && selectedSelectableRows.length < selectableRows.length;
 
         return (
           <Checkbox
             checked={isAllSelected}
-            indeterminate={isSomeSelected && !isAllSelected}
+            indeterminate={isSomeSelected}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               e.stopPropagation();
-              table.toggleAllRowsSelected(e.target.checked);
+
+              // Build new selection state with only selectable rows
+              const newSelection: Record<string, boolean> = {};
+
+              if (e.target.checked) {
+                // Select all selectable rows
+                selectableRows.forEach((row) => {
+                  newSelection[row.id] = true;
+                });
+              }
+              // If unchecking, newSelection stays empty (deselect all)
+
+              // Update selection state in one go
+              table.setRowSelection(newSelection);
             }}
             ariaLabel={isAllSelected ? "Unselect all rows" : "Select all rows"}
           />
         );
       },
       cell: ({ row }) => {
+        const canSelect = row.getCanSelect();
+
+        // Hide checkbox completely for disabled rows
+        if (!canSelect) {
+          return null;
+        }
+
         return (
           <Checkbox
             checked={row.getIsSelected()}
@@ -196,7 +223,11 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         });
       }
     },
-    enableRowSelection: selectable ? true : undefined,
+    enableRowSelection: selectable
+      ? isRowDisabled
+        ? (row) => !isRowDisabled(row) // If isRowDisabled is provided, enable selection only for non-disabled rows
+        : true
+      : undefined,
     getRowId: (row, index) => {
       // Use id if available, otherwise fall back to index
       return (row as any)?.id?.toString() ?? index.toString();

@@ -142,3 +142,16 @@
 .bodyCellPinned {
   @apply sticky right-0 border-l border-neutral-border bg-neutral-background;
 }
+
+// Style for disabled checkboxes in data table
+.bodyCell {
+  :global(.checkbox_disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    :global(.checkbox__box),
+    :global(.checkbox__input) {
+      cursor: not-allowed;
+    }
+  }
+}
