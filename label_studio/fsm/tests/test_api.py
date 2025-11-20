@@ -1,7 +1,7 @@
 from datetime import timedelta
+from unittest.mock import patch
 from urllib.parse import quote
 
-from unittest.mock import patch
 from fsm.state_choices import AnnotationStateChoices, ProjectStateChoices, TaskStateChoices
 from fsm.state_manager import get_state_manager
 from fsm.state_models import AnnotationState, ProjectState, TaskState
@@ -402,4 +402,3 @@ class LsoFSMEntityTransitionAPITests(FSMEntityTransitionAPITests, APITestCase):
         assert response.status_code == 200
         current_state = self.StateManager.get_current_state_value(self.task)
         assert current_state is None
-

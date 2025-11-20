@@ -1,4 +1,5 @@
 import logging
+
 from core.permissions import all_permissions
 from core.utils.filterset_to_openapi_params import filterset_to_openapi_params
 from django.shortcuts import get_object_or_404
@@ -185,7 +186,9 @@ class FSMEntityTransitionAPI(FSMAPIMixin, generics.GenericAPIView):
             raise ValidationError({'detail': str(e)})
         except TransitionValidationError as e:
             # Explicit validation failure
-            logger.warning(f'Transition validation failed with context: {e.context} and error: {e} for entity: {entity.id}')
+            logger.warning(
+                f'Transition validation failed with context: {e.context} and error: {e} for entity: {entity.id}'
+            )
             raise ValidationError({'detail': str(e)})
         # Handle feature-flag disabled path (no state record created)
         if state_record is None:
