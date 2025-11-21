@@ -8,6 +8,74 @@ alwaysApply: false
 ## Overview
 The LabelStudio Playground is a standalone, embeddable React application for editing and previewing LabelStudio XML labeling configurations. It is designed to be embedded via iframe in documentation or external web applications, providing a focused environment for working with XML-based labeling configs and live previewing the LabelStudio interface.
 
+## Architecture
+
+### Runtime architecture
+
+```mermaid
+flowchart TD
+  A[index.html root] --> B[main.tsx createRoot<br/>embedFeatureFlags]
+  B --> C[PlaygroundApp]
+  C --> D[TopBar<br/>theme and share controls]
+  C --> E[EditorPanel<br/>CodeEditor plus BottomPanel]
+  C --> F[PreviewPanel<br/>LabelStudio preview]
+
+  E --> G[configAtom<br/>Jotai state]
+  F --> G
+  F --> H[annotationAtom and sampleTaskAtom]
+  H --> I[BottomPanel JSON views]
+```
+
+**Key points**
+
+- **Entry HTML**: `src/index.html` defines a simple shell with a `root` div where the React tree is mounted.
+- **Entry script**: `src/main.tsx` calls `createRoot` on the `root` element, embeds feature flags into `window.FEATURE_FLAGS` via `embedFeatureFlags.ts`, and renders `PlaygroundApp`.
+- **Top level layout**: `PlaygroundApp` manages the header and flex layout that splits the screen between `EditorPanel` and `PreviewPanel`, with a draggable divider to resize panels.
+- **Editor side**: `EditorPanel` wraps the `CodeEditor` from `@humansignal/ui` and a resizable `BottomPanel` that shows sample task input and live annotation JSON output.
+- **Preview side**: `PreviewPanel` owns the lifecycle of the `LabelStudio` instance from `@humansignal/editor`, including dynamic import, initialization, and teardown.
+
+### Data flow and editor mounting
+
+```mermaid
+flowchart TD
+  P[URL query params<br/>config configUrl interfaces mode] --> Q[PlaygroundApp load effect]
+  Q --> R[configAtom and interfacesAtom<br/>loadingAtom and errorAtom]
+  R --> S[PreviewPanel]
+  S --> T[generateSampleTaskFromConfig<br/>XML plus sample data]
+  S --> U[dynamic import @humansignal editor]
+  U --> V[LabelStudio instance<br/>mounted into rootRef]
+  V --> W[MST annotationStore selected annotation]
+  W --> X[onSnapshot serializeAnnotation]
+  X --> Y[annotationAtom]
+  Y --> Z[BottomPanel annotation JSON]
+```
+
+**How the editor is mounted**
+
+- **URL parsing**: On mount, `PlaygroundApp` reads `config`, `configUrl`, `interfaces`, and `mode` from the URL using `getQueryParams` and `getInterfacesFromParams` in `src/utils/query.ts`.
+  - `configUrl` takes precedence; if provided, it is fetched and `<br>` tags are converted back to newlines.
+  - If only `config` is present, the app first checks if it looks like XML with `throwUnlessXmlLike`; otherwise it attempts to `decodeURIComponent` the value and again replaces `<br>` tags with newlines.
+  - Errors in decoding or fetching set `errorAtom` and clear `loadingAtom`.
+- **State wiring**: The decoded config, loading state, error state, and interfaces list are pushed into Jotai atoms defined in `src/atoms/configAtoms.ts`.
+- **Sample task generation**: When `PreviewPanel` sees a non-empty config with no loading or error, it:
+  - Dynamically imports `@humansignal/editor` and reads the `LabelStudio` constructor.
+  - Calls `generateSampleTaskFromConfig(config)` from `src/utils/generateSampleTask.ts` to build a realistic `task.data` payload based on the XML config and any embedded JSON comment.
+- **LabelStudio instance lifecycle**:
+  - Before creating a new instance, `PreviewPanel` runs a `cleanup` routine that:
+    - Deletes any global `window.LabelStudio` reference.
+    - Destroys the previous `lsfInstance` if it exists, swallowing errors from hot reload edge cases.
+    - Cancels any pending `requestAnimationFrame` and MST snapshot subscriptions.
+  - After cleanup, `PreviewPanel` sets `showPreviewAtom` to `true` and constructs a new `LabelStudio` instance with:
+    - `config`, generated `task`, and `interfaces` list.
+    - `instanceOptions` that select React version v18.
+    - `settings` that force the bottom panel to be present and collapsible, with defaults driven by `displayModeAtom`.
+  - Once `onStorageInitialized` fires, `PreviewPanel`:
+    - Creates and selects an initial annotation via `annotationStore`.
+    - Subscribes to MST snapshots with `onSnapshot` and writes serialized annotations into `annotationAtom` on each change.
+- **Bottom panel output**:
+  - `BottomPanel` reads `sampleTaskAtom` and `annotationAtom` and renders them as formatted JSON in side by side panes for input and output.
+  - This creates a tight loop from config to preview to live annotation output without leaking MST models into React state.
+
 ## Main Features
 
 - **Live XML Config Editing:** Edit Label Studio XML configs in real time and instantly preview the result.
@@ -20,24 +88,30 @@ The LabelStudio Playground is a standalone, embeddable React application for edi
 ## Main Components
 
 ### 1. `PlaygroundApp`
-- **Location:** `src/components/PlaygroundApp.tsx`
+- **Location:** `src/components/PlaygroundApp/PlaygroundApp.tsx`
 - **Role:** The main application component. Handles:
   - UI rendering and atom wiring only; all state is managed via Jotai atoms.
   - Reads and writes config, loading, error, interfaces state via atoms.
   - Uses utility functions for parsing URL parameters and interface options.
   - Renders the code editor and preview panels side by side using Tailwind CSS for layout.
 
-### 2. `PlaygroundPreview`
-- **Location:** `src/components/PlaygroundPreview.tsx`
+### 2. `PreviewPanel`
+- **Location:** `src/components/PreviewPanel/PreviewPanel.tsx`
 - **Role:** Renders the live LabelStudio preview panel.
-  - Receives all state as props (from atoms in PlaygroundApp).
-  - Dynamically loads the `@humansignal/editor` package and instantiates a LabelStudio instance with the current config and interface options.
-  - Handles cleanup of the LabelStudio instance on config/interface changes or unmount.
-  - Observes MST annotation changes and updates a Jotai atom or local state with the serialized annotation JSON, which is displayed below the preview.
-  - Displays loading and error states using Tailwind classes.
+  - Reads config, loading state, error state, interfaces, and display mode from Jotai atoms.
+  - Dynamically loads the `@humansignal/editor` package and instantiates a `LabelStudio` instance with the current config, generated sample task, and interface options.
+  - Handles cleanup of the `LabelStudio` instance on config or interface changes, unmount, or hot reload.
+  - Observes MST annotation changes via `onSnapshot` and writes serialized annotations into a Jotai atom used by the bottom panel.
+  - Displays loading and error states and suppresses preview rendering when config is missing or invalid.
 
 ### 3. `main.tsx`
 - **Role:** Entry point. Mounts the `PlaygroundApp` to the DOM.
+
+### 4. `EditorPanel` and `BottomPanel`
+- **Location:** `src/components/EditorPanel/EditorPanel.tsx` and `src/components/BottomPanel/BottomPanel.tsx`
+- **Role:** Provide the XML editor and input or output visualization.
+  - `EditorPanel` is a controlled wrapper around `CodeEditor` from `@humansignal/ui` bound to `configAtom`, with a draggable horizontal divider.
+  - `BottomPanel` shows sample task `data` and the current annotation JSON side by side and can be collapsed or expanded while preserving height.
 
 ## State Management
 - All application state (config, loading, error, interfaces, annotation, sample task) is managed using Jotai atoms, defined in `src/atoms/configAtoms.ts`.
@@ -107,6 +181,37 @@ The LabelStudio Playground is a standalone, embeddable React application for edi
 - The app can be extended to support more URL parameters, additional LabelStudio features, or integration with other HumanSignal libraries.
 - To add new sample data types, update `generateSampleTask.ts` with new logic and public domain URLs.
 - To customize annotation output, update the preview logic to observe and display additional MST state as needed.
+
+## Feature flags
+
+- The playground uses the same feature flags as the main Label Studio application, sourced from `label_studio/feature_flags.json` in the backend repo.
+- `src/utils/embedFeatureFlags.ts` imports this JSON and mirrors it into `window.FEATURE_FLAGS` at startup so that `@humansignal/editor` and UI code can rely on the usual feature flag environment.
+- Feature flags in `label_studio/feature_flags.json` are updated via a scheduled GitHub Action or manually by running the `Update Feature Flags` workflow in the `label-studio` repository CI.
+
+## Deployment and hosting
+
+- **Build tooling**:
+  - The playground is an Nx application defined by `project.json` with a `build` target that uses `@nx/webpack:webpack`.
+  - Production builds output to `dist/apps/playground/playground-assets` with `baseHref` set to `/playground-assets/` so that assets can be served from a stable subpath.
+  - The `playground:build` script in `web/package.json` sets `MODE=standalone-playground`, runs the production build, and then moves `dist/apps/playground/playground-assets/index.html` to `dist/apps/playground/index.html` for convenience.
+- **Webpack public path**:
+  - `web/webpack.config.js` reads `MODE` and, when it equals `standalone-playground`, configures `output.publicPath` to `/playground-assets/`.
+  - This ensures that all lazy loaded chunks and static assets resolve correctly when the playground is served under that prefix.
+- **Runtime hosting**:
+  - The compiled `dist/apps/playground` directory is deployed as a static site, currently via a Netlify project referenced in internal docs as `label-studio-playground`.
+  - New deployments can be triggered either by merging changes to the playground sources into the main repo or by manually triggering a deploy in the Netlify admin for the playground project.
+  - Documentation pages embed the playground as an iframe that points at the deployed playground root, passing XML configs and interface flags via query parameters.
+
+### Deployment flow
+
+```mermaid
+flowchart TD
+  A1[Developer runs yarn playground build] --> B1[Nx playground build production target]
+  B1 --> C1[Webpack bundles app<br/>outputPath dist apps playground playground assets]
+  C1 --> D1[Move built index html<br/>to dist apps playground index html]
+  D1 --> E1[Static hosting platform<br/>serves dist apps playground]
+  E1 --> F1[Docs site iframe<br/>loads playground with config query]
+```
 
 ## Directory Structure
 

@@ -236,6 +236,8 @@ def is_job_on_worker(job_id, queue_name):
     :param queue_name: Queue name
     :return: True if job on worker
     """
+    if not job_id:
+        return False
     registry = StartedJobRegistry(queue_name, connection=_redis)
     member = job_id.encode() if isinstance(job_id, str) else job_id
     # Use Redis ZSET membership check (ZSCORE) instead of registry.get_job_ids(),

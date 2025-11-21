@@ -19,6 +19,11 @@ def test_is_job_on_worker_does_not_call_get_job_ids():
 
         fake_connection.zscore.assert_called_once_with('rq:started:low', b'job123')
 
+        # Ensure None job IDs short-circuit without touching Redis.
+        fake_connection.zscore.reset_mock()
+        assert is_job_on_worker(None, 'low') is False
+        fake_connection.zscore.assert_not_called()
+
 
 def test_is_job_on_worker_safe_from_non_main_thread(monkeypatch):
     """Simulate the original failure: registry.get_job_ids would raise when used from non-main threads."""
