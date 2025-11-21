@@ -2175,6 +2175,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         isDraggingNewBezier,
         ghostPointDragInfo,
         selected,
+        disabled,
         isShiftKeyHeld: refShiftState,
       } = currentValuesRef.current;
 
