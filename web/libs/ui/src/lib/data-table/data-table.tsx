@@ -73,6 +73,8 @@ export type DataTableProps<T extends DataShape> = {
   loadingRows?: number;
   /** Optional className to apply to the table container */
   className?: string;
+  /** Test ID for the table container */
+  dataTestId?: string;
 };
 
 export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
@@ -86,6 +88,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     isRowSelectable,
     loadingRows = 5,
     className,
+    dataTestId,
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
@@ -175,6 +178,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
               table.setRowSelection(newSelection);
             }}
             ariaLabel={isAllSelected ? "Unselect all rows" : "Select all rows"}
+            data-testid="data-table-select-all"
           />
         );
       },
@@ -194,6 +198,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
               row.toggleSelected(e.target.checked);
             }}
             ariaLabel={row.getIsSelected() ? "Unselect row" : "Select row"}
+            data-testid={`data-table-row-${row.id}-select`}
           />
         );
       },
@@ -291,7 +296,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const showEmptyState = rows.length === 0 && !props.isLoading && props.emptyState;
 
   return (
-    <div className={cn(styles.container, className)}>
+    <div className={cn(styles.container, className)} data-testid={dataTestId}>
       <DataTableHead table={table} />
       {showLoadingSkeleton ? (
         <DataTableSkeletonBody
@@ -387,6 +392,7 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
                 key={header.id}
                 style={style}
                 onClick={handleHeaderClick}
+                data-testid={`data-table-header-${header.id}`}
               >
                 {header.isPlaceholder ? null : flexRender(column.columnDef.header, header.getContext())}
 
@@ -438,6 +444,7 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
         className,
       )}
       onClick={handleRowClick}
+      data-testid={`data-table-row-${row.id}`}
     >
       {row.getVisibleCells().map((cell) => {
         const isPinned = cell.column.getIsPinned();

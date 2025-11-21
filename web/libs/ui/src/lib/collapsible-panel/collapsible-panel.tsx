@@ -24,6 +24,8 @@ export type CollapsiblePanelProps = {
   onExpandedChange?: (expanded: boolean) => void;
   /** Disable the toggle button (prevents collapsing/expanding) */
   disableToggle?: boolean;
+  /** Test ID for the panel container */
+  dataTestId?: string;
 };
 
 export const CollapsiblePanel = ({
@@ -37,6 +39,7 @@ export const CollapsiblePanel = ({
   expanded: controlledExpanded,
   onExpandedChange,
   disableToggle = false,
+  dataTestId,
 }: CollapsiblePanelProps) => {
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
 
@@ -71,7 +74,7 @@ export const CollapsiblePanel = ({
   const styles = variantStyles[variant];
 
   return (
-    <div className={cn("border rounded-md overflow-hidden", styles.container, className)}>
+    <div className={cn("border rounded-md overflow-hidden", styles.container, className)} data-testid={dataTestId}>
       {/* Header - Always visible */}
       <div
         className={cn(
@@ -81,6 +84,7 @@ export const CollapsiblePanel = ({
           "transition-colors",
         )}
         onClick={handleToggle}
+        data-testid={dataTestId ? `${dataTestId}-header` : undefined}
       >
         <Button
           variant="neutral"
@@ -94,11 +98,12 @@ export const CollapsiblePanel = ({
           disabled={disableToggle}
           aria-label={isExpanded ? "Collapse panel" : "Expand panel"}
           aria-expanded={isExpanded}
+          data-testid="collapsible-panel-toggle"
         >
           {isExpanded ? <IconChevron size={16} /> : <IconChevronDown size={16} />}
         </Button>
 
-        <div className="flex-1 flex items-center gap-2 truncate">
+        <div className="flex-1 flex items-center gap-2 truncate" data-testid="collapsible-panel-title">
           <span className="text-sm font-medium truncate">{title}</span>
           {count !== undefined && count > 0 && <span className="text-sm text-neutral-content-subtle">({count})</span>}
         </div>
@@ -108,6 +113,7 @@ export const CollapsiblePanel = ({
             onClick={(e) => {
               e.stopPropagation();
             }}
+            data-testid="collapsible-panel-actions"
           >
             {actions}
           </div>
@@ -115,7 +121,11 @@ export const CollapsiblePanel = ({
       </div>
 
       {/* Content - Collapsible */}
-      {isExpanded && children && <div className="border-t border-inherit">{children}</div>}
+      {isExpanded && children && (
+        <div className="border-t border-inherit" data-testid="collapsible-panel-content">
+          {children}
+        </div>
+      )}
     </div>
   );
 };
