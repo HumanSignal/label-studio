@@ -71,6 +71,8 @@ export type DataTableProps<T extends DataShape> = {
   isLoading?: boolean;
   /** Number of skeleton rows to show when loading (default: 5) */
   loadingRows?: number;
+  /** Optional className to apply to the table container */
+  className?: string;
 };
 
 export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
@@ -83,6 +85,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     enableSorting = true,
     isRowSelectable,
     loadingRows = 5,
+    className,
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
@@ -288,7 +291,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const showEmptyState = rows.length === 0 && !props.isLoading && props.emptyState;
 
   return (
-    <div className={styles.container}>
+    <div className={cn(styles.container, className)}>
       <DataTableHead table={table} />
       {showLoadingSkeleton ? (
         <DataTableSkeletonBody
