@@ -4,7 +4,7 @@ import { useConfig } from "../../providers/ConfigProvider";
 import { useBreadcrumbs, useFindRouteComponent } from "../../providers/RoutesProvider";
 import { BemWithSpecificContext } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
-import { Dropdown } from "../Dropdown/Dropdown";
+import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../Menu/Menu";
 import "./Breadcrumbs.scss";
 

@@ -25,6 +25,7 @@ Object.defineProperty(window.HTMLMediaElement.prototype, "paused", {
   get() {
     return this._mock.paused;
   },
+  configurable: true,
 });
 
 // Get and set media duration
@@ -37,6 +38,7 @@ Object.defineProperty(window.HTMLMediaElement.prototype, "duration", {
     this._mock._resetMock(this);
     this._mock.duration = value;
   },
+  configurable: true,
 });
 
 // Load the media file

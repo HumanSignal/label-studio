@@ -2,7 +2,7 @@ import { Button, Checkbox } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import React from "react";
 import { cn } from "../../utils/bem";
-import { Dropdown } from "./Dropdown/Dropdown";
+import { Dropdown } from "@humansignal/ui";
 import { Menu } from "./Menu/Menu";
 
 const injector = inject(({ store }) => {

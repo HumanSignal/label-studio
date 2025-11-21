@@ -21,7 +21,7 @@ import {
 } from "@humansignal/icons";
 import { Tooltip, Userpic, ToastType, useToast } from "@humansignal/ui";
 import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
-import { useDropdown } from "../../common/Dropdown/DropdownTrigger";
+import { useDropdown } from "@humansignal/ui";
 import { isFF } from "../../utils/feature-flags";
 
 // eslint-disable-next-line

@@ -1134,6 +1134,12 @@
         "decorators": ""
     },
     {
+        "url": "/api/fsm/entities/<str:entity_name>/<int:entity_id>/transition/",
+        "module": "fsm.api.FSMEntityTransitionAPI",
+        "name": "fsm:fsm-entity-transition",
+        "decorators": ""
+    },
+    {
         "url": "/data/local-files/",
         "module": "core.views.localfiles_data",
         "name": "localfiles_data",
