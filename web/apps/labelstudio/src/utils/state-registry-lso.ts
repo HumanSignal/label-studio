@@ -71,7 +71,7 @@ if (process.env.NODE_ENV === "development") {
   const missingStates = lsoStates.filter((state) => !stateRegistry.isRegistered(state));
 
   if (missingStates.length > 0) {
-    console.warn("[LSO State Registry] Missing state registrations:", missingStates);
+    console.error("[LSO State Registry] Missing state registrations:", missingStates);
   } else {
     console.log("[LSO State Registry] ✅ All LSO states registered successfully");
     console.log(`[LSO State Registry] Registered ${lsoStates.length} LSO states`);
