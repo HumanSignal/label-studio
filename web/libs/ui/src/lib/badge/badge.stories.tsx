@@ -9,6 +9,10 @@ const meta: Meta<typeof Badge> = {
       control: "select",
       options: ["default", "secondary", "destructive", "info", "outline", "beta"],
     },
+    shape: {
+      control: "select",
+      options: ["rounded", "squared"],
+    },
   },
 };
 
@@ -270,6 +274,48 @@ export const Interactive: Story = {
 };
 
 /**
+ * Badge Shapes
+ *
+ * Badges support two shapes: rounded (default) and squared.
+ */
+export const Shapes: Story = {
+  render: () => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Rounded (default):</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="default" shape="rounded">
+              Rounded Default
+            </Badge>
+            <Badge variant="secondary" shape="rounded">
+              Rounded Secondary
+            </Badge>
+            <Badge variant="outline" shape="rounded">
+              Rounded Outline
+            </Badge>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-neutral-content-subtle mb-2">Squared:</p>
+          <div className="flex flex-wrap gap-3">
+            <Badge variant="default" shape="squared">
+              Squared Default
+            </Badge>
+            <Badge variant="secondary" shape="squared">
+              Squared Secondary
+            </Badge>
+            <Badge variant="outline" shape="squared">
+              Squared Outline
+            </Badge>
+          </div>
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
  * Custom Styled Badges
  *
  * Badges can be customized with additional classes.
@@ -284,7 +330,7 @@ export const CustomStyled: Story = {
         <Badge variant="secondary" className="text-[10px] px-2 py-0">
           Tiny Badge
         </Badge>
-        <Badge variant="info" className="rounded-sm">
+        <Badge variant="info" shape="squared">
           Squared Badge
         </Badge>
         <Badge variant="beta" className="uppercase tracking-wider">

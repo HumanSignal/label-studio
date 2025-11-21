@@ -84,7 +84,7 @@ const getColumnStyle = (size: number, minSize: number, maxSize: number | undefin
   width: `${size}px`,
   minWidth: `${minSize}px`,
   maxWidth: maxSize ? `${maxSize}px` : undefined,
-  flex: `1 1 ${size}px`,
+  flex: `0 0 ${size}px`,
 });
 
 export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
