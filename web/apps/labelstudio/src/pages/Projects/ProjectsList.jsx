@@ -110,9 +110,9 @@ const ProjectCard = ({ project }) => {
               </Dropdown.Trigger>
             </div>
 
-            {project.current_state && (
+            {project.state && (
               <div className={cn("project-card").elem("state-chip").toClassName()}>
-                <ProjectStateChip state={project.current_state} projectId={project.id} interactive={false} />
+                <ProjectStateChip state={project.state} projectId={project.id} interactive={false} />
               </div>
             )}
           </div>
