@@ -309,6 +309,21 @@ export const CustomEmptyStateWithActions: Story = {
   },
 };
 
+/**
+ * Loading State
+ *
+ * Shows skeleton rows while data is loading.
+ * Displays 5 skeleton rows by default (configurable with loadingRows prop).
+ */
+export const Loading: Story = {
+  args: {
+    data: [],
+    columns: baseColumns,
+    isLoading: true,
+    loadingRows: 5,
+  },
+};
+
 export const LargeDataset: Story = {
   render: () => {
     const [sorting, setSorting] = useState<SortingState>([]);

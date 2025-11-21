@@ -26,6 +26,7 @@ import { Checkbox } from "../checkbox/checkbox";
 import { Typography } from "../typography/typography";
 import { IconSortUp, IconSortDown, IconSearch } from "@humansignal/icons";
 import { EmptyState } from "../empty-state/empty-state";
+import { Skeleton } from "../skeleton/skeleton";
 import styles from "./data-table.module.scss";
 
 export type DataShape = Record<string, any>[];
@@ -68,6 +69,8 @@ export type DataTableProps<T extends DataShape> = {
   };
   /** Whether data is currently loading */
   isLoading?: boolean;
+  /** Number of skeleton rows to show when loading (default: 5) */
+  loadingRows?: number;
 };
 
 export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
@@ -79,6 +82,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     onSortingChange: controlledOnSortingChange,
     enableSorting = true,
     isRowSelectable,
+    loadingRows = 5,
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
@@ -278,13 +282,22 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     [props.onRowClick],
   );
 
+  // Check if we should show loading skeleton
+  const showLoadingSkeleton = props.isLoading && rows.length === 0;
   // Check if we should show empty state
   const showEmptyState = rows.length === 0 && !props.isLoading && props.emptyState;
 
   return (
     <div className={styles.container}>
       <DataTableHead table={table} />
-      {showEmptyState ? (
+      {showLoadingSkeleton ? (
+        <DataTableSkeletonBody
+          table={table}
+          loadingRows={loadingRows}
+          columnSizing={columnSizing}
+          selectable={selectable}
+        />
+      ) : showEmptyState ? (
         <div className={styles.body}>
           <EmptyState
             className="px-wide py-widest"
@@ -491,6 +504,102 @@ const MemoizedDataTableBody = memo(DataTableBody, (prev, next) => {
     prev.activeRowId === next.activeRowId
   );
 }) as typeof DataTableBody;
+
+/**
+ * DataTableSkeletonBody - Renders skeleton loading rows
+ * Displayed when table is loading and has no data
+ */
+interface DataTableSkeletonBodyProps<T> {
+  table: Table<T>;
+  loadingRows: number;
+  columnSizing: Record<string, number>;
+  selectable: boolean;
+}
+
+const DataTableSkeletonBody = <T,>({
+  table,
+  loadingRows,
+  columnSizing: _columnSizing,
+  selectable: _selectable,
+}: DataTableSkeletonBodyProps<T>) => {
+  const headerGroups = table.getHeaderGroups();
+  const headers = headerGroups[0]?.headers || [];
+
+  // Render one of 4 skeleton patterns based on column index
+  const renderSkeletonPattern = (columnIndex: number) => {
+    // Cycle through 4 patterns using modulo
+    const patternIndex = columnIndex % 4;
+
+    switch (patternIndex) {
+      case 0:
+        // Pattern 1: Circle + line
+        return (
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-6 w-6 flex-shrink-0" />
+            <Skeleton className="h-4 rounded w-[150px]" />
+          </div>
+        );
+      case 1:
+        // Pattern 2: Long line
+        return <Skeleton className="h-4 rounded w-[90%]" />;
+      case 2:
+        // Pattern 3: Line + square at the end
+        return (
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-4 rounded w-[100px]" />
+            <Skeleton className="h-4 w-4 rounded flex-shrink-0" />
+          </div>
+        );
+      case 3:
+        // Pattern 4: Short line
+        return <Skeleton className="h-4 rounded w-1/2" />;
+      default:
+        return <Skeleton className="h-4 rounded w-2/3" />;
+    }
+  };
+
+  return (
+    <div className={styles.body}>
+      {Array.from({ length: loadingRows }).map((_, rowIndex) => (
+        <div className={styles.bodyRow} key={rowIndex}>
+          {headers.map((header, columnIndex) => {
+            const { column } = header;
+            const isPinned = column.getIsPinned();
+            const columnDef = column.columnDef;
+            const minSize = columnDef.minSize ?? 50;
+            const maxSize = columnDef.maxSize ?? 1200;
+            const size = header.getSize();
+
+            const style = {
+              width: `${size}px`,
+              minWidth: `${minSize}px`,
+              maxWidth: maxSize ? `${maxSize}px` : undefined,
+              flex: "0 0 auto",
+            };
+
+            // For selection column, show empty cell
+            if (column.id === "select") {
+              return (
+                <div className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)} key={header.id} style={style}>
+                  <div className="w-4 h-4" />
+                </div>
+              );
+            }
+
+            // Adjust column index to account for select column
+            const patternColumnIndex = headers[0]?.column.id === "select" ? columnIndex - 1 : columnIndex;
+
+            return (
+              <div className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)} key={header.id} style={style}>
+                {renderSkeletonPattern(patternColumnIndex)}
+              </div>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 /**
  * Header - Unified header component for all columns
