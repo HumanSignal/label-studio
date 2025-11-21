@@ -25,8 +25,6 @@ export interface PaginationProps {
   allowRewind?: boolean;
   /** Whether the component is disabled */
   disabled?: boolean;
-  /** Size variant */
-  size?: "small" | "medium" | "large";
   /** Whether to show even when only 1 page */
   alwaysVisible?: boolean;
   /** Whether to show the label with item range */
@@ -71,7 +69,6 @@ export const Pagination: FC<PaginationProps> = ({
   allowInput = true,
   allowRewind = true,
   disabled = false,
-  size = "medium",
   alwaysVisible = false,
   showLabel = true,
   showPageSize = true,
@@ -181,7 +178,7 @@ export const Pagination: FC<PaginationProps> = ({
   const displayTotalPages = alwaysVisible && totalPages === 0 ? 1 : totalPages;
 
   return (
-    <div className={cn(styles.container, styles[`size-${size}`], disabled && styles.disabled)}>
+    <div className={cn(styles.container, styles["size-medium"], disabled && styles.disabled)}>
       {label && showLabel && (
         <div className={styles.labels}>
           <Typography className="text-neutral-content-subtler">
@@ -289,12 +286,7 @@ export const Pagination: FC<PaginationProps> = ({
       </div>
       {pageSizeOptions.length > 0 && showPageSize && (
         <div className={styles["page-size"]}>
-          <Select
-            value={currentPageSizeOption}
-            options={pageSizeSelectOptions}
-            onChange={handlePageSizeChange}
-            size={size}
-          />
+          <Select value={currentPageSizeOption} options={pageSizeSelectOptions} onChange={handlePageSizeChange} />
         </div>
       )}
     </div>

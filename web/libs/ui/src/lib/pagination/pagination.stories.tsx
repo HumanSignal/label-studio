@@ -14,7 +14,6 @@ const meta: Meta<typeof Pagination> = {
     allowInput: { control: "boolean" },
     allowRewind: { control: "boolean" },
     disabled: { control: "boolean" },
-    size: { control: "select", options: ["small", "medium", "large"] },
     alwaysVisible: { control: "boolean" },
     showLabel: { control: "boolean" },
     showPageSize: { control: "boolean" },
@@ -34,7 +33,6 @@ export const Default: Story = {
     allowInput: true,
     allowRewind: true,
     disabled: false,
-    size: "medium",
     alwaysVisible: false,
     showLabel: true,
     showPageSize: true,
@@ -114,28 +112,6 @@ export const Disabled: Story = {
     totalItems: 200,
     label: "Items",
     disabled: true,
-  },
-};
-
-export const SmallSize: Story = {
-  args: {
-    currentPage: 1,
-    totalPages: 10,
-    pageSize: 20,
-    totalItems: 200,
-    label: "Items",
-    size: "small",
-  },
-};
-
-export const LargeSize: Story = {
-  args: {
-    currentPage: 1,
-    totalPages: 10,
-    pageSize: 20,
-    totalItems: 200,
-    label: "Items",
-    size: "large",
   },
 };
 
