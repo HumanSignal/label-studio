@@ -12,7 +12,7 @@ import {
 } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
 import { type FC, useCallback, useContext, useEffect, useMemo } from "react";
-import { Dropdown } from "../../../common/Dropdown/Dropdown";
+import { Dropdown } from "@humansignal/ui";
 // eslint-disable-next-line
 // @ts-ignore
 import { Menu } from "../../../common/Menu/Menu";
