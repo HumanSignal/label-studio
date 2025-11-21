@@ -22,8 +22,8 @@ export type CollapsiblePanelProps = {
   expanded?: boolean;
   /** Callback when expanded state changes */
   onExpandedChange?: (expanded: boolean) => void;
-  /** Disable collapsing/expanding (useful for threshold logic) */
-  disabled?: boolean;
+  /** Disable the toggle button (prevents collapsing/expanding) */
+  disableToggle?: boolean;
 };
 
 export const CollapsiblePanel = ({
@@ -36,7 +36,7 @@ export const CollapsiblePanel = ({
   defaultExpanded = true,
   expanded: controlledExpanded,
   onExpandedChange,
-  disabled = false,
+  disableToggle = false,
 }: CollapsiblePanelProps) => {
   const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
 
@@ -45,7 +45,7 @@ export const CollapsiblePanel = ({
   const isControlled = controlledExpanded !== undefined;
 
   const handleToggle = () => {
-    if (disabled) return;
+    if (disableToggle) return;
 
     const newExpanded = !isExpanded;
 
@@ -76,9 +76,8 @@ export const CollapsiblePanel = ({
       <div
         className={cn(
           "flex items-center gap-2 px-base py-tight",
-          !disabled && "cursor-pointer",
-          !disabled && styles.header,
-          disabled && "cursor-not-allowed opacity-60",
+          !disableToggle && "cursor-pointer",
+          !disableToggle && styles.header,
           "transition-colors",
         )}
         onClick={handleToggle}
@@ -89,10 +88,10 @@ export const CollapsiblePanel = ({
           size="small"
           className={cn(
             "flex items-center justify-center text-neutral-content-subtle transition-colors",
-            !disabled && "hover:text-neutral-content",
-            disabled && "cursor-not-allowed",
+            !disableToggle && "hover:text-neutral-content",
+            disableToggle && "opacity-40 cursor-not-allowed pointer-events-none",
           )}
-          disabled={disabled}
+          disabled={disableToggle}
           aria-label={isExpanded ? "Collapse panel" : "Expand panel"}
           aria-expanded={isExpanded}
         >

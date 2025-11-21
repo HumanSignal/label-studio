@@ -14,7 +14,7 @@ const meta: Meta<typeof CollapsiblePanel> = {
       control: "select",
       options: ["primary", "default"],
     },
-    disabled: {
+    disableToggle: {
       control: "boolean",
     },
     defaultExpanded: {
@@ -122,28 +122,23 @@ export const WithEmptyState: Story = {
 };
 
 /**
- * Disabled (Cannot be Collapsed)
+ * Toggle Disabled (Cannot be Collapsed/Expanded)
  *
- * Panel that cannot be collapsed - useful when threshold is exceeded.
- * In this example, the panel is locked open because too many items are selected.
+ * Panel with disabled toggle button - useful when threshold is exceeded.
+ * The toggle button is disabled but the rest of the header (title, actions) remains interactive.
  */
-export const Disabled: Story = {
+export const ToggleDisabled: Story = {
   args: {
     variant: "primary",
-    title: "15 members selected (threshold exceeded)",
-    disabled: true,
+    title: "John, Jane, Bob, Alice, Charlie +10 selected",
+    disableToggle: true,
+    expanded: false,
     actions: (
       <Button variant="neutral" look="outlined" size="small">
         Clear Selection
       </Button>
     ),
-    children: (
-      <div className="p-base">
-        <Typography variant="body" size="small" className="text-neutral-content-subtle">
-          Too many members selected to display. Clear some selections to collapse this panel.
-        </Typography>
-      </div>
-    ),
+    children: null,
   },
 };
 
@@ -317,7 +312,11 @@ export const MemberSelectionPanel: Story = {
 
         <CollapsiblePanel
           variant="primary"
-          title={selectedCount > 0 ? `${selectedCount} member${selectedCount === 1 ? "" : "s"} selected` : "No members selected"}
+          title={
+            selectedCount > 0
+              ? `${selectedCount} member${selectedCount === 1 ? "" : "s"} selected`
+              : "No members selected"
+          }
           actions={
             selectedCount > 0 ? (
               <Button variant="neutral" look="outlined" size="small" onClick={handleClearSelection}>
@@ -325,9 +324,9 @@ export const MemberSelectionPanel: Story = {
               </Button>
             ) : undefined
           }
-          expanded={isExpanded}
+          expanded={selectedCount > 10 ? false : isExpanded}
           onExpandedChange={setIsExpanded}
-          disabled={selectedCount > 10}
+          disableToggle={selectedCount > 10}
         >
           {selectedCount === 0 ? (
             <EmptyState
@@ -355,4 +354,3 @@ export const MemberSelectionPanel: Story = {
     );
   },
 };
-
