@@ -43,6 +43,10 @@
   }
 }
 
+.headCellContent {
+  @apply flex items-center flex-1 min-w-0 overflow-hidden;
+}
+
 .headCellPinned {
   @apply sticky right-0 border-l border-neutral-border bg-neutral-background;
 }
@@ -139,14 +143,8 @@
   > * {
     @apply min-w-0 truncate;
   }
-}
 
-.bodyCellPinned {
-  @apply sticky right-0 border-l border-neutral-border bg-neutral-background;
-}
-
-// Style for disabled checkboxes in data table
-.bodyCell {
+  // Style for disabled checkboxes in data table
   :global(.checkbox_disabled) {
     opacity: 0.5;
     cursor: not-allowed;
@@ -156,4 +154,8 @@
       cursor: not-allowed;
     }
   }
+}
+
+.bodyCellPinned {
+  @apply sticky right-0 border-l border-neutral-border bg-neutral-background;
 }

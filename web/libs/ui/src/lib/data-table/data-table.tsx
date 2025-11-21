@@ -396,15 +396,15 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
                 )}
                 key={header.id}
                 style={style}
-                onClick={handleHeaderClick}
                 data-testid={`data-table-header-${header.id}`}
               >
-                {header.isPlaceholder ? null : flexRender(column.columnDef.header, header.getContext())}
+                <div className={styles.headCellContent} onClick={handleHeaderClick}>
+                  {header.isPlaceholder ? null : flexRender(column.columnDef.header, header.getContext())}
+                </div>
 
-                {group.headers[group.headers.length - 1]?.id !== header.id && (
+                {group.headers[group.headers.length - 1]?.id !== header.id && column.id !== "select" && (
                   <div
                     className={styles.headCellResizer}
-                    onClick={(e) => e.stopPropagation()}
                     onDoubleClick={() => header.column.resetSize()}
                     onMouseDown={header.getResizeHandler()}
                     onTouchStart={header.getResizeHandler()}
