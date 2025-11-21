@@ -1,8 +1,6 @@
 import threading
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from label_studio.core.redis import is_job_on_worker
 
 
@@ -65,4 +63,3 @@ def test_is_job_on_worker_safe_from_non_main_thread(monkeypatch):
             raise result['error']  # type: ignore[misc]
 
         assert result['value'] is False
-

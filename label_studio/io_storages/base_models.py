@@ -670,9 +670,8 @@ class ImportStorage(Storage):
             queue_name = 'low'
             queue = django_rq.get_queue(queue_name)
             meta = {'project': self.project.id, 'storage': self.id}
-            if (
-                not is_job_in_queue(queue, 'import_sync_background', meta=meta) and 
-                not is_job_on_worker(job_id=self.last_sync_job, queue_name=queue_name)
+            if not is_job_in_queue(queue, 'import_sync_background', meta=meta) and not is_job_on_worker(
+                job_id=self.last_sync_job, queue_name=queue_name
             ):
                 if not self.info_set_queued():
                     return
