@@ -24,7 +24,8 @@ import { cn } from "../../utils/utils";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
 import { Checkbox } from "../checkbox/checkbox";
 import { Typography } from "../typography/typography";
-import { IconSortUp, IconSortDown } from "@humansignal/icons";
+import { IconSortUp, IconSortDown, IconSearch } from "@humansignal/icons";
+import { EmptyState } from "../empty-state/empty-state";
 import styles from "./data-table.module.scss";
 
 export type DataShape = Record<string, any>[];
@@ -53,6 +54,20 @@ export type DataTableProps<T extends DataShape> = {
   sorting?: SortingState;
   onSortingChange?: (updater: SortingState | ((old: SortingState) => SortingState)) => void;
   enableSorting?: boolean; // Global enable/disable sorting
+  // Empty state props
+  /** Empty state configuration when no data is available */
+  emptyState?: {
+    /** Icon to display (defaults to IconSearch) */
+    icon?: React.ReactNode;
+    /** Title text (defaults to "No items found") */
+    title?: string;
+    /** Description text (defaults to "Try adjusting your search or clearing the filters to see more results.") */
+    description?: string;
+    /** Action buttons or other interactive elements */
+    actions?: React.ReactNode;
+  };
+  /** Whether data is currently loading */
+  isLoading?: boolean;
 };
 
 export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
@@ -263,18 +278,37 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     [props.onRowClick],
   );
 
+  // Check if we should show empty state
+  const showEmptyState = rows.length === 0 && !props.isLoading && props.emptyState;
+
   return (
     <div className={styles.container}>
       <DataTableHead table={table} />
-      <MemoizedDataTableBody
-        rows={rows}
-        rowClassName={props.rowClassName}
-        onRowClick={handleRowClick}
-        columnVisibility={props.columnVisibility}
-        columnSizing={columnSizing}
-        rowSelection={rowSelection}
-        activeRowId={activeRowId}
-      />
+      {showEmptyState ? (
+        <div className={styles.body}>
+          <EmptyState
+            className="px-wide py-widest"
+            size="small"
+            variant="warning"
+            icon={props.emptyState?.icon ?? <IconSearch />}
+            title={props.emptyState?.title ?? "No items found"}
+            description={
+              props.emptyState?.description ?? "Try adjusting your search or clearing the filters to see more results."
+            }
+            actions={props.emptyState?.actions}
+          />
+        </div>
+      ) : (
+        <MemoizedDataTableBody
+          rows={rows}
+          rowClassName={props.rowClassName}
+          onRowClick={handleRowClick}
+          columnVisibility={props.columnVisibility}
+          columnSizing={columnSizing}
+          rowSelection={rowSelection}
+          activeRowId={activeRowId}
+        />
+      )}
     </div>
   );
 };

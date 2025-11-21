@@ -257,10 +257,55 @@ export const WithSortingAndSelection: Story = {
   },
 };
 
+/**
+ * Example with empty state when no data
+ * Shows the default empty state with search icon and default messaging
+ */
 export const EmptyState: Story = {
   args: {
     data: [],
     columns: baseColumns,
+    emptyState: {},
+  },
+};
+
+/**
+ * Custom Empty State with Actions
+ *
+ * Example showing a custom empty state with custom title, description, and action buttons.
+ * Demonstrates how to provide interactive elements in the empty state.
+ */
+export const CustomEmptyStateWithActions: Story = {
+  render: () => {
+    return (
+      <DataTable
+        data={[]}
+        columns={baseColumns}
+        emptyState={{
+          title: "No users found",
+          description: "Get started by adding your first user to the system. You can import users or create them manually.",
+          actions: (
+            <div className="flex gap-2">
+              <Button
+                variant="primary"
+                size="small"
+                onClick={() => alert("Create user clicked")}
+              >
+                Create User
+              </Button>
+              <Button
+                variant="neutral"
+                look="outlined"
+                size="small"
+                onClick={() => alert("Import users clicked")}
+              >
+                Import Users
+              </Button>
+            </div>
+          ),
+        }}
+      />
+    );
   },
 };
 
