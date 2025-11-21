@@ -20,7 +20,6 @@ dependencies = [
     "attrs (>=19.2.0)",
     "pyyaml (>=6.0.0)",
     "azure-storage-blob (>=12.6.0)",
-    "boto (>=2.49.0,<3.0.0)",
     "boto3 (>=1.28.58,<2.0.0)",
     "botocore (>=1.39.3,<2.0.0)",
     "bleach (>=5.0.0,<5.1.0)",
