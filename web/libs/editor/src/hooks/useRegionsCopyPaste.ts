@@ -40,6 +40,17 @@ export const useRegionsCopyPaste = (entity: any) => {
           return { ...res, readonly: false };
         });
 
+        if (isFF(FF_LSDV_4583)) {
+          // if user selected another image, we should paste in the current
+          // image, not the one they copied from
+          for (const result of results) {
+            const target = entity.names.get(result.to_name);
+            if (target.isMultiItem) {
+              result.item_index = target.currentItemIndex;
+            }
+          }
+        }
+
         entity.appendResults(results);
         ev.preventDefault();
       } catch (e) {
