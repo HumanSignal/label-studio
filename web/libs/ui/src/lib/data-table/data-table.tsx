@@ -77,6 +77,16 @@ export type DataTableProps<T extends DataShape> = {
   dataTestId?: string;
 };
 
+/**
+ * Calculate column style for consistent width handling across header, body, and skeleton cells
+ */
+const getColumnStyle = (size: number, minSize: number, maxSize: number | undefined) => ({
+  width: `${size}px`,
+  minWidth: `${minSize}px`,
+  maxWidth: maxSize ? `${maxSize}px` : undefined,
+  flex: `1 1 ${size}px`,
+});
+
 export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const {
     selectable = false,
@@ -354,13 +364,8 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
             // Check if this column is sortable
             const isSortable = column.getCanSort();
 
-            // super simple: everything uses TanStack's size
-            const style = {
-              width: `${size}px`,
-              minWidth: `${minSize}px`,
-              maxWidth: maxSize ? `${maxSize}px` : undefined,
-              flex: "0 0 auto",
-            };
+            // Calculate column style
+            const style = getColumnStyle(size, minSize, maxSize);
 
             const noDivider = column.columnDef.meta?.noDivider;
             // Also check if previous column has noDivider to prevent divider between them
@@ -399,6 +404,7 @@ const DataTableHead = <T extends Record<string, unknown>>({ table }: DataTableHe
                 {group.headers[group.headers.length - 1]?.id !== header.id && (
                   <div
                     className={styles.headCellResizer}
+                    onClick={(e) => e.stopPropagation()}
                     onDoubleClick={() => header.column.resetSize()}
                     onMouseDown={header.getResizeHandler()}
                     onTouchStart={header.getResizeHandler()}
@@ -453,12 +459,8 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
         const maxSize = columnDef.maxSize ?? 1200;
         const size = cell.column.getSize();
 
-        const style = {
-          width: `${size}px`,
-          minWidth: `${minSize}px`,
-          maxWidth: maxSize ? `${maxSize}px` : undefined,
-          flex: "0 0 auto",
-        };
+        // Calculate column style
+        const style = getColumnStyle(size, minSize, maxSize);
 
         return (
           <div className={cn(styles.bodyCell, isPinned && styles.bodyCellPinned)} key={cell.id} style={style}>
@@ -580,12 +582,8 @@ const DataTableSkeletonBody = <T,>({
             const maxSize = columnDef.maxSize ?? 1200;
             const size = header.getSize();
 
-            const style = {
-              width: `${size}px`,
-              minWidth: `${minSize}px`,
-              maxWidth: maxSize ? `${maxSize}px` : undefined,
-              flex: "0 0 auto",
-            };
+            // Calculate column style
+            const style = getColumnStyle(size, minSize, maxSize);
 
             // For selection column, show empty cell
             if (column.id === "select") {

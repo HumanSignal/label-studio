@@ -15,7 +15,7 @@
 }
 
 .headRow {
-  @apply relative min-w-min flex justify-start;
+  @apply relative min-w-min flex justify-start w-full;
 }
 
 .headCell {
@@ -97,7 +97,7 @@
 }
 
 .bodyRow {
-  @apply min-w-min flex justify-start transition-all duration-150 ease-out;
+  @apply min-w-min flex justify-start transition-all duration-150 ease-out w-full;
 
   &:nth-child(2n) {
     @apply bg-neutral-surface;
