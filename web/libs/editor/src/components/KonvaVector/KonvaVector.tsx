@@ -733,7 +733,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
   const isDragging = useRef(false);
   const [stageReadyRetry, setStageReadyRetry] = useState(0);
-  const calculateGhostPointRef = useRef<((shiftKeyState?: boolean, eventPos?: { x: number; y: number }) => void) | null>(null);
+  const calculateGhostPointRef = useRef<
+    ((shiftKeyState?: boolean, eventPos?: { x: number; y: number }) => void) | null
+  >(null);
   const ghostPointRef = useRef<GhostPointRef | null>(null);
 
   // Ref to prevent effect from running multiple times
@@ -2752,17 +2754,17 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       // Only process ghost point and other logic if within bounds
       if (imagePos.x >= 0 && imagePos.x <= width && imagePos.y >= 0 && imagePos.y <= height) {
         // Handle ghost point when Shift is held (check event directly for real-time updates)
-          // Only show ghost point when region is selected and not disabled
-          if (
-            e.evt.shiftKey &&
-            imagePos &&
-            initialPoints.length >= 2 &&
-            !isDragging.current &&
-            !isDraggingNewBezier &&
-            !ghostPointDragInfo?.isDragging &&
-            selected &&
-            !disabled
-          ) {
+        // Only show ghost point when region is selected and not disabled
+        if (
+          e.evt.shiftKey &&
+          imagePos &&
+          initialPoints.length >= 2 &&
+          !isDragging.current &&
+          !isDraggingNewBezier &&
+          !ghostPointDragInfo?.isDragging &&
+          selected &&
+          !disabled
+        ) {
           const scale = transform.zoom * fitScale;
           const hitRadius = HIT_RADIUS.SELECTION / scale;
           let isOverPoint = false;
