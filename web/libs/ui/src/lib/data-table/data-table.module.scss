@@ -111,7 +111,7 @@
 .bodyRowClickable {
   @apply cursor-pointer;
 
-  &:hover:not(.bodyRowError) {
+  &:hover:not(.bodyRowError, .bodyRowActive) {
     @apply bg-primary-emphasis-subtle;
   }
 }
