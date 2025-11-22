@@ -586,10 +586,16 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
       const ry = x * sin + y * cos;
 
       // Step 3: Translate and clamp to image bounds
-      const result = {
-        ...point,
+      const translatedPos = {
         x: Math.max(0, Math.min(imageWidth, rx + constrainedDx)),
         y: Math.max(0, Math.min(imageHeight, ry + constrainedDy)),
+      };
+      // Apply pixel snapping if enabled
+      const snappedPos = snapToPixel(translatedPos, pixelSnapping);
+      const result = {
+        ...point,
+        x: snappedPos.x,
+        y: snappedPos.y,
       };
 
       // Transform control points if bezier
@@ -599,20 +605,22 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           const cp1y = point.controlPoint1.y * constrainedScaleY;
           const cp1rx = cp1x * cos - cp1y * sin;
           const cp1ry = cp1x * sin + cp1y * cos;
-          result.controlPoint1 = {
+          const cp1Translated = {
             x: Math.max(0, Math.min(imageWidth, cp1rx + constrainedDx)),
             y: Math.max(0, Math.min(imageHeight, cp1ry + constrainedDy)),
           };
+          result.controlPoint1 = snapToPixel(cp1Translated, pixelSnapping);
         }
         if (point.controlPoint2) {
           const cp2x = point.controlPoint2.x * constrainedScaleX;
           const cp2y = point.controlPoint2.y * constrainedScaleY;
           const cp2rx = cp2x * cos - cp2y * sin;
           const cp2ry = cp2x * sin + cp2y * cos;
-          result.controlPoint2 = {
+          const cp2Translated = {
             x: Math.max(0, Math.min(imageWidth, cp2rx + constrainedDx)),
             y: Math.max(0, Math.min(imageHeight, cp2ry + constrainedDy)),
           };
+          result.controlPoint2 = snapToPixel(cp2Translated, pixelSnapping);
         }
       }
 
@@ -2656,25 +2664,28 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           const newX = original.x + deltaX;
           const newY = original.y + deltaY;
 
+          // Apply pixel snapping if enabled
+          const snappedPos = snapToPixel({ x: newX, y: newY }, pixelSnapping);
+
           const updatedPoint = {
             ...point,
-            x: newX,
-            y: newY,
+            x: snappedPos.x,
+            y: snappedPos.y,
           };
 
           // Move control points with the anchor point
           if (point.isBezier) {
             if (original.controlPoint1) {
-              updatedPoint.controlPoint1 = {
-                x: original.controlPoint1.x + deltaX,
-                y: original.controlPoint1.y + deltaY,
-              };
+              const cp1X = original.controlPoint1.x + deltaX;
+              const cp1Y = original.controlPoint1.y + deltaY;
+              const snappedCP1 = snapToPixel({ x: cp1X, y: cp1Y }, pixelSnapping);
+              updatedPoint.controlPoint1 = snappedCP1;
             }
             if (original.controlPoint2) {
-              updatedPoint.controlPoint2 = {
-                x: original.controlPoint2.x + deltaX,
-                y: original.controlPoint2.y + deltaY,
-              };
+              const cp2X = original.controlPoint2.x + deltaX;
+              const cp2Y = original.controlPoint2.y + deltaY;
+              const snappedCP2 = snapToPixel({ x: cp2X, y: cp2Y }, pixelSnapping);
+              updatedPoint.controlPoint2 = snappedCP2;
             }
           }
 
@@ -2826,19 +2837,21 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             if (updatedPoint.controlPoint1 && lastPos.current.originalControlPoint1) {
               const deltaX = finalPos.x - originalX;
               const deltaY = finalPos.y - originalY;
-              updatedPoint.controlPoint1 = {
+              const cp1Pos = {
                 x: lastPos.current.originalControlPoint1.x + deltaX,
                 y: lastPos.current.originalControlPoint1.y + deltaY,
               };
+              updatedPoint.controlPoint1 = snapToPixel(cp1Pos, pixelSnapping);
             }
 
             if (updatedPoint.controlPoint2 && lastPos.current.originalControlPoint2) {
               const deltaX = finalPos.x - originalX;
               const deltaY = finalPos.y - originalY;
-              updatedPoint.controlPoint2 = {
+              const cp2Pos = {
                 x: lastPos.current.originalControlPoint2.x + deltaX,
                 y: lastPos.current.originalControlPoint2.y + deltaY,
               };
+              updatedPoint.controlPoint2 = snapToPixel(cp2Pos, pixelSnapping);
             }
 
             const constrainedPoint = constrainAnchorPointsToBounds([updatedPoint], { width, height })[0];
@@ -3725,6 +3738,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               fitScale={fitScale}
               getCurrentPointsRef={getCurrentPointsRef}
               updateCurrentPointsRef={updateCurrentPointsRef}
+              pixelSnapping={pixelSnapping}
               onPointsChange={(newPoints) => {
                 // Update main path points
                 onPointsChange?.(newPoints);
@@ -4151,6 +4165,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
               proxyRefs={proxyRefs}
               getCurrentPointsRef={getCurrentPointsRef}
               updateCurrentPointsRef={updateCurrentPointsRef}
+              pixelSnapping={pixelSnapping}
               onPointsChange={(newPoints) => {
                 // Update main path points
                 onPointsChange?.(newPoints);
