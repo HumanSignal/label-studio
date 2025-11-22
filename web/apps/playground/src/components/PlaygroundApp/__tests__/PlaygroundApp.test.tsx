@@ -59,7 +59,7 @@ describe("PlaygroundApp", () => {
       return mockSetInterfaces;
     });
 
-    // Reset window.location
+    // Reset window.location to default
     Object.defineProperty(window, "location", {
       value: new URL("http://localhost"),
       writable: true,

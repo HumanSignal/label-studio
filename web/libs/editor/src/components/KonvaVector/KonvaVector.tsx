@@ -3262,6 +3262,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     disabled,
     transformMode,
     disableInternalPointAddition,
+    handleTransformStart,
+    handleTransformEnd,
     pointCreationManager,
   });
 
