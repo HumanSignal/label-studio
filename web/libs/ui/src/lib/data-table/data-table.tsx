@@ -630,14 +630,19 @@ export const Header = <T,>({
   originalHeader,
 }: HeaderProps<T>) => {
   // Get header label - use originalHeader if provided, otherwise try to extract from columnDef
-  let headerLabel: string | React.ReactNode = header.column.id;
-  if (originalHeader) {
+  let headerLabel: string | React.ReactNode = undefined;
+  if (originalHeader !== undefined) {
     headerLabel = originalHeader;
   } else {
     const headerDef = header.column.columnDef.header;
     if (typeof headerDef === "string") {
       headerLabel = headerDef;
     }
+  }
+
+  // If no header label is defined, render nothing
+  if (headerLabel === undefined) {
+    return null;
   }
 
   if (!enableSorting) {
