@@ -471,7 +471,6 @@ export default types
       });
 
       hotkeys.addNamed("region:exit", (e) => {
-        e.stopPropagation();
         e.stopImmediatePropagation();
 
         const c = self.annotationStore.selected;
