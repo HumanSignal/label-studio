@@ -74,13 +74,16 @@ export const CollapsiblePanel = ({
   const styles = variantStyles[variant];
 
   return (
-    <div className={cn("border rounded-md overflow-hidden", styles.container, className)} data-testid={dataTestId}>
+    <div
+      className={cn("flex flex-col border rounded-md overflow-hidden shrink-0", styles.container, className)}
+      data-testid={dataTestId}
+    >
       {/* Header - Always visible */}
       <div
         className={cn(
           "flex items-center gap-2 px-base py-tight",
+          styles.header,
           !disableToggle && "cursor-pointer",
-          !disableToggle && styles.header,
           "transition-colors",
         )}
         onClick={handleToggle}
