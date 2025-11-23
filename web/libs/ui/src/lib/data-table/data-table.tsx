@@ -75,6 +75,8 @@ export type DataTableProps<T extends DataShape> = {
   className?: string;
   /** Test ID for the table container */
   dataTestId?: string;
+  /** Controlled active row ID - when provided, controls which row is active */
+  activeRowId?: string;
 };
 
 /**
@@ -99,10 +101,17 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     loadingRows = 5,
     className,
     dataTestId,
+    activeRowId: controlledActiveRowId,
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
-  const [activeRowId, setActiveRowId] = useState<string | undefined>(undefined);
+  const [internalActiveRowId, setInternalActiveRowId] = useState<string | undefined>(undefined);
+
+  // Use controlled activeRowId if onRowClick is provided (parent controls state via clicks)
+  // OR if activeRowId is explicitly provided (not undefined)
+  // When onRowClick is provided, activeRowId is read-only for display purposes
+  const isActiveRowControlled = props.onRowClick !== undefined || controlledActiveRowId !== undefined;
+  const activeRowId = isActiveRowControlled ? (controlledActiveRowId ?? undefined) : internalActiveRowId;
 
   // Use controlled selection if provided, otherwise use internal state
   const rowSelection = controlledRowSelection ?? internalRowSelection;
@@ -288,16 +297,17 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
 
   const handleRowClick = useCallback(
     (row?: Row<T[number]>) => {
-      // Only toggle active row ID and call onRowClick if onRowClick is defined
+      // Call parent's onRowClick handler if provided
       if (props.onRowClick) {
-        // Toggle active row ID: if clicking the same row, deactivate it
-        if (row) {
-          setActiveRowId((currentActiveId) => (currentActiveId === row.id ? undefined : row.id));
-        }
         props.onRowClick(row);
+      } else if (!isActiveRowControlled && row) {
+        // Only manage internal state if uncontrolled AND no onRowClick provided
+        // When controlled, parent handles all state via onRowClick
+        const newActiveRowId = activeRowId === row.id ? undefined : row.id;
+        setInternalActiveRowId(newActiveRowId);
       }
     },
-    [props.onRowClick],
+    [props.onRowClick, activeRowId, isActiveRowControlled],
   );
 
   // Check if we should show loading skeleton
