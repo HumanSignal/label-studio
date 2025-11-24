@@ -110,6 +110,15 @@ export const WithManyOptions: Story = {
   },
 };
 
+export const WithManyOptionsSearchableVirtualList: Story = {
+  args: {
+    options: thousandOptions as any[],
+    label: "Thousand options (searchable + virtual list)",
+    searchable: true,
+    isVirtualList: true,
+  },
+};
+
 export const Loading: Story = {
   args: {
     options: ["Apple", "Banana", "Blueberry", "Grapes", "Pineapple"] as any[],
