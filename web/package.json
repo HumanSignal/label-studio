@@ -53,7 +53,7 @@
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-popover": "^1.1.6",
-    "@radix-ui/react-slot": "^1.1.1",
+    "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-switch": "^1.2.5",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toast": "^1.1.5",
@@ -235,6 +235,7 @@
   },
   "resolutions": {
     "@module-federation/dts-plugin": ">=0.18.0",
+    "@radix-ui/react-slot": "1.2.3",
     "d3-color": "3.1.0",
     "debug": ">=4.3.1",
     "diff": ">=3.5.0",
