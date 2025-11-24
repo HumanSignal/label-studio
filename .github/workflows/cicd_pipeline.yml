@@ -36,7 +36,7 @@ jobs:
 
       - name: Checkout
         if: github.event_name == 'push'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
 
@@ -237,14 +237,14 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ github.sha }}
           fetch-depth: 0
 
       - name: Checkout Actions Hub
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: HumanSignal/actions-hub
