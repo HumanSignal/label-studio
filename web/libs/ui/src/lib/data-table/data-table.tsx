@@ -51,6 +51,8 @@ export type DataTableProps<T extends DataShape> = {
     updater: Record<string, boolean> | ((old: Record<string, boolean>) => Record<string, boolean>),
   ) => void;
   isRowSelectable?: (row: Row<T[number]>) => boolean; // Function to determine if a row checkbox should be shown/selectable
+  onSelectAllChange?: (checked: boolean, selectableRowsCount: number) => void; // Called when header checkbox changes, before default selection logic
+  invertedSelectionEnabled?: boolean; // When true, header checkbox appears checked (for "select all" mode even when no rows are selectable)
   // Sorting props
   sorting?: SortingState;
   onSortingChange?: (updater: SortingState | ((old: SortingState) => SortingState)) => void;
@@ -98,6 +100,8 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     onSortingChange: controlledOnSortingChange,
     enableSorting = true,
     isRowSelectable,
+    onSelectAllChange,
+    invertedSelectionEnabled,
     loadingRows = 5,
     className,
     dataTestId,
@@ -171,9 +175,17 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         const selectableRows = table.getRowModel().rows.filter((row) => row.getCanSelect());
         const selectedSelectableRows = selectableRows.filter((row) => row.getIsSelected());
 
-        const isAllSelected = selectableRows.length > 0 && selectedSelectableRows.length === selectableRows.length;
-        const isSomeSelected =
+        // Calculate checkbox state: use invertedSelectionEnabled if provided, otherwise calculate normally
+        const calculatedIsAllSelected =
+          selectableRows.length > 0 && selectedSelectableRows.length === selectableRows.length;
+        const calculatedIsSomeSelected =
           selectedSelectableRows.length > 0 && selectedSelectableRows.length < selectableRows.length;
+
+        // When invertedSelectionEnabled is true, checkbox is checked (select all mode)
+        // When false/undefined, use calculated state
+        const isAllSelected =
+          invertedSelectionEnabled !== undefined ? invertedSelectionEnabled : calculatedIsAllSelected;
+        const isSomeSelected = invertedSelectionEnabled ? false : calculatedIsSomeSelected; // Don't show indeterminate in inverted mode
 
         return (
           <Checkbox
@@ -181,6 +193,11 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
             indeterminate={isSomeSelected}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               e.stopPropagation();
+
+              // Call custom handler if provided (allows parent to handle special cases)
+              if (onSelectAllChange) {
+                onSelectAllChange(e.target.checked, selectableRows.length);
+              }
 
               // Build new selection state with only selectable rows
               const newSelection: Record<string, boolean> = {};
