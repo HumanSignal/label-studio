@@ -1,6 +1,6 @@
 import { observer, useLocalStore } from "mobx-react";
 import { toJS } from "mobx";
-import React, { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useRef } from "react";
 import { ViewColumnType, ViewColumnTypeName, ViewColumnTypeShort } from "../../../../stores/Tabs/tab_column";
 import { Button } from "@humansignal/ui";
 import { Dropdown } from "@humansignal/ui";
@@ -72,34 +72,27 @@ const AgreementSelectedWrapper = observer(({ column, children }) => {
   const root = getRoot(column.original);
   const selectedView = root.viewsStore.selected;
   const agreementFilters = selectedView.agreement_selected;
-  const [isOpen, setIsOpen] = useState(false);
   const ref = useRef(null);
   const closeHandler = () => {
     ref.current?.close();
-    setIsOpen(false);
   };
   const onSave = (agreementFilters) => {
     selectedView.setAgreementFilters(agreementFilters);
     closeHandler();
     return selectedView.save();
   };
-  const onToggle = (isOpen) => {
-    setIsOpen(isOpen);
-  };
+
   return (
     <Dropdown.Trigger
       ref={ref}
       content={
-        isOpen ? (
-          <AgreementSelected.HeaderCell
-            agreementFilters={agreementFilters}
-            onSave={onSave}
-            align="left"
-            onClose={closeHandler}
-          />
-        ) : null
+        <AgreementSelected.HeaderCell
+          agreementFilters={agreementFilters}
+          onSave={onSave}
+          align="left"
+          onClose={closeHandler}
+        />
       }
-      onToggle={onToggle}
     >
       <Button
         look="outlined"

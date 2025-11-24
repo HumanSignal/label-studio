@@ -236,9 +236,16 @@ def is_job_on_worker(job_id, queue_name):
     :param queue_name: Queue name
     :return: True if job on worker
     """
+    if not job_id:
+        return False
     registry = StartedJobRegistry(queue_name, connection=_redis)
-    ids = registry.get_job_ids()
-    return job_id in ids
+    member = job_id.encode() if isinstance(job_id, str) else job_id
+    # Use Redis ZSET membership check (ZSCORE) instead of registry.get_job_ids(),
+    # because the latter calls registry.cleanup(), which installs SIGALRM timers and
+    # crashes when executed outside the interpreter's main thread (e.g., inside WSGI).
+    # ZSCORE simply looks up the score of the member in the sorted set: if it returns
+    # None, the member/job ID is not present; otherwise it is currently marked as running.
+    return registry.connection.zscore(registry.key, member) is not None
 
 
 def delete_job_by_id(queue, id):
