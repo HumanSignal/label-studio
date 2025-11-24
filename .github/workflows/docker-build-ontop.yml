@@ -65,7 +65,7 @@ jobs:
 
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: 'recursive'
           ref: ${{ inputs.ref }}
