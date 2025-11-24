@@ -27,7 +27,7 @@ jobs:
           git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
 

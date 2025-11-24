@@ -184,7 +184,11 @@ class ProjectListAPI(generics.ListCreateAPIView):
         )
         if filter in ['pinned_only', 'exclude_pinned']:
             projects = projects.filter(pinned_at__isnull=filter == 'exclude_pinned')
-        return ProjectManager.with_counts_annotate(projects, fields=fields).prefetch_related('members', 'created_by')
+        return (
+            ProjectManager.with_counts_annotate(projects, fields=fields)
+            .annotate_fsm_state()
+            .prefetch_related('members', 'created_by')
+        )
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
@@ -238,7 +242,11 @@ class ProjectCountsListAPI(generics.ListAPIView):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        return Project.objects.with_counts(fields=fields).filter(organization=self.request.user.active_organization)
+        return (
+            Project.objects.with_counts(fields=fields)
+            .annotate_fsm_state()
+            .filter(organization=self.request.user.active_organization)
+        )
 
 
 @method_decorator(
@@ -345,7 +353,7 @@ class ProjectCountsListAPI(generics.ListAPIView):
 )
 class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    queryset = Project.objects.with_counts()
+    queryset = Project.objects.with_counts().annotate_fsm_state()
     permission_required = ViewClassPermission(
         GET=all_permissions.projects_view,
         DELETE=all_permissions.projects_delete,
@@ -362,7 +370,11 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        return Project.objects.with_counts(fields=fields).filter(organization=self.request.user.active_organization)
+        return (
+            Project.objects.with_counts(fields=fields)
+            .annotate_fsm_state()
+            .filter(organization=self.request.user.active_organization)
+        )
 
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)

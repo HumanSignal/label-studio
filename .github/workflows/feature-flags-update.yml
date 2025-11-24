@@ -47,7 +47,7 @@ jobs:
           git config --global user.email 'robot-ci-heartex@users.noreply.github.com'
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           fetch-depth: 1

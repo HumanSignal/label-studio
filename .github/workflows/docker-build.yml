@@ -44,7 +44,7 @@ jobs:
       sha: ${{ steps.version.outputs.sha }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: 'recursive'
           ref: ${{ inputs.sha }}
@@ -102,7 +102,7 @@ jobs:
           echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           submodules: 'recursive'
           ref: ${{ inputs.sha }}
