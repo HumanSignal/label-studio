@@ -10,6 +10,7 @@ export * from "./lib/checkbox/checkbox";
 export * from "./lib/code-block/code-block";
 export * from "./lib/code-block/code-block";
 export * from "./lib/code-editor/code-editor";
+export * from "./lib/collapsible-panel";
 export * from "./lib/dropdown";
 export * from "./lib/empty-state/empty-state";
 export * from "./lib/enterprise-badge/enterprise-badge";
@@ -30,6 +31,9 @@ export * from "./lib/spinner/spinner";
 export * from "./lib/sparkles/sparkles";
 export * from "./lib/popover/popover";
 export * from "./lib/auto-sizer-table/auto-sizer-table";
+export * from "./lib/data-table";
+export * from "./lib/pagination";
+export * from "./lib/drawer";
 
 export * from "./utils/utils";
 

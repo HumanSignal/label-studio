@@ -470,7 +470,9 @@ export default types
         if (!annotation.isDrawing) annotation.redo();
       });
 
-      hotkeys.addNamed("region:exit", () => {
+      hotkeys.addNamed("region:exit", (e) => {
+        e.stopImmediatePropagation();
+
         const c = self.annotationStore.selected;
         const managers = ToolsManager.allInstances();
         const tools = managers
