@@ -667,10 +667,11 @@ class ImportStorage(Storage):
 
     def sync(self):
         if redis_connected():
-            queue = django_rq.get_queue('low')
+            queue_name = 'low'
+            queue = django_rq.get_queue(queue_name)
             meta = {'project': self.project.id, 'storage': self.id}
             if not is_job_in_queue(queue, 'import_sync_background', meta=meta) and not is_job_on_worker(
-                job_id=self.last_sync_job, queue_name='low'
+                job_id=self.last_sync_job, queue_name=queue_name
             ):
                 if not self.info_set_queued():
                     return
@@ -680,7 +681,7 @@ class ImportStorage(Storage):
                     import_sync_background,
                     self.__class__,
                     self.id,
-                    queue_name='low',
+                    queue_name=queue_name,
                     meta=meta,
                     project_id=self.project.id,
                     organization_id=self.project.organization.id,

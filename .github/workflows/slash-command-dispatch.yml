@@ -51,7 +51,7 @@ jobs:
       - name: "Slash Command Dispatch"
         id: scd_issues
         if: steps.determine_command.outputs.command-state == 'known'
-        uses: peter-evans/slash-command-dispatch@v4
+        uses: peter-evans/slash-command-dispatch@v5
         with:
           token: ${{ secrets.GIT_PAT }}
           reaction-token: ${{ secrets.GIT_PAT }}

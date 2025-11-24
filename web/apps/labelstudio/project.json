@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/labelstudio/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/webpack:webpack",
@@ -87,6 +88,5 @@
         "command": "node ../../tools/version/version.mjs"
       }
     }
-  },
-  "tags": []
+  }
 }
