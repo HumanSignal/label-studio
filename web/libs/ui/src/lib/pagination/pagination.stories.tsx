@@ -158,4 +158,3 @@ export const Minimal: Story = {
     showPageSize: false,
   },
 };
-

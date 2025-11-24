@@ -247,18 +247,10 @@ export const Interactive: Story = {
   render: () => {
     return (
       <div className="flex flex-wrap gap-3">
-        <Badge
-          variant="default"
-          className="cursor-pointer hover:opacity-80"
-          onClick={() => alert("Badge clicked!")}
-        >
+        <Badge variant="default" className="cursor-pointer hover:opacity-80" onClick={() => alert("Badge clicked!")}>
           Clickable
         </Badge>
-        <Badge
-          variant="secondary"
-          className="cursor-pointer hover:opacity-80"
-          onClick={() => alert("Tag clicked!")}
-        >
+        <Badge variant="secondary" className="cursor-pointer hover:opacity-80" onClick={() => alert("Tag clicked!")}>
           Tag
         </Badge>
         <Badge
@@ -369,15 +361,11 @@ export const InContext: Story = {
               </div>
               <div className="flex items-center gap-2">
                 <Badge
-                  variant={
-                    user.role === "admin" ? "destructive" : user.role === "editor" ? "default" : "secondary"
-                  }
+                  variant={user.role === "admin" ? "destructive" : user.role === "editor" ? "default" : "secondary"}
                 >
                   {user.role}
                 </Badge>
-                <Badge variant={user.status === "active" ? "default" : "outline"}>
-                  {user.status}
-                </Badge>
+                <Badge variant={user.status === "active" ? "default" : "outline"}>{user.status}</Badge>
               </div>
             </div>
           ))}
@@ -386,4 +374,3 @@ export const InContext: Story = {
     );
   },
 };
-

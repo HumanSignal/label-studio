@@ -283,22 +283,14 @@ export const CustomEmptyStateWithActions: Story = {
         columns={baseColumns}
         emptyState={{
           title: "No users found",
-          description: "Get started by adding your first user to the system. You can import users or create them manually.",
+          description:
+            "Get started by adding your first user to the system. You can import users or create them manually.",
           actions: (
             <div className="flex gap-2">
-              <Button
-                variant="primary"
-                size="small"
-                onClick={() => alert("Create user clicked")}
-              >
+              <Button variant="primary" size="small" onClick={() => alert("Create user clicked")}>
                 Create User
               </Button>
-              <Button
-                variant="neutral"
-                look="outlined"
-                size="small"
-                onClick={() => alert("Import users clicked")}
-              >
+              <Button variant="neutral" look="outlined" size="small" onClick={() => alert("Import users clicked")}>
                 Import Users
               </Button>
             </div>
