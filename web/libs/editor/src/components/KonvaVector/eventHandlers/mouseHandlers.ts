@@ -25,6 +25,10 @@ import { PointType } from "../types";
 
 export function createMouseDownHandler(props: EventHandlerProps, handledSelectionInMouseDown: { current: boolean }) {
   return (e: KonvaEventObject<MouseEvent>) => {
+    // Prevent all interactions when disabled
+    if (props.disabled) {
+      return;
+    }
     // Reset the handledSelectionInMouseDown flag at the start of each mousedown
     // This ensures clean state for each interaction
     handledSelectionInMouseDown.current = false;
@@ -284,6 +288,15 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
 
 export function createMouseMoveHandler(props: EventHandlerProps, handledSelectionInMouseDown: { current: boolean }) {
   return (e: KonvaEventObject<MouseEvent>) => {
+    // Prevent all interactions when disabled (but allow cursor position updates)
+    // Only block dragging and point interactions
+    const isDragging = props.draggedPointIndex !== null || props.draggedControlPoint !== null;
+    if (props.disabled && isDragging) {
+      // Stop any ongoing drags when disabled
+      props.setDraggedPointIndex(null);
+      props.setDraggedControlPoint(null);
+      return;
+    }
     const pos = e.target.getStage()?.getPointerPosition();
     if (!pos) return;
 
