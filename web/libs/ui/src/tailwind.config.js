@@ -204,8 +204,5 @@ module.exports = {
   corePlugins: {
     preflight: true,
   },
-  plugins: [
-    // ...
-    require("tailwind-scrollbar"),
-  ],
+  plugins: [require("tailwindcss-animate"), require("tailwind-scrollbar")],
 };
