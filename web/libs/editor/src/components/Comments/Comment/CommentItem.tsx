@@ -4,7 +4,7 @@ import { type FC, useCallback, useContext, useMemo, useState } from "react";
 import { Tooltip, Userpic } from "@humansignal/ui";
 import { IconCheck, IconEllipsis } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
-import { Dropdown } from "../../../common/Dropdown/Dropdown";
+import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../../../common/Menu/Menu";
 import { Space } from "../../../common/Space/Space";
 import { cn } from "../../../utils/bem";
@@ -42,7 +42,11 @@ interface CommentItemProps {
     setHighlighted: (value: boolean) => {};
     _commentRef: React.Ref<HTMLElement>;
   };
-  listComments: ({ suppressClearComments }: { suppressClearComments: boolean }) => void;
+  listComments: ({
+    suppressClearComments,
+  }: {
+    suppressClearComments: boolean;
+  }) => void;
   classificationsItems: any;
 }
 

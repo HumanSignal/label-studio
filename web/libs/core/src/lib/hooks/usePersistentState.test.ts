@@ -1,5 +1,4 @@
-import { act } from "react";
-import { renderHook } from "@testing-library/react-hooks";
+import { renderHook, act } from "@testing-library/react";
 import { usePersistentState, usePersistentJSONState } from "./usePersistentState";
 
 describe("usePersistentState", () => {

@@ -1,8 +1,8 @@
-import { getJestProjects } from "@nx/jest";
+import { getJestProjectsAsync } from "@nx/jest";
 import { pathsToModuleNameMapper } from "ts-jest";
 
-export default {
-  projects: getJestProjects(),
+export default async () => ({
+  projects: await getJestProjectsAsync(),
   moduleNameMapper: pathsToModuleNameMapper(
     {
       "@humansignal/core": ["libs/core/src/index.ts"],
@@ -15,4 +15,4 @@ export default {
     },
     { prefix: "<rootDir>/../../" },
   ),
-};
+});

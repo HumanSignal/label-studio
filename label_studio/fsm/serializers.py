@@ -22,3 +22,22 @@ class StateModelSerializer(serializers.Serializer):
     triggered_by = TriggeredBySerializer(read_only=True, allow_null=True)
     created_at = serializers.DateTimeField(read_only=True)
     context_data = serializers.JSONField(read_only=True)
+
+
+class FSMTransitionExecuteRequestSerializer(serializers.Serializer):
+    """
+    Request body serializer for executing a manual FSM transition.
+    """
+
+    transition_name = serializers.CharField()
+    transition_data = serializers.DictField(required=False, allow_null=True)
+
+
+class FSMTransitionExecuteResponseSerializer(serializers.Serializer):
+    """
+    Response serializer for manual FSM transition execution.
+    """
+
+    success = serializers.BooleanField(read_only=True)
+    new_state = serializers.CharField(read_only=True, allow_null=True)
+    state_record = StateModelSerializer(read_only=True, allow_null=True)

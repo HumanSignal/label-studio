@@ -760,7 +760,7 @@ export class LSFWrapper {
 
   saveDraft = async (target = null) => {
     const selected = target || this.lsf?.annotationStore?.selected;
-    const hasChanges = this.needsDraftSave(selected);
+    const hasChanges = selected ? this.needsDraftSave(selected) : false;
 
     if (selected?.isDraftSaving) {
       await when(() => !selected.isDraftSaving);

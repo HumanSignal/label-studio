@@ -169,6 +169,7 @@ export { ReactComponent as IconLockUnlocked } from "./unlocked.svg";
 export { ReactComponent as IconLsLabeling } from "./ls-labeling.svg";
 export { ReactComponent as IconLsReview } from "./ls-review.svg";
 export { ReactComponent as IconMagicWandTool } from "./magic-wand-tool.svg";
+export { ReactComponent as IconMail } from "./mail.svg";
 export { ReactComponent as IconMastercard } from "./mastercard.svg";
 export { ReactComponent as IconMembers } from "./members.svg";
 export { ReactComponent as IconMenu } from "./menu.svg";

@@ -11,6 +11,7 @@ interface VectorPointsProps {
   transform: { zoom: number; offsetX: number; offsetY: number };
   fitScale: number;
   pointRefs: React.MutableRefObject<{ [key: number]: Konva.Circle | null }>;
+  selected?: boolean;
   disabled?: boolean;
   transformMode?: boolean;
   pointRadius?: {
@@ -33,6 +34,7 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
   transform,
   fitScale,
   pointRefs,
+  selected = true,
   disabled = false,
   transformMode = false,
   pointRadius,
@@ -44,11 +46,11 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
   maxPoints,
   onPointClick,
 }) => {
-  // CRITICAL: For single-point regions, we need to allow clicks even when disabled
+  // CRITICAL: For single-point regions, we need to allow clicks even when not selected
   // Single-point regions have no segments to click on, so clicking the point must trigger region selection
-  // BUT: Never allow clicks when in transform mode
+  // BUT: Never allow clicks when disabled or in transform mode
   const isSinglePointRegion = initialPoints.length === 1;
-  const shouldListenToClicks = !transformMode && (!disabled || isSinglePointRegion);
+  const shouldListenToClicks = !disabled && !transformMode && (selected || isSinglePointRegion);
 
   return (
     <>
@@ -58,7 +60,7 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
         // Use configurable radius with fallbacks to defaults
         const enabledRadius = pointRadius?.enabled ?? 6;
         const disabledRadius = pointRadius?.disabled ?? 4;
-        const baseRadius = disabled ? disabledRadius : enabledRadius;
+        const baseRadius = selected ? enabledRadius : disabledRadius;
         // Check if maxPoints is reached
         const isMaxPointsReached = maxPoints !== undefined && initialPoints.length >= maxPoints;
         // Check if multiple points are selected
@@ -67,10 +69,10 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
         const isExplicitlySelected = selectedPointIndex === index || selectedPoints.has(index);
         // Active point should only be rendered as selected if:
         // - It's explicitly selected, OR
-        // - (Not disabled AND maxPoints not reached AND not in multi-selection AND it's the active point)
+        // - (selected AND maxPoints not reached AND not in multi-selection AND it's the active point)
         const isSelected =
           isExplicitlySelected ||
-          (!disabled &&
+          (selected &&
             !isMaxPointsReached &&
             !isMultiSelection &&
             activePointId !== null &&
@@ -82,7 +84,7 @@ export const VectorPoints: React.FC<VectorPointsProps> = ({
         return (
           <>
             {/* White outline ring for selected points - rendered outside the colored stroke */}
-            {!disabled && isSelected && (
+            {selected && isSelected && (
               <Circle
                 key={`point-outline-${index}-${point.x}-${point.y}`}
                 x={point.x}

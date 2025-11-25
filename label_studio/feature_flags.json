@@ -2148,6 +2148,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_bros_12_support_reports": {
+      "key": "fflag_feat_bros_12_support_reports",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "6f7074ba239341a6b20502b7d3e7255b",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_bros_193_new_cloud_storage_providers_short": {
       "key": "fflag_feat_bros_193_new_cloud_storage_providers_short",
       "on": false,

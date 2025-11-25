@@ -1,5 +1,6 @@
 import type Konva from "konva";
 import type { BezierPoint } from "../types";
+import { snapToPixel } from "../eventHandlers/utils";
 
 export interface TransformResult {
   newPoints: BezierPoint[];
@@ -33,6 +34,7 @@ export function applyTransformationToControlPoints(
   transformerCenterX: number,
   transformerCenterY: number,
   isRotation = false,
+  pixelSnapping = false,
 ): BezierPoint[] {
   const rotationRadians = currentRotation * (Math.PI / 180);
   const cos = Math.cos(rotationRadians);
@@ -64,16 +66,24 @@ export function applyTransformationToControlPoints(
         const rotatedCP2Y = scaledCP2X * sin + scaledCP2Y * cos;
 
         // Apply to current anchor position
-        return {
-          ...point,
-          controlPoint1: {
+        const cp1 = snapToPixel(
+          {
             x: point.x + rotatedCP1X,
             y: point.y + rotatedCP1Y,
           },
-          controlPoint2: {
+          pixelSnapping,
+        );
+        const cp2 = snapToPixel(
+          {
             x: point.x + rotatedCP2X,
             y: point.y + rotatedCP2Y,
           },
+          pixelSnapping,
+        );
+        return {
+          ...point,
+          controlPoint1: cp1,
+          controlPoint2: cp2,
         };
       }
 
@@ -91,16 +101,24 @@ export function applyTransformationToControlPoints(
       const scaledCP2Y = originalCP2OffsetY * currentScaleY;
 
       // Apply to current anchor position
-      return {
-        ...point,
-        controlPoint1: {
+      const cp1 = snapToPixel(
+        {
           x: point.x + scaledCP1X,
           y: point.y + scaledCP1Y,
         },
-        controlPoint2: {
+        pixelSnapping,
+      );
+      const cp2 = snapToPixel(
+        {
           x: point.x + scaledCP2X,
           y: point.y + scaledCP2Y,
         },
+        pixelSnapping,
+      );
+      return {
+        ...point,
+        controlPoint1: cp1,
+        controlPoint2: cp2,
       };
     }
     return point;
@@ -153,6 +171,7 @@ export function applyTransformationToPoints(
   bounds?: { width: number; height: number },
   getCurrentPointsRef?: () => BezierPoint[],
   updateCurrentPointsRef?: (points: BezierPoint[]) => void,
+  pixelSnapping = false,
 ): TransformResult {
   const nodes = transformer.nodes();
 
@@ -192,9 +211,10 @@ export function applyTransformationToPoints(
       // Use stored original positions if available, otherwise use current positions
       const originalPos = originalPositions?.[pointIndex] || originalPoint;
 
-      // Update the point position (no individual constraints - group constraints handled by transformer)
-      point.x = transformedX;
-      point.y = transformedY;
+      // Update the point position with pixel snapping if enabled
+      const snappedPos = snapToPixel({ x: transformedX, y: transformedY }, pixelSnapping);
+      point.x = snappedPos.x;
+      point.y = snappedPos.y;
 
       // Don't update proxy node position - let transformer manage it
       // This prevents the update loop

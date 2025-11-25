@@ -2,8 +2,8 @@ import { formatDistanceToNow, format, parseISO } from "date-fns";
 import { useCallback, useContext } from "react";
 
 import truncate from "truncate-middle";
-import { Dropdown, Menu } from "../../../components";
-import { Button } from "@humansignal/ui";
+import { Menu } from "../../../components";
+import { Button, Dropdown } from "@humansignal/ui";
 import { confirm } from "../../../components/Modal/Modal";
 import { Oneof } from "../../../components/Oneof/Oneof";
 import { IconEllipsis } from "@humansignal/icons";
@@ -95,7 +95,12 @@ const BackendCard = ({ backend, onStartTrain, onEdit, onDelete, onTestRequest })
         <div className={rootClass.elem("group")}>{truncate(backend.url, 20, 10, "...")}</div>
         <div className={rootClass.elem("group")}>
           <Tooltip title={format(parseISO(backend.created_at), "yyyy-MM-dd HH:mm:ss")}>
-            <span>Created&nbsp;{formatDistanceToNow(parseISO(backend.created_at), { addSuffix: true })}</span>
+            <span>
+              Created&nbsp;
+              {formatDistanceToNow(parseISO(backend.created_at), {
+                addSuffix: true,
+              })}
+            </span>
           </Tooltip>
         </div>
       </div>
