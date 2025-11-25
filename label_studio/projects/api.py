@@ -1,9 +1,10 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 import os
 import pathlib
 
+from core.feature_flags import flag_set
 from core.filters import ListFilter
 from core.label_config import config_essential_data_has_changed
 from core.mixins import GetParentObjectMixin
@@ -184,11 +185,15 @@ class ProjectListAPI(generics.ListCreateAPIView):
         )
         if filter in ['pinned_only', 'exclude_pinned']:
             projects = projects.filter(pinned_at__isnull=filter == 'exclude_pinned')
-        return (
-            ProjectManager.with_counts_annotate(projects, fields=fields)
-            .annotate_fsm_state()
-            .prefetch_related('members', 'created_by')
-        )
+        projects = ProjectManager.with_counts_annotate(projects, fields=fields)
+
+        # Only annotate FSM state for UI/API consumption when both feature flags are enabled
+        if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
+            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
+        ):
+            projects = projects.annotate_fsm_state()
+
+        return projects.prefetch_related('members', 'created_by')
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
@@ -242,11 +247,17 @@ class ProjectCountsListAPI(generics.ListAPIView):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        return (
-            Project.objects.with_counts(fields=fields)
-            .annotate_fsm_state()
-            .filter(organization=self.request.user.active_organization)
+        projects = Project.objects.with_counts(fields=fields).filter(
+            organization=self.request.user.active_organization
         )
+
+        # Only annotate FSM state for UI/API consumption when both feature flags are enabled
+        if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
+            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
+        ):
+            projects = projects.annotate_fsm_state()
+
+        return projects
 
 
 @method_decorator(
@@ -353,7 +364,7 @@ class ProjectCountsListAPI(generics.ListAPIView):
 )
 class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    queryset = Project.objects.with_counts().annotate_fsm_state()
+    queryset = Project.objects.with_counts()
     permission_required = ViewClassPermission(
         GET=all_permissions.projects_view,
         DELETE=all_permissions.projects_delete,
@@ -370,11 +381,17 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         serializer = GetFieldsSerializer(data=self.request.query_params)
         serializer.is_valid(raise_exception=True)
         fields = serializer.validated_data.get('include')
-        return (
-            Project.objects.with_counts(fields=fields)
-            .annotate_fsm_state()
-            .filter(organization=self.request.user.active_organization)
+        projects = Project.objects.with_counts(fields=fields).filter(
+            organization=self.request.user.active_organization
         )
+
+        # Only annotate FSM state for UI/API consumption when both feature flags are enabled
+        if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
+            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
+        ):
+            projects = projects.annotate_fsm_state()
+
+        return projects
 
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)

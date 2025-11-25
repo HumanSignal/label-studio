@@ -14,7 +14,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone as django_timezone
-from django_rq import get_connection, job
+from django_rq import get_connection
 
 logger = logging.getLogger(__name__)
 
@@ -302,7 +302,6 @@ def cleanup_redis_activity_data(user_ids: Set[int]) -> bool:
         return False
 
 
-@job('low', timeout=3600)
 def sync_user_activities_to_db(max_users: int = None) -> dict:
     """
     Synchronize user activities from Redis to database.
