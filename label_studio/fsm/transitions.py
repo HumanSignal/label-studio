@@ -54,6 +54,9 @@ class TransitionContext(BaseModel, Generic[EntityType, StateModelType]):
     # Organizational context
     organization_id: Optional[int] = Field(None, description='Organization context for the transition')
 
+    # Validation context, for cases where we want to skip validation for the transition
+    skip_validation: Optional[bool] = Field(default=False, description='Whether to skip validation for the transition')
+
     @property
     def has_current_state(self) -> bool:
         """Check if entity has a current state"""
@@ -269,7 +272,7 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
 
         This method handles the preparation phase of the transition:
         1. Set context on the transition instance
-        2. Validate the transition
+        2. Validate the transition if not skipped
         3. Execute pre-transition hooks
         4. Perform the actual transition logic
 
@@ -290,7 +293,7 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
 
         try:
             # Validate transition
-            if not self.validate_transition(context):
+            if not context.skip_validation and not self.validate_transition(context):
                 raise TransitionValidationError(
                     f'Transition validation failed for {self.transition_name}',
                     {'current_state': context.current_state, 'target_state': self.target_state},
