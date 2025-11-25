@@ -87,6 +87,3 @@ def test_localfiles_data_allows_backslash_paths(
     response = business_client.get(url)
 
     assert response.status_code == 200
-
-
-

@@ -3,7 +3,6 @@
 import os
 
 import pytest
-
 from io_storages.localfiles.models import normalize_storage_path
 
 
@@ -27,4 +26,3 @@ def test_normalize_storage_path_windows_drive():
     raw = 'C:\\data\\set\\'
     expected = 'C:/data/set' if os.name != 'nt' else 'C:\\data\\set'
     assert normalize_storage_path(raw) == expected
-
