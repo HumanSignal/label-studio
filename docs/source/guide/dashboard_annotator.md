@@ -112,7 +112,7 @@ Keep in mind that all metrics in the table, including task assignments, are [fil
 | Column | Description | 
 | --- | --- | 
 | **Assigned** | The number of tasks that have either been manually assigned to the user or have received a submitted annotation from the user.  | 
-| **Pending** | The number of tasks manually assigned to the user which have neither received their submitted annotation nor have been skipped. |
+| **Pending** | The number of tasks manually assigned to the user, and for which they haven't submitted an annotation and have not skipped. |
 | **Submitted** | Number of submitted annotations. This includes annotations that have and have not been reviewed. |
 | **Skipped** | Number of skipped annotations. |
 | **Performance Score** | The performance score is calculated based on review actions on submitted annotations. See [the table above](#Annotation-performance-summaries) for a complete description. <br /><br />If no annotations have been reviewed, this column is grayed out.  |
