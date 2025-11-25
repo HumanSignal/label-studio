@@ -2,7 +2,11 @@
 """
 import os
 
-from io_storages.localfiles.models import LocalFilesExportStorage, LocalFilesImportStorage
+from io_storages.localfiles.models import (
+    LocalFilesExportStorage,
+    LocalFilesImportStorage,
+    normalize_storage_path,
+)
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
@@ -18,6 +22,8 @@ class LocalFilesImportStorageSerializer(ImportStorageSerializer):
     def validate(self, data):
         # Validate local file path
         data = super(LocalFilesImportStorageSerializer, self).validate(data)
+        if 'path' in data:
+            data['path'] = normalize_storage_path(data['path'])
         storage = LocalFilesImportStorage(**data)
         try:
             storage.validate_connection()
@@ -36,4 +42,6 @@ class LocalFilesExportStorageSerializer(ExportStorageSerializer):
     def validate(self, data):
         # Validate local file path
         data = super(LocalFilesExportStorageSerializer, self).validate(data)
+        if 'path' in data:
+            data['path'] = normalize_storage_path(data['path'])
         return data

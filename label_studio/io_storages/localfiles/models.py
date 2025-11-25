@@ -28,6 +28,25 @@ from tasks.models import Annotation
 logger = logging.getLogger(__name__)
 
 
+def normalize_storage_path(raw_path: str | None) -> str | None:
+    """Return a canonical representation for LocalFiles paths.
+
+    We need consistent paths because permission checks compare the requested
+    directory with storage.path prefixes. Users often enter trailing slashes or
+    Windows separators; normalizing here prevents mismatches.
+    """
+    if raw_path is None:
+        return None
+
+    trimmed = raw_path.strip()
+    if trimmed == '':
+        return ''
+
+    collapsed = trimmed.replace('\\', os.sep)
+    normalized = os.path.normpath(collapsed)
+    return normalized
+
+
 class LocalFilesMixin(models.Model):
     path = models.TextField(_('path'), null=True, blank=True, help_text='Local path')
     regex_filter = models.TextField(
@@ -42,8 +61,34 @@ class LocalFilesMixin(models.Model):
         help_text='Interpret objects as BLOBs and generate URLs',
     )
 
+    def clean(self):
+        super().clean()
+        if self.path is not None:
+            self.path = normalize_storage_path(self.path)
+
+    def save(self, *args, **kwargs):
+        if self.path is not None:
+            self.path = normalize_storage_path(self.path)
+        super().save(*args, **kwargs)
+
+    def _get_storage_path_or_raise(self, exception_cls=ValueError) -> str:
+        """Return a sanitized storage path or raise a caller-provided exception type.
+
+        All downstream filesystem operations eventually need an absolute path without
+        trailing slashes or mixed separators. Centralizing that logic here keeps the
+        normalization rules consistent and allows callers to decide what exception
+        class (ValidationError vs ValueError) should be raised when the path is
+        missing or invalid.
+        """
+        normalized = normalize_storage_path(self.path)
+        if not normalized:
+            raise exception_cls('Path must be set for Local Files storage')
+        return normalized
+
     def validate_connection(self):
-        path = Path(self.path)
+        normalized_path = self._get_storage_path_or_raise(ValidationError)
+        self.path = normalized_path
+        path = Path(normalized_path)
         document_root = Path(settings.LOCAL_FILES_DOCUMENT_ROOT)
         if not path.exists():
             raise ValidationError(f'Path {self.path} does not exist')
@@ -76,7 +121,7 @@ class LocalFilesImportStorageBase(LocalFilesMixin, ImportStorage):
     )
 
     def iter_objects(self):
-        path = Path(self.path)
+        path = Path(self._get_storage_path_or_raise())
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
         # For better control of imported tasks, file reading has been changed to ascending order of filenames.
         # In other words, the task IDs are sorted by filename order.
@@ -139,7 +184,8 @@ class LocalFilesExportStorage(LocalFilesMixin, ExportStorage):
 
         # get key that identifies this object in storage
         key = LocalFilesExportStorageLink.get_key(annotation)
-        key = os.path.join(self.path, f'{key}')
+        storage_path = self._get_storage_path_or_raise()
+        key = os.path.join(storage_path, f'{key}')
 
         # put object into storage
         with open(key, mode='w') as f:
