@@ -166,6 +166,6 @@ Keep in mind that all metrics in the table, including task assignments, are [fil
 | **Fix + Accepted** | Number of annotations the user has updated and then accepted. |
 | **Rejected** | Number of annotations the user has rejected.  |
 | **Total Time** | The total time this user spent reviewing. See [the table above](#Review-performance-summaries) for a complete description. |
-| **Average Time** | The average time reviewing each annotation. |
+| **Average Time** | The average time spent reviewing each annotation. |
 | **Median Time** | The median time spent reviewing each annotation. |
 
