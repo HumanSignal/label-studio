@@ -302,7 +302,6 @@ def cleanup_redis_activity_data(user_ids: Set[int]) -> bool:
         return False
 
 
-@job('low', timeout=3600)
 def sync_user_activities_to_db(max_users: int = None) -> dict:
     """
     Synchronize user activities from Redis to database.

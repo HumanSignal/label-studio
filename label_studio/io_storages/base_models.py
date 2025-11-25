@@ -723,7 +723,6 @@ class ProjectStorageMixin(models.Model):
         abstract = True
 
 
-@job('low')
 def import_sync_background(storage_class, storage_id, timeout=settings.RQ_LONG_JOB_TIMEOUT, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     try:
@@ -736,13 +735,11 @@ def import_sync_background(storage_class, storage_id, timeout=settings.RQ_LONG_J
         return
 
 
-@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()
 
 
-@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_only_new_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_only_new_annotations()
