@@ -6,6 +6,7 @@ Tests the uuid-utils library integration and UUID7 functionality.
 
 import uuid
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 from unittest.mock import Mock, patch
 
 # Additional imports for transition_utils coverage tests
@@ -18,7 +19,7 @@ from fsm.transition_utils import (
     get_entity_state_flow,
     validate_transition_data,
 )
-from fsm.transitions import BaseTransition, TransitionValidationError
+from fsm.transitions import BaseTransition, TransitionContext, TransitionValidationError
 from fsm.utils import (
     UUID7Generator,
     generate_uuid7,
@@ -207,8 +208,7 @@ class TransitionUtilsTests(TestCase):
         class BrokenTransition(BaseTransition):
             """Transition that raises unexpected error"""
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'BROKEN'
 
             def transition(self, context):
@@ -237,8 +237,7 @@ class TransitionUtilsTests(TestCase):
         class ValidatingTransition(BaseTransition):
             """Transition that raises validation error"""
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'VALIDATED'
 
             def transition(self, context):
@@ -268,8 +267,7 @@ class TransitionUtilsTests(TestCase):
 
             required_field: str = Field(...)
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'STRICT'
 
             def transition(self, context):
@@ -290,8 +288,7 @@ class TransitionUtilsTests(TestCase):
             required_field: str = Field(...)
             number_field: int = Field(default=0, ge=0)
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'VALIDATED'
 
             def transition(self, context):
@@ -323,8 +320,7 @@ class TransitionUtilsTests(TestCase):
         class CustomErrorTransition(BaseTransition):
             """Transition that raises custom error in __init__"""
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'ERROR'
 
             def transition(self, context):
@@ -348,8 +344,7 @@ class TransitionUtilsTests(TestCase):
 
             required_field: str = Field(...)
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'REQUIRED'
 
             def transition(self, context):
