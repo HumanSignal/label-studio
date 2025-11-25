@@ -151,6 +151,22 @@ const _Tool = types
     };
 
     return {
+      /**
+       * Reset tool state when region is destroyed
+       * Called when currentArea is destroyed (e.g., via undo) to prevent locked state
+       */
+      resetToolState() {
+        if (self.mode === "drawing") {
+          self.mode = "viewing";
+        }
+        if (self.currentArea && !isAlive(self.currentArea)) {
+          self.currentArea = null;
+        }
+        if (self.isDrawing) {
+          self.setDrawing(false);
+        }
+        self.stopListening();
+      },
       // Override event() to allow shift-key events through for ghost point insertion
       event(name, ev, [x, y, canvasX, canvasY]) {
         // For Vector tool, allow shift-key events to pass through
@@ -173,6 +189,11 @@ const _Tool = types
         }
       },
       canStartDrawing() {
+        // Check if currentArea is destroyed and reset state if so
+        if (self.currentArea && !isAlive(self.currentArea)) {
+          self.resetToolState();
+        }
+
         // Override to allow continuing to draw on selected/highlighted regions even if there's a selection
         // This is Vector-specific behavior - other tools should use the default behavior from MultipleClicksDrawingTool
         // First call the MultipleClicksDrawingTool's canStartDrawing (which includes selection check)
@@ -238,7 +259,23 @@ const _Tool = types
       },
 
       startDrawing(x, y) {
-        if (self.mode === "drawing") return;
+        console.log(self.mode, self.canStartDrawing());
+        
+        // Check if currentArea is destroyed and reset state if so
+        // This handles the case where region was destroyed via undo but tool state wasn't reset
+        if (self.currentArea && !isAlive(self.currentArea)) {
+          self.resetToolState();
+        }
+        
+        // If mode is "drawing" but currentArea is null or destroyed, reset state
+        if (self.mode === "drawing") {
+          if (!self.currentArea || !isAlive(self.currentArea)) {
+            self.resetToolState();
+          } else {
+            return; // Still actively drawing a valid region
+          }
+        }
+        
         if (!self.canStartDrawing()) return;
 
         const { x: rx, y: ry } = self.realCoordsFromCursor(x, y);
@@ -335,7 +372,17 @@ const _Tool = types
       _finishDrawing() {
         const { currentArea, control } = self;
 
-        if (currentArea === null) return;
+        if (currentArea === null) {
+          // If currentArea is null, still reset state to prevent locked state
+          self.resetToolState();
+          return;
+        }
+
+        // Check if currentArea was destroyed (e.g., via undo)
+        if (!isAlive(currentArea)) {
+          self.resetToolState();
+          return;
+        }
 
         down = false;
         self.currentArea?.notifyDrawingFinished();
@@ -354,10 +401,12 @@ const _Tool = types
       deleteRegion() {
         const { currentArea } = self;
 
+        // Reset all tool state
         self.setDrawing(false);
+        self.mode = "viewing";
         self.currentArea = null;
         self.stopListening();
-        if (currentArea) {
+        if (currentArea && isAlive(currentArea)) {
           currentArea.deleteRegion();
         }
       },

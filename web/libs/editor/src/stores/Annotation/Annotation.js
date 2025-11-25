@@ -668,13 +668,21 @@ const _Annotation = types
           const points = currentRegion?.points?.length ?? 0;
 
           stopDrawingAfterNextUndo = points <= 1;
+        } else if (currentRegion?.type === "vectorregion") {
+          const vertices = currentRegion?.vertices?.length ?? 0;
+
+          stopDrawingAfterNextUndo = vertices <= 1;
         }
 
         history.undo();
         regionStore.selectRegionsByIds(selectedIds);
 
         if (stopDrawingAfterNextUndo) {
-          currentRegion.setDrawing(false);
+          // Check if region still exists after undo (it might have been destroyed)
+          const regionAfterUndo = regionStore.findRegion(currentRegion?.id);
+          if (regionAfterUndo && isAlive(regionAfterUndo)) {
+            regionAfterUndo.setDrawing(false);
+          }
           self.setIsDrawing(false);
         }
       }
