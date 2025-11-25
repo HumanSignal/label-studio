@@ -1,7 +1,7 @@
 import { inject } from "mobx-react";
 import { useCallback, useState } from "react";
 import { Button, ButtonGroup } from "@humansignal/ui";
-import { Dropdown } from "../../Common/Dropdown/DropdownComponent";
+import { Dropdown } from "@humansignal/ui";
 import { Toggle } from "../../Common/Form";
 import { IconSettings, IconMinus, IconPlus } from "@humansignal/icons";
 import debounce from "lodash/debounce";

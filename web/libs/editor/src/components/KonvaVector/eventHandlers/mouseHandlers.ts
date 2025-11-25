@@ -25,6 +25,10 @@ import { PointType } from "../types";
 
 export function createMouseDownHandler(props: EventHandlerProps, handledSelectionInMouseDown: { current: boolean }) {
   return (e: KonvaEventObject<MouseEvent>) => {
+    // Prevent all interactions when disabled
+    if (props.disabled) {
+      return;
+    }
     // Reset the handledSelectionInMouseDown flag at the start of each mousedown
     // This ensures clean state for each interaction
     handledSelectionInMouseDown.current = false;
@@ -212,6 +216,8 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
                 controlIndex: 1,
               });
               props.isDragging.current = true;
+              // Fire transform start event when control point dragging begins
+              props.handleTransformStart?.();
               props.lastPos.current = {
                 x: e.evt.clientX,
                 y: e.evt.clientY,
@@ -233,6 +239,8 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
                 controlIndex: 2,
               });
               props.isDragging.current = true;
+              // Fire transform start event when control point dragging begins
+              props.handleTransformStart?.();
               props.lastPos.current = {
                 x: e.evt.clientX,
                 y: e.evt.clientY,
@@ -280,6 +288,15 @@ export function createMouseDownHandler(props: EventHandlerProps, handledSelectio
 
 export function createMouseMoveHandler(props: EventHandlerProps, handledSelectionInMouseDown: { current: boolean }) {
   return (e: KonvaEventObject<MouseEvent>) => {
+    // Prevent all interactions when disabled (but allow cursor position updates)
+    // Only block dragging and point interactions
+    const isDragging = props.draggedPointIndex !== null || props.draggedControlPoint !== null;
+    if (props.disabled && isDragging) {
+      // Stop any ongoing drags when disabled
+      props.setDraggedPointIndex(null);
+      props.setDraggedControlPoint(null);
+      return;
+    }
     const pos = e.target.getStage()?.getPointerPosition();
     if (!pos) return;
 
@@ -448,6 +465,8 @@ export function createMouseMoveHandler(props: EventHandlerProps, handledSelectio
       // If we haven't started dragging yet, check if we should start
       if (!props.isDragging.current && (mouseDeltaX > dragThreshold || mouseDeltaY > dragThreshold)) {
         props.isDragging.current = true;
+        // Fire transform start event when point dragging begins
+        props.handleTransformStart?.();
       }
 
       // Only proceed with dragging if we're actually dragging
@@ -773,6 +792,13 @@ export function createMouseUpHandler(props: EventHandlerProps) {
         // Normal point selection
         handlePointSelectionFromIndex(pointIndex, props, e);
       }
+    }
+
+    // Fire transform end event if we were dragging (point or control point)
+    const wasDragging =
+      props.isDragging.current || props.draggedPointIndex !== null || props.draggedControlPoint !== null;
+    if (wasDragging) {
+      props.handleTransformEnd?.(e);
     }
 
     // Reset dragging state

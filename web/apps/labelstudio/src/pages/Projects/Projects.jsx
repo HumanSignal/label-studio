@@ -52,6 +52,7 @@ export const ProjectsPage = () => {
       "color",
       "is_published",
       "assignment_settings",
+      "state",
     ].join(",");
 
     const data = await api.callApi("projects", {

@@ -233,18 +233,6 @@ css = ["tinycss2 (>=1.1.0,<1.2)"]
 dev = ["Sphinx (==4.3.2)", "black (==22.3.0) ; implementation_name == \"cpython\"", "build (==0.8.0)", "flake8 (==4.0.1)", "hashin (==0.17.0)", "mypy (==0.961) ; implementation_name == \"cpython\"", "pip-tools (==6.6.2)", "pytest (==7.1.2)", "tox (==3.25.0)", "twine (==4.0.1)", "wheel (==0.37.1)"]
 
 [[package]]
-name = "boto"
-version = "2.49.0"
-description = "Amazon Web Services Library"
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "boto-2.49.0-py2.py3-none-any.whl", hash = "sha256:147758d41ae7240dc989f0039f27da8ca0d53734be0eb869ef16e3adcfa462e8"},
-    {file = "boto-2.49.0.tar.gz", hash = "sha256:ea0d3b40a2d852767be77ca343b58a9e3a4b00d9db440efb8da74b4e58025e5a"},
-]
-
-[[package]]
 name = "boto3"
 version = "1.39.3"
 description = "The AWS SDK for Python"
@@ -2143,7 +2131,7 @@ optional = false
 python-versions = ">=3.9,<4"
 groups = ["main"]
 files = [
-    {file = "995336272eb1d0d6d572efed553bae08228f81d8.zip", hash = "sha256:8b5b98090be94693fa8a3a7d44ce9ca23c79a5d07a843d8f2a84da0c3e8d13eb"},
+    {file = "9b72a9525c98ecbf36c816d30365380033ee80e1.zip", hash = "sha256:95d6b0b968a779b6216a6c5bf94ae7461c3decf53066ebeee1442627f7ff51a1"},
 ]
 
 [package.dependencies]
@@ -2171,7 +2159,7 @@ xmljson = "0.2.1"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/995336272eb1d0d6d572efed553bae08228f81d8.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/9b72a9525c98ecbf36c816d30365380033ee80e1.zip"
 
 [[package]]
 name = "launchdarkly-server-sdk"
@@ -5117,4 +5105,4 @@ uwsgi = ["pyuwsgi", "uwsgitop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "879773b4c0775ff2266b3c97b7426ccac34aaa14c4d4ae06824ae5866fff375d"
+content-hash = "46f607014fe7c51f64b807475fac8edd5a2c7211d81da09fd1c99cf72f5a5b60"

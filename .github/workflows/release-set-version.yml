@@ -33,7 +33,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.branch }}

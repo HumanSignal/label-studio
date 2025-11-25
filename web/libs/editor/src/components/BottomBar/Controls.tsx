@@ -10,7 +10,7 @@ import { useCallback, useState } from "react";
 
 import { Button, ButtonGroup, type ButtonProps } from "@humansignal/ui";
 import { IconBan, IconChevronDown } from "@humansignal/icons";
-import { Dropdown } from "../../common/Dropdown/Dropdown";
+import { Dropdown } from "@humansignal/ui";
 import type { CustomButtonType } from "../../stores/CustomButton";
 import { cn } from "../../utils/bem";
 import { FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
@@ -198,7 +198,13 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
 
       const useExitOption = !isDisabled && isNotQuickView;
 
-      const SubmitOption = ({ isUpdate, onClickMethod }: { isUpdate: boolean; onClickMethod: () => any }) => {
+      const SubmitOption = ({
+        isUpdate,
+        onClickMethod,
+      }: {
+        isUpdate: boolean;
+        onClickMethod: () => any;
+      }) => {
         return (
           <div className="p-tighter rounded">
             <Button

@@ -104,9 +104,12 @@ export interface EventHandlerProps {
   setActivePointId?: (id: string | null) => void;
   setLastAddedPointId?: (pointId: string | null) => void;
   isTransforming?: boolean;
+  selected?: boolean;
   disabled?: boolean;
   transformMode?: boolean;
   disableInternalPointAddition?: boolean;
+  handleTransformStart?: () => void;
+  handleTransformEnd?: (e?: KonvaEventObject<MouseEvent>) => void;
   pointCreationManager?: {
     isCreating: () => boolean;
     createRegularPointAt: (x: number, y: number, prevPointId?: string) => boolean;
@@ -138,5 +141,5 @@ export interface EventHandlers {
   handleLayerMouseDown: (e: KonvaEventObject<MouseEvent>) => void;
   handleLayerClick: (e: KonvaEventObject<MouseEvent>) => void;
   handleLayerMouseMove: (e: KonvaEventObject<MouseEvent>) => void;
-  handleLayerMouseUp: () => void;
+  handleLayerMouseUp: (e?: KonvaEventObject<MouseEvent>) => void;
 }

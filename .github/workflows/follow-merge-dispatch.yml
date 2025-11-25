@@ -63,7 +63,7 @@ jobs:
             throw `${{ github.actor }} don't have membership in ${owner} organization`
 
       - name: Checkout Actions Hub
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: HumanSignal/actions-hub

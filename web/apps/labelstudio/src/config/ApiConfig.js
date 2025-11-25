@@ -92,6 +92,9 @@ export const API_CONFIG = {
 
     accessTokenSettings: "GET:/jwt/settings",
     accessTokenUpdateSettings: "POST:/jwt/settings",
+
+    // FSM
+    fsmStateHistory: "GET:/fsm/entities/:entityType/:entityId/history",
   },
   alwaysExpectJSON: false,
 };

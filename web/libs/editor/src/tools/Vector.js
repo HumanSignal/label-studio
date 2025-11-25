@@ -264,6 +264,8 @@ const _Tool = types
 
         const currentArea = area && isAlive(area) ? area : null;
 
+        self.annotation.history.freeze();
+
         // Only create new region if we don't have an existing one
         if (!currentArea) {
           self.currentArea = self.createRegion(self.createRegionOptions(), true);
@@ -318,6 +320,7 @@ const _Tool = types
         // skipping a frame to let KonvaVector render and update properly
         setTimeout(() => {
           self.currentArea?.commitPoint?.(rx, ry);
+          self.annotation.history.unfreeze();
           self.finishDrawing();
         });
       },

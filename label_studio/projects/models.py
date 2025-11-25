@@ -121,7 +121,7 @@ class ProjectManager(models.Manager):
         Example:
             projects = Project.objects.with_state().filter(organization=org)
             for project in projects:
-                print(project.current_state)  # No N+1 queries!
+                print(project.state)  # No N+1 queries!
         """
         return self.get_queryset().annotate_fsm_state()
 
