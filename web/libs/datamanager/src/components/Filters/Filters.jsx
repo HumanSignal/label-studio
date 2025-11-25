@@ -40,7 +40,6 @@ export const Filters = injector(({ views, currentView, filters }) => {
           value: filter.id,
           title: filter.field.title,
           original: filter,
-          disabled: filter.field.disabled,
         });
 
         return { ...res, [target]: group };
