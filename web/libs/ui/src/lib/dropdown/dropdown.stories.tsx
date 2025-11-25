@@ -453,25 +453,6 @@ export const MultipleDropdowns: Story = {
   ),
 };
 
-// Using Dropdown Component Directly (Advanced)
-export const DirectDropdownUsage: Story = {
-  render: () => {
-    const [visible, setVisible] = useState(false);
-    const [triggerRef] = useState<HTMLButtonElement | null>(null);
-
-    return (
-      <div>
-        <Button ref={triggerRef as any} onClick={() => setVisible(!visible)}>
-          Advanced Direct Usage
-        </Button>
-        <Dropdown visible={visible} onToggle={setVisible} alignment="bottom-left">
-          <MenuContent />
-        </Dropdown>
-      </div>
-    );
-  },
-};
-
 // With Labels
 export const WithLabels: Story = {
   render: (args) => (
