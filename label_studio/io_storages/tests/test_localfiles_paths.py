@@ -1,9 +1,14 @@
 """Tests for LocalFiles helpers."""
 
 import os
+import tempfile
 
 import pytest
 from io_storages.localfiles.models import normalize_storage_path
+
+
+_TMP_DIR = tempfile.gettempdir()
+_DATASET_DIR = os.path.join(_TMP_DIR, 'dataset')
 
 
 @pytest.mark.parametrize(
@@ -11,11 +16,11 @@ from io_storages.localfiles.models import normalize_storage_path
     [
         (None, None),
         ('', ''),
-        ('/tmp/dataset', os.path.normpath('/tmp/dataset')),
-        ('/tmp/dataset/', os.path.normpath('/tmp/dataset')),
-        ('  /tmp/dataset/  ', os.path.normpath('/tmp/dataset')),
-        (os.path.join('tmp', 'dataset', ''), os.path.join('tmp', 'dataset')),
-        ('tmp\\dataset\\', os.path.join('tmp', 'dataset')),
+        (_DATASET_DIR, os.path.normpath(_DATASET_DIR)),
+        (_DATASET_DIR + os.sep, os.path.normpath(_DATASET_DIR)),
+        (f'  {_DATASET_DIR}{os.sep}  ', os.path.normpath(_DATASET_DIR)),
+        (os.path.join(_TMP_DIR, 'dataset', ''), os.path.join(_TMP_DIR, 'dataset')),
+        (_DATASET_DIR.replace(os.sep, '\\') + '\\', os.path.join(_TMP_DIR, 'dataset')),
     ],
 )
 def test_normalize_storage_path_basic_cases(raw, expected):
