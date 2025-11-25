@@ -29,7 +29,6 @@ from django.db.models import JSONField
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django_rq import job
 from io_storages.utils import StorageObject, get_uri_via_regex, parse_bucket_uri
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
