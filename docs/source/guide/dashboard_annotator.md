@@ -136,7 +136,7 @@ The **Reviews** tab shows information related to a user's activity reviewing oth
 | **Time Reviewing** | The total time spent reviewing. This is calculated from when a user opens an annotation to when they either take action on it (such as approving it) or close it by moving away from the task. This also includes idle time when the window is in focus. |
 
 !!! note
-    Data collection for review time began on September 25, 2025 for Cloud environment, or for 2.30 for on-prem deployments. If you filter for earlier dates, review time will not be calculated.
+    Data collection for review time began on September 25, 2025 for cloud environments, or for 2.30 for on-prem deployments. If you filter for earlier dates, review time will not be calculated.
 
 ### Review graphs
 
