@@ -111,8 +111,8 @@ Keep in mind that all metrics in the table, including task assignments, are [fil
 
 | Column | Description | 
 | --- | --- | 
-| **Assigned** | The number of annotations that have been manually assigned to the user + the number of submitted annotations in projects using automatic assignment.  | 
-| **Pending** | The number of annotations that have been manually assigned to the user and have not yet been submitted or skipped. |
+| **Assigned** | The number of tasks that have either been manually assigned to the user or have received a submitted annotation from the user.  | 
+| **Pending** | The number of tasks manually assigned to the user which have neither received their submitted annotation nor have been skipped. |
 | **Submitted** | Number of submitted annotations. This includes annotations that have and have not been reviewed. |
 | **Skipped** | Number of skipped annotations. |
 | **Performance Score** | The performance score is calculated based on review actions on submitted annotations. See [the table above](#Annotation-performance-summaries) for a complete description. <br /><br />If no annotations have been reviewed, this column is grayed out.  |
@@ -136,7 +136,7 @@ The **Reviews** tab shows information related to a user's activity reviewing oth
 | **Time Reviewing** | The total time spent reviewing. This is calculated from when a user opens an annotation to when they either take action on it (such as approving it) or close it by moving away from the task. This also includes idle time when the window is in focus. |
 
 !!! note
-    Data collection for review time began on September 25, 2025. If you filter for earlier dates, review time will not be calculated.
+    Data collection for review time began on September 25, 2025 for Cloud environment, or for 2.30 for on-prem deployments. If you filter for earlier dates, review time will not be calculated.
 
 ### Review graphs
 
@@ -161,11 +161,11 @@ Keep in mind that all metrics in the table, including task assignments, are [fil
 | Column | Description | 
 | --- | --- | 
 | **Annotations Reviewed** | The number of annotations that the user has reviewed. This includes all review actions (accept, reject, fix + accept).  | 
-| **Pending** | The number of annotations that the user has been manually assigned as a reviewer and which have not yet been completed. |
+| **Pending** | The number of annotations that the user has been manually assigned as a reviewer and which have not yet received their review. |
 | **Accepted** | Number of annotations the user has accepted. |
 | **Fix + Accepted** | Number of annotations the user has updated and then accepted. |
 | **Rejected** | Number of annotations the user has rejected.  |
 | **Total Time** | The total time this user spent reviewing. See [the table above](#Review-performance-summaries) for a complete description. |
-| **Average Time** | The average time spent on each annotation. |
-| **Median Time** | The median time spent on each annotation. |
+| **Average Time** | The average time reviewing each annotation. |
+| **Median Time** | The median time spent reviewing each annotation. |
 
