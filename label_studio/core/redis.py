@@ -79,7 +79,9 @@ def redis_healthcheck():
 
 
 def redis_connected():
-    return redis_healthcheck()
+    if settings.REDIS_ENABLED:
+        return redis_healthcheck()
+    return False
 
 
 def _is_serializable(value: Any) -> bool:

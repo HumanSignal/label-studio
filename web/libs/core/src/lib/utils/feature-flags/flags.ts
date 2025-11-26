@@ -113,3 +113,8 @@ export const FF_MULTIPLE_LABELS_REGIONS = "fflag_feat_front_bros_327_multiple_la
  * Agreement Filtered
  */
 export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_column_short";
+
+/**
+ * FSM State Fields
+ */
+export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
