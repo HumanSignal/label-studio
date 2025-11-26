@@ -121,18 +121,35 @@
 
   &__title {
     display: flex;
+    flex-wrap: wrap;
     font-size: 16px;
     font-weight: 500;
     margin-bottom: 0.25rem;
     line-height: 22px;
     align-items: center;
+    row-gap: 0.25rem;
+
+    &-text-wrapper {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+    }
 
     &-text {
-      max-width: 250px;
+      flex: 1;
+      min-width: 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+  }
+
+  &__state-chip {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    white-space: nowrap;
   }
 
   &__summary {

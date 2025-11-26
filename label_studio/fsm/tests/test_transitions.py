@@ -856,3 +856,110 @@ def test_side_effect_only_transition():
     # Test transition execution
     result = transition.transition(context)
     assert result['action'] == 'email_sent'
+
+
+def test_skip_validation_flag():
+    """
+    Test the skip_validation flag in TransitionContext.
+
+    This test validates step by step:
+    - Creating a transition with validation logic that would normally fail
+    - Verifying that validation runs and fails when skip_validation=False (default)
+    - Verifying that validation is skipped when skip_validation=True
+    - Confirming that prepare_and_validate respects the skip_validation flag
+    - Ensuring the transition can execute successfully when validation is skipped
+
+    Critical validation: The skip_validation flag provides a mechanism to bypass
+    validation checks for special cases like system migrations, data imports, or
+    administrative operations that need to override normal business rules.
+    """
+
+    class StrictValidationTransition(BaseTransition):
+        """Test transition with strict validation rules"""
+
+        action: str = Field(..., description='Action to perform')
+
+        @property
+        def target_state(self) -> str:
+            return TestStateChoices.COMPLETED
+
+        def validate_transition(self, context: TransitionContext) -> bool:
+            """Validation that only allows transition from IN_PROGRESS state"""
+            if context.current_state != TestStateChoices.IN_PROGRESS:
+                raise TransitionValidationError(
+                    f'Can only complete from IN_PROGRESS state, not {context.current_state}',
+                    {'current_state': context.current_state, 'target_state': self.target_state},
+                )
+            return True
+
+        def transition(self, context: TransitionContext) -> Dict[str, Any]:
+            return {'action': self.action, 'completed': True}
+
+    # Create mock entity
+    mock_entity = MockEntity()
+
+    # Test 1: Normal validation (skip_validation=False, default behavior)
+    # This should fail because current_state is CREATED, not IN_PROGRESS
+    transition = StrictValidationTransition(action='test_action')
+    context_with_validation = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,  # Invalid state for this transition
+        target_state=transition.target_state,
+        skip_validation=False,  # Explicit False (same as default)
+    )
+
+    # Verify that validation fails as expected
+    with pytest.raises(TransitionValidationError) as cm:
+        transition.prepare_and_validate(context_with_validation)
+
+    error = cm.value
+    assert 'Can only complete from IN_PROGRESS state' in str(error)
+    assert error.context['current_state'] == TestStateChoices.CREATED
+
+    # Test 2: Skip validation (skip_validation=True)
+    # This should succeed even though current_state is CREATED
+    transition_skip = StrictValidationTransition(action='skip_validation_action')
+    context_skip_validation = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,  # Same invalid state
+        target_state=transition_skip.target_state,
+        skip_validation=True,  # Validation should be skipped
+    )
+
+    # This should NOT raise an error because validation is skipped
+    result = transition_skip.prepare_and_validate(context_skip_validation)
+
+    # Verify the transition executed successfully
+    assert result['action'] == 'skip_validation_action'
+    assert result['completed'] is True
+
+    # Test 3: Verify default behavior (skip_validation not specified, defaults to False)
+    transition_default = StrictValidationTransition(action='default_action')
+    context_default = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=transition_default.target_state,
+        # skip_validation not specified, should default to False
+    )
+
+    # Verify default is False (validation should run and fail)
+    assert context_default.skip_validation is False
+
+    with pytest.raises(TransitionValidationError) as cm:
+        transition_default.prepare_and_validate(context_default)
+
+    assert 'Can only complete from IN_PROGRESS state' in str(cm.value)
+
+    # Test 4: Verify that with correct state and skip_validation=False, it succeeds
+    transition_valid = StrictValidationTransition(action='valid_action')
+    context_valid = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.IN_PROGRESS,  # Correct state
+        target_state=transition_valid.target_state,
+        skip_validation=False,
+    )
+
+    # This should succeed because state is valid
+    result_valid = transition_valid.prepare_and_validate(context_valid)
+    assert result_valid['action'] == 'valid_action'
+    assert result_valid['completed'] is True

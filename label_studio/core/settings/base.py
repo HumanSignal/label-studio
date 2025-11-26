@@ -346,6 +346,9 @@ TEMPLATES = [
     }
 ]
 
+# OSS version does not support Redis
+REDIS_ENABLED = False
+
 # RQ
 RQ_QUEUES = {
     'critical': {

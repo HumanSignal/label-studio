@@ -29,7 +29,6 @@ from django.db.models import JSONField
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django_rq import job
 from io_storages.utils import StorageObject, get_uri_via_regex, parse_bucket_uri
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
@@ -667,10 +666,11 @@ class ImportStorage(Storage):
 
     def sync(self):
         if redis_connected():
-            queue = django_rq.get_queue('low')
+            queue_name = 'low'
+            queue = django_rq.get_queue(queue_name)
             meta = {'project': self.project.id, 'storage': self.id}
             if not is_job_in_queue(queue, 'import_sync_background', meta=meta) and not is_job_on_worker(
-                job_id=self.last_sync_job, queue_name='low'
+                job_id=self.last_sync_job, queue_name=queue_name
             ):
                 if not self.info_set_queued():
                     return
@@ -680,7 +680,7 @@ class ImportStorage(Storage):
                     import_sync_background,
                     self.__class__,
                     self.id,
-                    queue_name='low',
+                    queue_name=queue_name,
                     meta=meta,
                     project_id=self.project.id,
                     organization_id=self.project.organization.id,
@@ -722,7 +722,6 @@ class ProjectStorageMixin(models.Model):
         abstract = True
 
 
-@job('low')
 def import_sync_background(storage_class, storage_id, timeout=settings.RQ_LONG_JOB_TIMEOUT, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     try:
@@ -735,13 +734,11 @@ def import_sync_background(storage_class, storage_id, timeout=settings.RQ_LONG_J
         return
 
 
-@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()
 
 
-@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_only_new_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_only_new_annotations()

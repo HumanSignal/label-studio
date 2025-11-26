@@ -45,7 +45,7 @@ jobs:
             }
 
       - name: Checkout Actions Hub
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: HumanSignal/actions-hub

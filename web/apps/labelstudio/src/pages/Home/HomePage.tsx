@@ -1,5 +1,5 @@
 import { IconExternal, IconFolderAdd, IconHumanSignal, IconUserAdd, IconFolderOpen } from "@humansignal/icons";
-import { Button, SimpleCard, Spinner, Typography } from "@humansignal/ui";
+import { Button, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -212,7 +212,9 @@ function ProjectSimpleCard({
         style={{ borderLeftColor: color }}
       >
         <div className="flex flex-col gap-1">
-          <span className="text-neutral-content">{project.title}</span>
+          <Tooltip title={project.title}>
+            <span className="text-neutral-content truncate">{project.title}</span>
+          </Tooltip>
           <div className="text-neutral-content-subtler text-sm">
             {finished} of {total} Tasks ({total > 0 ? Math.round((finished / total) * 100) : 0}%)
           </div>
