@@ -23,9 +23,9 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
 
   const onSelect = (entity: Annotation) => {
     if (entity.type === "annotation") {
-      annotationStore.selectAnnotation(entity.id);
+      annotationStore.selectAnnotation(entity.id, { exitViewAll: true });
     } else {
-      annotationStore.selectPrediction(entity.id);
+      annotationStore.selectPrediction(entity.id, { exitViewAll: true });
     }
   };
 
