@@ -55,7 +55,10 @@ export interface DropdownProps {
   onToggle?: (visible: boolean) => void;
   /** Additional callback when visibility changes (from LabelStudio) */
   onVisibilityChanged?: (visible: boolean) => void;
-  /** Open dropdown upward for short viewports (from DataManager) */
+  /**
+   * Open dropdown upward for short viewports (from DataManager)
+   * @deprecated This is now handled automatically by CSS anchor positioning with position-try fallbacks
+   */
   openUpwardForShortViewport?: boolean;
   /** Constrain dropdown height to prevent overflow (from DataManager) */
   constrainHeight?: boolean;
@@ -63,7 +66,7 @@ export interface DropdownProps {
   syncWidth?: boolean;
 }
 
-export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
+const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
   ({ animated = true, visible = false, dropdownClassName, ...props }, ref) => {
     const rootName = cn("dropdown");
 
@@ -96,19 +99,24 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     // Generate stable z-index for stacking
     const dropdownZIndex = useRef(1000 + zIndexCounter++).current;
 
+    // Determine if anchor positioning should be used
+    // Only enable when browser supports it AND there's a trigger element to anchor to
+    const hasTrigger = triggerRef?.current != null;
+    const isAnchorEnabled = supportsAnchorPositioning && hasTrigger;
+
     // Set anchor-name on trigger element for CSS anchor positioning
     useEffect(() => {
-      if (supportsAnchorPositioning && triggerRef?.current) {
+      if (isAnchorEnabled && triggerRef?.current) {
         (triggerRef.current as HTMLElement).style.anchorName = anchorName;
       }
-    }, [supportsAnchorPositioning, triggerRef, anchorName]);
+    }, [isAnchorEnabled, triggerRef, anchorName]);
 
     // Set position-anchor on dropdown element dynamically
     useEffect(() => {
-      if (supportsAnchorPositioning && dropdown.current) {
+      if (isAnchorEnabled && dropdown.current) {
         (dropdown.current as HTMLElement).style.positionAnchor = anchorName;
       }
-    }, [supportsAnchorPositioning, anchorName, visibility]);
+    }, [isAnchorEnabled, anchorName, visibility]);
 
     // Sync dropdown width with trigger width when syncWidth is enabled
     // Only use JavaScript measurement as fallback when anchor positioning is not supported
@@ -294,22 +302,83 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
     }, [visibility, visible]);
 
     const compositeStyles = useMemo(() => {
+      // Determine if we should use anchor positioning for this dropdown
+      // Only use anchor positioning when there's a trigger element to anchor to
+      const useAnchor = supportsAnchorPositioning && hasTrigger;
+
+      // Build anchor positioning styles when enabled
+      const anchorStyles: Record<string, string> = {};
+      if (useAnchor) {
+        const alignment = props.alignment || "bottom-left";
+        const [vertical, horizontal] = alignment.split("-");
+
+        // Set initial position based on alignment
+        if (vertical === "bottom") {
+          anchorStyles.top = "anchor(bottom)";
+          anchorStyles.bottom = "auto";
+        } else {
+          anchorStyles.bottom = "anchor(top)";
+          anchorStyles.top = "auto";
+        }
+
+        if (horizontal === "left") {
+          anchorStyles.left = "anchor(left)";
+          anchorStyles.right = "auto";
+        } else if (horizontal === "right") {
+          anchorStyles.right = "anchor(right)";
+          anchorStyles.left = "auto";
+        } else if (horizontal === "center") {
+          anchorStyles.left = "anchor(center)";
+          anchorStyles.right = "auto";
+          anchorStyles.translate = "-50% 0";
+        }
+
+        // Generate exhaustive fallback order based on alignment preference
+        const allPositions = ["bottom-left", "bottom-center", "bottom-right", "top-left", "top-center", "top-right"];
+        const currentPosition = `${vertical}-${horizontal}`;
+        const oppositeVertical = vertical === "bottom" ? "top" : "bottom";
+
+        // Build prioritized fallback list
+        const fallbacks: string[] = [];
+
+        // 1. Opposite vertical with same horizontal (most likely to fit)
+        fallbacks.push(`--dropdown-${oppositeVertical}-${horizontal}`);
+
+        // 2. Same vertical, alternate horizontals
+        const sameVerticalAlternates = allPositions
+          .filter((pos) => pos.startsWith(vertical) && pos !== currentPosition)
+          .map((pos) => `--dropdown-${pos}`);
+        fallbacks.push(...sameVerticalAlternates);
+
+        // 3. Opposite vertical, alternate horizontals (excluding already added)
+        const oppositeVerticalAlternates = allPositions
+          .filter((pos) => pos.startsWith(oppositeVertical) && pos !== `${oppositeVertical}-${horizontal}`)
+          .map((pos) => `--dropdown-${pos}`);
+        fallbacks.push(...oppositeVerticalAlternates);
+
+        // 4. Generic flip fallbacks as last resort
+        fallbacks.push("flip-block", "flip-inline");
+
+        anchorStyles.positionTryFallbacks = fallbacks.join(", ");
+      }
+
       return {
-        ...(props.style ?? {}),
-        // Only apply JS-calculated offset when anchor positioning is not supported
-        ...(!supportsAnchorPositioning ? (offset ?? {}) : {}),
+        // Apply anchor positioning styles OR JS-calculated offset for fallback
+        ...(useAnchor ? anchorStyles : (offset ?? {})),
         zIndex: (minIndex ?? 0) + dropdownZIndex,
-        // Apply width sync if enabled (only for fallback when anchor positioning is not supported)
-        ...(!supportsAnchorPositioning && props.syncWidth && triggerWidth
-          ? { width: triggerWidth, minWidth: triggerWidth }
-          : {}),
+        // Apply width sync if enabled (only for fallback when anchor positioning is not used)
+        ...(!useAnchor && props.syncWidth && triggerWidth ? { width: triggerWidth, minWidth: triggerWidth } : {}),
         // Apply height constraint when enabled
         // Always apply maxHeight for constrainHeight since CSS can't do dynamic calculations
         // Subtract 8px for bottom padding when constrainHeight is enabled
         ...(props.constrainHeight && maxHeight ? { maxHeight: maxHeight - 8 } : {}),
+        // props.style last so it can override positioning if needed
+        ...(props.style ?? {}),
       };
     }, [
       props.style,
+      props.alignment,
+      hasTrigger,
       dropdownZIndex,
       minIndex,
       offset,
@@ -346,7 +415,9 @@ export const Dropdown = forwardRef<DropdownRef, DropdownProps>(
   },
 );
 
-Dropdown.displayName = "Dropdown";
+DropdownComponent.displayName = "Dropdown";
 
-// @ts-ignore Re-export Dropdown.Trigger for backwards compatibility
-Dropdown.Trigger = DropdownTrigger;
+// Create properly typed Dropdown with static Trigger property
+export const Dropdown = Object.assign(DropdownComponent, {
+  Trigger: DropdownTrigger,
+});

@@ -256,12 +256,25 @@ class FsmHistoryStateModel(models.Model):
                         # Build a minimal context for should_execute check
                         # NOTE: We skip getting current state here to avoid recursion issues
                         # The actual state will be retrieved during transition execution
-                        context = TransitionContext(
+                        minimal_context = TransitionContext(
                             entity=self,
                             current_user=None,  # Will be set properly during execution
                             current_state_object=None,  # Skip to avoid recursion
                             current_state=None,  # Skip to avoid recursion
-                            target_state=temp_transition.target_state,
+                            target_state=None,  # Will be computed
+                            organization_id=getattr(self, 'organization_id', None),
+                        )
+
+                        # Get target_state (can use entity from minimal_context)
+                        target_state = temp_transition.get_target_state(minimal_context)
+
+                        # Update context with computed target_state
+                        context = TransitionContext(
+                            entity=self,
+                            current_user=None,
+                            current_state_object=None,
+                            current_state=None,
+                            target_state=target_state,
                             organization_id=getattr(self, 'organization_id', None),
                         )
 

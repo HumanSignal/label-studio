@@ -5,7 +5,7 @@ This module defines declarative transitions for the Project entity,
 replacing the previous signal-based approach with explicit, testable transitions.
 """
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fsm.registry import register_state_transition
 from fsm.state_choices import ProjectStateChoices
@@ -25,8 +25,7 @@ class ProjectCreatedTransition(ModelChangeTransition):
     Trigger: Automatically on creation (triggers_on_create=True, triggers_on_update=False)
     """
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return ProjectStateChoices.CREATED
 
     def should_execute(self, context: TransitionContext) -> bool:
@@ -71,8 +70,7 @@ class ProjectInProgressTransition(ModelChangeTransition):
     From: CREATED -> IN_PROGRESS
     """
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return ProjectStateChoices.IN_PROGRESS
 
     def get_reason(self, context: TransitionContext) -> str:
@@ -96,8 +94,7 @@ class ProjectCompletedTransition(ModelChangeTransition):
     From: IN_PROGRESS -> COMPLETED
     """
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return ProjectStateChoices.COMPLETED
 
     def get_reason(self, context: TransitionContext) -> str:
@@ -123,8 +120,7 @@ class ProjectInProgressFromCompletedTransition(ModelChangeTransition):
     From: COMPLETED -> IN_PROGRESS
     """
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return ProjectStateChoices.IN_PROGRESS
 
     def get_reason(self, context: TransitionContext) -> str:

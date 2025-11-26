@@ -65,7 +65,9 @@
   /* Prevent dropdown from causing page overflow */
   max-width: calc(100vw - 20px);
   max-height: calc(100vh - 20px);
-  overflow: auto;
+
+  /* Use flex column to allow inner scrollable content */
+  flex-direction: column;
 
   /* Modern anchor positioning for supported browsers */
   @supports (anchor-name: --test) {
