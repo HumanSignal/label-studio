@@ -678,6 +678,7 @@ const _Annotation = types
         regionStore.selectRegionsByIds(selectedIds);
 
         if (stopDrawingAfterNextUndo) {
+          currentRegion.setDrawing(false);
           self.setIsDrawing(false);
         }
       }
