@@ -678,11 +678,6 @@ const _Annotation = types
         regionStore.selectRegionsByIds(selectedIds);
 
         if (stopDrawingAfterNextUndo) {
-          // Check if region still exists after undo (it might have been destroyed)
-          const regionAfterUndo = regionStore.findRegion(currentRegion?.id);
-          if (regionAfterUndo && isAlive(regionAfterUndo)) {
-            regionAfterUndo.setDrawing(false);
-          }
           self.setIsDrawing(false);
         }
       }
