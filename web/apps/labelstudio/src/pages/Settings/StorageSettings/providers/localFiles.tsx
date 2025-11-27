@@ -33,9 +33,12 @@ const LocalFilesServingWarning = () => {
           {isCommunityEdition && (
             <Alert variant="info">
               <AlertDescription>
-                Tip: Create a "mydata" or "label-studio-data" directory next to the command you use to run Label Studio
-                and local file serving will be enabled automatically. Or mount these directories to your container to
-                enable local file serving automatically.
+                <p>Tip: Create a "mydata" or "label-studio-data" directory next to the command you use to run Label Studio
+                and local file serving will be enabled automatically.</p>
+                <p>If you run the Docker image, the app starts in "/label-studio", 
+                so you can bind-mount your host folder to "/label-studio/mydata"
+                or "/label-studio/label-studio-data" inside the container 
+                to enable local file serving without extra configuration.</p>
               </AlertDescription>
             </Alert>
           )}
