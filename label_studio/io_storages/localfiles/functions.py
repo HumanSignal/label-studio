@@ -4,9 +4,8 @@ Utility helpers for LocalFiles storage operations.
 import os
 from pathlib import Path
 from typing import Iterable, Optional
-from django.conf import settings
 
-AUTO_ROOT_CANDIDATES: tuple[str, ...] = ("mydata", "label-studio-data")
+AUTO_ROOT_CANDIDATES: tuple[str, ...] = ('mydata', 'label-studio-data')
 
 
 def autodetect_local_files_root(
@@ -22,7 +21,7 @@ def autodetect_local_files_root(
     return None
 
 
-__all__ = ["autodetect_local_files_root", "AUTO_ROOT_CANDIDATES"]
+__all__ = ['autodetect_local_files_root', 'AUTO_ROOT_CANDIDATES']
 
 
 def normalize_storage_path(raw_path: str | None) -> str | None:

@@ -21,8 +21,8 @@ from io_storages.base_models import (
     ImportStorageLink,
     ProjectStorageMixin,
 )
-from io_storages.utils import StorageObject, load_tasks_json
 from io_storages.localfiles.functions import normalize_storage_path
+from io_storages.utils import StorageObject, load_tasks_json
 from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation
 

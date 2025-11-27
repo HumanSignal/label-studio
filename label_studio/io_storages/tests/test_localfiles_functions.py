@@ -1,16 +1,16 @@
 import os
-import pytest
 import tempfile
 
-from pathlib import Path
+import pytest
 from io_storages.localfiles.functions import autodetect_local_files_root, normalize_storage_path
 
+
 def test_autodetect_local_files_root_returns_first_candidate(tmp_path, monkeypatch):
-    project_dir = tmp_path / "project"
+    project_dir = tmp_path / 'project'
     project_dir.mkdir()
-    target_dir = project_dir / "mydata"
+    target_dir = project_dir / 'mydata'
     target_dir.mkdir()
-    (project_dir / "label-studio-data").mkdir()
+    (project_dir / 'label-studio-data').mkdir()
 
     monkeypatch.chdir(project_dir)
 
@@ -20,7 +20,7 @@ def test_autodetect_local_files_root_returns_first_candidate(tmp_path, monkeypat
 
 
 def test_autodetect_local_files_root_returns_none_when_missing(tmp_path):
-    base_dir = tmp_path / "project"
+    base_dir = tmp_path / 'project'
     base_dir.mkdir()
 
     detected = autodetect_local_files_root(base_dir=str(base_dir))

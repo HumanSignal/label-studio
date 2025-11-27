@@ -27,7 +27,7 @@ def test_validate_connection_rejects_document_root_path(settings, tmp_path, proj
         storage.validate_connection()
 
     error_message = str(exc_info.value)
-    assert "cannot be the same as LOCAL_FILES_DOCUMENT_ROOT" in error_message
+    assert 'cannot be the same as LOCAL_FILES_DOCUMENT_ROOT' in error_message
 
 
 @pytest.mark.django_db
@@ -41,9 +41,9 @@ def test_validate_connection_requires_subdirectory(settings, tmp_path, project_i
     - Confirm the error text mentions the subdirectory requirement so users understand the fix
     """
 
-    document_root = tmp_path / "root"
+    document_root = tmp_path / 'root'
     document_root.mkdir()
-    outside_dir = tmp_path / "outside"
+    outside_dir = tmp_path / 'outside'
     outside_dir.mkdir()
 
     settings.LOCAL_FILES_DOCUMENT_ROOT = str(document_root)
@@ -56,5 +56,4 @@ def test_validate_connection_requires_subdirectory(settings, tmp_path, project_i
         storage.validate_connection()
 
     error_message = str(exc_info.value)
-    assert "must be a subdirectory of LOCAL_FILES_DOCUMENT_ROOT" in error_message
-
+    assert 'must be a subdirectory of LOCAL_FILES_DOCUMENT_ROOT' in error_message

@@ -6,19 +6,17 @@ import mimetypes
 import os
 import posixpath
 from pathlib import Path
+from typing import Optional
 
 from django.conf import settings
 from django.db.models import CharField, F, Value
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseNotModified
-from ranged_fileresponse import RangedFileResponse
-
 from django.utils._os import safe_join
 from drf_spectacular.utils import extend_schema
+from io_storages.localfiles.models import LocalFilesImportStorage
+from ranged_fileresponse import RangedFileResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from typing import Optional
-
-from io_storages.localfiles.models import LocalFilesImportStorage
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +24,7 @@ logger = logging.getLogger(__name__)
 """
 Utility helpers for LocalFiles storage operations.
 """
+
 
 def _if_none_match_satisfied(header_value: Optional[str], etag: str) -> bool:
     """Return True if the client's cached representation matches the current file."""
@@ -72,16 +71,17 @@ def build_localfile_response(
     response['ETag'] = etag  # Enables client-side caching for unchanged files.
     return response
 
+
 """
 Main view for serving files residing under LocalFilesImportStorage roots with ETag support
 """
+
 
 @extend_schema(exclude=True)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def localfiles_data(request):
-    """Serve files residing under LocalFilesImportStorage roots with ETag support.
-    """
+    """Serve files residing under LocalFilesImportStorage roots with ETag support."""
     path = request.GET.get('d')
     if settings.LOCAL_FILES_SERVING_ENABLED is False:
         return HttpResponseForbidden(
@@ -118,4 +118,3 @@ def localfiles_data(request):
             return HttpResponseNotFound()
 
     return HttpResponseForbidden()
-
