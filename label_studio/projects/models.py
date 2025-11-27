@@ -325,7 +325,6 @@ class Project(ProjectMixin, FsmHistoryStateModel):
     show_ground_truth_always = models.BooleanField(
         _('show ground truth always'),
         default=False,
-        null=True,
         help_text='When enabled, ground truth tasks will be shown to all annotators regardless of overlap',
     )
     show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
