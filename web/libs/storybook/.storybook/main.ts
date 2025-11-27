@@ -1,9 +1,18 @@
 import type { StorybookConfig } from "@storybook/react-webpack5";
 
 const config: StorybookConfig = {
-  stories: ["../../../libs/**/*.@(mdx|stories.@(js|jsx|ts|tsx))", "../../../apps/**/*.@(mdx|stories.@(js|jsx|ts|tsx))"],
+  stories: [
+    "../../../libs/**/*.@(mdx|stories.@(js|jsx|ts|tsx))",
+    "../../../apps/**/*.@(mdx|stories.@(js|jsx|ts|tsx))",
+  ],
 
-  addons: ["@nx/react/plugins/storybook", "@storybook/addon-docs", "../addons/theme-toggle/register"],
+  staticDirs: ["../public"],
+
+  addons: [
+    "@nx/react/plugins/storybook",
+    "@storybook/addon-docs",
+    "../addons/theme-toggle/register",
+  ],
 
   webpackFinal(config) {
     const css_prefix = "ls-";
@@ -26,7 +35,11 @@ const config: StorybookConfig = {
           if (!r.use) return false;
           const testString = r.test?.toString() ?? "";
           // Skip CSS modules and node_modules
-          if (testString.match(/module/) || r.exclude?.toString().includes("node_modules")) return false;
+          if (
+            testString.match(/module/) ||
+            r.exclude?.toString().includes("node_modules")
+          )
+            return false;
           // Target rules with css-loader
           return (
             testString.match(/scss|sass/) &&
@@ -36,12 +49,17 @@ const config: StorybookConfig = {
         });
 
         scssRules.forEach((r: any) => {
-          const cssLoader = r.use.find((use: any) => use.loader && use.loader.includes("css-loader"));
+          const cssLoader = r.use.find(
+            (use: any) => use.loader && use.loader.includes("css-loader"),
+          );
 
           if (cssLoader && cssLoader.options) {
             cssLoader.options.modules = {
               localIdentName: `${css_prefix}[local]`,
-              getLocalIdent(_ctx: any, _ident: any, className: string) {
+              getLocalIdent(ctx: any, _ident: any, className: string) {
+                // Skip prefixing for Storybook preview styles (targets Storybook DOM classes)
+                if (ctx.resourcePath?.includes("preview.scss"))
+                  return className;
                 if (className.includes("ant")) return className;
               },
             };
