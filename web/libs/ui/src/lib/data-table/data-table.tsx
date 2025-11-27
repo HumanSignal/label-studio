@@ -229,7 +229,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         }
 
         return (
-          <label className="flex justify-center cursor-pointer size-[44px] -m-tight">
+          <label className="flex justify-center cursor-pointer size-[48px] -m-tight">
             <Checkbox
               checked={row.getIsSelected()}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
