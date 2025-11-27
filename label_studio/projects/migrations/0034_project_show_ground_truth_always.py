@@ -2,13 +2,6 @@
 
 from django.db import migrations, models
 
-def set_defaults_based_on_mode(apps, schema_editor):
-    """
-    For existing projects with show_ground_truth_first=True (Onboarding mode),
-    set show_ground_truth_always=True.
-    """
-    Project = apps.get_model("projects", "Project")
-    Project.objects.filter(show_ground_truth_first=True).update(show_ground_truth_always=True)
 
 class Migration(migrations.Migration):
 
@@ -27,5 +20,4 @@ class Migration(migrations.Migration):
                 verbose_name="show ground truth always",
             ),
         ),
-        migrations.RunPython(set_defaults_based_on_mode, reverse_code=migrations.RunPython.noop),
     ]
