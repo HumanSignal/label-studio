@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 from io_storages.localfiles.models import LocalFilesExportStorage, LocalFilesExportStorageLink
 from projects.tests.factories import ProjectFactory
 from tasks.tests.factories import AnnotationFactory, TaskFactory
@@ -89,4 +88,3 @@ def test_annotation_delete_respects_can_delete_flag(settings, tmp_path):
     assert exported_file.exists()
     # Link still cascades with the annotation deletion, but the disk artifact must remain.
     assert not LocalFilesExportStorageLink.objects.filter(storage=storage).exists()
-

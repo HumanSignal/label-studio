@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
@@ -23,7 +24,6 @@ from io_storages.base_models import (
 )
 from io_storages.localfiles.functions import normalize_storage_path
 from io_storages.utils import StorageObject, load_tasks_json
-from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ class LocalFilesMixin(models.Model):
             )
         if document_root not in path.parents:
             raise ValidationError(
-                f'Absolute local path "{self.path}" must be an existing subdirectory of '
+                f'Absolute local path "{self.path}" must be a subdirectory of '
                 f'LOCAL_FILES_DOCUMENT_ROOT="{settings.LOCAL_FILES_DOCUMENT_ROOT}" by security reasons. '
                 f'For example: "{example_path}".{self.community_auto_hint()}'
             )
