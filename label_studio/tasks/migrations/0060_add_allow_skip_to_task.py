@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
             name='allow_skip',
             field=models.BooleanField(
                 default=True,
+                null=True,
                 help_text='Whether this task can be skipped. Set to False to make task unskippable.',
                 verbose_name='allow_skip',
             ),
