@@ -42,12 +42,18 @@ export const CurrentTask = observer(({ store }) => {
   const showCounter = store.hasInterface("topbar:task-counter");
 
   // @todo some interface?
+  const task = store.task;
+  const allowPostpone = task?.allow_postpone !== false; // Default to true if undefined
+  const allowSkip = task?.allow_skip !== false; // Default to true if undefined
+  // If task cannot be skipped, also disable postpone to prevent bypassing the restriction
   let canPostpone =
     !isDefined(store.annotationStore.selected.pk) &&
     (!isFF(FF_LEAP_1173) || store.hasInterface("skip")) &&
     !store.canGoNextTask &&
     !store.hasInterface("review") &&
-    store.hasInterface("postpone");
+    store.hasInterface("postpone") &&
+    allowPostpone &&
+    allowSkip; // Disable postpone if task cannot be skipped
 
   if (store.hasInterface("annotations:comments") && isFF(FF_DEV_4174)) {
     canPostpone = canPostpone && store.commentStore.addedCommentThisSession && visibleComments >= initialCommentLength;

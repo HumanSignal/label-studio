@@ -142,14 +142,19 @@ export const Controls = controlsInjector(
       );
     } else {
       if (store.hasInterface("skip")) {
+        const task = store.task;
+        const allowSkip = task?.allow_skip !== false; // Default to true if undefined
+        const isDisabled = disabled || !allowSkip;
+        const tooltip = allowSkip ? "Cancel (skip) task: [ Ctrl+Space ]" : "This task cannot be skipped";
         buttons.push(
-          <ButtonTooltip key="skip" title="Cancel (skip) task: [ Ctrl+Space ]">
+          <ButtonTooltip key="skip" title={tooltip}>
             <Button
               aria-label="Skip current task"
-              disabled={disabled}
+              disabled={isDisabled}
               variant="negative"
               look="outlined"
               onClick={async (e) => {
+                if (!allowSkip) return;
                 if (store.hasInterface("comments:skip") ?? true) {
                   buttonHandler(e, () => store.skipTask({}), "Please enter a comment before skipping");
                 } else {

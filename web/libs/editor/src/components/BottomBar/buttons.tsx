@@ -95,14 +95,20 @@ type SkipButtonProps = {
 
 export const SkipButton = memo(
   observer(({ disabled, store, onSkipWithComment }: SkipButtonProps) => {
+    const task = store.task;
+    const allowSkip = task?.allow_skip !== false; // Default to true if undefined
+    const isDisabled = disabled || !allowSkip;
+    const tooltip = allowSkip ? "Cancel (skip) task [ Ctrl+Space ]" : "This task cannot be skipped";
+
     return (
       <Button
         key="skip"
         aria-label="skip-task"
-        disabled={disabled}
+        disabled={isDisabled}
         look="outlined"
-        tooltip="Cancel (skip) task [ Ctrl+Space ]"
+        tooltip={tooltip}
         onClick={async (e) => {
+          if (!allowSkip) return;
           const action = () => store.skipTask({});
           const selected = store.annotationStore?.selected;
 

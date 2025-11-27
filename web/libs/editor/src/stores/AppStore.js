@@ -669,6 +669,13 @@ export default types
 
     function skipTask(extraData) {
       if (self.isSubmitting) return;
+      // Check if task can be skipped
+      const task = self.task;
+      const allowSkip = task?.allow_skip !== false; // Default to true if undefined
+      if (!allowSkip) {
+        console.warn("Task cannot be skipped: allow_skip is false");
+        return; // Silently prevent skip (UI button should already be disabled)
+      }
       handleSubmittingFlag(() => {
         getEnv(self).events.invoke("skipTask", self, extraData);
         self.incrementQueuePosition();

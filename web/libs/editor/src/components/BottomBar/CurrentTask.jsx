@@ -15,12 +15,18 @@ export const CurrentTask = observer(({ store }) => {
   const historyEnabled = store.hasInterface("topbar:prevnext");
 
   // @todo some interface?
+  const task = store.task;
+  const allowPostpone = task?.allow_postpone !== false; // Default to true if undefined
+  const allowSkip = task?.allow_skip !== false; // Default to true if undefined
+  // If task cannot be skipped, also disable postpone to prevent bypassing the restriction
   const canPostpone =
     !isDefined(store.annotationStore.selected.pk) &&
     !store.canGoNextTask &&
     (!isFF(FF_LEAP_1173) || store.hasInterface("skip")) &&
     !store.hasInterface("review") &&
-    store.hasInterface("postpone");
+    store.hasInterface("postpone") &&
+    allowPostpone &&
+    allowSkip; // Disable postpone if task cannot be skipped
 
   return (
     <div className={cn("bottombar").elem("section").toClassName()}>

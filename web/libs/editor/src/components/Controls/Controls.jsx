@@ -53,14 +53,18 @@ export default inject("store")(
      */
     if (!store.annotationStore.predictSelect || store.explore) {
       const disabled = store.isSubmitting;
+      const task = store.task;
+      const allowSkip = task?.allow_skip !== false; // Default to true if undefined
+      const skipDisabled = disabled || !allowSkip;
+      const skipTooltip = allowSkip ? "Cancel (skip) task: [ Ctrl+Space ]" : "This task cannot be skipped";
 
       if (store.hasInterface("skip")) {
         skipButton = (
           <Button
-            disabled={disabled}
+            disabled={skipDisabled}
             look="danger"
-            onClick={store.skipTask}
-            tooltip="Cancel (skip) task: [ Ctrl+Space ]"
+            onClick={allowSkip ? store.skipTask : undefined}
+            tooltip={skipTooltip}
             className={`${styles.skip} ${skipButtonClassName}`}
           >
             Skip {buttons.skip}

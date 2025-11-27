@@ -812,6 +812,15 @@ export class LSFWrapper {
   };
 
   onSkipTask = async (_, { comment } = {}) => {
+    // Check if task can be skipped
+    const task = this.task;
+    const allowSkip = task?.allow_skip !== false; // Default to true if undefined
+    if (!allowSkip) {
+      console.warn("Task cannot be skipped: allow_skip is false");
+      this.showOperationToast(400, null, "This task cannot be skipped", { error: "Task cannot be skipped" });
+      return;
+    }
+
     const result = await this.submitCurrentAnnotation(
       "skipTask",
       async (taskID, body) => {

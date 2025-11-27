@@ -668,6 +668,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 total_predictions=len(task_predictions[i]),
                 total_annotations=total_annotations,
                 cancelled_annotations=cancelled_annotations,
+                allow_skip=task.get('allow_skip', True),  # Default to True for backward compatibility
             )
             db_tasks.append(t)
 
