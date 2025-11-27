@@ -78,7 +78,6 @@ if not logging.getLogger().hasHandlers():
 
 from label_studio.core.utils.io import get_data_dir
 from label_studio.core.utils.params import get_bool_env, get_env
-from label_studio.io_storages.localfiles.functions import autodetect_local_files_root
 
 logger = logging.getLogger(__name__)
 SILENCED_SYSTEM_CHECKS = []
@@ -600,8 +599,8 @@ CLOUD_FILE_STORAGE_ENABLED = False
 
 if (
     VERSION_EDITION == 'Community'
-    and not 'LOCAL_FILES_DOCUMENT_ROOT' in os.environ
-    and not 'LOCAL_FILES_SERVING_ENABLED' in os.environ
+    and 'LOCAL_FILES_DOCUMENT_ROOT' not in os.environ
+    and 'LOCAL_FILES_SERVING_ENABLED' not in os.environ
 ):
     from label_studio.io_storages.localfiles.functions import autodetect_local_files_root
 

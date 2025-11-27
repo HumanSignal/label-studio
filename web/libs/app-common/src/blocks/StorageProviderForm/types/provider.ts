@@ -112,7 +112,7 @@ export function extractDefaultValues(fields: (FieldDefinition | MessageDefinitio
       defaultValues[field.name] = customDefault;
       return;
     }
-    
+
     // If the field does not have a default value, try to get it from the schema
     try {
       // Try to get the default value from the schema by accessing the internal structure

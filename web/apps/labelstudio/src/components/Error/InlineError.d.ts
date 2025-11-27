@@ -11,4 +11,3 @@ export interface InlineErrorProps {
 declare module "apps/labelstudio/src/components/Error/InlineError" {
   export const InlineError: FC<InlineErrorProps>;
 }
-

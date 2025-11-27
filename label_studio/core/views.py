@@ -17,7 +17,6 @@ from django.conf import settings
 from django.contrib.auth import logout
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect, render, reverse
-from django.utils._os import safe_join
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from drf_spectacular.utils import extend_schema
