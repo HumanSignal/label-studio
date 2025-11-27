@@ -236,6 +236,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             'total_predictions_number',
             'sampling',
             'show_ground_truth_first',
+            'show_ground_truth_always',
             'show_overlap_first',
             'overlap_cohort_percentage',
             'task_data_login',

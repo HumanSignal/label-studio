@@ -322,6 +322,12 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         default=False,
         help_text='Onboarding mode (true): show ground truth tasks first in the labeling stream',
     )
+    show_ground_truth_always = models.BooleanField(
+        _('show ground truth always'),
+        default=False,
+        null=True,
+        help_text='When enabled, ground truth tasks will be shown to all annotators regardless of overlap',
+    )
     show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
     overlap_cohort_percentage = models.IntegerField(_('overlap_cohort_percentage'), default=100)
 

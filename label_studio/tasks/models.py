@@ -283,9 +283,10 @@ class Task(TaskMixin, FsmHistoryStateModel):
         """
         from projects.functions.next_task import get_next_task_logging_level
 
-        if self.project.show_ground_truth_first:
+        if self.project.show_ground_truth_first or self.project.show_ground_truth_always:
             # in show_ground_truth_first mode(onboarding)
             # we ignore overlap setting for ground_truth tasks
+            # in show_ground_truth_always mode we ignore overlap setting for ground_truth tasks
             # https://humansignal.atlassian.net/browse/LEAP-1963
             if self.annotations.filter(ground_truth=True).exists():
                 return False

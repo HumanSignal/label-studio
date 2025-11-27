@@ -73,6 +73,7 @@ declare type APIProject = {
   total_predictions_number?: string;
   sampling?: "Sequential sampling" | "Uniform sampling" | "Uncertainty sampling" | null;
   show_ground_truth_first?: boolean;
+  show_ground_truth_always?: boolean;
   show_overlap_first?: boolean;
   overlap_cohort_percentage?: number;
 

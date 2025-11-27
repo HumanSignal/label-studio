@@ -59,10 +59,7 @@ def _get_first_unlocked(tasks_query: QuerySet[Task], user) -> Union[Task, None]:
 
 def _try_ground_truth(tasks: QuerySet[Task], project: Project, user: User) -> Union[Task, None]:
     """Returns task from ground truth set"""
-    ground_truth = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
-    not_solved_tasks_with_ground_truths = tasks.annotate(has_ground_truths=Exists(ground_truth)).filter(
-        has_ground_truths=True
-    )
+    not_solved_tasks_with_ground_truths = _annotate_has_ground_truths(tasks).filter(has_ground_truths=True)
     if not_solved_tasks_with_ground_truths.exists():
         if project.sampling == project.SEQUENCE:
             return _get_first_unlocked(not_solved_tasks_with_ground_truths, user)
@@ -81,10 +78,10 @@ def _try_tasks_with_overlap(tasks: QuerySet[Task]) -> Tuple[Union[Task, None], Q
 def _try_breadth_first(tasks: QuerySet[Task], user: User, project: Project) -> Union[Task, None]:
     """Try to find tasks with maximum amount of annotations, since we are trying to label tasks as fast as possible"""
 
-    # Exclude ground truth annotations from the count when not in onboarding mode
+    # Exclude ground truth annotations from the count when not in onboarding mode or show_ground_truth_always mode
     # to prevent GT tasks from being prioritized via breadth-first logic
     annotation_filter = ~Q(annotations__completed_by=user)
-    if not project.show_ground_truth_first:
+    if not project.show_ground_truth_first and not project.show_ground_truth_always:
         annotation_filter &= ~Q(annotations__ground_truth=True)
 
     tasks = tasks.annotate(annotations_count=Count('annotations', filter=annotation_filter))
@@ -158,6 +155,11 @@ def _try_uncertainty_sampling(
     return next_task
 
 
+def _annotate_has_ground_truths(tasks: QuerySet[Task]) -> QuerySet[Task]:
+    ground_truth = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
+    return tasks.annotate(has_ground_truths=Exists(ground_truth))
+
+
 def get_not_solved_tasks_qs(
     user: User,
     project: Project,
@@ -197,9 +199,9 @@ def get_not_solved_tasks_qs(
             )
             capacity_pred = Q(annotators__lt=F('overlap') + (lse_project.max_additional_annotators_assignable or 0))
 
-            if project.show_ground_truth_first:
-                gt_subq = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
-                qs = qs.annotate(has_ground_truths=Exists(gt_subq))
+            # Always include ground truth tasks in the query
+            if project.show_ground_truth_first or project.show_ground_truth_always:
+                qs = _annotate_has_ground_truths(qs)
                 # Keep all GT tasks + apply low-agreement+capacity to the rest. For sure, we can do:
                 # - if user.solved_tasks_array.count < lse_project.annotator_evaluation_minimum_tasks
                 # - else, apply low-agreement+capacity to the rest (maybe performance will be better)
@@ -212,9 +214,14 @@ def get_not_solved_tasks_qs(
 
         # otherwise, filtering out completed tasks is sufficient
         else:
-            # ignore tasks that are already labeled when GT-first is NOT allowed
             if not allow_gt_first:
-                not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
+                if project.show_ground_truth_always:
+                    # Include ground truth tasks in the query if show_ground_truth_always is enabled
+                    not_solved_tasks = _annotate_has_ground_truths(not_solved_tasks)
+                    not_solved_tasks = not_solved_tasks.filter(Q(is_labeled=False) | Q(has_ground_truths=True))
+                # ignore tasks that are already labeled when GT-first is NOT allowed and no need to include GT tasks always
+                else:
+                    not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
     if not flag_set('fflag_fix_back_lsdv_4523_show_overlap_first_order_27022023_short'):
         # show tasks with overlap > 1 first (unless tasks are already prioritized on agreement)
@@ -453,6 +460,7 @@ def get_next_task(
                         'skip_queue': project.skip_queue,
                         'sampling': project.sampling,
                         'show_ground_truth_first': project.show_ground_truth_first,
+                        'show_ground_truth_always': project.show_ground_truth_always,
                         'show_overlap_first': project.show_overlap_first,
                         'overlap_cohort_percentage': project.overlap_cohort_percentage,
                         'project_id': project.id,
