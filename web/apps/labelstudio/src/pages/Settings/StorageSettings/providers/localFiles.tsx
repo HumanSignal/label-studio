@@ -21,6 +21,7 @@ const pathSchema = defaultPathExample
 const LocalFilesServingWarning = () => {
   if (localFilesServingEnabled) return null;
   return (
+    <>
     <Alert variant="destructive">
       <AlertTitle>Local file serving is disabled</AlertTitle>
       <AlertDescription>
@@ -29,17 +30,17 @@ const LocalFilesServingWarning = () => {
         <a href="https://labelstud.io/guide/storage.html#Local-storage" target="_blank" rel="noreferrer">
           Local Storage documentation
         </a>
-        .
         {isCommunityEdition && (
-          <>
-            {" "}
-            Community tip: create a <code>mydata</code> or <code>label-studio-data</code> directory next to the command
-            you use to run Label Studio and local file serving will be enabled automatically when the environment
-            variables are unset.
-          </>
+          <Alert variant="info">
+            <AlertDescription>
+              Tip: Create a "mydata" or "label-studio-data" directory next to the command
+              you use to run Label Studio and local file serving will be enabled automatically.
+            </AlertDescription>
+          </Alert>
         )}
       </AlertDescription>
     </Alert>
+    </>
   );
 };
 
