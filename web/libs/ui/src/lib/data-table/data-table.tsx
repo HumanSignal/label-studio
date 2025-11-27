@@ -19,7 +19,7 @@ declare module "@tanstack/react-table" {
     sortParam?: string; // API field name for sorting (e.g., "user__first_name")
   }
 }
-import { memo, useState, useMemo, useCallback, useRef } from "react";
+import { memo, useState, useMemo, useCallback } from "react";
 import { cn } from "../../utils/utils";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
 import { Checkbox } from "../checkbox/checkbox";
@@ -110,9 +110,6 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const [internalActiveRowId, setInternalActiveRowId] = useState<string | undefined>(undefined);
-
-  // Track previous row count for skeleton loading state
-  const prevRowCountRef = useRef<number>(loadingRows);
 
   // Use controlled activeRowId if onRowClick is provided (parent controls state via clicks)
   // OR if activeRowId is explicitly provided (not undefined)
@@ -314,11 +311,6 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
 
   const { columnSizing } = table.getState();
   const rows = table.getRowModel().rows;
-
-  // Update ref during render when we have stable data (no useEffect needed)
-  if (!props.isLoading && rows.length > 0) {
-    prevRowCountRef.current = rows.length;
-  }
 
   const handleRowClick = useCallback(
     (row?: Row<T[number]>) => {
