@@ -82,6 +82,24 @@ class StateManager:
     CACHE_PREFIX = 'fsm:current'
 
     @classmethod
+    def clear_fsm_cache(cls):
+        """
+        Clear all FSM-related cache keys.
+
+        Uses delete_pattern if available (django-redis), otherwise logs a warning.
+        This is primarily used for test isolation.
+        """
+        fsm_cache = get_fsm_cache()
+        pattern = f'{cls.CACHE_PREFIX}:*'
+        if hasattr(fsm_cache, 'delete_pattern'):
+            fsm_cache.delete_pattern(pattern)
+        else:
+            logger.warning(
+                'FSM cache clear requested but cache backend does not support delete_pattern. '
+                'FSM cache keys may persist.'
+            )
+
+    @classmethod
     def _is_fsm_enabled(cls, user='auto') -> bool:
         if user == 'auto':
             user = CurrentContext.get_user()
