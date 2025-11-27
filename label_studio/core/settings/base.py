@@ -69,12 +69,20 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'ERROR',
         },
+        'faker': {
+            'level': 'WARNING',
+            'propagate': False,
+        },
     },
 }
 
 # for printing messages before main logging config applied
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+
+# Suppress verbose Faker locale messages early, before Faker is imported
+logging.getLogger('faker').setLevel(logging.WARNING)
+logging.getLogger('faker.providers').setLevel(logging.WARNING)
 
 from label_studio.core.utils.io import get_data_dir
 from label_studio.core.utils.params import get_bool_env, get_env

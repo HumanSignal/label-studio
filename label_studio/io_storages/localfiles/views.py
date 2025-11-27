@@ -51,8 +51,8 @@ def build_localfile_response(
         logger.error('Error opening file %s: %s', full_path, exc)
         return HttpResponseNotFound(f'Error opening file {full_path}')
 
-    stat_result = os.fstat(file_handle.fileno())
     # Weak ETag keeps the implementation simple while still invalidating on file edits.
+    stat_result = os.fstat(file_handle.fileno())
     mtime_ns = getattr(stat_result, 'st_mtime_ns', int(stat_result.st_mtime * 1_000_000_000))
     etag = f'W/"{mtime_ns:x}-{stat_result.st_size:x}"'
 

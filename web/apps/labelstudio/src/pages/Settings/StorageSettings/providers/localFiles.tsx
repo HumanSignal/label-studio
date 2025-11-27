@@ -33,12 +33,15 @@ const LocalFilesServingWarning = () => {
           {isCommunityEdition && (
             <Alert variant="info">
               <AlertDescription>
-                <p>Tip: Create a "mydata" or "label-studio-data" directory next to the command you use to run Label Studio
-                and local file serving will be enabled automatically.</p>
-                <p>If you run the Docker image, the app starts in "/label-studio", 
-                so you can bind-mount your host folder to "/label-studio/mydata"
-                or "/label-studio/label-studio-data" inside the container 
-                to enable local file serving without extra configuration.</p>
+                <p>
+                  Tip: Create a "mydata" or "label-studio-data" directory next to the command you use to run Label
+                  Studio and local file serving will be enabled automatically.
+                </p>
+                <p>
+                  If you run the Docker image, the app starts in "/label-studio", so you can bind-mount your host folder
+                  to "/label-studio/mydata" or "/label-studio/label-studio-data" inside the container to enable local
+                  file serving without extra configuration.
+                </p>
               </AlertDescription>
             </Alert>
           )}
@@ -76,6 +79,7 @@ export const localFilesProvider: ProviderConfig = {
       placeholder: defaultPathExample || "/data/my-folder/subdirectory",
       schema: pathSchema,
       defaultValue: defaultPathExample,
+      description: `This path must be an absolute path on the host machine where Label Studio is running and start with \n"${localFilesDocumentRoot}" (LOCAL_FILES_DOCUMENT_ROOT).`,
     },
   ],
   layout: [{ fields: ["serving_warning"] }, { fields: ["path"] }],

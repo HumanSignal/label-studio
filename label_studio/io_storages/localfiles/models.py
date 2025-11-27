@@ -89,13 +89,13 @@ class LocalFilesMixin(models.Model):
             raise ValidationError(
                 f'Absolute local path "{self.path}" cannot be the same as '
                 f'LOCAL_FILES_DOCUMENT_ROOT="{settings.LOCAL_FILES_DOCUMENT_ROOT}" by security reasons. Please add a subdirectory. '
-                f'For example: "{example_path}".{self.community_auto_hint()}'
+                f'For example: "{example_path}".'
             )
         if document_root not in path.parents:
             raise ValidationError(
                 f'Absolute local path "{self.path}" must be a subdirectory of '
                 f'LOCAL_FILES_DOCUMENT_ROOT="{settings.LOCAL_FILES_DOCUMENT_ROOT}" by security reasons. '
-                f'For example: "{example_path}".{self.community_auto_hint()}'
+                f'For example: "{example_path}".'
             )
         if settings.LOCAL_FILES_SERVING_ENABLED is False:
             raise ValidationError(
@@ -104,6 +104,7 @@ class LocalFilesMixin(models.Model):
                 'To enable Local Files storage, set the LOCAL_FILES_SERVING_ENABLED environment '
                 'variable to "true" and restart Label Studio. See '
                 'https://labelstud.io/guide/storage.html#Local-storage for details.'
+                '\n\n'
                 f'{self.community_auto_hint()}'
             )
 
