@@ -71,8 +71,6 @@ export type DataTableProps<T extends DataShape> = {
   };
   /** Whether data is currently loading */
   isLoading?: boolean;
-  /** Whether data is currently being refetched (shows loading with preserved row count) */
-  isFetching?: boolean;
   /** Number of skeleton rows to show when loading (default: 5) */
   loadingRows?: number;
   /** Optional className to apply to the table container */
@@ -318,7 +316,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const rows = table.getRowModel().rows;
 
   // Update ref during render when we have stable data (no useEffect needed)
-  if (!props.isLoading && !props.isFetching && rows.length > 0) {
+  if (!props.isLoading && rows.length > 0) {
     prevRowCountRef.current = rows.length;
   }
 
@@ -337,35 +335,16 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     [props.onRowClick, activeRowId, isActiveRowControlled],
   );
 
-  // Calculate skeleton row count based on loading state
-  const skeletonRowCount = useMemo(() => {
-    // If we have existing data and are refetching, use previous count
-    if (props.isFetching && rows.length > 0) {
-      return prevRowCountRef.current;
-    }
-    // Otherwise use default loadingRows
-    return loadingRows;
-  }, [props.isFetching, rows.length, loadingRows]);
-
-  // Check if we should show loading skeleton
-  const showLoadingSkeleton = useMemo(() => {
-    // Show skeleton on initial load (no data yet)
-    if (props.isLoading && rows.length === 0) return true;
-    // Show skeleton when refetching with existing data
-    if (props.isFetching && rows.length > 0) return true;
-    return false;
-  }, [props.isLoading, props.isFetching, rows.length]);
-
   // Check if we should show empty state
   const showEmptyState = rows.length === 0 && !props.isLoading && props.emptyState;
 
   return (
     <div className={cn(styles.container, className)} data-testid={dataTestId}>
       <DataTableHead table={table} />
-      {showLoadingSkeleton ? (
+      {props.isLoading ? (
         <DataTableSkeletonBody
           table={table}
-          loadingRows={skeletonRowCount}
+          loadingRows={loadingRows}
           columnSizing={columnSizing}
           selectable={selectable}
         />
