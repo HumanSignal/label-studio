@@ -188,34 +188,36 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         const isSomeSelected = invertedSelectionEnabled ? false : calculatedIsSomeSelected; // Don't show indeterminate in inverted mode
 
         return (
-          <Checkbox
-            checked={isAllSelected}
-            indeterminate={isSomeSelected}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              e.stopPropagation();
+          <label className="flex justify-center cursor-pointer size-[48px] -m-tight">
+            <Checkbox
+              checked={isAllSelected}
+              indeterminate={isSomeSelected}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                e.stopPropagation();
 
-              // Call custom handler if provided (allows parent to handle special cases)
-              if (onSelectAllChange) {
-                onSelectAllChange(e.target.checked, selectableRows.length);
-              }
+                // Call custom handler if provided (allows parent to handle special cases)
+                if (onSelectAllChange) {
+                  onSelectAllChange(e.target.checked, selectableRows.length);
+                }
 
-              // Build new selection state with only selectable rows
-              const newSelection: Record<string, boolean> = {};
+                // Build new selection state with only selectable rows
+                const newSelection: Record<string, boolean> = {};
 
-              if (e.target.checked) {
-                // Select all selectable rows
-                selectableRows.forEach((row) => {
-                  newSelection[row.id] = true;
-                });
-              }
-              // If unchecking, newSelection stays empty (deselect all)
+                if (e.target.checked) {
+                  // Select all selectable rows
+                  selectableRows.forEach((row) => {
+                    newSelection[row.id] = true;
+                  });
+                }
+                // If unchecking, newSelection stays empty (deselect all)
 
-              // Update selection state in one go
-              table.setRowSelection(newSelection);
-            }}
-            ariaLabel={isAllSelected ? "Unselect all rows" : "Select all rows"}
-            data-testid="data-table-select-all"
-          />
+                // Update selection state in one go
+                table.setRowSelection(newSelection);
+              }}
+              ariaLabel={isAllSelected ? "Unselect all rows" : "Select all rows"}
+              data-testid="data-table-select-all"
+            />
+          </label>
         );
       },
       cell: ({ row }) => {
@@ -227,15 +229,17 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         }
 
         return (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              e.stopPropagation();
-              row.toggleSelected(e.target.checked);
-            }}
-            ariaLabel={row.getIsSelected() ? "Unselect row" : "Select row"}
-            data-testid={`data-table-row-${row.id}-select`}
-          />
+          <label className="flex justify-center cursor-pointer size-[44px] -m-tight">
+            <Checkbox
+              checked={row.getIsSelected()}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                e.stopPropagation();
+                row.toggleSelected(e.target.checked);
+              }}
+              ariaLabel={row.getIsSelected() ? "Unselect row" : "Select row"}
+              data-testid={`data-table-row-${row.id}-select`}
+            />
+          </label>
         );
       },
       size: 20,
