@@ -210,7 +210,7 @@ class Task(TaskMixin, FsmHistoryStateModel):
             if locked_task:
                 return locked_task
         else:
-            raise Exception('Neither project or tasks passed to get_locked_by')
+            raise ValidationError('Neither project or tasks passed to get_locked_by')
 
         if lock:
             return lock.task
@@ -265,7 +265,7 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 # alien's skipped annotations are not counted at all
                 q = Q(was_cancelled=True) & ~Q(completed_by=user)
             else:
-                raise Exception(f'Invalid SkipQueue value: {self.project.skip_queue}')
+                raise ValidationError(f'Invalid SkipQueue value: {self.project.skip_queue}')
 
             # for LSE we also need to exclude rejected queue
             rejected_q = self.get_rejected_query()
