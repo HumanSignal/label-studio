@@ -10,7 +10,7 @@ import gc
 import threading
 import weakref
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from unittest.mock import Mock
 
 import pytest
@@ -25,8 +25,7 @@ class EdgeCaseTransition(BaseTransition):
 
     edge_case_data: Any = Field(None, description='Data for edge case testing')
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return 'EDGE_CASE_PROCESSED'
 
     def validate_transition(self, context: TransitionContext) -> bool:
@@ -43,8 +42,7 @@ class ErrorProneTransition(BaseTransition):
     should_fail: str = Field('no', description='Controls failure behavior')
     failure_stage: str = Field('none', description='Stage at which to fail')
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return 'ERROR_TESTED'
 
     def validate_transition(self, context: TransitionContext) -> bool:
@@ -96,7 +94,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
             entity=self.mock_entity,
             current_user=None,  # None user
             current_state=None,  # None state (initial)
-            target_state=transition_none.target_state,
+            target_state=transition_none.get_target_state(),
         )
 
         # Should handle None values gracefully
@@ -141,7 +139,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
         large_string_transition = EdgeCaseTransition(edge_case_data=large_string)
 
         context = TransitionContext(
-            entity=self.mock_entity, current_state='CREATED', target_state=large_string_transition.target_state
+            entity=self.mock_entity, current_state='CREATED', target_state=large_string_transition.get_target_state()
         )
 
         result = large_string_transition.transition(context)
@@ -277,7 +275,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
 
         transition = EdgeCaseTransition(edge_case_data=complex_structure)
         context = TransitionContext(
-            entity=self.mock_entity, current_state='CREATED', target_state=transition.target_state
+            entity=self.mock_entity, current_state='CREATED', target_state=transition.get_target_state()
         )
 
         result = transition.transition(context)
@@ -301,7 +299,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
             context = TransitionContext(
                 entity=self.mock_entity,
                 current_state='CREATED',
-                target_state=transition.target_state,
+                target_state=transition.get_target_state(),
                 metadata={'iteration': i},
             )
 
@@ -331,7 +329,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
         # Test that new instances can still be created after cleanup
         new_transition = EdgeCaseTransition(edge_case_data='after_cleanup')
         new_context = TransitionContext(
-            entity=self.mock_entity, current_state='CREATED', target_state=new_transition.target_state
+            entity=self.mock_entity, current_state='CREATED', target_state=new_transition.get_target_state()
         )
 
         result = new_transition.transition(new_context)
@@ -348,12 +346,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
         class ValidationErrorTransition(BaseTransition):
             error_type: str = Field(..., description='Type of error to raise')
 
-            @property
-            def target_state(self) -> str:
-                return 'ERROR_STATE'
-
-            @classmethod
-            def get_target_state(cls) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'ERROR_STATE'
 
             @classmethod
@@ -435,8 +428,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
         # Test duplicate registration (should overwrite)
 
         class NewEdgeCaseTransition(BaseTransition):
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'NEW_EDGE_CASE'
 
             def transition(self, context: TransitionContext) -> Dict[str, Any]:
@@ -574,7 +566,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
                 )
 
                 context = TransitionContext(
-                    entity=self.mock_entity, current_state='CREATED', target_state=transition.target_state
+                    entity=self.mock_entity, current_state='CREATED', target_state=transition.get_target_state()
                 )
 
                 if worker_id % 2 == 0:
@@ -626,12 +618,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
             resources_allocated: list = Field(default_factory=list, description='Track allocated resources')
             resources_cleaned: list = Field(default_factory=list, description='Track cleaned resources')
 
-            @property
-            def target_state(self) -> str:
-                return 'RESOURCE_PROCESSED'
-
-            @classmethod
-            def get_target_state(cls) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'RESOURCE_PROCESSED'
 
             @classmethod
@@ -661,7 +648,7 @@ class EdgeCasesAndErrorHandlingTests(TestCase):
         # Test successful case
         success_transition = ResourceTrackingTransition(resource_name='success')
         context = TransitionContext(
-            entity=self.mock_entity, current_state='CREATED', target_state=success_transition.target_state
+            entity=self.mock_entity, current_state='CREATED', target_state=success_transition.get_target_state()
         )
 
         assert success_transition.validate_transition(context)

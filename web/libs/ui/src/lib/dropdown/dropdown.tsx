@@ -99,19 +99,24 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
     // Generate stable z-index for stacking
     const dropdownZIndex = useRef(1000 + zIndexCounter++).current;
 
+    // Determine if anchor positioning should be used
+    // Only enable when browser supports it AND there's a trigger element to anchor to
+    const hasTrigger = triggerRef?.current != null;
+    const isAnchorEnabled = supportsAnchorPositioning && hasTrigger;
+
     // Set anchor-name on trigger element for CSS anchor positioning
     useEffect(() => {
-      if (supportsAnchorPositioning && triggerRef?.current) {
+      if (isAnchorEnabled && triggerRef?.current) {
         (triggerRef.current as HTMLElement).style.anchorName = anchorName;
       }
-    }, [supportsAnchorPositioning, triggerRef, anchorName]);
+    }, [isAnchorEnabled, triggerRef, anchorName]);
 
     // Set position-anchor on dropdown element dynamically
     useEffect(() => {
-      if (supportsAnchorPositioning && dropdown.current) {
+      if (isAnchorEnabled && dropdown.current) {
         (dropdown.current as HTMLElement).style.positionAnchor = anchorName;
       }
-    }, [supportsAnchorPositioning, anchorName, visibility]);
+    }, [isAnchorEnabled, anchorName, visibility]);
 
     // Sync dropdown width with trigger width when syncWidth is enabled
     // Only use JavaScript measurement as fallback when anchor positioning is not supported
@@ -297,12 +302,16 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
     }, [visibility, visible]);
 
     const compositeStyles = useMemo(() => {
-      // Get alignment positioning for anchor positioning
-      const alignment = props.alignment || "bottom-left";
-      const [vertical, horizontal] = alignment.split("-");
+      // Determine if we should use anchor positioning for this dropdown
+      // Only use anchor positioning when there's a trigger element to anchor to
+      const useAnchor = supportsAnchorPositioning && hasTrigger;
 
-      const anchorStyles: any = {};
-      if (supportsAnchorPositioning) {
+      // Build anchor positioning styles when enabled
+      const anchorStyles: Record<string, string> = {};
+      if (useAnchor) {
+        const alignment = props.alignment || "bottom-left";
+        const [vertical, horizontal] = alignment.split("-");
+
         // Set initial position based on alignment
         if (vertical === "bottom") {
           anchorStyles.top = "anchor(bottom)";
@@ -325,9 +334,7 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
         }
 
         // Generate exhaustive fallback order based on alignment preference
-        // This ensures ALL 6 positions are tried before resorting to flip fallbacks
         const allPositions = ["bottom-left", "bottom-center", "bottom-right", "top-left", "top-center", "top-right"];
-
         const currentPosition = `${vertical}-${horizontal}`;
         const oppositeVertical = vertical === "bottom" ? "top" : "bottom";
 
@@ -356,23 +363,22 @@ const DropdownComponent = forwardRef<DropdownRef, DropdownProps>(
       }
 
       return {
-        // Only apply JS-calculated offset when anchor positioning is not supported
-        ...(!supportsAnchorPositioning ? (offset ?? {}) : anchorStyles),
+        // Apply anchor positioning styles OR JS-calculated offset for fallback
+        ...(useAnchor ? anchorStyles : (offset ?? {})),
         zIndex: (minIndex ?? 0) + dropdownZIndex,
-        // Apply width sync if enabled (only for fallback when anchor positioning is not supported)
-        ...(!supportsAnchorPositioning && props.syncWidth && triggerWidth
-          ? { width: triggerWidth, minWidth: triggerWidth }
-          : {}),
+        // Apply width sync if enabled (only for fallback when anchor positioning is not used)
+        ...(!useAnchor && props.syncWidth && triggerWidth ? { width: triggerWidth, minWidth: triggerWidth } : {}),
         // Apply height constraint when enabled
         // Always apply maxHeight for constrainHeight since CSS can't do dynamic calculations
         // Subtract 8px for bottom padding when constrainHeight is enabled
         ...(props.constrainHeight && maxHeight ? { maxHeight: maxHeight - 8 } : {}),
-        // props.style last so it can override alignment-based positioning
+        // props.style last so it can override positioning if needed
         ...(props.style ?? {}),
       };
     }, [
       props.style,
       props.alignment,
+      hasTrigger,
       dropdownZIndex,
       minIndex,
       offset,
