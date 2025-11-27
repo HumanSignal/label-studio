@@ -238,7 +238,6 @@ const _Tool = types
       },
 
       startDrawing(x, y) {
-        if (self.mode === "drawing") return;
         if (!self.canStartDrawing()) return;
 
         const { x: rx, y: ry } = self.realCoordsFromCursor(x, y);

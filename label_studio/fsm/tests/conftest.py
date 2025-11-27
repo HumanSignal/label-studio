@@ -10,6 +10,7 @@ from copy import deepcopy
 import pytest
 from django.core.cache import cache
 from fsm.registry import state_choices_registry, state_model_registry, transition_registry
+from fsm.state_manager import StateManager
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +36,7 @@ def fsm_test_isolation():
     # Clear context and cache after test
     CurrentContext.clear()
     cache.clear()
+    StateManager.clear_fsm_cache()
     transition_registry.clear()
     state_choices_registry.clear()
     state_model_registry.clear()
