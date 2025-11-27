@@ -676,7 +676,7 @@ export const Header = <T,>({
 
   if (!enableSorting) {
     return (
-      <Typography variant="body" size="small">
+      <Typography variant="label" size="small">
         {headerLabel}
       </Typography>
     );
@@ -687,7 +687,7 @@ export const Header = <T,>({
 
   return (
     <div className={styles.headerContent}>
-      <Typography variant="body" size="small" className={cn(isSorted && styles.headerTextSorted)}>
+      <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
         {headerLabel}
       </Typography>
       {/* Always render icon container for sortable columns - CSS handles visibility */}
