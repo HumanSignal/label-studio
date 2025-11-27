@@ -831,7 +831,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         if label_config_has_changed or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
             self.parsed_label_config = parse_config(self.label_config)
-            self.label_config_hash = hash(str(self.parsed_label_config))
+            self.label_config_hash = hash(str(self.label_config))
             if update_fields is not None:
                 update_fields = {'data_types', 'parsed_label_config', 'label_config_hash'}.union(update_fields)
 
