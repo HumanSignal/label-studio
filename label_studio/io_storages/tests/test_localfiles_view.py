@@ -62,7 +62,7 @@ def test_localfiles_data_allows_trailing_slash_in_storage_path(
     _create_storage(project, storage_path_with_slash)
 
     relative_path = test_file.relative_to(Path(settings.LOCAL_FILES_DOCUMENT_ROOT)).as_posix()
-    url = reverse('localfiles_data') + f'?d={relative_path}'
+    url = reverse('storages:localfiles_data') + f'?d={relative_path}'
 
     response = business_client.get(url)
 
@@ -91,7 +91,7 @@ def test_localfiles_data_allows_backslash_paths(
     _create_storage(project, windows_style_path)
 
     relative_path = test_file.relative_to(Path(settings.LOCAL_FILES_DOCUMENT_ROOT)).as_posix()
-    url = reverse('localfiles_data') + f'?d={relative_path}'
+    url = reverse('storages:localfiles_data') + f'?d={relative_path}'
 
     response = business_client.get(url)
 
@@ -128,7 +128,7 @@ def test_localfiles_data_sets_weak_etag_header(
     )
     _create_storage(project, str(dataset_dir))
 
-    url = reverse('localfiles_data') + f'?d={relative_path}'
+    url = reverse('storages:localfiles_data') + f'?d={relative_path}'
     response = business_client.get(url)
 
     body = b''.join(response.streaming_content)
@@ -167,7 +167,7 @@ def test_localfiles_data_returns_not_modified_for_matching_etag(
     )
     _create_storage(project, str(dataset_dir))
 
-    url = reverse('localfiles_data') + f'?d={relative_path}'
+    url = reverse('storages:localfiles_data') + f'?d={relative_path}'
     first_response = business_client.get(url)
     etag = first_response['ETag']
 

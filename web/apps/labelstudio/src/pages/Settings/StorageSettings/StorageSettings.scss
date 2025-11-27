@@ -54,4 +54,13 @@
     font-size: 14px;
     opacity: 0.7;
   }
+
+  &__summary {
+    .dl__dd {
+      min-width: 0;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+  }
 }

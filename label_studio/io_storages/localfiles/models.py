@@ -11,7 +11,7 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from io_storages.base_models import (
@@ -196,6 +196,19 @@ class LocalFilesExportStorage(LocalFilesMixin, ExportStorage):
         # Create export storage link
         LocalFilesExportStorageLink.create(annotation, self)
 
+    def delete_annotation(self, annotation):
+        logger.debug(f'Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
+        key = LocalFilesExportStorageLink.get_key(annotation)
+        storage_path = self._get_storage_path_or_raise()
+        file_path = os.path.join(storage_path, f'{key}')
+
+        try:
+            os.remove(file_path)
+        except FileNotFoundError:
+            logger.warning(f'Export file {file_path} is already missing for annotation {annotation}')  # nosec
+
+        LocalFilesExportStorageLink.objects.filter(storage=self, annotation=annotation).delete()
+
 
 class LocalFilesImportStorageLink(ImportStorageLink):
     storage = models.ForeignKey(LocalFilesImportStorage, on_delete=models.CASCADE, related_name='links')
@@ -212,3 +225,13 @@ def export_annotation_to_local_files(sender, instance, **kwargs):
         for storage in project.io_storages_localfilesexportstorages.all():
             logger.debug(f'Export {instance} to Local Storage {storage}')
             storage.save_annotation(instance)
+
+
+@receiver(pre_delete, sender=Annotation)
+def delete_annotation_from_local_files(sender, instance, **kwargs):
+    links = LocalFilesExportStorageLink.objects.filter(annotation=instance)
+    for link in links:
+        storage = link.storage
+        if storage.can_delete_objects:
+            logger.debug(f'Delete {instance} from Local Storage {storage}')  # nosec
+            storage.delete_annotation(instance)

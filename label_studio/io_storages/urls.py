@@ -210,5 +210,5 @@ urlpatterns += [
 ]
 
 urlpatterns += [
-    re_path(r'^data/local-files/', localfiles_data, name='localfiles_data'),
+    re_path(r'data/local-files/', localfiles_data, name='localfiles_data'),
 ]

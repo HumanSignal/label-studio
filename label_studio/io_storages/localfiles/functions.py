@@ -21,9 +21,6 @@ def autodetect_local_files_root(
     return None
 
 
-__all__ = ['autodetect_local_files_root', 'AUTO_ROOT_CANDIDATES']
-
-
 def normalize_storage_path(raw_path: str | None) -> str | None:
     """Return a canonical representation for LocalFiles paths.
 

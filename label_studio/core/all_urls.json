@@ -1142,7 +1142,7 @@
     {
         "url": "/data/local-files/",
         "module": "io_storages.localfiles.views.localfiles_data",
-        "name": "localfiles_data",
+        "name": "storages:localfiles_data",
         "decorators": ""
     },
     {
