@@ -668,6 +668,10 @@ const _Annotation = types
           const points = currentRegion?.points?.length ?? 0;
 
           stopDrawingAfterNextUndo = points <= 1;
+        } else if (currentRegion?.type === "vectorregion") {
+          const vertices = currentRegion?.vertices?.length ?? 0;
+
+          stopDrawingAfterNextUndo = vertices <= 1;
         }
 
         history.undo();
