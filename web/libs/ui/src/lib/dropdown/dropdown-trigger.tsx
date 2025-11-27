@@ -36,6 +36,8 @@ interface DropdownTriggerProps extends DropdownProps {
   className?: string;
   /** Custom validation function to check if an element should be considered part of the dropdown (from DataManager) */
   isChildValid?: (element: HTMLElement) => boolean;
+  /** Children elements (trigger element) */
+  children?: React.ReactNode;
 }
 
 export const DropdownTrigger = forwardRef<DropdownRef, DropdownTriggerProps>(

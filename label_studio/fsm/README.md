@@ -99,8 +99,7 @@ class ProcessOrderTransition(BaseTransition):
     processor_id: int = Field(..., description="ID of user processing the order")
     priority: str = Field('normal', description="Processing priority")
     
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return OrderStateChoices.PROCESSING
     
     def validate_transition(self, context) -> bool:
@@ -195,8 +194,7 @@ class ShipOrderTransition(BaseTransition):
     tracking_number: str = Field(..., description="Shipping tracking number")
     carrier: str = Field(..., description="Shipping carrier")
     
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return OrderStateChoices.SHIPPED
     
     def pre_transition_hook(self, context):
