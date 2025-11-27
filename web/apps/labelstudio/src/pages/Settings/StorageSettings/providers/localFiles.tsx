@@ -22,24 +22,24 @@ const LocalFilesServingWarning = () => {
   if (localFilesServingEnabled) return null;
   return (
     <>
-    <Alert variant="destructive">
-      <AlertTitle>Local file serving is disabled</AlertTitle>
-      <AlertDescription>
-        Set the "LOCAL_FILES_SERVING_ENABLED" environment variable to "true" and restart Label Studio to enable Local
-        Files storage. See the documentation for details:{" "}
-        <a href="https://labelstud.io/guide/storage.html#Local-storage" target="_blank" rel="noreferrer">
-          Local Storage documentation
-        </a>
-        {isCommunityEdition && (
-          <Alert variant="info">
-            <AlertDescription>
-              Tip: Create a "mydata" or "label-studio-data" directory next to the command
-              you use to run Label Studio and local file serving will be enabled automatically.
-            </AlertDescription>
-          </Alert>
-        )}
-      </AlertDescription>
-    </Alert>
+      <Alert variant="destructive">
+        <AlertTitle>Local file serving is disabled</AlertTitle>
+        <AlertDescription>
+          Set the "LOCAL_FILES_SERVING_ENABLED" environment variable to "true" and restart Label Studio to enable Local
+          Files storage. See the documentation for details:{" "}
+          <a href="https://labelstud.io/guide/storage.html#Local-storage" target="_blank" rel="noreferrer">
+            Local Storage documentation
+          </a>
+          {isCommunityEdition && (
+            <Alert variant="info">
+              <AlertDescription>
+                Tip: Create a "mydata" or "label-studio-data" directory next to the command you use to run Label Studio
+                and local file serving will be enabled automatically.
+              </AlertDescription>
+            </Alert>
+          )}
+        </AlertDescription>
+      </Alert>
     </>
   );
 };

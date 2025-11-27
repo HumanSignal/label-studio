@@ -9,4 +9,3 @@ from label_studio.tests.utils import project_id as _project_id  # noqa: F401
 # Re-export fixtures so pytest treats them as part of this subtree.
 business_client = _business_client
 project_id = _project_id
-
