@@ -19,6 +19,15 @@ def _create_storage(project, path):
     )
 
 
+def _create_dataset_file(settings, tmp_path, filename, content):
+    dataset_dir = tmp_path / 'test_upload_data'
+    dataset_dir.mkdir(exist_ok=True)
+    test_file = dataset_dir / filename
+    test_file.write_text(content, encoding='utf-8')
+    relative_path = test_file.relative_to(Path(settings.LOCAL_FILES_DOCUMENT_ROOT)).as_posix()
+    return dataset_dir, relative_path, content.encode('utf-8')
+
+
 @pytest.mark.django_db
 def test_localfiles_data_allows_trailing_slash_in_storage_path(
     business_client,
@@ -87,3 +96,82 @@ def test_localfiles_data_allows_backslash_paths(
     response = business_client.get(url)
 
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_localfiles_data_sets_weak_etag_header(
+    business_client,
+    project_id,
+    settings,
+    tmp_path,
+):
+    """Verify first download emits weak ETag along with file payload.
+
+    This test validates step by step:
+    - Enabling local file serving and writing a sample file under the doc root
+    - Linking the project to that directory via LocalFilesImportStorage
+    - Requesting the file through /data/local-files and capturing the response
+    - Confirming a 200 status, the presence of a weak ETag header, and that the streamed bytes match disk
+
+    Critical validation: clients must receive a deterministic weak ETag so they
+    can re-use cached media without hitting the server again.
+    """
+    settings.LOCAL_FILES_SERVING_ENABLED = True
+    settings.LOCAL_FILES_DOCUMENT_ROOT = str(tmp_path)
+
+    project = Project.objects.get(pk=project_id)
+    dataset_dir, relative_path, expected_bytes = _create_dataset_file(
+        settings=settings,
+        tmp_path=tmp_path,
+        filename='etag.txt',
+        content='etag-content',
+    )
+    _create_storage(project, str(dataset_dir))
+
+    url = reverse('localfiles_data') + f'?d={relative_path}'
+    response = business_client.get(url)
+
+    body = b''.join(response.streaming_content)
+    assert response.status_code == 200
+    assert response.has_header('ETag')
+    assert response['ETag'].startswith('W/"')
+    assert body == expected_bytes
+
+
+@pytest.mark.django_db
+def test_localfiles_data_returns_not_modified_for_matching_etag(
+    business_client,
+    project_id,
+    settings,
+    tmp_path,
+):
+    """Ensure cached clients receive 304 when sending a matching If-None-Match.
+
+    This test validates step by step:
+    - Serving a file once to obtain the server-generated weak ETag
+    - Issuing a follow-up request that includes the same ETag in If-None-Match
+    - Verifying the server returns 304 Not Modified with the original ETag header
+
+    Critical validation: prevents redundant file reads and bandwidth usage when
+    assets remain unchanged.
+    """
+    settings.LOCAL_FILES_SERVING_ENABLED = True
+    settings.LOCAL_FILES_DOCUMENT_ROOT = str(tmp_path)
+
+    project = Project.objects.get(pk=project_id)
+    dataset_dir, relative_path, _ = _create_dataset_file(
+        settings=settings,
+        tmp_path=tmp_path,
+        filename='etag-304.txt',
+        content='etag-304-content',
+    )
+    _create_storage(project, str(dataset_dir))
+
+    url = reverse('localfiles_data') + f'?d={relative_path}'
+    first_response = business_client.get(url)
+    etag = first_response['ETag']
+
+    cached_response = business_client.get(url, HTTP_IF_NONE_MATCH=etag)
+
+    assert cached_response.status_code == 304
+    assert cached_response['ETag'] == etag

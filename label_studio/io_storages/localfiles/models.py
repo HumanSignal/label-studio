@@ -22,29 +22,11 @@ from io_storages.base_models import (
     ProjectStorageMixin,
 )
 from io_storages.utils import StorageObject, load_tasks_json
+from io_storages.localfiles.functions import normalize_storage_path
 from rest_framework.exceptions import ValidationError
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
-
-
-def normalize_storage_path(raw_path: str | None) -> str | None:
-    """Return a canonical representation for LocalFiles paths.
-
-    We need consistent paths because permission checks compare the requested
-    directory with storage.path prefixes. Users often enter trailing slashes or
-    Windows separators; normalizing here prevents mismatches.
-    """
-    if raw_path is None:
-        return None
-
-    trimmed = raw_path.strip()
-    if trimmed == '':
-        return ''
-
-    collapsed = trimmed.replace('\\', os.sep)
-    normalized = os.path.normpath(collapsed)
-    return normalized
 
 
 class LocalFilesMixin(models.Model):
@@ -85,24 +67,44 @@ class LocalFilesMixin(models.Model):
             raise exception_cls('Path must be set for Local Files storage')
         return normalized
 
+    @staticmethod
+    def community_auto_hint():
+        if settings.VERSION_EDITION == 'Community':
+            return (
+                ' Community tip: create a "mydata" or "label-studio-data" directory next to the Label Studio '
+                'command to auto-enable LOCAL_FILES_DOCUMENT_ROOT when the environment variables are unset.'
+            )
+        return ''
+
     def validate_connection(self):
         normalized_path = self._get_storage_path_or_raise(ValidationError)
         self.path = normalized_path
         path = Path(normalized_path)
         document_root = Path(settings.LOCAL_FILES_DOCUMENT_ROOT)
+        example_path = Path(settings.LOCAL_FILES_DOCUMENT_ROOT) / 'dataset1'
+
         if not path.exists():
-            raise ValidationError(f'Path {self.path} does not exist')
+            raise ValidationError(f'Absolute local path "{self.path}" does not exist')
+        if document_root == path:
+            raise ValidationError(
+                f'Absolute local path "{self.path}" cannot be the same as '
+                f'LOCAL_FILES_DOCUMENT_ROOT="{settings.LOCAL_FILES_DOCUMENT_ROOT}" by security reasons. Please add a subdirectory. '
+                f'For example: "{example_path}".{self.community_auto_hint()}'
+            )
         if document_root not in path.parents:
             raise ValidationError(
-                f'Path {self.path} must start with '
-                f'LOCAL_FILES_DOCUMENT_ROOT={settings.LOCAL_FILES_DOCUMENT_ROOT} '
-                f'and must be a child, e.g.: {Path(settings.LOCAL_FILES_DOCUMENT_ROOT) / "abc"}'
+                f'Absolute local path "{self.path}" must be an existing subdirectory of '
+                f'LOCAL_FILES_DOCUMENT_ROOT="{settings.LOCAL_FILES_DOCUMENT_ROOT}" by security reasons. '
+                f'For example: "{example_path}".{self.community_auto_hint()}'
             )
         if settings.LOCAL_FILES_SERVING_ENABLED is False:
             raise ValidationError(
-                "Serving local files can be dangerous, so it's disabled by default. "
-                'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable, '
-                'please check docs: https://labelstud.io/guide/storage.html#Local-storage'
+                'Serving local files from the host filesystem can be a security risk, so '
+                'LOCAL_FILES_SERVING_ENABLED is disabled by default. '
+                'To enable Local Files storage, set the LOCAL_FILES_SERVING_ENABLED environment '
+                'variable to "true" and restart Label Studio. See '
+                'https://labelstud.io/guide/storage.html#Local-storage for details.'
+                f'{self.community_auto_hint()}'
             )
 
 

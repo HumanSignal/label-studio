@@ -78,6 +78,7 @@ if not logging.getLogger().hasHandlers():
 
 from label_studio.core.utils.io import get_data_dir
 from label_studio.core.utils.params import get_bool_env, get_env
+from label_studio.io_storages.localfiles.functions import autodetect_local_files_root
 
 logger = logging.getLogger(__name__)
 SILENCED_SYSTEM_CHECKS = []
@@ -596,6 +597,22 @@ SHOW_TRACEBACK_FOR_EXPORT_CONVERTER = get_bool_env('SHOW_TRACEBACK_FOR_EXPORT_CO
 EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
 USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)  # False is for tests
 CLOUD_FILE_STORAGE_ENABLED = False
+
+if (
+    VERSION_EDITION == 'Community'
+    and not 'LOCAL_FILES_DOCUMENT_ROOT' in os.environ
+    and not 'LOCAL_FILES_SERVING_ENABLED' in os.environ
+):
+    from label_studio.io_storages.localfiles.functions import autodetect_local_files_root
+
+    _autodetected_root = autodetect_local_files_root()
+    if _autodetected_root:
+        LOCAL_FILES_DOCUMENT_ROOT = _autodetected_root
+        LOCAL_FILES_SERVING_ENABLED = True
+        logger.info(
+            'LOCAL_FILES_DOCUMENT_ROOT auto-configured to %s and LOCAL_FILES_SERVING_ENABLED set to true.',
+            LOCAL_FILES_DOCUMENT_ROOT,
+        )
 
 IO_STORAGES_IMPORT_LINK_NAMES = [
     'io_storages_s3importstoragelink',
