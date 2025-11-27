@@ -4,13 +4,10 @@ from django.db import migrations
 def normalize_paths(apps, schema_editor):
     from io_storages.localfiles.models import normalize_storage_path
 
-    storages = (
-        ('LocalFilesImportStorage', 'import'),
-        ('LocalFilesExportStorage', 'export'),
-    )
+    LocalFilesImportStorage = apps.get_model('io_storages', 'LocalFilesImportStorage')
+    LocalFilesExportStorage = apps.get_model('io_storages', 'LocalFilesExportStorage')
 
-    for model_name, label in storages:
-        Model = apps.get_model('io_storages', model_name)
+    for Model in (LocalFilesImportStorage, LocalFilesExportStorage):
         total = Model.objects.count()
         updated = 0
 
@@ -20,7 +17,7 @@ def normalize_paths(apps, schema_editor):
                 Model.objects.filter(pk=storage.pk).update(path=normalized)
                 updated += 1
 
-        print(f'Normalized {updated}/{total} {label} storage paths')
+        print(f'Normalized {updated}/{total} {Model.__name__} paths')
 
 
 class Migration(migrations.Migration):
