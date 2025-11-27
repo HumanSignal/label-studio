@@ -11,7 +11,7 @@ const isCommunityEdition =
   typeof window === "undefined" ? false : window.APP_SETTINGS?.version?.edition === "Community";
 const trimTrailingSeparators = (value?: string) => value?.replace(/[/\\]+$/, "");
 const defaultPathExample = localFilesDocumentRoot
-  ? `${trimTrailingSeparators(localFilesDocumentRoot)}/subdirectory`
+  ? `${trimTrailingSeparators(localFilesDocumentRoot)}/your-subdirectory`
   : undefined;
 
 const pathSchema = defaultPathExample
@@ -34,7 +34,8 @@ const LocalFilesServingWarning = () => {
             <Alert variant="info">
               <AlertDescription>
                 Tip: Create a "mydata" or "label-studio-data" directory next to the command you use to run Label Studio
-                and local file serving will be enabled automatically.
+                and local file serving will be enabled automatically. Or mount these directories to your container to
+                enable local file serving automatically.
               </AlertDescription>
             </Alert>
           )}
