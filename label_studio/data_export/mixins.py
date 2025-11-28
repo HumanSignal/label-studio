@@ -154,7 +154,11 @@ class ExportMixin:
     def get_task_queryset(self, ids, annotation_filter_options):
         annotations_qs = self._get_filtered_annotations_queryset(annotation_filter_options=annotation_filter_options)
 
-        return (
+        # Add FSM state annotation to annotations to avoid N+1 queries during export
+        if hasattr(annotations_qs, 'with_state'):
+            annotations_qs = annotations_qs.with_state()
+
+        qs = (
             Task.objects.filter(id__in=ids)
             .select_related('file_upload')  # select_related more efficient for regular foreign-key relationship
             .prefetch_related(
@@ -163,6 +167,12 @@ class ExportMixin:
                 'comment_authors',
             )
         )
+
+        # Add FSM state annotation to tasks as well to avoid N+1 queries during export
+        if hasattr(qs, 'with_state'):
+            qs = qs.with_state()
+
+        return qs
 
     def get_export_data(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
         """

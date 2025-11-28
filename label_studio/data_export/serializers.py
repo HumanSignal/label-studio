@@ -4,6 +4,7 @@ from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func
 from data_export.models import DataExport
 from django.conf import settings
+from fsm.serializer_fields import FSMStateField
 from label_studio_sdk._extensions.label_studio_tools.core.label_config import is_video_object_tracking
 from label_studio_sdk._extensions.label_studio_tools.postprocessing.video import extract_key_frames
 from ml.mixins import InteractiveMixin
@@ -26,6 +27,7 @@ class CompletedBySerializer(serializers.ModelSerializer):
 class AnnotationSerializer(FlexFieldsModelSerializer):
     completed_by = serializers.PrimaryKeyRelatedField(read_only=True)
     result = serializers.SerializerMethodField()
+    state = FSMStateField(read_only=True)  # FSM state for annotations
 
     class Meta:
         model = Annotation
@@ -48,6 +50,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
     file_upload = serializers.ReadOnlyField(source='file_upload_name')
     drafts = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     predictions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    state = FSMStateField(read_only=True)  # FSM state for tasks
 
     # resolve $undefined$ key in task data, if any
     def to_representation(self, task):
