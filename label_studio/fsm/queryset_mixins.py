@@ -10,7 +10,7 @@ Usage:
 
     class TaskManager(models.Manager):
         def get_queryset(self):
-            return TaskQuerySet(self.model, using=self._db).annotate_fsm_state()
+            return TaskQuerySet(self.model, using=self._db)
 
 Note:
     State annotation is guarded by 'fflag_feat_fit_568_finite_state_management' only.
@@ -37,8 +37,8 @@ class FSMStateQuerySetMixin:
     """
     Mixin for Django QuerySets to efficiently annotate FSM state.
 
-    Provides both `annotate_fsm_state()` and `with_state()` methods that add a
-    `current_state` annotation to the queryset using an optimized subquery.
+    Provides the `with_state()` method that adds a `current_state`
+    annotation to the queryset using an optimized subquery.
 
     This approach:
     - Prevents N+1 queries by using a single JOIN/subquery
@@ -53,7 +53,7 @@ class FSMStateQuerySetMixin:
                 return TaskQuerySet(self.model, using=self._db)
 
             def with_state(self):
-                return self.get_queryset().annotate_fsm_state()
+                return self.get_queryset().with_state()
 
         # Usage - both approaches work identically
         tasks = Task.objects.with_state().filter(project=project)
@@ -66,13 +66,14 @@ class FSMStateQuerySetMixin:
 
     def with_state(self):
         """
-        Convenience method to annotate queryset with FSM state.
+        Annotate the queryset with the current FSM state.
 
-        This is a more intuitive alias for `annotate_fsm_state()` that can be
-        chained with other queryset methods at any point in the query chain.
+        Adds a `current_state` field to each object containing the current
+        state string value. This is done using an efficient subquery that
+        leverages UUID7 natural ordering to prevent N+1 queries.
 
         Returns:
-            QuerySet: The queryset with current_state annotation
+            QuerySet: The annotated queryset with `current_state` field
 
         Example:
             # Chain after filters
@@ -83,19 +84,6 @@ class FSMStateQuerySetMixin:
 
             # Multiple chaining
             tasks = Task.objects.filter(is_labeled=True).with_state().order_by('-created_at')
-        """
-        return self.annotate_fsm_state()
-
-    def annotate_fsm_state(self):
-        """
-        Annotate the queryset with the current FSM state.
-
-        Adds a `current_state` field to each object containing the current
-        state string value. This is done using an efficient subquery that
-        leverages UUID7 natural ordering.
-
-        Returns:
-            QuerySet: The annotated queryset with `current_state` field
 
         Note:
             - If FSM feature flag is disabled, returns queryset unchanged (zero impact)

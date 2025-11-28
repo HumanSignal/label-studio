@@ -595,7 +595,7 @@ class AnnotationManager(models.Manager):
 
     def with_state(self):
         """Return queryset with FSM state annotated."""
-        return self.get_queryset().annotate_fsm_state()
+        return self.get_queryset().with_state()
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -855,7 +855,7 @@ class TaskLockManager(models.Manager):
 
     def with_state(self):
         """Return queryset with FSM state annotated."""
-        return self.get_queryset().annotate_fsm_state()
+        return self.get_queryset().with_state()
 
 
 class TaskLock(FsmHistoryStateModel):
@@ -899,7 +899,7 @@ class AnnotationDraftManager(models.Manager):
 
     def with_state(self):
         """Return queryset with FSM state annotated."""
-        return self.get_queryset().annotate_fsm_state()
+        return self.get_queryset().with_state()
 
 
 class AnnotationDraft(FsmHistoryStateModel):
