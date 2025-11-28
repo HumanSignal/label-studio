@@ -5,7 +5,7 @@
 
 import type React from "react";
 import { Popover, Badge, Button, Typography } from "@humansignal/ui";
-import { IconSync, IconError, IconHistoryRewind } from "@humansignal/icons";
+import { IconSync, IconError, IconHistoryRewind, IconCross } from "@humansignal/icons";
 import { useStateHistory, type StateHistoryItem } from "../../hooks/useStateHistory";
 import { getStateColorClass, formatStateName, formatTimestamp, formatUserName } from "./utils";
 
@@ -42,11 +42,23 @@ export function StateHistoryPopover({
       >
         {/* Header */}
         <div className="px-4 py-3 border-b border-neutral-border">
-          <div className="flex items-center gap-2">
-            <IconHistoryRewind className="w-4 h-4 " />
-            <Typography variant="body" size="small" className="font-medium text-neutral-foreground">
-              State History
-            </Typography>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <IconHistoryRewind className="w-4 h-4 " />
+              <Typography variant="body" size="small" className="font-medium text-neutral-foreground">
+                State History
+              </Typography>
+            </div>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenChange?.(false);
+              }}
+              leading={<IconCross />}
+              look="string"
+              size="small"
+              aria-label="Close"
+            />
           </div>
         </div>
 
