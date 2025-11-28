@@ -12,13 +12,40 @@ from typing import Any, Dict, List, Optional, Type
 from core.current_request import CurrentContext
 from core.feature_flags import flag_set
 from django.conf import settings
-from django.core.cache import cache
+from django.core.cache import cache, caches
 from django.db.models import Model, QuerySet
 from fsm.registry import get_state_model_for_entity
 from fsm.state_models import BaseState
 from fsm.transition_executor import execute_transition_with_state_manager
 
 logger = logging.getLogger(__name__)
+
+
+_fsm_cache = None
+
+
+def get_fsm_cache():
+    """
+    Get the cache backend for FSM operations.
+
+    Uses REDIS_CACHE_ALIAS when available (LSE) to ensure FSM caching works
+    even when DUMMY_CACHE is enabled. Falls back to default cache for LSO.
+
+    The result is memoized so the cache lookup only happens once per process.
+
+    Returns:
+        Cache backend instance
+    """
+    global _fsm_cache
+    if _fsm_cache is not None:
+        return _fsm_cache
+
+    redis_cache_alias = getattr(settings, 'REDIS_CACHE_ALIAS', None)
+    if redis_cache_alias and redis_cache_alias in settings.CACHES:
+        _fsm_cache = caches[redis_cache_alias]
+    else:
+        _fsm_cache = cache
+    return _fsm_cache
 
 
 class StateManagerError(Exception):
@@ -53,6 +80,24 @@ class StateManager:
 
     CACHE_TTL = getattr(settings, 'FSM_CACHE_TTL', 300)  # 5 minutes default
     CACHE_PREFIX = 'fsm:current'
+
+    @classmethod
+    def clear_fsm_cache(cls):
+        """
+        Clear all FSM-related cache keys.
+
+        Uses delete_pattern if available (django-redis), otherwise logs a warning.
+        This is primarily used for test isolation.
+        """
+        fsm_cache = get_fsm_cache()
+        pattern = f'{cls.CACHE_PREFIX}:*'
+        if hasattr(fsm_cache, 'delete_pattern'):
+            fsm_cache.delete_pattern(pattern)
+        else:
+            logger.warning(
+                'FSM cache clear requested but cache backend does not support delete_pattern. '
+                'FSM cache keys may persist.'
+            )
 
     @classmethod
     def _is_fsm_enabled(cls, user='auto') -> bool:
@@ -90,9 +135,10 @@ class StateManager:
             return None  # Feature disabled, return no state
 
         cache_key = cls.get_cache_key(entity)
+        fsm_cache = get_fsm_cache()
 
         # Try cache first
-        cached_state = cache.get(cache_key)
+        cached_state = fsm_cache.get(cache_key)
         if cached_state is not None:
             logger.info(
                 'FSM: Cache hit',
@@ -116,7 +162,7 @@ class StateManager:
 
             # Cache result
             if current_state is not None:
-                cache.set(cache_key, current_state, cls.CACHE_TTL)
+                fsm_cache.set(cache_key, current_state, cls.CACHE_TTL)
                 logger.info(
                     'FSM: Cache miss',
                     extra={
@@ -237,6 +283,7 @@ class StateManager:
         # Optimistic concurrency control using cache-based locking
         cache_key = cls.get_cache_key(entity)
         lock_key = f'{cache_key}:lock'
+        fsm_cache = get_fsm_cache()
 
         if organization_id is None:
             organization_id = CurrentContext.get_organization_id()
@@ -244,7 +291,7 @@ class StateManager:
         try:
             # Try to acquire an optimistic lock using cache add (atomic operation)
             # add() only succeeds if the key doesn't exist
-            lock_acquired = cache.add(lock_key, 'locked', timeout=5)  # 5 second timeout
+            lock_acquired = fsm_cache.add(lock_key, 'locked', timeout=5)  # 5 second timeout
 
             if not lock_acquired:
                 # Another process is currently transitioning this entity
@@ -313,7 +360,7 @@ class StateManager:
 
                 # Write-through cache: Update immediately
                 # This ensures the cache is updated atomically with the database
-                cache.set(cache_key, new_state, cls.CACHE_TTL)
+                fsm_cache.set(cache_key, new_state, cls.CACHE_TTL)
 
                 logger.info(
                     'FSM: Cache updated for transition state',
@@ -347,12 +394,12 @@ class StateManager:
 
             finally:
                 # Always release the lock, regardless of success or failure
-                cache.delete(lock_key)
+                fsm_cache.delete(lock_key)
 
         except Exception as e:
             # On failure, clean up lock and invalidate potentially stale cache
-            cache.delete(lock_key)
-            cache.delete(cache_key)
+            fsm_cache.delete(lock_key)
+            fsm_cache.delete(cache_key)
 
             # Get organization_id for error logging if it wasn't set earlier
             organization_id = CurrentContext.get_organization_id()
@@ -421,7 +468,8 @@ class StateManager:
     def invalidate_cache(cls, entity: Model):
         """Invalidate cached state for an entity"""
         cache_key = cls.get_cache_key(entity)
-        cache.delete(cache_key)
+        fsm_cache = get_fsm_cache()
+        fsm_cache.delete(cache_key)
         organization_id = CurrentContext.get_organization_id()
         logger.info(
             'FSM: Cache invalidated',
@@ -450,7 +498,8 @@ class StateManager:
                 cache_updates[cache_key] = current_state
 
         if cache_updates:
-            cache.set_many(cache_updates, cls.CACHE_TTL)
+            fsm_cache = get_fsm_cache()
+            fsm_cache.set_many(cache_updates, cls.CACHE_TTL)
             logger.info(
                 'FSM: Cache warmed',
                 extra={
