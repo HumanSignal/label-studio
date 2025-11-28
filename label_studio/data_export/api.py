@@ -173,7 +173,7 @@ class ExportAPI(generics.RetrieveAPIView):
 
         # Create a prefetch for annotations with FSM state
         annotations_qs = Annotation.objects.all()
-        
+
         # Only annotate FSM state if both feature flags are enabled
         user = getattr(self.request, 'user', None)
         if (

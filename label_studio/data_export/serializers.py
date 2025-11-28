@@ -38,9 +38,9 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
         """Override to conditionally exclude FSM state field when feature flags are disabled."""
         from core.current_request import CurrentContext
         from core.feature_flags import flag_set
-        
+
         ret = super().to_representation(instance)
-        
+
         # Remove state field from output if either feature flag is disabled
         user = CurrentContext.get_user()
         if not (
@@ -48,7 +48,7 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
             and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
         ):
             ret.pop('state', None)
-        
+
         return ret
 
     def get_result(self, obj):
@@ -73,7 +73,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
     def to_representation(self, task):
         from core.current_request import CurrentContext
         from core.feature_flags import flag_set
-        
+
         # avoid long project initializations
         project = getattr(self, '_project', None)
         if project is None:
@@ -89,7 +89,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
         replace_task_data_undefined_with_config_field(data, project)
 
         ret = super().to_representation(task)
-        
+
         # Remove state field from output if either feature flag is disabled
         user = CurrentContext.get_user()
         if not (
@@ -97,7 +97,7 @@ class BaseExportDataSerializer(FlexFieldsModelSerializer):
             and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
         ):
             ret.pop('state', None)
-        
+
         return ret
 
     class Meta:

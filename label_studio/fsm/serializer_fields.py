@@ -26,8 +26,6 @@ Note:
     incremental rollout and testing.
 """
 
-from core.current_request import CurrentContext
-from core.feature_flags import flag_set
 from fsm.state_manager import StateManager
 from rest_framework import serializers
 
@@ -86,7 +84,7 @@ class FSMStateField(serializers.ReadOnlyField):
 
         Returns:
             str or None: The current state value (None if no state exists)
-            
+
         Note:
             Field exclusion based on feature flags is handled at the serializer level
             via get_fields() override, not here.
