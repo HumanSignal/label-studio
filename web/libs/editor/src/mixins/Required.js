@@ -1,4 +1,4 @@
-import { getParent, types } from "mobx-state-tree";
+import { getParent, hasParent, types } from "mobx-state-tree";
 import { FF_LSDV_4583, isFF } from "../utils/feature-flags";
 
 /**
@@ -16,6 +16,7 @@ function findVisibilityParam(node, param) {
     }
     // all tags are sitting in `children` array of their parent,
     // so we need to go up 2 levels to get the parent
+    if (!hasParent(node, 2)) break;
     node = getParent(node, 2);
   }
   return null;
