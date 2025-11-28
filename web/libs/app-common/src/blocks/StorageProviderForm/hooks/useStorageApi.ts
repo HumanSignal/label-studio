@@ -10,12 +10,48 @@ interface UseStorageApiProps {
   project?: number;
   onSubmit: () => void;
   onClose: () => void;
+  onValidationError?: (errors: Record<string, string>) => void;
 }
 
-export const useStorageApi = ({ target, storage, project, onSubmit, onClose }: UseStorageApiProps) => {
+const normalizeValidationErrors = (errors: Record<string, string | string[]>) => {
+  const normalized: Record<string, string> = {};
+
+  Object.entries(errors).forEach(([field, messages]) => {
+    if (Array.isArray(messages)) {
+      normalized[field] = messages.filter(Boolean).join(" ");
+    } else if (typeof messages === "string") {
+      normalized[field] = messages;
+    }
+  });
+
+  return normalized;
+};
+
+export const useStorageApi = ({
+  target,
+  storage,
+  project,
+  onSubmit,
+  onClose,
+  onValidationError,
+}: UseStorageApiProps) => {
   const api = useAPI();
   const isEditMode = Boolean(storage);
   const action = storage ? "updateStorage" : "createStorage";
+
+  const handleValidationErrors = useCallback(
+    (result: any) => {
+      const validationErrors = result?.response?.validation_errors;
+      if (validationErrors && onValidationError) {
+        onValidationError(normalizeValidationErrors(validationErrors));
+      }
+    },
+    [onValidationError],
+  );
+
+  const errorFilter = useCallback((result: any) => {
+    return result?.$meta?.status === 400;
+  }, []);
 
   // Clean form data for submission
   const cleanFormDataForSubmission = useCallback(
@@ -85,7 +121,11 @@ export const useStorageApi = ({ target, storage, project, onSubmit, onClose }: U
           type: connectionData.provider,
         },
         body,
+        errorFilter,
       });
+      if (result?.error) {
+        handleValidationErrors(result);
+      }
       return result;
     },
   });
@@ -126,7 +166,11 @@ export const useStorageApi = ({ target, storage, project, onSubmit, onClose }: U
           pk: storage?.id,
         },
         body,
+        errorFilter,
       });
+      if (result?.error) {
+        handleValidationErrors(result);
+      }
 
       // Only if storage save was successful, then trigger sync for import storages
       if (result?.$meta?.ok && target !== "export" && result?.id) {
@@ -175,7 +219,11 @@ export const useStorageApi = ({ target, storage, project, onSubmit, onClose }: U
           pk: storage?.id,
         },
         body,
+        errorFilter,
       });
+      if (result?.error) {
+        handleValidationErrors(result);
+      }
 
       return result;
     },
@@ -200,13 +248,18 @@ export const useStorageApi = ({ target, storage, project, onSubmit, onClose }: U
         body.limit = 30;
       }
 
-      return api.callApi<{ files: any[] }>("storageFiles", {
+      const result = await api.callApi<{ files: any[] }>("storageFiles", {
         params: {
           target,
           type: previewData.provider,
         },
         body,
+        errorFilter,
       });
+      if ((result as any)?.error) {
+        handleValidationErrors(result);
+      }
+      return result;
     },
   });
 
