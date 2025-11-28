@@ -12,6 +12,8 @@ from django.conf import settings
 from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema_field
 from fsm.serializer_fields import FSMStateField
+from fsm.state_manager import get_state_manager
+from fsm.utils import is_fsm_enabled
 from label_studio_sdk.label_interface import LabelInterface
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -700,53 +702,14 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         Backfill FSM states for tasks created via bulk_create().
 
         bulk_create() bypasses the model's save() method, so FSM transitions
-        registered with triggers_on_create=True don't fire automatically.
-        This method manually initializes FSM states for those tasks.
-
-        Args:
-            tasks: List of Task instances that were bulk-created
+        don't fire automatically. This sets initial CREATED state for newly imported tasks.
         """
-        if not tasks:
+        if not tasks or not is_fsm_enabled(user=None):
             return
 
-        try:
-            # Import here to avoid circular dependencies and to gracefully handle LSE-only imports
-            from lse_fsm.state_inference import backfill_state_for_entity
-
-            logger.info(f'Backfilling FSM states for {len(tasks)} imported tasks')
-
-            # Backfill initial state for each task
-            for task in tasks:
-                try:
-                    backfill_state_for_entity(task, 'task', create_record=True)
-                except Exception as e:
-                    # Log but don't fail the import if FSM backfill fails for a specific task
-                    logger.warning(
-                        f'FSM state backfill failed for task {task.id}: {e}',
-                        extra={
-                            'event': 'fsm.backfill_failed',
-                            'task_id': task.id,
-                            'project_id': task.project_id,
-                            'error': str(e),
-                        },
-                    )
-
-            logger.info(f'FSM states backfilled for {len(tasks)} imported tasks')
-
-        except ImportError:
-            # LSE not available (OSS), skip FSM backfill
-            logger.debug('LSE not available, skipping FSM state backfill for imported tasks')
-        except Exception as e:
-            # Don't fail import if FSM backfill fails
-            logger.error(
-                f'FSM state backfill failed for imported tasks: {e}',
-                extra={
-                    'event': 'fsm.backfill_batch_failed',
-                    'task_count': len(tasks),
-                    'error': str(e),
-                },
-                exc_info=True,
-            )
+        StateManager = get_state_manager()
+        for task in tasks:
+            StateManager.execute_transition(entity=task, transition_name='task_created', user=None)
 
     @staticmethod
     def post_process_annotations(user, db_annotations, action):
