@@ -161,9 +161,7 @@ class TestTaskAPI(APITestCase):
 
         self.client.force_authenticate(user=self.user)
         response = self.client.post(
-            f'/api/tasks/{task.id}/annotations/',
-            data={'result': [], 'was_cancelled': True},
-            format='json'
+            f'/api/tasks/{task.id}/annotations/', data={'result': [], 'was_cancelled': True}, format='json'
         )
 
         assert response.status_code == 400
@@ -176,9 +174,7 @@ class TestTaskAPI(APITestCase):
 
         self.client.force_authenticate(user=self.user)
         response = self.client.post(
-            f'/api/tasks/{task.id}/annotations/',
-            data={'result': [], 'was_cancelled': True},
-            format='json'
+            f'/api/tasks/{task.id}/annotations/', data={'result': [], 'was_cancelled': True}, format='json'
         )
 
         assert response.status_code == 201
@@ -189,9 +185,7 @@ class TestTaskAPI(APITestCase):
 
         self.client.force_authenticate(user=self.user)
         response = self.client.post(
-            f'/api/tasks/{task.id}/annotations/',
-            data={'result': [], 'was_cancelled': True},
-            format='json'
+            f'/api/tasks/{task.id}/annotations/', data={'result': [], 'was_cancelled': True}, format='json'
         )
 
         assert response.status_code == 201

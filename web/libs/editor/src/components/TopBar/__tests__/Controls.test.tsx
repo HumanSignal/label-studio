@@ -62,7 +62,15 @@ describe("TopBar Controls", () => {
       task: { id: 1, allow_skip: false },
       interfaces: ["skip"],
     });
-    const annotation = { id: "test", skipped: false, userGenerate: false, sentUserGenerate: false, versions: {}, results: [], editable: true };
+    const annotation = {
+      id: "test",
+      skipped: false,
+      userGenerate: false,
+      sentUserGenerate: false,
+      versions: {},
+      results: [],
+      editable: true,
+    };
 
     const { getByLabelText } = render(
       <Provider store={mockStore}>
@@ -82,7 +90,15 @@ describe("TopBar Controls", () => {
       task: { id: 1, allow_skip: true },
       interfaces: ["skip"],
     });
-    const annotation = { id: "test", skipped: false, userGenerate: false, sentUserGenerate: false, versions: {}, results: [], editable: true };
+    const annotation = {
+      id: "test",
+      skipped: false,
+      userGenerate: false,
+      sentUserGenerate: false,
+      versions: {},
+      results: [],
+      editable: true,
+    };
 
     const { getByLabelText } = render(
       <Provider store={mockStore}>
@@ -102,7 +118,15 @@ describe("TopBar Controls", () => {
       task: { id: 1, allow_skip: false },
       interfaces: ["skip"],
     });
-    const annotation = { id: "test", skipped: false, userGenerate: false, sentUserGenerate: false, versions: {}, results: [], editable: true };
+    const annotation = {
+      id: "test",
+      skipped: false,
+      userGenerate: false,
+      sentUserGenerate: false,
+      versions: {},
+      results: [],
+      editable: true,
+    };
 
     const { getByLabelText } = render(
       <Provider store={mockStore}>
@@ -116,4 +140,3 @@ describe("TopBar Controls", () => {
     expect(mockStore.skipTask).not.toHaveBeenCalled();
   });
 });
-

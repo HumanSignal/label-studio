@@ -127,4 +127,3 @@ describe("Controls", () => {
     expect(mockStore.skipTask).toHaveBeenCalled();
   });
 });
-
