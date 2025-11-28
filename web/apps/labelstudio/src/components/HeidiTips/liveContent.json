@@ -12,44 +12,6 @@
           "treatment": "find_and_manage_projects_live"
         }
       }
-    },
-    {
-      "title": "Did you know?",
-      "content": "Try Label Studio Starter Cloud, optimized for small teams and projects.",
-      "link": {
-        "label": "Learn more",
-        "url": "https://humansignal.com/pricing/",
-        "params": {
-          "experiment": "project_creation_tip",
-          "treatment": "starter_cloud_live"
-        }
-      }
-    },
-    {
-      "title": "Did you know?",
-      "content": "You can control access to specific projects and workspaces for internal team members and external annotators using Label Studio Enterprise.",
-      "closable": true,
-      "link": {
-        "label": "Learn more",
-        "url": "https://docs.humansignal.com/guide/manage_users#Roles-in-Label-Studio-Enterprise",
-        "params": {
-          "experiment": "project_creation_tip",
-          "treatment": "access_to_projects_live"
-        }
-      }
-    },
-    {
-      "title": "Labeling for GenAI",
-      "content": "Label Studio has templates available for supervised LLM fine-tuning, RAG retrieval ranking, RLHF, chatbot evaluation, and more.",
-      "closable": true,
-      "link": {
-        "label": "Explore templates",
-        "url": "https://labelstud.io/templates/gallery_generative_ai",
-        "params": {
-          "experiment": "project_creation_tip",
-          "treatment": "genai_templates_live"
-        }
-      }
     }
   ],
   "organizationPage": [
@@ -63,57 +25,6 @@
         "params": {
           "experiment": "organization_page_tip",
           "treatment": "team_growing_live"
-        }
-      }
-    },
-    {
-      "title": "Want to simplify and secure logging in?",
-      "content": "Enable Single Sign-On for your team using SAML, SCIM2 or LDAP with Label Studio Enterprise.",
-      "closable": true,
-      "link": {
-        "label": "Learn more",
-        "url": "https://docs.humansignal.com/guide/auth_setup",
-        "params": {
-          "experiment": "organization_page_tip",
-          "treatment": "enable_sso_live"
-        }
-      }
-    },
-    {
-      "title": "Did you know?",
-      "content": "Label Studio now has a Starter Cloud offering optimized for small teams and projects.",
-      "link": {
-        "label": "Learn more",
-        "url": "https://humansignal.com/pricing/",
-        "params": {
-          "experiment": "organization_page_tip",
-          "treatment": "starter_cloud_live"
-        }
-      }
-    },
-    {
-      "title": "Share knowledge with the community",
-      "content": "Have questions or a tip to share with other Label Studio users? Join the community slack channel for the latest updates. ",
-      "closable": true,
-      "link": {
-        "label": "Join the community",
-        "url": "https://label-studio.slack.com",
-        "params": {
-          "experiment": "organization_page_tip",
-          "treatment": "share_knowledge_live"
-        }
-      }
-    },
-    {
-      "title": "Did you know?",
-      "content": "Label Studio supports multiple points of integration with cloud storage, machine learning models, and popular tools to automate your machine learning pipeline.",
-      "closable": true,
-      "link": {
-        "label": "Check out the integrations directory",
-        "url": "https://labelstud.io/integrations/",
-        "params": {
-          "experiment": "organization_page_tip",
-          "treatment": "integration_points_live"
         }
       }
     }
@@ -131,50 +42,11 @@
           "treatment": "auto_labeling_live"
         }
       }
-    },
-    {
-      "title": "Did you know?",
-      "content": "Try Label Studio Starter Cloud, optimized for small teams and projects.",
-      "closable": true,
-      "link": {
-        "label": "Learn more",
-        "url": "https://humansignal.com/pricing/",
-        "params": {
-          "experiment": "project_settings_tip",
-          "treatment": "starter_cloud_live"
-        }
-      }
-    },
-    {
-      "title": "Evaluate GenAI models",
-      "content": "Combine automation plus human supervision to evaluate and ensure LLM quality in the Enterprise platform.",
-      "closable": true,
-      "link": {
-        "label": "Learn more",
-        "url": "https://humansignal.com/evals/",
-        "params": {
-          "experiment": "project_settings_tip",
-          "treatment": "evals_live"
-        }
-      }
-    },
-    {
-      "title": "Did you know?",
-      "content": "You can connect ML models using the backend SDK to save time with pre-labeling or active learning.",
-      "closable": true,
-      "link": {
-        "label": "Learn more",
-        "url": "https://labelstud.io/guide/ml",
-        "params": {
-          "experiment": "project_settings_tip",
-          "treatment": "connect_ml_models_live"
-        }
-      }
     }
   ],
   "authPage": [
     {
-      "title": "Auto-labeling with Prompts",
+      "title": "Auto-labeling with Prompts is here!",
       "description": "Use LLMs to instantly pre-label thousands of tasks with accurate predictions.",
       "link": {
         "label": "Learn more",
@@ -182,66 +54,6 @@
         "params": {
           "experiment": "login_revamp",
           "treatment": "prompts_auto_labeling_live"
-        }
-      }
-    },
-    {
-      "title": "Evaluate and compare LLMs",
-      "description": "Compare accuracy, cost, and performance on your tasks with Label Studio Prompts.",
-      "link": {
-        "label": "Learn more",
-        "url": "https://docs.humansignal.com/guide/prompts_overview",
-        "params": {
-          "experiment": "login_revamp",
-          "treatment": "model_eval_live"
-        }
-      }
-    },
-    {
-      "title": "New Feature!",
-      "description": "You can now label multi-page documents like PDFs.",
-      "link": {
-        "label": "Learn more",
-        "url": "https://labelstud.io/templates/multi-page-document-annotation",
-        "params": {
-          "experiment": "login_revamp",
-          "treatment": "multi_image_live"
-        }
-      }
-    },
-    {
-      "title": "New Enterprise Feature!",
-      "description": "Save time by labeling many tasks at once with Bulk Labeling",
-      "link": {
-        "label": "Learn more",
-        "url": "https://docs.humansignal.com/guide/labeling.html#Bulk-labeling",
-        "params": {
-          "experiment": "login_revamp",
-          "treatment": "bulk_labeling_live"
-        }
-      }
-    },
-    {
-      "title": "Did you know?",
-      "description": "Try Label Studio Starter Cloud, optimized for small teams and projects.",
-      "link": {
-        "label": "Learn more",
-        "url": "https://humansignal.com/pricing/",
-        "params": {
-          "experiment": "login_revamp",
-          "treatment": "starter_cloud_live"
-        }
-      }
-    },
-    {
-      "title": "Did you know?",
-      "description": "There's an Enterprise version of Label Studio packed with more features and automation to label data faster while ensuring the highest quality.",
-      "link": {
-        "label": "Learn more",
-        "url": "https://humansignal.com/goenterprise/",
-        "params": {
-          "experiment": "login_revamp",
-          "treatment": "enterprise_platform_live"
         }
       }
     }
