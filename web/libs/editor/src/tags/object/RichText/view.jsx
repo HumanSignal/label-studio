@@ -169,7 +169,14 @@ class RichTextPieceView extends Component {
       selection.extend(span, 0);
     } else {
       selection.selectAllChildren(span);
-      selection.extend(lastSpan, lastSpan.childNodes.length - 1);
+      // Extend to the end of the text node inside the last span, not to a child index
+      const lastTextNode = lastSpan.firstChild;
+      if (lastTextNode && lastTextNode.nodeType === Node.TEXT_NODE) {
+        selection.extend(lastTextNode, lastTextNode.length);
+      } else {
+        // Fallback: if no text node found, extend to the end of the span element
+        selection.extend(lastSpan, lastSpan.childNodes.length);
+      }
     }
   };
 
@@ -216,6 +223,28 @@ class RichTextPieceView extends Component {
       // update range to respect granularity
       applyTextGranularity(selection, item.granularity);
       range = selection.getRangeAt(0);
+
+      // Normalize range to ensure end container is a text node before calculating offsets
+      // This is critical for backwards resize where endContainer might be a span element
+      // Only normalize end container, as start container is usually already correct
+      if (range.endContainer.nodeType !== Node.TEXT_NODE) {
+        // For end container, find the last text node to preserve the end position
+        const walker = root.ownerDocument.createTreeWalker(
+          range.endContainer,
+          NodeFilter.SHOW_TEXT,
+          null,
+        );
+        let lastTextNode = null;
+        let currentNode = walker.nextNode();
+        while (currentNode) {
+          lastTextNode = currentNode;
+          currentNode = walker.nextNode();
+        }
+        if (lastTextNode) {
+          // Use the full length of the last text node to preserve end position
+          range.setEnd(lastTextNode, lastTextNode.length);
+        }
+      }
 
       // so no visual glitches on the screen, selection was just a helper here, we don't need it anymore
       selection.removeAllRanges();
