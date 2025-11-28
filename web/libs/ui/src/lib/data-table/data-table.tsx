@@ -188,7 +188,10 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         const isSomeSelected = invertedSelectionEnabled ? false : calculatedIsSomeSelected; // Don't show indeterminate in inverted mode
 
         return (
-          <label className="flex justify-center cursor-pointer size-[48px] -m-tight">
+          <label
+            className="flex justify-center cursor-pointer size-[48px] -m-tight"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Checkbox
               checked={isAllSelected}
               indeterminate={isSomeSelected}
@@ -229,7 +232,10 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         }
 
         return (
-          <label className="flex justify-center cursor-pointer size-[48px] -m-tight">
+          <label
+            className="flex justify-center cursor-pointer size-[48px] -m-tight"
+            onClick={(e) => e.stopPropagation()}
+          >
             <Checkbox
               checked={row.getIsSelected()}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
