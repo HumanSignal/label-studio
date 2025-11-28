@@ -68,10 +68,6 @@ class ProjectQuerySet(models.QuerySet):
 
 
 class ProjectQuerySetWithFSM(FSMStateQuerySetMixin, ProjectQuerySet):
-    """
-    Custom QuerySet for Project model with FSM state annotation support.
-    """
-
     pass
 
 
@@ -123,7 +119,7 @@ class ProjectManager(models.Manager):
             for project in projects:
                 print(project.state)  # No N+1 queries!
         """
-        return self.get_queryset().annotate_fsm_state()
+        return self.get_queryset().with_state()
 
     def with_counts(self, fields=None):
         return self.with_counts_annotate(self.get_queryset(), fields=fields)

@@ -47,7 +47,7 @@ class FSMStateField(serializers.ReadOnlyField):
     Example with annotations (optimal):
         # In your viewset
         def get_queryset(self):
-            return Task.objects.all().annotate_fsm_state()
+            return Task.objects.all().with_state()
 
         # In your serializer
         class TaskSerializer(serializers.ModelSerializer):
@@ -98,7 +98,7 @@ class FSMStateField(serializers.ReadOnlyField):
             return None
 
         # Check if the instance has a state annotation
-        # This can come from Data Manager's annotate_state() or FSMStateQuerySetMixin.annotate_fsm_state()
+        # This can come from Data Manager's annotate_state() or FSMStateQuerySetMixin.with_state()
         if hasattr(instance, 'state'):
             # Use the annotated value (no additional query)
             return instance.state

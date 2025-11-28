@@ -187,6 +187,8 @@
     version_edition: "{{ settings.VERSION_EDITION }}",
     server_id: {{ request.server_id|json_dumps_ensure_ascii|safe }},
     collect_analytics: {{ settings.COLLECT_ANALYTICS|yesno:"true,false" }},
+    local_files_document_root: {{ settings.LOCAL_FILES_DOCUMENT_ROOT|json_dumps_ensure_ascii|safe }},
+    local_files_serving_enabled: {{ settings.LOCAL_FILES_SERVING_ENABLED|yesno:"true,false" }},
 
     data_manager: {
       max_users_to_display: {{ settings.DM_MAX_USERS_TO_DISPLAY }},
