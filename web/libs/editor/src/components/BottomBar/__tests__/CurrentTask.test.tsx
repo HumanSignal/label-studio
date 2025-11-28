@@ -32,7 +32,7 @@ describe("CurrentTask", () => {
           annotationId: null,
         },
       ],
-      task: { id: 6616 },
+      task: { id: 6616, allow_skip: true, allow_postpone: true },
       commentStore: {
         loading: "list",
         comments: [],
@@ -111,5 +111,61 @@ describe("CurrentTask", () => {
     rerender(<CurrentTask store={store} />);
 
     expect(getByTestId("next-task").disabled).toBe(true);
+  });
+
+  it("disables postpone button when allow_skip=false", () => {
+    store.hasInterface.mockImplementation((interfaceName: string) =>
+      ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
+    );
+    store.task = { id: 6616, allow_skip: false, allow_postpone: true };
+
+    const { getByTestId } = render(<CurrentTask store={store} />);
+
+    expect(getByTestId("next-task").disabled).toBe(true);
+  });
+
+  it("enables postpone button when allow_skip=true", () => {
+    store.hasInterface.mockImplementation((interfaceName: string) =>
+      ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
+    );
+    store.task = { id: 6616, allow_skip: true, allow_postpone: true };
+
+    const { getByTestId } = render(<CurrentTask store={store} />);
+
+    expect(getByTestId("next-task").disabled).toBe(false);
+  });
+
+  it("enables postpone button when allow_skip is undefined", () => {
+    store.hasInterface.mockImplementation((interfaceName: string) =>
+      ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
+    );
+    store.task = { id: 6616, allow_postpone: true }; // no allow_skip property
+
+    const { getByTestId } = render(<CurrentTask store={store} />);
+
+    expect(getByTestId("next-task").disabled).toBe(false);
+  });
+
+  it("disables postpone button when both allow_skip=false and allow_postpone=false", () => {
+    store.hasInterface.mockImplementation((interfaceName: string) =>
+      ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
+    );
+    store.task = { id: 6616, allow_skip: false, allow_postpone: false };
+
+    const { getByTestId } = render(<CurrentTask store={store} />);
+
+    expect(getByTestId("next-task").disabled).toBe(true);
+  });
+
+  it("enables postpone button when canGoNextTask=true regardless of allow_skip", () => {
+    store.hasInterface.mockImplementation((interfaceName: string) =>
+      ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
+    );
+    store.task = { id: 6616, allow_skip: false, allow_postpone: true };
+    store.canGoNextTask = true;
+
+    const { getByTestId } = render(<CurrentTask store={store} />);
+
+    expect(getByTestId("next-task").disabled).toBe(false);
   });
 });
