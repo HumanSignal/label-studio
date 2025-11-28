@@ -16,12 +16,14 @@ Usage:
             fields = ['id', 'data', 'state', ...]
 
 Note:
-    All state serialization functionality is guarded by TWO feature flags:
+    State field visibility is controlled by TWO feature flags:
     1. 'fflag_feat_fit_568_finite_state_management' - Controls FSM background calculations
     2. 'fflag_feat_fit_710_fsm_state_fields' - Controls state field display in APIs
 
-    When either flag is disabled, fields return None. This allows enabling FSM background
-    work while keeping state fields hidden during incremental rollout and testing.
+    When either flag is disabled, serializers using this field should override get_fields()
+    to exclude the field entirely. See data_export/serializers.py for an example.
+    This allows enabling FSM background work while keeping state fields hidden during
+    incremental rollout and testing.
 """
 
 from core.current_request import CurrentContext
@@ -42,7 +44,8 @@ class FSMStateField(serializers.ReadOnlyField):
     - Works with annotated querysets (no N+1 queries)
     - Falls back to StateManager for single object retrievals
     - Always read-only (state changes through transitions only)
-    - Returns None if FSM is disabled or no state exists
+    - Returns None if no state exists
+    - Serializers should override get_fields() to exclude field when flags are disabled
 
     Example with annotations (optimal):
         # In your viewset
@@ -82,23 +85,17 @@ class FSMStateField(serializers.ReadOnlyField):
             instance: The model instance being serialized
 
         Returns:
-            str or None: The current state value (None if either feature flag disabled)
+            str or None: The current state value (None if no state exists)
+            
+        Note:
+            Field exclusion based on feature flags is handled at the serializer level
+            via get_fields() override, not here.
         """
-        # Check both feature flags (works for both core and enterprise)
-        # 1. General FSM functionality (background calculations)
-        # 2. State field display control (API exposure)
-        user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
-            return None
-
         if instance is None:
             return None
 
         # Check if the instance has a state annotation
-        # This can come from Data Manager's annotate_state() or FSMStateQuerySetMixin.annotate_fsm_state()
+        # This can come from Data Manager's annotate_state() or FSMStateQuerySetMixin.with_state()
         if hasattr(instance, 'state'):
             # Use the annotated value (no additional query)
             return instance.state
