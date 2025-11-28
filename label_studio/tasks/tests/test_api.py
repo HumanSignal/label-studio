@@ -94,6 +94,7 @@ class TestTaskAPI(APITestCase):
             'comment_count': 0,
             'last_comment_updated_at': None,
             'unresolved_comment_count': 0,
+            'allow_skip': True,
         }
 
     def test_create_task_without_project_id_fails(self):
