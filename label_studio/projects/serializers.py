@@ -3,6 +3,7 @@
 import bleach
 from constants import SAFE_HTML_ATTRIBUTES, SAFE_HTML_TAGS
 from django.db.models import Q
+from fsm.serializer_fields import FSMStateField
 from label_studio_sdk.label_interface import LabelInterface
 from label_studio_sdk.label_interface.control_tags import (
     BrushLabelsTag,
@@ -97,6 +98,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
 
     queue_total = serializers.SerializerMethodField()
     queue_done = serializers.SerializerMethodField()
+    state = FSMStateField(read_only=True)  # FSM state - automatically uses annotation if present
 
     @property
     def user_id(self):
@@ -249,6 +251,7 @@ class ProjectSerializer(FlexFieldsModelSerializer):
             'queue_total',
             'queue_done',
             'config_suitable_for_bulk_annotation',
+            'state',
         ]
 
     def validate_label_config(self, value):

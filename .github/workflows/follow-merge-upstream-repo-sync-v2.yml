@@ -40,7 +40,7 @@ jobs:
             > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
 
       - name: Checkout Actions Hub
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: HumanSignal/actions-hub
@@ -79,14 +79,14 @@ jobs:
           branch_name: "${{ steps.upstream-prs.outputs.branch_name }}"
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ steps.get-branch.outputs.branch_name }}
           fetch-depth: 0
 
       - name: Checkout Actions Hub
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GIT_PAT }}
           repository: HumanSignal/actions-hub

@@ -35,6 +35,7 @@ interface VectorTransformerProps {
   fitScale?: number;
   updateCurrentPointsRef?: (points: BezierPoint[]) => void;
   getCurrentPointsRef?: () => BezierPoint[];
+  pixelSnapping?: boolean;
 }
 
 export const VectorTransformer: React.FC<VectorTransformerProps> = ({
@@ -54,6 +55,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
   fitScale = 1,
   updateCurrentPointsRef,
   getCurrentPointsRef,
+  pixelSnapping = false,
 }) => {
   const transformerStateRef = React.useRef<{
     rotation: number;
@@ -149,6 +151,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               bounds,
               getCurrentPointsRef,
               updateCurrentPointsRef,
+              pixelSnapping,
             );
 
             // Update the ref immediately so next transformation tick uses latest points
@@ -179,6 +182,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
                   transformerCenter.x,
                   transformerCenter.y,
                   isActualRotation, // Only apply rotation logic if there's actual rotation
+                  pixelSnapping,
                 );
                 onPointsChange?.(updatedPoints);
               });
@@ -379,6 +383,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
               bounds,
               getCurrentPointsRef,
               updateCurrentPointsRef,
+              pixelSnapping,
             );
 
             // Update the ref immediately so next transformation tick uses latest points
@@ -401,6 +406,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
                 transformerCenter.x,
                 transformerCenter.y,
                 false, // isRotation = false for onDragMove (translation only)
+                pixelSnapping,
               );
               onPointsChange?.(updatedPoints);
             });
@@ -449,6 +455,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             transformerCenter.x,
             transformerCenter.y,
             false, // isRotation = false for drag operations
+            pixelSnapping,
           );
 
           onPointsChange?.(updatedPoints);
@@ -511,6 +518,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
             transformerCenter.x,
             transformerCenter.y,
             isActualRotation,
+            pixelSnapping,
           );
 
           onPointsChange?.(updatedPoints);

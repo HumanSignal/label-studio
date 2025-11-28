@@ -392,7 +392,10 @@ export const Select = forwardRef(
                       {({
                         onItemsRendered,
                         ref: infiniteLoaderRef,
-                      }: { onItemsRendered: (params: any) => void; ref: any }) => {
+                      }: {
+                        onItemsRendered: (params: any) => void;
+                        ref: any;
+                      }) => {
                         // Calculate height based on actual item count from flatOptions
                         // When searching, _options is filtered and flat; when not searching, _options === options (all items)
                         const actualItemCount = searchable && query.trim() ? _options.length : flatOptions.length;
@@ -401,6 +404,7 @@ export const Select = forwardRef(
 
                         return (
                           <VariableSizeList
+                            key={renderedOptions.length}
                             itemData={renderedOptions}
                             itemSize={() => VARIABLE_LIST_ITEM_HEIGHT}
                             itemCount={renderedOptions.length}

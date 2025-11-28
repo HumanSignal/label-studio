@@ -21,7 +21,7 @@ import {
 } from "@humansignal/icons";
 import { Tooltip, Userpic, ToastType, useToast } from "@humansignal/ui";
 import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
-import { useDropdown } from "../../common/Dropdown/DropdownTrigger";
+import { useDropdown } from "@humansignal/ui";
 import { isFF } from "../../utils/feature-flags";
 
 // eslint-disable-next-line
@@ -287,7 +287,10 @@ export const AnnotationButton = observer(
     );
 
     return (
-      <div className={cn("annotation-button").mod({ selected: entity.selected }).toClassName()}>
+      <div
+        className={cn("annotation-button").mod({ selected: entity.selected }).toClassName()}
+        data-annotation-id={entity.pk ?? entity.id}
+      >
         <div className={cn("annotation-button").elem("mainSection").toClassName()} onClick={clickHandler}>
           <div className={cn("annotation-button").elem("picSection").toClassName()}>
             <Userpic

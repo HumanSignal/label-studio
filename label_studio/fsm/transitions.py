@@ -54,6 +54,9 @@ class TransitionContext(BaseModel, Generic[EntityType, StateModelType]):
     # Organizational context
     organization_id: Optional[int] = Field(None, description='Organization context for the transition')
 
+    # Validation context, for cases where we want to skip validation for the transition
+    skip_validation: Optional[bool] = Field(default=False, description='Whether to skip validation for the transition')
+
     @property
     def has_current_state(self) -> bool:
         """Check if entity has a current state"""
@@ -85,8 +88,7 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
             assigned_user_id: int = Field(..., description="User assigned to start the task")
             estimated_duration: Optional[int] = Field(None, description="Estimated completion time in hours")
 
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext[Task, TaskState]]) -> str:
                 return TaskStateChoices.IN_PROGRESS
 
             def validate_transition(self, context: TransitionContext[Task, TaskState]) -> bool:
@@ -118,11 +120,18 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
         """Set the transition context"""
         self.__context = value
 
-    @property
     @abstractmethod
-    def target_state(self) -> Optional[str]:
+    def get_target_state(
+        self, context: Optional[TransitionContext[EntityType, StateModelType]] = None
+    ) -> Optional[str]:
         """
-        The target state this transition leads to.
+        Get the target state this transition leads to.
+
+        Can optionally use context to compute target_state dynamically.
+        If context is None, should return a static target_state or None.
+
+        Args:
+            context: Optional transition context (may be minimal with just entity)
 
         Returns:
             String representation of the target state, or None for side-effect only transitions
@@ -150,18 +159,6 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
                 result += '_'
             result += char.lower()
         return result
-
-    @classmethod
-    def get_target_state(cls) -> Optional[str]:
-        """
-        Get the target state for this transition class without creating an instance.
-
-        Override this in subclasses where the target state is known at the class level.
-
-        Returns:
-            The target state name, or None if it depends on instance data
-        """
-        return None
 
     @classmethod
     def can_transition_from_state(cls, context: TransitionContext[EntityType, StateModelType]) -> bool:
@@ -269,7 +266,7 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
 
         This method handles the preparation phase of the transition:
         1. Set context on the transition instance
-        2. Validate the transition
+        2. Validate the transition if not skipped
         3. Execute pre-transition hooks
         4. Perform the actual transition logic
 
@@ -290,10 +287,10 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
 
         try:
             # Validate transition
-            if not self.validate_transition(context):
+            if not context.skip_validation and not self.validate_transition(context):
                 raise TransitionValidationError(
                     f'Transition validation failed for {self.transition_name}',
-                    {'current_state': context.current_state, 'target_state': self.target_state},
+                    {'current_state': context.current_state, 'target_state': context.target_state},
                 )
 
             # Pre-transition hook
@@ -345,8 +342,7 @@ class ModelChangeTransition(BaseTransition, Generic[EntityType, StateModelType])
     Example usage:
         @register_state_transition('task', 'task_created', triggers_on_create=True)
         class TaskCreatedTransition(ModelChangeTransition[Task, TaskState]):
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'CREATED'
 
             def transition(self, context: TransitionContext) -> Dict[str, Any]:
@@ -354,8 +350,7 @@ class ModelChangeTransition(BaseTransition, Generic[EntityType, StateModelType])
 
         @register_state_transition('task', 'task_labeled', triggers_on=['is_labeled'])
         class TaskLabeledTransition(ModelChangeTransition[Task, TaskState]):
-            @property
-            def target_state(self) -> str:
+            def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
                 return 'ANNOTATION_COMPLETE'
 
             def transition(self, context: TransitionContext) -> Dict[str, Any]:

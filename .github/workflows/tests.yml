@@ -48,7 +48,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.head_sha }}
 
@@ -109,7 +109,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.head_sha }}
 
@@ -177,7 +177,7 @@ jobs:
       - uses: hmarr/debug-action@v3.0.0
 
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.head_sha }}
 

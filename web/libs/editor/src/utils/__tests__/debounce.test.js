@@ -19,6 +19,6 @@ describe("Debounce function", () => {
 
     jest.runAllTimers();
 
-    expect(func).toBeCalledTimes(1);
+    expect(func).toHaveBeenCalledTimes(1);
   });
 });

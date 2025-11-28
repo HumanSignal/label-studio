@@ -5,7 +5,7 @@ This module defines declarative transitions for the Annotation entity.
 Annotation transitions can update related task states via post_transition_hooks.
 """
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from fsm.registry import register_state_transition
 from fsm.state_choices import AnnotationStateChoices
@@ -22,8 +22,7 @@ class AnnotationSubmittedTransition(ModelChangeTransition):
     Trigger: Automatically on creation only (triggers_on_create=True, triggers_on_update=False)
     """
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return AnnotationStateChoices.SUBMITTED
 
     def get_reason(self, context: TransitionContext) -> str:
@@ -89,8 +88,7 @@ class AnnotationUpdatedTransition(ModelChangeTransition):
     Trigger: On update (triggers_on_create=False, triggers_on_update=True, force_state_record=True)
     """
 
-    @property
-    def target_state(self) -> str:
+    def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
         return AnnotationStateChoices.SUBMITTED
 
     def get_reason(self, context: TransitionContext) -> str:

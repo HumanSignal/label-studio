@@ -3,7 +3,7 @@ import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { IconEllipsisVertical, IconPlus } from "@humansignal/icons";
 import { cn } from "../../../utils/bem";
 import { Button } from "@humansignal/ui";
-import { Dropdown } from "../Dropdown/DropdownComponent";
+import { Dropdown } from "@humansignal/ui";
 import Input from "../Input/Input";
 import "./Tabs.scss";
 import { TabsMenu } from "./TabsMenu";

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { IconZoomIn } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
-import { Dropdown } from "../../../common/Dropdown/Dropdown";
+import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../../../common/Menu/Menu";
 import { ErrorMessage } from "../../../components/ErrorMessage/ErrorMessage";
 import ObjectTag from "../../../components/Tags/Object";
@@ -144,7 +144,11 @@ const HtxVideoView = ({ item, store }) => {
   const [position, _setPosition] = useState(1);
 
   const [videoSize, setVideoSize] = useState(null);
-  const [videoDimensions, setVideoDimensions] = useState({ width: 0, height: 0, ratio: 1 });
+  const [videoDimensions, setVideoDimensions] = useState({
+    width: 0,
+    height: 0,
+    ratio: 1,
+  });
   const [{ zoom, pan }, { setZoomAndPan, setZoom, setPan }] = useZoom(
     videoDimensions,
     item.ref.current

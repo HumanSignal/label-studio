@@ -1,0 +1,181 @@
+/* Position-try fallback definitions for anchor positioning */
+/* These use implicit anchor references via position-anchor set in JS */
+@position-try --dropdown-bottom-left {
+  bottom: auto;
+  top: anchor(bottom);
+  left: anchor(left);
+  right: auto;
+}
+
+@position-try --dropdown-bottom-right {
+  bottom: auto;
+  top: anchor(bottom);
+  right: anchor(right);
+  left: auto;
+}
+
+@position-try --dropdown-bottom-center {
+  bottom: auto;
+  top: anchor(bottom);
+  left: anchor(center);
+  right: auto;
+  translate: -50% 0;
+}
+
+@position-try --dropdown-top-left {
+  top: auto;
+  bottom: anchor(top);
+  left: anchor(left);
+  right: auto;
+}
+
+@position-try --dropdown-top-right {
+  top: auto;
+  bottom: anchor(top);
+  right: anchor(right);
+  left: auto;
+}
+
+@position-try --dropdown-top-center {
+  top: auto;
+  bottom: anchor(top);
+  left: anchor(center);
+  right: auto;
+  translate: -50% 0;
+}
+
+.dropdown {
+  --menu-animation-duration: 0.15s;
+  --menu-animation-curve: cubic-bezier(0.21, 1.04, 0.68, 1);
+  --menu-animation-start: -10px;
+
+  /* Default positioning for fallback (no anchor support) */
+  position: absolute;
+  top: calc(100% + 1px);
+  z-index: 500;
+
+  /* Hidden by default - will be shown with animation classes */
+  display: none;
+  box-sizing: border-box;
+  background-color: var(--color-neutral-background);
+  box-shadow: 0 5px 20px rgb(var(--color-neutral-shadow-raw) / calc(20% * var(--shadow-intensity)));
+  will-change: transform, opacity;
+  border-radius: var(--corner-radius-small, 4px);
+
+  /* Prevent dropdown from causing page overflow */
+  max-width: calc(100vw - 20px);
+  max-height: calc(100vh - 20px);
+
+  /* Use flex column to allow inner scrollable content */
+  flex-direction: column;
+
+  /* Modern anchor positioning for supported browsers */
+  @supports (anchor-name: --test) {
+    position: fixed;
+
+    /* position-anchor is set dynamically via JavaScript for each dropdown instance */
+    /* Default position - anchor() uses the position-anchor value when no name specified */
+    top: anchor(bottom);
+    left: anchor(left);
+    bottom: auto;
+    right: auto;
+
+    /* Automatic fallback positioning when overflowing */
+    position-try-fallbacks:
+      --dropdown-bottom-right,
+      --dropdown-bottom-center,
+      --dropdown-top-left,
+      --dropdown-top-right,
+      --dropdown-top-center,
+      flip-block,
+      flip-inline;
+
+    /* Only show when anchor is visible */
+    position-visibility: anchors-visible;
+  }
+
+  /* Width syncing with trigger using anchor-size() for anchor positioning */
+  &_sync-width {
+    @supports (width: anchor-size(width)) {
+      /* Use anchor-size() to automatically match trigger width */
+      width: anchor-size(width);
+      min-width: anchor-size(width);
+    }
+  }
+
+  /* Height constraint using available space calculation of the viewport performed in JS */
+  &_constrain-height {
+    overflow-y: auto;
+  }
+
+  &_align {
+    &_left {
+      left: -20px;
+
+      @supports (anchor-name: --test) {
+        left: anchor(left);
+      }
+    }
+
+    &_right {
+      right: -20px;
+
+      @supports (anchor-name: --test) {
+        right: anchor(right);
+      }
+    }
+  }
+
+  &__trigger {
+    position: relative;
+
+    /* Set as anchor for modern browsers */
+    @supports (anchor-name: --test) {
+      anchor-name: --dropdown-trigger;
+    }
+  }
+
+  &.before-appear,
+  &.before-disappear {
+    transition-property: opacity, transform;
+    transition-duration: var(--menu-animation-duration);
+    transition-timing-function: var(--menu-animation-curve);
+  }
+
+  /* Mount state - keeps element in DOM for ref/anchor initialization but invisible */
+  &.mounted {
+    display: flex;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate3d(0, var(--menu-animation-start), 0);
+  }
+
+  &.before-appear {
+    opacity: 0;
+    display: flex;
+    transform: translate3d(0, var(--menu-animation-start), 0);
+  }
+
+  &.appear {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  &.visible {
+    opacity: 1;
+    display: flex;
+  }
+
+  &.before-disappear {
+    opacity: 1;
+    display: flex;
+    transform: translate3d(0, 0, 0);
+  }
+
+  &.disappear {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate3d(0, var(--menu-animation-start), 0);
+  }
+}
