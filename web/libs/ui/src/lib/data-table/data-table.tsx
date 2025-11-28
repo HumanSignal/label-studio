@@ -188,34 +188,39 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         const isSomeSelected = invertedSelectionEnabled ? false : calculatedIsSomeSelected; // Don't show indeterminate in inverted mode
 
         return (
-          <Checkbox
-            checked={isAllSelected}
-            indeterminate={isSomeSelected}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              e.stopPropagation();
+          <label
+            className="flex justify-center cursor-pointer size-[48px] -m-tight"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Checkbox
+              checked={isAllSelected}
+              indeterminate={isSomeSelected}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                e.stopPropagation();
 
-              // Call custom handler if provided (allows parent to handle special cases)
-              if (onSelectAllChange) {
-                onSelectAllChange(e.target.checked, selectableRows.length);
-              }
+                // Call custom handler if provided (allows parent to handle special cases)
+                if (onSelectAllChange) {
+                  onSelectAllChange(e.target.checked, selectableRows.length);
+                }
 
-              // Build new selection state with only selectable rows
-              const newSelection: Record<string, boolean> = {};
+                // Build new selection state with only selectable rows
+                const newSelection: Record<string, boolean> = {};
 
-              if (e.target.checked) {
-                // Select all selectable rows
-                selectableRows.forEach((row) => {
-                  newSelection[row.id] = true;
-                });
-              }
-              // If unchecking, newSelection stays empty (deselect all)
+                if (e.target.checked) {
+                  // Select all selectable rows
+                  selectableRows.forEach((row) => {
+                    newSelection[row.id] = true;
+                  });
+                }
+                // If unchecking, newSelection stays empty (deselect all)
 
-              // Update selection state in one go
-              table.setRowSelection(newSelection);
-            }}
-            ariaLabel={isAllSelected ? "Unselect all rows" : "Select all rows"}
-            data-testid="data-table-select-all"
-          />
+                // Update selection state in one go
+                table.setRowSelection(newSelection);
+              }}
+              ariaLabel={isAllSelected ? "Unselect all rows" : "Select all rows"}
+              data-testid="data-table-select-all"
+            />
+          </label>
         );
       },
       cell: ({ row }) => {
@@ -227,15 +232,20 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         }
 
         return (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              e.stopPropagation();
-              row.toggleSelected(e.target.checked);
-            }}
-            ariaLabel={row.getIsSelected() ? "Unselect row" : "Select row"}
-            data-testid={`data-table-row-${row.id}-select`}
-          />
+          <label
+            className="flex justify-center cursor-pointer size-[48px] -m-tight"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Checkbox
+              checked={row.getIsSelected()}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                e.stopPropagation();
+                row.toggleSelected(e.target.checked);
+              }}
+              ariaLabel={row.getIsSelected() ? "Unselect row" : "Select row"}
+              data-testid={`data-table-row-${row.id}-select`}
+            />
+          </label>
         );
       },
       size: 20,
@@ -327,15 +337,13 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
     [props.onRowClick, activeRowId, isActiveRowControlled],
   );
 
-  // Check if we should show loading skeleton
-  const showLoadingSkeleton = props.isLoading && rows.length === 0;
   // Check if we should show empty state
   const showEmptyState = rows.length === 0 && !props.isLoading && props.emptyState;
 
   return (
     <div className={cn(styles.container, className)} data-testid={dataTestId}>
       <DataTableHead table={table} />
-      {showLoadingSkeleton ? (
+      {props.isLoading ? (
         <DataTableSkeletonBody
           table={table}
           loadingRows={loadingRows}
@@ -674,7 +682,7 @@ export const Header = <T,>({
 
   if (!enableSorting) {
     return (
-      <Typography variant="body" size="small">
+      <Typography variant="label" size="small">
         {headerLabel}
       </Typography>
     );
@@ -685,7 +693,7 @@ export const Header = <T,>({
 
   return (
     <div className={styles.headerContent}>
-      <Typography variant="body" size="small" className={cn(isSorted && styles.headerTextSorted)}>
+      <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
         {headerLabel}
       </Typography>
       {/* Always render icon container for sortable columns - CSS handles visibility */}

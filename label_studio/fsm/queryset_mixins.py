@@ -13,11 +13,14 @@ Usage:
             return TaskQuerySet(self.model, using=self._db).annotate_fsm_state()
 
 Note:
-    All state annotation functionality is guarded by TWO feature flags:
-    1. 'fflag_feat_fit_568_finite_state_management' - Controls FSM background calculations
-    2. 'fflag_feat_fit_710_fsm_state_fields' - Controls state field display in APIs
+    State annotation is guarded by 'fflag_feat_fit_568_finite_state_management' only.
+    This allows background FSM processes to annotate current_state for internal use.
 
-    When disabled, no annotation is performed and there is zero performance impact.
+    UI/API consumption of state fields is separately controlled by serializers
+    that check BOTH 'fflag_feat_fit_568_finite_state_management' AND
+    'fflag_feat_fit_710_fsm_state_fields' before exposing state data.
+
+    When the flag is disabled, no annotation is performed and there is zero performance impact.
 """
 
 import logging
@@ -74,13 +77,12 @@ class FSMStateQuerySetMixin:
             - If no state exists for an entity, `current_state` will be None
             - The state is read-only and should not be modified directly
         """
-        # Check feature flag directly (works for both core and enterprise)
-        # Using flag_set directly instead of is_fsm_enabled to work in enterprise context
+        # Check only fflag_feat_fit_568_finite_state_management for background FSM processes.
+        # This allows background processes to annotate current_state for internal use.
+        # UI/API serializers separately check both fflag_feat_fit_568 AND fflag_feat_fit_710
+        # before exposing state data to consumers.
         user = CurrentContext.get_user()
-        if not (
-            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
-            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
-        ):
+        if not flag_set('fflag_feat_fit_568_finite_state_management', user=user):
             logger.debug('FSM feature flag disabled, skipping state annotation')
             return self
 

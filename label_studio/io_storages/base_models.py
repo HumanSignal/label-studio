@@ -29,7 +29,6 @@ from django.db.models import JSONField
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django_rq import job
 from io_storages.utils import StorageObject, get_uri_via_regex, parse_bucket_uri
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
@@ -723,7 +722,6 @@ class ProjectStorageMixin(models.Model):
         abstract = True
 
 
-@job('low')
 def import_sync_background(storage_class, storage_id, timeout=settings.RQ_LONG_JOB_TIMEOUT, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     try:
@@ -736,13 +734,11 @@ def import_sync_background(storage_class, storage_id, timeout=settings.RQ_LONG_J
         return
 
 
-@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_all_annotations()
 
 
-@job('low', timeout=settings.RQ_LONG_JOB_TIMEOUT)
 def export_sync_only_new_background(storage_class, storage_id, **kwargs):
     storage = storage_class.objects.get(id=storage_id)
     storage.save_only_new_annotations()
