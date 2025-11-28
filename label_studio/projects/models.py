@@ -68,10 +68,6 @@ class ProjectQuerySet(models.QuerySet):
 
 
 class ProjectQuerySetWithFSM(FSMStateQuerySetMixin, ProjectQuerySet):
-    """
-    Custom QuerySet for Project model with FSM state annotation support.
-    """
-
     pass
 
 

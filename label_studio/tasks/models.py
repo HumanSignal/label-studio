@@ -571,10 +571,6 @@ class AnnotationQuerySet(models.QuerySet):
 
 
 class AnnotationQuerySetWithFSM(FSMStateQuerySetMixin, AnnotationQuerySet):
-    """
-    Custom QuerySet for Annotation model with FSM state annotation support.
-    """
-
     pass
 
 
@@ -846,15 +842,15 @@ class TaskLockQuerySet(models.QuerySet):
     pass
 
 
+class TaskLockQuerySetWithFSM(FSMStateQuerySetMixin, TaskLockQuerySet):
+    pass
+
+
 class TaskLockManager(models.Manager):
     """Manager for TaskLock with FSM state support"""
 
     def get_queryset(self):
         """Return QuerySet with FSM state annotation support"""
-        # Create a dynamic class that mixes FSM support into the queryset
-        class TaskLockQuerySetWithFSM(FSMStateQuerySetMixin, TaskLockQuerySet):
-            pass
-
         return TaskLockQuerySetWithFSM(self.model, using=self._db)
 
     def with_state(self):
@@ -890,15 +886,15 @@ class AnnotationDraftQuerySet(models.QuerySet):
     pass
 
 
+class AnnotationDraftQuerySetWithFSM(FSMStateQuerySetMixin, AnnotationDraftQuerySet):
+    pass
+
+
 class AnnotationDraftManager(models.Manager):
     """Manager for AnnotationDraft with FSM state support"""
 
     def get_queryset(self):
         """Return QuerySet with FSM state annotation support"""
-        # Create a dynamic class that mixes FSM support into the queryset
-        class AnnotationDraftQuerySetWithFSM(FSMStateQuerySetMixin, AnnotationDraftQuerySet):
-            pass
-
         return AnnotationDraftQuerySetWithFSM(self.model, using=self._db)
 
     def with_state(self):

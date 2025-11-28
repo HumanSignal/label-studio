@@ -490,14 +490,7 @@ def apply_filters(queryset, filters, project, request):
 
 
 class TaskQuerySet(FSMStateQuerySetMixin, models.QuerySet):
-    """
-    QuerySet for Task model with FSM state annotation support.
-
-    Extends Django's QuerySet with:
-    - FSM state annotation (via FSMStateQuerySetMixin)
-    - Data Manager filters and ordering
-    - Selected items handling
-    """
+    """QuerySet for Task model with Data Manager filters and ordering support."""
 
     def prepared(self, prepare_params=None):
         """Apply filters, ordering and selected items to queryset

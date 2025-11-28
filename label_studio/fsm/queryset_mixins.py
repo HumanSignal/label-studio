@@ -37,8 +37,8 @@ class FSMStateQuerySetMixin:
     """
     Mixin for Django QuerySets to efficiently annotate FSM state.
 
-    Provides the `annotate_fsm_state()` method that adds a `current_state`
-    annotation to the queryset using an optimized subquery.
+    Provides both `annotate_fsm_state()` and `with_state()` methods that add a
+    `current_state` annotation to the queryset using an optimized subquery.
 
     This approach:
     - Prevents N+1 queries by using a single JOIN/subquery
@@ -55,11 +55,36 @@ class FSMStateQuerySetMixin:
             def with_state(self):
                 return self.get_queryset().annotate_fsm_state()
 
-        # Usage
+        # Usage - both approaches work identically
         tasks = Task.objects.with_state().filter(project=project)
+        # Or chain it after filters
+        tasks = Task.objects.filter(project=project).with_state()
+
         for task in tasks:
             print(f"Task {task.id}: {task.current_state}")  # No additional queries!
     """
+
+    def with_state(self):
+        """
+        Convenience method to annotate queryset with FSM state.
+
+        This is a more intuitive alias for `annotate_fsm_state()` that can be
+        chained with other queryset methods at any point in the query chain.
+
+        Returns:
+            QuerySet: The queryset with current_state annotation
+
+        Example:
+            # Chain after filters
+            tasks = Task.objects.filter(project=project).with_state()
+
+            # Or use from manager
+            tasks = Task.objects.with_state().filter(project=project)
+
+            # Multiple chaining
+            tasks = Task.objects.filter(is_labeled=True).with_state().order_by('-created_at')
+        """
+        return self.annotate_fsm_state()
 
     def annotate_fsm_state(self):
         """
