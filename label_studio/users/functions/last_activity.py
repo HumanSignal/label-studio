@@ -47,7 +47,6 @@ def set_user_last_activity(user_id: int, timestamp: Optional[datetime] = None) -
         True if successfully set, False otherwise
     """
     if not redis_connected():
-        logger.warning('Redis not connected, skipping activity update for user %s', user_id)
         return False
 
     if timestamp is None:
