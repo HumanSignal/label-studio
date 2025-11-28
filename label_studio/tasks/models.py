@@ -100,6 +100,7 @@ class Task(TaskMixin, FsmHistoryStateModel):
     allow_skip = models.BooleanField(
         _('allow_skip'),
         default=True,
+        null=True,
         help_text='Whether this task can be skipped. Set to False to make task unskippable.',
     )
     overlap = models.IntegerField(
