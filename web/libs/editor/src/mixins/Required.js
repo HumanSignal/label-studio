@@ -1,6 +1,26 @@
 import { getParent, types } from "mobx-state-tree";
 import { FF_LSDV_4583, isFF } from "../utils/feature-flags";
 
+/**
+ * Looks for a given visibility parameter in the node or its parents.
+ * For convenience users can specify visibility parameters in parent `View` tag up the tree.
+ * @todo We should use it for all params but for now it's only used for `whenrole`.
+ * @param {Object} node Control tag
+ * @param {string} param Visibility parameter name (whenrole, whenlabelvalue, whenchoicevalue)
+ * @returns {string|null}
+ */
+function findVisibilityParam(node, param) {
+  while (node) {
+    if (node[param]) {
+      return node[param];
+    }
+    // all tags are sitting in `children` array of their parent,
+    // so we need to go up 2 levels to get the parent
+    node = getParent(node, 2);
+  }
+  return null;
+}
+
 const RequiredMixin = types
   .model({
     required: types.optional(types.boolean, false),
@@ -13,7 +33,7 @@ const RequiredMixin = types
 
     return {
       validate() {
-        const whenRoles = self.whenrole ? self.whenrole.split(",") : null;
+        const whenRoles = findVisibilityParam(self, "whenrole")?.split(",") ?? null;
 
         if (!Super.validate()) return false;
         if (!self.required) return true;
@@ -34,9 +54,9 @@ const RequiredMixin = types
 
                 if (label && label !== self.whentagname) continue;
               }
-
-              if (whenRoles && !whenRoles.includes(reg.chatmessage?.role)) continue;
             }
+
+            if (whenRoles && !whenRoles.includes(reg.chatmessage?.role)) continue;
 
             if (self.whenlabelvalue && !reg.hasLabel(self.whenlabelvalue)) {
               continue;
