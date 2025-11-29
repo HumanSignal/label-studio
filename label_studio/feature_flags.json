@@ -2607,33 +2607,6 @@
       "version": 2,
       "deleted": false
     },
-    "fflag_feat_front_bros58_timeseries_multichannel_short": {
-      "key": "fflag_feat_front_bros58_timeseries_multichannel_short",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "99504b973dab4599b2438b5769df30df",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 5,
-      "deleted": false
-    },
     "fflag_feat_front_bros_194_custom_tags_short": {
       "key": "fflag_feat_front_bros_194_custom_tags_short",
       "on": true,
