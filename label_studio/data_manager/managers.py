@@ -490,14 +490,7 @@ def apply_filters(queryset, filters, project, request):
 
 
 class TaskQuerySet(FSMStateQuerySetMixin, models.QuerySet):
-    """
-    QuerySet for Task model with FSM state annotation support.
-
-    Extends Django's QuerySet with:
-    - FSM state annotation (via FSMStateQuerySetMixin)
-    - Data Manager filters and ordering
-    - Selected items handling
-    """
+    """QuerySet for Task model with Data Manager filters and ordering support."""
 
     def prepared(self, prepare_params=None):
         """Apply filters, ordering and selected items to queryset
@@ -714,16 +707,16 @@ def annotate_state(queryset):
     """
     Annotate queryset with FSM state as 'state' field.
 
-    Uses FSMStateQuerySetMixin.annotate_fsm_state() to efficiently annotate
+    Uses FSMStateQuerySetMixin.with_state() to efficiently annotate
     the current state without causing N+1 queries. Aliases 'current_state' to
     'state' to match the Data Manager column name.
 
     Note: Feature flag checks and user context validation are handled by
-    annotate_fsm_state() itself, so no additional checks are needed here.
+    with_state() itself, so no additional checks are needed here.
     """
-    # Use the mixin's annotate_fsm_state() method which creates 'current_state' annotation
+    # Use the mixin's with_state() method which creates 'current_state' annotation
     # (includes feature flag and user context checks)
-    queryset = queryset.annotate_fsm_state()
+    queryset = queryset.with_state()
 
     # Alias 'current_state' to 'state' for Data Manager column compatibility
     # Only add the alias if current_state was actually added (feature flags enabled)
@@ -858,4 +851,4 @@ class TaskManager(models.Manager):
 
     def with_state(self):
         """Return queryset with FSM state annotated."""
-        return self.get_queryset().annotate_fsm_state()
+        return self.get_queryset().with_state()
