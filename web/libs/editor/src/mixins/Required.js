@@ -34,8 +34,6 @@ const RequiredMixin = types
 
     return {
       validate() {
-        const whenRoles = findVisibilityParam(self, "whenrole")?.split(",") ?? null;
-
         if (!Super.validate()) return false;
         if (!self.required) return true;
 
@@ -57,7 +55,10 @@ const RequiredMixin = types
               }
             }
 
-            if (whenRoles && !whenRoles.includes(reg.chatmessage?.role)) continue;
+            if (reg.role) {
+              const whenRoles = findVisibilityParam(self, "whenrole")?.split(",") ?? null;
+              if (whenRoles && !whenRoles.includes(reg.role)) continue;
+            }
 
             if (self.whenlabelvalue && !reg.hasLabel(self.whenlabelvalue)) {
               continue;
