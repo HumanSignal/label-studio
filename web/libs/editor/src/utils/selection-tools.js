@@ -333,18 +333,14 @@ export const fixRange = (range) => {
   if (!isTextNode(endContainer)) {
     // For end container, find the last text node within it to preserve the end position
     // This is especially important when the span is at the end of text
-    const walker = commonContainer.ownerDocument.createTreeWalker(
-      endContainer,
-      NodeFilter.SHOW_TEXT,
-      null,
-    );
+    const walker = commonContainer.ownerDocument.createTreeWalker(endContainer, NodeFilter.SHOW_TEXT, null);
     let lastTextNode = null;
     let currentNode = walker.nextNode();
     while (currentNode) {
       lastTextNode = currentNode;
       currentNode = walker.nextNode();
     }
-    
+
     if (lastTextNode) {
       // Skip empty whitespace-only text nodes
       while (/^\s*$/.test(lastTextNode.wholeText)) {
