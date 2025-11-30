@@ -14,6 +14,7 @@ import { htmlEscape, matchesSelector } from "../../../utils/html";
 import {
   applyTextGranularity,
   fixCodePointsInRange,
+  fixRange,
   rangeToGlobalOffset,
   trimSelection,
 } from "../../../utils/selection-tools";
@@ -224,27 +225,15 @@ class RichTextPieceView extends Component {
       applyTextGranularity(selection, item.granularity);
       range = selection.getRangeAt(0);
 
-      // Normalize range to ensure end container is a text node before calculating offsets
-      // This is critical for backwards resize where endContainer might be a span element
-      // Only normalize end container, as start container is usually already correct
-      if (range.endContainer.nodeType !== Node.TEXT_NODE) {
-        // For end container, find the last text node to preserve the end position
-        const walker = root.ownerDocument.createTreeWalker(
-          range.endContainer,
-          NodeFilter.SHOW_TEXT,
-          null,
-        );
-        let lastTextNode = null;
-        let currentNode = walker.nextNode();
-        while (currentNode) {
-          lastTextNode = currentNode;
-          currentNode = walker.nextNode();
-        }
-        if (lastTextNode) {
-          // Use the full length of the last text node to preserve end position
-          range.setEnd(lastTextNode, lastTextNode.length);
-        }
+      // Normalize range to ensure containers are text nodes before calculating offsets
+      // This fixes issues where containers might be span elements instead of text nodes
+      // (especially important when span is at the end of text)
+      const normalizedRange = fixRange(range.cloneRange());
+      if (!normalizedRange) {
+        selection.removeAllRanges();
+        return false;
       }
+      range = normalizedRange;
 
       // so no visual glitches on the screen, selection was just a helper here, we don't need it anymore
       selection.removeAllRanges();

@@ -303,7 +303,7 @@ const textNodeLookup = (commonContainer, node, offset, direction = "forward") =>
  * not root, not some previous element with `startOffset` on the last char.
  * @param {Range} range
  */
-const fixRange = (range) => {
+export const fixRange = (range) => {
   const { endOffset, commonAncestorContainer: commonContainer } = range;
   let { startOffset, startContainer, endContainer } = range;
 
@@ -331,15 +331,40 @@ const fixRange = (range) => {
   }
 
   if (!isTextNode(endContainer)) {
-    endContainer = textNodeLookup(commonContainer, endContainer, endOffset, "backward");
-    if (!endContainer) return null;
-
-    while (/^\s*$/.test(endContainer.wholeText)) {
-      endContainer = textNodeLookup(commonContainer, endContainer, endOffset, "backward-next");
-      if (!endContainer) return null;
+    // For end container, find the last text node within it to preserve the end position
+    // This is especially important when the span is at the end of text
+    const walker = commonContainer.ownerDocument.createTreeWalker(
+      endContainer,
+      NodeFilter.SHOW_TEXT,
+      null,
+    );
+    let lastTextNode = null;
+    let currentNode = walker.nextNode();
+    while (currentNode) {
+      lastTextNode = currentNode;
+      currentNode = walker.nextNode();
     }
-    // we skip empty whitespace-only text nodes, so we need the found one to be included
-    range.setEnd(endContainer, endContainer.length);
+    
+    if (lastTextNode) {
+      // Skip empty whitespace-only text nodes
+      while (/^\s*$/.test(lastTextNode.wholeText)) {
+        const prevTextNode = textNodeLookup(commonContainer, lastTextNode, 0, "backward-next");
+        if (!prevTextNode || prevTextNode === lastTextNode) break;
+        lastTextNode = prevTextNode;
+      }
+      // Use the full length of the last text node to preserve end position
+      range.setEnd(lastTextNode, lastTextNode.length);
+    } else {
+      // Fallback to textNodeLookup if TreeWalker didn't find anything
+      endContainer = textNodeLookup(commonContainer, endContainer, endOffset, "backward");
+      if (!endContainer) return null;
+
+      while (/^\s*$/.test(endContainer.wholeText)) {
+        endContainer = textNodeLookup(commonContainer, endContainer, endOffset, "backward-next");
+        if (!endContainer) return null;
+      }
+      range.setEnd(endContainer, endContainer.length);
+    }
   }
 
   return range;
