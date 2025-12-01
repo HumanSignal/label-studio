@@ -5,7 +5,7 @@ const theme = create({
   base: "dark",
   brandTitle: "Label Studio",
   brandUrl: "https://labelstud.io",
-  brandImage: "/logo.svg",
+  brandImage: "logo.svg",
   brandTarget: "_blank",
 });
 
