@@ -627,86 +627,86 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             item.parent.annotation.history.freeze();
           }}
           onTransformEnd={(e) => {
-            // Always unfreeze history first, regardless of event type
             item.parent.annotation.history.unfreeze();
 
-            // Only handle transformer-specific logic if event has the required properties
-            // This is for the legacy transformer approach (not VectorTransformer)
-            if (e && e.target && e.currentTarget && e.target === e.currentTarget) {
-              const t = e.target;
-              const dx = t.getAttr("x", 0);
-              const dy = t.getAttr("y", 0);
-              const scaleX = t.getAttr("scaleX", 1);
-              const scaleY = t.getAttr("scaleY", 1);
-              const rotation = t.getAttr("rotation", 0);
+            // Handle case where event might be undefined (e.g., from onTransformationEnd)
+            if (!e || !e.target || !e.currentTarget) return;
 
-              // Reset transform attributes
-              t.setAttr("x", 0);
-              t.setAttr("y", 0);
-              t.setAttr("scaleX", 1);
-              t.setAttr("scaleY", 1);
-              t.setAttr("rotation", 0);
+            if (e.target !== e.currentTarget) return;
 
-              // Apply transformation to all points using KonvaVector methods
-              if (item.vectorRef) {
-                // Apply the transformation exactly as Konva did:
-                // 1. Scale around origin (0,0)
-                // 2. Rotate around origin (0,0)
-                // 3. Translate by (dx, dy)
-                // Don't pass centerX/centerY - transform around origin
-                const radians = rotation * (Math.PI / 180);
-                const cos = Math.cos(radians);
-                const sin = Math.sin(radians);
+            const t = e.target;
+            const dx = t.getAttr("x", 0);
+            const dy = t.getAttr("y", 0);
+            const scaleX = t.getAttr("scaleX", 1);
+            const scaleY = t.getAttr("scaleY", 1);
+            const rotation = t.getAttr("rotation", 0);
 
-                const imageWidth = image?.naturalWidth ?? 0;
-                const imageHeight = image?.naturalHeight ?? 0;
+            // Reset transform attributes
+            t.setAttr("x", 0);
+            t.setAttr("y", 0);
+            t.setAttr("scaleX", 1);
+            t.setAttr("scaleY", 1);
+            t.setAttr("rotation", 0);
 
-                const transformedVertices = item.vertices.map((point) => {
-                  // Step 1: Scale
-                  const x = point.x * scaleX;
-                  const y = point.y * scaleY;
+            // Apply transformation to all points using KonvaVector methods
+            if (item.vectorRef) {
+              // Apply the transformation exactly as Konva did:
+              // 1. Scale around origin (0,0)
+              // 2. Rotate around origin (0,0)
+              // 3. Translate by (dx, dy)
+              // Don't pass centerX/centerY - transform around origin
+              const radians = rotation * (Math.PI / 180);
+              const cos = Math.cos(radians);
+              const sin = Math.sin(radians);
 
-                  // Step 2: Rotate
-                  const rx = x * cos - y * sin;
-                  const ry = x * sin + y * cos;
+              const imageWidth = image?.naturalWidth ?? 0;
+              const imageHeight = image?.naturalHeight ?? 0;
 
-                  // Step 3: Translate and clamp to image bounds
-                  const result = {
-                    ...point,
-                    x: Math.max(0, Math.min(imageWidth, rx + dx)),
-                    y: Math.max(0, Math.min(imageHeight, ry + dy)),
-                  };
+              const transformedVertices = item.vertices.map((point) => {
+                // Step 1: Scale
+                const x = point.x * scaleX;
+                const y = point.y * scaleY;
 
-                  // Transform control points if bezier
-                  if (point.isBezier) {
-                    if (point.controlPoint1) {
-                      const cp1x = point.controlPoint1.x * scaleX;
-                      const cp1y = point.controlPoint1.y * scaleY;
-                      const cp1rx = cp1x * cos - cp1y * sin;
-                      const cp1ry = cp1x * sin + cp1y * cos;
-                      result.controlPoint1 = {
-                        x: Math.max(0, Math.min(imageWidth, cp1rx + dx)),
-                        y: Math.max(0, Math.min(imageHeight, cp1ry + dy)),
-                      };
-                    }
-                    if (point.controlPoint2) {
-                      const cp2x = point.controlPoint2.x * scaleX;
-                      const cp2y = point.controlPoint2.y * scaleY;
-                      const cp2rx = cp2x * cos - cp2y * sin;
-                      const cp2ry = cp2x * sin + cp2y * cos;
-                      result.controlPoint2 = {
-                        x: Math.max(0, Math.min(imageWidth, cp2rx + dx)),
-                        y: Math.max(0, Math.min(imageHeight, cp2ry + dy)),
-                      };
-                    }
+                // Step 2: Rotate
+                const rx = x * cos - y * sin;
+                const ry = x * sin + y * cos;
+
+                // Step 3: Translate and clamp to image bounds
+                const result = {
+                  ...point,
+                  x: Math.max(0, Math.min(imageWidth, rx + dx)),
+                  y: Math.max(0, Math.min(imageHeight, ry + dy)),
+                };
+
+                // Transform control points if bezier
+                if (point.isBezier) {
+                  if (point.controlPoint1) {
+                    const cp1x = point.controlPoint1.x * scaleX;
+                    const cp1y = point.controlPoint1.y * scaleY;
+                    const cp1rx = cp1x * cos - cp1y * sin;
+                    const cp1ry = cp1x * sin + cp1y * cos;
+                    result.controlPoint1 = {
+                      x: Math.max(0, Math.min(imageWidth, cp1rx + dx)),
+                      y: Math.max(0, Math.min(imageHeight, cp1ry + dy)),
+                    };
                   }
+                  if (point.controlPoint2) {
+                    const cp2x = point.controlPoint2.x * scaleX;
+                    const cp2y = point.controlPoint2.y * scaleY;
+                    const cp2rx = cp2x * cos - cp2y * sin;
+                    const cp2ry = cp2x * sin + cp2y * cos;
+                    result.controlPoint2 = {
+                      x: Math.max(0, Math.min(imageWidth, cp2rx + dx)),
+                      y: Math.max(0, Math.min(imageHeight, cp2ry + dy)),
+                    };
+                  }
+                }
 
-                  return result;
-                });
+                return result;
+              });
 
-                // Update the points
-                item.updatePointsFromKonvaVector(transformedVertices);
-              }
+              // Update the points
+              item.updatePointsFromKonvaVector(transformedVertices);
             }
           }}
           onPointsChange={(points) => {
