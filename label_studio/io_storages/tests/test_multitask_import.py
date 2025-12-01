@@ -423,3 +423,15 @@ def test_list_jsonl_with_datetimes(storage):
     assert list(output) == expected_output
 
     create_tasks(storage, list(output))
+
+
+def test_allow_skip_false_is_saved(storage):
+    project, s3_storage = storage
+    task_data = {
+        'data': {'text': 'Task with disallowed skip'},
+        'allow_skip': False,
+    }
+    params = StorageObject(key='test.json', task_data=task_data)
+    # Create one task via cloud import pathway
+    task = S3ImportStorage.add_task(project, 1, 1, s3_storage, params, S3ImportStorageLink)
+    assert task.allow_skip is False
