@@ -133,14 +133,14 @@ body {
     &:checked {
       &~span:last-of-type {
         background-color: var(--color-primary-background) !important;
-        color: var(--color-neutral-on-dark-content) !important;
+        color: var(--color-primary-content) !important;
       }
     }
 
     &:not(:checked) {
       &~span:first-of-type {
         background-color: var(--color-primary-background) !important;
-        color: var(--color-neutral-on-dark-content) !important;
+        color: var(--color-primary-content) !important;
       }
     }
   }
