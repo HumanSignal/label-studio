@@ -103,7 +103,7 @@ export const getLabelCounts = (labels: string[], labelColors: Record<string, Lab
     background: convertToRGBA(defaultLabelColor, 0.3),
     border: defaultLabelColor,
     count: 0,
-  }
+  };
 
   for (const label of labels) {
     let data = labelCounts[label];
