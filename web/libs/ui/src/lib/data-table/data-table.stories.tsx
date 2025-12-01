@@ -171,17 +171,23 @@ export const WithSelection: Story = {
 export const WithRowClick: Story = {
   render: () => {
     const [clickedUser, setClickedUser] = useState<User | null>(null);
+    const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+    const selectedCount = Object.keys(rowSelection).length;
 
     return (
       <div className="flex flex-col gap-4">
-        <div className="p-4 bg-neutral-surface rounded-md">
+        <div className="p-4 bg-neutral-surface rounded-md flex justify-between items-center">
           <p className="text-sm text-neutral-content-subtle">
             {clickedUser ? `Last clicked: ${clickedUser.name}` : "Click on a row"}
           </p>
+          <p className="text-sm text-neutral-content-subtle">Selected: {selectedCount}</p>
         </div>
         <DataTable
           data={sampleData}
           columns={baseColumns}
+          selectable
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
           onRowClick={(row) => setClickedUser(row ? row.original : null)}
         />
       </div>
