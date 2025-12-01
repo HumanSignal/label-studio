@@ -19,6 +19,7 @@ concurrency:
 
 env:
   POETRY_VERSION: 2.1.4
+  SLACK_CHANNEL_ID: "C02LMULF4NA"
 
 jobs:
   sync:
@@ -46,21 +47,6 @@ jobs:
           repository: HumanSignal/actions-hub
           path: ./.github/actions-hub
 
-      - name: Team details
-        id: team_details
-        uses: ./.github/actions-hub/actions/team-details
-        with:
-          jira-server: "${{ vars.JIRA_SERVER }}"
-          jira-username: "${{ secrets.JIRA_USERNAME }}"
-          jira-token: "${{ secrets.JIRA_TOKEN }}"
-          github_token: "${{ secrets.GIT_PAT }}"
-        continue-on-error: true
-
-      - name: Git Configure
-        uses: ./.github/actions-hub/actions/git-configure
-        with:
-          username: "${{ steps.team_details.outputs.github-username }}"
-
       - name: Get Upstream PRs
         uses: ./.github/actions-hub/actions/follow-merge-upstream-prs
         id: upstream-prs
@@ -69,6 +55,22 @@ jobs:
           poetry_repositories: "label-studio-sdk"
           infra_repositories: ""
           github_token: "${{ secrets.GIT_PAT }}"
+
+      - name: Team details
+        id: team_details
+        uses: ./.github/actions-hub/actions/team-details
+        with:
+          jira-server: "${{ vars.JIRA_SERVER }}"
+          jira-username: "${{ secrets.JIRA_USERNAME }}"
+          jira-token: "${{ secrets.JIRA_TOKEN }}"
+          github_token: "${{ secrets.GIT_PAT }}"
+          github-username: "${{ steps.upstream-prs.outputs.author_username }}"
+        continue-on-error: true
+
+      - name: Git Configure
+        uses: ./.github/actions-hub/actions/git-configure
+        with:
+          username: "${{ steps.team_details.outputs.github-username }}"
 
       - name: Find or Create branch
         uses: ./.github/actions-hub/actions/github-find-or-create-branch
@@ -235,16 +237,21 @@ jobs:
               }
             }'
 
-  #      - name: Notify on failure
-  #        uses: ./.github/actions-hub/actions/github-create-comment
-  #        if: failure()
-  #        with:
-  #          github_token: ${{ secrets.GIT_PAT }}
-  #          repository: "${{ steps.fm.outputs.repo_name }}"
-  #          issue_number: "${{ steps.fm.outputs.pr_number }}"
-  #          body: |
-  #            Follow Merge downstream workflow has been failed.
-  #            > [Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+      - name: Send Slack Notification on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v2.1.1
+        env:
+          MENTION: "<@${{ steps.team_details.outputs.slack-user-id }}>"
+          WORKFLOW: "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow>"
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_LSE_BOT_TOKEN }}
+          payload: |
+            channel: "${{ env.SLACK_CHANNEL_ID }}"
+            text: >+
+              :x: Follow Merge downstream workflow has been failed in <https://github.com/${{ github.repository }}|${{ github.repository }}>.
+              [ ${{ env.WORKFLOW }} ]
+              ${{ steps.team_details.outputs.slack-user-id && env.MENTION || '' }}
 
       - name: Add reaction to chat ops command comment
         if: always() && github.event.client_payload.github.payload.comment.id && github.event.client_payload.github.payload.repository.full_name
