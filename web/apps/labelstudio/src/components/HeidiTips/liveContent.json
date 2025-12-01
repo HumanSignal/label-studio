@@ -200,6 +200,18 @@
   ],
   "authPage": [
     {
+      "title": "Live Event Dec 10th",
+      "description": "Join the Label Studio product team for a fast-paced tour of this year's biggest releases",
+      "link": {
+        "label": "December 10, 2025 9am PST",
+        "url": "https://humansignal.com/webinars/label-studio-wrapped-2025/",
+        "params": {
+          "experiment": "login_revamp",
+          "treatment": "wrapped_webinar_2025_live"
+        }
+      }
+    },
+    {
       "title": "Auto-labeling with Prompts",
       "description": "Use LLMs to instantly pre-label thousands of tasks with accurate predictions.",
       "link": {
