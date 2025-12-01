@@ -209,8 +209,8 @@
           "experiment": "login_revamp",
           "treatment": "wrapped_webinar_2025_live"
         }
-      }    
-    },      
+      }
+    },
     {
       "title": "Auto-labeling with Prompts",
       "description": "Use LLMs to instantly pre-label thousands of tasks with accurate predictions.",
