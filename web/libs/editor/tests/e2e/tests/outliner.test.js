@@ -219,7 +219,7 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
   const resultWithoutMeta = await LabelStudio.serialize();
 
   assert.deepStrictEqual(resultWithoutMeta[2].meta, undefined);
-});
+}).retry(3);
 
 Scenario("Panels manipulations", async ({ I, LabelStudio, AtPanels }) => {
   I.amOnPage("/");

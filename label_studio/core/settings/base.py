@@ -69,12 +69,20 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'ERROR',
         },
+        'faker': {
+            'level': 'WARNING',
+            'propagate': False,
+        },
     },
 }
 
 # for printing messages before main logging config applied
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+
+# Suppress verbose Faker locale messages early, before Faker is imported
+logging.getLogger('faker').setLevel(logging.WARNING)
+logging.getLogger('faker.providers').setLevel(logging.WARNING)
 
 from label_studio.core.utils.io import get_data_dir
 from label_studio.core.utils.params import get_bool_env, get_env
@@ -405,6 +413,7 @@ SPECTACULAR_SETTINGS = {
     ],
     'CONTACT': {'url': 'https://labelstud.io'},
     'X_LOGO': {'url': '../../static/icons/logo-black.svg'},
+    'ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE': False,
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
@@ -596,6 +605,22 @@ SHOW_TRACEBACK_FOR_EXPORT_CONVERTER = get_bool_env('SHOW_TRACEBACK_FOR_EXPORT_CO
 EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', False)
 USE_ENFORCE_CSRF_CHECKS = get_bool_env('USE_ENFORCE_CSRF_CHECKS', True)  # False is for tests
 CLOUD_FILE_STORAGE_ENABLED = False
+
+if (
+    VERSION_EDITION == 'Community'
+    and 'LOCAL_FILES_DOCUMENT_ROOT' not in os.environ
+    and 'LOCAL_FILES_SERVING_ENABLED' not in os.environ
+):
+    from label_studio.io_storages.localfiles.functions import autodetect_local_files_root
+
+    _autodetected_root = autodetect_local_files_root()
+    if _autodetected_root:
+        LOCAL_FILES_DOCUMENT_ROOT = _autodetected_root
+        LOCAL_FILES_SERVING_ENABLED = True
+        logger.info(
+            'LOCAL_FILES_DOCUMENT_ROOT auto-configured to %s and LOCAL_FILES_SERVING_ENABLED set to true.',
+            LOCAL_FILES_DOCUMENT_ROOT,
+        )
 
 IO_STORAGES_IMPORT_LINK_NAMES = [
     'io_storages_s3importstoragelink',

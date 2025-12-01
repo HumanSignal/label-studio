@@ -248,7 +248,7 @@ export const stateRegistry = new StateRegistry();
 stateRegistry.registerBatch({
   CREATED: {
     type: StateType.INITIAL,
-    label: "Created",
+    label: "Initial",
     tooltips: {
       task: "Task has been created and is ready for annotation",
       annotation: "Annotation has been created",

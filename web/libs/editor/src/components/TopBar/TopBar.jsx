@@ -61,7 +61,7 @@ export const TopBar = observer(({ store }) => {
                 event.preventDefault();
                 const created = store.annotationStore.createAnnotation();
 
-                store.annotationStore.selectAnnotation(created.id);
+                store.annotationStore.selectAnnotation(created.id, { exitViewAll: true });
               }}
             >
               <IconPlus />

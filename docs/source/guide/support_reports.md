@@ -36,7 +36,7 @@ These reports bundle together anonymized operational metrics and environment det
 Once completed, you can use the action icons to:
 
 * Download the ZIP directly and inspect its contents
-* Trigger delivery via email or HTTPS 
+* Trigger delivery via email
 
 ![Screenshot of support reports page](/images/admin/support-report-generate.png)
 
