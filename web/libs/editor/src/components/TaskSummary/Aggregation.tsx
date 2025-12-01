@@ -50,7 +50,7 @@ export const AggregationCell = ({
             colors={{
               background: data.background,
               border: data.border,
-              color: data.color || data.border,
+              color: data.color,
             }}
             className="mr-tighter mb-tighter"
             thickBorder
