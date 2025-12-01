@@ -37,9 +37,12 @@ module.exports = {
    *
    * {{ react }}
    */
-  grabStickTime() {
+  async grabStickTime() {
     // xPath cannot find `text` tag so we exchange it with `*`
-    return I.grabTextFrom(locate(this._channelStickSelector).find("*").at(2));
+    const rawValue = await I.grabTextFrom(locate(this._channelStickSelector).find("*").at(2));
+    const numericPart = rawValue.match(/-?\d+(?:\.\d+)?/);
+
+    return numericPart ? Number(numericPart[0]) : Number(rawValue);
   },
 
   /**
