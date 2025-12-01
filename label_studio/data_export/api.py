@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
+from django.db.models import Prefetch
 from django.http import FileResponse, HttpResponse
 from django.utils.decorators import method_decorator
 from drf_spectacular.types import OpenApiTypes
@@ -166,7 +167,34 @@ class ExportAPI(generics.RetrieveAPIView):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
     def get_task_queryset(self, queryset):
-        return queryset.select_related('project').prefetch_related('annotations', 'predictions')
+        # Import here to avoid circular dependencies
+        from core.feature_flags import flag_set
+        from tasks.models import Annotation
+
+        # Create a prefetch for annotations with FSM state
+        annotations_qs = Annotation.objects.all()
+
+        # Only annotate FSM state if both feature flags are enabled
+        user = getattr(self.request, 'user', None)
+        if (
+            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
+            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
+            and hasattr(annotations_qs, 'with_state')
+        ):
+            annotations_qs = annotations_qs.with_state()
+
+        qs = queryset.select_related('project').prefetch_related(
+            Prefetch('annotations', queryset=annotations_qs), 'predictions'
+        )
+
+        # Add FSM state annotation to tasks as well to avoid N+1 queries during export
+        if (
+            flag_set('fflag_feat_fit_568_finite_state_management', user=user)
+            and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
+            and hasattr(qs, 'with_state')
+        ):
+            qs = qs.with_state()
+        return qs
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
