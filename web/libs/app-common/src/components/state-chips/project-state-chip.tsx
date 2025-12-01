@@ -32,7 +32,12 @@ export function ProjectStateChip({ state, projectId, interactive = true }: Proje
   const colorClasses = getStateColorClass(state);
 
   const popoverContent = projectId ? (
-    <StateHistoryPopoverContent entityType="project" entityId={projectId} isOpen={open} />
+    <StateHistoryPopoverContent
+      entityType="project"
+      entityId={projectId}
+      isOpen={open}
+      onClose={() => setOpen(false)}
+    />
   ) : undefined;
 
   return (

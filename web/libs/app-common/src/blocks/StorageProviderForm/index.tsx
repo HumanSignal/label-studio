@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useCallback, useEffect, useState } from "react";
 import { useModalControls } from "@humansignal/ui/lib/modal";
 import { Stepper, ProviderSelectionStep, ProviderDetailsStep, PreviewStep, ReviewStep } from "./Steps";
 import { FormHeader } from "./components/form-header";
@@ -88,6 +88,7 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
       formState,
       setFormState,
       errors,
+      setErrors,
       validateEntireForm,
       handleProviderFieldChange,
       handleFieldBlur,
@@ -153,6 +154,20 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
       }
     }, [onHide, resetForm]);
 
+    // Sync backend validation_errors to current form errors so inputs show the exact API message
+    // instead of surfacing a global modal. The API hook normalizes DRF's shape into
+    // { fieldName: "message" }, which we merge into our stateful error map.
+    const handleServerValidationErrors = useCallback(
+      (serverErrors: Record<string, string>) => {
+        if (!serverErrors || Object.keys(serverErrors).length === 0) return;
+        setErrors((prev) => ({
+          ...prev,
+          ...serverErrors,
+        }));
+      },
+      [setErrors],
+    );
+
     // Initialize API hooks
     const { testConnectionMutation, createStorageMutation, saveStorageMutation, loadFilesPreviewMutation, action } =
       useStorageApi({
@@ -160,6 +175,7 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
         storage,
         project,
         onSubmit,
+        onValidationError: handleServerValidationErrors,
         onClose: () => {
           resetForm();
           setFilesPreview(null);
@@ -228,6 +244,8 @@ export const StorageProviderForm = forwardRef<unknown, StorageProviderFormProps>
         onSuccess: (response) => {
           if (response?.files) {
             setFilesPreview(response.files);
+          } else {
+            setFilesPreview(null);
           }
         },
         onError: () => {

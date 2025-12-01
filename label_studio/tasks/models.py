@@ -571,10 +571,6 @@ class AnnotationQuerySet(models.QuerySet):
 
 
 class AnnotationQuerySetWithFSM(FSMStateQuerySetMixin, AnnotationQuerySet):
-    """
-    Custom QuerySet for Annotation model with FSM state annotation support.
-    """
-
     pass
 
 
@@ -599,7 +595,7 @@ class AnnotationManager(models.Manager):
 
     def with_state(self):
         """Return queryset with FSM state annotated."""
-        return self.get_queryset().annotate_fsm_state()
+        return self.get_queryset().with_state()
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -846,20 +842,20 @@ class TaskLockQuerySet(models.QuerySet):
     pass
 
 
+class TaskLockQuerySetWithFSM(FSMStateQuerySetMixin, TaskLockQuerySet):
+    pass
+
+
 class TaskLockManager(models.Manager):
     """Manager for TaskLock with FSM state support"""
 
     def get_queryset(self):
         """Return QuerySet with FSM state annotation support"""
-        # Create a dynamic class that mixes FSM support into the queryset
-        class TaskLockQuerySetWithFSM(FSMStateQuerySetMixin, TaskLockQuerySet):
-            pass
-
         return TaskLockQuerySetWithFSM(self.model, using=self._db)
 
     def with_state(self):
         """Return queryset with FSM state annotated."""
-        return self.get_queryset().annotate_fsm_state()
+        return self.get_queryset().with_state()
 
 
 class TaskLock(FsmHistoryStateModel):
@@ -890,20 +886,20 @@ class AnnotationDraftQuerySet(models.QuerySet):
     pass
 
 
+class AnnotationDraftQuerySetWithFSM(FSMStateQuerySetMixin, AnnotationDraftQuerySet):
+    pass
+
+
 class AnnotationDraftManager(models.Manager):
     """Manager for AnnotationDraft with FSM state support"""
 
     def get_queryset(self):
         """Return QuerySet with FSM state annotation support"""
-        # Create a dynamic class that mixes FSM support into the queryset
-        class AnnotationDraftQuerySetWithFSM(FSMStateQuerySetMixin, AnnotationDraftQuerySet):
-            pass
-
         return AnnotationDraftQuerySetWithFSM(self.model, using=self._db)
 
     def with_state(self):
         """Return queryset with FSM state annotated."""
-        return self.get_queryset().annotate_fsm_state()
+        return self.get_queryset().with_state()
 
 
 class AnnotationDraft(FsmHistoryStateModel):
