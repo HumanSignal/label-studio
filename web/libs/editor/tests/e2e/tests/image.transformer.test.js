@@ -72,7 +72,7 @@ const shapes = {
   },
   Polygon: {
     drawAction: "drawByClickingPoints",
-    hasTransformer: true,
+    hasTransformer: false,
     hasRotator: false,
     hasMoveToolTransformer: true,
     hasMultiSelectionTransformer: true,
