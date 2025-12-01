@@ -32,7 +32,7 @@ export function TaskStateChip({ state, taskId, interactive = true }: TaskStateCh
   const colorClasses = getStateColorClass(state);
 
   const popoverContent = taskId ? (
-    <StateHistoryPopoverContent entityType="task" entityId={taskId} isOpen={open} />
+    <StateHistoryPopoverContent entityType="task" entityId={taskId} isOpen={open} onClose={() => setOpen(false)} />
   ) : undefined;
 
   return (

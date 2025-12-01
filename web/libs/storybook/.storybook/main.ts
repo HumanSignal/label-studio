@@ -3,6 +3,8 @@ import type { StorybookConfig } from "@storybook/react-webpack5";
 const config: StorybookConfig = {
   stories: ["../../../libs/**/*.@(mdx|stories.@(js|jsx|ts|tsx))", "../../../apps/**/*.@(mdx|stories.@(js|jsx|ts|tsx))"],
 
+  staticDirs: ["../public"],
+
   addons: ["@nx/react/plugins/storybook", "@storybook/addon-docs", "../addons/theme-toggle/register"],
 
   webpackFinal(config) {
@@ -41,7 +43,9 @@ const config: StorybookConfig = {
           if (cssLoader && cssLoader.options) {
             cssLoader.options.modules = {
               localIdentName: `${css_prefix}[local]`,
-              getLocalIdent(_ctx: any, _ident: any, className: string) {
+              getLocalIdent(ctx: any, _ident: any, className: string) {
+                // Skip prefixing for Storybook preview styles (targets Storybook DOM classes)
+                if (ctx.resourcePath?.includes("preview.scss")) return className;
                 if (className.includes("ant")) return className;
               },
             };

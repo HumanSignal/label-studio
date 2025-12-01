@@ -19,7 +19,7 @@ const LabelsRenderer: RendererType = (results, control) => {
   const labelCounts = getLabelCounts(labels, control.label_attrs);
 
   return (
-    <span className="flex gap-1.5 flex-wrap">
+    <span className="flex gap-tighter flex-wrap">
       {Object.entries(labelCounts)
         .filter(([_, data]) => data.count > 0)
         .map(([label, data]) => {
@@ -66,7 +66,7 @@ export const renderers: Record<string, RendererType> = {
     if (!choices.length) return null;
 
     return (
-      <span className="flex gap-1.5 flex-wrap">
+      <span className="flex gap-tighter flex-wrap">
         {unique.map((choice) => (
           <Chip
             key={choice}
@@ -88,7 +88,7 @@ export const renderers: Record<string, RendererType> = {
     const values: string[] = resultValue(results[0]).map((item: string[]) => item.join(" / "));
 
     return (
-      <span className="flex gap-1.5 flex-wrap">
+      <span className="flex gap-tighter flex-wrap">
         {values.map((value) => (
           <Chip key={value}>{value}</Chip>
         ))}
@@ -125,7 +125,7 @@ export const renderers: Record<string, RendererType> = {
           return (
             <div key={bucket} className="text-sm">
               <span className="font-semibold">{bucket}</span>:{" "}
-              <span className="inline-flex gap-1.5 flex-wrap">
+              <span className="inline-flex gap-tighter flex-wrap">
                 {items.map((item) => (
                   <Chip key={item}>{item}</Chip>
                 ))}
