@@ -135,7 +135,7 @@ export const AnnotationButton = observer(
           const c = annotationStore.addAnnotationFromPrediction(entity);
 
           window.setTimeout(() => {
-            annotationStore.selectAnnotation(c.id);
+            annotationStore.selectAnnotation(c.id, { exitViewAll: true });
             clickHandler();
           });
         }, [entity]);

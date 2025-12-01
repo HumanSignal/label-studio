@@ -413,6 +413,7 @@ SPECTACULAR_SETTINGS = {
     ],
     'CONTACT': {'url': 'https://labelstud.io'},
     'X_LOGO': {'url': '../../static/icons/logo-black.svg'},
+    'ENUM_ADD_EXPLICIT_BLANK_NULL_CHOICE': False,
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)

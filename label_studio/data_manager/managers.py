@@ -32,6 +32,7 @@ from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Coalesce, Concat
 from fsm.queryset_mixins import FSMStateQuerySetMixin
 from pydantic import BaseModel
+from rest_framework.exceptions import ValidationError
 
 from label_studio.core.utils.common import load_func
 from label_studio.core.utils.params import cast_bool_from_str
@@ -382,7 +383,7 @@ def apply_filters(queryset, filters, project, request):
                 value_type = type(queryset.values_list(field_name, flat=True)[0]).__name__
 
             if (value_type == 'list' or value_type == 'tuple') and 'equal' in _filter.operator:
-                raise Exception('Not supported filter type')
+                raise ValidationError('Not supported filter type')
 
             # special case: for strings empty is "" or null=True
             if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':

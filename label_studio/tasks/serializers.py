@@ -12,6 +12,8 @@ from django.conf import settings
 from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema_field
 from fsm.serializer_fields import FSMStateField
+from fsm.state_manager import get_state_manager
+from fsm.utils import is_fsm_enabled
 from label_studio_sdk.label_interface import LabelInterface
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -689,7 +691,25 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
         logging.info(f'Tasks serialization success, len = {len(self.db_tasks)}')
 
+        # Backfill FSM states for bulk-created tasks
+        # bulk_create() bypasses save() so FSM transitions don't fire automatically
+        self._backfill_fsm_states(self.db_tasks)
+
         return db_tasks
+
+    def _backfill_fsm_states(self, tasks):
+        """
+        Backfill FSM states for tasks created via bulk_create().
+
+        bulk_create() bypasses the model's save() method, so FSM transitions
+        don't fire automatically. This sets initial CREATED state for newly imported tasks.
+        """
+        if not tasks or not is_fsm_enabled(user=None):
+            return
+
+        StateManager = get_state_manager()
+        for task in tasks:
+            StateManager.execute_transition(entity=task, transition_name='task_created', user=None)
 
     @staticmethod
     def post_process_annotations(user, db_annotations, action):
