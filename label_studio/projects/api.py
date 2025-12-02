@@ -193,7 +193,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
                 'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
         ):
-            projects = projects.annotate_fsm_state()
+            projects = projects.with_state()
 
         return projects.prefetch_related('members', 'created_by')
 
@@ -258,7 +258,7 @@ class ProjectCountsListAPI(generics.ListAPIView):
         if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
                 'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
         ):
-            projects = projects.annotate_fsm_state()
+            projects = projects.with_state()
 
         return projects
 
@@ -392,7 +392,7 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
         if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
                 'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
         ):
-            projects = projects.annotate_fsm_state()
+            projects = projects.with_state()
 
         return projects
 

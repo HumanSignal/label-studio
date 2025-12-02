@@ -10,7 +10,7 @@ Usage:
 
     class TaskManager(models.Manager):
         def get_queryset(self):
-            return TaskQuerySet(self.model, using=self._db).annotate_fsm_state()
+            return TaskQuerySet(self.model, using=self._db)
 
 Note:
     State annotation is guarded by 'fflag_feat_fit_568_finite_state_management' only.
@@ -37,7 +37,7 @@ class FSMStateQuerySetMixin:
     """
     Mixin for Django QuerySets to efficiently annotate FSM state.
 
-    Provides the `annotate_fsm_state()` method that adds a `current_state`
+    Provides the `with_state()` method that adds a `current_state`
     annotation to the queryset using an optimized subquery.
 
     This approach:
@@ -53,24 +53,37 @@ class FSMStateQuerySetMixin:
                 return TaskQuerySet(self.model, using=self._db)
 
             def with_state(self):
-                return self.get_queryset().annotate_fsm_state()
+                return self.get_queryset().with_state()
 
-        # Usage
+        # Usage - both approaches work identically
         tasks = Task.objects.with_state().filter(project=project)
+        # Or chain it after filters
+        tasks = Task.objects.filter(project=project).with_state()
+
         for task in tasks:
             print(f"Task {task.id}: {task.current_state}")  # No additional queries!
     """
 
-    def annotate_fsm_state(self):
+    def with_state(self):
         """
         Annotate the queryset with the current FSM state.
 
         Adds a `current_state` field to each object containing the current
         state string value. This is done using an efficient subquery that
-        leverages UUID7 natural ordering.
+        leverages UUID7 natural ordering to prevent N+1 queries.
 
         Returns:
             QuerySet: The annotated queryset with `current_state` field
+
+        Example:
+            # Chain after filters
+            tasks = Task.objects.filter(project=project).with_state()
+
+            # Or use from manager
+            tasks = Task.objects.with_state().filter(project=project)
+
+            # Multiple chaining
+            tasks = Task.objects.filter(is_labeled=True).with_state().order_by('-created_at')
 
         Note:
             - If FSM feature flag is disabled, returns queryset unchanged (zero impact)
