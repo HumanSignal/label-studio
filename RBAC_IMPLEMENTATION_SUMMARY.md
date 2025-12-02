@@ -1,17 +1,20 @@
 # Role-Based Access Control Implementation Summary
 
 ## Overview
+
 Successfully implemented a simple role-based access control system for Label Studio Community Edition with two roles: Admin and Annotator.
 
 ## Implementation Details
 
 ### 1. Database Changes
+
 - Added `role` field to User model (`users.models.User`)
 - Field type: `CharField(max_length=32)` with choices `[('admin', 'Admin'), ('annotator', 'Annotator')]`
 - Default value: `'annotator'`
 - Migration: `users.0012_user_role.py`
 
 ### 2. API Changes
+
 - Added `role` field to user serializers (`BaseUserSerializer`)
 - Role is now included in API responses:
   - `/api/current-user/whoami` - Returns user's role
@@ -19,12 +22,16 @@ Successfully implemented a simple role-based access control system for Label Stu
 - `PATCH /api/users/{id}/` now enforces admin-only role changes and prevents demoting the last remaining admin in an organization.
 
 ### 3. Permission System
+
 Created two decorators for access control:
+
 - `admin_only`: For regular view functions and class-based view methods
 - `admin_only_method`: Specifically for ViewSet methods
 
 Protected endpoints:
+
 - **Project Management** (admin only):
+
   - `POST /api/projects/` - Create project
   - `DELETE /api/projects/{id}/` - Delete project
   - `PATCH /api/projects/{id}/` - Update project configuration
@@ -34,12 +41,15 @@ Protected endpoints:
   - `DELETE /api/users/{id}/` - Delete user
 
 ### 4. Management Command
+
 Created Django management command: `assign_role`
+
 ```bash
 python manage.py assign_role --email user@example.com --role admin
 ```
 
 ### 5. Testing
+
 - Created 13 comprehensive tests in `users/tests/test_role_permissions.py`
 - All tests pass successfully
 - Tests cover:
@@ -51,10 +61,12 @@ python manage.py assign_role --email user@example.com --role admin
   - API response includes role
 
 ### 6. Frontend Enhancements
+
 - Organization → People list now surfaces each member's role.
 - The member detail panel includes **Make Admin** / **Set as Annotator** actions for admins, wired to the updated API safeguards.
 
 ### 7. Documentation
+
 - Created `RBAC_GUIDE.md` with comprehensive documentation
 - Includes:
   - Role descriptions
@@ -65,12 +77,14 @@ python manage.py assign_role --email user@example.com --role admin
   - Extension guidelines
 
 ### 8. Test Infrastructure Updates
+
 - Updated `OrganizationFactory` to set organization creators as admins
 - Ensures existing tests work correctly with new permission system
 
 ## Files Modified/Created
 
 ### Created Files:
+
 1. `label_studio/users/migrations/0012_user_role.py` - Database migration
 2. `label_studio/users/role_permissions.py` - Permission decorators
 3. `label_studio/users/management/commands/assign_role.py` - Management command
@@ -81,6 +95,7 @@ python manage.py assign_role --email user@example.com --role admin
 8. `verify_rbac.py` - Verification script
 
 ### Modified Files:
+
 1. `label_studio/users/models.py` - Added role field
 2. `label_studio/users/serializers.py` - Added role to serializer
 3. `label_studio/users/api.py` - Protected user endpoints
@@ -88,6 +103,7 @@ python manage.py assign_role --email user@example.com --role admin
 5. `label_studio/organizations/tests/factories.py` - Set admin role for creators
 
 ## Test Results
+
 ```
 All tests passing:
 - 13 role permission tests ✓
@@ -99,11 +115,13 @@ Total: 57 tests passing
 ## Migration Path
 
 ### For Fresh Installations:
+
 1. Run migrations: `python manage.py migrate`
 2. First user created will have 'annotator' role by default
 3. Assign admin role: `python manage.py assign_role --email admin@example.com --role admin`
 
 ### For Existing Installations:
+
 1. Run migrations: `python manage.py migrate`
 2. All existing users will have 'annotator' role by default
 3. Manually assign admin role to appropriate users:
@@ -115,6 +133,7 @@ Total: 57 tests passing
 ## Usage Examples
 
 ### Assigning Roles:
+
 ```bash
 # Via management command
 python manage.py assign_role --email user@example.com --role admin
@@ -127,6 +146,7 @@ user.save()
 ```
 
 ### API Usage:
+
 ```bash
 # Check current user's role
 curl -X GET http://localhost:8080/api/current-user/whoami \
@@ -165,6 +185,7 @@ curl -X POST http://localhost:8080/api/projects/ \
 ## Future Enhancements
 
 Potential areas for extension:
+
 1. Additional roles (e.g., Reviewer, Manager)
 2. Fine-grained permissions per resource
 3. Role-based UI hiding/showing
@@ -175,6 +196,7 @@ Potential areas for extension:
 ## Support
 
 For issues or questions:
+
 1. Check `RBAC_GUIDE.md` for detailed documentation
 2. Review test cases in `users/tests/test_role_permissions.py` for examples
 3. Run `verify_rbac.py` to verify installation
@@ -182,6 +204,7 @@ For issues or questions:
 ## Conclusion
 
 The implementation provides a solid foundation for role-based access control in Label Studio CE:
+
 - ✓ Simple to use
 - ✓ Well-tested
 - ✓ Fully documented

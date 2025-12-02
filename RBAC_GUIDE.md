@@ -5,13 +5,16 @@ This document describes the role-based access control system implemented in Labe
 ## Overview
 
 Label Studio CE now supports two user roles:
+
 - **Admin**: Full access to create/manage projects, configure label configs, and manage users
 - **Annotator**: Limited access to assigned projects for labeling tasks only (no configuration or deletion)
 
 ## User Roles
 
 ### Admin Role
+
 Admins have full permissions including:
+
 - Create new projects
 - Delete projects
 - Modify project configurations (including label configs)
@@ -21,13 +24,16 @@ Admins have full permissions including:
 - All annotator permissions
 
 ### Annotator Role
+
 Annotators have limited permissions:
+
 - View assigned projects
 - Perform labeling/annotation tasks
 - Submit annotations
 - View their own profile
 
 Annotators **cannot**:
+
 - Create or delete projects
 - Modify project configurations
 - Create or delete users
@@ -61,10 +67,12 @@ python manage.py assign_role --email user@example.com --role admin
 ```
 
 Options:
+
 - `--email`: Email address of the user (required)
 - `--role`: Role to assign (`admin` or `annotator`, required)
 
 Example:
+
 ```bash
 # Assign admin role to a user
 python manage.py assign_role --email admin@example.com --role admin
@@ -99,7 +107,9 @@ user.save()
 The user's role is included in API responses:
 
 #### `/api/current-user/whoami`
+
 Returns the current user's information including their role:
+
 ```json
 {
   "id": 1,
@@ -111,7 +121,9 @@ Returns the current user's information including their role:
 ```
 
 #### `/api/users/` (User List/Detail)
+
 The role field is included in user objects:
+
 ```json
 {
   "id": 1,
@@ -126,15 +138,18 @@ The role field is included in user objects:
 The following endpoints are restricted to admin users only:
 
 #### Project Management
+
 - `POST /api/projects/` - Create new project (admin only)
 - `DELETE /api/projects/{id}/` - Delete project (admin only)
 - `PATCH /api/projects/{id}/` - Update project configuration (admin only)
 
 #### User Management
+
 - `POST /api/users/` - Create new user (admin only)
 - `DELETE /api/users/{id}/` - Delete user (admin only)
 
 When an annotator tries to access an admin-only endpoint, they will receive a `403 Forbidden` response:
+
 ```json
 {
   "detail": "Permission denied. Admin role required."
@@ -150,6 +165,7 @@ ALTER TABLE htx_user ADD COLUMN role VARCHAR(32) DEFAULT 'annotator';
 ```
 
 Valid values:
+
 - `'admin'`
 - `'annotator'`
 
@@ -170,6 +186,7 @@ python manage.py assign_role --email your-admin@example.com --role admin
 To test the role-based access control:
 
 1. Create two users with different roles:
+
 ```bash
 # Create users via Django shell
 python manage.py shell
@@ -183,6 +200,7 @@ python manage.py shell
 ```
 
 2. Test API access:
+
 ```bash
 # Get admin token
 curl -X POST http://localhost:8080/api/auth/login/ \
@@ -212,6 +230,7 @@ curl -X POST http://localhost:8080/api/projects/ \
 The current implementation uses a simple CharField with choices. To add more roles or modify permissions:
 
 1. Update the choices in `users/models.py`:
+
 ```python
 role = models.CharField(
     _('role'),
@@ -227,6 +246,7 @@ role = models.CharField(
 ```
 
 2. Create a new migration:
+
 ```bash
 python manage.py makemigrations
 python manage.py migrate
@@ -248,13 +268,17 @@ python manage.py migrate
 ## Troubleshooting
 
 ### All users show as annotators
+
 After migration, existing users default to `annotator` role. Manually assign admin role:
+
 ```bash
 python manage.py assign_role --email your-admin@example.com --role admin
 ```
 
 ### Getting 403 Forbidden errors
+
 Check the user's role:
+
 ```bash
 python manage.py shell
 >>> from users.models import User
@@ -263,13 +287,16 @@ python manage.py shell
 ```
 
 If the role is incorrect, update it:
+
 ```python
 >>> user.role = 'admin'
 >>> user.save()
 ```
 
 ### Role not showing in API responses
+
 Ensure you've:
+
 1. Run migrations: `python manage.py migrate`
 2. Restarted the server
 3. The serializer includes the `role` field
