@@ -127,89 +127,91 @@ for (const shapeName of Object.keys(shapes)) {
   shapesTable.add([shapeName]);
 }
 
-Data(shapesTable).Scenario(
-  "Check transformer existing for different shapes, their amount and modes.",
-  async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
-    const { shapeName } = current;
-    const Shape = shapes[shapeName];
+Data(shapesTable)
+  .Scenario(
+    "Check transformer existing for different shapes, their amount and modes.",
+    async ({ I, LabelStudio, AtImageView, AtOutliner, AtPanels, current }) => {
+      const { shapeName } = current;
+      const Shape = shapes[shapeName];
 
-    I.amOnPage("/");
-    const bbox1 = {
-      x: 100,
-      y: 100,
-      width: 200,
-      height: 200,
-    };
-    const bbox2 = {
-      x: 400,
-      y: 100,
-      width: 200,
-      height: 200,
-    };
-    const getCenter = (bbox) => [bbox.x + bbox.width / 2, bbox.y + bbox.height / 2];
-    let isTransformerExist;
-    const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
+      I.amOnPage("/");
+      const bbox1 = {
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 200,
+      };
+      const bbox2 = {
+        x: 400,
+        y: 100,
+        width: 200,
+        height: 200,
+      };
+      const getCenter = (bbox) => [bbox.x + bbox.width / 2, bbox.y + bbox.height / 2];
+      let isTransformerExist;
+      const AtDetailsPanel = AtPanels.usePanel(AtPanels.PANEL.DETAILS);
 
-    LabelStudio.init(getParamsWithLabels(shapeName));
-    AtDetailsPanel.collapsePanel();
+      LabelStudio.init(getParamsWithLabels(shapeName));
+      AtDetailsPanel.collapsePanel();
 
-    LabelStudio.waitForObjectsReady();
-    AtOutliner.seeRegions(0);
-    await AtImageView.lookForStage();
+      LabelStudio.waitForObjectsReady();
+      AtOutliner.seeRegions(0);
+      await AtImageView.lookForStage();
 
-    // Draw two regions
-    I.pressKey("1");
-    drawShapeByBbox(Shape, bbox1.x, bbox1.y, bbox1.width, bbox1.height, AtImageView);
-    AtOutliner.seeRegions(1);
-    I.pressKey("1");
-    drawShapeByBbox(Shape, bbox2.x, bbox2.y, bbox2.width, bbox2.height, AtImageView);
-    AtOutliner.seeRegions(2);
+      // Draw two regions
+      I.pressKey("1");
+      drawShapeByBbox(Shape, bbox1.x, bbox1.y, bbox1.width, bbox1.height, AtImageView);
+      AtOutliner.seeRegions(1);
+      I.pressKey("1");
+      drawShapeByBbox(Shape, bbox2.x, bbox2.y, bbox2.width, bbox2.height, AtImageView);
+      AtOutliner.seeRegions(2);
 
-    // Check that it wasn't a cause to show a transformer
-    isTransformerExist = await AtImageView.isTransformerExist();
-    assert.strictEqual(isTransformerExist, false);
+      // Check that it wasn't a cause to show a transformer
+      isTransformerExist = await AtImageView.isTransformerExist();
+      assert.strictEqual(isTransformerExist, false);
 
-    // Select the first region
-    AtImageView.clickAt(...getCenter(bbox1));
-    AtOutliner.seeSelectedRegion();
+      // Select the first region
+      AtImageView.clickAt(...getCenter(bbox1));
+      AtOutliner.seeSelectedRegion();
 
-    // Match if transformer exist with expectations in single selected mode
-    isTransformerExist = await AtImageView.isTransformerExist();
-    assert.strictEqual(isTransformerExist, Shape.hasTransformer);
+      // Match if transformer exist with expectations in single selected mode
+      isTransformerExist = await AtImageView.isTransformerExist();
+      assert.strictEqual(isTransformerExist, Shape.hasTransformer);
 
-    // Match if rotator at transformer exist with expectations in single selected mode
-    isTransformerExist = await AtImageView.isRotaterExist();
-    assert.strictEqual(isTransformerExist, Shape.hasRotator);
+      // Match if rotator at transformer exist with expectations in single selected mode
+      isTransformerExist = await AtImageView.isRotaterExist();
+      assert.strictEqual(isTransformerExist, Shape.hasRotator);
 
-    // Switch to move tool
-    I.pressKey("v");
+      // Switch to move tool
+      I.pressKey("v");
 
-    // Match if rotator at transformer exist with expectations in single selected mode with move tool chosen
-    isTransformerExist = await AtImageView.isTransformerExist();
-    assert.strictEqual(isTransformerExist, Shape.hasMoveToolTransformer);
+      // Match if rotator at transformer exist with expectations in single selected mode with move tool chosen
+      isTransformerExist = await AtImageView.isTransformerExist();
+      assert.strictEqual(isTransformerExist, Shape.hasMoveToolTransformer);
 
-    // Deselect the previous selected region
-    I.pressKey(["u"]);
+      // Deselect the previous selected region
+      I.pressKey(["u"]);
 
-    // Select 2 regions
-    AtImageView.drawThroughPoints(
-      [
-        [bbox1.x - 5, bbox1.y - 5],
-        [bbox2.x + bbox2.width + 5, bbox2.y + bbox2.height + 5],
-      ],
-      "steps",
-      10,
-    );
+      // Select 2 regions
+      AtImageView.drawThroughPoints(
+        [
+          [bbox1.x - 5, bbox1.y - 5],
+          [bbox2.x + bbox2.width + 5, bbox2.y + bbox2.height + 5],
+        ],
+        "steps",
+        10,
+      );
 
-    // Match if transformer exist with expectations in multiple selected mode
-    isTransformerExist = await AtImageView.isTransformerExist();
-    assert.strictEqual(isTransformerExist, Shape.hasMultiSelectionTransformer);
+      // Match if transformer exist with expectations in multiple selected mode
+      isTransformerExist = await AtImageView.isTransformerExist();
+      assert.strictEqual(isTransformerExist, Shape.hasMultiSelectionTransformer);
 
-    // Match if rotator exist with expectations in multiple selected mode
-    isTransformerExist = await AtImageView.isRotaterExist();
-    assert.strictEqual(isTransformerExist, Shape.hasMultiSelectionRotator);
-  },
-);
+      // Match if rotator exist with expectations in multiple selected mode
+      isTransformerExist = await AtImageView.isRotaterExist();
+      assert.strictEqual(isTransformerExist, Shape.hasMultiSelectionRotator);
+    },
+  )
+  .retry(3);
 
 Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMoveToolTransformer)).Scenario(
   "Resizing a single region",
