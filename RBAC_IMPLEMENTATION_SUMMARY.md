@@ -16,6 +16,7 @@ Successfully implemented a simple role-based access control system for Label Stu
 - Role is now included in API responses:
   - `/api/current-user/whoami` - Returns user's role
   - `/api/users/` - Includes role in user objects
+- `PATCH /api/users/{id}/` now enforces admin-only role changes and prevents demoting the last remaining admin in an organization.
 
 ### 3. Permission System
 Created two decorators for access control:
@@ -49,7 +50,11 @@ python manage.py assign_role --email user@example.com --role admin
   - Authentication requirements
   - API response includes role
 
-### 6. Documentation
+### 6. Frontend Enhancements
+- Organization → People list now surfaces each member's role.
+- The member detail panel includes **Make Admin** / **Set as Annotator** actions for admins, wired to the updated API safeguards.
+
+### 7. Documentation
 - Created `RBAC_GUIDE.md` with comprehensive documentation
 - Includes:
   - Role descriptions
@@ -59,7 +64,7 @@ python manage.py assign_role --email user@example.com --role admin
   - Troubleshooting
   - Extension guidelines
 
-### 7. Test Infrastructure Updates
+### 8. Test Infrastructure Updates
 - Updated `OrganizationFactory` to set organization creators as admins
 - Ensures existing tests work correctly with new permission system
 

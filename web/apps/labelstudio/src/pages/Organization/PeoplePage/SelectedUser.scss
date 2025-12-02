@@ -69,4 +69,29 @@
       background-color: var(--color-primary-emphasis-subtle);
     }
   }
+
+  &__role-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 500;
+    background: var(--color-neutral-emphasis-subtle);
+    text-transform: capitalize;
+
+    &_type_admin {
+      background: var(--color-primary-emphasis-subtle);
+      color: var(--color-primary-content);
+    }
+  }
+
+  &__role-actions {
+    margin-top: 12px;
+  }
+
+  &__role-warning {
+    margin-top: 8px;
+    color: var(--color-warning-content);
+    font-size: 0.875rem;
+  }
 }

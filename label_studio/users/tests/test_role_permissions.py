@@ -208,6 +208,35 @@ class RoleBasedAccessControlTestCase(TestCase):
         # Verify user still exists
         self.assertTrue(User.objects.filter(pk=user_to_delete.id).exists())
 
+    def test_admin_can_update_user_role(self):
+        """Admin should be able to promote another member to admin."""
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('user-detail', kwargs={'pk': self.annotator_user.id})
+        response = self.client.patch(url, data={'role': 'admin'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.annotator_user.refresh_from_db()
+        self.assertEqual(self.annotator_user.role, 'admin')
+
+    def test_annotator_cannot_update_user_role(self):
+        """Annotators must not be allowed to change roles."""
+        self.client.force_authenticate(user=self.annotator_user)
+        url = reverse('user-detail', kwargs={'pk': self.admin_user.id})
+        response = self.client.patch(url, data={'role': 'annotator'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertIn('Admin role required', response.data['detail'])
+        self.admin_user.refresh_from_db()
+        self.assertEqual(self.admin_user.role, 'admin')
+
+    def test_cannot_remove_last_admin(self):
+        """Prevent demoting the final admin within an organization."""
+        self.client.force_authenticate(user=self.admin_user)
+        url = reverse('user-detail', kwargs={'pk': self.admin_user.id})
+        response = self.client.patch(url, data={'role': 'annotator'}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('at least one admin', response.data['detail'].lower())
+        self.admin_user.refresh_from_db()
+        self.assertEqual(self.admin_user.role, 'admin')
+
     def test_whoami_includes_role(self):
         """Test that the whoami endpoint includes the user's role"""
         self.client.force_authenticate(user=self.admin_user)

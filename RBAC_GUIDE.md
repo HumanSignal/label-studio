@@ -42,6 +42,16 @@ Annotators **cannot**:
 
 ## Assigning Roles
 
+### Using the Organization UI
+
+Admins can promote or demote members directly from **Organization → People**:
+
+1. Open the **Organization** navigation item (only visible to admins).
+2. Select the member from the list to open their detail panel.
+3. In the **Role** section, click **Make Admin** or **Set as Annotator**.
+
+The member list updates immediately after the change, and Label Studio prevents you from removing the final admin in an organization.
+
 ### Using the Management Command
 
 You can assign roles to users using the Django management command:

@@ -20,6 +20,7 @@ export const PeoplePage = () => {
   const toast = useToast();
   const [selectedUser, setSelectedUser] = useState(null);
   const [invitationOpen, setInvitationOpen] = useState(false);
+  const [listRefreshKey, setListRefreshKey] = useState(0);
 
   useUpdatePageTitle("People");
 
@@ -31,6 +32,14 @@ export const PeoplePage = () => {
     },
     [setSelectedUser],
   );
+
+  const handleRoleChanged = useCallback((updatedUser) => {
+    setSelectedUser(updatedUser);
+    if (updatedUser?.id) {
+      localStorage.setItem("selectedUser", updatedUser.id);
+    }
+    setListRefreshKey((prev) => prev + 1);
+  }, []);
 
   const apiTokensSettingsModalProps = useMemo(
     () => ({
@@ -83,11 +92,16 @@ export const PeoplePage = () => {
         <PeopleList
           selectedUser={selectedUser}
           defaultSelected={defaultSelected}
+          refreshKey={listRefreshKey}
           onSelect={(user) => selectUser(user)}
         />
 
         {selectedUser ? (
-          <SelectedUser user={selectedUser} onClose={() => selectUser(null)} />
+          <SelectedUser
+            user={selectedUser}
+            onClose={() => selectUser(null)}
+            onRoleChanged={handleRoleChanged}
+          />
         ) : (
           isFF(FF_LSDV_E_297) && <HeidiTips collection="organizationPage" />
         )}

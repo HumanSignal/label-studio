@@ -6,7 +6,7 @@ from core.permissions import ViewClassPermission, all_permissions
 from django.utils.decorators import method_decorator
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
-from rest_framework import generics, viewsets
+from rest_framework import generics, status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
@@ -201,6 +201,48 @@ class UserAPI(viewsets.ModelViewSet):
             return UserSerializerUpdate
         return super().get_serializer_class()
 
+    def _validate_role_update(self, request, target_user):
+        """Ensure only admins can change roles and an org keeps at least one admin."""
+        new_role = request.data.get('role')
+        if new_role is None or new_role == target_user.role:
+            return None
+
+        if request.user.role != 'admin':
+            return Response(
+                {'detail': 'Permission denied. Admin role required.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        valid_roles = {choice[0] for choice in User._meta.get_field('role').choices}
+        if new_role not in valid_roles:
+            return Response(
+                {'role': ['Invalid role.']},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Prevent demoting the last admin in the current organization
+        if target_user.role == 'admin' and new_role != 'admin':
+            organization = request.user.active_organization
+            if organization is not None:
+                remaining_admin_exists = (
+                    User.objects.filter(
+                        organizations=organization,
+                        role='admin',
+                        om_through__organization=organization,
+                        om_through__deleted_at__isnull=True,
+                    )
+                    .exclude(pk=target_user.pk)
+                    .distinct()
+                    .exists()
+                )
+                if not remaining_admin_exists:
+                    return Response(
+                        {'detail': 'Organization must have at least one admin user.'},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+        return None
+
     def get_serializer_context(self):
         context = super(UserAPI, self).get_serializer_context()
         context['user'] = self.request.user
@@ -224,6 +266,11 @@ class UserAPI(viewsets.ModelViewSet):
         return super(UserAPI, self).retrieve(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        validation_error = self._validate_role_update(request, instance)
+        if validation_error is not None:
+            return validation_error
+
         result = super(UserAPI, self).partial_update(request, *args, **kwargs)
 
         # throw MethodNotAllowed if read-only fields are attempted to be updated

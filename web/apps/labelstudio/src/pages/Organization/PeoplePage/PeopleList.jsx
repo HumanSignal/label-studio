@@ -9,30 +9,31 @@ import { isDefined } from "../../../utils/helpers";
 import "./PeopleList.scss";
 import { CopyableTooltip } from "../../../components/CopyableTooltip/CopyableTooltip";
 
-export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
+export const PeopleList = ({ onSelect, selectedUser, defaultSelected, refreshKey = 0 }) => {
   const api = useAPI();
   const [usersList, setUsersList] = useState();
   const [currentPage] = usePage("page", 1);
   const [currentPageSize] = usePageSize("page_size", 30);
   const [totalItems, setTotalItems] = useState(0);
 
-  console.log({ currentPage, currentPageSize });
+  const fetchUsers = useCallback(
+    async (page = currentPage, pageSize = currentPageSize) => {
+      const response = await api.callApi("memberships", {
+        params: {
+          pk: 1,
+          contributed_to_projects: 1,
+          page,
+          page_size: pageSize,
+        },
+      });
 
-  const fetchUsers = useCallback(async (page, pageSize) => {
-    const response = await api.callApi("memberships", {
-      params: {
-        pk: 1,
-        contributed_to_projects: 1,
-        page,
-        page_size: pageSize,
-      },
-    });
-
-    if (response.results) {
-      setUsersList(response.results);
-      setTotalItems(response.count);
-    }
-  }, []);
+      if (response.results) {
+        setUsersList(response.results);
+        setTotalItems(response.count);
+      }
+    },
+    [api, currentPage, currentPageSize],
+  );
 
   const selectUser = useCallback(
     (user) => {
@@ -46,8 +47,8 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
   );
 
   useEffect(() => {
-    fetchUsers(currentPage, currentPageSize);
-  }, []);
+    fetchUsers();
+  }, [fetchUsers, refreshKey]);
 
   useEffect(() => {
     if (isDefined(defaultSelected) && usersList) {
@@ -71,6 +72,9 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
                 <Elem name="column" mix="name">
                   Name
                 </Elem>
+                <Elem name="column" mix="role">
+                  Role
+                </Elem>
                 <Elem name="column" mix="last-activity">
                   Last Activity
                 </Elem>
@@ -91,6 +95,9 @@ export const PeopleList = ({ onSelect, selectedUser, defaultSelected }) => {
                       </Elem>
                       <Elem name="field" mix="name">
                         {user.first_name} {user.last_name}
+                      </Elem>
+                      <Elem name="field" mix="role">
+                        {user.role === "admin" ? "Admin" : "Annotator"}
                       </Elem>
                       <Elem name="field" mix="last-activity">
                         {formatDistance(new Date(user.last_activity), new Date(), { addSuffix: true })}

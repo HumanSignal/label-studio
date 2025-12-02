@@ -52,6 +52,11 @@
       width: 200px;
     }
 
+    &.role {
+      width: 120px;
+      text-transform: capitalize;
+    }
+
     &.last-activity {
       width: 160px;
     }
