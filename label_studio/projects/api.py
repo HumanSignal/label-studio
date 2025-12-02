@@ -24,14 +24,14 @@ from django.utils.decorators import method_decorator
 from django_filters import CharFilter, FilterSet
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema, inline_serializer
 from label_studio_sdk.label_interface.interface import LabelInterface
 from ml.serializers import MLBackendSerializer
 from organizations.serializers import OrganizationMemberListSerializer, OrganizationMemberListParamsSerializer
 from projects.functions.next_task import get_next_task
 from projects.functions.stream_history import get_label_stream_history
 from projects.functions.utils import recalculate_created_annotations_and_labels_from_scratch
-from projects.models import Project, ProjectImport, ProjectManager, ProjectReimport, ProjectSummary
+from projects.models import Project, ProjectImport, ProjectManager, ProjectMember, ProjectReimport, ProjectSummary
 from projects.serializers import (
     GetFieldsSerializer,
     ProjectCountsSerializer,
@@ -41,9 +41,9 @@ from projects.serializers import (
     ProjectModelVersionParamsSerializer,
     ProjectReimportSerializer,
     ProjectSerializer,
-    ProjectSummarySerializer,
+    ProjectSummarySerializer, ProjectCollaboratorSerializer,
 )
-from rest_framework import filters, generics, status
+from rest_framework import filters, generics, serializers, status
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import ValidationError as RestValidationError
 from rest_framework.pagination import PageNumberPagination
@@ -191,7 +191,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
 
         # Only annotate FSM state for UI/API consumption when both feature flags are enabled
         if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
-            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
+                'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
         ):
             projects = projects.annotate_fsm_state()
 
@@ -256,7 +256,7 @@ class ProjectCountsListAPI(generics.ListAPIView):
 
         # Only annotate FSM state for UI/API consumption when both feature flags are enabled
         if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
-            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
+                'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
         ):
             projects = projects.annotate_fsm_state()
 
@@ -390,7 +390,7 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
 
         # Only annotate FSM state for UI/API consumption when both feature flags are enabled
         if flag_set('fflag_feat_fit_568_finite_state_management', user=self.request.user) and flag_set(
-            'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
+                'fflag_feat_fit_710_fsm_state_fields', user=self.request.user
         ):
             projects = projects.annotate_fsm_state()
 
@@ -767,27 +767,83 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
         return instance
 
 
-# get: 프로젝트 collaborator 리스트 가져오기
-#post:
-class ProjectMemberListAPI(generics.ListCreateAPIView, generics.DestroyAPIView):
+@method_decorator(
+    name='get',
+    decorator=extend_schema(
+        tags=['Projects'],
+        summary='List project members',
+        description='Retrieve a list of members for the specified project.',
+        responses={200: ProjectCollaboratorSerializer(many=True)},
+    ),
+)
+@method_decorator(
+    name='post',
+    decorator=extend_schema(
+        tags=['Projects'],
+        summary='Add project members',
+        description='Add new members to the project by their user IDs.',
+        request=inline_serializer(
+            name='AddProjectMembers',
+            fields={
+                'ids': serializers.ListField(child=serializers.IntegerField())
+            }
+        ),
+        responses={201: ProjectCollaboratorSerializer(many=True)},
+    ),
+)
+class ProjectMemberListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser)
-    permission_classes = ViewClassPermission(
-        GET=all_permissions.organizations_view
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        POST=all_permissions.projects_change,
     )
-    serializer_class = OrganizationMemberListSerializer
+    serializer_class = ProjectCollaboratorSerializer
 
     def get_queryset(self):
-        org = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs[self.lookup_field])
-        if flag_set('fix_backend_dev_3134_exclude_deactivated_users', self.request.user):
-            serializer = OrganizationMemberListParamsSerializer(data=self.request.GET)
-            serializer.is_valid(raise_exception=True)
-            active = serializer.validated_data['active']
+        project = generics.get_object_or_404(Project, pk=self.kwargs['pk'])
+        return ProjectMember.objects.filter(project=project)
 
-            if active:
-                return org.active_members.prefetch_related('user__om_through').order_by('user__username')
-                # organization page to show all members
-        else:
-            return org.members.prefetch_related('user__om_through').order_by('user__username')
+    def post(self, request, *args, **kwargs):
+        project = generics.get_object_or_404(Project, pk=self.kwargs['pk'])
+        user_ids = request.data.get('ids', [])
+
+        if not user_ids:
+             raise RestValidationError('No user IDs provided')
+        users = User.objects.filter(id__in=user_ids, organizations=project.organization)
+        if not users.exists():
+            raise RestValidationError('No valid users found')
+
+        for user in users:
+            project.add_collaborator(user)
+
+        members = ProjectMember.objects.filter(project=project, user__in=users)
+        serializer = self.get_serializer(members, many=True)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@method_decorator(
+    name='get',
+    decorator=extend_schema(
+        tags=['Projects'],
+        summary='List potential project members',
+        description='Retrieve a list of users from the organization who are not yet members of the project.',
+        responses={200: UserSimpleSerializer(many=True)},
+    ),
+)
+class ProjectPotentialCollaboratorsAPI(generics.ListAPIView):
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+    )
+    serializer_class = UserSimpleSerializer
+
+    def get_queryset(self):
+        project = generics.get_object_or_404(Project, pk=self.kwargs['pk'])
+        return User.objects.filter(
+            organizations=project.organization
+        ).exclude(
+            project_memberships__project=project
+        ).distinct()
+
 
 
 def read_templates_and_groups():

@@ -111,8 +111,9 @@ class ProjectManager(models.Manager):
         """Return ProjectQuerySet with FSM state annotation support"""
         return ProjectQuerySetWithFSM(self.model, using=self._db)
 
+    # 프로젝트의 contributor
     def for_user(self, user):
-        return self.get_queryset().filter(organization=user.active_organization)
+        return self.get_queryset().filter(contributor=user)
 
     def with_state(self):
         """
@@ -171,13 +172,12 @@ class ProjectMember(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='project_memberships', help_text='User ID'
     )
-    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='members', help_text='Project ID')
+    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='members',
+                                help_text='Project ID')
     enabled = models.BooleanField(default=True, help_text='Project member is enabled')
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
     role = models.CharField(max_length=64, choices=Role.choices, default=Role.ANNOTATOR)
-
-
 
 
 class Project(ProjectMixin, FsmHistoryStateModel):
@@ -477,8 +477,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         self.token = create_hash()
         self.save(update_fields=['token'])
 
-
-# project에 collaborator 추가
+    # project에 collaborator 추가
     def add_collaborator(self, user):
         created = False
         with transaction.atomic():
@@ -923,10 +922,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
             # TODO: avoid checking teams but rather add all project members when creating a project
             return self.team_link.team.members.values_list('user', flat=True)
         else:
-            from users.models import User
-
-            # TODO: may want to return all users from organization
-            return User.objects.none()
+            return ProjectMember.objects.filter(project=self.pk).values_list('user', flat=True)
 
     def has_team_user(self, user):
         return hasattr(self, 'team_link') and self.team_link.team.has_user(user)
@@ -939,8 +935,8 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         team_members = User.objects.filter(id__in=member_ids).order_by('email')
 
         # add members from invited projects
-        project_member_ids = self.members.values_list('user__id', flat=True) # projectmember 테이블의 id 칼럼 값을 가져옴
-        project_members = User.objects.filter(id__in=project_member_ids) # 위에서 가져온 id를 가지고 필터링
+        project_member_ids = self.members.values_list('user__id', flat=True)  # projectmember 테이블의 id 칼럼 값을 가져옴
+        project_members = User.objects.filter(id__in=project_member_ids)  # 위에서 가져온 id를 가지고 필터링
 
         annotators = team_members | project_members
 
@@ -1367,7 +1363,6 @@ class LabelStreamHistory(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['user', 'project'], name='unique_history')]
-
 
 
 class ProjectSummary(models.Model):
