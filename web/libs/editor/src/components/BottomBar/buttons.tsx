@@ -93,12 +93,26 @@ type SkipButtonProps = {
   onSkipWithComment: (event: React.MouseEvent, action: () => any) => void;
 };
 
+// Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+const MANAGER_ROLES = ["OW", "AD", "MA"];
+
 export const SkipButton = memo(
   observer(({ disabled, store, onSkipWithComment }: SkipButtonProps) => {
     const task = store.task;
-    const allowSkip = task?.allow_skip !== false; // Default to true if undefined
-    const isDisabled = disabled || !allowSkip;
-    const tooltip = allowSkip ? "Cancel (skip) task [ Ctrl+Space ]" : "This task cannot be skipped";
+    const taskAllowSkip = task?.allow_skip !== false;
+    const userRole = (window as any).APP_SETTINGS?.user?.role;
+    const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
+    const canSkip = taskAllowSkip || hasForceSkipPermission;
+    const isDisabled = disabled || !canSkip;
+
+    let tooltip: string;
+    if (taskAllowSkip) {
+      tooltip = "Cancel (skip) task [ Ctrl+Space ]";
+    } else if (hasForceSkipPermission) {
+      tooltip = "Cancel (skip) task (managers only) [ Ctrl+Space ]";
+    } else {
+      tooltip = "This task cannot be skipped";
+    }
 
     return (
       <Button
@@ -108,10 +122,9 @@ export const SkipButton = memo(
         look="outlined"
         tooltip={tooltip}
         onClick={async (e) => {
-          if (!allowSkip) return;
+          if (!canSkip) return;
           const action = () => store.skipTask({});
           const selected = store.annotationStore?.selected;
-
           if (store.hasInterface("comments:skip") ?? true) {
             onSkipWithComment(e, action);
           } else {

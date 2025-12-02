@@ -30,9 +30,20 @@ const createMockStore = (overrides: any = {}) => ({
   ...overrides,
 });
 
+// Helper to set up window.APP_SETTINGS for role-based tests
+const setupAppSettings = (role?: string) => {
+  (window as any).APP_SETTINGS = {
+    user: {
+      role,
+    },
+  };
+};
+
 describe("SkipButton", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset APP_SETTINGS before each test
+    (window as any).APP_SETTINGS = undefined;
   });
 
   test("Skip button disabled when allow_skip=false", () => {
@@ -156,5 +167,135 @@ describe("SkipButton", () => {
 
     const button = getByTestId("skip-button");
     expect(button).toBeDisabled();
+  });
+
+  // Role-based tests (OW=Owner, AD=Admin, MA=Manager can force-skip)
+  test("Skip button enabled when allow_skip=false but user is Owner (OW)", () => {
+    setupAppSettings("OW");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
+    });
+    const onSkipWithComment = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <SkipButton disabled={false} store={mockStore as any} onSkipWithComment={onSkipWithComment} />
+      </Provider>,
+    );
+
+    const button = getByTestId("skip-button");
+    expect(button).not.toBeDisabled();
+    expect(button).toHaveAttribute("title", "Cancel (skip) task (managers only) [ Ctrl+Space ]");
+  });
+
+  test("Skip button enabled when allow_skip=false but user is Admin (AD)", () => {
+    setupAppSettings("AD");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
+    });
+    const onSkipWithComment = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <SkipButton disabled={false} store={mockStore as any} onSkipWithComment={onSkipWithComment} />
+      </Provider>,
+    );
+
+    const button = getByTestId("skip-button");
+    expect(button).not.toBeDisabled();
+    expect(button).toHaveAttribute("title", "Cancel (skip) task (managers only) [ Ctrl+Space ]");
+  });
+
+  test("Skip button enabled when allow_skip=false but user is Manager (MA)", () => {
+    setupAppSettings("MA");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
+    });
+    const onSkipWithComment = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <SkipButton disabled={false} store={mockStore as any} onSkipWithComment={onSkipWithComment} />
+      </Provider>,
+    );
+
+    const button = getByTestId("skip-button");
+    expect(button).not.toBeDisabled();
+    expect(button).toHaveAttribute("title", "Cancel (skip) task (managers only) [ Ctrl+Space ]");
+  });
+
+  test("Skip button disabled when allow_skip=false and user is Annotator (AN)", () => {
+    setupAppSettings("AN");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
+    });
+    const onSkipWithComment = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <SkipButton disabled={false} store={mockStore as any} onSkipWithComment={onSkipWithComment} />
+      </Provider>,
+    );
+
+    const button = getByTestId("skip-button");
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("title", "This task cannot be skipped");
+  });
+
+  test("Skip button disabled when allow_skip=false and user is Reviewer (RE)", () => {
+    setupAppSettings("RE");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
+    });
+    const onSkipWithComment = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <SkipButton disabled={false} store={mockStore as any} onSkipWithComment={onSkipWithComment} />
+      </Provider>,
+    );
+
+    const button = getByTestId("skip-button");
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("title", "This task cannot be skipped");
+  });
+
+  test("Skip button onClick triggers when allow_skip=false but user is Manager", () => {
+    setupAppSettings("MA");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
+      interfaces: ["skip", "comments:skip"],
+    });
+    const onSkipWithComment = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <SkipButton disabled={false} store={mockStore as any} onSkipWithComment={onSkipWithComment} />
+      </Provider>,
+    );
+
+    const button = getByTestId("skip-button");
+    fireEvent.click(button);
+
+    expect(onSkipWithComment).toHaveBeenCalled();
+  });
+
+  test("Skip button shows normal tooltip when allow_skip=true even for Manager", () => {
+    setupAppSettings("MA");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: true },
+    });
+    const onSkipWithComment = jest.fn();
+
+    const { getByTestId } = render(
+      <Provider store={mockStore}>
+        <SkipButton disabled={false} store={mockStore as any} onSkipWithComment={onSkipWithComment} />
+      </Provider>,
+    );
+
+    const button = getByTestId("skip-button");
+    expect(button).not.toBeDisabled();
+    // When task allows skip, show normal tooltip even if user is manager
+    expect(button).toHaveAttribute("title", "Cancel (skip) task [ Ctrl+Space ]");
   });
 });

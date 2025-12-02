@@ -19,14 +19,12 @@ export const CurrentTask = observer(({ store }) => {
 
   useEffect(() => {
     store.commentStore.setAddedCommentThisSession(false);
-
     const reactionDisposer = reaction(
       () => store.commentStore.comments.map((item) => item.isDeleted),
       (result) => {
         setVisibleComments(result.filter((item) => !item).length);
       },
     );
-
     return () => {
       reactionDisposer?.();
     };
@@ -38,22 +36,26 @@ export const CurrentTask = observer(({ store }) => {
     }
   }, [store.commentStore.addedCommentThisSession]);
 
+  // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+  const MANAGER_ROLES = ["OW", "AD", "MA"];
+
   const historyEnabled = store.hasInterface("topbar:prevnext");
   const showCounter = store.hasInterface("topbar:task-counter");
-
-  // @todo some interface?
   const task = store.task;
-  const allowPostpone = task?.allow_postpone !== false; // Default to true if undefined
-  const allowSkip = task?.allow_skip !== false; // Default to true if undefined
-  // If task cannot be skipped, also disable postpone to prevent bypassing the restriction
+  const taskAllowSkip = task?.allow_skip !== false;
+  const userRole = window.APP_SETTINGS?.user?.role;
+  const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
+  const canSkipOrPostpone = taskAllowSkip || hasForceSkipPermission;
+
+  // If task cannot be skipped and user doesn't have force_skip, also disable postpone
+  // Note: store.hasInterface("postpone") is set by lsf-sdk based on task.allow_postpone from API
   let canPostpone =
     !isDefined(store.annotationStore.selected.pk) &&
     (!isFF(FF_LEAP_1173) || store.hasInterface("skip")) &&
     !store.canGoNextTask &&
     !store.hasInterface("review") &&
     store.hasInterface("postpone") &&
-    allowPostpone &&
-    allowSkip; // Disable postpone if task cannot be skipped
+    canSkipOrPostpone;
 
   if (store.hasInterface("annotations:comments") && isFF(FF_DEV_4174)) {
     canPostpone = canPostpone && store.commentStore.addedCommentThisSession && visibleComments >= initialCommentLength;

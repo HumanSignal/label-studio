@@ -5,6 +5,15 @@ import { mockFF } from "../../../../__mocks__/global";
 
 const ff = mockFF();
 
+// Helper to set up window.APP_SETTINGS for role-based tests
+const setupAppSettings = (role?: string) => {
+  (window as any).APP_SETTINGS = {
+    user: {
+      role,
+    },
+  };
+};
+
 describe("CurrentTask", () => {
   let store: any;
 
@@ -16,6 +25,8 @@ describe("CurrentTask", () => {
   });
 
   beforeEach(() => {
+    // Reset APP_SETTINGS before each test
+    (window as any).APP_SETTINGS = undefined;
     // Initialize your store with default values
     store = {
       annotationStore: { selected: { pk: null } },
@@ -145,5 +156,42 @@ describe("CurrentTask", () => {
     const { getByTestId } = render(<CurrentTask store={store} />);
 
     expect(getByTestId("next-task").disabled).toBe(false);
+  });
+
+  // Role-based tests (OW=Owner, AD=Admin, MA=Manager can force-skip/postpone)
+  it("enables postpone button when allow_skip=false but user is Owner (OW)", () => {
+    setupAppSettings("OW");
+    store.hasInterface.mockImplementation((interfaceName: string) =>
+      ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
+    );
+    store.task = { id: 6616, allow_skip: false };
+
+    const { getByTestId } = render(<CurrentTask store={store} />);
+
+    expect(getByTestId("next-task").disabled).toBe(false);
+  });
+
+  it("enables postpone button when allow_skip=false but user is Manager (MA)", () => {
+    setupAppSettings("MA");
+    store.hasInterface.mockImplementation((interfaceName: string) =>
+      ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
+    );
+    store.task = { id: 6616, allow_skip: false };
+
+    const { getByTestId } = render(<CurrentTask store={store} />);
+
+    expect(getByTestId("next-task").disabled).toBe(false);
+  });
+
+  it("disables postpone button when allow_skip=false and user is Annotator (AN)", () => {
+    setupAppSettings("AN");
+    store.hasInterface.mockImplementation((interfaceName: string) =>
+      ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
+    );
+    store.task = { id: 6616, allow_skip: false };
+
+    const { getByTestId } = render(<CurrentTask store={store} />);
+
+    expect(getByTestId("next-task").disabled).toBe(true);
   });
 });

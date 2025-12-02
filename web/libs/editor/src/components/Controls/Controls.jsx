@@ -51,19 +51,33 @@ export default inject("store")(
     /**
      * Check for Predict Menu
      */
+    // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+    const MANAGER_ROLES = ["OW", "AD", "MA"];
+
     if (!store.annotationStore.predictSelect || store.explore) {
       const disabled = store.isSubmitting;
       const task = store.task;
-      const allowSkip = task?.allow_skip !== false; // Default to true if undefined
-      const skipDisabled = disabled || !allowSkip;
-      const skipTooltip = allowSkip ? "Cancel (skip) task: [ Ctrl+Space ]" : "This task cannot be skipped";
+      const taskAllowSkip = task?.allow_skip !== false;
+      const userRole = window.APP_SETTINGS?.user?.role;
+      const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
+      const canSkip = taskAllowSkip || hasForceSkipPermission;
+      const skipDisabled = disabled || !canSkip;
+
+      let skipTooltip;
+      if (taskAllowSkip) {
+        skipTooltip = "Cancel (skip) task: [ Ctrl+Space ]";
+      } else if (hasForceSkipPermission) {
+        skipTooltip = "Cancel (skip) task (managers only) [ Ctrl+Space ]";
+      } else {
+        skipTooltip = "This task cannot be skipped";
+      }
 
       if (store.hasInterface("skip")) {
         skipButton = (
           <Button
             disabled={skipDisabled}
             look="danger"
-            onClick={allowSkip ? store.skipTask : undefined}
+            onClick={canSkip ? store.skipTask : undefined}
             tooltip={skipTooltip}
             className={`${styles.skip} ${skipButtonClassName}`}
           >

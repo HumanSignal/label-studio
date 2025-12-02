@@ -31,9 +31,20 @@ const createMockStore = (overrides: any = {}) => ({
   ...overrides,
 });
 
+// Helper to set up window.APP_SETTINGS for role-based tests
+const setupAppSettings = (role?: string) => {
+  (window as any).APP_SETTINGS = {
+    user: {
+      role,
+    },
+  };
+};
+
 describe("Controls", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset APP_SETTINGS before each test
+    (window as any).APP_SETTINGS = undefined;
   });
 
   test("Skip button disabled when allow_skip=false", () => {
@@ -107,6 +118,98 @@ describe("Controls", () => {
   test("Skip button onClick triggers skipTask when allow_skip=true", () => {
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: true },
+      interfaces: ["skip"],
+    });
+    const item = {
+      userGenerate: false,
+      sentUserGenerate: false,
+      versions: {},
+    };
+
+    const { getByText } = render(
+      <Provider store={mockStore}>
+        <Controls store={mockStore as any} item={item} />
+      </Provider>,
+    );
+
+    const skipButton = getByText(/Skip/i).closest("button");
+    fireEvent.click(skipButton!);
+
+    expect(mockStore.skipTask).toHaveBeenCalled();
+  });
+
+  // Role-based tests (OW=Owner, AD=Admin, MA=Manager can force-skip)
+  test("Skip button enabled when allow_skip=false but user is Owner (OW)", () => {
+    setupAppSettings("OW");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
+      interfaces: ["skip"],
+    });
+    const item = {
+      userGenerate: false,
+      sentUserGenerate: false,
+      versions: {},
+    };
+
+    const { getByText } = render(
+      <Provider store={mockStore}>
+        <Controls store={mockStore as any} item={item} />
+      </Provider>,
+    );
+
+    const skipButton = getByText(/Skip/i).closest("button");
+    expect(skipButton).not.toBeDisabled();
+    expect(skipButton).toHaveAttribute("title", "Cancel (skip) task (managers only) [ Ctrl+Space ]");
+  });
+
+  test("Skip button enabled when allow_skip=false but user is Manager (MA)", () => {
+    setupAppSettings("MA");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
+      interfaces: ["skip"],
+    });
+    const item = {
+      userGenerate: false,
+      sentUserGenerate: false,
+      versions: {},
+    };
+
+    const { getByText } = render(
+      <Provider store={mockStore}>
+        <Controls store={mockStore as any} item={item} />
+      </Provider>,
+    );
+
+    const skipButton = getByText(/Skip/i).closest("button");
+    expect(skipButton).not.toBeDisabled();
+  });
+
+  test("Skip button disabled when allow_skip=false and user is Annotator (AN)", () => {
+    setupAppSettings("AN");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
+      interfaces: ["skip"],
+    });
+    const item = {
+      userGenerate: false,
+      sentUserGenerate: false,
+      versions: {},
+    };
+
+    const { getByText } = render(
+      <Provider store={mockStore}>
+        <Controls store={mockStore as any} item={item} />
+      </Provider>,
+    );
+
+    const skipButton = getByText(/Skip/i).closest("button");
+    expect(skipButton).toBeDisabled();
+  });
+
+  test("Skip button onClick triggers skipTask when allow_skip=false but user is Manager", () => {
+    setupAppSettings("MA");
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
       interfaces: ["skip"],
     });
     const item = {

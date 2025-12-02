@@ -141,11 +141,26 @@ export const Controls = controlsInjector(
         </ButtonTooltip>,
       );
     } else {
+      // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+      const MANAGER_ROLES = ["OW", "AD", "MA"];
+
       if (store.hasInterface("skip")) {
         const task = store.task;
-        const allowSkip = task?.allow_skip !== false; // Default to true if undefined
-        const isDisabled = disabled || !allowSkip;
-        const tooltip = allowSkip ? "Cancel (skip) task: [ Ctrl+Space ]" : "This task cannot be skipped";
+        const taskAllowSkip = task?.allow_skip !== false;
+        const userRole = window.APP_SETTINGS?.user?.role;
+        const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
+        const canSkip = taskAllowSkip || hasForceSkipPermission;
+        const isDisabled = disabled || !canSkip;
+
+        let tooltip;
+        if (taskAllowSkip) {
+          tooltip = "Cancel (skip) task: [ Ctrl+Space ]";
+        } else if (hasForceSkipPermission) {
+          tooltip = "Cancel (skip) task (managers only) [ Ctrl+Space ]";
+        } else {
+          tooltip = "This task cannot be skipped";
+        }
+
         buttons.push(
           <ButtonTooltip key="skip" title={tooltip}>
             <Button
@@ -154,7 +169,7 @@ export const Controls = controlsInjector(
               variant="negative"
               look="outlined"
               onClick={async (e) => {
-                if (!allowSkip) return;
+                if (!canSkip) return;
                 if (store.hasInterface("comments:skip") ?? true) {
                   buttonHandler(e, () => store.skipTask({}), "Please enter a comment before skipping");
                 } else {
