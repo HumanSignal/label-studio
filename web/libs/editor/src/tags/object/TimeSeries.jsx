@@ -29,7 +29,6 @@ import "./TimeSeries/MultiChannel";
 import "./TimeSeries/Channel";
 import { getChannelColor } from "./TimeSeries/palette";
 import { FF_TIMESERIES_SYNC, isFF } from "../../utils/feature-flags";
-import { FF_MULTICHANNEL_TS } from "@humansignal/core/lib/utils/feature-flags";
 import { ff } from "@humansignal/core";
 /**
  * The `TimeSeries` tag can be used to label time series data. Read more about Time Series Labeling on [the time series template page](../templates/time_series.html).
@@ -1423,81 +1422,6 @@ const Overview = observer(({ item, data, series }) => {
 const HtxTimeSeriesViewRTS = ({ item }) => {
   const ref = React.createRef();
 
-  const handleMainAreaClick = (event) => {
-    if (!isAlive(item) || !isFF(FF_TIMESERIES_SYNC) || event.target.closest(".htx-timeseries-overview")) {
-      return;
-    }
-
-    const mainDisplayElement = ref.current;
-    if (
-      !mainDisplayElement ||
-      !item.brushRange ||
-      item.brushRange.length !== 2 ||
-      !item.margin ||
-      !item.canvasWidth ||
-      !item.keysRange ||
-      item.keysRange.length !== 2
-    ) {
-      console.warn("TimeSeries: Click handling skipped, essential data missing or component not ready.", {
-        hasRef: !!mainDisplayElement,
-        brushRange: item.brushRange,
-        margin: item.margin,
-        canvasWidth: item.canvasWidth,
-        keysRange: item.keysRange,
-      });
-      return;
-    }
-
-    const { left: marginLeft = 0, right: marginRight = 0 } = item.margin;
-    const plottingAreaWidth = item.canvasWidth - marginLeft - marginRight;
-
-    if (plottingAreaWidth <= 0) {
-      console.warn(`TimeSeries: Plotting area width (${plottingAreaWidth}) is not positive.`);
-      return;
-    }
-
-    const rect = mainDisplayElement.getBoundingClientRect();
-
-    let clickX = event.clientX - rect.left - marginLeft;
-    clickX = Math.max(0, Math.min(clickX, plottingAreaWidth));
-
-    const [brushTimeStartNative, brushTimeEndNative] = item.brushRange;
-    const brushDurationNative = brushTimeEndNative - brushTimeStartNative;
-
-    if (brushDurationNative <= 0) {
-      console.warn(`TimeSeries: Brush duration (${brushDurationNative}) is not positive.`);
-      return;
-    }
-
-    // Calculate the clicked time within the current brush range
-    const timeClicked = brushTimeStartNative + (clickX / plottingAreaWidth) * brushDurationNative;
-    const [minKey, maxKey] = item.keysRange;
-    const finalTime = Math.max(minKey, Math.min(timeClicked, maxKey));
-
-    // Since we're clicking on the visible area, the time is always inside the current view
-    // Update cursor position to the clicked location
-    item.setCursor(finalTime);
-
-    // Also update seekTo to ensure playhead moves to clicked position
-    item.setCursorAndSeek(finalTime);
-
-    // If we're currently playing, update the playback state to restart from the clicked position
-    if (item.isPlaying) {
-      item.restartPlaybackFromTime(finalTime);
-    }
-
-    if (isFF(FF_TIMESERIES_SYNC)) {
-      let relativeTime;
-      if (item.isDate) {
-        relativeTime = (finalTime - minKey) / 1000;
-      } else {
-        relativeTime = finalTime - minKey;
-      }
-      // Include current playing state to prevent other media from pausing during seek
-      item.syncSend({ time: relativeTime, playing: item.isPlaying }, "seek");
-    }
-  };
-
   React.useEffect(() => {
     if (item?.brushRange?.length) {
       item._nodeReference = ref.current;
@@ -1526,11 +1450,7 @@ const HtxTimeSeriesViewRTS = ({ item }) => {
     );
 
   return (
-    <div
-      ref={ref}
-      className="htx-timeseries"
-      onClick={ff.isActive(FF_MULTICHANNEL_TS) ? undefined : handleMainAreaClick}
-    >
+    <div ref={ref} className="htx-timeseries">
       <ObjectTag item={item}>
         {Tree.renderChildren(item, item.annotation)}
         <Overview data={item.dataObj} series={item.dataHash} item={item} range={item.brushRange} />
