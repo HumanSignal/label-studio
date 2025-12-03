@@ -656,15 +656,23 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         prev_inner_id = last_task.inner_id if last_task else 0
         max_inner_id = (prev_inner_id + 1) if prev_inner_id else 1
 
+        calculate_is_labeled_with_distinct_annotators = flag_set(
+            'fflag_fix_fit_1082_overlap_use_distinct_annotators', user='auto'
+        )
+
         for i, task in enumerate(validated_tasks):
             cancelled_annotations = len([ann for ann in task_annotations[i] if ann.get('was_cancelled', False)])
             total_annotations = len(task_annotations[i]) - cancelled_annotations
+            if calculate_is_labeled_with_distinct_annotators:
+                current_overlap = len(set([ann.get('completed_by_id') for ann in task_annotations[i]]))
+            else:
+                current_overlap = len(task_annotations[i])
             t = Task(
                 project=self.project,
                 data=task['data'],
                 meta=task.get('meta', {}),
                 overlap=max_overlap,
-                is_labeled=len(task_annotations[i]) >= max_overlap,
+                is_labeled=current_overlap >= max_overlap,
                 file_upload_id=task.get('file_upload_id'),
                 inner_id=None if prev_inner_id is None else max_inner_id + i,
                 total_predictions=len(task_predictions[i]),

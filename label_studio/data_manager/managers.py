@@ -586,19 +586,34 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
     queryset = get_tasks_agreement_queryset(queryset)
     max_additional_annotators_assignable = lse_project['max_additional_annotators_assignable']
 
-    completed_at_case = Case(
-        When(
-            # If agreement_threshold is set, evaluate all conditions
-            Q(is_labeled=True)
-            & (
-                Q(_agreement__gte=agreement_threshold)
-                | Q(annotation_count__gte=(F('overlap') + max_additional_annotators_assignable))
+    if flag_set('fflag_fix_fit_1082_overlap_use_distinct_annotators', user='auto'):
+        completed_at_case = Case(
+            When(
+                # If agreement_threshold is set, evaluate all conditions
+                Q(is_labeled=True)
+                & (
+                    Q(_agreement__gte=agreement_threshold)
+                    | Q(annotator_count__gte=(F('overlap') + max_additional_annotators_assignable))
+                ),
+                then=newest_annotation_subquery(),
             ),
-            then=newest_annotation_subquery(),
-        ),
-        default=Value(None),
-        output_field=DateTimeField(),
-    )
+            default=Value(None),
+            output_field=DateTimeField(),
+        )
+    else:
+        completed_at_case = Case(
+            When(
+                # If agreement_threshold is set, evaluate all conditions
+                Q(is_labeled=True)
+                & (
+                    Q(_agreement__gte=agreement_threshold)
+                    | Q(annotation_count__gte=(F('overlap') + max_additional_annotators_assignable))
+                ),
+                then=newest_annotation_subquery(),
+            ),
+            default=Value(None),
+            output_field=DateTimeField(),
+        )
 
     return queryset.annotate(completed_at=completed_at_case)
 
