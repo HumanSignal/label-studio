@@ -8,6 +8,7 @@ import { inject, observer } from "mobx-react";
 import type React from "react";
 import { memo, type ReactElement } from "react";
 import { Tooltip, Button } from "@humansignal/ui";
+import { IconInfoOutline } from "@humansignal/icons";
 import type { MSTStore } from "../../stores/types";
 
 type MixedInParams = {
@@ -99,43 +100,45 @@ const MANAGER_ROLES = ["OW", "AD", "MA"];
 export const SkipButton = memo(
   observer(({ disabled, store, onSkipWithComment }: SkipButtonProps) => {
     const task = store.task;
-    const taskAllowSkip = task?.allow_skip !== false;
+    const taskAllowSkip = (task as any)?.allow_skip !== false;
     const userRole = (window as any).APP_SETTINGS?.user?.role;
     const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
     const canSkip = taskAllowSkip || hasForceSkipPermission;
     const isDisabled = disabled || !canSkip;
 
-    let tooltip: string;
-    if (taskAllowSkip) {
-      tooltip = "Cancel (skip) task [ Ctrl+Space ]";
-    } else if (hasForceSkipPermission) {
-      tooltip = "Cancel (skip) task (managers only) [ Ctrl+Space ]";
-    } else {
-      tooltip = "This task cannot be skipped";
-    }
+    const tooltip: string = canSkip ? "Cancel (skip) task [ Ctrl+Space ]" : "This task cannot be skipped";
+
+    const showInfoIcon = !taskAllowSkip && hasForceSkipPermission;
 
     return (
-      <Button
-        key="skip"
-        aria-label="skip-task"
-        disabled={isDisabled}
-        look="outlined"
-        tooltip={tooltip}
-        onClick={async (e) => {
-          if (!canSkip) return;
-          const action = () => store.skipTask({});
-          const selected = store.annotationStore?.selected;
-          if (store.hasInterface("comments:skip") ?? true) {
-            onSkipWithComment(e, action);
-          } else {
-            selected?.submissionInProgress();
-            await store.commentStore.commentFormSubmit();
-            store.skipTask({});
-          }
-        }}
-      >
-        Skip
-      </Button>
+      <>
+        {showInfoIcon && (
+          <Tooltip title="Annotators and Reviewers will not be able to skip this task">
+            <IconInfoOutline width={20} height={20} className="text-neutral-content ml-auto cursor-pointer" />
+          </Tooltip>
+        )}
+        <Button
+          key="skip"
+          aria-label="skip-task"
+          disabled={isDisabled}
+          look="outlined"
+          tooltip={tooltip}
+          onClick={async (e) => {
+            if (!canSkip) return;
+            const action = () => store.skipTask({});
+            const selected = store.annotationStore?.selected;
+            if (store.hasInterface("comments:skip") ?? true) {
+              onSkipWithComment(e, action);
+            } else {
+              selected?.submissionInProgress();
+              await store.commentStore.commentFormSubmit();
+              store.skipTask({});
+            }
+          }}
+        >
+          Skip
+        </Button>
+      </>
     );
   }),
 );

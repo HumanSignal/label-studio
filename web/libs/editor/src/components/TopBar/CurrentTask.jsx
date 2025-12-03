@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
-import { Button, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
+import { Button, IconChevronLeft, IconChevronRight, Tooltip } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
 import { FF_DEV_3873, FF_DEV_4174, FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
@@ -125,30 +125,32 @@ export const CurrentTask = observer(({ store }) => {
               .mod({ newui: isFF(FF_DEV_3873) })
               .toClassName()}
           >
-            <Button
-              data-testid="prev-task"
-              aria-label={prevButtonMessage}
-              look="string"
-              disabled={!historyEnabled || !store.canGoPrevTask}
-              onClick={store.prevTask}
-              style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
-              variant="neutral"
-              tooltip={prevButtonMessage}
-            >
-              <IconChevronLeft />
-            </Button>
-            <Button
-              data-testid="next-task"
-              aria-label={nextButtonMessage}
-              look="string"
-              disabled={!canNavigateNext && !canPostponeTask}
-              onClick={canNavigateNext ? store.nextTask : store.postponeTask}
-              style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
-              variant={!canNavigateNext && canPostponeTask ? "primary" : "neutral"}
-              tooltip={nextButtonMessage}
-            >
-              <IconChevronRight />
-            </Button>
+            <Tooltip title={prevButtonMessage} alignment="bottom-center">
+              <Button
+                data-testid="prev-task"
+                aria-label={prevButtonMessage}
+                look="string"
+                disabled={!historyEnabled || !store.canGoPrevTask}
+                onClick={store.prevTask}
+                style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
+                variant="neutral"
+              >
+                <IconChevronLeft />
+              </Button>
+            </Tooltip>
+            <Tooltip title={nextButtonMessage} alignment="bottom-center">
+              <Button
+                data-testid="next-task"
+                aria-label={nextButtonMessage}
+                look="string"
+                disabled={!canNavigateNext && !canPostponeTask}
+                onClick={canNavigateNext ? store.nextTask : store.postponeTask}
+                style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
+                variant={!canNavigateNext && canPostponeTask ? "primary" : "neutral"}
+              >
+                <IconChevronRight />
+              </Button>
+            </Tooltip>
           </div>
         )}
       </div>

@@ -4,7 +4,8 @@ import { CheckCircleOutlined, CheckOutlined } from "@ant-design/icons";
 import Hint from "../Hint/Hint";
 import { DraftPanel } from "../Annotations/Annotations";
 import styles from "./Controls.module.scss";
-import { Button } from "@humansignal/ui";
+import { Button, Tooltip } from "@humansignal/ui";
+import { IconInfoOutline } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
 
 export default inject("store")(
@@ -63,26 +64,28 @@ export default inject("store")(
       const canSkip = taskAllowSkip || hasForceSkipPermission;
       const skipDisabled = disabled || !canSkip;
 
-      let skipTooltip;
-      if (taskAllowSkip) {
-        skipTooltip = "Cancel (skip) task: [ Ctrl+Space ]";
-      } else if (hasForceSkipPermission) {
-        skipTooltip = "Cancel (skip) task (managers only) [ Ctrl+Space ]";
-      } else {
-        skipTooltip = "This task cannot be skipped";
-      }
+      const skipTooltip = canSkip ? "Cancel (skip) task: [ Ctrl+Space ]" : "This task cannot be skipped";
+
+      const showInfoIcon = !taskAllowSkip && hasForceSkipPermission;
 
       if (store.hasInterface("skip")) {
         skipButton = (
-          <Button
-            disabled={skipDisabled}
-            look="danger"
-            onClick={canSkip ? store.skipTask : undefined}
-            tooltip={skipTooltip}
-            className={`${styles.skip} ${skipButtonClassName}`}
-          >
-            Skip {buttons.skip}
-          </Button>
+          <>
+            {showInfoIcon && (
+              <Tooltip title="Annotators and Reviewers will not be able to skip this task">
+                <IconInfoOutline width={20} height={20} className="text-neutral-content ml-auto cursor-pointer" />
+              </Tooltip>
+            )}
+            <Button
+              disabled={skipDisabled}
+              look="danger"
+              onClick={canSkip ? store.skipTask : undefined}
+              tooltip={skipTooltip}
+              className={`${styles.skip} ${skipButtonClassName}`}
+            >
+              Skip {buttons.skip}
+            </Button>
+          </>
         );
       }
 

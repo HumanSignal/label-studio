@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { observer } from "mobx-react";
-import { Button, IconChevronLeft, IconChevronRight } from "@humansignal/ui";
+import { Button, IconChevronLeft, IconChevronRight, Tooltip } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
@@ -81,26 +81,28 @@ export const CurrentTask = observer(({ store }) => {
         </div>
         {historyEnabled && (
           <div className={cn("current-task").elem("history-controls").toClassName()}>
-            <Button
-              variant="neutral"
-              data-testid="prev-task"
-              aria-label={prevButtonMessage}
-              disabled={!historyEnabled || !store.canGoPrevTask}
-              onClick={store.prevTask}
-              tooltip={prevButtonMessage}
-            >
-              <IconChevronLeft />
-            </Button>
-            <Button
-              data-testid="next-task"
-              aria-label={nextButtonMessage}
-              disabled={!canNavigateNext && !canPostponeTask}
-              onClick={canNavigateNext ? store.nextTask : store.postponeTask}
-              variant={!canNavigateNext && canPostponeTask ? "primary" : "neutral"}
-              tooltip={nextButtonMessage}
-            >
-              <IconChevronRight />
-            </Button>
+            <Tooltip title={prevButtonMessage} alignment="bottom-center">
+              <Button
+                variant="neutral"
+                data-testid="prev-task"
+                aria-label={prevButtonMessage}
+                disabled={!historyEnabled || !store.canGoPrevTask}
+                onClick={store.prevTask}
+              >
+                <IconChevronLeft />
+              </Button>
+            </Tooltip>
+            <Tooltip title={nextButtonMessage} alignment="bottom-center">
+              <Button
+                data-testid="next-task"
+                aria-label={nextButtonMessage}
+                disabled={!canNavigateNext && !canPostponeTask}
+                onClick={canNavigateNext ? store.nextTask : store.postponeTask}
+                variant={!canNavigateNext && canPostponeTask ? "primary" : "neutral"}
+              >
+                <IconChevronRight />
+              </Button>
+            </Tooltip>
           </div>
         )}
       </div>

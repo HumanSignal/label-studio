@@ -3,7 +3,7 @@
  */
 
 import { inject, observer } from "mobx-react";
-import { IconBan } from "@humansignal/icons";
+import { IconBan, IconInfoOutline } from "@humansignal/icons";
 import { Button, Tooltip } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
@@ -152,13 +152,16 @@ export const Controls = controlsInjector(
         const canSkip = taskAllowSkip || hasForceSkipPermission;
         const isDisabled = disabled || !canSkip;
 
-        let tooltip;
-        if (taskAllowSkip) {
-          tooltip = "Cancel (skip) task: [ Ctrl+Space ]";
-        } else if (hasForceSkipPermission) {
-          tooltip = "Cancel (skip) task (managers only) [ Ctrl+Space ]";
-        } else {
-          tooltip = "This task cannot be skipped";
+        const tooltip = canSkip ? "Cancel (skip) task: [ Ctrl+Space ]" : "This task cannot be skipped";
+
+        const showInfoIcon = !taskAllowSkip && hasForceSkipPermission;
+
+        if (showInfoIcon) {
+          buttons.push(
+            <Tooltip key="skip-info" title="Annotators and Reviewers will not be able to skip this task">
+              <IconInfoOutline width={20} height={20} className="text-neutral-content ml-auto cursor-pointer" />
+            </Tooltip>,
+          );
         }
 
         buttons.push(
