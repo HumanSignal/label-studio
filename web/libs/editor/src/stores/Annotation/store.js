@@ -184,10 +184,13 @@ const AnnotationStoreModel = types
       return c;
     }
 
-    function selectPrediction(id) {
-      const p = selectItem(id, self.predictions);
+    function selectPrediction(id, options = {}) {
+      // The same logic as in `selectAnnotation()`
+      if (options.exitViewAll) {
+        unselectViewingAll();
+      }
 
-      return p;
+      return selectItem(id, self.predictions);
     }
 
     function clearDeletedParents(annotation) {
