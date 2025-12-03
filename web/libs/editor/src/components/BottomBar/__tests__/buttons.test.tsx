@@ -12,8 +12,21 @@ jest.mock("@humansignal/ui", () => {
         </button>
       );
     }),
+    Tooltip: ({ children, title }: any) => {
+      return (
+        <div data-testid="tooltip" title={title}>
+          {children}
+        </div>
+      );
+    },
   };
 });
+
+jest.mock("@humansignal/icons", () => ({
+  IconInfoOutline: ({ width, height, className }: any) => (
+    <svg data-testid="info-icon" width={width} height={height} className={className} />
+  ),
+}));
 
 const createMockStore = (overrides: any = {}) => ({
   task: { id: 1, allow_skip: true, ...overrides.task },
@@ -185,7 +198,9 @@ describe("SkipButton", () => {
 
     const button = getByTestId("skip-button");
     expect(button).not.toBeDisabled();
-    expect(button).toHaveAttribute("title", "Cancel (skip) task (managers only) [ Ctrl+Space ]");
+    expect(button).toHaveAttribute("title", "Cancel (skip) task [ Ctrl+Space ]");
+    // Check that info icon is shown for managers when task is unskippable
+    expect(getByTestId("info-icon")).toBeInTheDocument();
   });
 
   test("Skip button enabled when allow_skip=false but user is Admin (AD)", () => {
@@ -203,7 +218,9 @@ describe("SkipButton", () => {
 
     const button = getByTestId("skip-button");
     expect(button).not.toBeDisabled();
-    expect(button).toHaveAttribute("title", "Cancel (skip) task (managers only) [ Ctrl+Space ]");
+    expect(button).toHaveAttribute("title", "Cancel (skip) task [ Ctrl+Space ]");
+    // Check that info icon is shown for managers when task is unskippable
+    expect(getByTestId("info-icon")).toBeInTheDocument();
   });
 
   test("Skip button enabled when allow_skip=false but user is Manager (MA)", () => {
@@ -221,7 +238,9 @@ describe("SkipButton", () => {
 
     const button = getByTestId("skip-button");
     expect(button).not.toBeDisabled();
-    expect(button).toHaveAttribute("title", "Cancel (skip) task (managers only) [ Ctrl+Space ]");
+    expect(button).toHaveAttribute("title", "Cancel (skip) task [ Ctrl+Space ]");
+    // Check that info icon is shown for managers when task is unskippable
+    expect(getByTestId("info-icon")).toBeInTheDocument();
   });
 
   test("Skip button disabled when allow_skip=false and user is Annotator (AN)", () => {
@@ -287,7 +306,7 @@ describe("SkipButton", () => {
     });
     const onSkipWithComment = jest.fn();
 
-    const { getByTestId } = render(
+    const { getByTestId, queryByTestId } = render(
       <Provider store={mockStore}>
         <SkipButton disabled={false} store={mockStore as any} onSkipWithComment={onSkipWithComment} />
       </Provider>,
@@ -297,5 +316,7 @@ describe("SkipButton", () => {
     expect(button).not.toBeDisabled();
     // When task allows skip, show normal tooltip even if user is manager
     expect(button).toHaveAttribute("title", "Cancel (skip) task [ Ctrl+Space ]");
+    // Info icon should not be shown when task allows skip
+    expect(queryByTestId("info-icon")).not.toBeInTheDocument();
   });
 });

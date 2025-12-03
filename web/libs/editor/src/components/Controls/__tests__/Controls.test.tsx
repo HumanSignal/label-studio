@@ -12,8 +12,21 @@ jest.mock("@humansignal/ui", () => {
         </button>
       );
     }),
+    Tooltip: ({ children, title }: any) => {
+      return (
+        <div data-testid="tooltip" title={title}>
+          {children}
+        </div>
+      );
+    },
   };
 });
+
+jest.mock("@humansignal/icons", () => ({
+  IconInfoOutline: ({ width, height, className }: any) => (
+    <svg data-testid="info-icon" width={width} height={height} className={className} />
+  ),
+}));
 
 const createMockStore = (overrides: any = {}) => ({
   task: { id: 1, allow_skip: true, ...overrides.task },
@@ -159,7 +172,7 @@ describe("Controls", () => {
 
     const skipButton = getByText(/Skip/i).closest("button");
     expect(skipButton).not.toBeDisabled();
-    expect(skipButton).toHaveAttribute("title", "Cancel (skip) task (managers only) [ Ctrl+Space ]");
+    expect(skipButton).toHaveAttribute("title", "Cancel (skip) task: [ Ctrl+Space ]");
   });
 
   test("Skip button enabled when allow_skip=false but user is Manager (MA)", () => {

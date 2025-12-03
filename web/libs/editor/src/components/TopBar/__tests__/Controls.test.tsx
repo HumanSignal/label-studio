@@ -178,7 +178,7 @@ describe("TopBar Controls", () => {
     expect(skipButton).not.toBeDisabled();
 
     const tooltip = skipButton.closest('[data-testid="tooltip"]');
-    expect(tooltip).toHaveAttribute("title", "Cancel (skip) task (managers only) [ Ctrl+Space ]");
+    expect(tooltip).toHaveAttribute("title", "Cancel (skip) task: [ Ctrl+Space ]");
   });
 
   test("Skip button enabled when allow_skip=false but user is Manager (MA)", () => {
