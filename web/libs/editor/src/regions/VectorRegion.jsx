@@ -123,6 +123,9 @@ const Model = types
       return max ? Number.parseInt(max) : undefined;
     },
     get incomplete() {
+      // If maxPoints is reached, the region is complete (not incomplete)
+      if (self.atMaxLength) return false;
+
       const notClosed = self.closable === true && self.closed === false;
       const notFinished = self.minPoints && self.vertices.length < self.minPoints;
       return notClosed || notFinished;
