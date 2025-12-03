@@ -461,13 +461,18 @@ export default types
       hotkeys.addNamed("annotation:undo", () => {
         const annotation = self.annotationStore.selected;
 
-        if (!annotation.isDrawing) annotation.undo();
+        // Allow undo even during drawing - the undo() method handles stopping drawing
+        // when appropriate (e.g., when vertices <= 1 for vector regions)
+        // This matches the behavior of the undo button which doesn't check isDrawing
+        annotation.undo();
       });
 
       hotkeys.addNamed("annotation:redo", () => {
         const annotation = self.annotationStore.selected;
 
-        if (!annotation.isDrawing) annotation.redo();
+        // Allow redo even during drawing - matches the behavior of the redo button
+        // which doesn't check isDrawing
+        annotation.redo();
       });
 
       hotkeys.addNamed("region:exit", (e) => {
