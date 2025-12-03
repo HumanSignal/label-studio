@@ -58,10 +58,12 @@ describe("CurrentTask", () => {
   });
 
   it("sets canPostpone correctly", () => {
-    // check if next-task is enabled
+    // check if next-task is enabled (when canPostpone is true)
     store.hasInterface.mockImplementation((interfaceName: string) =>
       ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
     );
+    store.canGoNextTask = false; // Ensure canGoNextTask is false so postpone is the only option
+    store.annotationStore.selected.pk = null; // No submitted annotation
 
     const { rerender, getByTestId } = render(<CurrentTask store={store} />);
 
@@ -75,6 +77,7 @@ describe("CurrentTask", () => {
         .mockImplementation((interfaceName: string) =>
           ["skip", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
         ),
+      canGoNextTask: false, // Ensure canGoNextTask is false
     };
 
     rerender(<CurrentTask store={store} />);
@@ -82,14 +85,17 @@ describe("CurrentTask", () => {
     expect(getByTestId("next-task").disabled).toBe(true);
 
     // check if next-task is disabled removing the skip interface
-    store = {
-      ...store,
+    // When skip interface is removed, canPostpone becomes false (FF_LEAP_1173 requires skip)
+    // So button should be disabled unless canGoNextTask is true
+    Object.assign(store, {
       hasInterface: jest
         .fn()
         .mockImplementation((interfaceName: string) =>
           ["postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
         ),
-    };
+      canGoNextTask: false, // Ensure canGoNextTask is false for this test
+    });
+    store.annotationStore.selected.pk = null; // Ensure no submitted annotation
 
     rerender(<CurrentTask store={store} />);
 
@@ -103,6 +109,7 @@ describe("CurrentTask", () => {
         .mockImplementation((interfaceName: string) =>
           ["topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
         ),
+      canGoNextTask: false, // Ensure canGoNextTask is false for this test
     };
 
     rerender(<CurrentTask store={store} />);
@@ -168,12 +175,15 @@ describe("CurrentTask", () => {
     expect(getByTestId("next-task").disabled).toBe(true);
   });
 
-  it("enables postpone button when canGoNextTask=true regardless of allow_skip", () => {
+  it("enables next button when canGoNextTask=true regardless of allow_skip (history navigation)", () => {
     store.hasInterface.mockImplementation((interfaceName: string) =>
       ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
     );
     store.task = { id: 6616, allow_skip: false, allow_postpone: true };
     store.canGoNextTask = true;
+    // History navigation is allowed even for unskippable tasks if canGoNextTask is true
+    // But we need to ensure annotation is submitted for non-managers
+    store.annotationStore.selected.pk = "123"; // Submitted annotation
 
     const { getByTestId } = render(<CurrentTask store={store} />);
 

@@ -22,15 +22,46 @@ export const CurrentTask = observer(({ store }) => {
   const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
   const canSkipOrPostpone = taskAllowSkip || hasForceSkipPermission;
 
+  // Check if user has submitted an annotation (pk is defined means annotation is in database)
+  const hasSubmittedAnnotation = isDefined(store.annotationStore.selected.pk);
+
   // If task cannot be skipped and user doesn't have force_skip, also disable postpone
   // Note: store.hasInterface("postpone") is set by lsf-sdk based on task.allow_postpone from API
   const canPostpone =
-    !isDefined(store.annotationStore.selected.pk) &&
+    !hasSubmittedAnnotation &&
     !store.canGoNextTask &&
     (!isFF(FF_LEAP_1173) || store.hasInterface("skip")) &&
     !store.hasInterface("review") &&
     store.hasInterface("postpone") &&
     canSkipOrPostpone;
+
+  // For unskippable tasks, force user to submit annotation before navigating
+  // Block both history navigation (next task) and postpone if no annotation submitted
+  const requiresAnnotationSubmission = !taskAllowSkip && !hasForceSkipPermission && !hasSubmittedAnnotation;
+  const canNavigateNext = store.canGoNextTask && !requiresAnnotationSubmission;
+  const canPostponeTask = canPostpone && !requiresAnnotationSubmission;
+
+  // Memoized messages for previous button
+  const prevButtonMessage = useMemo(() => {
+    return !store.canGoPrevTask ? "No previous task" : "Previous task";
+  }, [store.canGoPrevTask]);
+
+  // Memoized messages for next button
+  const nextButtonMessage = useMemo(() => {
+    if (requiresAnnotationSubmission) {
+      return "Submit an annotation to continue";
+    }
+    if (canNavigateNext) {
+      return "Next task";
+    }
+    if (canPostponeTask) {
+      return "Postpone task";
+    }
+    if (!canSkipOrPostpone) {
+      return "Cannot postpone: task cannot be skipped";
+    }
+    return "No next task available";
+  }, [requiresAnnotationSubmission, canNavigateNext, canPostponeTask, canSkipOrPostpone]);
 
   return (
     <div className={cn("bottombar").elem("section").toClassName()}>
@@ -53,26 +84,20 @@ export const CurrentTask = observer(({ store }) => {
             <Button
               variant="neutral"
               data-testid="prev-task"
+              aria-label={prevButtonMessage}
               disabled={!historyEnabled || !store.canGoPrevTask}
               onClick={store.prevTask}
-              tooltip={!store.canGoPrevTask ? "No previous task" : "Previous task"}
+              tooltip={prevButtonMessage}
             >
               <IconChevronLeft />
             </Button>
             <Button
               data-testid="next-task"
-              disabled={!store.canGoNextTask && !canPostpone}
-              onClick={store.canGoNextTask ? store.nextTask : store.postponeTask}
-              variant={!store.canGoNextTask && canPostpone ? "primary" : "neutral"}
-              tooltip={
-                store.canGoNextTask
-                  ? "Next task"
-                  : canPostpone
-                    ? "Postpone task"
-                    : !canSkipOrPostpone
-                      ? "Cannot postpone: task cannot be skipped"
-                      : "No next task available"
-              }
+              aria-label={nextButtonMessage}
+              disabled={!canNavigateNext && !canPostponeTask}
+              onClick={canNavigateNext ? store.nextTask : store.postponeTask}
+              variant={!canNavigateNext && canPostponeTask ? "primary" : "neutral"}
+              tooltip={nextButtonMessage}
             >
               <IconChevronRight />
             </Button>
