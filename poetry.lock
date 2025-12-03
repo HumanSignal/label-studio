@@ -741,14 +741,14 @@ files = [
 
 [[package]]
 name = "django"
-version = "5.1.14"
+version = "5.1.15"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "django-5.1.14-py3-none-any.whl", hash = "sha256:2a4b9c20404fd1bf50aaaa5542a19d860594cba1354f688f642feb271b91df27"},
-    {file = "django-5.1.14.tar.gz", hash = "sha256:b98409fb31fdd6e8c3a6ba2eef3415cc5c0020057b43b21ba7af6eff5f014831"},
+    {file = "django-5.1.15-py3-none-any.whl", hash = "sha256:117871e58d6eda37f09870b7d73a3d66567b03aecd515b386b1751177c413432"},
+    {file = "django-5.1.15.tar.gz", hash = "sha256:46a356b5ff867bece73fc6365e081f21c569973403ee7e9b9a0316f27d0eb947"},
 ]
 
 [package.dependencies]
@@ -2131,7 +2131,7 @@ optional = false
 python-versions = ">=3.9,<4"
 groups = ["main"]
 files = [
-    {file = "fcfbf04524c72a1a834fccc23b6de433e1b87dc7.zip", hash = "sha256:8784e07cfa7074472c2cbbd1753afdb3cfe155168d951332667804d947c4b903"},
+    {file = "c6857e92b44143f1aba234471632891490777856.zip", hash = "sha256:6b8ca9a1c3c93c1d8726e0f1434f3faac410a6f98aee222419dd9e6b704e6605"},
 ]
 
 [package.dependencies]
@@ -2159,7 +2159,7 @@ xmljson = "0.2.1"
 
 [package.source]
 type = "url"
-url = "https://github.com/HumanSignal/label-studio-sdk/archive/fcfbf04524c72a1a834fccc23b6de433e1b87dc7.zip"
+url = "https://github.com/HumanSignal/label-studio-sdk/archive/c6857e92b44143f1aba234471632891490777856.zip"
 
 [[package]]
 name = "launchdarkly-server-sdk"
@@ -4952,18 +4952,18 @@ files = [
 
 [[package]]
 name = "werkzeug"
-version = "3.0.6"
+version = "3.1.4"
 description = "The comprehensive WSGI web application library."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 groups = ["test"]
 files = [
-    {file = "werkzeug-3.0.6-py3-none-any.whl", hash = "sha256:1bc0c2310d2fbb07b1dd1105eba2f7af72f322e1e455f2f93c993bee8c8a5f17"},
-    {file = "werkzeug-3.0.6.tar.gz", hash = "sha256:a8dd59d4de28ca70471a34cba79bed5f7ef2e036a76b3ab0835474246eb41f8d"},
+    {file = "werkzeug-3.1.4-py3-none-any.whl", hash = "sha256:2ad50fb9ed09cc3af22c54698351027ace879a0b60a3b5edf5730b2f7d876905"},
+    {file = "werkzeug-3.1.4.tar.gz", hash = "sha256:cd3cd98b1b92dc3b7b3995038826c68097dcb16f9baa63abe35f20eafeb9fe5e"},
 ]
 
 [package.dependencies]
-MarkupSafe = ">=2.1.1"
+markupsafe = ">=2.1.1"
 
 [package.extras]
 watchdog = ["watchdog (>=2.3)"]
@@ -5105,4 +5105,4 @@ uwsgi = ["pyuwsgi", "uwsgitop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "88983e4e46c24758b0430dea443d3a38c262fd4bb5c83d5d6bebe294f269ee11"
+content-hash = "b3a445d40bb867cedd338d0cc2e0042323754f1a41bf96f4cddba2332a0fff1d"
