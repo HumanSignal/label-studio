@@ -55,6 +55,7 @@ export const CurrentTask = observer(({ store }) => {
               data-testid="prev-task"
               disabled={!historyEnabled || !store.canGoPrevTask}
               onClick={store.prevTask}
+              tooltip={!store.canGoPrevTask ? "No previous task" : "Previous task"}
             >
               <IconChevronLeft />
             </Button>
@@ -63,6 +64,15 @@ export const CurrentTask = observer(({ store }) => {
               disabled={!store.canGoNextTask && !canPostpone}
               onClick={store.canGoNextTask ? store.nextTask : store.postponeTask}
               variant={!store.canGoNextTask && canPostpone ? "primary" : "neutral"}
+              tooltip={
+                store.canGoNextTask
+                  ? "Next task"
+                  : canPostpone
+                    ? "Postpone task"
+                    : !canSkipOrPostpone
+                      ? "Cannot postpone: task cannot be skipped"
+                      : "No next task available"
+              }
             >
               <IconChevronRight />
             </Button>

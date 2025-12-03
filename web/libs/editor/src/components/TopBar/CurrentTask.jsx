@@ -102,17 +102,27 @@ export const CurrentTask = observer(({ store }) => {
               onClick={store.prevTask}
               style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
               variant="neutral"
+              tooltip={!store.canGoPrevTask ? "No previous task" : "Previous task"}
             >
               <IconChevronLeft />
             </Button>
             <Button
               data-testid="next-task"
-              aria-label="Next task"
+              aria-label={store.canGoNextTask ? "Next task" : canPostpone ? "Postpone task" : "Next task"}
               look="string"
               disabled={!store.canGoNextTask && !canPostpone}
               onClick={store.canGoNextTask ? store.nextTask : store.postponeTask}
               style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
               variant={!store.canGoNextTask && canPostpone ? "primary" : "neutral"}
+              tooltip={
+                store.canGoNextTask
+                  ? "Next task"
+                  : canPostpone
+                    ? "Postpone task"
+                    : !canSkipOrPostpone
+                      ? "Cannot postpone: task cannot be skipped"
+                      : "No next task available"
+              }
             >
               <IconChevronRight />
             </Button>
