@@ -98,19 +98,27 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
 
         {!isLoading && !isError && history.length > 0 && (
           <div className="space-y-3">
-            {history.map((item: StateHistoryItem, index: number) => (
-              <div key={index} className="pb-3 border-b border-neutral-border last:border-0 last:pb-0">
-                <div className="flex items-center justify-between mb-2">
-                  <Badge className={getStateColorClass(item.state)}>{formatStateName(item.state)}</Badge>
-                  <Typography variant="body" size="smallest" className="text-neutral-content-subtle">
-                    {formatTimestamp(item.created_at)}
-                  </Typography>
+            {history.map((item: StateHistoryItem, index: number) => {
+              const reasonText = item.triggered_by ? formatUserName(item.triggered_by) : item.context_data?.reason;
+              return (
+                <div
+                  key={index}
+                  className="flex flex-col gap-2 pb-3 border-b border-neutral-border last:border-0 last:pb-0"
+                >
+                  <div className="flex items-center justify-between">
+                    <Badge className={getStateColorClass(item.state)}>{formatStateName(item.state)}</Badge>
+                    <Typography variant="body" size="smallest" className="text-neutral-content-subtle">
+                      {formatTimestamp(item.created_at)}
+                    </Typography>
+                  </div>
+                  {reasonText && (
+                    <Typography variant="body" size="smallest" className="text-muted-foreground">
+                      {reasonText}
+                    </Typography>
+                  )}
                 </div>
-                <Typography variant="body" size="smallest" className="text-muted-foreground">
-                  {item.triggered_by ? `By: ${formatUserName(item.triggered_by)}` : item.context_data?.reason}
-                </Typography>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
