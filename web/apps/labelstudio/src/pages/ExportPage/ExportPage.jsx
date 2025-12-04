@@ -6,7 +6,7 @@ import { Modal } from "../../components/Modal/Modal";
 import { Space } from "../../components/Space/Space";
 import { useAPI } from "../../providers/ApiProvider";
 import { useFixedLocation, useParams } from "../../providers/RoutesProvider";
-import { BemWithSpecificContext } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { isDefined } from "../../utils/helpers";
 import "./ExportPage.scss";
 
@@ -22,8 +22,6 @@ const downloadFile = (blob, filename) => {
   link.download = filename;
   link.click();
 };
-
-const { Block, Elem } = BemWithSpecificContext();
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 5000));
 
@@ -115,7 +113,7 @@ export const ExportPage = () => {
       // footer="Read more about supported export formats in the Documentation."
       visible
     >
-      <Block name="export-page">
+      <div className={cn("export-page").toClassName()}>
         <FormatInfo
           availableFormats={availableFormats}
           selected={currentFormat}
@@ -126,56 +124,62 @@ export const ExportPage = () => {
           <Input type="hidden" name="exportType" value={currentFormat} />
         </Form>
 
-        <Elem name="footer">
+        <div className={cn("export-page").elem("footer").toClassName()}>
           <Space style={{ width: "100%" }} spread>
-            <Elem name="recent">{/* {exportHistory} */}</Elem>
-            <Elem name="actions">
+            <div className={cn("export-page").elem("recent").toClassName()}>{/* {exportHistory} */}</div>
+            <div className={cn("export-page").elem("actions").toClassName()}>
               <Space>
                 {downloadingMessage && "Files are being prepared. It might take some time."}
                 <Button className="w-[135px]" onClick={proceedExport} waiting={downloading} aria-label="Export data">
                   Export
                 </Button>
               </Space>
-            </Elem>
+            </div>
           </Space>
-        </Elem>
-      </Block>
+        </div>
+      </div>
     </Modal>
   );
 };
 
 const FormatInfo = ({ availableFormats, selected, onClick }) => {
   return (
-    <Block name="formats">
-      <Elem name="info">You can export dataset in one of the following formats:</Elem>
-      <Elem name="list">
+    <div className={cn("formats").toClassName()}>
+      <div className={cn("formats").elem("info").toClassName()}>
+        You can export dataset in one of the following formats:
+      </div>
+      <div className={cn("formats").elem("list").toClassName()}>
         {availableFormats.map((format) => (
-          <Elem
+          <div
             key={format.name}
-            name="item"
-            mod={{
-              active: !format.disabled,
-              selected: format.name === selected,
-            }}
+            className={cn("formats")
+              .elem("item")
+              .mod({
+                active: !format.disabled,
+                selected: format.name === selected,
+              })
+              .toClassName()}
             onClick={!format.disabled ? () => onClick(format) : null}
           >
-            <Elem name="name">
+            <div className={cn("formats").elem("name").toClassName()}>
               {format.title}
 
               <Space size="small">
                 {format.tags?.map?.((tag, index) => (
-                  <Elem key={index} name="tag">
+                  <div key={index} className={cn("formats").elem("tag").toClassName()}>
                     {tag}
-                  </Elem>
+                  </div>
                 ))}
               </Space>
-            </Elem>
+            </div>
 
-            {format.description && <Elem name="description">{format.description}</Elem>}
-          </Elem>
+            {format.description && (
+              <div className={cn("formats").elem("description").toClassName()}>{format.description}</div>
+            )}
+          </div>
         ))}
-      </Elem>
-      <Elem name="feedback">
+      </div>
+      <div className={cn("formats").elem("feedback").toClassName()}>
         Can't find an export format?
         <br />
         Please let us know in{" "}
@@ -191,8 +195,8 @@ const FormatInfo = ({ availableFormats, selected, onClick }) => {
         >
           Repository
         </a>
-      </Elem>
-    </Block>
+      </div>
+    </div>
   );
 };
 

@@ -3,7 +3,7 @@
  */
 
 import { Badge, Button, Typography } from "@humansignal/ui";
-import { IconSync, IconError, IconHistoryRewind } from "@humansignal/icons";
+import { IconSync, IconError, IconHistoryRewind, IconCross } from "@humansignal/icons";
 import { useStateHistory, type StateHistoryItem } from "../../hooks/useStateHistory";
 import { getStateColorClass, formatStateName, formatTimestamp, formatUserName } from "./utils";
 
@@ -11,9 +11,10 @@ export interface StateHistoryPopoverContentProps {
   entityType: "task" | "annotation" | "project";
   entityId: number;
   isOpen: boolean;
+  onClose?: () => void;
 }
 
-export function StateHistoryPopoverContent({ entityType, entityId, isOpen }: StateHistoryPopoverContentProps) {
+export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClose }: StateHistoryPopoverContentProps) {
   const { data, isLoading, isError, error, refetch } = useStateHistory({
     entityType,
     entityId,
@@ -29,11 +30,25 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen }: Sta
     >
       {/* Header */}
       <div className="px-4 py-3 border-b border-neutral-border">
-        <div className="flex items-center gap-2">
-          <IconHistoryRewind className="w-4 h-4 text-muted-foreground" />
-          <Typography variant="body" size="small" className="font-medium text-neutral-foreground">
-            State History
-          </Typography>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <IconHistoryRewind className="w-4 h-4 text-muted-foreground" />
+            <Typography variant="body" size="small" className="font-medium text-neutral-foreground">
+              State History
+            </Typography>
+          </div>
+          {onClose && (
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              leading={<IconCross />}
+              look="string"
+              size="small"
+              aria-label="Close"
+            />
+          )}
         </div>
       </div>
 

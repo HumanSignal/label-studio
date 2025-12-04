@@ -1,11 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { Label } from "..";
-import { BemWithSpecificContext } from "../../../../utils/bem";
+import { cn } from "../../../../utils/bem";
 import { FormField } from "../../FormField";
 import "./RadioGroup.scss";
 
 const RadioContext = createContext();
-const { Block, Elem } = BemWithSpecificContext();
 
 export const RadioGroup = ({
   label,
@@ -50,10 +49,10 @@ export const RadioGroup = ({
             isSimple: simple === true,
           }}
         >
-          <Block name="radio-group-ls" mod={{ size, simple }} mix={className}>
+          <div className={cn("radio-group-ls").mod({ size, simple }).mix(className).toClassName()}>
             <input ref={ref} name={props.name} type="hidden" defaultValue={currentValue} />
-            <Elem name="buttons">{children}</Elem>
-          </Block>
+            <div className={cn("radio-group-ls").elem("buttons").toClassName()}>{children}</div>
+          </div>
         </RadioContext.Provider>
       )}
     </FormField>
@@ -90,7 +89,10 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
   }, [props.checked]);
 
   return (
-    <Elem name="button" mod={{ checked, disabled }} onClickCapture={clickHandler}>
+    <div
+      className={cn("radio-group-ls").elem("button").mod({ checked, disabled }).toClassName()}
+      onClickCapture={clickHandler}
+    >
       {isSimple ? (
         <Label placement="right" text={label} description={description}>
           <input
@@ -105,7 +107,7 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
       ) : (
         children
       )}
-    </Elem>
+    </div>
   );
 };
 

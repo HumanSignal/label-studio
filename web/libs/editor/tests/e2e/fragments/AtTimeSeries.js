@@ -37,9 +37,16 @@ module.exports = {
    *
    * {{ react }}
    */
-  grabStickTime() {
+  async grabStickTime() {
     // xPath cannot find `text` tag so we exchange it with `*`
-    return I.grabTextFrom(locate(this._channelStickSelector).find("*").at(2));
+    const rawValue = await I.grabTextFrom(locate(this._channelStickSelector).find("*").at(2));
+    const numericPart = rawValue.match(/-?\d+(?:\.\d+)?/);
+    const parsedValue = numericPart ? Number(numericPart[0]) : Number(rawValue);
+
+    // Cursor labels are formatted with one decimal place (e.g. "0.8 Hz") even when the
+    // underlying data is integer-based. Round to the nearest integer so equality checks
+    // on sequential timestamps keep passing regardless of the display format.
+    return Number.isFinite(parsedValue) ? Math.round(parsedValue) : parsedValue;
   },
 
   /**

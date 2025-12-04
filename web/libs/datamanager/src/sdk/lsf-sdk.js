@@ -812,6 +812,18 @@ export class LSFWrapper {
   };
 
   onSkipTask = async (_, { comment } = {}) => {
+    // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+    const MANAGER_ROLES = ["OW", "AD", "MA"];
+    const task = this.task;
+    const taskAllowSkip = task?.allow_skip !== false;
+    const userRole = window.APP_SETTINGS?.user?.role;
+    const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
+    const canSkip = taskAllowSkip || hasForceSkipPermission;
+    if (!canSkip) {
+      console.warn("Task cannot be skipped: allow_skip is false and user lacks manager role");
+      this.showOperationToast(400, null, "This task cannot be skipped", { error: "Task cannot be skipped" });
+      return;
+    }
     const result = await this.submitCurrentAnnotation(
       "skipTask",
       async (taskID, body) => {

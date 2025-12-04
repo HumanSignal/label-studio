@@ -167,7 +167,7 @@ describe("TaskSummary", () => {
 
     render(<TaskSummary annotations={annotations} store={store} />);
 
-    expect(screen.getByText("Review Summary")).toBeInTheDocument();
+    expect(screen.getByText("Task Summary")).toBeInTheDocument();
     expect(screen.getByText("Task Data")).toBeInTheDocument();
   });
 

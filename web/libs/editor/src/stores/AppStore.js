@@ -461,13 +461,18 @@ export default types
       hotkeys.addNamed("annotation:undo", () => {
         const annotation = self.annotationStore.selected;
 
-        if (!annotation.isDrawing) annotation.undo();
+        // Allow undo even during drawing - the undo() method handles stopping drawing
+        // when appropriate (e.g., when vertices <= 1 for vector regions)
+        // This matches the behavior of the undo button which doesn't check isDrawing
+        annotation.undo();
       });
 
       hotkeys.addNamed("annotation:redo", () => {
         const annotation = self.annotationStore.selected;
 
-        if (!annotation.isDrawing) annotation.redo();
+        // Allow redo even during drawing - matches the behavior of the redo button
+        // which doesn't check isDrawing
+        annotation.redo();
       });
 
       hotkeys.addNamed("region:exit", (e) => {
@@ -669,6 +674,17 @@ export default types
 
     function skipTask(extraData) {
       if (self.isSubmitting) return;
+      // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+      const MANAGER_ROLES = ["OW", "AD", "MA"];
+      const task = self.task;
+      const taskAllowSkip = task?.allow_skip !== false;
+      const userRole = window.APP_SETTINGS?.user?.role;
+      const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
+      const canSkip = taskAllowSkip || hasForceSkipPermission;
+      if (!canSkip) {
+        console.warn("Task cannot be skipped: allow_skip is false and user lacks manager role");
+        return;
+      }
       handleSubmittingFlag(() => {
         getEnv(self).events.invoke("skipTask", self, extraData);
         self.incrementQueuePosition();

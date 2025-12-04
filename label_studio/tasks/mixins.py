@@ -1,10 +1,16 @@
+from core.feature_flags import flag_set
+
+
 class TaskMixin:
     def has_permission(self, user: 'User') -> bool:  # noqa: F821
         """Called by Task#has_permission"""
         return True
 
     def _get_is_labeled_value(self) -> bool:
-        n = self.completed_annotations.count()
+        if flag_set('fflag_fix_fit_1082_overlap_use_distinct_annotators', user='auto'):
+            n = self.completed_annotations.values('completed_by').distinct().count()
+        else:
+            n = self.completed_annotations.count()
         return n >= self.overlap
 
     def update_is_labeled(self, *args, **kwargs) -> None:

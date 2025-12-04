@@ -1,6 +1,7 @@
 from organizations.tests.factories import OrganizationFactory
 from projects.tests.factories import ProjectFactory
 from rest_framework.test import APITestCase
+from tasks.models import Task
 from tasks.tests.factories import TaskFactory
 
 
@@ -50,6 +51,7 @@ class TestTaskAPI(APITestCase):
             'comment_count': 0,
             'last_comment_updated_at': None,
             'unresolved_comment_count': 0,
+            'allow_skip': True,
         }
 
     def test_patch_task(self):
@@ -92,6 +94,7 @@ class TestTaskAPI(APITestCase):
             'comment_count': 0,
             'last_comment_updated_at': None,
             'unresolved_comment_count': 0,
+            'allow_skip': True,
         }
 
     def test_create_task_without_project_id_fails(self):
@@ -123,3 +126,67 @@ class TestTaskAPI(APITestCase):
         response_data = response.json()
         assert response_data['project'] == self.project.id
         assert response_data['data'] == {'text': 'test task'}
+
+    def test_get_task_includes_allow_skip(self):
+        """Test that GET task API includes allow_skip field"""
+        task = TaskFactory(project=self.project, allow_skip=False)
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(f'/api/tasks/{task.id}/')
+        assert response.status_code == 200
+        response_data = response.json()
+        assert 'allow_skip' in response_data
+        assert response_data['allow_skip'] is False
+
+    def test_create_task_with_allow_skip(self):
+        """Test that creating a task with allow_skip field succeeds"""
+        payload = {
+            'project': self.project.id,
+            'data': {'text': 'test task'},
+            'meta': {},
+            'allow_skip': False,
+        }
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post('/api/tasks/', data=payload, format='json')
+
+        assert response.status_code == 201
+        response_data = response.json()
+        assert response_data['allow_skip'] is False
+        task = Task.objects.get(id=response_data['id'])
+        assert task.allow_skip is False
+
+    def test_skip_unskippable_task_fails(self):
+        """Test that skipping a task with allow_skip=False fails"""
+        task = TaskFactory(project=self.project, allow_skip=False)
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            f'/api/tasks/{task.id}/annotations/', data={'result': [], 'was_cancelled': True}, format='json'
+        )
+
+        assert response.status_code == 400
+        response_data = response.json()
+        assert 'cannot be skipped' in str(response_data).lower()
+
+    def test_skip_skippable_task_succeeds(self):
+        """Test that skipping a task with allow_skip=True succeeds"""
+        task = TaskFactory(project=self.project, allow_skip=True)
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            f'/api/tasks/{task.id}/annotations/', data={'result': [], 'was_cancelled': True}, format='json'
+        )
+
+        assert response.status_code == 201
+
+    def test_skip_task_with_default_allow_skip_succeeds(self):
+        """Test that skipping a task without explicit allow_skip (defaults to True) succeeds"""
+        task = TaskFactory(project=self.project)  # allow_skip defaults to True
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post(
+            f'/api/tasks/{task.id}/annotations/', data={'result': [], 'was_cancelled': True}, format='json'
+        )
+
+        assert response.status_code == 201

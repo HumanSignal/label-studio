@@ -1,3 +1,7 @@
+/**
+ * @deprecated this file is not used; AnnotationsCarousel is used instead
+ */
+
 import { observer } from "mobx-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Space } from "../../common/Space/Space";
