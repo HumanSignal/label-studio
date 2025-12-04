@@ -16,6 +16,9 @@ export interface StateHistoryItem {
   previous_state?: string;
   transition_name?: string;
   reason?: string;
+  context_data?: {
+    reason?: string;
+  };
 }
 
 export interface StateHistoryResponse {
