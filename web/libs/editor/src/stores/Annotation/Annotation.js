@@ -977,7 +977,8 @@ const _Annotation = types
       //   }
       // };
 
-      Hotkey.setScope(Hotkey.DEFAULT_SCOPE);
+      const { enableHotkeys } = self.store.settings;
+      Hotkey.setScope(enableHotkeys ? Hotkey.DEFAULT_SCOPE : "__none__");
     },
 
     createResult(areaValue, resultValue, control, object, skipAfrerCreate = false, additionalStates = []) {

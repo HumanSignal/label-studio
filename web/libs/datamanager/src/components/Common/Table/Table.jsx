@@ -526,6 +526,9 @@ const TaskSourceView = ({ content, onTaskLoad, sdkType }) => {
         formatted.annotations = response.annotations ?? [];
         formatted.predictions = response.predictions ?? [];
       }
+      if (response.state) {
+        formatted.state = response.state;
+      }
       setSource(formatted);
     });
   }, []);

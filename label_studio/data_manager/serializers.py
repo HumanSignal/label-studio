@@ -483,6 +483,10 @@ class DataManagerTaskSerializer(TaskSerializer):
             and flag_set('fflag_feat_fit_710_fsm_state_fields', user=user)
         ):
             ret.pop('state', None)
+        # Ensure allow_skip is always present in the response, even if None
+        # This is important for frontend logic that checks allow_skip !== false
+        if 'allow_skip' not in ret:
+            ret['allow_skip'] = obj.allow_skip
         return ret
 
     def _pretty_results(self, task, field, unique=False):

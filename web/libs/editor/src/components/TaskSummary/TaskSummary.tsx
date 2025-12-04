@@ -23,9 +23,9 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
 
   const onSelect = (entity: Annotation) => {
     if (entity.type === "annotation") {
-      annotationStore.selectAnnotation(entity.id);
+      annotationStore.selectAnnotation(entity.id, { exitViewAll: true });
     } else {
-      annotationStore.selectPrediction(entity.id);
+      annotationStore.selectPrediction(entity.id, { exitViewAll: true });
     }
   };
 
@@ -92,7 +92,7 @@ const TaskSummary = ({ annotations: all, store: annotationStore }: TaskSummaryPr
   return (
     <div className="p-6">
       <div className="mb-base">
-        <h2 className="mb-base text-headline-small font-semibold text-neutral-content">Review Summary</h2>
+        <h2 className="mb-base text-headline-small font-semibold text-neutral-content">Task Summary</h2>
         <NumbersSummary values={values} />
       </div>
       <div className="mb-relaxed">

@@ -15,10 +15,10 @@ export const providers = {
   azure: azureProvider,
   redis: redisProvider,
   // Enterprise providers
-  databricks: databricksProvider,
   s3s: s3sProvider,
   gcswif: gcsWifProvider,
   azure_spi: azureSpiProvider,
+  databricks: databricksProvider,
   // Local provider
   localfiles: localFilesProvider,
 };

@@ -1,8 +1,9 @@
+import Constants from "../../core/Constants";
 import type { MSTControlTag } from "../../stores/types";
 import { contrastColor, convertToRGBA } from "../../utils/colors";
 import type { ControlTag, LabelColors, LabelCounts } from "./types";
 
-const defaultLabelColor = "var(--color-grape-200)";
+const defaultLabelColor = Constants.LABEL_BACKGROUND;
 
 /**
  * Generate light pastel-like background colors for label chips, cycling through
@@ -98,11 +99,16 @@ export const getLabelCounts = (labels: string[], labelColors: Record<string, Lab
   const labelCounts: Record<string, LabelCounts> = Object.fromEntries(
     Object.entries(labelColors).map(([lbl, attr]) => [lbl, { ...attr, count: 0 }]),
   );
+  const defaultData = {
+    background: convertToRGBA(defaultLabelColor, 0.3),
+    border: defaultLabelColor,
+    count: 0,
+  };
 
   for (const label of labels) {
     let data = labelCounts[label];
     if (!data) {
-      data = labelCounts[label] = { count: 0, border: defaultLabelColor, value: label, background: defaultLabelColor };
+      data = labelCounts[label] = { ...defaultData, value: label };
     }
     data.count++;
   }

@@ -1509,6 +1509,14 @@ You can also create a storage connection using the Label Studio API.
 ### Set up local storage with Docker
 If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](https://labelstud.io/guide/start#Run-Label-Studio-on-Docker-and-use-Local-Storage).
 
+<div class="opensource-only">
+
+!!! note "Community Edition auto-detection for Docker"
+    In the open source Community Edition, if `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` and `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED` are not set, Label Studio automatically looks in the current working directory for folders named `mydata` or `label-studio-data`.
+    When you use the official Docker image, the application runs from `/label-studio`, so you can mount a host folder to `/label-studio/mydata` or `/label-studio/label-studio-data` inside the container to enable local file serving without additional configuration.
+
+</div>
+
 
 
 
