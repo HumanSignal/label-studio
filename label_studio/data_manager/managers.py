@@ -498,6 +498,10 @@ class TaskQuerySet(FSMStateQuerySetMixin, models.QuerySet):
 
         :param prepare_params: prepare params with project, filters, orderings, etc
         :return: ordered and filtered queryset
+
+        Note: For multi-project queries, filters and ordering will use the first project's
+        configuration (label config, custom fields, etc.). This is backwards compatible
+        with single-project queries.
         """
         from projects.models import Project
 
@@ -506,7 +510,14 @@ class TaskQuerySet(FSMStateQuerySetMixin, models.QuerySet):
         if prepare_params is None:
             return queryset
 
-        project = Project.objects.get(pk=prepare_params.project)
+        # Get the project for filter/ordering configuration
+        # For multi-project queries, use the first project's configuration
+        if prepare_params.is_multi_project:
+            project = Project.objects.get(pk=prepare_params.projects[0])
+        else:
+            # Backwards compatible: prepare_params.project is an int
+            project = Project.objects.get(pk=prepare_params.project)
+
         request = prepare_params.request
         queryset = apply_filters(queryset, prepare_params.filters, project, request)
         queryset = apply_ordering(queryset, prepare_params.ordering, project, request, view_data=prepare_params.data)
@@ -840,7 +851,11 @@ class PreparedTaskManager(models.Manager):
 
     def only_filtered(self, prepare_params=None):
         request = prepare_params.request
-        queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
+        # Support both single and multiple projects
+        if prepare_params.is_multi_project:
+            queryset = TaskQuerySet(self.model).filter(project__in=prepare_params.projects)
+        else:
+            queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering, request=request)
         return queryset.prepared(prepare_params=prepare_params)
