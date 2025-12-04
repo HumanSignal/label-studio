@@ -173,6 +173,7 @@ export { ReactComponent as IconMail } from "./mail.svg";
 export { ReactComponent as IconMastercard } from "./mastercard.svg";
 export { ReactComponent as IconMembers } from "./members.svg";
 export { ReactComponent as IconMenu } from "./menu.svg";
+export { ReactComponent as IconMessagesCheck } from "./messages-check.svg";
 export { ReactComponent as IconMinus } from "./minus.svg";
 export { ReactComponent as IconModel } from "./model.svg";
 export { ReactComponent as IconModels } from "./models.svg";
