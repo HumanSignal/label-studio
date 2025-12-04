@@ -107,7 +107,7 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
                   </Typography>
                 </div>
                 <Typography variant="body" size="smallest" className="text-muted-foreground">
-                  By: {formatUserName(item.triggered_by)}
+                  {item.triggered_by ? `By: ${formatUserName(item.triggered_by)}` : item.context_data?.reason}
                 </Typography>
               </div>
             ))}
