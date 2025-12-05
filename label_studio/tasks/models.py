@@ -97,6 +97,12 @@ class Task(TaskMixin, FsmHistoryStateModel):
         help_text='True if the number of annotations for this task is greater than or equal '
         'to the number of maximum_completions for the project',
     )
+    allow_skip = models.BooleanField(
+        _('allow_skip'),
+        default=True,
+        null=True,
+        help_text='Whether this task can be skipped. Set to False to make task unskippable.',
+    )
     overlap = models.IntegerField(
         _('overlap'),
         default=1,

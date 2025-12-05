@@ -448,6 +448,8 @@ class ImportStorage(Storage):
         link_kwargs = asdict(link_object)
         data = link_kwargs.pop('task_data', None)
 
+        allow_skip = data.get('allow_skip', None)
+
         # predictions
         predictions = data.get('predictions') or []
         if predictions:
@@ -483,6 +485,7 @@ class ImportStorage(Storage):
                 total_annotations=len(annotations) - cancelled_annotations,
                 cancelled_annotations=cancelled_annotations,
                 inner_id=max_inner_id,
+                allow_skip=(allow_skip if allow_skip is not None else True),
             )
             # Save with skip_fsm flag to bypass FSM during bulk import
             task.save(skip_fsm=True)

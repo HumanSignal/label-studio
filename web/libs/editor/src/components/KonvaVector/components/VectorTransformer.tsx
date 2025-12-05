@@ -250,6 +250,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         isFirstTransformTickRef.current = true;
       }}
       onDragStart={(_e: any) => {
+        // Notify that transformation has started (for history freezing)
+        onTransformationStart?.();
+
         // Store original positions when dragging starts (for pure drag operations)
         originalPositionsRef.current = {};
         Array.from(selectedPoints).forEach((index) => {
@@ -477,6 +480,9 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         } catch (error) {
           console.warn("Drag end error:", error);
         }
+
+        // Notify that transformation has ended (for history unfreezing)
+        onTransformationEnd?.();
       }}
       onTransformEnd={(_e: any) => {
         // Get the transformer

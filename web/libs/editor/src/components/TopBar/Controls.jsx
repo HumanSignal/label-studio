@@ -3,7 +3,7 @@
  */
 
 import { inject, observer } from "mobx-react";
-import { IconBan } from "@humansignal/icons";
+import { IconBan, IconInfoOutline } from "@humansignal/icons";
 import { Button, Tooltip } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
 import { isDefined } from "../../utils/utilities";
@@ -141,15 +141,38 @@ export const Controls = controlsInjector(
         </ButtonTooltip>,
       );
     } else {
+      // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+      const MANAGER_ROLES = ["OW", "AD", "MA"];
+
       if (store.hasInterface("skip")) {
+        const task = store.task;
+        const taskAllowSkip = task?.allow_skip !== false;
+        const userRole = window.APP_SETTINGS?.user?.role;
+        const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
+        const canSkip = taskAllowSkip || hasForceSkipPermission;
+        const isDisabled = disabled || !canSkip;
+
+        const tooltip = canSkip ? "Cancel (skip) task: [ Ctrl+Space ]" : "This task cannot be skipped";
+
+        const showInfoIcon = !taskAllowSkip && hasForceSkipPermission;
+
+        if (showInfoIcon) {
+          buttons.push(
+            <Tooltip key="skip-info" title="Annotators and Reviewers will not be able to skip this task">
+              <IconInfoOutline width={20} height={20} className="text-neutral-content ml-auto cursor-pointer" />
+            </Tooltip>,
+          );
+        }
+
         buttons.push(
-          <ButtonTooltip key="skip" title="Cancel (skip) task: [ Ctrl+Space ]">
+          <ButtonTooltip key="skip" title={tooltip}>
             <Button
               aria-label="Skip current task"
-              disabled={disabled}
+              disabled={isDisabled}
               variant="negative"
               look="outlined"
               onClick={async (e) => {
+                if (!canSkip) return;
                 if (store.hasInterface("comments:skip") ?? true) {
                   buttonHandler(e, () => store.skipTask({}), "Please enter a comment before skipping");
                 } else {

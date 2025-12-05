@@ -4,7 +4,8 @@ import { CheckCircleOutlined, CheckOutlined } from "@ant-design/icons";
 import Hint from "../Hint/Hint";
 import { DraftPanel } from "../Annotations/Annotations";
 import styles from "./Controls.module.scss";
-import { Button } from "@humansignal/ui";
+import { Button, Tooltip } from "@humansignal/ui";
+import { IconInfoOutline } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
 
 export default inject("store")(
@@ -51,20 +52,40 @@ export default inject("store")(
     /**
      * Check for Predict Menu
      */
+    // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+    const MANAGER_ROLES = ["OW", "AD", "MA"];
+
     if (!store.annotationStore.predictSelect || store.explore) {
       const disabled = store.isSubmitting;
+      const task = store.task;
+      const taskAllowSkip = task?.allow_skip !== false;
+      const userRole = window.APP_SETTINGS?.user?.role;
+      const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
+      const canSkip = taskAllowSkip || hasForceSkipPermission;
+      const skipDisabled = disabled || !canSkip;
+
+      const skipTooltip = canSkip ? "Cancel (skip) task: [ Ctrl+Space ]" : "This task cannot be skipped";
+
+      const showInfoIcon = !taskAllowSkip && hasForceSkipPermission;
 
       if (store.hasInterface("skip")) {
         skipButton = (
-          <Button
-            disabled={disabled}
-            look="danger"
-            onClick={store.skipTask}
-            tooltip="Cancel (skip) task: [ Ctrl+Space ]"
-            className={`${styles.skip} ${skipButtonClassName}`}
-          >
-            Skip {buttons.skip}
-          </Button>
+          <>
+            {showInfoIcon && (
+              <Tooltip title="Annotators and Reviewers will not be able to skip this task">
+                <IconInfoOutline width={20} height={20} className="text-neutral-content ml-auto cursor-pointer" />
+              </Tooltip>
+            )}
+            <Button
+              disabled={skipDisabled}
+              look="danger"
+              onClick={canSkip ? store.skipTask : undefined}
+              tooltip={skipTooltip}
+              className={`${styles.skip} ${skipButtonClassName}`}
+            >
+              Skip {buttons.skip}
+            </Button>
+          </>
         );
       }
 

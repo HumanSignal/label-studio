@@ -489,18 +489,23 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
   // Helper function to call onTransformStart (only if not already transforming)
   const handleTransformStart = useCallback(() => {
-    if (!isTransformingRef.current && onTransformStart) {
+    if (!isTransformingRef.current) {
       isTransformingRef.current = true;
-      onTransformStart();
+      // Always call onTransformStart if provided, even if called multiple times
+      // The flag prevents duplicate calls, but we ensure it's called at least once
+      onTransformStart?.();
     }
   }, [onTransformStart]);
 
   // Helper function to call onTransformEnd (only if currently transforming)
   const handleTransformEnd = useCallback(
     (e?: Konva.KonvaEventObject<MouseEvent>) => {
-      if (isTransformingRef.current && onTransformEnd) {
+      // Always reset the flag if we were transforming
+      // This ensures we don't get stuck in a transforming state
+      if (isTransformingRef.current) {
         isTransformingRef.current = false;
-        onTransformEnd(e);
+        // Always call onTransformEnd if provided to ensure history is unfrozen
+        onTransformEnd?.(e);
       }
     },
     [onTransformEnd],
