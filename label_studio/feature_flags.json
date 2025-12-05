@@ -5174,7 +5174,7 @@
     },
     "fflag_fix_fit_1082_overlap_use_distinct_annotators": {
       "key": "fflag_fix_fit_1082_overlap_use_distinct_annotators",
-      "on": false,
+      "on": true,
       "prerequisites": [],
       "targets": [],
       "contextTargets": [],
@@ -5196,7 +5196,7 @@
       "trackEvents": false,
       "trackEventsFallthrough": false,
       "debugEventsUntilDate": null,
-      "version": 2,
+      "version": 3,
       "deleted": false
     },
     "fflag_fix_font_lsdv_3009_draft_saving_stuck_130223_short": {
