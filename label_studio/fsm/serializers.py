@@ -25,7 +25,7 @@ class StateModelSerializer(serializers.Serializer):
 
     def to_representation(self, instance):
         """
-        Override to exclude triggered_by field for annotators and reviewers.
+        Override to exclude triggered_by field for annotators.
         """
         data = super().to_representation(instance)
 
