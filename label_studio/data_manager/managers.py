@@ -31,6 +31,7 @@ from django.db.models import (
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Coalesce, Concat
 from fsm.queryset_mixins import FSMStateQuerySetMixin
+from fsm.registry import get_state_choices
 from pydantic import BaseModel
 from rest_framework.exceptions import ValidationError
 
@@ -172,6 +173,13 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
                 queryset = queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data'))
             f = F('ordering_field').asc(nulls_last=True) if ascending else F('ordering_field').desc(nulls_last=True)
 
+        elif field_name == 'state':
+            state_choices = get_state_choices('task')
+            whens = [When(current_state=state, then=Value(i + 1)) for i, state in enumerate(state_choices.values)]
+            queryset = queryset.annotate(
+                state_order=Case(*whens, default=Value(0), output_field=models.IntegerField())
+            )
+            f = F('state_order').asc(nulls_last=True) if ascending else F('state_order').desc(nulls_last=True)
         else:
             f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
 
