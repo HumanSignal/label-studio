@@ -308,7 +308,7 @@ class ProjectCountsListAPI(generics.ListAPIView):
                             'total_predictions_number': 0,
                             'sampling': 'Sequential sampling',
                             'show_ground_truth_first': True,
-                            'show_ground_truth_always': False,
+                            'annotator_evaluation_enabled': False,
                             'show_overlap_first': True,
                             'overlap_cohort_percentage': 100,
                             'task_data_login': 'user',
