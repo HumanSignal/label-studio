@@ -895,6 +895,15 @@ class Project(ProjectMixin, FsmHistoryStateModel):
                 elif self.num_annotations == 0 and self.num_drafts == 0:
                     summary.reset(tasks_data_based=False)
 
+        # Call dimensions postprocess if configured (LSE feature)
+        dimensions_postprocess = load_func(settings.PROJECT_SAVE_DIMENSIONS_POSTPROCESS)
+        if dimensions_postprocess is not None:
+            dimensions_postprocess(
+                project=self,
+                created=not exists,
+                label_config_has_changed=label_config_has_changed,
+            )
+
     # ============================================================================
     # FSM Integration
     # ============================================================================
