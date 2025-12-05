@@ -45,7 +45,7 @@ Depending on your user role, you can access this dashboard in several ways:
 | User role             | Access restrictions                                                                                  |
 |-----------------------|------------------------------------------------------------------------------------------------------|
 | **Owner** <br>and<br> **Admin**      | Can access from the navigation menu, the Organization page, the Home page, and the Members dashboard. <br> Can filter for all users. <br> Can filter for all workspaces. |
-| **Manager**               | Can access from the navigation menu, the Home page and the Members dashboard. <br> Can filter for all users. <br> Can only filter for workspaces or projects in which they are a member. |
+| **Manager**               | Can access from the navigation menu, the Home page and the Members dashboard. <br> Can filter for all users. <br> Can only filter for workspaces or projects in which they are a member. <br><br>  Note that this means Managers can see the full organization user list. However, they can only see annotation and review metrics for work completed within their own projects/workspaces. |
 | **Reviewer** <br>and<br> **Annotator** | Can access from navigation menu and the Home page. <br> Can only see their own annotation and reviewer history. <br> Can only filter for workspaces or projects in which they are a member. |
 
 
