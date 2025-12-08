@@ -198,7 +198,8 @@ def update_tasks_counters(queryset, from_scratch=True):
         )
 
     # filter our tasks with 0 annotations and 0 predictions and update them with 0
-    queryset.filter(annotations__isnull=True, predictions__isnull=True).update(
+    # order_by('id') ensures consistent row locking order to prevent deadlocks
+    queryset.filter(annotations__isnull=True, predictions__isnull=True).order_by('id').update(
         total_annotations=0, cancelled_annotations=0, total_predictions=0
     )
 
