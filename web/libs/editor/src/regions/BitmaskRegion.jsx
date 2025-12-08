@@ -176,16 +176,19 @@ const Model = types
 
           image.src = self.imageDataURL;
 
-          try {
-            await image.decode();
+          // Fallback onload
+          image.onload = () => {
             context.canvas.width = image.naturalWidth;
             context.canvas.height = image.naturalHeight;
             bitmask.width = image.naturalWidth;
             bitmask.height = image.naturalHeight;
-
             context.drawImage(image, 0, 0);
-
             self.finalizeRegion();
+          };
+
+          try {
+            await image.decode();
+            image.onload(); // on success of decode() onload() get called manually
           } catch (err) {
             console.log(err);
           }
