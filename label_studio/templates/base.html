@@ -44,7 +44,7 @@
     </script>
     {% endif %}
   {% endblock %}
-  
+
   {% block app-scripts %}
   {% endblock %}
 
@@ -112,10 +112,10 @@
       const match = key.match(prefixRegex);
       if (match) {
           const [, prefix, shortKey] = match;
-          
+
           // Get the current value
           const value = __customHotkeys[key];
-          
+
           // Check if value has active property set to false
           if (value && value.active === false) {
               // Create a copy of the value with key set to null
@@ -132,19 +132,19 @@
       // Check if custom hotkeys exist and the lookup is in there
       if (window.APP_SETTINGS?.user?.customHotkeys && lookup in window.APP_SETTINGS.user.customHotkeys) {
           const hotkeyValue = window.APP_SETTINGS.user.customHotkeys[lookup];
-          
+
           // If active is explicitly false, return a copy with key set to null
           if (hotkeyValue && hotkeyValue.active === false) {
               return {...hotkeyValue, key: null};
           }
-          
+
           // Otherwise return the original value
           return hotkeyValue;
-      } 
+      }
       // Fallback to default hotkeys if available
       else if (window.DEFAULT_HOTKEYS && lookup in window.DEFAULT_HOTKEYS) {
           return window.DEFAULT_HOTKEYS[lookup];
-      } 
+      }
       // No hotkey found
       else {
           return null;
@@ -153,12 +153,12 @@
 
   // Parse the default editor keymap
   var defaultEditorKeymap = JSON.parse({{ settings.EDITOR_KEYMAP|safe }});
-  
+
   // Merge the default keymap with custom editor hotkeys
   var mergedEditorKeymap = Object.assign({}, defaultEditorKeymap, editorCustomHotkeys);
-  
+
   window.APP_SETTINGS = Object.assign({
-    
+
     user: {
       id: {{ user.pk }},
       username: "{{user.username}}",
@@ -167,11 +167,12 @@
       initials: "{{user.get_initials}}",
 	email: "{{user.email}}",
 	customHotkeys: __customHotkeys,
-	
+
       allow_newsletters: {% if user.allow_newsletters is None %}null{% else %}{{user.allow_newsletters|yesno:"true,false"}}{% endif %},
       {% if user.avatar %}
       avatar: "{{user.avatar_url|safe}}",
       {% endif %}
+      {% block app_user_extra %}{% endblock %}
     },
     lookupHotkey: lookupHotkey,
     debug: {{settings.DEBUG|yesno:"true,false"}},
@@ -198,7 +199,7 @@
       page_title: "Label Studio",
       flags: {
         allow_organization_webhooks: {{settings.ALLOW_ORGANIZATION_WEBHOOKS|yesno:"true,false"}},
-        storage_persistence: {{ settings.STORAGE_PERSISTENCE|yesno:"true,false" }}, 
+        storage_persistence: {{ settings.STORAGE_PERSISTENCE|yesno:"true,false" }},
       },
     {% endblock %}
 

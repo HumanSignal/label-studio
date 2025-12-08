@@ -68,10 +68,6 @@ class ProjectQuerySet(models.QuerySet):
 
 
 class ProjectQuerySetWithFSM(FSMStateQuerySetMixin, ProjectQuerySet):
-    """
-    Custom QuerySet for Project model with FSM state annotation support.
-    """
-
     pass
 
 
@@ -123,7 +119,7 @@ class ProjectManager(models.Manager):
             for project in projects:
                 print(project.state)  # No N+1 queries!
         """
-        return self.get_queryset().annotate_fsm_state()
+        return self.get_queryset().with_state()
 
     def with_counts(self, fields=None):
         return self.with_counts_annotate(self.get_queryset(), fields=fields)
@@ -356,14 +352,23 @@ class Project(ProjectMixin, FsmHistoryStateModel):
 
     def __init__(self, *args, **kwargs):
         super(Project, self).__init__(*args, **kwargs)
-        self.__original_label_config = self.label_config
-        self.__maximum_annotations = self.maximum_annotations
-        self.__overlap_cohort_percentage = self.overlap_cohort_percentage
-        self.__skip_queue = self.skip_queue
+        # This check is required because deferred fields cause issues with evaluating lazy (deferred) fields if read directly, which means that any attempt to optimize a queryset involving projects
+        # will result in a performance regression as it will n+1 or in some cases cause an infinite loop.
+        deferred_fields = self.get_deferred_fields()
+        self.__original_label_config = self.label_config if 'label_config' not in deferred_fields else None
+        self.__maximum_annotations = self.maximum_annotations if 'maximum_annotations' not in deferred_fields else None
+        self.__overlap_cohort_percentage = (
+            self.overlap_cohort_percentage if 'overlap_cohort_percentage' not in deferred_fields else None
+        )
+        self.__skip_queue = self.skip_queue if 'skip_queue' not in deferred_fields else None
 
         # TODO: once bugfix with incorrect data types in List
         # logging.warning('! Please, remove code below after patching of all projects (extract_data_types)')
-        if self.label_config is not None:
+        if (
+            'label_config' not in deferred_fields
+            and self.label_config is not None
+            and 'data_types' not in deferred_fields
+        ):
             data_types = extract_data_types(self.label_config)
             if self.data_types != data_types:
                 self.data_types = data_types

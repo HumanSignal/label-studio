@@ -2,12 +2,6 @@ import { LabelStudio, TimeSeries } from "@humansignal/frontend-test/helpers/LSF"
 import { multiChannelSampleData, multiChannwlCnfig } from "../../data/timeseries/multichannel";
 import { TWO_FRAMES_TIMEOUT } from "../utils/constants";
 
-before(() => {
-  LabelStudio.addFeatureFlagsOnPageLoad({
-    fflag_feat_front_bros58_timeseries_multichannel_short: true,
-  });
-});
-
 describe("MultiChannel", () => {
   it("should render correctly", () => {
     cy.log("Initialize MultiChannel TimeSeries");

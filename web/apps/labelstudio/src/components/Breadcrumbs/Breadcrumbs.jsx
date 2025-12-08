@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useConfig } from "../../providers/ConfigProvider";
 import { useBreadcrumbs, useFindRouteComponent } from "../../providers/RoutesProvider";
-import { BemWithSpecificContext } from "../../utils/bem";
+import { cn } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
 import { Dropdown } from "@humansignal/ui";
 import { Menu } from "../Menu/Menu";
 import "./Breadcrumbs.scss";
-
-const { Block, Elem } = BemWithSpecificContext();
 
 export const Breadcrumbs = () => {
   const config = useConfig();
@@ -25,8 +23,8 @@ export const Breadcrumbs = () => {
   }, [reactBreadcrumbs, config]);
 
   return (
-    <Block name="breadcrumbs">
-      <Elem tag="ul" name="list">
+    <div className={cn("breadcrumbs").toClassName()}>
+      <ul className={cn("breadcrumbs").elem("list").toClassName()}>
         {breadcrumbs.map((item, index, list) => {
           const isLastItem = index === list.length - 1;
 
@@ -37,9 +35,14 @@ export const Breadcrumbs = () => {
           const isInternal = findComponent(href) !== null;
 
           const title = (
-            <Elem tag="span" name="label" mod={{ faded: index === item.length - 1 }}>
+            <span
+              className={cn("breadcrumbs")
+                .elem("label")
+                .mod({ faded: index === item.length - 1 })
+                .toClassName()}
+            >
               {item.title}
-            </Elem>
+            </span>
           );
 
           const dropdownSubmenu = item.submenu ? (
@@ -61,22 +64,20 @@ export const Breadcrumbs = () => {
           ) : null;
 
           return item.onClick ? (
-            <Elem key={key} tag="li" name="item" mod={{ last: isLastItem }}>
+            <li key={key} className={cn("breadcrumbs").elem("item").mod({ last: isLastItem }).toClassName()}>
               <span onClick={item.onClick}>{title}</span>
-            </Elem>
+            </li>
           ) : dropdownSubmenu ? (
-            <Elem
+            <Dropdown.Trigger
               key={key}
-              tag="li"
-              component={Dropdown.Trigger}
-              name="item"
-              mod={{ last: isLastItem }}
+              component="li"
+              className={cn("breadcrumbs").elem("item").mod({ last: isLastItem }).toClassName()}
               content={dropdownSubmenu}
             >
               <span>{title}</span>
-            </Elem>
+            </Dropdown.Trigger>
           ) : href && !isLastItem ? (
-            <Elem key={key} tag="li" name="item" mod={{ last: isLastItem }}>
+            <li key={key} className={cn("breadcrumbs").elem("item").mod({ last: isLastItem }).toClassName()}>
               {isInternal ? (
                 <NavLink to={href} data-external={true}>
                   {title}
@@ -84,14 +85,14 @@ export const Breadcrumbs = () => {
               ) : (
                 <a href={absoluteURL(href)}>{title}</a>
               )}
-            </Elem>
+            </li>
           ) : (
-            <Elem key={key} tag="li" name="item" mod={{ last: isLastItem }}>
+            <li key={key} className={cn("breadcrumbs").elem("item").mod({ last: isLastItem }).toClassName()}>
               {title}
-            </Elem>
+            </li>
           );
         })}
-      </Elem>
-    </Block>
+      </ul>
+    </div>
   );
 };

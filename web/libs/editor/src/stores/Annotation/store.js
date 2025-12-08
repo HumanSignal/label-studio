@@ -52,6 +52,10 @@ const AnnotationStoreModel = types
     },
 
     get viewingAll() {
+      // Even if we have View All flag stored as true, but we are in environment without it
+      // or if we are not ready yet — don't go into View All mode, it will be broken.
+      if (!self.initialized) return false;
+      if (!self.store.hasInterface("annotations:view-all")) return false;
       return self.viewingAllAnnotations;
     },
   }))
@@ -184,10 +188,13 @@ const AnnotationStoreModel = types
       return c;
     }
 
-    function selectPrediction(id) {
-      const p = selectItem(id, self.predictions);
+    function selectPrediction(id, options = {}) {
+      // The same logic as in `selectAnnotation()`
+      if (options.exitViewAll) {
+        unselectViewingAll();
+      }
 
-      return p;
+      return selectItem(id, self.predictions);
     }
 
     function clearDeletedParents(annotation) {

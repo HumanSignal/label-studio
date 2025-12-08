@@ -21,7 +21,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiParameter, OpenApiRespo
 from projects.functions.stream_history import fill_history_annotation
 from projects.models import Project
 from rest_framework import generics, viewsets
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from tasks.models import Annotation, AnnotationDraft, Prediction, Task
@@ -524,10 +524,10 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Annotations'],
         summary='Create annotation',
         description="""
-        Add annotations to a task like an annotator does. The content of the result field depends on your 
-        labeling configuration. For example, send the following data as part of your POST 
+        Add annotations to a task like an annotator does. The content of the result field depends on your
+        labeling configuration. For example, send the following data as part of your POST
         request to send an empty annotation with the ID of the user who completed the task:
-        
+
         ```json
         {
         "result": {},
@@ -536,7 +536,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         "lead_time": 0,
         "task": 0
         "completed_by": 123
-        } 
+        }
         ```
         """,
         parameters=[
@@ -597,6 +597,14 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         task = self.parent_object
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
         user = self.request.user
+
+        # Check if task is being skipped and if it's allowed
+        was_cancelled_get = bool_from_request(self.request.GET, 'was_cancelled', False)
+        was_cancelled_data = self.request.data.get('was_cancelled', False)
+        is_skipping = was_cancelled_get or was_cancelled_data
+
+        if is_skipping and not task.allow_skip:
+            raise ValidationError({'detail': 'This task cannot be skipped.'})
 
         # updates history
         result = ser.validated_data.get('result')
