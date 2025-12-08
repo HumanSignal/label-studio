@@ -836,7 +836,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         if label_config_has_changed or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
             self.parsed_label_config = parse_config(self.label_config)
-            self.label_config_hash = hash(str(self.parsed_label_config))
+            self.label_config_hash = hash(str(self.label_config))
             if update_fields is not None:
                 update_fields = {'data_types', 'parsed_label_config', 'label_config_hash'}.union(update_fields)
 
@@ -894,6 +894,15 @@ class Project(ProjectMixin, FsmHistoryStateModel):
                     summary.reset()
                 elif self.num_annotations == 0 and self.num_drafts == 0:
                     summary.reset(tasks_data_based=False)
+
+        # Call dimensions postprocess if configured (LSE feature)
+        dimensions_postprocess = load_func(settings.PROJECT_SAVE_DIMENSIONS_POSTPROCESS)
+        if dimensions_postprocess is not None:
+            dimensions_postprocess(
+                project=self,
+                created=not exists,
+                label_config_has_changed=label_config_has_changed,
+            )
 
     # ============================================================================
     # FSM Integration
