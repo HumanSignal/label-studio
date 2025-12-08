@@ -265,6 +265,7 @@ stages:
         label_config: <View><Text value="pdf" name="pdf" /><DateTime name="publication_date" toName="pdf" only="date" /><DateTime name="effective_date" toName="pdf" only="date" /></View>
         title: Test Draft 1
         show_collab_predictions: true
+        annotator_evaluation_enabled: true
       method: POST
       url: '{django_live_url}/api/projects'
     response:
