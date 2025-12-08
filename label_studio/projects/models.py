@@ -323,8 +323,8 @@ class Project(ProjectMixin, FsmHistoryStateModel):
 
     annotator_evaluation_enabled = models.BooleanField(
         _('annotator evaluation enabled'),
-        default=False,
-        db_default=False,
+        default=True,
+        db_default=True,
         help_text='Enable annotator evaluation for the project',
     )
 
