@@ -9,12 +9,14 @@ import {
   IconError,
   IconHistoryRewind,
   IconCross,
-  IconBoundingBox,
-  IconClock,
-  IconCheckCircle,
+  IconStateInitial,
+  IconStateAnnotating,
+  IconStateNeedsReview,
+  IconStateInReview,
+  IconStateDone,
 } from "@humansignal/icons";
 import { useStateHistory, type StateHistoryItem } from "../../hooks/useStateHistory";
-import { formatStateName, formatTimestamp, formatUserName, getStateType, StateType } from "./utils";
+import { formatStateName, formatTimestamp, formatUserName } from "./utils";
 
 export interface StateHistoryPopoverContentProps {
   entityType: "task" | "annotation" | "project";
@@ -24,66 +26,96 @@ export interface StateHistoryPopoverContentProps {
 }
 
 /**
- * Get the icon component for a given state type
+ * State visual configuration - maps state labels to their icons and colors
+ * Colors from Figma design system
+ * Using raw hex values for inline styles (Tailwind dynamic classes don't work)
  */
-function getStateIcon(stateType: StateType): React.ComponentType<{ className?: string }> {
-  switch (stateType) {
-    case StateType.IN_PROGRESS:
-      return IconBoundingBox;
-    case StateType.ATTENTION:
-      return IconClock;
-    case StateType.TERMINAL:
-      return IconCheckCircle;
-    case StateType.INITIAL:
-    default:
-      return IconHistoryRewind;
-  }
-}
+type StateVisualConfig = {
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  baseBg: string; // Background for current/active state
+  subtleBg: string; // Background for past states
+  baseIconColor: string; // Icon color on base background
+  subtleIconColor: string; // Icon color on subtle background
+};
+
+const STATE_VISUALS: Record<string, StateVisualConfig> = {
+  // Terminal state (kale)
+  Done: {
+    icon: IconStateDone,
+    baseBg: "#57b7ab",
+    subtleBg: "#57b7ab", // Done stays bold even when past
+    baseIconColor: "#ffffff",
+    subtleIconColor: "#ffffff",
+  },
+  Completed: {
+    icon: IconStateDone,
+    baseBg: "#57b7ab",
+    subtleBg: "#57b7ab",
+    baseIconColor: "#ffffff",
+    subtleIconColor: "#ffffff",
+  },
+  // In Review state (plum palette)
+  "In Review": {
+    icon: IconStateInReview,
+    baseBg: "#e37bd3",
+    subtleBg: "#f7d6f2",
+    baseIconColor: "#ffffff",
+    subtleIconColor: "#c24fb0",
+  },
+  // Needs Review state (cantaloupe palette)
+  "Needs Review": {
+    icon: IconStateNeedsReview,
+    baseBg: "#ffa663",
+    subtleBg: "#ffe4d0",
+    baseIconColor: "#ffffff",
+    subtleIconColor: "#d97c2e",
+  },
+  // Annotating state (grape palette)
+  Annotating: {
+    icon: IconStateAnnotating,
+    baseBg: "#6d87f1",
+    subtleBg: "#d4dbfb",
+    baseIconColor: "#ffffff",
+    subtleIconColor: "#4a65d6",
+  },
+  "In Progress": {
+    icon: IconStateAnnotating,
+    baseBg: "#6d87f1",
+    subtleBg: "#d4dbfb",
+    baseIconColor: "#ffffff",
+    subtleIconColor: "#4a65d6",
+  },
+  // Initial state (neutral palette)
+  Initial: {
+    icon: IconStateInitial,
+    baseBg: "#f0efeb",
+    subtleBg: "#f0efeb",
+    baseIconColor: "#8c8c8c",
+    subtleIconColor: "#8c8c8c",
+  },
+  Created: {
+    icon: IconStateInitial,
+    baseBg: "#f0efeb",
+    subtleBg: "#f0efeb",
+    baseIconColor: "#8c8c8c",
+    subtleIconColor: "#8c8c8c",
+  },
+};
+
+// Default fallback for unknown states
+const DEFAULT_VISUAL: StateVisualConfig = {
+  icon: IconStateInitial,
+  baseBg: "#f0efeb",
+  subtleBg: "#f0efeb",
+  baseIconColor: "#8c8c8c",
+  subtleIconColor: "#8c8c8c",
+};
 
 /**
- * Get the background color class for a state icon based on state type and whether it's current (first item)
+ * Get visual configuration for a state based on its formatted label
  */
-function getStateIconBgClass(stateType: StateType, isCurrent: boolean): string {
-  if (isCurrent) {
-    // Active/current state uses bold colors
-    switch (stateType) {
-      case StateType.IN_PROGRESS:
-        return "bg-primary-surface-bold";
-      case StateType.ATTENTION:
-        return "bg-warning-surface-bold";
-      case StateType.TERMINAL:
-        return "bg-positive-surface-bold";
-      case StateType.INITIAL:
-      default:
-        return "bg-neutral-surface-active";
-    }
-  }
-  // Past states use subtle colors
-  switch (stateType) {
-    case StateType.IN_PROGRESS:
-      return "bg-primary-emphasis";
-    case StateType.ATTENTION:
-      return "bg-warning-emphasis";
-    case StateType.TERMINAL:
-      return "bg-positive-emphasis";
-    case StateType.INITIAL:
-    default:
-      return "bg-neutral-surface-active";
-  }
-}
-
-/**
- * Get the text color class for a state label based on state type and whether it's current
- */
-function getStateLabelClass(stateType: StateType, isCurrent: boolean): string {
-  if (isCurrent) {
-    return "text-neutral-content";
-  }
-  // Past states use subtler colors
-  if (stateType === StateType.INITIAL) {
-    return "text-neutral-content-subtler";
-  }
-  return "text-neutral-content-subtle";
+function getStateVisuals(stateLabel: string): StateVisualConfig {
+  return STATE_VISUALS[stateLabel] || DEFAULT_VISUAL;
 }
 
 /**
@@ -123,39 +155,48 @@ function TimelineItem({
   isLast: boolean;
 }) {
   const isCurrent = index === 0;
-  const stateType = getStateType(item.state);
-  const StateIcon = getStateIcon(stateType);
-  const bgClass = getStateIconBgClass(stateType, isCurrent);
-  const labelClass = getStateLabelClass(stateType, isCurrent);
+  const stateLabel = formatStateName(item.state);
+  const visuals = getStateVisuals(stateLabel);
+  const StateIcon = visuals.icon;
+  const bgColor = isCurrent ? visuals.baseBg : visuals.subtleBg;
+  const iconColor = isCurrent ? visuals.baseIconColor : visuals.subtleIconColor;
+
+  // Initial state always uses subtler text color
+  const isInitialState = stateLabel === "Initial" || stateLabel === "Created";
+  const labelClass = isInitialState
+    ? "text-neutral-content-subtler"
+    : isCurrent
+      ? "text-neutral-content"
+      : "text-neutral-content-subtle";
+
   const userName = formatUserName(item.triggered_by);
   const isSystem = userName === "System";
-  const reason = item.reason || item.context_data?.reason || item.transition_name;
+  const reason = item.context_data?.reason;
 
   return (
-    <div className="flex gap-2 items-start px-2 relative">
-      {/* Vertical timeline line */}
-      {!isLast && <div className="absolute left-[23.5px] top-[36px] bottom-0 w-px bg-neutral-border" />}
-
-      {/* State icon */}
-      <div className="flex flex-col items-center pt-0.5 shrink-0">
+    <div className="flex gap-2 items-start px-2">
+      {/* Icon column with timeline line */}
+      <div className="flex flex-col items-center shrink-0">
+        {/* State icon with circular background - 32px circle with 4px padding */}
         <div
-          className={`${bgClass} border-4 border-primary-background rounded-2xl size-8 flex items-center justify-center overflow-hidden`}
+          className="rounded-full size-8 p-1 flex items-center justify-center"
+          style={{ backgroundColor: bgColor }}
         >
-          <StateIcon className="w-4 h-4 text-neutral-icon" />
+          <StateIcon className="w-6 h-6 shrink-0" style={{ color: iconColor }} />
         </div>
+        {/* Timeline connector line */}
+        {!isLast && <div className="w-px flex-1 min-h-6 bg-neutral-border" />}
       </div>
 
       {/* Content */}
-      <div className="flex flex-col gap-0.5 flex-1 min-h-[40px] justify-center min-w-0">
+      <div className="flex flex-col gap-0.5 flex-1 min-h-10 justify-center min-w-0 pb-2">
         {/* State name and optional reason */}
         <div className="flex flex-col gap-1">
-          <Typography variant="label" size="small" className={`${labelClass} font-semibold truncate`}>
-            {formatStateName(item.state)}
-          </Typography>
+          <span className={`${labelClass} text-sm font-semibold truncate leading-[18px] tracking-[0.15px]`}>
+            {stateLabel}
+          </span>
           {reason && (
-            <Typography variant="body" size="small" className="text-neutral-content-subtler">
-              {reason}
-            </Typography>
+            <span className="text-neutral-content-subtler text-sm leading-[18px] tracking-[0.25px]">{reason}</span>
           )}
         </div>
 
@@ -166,9 +207,7 @@ function TimelineItem({
             <>
               <div className="flex items-center gap-1 shrink-0">
                 <Userpic size={20} user={item.triggered_by} username={getUserInitials(item.triggered_by)} />
-                <Typography variant="body" size="smaller" className="text-neutral-content-subtler">
-                  {userName}
-                </Typography>
+                <span className="text-xs leading-4 tracking-[0.5px]">{userName}</span>
               </div>
               {/* Dot separator */}
               <div className="size-[3px] rounded-full bg-neutral-content-subtler shrink-0" />
@@ -176,17 +215,13 @@ function TimelineItem({
           )}
           {isSystem && (
             <>
-              <Typography variant="body" size="smaller" className="text-neutral-content-subtler">
-                System
-              </Typography>
+              <span className="text-xs leading-4 tracking-[0.5px]">System</span>
               {/* Dot separator */}
               <div className="size-[3px] rounded-full bg-neutral-content-subtler shrink-0" />
             </>
           )}
           {/* Timestamp */}
-          <Typography variant="body" size="smaller" className="text-neutral-content-subtler">
-            {formatTimestamp(item.created_at)}
-          </Typography>
+          <span className="text-xs leading-4 tracking-[0.5px]">{formatTimestamp(item.created_at)}</span>
         </div>
       </div>
     </div>
@@ -204,7 +239,7 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
 
   return (
     <div
-      className="flex flex-col w-[320px] max-h-[400px] bg-primary-background rounded-lg shadow-lg"
+      className="flex flex-col w-[320px] max-h-[400px] bg-neutral-background rounded-lg shadow-lg"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header */}
@@ -275,18 +310,18 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
           </div>
         )}
 
-        {!isLoading && !isError && history.length > 0 && (
-          <div className="flex flex-col gap-6">
-            {history.map((item: StateHistoryItem, index: number) => (
-              <TimelineItem
-                key={`${item.state}-${item.created_at}-${index}`}
-                item={item}
-                index={index}
-                isLast={index === history.length - 1}
-              />
-            ))}
-          </div>
-        )}
+{!isLoading && !isError && history.length > 0 && (
+            <div className="flex flex-col">
+              {history.map((item: StateHistoryItem, index: number) => (
+                <TimelineItem
+                  key={`${item.state}-${item.created_at}-${index}`}
+                  item={item}
+                  index={index}
+                  isLast={index === history.length - 1}
+                />
+              ))}
+            </div>
+          )}
       </div>
     </div>
   );
