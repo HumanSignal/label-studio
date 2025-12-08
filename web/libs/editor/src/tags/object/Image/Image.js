@@ -1230,10 +1230,61 @@ const CoordsCalculations = types
         return [x, y];
       }
 
-      // good official way, but maybe a bit slower and with repeating cloning
-      const p = self.stageRef.getAbsoluteTransform().copy().invert().point({ x, y });
+      // Use MobX state values instead of reading Stage's actual transform
+      // This prevents coordinate corruption when Stage transform gets reset while MobX state is unchanged
+      const zoomScale = self.zoomScale || 1;
+      const stageTranslate = self.stageTranslate || { x: 0, y: 0 };
+      const rotation = self.rotation || 0;
+      
+      // Calculate stage position (includes alignmentOffset if FF_ZOOM_OPTIM is enabled)
+      let stageX = self.zoomingPositionX || 0;
+      let stageY = self.zoomingPositionY || 0;
+      if (isFF(FF_ZOOM_OPTIM)) {
+        const alignmentOffset = self.alignmentOffset || { x: 0, y: 0 };
+        stageX += alignmentOffset.x;
+        stageY += alignmentOffset.y;
+      }
 
-      return [p.x, p.y];
+      // Konva transform order: offset -> rotation -> scale -> position
+      // Inverse transform: translate(-position) -> scale(1/scale) -> rotate(-angle) -> translate(-offset)
+      
+      // Step 1: Subtract stage position
+      let px = x - stageX;
+      let py = y - stageY;
+
+      // Step 2: Apply inverse scale
+      px = px / zoomScale;
+      py = py / zoomScale;
+
+      // Step 3: Apply inverse rotation (if any)
+      if (rotation !== 0) {
+        const angleRad = (-rotation * Math.PI) / 180;
+        const cos = Math.cos(angleRad);
+        const sin = Math.sin(angleRad);
+        const newX = px * cos - py * sin;
+        const newY = px * sin + py * cos;
+        px = newX;
+        py = newY;
+      }
+
+      // Step 4: Subtract offset (inverse of adding offset)
+      px = px - stageTranslate.x;
+      py = py - stageTranslate.y;
+
+      // Fallback to Stage transform if result is invalid (defensive)
+      if (!Number.isFinite(px) || !Number.isFinite(py)) {
+        console.warn("🔍 fixZoomedCoords: Invalid result from MobX state, falling back to Stage transform", {
+          mobxZoomScale: zoomScale,
+          mobxStageX: stageX,
+          mobxStageY: stageY,
+          calculatedX: px,
+          calculatedY: py,
+        });
+        const p = self.stageRef.getAbsoluteTransform().copy().invert().point({ x, y });
+        return [p.x, p.y];
+      }
+
+      return [px, py];
     },
 
     // convert image coords to screen coords considering zoom

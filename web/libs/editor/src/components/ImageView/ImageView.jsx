@@ -1,4 +1,4 @@
-import { Component, createRef, forwardRef, Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
+import { Component, createRef, forwardRef, Fragment, memo, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Group, Layer, Line, Rect, Stage, Image as KonvaImage, Circle } from "react-konva";
 import { observer } from "mobx-react";
 import { getEnv, getRoot, isAlive } from "mobx-state-tree";
@@ -1231,6 +1231,7 @@ const EntireStage = observer(
     crosshairRef,
   }) => {
     const { store } = item;
+    const stageRef = useRef(null);
     let size;
     let position;
 
@@ -1251,16 +1252,121 @@ const EntireStage = observer(
       };
     }
 
+    const currentZoomScale = item.zoomScale;
+
+    // Monitor Stage transform to detect when it diverges from MobX state
+    // If it diverges, force it back to match MobX state
+    useEffect(() => {
+      if (!stageRef.current || currentZoomScale <= 20) return;
+
+      const checkAndFixTransform = () => {
+        const stage = stageRef.current;
+        if (!stage) return;
+
+        const actualScaleX = stage.scaleX();
+        const actualScaleY = stage.scaleY();
+        const actualX = stage.x();
+        const actualY = stage.y();
+        const expectedScale = currentZoomScale;
+
+        // Check if there's a significant mismatch (not just floating point differences)
+        const scaleMismatch = Math.abs(actualScaleX - expectedScale) > 0.1 || Math.abs(actualScaleY - expectedScale) > 0.1;
+        const positionMismatch = Math.abs(actualX - position.x) > 1 || Math.abs(actualY - position.y) > 1;
+
+        if (scaleMismatch || positionMismatch) {
+          console.error("🔴🔴🔴 EntireStage: Stage transform DIVERGED from MobX state! Fixing... 🔴🔴🔴", {
+            mobxZoomScale: expectedScale,
+            actualScaleX,
+            actualScaleY,
+            stageX: actualX,
+            stageY: actualY,
+            mobxPositionX: position.x,
+            mobxPositionY: position.y,
+            timestamp: Date.now(),
+          });
+
+          // Force Stage transform to match MobX state
+          // Use setAttrs to batch the updates
+          stage.setAttrs({
+            scaleX: expectedScale,
+            scaleY: expectedScale,
+            x: position.x,
+            y: position.y,
+          });
+          
+          // Force a redraw
+          stage.getLayer()?.batchDraw();
+        }
+      };
+
+      // Check immediately and then periodically during high zoom
+      checkAndFixTransform();
+      const interval = setInterval(checkAndFixTransform, 100); // Check every 100ms
+
+      return () => clearInterval(interval);
+    }, [currentZoomScale, position.x, position.y]);
+
+    // Use useLayoutEffect to fix Stage transform synchronously before paint
+    // This prevents coordinate corruption during drag operations
+    useLayoutEffect(() => {
+      if (!stageRef.current || currentZoomScale <= 20) return;
+
+      const stage = stageRef.current;
+      const actualScaleX = stage.scaleX();
+      const actualScaleY = stage.scaleY();
+      const actualX = stage.x();
+      const actualY = stage.y();
+
+      // Check if there's a mismatch and fix it immediately
+      const scaleMismatch = Math.abs(actualScaleX - currentZoomScale) > 0.1 || Math.abs(actualScaleY - currentZoomScale) > 0.1;
+      const positionMismatch = Math.abs(actualX - position.x) > 1 || Math.abs(actualY - position.y) > 1;
+
+      if (scaleMismatch || positionMismatch) {
+        // Fix immediately before any coordinate calculations happen
+        stage.setAttrs({
+          scaleX: currentZoomScale,
+          scaleY: currentZoomScale,
+          x: position.x,
+          y: position.y,
+        });
+      }
+    }, [currentZoomScale, position.x, position.y]);
+
     return (
       <Stage
+        key={`stage-${item.id}`}
         ref={(ref) => {
+          stageRef.current = ref;
           item.setStageRef(ref);
+          
+          // Fix transform immediately when ref is set
+          if (ref && currentZoomScale > 20) {
+            // Use requestAnimationFrame to ensure Stage is fully initialized
+            requestAnimationFrame(() => {
+              const actualScaleX = ref.scaleX();
+              const actualScaleY = ref.scaleY();
+              const actualX = ref.x();
+              const actualY = ref.y();
+              
+              const scaleMismatch = Math.abs(actualScaleX - currentZoomScale) > 0.1 || Math.abs(actualScaleY - currentZoomScale) > 0.1;
+              const positionMismatch = Math.abs(actualX - position.x) > 1 || Math.abs(actualY - position.y) > 1;
+              
+              if (scaleMismatch || positionMismatch) {
+                ref.setAttrs({
+                  scaleX: currentZoomScale,
+                  scaleY: currentZoomScale,
+                  x: position.x,
+                  y: position.y,
+                });
+              }
+            });
+          }
         }}
         className={[styles["image-element"], ...imagePositionClassnames].join(" ")}
         width={size.width}
         height={size.height}
-        scaleX={item.zoomScale}
-        scaleY={item.zoomScale}
+        scaleX={currentZoomScale}
+        scaleY={currentZoomScale}
         x={position.x}
         y={position.y}
         offsetX={item.stageTranslate.x}
