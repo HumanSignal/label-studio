@@ -23,6 +23,20 @@ class StateModelSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField(read_only=True)
     context_data = serializers.JSONField(read_only=True)
 
+    def to_representation(self, instance):
+        """
+        Override to exclude triggered_by field for annotators.
+        """
+        data = super().to_representation(instance)
+
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            user = request.user
+            if getattr(user, 'is_annotator', False):
+                data.pop('triggered_by', None)
+
+        return data
+
 
 class FSMTransitionExecuteRequestSerializer(serializers.Serializer):
     """
