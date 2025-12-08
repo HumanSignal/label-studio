@@ -1,13 +1,20 @@
 /**
  * StateHistoryPopover component
- * Displays the complete FSM state transition history for an entity
+ * Displays the complete FSM state transition history for an entity as a timeline
  */
 
 import type React from "react";
-import { Popover, Badge, Button, Typography } from "@humansignal/ui";
-import { IconSync, IconError, IconHistoryRewind } from "@humansignal/icons";
+import { Popover, Button, Typography, Userpic } from "@humansignal/ui";
+import {
+  IconSync,
+  IconError,
+  IconHistoryRewind,
+  IconBoundingBox,
+  IconClock,
+  IconCheckCircle,
+} from "@humansignal/icons";
 import { useStateHistory, type StateHistoryItem } from "../../hooks/useStateHistory";
-import { getStateColorClass, formatStateName, formatTimestamp, formatUserName } from "./utils";
+import { formatStateName, formatTimestamp, formatUserName, getStateType, StateType } from "./utils";
 
 export interface StateHistoryPopoverProps {
   trigger: React.ReactNode;
@@ -16,6 +23,176 @@ export interface StateHistoryPopoverProps {
   currentState: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+}
+
+/**
+ * Get the icon component for a given state type
+ */
+function getStateIcon(stateType: StateType): React.ComponentType<{ className?: string }> {
+  switch (stateType) {
+    case StateType.IN_PROGRESS:
+      return IconBoundingBox;
+    case StateType.ATTENTION:
+      return IconClock;
+    case StateType.TERMINAL:
+      return IconCheckCircle;
+    case StateType.INITIAL:
+    default:
+      return IconHistoryRewind;
+  }
+}
+
+/**
+ * Get the background color class for a state icon based on state type and whether it's current (first item)
+ */
+function getStateIconBgClass(stateType: StateType, isCurrent: boolean): string {
+  if (isCurrent) {
+    // Active/current state uses bold colors
+    switch (stateType) {
+      case StateType.IN_PROGRESS:
+        return "bg-primary-surface-bold";
+      case StateType.ATTENTION:
+        return "bg-warning-surface-bold";
+      case StateType.TERMINAL:
+        return "bg-positive-surface-bold";
+      case StateType.INITIAL:
+      default:
+        return "bg-neutral-surface-active";
+    }
+  }
+  // Past states use subtle colors
+  switch (stateType) {
+    case StateType.IN_PROGRESS:
+      return "bg-primary-emphasis";
+    case StateType.ATTENTION:
+      return "bg-warning-emphasis";
+    case StateType.TERMINAL:
+      return "bg-positive-emphasis";
+    case StateType.INITIAL:
+    default:
+      return "bg-neutral-surface-active";
+  }
+}
+
+/**
+ * Get the text color class for a state label based on state type and whether it's current
+ */
+function getStateLabelClass(stateType: StateType, isCurrent: boolean): string {
+  if (isCurrent) {
+    return "text-neutral-content";
+  }
+  // Past states use subtler colors
+  if (stateType === StateType.INITIAL) {
+    return "text-neutral-content-subtler";
+  }
+  return "text-neutral-content-subtle";
+}
+
+/**
+ * Get user initials from triggered_by object
+ */
+function getUserInitials(
+  triggeredBy: {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+  } | null,
+): string {
+  if (!triggeredBy) return "SY";
+
+  const { first_name, last_name, email } = triggeredBy;
+
+  if (first_name && last_name) {
+    return `${first_name.charAt(0)}${last_name.charAt(0)}`.toUpperCase();
+  }
+  if (first_name) return first_name.slice(0, 2).toUpperCase();
+  if (last_name) return last_name.slice(0, 2).toUpperCase();
+  if (email) return email.slice(0, 2).toUpperCase();
+
+  return "SY";
+}
+
+/**
+ * Timeline item component for a single state history entry
+ */
+function TimelineItem({
+  item,
+  index,
+  isLast,
+}: {
+  item: StateHistoryItem;
+  index: number;
+  isLast: boolean;
+}) {
+  const isCurrent = index === 0;
+  const stateType = getStateType(item.state);
+  const StateIcon = getStateIcon(stateType);
+  const bgClass = getStateIconBgClass(stateType, isCurrent);
+  const labelClass = getStateLabelClass(stateType, isCurrent);
+  const userName = formatUserName(item.triggered_by);
+  const isSystem = userName === "System";
+  const reason = item.reason || item.context_data?.reason || item.transition_name;
+
+  return (
+    <div className="flex gap-2 items-start px-2 relative">
+      {/* Vertical timeline line */}
+      {!isLast && <div className="absolute left-[23.5px] top-[36px] bottom-0 w-px bg-neutral-border" />}
+
+      {/* State icon */}
+      <div className="flex flex-col items-center pt-0.5 shrink-0">
+        <div
+          className={`${bgClass} border-4 border-primary-background rounded-2xl size-8 flex items-center justify-center overflow-hidden`}
+        >
+          <StateIcon className="w-4 h-4 text-neutral-icon" />
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-col gap-0.5 flex-1 min-h-[40px] justify-center min-w-0">
+        {/* State name and optional reason */}
+        <div className="flex flex-col gap-1">
+          <Typography variant="label" size="small" className={`${labelClass} font-semibold truncate`}>
+            {formatStateName(item.state)}
+          </Typography>
+          {reason && (
+            <Typography variant="body" size="small" className="text-neutral-content-subtler">
+              {reason}
+            </Typography>
+          )}
+        </div>
+
+        {/* Metadata row */}
+        <div className="flex items-center gap-2 text-neutral-content-subtler">
+          {/* Author section */}
+          {!isSystem && (
+            <>
+              <div className="flex items-center gap-1 shrink-0">
+                <Userpic size={20} user={item.triggered_by} username={getUserInitials(item.triggered_by)} />
+                <Typography variant="body" size="smaller" className="text-neutral-content-subtler">
+                  {userName}
+                </Typography>
+              </div>
+              {/* Dot separator */}
+              <div className="size-[3px] rounded-full bg-neutral-content-subtler shrink-0" />
+            </>
+          )}
+          {isSystem && (
+            <>
+              <Typography variant="body" size="smaller" className="text-neutral-content-subtler">
+                System
+              </Typography>
+              {/* Dot separator */}
+              <div className="size-[3px] rounded-full bg-neutral-content-subtler shrink-0" />
+            </>
+          )}
+          {/* Timestamp */}
+          <Typography variant="body" size="smaller" className="text-neutral-content-subtler">
+            {formatTimestamp(item.created_at)}
+          </Typography>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function StateHistoryPopover({
@@ -43,7 +220,7 @@ export function StateHistoryPopover({
         {/* Header */}
         <div className="px-4 py-3 border-b border-neutral-border">
           <div className="flex items-center gap-2">
-            <IconHistoryRewind className="w-4 h-4 " />
+            <IconHistoryRewind className="w-4 h-4" />
             <Typography variant="body" size="small" className="font-medium text-neutral-foreground">
               State History
             </Typography>
@@ -95,26 +272,14 @@ export function StateHistoryPopover({
           )}
 
           {!isLoading && !isError && history.length > 0 && (
-            <div className="space-y-3">
+            <div className="flex flex-col gap-6">
               {history.map((item: StateHistoryItem, index: number) => (
-                <div key={index} className="pb-3 border-b border-neutral-border last:border-0 last:pb-0">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge className={getStateColorClass(item.state)}>{formatStateName(item.state)}</Badge>
-                    <Typography variant="body" size="smallest" className="text-neutral-content-subtle">
-                      {formatTimestamp(item.created_at)}
-                    </Typography>
-                  </div>
-                  <div>
-                    <Typography variant="body" size="smallest" className="text-muted-foreground">
-                      By: {formatUserName(item.triggered_by)}
-                    </Typography>
-                    {item.transition_name && (
-                      <Typography variant="body" size="smallest" className="mt-1 text-neutral-content-subtle">
-                        {item.transition_name}
-                      </Typography>
-                    )}
-                  </div>
-                </div>
+                <TimelineItem
+                  key={`${item.state}-${item.created_at}-${index}`}
+                  item={item}
+                  index={index}
+                  isLast={index === history.length - 1}
+                />
               ))}
             </div>
           )}
