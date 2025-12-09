@@ -5,7 +5,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_front_dev_3873_labeling_ui_improvements_short': True,
     'fflag_feat_back_dev_3756_queue_enrollment_min_short': False,
     'fflag_fix_front_lsdv_4620_memory_leaks_100723_short': False,
-    'fflag_fix_all_lsdv_4971_async_reimport_09052023_short': True,
     # Jan 16
     'feat_all_optic_71_dashboard_multiple_labeling_group_support_v1_01092023_short': True,
     'fflag_feat_front_prod_281_project_list_search_19072023_short': True,
