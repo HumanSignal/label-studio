@@ -178,7 +178,7 @@ export const defaultTipsCollection: TipsCollection = {
       closable: true,
       link: {
         label: "Learn more",
-        url: "https://aws.amazon.com/marketplace/pp/prodview-wjac3msf77tny ",
+        url: "https://aws.amazon.com/marketplace/pp/prodview-wjac3msf77tny",
         params: {
           experiment: "project_settings_tip",
           treatment: "aws_marketplace",
