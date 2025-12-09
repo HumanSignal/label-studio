@@ -17,7 +17,7 @@ from datetime import timedelta
 
 from django.core.exceptions import ImproperlyConfigured
 
-from label_studio.core.utils.params import get_bool_env, get_env_list
+from label_studio.core.utils.params import get_bool_env, get_env, get_env_list, has_env
 
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
@@ -85,7 +85,6 @@ logging.getLogger('faker').setLevel(logging.WARNING)
 logging.getLogger('faker.providers').setLevel(logging.WARNING)
 
 from label_studio.core.utils.io import get_data_dir
-from label_studio.core.utils.params import get_bool_env, get_env
 
 logger = logging.getLogger(__name__)
 SILENCED_SYSTEM_CHECKS = []
@@ -608,8 +607,8 @@ CLOUD_FILE_STORAGE_ENABLED = False
 
 if (
     VERSION_EDITION == 'Community'
-    and 'LOCAL_FILES_DOCUMENT_ROOT' not in os.environ
-    and 'LOCAL_FILES_SERVING_ENABLED' not in os.environ
+    and not has_env('LOCAL_FILES_DOCUMENT_ROOT')
+    and not has_env('LOCAL_FILES_SERVING_ENABLED')
 ):
     from label_studio.io_storages.localfiles.functions import autodetect_local_files_root
 
