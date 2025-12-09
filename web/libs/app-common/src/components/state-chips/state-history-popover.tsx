@@ -3,20 +3,11 @@
  * Displays the complete FSM state transition history for an entity as a timeline
  */
 
-import type React from "react";
 import { Popover, Button, Typography, Userpic } from "@humansignal/ui";
-import {
-  IconSync,
-  IconError,
-  IconHistoryRewind,
-  IconStateInitial,
-  IconStateAnnotating,
-  IconStateNeedsReview,
-  IconStateInReview,
-  IconStateDone,
-} from "@humansignal/icons";
+import { IconSync, IconError, IconHistoryRewind } from "@humansignal/icons";
 import { useStateHistory, type StateHistoryItem } from "../../hooks/useStateHistory";
 import { formatStateName, formatTimestamp, formatUserName } from "./utils";
+import { getStateVisuals } from "./state-visuals";
 
 export interface StateHistoryPopoverProps {
   trigger: React.ReactNode;
@@ -25,99 +16,6 @@ export interface StateHistoryPopoverProps {
   currentState: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-}
-
-/**
- * State visual configuration - maps state labels to their icons and colors
- * Colors from Figma design system
- * Using raw hex values for inline styles (Tailwind dynamic classes don't work)
- */
-type StateVisualConfig = {
-  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
-  baseBg: string; // Background for current/active state
-  subtleBg: string; // Background for past states
-  baseIconColor: string; // Icon color on base background
-  subtleIconColor: string; // Icon color on subtle background
-};
-
-const STATE_VISUALS: Record<string, StateVisualConfig> = {
-  // Terminal state (kale)
-  Done: {
-    icon: IconStateDone,
-    baseBg: "#57b7ab",
-    subtleBg: "#57b7ab", // Done stays bold even when past
-    baseIconColor: "#ffffff",
-    subtleIconColor: "#ffffff",
-  },
-  Completed: {
-    icon: IconStateDone,
-    baseBg: "#57b7ab",
-    subtleBg: "#57b7ab",
-    baseIconColor: "#ffffff",
-    subtleIconColor: "#ffffff",
-  },
-  // In Review state (plum palette)
-  "In Review": {
-    icon: IconStateInReview,
-    baseBg: "#e37bd3",
-    subtleBg: "#f7d6f2",
-    baseIconColor: "#ffffff",
-    subtleIconColor: "#c24fb0",
-  },
-  // Needs Review state (cantaloupe palette)
-  "Needs Review": {
-    icon: IconStateNeedsReview,
-    baseBg: "#ffa663",
-    subtleBg: "#ffe4d0",
-    baseIconColor: "#ffffff",
-    subtleIconColor: "#d97c2e",
-  },
-  // Annotating state (grape palette)
-  Annotating: {
-    icon: IconStateAnnotating,
-    baseBg: "#6d87f1",
-    subtleBg: "#d4dbfb",
-    baseIconColor: "#ffffff",
-    subtleIconColor: "#4a65d6",
-  },
-  "In Progress": {
-    icon: IconStateAnnotating,
-    baseBg: "#6d87f1",
-    subtleBg: "#d4dbfb",
-    baseIconColor: "#ffffff",
-    subtleIconColor: "#4a65d6",
-  },
-  // Initial state (neutral palette)
-  Initial: {
-    icon: IconStateInitial,
-    baseBg: "#f0efeb",
-    subtleBg: "#f0efeb",
-    baseIconColor: "#8c8c8c",
-    subtleIconColor: "#8c8c8c",
-  },
-  Created: {
-    icon: IconStateInitial,
-    baseBg: "#f0efeb",
-    subtleBg: "#f0efeb",
-    baseIconColor: "#8c8c8c",
-    subtleIconColor: "#8c8c8c",
-  },
-};
-
-// Default fallback for unknown states
-const DEFAULT_VISUAL: StateVisualConfig = {
-  icon: IconStateInitial,
-  baseBg: "#f0efeb",
-  subtleBg: "#f0efeb",
-  baseIconColor: "#8c8c8c",
-  subtleIconColor: "#8c8c8c",
-};
-
-/**
- * Get visual configuration for a state based on its formatted label
- */
-function getStateVisuals(stateLabel: string): StateVisualConfig {
-  return STATE_VISUALS[stateLabel] || DEFAULT_VISUAL;
 }
 
 /**
@@ -180,10 +78,7 @@ function TimelineItem({
       {/* Icon column with timeline line */}
       <div className="flex flex-col items-center shrink-0">
         {/* State icon with circular background - 32px circle with 4px padding */}
-        <div
-          className="rounded-full size-8 p-1 flex items-center justify-center"
-          style={{ backgroundColor: bgColor }}
-        >
+        <div className="rounded-full size-8 p-1 flex items-center justify-center" style={{ backgroundColor: bgColor }}>
           <StateIcon className="w-6 h-6 shrink-0" style={{ color: iconColor }} />
         </div>
         {/* Timeline connector line */}
