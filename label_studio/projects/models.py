@@ -5,6 +5,7 @@ import logging
 from typing import Any, Mapping, Optional
 
 from annoying.fields import AutoOneToOneField
+from core.current_request import CurrentContext
 from core.label_config import (
     check_control_in_config_by_regex,
     check_toname_in_config_by_regex,
@@ -35,6 +36,7 @@ from django.db.models.expressions import RawSQL
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from fsm.models import FsmHistoryStateModel
+from fsm.project_transitions import update_project_state_after_task_change
 from fsm.queryset_mixins import FSMStateQuerySetMixin
 from label_studio_sdk._extensions.label_studio_tools.core.label_config import parse_config
 from labels_manager.models import Label
@@ -528,6 +530,11 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             self._rearrange_overlap_cohort()
+
+        if tasks_number_changed:
+            # FSM: Recalculate project state after task deletion or import
+            user = CurrentContext.get_user()
+            update_project_state_after_task_change(self, user=user)
 
     def _batch_update_with_retry(self, queryset, batch_size=500, max_retries=3, **update_fields):
         batch_update_with_retry(queryset, batch_size, max_retries, **update_fields)

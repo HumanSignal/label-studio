@@ -7,6 +7,8 @@ replacing the previous signal-based approach with explicit, testable transitions
 
 from typing import Any, Dict, Optional
 
+from core.utils.common import load_func
+from django.conf import settings
 from fsm.registry import register_state_transition
 from fsm.state_choices import ProjectStateChoices
 from fsm.state_manager import StateManager
@@ -135,7 +137,7 @@ class ProjectInProgressFromCompletedTransition(ModelChangeTransition):
         }
 
 
-def update_project_state_after_task_change(project, user=None):
+def _update_project_state_after_task_change_lso(project, user=None):
     current_state = StateManager.get_current_state_value(project)
     inferred_state = infer_entity_state_from_data(project)
 
@@ -154,3 +156,8 @@ def update_project_state_after_task_change(project, user=None):
                 )
         elif inferred_state == ProjectStateChoices.COMPLETED:
             StateManager.execute_transition(entity=project, transition_name='project_completed', user=user)
+
+
+def update_project_state_after_task_change(project, user=None):
+    update_func = load_func(settings.FSM_UPDATE_PROJECT_STATE_AFTER_TASK_CHANGE)
+    return update_func(project, user)

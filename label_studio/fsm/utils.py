@@ -402,6 +402,10 @@ def get_or_initialize_state(entity, user=None, inferred_state=None) -> Optional[
     if not is_fsm_enabled(user):
         return None
 
+    # Skip if FSM is temporarily disabled (e.g., during cleanup or bulk operations)
+    if CurrentContext.is_fsm_disabled():
+        return inferred_state  # Return inferred state without persisting
+
     try:
         from fsm.state_manager import get_state_manager
 
