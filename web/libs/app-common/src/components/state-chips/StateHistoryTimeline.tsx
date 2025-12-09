@@ -94,7 +94,7 @@ export function TimelineItem({ item, index, isLast }: TimelineItemProps) {
             {stateLabel}
           </span>
           {reason && (
-            <span className="text-neutral-content-subtler text-sm leading-[18px] tracking-[0.25px]">{reason}</span>
+            <span className="text-neutral-content-subtler text-sm leading-[18px] tracking-[0.25px] mt-0.5">{reason}</span>
           )}
         </div>
 

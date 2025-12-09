@@ -25,7 +25,7 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
 
   return (
     <div
-      className="flex flex-col w-[320px] max-h-[400px] bg-neutral-background rounded-lg shadow-lg"
+      className="flex flex-col w-[360px] max-h-[400px] bg-neutral-background rounded-lg shadow-lg"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header */}
