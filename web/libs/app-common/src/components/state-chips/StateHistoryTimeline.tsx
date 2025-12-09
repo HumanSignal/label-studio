@@ -2,7 +2,7 @@
  * StateHistoryTimeline - Reusable timeline component for displaying state history
  */
 
-import { Userpic } from "@humansignal/ui";
+import { Userpic, cn } from "@humansignal/ui";
 import type { StateHistoryItem } from "../../hooks/useStateHistory";
 import { formatStateName, formatTimestamp, formatUserName } from "./utils";
 import { getStateVisuals } from "./state-visuals";
@@ -79,7 +79,7 @@ export function TimelineItem({ item, index, isLast }: TimelineItemProps) {
       </div>
 
       {/* Content */}
-      <div className="flex flex-col gap-0.5 flex-1 min-h-10 justify-center min-w-0 pb-6">
+      <div className={cn("flex flex-col gap-0.5 flex-1 min-h-10 justify-center min-w-0", !isLast && "pb-6")}>
         {/* State name and optional reason */}
         <div className="flex flex-col gap-1">
           <span className={`${labelClass} text-sm font-semibold truncate leading-[18px] tracking-[0.15px]`}>
