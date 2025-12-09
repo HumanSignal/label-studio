@@ -21,20 +21,20 @@ export type StateVisualConfig = {
 };
 
 export const STATE_VISUALS: Record<string, StateVisualConfig> = {
-  // Terminal state (kale) - Done stays bold even when past (terminal state)
+  // Terminal state (kale)
   Done: {
     icon: IconStateDone,
     baseBg: "#57b7ab",
-    subtleBg: "#57b7ab", // Done stays bold even when past
+    subtleBg: "#d4ebe8", // Light kale for past Done states
     baseIconColor: "#f4f9f9", // Light kale for icon on base bg
-    subtleIconColor: "#f4f9f9",
+    subtleIconColor: "#57b7ab", // Base kale for icon on subtle bg
   },
   Completed: {
     icon: IconStateDone,
     baseBg: "#57b7ab",
-    subtleBg: "#57b7ab",
+    subtleBg: "#d4ebe8",
     baseIconColor: "#f4f9f9",
-    subtleIconColor: "#f4f9f9",
+    subtleIconColor: "#57b7ab",
   },
   // In Review state (plum palette)
   "In Review": {
