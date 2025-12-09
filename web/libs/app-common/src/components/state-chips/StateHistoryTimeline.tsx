@@ -49,11 +49,19 @@ export function TimelineItem({ item, index, isLast }: TimelineItemProps) {
   const stateLabel = formatStateName(item.state);
   const visuals = getStateVisuals(stateLabel);
   const StateIcon = visuals.icon;
-  const bgColor = isCurrent ? visuals.baseBg : visuals.subtleBg;
-  const iconColor = isCurrent ? visuals.baseIconColor : visuals.subtleIconColor;
 
-  // Initial state always uses subtler text color
+  // Initial state always uses subtle styling (never bold) regardless of position
   const isInitialState = stateLabel === "Initial" || stateLabel === "Created";
+
+  // Current state (index 0) gets bold/base colors, past states get subtle colors
+  // Exception: Initial state ALWAYS uses subtle styling
+  const bgColor = isCurrent && !isInitialState ? visuals.baseBg : visuals.subtleBg;
+  const iconColor = isCurrent && !isInitialState ? visuals.baseIconColor : visuals.subtleIconColor;
+
+  // Text color hierarchy:
+  // - Initial: Always subtler (muted) - #6b6860
+  // - Current: Dark (content) - #262522
+  // - Past: Subtle - #45433e
   const labelClass = isInitialState
     ? "text-neutral-content-subtler"
     : isCurrent
