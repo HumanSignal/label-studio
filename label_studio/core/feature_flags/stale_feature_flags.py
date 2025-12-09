@@ -22,7 +22,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_optic_1025_zendesk_widget_integration': False,
     'fflag_feat_all_optic_991_dashboard_v2_short': True,
     'fflag_feat_optic_378_limit_projects_per_page_to_ten_short': True,
-    'fflag_feat_optic_67_drag_and_drop_charts': True,
     # Feb 6
     'fflag_feat_all_dia_1576_prompts_easy_breezy_onboarding_short_async_presets_ks': False,
     'fflag_front_dia_1150_ddisco_sneak_preview': False,
