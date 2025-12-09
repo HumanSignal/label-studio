@@ -134,8 +134,7 @@
   "projectSettings": [
     {
       "title": "Apply your AWS spend to Label Studio Enterprise",
-      "content":
-        "Label Studio Enterprise is now available on the AWS Marketplace so you can use your committed spend to streamline data labeling workflows.",
+      "content": "Label Studio Enterprise is now available on the AWS Marketplace so you can use your committed spend to streamline data labeling workflows.",
       "closable": true,
       "link": {
         "label": "Learn more",
