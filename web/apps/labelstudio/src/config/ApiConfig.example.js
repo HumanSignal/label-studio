@@ -51,7 +51,7 @@ export const API_CONFIG = {
           total_annotations_number: 300,
           total_predictions_number: 100,
           sampling: "Sequential sampling",
-          annotator_evaluation_enabled: true,
+          annotator_evaluation_enabled: false,
           show_overlap_first: false,
           overlap_cohort_percentage: 100,
           task_data_login: null,

@@ -55,7 +55,6 @@ stages:
         label_config: <View></View>
         title: Test Draft 1
         show_collab_predictions: true
-        annotator_evaluation_enabled: true
       method: POST
       url: '{django_live_url}/api/projects'
     response:

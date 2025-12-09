@@ -316,7 +316,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         max_length=100, choices=SkipQueue.choices, null=True, default=SkipQueue.REQUEUE_FOR_OTHERS
     )
 
-    # Deprecated
+    # Deprecated in favor of annotator_evaluation_enabled
     show_ground_truth_first = models.BooleanField(
         _('show ground truth first'),
         default=False,
@@ -325,8 +325,8 @@ class Project(ProjectMixin, FsmHistoryStateModel):
 
     annotator_evaluation_enabled = models.BooleanField(
         _('annotator evaluation enabled'),
-        default=True,
-        db_default=True,
+        default=False,
+        db_default=False,
         help_text='Enable annotator evaluation for the project',
     )
 
