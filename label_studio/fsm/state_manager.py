@@ -262,6 +262,10 @@ class StateManager:
         if not cls._is_fsm_enabled(user=user):
             return True  # Feature disabled, silently succeed
 
+        # Skip if FSM is temporarily disabled (e.g., during cleanup or bulk operations)
+        if CurrentContext.is_fsm_disabled():
+            return True  # FSM disabled, silently succeed
+
         state_model = get_state_model_for_entity(entity)
         if not state_model:
             raise StateManagerError(f'No state model found for {entity._meta.model_name} when transitioning state')

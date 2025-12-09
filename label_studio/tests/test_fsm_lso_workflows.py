@@ -682,3 +682,42 @@ class TestColdStartScenarios:
         # Step 4: Verify project is COMPLETED (all tasks completed)
         project_state = StateManager.get_current_state_value(project)
         assert project_state == ProjectStateChoices.COMPLETED
+
+
+def test_project_completes_after_deleting_unfinished_tasks(django_live_url, business_client):
+    """
+    Deleting all unfinished tasks should complete the project if the remaining task(s) are completed.
+    Steps:
+    - Create project with 4 tasks
+    - Annotate 1 task (project -> IN_PROGRESS)
+    - Delete the 3 unannotated tasks via Delete Tasks action
+    - Expect project -> COMPLETED (only completed task remains)
+    """
+    ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
+
+    project = ls.projects.create(
+        title='Complete after deleting unfinished',
+        label_config='<View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="positive"/><Choice value="negative"/></Choices></View>',
+    )
+    # Create 4 tasks
+    tasks = [ls.tasks.create(project=project.id, data={'text': f'Task {i}'}) for i in range(4)]
+    assert len(list(ls.tasks.list(project=project.id))) == 4
+
+    # Annotate the first task
+    ls.annotations.create(
+        id=tasks[0].id,
+        result=[{'value': {'choices': ['positive']}, 'from_name': 'label', 'to_name': 'text', 'type': 'choices'}],
+        lead_time=1.0,
+    )
+    # Project should be IN_PROGRESS with mixed completion
+    assert_project_state(project.id, ProjectStateChoices.IN_PROGRESS)
+
+    # Delete remaining 3 unannotated tasks using Data Manager action
+    ids_to_delete = [t.id for t in tasks[1:]]
+    ls.actions.create(project=project.id, id='delete_tasks', selected_items={'all': False, 'included': ids_to_delete})
+
+    # Only one task should remain
+    remaining = list(ls.tasks.list(project=project.id))
+    assert len(remaining) == 1
+    # Project should now be COMPLETED since all remaining tasks are completed
+    assert_project_state(project.id, ProjectStateChoices.COMPLETED)
