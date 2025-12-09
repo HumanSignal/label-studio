@@ -127,8 +127,6 @@ export const FF_LSDV_4998 = "fflag_fix_front_lsdv_4998_missed_dynamic_children_0
  */
 export const FF_TAXONOMY_ASYNC = "fflag_feat_front_lsdv_5451_async_taxonomy_110823_short";
 
-export const FF_LEAP_218 = "fflag_fix_front_leap_218_improve_performance_of_taxonomy_search_short";
-
 /**
  * Allow to label NER directly with Taxonomy instead of Labels
  * @link https://app.launchdarkly.com/default/production/features/fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short
@@ -175,7 +173,7 @@ export const FF_BULK_ANNOTATION = "fflag_feat_all_leap_1181_bulk_annotation_shor
 
 /**
  * Disable the postpone option if the skip interface isn't set
- * @link https://app.launchdarkly.com/projects/default/flags/fflag_feat_front_leap_1173_disable_postpone_skip_short
+ * @link http s://app.launchdarkly.com/projects/default/flags/fflag_feat_front_leap_1173_disable_postpone_skip_short
  */
 export const FF_LEAP_1173 = "fflag_feat_front_leap_1173_disable_postpone_skip_short";
 
