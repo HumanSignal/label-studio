@@ -2,7 +2,7 @@
  * StateHistoryTimeline - Reusable timeline component for displaying state history
  */
 
-import { Userpic, cn } from "@humansignal/ui";
+import { Userpic, cn, Typography } from "@humansignal/ui";
 import type { StateHistoryItem } from "../../hooks/useStateHistory";
 import { formatStateName, formatTimestamp, formatUserName } from "./utils";
 import { getStateVisuals } from "./state-visuals";
@@ -69,9 +69,9 @@ export function TimelineItem({ item, index, isLast }: TimelineItemProps) {
       )}
       {/* Icon column */}
       <div className="flex flex-col items-center shrink-0 pt-0.5">
-        {/* State icon with circular background - 32px circle with 18px icon */}
+        {/* State icon with circular background - 32px circle with 24px icon */}
         <div className="rounded-full size-8 p-1 flex items-center justify-center" style={{ backgroundColor: bgColor }}>
-          <StateIcon className="w-[18px] h-[18px] shrink-0" style={{ color: iconColor }} />
+          <StateIcon className="w-6 h-6 shrink-0" style={{ color: iconColor }} />
         </div>
       </div>
 
@@ -79,13 +79,13 @@ export function TimelineItem({ item, index, isLast }: TimelineItemProps) {
       <div className={cn("flex flex-col gap-0.5 flex-1 min-h-10 justify-center min-w-0", !isLast && "pb-6")}>
         {/* State name and optional reason */}
         <div className="flex flex-col gap-1">
-          <span className={`${labelClass} text-sm font-semibold truncate leading-[18px] tracking-[0.15px]`}>
+          <Typography variant="label" size="small" className={`${labelClass} truncate`}>
             {stateLabel}
-          </span>
+          </Typography>
           {reason && (
-            <span className="text-neutral-content-subtler text-sm leading-[18px] tracking-[0.25px] mt-0.5">
+            <Typography variant="body" size="smaller" className="text-neutral-content-subtler mt-0.5">
               {reason}
-            </span>
+            </Typography>
           )}
         </div>
 
@@ -96,7 +96,9 @@ export function TimelineItem({ item, index, isLast }: TimelineItemProps) {
             <>
               <div className="flex items-center gap-1 shrink-0">
                 <Userpic size={20} user={item.triggered_by} username={getUserInitials(item.triggered_by)} />
-                <span className="text-xs leading-4 tracking-[0.5px]">{userName}</span>
+                <Typography variant="body" size="smaller">
+                  {userName}
+                </Typography>
               </div>
               {/* Dot separator */}
               <div className="size-[3px] rounded-full bg-neutral-content-subtler shrink-0" />
@@ -104,13 +106,17 @@ export function TimelineItem({ item, index, isLast }: TimelineItemProps) {
           )}
           {isSystem && (
             <>
-              <span className="text-xs leading-4 tracking-[0.5px]">System</span>
+              <Typography variant="body" size="smaller">
+                System
+              </Typography>
               {/* Dot separator */}
               <div className="size-[3px] rounded-full bg-neutral-content-subtler shrink-0" />
             </>
           )}
           {/* Timestamp */}
-          <span className="text-xs leading-4 tracking-[0.5px]">{formatTimestamp(item.created_at)}</span>
+          <Typography variant="body" size="smaller">
+            {formatTimestamp(item.created_at)}
+          </Typography>
         </div>
       </div>
     </div>
