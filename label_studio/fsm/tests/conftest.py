@@ -11,6 +11,7 @@ import pytest
 from django.core.cache import cache
 from fsm.registry import state_choices_registry, state_model_registry, transition_registry
 from fsm.state_manager import StateManager
+from tests.conftest import django_live_url  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
