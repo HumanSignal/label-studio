@@ -11,6 +11,7 @@ import pytest
 from django.core.cache import cache
 from fsm.registry import state_choices_registry, state_model_registry, transition_registry
 from fsm.state_manager import StateManager
+
 from label_studio.tests import conftest as ls_tests_conftest
 
 logger = logging.getLogger(__name__)
@@ -28,6 +29,7 @@ s3 = ls_tests_conftest.s3
 s3_with_images = ls_tests_conftest.s3_with_images
 gcs_client = ls_tests_conftest.gcs_client
 azure_client = ls_tests_conftest.azure_client
+
 
 @pytest.fixture(autouse=True, scope='function')
 def fsm_test_isolation():
