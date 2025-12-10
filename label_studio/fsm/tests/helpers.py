@@ -11,13 +11,11 @@ This module provides reusable helper functions for FSM testing, including:
 import logging
 from typing import Optional
 
-from assignments.models import TaskAssignment
 from core.current_request import CurrentContext
 from django.core.cache import cache
 from fsm.state_manager import get_state_manager
 from label_studio_sdk.client import LabelStudio
 from projects.models import Project
-from reviews.models import AnnotationReview
 from tasks.models import Annotation, AnnotationDraft, Task
 
 logger = logging.getLogger(__name__)
