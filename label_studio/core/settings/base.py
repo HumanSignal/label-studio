@@ -17,7 +17,7 @@ from datetime import timedelta
 
 from django.core.exceptions import ImproperlyConfigured
 
-from label_studio.core.utils.params import get_bool_env, get_env_list
+from label_studio.core.utils.params import get_bool_env, get_env, get_env_list, has_env
 
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
@@ -85,7 +85,6 @@ logging.getLogger('faker').setLevel(logging.WARNING)
 logging.getLogger('faker.providers').setLevel(logging.WARNING)
 
 from label_studio.core.utils.io import get_data_dir
-from label_studio.core.utils.params import get_bool_env, get_env
 
 logger = logging.getLogger(__name__)
 SILENCED_SYSTEM_CHECKS = []
@@ -608,8 +607,8 @@ CLOUD_FILE_STORAGE_ENABLED = False
 
 if (
     VERSION_EDITION == 'Community'
-    and 'LOCAL_FILES_DOCUMENT_ROOT' not in os.environ
-    and 'LOCAL_FILES_SERVING_ENABLED' not in os.environ
+    and not has_env('LOCAL_FILES_DOCUMENT_ROOT')
+    and not has_env('LOCAL_FILES_SERVING_ENABLED')
 ):
     from label_studio.io_storages.localfiles.functions import autodetect_local_files_root
 
@@ -665,6 +664,7 @@ PREPROCESS_FIELD_NAME = 'data_manager.functions.preprocess_field_name'
 INTERACTIVE_DATA_SERIALIZER = 'data_export.serializers.BaseExportDataSerializerForInteractive'
 PROJECT_IMPORT_PERMISSION = 'projects.permissions.ProjectImportPermission'
 DELETE_TASKS_ANNOTATIONS_POSTPROCESS = None
+PROJECT_SAVE_DIMENSIONS_POSTPROCESS = None
 FEATURE_FLAGS_GET_USER_REPR = 'core.feature_flags.utils.get_user_repr'
 FEATURE_FLAGS_GET_USER_REPR_FROM_ORGANIZATION = 'core.feature_flags.utils.get_user_repr_from_organization'
 
@@ -932,6 +932,7 @@ DM_MAX_USERS_TO_DISPLAY = int(get_env('DM_MAX_USERS_TO_DISPLAY', 10))
 
 # Base FSM (Finite State Machine) Configuration for Label Studio
 FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
+FSM_UPDATE_PROJECT_STATE_AFTER_TASK_CHANGE = 'fsm.project_transitions._update_project_state_after_task_change_lso'
 
 # Used for async migrations. In LSE this is set to a real queue name, including here so we
 # can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
