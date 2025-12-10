@@ -561,8 +561,8 @@ class TestGetOrInitializeStateParameters(TestCase):
             with patch('fsm.utils.CurrentContext') as mock_context:
                 mock_context.is_fsm_disabled.return_value = False
 
-                # Mock StateManager to capture call arguments
-                with patch('fsm.utils.get_state_manager') as mock_get_sm:
+                # Mock StateManager - patch where it's imported (fsm.state_manager)
+                with patch('fsm.state_manager.get_state_manager') as mock_get_sm:
                     mock_sm = Mock()
                     mock_sm.get_current_state_value.return_value = None  # No existing state
                     mock_get_sm.return_value = mock_sm
@@ -605,8 +605,8 @@ class TestGetOrInitializeStateParameters(TestCase):
             with patch('fsm.utils.CurrentContext') as mock_context:
                 mock_context.is_fsm_disabled.return_value = False
 
-                # Mock StateManager to capture call arguments
-                with patch('fsm.utils.get_state_manager') as mock_get_sm:
+                # Mock StateManager - patch where it's imported (fsm.state_manager)
+                with patch('fsm.state_manager.get_state_manager') as mock_get_sm:
                     mock_sm = Mock()
                     mock_sm.get_current_state_value.return_value = None  # No existing state
                     mock_get_sm.return_value = mock_sm
@@ -651,8 +651,8 @@ class TestGetOrInitializeStateParameters(TestCase):
             with patch('fsm.utils.CurrentContext') as mock_context:
                 mock_context.is_fsm_disabled.return_value = False
 
-                # Mock StateManager to capture call arguments
-                with patch('fsm.utils.get_state_manager') as mock_get_sm:
+                # Mock StateManager - patch where it's imported (fsm.state_manager)
+                with patch('fsm.state_manager.get_state_manager') as mock_get_sm:
                     mock_sm = Mock()
                     mock_sm.get_current_state_value.return_value = None  # No existing state
                     mock_get_sm.return_value = mock_sm
@@ -691,8 +691,8 @@ class TestGetOrInitializeStateParameters(TestCase):
             with patch('fsm.utils.CurrentContext') as mock_context:
                 mock_context.is_fsm_disabled.return_value = False
 
-                # Mock StateManager to capture call arguments
-                with patch('fsm.utils.get_state_manager') as mock_get_sm:
+                # Mock StateManager - patch where it's imported (fsm.state_manager)
+                with patch('fsm.state_manager.get_state_manager') as mock_get_sm:
                     mock_sm = Mock()
                     mock_sm.get_current_state_value.return_value = None  # No existing state
                     mock_get_sm.return_value = mock_sm
