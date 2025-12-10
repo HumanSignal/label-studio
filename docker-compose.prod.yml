@@ -1,0 +1,41 @@
+services:
+  app:
+    stdin_open: true
+    tty: true
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8100:8000"
+    depends_on:
+      - db
+    environment:
+      - DJANGO_DB=default
+      - POSTGRE_NAME=postgres
+      - POSTGRE_USER=postgres
+      - POSTGRE_PASSWORD=
+      - POSTGRE_PORT=5432
+      - POSTGRE_HOST=db
+      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
+      - JSON_LOG=1
+      - CORS_ALLOWED_ORIGINS=https://labelstudio.veip.cloud
+      - LOG_LEVEL=DEBUG
+      # Local Files Storage Configuration
+      - LOCAL_FILES_SERVING_ENABLED=true
+      - LOCAL_FILES_DOCUMENT_ROOT=/label-studio/data
+    volumes:
+      - ./mydata:/label-studio/data:rw
+    command: label-studio-uwsgi
+
+  db:
+    image: pgautoupgrade/pgautoupgrade:13-alpine
+    hostname: db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_USER=postgres
+    volumes:
+      - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
+      - ./deploy/pgsql/certs:/var/lib/postgresql/certs:ro
+    ports:
+      - "5433:5432"
+
