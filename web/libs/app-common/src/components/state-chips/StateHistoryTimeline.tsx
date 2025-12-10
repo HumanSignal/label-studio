@@ -59,7 +59,7 @@ export function TimelineItem({ item, index, isLast }: TimelineItemProps) {
 
   const userName = formatUserName(item.triggered_by);
   const isSystem = userName === "System";
-  const reason = item.reason ?? item.context_data?.reason;
+  const reason = item.reason;
 
   return (
     <div className="flex gap-2 items-start relative">
