@@ -1,9 +1,9 @@
 import { IconExternal, IconFolderAdd, IconHumanSignal, IconUserAdd, IconFolderOpen } from "@humansignal/icons";
 import { Button, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useUpdatePageTitle } from "@humansignal/core";
+import { getVisitedProjectIds, useUpdatePageTitle } from "@humansignal/core";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { useAPI } from "../../providers/ApiProvider";
 import { CreateProject } from "../CreateProject/CreateProject";
@@ -56,14 +56,29 @@ export const HomePage: Page = () => {
   const [invitationOpen, setInvitationOpen] = useState(false);
 
   useUpdatePageTitle("Home");
+
+  const visitedIds = useMemo(() => getVisitedProjectIds(), []);
+  const hasVisitedProjects = visitedIds.length > 0;
+
   const { data, isFetching, isSuccess, isError } = useQuery({
-    queryKey: ["projects", { page_size: 10 }],
+    queryKey: ["projects", hasVisitedProjects ? { ids: visitedIds } : { page_size: PROJECTS_TO_SHOW }],
     async queryFn() {
-      return api.callApi<{ results: APIProject[]; count: number }>("projects", {
-        params: { page_size: PROJECTS_TO_SHOW },
-      });
+      const params = hasVisitedProjects
+        ? { ids: visitedIds.join(","), page_size: PROJECTS_TO_SHOW }
+        : { page_size: PROJECTS_TO_SHOW };
+
+      return api.callApi<{ results: APIProject[]; count: number }>("projects", { params });
     },
   });
+
+  // Sort results by visited order when using visited project IDs
+  const sortedProjects = useMemo(() => {
+    if (!data?.results) return [];
+    if (!hasVisitedProjects) return data.results;
+
+    const projectMap = new Map(data.results.map((p) => [p.id, p]));
+    return visitedIds.map((id) => projectMap.get(id)).filter((p): p is APIProject => p !== undefined);
+  }, [data?.results, hasVisitedProjects, visitedIds]);
 
   const handleActions = (action: Action) => {
     return () => {
@@ -125,7 +140,7 @@ export const HomePage: Page = () => {
               </div>
             ) : isError ? (
               <div className="h-64 flex justify-center items-center">can't load projects</div>
-            ) : isSuccess && data && data.results.length === 0 ? (
+            ) : isSuccess && data && sortedProjects.length === 0 ? (
               <div className="flex flex-col justify-center items-center border border-primary-border-subtle bg-primary-emphasis-subtle rounded-lg h-64">
                 <div
                   className={
@@ -144,9 +159,9 @@ export const HomePage: Page = () => {
                   Create Project
                 </Button>
               </div>
-            ) : isSuccess && data && data.results.length > 0 ? (
+            ) : isSuccess && data && sortedProjects.length > 0 ? (
               <div className="flex flex-col gap-1">
-                {data.results.map((project) => {
+                {sortedProjects.map((project) => {
                   return <ProjectSimpleCard key={project.id} project={project} />;
                 })}
               </div>

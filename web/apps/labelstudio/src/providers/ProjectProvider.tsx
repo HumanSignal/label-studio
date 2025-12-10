@@ -1,6 +1,7 @@
 import type React from "react";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { shallowEqualObjects } from "shallow-equal";
+import { addVisitedProject } from "@humansignal/core";
 import { FF_UNSAVED_CHANGES, isFF } from "../utils/feature-flags";
 import { useAPI, type WrappedResponse } from "./ApiProvider";
 import { useAppStore } from "./AppStoreProvider";
@@ -61,6 +62,10 @@ export const ProjectProvider: React.FunctionComponent = ({ children }) => {
         setProjectData(projectInfo);
         updateStore({ project: projectInfo });
         projectCache.set(projectInfo.id, projectInfo);
+      }
+
+      if (projectInfo?.id) {
+        addVisitedProject(projectInfo.id);
       }
 
       return projectInfo;
