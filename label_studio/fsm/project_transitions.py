@@ -133,7 +133,7 @@ class ProjectInProgressFromCompletedTransition(ModelChangeTransition):
         }
 
 
-def _update_project_state_after_task_change_lso(project, user=None):
+def sync_project_state(project, user=None, reason=None, context_data=None):
     current_state = StateManager.get_current_state_value(project)
     inferred_state = infer_entity_state_from_data(project)
 
@@ -155,5 +155,5 @@ def _update_project_state_after_task_change_lso(project, user=None):
 
 
 def update_project_state_after_task_change(project, user=None):
-    update_func = load_func(settings.FSM_UPDATE_PROJECT_STATE_AFTER_TASK_CHANGE)
+    update_func = load_func(settings.FSM_SYNC_PROJECT_STATE)
     return update_func(project, user)
