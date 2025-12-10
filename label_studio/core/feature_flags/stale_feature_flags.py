@@ -11,7 +11,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_front_prod_281_project_list_search_19072023_short': True,
     'fflag_feat_all_lsdv_e_295_project_level_roles_via_saml_scim_ldap_short': True,
     'ff_back_2884_comments_notifications_02092022_short': True,
-    'ff_back_DEV_1711_review_queue_140222_short': True,
     'ff_front_dev_1480_created_on_in_review_180122_short': True,
     'fflag_fix_front_leap_32_zoom_perf_190923_short': True,
     'fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short': True,
