@@ -173,7 +173,7 @@ export const FF_BULK_ANNOTATION = "fflag_feat_all_leap_1181_bulk_annotation_shor
 
 /**
  * Disable the postpone option if the skip interface isn't set
- * @link http s://app.launchdarkly.com/projects/default/flags/fflag_feat_front_leap_1173_disable_postpone_skip_short
+ * @link https://app.launchdarkly.com/projects/default/flags/fflag_feat_front_leap_1173_disable_postpone_skip_short
  */
 export const FF_LEAP_1173 = "fflag_feat_front_leap_1173_disable_postpone_skip_short";
 
