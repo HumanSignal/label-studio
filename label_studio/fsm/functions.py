@@ -48,7 +48,7 @@ def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
 
         # Backfill initial CREATED state for each task
         for task in tasks:
-            backfill_state_for_entity(task, 'task', create_record=True)
+            backfill_state_for_entity(task, 'task')
 
         logger.info(f'Storage sync: FSM states created for {len(task_ids)} tasks')
     except ImportError:
