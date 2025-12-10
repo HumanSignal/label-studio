@@ -12,9 +12,9 @@ Test Coverage:
 """
 
 import pytest
+from fsm.state_choices import TaskStateChoices
 from fsm.tests.helpers import (
     IMAGE_CLASSIFICATION_CONFIG,
-    TaskStateChoices,
     assert_state_exists,
     assert_task_state,
     create_sdk_client,
