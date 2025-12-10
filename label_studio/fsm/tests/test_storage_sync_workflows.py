@@ -196,7 +196,9 @@ class TestAzureStorageSyncWorkflows:
 class TestLocalStorageSyncWorkflows:
     """Test FSM state management for local storage sync operations."""
 
-    def test_local_storage_sync_creates_tasks_with_fsm_states(self, django_live_url, business_client):
+    def test_local_storage_sync_creates_tasks_with_fsm_states(
+        self, django_live_url, business_client, tmp_path, settings
+    ):
         """Test local storage sync creates tasks with FSM states.
 
         This test validates step by step:
@@ -212,9 +214,16 @@ class TestLocalStorageSyncWorkflows:
 
         # Create project
         project = ls.projects.create(title='FSM Local Storage Sync Test', label_config=IMAGE_CLASSIFICATION_CONFIG)
+        local_root = tmp_path / 'local-storage'
+        local_root.mkdir()
+        (local_root / 'image1.jpg').write_text('123')
+        (local_root / 'subdir').mkdir()
+        (local_root / 'subdir' / 'image2.jpg').write_text('456')
+
+        settings.LOCAL_FILES_DOCUMENT_ROOT = tmp_path
 
         storage = ls.import_storage.local.create(
-            project=project.id, path='/tmp/test-files', regex_filter='.*', use_blob_urls=True
+            project=project.id, path=str(local_root), regex_filter='.*', use_blob_urls=True
         )
 
         # Trigger sync
