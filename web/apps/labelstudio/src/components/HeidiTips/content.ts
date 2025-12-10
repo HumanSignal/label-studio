@@ -172,6 +172,20 @@ export const defaultTipsCollection: TipsCollection = {
   ],
   projectSettings: [
     {
+      title: "Apply your AWS spend to Label Studio Enterprise",
+      content:
+        "Label Studio Enterprise is now available on the AWS Marketplace so you can use your committed spend to streamline data labeling workflows.",
+      closable: true,
+      link: {
+        label: "Learn more",
+        url: "https://aws.amazon.com/marketplace/pp/prodview-wjac3msf77tny",
+        params: {
+          experiment: "project_settings_tip",
+          treatment: "aws_marketplace",
+        },
+      },
+    },
+    {
       title: "Save time with Auto-Labeling",
       content:
         "Use automation to instantly label large-scale datasets without sacrificing quality in the Enterprise platform.",

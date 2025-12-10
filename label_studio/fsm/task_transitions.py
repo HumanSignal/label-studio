@@ -49,7 +49,6 @@ class TaskCreatedTransition(ModelChangeTransition):
         task = context.entity
 
         return {
-            'reason': 'Task created in the system',
             'project_id': task.project_id,
             'data_keys': list(task.data.keys()) if task.data else [],
         }
@@ -77,7 +76,6 @@ class TaskCompletedTransition(ModelChangeTransition):
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         task = context.entity
         return {
-            'reason': 'Task completed - annotation submitted',
             'task_id': task.id,
             'project_id': task.project_id,
             'total_annotations': task.total_annotations,
@@ -104,7 +102,6 @@ class TaskInProgressTransition(ModelChangeTransition):
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         task = context.entity
         return {
-            'reason': 'Task moved to in progress - annotations deleted',
             'task_id': task.id,
             'project_id': task.project_id,
             'total_annotations': task.total_annotations,

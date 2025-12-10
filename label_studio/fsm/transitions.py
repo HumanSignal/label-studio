@@ -36,7 +36,7 @@ class TransitionContext(BaseModel, Generic[EntityType, StateModelType]):
 
     # Core context information
     entity: Any = Field(..., description='The entity being transitioned')
-    current_user: Optional[Any] = Field(None, description='User triggering the transition')
+    current_user: Optional[Any] = Field(None, description='User triggering the transition (request user)')
     current_state_object: Optional[Any] = Field(None, description='Full current state object')
     current_state: Optional[str] = Field(None, description='Current state as string')
     target_state: Optional[str] = Field(
