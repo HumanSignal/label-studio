@@ -1,14 +1,18 @@
-from django.conf import settings
-from typing import Optional
 import logging
+from typing import Optional
+
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
+
 
 def _get_inference_map_lso():
     return {}
 
+
 def get_inference_map():
     return settings.FSM_INFERENCE_MAP
+
 
 def get_or_infer_state(entity, entity_type: Optional[str] = None) -> Optional[str]:
     """
