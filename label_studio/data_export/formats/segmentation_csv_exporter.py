@@ -9,6 +9,7 @@ import io
 import json
 import logging
 import os
+import re
 import shutil
 import base64
 from urllib.parse import urljoin
@@ -113,25 +114,56 @@ def _compute_bbox_and_area(mask: np.ndarray) -> Tuple[int, int, int, int, int]:
 
 
 def _compute_intensities(image: Image.Image, mask: np.ndarray) -> Tuple[Optional[float], Optional[float], Optional[float], Optional[float]]:
-    if mask.sum() == 0:
-        return None, None, None, None
-    mode = image.mode
     mask_bool = mask.astype(bool)
-    # Always compute gray
-    gray_np = np.array(image.convert("L"), dtype=np.float32)
-    mean_gray = float(gray_np[mask_bool].mean()) if mask_bool.any() else None
-    # Compute RGB only if image has color channels
+    if mask_bool.sum() == 0:
+        return 0.0, 0.0, 0.0, 0.0
+
+    mode = image.mode
     if mode in ("L", "I", "I;16", "F"):
-        return mean_gray, None, None, None
+        gray_np = np.array(image.convert("L"), dtype=np.float32)
+        mean_gray = float(gray_np[mask_bool].mean()) if mask_bool.any() else 0.0
+        return mean_gray, 0.0, 0.0, 0.0
+
     img_rgb = image.convert("RGB")
     r, g, b = img_rgb.split()
     r_np = np.array(r, dtype=np.float32)
     g_np = np.array(g, dtype=np.float32)
     b_np = np.array(b, dtype=np.float32)
-    mean_r = float(r_np[mask_bool].mean()) if mask_bool.any() else None
-    mean_g = float(g_np[mask_bool].mean()) if mask_bool.any() else None
-    mean_b = float(b_np[mask_bool].mean()) if mask_bool.any() else None
-    return mean_gray, mean_r, mean_g, mean_b
+    mean_r = float(r_np[mask_bool].mean()) if mask_bool.any() else 0.0
+    mean_g = float(g_np[mask_bool].mean()) if mask_bool.any() else 0.0
+    mean_b = float(b_np[mask_bool].mean()) if mask_bool.any() else 0.0
+    # For RGB images we report gray as 0.0 per requirement
+    return 0.0, mean_r, mean_g, mean_b
+
+
+def _parse_textarea_means(texts: List[str]) -> Tuple[Optional[float], Optional[float], Optional[float], Optional[float]]:
+    """Parse textarea text values for pre-computed intensities."""
+    if not texts:
+        return None, None, None, None
+    raw = str(texts[0]).strip()
+    try:
+        val = float(raw)
+        return val, None, None, None
+    except Exception:
+        pass
+
+    gray = r = g = b = None
+    try:
+        matches = re.findall(r'(gray|grey|r|g|b)\s*[:=]\s*(-?\d+(?:\.\d+)?)', raw, flags=re.IGNORECASE)
+        for key, val in matches:
+            val_f = float(val)
+            lk = key.lower()
+            if lk in ("gray", "grey"):
+                gray = val_f
+            elif lk == "r":
+                r = val_f
+            elif lk == "g":
+                g = val_f
+            elif lk == "b":
+                b = val_f
+    except Exception:
+        return None, None, None, None
+    return gray, r, g, b
 
 
 def _best_effort_filename_from_url(url: str) -> str:
@@ -292,7 +324,7 @@ def export_segmentation_metrics(tasks: Iterable[Dict], project, download_resourc
                 results = ann.get("result") or []
                 # Pre-scan labels and textarea means by region id to merge shape+label cases and reuse intensities
                 label_by_region: Dict[str, str] = {}
-                textarea_by_region: Dict[str, float] = {}
+                textarea_by_region: Dict[str, Tuple[Optional[float], Optional[float], Optional[float], Optional[float]]] = {}
                 for res in results:
                     value = res.get("value") or {}
                     region_id = res.get("id")
@@ -309,40 +341,27 @@ def export_segmentation_metrics(tasks: Iterable[Dict], project, download_resourc
                     if res.get("type") == "textarea":
                         texts = value.get("text") or []
                         if isinstance(texts, list) and texts:
-                            try:
-                                textarea_by_region[str(region_id)] = float(str(texts[0]).strip())
-                            except Exception:
-                                pass
+                            parsed = _parse_textarea_means(texts)
+                            textarea_by_region[str(region_id)] = parsed
 
                 processed_region_ids: set[str] = set()
                 for res in results:
                     rtype = (res.get("type") or "").lower()
                     value = res.get("value") or {}
 
-                    # Determine object/image URL early to allow size fallback
+                    # Determine object/image URL but avoid fetching; rely on annotation dims
                     to_name = res.get("to_name") or ""
                     data_key = _get_object_value_key_for_result(project, to_name) or next(iter(data.keys()), None)
                     image_url = data.get(data_key) if data_key in data else next(iter(data.values()), None)
                     if not image_url:
                         logger.debug("Skip region without image url")
                         continue
-                    source = _resolve_image_source(project, str(image_url), download_resources, hostname)
+                    source_filename = _best_effort_filename_from_url(str(image_url))
 
-                    # Obtain original size, fallback to image probe if needed
                     ow = res.get("original_width") or value.get("original_width")
                     oh = res.get("original_height") or value.get("original_height")
                     original_width = int(ow) if ow else 0
                     original_height = int(oh) if oh else 0
-                    if (not original_width or not original_height) and download_resources:
-                        probe = _open_image(project, source, download_resources)
-                        if probe is not None:
-                            try:
-                                original_width, original_height = int(probe.width), int(probe.height)
-                            finally:
-                                try:
-                                    probe.close()
-                                except Exception:
-                                    pass
                     if not original_width or not original_height:
                         logger.debug("Skip region without original image size (no fallback available)")
                         continue
@@ -381,20 +400,19 @@ def export_segmentation_metrics(tasks: Iterable[Dict], project, download_resourc
                     bbox_x, bbox_y, w, h, area = _compute_bbox_and_area(mask)
 
                     # Prefer existing TextArea mean intensity if available for this region
-                    tg = textarea_by_region.get(region_id_str)
-                    if tg is not None:
-                        mean_gray, mean_r, mean_g, mean_b = tg, None, None, None
-                    else:
-                        pil_img = _open_image(project, source, download_resources)
-                        mean_gray = mean_r = mean_g = mean_b = None
-                        if pil_img is not None:
-                            try:
-                                mean_gray, mean_r, mean_g, mean_b = _compute_intensities(pil_img, mask)
-                            except Exception as exc:
-                                logger.debug(f"Failed to compute intensities for {source.url}: {exc}")
+                    text_means = textarea_by_region.get(region_id_str)
+                    mean_gray = mean_r = mean_g = mean_b = None
+                    if text_means is not None:
+                        mean_gray, mean_r, mean_g, mean_b = text_means
+
+                    # Ensure all channels are populated; default missing values to 0.0
+                    mean_gray = 0.0 if mean_gray is None else mean_gray
+                    mean_r = 0.0 if mean_r is None else mean_r
+                    mean_g = 0.0 if mean_g is None else mean_g
+                    mean_b = 0.0 if mean_b is None else mean_b
 
                     row = {
-                        "image_filename": source.filename,
+                        "image_filename": source_filename,
                         "task_id": task_id,
                         "annotation_id": ann_id,
                         "region_id": region_id,
@@ -405,15 +423,15 @@ def export_segmentation_metrics(tasks: Iterable[Dict], project, download_resourc
                         "x_length_px": w,
                         "y_length_px": h,
                         "area_px": area,
-                        "mean_gray": mean_gray if mean_gray is not None else "",
-                        "mean_r": mean_r if mean_r is not None else "",
-                        "mean_g": mean_g if mean_g is not None else "",
-                        "mean_b": mean_b if mean_b is not None else "",
+                        "mean_gray": mean_gray,
+                        "mean_r": mean_r,
+                        "mean_g": mean_g,
+                        "mean_b": mean_b,
                         "polygon_points_px": json.dumps(poly_points_px) if poly_points_px else "",
                     }
 
                     # Group per image (include task id to avoid collisions)
-                    key = f"{source.filename}__task_{task_id}"
+                    key = f"{source_filename}__task_{task_id}"
                     rows_by_image[key].append(row)
                     processed_region_ids.add(region_id_str)
 

@@ -47,7 +47,7 @@ The default labeling interface now includes:
             required="true"
             maxSubmissions="1"
             rows="5"
-            placeholder="Mean Intensity"
+           placeholder="Mean Intensity (gray/R/G/B)"
             displayMode="region-list"
             />
   <!-- Brush Labels (tag1) -->

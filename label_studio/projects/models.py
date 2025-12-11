@@ -163,7 +163,7 @@ class Project(ProjectMixin, models.Model):
             required="true"
             maxSubmissions="1"
             rows="5"
-            placeholder="Mean Intensity"
+            placeholder="Mean Intensity (gray/R/G/B; gray=0 on RGB, R/G/B=0 on gray)"
             displayMode="region-list"
             />
   <!-- Brush Labels (tag1) -->

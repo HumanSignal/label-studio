@@ -27,7 +27,7 @@ config: |
     <TextArea name="mean_intensity" toName="image"
               perRegion="true"
               rows="5"
-              placeholder="Mean Intensity"
+              placeholder="Mean Intensity (gray/R/G/B; gray=0 on RGB, R/G/B=0 on gray)"
               displayMode="region-list"
               />
     <!-- Polygon Labels (tag2) -->
