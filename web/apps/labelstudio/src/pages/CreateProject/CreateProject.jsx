@@ -127,19 +127,29 @@ export const CreateProject = ({ onClose }) => {
     setError(null);
   }, [name]);
 
-  // Load templates and expose FastSAM/SAM2 as options on the Name step
+  // Load templates and expose auto-detection options on the Name step
   React.useEffect(() => {
     const loadTemplates = async () => {
       const res = await api.callApi("configTemplates");
-      const wanted = new Set([
-        "FastSAM – Interactive Segmentation",
-        "SAM2 – Interactive Segmentation",
-      ]);
+      const wantedTitles = ["Full Auto Detection", "Semi Auto Detection"];
+      const wanted = new Set(wantedTitles);
       const items = (res?.templates ?? []).filter((t) => wanted.has(t.title));
+
       setTemplateOptions(items);
+
+      if (!selectedRecipe) {
+        const defaultTemplate = items.find((t) => t.title === "Full Auto Detection");
+
+        if (defaultTemplate) {
+          setSelectedRecipe(defaultTemplate);
+          if (project && (!project.label_config || project.label_config === "<View></View>")) {
+            updateProject({ ...project, label_config: defaultTemplate.config });
+          }
+        }
+      }
     };
     loadTemplates();
-  }, []);
+  }, [api, project, selectedRecipe, updateProject]);
 
   const handleSelectTemplate = React.useCallback(
     (titleOrNull) => {
