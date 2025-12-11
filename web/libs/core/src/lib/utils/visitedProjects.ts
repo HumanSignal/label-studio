@@ -35,4 +35,3 @@ export function addVisitedProject(projectId: number): void {
     // Silently fail if localStorage is unavailable
   }
 }
-
