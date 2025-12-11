@@ -221,6 +221,7 @@ class TestLocalStorageSyncWorkflows:
         (local_root / 'subdir' / 'image2.jpg').write_text('456')
 
         settings.LOCAL_FILES_DOCUMENT_ROOT = tmp_path
+        settings.LOCAL_FILES_SERVING_ENABLED = True
 
         storage = ls.import_storage.local.create(
             project=project.id, path=str(local_root), regex_filter='.*', use_blob_urls=True
