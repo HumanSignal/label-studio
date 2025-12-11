@@ -539,7 +539,10 @@ const HtxPolygonView = ({ item, setShapeRef }) => {
   const { suggestion } = useContext(ImageViewContext) ?? {};
 
   const regionStyles = useRegionStyles(item, {
-    useStrokeAsFill: true,
+    useStrokeAsFill: false,
+    includeFill: false,
+    forceNoFill: true,
+    strokeWidthMultiplier: 0.5,
   });
 
   function renderCircle({ points, idx }) {

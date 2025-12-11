@@ -23,6 +23,8 @@ type StyleOptions = typeof defaultStyles & {
   includeFill?: boolean;
   useStrokeAsFill?: boolean;
   sameStrokeWidthForSelected?: boolean;
+  forceNoFill?: boolean;
+  strokeWidthMultiplier?: number;
 };
 
 export const getRegionStyles = ({
@@ -39,6 +41,7 @@ export const getRegionStyles = ({
   defaultStrokeWidth = defaultStyle.strokewidth,
   defaultStrokeWidthHighlighted = Constants.HIGHLIGHTED_STROKE_WIDTH,
   defaultSuggestionWidth = Constants.SUGGESTION_STROKE_WIDTH,
+  strokeWidthMultiplier = 1,
 }: StyleOptions) => {
   const style = region.style || region.tag;
 
@@ -69,25 +72,28 @@ export const getRegionStyles = ({
   return {
     strokeColor,
     fillColor,
-    strokeWidth,
+    strokeWidth: strokeWidth * strokeWidthMultiplier,
   };
 };
 
 export const useRegionStyles = (region: any, options: Partial<StyleOptions> = {}) => {
   const { suggestion } = useContext(ImageViewContext) ?? {};
   const [highlighted, setHighlighted] = useState(region.highlighted);
-  const [shouldFill, setShouldFill] = useState(region.fill ?? (options.useStrokeAsFill || options.includeFill));
+  const forceNoFill = options.forceNoFill ?? false;
+  const [shouldFill, setShouldFill] = useState(
+    forceNoFill ? false : region.fill ?? (options.useStrokeAsFill || options.includeFill),
+  );
 
   const styles = useMemo(() => {
     return getRegionStyles({
       ...defaultStyles,
       ...(options ?? {}),
       highlighted,
-      shouldFill,
+      shouldFill: forceNoFill ? false : shouldFill,
       region,
       suggestion,
     });
-  }, [region, suggestion, options, highlighted, shouldFill]);
+  }, [region, suggestion, options, highlighted, shouldFill, forceNoFill]);
 
   useEffect(() => {
     const disposeObserver = ["highlighted", "fill"].map((prop) => {
@@ -100,6 +106,7 @@ export const useRegionStyles = (region: any, options: Partial<StyleOptions> = {}
               case "highlighted":
                 return setHighlighted(newValue);
               case "fill":
+                if (forceNoFill) return;
                 return setShouldFill(newValue);
             }
           },
@@ -113,7 +120,7 @@ export const useRegionStyles = (region: any, options: Partial<StyleOptions> = {}
     return () => {
       disposeObserver.forEach((dispose) => dispose());
     };
-  }, [region]);
+  }, [region, forceNoFill]);
 
   return styles;
 };
