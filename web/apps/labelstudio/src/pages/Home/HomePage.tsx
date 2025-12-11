@@ -68,10 +68,11 @@ export const HomePage: Page = () => {
 
   useUpdatePageTitle("Home");
 
-  // Update location key atom when navigation occurs - this triggers visitedIdsAtom to re-read from localStorage
+  // Update location key atom when component mounts or when navigating back to this page
+  // This triggers visitedIdsAtom to re-read from localStorage
   useEffect(() => {
     setLocationKey(location.key);
-  }, [location.key, setLocationKey]);
+  }, []); // Empty deps - only run on mount
 
   const { data, isFetching, isSuccess, isError } = useQuery({
     queryKey: ["projects", { page_size: PROJECTS_TO_SHOW }],

@@ -2,14 +2,14 @@ import { atom } from "jotai";
 import { getVisitedProjectIds } from "@humansignal/core";
 
 /**
- * Atom to track navigation changes via location key.
- * This atom is updated from the HomePage component when location changes.
+ * Atom to track when the HomePage is mounted/visited.
+ * Updated from the HomePage component on mount to trigger a refresh of visited projects.
  */
 export const locationKeyAtom = atom<string>("");
 
 /**
  * Derived atom that automatically reads visited project IDs from localStorage.
- * Re-evaluates whenever locationKeyAtom changes (on navigation).
+ * Re-evaluates whenever locationKeyAtom changes (when HomePage mounts).
  */
 const getUserId = () => window.APP_SETTINGS?.user?.id;
 export const visitedIdsAtom = atom((get) => {
