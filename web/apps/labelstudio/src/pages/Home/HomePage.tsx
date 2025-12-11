@@ -2,7 +2,7 @@ import { IconExternal, IconFolderAdd, IconHumanSignal, IconUserAdd, IconFolderOp
 import { Button, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { getVisitedProjectIds, useUpdatePageTitle } from "@humansignal/core";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { useAPI } from "../../providers/ApiProvider";
@@ -52,12 +52,14 @@ type Action = (typeof actions)[number]["type"];
 
 export const HomePage: Page = () => {
   const api = useAPI();
+  const location = useLocation();
   const [creationDialogOpen, setCreationDialogOpen] = useState(false);
   const [invitationOpen, setInvitationOpen] = useState(false);
 
   useUpdatePageTitle("Home");
 
-  const visitedIds = useMemo(() => getVisitedProjectIds(), []);
+  // Re-read visited IDs when navigating back to this page (location.key changes on navigation)
+  const visitedIds = useMemo(() => getVisitedProjectIds(), [location.key]);
   const hasVisitedProjects = visitedIds.length > 0;
 
   const { data, isFetching, isSuccess, isError } = useQuery({
