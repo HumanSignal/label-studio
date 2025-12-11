@@ -43,7 +43,7 @@ For more information, see [Members dashboard](dashboard_members).
 
 ### Member performance dashboard
 
-The Member Performance (Annotator Performance) dashboard shows how a specific user is performing across one or more projects over a chosen time period. It summarizes their annotation and review activity, and lets you filter by date range, workspace, and project. 
+The Member Performance dashboard shows how a specific user is performing across one or more projects over a chosen time period. It summarizes their annotation and review activity, and lets you filter by date range, workspace, and project. 
 
 Its purpose is to help managers and individual contributors track productivity and quality over time so they can spot issues early, adjust staffing or training, and validate things like timesheets. 
 
