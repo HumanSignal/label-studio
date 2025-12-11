@@ -58,29 +58,36 @@ export const HomePage: Page = () => {
 
   useUpdatePageTitle("Home");
 
+  const userId = window.APP_SETTINGS?.user?.id;
+
   // Re-read visited IDs when navigating back to this page (location.key changes on navigation)
-  const visitedIds = useMemo(() => getVisitedProjectIds(), [location.key]);
-  const hasVisitedProjects = visitedIds.length > 0;
+  const visitedIds = useMemo(() => getVisitedProjectIds(userId), [location.key, userId]);
 
   const { data, isFetching, isSuccess, isError } = useQuery({
-    queryKey: ["projects", hasVisitedProjects ? { ids: visitedIds } : { page_size: PROJECTS_TO_SHOW }],
+    queryKey: ["projects", { page_size: PROJECTS_TO_SHOW }],
     async queryFn() {
-      const params = hasVisitedProjects
-        ? { ids: visitedIds.join(","), page_size: PROJECTS_TO_SHOW }
-        : { page_size: PROJECTS_TO_SHOW };
-
-      return api.callApi<{ results: APIProject[]; count: number }>("projects", { params });
+      return api.callApi<{ results: APIProject[]; count: number }>("projects", {
+        params: { page_size: PROJECTS_TO_SHOW },
+      });
     },
   });
 
-  // Sort results by visited order when using visited project IDs
+  // Reorder results: visited projects first (in visited order), then fill with non-visited
   const sortedProjects = useMemo(() => {
     if (!data?.results) return [];
-    if (!hasVisitedProjects) return data.results;
+    if (visitedIds.length === 0) return data.results;
 
+    const visitedSet = new Set(visitedIds);
     const projectMap = new Map(data.results.map((p) => [p.id, p]));
-    return visitedIds.map((id) => projectMap.get(id)).filter((p): p is APIProject => p !== undefined);
-  }, [data?.results, hasVisitedProjects, visitedIds]);
+
+    // Get visited projects that exist in the results (in visited order)
+    const visitedProjects = visitedIds.map((id) => projectMap.get(id)).filter((p): p is APIProject => p !== undefined);
+
+    // Get non-visited projects to fill remaining slots
+    const nonVisitedProjects = data.results.filter((p) => !visitedSet.has(p.id));
+
+    return [...visitedProjects, ...nonVisitedProjects].slice(0, PROJECTS_TO_SHOW);
+  }, [data?.results, visitedIds]);
 
   const handleActions = (action: Action) => {
     return () => {

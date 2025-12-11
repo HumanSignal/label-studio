@@ -65,7 +65,8 @@ export const ProjectProvider: React.FunctionComponent = ({ children }) => {
       }
 
       if (projectInfo?.id) {
-        addVisitedProject(projectInfo.id);
+        const userId = window.APP_SETTINGS?.user?.id;
+        addVisitedProject(projectInfo.id, userId);
       }
 
       return projectInfo;
