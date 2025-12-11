@@ -36,7 +36,7 @@ class TransitionContext(BaseModel, Generic[EntityType, StateModelType]):
 
     # Core context information
     entity: Any = Field(..., description='The entity being transitioned')
-    current_user: Optional[Any] = Field(None, description='User triggering the transition')
+    current_user: Optional[Any] = Field(None, description='User triggering the transition (request user)')
     current_state_object: Optional[Any] = Field(None, description='Full current state object')
     current_state: Optional[str] = Field(None, description='Current state as string')
     target_state: Optional[str] = Field(
@@ -56,6 +56,20 @@ class TransitionContext(BaseModel, Generic[EntityType, StateModelType]):
 
     # Validation context, for cases where we want to skip validation for the transition
     skip_validation: Optional[bool] = Field(default=False, description='Whether to skip validation for the transition')
+
+    # Reason override - if provided, takes precedence over Transition.get_reason()
+    # This allows callers to provide context-specific reasons for transitions
+    # (e.g., "Project moved from Sandbox to FSM Testing workspace")
+    reason: Optional[str] = Field(
+        None, description='Override reason for this transition (takes precedence over get_reason)'
+    )
+
+    # Additional context data to be merged with transition's context_data
+    # This allows callers to add extra data to be stored in the state record's JSONB context_data
+    # (e.g., workspace_from_id, workspace_to_id for workspace change transitions)
+    context_data: Dict[str, Any] = Field(
+        default_factory=dict, description='Additional context data to store with state record'
+    )
 
     @property
     def has_current_state(self) -> bool:
@@ -250,6 +264,10 @@ class BaseTransition(BaseModel, ABC, Generic[EntityType, StateModelType]):
         Get a human-readable reason for this transition.
 
         Override in subclasses to provide more specific reasons.
+
+        Note: If `context.reason` is set, it takes precedence over this method.
+        This allows callers to provide context-specific reasons when executing
+        transitions (e.g., "Project moved from Sandbox to shared workspace").
 
         Args:
             context: The transition context
