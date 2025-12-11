@@ -47,6 +47,8 @@ The Member Performance (Annotator Performance) dashboard shows how a specific us
 
 Its purpose is to help managers and individual contributors track productivity and quality over time so they can spot issues early, adjust staffing or training, and validate things like timesheets. 
 
+Available to all users, but the information available depends on your user role. 
+
 For more information, see [Member Performance dashboard](dashboard_annotator). 
 
 ![Screenshot of annotator dashboard](/images/analytics/member-perf.png)
