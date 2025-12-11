@@ -1,16 +1,23 @@
 import { IconExternal, IconFolderAdd, IconHumanSignal, IconUserAdd, IconFolderOpen } from "@humansignal/icons";
 import { Button, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { getVisitedProjectIds, useUpdatePageTitle } from "@humansignal/core";
+import { useUpdatePageTitle } from "@humansignal/core";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { useAPI } from "../../providers/ApiProvider";
 import { CreateProject } from "../CreateProject/CreateProject";
 import { InviteLink } from "../Organization/PeoplePage/InviteLink";
 import type { Page } from "../types/Page";
-
-const PROJECTS_TO_SHOW = 10;
+import {
+  creationDialogOpen,
+  invitationOpen,
+  locationKeyAtom,
+  PROJECTS_TO_SHOW,
+  projectsDataAtom,
+  sortedProjectsAtom,
+} from "./atoms";
 
 const resources = [
   {
@@ -53,15 +60,18 @@ type Action = (typeof actions)[number]["type"];
 export const HomePage: Page = () => {
   const api = useAPI();
   const location = useLocation();
-  const [creationDialogOpen, setCreationDialogOpen] = useState(false);
-  const [invitationOpen, setInvitationOpen] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useAtom(creationDialogOpen);
+  const [invitationIsOpen, setInvitationIsOpen] = useAtom(invitationOpen);
+  const setLocationKey = useSetAtom(locationKeyAtom);
+  const setProjectsData = useSetAtom(projectsDataAtom);
+  const sortedProjects = useAtomValue(sortedProjectsAtom);
 
   useUpdatePageTitle("Home");
 
-  const userId = window.APP_SETTINGS?.user?.id;
-
-  // Re-read visited IDs when navigating back to this page (location.key changes on navigation)
-  const visitedIds = useMemo(() => getVisitedProjectIds(userId), [location.key, userId]);
+  // Update location key atom when navigation occurs - this triggers visitedIdsAtom to re-read from localStorage
+  useEffect(() => {
+    setLocationKey(location.key);
+  }, [location.key, setLocationKey]);
 
   const { data, isFetching, isSuccess, isError } = useQuery({
     queryKey: ["projects", { page_size: PROJECTS_TO_SHOW }],
@@ -72,31 +82,21 @@ export const HomePage: Page = () => {
     },
   });
 
-  // Reorder results: visited projects first (in visited order), then fill with non-visited
-  const sortedProjects = useMemo(() => {
-    if (!data?.results) return [];
-    if (visitedIds.length === 0) return data.results;
-
-    const visitedSet = new Set(visitedIds);
-    const projectMap = new Map(data.results.map((p) => [p.id, p]));
-
-    // Get visited projects that exist in the results (in visited order)
-    const visitedProjects = visitedIds.map((id) => projectMap.get(id)).filter((p): p is APIProject => p !== undefined);
-
-    // Get non-visited projects to fill remaining slots
-    const nonVisitedProjects = data.results.filter((p) => !visitedSet.has(p.id));
-
-    return [...visitedProjects, ...nonVisitedProjects].slice(0, PROJECTS_TO_SHOW);
-  }, [data?.results, visitedIds]);
+  // Update projects data atom when query data changes
+  useEffect(() => {
+    if (data?.results) {
+      setProjectsData(data.results);
+    }
+  }, [data?.results, setProjectsData]);
 
   const handleActions = (action: Action) => {
     return () => {
       switch (action) {
         case "createProject":
-          setCreationDialogOpen(true);
+          setModalIsOpen(true);
           break;
         case "inviteMembers":
-          setInvitationOpen(true);
+          setInvitationIsOpen(true);
           break;
       }
     };
@@ -164,7 +164,7 @@ export const HomePage: Page = () => {
                 <Typography size="small" className="text-neutral-content-subtler">
                   Import your data and set up the labeling interface to start annotating
                 </Typography>
-                <Button className="mt-4" onClick={() => setCreationDialogOpen(true)} aria-label="Create new project">
+                <Button className="mt-4" onClick={() => setModalIsOpen(true)} aria-label="Create new project">
                   Create Project
                 </Button>
               </div>
@@ -204,8 +204,8 @@ export const HomePage: Page = () => {
           </div>
         </section>
       </div>
-      {creationDialogOpen && <CreateProject onClose={() => setCreationDialogOpen(false)} />}
-      <InviteLink opened={invitationOpen} onClosed={() => setInvitationOpen(false)} />
+      {modalIsOpen && <CreateProject onClose={() => setModalIsOpen(false)} />}
+      <InviteLink opened={invitationIsOpen} onClosed={() => setInvitationIsOpen(false)} />
     </main>
   );
 };
