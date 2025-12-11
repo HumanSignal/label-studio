@@ -17,6 +17,7 @@ import {
   PROJECTS_TO_SHOW,
   projectsDataAtom,
   sortedProjectsAtom,
+  visitedIdsAtom,
 } from "./atoms";
 
 const resources = [
@@ -65,15 +66,11 @@ export const HomePage: Page = () => {
   const setLocationKey = useSetAtom(locationKeyAtom);
   const setProjectsData = useSetAtom(projectsDataAtom);
   const sortedProjects = useAtomValue(sortedProjectsAtom);
+  const visitedIds = useAtomValue(visitedIdsAtom);
 
   useUpdatePageTitle("Home");
 
-  // Update location key atom when component mounts or when navigating back to this page
-  // This triggers visitedIdsAtom to re-read from localStorage
-  useEffect(() => {
-    setLocationKey(location.key);
-  }, []); // Empty deps - only run on mount
-
+  // Fetch regular projects
   const { data, isFetching, isSuccess, isError } = useQuery({
     queryKey: ["projects", { page_size: PROJECTS_TO_SHOW }],
     async queryFn() {
@@ -83,12 +80,42 @@ export const HomePage: Page = () => {
     },
   });
 
-  // Update projects data atom when query data changes
+  // Fetch visited projects specifically by their IDs
+  const { data: visitedProjectsData } = useQuery({
+    queryKey: ["visited-projects", { ids: visitedIds }],
+    async queryFn() {
+      if (visitedIds.length === 0) return { results: [], count: 0 };
+
+      return api.callApi<{ results: APIProject[]; count: number }>("projects", {
+        params: {
+          ids: visitedIds.join(","),
+          page_size: visitedIds.length,
+        },
+      });
+    },
+    enabled: visitedIds.length > 0,
+  });
+
+  // Update location key atom when navigating to/returning to this page
+  // This triggers visitedIdsAtom to re-read from localStorage
+  // We use a timestamp to ensure the atom always updates, forcing a re-read
   useEffect(() => {
-    if (data?.results) {
-      setProjectsData(data.results);
+    setLocationKey(Date.now().toString());
+  }, [location.pathname, setLocationKey]);
+
+  // Merge visited and regular projects, removing duplicates
+  useEffect(() => {
+    const visitedProjects = visitedProjectsData?.results ?? [];
+    const regularProjects = data?.results ?? [];
+
+    // Merge and deduplicate
+    const allProjects = [...visitedProjects, ...regularProjects];
+    const uniqueProjects = Array.from(new Map(allProjects.map((p) => [p.id, p])).values());
+
+    if (uniqueProjects.length > 0) {
+      setProjectsData(uniqueProjects);
     }
-  }, [data?.results, setProjectsData]);
+  }, [data?.results, visitedProjectsData?.results, setProjectsData]);
 
   const handleActions = (action: Action) => {
     return () => {
