@@ -112,53 +112,22 @@ stages:
     url: '{django_live_url}/api/projects/{pk}/export/formats'
   response:
     json:
+      - title: Biowork CSV
+        description: ZIP with one CSV per image; rows per annotation with bbox (px) and mean intensities (gray, RGB).
+        link: https://labelstud.io/guide/export.html#CSV
+        tags:
+        - image segmentation
+        name: SEG_CSV
       - title: JSON
         description: List of items in raw JSON format stored in one JSON file. Use to export
           both the data and the annotations for a dataset. It's Label Studio Common Format
         link: https://labelstud.io/guide/export.html#JSON
         name: JSON
-      - title: JSON-MIN
-        description: List of items where only "from_name", "to_name" values from the raw
-          JSON format are exported. Use to export only the annotations for a dataset.
-        link: https://labelstud.io/guide/export.html#JSON-MIN
-        name: JSON_MIN
       - title: CSV
         description: Results are stored as comma-separated values with the column names
           specified by the values of the "from_name" and "to_name" fields.
         link: https://labelstud.io/guide/export.html#CSV
         name: CSV
-      - title: TSV
-        description: Results are stored in tab-separated tabular file with column names
-          specified by "from_name" "to_name" values
-        link: https://labelstud.io/guide/export.html#TSV
-        name: TSV
-      - title: COCO
-        description: Popular machine learning format used by the COCO dataset for object
-          detection and image segmentation tasks with polygons and rectangles.
-        link: https://labelstud.io/guide/export.html#COCO
-        tags:
-        - image segmentation
-        - object detection
-        - keypoints
-        name: COCO
-      - title: COCO with Images
-        description: COCO format with images downloaded.
-        link: https://labelstud.io/guide/export.html#COCO
-        tags:
-        - image segmentation
-        - object detection
-        - keypoints
-        name: COCO_WITH_IMAGES
-      - title: YOLO
-        description: Popular TXT format is created for each image file. Each txt file contains
-          annotations for the corresponding image file, that is object class, object coordinates,
-          height & width.
-        link: https://labelstud.io/guide/export.html#YOLO
-        tags:
-        - image segmentation
-        - object detection
-        - keypoints
-        name: YOLO
       - title: YOLO with Images
         description: YOLO format with images downloaded.
         link: https://labelstud.io/guide/export.html#YOLO
@@ -167,71 +136,12 @@ stages:
         - object detection
         - keypoints
         name: YOLO_WITH_IMAGES
-      - title: YOLOv8 OBB
-        description: Popular TXT format is created for each image file. Each txt file contains
-          annotations for the corresponding image file. The YOLO OBB format designates bounding
-          boxes by their four corner points with coordinates normalized between 0 and 1,
-          so it is possible to export rotated objects.
-        link: https://labelstud.io/guide/export.html#YOLO
-        tags:
-        - image segmentation
-        - object detection
-        name: YOLO_OBB
-      - title: YOLOv8 OBB with Images
-        description: YOLOv8 OBB format with images downloaded.
-        link: https://labelstud.io/guide/export.html#YOLO
-        tags:
-        - image segmentation
-        - object detection
-        name: YOLO_OBB_WITH_IMAGES
-      - title: CONLL2003
-        description: Popular format used for the CoNLL-2003 named entity recognition challenge.
-        link: https://labelstud.io/guide/export.html#CONLL2003
-        tags:
-        - sequence labeling
-        - text tagging
-        - named entity recognition
-        name: CONLL2003
-        disabled: true
-      - title: Pascal VOC XML
-        description: Popular XML format used for object detection and polygon image segmentation
-          tasks.
-        link: https://labelstud.io/guide/export.html#Pascal-VOC-XML
-        tags:
-        - image segmentation
-        - object detection
-        name: VOC
-        disabled: true
-      - title: Brush labels to NumPy
-        description: Export your brush labels as NumPy 2d arrays. Each label outputs as
-          one image.
-        link: https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG
-        tags:
-        - image segmentation
-        name: BRUSH_TO_NUMPY
-        disabled: true
       - title: Brush labels to PNG
         description: Export your brush labels as PNG images. Each label outputs as one image.
         link: https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG
         tags:
         - image segmentation
         name: BRUSH_TO_PNG
-        disabled: true
-      - title: ASR Manifest
-        description: Export audio transcription labels for automatic speech recognition
-          as the JSON manifest format expected by NVIDIA NeMo models.
-        link: https://labelstud.io/guide/export.html#ASR-MANIFEST
-        tags:
-        - speech recognition
-        name: ASR_MANIFEST
-        disabled: true
-      - title: "Brush labels to COCO"
-        description: "Export your brush labels as COCO format for segmentation tasks. Converts RLE encoded masks to COCO polygons."
-        link: "https://labelstud.io/guide/export.html#COCO"
-        tags:
-          - "image segmentation"
-          - "brush annotations"
-        name: "BRUSH_TO_COCO"
         disabled: true
 
 
@@ -279,64 +189,14 @@ stages:
         description: !anystr
         link: 'https://labelstud.io/guide/export.html#JSON'
         name: 'JSON'
-      - title: 'JSON-MIN'
-        description: !anystr
-        link: 'https://labelstud.io/guide/export.html#JSON-MIN'
-        name: 'JSON_MIN'
       - title: 'CSV'
         description: !anystr
         link: 'https://labelstud.io/guide/export.html#CSV'
         name: 'CSV'
-      - title: 'TSV'
-        description: !anystr
-        link: 'https://labelstud.io/guide/export.html#TSV'
-        name: 'TSV'
-      - title: 'COCO'
-        description: !anystr
-        link: 'https://labelstud.io/guide/export.html#COCO'
-        tags: ['image segmentation', 'object detection']
-        name: 'COCO'
-        disabled: true
-      - title: 'YOLO'
-        description: !anystr
-        link: 'https://labelstud.io/guide/export.html#YOLO'
-        tags: ['image segmentation', 'object detection']
-        name: 'YOLO'
-        disabled: true
-      - title: 'YOLOv8 OBB'
-        description: !anystr
-        link: 'https://labelstud.io/guide/export.html#YOLO'
-        tags: ['image segmentation', 'object detection']
-        name: 'YOLO_OBB'
-        disabled: true
-      - title: 'CONLL2003'
-        description: !anystr
-        link: 'https://labelstud.io/guide/export.html#CONLL2003'
-        tags: ['sequence labeling', 'text tagging', 'named entity recognition']
-        name: 'CONLL2003'
-        disabled: true
-      - title: 'Pascal VOC XML'
-        description: !anystr
-        link: 'https://labelstud.io/guide/export.html#Pascal-VOC-XML'
-        tags: ['image segmentation', 'object detection']
-        name: 'VOC'
-        disabled: true
-      - title: 'Brush labels to NumPy'
-        description: !anystr
-        link: 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG'
-        tags: ['image segmentation']
-        name: 'BRUSH_TO_NUMPY'
-        disabled: true
       - title: 'Brush labels to PNG'
         description: !anystr
         link: 'https://labelstud.io/guide/export.html#Brush-labels-to-NumPy-amp-PNG'
         tags: ['image segmentation']
         name: 'BRUSH_TO_PNG'
-        disabled: true
-      - title: 'ASR Manifest'
-        description: !anystr
-        link: 'https://labelstud.io/guide/export.html#ASR-MANIFEST'
-        tags: ['speech recognition']
-        name: 'ASR_MANIFEST'
         disabled: true
     status_code: 200

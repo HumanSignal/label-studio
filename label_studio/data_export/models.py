@@ -132,12 +132,28 @@ class DataExport(object):
     def get_export_formats(project):
         converter = Converter(config=project.get_parsed_config(), project_dir=None)
         formats = []
+        excluded_formats = {
+            'JSON_MIN',
+            'TSV',
+            'COCO',
+            'COCO_WITH_IMAGES',
+            'VOC',
+            'YOLO',
+            'YOLO_OBB',
+            'YOLO_OBB_WITH_IMAGES',
+            'BRUSH_TO_NUMPY',
+            'BRUSH_TO_COCO',
+            'CONLL2003',
+            'ASR_MANIFEST',
+        }
         supported_formats = set(converter.supported_formats)
         for format, format_info in converter.all_formats().items():
             format_info = deepcopy(format_info)
             format_info['name'] = format.name
             if format.name not in supported_formats:
                 format_info['disabled'] = True
+            if format.name in excluded_formats:
+                continue
             formats.append(format_info)
 
         # Append SEG_CSV format for image segmentation projects
@@ -150,15 +166,15 @@ class DataExport(object):
                     has_seg = True
                     break
             if has_seg:
-                formats.append(
-                    {
-                        'name': 'SEG_CSV',
-                        'title': 'Segmentation CSV (per image)',
-                        'description': 'ZIP with one CSV per image; rows per annotation with bbox (px) and mean intensities (gray, RGB).',
-                        'link': 'https://labelstud.io/guide/export.html#CSV',
-                        'tags': ['image segmentation'],
-                    }
-                )
+                seg_format = {
+                    'name': 'SEG_CSV',
+                    'title': 'Biowork CSV',
+                    'description': 'ZIP with one CSV per image; rows per annotation with bbox (px) and mean intensities (gray, RGB).',
+                    'link': 'https://labelstud.io/guide/export.html#CSV',
+                    'tags': ['image segmentation'],
+                }
+                # Place Biowork CSV at the top so it appears first in the UI
+                formats.insert(0, seg_format)
         except Exception:
             # If config parsing fails, ignore custom format
             pass
