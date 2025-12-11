@@ -285,3 +285,10 @@ export { ReactComponent as IconCloudProviderRedis } from "./cloud-provider-redis
 export { ReactComponent as IconCloudProviderGCS } from "./cloud-provider-gcs.svg";
 export { ReactComponent as IconCloudProviderAzure } from "./cloud-provider-azure.svg";
 export { ReactComponent as IconCloudProviderDatabricks } from "./cloud-provider-databricks.svg";
+
+// State timeline icons
+export { ReactComponent as IconStateInitial } from "./state-initial.svg";
+export { ReactComponent as IconStateAnnotating } from "./state-annotating.svg";
+export { ReactComponent as IconStateNeedsReview } from "./state-needs-review.svg";
+export { ReactComponent as IconStateInReview } from "./state-in-review.svg";
+export { ReactComponent as IconStateDone } from "./state-done.svg";
