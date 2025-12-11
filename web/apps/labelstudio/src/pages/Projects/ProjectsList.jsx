@@ -141,7 +141,7 @@ const ProjectCard = ({ project }) => {
         <div className={cn("project-card").elem("description").toClassName()}>{project.description}</div>
         <div className={cn("project-card").elem("info").toClassName()}>
           <div className={cn("project-card").elem("created-date").toClassName()}>
-            {format(new Date(project.created_at), "dd MMM 'yy, HH:mm")}
+            {format(new Date(project.created_at), "dd MMM yyyy, HH:mm")}
           </div>
           <div className={cn("project-card").elem("created-by").toClassName()}>
             <Userpic src="#" user={project.created_by} showUsernameTooltip />
