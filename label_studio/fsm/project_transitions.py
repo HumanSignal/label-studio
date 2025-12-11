@@ -51,7 +51,6 @@ class ProjectCreatedTransition(ModelChangeTransition):
         project = context.entity
 
         return {
-            'reason': 'Project created',
             'organization_id': project.organization_id,
             'title': project.title,
             'created_by_id': project.created_by_id if project.created_by_id else None,
@@ -81,7 +80,6 @@ class ProjectInProgressTransition(ModelChangeTransition):
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         project = context.entity
         return {
-            'reason': 'Project moved to in progress - first annotation submitted',
             'organization_id': project.organization_id,
             'total_tasks': project.tasks.count(),
         }
@@ -105,7 +103,6 @@ class ProjectCompletedTransition(ModelChangeTransition):
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         project = context.entity
         return {
-            'reason': 'Project completed - all tasks completed',
             'organization_id': project.organization_id,
             'total_tasks': project.tasks.count(),
         }
@@ -131,13 +128,12 @@ class ProjectInProgressFromCompletedTransition(ModelChangeTransition):
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         project = context.entity
         return {
-            'reason': 'Project moved back to in progress - task became incomplete',
             'organization_id': project.organization_id,
             'total_tasks': project.tasks.count(),
         }
 
 
-def _update_project_state_after_task_change_lso(project, user=None):
+def sync_project_state(project, user=None, reason=None, context_data=None):
     current_state = StateManager.get_current_state_value(project)
     inferred_state = infer_entity_state_from_data(project)
 
@@ -159,5 +155,5 @@ def _update_project_state_after_task_change_lso(project, user=None):
 
 
 def update_project_state_after_task_change(project, user=None):
-    update_func = load_func(settings.FSM_UPDATE_PROJECT_STATE_AFTER_TASK_CHANGE)
+    update_func = load_func(settings.FSM_SYNC_PROJECT_STATE)
     return update_func(project, user)
