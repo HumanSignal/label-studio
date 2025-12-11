@@ -374,7 +374,7 @@ def infer_entity_state_from_data(entity) -> Optional[str]:
         return None
 
 
-def get_or_initialize_state(entity, user=None, inferred_state=None) -> Optional[str]:
+def get_or_initialize_state(entity, user=None, inferred_state=None, reason=None, context_data=None) -> Optional[str]:
     """
     Get current state, or initialize it if it doesn't exist.
 
@@ -389,6 +389,8 @@ def get_or_initialize_state(entity, user=None, inferred_state=None) -> Optional[
         entity: The entity to get or initialize state for
         user: User for FSM context (optional)
         inferred_state: Pre-computed inferred state (optional, will compute if not provided)
+        reason: Custom reason for the state initialization (optional, overrides default)
+        context_data: Additional context data to store with state record (optional)
 
     Returns:
         Current or newly initialized state value, or None if FSM disabled or failed
@@ -448,7 +450,14 @@ def get_or_initialize_state(entity, user=None, inferred_state=None) -> Optional[
                     'transition_name': transition_name,
                 },
             )
-            StateManager.execute_transition(entity=entity, transition_name=transition_name, user=user)
+            # Pass reason and context_data if provided (flow through to TransitionContext)
+            StateManager.execute_transition(
+                entity=entity,
+                transition_name=transition_name,
+                user=user,
+                reason=reason,
+                context_data=context_data or {},
+            )
             return inferred_state
         else:
             logger.warning(

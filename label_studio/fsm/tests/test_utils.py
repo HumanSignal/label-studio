@@ -531,3 +531,183 @@ class TestGetCurrentStateSafeCoverage(TestCase):
         with patch('fsm.utils.is_fsm_enabled', return_value=False):
             result = get_current_state_safe(mock_entity)
             assert result is None
+
+
+class TestGetOrInitializeStateParameters(TestCase):
+    """Test coverage for get_or_initialize_state reason and context_data parameters.
+
+    These tests validate that the reason and context_data parameters are correctly
+    accepted and passed through to StateManager.execute_transition().
+    """
+
+    def setUp(self):
+        self.mock_entity = MockEntity()
+
+    def test_get_or_initialize_state_accepts_reason_parameter(self):
+        """Test that get_or_initialize_state accepts reason parameter.
+
+        This test validates step by step:
+        - Calling get_or_initialize_state with a reason parameter
+        - Verifying it's passed to StateManager.execute_transition
+
+        Critical validation: The reason parameter allows callers to provide
+        context-specific reasons for state initialization.
+        """
+        from fsm.utils import get_or_initialize_state
+
+        custom_reason = 'Bulk import completed - initializing state'
+
+        with patch('fsm.utils.is_fsm_enabled', return_value=True):
+            with patch('fsm.utils.CurrentContext') as mock_context:
+                mock_context.is_fsm_disabled.return_value = False
+
+                # Mock StateManager - patch where it's imported (fsm.state_manager)
+                with patch('fsm.state_manager.get_state_manager') as mock_get_sm:
+                    mock_sm = Mock()
+                    mock_sm.get_current_state_value.return_value = None  # No existing state
+                    mock_get_sm.return_value = mock_sm
+
+                    # Mock state inference
+                    with patch('fsm.utils.infer_entity_state_from_data', return_value='IN_PROGRESS'):
+                        with patch('fsm.utils._get_initialization_transition_name', return_value='init_transition'):
+                            # Call with reason
+                            get_or_initialize_state(
+                                self.mock_entity,
+                                user=None,
+                                inferred_state='IN_PROGRESS',
+                                reason=custom_reason,
+                            )
+
+                            # Verify execute_transition was called with reason
+                            mock_sm.execute_transition.assert_called_once()
+                            call_kwargs = mock_sm.execute_transition.call_args[1]
+                            assert call_kwargs.get('reason') == custom_reason
+
+    def test_get_or_initialize_state_accepts_context_data_parameter(self):
+        """Test that get_or_initialize_state accepts context_data parameter.
+
+        This test validates step by step:
+        - Calling get_or_initialize_state with a context_data parameter
+        - Verifying it's passed to StateManager.execute_transition
+
+        Critical validation: The context_data parameter allows callers to add
+        additional data to be stored in the state record's JSONB context_data.
+        """
+        from fsm.utils import get_or_initialize_state
+
+        custom_context_data = {
+            'import_source_id': 123,
+            'task_count': 456,
+            'triggered_by_api': False,
+        }
+
+        with patch('fsm.utils.is_fsm_enabled', return_value=True):
+            with patch('fsm.utils.CurrentContext') as mock_context:
+                mock_context.is_fsm_disabled.return_value = False
+
+                # Mock StateManager - patch where it's imported (fsm.state_manager)
+                with patch('fsm.state_manager.get_state_manager') as mock_get_sm:
+                    mock_sm = Mock()
+                    mock_sm.get_current_state_value.return_value = None  # No existing state
+                    mock_get_sm.return_value = mock_sm
+
+                    # Mock state inference
+                    with patch('fsm.utils.infer_entity_state_from_data', return_value='IN_PROGRESS'):
+                        with patch('fsm.utils._get_initialization_transition_name', return_value='init_transition'):
+                            # Call with context_data
+                            get_or_initialize_state(
+                                self.mock_entity,
+                                user=None,
+                                inferred_state='IN_PROGRESS',
+                                context_data=custom_context_data,
+                            )
+
+                            # Verify execute_transition was called with context_data
+                            mock_sm.execute_transition.assert_called_once()
+                            call_kwargs = mock_sm.execute_transition.call_args[1]
+                            assert call_kwargs.get('context_data') == custom_context_data
+
+    def test_get_or_initialize_state_with_both_reason_and_context_data(self):
+        """Test get_or_initialize_state with both reason and context_data.
+
+        This test validates step by step:
+        - Calling get_or_initialize_state with both reason and context_data
+        - Verifying both are passed to StateManager.execute_transition
+
+        Critical validation: Both parameters should be passed independently
+        without interference.
+        """
+        from fsm.utils import get_or_initialize_state
+
+        custom_reason = 'Bulk import completed with configuration changes'
+        custom_context_data = {
+            'import_source_id': 123,
+            'previous_task_count': 100,
+            'new_task_count': 456,
+            'triggered_by_api': False,
+        }
+
+        with patch('fsm.utils.is_fsm_enabled', return_value=True):
+            with patch('fsm.utils.CurrentContext') as mock_context:
+                mock_context.is_fsm_disabled.return_value = False
+
+                # Mock StateManager - patch where it's imported (fsm.state_manager)
+                with patch('fsm.state_manager.get_state_manager') as mock_get_sm:
+                    mock_sm = Mock()
+                    mock_sm.get_current_state_value.return_value = None  # No existing state
+                    mock_get_sm.return_value = mock_sm
+
+                    # Mock state inference
+                    with patch('fsm.utils.infer_entity_state_from_data', return_value='IN_PROGRESS'):
+                        with patch('fsm.utils._get_initialization_transition_name', return_value='init_transition'):
+                            # Call with both reason and context_data
+                            get_or_initialize_state(
+                                self.mock_entity,
+                                user=None,
+                                inferred_state='IN_PROGRESS',
+                                reason=custom_reason,
+                                context_data=custom_context_data,
+                            )
+
+                            # Verify execute_transition was called with both parameters
+                            mock_sm.execute_transition.assert_called_once()
+                            call_kwargs = mock_sm.execute_transition.call_args[1]
+                            assert call_kwargs.get('reason') == custom_reason
+                            assert call_kwargs.get('context_data') == custom_context_data
+
+    def test_get_or_initialize_state_defaults_context_data_to_empty_dict(self):
+        """Test that get_or_initialize_state defaults context_data to empty dict.
+
+        This test validates step by step:
+        - Calling get_or_initialize_state without context_data
+        - Verifying empty dict is passed to StateManager.execute_transition
+
+        Critical validation: When context_data is not provided, it should
+        default to an empty dict (not None) to ensure proper merging behavior.
+        """
+        from fsm.utils import get_or_initialize_state
+
+        with patch('fsm.utils.is_fsm_enabled', return_value=True):
+            with patch('fsm.utils.CurrentContext') as mock_context:
+                mock_context.is_fsm_disabled.return_value = False
+
+                # Mock StateManager - patch where it's imported (fsm.state_manager)
+                with patch('fsm.state_manager.get_state_manager') as mock_get_sm:
+                    mock_sm = Mock()
+                    mock_sm.get_current_state_value.return_value = None  # No existing state
+                    mock_get_sm.return_value = mock_sm
+
+                    # Mock state inference
+                    with patch('fsm.utils.infer_entity_state_from_data', return_value='IN_PROGRESS'):
+                        with patch('fsm.utils._get_initialization_transition_name', return_value='init_transition'):
+                            # Call without context_data
+                            get_or_initialize_state(
+                                self.mock_entity,
+                                user=None,
+                                inferred_state='IN_PROGRESS',
+                            )
+
+                            # Verify execute_transition was called with empty dict for context_data
+                            mock_sm.execute_transition.assert_called_once()
+                            call_kwargs = mock_sm.execute_transition.call_args[1]
+                            assert call_kwargs.get('context_data') == {}
