@@ -171,7 +171,7 @@ def heidi_tips(request):
     # Allow disabling via feature flag or env var (fflag_feat_front_hide_heidi_tips_short)
     if flag_set('fflag_feat_front_hide_heidi_tips_short', user='auto'):
         return HttpResponseNotFound()
-    url = 'https://raw.githubusercontent.com/HumanSignal/label-studio/refs/heads/develop/web/apps/labelstudio/src/components/HeidiTips/liveContent.json'
+    url = 'https://raw.githubusercontent.com/gavinlouuu-kpt/biowork/refs/heads/main/web/apps/labelstudio/src/components/HeidiTips/liveContent.json'
 
     response = None
     try:
