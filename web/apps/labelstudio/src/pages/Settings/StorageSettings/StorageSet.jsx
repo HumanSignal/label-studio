@@ -97,6 +97,7 @@ export const StorageSet = forwardRef(
       ref,
       () => ({
         openAddModal: () => showStorageFormModal(),
+        openEditModal: (storage) => showStorageFormModal(storage),
       }),
       [showStorageFormModal],
     );

@@ -1,24 +1,15 @@
-import {
-  Button,
-  EmptyState,
-  IconCloudCustom,
-  IconCloudProviderAzure,
-  IconCloudProviderGCS,
-  IconCloudProviderRedis,
-  IconCloudProviderS3,
-  IconExternal,
-  SimpleCard,
-  Spinner,
-  Tooltip,
-  Typography,
-} from "@humansignal/ui";
-import { useEffect, useRef } from "react";
+import { Button, Spinner, Typography } from "@humansignal/ui";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useUpdatePageTitle, createTitleFromSegments } from "@humansignal/core";
 import { useProject } from "../../../providers/ProjectProvider";
 import { cn } from "../../../utils/bem";
+import { confirm } from "../../../components/Modal/Modal";
 import { StorageSet } from "./StorageSet";
 import { useStorageCard } from "./hooks/useStorageCard";
+import { StorageControlBar } from "./StorageControlBar";
+import { StorageList } from "./StorageList";
+import { ApiContext } from "../../../providers/ApiProvider";
 import "./StorageSettings.scss";
 
 export const StorageSettings = () => {
@@ -26,10 +17,16 @@ export const StorageSettings = () => {
   const rootClass = cn("storage-settings"); // TODO: Remove in the next BEM cleanup
   const history = useHistory();
   const location = useLocation();
+  const api = useContext(ApiContext);
   const sourceStorageRef = useRef();
   const targetStorageRef = useRef();
 
-  useUpdatePageTitle(createTitleFromSegments([project?.title, "Cloud Storage Settings"]));
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState("all"); // "all", "source", "target"
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 6;
+
+  useUpdatePageTitle(createTitleFromSegments([project?.title, "Connection Management"]));
 
   // Fetch storage data at parent level
   const sourceStorage = useStorageCard("", project?.id);
@@ -39,6 +36,67 @@ export const StorageSettings = () => {
   const hasAnyStorages = sourceStorage.storages?.length > 0 || targetStorage.storages?.length > 0;
   const isLoading = sourceStorage.loading || targetStorage.loading;
   const isLoaded = sourceStorage.loaded && targetStorage.loaded;
+
+  // Combine all storages with their target type
+  const allStorages = useMemo(() => {
+    const source = (sourceStorage.storages || []).map((s) => ({ ...s, target: "import" }));
+    const target = (targetStorage.storages || []).map((s) => ({ ...s, target: "export" }));
+    return [...source, ...target];
+  }, [sourceStorage.storages, targetStorage.storages]);
+
+  // Get storage types (combine from both)
+  const storageTypes = useMemo(() => {
+    const sourceTypes = sourceStorage.storageTypes || [];
+    const targetTypes = targetStorage.storageTypes || [];
+    const combined = [...sourceTypes];
+    targetTypes.forEach((tt) => {
+      if (!combined.find((st) => st.name === tt.name)) {
+        combined.push(tt);
+      }
+    });
+    return combined;
+  }, [sourceStorage.storageTypes, targetStorage.storageTypes]);
+
+  // Filter storages by search query and filter type
+  const filteredStorages = useMemo(() => {
+    let filtered = allStorages;
+
+    // Filter by type
+    if (filterType === "source") {
+      filtered = filtered.filter((s) => s.target === "import");
+    } else if (filterType === "target") {
+      filtered = filtered.filter((s) => s.target === "export");
+    }
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((s) => {
+        const storageTypeTitle = storageTypes.find((st) => st.name === s.type)?.title || "";
+        return (
+          s.title?.toLowerCase().includes(query) ||
+          s.type?.toLowerCase().includes(query) ||
+          storageTypeTitle.toLowerCase().includes(query)
+        );
+      });
+    }
+
+    return filtered;
+  }, [allStorages, filterType, searchQuery, storageTypes]);
+
+  // Paginate filtered storages
+  const paginatedStorages = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return filteredStorages.slice(start, end);
+  }, [filteredStorages, currentPage, pageSize]);
+
+  const totalPages = Math.ceil(filteredStorages.length / pageSize);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterType, searchQuery]);
 
   // Handle auto-open query parameter
   useEffect(() => {
@@ -54,130 +112,129 @@ export const StorageSettings = () => {
     }
   }, [location, history, isLoaded]);
 
-  return (
-    <section className="max-w-[680px]">
-      <Typography variant="headline" size="medium" className="mb-base">
-        Cloud Storage
-      </Typography>
-      {hasAnyStorages && (
-        <Typography size="small" className="text-neutral-content-subtler mb-wider">
-          Use cloud or database storage as the source for your labeling tasks or the target of your completed
-          annotations.
-        </Typography>
-      )}
+  const handleDeleteStorage = async (storage) => {
+    confirm({
+      title: "Deleting storage",
+      body: "This action cannot be undone. Are you sure?",
+      buttonLook: "negative",
+      onOk: async () => {
+        const response = await api.callApi("deleteStorage", {
+          params: {
+            type: storage.type,
+            pk: storage.id,
+            target: storage.target === "export" ? "export" : "",
+          },
+        });
 
+        if (response !== null) {
+          if (storage.target === "export") {
+            await targetStorage.fetchStorages();
+          } else {
+            await sourceStorage.fetchStorages();
+          }
+        }
+      },
+    });
+  };
+
+  return (
+    <div className="max-w-[1200px]">
+      {/* Header Section */}
+      <div className="flex items-start justify-between mb-wider">
+        <div>
+          <Typography variant="headline" size="large" className="mb-2">
+            Connection Management
+          </Typography>
+          <Typography size="small" className="text-neutral-content-subtler">
+            Manage your cloud connections and verify dataset sync status.
+          </Typography>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            look="outlined"
+            variant="neutral"
+            size="small"
+            className={cn("border-primary-border")}
+          >
+            Overview
+          </Button>
+          <Button look="outlined" variant="neutral" size="small">
+            Log
+          </Button>
+        </div>
+      </div>
+
+      {/* Control Bar */}
+      <StorageControlBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        filterType={filterType}
+        onFilterChange={setFilterType}
+        onAddSource={() => sourceStorageRef.current?.openAddModal()}
+        onAddTarget={() => targetStorageRef.current?.openAddModal()}
+      />
+
+      {/* Always render StorageSet components (hidden) so refs are populated */}
+      <div className="hidden">
+        <StorageSet
+          ref={sourceStorageRef}
+          title="Source Cloud Storage"
+          buttonLabel="Add Source Storage"
+          rootClass={rootClass}
+          storageTypes={sourceStorage.storageTypes}
+          storages={sourceStorage.storages}
+          storagesLoaded={sourceStorage.storagesLoaded}
+          loading={sourceStorage.loading}
+          loaded={sourceStorage.loaded}
+          fetchStorages={sourceStorage.fetchStorages}
+        />
+        <StorageSet
+          ref={targetStorageRef}
+          title="Target Cloud Storage"
+          target="export"
+          buttonLabel="Add Target Storage"
+          rootClass={rootClass}
+          storageTypes={targetStorage.storageTypes}
+          storages={targetStorage.storages}
+          storagesLoaded={targetStorage.storagesLoaded}
+          loading={targetStorage.loading}
+          loaded={targetStorage.loaded}
+          fetchStorages={targetStorage.fetchStorages}
+        />
+      </div>
+
+      {/* Loading State */}
       {isLoading && !isLoaded && (
         <div className="flex items-center justify-center h-[50rem]">
           <Spinner />
         </div>
       )}
 
-      {/* Always render StorageSet components (hidden when showing EmptyState) so refs are populated */}
-      <div className={!hasAnyStorages && isLoaded ? "hidden" : ""}>
-        <div className="grid grid-cols-2 gap-8">
-          <StorageSet
-            ref={sourceStorageRef}
-            title="Source Cloud Storage"
-            buttonLabel="Add Source Storage"
-            rootClass={rootClass}
-            storageTypes={sourceStorage.storageTypes}
-            storages={sourceStorage.storages}
-            storagesLoaded={sourceStorage.storagesLoaded}
-            loading={sourceStorage.loading}
-            loaded={sourceStorage.loaded}
-            fetchStorages={sourceStorage.fetchStorages}
-          />
-
-          <StorageSet
-            ref={targetStorageRef}
-            title="Target Cloud Storage"
-            target="export"
-            buttonLabel="Add Target Storage"
-            rootClass={rootClass}
-            storageTypes={targetStorage.storageTypes}
-            storages={targetStorage.storages}
-            storagesLoaded={targetStorage.storagesLoaded}
-            loading={targetStorage.loading}
-            loaded={targetStorage.loaded}
-            fetchStorages={targetStorage.fetchStorages}
-          />
-        </div>
-      </div>
-
-      {/* Show EmptyState when no storages exist */}
-      {!hasAnyStorages && isLoaded && !isLoading && (
-        <SimpleCard title="" className="bg-primary-background border-primary-border-subtler p-base">
-          <EmptyState
-            size="medium"
-            variant="primary"
-            icon={<IconCloudCustom />}
-            title="Add your first cloud storage"
-            description="Use cloud or database storage as the source for your labeling tasks or the target of your completed annotations."
-            additionalContent={
-              <div className="flex items-center justify-center gap-base" data-testid="dm-storage-provider-icons">
-                <Tooltip title="Amazon S3">
-                  <div className="flex items-center justify-center p-2" aria-label="Amazon S3">
-                    <IconCloudProviderS3 width={32} height={32} className="text-neutral-content-subtler" />
-                  </div>
-                </Tooltip>
-                <Tooltip title="Google Cloud Storage">
-                  <div className="flex items-center justify-center p-2" aria-label="Google Cloud Storage">
-                    <IconCloudProviderGCS width={32} height={32} className="text-neutral-content-subtler" />
-                  </div>
-                </Tooltip>
-                <Tooltip title="Azure Blob Storage">
-                  <div className="flex items-center justify-center p-2" aria-label="Azure Blob Storage">
-                    <IconCloudProviderAzure width={32} height={32} className="text-neutral-content-subtler" />
-                  </div>
-                </Tooltip>
-                <Tooltip title="Redis Storage">
-                  <div className="flex items-center justify-center p-2" aria-label="Redis Storage">
-                    <IconCloudProviderRedis width={32} height={32} className="text-neutral-content-subtler" />
-                  </div>
-                </Tooltip>
-              </div>
+      {/* Connection Cards Grid */}
+      {isLoaded && !isLoading && (
+        <StorageList
+          storages={paginatedStorages}
+          storageTypes={storageTypes}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredStorages.length}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onEditStorage={(s) => {
+            const showModal = s.target === "export"
+              ? targetStorageRef.current?.openEditModal
+              : sourceStorageRef.current?.openEditModal;
+            if (showModal) {
+              showModal(s);
             }
-            actions={
-              <div className="flex gap-base">
-                <Button
-                  look="primary"
-                  data-testid="add-source-storage-button-empty-state"
-                  aria-label="Add Source Storage"
-                  onClick={() => sourceStorageRef.current?.openAddModal()}
-                >
-                  Add Source Storage
-                </Button>
-                <Button
-                  look="primary"
-                  data-testid="add-target-storage-button-empty-state"
-                  aria-label="Add Target Storage"
-                  onClick={() => targetStorageRef.current?.openAddModal()}
-                >
-                  Add Target Storage
-                </Button>
-              </div>
-            }
-            footer={
-              !window.APP_SETTINGS?.whitelabel_is_active && (
-                <Typography variant="label" size="small" className="text-primary-link">
-                  <a
-                    href="https://docs.humansignal.com/guide/storage"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-testid="storage-help-link"
-                    aria-label="Learn more about cloud storage (opens in new window)"
-                    className="inline-flex items-center gap-1 hover:underline"
-                  >
-                    Learn more
-                    <IconExternal width={16} height={16} />
-                  </a>
-                </Typography>
-              )
-            }
-          />
-        </SimpleCard>
+          }}
+          onDeleteStorage={handleDeleteStorage}
+          onAddSource={() => sourceStorageRef.current?.openAddModal()}
+          onAddTarget={() => targetStorageRef.current?.openAddModal()}
+          rootClass={rootClass}
+        />
       )}
-    </section>
+    </div>
   );
 };
 
