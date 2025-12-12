@@ -7,76 +7,9 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
-def _get_inference_map_lso():
-    return {}
-
-
-def get_inference_map():
-    return load_func(settings.FSM_INFERENCE_MAP)()
-
-
 def get_or_infer_state(entity) -> Optional[str]:
-    """
-    Infer the FSM state for an entity from its fields and relationships.
-
-    This function is called ONLY when StateManager has already checked cache and DB
-    and found no state. It purely does inference based on entity fields.
-
-    NOTE: This function does NOT query the database - StateManager already did that.
-    It only looks at entity fields and relationships to infer the current state.
-
-    Args:
-        entity: The entity instance (Task, Annotation, etc.)
-
-    Returns:
-        Inferred state string, or None if inference failed
-    """
-    try:
-        # Infer state from entity fields (no DB queries)
-
-        # Infer based on entity type
-        entity_type = entity._meta.model_name
-
-        logger.info(
-            f'Inferring state for {entity_type} {entity.id} from entity fields',
-            extra={
-                'event': 'fsm.state_inference',
-                'entity_type': entity_type,
-                'entity_id': entity.id,
-            },
-        )
-
-        inference_func = get_inference_map().get(entity_type.lower())
-        if not inference_func:
-            logger.warning(f'No inference function for entity type: {entity_type}')
-            return None
-
-        inferred_state = inference_func(entity)
-
-        logger.info(
-            f'Inferred state for {entity_type} {entity.id}: {inferred_state}',
-            extra={
-                'event': 'fsm.state_inferred',
-                'entity_type': entity_type,
-                'entity_id': entity.id,
-                'inferred_state': inferred_state,
-            },
-        )
-
-        return inferred_state
-
-    except Exception as e:
-        logger.error(
-            f'Failed to get or infer state for {entity_type}: {e}',
-            exc_info=True,
-            extra={
-                'event': 'fsm.state_inference_failed',
-                'entity_type': entity_type,
-                'entity_id': getattr(entity, 'id', None),
-            },
-        )
-        # Return None - caller should handle this gracefully
-        return None
+    func = load_func(settings.FSM_INFERENCE_FUNCTION)
+    return func(entity)
 
 
 def backfill_state_for_entity(entity) -> Optional[str]:
