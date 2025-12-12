@@ -15,7 +15,7 @@ def get_inference_map():
     return load_func(settings.FSM_INFERENCE_MAP)()
 
 
-def get_or_infer_state(entity, entity_type: Optional[str] = None) -> Optional[str]:
+def get_or_infer_state(entity) -> Optional[str]:
     """
     Infer the FSM state for an entity from its fields and relationships.
 
@@ -27,13 +27,16 @@ def get_or_infer_state(entity, entity_type: Optional[str] = None) -> Optional[st
 
     Args:
         entity: The entity instance (Task, Annotation, etc.)
-        entity_type: Type string ('task', 'annotation', 'draft', 'review', 'project')
 
     Returns:
         Inferred state string, or None if inference failed
     """
     try:
         # Infer state from entity fields (no DB queries)
+
+        # Infer based on entity type
+        entity_type = entity._meta.model_name
+
         logger.info(
             f'Inferring state for {entity_type} {entity.id} from entity fields',
             extra={
@@ -42,11 +45,6 @@ def get_or_infer_state(entity, entity_type: Optional[str] = None) -> Optional[st
                 'entity_id': entity.id,
             },
         )
-
-        # Infer based on entity type
-
-        if entity_type is None:
-            entity_type = entity._meta.model_name
 
         inference_func = get_inference_map().get(entity_type.lower())
         if not inference_func:
@@ -81,7 +79,7 @@ def get_or_infer_state(entity, entity_type: Optional[str] = None) -> Optional[st
         return None
 
 
-def backfill_state_for_entity(entity, entity_type: str) -> Optional[str]:
+def backfill_state_for_entity(entity) -> Optional[str]:
     """
     Backfill FSM state for an entity that doesn't have one.
 
@@ -90,13 +88,12 @@ def backfill_state_for_entity(entity, entity_type: str) -> Optional[str]:
 
     Args:
         entity: The entity instance
-        entity_type: Type string ('task', 'annotation', etc.)
 
     Returns:
         The inferred/created state, or None if failed
     """
     try:
-        inferred_state = get_or_infer_state(entity, entity_type)
+        inferred_state = get_or_infer_state(entity)
 
         if not inferred_state:
             return None
@@ -138,6 +135,7 @@ def backfill_state_for_entity(entity, entity_type: str) -> Optional[str]:
             organization_id=org_id,
         )
 
+        entity_type = entity._meta.model_name
         logger.info(
             f'Backfilled state for {entity_type} {entity.id}: {inferred_state}',
             extra={
