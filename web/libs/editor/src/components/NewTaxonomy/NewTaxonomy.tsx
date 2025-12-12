@@ -180,6 +180,7 @@ const NewTaxonomy = ({
       }
       loadData={loadData}
       treeCheckable
+      showSearch={false}
       showArrow
       dropdownRender={renderDropdown}
       onDropdownVisibleChange={handleDropdownChange}
