@@ -587,7 +587,7 @@ class RichTextPieceView extends Component {
           key="root"
           className={cn("richtext").elem("iframe").mix("htx-richtext").toClassName()}
           referrerPolicy="no-referrer"
-          sandbox="allow-same-origin allow-scripts"
+          sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox allow-presentation"
           ref={(el) => {
             item.setReady(false);
             item.mountNodeRef.current = el;

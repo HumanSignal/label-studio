@@ -520,6 +520,47 @@ function findNodeAt(context, at) {
 function sanitizeHtml(html = []) {
   if (!html) return "";
 
+  // Whitelist of allowed iframe domains - easily extensible for future additions
+  const ALLOWED_IFRAME_DOMAINS = [
+    "www.youtube.com",
+    "youtube.com",
+    "www.youtube-nocookie.com",
+    "youtube-nocookie.com",
+    "youtu.be", // YouTube's shortened URL format
+  ];
+
+  // Helper function to validate if iframe src is from an allowed domain
+  const isAllowedIframeSrc = (src) => {
+    console.log("[isAllowedIframeSrc] Checking src:", src);
+    if (!src) {
+      console.log("[isAllowedIframeSrc] No src provided, blocking");
+      return false;
+    }
+
+    // Allow template variables (e.g., $partner_public_url) - they'll be validated after substitution
+    if (src.startsWith("$")) {
+      console.log("[isAllowedIframeSrc] Template variable detected, allowing:", src);
+      return true;
+    }
+
+    try {
+      const url = new URL(src);
+      // Only allow HTTPS for security
+      if (url.protocol !== "https:") {
+        console.log("[isAllowedIframeSrc] Not HTTPS, blocking");
+        return false;
+      }
+      // Check if hostname matches any allowed domain
+      const isAllowed = ALLOWED_IFRAME_DOMAINS.includes(url.hostname);
+      console.log("[isAllowedIframeSrc] Hostname check:", url.hostname, "allowed:", isAllowed);
+      return isAllowed;
+    } catch (e) {
+      // Invalid URL format
+      console.log("[isAllowedIframeSrc] Invalid URL format:", e.message);
+      return false;
+    }
+  };
+
   const disallowedAttributes = [
     "onauxclick",
     "onafterprint",
@@ -613,17 +654,51 @@ function sanitizeHtml(html = []) {
     iframe: true,
   };
 
-  return sanitizeHTML(html, {
+  const result = sanitizeHTML(html, {
     allowedTags: false,
     allowedAttributes: false,
     disallowedTagsMode: "discard",
     allowVulnerableTags: true,
     exclusiveFilter(frame) {
-      //...except those in the blacklist
+      // Block scripts unconditionally
+      if (frame.tag === "script") return true;
+
+      // For iframes, only block if NOT from whitelisted domain
+      if (frame.tag === "iframe") {
+        const src = frame.attribs?.src;
+        return !isAllowedIframeSrc(src);
+      }
+
+      // Check other disallowed tags
       return disallowedTags[frame.tag];
     },
     nonTextTags: ["script", "textarea", "option", "noscript"],
     transformTags: {
+      iframe: (tagName, attribs) => {
+        // Only allow specific safe attributes for iframes
+        const allowedIframeAttribs = {};
+        const safeAttrs = [
+          "src",
+          "width",
+          "height",
+          "frameborder",
+          "allowfullscreen",
+          "allow",
+          "title",
+          "referrerpolicy",
+        ];
+
+        safeAttrs.forEach((attr) => {
+          if (attribs[attr]) {
+            allowedIframeAttribs[attr] = attribs[attr];
+          }
+        });
+
+        return {
+          tagName,
+          attribs: allowedIframeAttribs,
+        };
+      },
       "*": (tagName, attribs) => {
         Object.keys(attribs).forEach((attr) => {
           // If the attribute is in the disallowed list, remove it
@@ -638,6 +713,8 @@ function sanitizeHtml(html = []) {
       },
     },
   });
+
+  return result;
 }
 
 export {
