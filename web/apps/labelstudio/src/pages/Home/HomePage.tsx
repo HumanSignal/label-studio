@@ -1,16 +1,24 @@
 import { IconExternal, IconFolderAdd, IconHumanSignal, IconUserAdd, IconFolderOpen } from "@humansignal/icons";
 import { Button, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useUpdatePageTitle } from "@humansignal/core";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { useAPI } from "../../providers/ApiProvider";
 import { CreateProject } from "../CreateProject/CreateProject";
 import { InviteLink } from "../Organization/PeoplePage/InviteLink";
 import type { Page } from "../types/Page";
-
-const PROJECTS_TO_SHOW = 10;
+import {
+  creationDialogOpen,
+  invitationOpen,
+  locationKeyAtom,
+  PROJECTS_TO_SHOW,
+  projectsDataAtom,
+  sortedProjectsAtom,
+  visitedIdsAtom,
+} from "./atoms";
 
 const resources = [
   {
@@ -52,12 +60,19 @@ type Action = (typeof actions)[number]["type"];
 
 export const HomePage: Page = () => {
   const api = useAPI();
-  const [creationDialogOpen, setCreationDialogOpen] = useState(false);
-  const [invitationOpen, setInvitationOpen] = useState(false);
+  const location = useLocation();
+  const [modalIsOpen, setModalIsOpen] = useAtom(creationDialogOpen);
+  const [invitationIsOpen, setInvitationIsOpen] = useAtom(invitationOpen);
+  const setLocationKey = useSetAtom(locationKeyAtom);
+  const setProjectsData = useSetAtom(projectsDataAtom);
+  const sortedProjects = useAtomValue(sortedProjectsAtom);
+  const visitedIds = useAtomValue(visitedIdsAtom);
 
   useUpdatePageTitle("Home");
+
+  // Fetch regular projects
   const { data, isFetching, isSuccess, isError } = useQuery({
-    queryKey: ["projects", { page_size: 10 }],
+    queryKey: ["projects", { page_size: PROJECTS_TO_SHOW }],
     async queryFn() {
       return api.callApi<{ results: APIProject[]; count: number }>("projects", {
         params: { page_size: PROJECTS_TO_SHOW },
@@ -65,14 +80,51 @@ export const HomePage: Page = () => {
     },
   });
 
+  // Fetch visited projects specifically by their IDs
+  const { data: visitedProjectsData } = useQuery({
+    queryKey: ["visited-projects", { ids: visitedIds }],
+    async queryFn() {
+      if (visitedIds.length === 0) return { results: [], count: 0 };
+
+      return api.callApi<{ results: APIProject[]; count: number }>("projects", {
+        params: {
+          ids: visitedIds.join(","),
+          page_size: visitedIds.length,
+        },
+      });
+    },
+    enabled: visitedIds.length > 0,
+  });
+
+  // Update location key atom when navigating to/returning to this page
+  // This triggers visitedIdsAtom to re-read from localStorage
+  // We use a timestamp to ensure the atom always updates, forcing a re-read
+  useEffect(() => {
+    setLocationKey(Date.now().toString());
+  }, [location.pathname, setLocationKey]);
+
+  // Merge visited and regular projects, removing duplicates
+  useEffect(() => {
+    const visitedProjects = visitedProjectsData?.results ?? [];
+    const regularProjects = data?.results ?? [];
+
+    // Merge and deduplicate
+    const allProjects = [...visitedProjects, ...regularProjects];
+    const uniqueProjects = Array.from(new Map(allProjects.map((p) => [p.id, p])).values());
+
+    if (uniqueProjects.length > 0) {
+      setProjectsData(uniqueProjects);
+    }
+  }, [data?.results, visitedProjectsData?.results, setProjectsData]);
+
   const handleActions = (action: Action) => {
     return () => {
       switch (action) {
         case "createProject":
-          setCreationDialogOpen(true);
+          setModalIsOpen(true);
           break;
         case "inviteMembers":
-          setInvitationOpen(true);
+          setInvitationIsOpen(true);
           break;
       }
     };
@@ -125,7 +177,7 @@ export const HomePage: Page = () => {
               </div>
             ) : isError ? (
               <div className="h-64 flex justify-center items-center">can't load projects</div>
-            ) : isSuccess && data && data.results.length === 0 ? (
+            ) : isSuccess && data && sortedProjects.length === 0 ? (
               <div className="flex flex-col justify-center items-center border border-primary-border-subtle bg-primary-emphasis-subtle rounded-lg h-64">
                 <div
                   className={
@@ -140,13 +192,13 @@ export const HomePage: Page = () => {
                 <Typography size="small" className="text-neutral-content-subtler">
                   Import your data and set up the labeling interface to start annotating
                 </Typography>
-                <Button className="mt-4" onClick={() => setCreationDialogOpen(true)} aria-label="Create new project">
+                <Button className="mt-4" onClick={() => setModalIsOpen(true)} aria-label="Create new project">
                   Create Project
                 </Button>
               </div>
-            ) : isSuccess && data && data.results.length > 0 ? (
+            ) : isSuccess && data && sortedProjects.length > 0 ? (
               <div className="flex flex-col gap-1">
-                {data.results.map((project) => {
+                {sortedProjects.map((project) => {
                   return <ProjectSimpleCard key={project.id} project={project} />;
                 })}
               </div>
@@ -180,8 +232,8 @@ export const HomePage: Page = () => {
           </div>
         </section>
       </div>
-      {creationDialogOpen && <CreateProject onClose={() => setCreationDialogOpen(false)} />}
-      <InviteLink opened={invitationOpen} onClosed={() => setInvitationOpen(false)} />
+      {modalIsOpen && <CreateProject onClose={() => setModalIsOpen(false)} />}
+      <InviteLink opened={invitationIsOpen} onClosed={() => setInvitationIsOpen(false)} />
     </main>
   );
 };
