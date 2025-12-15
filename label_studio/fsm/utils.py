@@ -341,30 +341,28 @@ def infer_entity_state_from_data(entity) -> Optional[str]:
         return None
 
 
-def get_or_initialize_state(entity, user=None, inferred_state=None, reason=None, context_data=None) -> Optional[str]:
+def get_or_initialize_state(entity, user, inferred_state: str) -> Optional[str]:
     """
     Get current state, or initialize it if it doesn't exist.
 
     This function handles "cold start" scenarios where pre-existing entities
     don't have FSM state records. It will:
-    1. Try to get the current state
-    2. If None, infer the state from entity data
-    3. Initialize the state with an appropriate transition
-    4. Return the state value (never returns None if initialization succeeds)
+    1. If the state already exists, use that
+    2. If the state doesn't exist, infer the state from the entity and initialize it with an appropriate transition
+    2. Return the state value (never returns None if initialization succeeds)
 
     Args:
         entity: The entity to get or initialize state for
-        user: User for FSM context (optional)
-        inferred_state: Pre-computed inferred state (optional, will compute if not provided)
-        reason: Custom reason for the state initialization (optional, overrides default)
-        context_data: Additional context data to store with state record (optional)
+        user: User for FSM context
+        inferred_state: Pre-computed inferred state
 
     Returns:
         Current or newly initialized state value, or None if FSM disabled or failed
 
     Examples:
         >>> task = Task.objects.get(id=123)  # Pre-existing task without state
-        >>> state = get_or_initialize_state(task, user=request.user)
+        >>> inferred_state = infer_entity_state_from_data(task)
+        >>> state = get_or_initialize_state(task, user=request.user, inferred_state=inferred_state)
         >>> # state is now 'COMPLETED' or 'CREATED' based on task.is_labeled
         >>> # and a state record has been created
     """
@@ -386,10 +384,6 @@ def get_or_initialize_state(entity, user=None, inferred_state=None, reason=None,
         if current_state is not None:
             # State already exists, return it
             return current_state
-
-        # No state exists - need to initialize it
-        if inferred_state is None:
-            inferred_state = infer_entity_state_from_data(entity)
 
         if inferred_state is None:
             logger.warning(
@@ -417,13 +411,10 @@ def get_or_initialize_state(entity, user=None, inferred_state=None, reason=None,
                     'transition_name': transition_name,
                 },
             )
-            # Pass reason and context_data if provided (flow through to TransitionContext)
             StateManager.execute_transition(
                 entity=entity,
                 transition_name=transition_name,
                 user=user,
-                reason=reason,
-                context_data=context_data or {},
             )
             return inferred_state
         else:
