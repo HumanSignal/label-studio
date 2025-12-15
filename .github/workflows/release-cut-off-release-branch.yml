@@ -33,7 +33,7 @@ jobs:
           token: ${{ secrets.GIT_PAT }}
           ref: ${{ inputs.ref }}
           submodules: 'recursive'
-          fetch-depth: 0
+          fetch-depth: 2147483647
 
       - name: Configure git
         shell: bash
