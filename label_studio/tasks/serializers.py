@@ -718,6 +718,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         bulk_create() bypasses the model's save() method, so FSM transitions
         don't fire automatically. This sets initial state for newly imported tasks.
         """
+        # TODO: extend this to importing other bulk objects
         user = CurrentContext.get_user()
         if not tasks or not is_fsm_enabled(user):
             return
