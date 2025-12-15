@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
 import { Button, IconChevronLeft, IconChevronRight, Tooltip } from "@humansignal/ui";
 import { cn } from "../../utils/bem";
-import { FF_DEV_3873, FF_DEV_4174, FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
+import { FF_DEV_4174, FF_LEAP_1173, FF_TASK_COUNT_FIX, isFF } from "../../utils/feature-flags";
 import { guidGenerator } from "../../utils/unique";
 import { isDefined } from "../../utils/utilities";
 import "./CurrentTask.scss";
@@ -98,10 +98,7 @@ export const CurrentTask = observer(({ store }) => {
   return (
     <div className={cn("bottombar").elem("section").toClassName()}>
       <div className={cn("current-task").mod({ "with-history": historyEnabled }).toClassName()}>
-        <div
-          className={cn("current-task").elem("task-id").toClassName()}
-          style={{ fontSize: isFF(FF_DEV_3873) ? 12 : 14 }}
-        >
+        <div className={cn("current-task").elem("task-id").toClassName()}>
           {store.task.id ?? guidGenerator()}
           {historyEnabled &&
             showCounter &&
@@ -116,12 +113,7 @@ export const CurrentTask = observer(({ store }) => {
             ))}
         </div>
         {historyEnabled && (
-          <div
-            className={cn("current-task")
-              .elem("history-controls")
-              .mod({ newui: isFF(FF_DEV_3873) })
-              .toClassName()}
-          >
+          <div className={cn("current-task").elem("history-controls").mod({ newui: true }).toClassName()}>
             <Tooltip title={prevButtonMessage}>
               <Button
                 data-testid="prev-task"
@@ -129,7 +121,6 @@ export const CurrentTask = observer(({ store }) => {
                 look="string"
                 disabled={!historyEnabled || !store.canGoPrevTask}
                 onClick={store.prevTask}
-                style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
                 variant="neutral"
                 leading={<IconChevronLeft />}
                 size="small"
@@ -142,7 +133,6 @@ export const CurrentTask = observer(({ store }) => {
                 look="string"
                 disabled={!canNavigateNext && !canPostponeTask}
                 onClick={canNavigateNext ? store.nextTask : store.postponeTask}
-                style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
                 variant={!canNavigateNext && canPostponeTask ? "primary" : "neutral"}
                 leading={<IconChevronRight />}
                 size="small"
