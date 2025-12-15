@@ -245,7 +245,7 @@ class TestLocalStorageSyncWorkflows:
             assert_task_state(task.id, TaskStateChoices.CREATED)
 
 
-@pytest.skip(reason='TODO')
+@pytest.mark.skip(reason='TODO')
 class TestStorageSyncWithAnnotations:
     """Test FSM state management for storage sync with pre-labeled data."""
 
