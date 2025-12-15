@@ -26,6 +26,14 @@ describe("parseTextareaMeans", () => {
     expect(result.b).toBeCloseTo(4);
   });
 
+  test("parses RGB-only labeled channels string", () => {
+    const result = parseTextareaMeans("r=10; g=20.5; b=30");
+    expect(result.gray).toBeNull();
+    expect(result.r).toBeCloseTo(10);
+    expect(result.g).toBeCloseTo(20.5);
+    expect(result.b).toBeCloseTo(30);
+  });
+
   test("returns nulls on malformed input", () => {
     const result = parseTextareaMeans("not-a-number");
     expect(result.gray).toBeNull();

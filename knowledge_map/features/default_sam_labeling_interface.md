@@ -23,7 +23,7 @@ The default labeling interface now includes:
    - **PolygonLabels (tag2)**: For vector polygon annotations (green)
 
 3. **Metadata Collection**:
-   - **TextArea (mean_intensity)**: For per-region metadata collection
+   - **TextArea (mean_intensity)**: For per-region RGB mean intensity metadata collection
 
 ### XML Configuration
 
@@ -37,19 +37,19 @@ The default labeling interface now includes:
   </KeyPointLabels>
      
    <!-- Smart Rectangle Labels (tag4) -->
-   <Header value="Interact: Rectangle Labels"/>
-   <RectangleLabels name="tag4" toName="image" smart="true">
-     <Label value="Object" smart="true" background="#0000FF"/>
-   </RectangleLabels>
-  
-    <TextArea name="mean_intensity" toName="image"
-            perRegion="true"
-            required="true"
-            maxSubmissions="1"
-            rows="5"
-           placeholder="Mean Intensity (gray/R/G/B)"
-            displayMode="region-list"
-            />
+  <Header value="Interact: Rectangle Labels"/>
+  <RectangleLabels name="tag4" toName="image" smart="true">
+    <Label value="Object" smart="true" background="#0000FF"/>
+  </RectangleLabels>
+ 
+   <TextArea name="mean_intensity" toName="image"
+           perRegion="true"
+           required="true"
+           maxSubmissions="1"
+           rows="5"
+          placeholder="Mean Intensity (R/G/B)"
+           displayMode="region-list"
+           />
   <!-- Brush Labels (tag1) -->
   <Header value="Result: Brush Labels"/>
   <BrushLabels name="tag1" toName="image">

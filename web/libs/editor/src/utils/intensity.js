@@ -2,6 +2,12 @@ import { colorToRGBAArray } from "./colors";
 
 /**
  * Parse textarea-based mean intensity values for gray/R/G/B channels.
+ *
+ * Backends now emit RGB-only values in the form `r=..; g=..; b=..`.
+ * Older data may still contain a single gray value or `gray=..` entries.
+ * This helper keeps backward compatibility but callers should prefer
+ * the RGB channels; grayscale can be inferred when r≈g≈b.
+ *
  * Mirrors backend `_parse_textarea_means` behavior in
  * `label_studio/data_export/formats/segmentation_csv_exporter.py`.
  *
@@ -61,6 +67,10 @@ export const parseTextareaMeans = (rawValue) => {
 
 /**
  * Compute gray/R/G/B intensities from a display color.
+ *
+ * The gray value here is a derived luma approximation from the RGB
+ * components; it is not a primary stored channel. For behavior that
+ * depends on intensity, prefer working with the explicit RGB values.
  *
  * @param {string} color
  * @returns {{ gray: number, r: number, g: number, b: number }}

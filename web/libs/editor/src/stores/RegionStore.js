@@ -136,8 +136,14 @@ const SelectionMap = types
 export default types
   .model("RegionStore", {
     sort: types.optional(
-      types.enumeration(["date", "score", "intensity_gray", "intensity_r", "intensity_g", "intensity_b"]),
-      window.localStorage.getItem(localStorageKeys.sort) ?? "date",
+      types.enumeration(["date", "score", "intensity_r", "intensity_g", "intensity_b"]),
+      (() => {
+        const stored = window.localStorage.getItem(localStorageKeys.sort);
+        const allowed = new Set(["date", "score", "intensity_r", "intensity_g", "intensity_b"]);
+
+        if (!stored || !allowed.has(stored)) return "date";
+        return stored;
+      })(),
     ),
 
     sortOrder: types.optional(
@@ -278,22 +284,6 @@ export default types
             [...self.filteredRegions].sort(isDesc ? (a, b) => b.ouid - a.ouid : (a, b) => a.ouid - b.ouid),
           score: (isDesc) =>
             [...self.filteredRegions].sort(isDesc ? (a, b) => b.score - a.score : (a, b) => a.score - b.score),
-          intensity_gray: (isDesc) => {
-            const intensities = new Map();
-
-            self.filteredRegions.forEach((region) => {
-              intensities.set(region.id, getRegionIntensities(region));
-            });
-
-            return [...self.filteredRegions].sort((a, b) => {
-              const ia = intensities.get(a.id);
-              const ib = intensities.get(b.id);
-              const av = ia?.gray ?? 0;
-              const bv = ib?.gray ?? 0;
-
-              return isDesc ? bv - av : av - bv;
-            });
-          },
           intensity_r: (isDesc) => {
             const intensities = new Map();
 

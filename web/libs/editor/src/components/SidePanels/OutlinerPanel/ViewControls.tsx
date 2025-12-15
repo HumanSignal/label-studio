@@ -25,7 +25,7 @@ const { Block, Elem } = BemWithSpecifiContext();
 
 export type GroupingOptions = "manual" | "label" | "type";
 
-export type OrderingOptions = "score" | "date" | "intensity_gray" | "intensity_r" | "intensity_g" | "intensity_b";
+export type OrderingOptions = "score" | "date" | "intensity_r" | "intensity_g" | "intensity_b";
 
 export type OrderingDirection = "asc" | "desc";
 
@@ -103,16 +103,6 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             selectedLabel: "By Score",
             icon: <IconPredictions width={16} height={16} />,
           };
-        case "intensity_gray":
-          return {
-            label: (
-              <>
-                <IconPredictions /> Order by Mean Gray
-              </>
-            ),
-            selectedLabel: "By Mean Gray",
-            icon: <IconPredictions width={16} height={16} />,
-          };
         case "intensity_r":
           return {
             label: (
@@ -161,7 +151,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             <Grouping
               value={ordering}
               direction={orderingDirection}
-              options={["score", "date", "intensity_gray", "intensity_r", "intensity_g", "intensity_b"]}
+              options={["score", "date", "intensity_r", "intensity_g", "intensity_b"]}
               onChange={(value) => onOrderingChange(value)}
               readableValueForKey={getOrderingLabels}
               allowClickSelected={false}
