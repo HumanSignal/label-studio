@@ -273,7 +273,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                       </div>
                     }
                   >
-                    <Button disabled={isDisabled} aria-label="Submit annotation" data-testid="bottombar-submit-dropdown">
+                    <Button
+                      disabled={isDisabled}
+                      aria-label="Submit annotation"
+                      data-testid="bottombar-submit-dropdown"
+                    >
                       <IconChevronDown />
                     </Button>
                   </Dropdown.Trigger>
@@ -312,7 +316,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                   alignment="top-right"
                   content={<SubmitOption onClickMethod={store.updateAnnotation} isUpdate={isUpdate} />}
                 >
-                  <Button disabled={isUpdateDisabled} aria-label="Update annotation" data-testid="bottombar-update-dropdown">
+                  <Button
+                    disabled={isUpdateDisabled}
+                    aria-label="Update annotation"
+                    data-testid="bottombar-update-dropdown"
+                  >
                     <IconChevronDown />
                   </Button>
                 </Dropdown.Trigger>
