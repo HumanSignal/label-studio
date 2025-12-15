@@ -532,7 +532,6 @@ function sanitizeHtml(html = []) {
   // Helper function to validate if iframe src is from an allowed domain
   const isAllowedIframeSrc = (src) => {
     if (!src) {
-      console.error("[isAllowedIframeSrc] No src provided, blocking");
       return false;
     }
 
@@ -540,16 +539,13 @@ function sanitizeHtml(html = []) {
       const url = new URL(src);
       // Only allow HTTPS for security
       if (url.protocol !== "https:") {
-        console.error("[isAllowedIframeSrc] Not HTTPS, blocking");
         return false;
       }
       // Check if hostname matches any allowed domain
       const isAllowed = ALLOWED_IFRAME_DOMAINS.includes(url.hostname);
-      console.error("[isAllowedIframeSrc] Hostname check:", url.hostname, "allowed:", isAllowed);
       return isAllowed;
     } catch (e) {
       // Invalid URL format
-      console.error("[isAllowedIframeSrc] Invalid URL format:", e.message);
       return false;
     }
   };
