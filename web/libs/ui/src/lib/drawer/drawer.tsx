@@ -80,6 +80,11 @@ export interface DrawerProps {
    * @default "drawer"
    */
   dataTestId?: string;
+  /**
+   * Callback fired when the drawer opens to handle auto-focus behavior
+   * Set to `(e) => e.preventDefault()` to prevent auto-focus on the first focusable element
+   */
+  onOpenAutoFocus?: (event: Event) => void;
 }
 
 /**
@@ -116,6 +121,7 @@ export const Drawer = ({
   closeOnClickOutside = true,
   contentClassName,
   dataTestId = "drawer",
+  onOpenAutoFocus,
 }: DrawerProps) => {
   const defaultWidth = side === "left" || side === "right" ? "w-1/4" : undefined;
   const computedContentClassName = cnm(
@@ -134,6 +140,7 @@ export const Drawer = ({
         closeOnClickOutside={closeOnClickOutside}
         data-slot="drawer-content"
         data-testid={dataTestId}
+        onOpenAutoFocus={onOpenAutoFocus}
       >
         <SheetHeader
           className={cn(
