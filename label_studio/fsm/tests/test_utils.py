@@ -516,6 +516,23 @@ class TestResolveOrganizationIdCoverage(TestCase):
         assert cached == 987
 
 
+class TestGetCurrentStateSafeCoverage(TestCase):
+    """Test coverage for get_current_state_safe error handling"""
+
+    def test_get_current_state_safe_when_fsm_disabled(self):
+        """Test get_current_state_safe returns None when FSM is disabled"""
+        from fsm.utils import get_current_state_safe
+
+        mock_entity = Mock()
+        mock_entity.pk = 1
+        mock_entity._meta = Mock()
+        mock_entity._meta.label_lower = 'test.entity'
+
+        with patch('fsm.utils.is_fsm_enabled', return_value=False):
+            result = get_current_state_safe(mock_entity)
+            assert result is None
+
+
 class TestGetOrInitializeState(TestCase):
     """Tests for get_or_initialize_state with its current signature.
 
