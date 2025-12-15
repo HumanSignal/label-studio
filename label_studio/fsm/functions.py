@@ -6,7 +6,9 @@ used across different parts of the codebase.
 """
 import logging
 
-from fsm.state_inference import backfill_state_for_entity
+from core.current_request import CurrentContext
+from fsm.state_inference import get_or_infer_state
+from fsm.utils import get_or_initialize_state
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +49,21 @@ def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
         logger.info(f'Storage sync: creating initial FSM states for {len(task_ids)} tasks')
 
         # Backfill initial CREATED state for each task
+        # TODO: handle connected entities to each task (annotations, predictions, etc)
         for task in tasks:
-            backfill_state_for_entity(task)
+
+            # TODO: use user in entity or user who is importing (CurrentContext)?
+            # # Try to get user from entity
+            # user = None
+            # if hasattr(entity, 'user'):
+            #     user = entity.user
+            # elif hasattr(entity, 'created_by'):
+            #     user = entity.created_by
+            # elif hasattr(entity, 'completed_by'):
+            #     user = entity.completed_by
+
+            inferred_state = get_or_infer_state(task)
+            get_or_initialize_state(task, user=CurrentContext.get_user(), inferred_state=inferred_state)
 
         logger.info(f'Storage sync: FSM states created for {len(task_ids)} tasks')
     except Exception as e:
