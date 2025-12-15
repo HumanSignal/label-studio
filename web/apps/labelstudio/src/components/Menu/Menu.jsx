@@ -2,7 +2,7 @@ import { forwardRef, useCallback, useMemo } from "react";
 import { cn } from "../../utils/bem";
 import { useDropdown } from "@humansignal/ui";
 import "./Menu.scss";
-import { Block, Elem, MenuContext } from "./MenuContext";
+import { MenuContext } from "./MenuContext";
 import { MenuItem } from "./MenuItem";
 
 export const Menu = forwardRef(
@@ -30,25 +30,22 @@ export const Menu = forwardRef(
 
     return (
       <MenuContext.Provider value={{ selected }}>
-        <Block
+        <ul
           ref={ref}
-          tag="ul"
-          name="main-menu"
-          mod={{ size, collapsed, contextual }}
-          mix={className}
+          className={cn("main-menu").mod({ size, collapsed, contextual }).mix(className).toClassName()}
           style={style}
           onClick={clickHandler}
         >
           {children}
-        </Block>
+        </ul>
       </MenuContext.Provider>
     );
   },
 );
 
 Menu.Item = MenuItem;
-Menu.Spacer = () => <Elem block="main-menu" tag="li" name="spacer" />;
-Menu.Divider = () => <Elem block="main-menu" tag="li" name="divider" />;
+Menu.Spacer = () => <li className={cn("main-menu").elem("spacer").toClassName()} />;
+Menu.Divider = () => <li className={cn("main-menu").elem("divider").toClassName()} />;
 Menu.Builder = (url, menuItems) => {
   return (menuItems ?? []).map((item, index) => {
     if (item === "SPACER") return <Menu.Spacer key={index} />;
@@ -85,11 +82,9 @@ Menu.Builder = (url, menuItems) => {
 
 Menu.Group = ({ children, title, className, style }) => {
   return (
-    <Block name="menu-group" mix={className} style={style}>
-      <Elem name="title">{title}</Elem>
-      <Elem tag="ul" name="list">
-        {children}
-      </Elem>
-    </Block>
+    <div className={cn("menu-group").mix(className).toClassName()} style={style}>
+      <div className={cn("menu-group").elem("title").toClassName()}>{title}</div>
+      <ul className={cn("menu-group").elem("list").toClassName()}>{children}</ul>
+    </div>
   );
 };

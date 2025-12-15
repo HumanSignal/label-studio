@@ -34,6 +34,7 @@ const mockStore = {
   settings: {
     enableTooltips: true,
   },
+  task: { id: 1, allow_skip: true },
   skipTask: jest.fn(),
   commentStore: {
     currentComment: {
@@ -118,5 +119,50 @@ describe("Controls", () => {
 
     await expect(mockStore.commentStore.commentFormSubmit).toHaveBeenCalled();
     expect(mockStore.skipTask).toHaveBeenCalled();
+  });
+
+  test("Skip button disabled when allow_skip=false", () => {
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    const skipTask = getByLabelText("skip-task");
+    expect(skipTask).toBeDisabled();
+  });
+
+  test("Skip button enabled when allow_skip=true", () => {
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: true };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    const skipTask = getByLabelText("skip-task");
+    expect(skipTask).not.toBeDisabled();
+  });
+
+  test("Skip action blocked when allow_skip=false", () => {
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+    mockStore.skipTask.mockClear();
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    const skipTask = getByLabelText("skip-task");
+    fireEvent.click(skipTask);
+
+    expect(mockStore.skipTask).not.toHaveBeenCalled();
   });
 });

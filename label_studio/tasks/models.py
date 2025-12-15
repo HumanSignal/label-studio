@@ -97,6 +97,12 @@ class Task(TaskMixin, FsmHistoryStateModel):
         help_text='True if the number of annotations for this task is greater than or equal '
         'to the number of maximum_completions for the project',
     )
+    allow_skip = models.BooleanField(
+        _('allow_skip'),
+        default=True,
+        null=True,
+        help_text='Whether this task can be skipped. Set to False to make task unskippable.',
+    )
     overlap = models.IntegerField(
         _('overlap'),
         default=1,
@@ -210,7 +216,7 @@ class Task(TaskMixin, FsmHistoryStateModel):
             if locked_task:
                 return locked_task
         else:
-            raise Exception('Neither project or tasks passed to get_locked_by')
+            raise ValidationError('Neither project or tasks passed to get_locked_by')
 
         if lock:
             return lock.task
@@ -265,7 +271,7 @@ class Task(TaskMixin, FsmHistoryStateModel):
                 # alien's skipped annotations are not counted at all
                 q = Q(was_cancelled=True) & ~Q(completed_by=user)
             else:
-                raise Exception(f'Invalid SkipQueue value: {self.project.skip_queue}')
+                raise ValidationError(f'Invalid SkipQueue value: {self.project.skip_queue}')
 
             # for LSE we also need to exclude rejected queue
             rejected_q = self.get_rejected_query()

@@ -9,6 +9,9 @@ import { isDefined } from "../../utils/utilities";
 import "./CurrentTask.scss";
 import { reaction } from "mobx";
 
+// Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+const MANAGER_ROLES = ["OW", "AD", "MA"];
+
 export const CurrentTask = observer(({ store }) => {
   const currentIndex = useMemo(() => {
     return store.taskHistory.findIndex((x) => x.taskId === store.task.id) + 1;
@@ -41,13 +44,52 @@ export const CurrentTask = observer(({ store }) => {
   const historyEnabled = store.hasInterface("topbar:prevnext");
   const showCounter = store.hasInterface("topbar:task-counter");
 
-  // @todo some interface?
+  const task = store.task;
+  const taskAllowSkip = task?.allow_skip !== false;
+  const userRole = window.APP_SETTINGS?.user?.role;
+  const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
+  const canSkipOrPostpone = taskAllowSkip || hasForceSkipPermission;
+
+  // Check if user has submitted an annotation (pk is defined means annotation is in database)
+  const hasSubmittedAnnotation = isDefined(store.annotationStore.selected.pk);
+
+  // If task cannot be skipped and user doesn't have force_skip, also disable postpone
+  // Note: store.hasInterface("postpone") is set by lsf-sdk based on task.allow_postpone from API
   let canPostpone =
-    !isDefined(store.annotationStore.selected.pk) &&
+    !hasSubmittedAnnotation &&
     !store.canGoNextTask &&
     (!isFF(FF_LEAP_1173) || store.hasInterface("skip")) &&
     !store.hasInterface("review") &&
-    store.hasInterface("postpone");
+    store.hasInterface("postpone") &&
+    canSkipOrPostpone;
+
+  // For unskippable tasks, force user to submit annotation before navigating
+  // Block both history navigation (next task) and postpone if no annotation submitted
+  const requiresAnnotationSubmission = !taskAllowSkip && !hasForceSkipPermission && !hasSubmittedAnnotation;
+  const canNavigateNext = store.canGoNextTask && !requiresAnnotationSubmission;
+  const canPostponeTask = canPostpone && !requiresAnnotationSubmission;
+
+  // Memoized messages for previous button
+  const prevButtonMessage = useMemo(() => {
+    return !store.canGoPrevTask ? "No previous task" : "Previous task";
+  }, [store.canGoPrevTask]);
+
+  // Memoized messages for next button
+  const nextButtonMessage = useMemo(() => {
+    if (requiresAnnotationSubmission) {
+      return "Submit an annotation to continue";
+    }
+    if (canNavigateNext) {
+      return "Next task";
+    }
+    if (canPostponeTask) {
+      return "Postpone task";
+    }
+    if (!canSkipOrPostpone) {
+      return "Cannot postpone: task cannot be skipped";
+    }
+    return "No next task available";
+  }, [requiresAnnotationSubmission, canNavigateNext, canPostponeTask, canSkipOrPostpone]);
 
   if (store.hasInterface("annotations:comments") && isFF(FF_DEV_4174)) {
     canPostpone = canPostpone && store.commentStore.addedCommentThisSession && visibleComments >= initialCommentLength;
@@ -80,10 +122,10 @@ export const CurrentTask = observer(({ store }) => {
               .mod({ newui: isFF(FF_DEV_3873) })
               .toClassName()}
           >
-            <Tooltip title="Previous Task">
+            <Tooltip title={prevButtonMessage}>
               <Button
                 data-testid="prev-task"
-                aria-label="Previous task"
+                aria-label={prevButtonMessage}
                 look="string"
                 disabled={!historyEnabled || !store.canGoPrevTask}
                 onClick={store.prevTask}
@@ -93,15 +135,15 @@ export const CurrentTask = observer(({ store }) => {
                 size="small"
               />
             </Tooltip>
-            <Tooltip title={!store.canGoNextTask && canPostpone ? "Postpone Task" : "Next Task"}>
+            <Tooltip title={nextButtonMessage}>
               <Button
                 data-testid="next-task"
-                aria-label="Next task"
+                aria-label={nextButtonMessage}
                 look="string"
-                disabled={!store.canGoNextTask && !canPostpone}
-                onClick={store.canGoNextTask ? store.nextTask : store.postponeTask}
+                disabled={!canNavigateNext && !canPostponeTask}
+                onClick={canNavigateNext ? store.nextTask : store.postponeTask}
                 style={{ background: !isFF(FF_DEV_3873) && "none", backgroundColor: isFF(FF_DEV_3873) && "none" }}
-                variant={!store.canGoNextTask && canPostpone ? "primary" : "neutral"}
+                variant={!canNavigateNext && canPostponeTask ? "primary" : "neutral"}
                 leading={<IconChevronRight />}
                 size="small"
               />

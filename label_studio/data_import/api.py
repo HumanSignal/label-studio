@@ -717,10 +717,7 @@ class ReImportAPI(ImportAPI):
                 status=status.HTTP_200_OK,
             )
 
-        if (
-            flag_set('fflag_fix_all_lsdv_4971_async_reimport_09052023_short', request.user)
-            and settings.VERSION_EDITION != 'Community'
-        ):
+        if settings.VERSION_EDITION != 'Community':
             return self.async_reimport(
                 project, file_upload_ids, files_as_tasks_list, request.user.active_organization_id
             )

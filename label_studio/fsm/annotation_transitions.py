@@ -34,7 +34,6 @@ class AnnotationSubmittedTransition(ModelChangeTransition):
         annotation = context.entity
 
         return {
-            'reason': 'Annotation submitted for review',
             'task_id': annotation.task_id,
             'project_id': annotation.project_id,
             'completed_by_id': annotation.completed_by_id,
@@ -100,7 +99,6 @@ class AnnotationUpdatedTransition(ModelChangeTransition):
         annotation = context.entity
 
         return {
-            'reason': 'Annotation updated',
             'task_id': annotation.task_id,
             'project_id': annotation.project_id,
             'updated_by_id': getattr(annotation, 'updated_by_id', None),

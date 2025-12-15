@@ -12,6 +12,8 @@ from django.conf import settings
 from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema_field
 from fsm.serializer_fields import FSMStateField
+from fsm.state_manager import get_state_manager
+from fsm.utils import is_fsm_enabled
 from label_studio_sdk.label_interface import LabelInterface
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -264,7 +266,12 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
             data = instance.data
             replace_task_data_undefined_with_config_field(data, project)
 
-        return super().to_representation(instance)
+        ret = super().to_representation(instance)
+        # Ensure allow_skip is always present in the response, even if None
+        # This is important for frontend logic that checks allow_skip !== false
+        if 'allow_skip' not in ret:
+            ret['allow_skip'] = instance.allow_skip
+        return ret
 
     class Meta:
         model = Task
@@ -654,20 +661,29 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         prev_inner_id = last_task.inner_id if last_task else 0
         max_inner_id = (prev_inner_id + 1) if prev_inner_id else 1
 
+        calculate_is_labeled_with_distinct_annotators = flag_set(
+            'fflag_fix_fit_1082_overlap_use_distinct_annotators', user='auto'
+        )
+
         for i, task in enumerate(validated_tasks):
             cancelled_annotations = len([ann for ann in task_annotations[i] if ann.get('was_cancelled', False)])
             total_annotations = len(task_annotations[i]) - cancelled_annotations
+            if calculate_is_labeled_with_distinct_annotators:
+                current_overlap = len(set([ann.get('completed_by_id') for ann in task_annotations[i]]))
+            else:
+                current_overlap = len(task_annotations[i])
             t = Task(
                 project=self.project,
                 data=task['data'],
                 meta=task.get('meta', {}),
                 overlap=max_overlap,
-                is_labeled=len(task_annotations[i]) >= max_overlap,
+                is_labeled=current_overlap >= max_overlap,
                 file_upload_id=task.get('file_upload_id'),
                 inner_id=None if prev_inner_id is None else max_inner_id + i,
                 total_predictions=len(task_predictions[i]),
                 total_annotations=total_annotations,
                 cancelled_annotations=cancelled_annotations,
+                allow_skip=task.get('allow_skip', True),  # Default to True for backward compatibility
             )
             db_tasks.append(t)
 
@@ -689,7 +705,25 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
         logging.info(f'Tasks serialization success, len = {len(self.db_tasks)}')
 
+        # Backfill FSM states for bulk-created tasks
+        # bulk_create() bypasses save() so FSM transitions don't fire automatically
+        self._backfill_fsm_states(self.db_tasks)
+
         return db_tasks
+
+    def _backfill_fsm_states(self, tasks):
+        """
+        Backfill FSM states for tasks created via bulk_create().
+
+        bulk_create() bypasses the model's save() method, so FSM transitions
+        don't fire automatically. This sets initial CREATED state for newly imported tasks.
+        """
+        if not tasks or not is_fsm_enabled(user=None):
+            return
+
+        StateManager = get_state_manager()
+        for task in tasks:
+            StateManager.execute_transition(entity=task, transition_name='task_created', user=None)
 
     @staticmethod
     def post_process_annotations(user, db_annotations, action):

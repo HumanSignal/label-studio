@@ -117,6 +117,11 @@ def execute_transition_with_state_manager(
     # Phase 1: Prepare and validate the transition
     transition_context_data = transition.prepare_and_validate(context)
 
+    # Merge any additional context_data from TransitionContext
+    # This allows callers to add extra data (e.g., workspace_from_id) to the state record
+    if context.context_data:
+        transition_context_data = {**transition_context_data, **context.context_data}
+
     # Phase 2: Create the state record via StateManager methods (skip for side-effect only transitions)
     if is_side_effect_only:
         # For side-effect only transitions, execute hooks without creating state records
@@ -135,13 +140,16 @@ def execute_transition_with_state_manager(
     # Check if this transition forces state record creation (for audit trails)
     force_state_record = getattr(transition, '_force_state_record', False)
 
+    # Use context.reason if provided (caller override), otherwise use transition's default
+    reason = context.reason if context.reason else transition.get_reason(context)
+
     success = state_manager_class.transition_state(
         entity=entity,
         new_state=target_state,
         transition_name=transition.transition_name,
         user=user,
         context=transition_context_data,
-        reason=transition.get_reason(context),
+        reason=reason,
         force_state_record=force_state_record,
     )
 

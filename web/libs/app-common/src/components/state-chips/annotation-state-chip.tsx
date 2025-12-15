@@ -32,7 +32,12 @@ export function AnnotationStateChip({ state, annotationId, interactive = true }:
   const colorClasses = getStateColorClass(state);
 
   const popoverContent = annotationId ? (
-    <StateHistoryPopoverContent entityType="annotation" entityId={annotationId} isOpen={open} />
+    <StateHistoryPopoverContent
+      entityType="annotation"
+      entityId={annotationId}
+      isOpen={open}
+      onClose={() => setOpen(false)}
+    />
   ) : undefined;
 
   return (

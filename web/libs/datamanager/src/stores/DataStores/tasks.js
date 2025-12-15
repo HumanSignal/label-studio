@@ -34,6 +34,7 @@ export const create = (columns) => {
     // annotation to select on rejected queue
     default_selected_annotation: types.maybeNull(types.number),
     allow_postpone: types.maybeNull(types.boolean),
+    allow_skip: types.optional(types.maybeNull(types.boolean), true),
     unique_lock_id: types.maybeNull(types.string),
     updated_by: types.optional(types.array(Assignee), []),
     ...(isFF(FF_DISABLE_GLOBAL_USER_FETCHING)
