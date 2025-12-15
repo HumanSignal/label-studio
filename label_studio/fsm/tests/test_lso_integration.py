@@ -16,7 +16,7 @@ from django.core.cache import cache
 from fsm.state_choices import AnnotationStateChoices, ProjectStateChoices, TaskStateChoices
 from fsm.state_manager import StateManager, StateManagerError
 from fsm.state_models import AnnotationState, ProjectState, TaskState
-from fsm.utils import get_current_state_safe, is_fsm_enabled, resolve_organization_id
+from fsm.utils import is_fsm_enabled, resolve_organization_id
 from organizations.tests.factories import OrganizationFactory
 from projects.tests.factories import ProjectFactory
 from tasks.models import Annotation
@@ -134,24 +134,6 @@ class TestLSOFSMIntegration:
 
         # States should match
         assert state1 == state2
-
-    def test_get_current_state_safe_with_no_state(self):
-        """
-        Test get_current_state_safe returns None for entities without states.
-
-        Validates:
-        - Utility function handles entities with no state records
-        - No exceptions raised
-        - Returns None gracefully
-        """
-        # Create a project but delete its state records
-        project = ProjectFactory(organization=self.org)
-        ProjectState.objects.filter(project=project).delete()
-        cache.clear()
-
-        # Should return None, not raise
-        state = get_current_state_safe(project)
-        assert state is None
 
     def test_resolve_organization_id_from_entity(self):
         """
@@ -370,23 +352,6 @@ class TestLSOFSMUtilities:
 
         org_id = resolve_organization_id(mock_entity)
         assert org_id == self.org.id
-
-    def test_get_current_state_safe_with_state(self):
-        """
-        Test get_current_state_safe returns correct state value.
-
-        Validates:
-        - Function returns state string (not None)
-        - State value is correct
-        - Works correctly with database query
-        """
-        project = ProjectFactory(organization=self.org)
-        cache.clear()
-
-        # Should return state value string, not None
-        state_value = get_current_state_safe(project)
-        assert state_value is not None
-        assert state_value == ProjectStateChoices.CREATED
 
     def test_state_manager_handles_concurrent_access(self):
         """
