@@ -25,7 +25,7 @@ const { Block, Elem } = BemWithSpecifiContext();
 
 export type GroupingOptions = "manual" | "label" | "type";
 
-export type OrderingOptions = "score" | "date" | "intensity_r" | "intensity_g" | "intensity_b";
+export type OrderingOptions = "score" | "date" | "intensity_r" | "intensity_g" | "intensity_b" | "area" | "bbox_width" | "bbox_height";
 
 export type OrderingDirection = "asc" | "desc";
 
@@ -133,6 +133,36 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             selectedLabel: "By Mean Blue",
             icon: <IconPredictions width={16} height={16} />,
           };
+        case "area":
+          return {
+            label: (
+              <>
+                <IconBoundingBox /> Order by Area
+              </>
+            ),
+            selectedLabel: "By Area",
+            icon: <IconBoundingBox width={16} height={16} />,
+          };
+        case "bbox_width":
+          return {
+            label: (
+              <>
+                <IconBoundingBox /> Order by Width
+              </>
+            ),
+            selectedLabel: "By Width",
+            icon: <IconBoundingBox width={16} height={16} />,
+          };
+        case "bbox_height":
+          return {
+            label: (
+              <>
+                <IconBoundingBox /> Order by Height
+              </>
+            ),
+            selectedLabel: "By Height",
+            icon: <IconBoundingBox width={16} height={16} />,
+          };
       }
     }, []);
 
@@ -151,7 +181,7 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             <Grouping
               value={ordering}
               direction={orderingDirection}
-              options={["score", "date", "intensity_r", "intensity_g", "intensity_b"]}
+              options={["score", "date", "area", "bbox_width", "bbox_height", "intensity_r", "intensity_g", "intensity_b"]}
               onChange={(value) => onOrderingChange(value)}
               readableValueForKey={getOrderingLabels}
               allowClickSelected={false}

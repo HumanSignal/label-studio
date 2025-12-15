@@ -332,6 +332,27 @@ export default types
               return isDesc ? bv - av : av - bv;
             });
           },
+          area: (isDesc) =>
+            [...self.filteredRegions].sort((a, b) => {
+              const aArea = a.meta?.area ?? 0;
+              const bArea = b.meta?.area ?? 0;
+
+              return isDesc ? bArea - aArea : aArea - bArea;
+            }),
+          bbox_width: (isDesc) =>
+            [...self.filteredRegions].sort((a, b) => {
+              const aWidth = a.meta?.bbox?.width ?? 0;
+              const bWidth = b.meta?.bbox?.width ?? 0;
+
+              return isDesc ? bWidth - aWidth : aWidth - bWidth;
+            }),
+          bbox_height: (isDesc) =>
+            [...self.filteredRegions].sort((a, b) => {
+              const aHeight = a.meta?.bbox?.height ?? 0;
+              const bHeight = b.meta?.bbox?.height ?? 0;
+
+              return isDesc ? bHeight - aHeight : aHeight - bHeight;
+            }),
         };
 
         const sorter = sorts[self.sort] || sorts.date;

@@ -205,6 +205,10 @@ export const AreaMixinBase = types
      */
     applyAdditionalDataFromResult(_result) {
       // This method should be overridden if we need to get some additional data from result on deserialize
+      // Merge any geometry metadata (area, bbox) from result into region meta
+      if (_result?.meta) {
+        self.meta = { ...self.meta, ..._result.meta };
+      }
     },
 
     removeResult(r) {

@@ -83,8 +83,27 @@ export const ResultItem: FC<{ result: any }> = observer(({ result }) => {
 });
 
 export const RegionDetailsMain: FC<{ region: any }> = observer(({ region }) => {
+  const meta = region.meta as any;
+  const area = meta?.area;
+  const bbox = meta?.bbox;
+
   return (
     <>
+      {area != null || bbox ? (
+        <Block name="region-meta">
+          <Elem name="result">
+            <Text>Geometry:</Text>
+            <Elem name="value">
+              {area != null && <div>Area (px): {area}</div>}
+              {bbox && (
+                <div>
+                  BBox (px): x={bbox.x}, y={bbox.y}, w={bbox.width}, h={bbox.height}
+                </div>
+              )}
+            </Elem>
+          </Elem>
+        </Block>
+      ) : null}
       <Elem name="result">
         {(region?.results as any[]).map((res) => (
           <ResultItem key={res.pid} result={res} />
