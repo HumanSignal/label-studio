@@ -632,6 +632,8 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             // Handle case where event might be undefined (e.g., from onTransformationEnd)
             if (!e || !e.target || !e.currentTarget) return;
 
+            // Only process if this is actually a transform event on the Group
+            // Shape dragging doesn't transform the Group, so we should skip it
             if (e.target !== e.currentTarget) return;
 
             const t = e.target;
@@ -640,6 +642,24 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             const scaleX = t.getAttr("scaleX", 1);
             const scaleY = t.getAttr("scaleY", 1);
             const rotation = t.getAttr("rotation", 0);
+
+            // Only apply transformation if there's actually a meaningful change
+            // This prevents applying stale transform values from previous operations
+            // Shape dragging doesn't transform the Group, so dx/dy should be 0
+            const hasTranslation = Math.abs(dx) > 0.001 || Math.abs(dy) > 0.001;
+            const hasScale = Math.abs(scaleX - 1) > 0.001 || Math.abs(scaleY - 1) > 0.001;
+            const hasRotation = Math.abs(rotation) > 0.001;
+
+            if (!hasTranslation && !hasScale && !hasRotation) {
+              // No meaningful transformation - just reset and return
+              // This handles the case where onTransformEnd is called after shape dragging
+              t.setAttr("x", 0);
+              t.setAttr("y", 0);
+              t.setAttr("scaleX", 1);
+              t.setAttr("scaleY", 1);
+              t.setAttr("rotation", 0);
+              return;
+            }
 
             // Reset transform attributes
             t.setAttr("x", 0);
@@ -661,6 +681,16 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
               const imageWidth = image?.naturalWidth ?? 0;
               const imageHeight = image?.naturalHeight ?? 0;
+              const pixelSnapping = item.control?.snap === "pixel";
+
+              // Helper function to snap to pixel if enabled
+              const snapToPixel = (point) => {
+                if (!pixelSnapping) return point;
+                return {
+                  x: Math.round(point.x),
+                  y: Math.round(point.y),
+                };
+              };
 
               const transformedVertices = item.vertices.map((point) => {
                 // Step 1: Scale
@@ -672,10 +702,18 @@ const HtxVectorView = observer(({ item, suggestion }) => {
                 const ry = x * sin + y * cos;
 
                 // Step 3: Translate and clamp to image bounds
-                const result = {
-                  ...point,
+                const translatedPos = {
                   x: Math.max(0, Math.min(imageWidth, rx + dx)),
                   y: Math.max(0, Math.min(imageHeight, ry + dy)),
+                };
+
+                // Apply pixel snapping if enabled
+                const snappedPos = snapToPixel(translatedPos);
+
+                const result = {
+                  ...point,
+                  x: snappedPos.x,
+                  y: snappedPos.y,
                 };
 
                 // Transform control points if bezier
@@ -685,20 +723,22 @@ const HtxVectorView = observer(({ item, suggestion }) => {
                     const cp1y = point.controlPoint1.y * scaleY;
                     const cp1rx = cp1x * cos - cp1y * sin;
                     const cp1ry = cp1x * sin + cp1y * cos;
-                    result.controlPoint1 = {
+                    const cp1Translated = {
                       x: Math.max(0, Math.min(imageWidth, cp1rx + dx)),
                       y: Math.max(0, Math.min(imageHeight, cp1ry + dy)),
                     };
+                    result.controlPoint1 = snapToPixel(cp1Translated);
                   }
                   if (point.controlPoint2) {
                     const cp2x = point.controlPoint2.x * scaleX;
                     const cp2y = point.controlPoint2.y * scaleY;
                     const cp2rx = cp2x * cos - cp2y * sin;
                     const cp2ry = cp2x * sin + cp2y * cos;
-                    result.controlPoint2 = {
+                    const cp2Translated = {
                       x: Math.max(0, Math.min(imageWidth, cp2rx + dx)),
                       y: Math.max(0, Math.min(imageHeight, cp2ry + dy)),
                     };
+                    result.controlPoint2 = snapToPixel(cp2Translated);
                   }
                 }
 

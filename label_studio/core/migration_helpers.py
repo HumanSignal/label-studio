@@ -4,6 +4,7 @@ from typing import Callable, Tuple
 from core.redis import start_job_async_or_sync
 from django.conf import settings
 from django.db import connection
+from rq import Retry
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +82,7 @@ def make_sql_migration(
                 sql=sql_forwards,
                 apply_on_sqlite=apply_on_sqlite,
                 reverse=False,
+                retry=Retry(max=3, interval=[60, 300, 1800]),
             )
         else:
             AsyncMigrationStatus = apps.get_model('core', 'AsyncMigrationStatus')
@@ -96,6 +98,7 @@ def make_sql_migration(
             sql=sql_backwards,
             apply_on_sqlite=apply_on_sqlite,
             reverse=True,
+            retry=Retry(max=3, interval=[60, 300, 1800]),
         )
 
     return forwards, backwards
