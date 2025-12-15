@@ -303,7 +303,7 @@ const textNodeLookup = (commonContainer, node, offset, direction = "forward") =>
  * not root, not some previous element with `startOffset` on the last char.
  * @param {Range} range
  */
-const fixRange = (range) => {
+export const fixRange = (range) => {
   const { endOffset, commonAncestorContainer: commonContainer } = range;
   let { startOffset, startContainer, endContainer } = range;
 

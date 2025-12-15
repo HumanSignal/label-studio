@@ -59,7 +59,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          fetch-depth: 2147483647
           ref: ${{ inputs.head_sha }}
 
       - name: Run gitleaks
