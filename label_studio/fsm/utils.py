@@ -276,6 +276,37 @@ def is_fsm_enabled(user=None) -> bool:
     return CurrentContext.is_fsm_enabled()
 
 
+def get_current_state_safe(entity, user=None) -> Optional[str]:
+    """
+    Safely get current state with error handling.
+    Args:
+        entity: The entity to get state for
+        user: The user making the request (for feature flag checking)
+    Returns:
+        Current state string or None if failed
+    """
+    if not is_fsm_enabled(user):
+        return None
+
+    try:
+        from fsm.state_manager import get_state_manager
+
+        StateManager = get_state_manager()
+        return StateManager.get_current_state_value(entity)
+    except Exception as e:
+        logger.warning(
+            f'Failed to get current state for {entity._meta.label_lower} {entity.pk}: {str(e)}',
+            extra={
+                'event': 'fsm.get_state_error',
+                'entity_type': entity._meta.label_lower,
+                'entity_id': entity.pk,
+                'organization_id': resolve_organization_id(entity, user),
+                'error': str(e),
+            },
+        )
+        return None
+
+
 def _get_or_infer_state(entity) -> Optional[str]:
     """
     Infer what the FSM state should be based on entity's current data.
