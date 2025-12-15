@@ -69,7 +69,7 @@ jobs:
         with:
           submodules: 'recursive'
           ref: ${{ inputs.ref }}
-          fetch-depth: 0
+          fetch-depth: 2147483647
 
       - name: Edit Dockerfile
         env:

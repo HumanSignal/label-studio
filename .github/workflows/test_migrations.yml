@@ -96,7 +96,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
-          fetch-depth: 0
+          fetch-depth: 2147483647
 
       - name: "Install poetry"
         run: pipx install "poetry==${{ env.POETRY_VERSION }}"
