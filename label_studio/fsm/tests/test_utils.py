@@ -560,7 +560,9 @@ class TestGetOrInitializeState(TestCase):
         with patch('fsm.utils.is_fsm_enabled', return_value=True):
             with patch('fsm.utils.CurrentContext') as mock_context:
                 mock_context.is_fsm_disabled.return_value = True
-                assert get_or_initialize_state(self.mock_entity, user=None, inferred_state='IN_PROGRESS') == 'IN_PROGRESS'
+                assert (
+                    get_or_initialize_state(self.mock_entity, user=None, inferred_state='IN_PROGRESS') == 'IN_PROGRESS'
+                )
 
     def test_get_or_initialize_state_returns_existing_state(self):
         """If a state already exists, it should be returned and no transition executed."""
@@ -575,7 +577,10 @@ class TestGetOrInitializeState(TestCase):
                     mock_sm.get_current_state_value.return_value = 'EXISTING_STATE'
                     mock_get_sm.return_value = mock_sm
 
-                    assert get_or_initialize_state(self.mock_entity, user=None, inferred_state='IN_PROGRESS') == 'EXISTING_STATE'
+                    assert (
+                        get_or_initialize_state(self.mock_entity, user=None, inferred_state='IN_PROGRESS')
+                        == 'EXISTING_STATE'
+                    )
                     mock_sm.execute_transition.assert_not_called()
 
     def test_get_or_initialize_state_returns_none_when_inference_failed(self):
@@ -608,7 +613,10 @@ class TestGetOrInitializeState(TestCase):
                     mock_get_sm.return_value = mock_sm
 
                     with patch('fsm.utils._get_initialization_transition_name', return_value='init_transition'):
-                        assert get_or_initialize_state(self.mock_entity, user=None, inferred_state='IN_PROGRESS') == 'IN_PROGRESS'
+                        assert (
+                            get_or_initialize_state(self.mock_entity, user=None, inferred_state='IN_PROGRESS')
+                            == 'IN_PROGRESS'
+                        )
 
                         mock_sm.execute_transition.assert_called_once()
                         call_kwargs = mock_sm.execute_transition.call_args[1]
@@ -630,5 +638,7 @@ class TestGetOrInitializeState(TestCase):
                     mock_get_sm.return_value = mock_sm
 
                     with patch('fsm.utils._get_initialization_transition_name', return_value=None):
-                        assert get_or_initialize_state(self.mock_entity, user=None, inferred_state='IN_PROGRESS') is None
+                        assert (
+                            get_or_initialize_state(self.mock_entity, user=None, inferred_state='IN_PROGRESS') is None
+                        )
                         mock_sm.execute_transition.assert_not_called()

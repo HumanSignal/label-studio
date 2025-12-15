@@ -276,7 +276,7 @@ def is_fsm_enabled(user=None) -> bool:
     return CurrentContext.is_fsm_enabled()
 
 
-def infer_entity_state_from_data(entity) -> Optional[str]:
+def _get_or_infer_state(entity) -> Optional[str]:
     """
     Infer what the FSM state should be based on entity's current data.
 
@@ -293,11 +293,11 @@ def infer_entity_state_from_data(entity) -> Optional[str]:
     Examples:
         >>> task = Task.objects.get(id=123)
         >>> task.is_labeled = True
-        >>> infer_entity_state_from_data(task)
+        >>> _get_or_infer_state(task)
         'COMPLETED'
 
         >>> project = Project.objects.get(id=456)
-        >>> infer_entity_state_from_data(project)
+        >>> _get_or_infer_state(project)
         'CREATED'
     """
     from fsm.state_choices import AnnotationStateChoices, ProjectStateChoices, TaskStateChoices
@@ -361,7 +361,8 @@ def get_or_initialize_state(entity, user, inferred_state: str) -> Optional[str]:
 
     Examples:
         >>> task = Task.objects.get(id=123)  # Pre-existing task without state
-        >>> inferred_state = infer_entity_state_from_data(task)
+        >>> from fsm.state_inference import get_or_infer_state
+        >>> inferred_state = get_or_infer_state(task)
         >>> state = get_or_initialize_state(task, user=request.user, inferred_state=inferred_state)
         >>> # state is now 'COMPLETED' or 'CREATED' based on task.is_labeled
         >>> # and a state record has been created
