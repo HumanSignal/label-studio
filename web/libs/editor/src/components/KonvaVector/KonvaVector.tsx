@@ -279,6 +279,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // This ensures applyTransformationToPoints always uses the latest points
   const currentPointsRef = useRef<BezierPoint[]>(initialPoints);
 
+  // Ref to store updatePoints function to ensure it's accessible in closures
+  const updatePointsRef = useRef<((points: BezierPoint[]) => void) | null>(null);
+
   // Update ref whenever initialPoints state changes
   useEffect(() => {
     currentPointsRef.current = initialPoints;
@@ -1054,6 +1057,11 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
     },
     [onPointsChange],
   );
+
+  // Store updatePoints in ref for access in closures
+  useEffect(() => {
+    updatePointsRef.current = updatePoints;
+  }, [updatePoints]);
 
   // Function to update current points ref - used by VectorTransformer during transformation
   const updateCurrentPointsRef = useCallback((points: BezierPoint[]) => {
@@ -2700,6 +2708,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         shapeDragDistance.current = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
         // Apply delta to all points
+        // IMPORTANT: Do NOT apply pixel snapping during dragging - it causes points to collapse
+        // Pixel snapping will be applied when dragging ends (in handleStageMouseUp)
         const newPoints = initialPoints.map((point, index) => {
           const original = originalPointsPositions.current[index];
           if (!original) return point;
@@ -2707,13 +2717,10 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           const newX = original.x + deltaX;
           const newY = original.y + deltaY;
 
-          // Apply pixel snapping if enabled
-          const snappedPos = snapToPixel({ x: newX, y: newY }, pixelSnapping);
-
           const updatedPoint = {
             ...point,
-            x: snappedPos.x,
-            y: snappedPos.y,
+            x: newX,
+            y: newY,
           };
 
           // Move control points with the anchor point
@@ -2721,23 +2728,23 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             if (original.controlPoint1) {
               const cp1X = original.controlPoint1.x + deltaX;
               const cp1Y = original.controlPoint1.y + deltaY;
-              const snappedCP1 = snapToPixel({ x: cp1X, y: cp1Y }, pixelSnapping);
-              updatedPoint.controlPoint1 = snappedCP1;
+              updatedPoint.controlPoint1 = { x: cp1X, y: cp1Y };
             }
             if (original.controlPoint2) {
               const cp2X = original.controlPoint2.x + deltaX;
               const cp2Y = original.controlPoint2.y + deltaY;
-              const snappedCP2 = snapToPixel({ x: cp2X, y: cp2Y }, pixelSnapping);
-              updatedPoint.controlPoint2 = snappedCP2;
+              updatedPoint.controlPoint2 = { x: cp2X, y: cp2Y };
             }
           }
 
           return updatedPoint;
         });
 
-        // Apply bounds checking to all points
+        // Apply bounds checking to preserve relative positions
         const constrainedPoints = constrainAnchorPointsToBounds(newPoints as BezierPoint[], { width, height });
 
+        // Do NOT apply pixel snapping here - it will cause points to collapse
+        // Pixel snapping will be applied once when dragging ends
         onPointsChange?.(constrainedPoints as BezierPoint[]);
         return; // Don't process other logic when dragging shape
       }
@@ -2944,6 +2951,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         activePointId,
         disabled,
         onFinish,
+        pixelSnapping,
+        width,
+        height,
       } = currentValuesRef.current;
 
       // Prevent all interactions when disabled
@@ -2958,6 +2968,113 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
 
         setIsDraggingShape(false);
         handleTransformEnd(e);
+
+        // Apply pixel snapping when dragging ends (if enabled)
+        // CRITICAL: Snap all points while preventing collapse by preserving relative positions
+        if (pixelSnapping && currentPointsRef.current.length > 0) {
+          // Get the current points (they were updated during dragging without snapping)
+          // Use currentPointsRef to get the latest points immediately
+          const currentPoints = currentPointsRef.current;
+
+          // Snap the first point
+          const firstPoint = currentPoints[0];
+          const snappedFirstPos = snapToPixel({ x: firstPoint.x, y: firstPoint.y }, pixelSnapping);
+
+          // For all points, snap individually but check for collisions
+          const snappedPoints: BezierPoint[] = [];
+          const snappedPositions = new Map<number, { x: number; y: number }>(); // Track snapped positions by index
+
+          for (let i = 0; i < currentPoints.length; i++) {
+            const point = currentPoints[i];
+
+            if (i === 0) {
+              // First point - use snapped position directly
+              const snappedPoint: BezierPoint = {
+                ...point,
+                x: snappedFirstPos.x,
+                y: snappedFirstPos.y,
+              };
+
+              // Snap control points if bezier
+              if (point.isBezier) {
+                if (point.controlPoint1) {
+                  snappedPoint.controlPoint1 = snapToPixel(point.controlPoint1, pixelSnapping);
+                }
+                if (point.controlPoint2) {
+                  snappedPoint.controlPoint2 = snapToPixel(point.controlPoint2, pixelSnapping);
+                }
+              }
+
+              snappedPoints.push(snappedPoint);
+              snappedPositions.set(i, { x: snappedFirstPos.x, y: snappedFirstPos.y });
+            } else {
+              // Subsequent points - snap individually first
+              let snappedPos = snapToPixel({ x: point.x, y: point.y }, pixelSnapping);
+
+              // Check if this snapped position would collide with any previously snapped point
+              let wouldCollapse = false;
+              for (let j = 0; j < i; j++) {
+                const prevSnapped = snappedPositions.get(j);
+                if (prevSnapped) {
+                  const snappedDistance = Math.sqrt(
+                    (snappedPos.x - prevSnapped.x) ** 2 + (snappedPos.y - prevSnapped.y) ** 2,
+                  );
+                  const originalDistance = Math.sqrt(
+                    (point.x - currentPoints[j].x) ** 2 + (point.y - currentPoints[j].y) ** 2,
+                  );
+
+                  // If snapped positions would be the same but original positions were different,
+                  // preserve relative offset to prevent collapse
+                  if (snappedDistance < 0.1 && originalDistance > 0.1) {
+                    wouldCollapse = true;
+                    // Preserve relative offset from first point
+                    const relativeX = point.x - firstPoint.x;
+                    const relativeY = point.y - firstPoint.y;
+                    snappedPos = {
+                      x: snappedFirstPos.x + relativeX,
+                      y: snappedFirstPos.y + relativeY,
+                    };
+                    break;
+                  }
+                }
+              }
+
+              const snappedPoint: BezierPoint = {
+                ...point,
+                x: snappedPos.x,
+                y: snappedPos.y,
+              };
+
+              // Snap control points if bezier
+              if (point.isBezier) {
+                if (point.controlPoint1) {
+                  snappedPoint.controlPoint1 = snapToPixel(point.controlPoint1, pixelSnapping);
+                }
+                if (point.controlPoint2) {
+                  snappedPoint.controlPoint2 = snapToPixel(point.controlPoint2, pixelSnapping);
+                }
+              }
+
+              snappedPoints.push(snappedPoint);
+              snappedPositions.set(i, { x: snappedPos.x, y: snappedPos.y });
+            }
+          }
+
+          const finalSnappedPoints = snappedPoints;
+
+          // Apply bounds checking after snapping
+          const constrainedSnappedPoints = constrainAnchorPointsToBounds(finalSnappedPoints as BezierPoint[], {
+            width,
+            height,
+          });
+
+          // Update points with snapped positions using updatePoints to ensure proper state management
+          // Use ref to ensure we have the latest updatePoints function
+          if (updatePointsRef.current) {
+            updatePointsRef.current(constrainedSnappedPoints as BezierPoint[]);
+          }
+        }
+
         shapeDragStartPos.current = null;
         originalPointsPositions.current = [];
 

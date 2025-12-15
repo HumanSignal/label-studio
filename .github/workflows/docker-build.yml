@@ -106,7 +106,7 @@ jobs:
         with:
           submodules: 'recursive'
           ref: ${{ inputs.sha }}
-          fetch-depth: 0
+          fetch-depth: 2147483647
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.11.1
@@ -169,7 +169,7 @@ jobs:
           touch "${{ runner.temp }}/digests/${digest#sha256:}"
     
       - name: Upload digest
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: digests-${{ env.PLATFORM_PAIR }}
           path: ${{ runner.temp }}/digests/*
@@ -183,7 +183,7 @@ jobs:
       - calculate_version
     steps:
       - name: Download digests
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: ${{ runner.temp }}/digests
           pattern: digests-*
