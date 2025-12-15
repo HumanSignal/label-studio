@@ -6,6 +6,7 @@ import { AllRegionsType } from "../regions";
 import { debounce } from "../utils/debounce";
 import Tree, { TRAVERSE_STOP } from "../core/Tree";
 import { FF_DEV_2755, isFF } from "../utils/feature-flags";
+import { computeColorIntensities, parseTextareaMeans } from "../utils/intensity";
 
 const hotkeys = Hotkey("RegionStore");
 
@@ -135,7 +136,7 @@ const SelectionMap = types
 export default types
   .model("RegionStore", {
     sort: types.optional(
-      types.enumeration(["date", "score"]),
+      types.enumeration(["date", "score", "intensity_gray", "intensity_r", "intensity_g", "intensity_b"]),
       window.localStorage.getItem(localStorageKeys.sort) ?? "date",
     ),
 
@@ -159,6 +160,45 @@ export default types
   })
   .views((self) => {
     let lastClickedItem;
+    const getRegionIntensityFromText = (region) => {
+      const results = region?.results || [];
+      const meanResult = results.find(
+        (result) => result?.type === "textarea" && result?.from_name?.name === "mean_intensity",
+      );
+
+      if (!meanResult || !meanResult.value) return null;
+
+      const parsed = parseTextareaMeans(meanResult.value.text);
+
+      if (!parsed) return null;
+
+      const { gray, r, g, b } = parsed;
+      const hasAny =
+        (typeof gray === "number" && !Number.isNaN(gray)) ||
+        (typeof r === "number" && !Number.isNaN(r)) ||
+        (typeof g === "number" && !Number.isNaN(g)) ||
+        (typeof b === "number" && !Number.isNaN(b));
+
+      if (!hasAny) return null;
+
+      return {
+        gray: typeof gray === "number" && !Number.isNaN(gray) ? gray : 0,
+        r: typeof r === "number" && !Number.isNaN(r) ? r : 0,
+        g: typeof g === "number" && !Number.isNaN(g) ? g : 0,
+        b: typeof b === "number" && !Number.isNaN(b) ? b : 0,
+      };
+    };
+
+    const getRegionIntensities = (region) => {
+      const fromText = getRegionIntensityFromText(region);
+
+      if (fromText) return fromText;
+
+      const colorSource = region?.background ?? (region?.getOneColor ? region.getOneColor() : "#666") ?? "#666";
+
+      return computeColorIntensities(colorSource);
+    };
+
     const getShiftClickSelectedRange = (item, tree) => {
       const regions = [];
       let clickedRegionsFound = 0;
@@ -238,9 +278,74 @@ export default types
             [...self.filteredRegions].sort(isDesc ? (a, b) => b.ouid - a.ouid : (a, b) => a.ouid - b.ouid),
           score: (isDesc) =>
             [...self.filteredRegions].sort(isDesc ? (a, b) => b.score - a.score : (a, b) => a.score - b.score),
+          intensity_gray: (isDesc) => {
+            const intensities = new Map();
+
+            self.filteredRegions.forEach((region) => {
+              intensities.set(region.id, getRegionIntensities(region));
+            });
+
+            return [...self.filteredRegions].sort((a, b) => {
+              const ia = intensities.get(a.id);
+              const ib = intensities.get(b.id);
+              const av = ia?.gray ?? 0;
+              const bv = ib?.gray ?? 0;
+
+              return isDesc ? bv - av : av - bv;
+            });
+          },
+          intensity_r: (isDesc) => {
+            const intensities = new Map();
+
+            self.filteredRegions.forEach((region) => {
+              intensities.set(region.id, getRegionIntensities(region));
+            });
+
+            return [...self.filteredRegions].sort((a, b) => {
+              const ia = intensities.get(a.id);
+              const ib = intensities.get(b.id);
+              const av = ia?.r ?? 0;
+              const bv = ib?.r ?? 0;
+
+              return isDesc ? bv - av : av - bv;
+            });
+          },
+          intensity_g: (isDesc) => {
+            const intensities = new Map();
+
+            self.filteredRegions.forEach((region) => {
+              intensities.set(region.id, getRegionIntensities(region));
+            });
+
+            return [...self.filteredRegions].sort((a, b) => {
+              const ia = intensities.get(a.id);
+              const ib = intensities.get(b.id);
+              const av = ia?.g ?? 0;
+              const bv = ib?.g ?? 0;
+
+              return isDesc ? bv - av : av - bv;
+            });
+          },
+          intensity_b: (isDesc) => {
+            const intensities = new Map();
+
+            self.filteredRegions.forEach((region) => {
+              intensities.set(region.id, getRegionIntensities(region));
+            });
+
+            return [...self.filteredRegions].sort((a, b) => {
+              const ia = intensities.get(a.id);
+              const ib = intensities.get(b.id);
+              const av = ia?.b ?? 0;
+              const bv = ib?.b ?? 0;
+
+              return isDesc ? bv - av : av - bv;
+            });
+          },
         };
 
-        const sorted = sorts[self.sort](self.sortOrder === "desc");
+        const sorter = sorts[self.sort] || sorts.date;
+        const sorted = sorter(self.sortOrder === "desc");
 
         return sorted;
       },
