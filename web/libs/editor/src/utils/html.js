@@ -531,32 +531,25 @@ function sanitizeHtml(html = []) {
 
   // Helper function to validate if iframe src is from an allowed domain
   const isAllowedIframeSrc = (src) => {
-    console.log("[isAllowedIframeSrc] Checking src:", src);
     if (!src) {
-      console.log("[isAllowedIframeSrc] No src provided, blocking");
+      console.error("[isAllowedIframeSrc] No src provided, blocking");
       return false;
-    }
-
-    // Allow template variables (e.g., $partner_public_url) - they'll be validated after substitution
-    if (src.startsWith("$")) {
-      console.log("[isAllowedIframeSrc] Template variable detected, allowing:", src);
-      return true;
     }
 
     try {
       const url = new URL(src);
       // Only allow HTTPS for security
       if (url.protocol !== "https:") {
-        console.log("[isAllowedIframeSrc] Not HTTPS, blocking");
+        console.error("[isAllowedIframeSrc] Not HTTPS, blocking");
         return false;
       }
       // Check if hostname matches any allowed domain
       const isAllowed = ALLOWED_IFRAME_DOMAINS.includes(url.hostname);
-      console.log("[isAllowedIframeSrc] Hostname check:", url.hostname, "allowed:", isAllowed);
+      console.error("[isAllowedIframeSrc] Hostname check:", url.hostname, "allowed:", isAllowed);
       return isAllowed;
     } catch (e) {
       // Invalid URL format
-      console.log("[isAllowedIframeSrc] Invalid URL format:", e.message);
+      console.error("[isAllowedIframeSrc] Invalid URL format:", e.message);
       return false;
     }
   };
@@ -660,9 +653,6 @@ function sanitizeHtml(html = []) {
     disallowedTagsMode: "discard",
     allowVulnerableTags: true,
     exclusiveFilter(frame) {
-      // Block scripts unconditionally
-      if (frame.tag === "script") return true;
-
       // For iframes, only block if NOT from whitelisted domain
       if (frame.tag === "iframe") {
         const src = frame.attribs?.src;
@@ -675,28 +665,9 @@ function sanitizeHtml(html = []) {
     nonTextTags: ["script", "textarea", "option", "noscript"],
     transformTags: {
       iframe: (tagName, attribs) => {
-        // Only allow specific safe attributes for iframes
-        const allowedIframeAttribs = {};
-        const safeAttrs = [
-          "src",
-          "width",
-          "height",
-          "frameborder",
-          "allowfullscreen",
-          "allow",
-          "title",
-          "referrerpolicy",
-        ];
-
-        safeAttrs.forEach((attr) => {
-          if (attribs[attr]) {
-            allowedIframeAttribs[attr] = attribs[attr];
-          }
-        });
-
         return {
           tagName,
-          attribs: allowedIframeAttribs,
+          attribs,
         };
       },
       "*": (tagName, attribs) => {
