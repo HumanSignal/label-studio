@@ -546,6 +546,8 @@ export default types
     toggleSortOrder() {
       if (self.sortOrder === "asc") self.sortOrder = "desc";
       else self.sortOrder = "asc";
+
+      window.localStorage.setItem(localStorageKeys.sortDirection, self.sortOrder);
     },
 
     setView(view) {
@@ -556,9 +558,7 @@ export default types
     },
 
     setSort(sort) {
-      if (self.sort === sort) {
-        self.toggleSortOrder();
-      } else {
+      if (self.sort !== sort) {
         self.sortOrder = "asc";
         self.sort = sort;
       }

@@ -34,12 +34,13 @@ interface ViewControlsProps {
   orderingDirection?: OrderingDirection;
   regions: any;
   onOrderingChange: (ordering: OrderingOptions) => void;
+  onOrderingDirectionToggle: () => void;
   onGroupingChange: (grouping: GroupingOptions) => void;
   onFilterChange: (filter: any) => void;
 }
 
 export const ViewControls: FC<ViewControlsProps> = observer(
-  ({ ordering, regions, orderingDirection, onOrderingChange, onGroupingChange, onFilterChange }) => {
+  ({ ordering, regions, orderingDirection, onOrderingChange, onOrderingDirectionToggle, onGroupingChange, onFilterChange }) => {
     const grouping = regions.group;
     const context = useContext(SidePanelsContext);
     const getGroupingLabels = useCallback((value: GroupingOptions): LabelInfo => {
@@ -163,9 +164,18 @@ export const ViewControls: FC<ViewControlsProps> = observer(
               options={["score", "date", "intensity_gray", "intensity_r", "intensity_g", "intensity_b"]}
               onChange={(value) => onOrderingChange(value)}
               readableValueForKey={getOrderingLabels}
-              allowClickSelected
-              extraIcon={renderOrderingDirectionIcon}
+              allowClickSelected={false}
             />
+            <Elem
+              tag={Button}
+              type="text"
+              onClick={onOrderingDirectionToggle}
+              aria-label={orderingDirection === "asc" ? "Sort descending" : "Sort ascending"}
+              tooltip={orderingDirection === "asc" ? "High to low" : "Low to high"}
+              tooltipTheme="dark"
+            >
+              {renderOrderingDirectionIcon}
+            </Elem>
           </Elem>
         )}
         <ToggleRegionsVisibilityButton regions={regions} />

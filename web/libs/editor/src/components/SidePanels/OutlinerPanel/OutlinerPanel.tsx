@@ -38,6 +38,9 @@ const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) =
     },
     [regions],
   );
+  const onOrderingDirectionToggle = useCallback(() => {
+    regions.toggleSortOrder();
+  }, [regions]);
 
   const onGroupingChange = useCallback(
     (value: GroupingOptions) => {
@@ -67,6 +70,7 @@ const OutlinerPanelComponent: FC<OutlinerPanelProps> = ({ regions, ...props }) =
         regions={regions}
         orderingDirection={regions.sortOrder}
         onOrderingChange={onOrderingChange}
+        onOrderingDirectionToggle={onOrderingDirectionToggle}
         onGroupingChange={onGroupingChange}
         onFilterChange={onFilterChange}
       />
@@ -82,6 +86,9 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
     },
     [regions],
   );
+  const onOrderingDirectionToggle = useCallback(() => {
+    regions.toggleSortOrder();
+  }, [regions]);
 
   const onGroupingChange = useCallback(
     (value: GroupingOptions) => {
@@ -104,6 +111,7 @@ const OutlinerStandAlone: FC<OutlinerPanelProps> = ({ regions }) => {
         regions={regions}
         orderingDirection={regions.sortOrder}
         onOrderingChange={onOrderingChange}
+        onOrderingDirectionToggle={onOrderingDirectionToggle}
         onGroupingChange={onGroupingChange}
         onFilterChange={onFilterChange}
       />
