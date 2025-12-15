@@ -156,9 +156,11 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     :param job: Job function
     :param args: Function arguments
     :param in_seconds: Job will be delayed for in_seconds
+    :param retry: RQ Retry object or int (max retries). Only used in async mode.
     :param kwargs: Function keywords arguments
     :return: Job or function result
     """
+    from rq import Retry
 
     redis = redis_connected() and kwargs.get('redis', True)
     queue_name = kwargs.get('queue_name', 'default')
@@ -172,6 +174,13 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
     if 'job_timeout' in kwargs:
         job_timeout = kwargs['job_timeout']
         del kwargs['job_timeout']
+
+    retry = None
+    if 'retry' in kwargs:
+        retry = kwargs['retry']
+        del kwargs['retry']
+        if isinstance(retry, int):
+            retry = Retry(max=retry)
 
     if redis:
         # Async execution with Redis - wrap job for context management
@@ -202,6 +211,7 @@ def start_job_async_or_sync(job, *args, in_seconds=0, **kwargs):
             **kwargs,
             job_timeout=job_timeout,
             failure_ttl=settings.RQ_FAILED_JOB_TTL,
+            retry=retry,
         )
         return job
     else:
