@@ -40,7 +40,7 @@ jobs:
 
       - name: Cache gitleaks archive
         id: cache_gitleaks
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /usr/local/bin/gitleaks
           key: gitleaks-${{ env.PLATFORM }}-${{ env.GITLEAKS_VERSION }}
@@ -59,7 +59,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          fetch-depth: 2147483647
           ref: ${{ inputs.head_sha }}
 
       - name: Run gitleaks
@@ -79,7 +79,7 @@ jobs:
 
       - name: Upload test results
         if: failure()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: GitLeaks results
           path: results.sarif

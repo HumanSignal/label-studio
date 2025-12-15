@@ -44,7 +44,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof DialogPrimitive.Co
         <DialogPrimitive.Content
           ref={ref}
           className={cn(
-            "fixed z-50 flex flex-col bg-neutral-surface shadow-lg border-neutral-border transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+            "fixed z-50 flex flex-col bg-neutral-surface shadow-lg border-neutral-border transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500 focus:outline-none",
             side === "top" &&
               "inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
             side === "bottom" &&
@@ -56,6 +56,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof DialogPrimitive.Co
             className,
           )}
           onInteractOutside={closeOnClickOutside ? undefined : (e) => e.preventDefault()}
+          tabIndex={-1}
           {...props}
         >
           {children}
