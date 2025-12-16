@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import CM from "codemirror";
 import { Button, cnm } from "@humansignal/ui";
 import { IconTrash } from "@humansignal/icons";
@@ -18,6 +18,8 @@ import tags from "@humansignal/core/lib/utils/schema/tags.json";
 import { UnsavedChanges } from "./UnsavedChanges";
 import { Checkbox, CodeEditor, Select } from "@humansignal/ui";
 import snakeCase from "lodash/snakeCase";
+import { useConfigResizer } from "./useConfigResizer";
+import { ConfigResizer } from "./ConfigResizer";
 
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
@@ -352,6 +354,34 @@ const Configurator = ({
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
   const [waiting, setWaiting] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
+  const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(undefined);
+
+  // Resizer hook
+  const { previewWidthPercent, setPreviewWidthPercent, constraints } = useConfigResizer({
+    projectId: project?.id,
+    containerWidth,
+  });
+
+  // Track container width for resizer constraints
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.clientWidth);
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(containerRef.current);
+
+    updateWidth();
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   // config update is debounced because of user input
   const [configToCheck, setConfigToCheck] = React.useState();
@@ -485,95 +515,106 @@ const Configurator = ({
 
   return (
     <div className={configClass}>
-      <div className={configClass.elem("container")}>
-        <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
-        <header>
-          <Button
-            type="button"
-            data-leave={true}
-            onClick={onBrowse}
-            size="small"
-            look="outlined"
-            aria-label="Browse templates"
-          >
-            Browse Templates
-          </Button>
-          <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
-        </header>
-        <div className={configClass.elem("editor")}>
-          {configure === "code" && (
-            <div className={configClass.elem("code")} style={{ display: configure === "code" ? undefined : "none" }}>
-              <CodeEditor
-                name="code"
-                id="edit_code"
-                value={config}
-                autoCloseTags={true}
-                smartIndent={true}
-                detach
-                border
-                extensions={["hint", "xml-hint"]}
-                options={{
-                  mode: "xml",
-                  theme: "default",
-                  lineNumbers: true,
-                  extraKeys: {
-                    "'<'": completeAfter,
-                    // "'/'": completeIfAfterLt,
-                    "' '": completeIfInTag,
-                    "'='": completeIfInTag,
-                    "Ctrl-Space": "autocomplete",
-                  },
-                  hintOptions: { schemaInfo: tags },
-                }}
-                // don't close modal with Escape while editing config
-                onKeyDown={(editor, e) => {
-                  if (e.code === "Escape") e.stopPropagation();
-                }}
-                onChange={(editor, data, value) => onChange(value)}
-              />
-            </div>
-          )}
-          {visualLoaded && (
-            <div
-              className={configClass.elem("visual")}
-              style={{ display: configure === "visual" ? undefined : "none" }}
+      <div className={configClass.elem("container")} ref={containerRef} style={{ display: "flex", position: "relative" }}>
+        <div style={{ width: `${100 - previewWidthPercent}%`, minWidth: `${constraints.minEditorPercent}%`, display: "flex", flexDirection: "column" }}>
+          <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
+          <header>
+            <Button
+              type="button"
+              data-leave={true}
+              onClick={onBrowse}
+              size="small"
+              look="outlined"
+              aria-label="Browse templates"
             >
-              {isEmptyConfig(config) && <EmptyConfigPlaceholder />}
-              <ConfigureColumns columns={columns} project={project} template={template} />
-              {template.controls.map((control) => (
-                <ConfigureControl control={control} template={template} key={control.getAttribute("name")} />
-              ))}
-              <ConfigureSettings template={template} />
-            </div>
-          )}
-        </div>
-        {disableSaveButton !== true && onSaveClick && (
-          <Form.Actions size="small" extra={configure === "code" && extra} valid>
-            {saved && (
-              <div className={cn("form-indicator").toClassName()}>
-                <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()}>Saved!</span>
+              Browse Templates
+            </Button>
+            <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
+          </header>
+          <div className={configClass.elem("editor")}>
+            {configure === "code" && (
+              <div className={configClass.elem("code")} style={{ display: configure === "code" ? undefined : "none" }}>
+                <CodeEditor
+                  name="code"
+                  id="edit_code"
+                  value={config}
+                  autoCloseTags={true}
+                  smartIndent={true}
+                  detach
+                  border
+                  extensions={["hint", "xml-hint"]}
+                  options={{
+                    mode: "xml",
+                    theme: "default",
+                    lineNumbers: true,
+                    extraKeys: {
+                      "'<'": completeAfter,
+                      // "'/'": completeIfAfterLt,
+                      "' '": completeIfInTag,
+                      "'='": completeIfInTag,
+                      "Ctrl-Space": "autocomplete",
+                    },
+                    hintOptions: { schemaInfo: tags },
+                  }}
+                  // don't close modal with Escape while editing config
+                  onKeyDown={(editor, e) => {
+                    if (e.code === "Escape") e.stopPropagation();
+                  }}
+                  onChange={(editor, data, value) => onChange(value)}
+                />
               </div>
             )}
-            <Button
-              size="small"
-              className="w-[120px]"
-              onClick={onSave}
-              waiting={waiting}
-              aria-label="Save configuration"
-            >
-              {waiting ? "Saving..." : "Save"}
-            </Button>
-            {isFF(FF_UNSAVED_CHANGES) && <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />}
-          </Form.Actions>
-        )}
+            {visualLoaded && (
+              <div
+                className={configClass.elem("visual")}
+                style={{ display: configure === "visual" ? undefined : "none" }}
+              >
+                {isEmptyConfig(config) && <EmptyConfigPlaceholder />}
+                <ConfigureColumns columns={columns} project={project} template={template} />
+                {template.controls.map((control) => (
+                  <ConfigureControl control={control} template={template} key={control.getAttribute("name")} />
+                ))}
+                <ConfigureSettings template={template} />
+              </div>
+            )}
+          </div>
+          {disableSaveButton !== true && onSaveClick && (
+            <Form.Actions size="small" extra={configure === "code" && extra} valid>
+              {saved && (
+                <div className={cn("form-indicator").toClassName()}>
+                  <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()}>Saved!</span>
+                </div>
+              )}
+              <Button
+                size="small"
+                className="w-[120px]"
+                onClick={onSave}
+                waiting={waiting}
+                aria-label="Save configuration"
+              >
+                {waiting ? "Saving..." : "Save"}
+              </Button>
+              {isFF(FF_UNSAVED_CHANGES) && <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />}
+            </Form.Actions>
+          )}
+        </div>
+        <div style={{ width: `${previewWidthPercent}%`, minWidth: `${constraints.minPreviewPercent}%`, position: "relative" }}>
+          <ConfigResizer
+            containerRef={containerRef}
+            previewWidthPercent={previewWidthPercent}
+            onResize={setPreviewWidthPercent}
+            onResizeFinished={setPreviewWidthPercent}
+            constraints={constraints}
+          />
+          <Preview
+            config={configToDisplay}
+            data={data}
+            project={project}
+            loading={loading}
+            error={parserError || error || (configure === "code" && warning)}
+          />
+        </div>
       </div>
-      <Preview
-        config={configToDisplay}
-        data={data}
-        project={project}
-        loading={loading}
-        error={parserError || error || (configure === "code" && warning)}
-      />
     </div>
   );
 };
