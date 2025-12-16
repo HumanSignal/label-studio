@@ -21,7 +21,7 @@ flowchart TD
     B3 -- no --> B4{"LSE low-agreement path?<br/>fflag OPTIC-161<br/>agreement_threshold set<br/>user is annotator"}
     B4 -- yes --> B6["Filter by agreement threshold<br/>and annotator capacity"] --> B7[Optionally prioritize by low agreement]
 
-    B4 -- no --> B8{"Evaluation mode?<br/>fflag ALL-LEAP-1825<br/>show_ground_truth_first"}
+    B4 -- no --> B8{"Evaluation mode?<br/>fflag ALL-LEAP-1825<br/>annotator_evaluation_enabled"}
     B8 -- yes --> B7
     B8 -- no --> B9[Filter: is_labeled=false] --> B7
   end
@@ -69,9 +69,7 @@ flowchart TD
 
 ### GT-first gating
 - `should_attempt_ground_truth_first(user, project)` returns true when:
-  - `show_ground_truth_first=True` and either no `lse_project` or `annotator_evaluation_minimum_tasks` is not set, or
-  - the user's completed GT-equipped tasks < `annotator_evaluation_minimum_tasks`, or
-  - minimum tasks reached but the user's GT agreement score is missing or below `annotator_evaluation_minimum_score` (percent).
+  - `annotator_evaluation_enabled=True` and `annotator_evaluation_onboarding_tasks > 0` and the user's completed GT-equipped tasks < `annotator_evaluation_onboarding_tasks`.
 - Otherwise returns false (GT-first disabled; proceed via low-agreement/overlap/sampling).
 
 ## Queue labels appended to response

@@ -54,35 +54,40 @@ ProjectImportPermission = load_func(settings.PROJECT_IMPORT_PERMISSION)
 
 task_create_response_scheme = {
     201: OpenApiResponse(
-        description='Tasks successfully imported',
+        description='Tasks successfully imported or import queued. **For non-Community editions**, the response will be `{"import": <import_id>}` which you can use to poll the import status. **For Community edition**, the response contains task counts and is processed synchronously.',
         response={
             'title': 'Task creation response',
-            'description': 'Task creation response',
+            'description': 'Response format varies by edition. Non-Community editions return `{"import": <import_id>}` for async processing. Community edition returns the detailed response below with task counts.',
             'type': 'object',
             'properties': {
+                'import': {
+                    'title': 'import',
+                    'description': 'Import ID for async operations (non-Community editions only). Use this ID to poll `/api/projects/{project_id}/imports/{import_id}` for status.',
+                    'type': 'integer',
+                },
                 'task_count': {
                     'title': 'task_count',
-                    'description': 'Number of tasks added',
+                    'description': 'Number of tasks added (Community edition sync import only)',
                     'type': 'integer',
                 },
                 'annotation_count': {
                     'title': 'annotation_count',
-                    'description': 'Number of annotations added',
+                    'description': 'Number of annotations added (Community edition sync import only)',
                     'type': 'integer',
                 },
                 'predictions_count': {
                     'title': 'predictions_count',
-                    'description': 'Number of predictions added',
+                    'description': 'Number of predictions added (Community edition sync import only)',
                     'type': 'integer',
                 },
                 'duration': {
                     'title': 'duration',
-                    'description': 'Time in seconds to create',
+                    'description': 'Time in seconds to create (Community edition sync import only)',
                     'type': 'number',
                 },
                 'file_upload_ids': {
                     'title': 'file_upload_ids',
-                    'description': 'Database IDs of uploaded files',
+                    'description': 'Database IDs of uploaded files (Community edition sync import only)',
                     'type': 'array',
                     'items': {
                         'title': 'File Upload IDs',
@@ -91,12 +96,12 @@ task_create_response_scheme = {
                 },
                 'could_be_tasks_list': {
                     'title': 'could_be_tasks_list',
-                    'description': 'Whether uploaded files can contain lists of tasks, like CSV/TSV files',
+                    'description': 'Whether uploaded files can contain lists of tasks, like CSV/TSV files (Community edition sync import only)',
                     'type': 'boolean',
                 },
                 'found_formats': {
                     'title': 'found_formats',
-                    'description': 'The list of found file formats',
+                    'description': 'The list of found file formats (Community edition sync import only)',
                     'type': 'array',
                     'items': {
                         'title': 'File format',
@@ -105,7 +110,7 @@ task_create_response_scheme = {
                 },
                 'data_columns': {
                     'title': 'data_columns',
-                    'description': 'The list of found data columns',
+                    'description': 'The list of found data columns (Community edition sync import only)',
                     'type': 'array',
                     'items': {
                         'title': 'Data column name',
@@ -175,6 +180,20 @@ task_create_response_scheme = {
             include all variables that were used in the *label_config*. For example,
             if the label configuration has a *$text* variable, then each item in a data object
             must include a "text" field.
+            <br>
+
+            ## Async Import Behavior
+            <hr style="opacity:0.3">
+
+            **For non-Community editions, this endpoint processes imports asynchronously.**
+            
+            - The POST request **can fail** for invalid parameters, malformed request body, or other request-level validation errors.
+            - However, **data validation errors** that occur during import processing are handled asynchronously and will not cause the POST request to fail.
+            - Upon successful request validation, a response is returned: `{{"import": <import_id>}}`
+            - Use the returned `import_id` to poll the GET `/api/projects/{{project_id}}/imports/{{import_id}}` endpoint to check the import status and see any data validation errors.
+            - Data-level errors and import failures will only be visible in the GET request response.
+
+            For Community edition, imports are processed synchronously and return task counts immediately.
             <br>
 
             ## POST requests

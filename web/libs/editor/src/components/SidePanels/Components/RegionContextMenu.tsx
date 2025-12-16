@@ -46,17 +46,11 @@ export const RegionContextMenu: FC<{ item: any }> = observer(({ item }: { item: 
 
   return (
     <ContextMenuTrigger
-      className={cn("region-context-menu").toClassName()}
+      className={cn("region-context-menu").mod({ open }).toClassName()}
       content={<ContextMenu actions={actions} />}
       onToggle={(isOpen) => setOpen(isOpen)}
     >
-      <Button
-        variant="neutral"
-        look="string"
-        size="smaller"
-        style={{ ...(open ? { display: "flex !important" } : null) }}
-        aria-label="Region options"
-      >
+      <Button variant="neutral" look="string" size="smaller" aria-label="Region options">
         <IconEllipsis />
       </Button>
     </ContextMenuTrigger>
