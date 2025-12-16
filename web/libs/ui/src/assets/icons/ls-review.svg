@@ -1,9 +1,1 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="3" y="3" width="4" height="4" rx="1" stroke="currentColor" stroke-width="2"/>
-<rect x="3" y="17" width="4" height="4" rx="1" stroke="currentColor" stroke-width="2"/>
-<rect x="17" y="3" width="4" height="4" rx="1" stroke="currentColor" stroke-width="2"/>
-<rect x="4" y="8" width="2" height="8" fill="currentColor"/>
-<rect x="8" y="6" width="2" height="8" transform="rotate(-90 8 6)" fill="currentColor"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M16.5 11C19 11 21 13 21 15.5C21 16.38 20.75 17.21 20.31 17.9L23.39 21L22 22.39L18.88 19.32C18.19 19.75 17.37 20 16.5 20C14 20 12 18 12 15.5C12 13 14 11 16.5 11ZM14 15.5C14 14.12 15.12 13 16.5 13C17.88 13 19 14.12 19 15.5C19 16.88 17.88 18 16.5 18C15.12 18 14 16.88 14 15.5Z" fill="currentColor"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M18 8H20V10.0218C19.3945 9.63413 18.7204 9.3441 18 9.17393V8ZM10.4982 18H8V20H11.8096C11.2573 19.4245 10.8099 18.7476 10.4982 18Z" fill="currentColor"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><rect width="4" height="4" x="3" y="3" stroke="currentColor" stroke-width="2" rx="1"/><rect width="4" height="4" x="3" y="17" stroke="currentColor" stroke-width="2" rx="1"/><rect width="4" height="4" x="17" y="3" stroke="currentColor" stroke-width="2" rx="1"/><rect width="2" height="8" x="4" y="8" fill="currentColor"/><rect width="2" height="8" x="8" y="6" fill="currentColor" transform="rotate(-90 8 6)"/><path fill="currentColor" fill-rule="evenodd" d="M16.5 11C19 11 21 13 21 15.5C21 16.38 20.75 17.21 20.31 17.9L23.39 21L22 22.39L18.88 19.32C18.19 19.75 17.37 20 16.5 20C14 20 12 18 12 15.5C12 13 14 11 16.5 11ZM14 15.5C14 14.12 15.12 13 16.5 13C17.88 13 19 14.12 19 15.5C19 16.88 17.88 18 16.5 18C15.12 18 14 16.88 14 15.5Z" clip-rule="evenodd"/><path fill="currentColor" fill-rule="evenodd" d="M18 8H20V10.0218C19.3945 9.63413 18.7204 9.3441 18 9.17393V8ZM10.4982 18H8V20H11.8096C11.2573 19.4245 10.8099 18.7476 10.4982 18Z" clip-rule="evenodd"/></svg>

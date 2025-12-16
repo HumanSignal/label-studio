@@ -1,12 +1,1 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g opacity="0.4">
-<rect x="3" y="15" width="3" height="5" rx="1" fill="currentColor"/>
-</g>
-<g opacity="0.6">
-<rect x="8" y="13" width="3" height="7" rx="1" fill="currentColor"/>
-</g>
-<g opacity="0.8">
-<rect x="13" y="10" width="3" height="10" rx="1" fill="currentColor"/>
-</g>
-<rect x="18" y="4" width="3" height="16" rx="1" fill="currentColor"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><g opacity=".4"><rect width="3" height="5" x="3" y="15" fill="currentColor" rx="1"/></g><g opacity=".6"><rect width="3" height="7" x="8" y="13" fill="currentColor" rx="1"/></g><g opacity=".8"><rect width="3" height="10" x="13" y="10" fill="currentColor" rx="1"/></g><rect width="3" height="16" x="18" y="4" fill="currentColor" rx="1"/></svg>

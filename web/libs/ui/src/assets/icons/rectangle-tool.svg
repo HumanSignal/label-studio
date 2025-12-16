@@ -1,18 +1,1 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path opacity="0.4" d="M3.75 5.25H15.75C17.8713 5.25 18.9319 5.25 19.591 5.90901C20.25 6.56802 20.25 7.6287 20.25 9.75V18.75H8.25C6.12868 18.75 5.06802 18.75 4.40901 18.091C3.75 17.4319 3.75 16.3713 3.75 14.25V5.25Z" fill="currentColor"/>
-<g filter="url(#filter0_d_4490_28196)">
-<path d="M21 17.625C21 16.5895 20.1605 15.75 19.125 15.75C18.0895 15.75 17.25 16.5895 17.25 17.625C17.25 18.6605 18.0895 19.5 19.125 19.5C20.1605 19.5 21 18.6605 21 17.625Z" fill="currentColor"/>
-<path d="M6.75 6.375C6.75 5.33947 5.91053 4.5 4.875 4.5C3.83947 4.5 3 5.33947 3 6.375C3 7.41053 3.83947 8.25 4.875 8.25C5.91053 8.25 6.75 7.41053 6.75 6.375Z" fill="currentColor"/>
-</g>
-<defs>
-<filter id="filter0_d_4490_28196" x="0" y="2.5" width="24" height="21" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-<feFlood flood-opacity="0" result="BackgroundImageFix"/>
-<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
-<feOffset dy="1"/>
-<feGaussianBlur stdDeviation="1.5"/>
-<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.4 0"/>
-<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_4490_28196"/>
-<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_4490_28196" result="shape"/>
-</filter>
-</defs>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path fill="currentColor" d="M3.75 5.25H15.75C17.8713 5.25 18.9319 5.25 19.591 5.90901C20.25 6.56802 20.25 7.6287 20.25 9.75V18.75H8.25C6.12868 18.75 5.06802 18.75 4.40901 18.091C3.75 17.4319 3.75 16.3713 3.75 14.25V5.25Z" opacity=".4"/><g filter="url(#filter0_d_4490_28196)"><path fill="currentColor" d="M21 17.625C21 16.5895 20.1605 15.75 19.125 15.75C18.0895 15.75 17.25 16.5895 17.25 17.625C17.25 18.6605 18.0895 19.5 19.125 19.5C20.1605 19.5 21 18.6605 21 17.625Z"/><path fill="currentColor" d="M6.75 6.375C6.75 5.33947 5.91053 4.5 4.875 4.5C3.83947 4.5 3 5.33947 3 6.375C3 7.41053 3.83947 8.25 4.875 8.25C5.91053 8.25 6.75 7.41053 6.75 6.375Z"/></g><defs><filter id="filter0_d_4490_28196" width="24" height="21" x="0" y="2.5" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feColorMatrix in="SourceAlpha" result="hardAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/><feOffset dy="1"/><feGaussianBlur stdDeviation="1.5"/><feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.4 0"/><feBlend in2="BackgroundImageFix" mode="normal" result="effect1_dropShadow_4490_28196"/><feBlend in="SourceGraphic" in2="effect1_dropShadow_4490_28196" mode="normal" result="shape"/></filter></defs></svg>
