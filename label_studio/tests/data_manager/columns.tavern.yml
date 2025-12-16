@@ -42,7 +42,7 @@ stages:
              "start_training_on_annotation_update": false, "show_collab_predictions": true, "num_tasks_with_annotations": null,
              "task_number": null, "useful_annotation_number": null, "ground_truth_number": null, "skipped_annotations_number": null,
              "total_annotations_number": null, "total_predictions_number": null, "sampling": "Sequential sampling",
-             "show_ground_truth_first": false, "show_overlap_first": false, "overlap_cohort_percentage": 100,
+             "show_ground_truth_first": false, "annotator_evaluation_enabled": false, "show_overlap_first": false, "overlap_cohort_percentage": 100,
              "task_data_login": null, "task_data_password": null,
              "control_weights": {"label": {"overall": 1.0, "type": "Choices", "labels": {"pos": 1.0, "neg": 1.0}}},
              "parsed_label_config": {

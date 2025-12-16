@@ -315,11 +315,21 @@ class Project(ProjectMixin, FsmHistoryStateModel):
     skip_queue = models.CharField(
         max_length=100, choices=SkipQueue.choices, null=True, default=SkipQueue.REQUEUE_FOR_OTHERS
     )
+
+    # Deprecated in favor of annotator_evaluation_enabled
     show_ground_truth_first = models.BooleanField(
         _('show ground truth first'),
         default=False,
         help_text='Onboarding mode (true): show ground truth tasks first in the labeling stream',
     )
+
+    annotator_evaluation_enabled = models.BooleanField(
+        _('annotator evaluation enabled'),
+        default=False,
+        db_default=False,
+        help_text='Enable annotator evaluation for the project',
+    )
+
     show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
     overlap_cohort_percentage = models.IntegerField(_('overlap_cohort_percentage'), default=100)
 
