@@ -14,7 +14,6 @@ import {
   FF_DEV_1284,
   FF_DEV_3391,
   FF_LLM_EPIC,
-  FF_LSDV_3009,
   FF_LSDV_4583,
   FF_REVIEWER_FLOW,
   isFF,
@@ -809,9 +808,6 @@ const _Annotation = types
       if (!self.editable) return;
 
       const result = self.serializeAnnotation({ fast: true });
-      // if this is new annotation and no regions added yet
-
-      if (!isFF(FF_LSDV_3009) && !self.pk && !result.length) return;
 
       self.setDraftSelected();
       self.versions.draft = result;
