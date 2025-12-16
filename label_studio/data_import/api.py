@@ -187,10 +187,11 @@ task_create_response_scheme = {
 
             **For non-Community editions, this endpoint processes imports asynchronously.**
             
-            - The POST request will **not** fail if something goes wrong during import.
-            - Instead, it immediately returns a response: `{{"import": <import_id>}}`
-            - Use the returned `import_id` to poll the GET `/api/projects/{{project_id}}/imports/{{import_id}}` endpoint to check the import status and see any errors.
-            - Errors and failures will only be visible in the GET request response.
+            - The POST request **can fail** for invalid parameters, malformed request body, or other request-level validation errors.
+            - However, **data validation errors** that occur during import processing are handled asynchronously and will not cause the POST request to fail.
+            - Upon successful request validation, a response is returned: `{{"import": <import_id>}}`
+            - Use the returned `import_id` to poll the GET `/api/projects/{{project_id}}/imports/{{import_id}}` endpoint to check the import status and see any data validation errors.
+            - Data-level errors and import failures will only be visible in the GET request response.
 
             For Community edition, imports are processed synchronously and return task counts immediately.
             <br>
