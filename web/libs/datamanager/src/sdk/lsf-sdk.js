@@ -1,12 +1,4 @@
-import {
-  FF_DEV_1752,
-  FF_DEV_2186,
-  FF_DEV_2887,
-  FF_DEV_3034,
-  FF_LSDV_4620_3_ML,
-  FF_REGION_VISIBILITY_FROM_URL,
-  isFF,
-} from "../utils/feature-flags";
+import { FF_DEV_1752, FF_DEV_2186, FF_DEV_2887, FF_DEV_3034, FF_LSDV_4620_3_ML, isFF } from "../utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
@@ -141,10 +133,8 @@ export class LSFWrapper {
         "annotations:delete",
         "annotations:tabs",
         "predictions:tabs",
+        "annotations:copy-link",
       );
-      if (isFF(FF_REGION_VISIBILITY_FROM_URL)) {
-        interfaces.push("annotations:copy-link");
-      }
     }
 
     if (this.datamanager.hasInterface("instruction")) {
