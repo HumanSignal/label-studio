@@ -358,7 +358,7 @@ const Configurator = ({
   const [containerWidth, setContainerWidth] = useState(undefined);
 
   // Resizer hook
-  const { previewWidthPercent, setPreviewWidthPercent, constraints } = useConfigResizer({
+  const { editorWidthPixels, setEditorWidthPixels, previewWidthPixels, constraints } = useConfigResizer({
     projectId: project?.id,
     containerWidth,
   });
@@ -518,12 +518,15 @@ const Configurator = ({
       <div
         className={configClass.elem("container")}
         ref={containerRef}
-        style={{ display: "flex", position: "relative" }}
+        style={{
+          display: "grid",
+          gridTemplateColumns: `${editorWidthPixels}px minmax(400px, 1fr)`,
+          gap: "16px",
+          position: "relative",
+        }}
       >
         <div
           style={{
-            width: `${100 - previewWidthPercent}%`,
-            minWidth: `${constraints.minEditorPercent}%`,
             display: "flex",
             flexDirection: "column",
           }}
@@ -598,13 +601,7 @@ const Configurator = ({
                   </span>
                 </div>
               )}
-              <Button
-                size="small"
-                className="w-[120px]"
-                onClick={onSave}
-                waiting={waiting}
-                aria-label="Save configuration"
-              >
+              <Button className="w-[120px]" onClick={onSave} waiting={waiting} aria-label="Save configuration">
                 {waiting ? "Saving..." : "Save"}
               </Button>
               {isFF(FF_UNSAVED_CHANGES) && <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />}
@@ -613,16 +610,14 @@ const Configurator = ({
         </div>
         <div
           style={{
-            width: `${previewWidthPercent}%`,
-            minWidth: `${constraints.minPreviewPercent}%`,
             position: "relative",
           }}
         >
           <ConfigResizer
             containerRef={containerRef}
-            previewWidthPercent={previewWidthPercent}
-            onResize={setPreviewWidthPercent}
-            onResizeFinished={setPreviewWidthPercent}
+            editorWidthPixels={editorWidthPixels}
+            onResize={setEditorWidthPixels}
+            onResizeFinished={setEditorWidthPixels}
             constraints={constraints}
           />
           <Preview

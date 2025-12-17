@@ -32,11 +32,15 @@ $scroll-width: 5px;
 
 .wizard .configure__container {
   display: flex;
-  flex-direction: column;
-  padding: 16px 16px - $scroll-width 16px 20px;
+  flex-direction: row;
+  padding: 0;
   overflow-y: scroll;
   background-color: var(--color-neutral-background);
   gap: var(--spacing-base);
+
+  & > div {
+    padding: 16px 16px - $scroll-width 16px 20px;
+  }
 
   &::-webkit-scrollbar {
     width: $scroll-width;
@@ -252,10 +256,11 @@ $scroll-width: 5px;
   line-height: 1;
 }
 
-.configure__container>header {
+.configure__container > div > header {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  padding: var(--spacing-tight) 0;
 }
 
 .configure__editor {
@@ -274,7 +279,7 @@ $scroll-width: 5px;
   }
 }
 
-.configure__container>header .toggle-items {
+.configure__container > div > header .toggle-items {
   margin-left: auto;
 }
 
@@ -540,18 +545,17 @@ $scroll-width: 5px;
 }
 
 .wizard .configure__preview {
-  background-color: var(--color-neutral-surface);
   flex-grow: 10;
   min-width: 500px;
-  padding: 16px 16px 0;
+  padding: 0;
   overflow-y: auto;
-  border-left: 1px solid var(--color-neutral-border);
   display: flex;
   flex-direction: column;
   color: var(--color-neutral-content);
+  height: 100%;
 
   h3 {
-    margin: 8px 0 16px;
+    padding: var(--spacing-tight) 0;
     font-size: 16px;
     color: var(--color-neutral-content);
   }
@@ -565,6 +569,10 @@ $scroll-width: 5px;
   &-ui {
     flex: 1;
     min-height: 0;
+    background-color: var(--color-neutral-surface);
+    border: 1px solid var(--color-neutral-border);
+    border-radius: var(--corner-radius-small);
+    padding: var(--spacing-base);
   }
 
   &-error {
