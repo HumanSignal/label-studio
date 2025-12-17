@@ -2,16 +2,15 @@ import { useCallback, useRef, useState } from "react";
 import { cn } from "../../../utils/bem";
 import "./ConfigResizer.scss";
 
-const calculatePreviewPercent = (initialPercent, containerWidth, initialX, currentX, minPercent, maxPercent) => {
+const calculateEditorWidth = (initialWidth, initialX, currentX, minWidth, maxWidth) => {
   // Calculate offset from initial position
-  // Dragging left (currentX < initialX) should increase preview width
-  const offset = initialX - currentX; // Negative when dragging right, positive when dragging left
-  const offsetPercent = (offset / containerWidth) * 100;
-  const newPercent = initialPercent + offsetPercent;
-  return Math.max(minPercent, Math.min(maxPercent, newPercent));
+  // Dragging right (currentX > initialX) should increase editor width
+  const offset = currentX - initialX;
+  const newWidth = initialWidth + offset;
+  return Math.max(minWidth, Math.min(maxWidth, newWidth));
 };
 
-export const ConfigResizer = ({ containerRef, previewWidthPercent, onResize, onResizeFinished, constraints }) => {
+export const ConfigResizer = ({ containerRef, editorWidthPixels, onResize, onResizeFinished, constraints }) => {
   const [isResizing, setIsResizing] = useState(false);
   const handleRef = useRef(null);
 
@@ -23,23 +22,23 @@ export const ConfigResizer = ({ containerRef, previewWidthPercent, onResize, onR
       const container = containerRef.current;
       if (!container) return;
 
-      const containerRect = container.getBoundingClientRect();
+      // Capture container width once at the start of drag (not on every mouse move)
+      const containerWidth = container.clientWidth;
       const initialX = evt.pageX;
-      const initialPercent = previewWidthPercent;
-      let newPercent = previewWidthPercent;
+      const initialWidth = editorWidthPixels;
+      let newWidth = editorWidthPixels;
 
       const onMouseMove = (e) => {
-        const containerRectCurrent = container.getBoundingClientRect();
-        newPercent = calculatePreviewPercent(
-          initialPercent,
-          containerRectCurrent.width,
+        // Use the captured container width instead of recalculating getBoundingClientRect()
+        newWidth = calculateEditorWidth(
+          initialWidth,
           initialX,
           e.pageX,
-          constraints.minPreviewPercent,
-          constraints.maxPreviewPercent,
+          constraints.minEditorWidth,
+          constraints.maxEditorWidth,
         );
 
-        onResize(newPercent);
+        onResize(newWidth);
       };
 
       const onMouseUp = () => {
@@ -50,8 +49,8 @@ export const ConfigResizer = ({ containerRef, previewWidthPercent, onResize, onR
 
         setIsResizing(false);
 
-        if (newPercent !== previewWidthPercent && onResizeFinished) {
-          onResizeFinished(newPercent);
+        if (newWidth !== editorWidthPixels && onResizeFinished) {
+          onResizeFinished(newWidth);
         }
       };
 
@@ -61,7 +60,7 @@ export const ConfigResizer = ({ containerRef, previewWidthPercent, onResize, onR
       document.body.style.cursor = "col-resize";
       setIsResizing(true);
     },
-    [containerRef, previewWidthPercent, onResize, onResizeFinished, constraints],
+    [containerRef, editorWidthPixels, onResize, onResizeFinished, constraints],
   );
 
   return (
