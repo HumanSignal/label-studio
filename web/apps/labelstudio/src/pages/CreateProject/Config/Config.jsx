@@ -358,7 +358,7 @@ const Configurator = ({
   const [containerWidth, setContainerWidth] = useState(undefined);
 
   // Resizer hook
-  const { editorWidthPixels, setEditorWidthPixels, previewWidthPixels, constraints } = useConfigResizer({
+  const { editorWidthPixels, setEditorWidthPixels, constraints } = useConfigResizer({
     projectId: project?.id,
     containerWidth,
   });
@@ -571,10 +571,10 @@ const Configurator = ({
                     hintOptions: { schemaInfo: tags },
                   }}
                   // don't close modal with Escape while editing config
-                  onKeyDown={(editor, e) => {
+                  onKeyDown={(_editor, e) => {
                     if (e.code === "Escape") e.stopPropagation();
                   }}
-                  onChange={(editor, data, value) => onChange(value)}
+                  onChange={(_editor, _data, value) => onChange(value)}
                 />
               </div>
             )}
@@ -684,7 +684,7 @@ export const ConfigPage = ({
     if (externalColumns?.length) setColumns(externalColumns);
   }, [externalColumns]);
 
-  const [warning, setWarning] = React.useState();
+  const [warning, _setWarning] = React.useState();
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -699,8 +699,8 @@ export const ConfigPage = ({
           setColumns(res.common_data_columns);
         }
       }
-      fetchData();
     };
+    fetchData();
   }, [columns, project]);
 
   const onSelectRecipe = React.useCallback((recipe) => {

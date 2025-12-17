@@ -14,7 +14,7 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
   // Generate storage key based on project ID
   // This allows separate storage for different projects
   const storageKey = useMemo(
-    () => (projectId ? `config-editor-width:${projectId}` : `config-editor-width`),
+    () => (projectId ? `config-editor-width:${projectId}` : "config-editor-width"),
     [projectId],
   );
 

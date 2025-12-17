@@ -22,14 +22,11 @@ export const ConfigResizer = ({ containerRef, editorWidthPixels, onResize, onRes
       const container = containerRef.current;
       if (!container) return;
 
-      // Capture container width once at the start of drag (not on every mouse move)
-      const containerWidth = container.clientWidth;
       const initialX = evt.pageX;
       const initialWidth = editorWidthPixels;
       let newWidth = editorWidthPixels;
 
       const onMouseMove = (e) => {
-        // Use the captured container width instead of recalculating getBoundingClientRect()
         newWidth = calculateEditorWidth(
           initialWidth,
           initialX,
