@@ -202,7 +202,6 @@ export const CommentItem: FC<CommentItemProps> = observer(
                       items={classificationsItems}
                       onChange={taxonomyOnChange}
                       options={COMMENT_TAXONOMY_OPTIONS}
-                      defaultSearch={false}
                     />
                   </div>
                 )}

@@ -65,6 +65,7 @@ export const AcceptButton = memo(
           await store.commentStore.commentFormSubmit();
           store.acceptAnnotation();
         }}
+        data-testid="bottombar-accept-button"
       >
         {hasChanges ? "Fix + Accept" : "Accept"}
       </Button>
@@ -135,6 +136,7 @@ export const SkipButton = memo(
               store.skipTask({});
             }
           }}
+          data-testid="bottombar-skip-button"
         >
           Skip
         </Button>
@@ -159,6 +161,7 @@ export const UnskipButton = memo(
           await store.commentStore.commentFormSubmit();
           store.unskipTask();
         }}
+        data-testid="bottombar-unskip-button"
       >
         Cancel skip
       </Button>
