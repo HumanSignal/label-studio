@@ -8,7 +8,7 @@ import { FF_DEV_3793, isFF } from "../utils/feature-flags";
 
 const _Tool = types
   .model("KeyPointTool", {
-    default: types.optional(types.boolean, true),
+    default: types.optional(types.boolean, false),
     group: "segmentation",
     shortcut: "K",
     smart: true,

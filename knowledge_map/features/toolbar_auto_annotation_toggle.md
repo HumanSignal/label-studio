@@ -1,7 +1,7 @@
 # Toolbar Auto-Annotation Toggle Implementation
 
 ## Overview
-Modified the toolbar behavior to replace non-interactive tools with interactive (smart) tools when auto-annotation is turned on, instead of showing both simultaneously.
+Modified the toolbar behavior so that control tools are always visible, while segmentation tools swap between regular and smart variants based on the auto-annotation toggle. The Move (selection) tool is now the default selected tool for image-based tasks.
 
 ## Implementation Date
 October 5, 2025
@@ -19,10 +19,16 @@ October 5, 2025
 - Regular versions of smart tools (KeyPoint, Rectangle) were hidden when auto-annotation was OFF
 
 ### New Behavior
-- **Auto-annotation OFF**: Shows ALL regular tool versions (Brush, Polygon, KeyPoint, Rectangle, etc.) for manual annotation
-- **Auto-annotation ON**: Shows ONLY smart/interactive tool versions that trigger ML predictions
-- Tools are mutually exclusive based on the auto-annotation toggle state
-- Regular versions of smart tools now properly display when auto-annotation is OFF
+- **Control tools (non-dynamic, `group: "control"`):**
+  - Always visible in the toolbar.
+  - Includes Move (selection), Pan/Zoom, Rotate, brightness/contrast tools, etc.
+  - Move tool is the **default tool** for image-based tasks.
+- **Segmentation tools (non-control groups):**
+  - **Auto-annotation OFF**:
+    - Shows ALL regular tool versions (Brush, Polygon, KeyPoint, Rectangle, etc.) for manual annotation.
+  - **Auto-annotation ON**:
+    - Shows ONLY smart/interactive segmentation tools that trigger ML predictions.
+  - Regular and smart segmentation tools are still mutually exclusive based on the auto-annotation toggle state.
 
 ### Code Changes
 
@@ -94,19 +100,21 @@ The original logic prevented regular versions of smart tools (like KeyPoint and 
 ## How It Works
 
 ### Tool Classification
-1. **Regular Tools** (`dynamic: false`):
-   - Standard annotation tools for manual use
-   - Includes: Brush, Polygon, and regular versions of KeyPoint, Rectangle
-   - Used for manual annotation without ML assistance
-   - Visible when `store.autoAnnotation === false`
-   - Now properly render regardless of auto-annotation state
+1. **Control Tools** (`group: "control"`, `dynamic: false`):
+   - Always visible (Move, Pan/Zoom, Rotate, etc.).
+   - Do not participate in auto-annotation swapping logic.
+   - Move tool is marked as the **default** control tool.
 
-2. **Smart Tools** (`dynamic: true`):
-   - ML-powered interactive tools created from tags with `smart="true"`
-   - Includes: Smart versions of KeyPointLabels, RectangleLabels
-   - Trigger backend predictions from SAM model
-   - Visible when `store.autoAnnotation === true`
-   - Only render when `smartEnabled` is true
+2. **Regular Segmentation Tools** (`dynamic: false`, non-control groups):
+   - Standard annotation tools for manual use.
+   - Includes: Brush, Polygon, and regular versions of KeyPoint, Rectangle, MagicWand, etc.
+   - Visible when `store.autoAnnotation === false`.
+
+3. **Smart Segmentation Tools** (`dynamic: true`, non-control groups):
+   - ML-powered interactive tools created from tags with `smart="true"`.
+   - Includes: smart versions of KeyPointLabels, RectangleLabels, etc.
+   - Trigger backend predictions from the SAM model.
+   - Visible when `store.autoAnnotation === true` and `smartEnabled` is true.
 
 ### Tool Creation Process
 When a control tag in the XML config has `smart="true"`:
@@ -144,24 +152,28 @@ Example from `sam_poly_label_interf.xml`:
 
 ### Workflow
 1. User opens a task in Label Studio
-2. By default, auto-annotation is OFF - ALL regular tools are shown:
-   - Brush (for manual painting)
-   - Polygon (for manual polygon drawing)
-   - KeyPoint (for manual point placement)
-   - Rectangle (for manual rectangle drawing)
+2. By default, auto-annotation is OFF:
+   - **Move tool is selected by default** (control group).
+   - All regular segmentation tools are visible:
+     - Brush (for manual painting)
+     - Polygon (for manual polygon drawing)
+     - KeyPoint (for manual point placement)
+     - Rectangle (for manual rectangle drawing)
 3. User toggles "Auto-Annotation" ON via the toggle in the bottom bar
-4. Toolbar instantly switches to show ONLY smart/interactive tools:
-   - Smart KeyPoint (triggers SAM with point prompts)
-   - Smart Rectangle (triggers SAM with box prompts)
-5. User can use these smart tools to trigger SAM predictions from the ML backend
-6. Toggling auto-annotation OFF returns to showing ALL regular tools
+4. Toolbar behavior:
+   - Control tools (Move, Pan/Zoom, Rotate, etc.) remain visible and usable.
+   - Only smart/interactive segmentation tools are shown:
+     - Smart KeyPoint (triggers SAM with point prompts)
+     - Smart Rectangle (triggers SAM with box prompts)
+5. User can use these smart tools to trigger SAM predictions from the ML backend, while still switching back to Move/Pan tools at any time.
+6. Toggling auto-annotation OFF returns to showing ALL regular segmentation tools, with Move still available and typically selected by default.
 
 ### Benefits
-- **Cleaner UI**: Only relevant tools shown at any time
-- **Clear mode distinction**: Visual indication of manual vs ML-assisted mode
-- **Reduced confusion**: Users don't see duplicate or conflicting tools
-- **Better UX**: Focused toolset for each annotation mode
-- **Complete toolset**: All regular tools (including KeyPoint and Rectangle) are available for manual annotation when auto-annotation is OFF
+- **Cleaner UI**: Only relevant segmentation tools shown at any time
+- **Clear mode distinction**: Visual indication of manual vs ML-assisted segmentation mode
+- **Reduced confusion**: Users don't see duplicate or conflicting segmentation tools
+- **Better UX**: Focused segmentation toolset for each annotation mode
+- **Complete toolset**: All regular tools (including KeyPoint and Rectangle) are available for manual annotation when auto-annotation is OFF, and control tools are always available
 
 ## Related Components
 
@@ -184,11 +196,13 @@ Example from `sam_poly_label_interf.xml`:
 
 ## Testing Checklist
 
-- [ ] Verify regular tools appear when auto-annotation is OFF
-- [ ] Verify smart tools appear when auto-annotation is ON
+- [ ] Verify regular segmentation tools appear when auto-annotation is OFF
+- [ ] Verify smart segmentation tools appear when auto-annotation is ON
 - [ ] Verify tools switch immediately when toggling auto-annotation
-- [ ] Verify smart tools trigger ML backend predictions
-- [ ] Verify no tools appear simultaneously from both groups
+- [ ] Verify smart tools trigger SAM ML backend predictions
+- [ ] Verify no segmentation tools appear simultaneously from both groups
+- [ ] Verify control tools (Move, Pan/Zoom, Rotate, etc.) are always visible and usable in both modes
+- [ ] Verify Move tool is selected by default when opening image-based tasks
 - [ ] Test with different XML configurations
 - [ ] Test with projects that have only regular tools
 - [ ] Test with projects that have only smart tools
@@ -211,4 +225,9 @@ Example from `sam_poly_label_interf.xml`:
 - The change is purely UI-based - no backend modifications needed
 - Existing annotations are not affected
 - Tool shortcuts remain functional in both modes
-- The SmartTools component groups multiple smart tools into a single "Auto-Detect" button with a dropdown
+- The SmartTools component groups multiple smart tools into a single "Auto-Detect" button with a dropdown (legacy); the current implementation uses grouped smart tools with control tools always visible.
+
+## GitHub Tracking
+
+- Create/maintain a GitHub issue such as **"Make Move tool default & keep it visible in auto-annotation mode"**.
+- Link this knowledge_map entry from the issue for context and QA notes.
