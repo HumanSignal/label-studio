@@ -23,6 +23,7 @@ export const GroundTruth = observer(({ entity, disabled = false, size = "md" }) 
               ev.preventDefault();
               entity.setGroundTruth(!entity.ground_truth);
             }}
+            data-testid="bottombar-ground-truth-button"
           >
             <IndicatorIcon
               className={cn("ground-truth")

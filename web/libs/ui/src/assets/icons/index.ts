@@ -213,6 +213,7 @@ export { ReactComponent as IconRectangleTool } from "./rectangle-tool.svg";
 export { ReactComponent as IconRectangleToolSmart } from "./rectangle-tool-smart.svg";
 export { ReactComponent as IconRedo } from "./redo.svg";
 export { ReactComponent as IconRefresh } from "./refresh.svg";
+export { ReactComponent as IconReset } from "./reset.svg";
 export { ReactComponent as IconRelationBi } from "./relation-bi.svg";
 export { ReactComponent as IconRelationLeft } from "./relation-left.svg";
 export { ReactComponent as IconRelationLink } from "./link-relation.svg";

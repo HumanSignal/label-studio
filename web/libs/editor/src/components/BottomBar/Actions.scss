@@ -1,0 +1,40 @@
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-tight);
+  margin-left: var(--spacing-tight);
+
+  &__action {
+    width: 36px;
+    max-width: 36px;
+    height: 36px;
+
+    &:disabled {
+      opacity: 0.6;
+    }
+
+    svg {
+      display: block;
+    }
+  }
+}
+
+.model-actions {
+  padding: 0 var(--spacing-tight);
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--spacing-tight);
+  position: relative;
+  margin-left: var(--spacing-tight);
+
+  &::before {
+    content: "";
+    display: block;
+    width: 1px;
+    height: calc(100% - var(--spacing-tight) * 2);
+    background-color: var(--color-neutral-border);
+    position: absolute;
+    left: 0;
+    top: var(--spacing-tight);
+    bottom: var(--spacing-tight);
+  }
+}
