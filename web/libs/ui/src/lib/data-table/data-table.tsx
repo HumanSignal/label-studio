@@ -111,6 +111,33 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
   const [internalActiveRowId, setInternalActiveRowId] = useState<string | undefined>(undefined);
 
+  // Restore column sizes from localStorage if storageKey is provided
+  const restoredColumnSizing = useMemo(() => {
+    if (!props.cellSizesStorageKey) return {};
+
+    try {
+      const stored = localStorage.getItem(props.cellSizesStorageKey);
+      if (!stored) return {};
+
+      const cellSizes = JSON.parse(stored) as Record<string, { size: number }>;
+      const columnSizing: Record<string, number> = {};
+
+      // Convert stored format { [columnId]: { size: number } } to TanStack format { [columnId]: number }
+      for (const [columnId, sizeData] of Object.entries(cellSizes)) {
+        if (sizeData?.size && typeof sizeData.size === "number") {
+          columnSizing[columnId] = sizeData.size;
+        }
+      }
+
+      return columnSizing;
+    } catch (error) {
+      console.warn("Failed to restore column sizes from localStorage:", error);
+      return {};
+    }
+  }, [props.cellSizesStorageKey]);
+
+  const [internalColumnSizing, setInternalColumnSizing] = useState<Record<string, number>>(restoredColumnSizing);
+
   // Use controlled activeRowId if onRowClick is provided (parent controls state via clicks)
   // OR if activeRowId is explicitly provided (not undefined)
   // When onRowClick is provided, activeRowId is read-only for display purposes
@@ -277,6 +304,13 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       columnVisibility: props.columnVisibility,
       rowSelection,
       sorting,
+      columnSizing: internalColumnSizing,
+    },
+    onColumnSizingChange: (updater) => {
+      setInternalColumnSizing((old) => {
+        const newState = typeof updater === "function" ? updater(old) : updater;
+        return newState;
+      });
     },
     onSortingChange: (updater) => {
       if (isSortingControlled && controlledOnSortingChange) {
