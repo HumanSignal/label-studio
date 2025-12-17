@@ -71,3 +71,8 @@ For example, the following JSON snippet would result in one skippable task and o
 ]
 ```
 
+!!! info Tip
+    Use the Allow Skip column to see which tasks have skipping disabled. 
+
+
+
