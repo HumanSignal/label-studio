@@ -241,7 +241,7 @@ const RegionsLayer = observer(({ regions, item, locked, isDrawing, workinAreaCoo
   // Access item.frame here to ensure the observer tracks frame changes
   // This ensures regions update correctly during fast scrubbing
   const frame = item.frame;
-  
+
   return (
     <>
       {regions.map((reg) => (
