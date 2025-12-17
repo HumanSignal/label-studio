@@ -515,8 +515,19 @@ const Configurator = ({
 
   return (
     <div className={configClass}>
-      <div className={configClass.elem("container")} ref={containerRef} style={{ display: "flex", position: "relative" }}>
-        <div style={{ width: `${100 - previewWidthPercent}%`, minWidth: `${constraints.minEditorPercent}%`, display: "flex", flexDirection: "column" }}>
+      <div
+        className={configClass.elem("container")}
+        ref={containerRef}
+        style={{ display: "flex", position: "relative" }}
+      >
+        <div
+          style={{
+            width: `${100 - previewWidthPercent}%`,
+            minWidth: `${constraints.minEditorPercent}%`,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
           <header>
             <Button
@@ -582,7 +593,9 @@ const Configurator = ({
             <Form.Actions size="small" extra={configure === "code" && extra} valid>
               {saved && (
                 <div className={cn("form-indicator").toClassName()}>
-                  <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()}>Saved!</span>
+                  <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()}>
+                    Saved!
+                  </span>
                 </div>
               )}
               <Button
@@ -598,7 +611,13 @@ const Configurator = ({
             </Form.Actions>
           )}
         </div>
-        <div style={{ width: `${previewWidthPercent}%`, minWidth: `${constraints.minPreviewPercent}%`, position: "relative" }}>
+        <div
+          style={{
+            width: `${previewWidthPercent}%`,
+            minWidth: `${constraints.minPreviewPercent}%`,
+            position: "relative",
+          }}
+        >
           <ConfigResizer
             containerRef={containerRef}
             previewWidthPercent={previewWidthPercent}

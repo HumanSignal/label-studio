@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { cn } from "../../../utils/bem";
 import "./ConfigResizer.scss";
 
@@ -67,12 +67,8 @@ export const ConfigResizer = ({ containerRef, previewWidthPercent, onResize, onR
   return (
     <div
       ref={handleRef}
-      className={cn("config-resizer")
-        .elem("handle")
-        .mod({ resizing: isResizing })
-        .toString()}
+      className={cn("config-resizer").elem("handle").mod({ resizing: isResizing }).toString()}
       onMouseDown={handleMouseDown}
     />
   );
 };
-
