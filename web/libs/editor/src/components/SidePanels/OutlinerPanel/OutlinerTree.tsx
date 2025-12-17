@@ -480,11 +480,12 @@ const RegionControls: FC<RegionControlsProps> = injector(
       return type?.includes("region") || type?.includes("range");
     }, [type]);
 
-    const { rgbText, areaText, statsText } = useMemo(() => {
+    const { rgbText, areaText, groupText, statsText } = useMemo(() => {
       if (!isRegionNode) {
         return {
           rgbText: "",
           areaText: "",
+          groupText: "",
           statsText: "",
         };
       }
@@ -526,14 +527,19 @@ const RegionControls: FC<RegionControlsProps> = injector(
         typeof meta?.area === "number" && Number.isFinite(meta.area) ? Math.round(meta.area) : null;
       const areaText = area != null ? `${area.toString()}px` : "";
 
+      const group = typeof meta?.group === "string" && meta.group ? meta.group : null;
+      const groupText = group != null ? `${group}` : "";
+
       const stats: string[] = [];
 
+      if (groupText) stats.push(groupText);
       if (rgbText) stats.push(rgbText);
       if (areaText) stats.push(areaText);
 
       return {
         rgbText,
         areaText,
+        groupText,
         statsText: stats.join(" | "),
       };
     }, [isRegionNode, item, entity]);

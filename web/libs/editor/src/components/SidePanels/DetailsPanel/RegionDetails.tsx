@@ -86,6 +86,7 @@ export const RegionDetailsMain: FC<{ region: any }> = observer(({ region }) => {
   const meta = region.meta as any;
   const area = meta?.area;
   const bbox = meta?.bbox;
+  const group = meta?.group;
 
   const meanR = typeof meta?.mean_r === "number" && Number.isFinite(meta.mean_r) ? meta.mean_r : null;
   const meanG = typeof meta?.mean_g === "number" && Number.isFinite(meta.mean_g) ? meta.mean_g : null;
@@ -123,6 +124,16 @@ export const RegionDetailsMain: FC<{ region: any }> = observer(({ region }) => {
               <div>
                 R={formatChannel(meanR)}, G={formatChannel(meanG)}, B={formatChannel(meanB)}
               </div>
+            </Elem>
+          </Elem>
+        </Block>
+      ) : null}
+      {group ? (
+        <Block name="region-meta">
+          <Elem name="result">
+            <Text>Group:</Text>
+            <Elem name="value">
+              <div>{group}</div>
             </Elem>
           </Elem>
         </Block>
