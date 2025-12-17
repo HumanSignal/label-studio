@@ -582,6 +582,71 @@ export default types
       window.localStorage.setItem(localStorageKeys.group, self.group);
     },
 
+    /**
+     * Filter regions by geometry and RGB mean metrics and auto-select matches.
+     *
+     * @param {Object} criteria
+     * @param {{min?: number, max?: number}} [criteria.width]
+     * @param {{min?: number, max?: number}} [criteria.height]
+     * @param {{min?: number, max?: number}} [criteria.area]
+     * @param {{min?: number, max?: number}} [criteria.meanR]
+     * @param {{min?: number, max?: number}} [criteria.meanG]
+     * @param {{min?: number, max?: number}} [criteria.meanB]
+     */
+    filterByMetrics(criteria = {}) {
+      const hasAnyConstraint = Object.values(criteria).some((range) => range && (isDefined(range.min) || isDefined(range.max)));
+
+      // No constraints — reset filters and selection.
+      if (!hasAnyConstraint) {
+        const allRegions = self.regions;
+
+        if (allRegions.length) {
+          self.setFilteredRegions(allRegions);
+        }
+        self.clearSelection();
+        return;
+      }
+
+      const inRange = (value, range) => {
+        if (!range) return true;
+        const { min, max } = range;
+        if (isDefined(min) && value < min) return false;
+        if (isDefined(max) && value > max) return false;
+        return true;
+      };
+
+      const filtered = self.regions.filter((region) => {
+        const meta = region.meta ?? {};
+        const bbox = meta.bbox ?? {};
+
+        const area = typeof meta.area === "number" && Number.isFinite(meta.area) ? meta.area : 0;
+        const width = typeof bbox.width === "number" && Number.isFinite(bbox.width) ? bbox.width : 0;
+        const height = typeof bbox.height === "number" && Number.isFinite(bbox.height) ? bbox.height : 0;
+
+        const r = typeof meta.mean_r === "number" && Number.isFinite(meta.mean_r) ? meta.mean_r : 0;
+        const g = typeof meta.mean_g === "number" && Number.isFinite(meta.mean_g) ? meta.mean_g : 0;
+        const b = typeof meta.mean_b === "number" && Number.isFinite(meta.mean_b) ? meta.mean_b : 0;
+
+        if (!inRange(width, criteria.width)) return false;
+        if (!inRange(height, criteria.height)) return false;
+        if (!inRange(area, criteria.area)) return false;
+        if (!inRange(r, criteria.meanR)) return false;
+        if (!inRange(g, criteria.meanG)) return false;
+        if (!inRange(b, criteria.meanB)) return false;
+
+        return true;
+      });
+
+      self.setFilteredRegions(filtered);
+
+      const filteredIds = filtered.map((r) => r.id);
+
+      self.clearSelection();
+      if (filteredIds.length) {
+        self.selectRegionsByIds(filteredIds);
+      }
+    },
+
     setFilteredRegions(filter) {
       if (self.regions.length === filter.length) {
         self.filter = null;

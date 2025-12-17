@@ -9,7 +9,11 @@ import { types } from "mobx-state-tree";
  */
 const NormalizationMixin = types
   .model({
-    meta: types.frozen<{ text?: string[] }>({}),
+    // meta is a frozen bag of additional fields populated by backends and UI:
+    // - text: string[]
+    // - area, bbox, mean_r/mean_g/mean_b
+    // - group: string
+    meta: types.frozen<Record<string, any>>({}),
   })
   .actions((self) => ({
     /**
@@ -26,6 +30,21 @@ const NormalizationMixin = types
         self.meta = adjusted;
       }
     },
+
+    /**
+     * Set meta group
+     * @param {string} group
+     */
+    setMetaGroup(group: string) {
+      if (group) {
+        self.meta = { ...self.meta, group };
+      } else {
+        const adjusted = { ...self.meta };
+
+        delete adjusted.group;
+        self.meta = adjusted;
+      }
+    },
   }))
   .actions((self) => ({
     /**
@@ -33,6 +52,13 @@ const NormalizationMixin = types
      */
     deleteMetaText() {
       self.setMetaText("");
+    },
+
+    /**
+     * Clear meta group
+     */
+    clearMetaGroup() {
+      self.setMetaGroup("");
     },
   }));
 

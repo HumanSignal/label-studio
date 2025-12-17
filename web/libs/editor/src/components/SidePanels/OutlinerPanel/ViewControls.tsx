@@ -1,4 +1,4 @@
-import { type FC, useCallback, useContext, useMemo } from "react";
+import { type ChangeEvent, type FC, useCallback, useContext, useMemo, useState } from "react";
 import {
   IconCursor,
   IconClockTimeFourOutline,
@@ -8,6 +8,7 @@ import {
   IconSortDown,
   IconSortUp,
   IconBoundingBox,
+  IconFilter,
   IconPredictions,
 } from "@humansignal/icons";
 import { Button } from "../../../common/Button/Button";
@@ -196,6 +197,8 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             >
               {renderOrderingDirectionIcon}
             </Elem>
+            <RegionMetricsFilter regions={regions} />
+            <BulkGroupAssignment regions={regions} />
           </Elem>
         )}
         <ToggleRegionsVisibilityButton regions={regions} />
@@ -327,6 +330,248 @@ const DirectionIndicator: FC<DirectionIndicator> = ({ direction, value, name, wr
   return <span>{content}</span>;
 };
 
+interface RegionMetricsFilterProps {
+  regions: any;
+}
+
+type Range = {
+  min?: number;
+  max?: number;
+};
+
+type MetricsCriteria = {
+  width?: Range;
+  height?: Range;
+  area?: Range;
+  meanR?: Range;
+  meanG?: Range;
+  meanB?: Range;
+};
+
+type MetricsState = {
+  minWidth: string;
+  maxWidth: string;
+  minHeight: string;
+  maxHeight: string;
+  minArea: string;
+  maxArea: string;
+  minR: string;
+  maxR: string;
+  minG: string;
+  maxG: string;
+  minB: string;
+  maxB: string;
+};
+
+const initialMetricsState: MetricsState = {
+  minWidth: "",
+  maxWidth: "",
+  minHeight: "",
+  maxHeight: "",
+  minArea: "",
+  maxArea: "",
+  minR: "",
+  maxR: "",
+  minG: "",
+  maxG: "",
+  minB: "",
+  maxB: "",
+};
+
+const RegionMetricsFilter: FC<RegionMetricsFilterProps> = ({ regions }) => {
+  const [state, setState] = useState<MetricsState>(initialMetricsState);
+
+  const onChangeField = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setState((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }, []);
+
+  const parseRange = (min: string, max: string): Range | undefined => {
+    const parsedMin = min !== "" ? Number(min) : undefined;
+    const parsedMax = max !== "" ? Number(max) : undefined;
+
+    if (!Number.isFinite(parsedMin as number) && !Number.isFinite(parsedMax as number)) {
+      return undefined;
+    }
+
+    const range: Range = {};
+
+    if (Number.isFinite(parsedMin as number)) range.min = parsedMin as number;
+    if (Number.isFinite(parsedMax as number)) range.max = parsedMax as number;
+
+    return Object.keys(range).length ? range : undefined;
+  };
+
+  const applyFilter = useCallback(() => {
+    const criteria: MetricsCriteria = {};
+
+    const width = parseRange(state.minWidth, state.maxWidth);
+    const height = parseRange(state.minHeight, state.maxHeight);
+    const area = parseRange(state.minArea, state.maxArea);
+    const meanR = parseRange(state.minR, state.maxR);
+    const meanG = parseRange(state.minG, state.maxG);
+    const meanB = parseRange(state.minB, state.maxB);
+
+    if (width) criteria.width = width;
+    if (height) criteria.height = height;
+    if (area) criteria.area = area;
+    if (meanR) criteria.meanR = meanR;
+    if (meanG) criteria.meanG = meanG;
+    if (meanB) criteria.meanB = meanB;
+
+    if (regions?.filterByMetrics) {
+      regions.filterByMetrics(criteria);
+    } else if (regions && typeof regions.setFilteredRegions === "function") {
+      // Fallback to legacy API if metrics filtering is not available
+      regions.setFilteredRegions(regions.regions);
+    }
+  }, [state, regions]);
+
+  const clearFilter = useCallback(() => {
+    setState(initialMetricsState);
+
+    if (regions?.filterByMetrics) {
+      regions.filterByMetrics({});
+    } else if (regions && typeof regions.setFilteredRegions === "function") {
+      regions.setFilteredRegions(regions.regions);
+    }
+  }, [regions]);
+
+  const content = useMemo(
+    () => (
+      <div className="view-controls__metrics-filter">
+        <div className="view-controls__metrics-filter-row">
+          <span>W (px)</span>
+          <input
+            type="number"
+            name="minWidth"
+            value={state.minWidth}
+            onChange={onChangeField}
+            placeholder="min"
+          />
+          <input
+            type="number"
+            name="maxWidth"
+            value={state.maxWidth}
+            onChange={onChangeField}
+            placeholder="max"
+          />
+        </div>
+        <div className="view-controls__metrics-filter-row">
+          <span>H (px)</span>
+          <input
+            type="number"
+            name="minHeight"
+            value={state.minHeight}
+            onChange={onChangeField}
+            placeholder="min"
+          />
+          <input
+            type="number"
+            name="maxHeight"
+            value={state.maxHeight}
+            onChange={onChangeField}
+            placeholder="max"
+          />
+        </div>
+        <div className="view-controls__metrics-filter-row">
+          <span>A (px²)</span>
+          <input
+            type="number"
+            name="minArea"
+            value={state.minArea}
+            onChange={onChangeField}
+            placeholder="min"
+          />
+          <input
+            type="number"
+            name="maxArea"
+            value={state.maxArea}
+            onChange={onChangeField}
+            placeholder="max"
+          />
+        </div>
+        <div className="view-controls__metrics-filter-row">
+          <span>R</span>
+          <input
+            type="number"
+            name="minR"
+            value={state.minR}
+            onChange={onChangeField}
+            placeholder="min"
+          />
+          <input
+            type="number"
+            name="maxR"
+            value={state.maxR}
+            onChange={onChangeField}
+            placeholder="max"
+          />
+        </div>
+        <div className="view-controls__metrics-filter-row">
+          <span>G</span>
+          <input
+            type="number"
+            name="minG"
+            value={state.minG}
+            onChange={onChangeField}
+            placeholder="min"
+          />
+          <input
+            type="number"
+            name="maxG"
+            value={state.maxG}
+            onChange={onChangeField}
+            placeholder="max"
+          />
+        </div>
+        <div className="view-controls__metrics-filter-row">
+          <span>B</span>
+          <input
+            type="number"
+            name="minB"
+            value={state.minB}
+            onChange={onChangeField}
+            placeholder="min"
+          />
+          <input
+            type="number"
+            name="maxB"
+            value={state.maxB}
+            onChange={onChangeField}
+            placeholder="max"
+          />
+        </div>
+        <div className="view-controls__metrics-filter-actions">
+          <Button type="text" onClick={clearFilter}>
+            Clear
+          </Button>
+          <Button type="primary" onClick={applyFilter}>
+            Apply
+          </Button>
+        </div>
+      </div>
+    ),
+    [state, onChangeField, applyFilter, clearFilter],
+  );
+
+  return (
+    <Dropdown.Trigger content={content}>
+      <Button
+        type="text"
+        icon={<IconFilter width={16} height={16} />}
+        aria-label="Filter regions by width/height/area/R/G/B"
+        tooltip="Filter regions by width/height/area/R/G/B"
+        tooltipTheme="dark"
+      />
+    </Dropdown.Trigger>
+  );
+};
+
 interface ToggleRegionsVisibilityButton {
   regions: any;
 }
@@ -362,5 +607,60 @@ const ToggleRegionsVisibilityButton = observer<FC<ToggleRegionsVisibilityButton>
       tooltip={isAllHidden ? "Show all regions" : "Hide all regions"}
       tooltipTheme="dark"
     />
+  );
+});
+
+interface BulkGroupAssignmentProps {
+  regions: any;
+}
+
+const BulkGroupAssignment: FC<BulkGroupAssignmentProps> = observer(({ regions }) => {
+  const [value, setValue] = useState("");
+
+  const hasSelection = regions?.hasSelection;
+
+  const applyGroup = useCallback(() => {
+    if (!regions?.selection?.list || !value) return;
+
+    regions.selection.list.forEach((region: any) => {
+      if (typeof region.setMetaGroup === "function") {
+        region.setMetaGroup(value);
+      }
+    });
+  }, [regions, value]);
+
+  if (!hasSelection) return null;
+
+  return (
+    <Dropdown.Trigger
+      content={
+        <div className="view-controls__metrics-filter">
+          <div className="view-controls__metrics-filter-row">
+            <span>Group</span>
+            <input
+              type="text"
+              name="group"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="Group name"
+            />
+          </div>
+          <div className="view-controls__metrics-filter-actions">
+            <Button type="primary" onClick={applyGroup}>
+              Apply
+            </Button>
+          </div>
+        </div>
+      }
+    >
+      <Button
+        type="text"
+        aria-label="Assign group to selected regions"
+        tooltip="Assign group to selected regions"
+        tooltipTheme="dark"
+      >
+        Group
+      </Button>
+    </Dropdown.Trigger>
   );
 });

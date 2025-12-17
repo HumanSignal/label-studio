@@ -18,6 +18,44 @@
     align-items: center;
   }
 
+  &__metrics-filter {
+    padding: var(--spacing-tight);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-tight);
+    min-width: 260px;
+
+    &-row {
+      display: grid;
+      grid-template-columns: auto 1fr 1fr;
+      column-gap: var(--spacing-tighter);
+      align-items: center;
+
+      span {
+        font-size: 11px;
+        color: var(--color-neutral-content-subtle);
+        white-space: nowrap;
+      }
+
+      input {
+        width: 100%;
+        padding: 2px 4px;
+        font-size: 11px;
+        border-radius: 2px;
+        border: 1px solid var(--color-border-neutral);
+        background-color: var(--color-neutral-background);
+        color: var(--color-neutral-content);
+      }
+    }
+
+    &-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--spacing-tight);
+      margin-top: var(--spacing-tight);
+    }
+  }
+
   &__label {
     width: 100%;
     display: flex;

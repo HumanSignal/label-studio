@@ -13,14 +13,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { IconArrow, IconChevronLeft, IconEyeClosed, IconEyeOpened, IconWarning, IconSparks } from "@humansignal/icons";
+import { IconArrow, IconChevronLeft, IconEyeClosed, IconEyeOpened, IconWarning } from "@humansignal/icons";
 import { Tooltip } from "@humansignal/ui";
 import Registry from "../../../core/Registry";
 import { PER_REGION_MODES } from "../../../mixins/PerRegionModes";
 import { Block, cn, Elem } from "../../../utils/bem";
 import { FF_DEV_2755, FF_DEV_3873, FF_PER_FIELD_COMMENTS, isFF } from "../../../utils/feature-flags";
 import { flatten, isDefined, isMacOS } from "../../../utils/utilities";
-import { NodeIcon } from "../../Node/Node";
 import { LockButton } from "../Components/LockButton";
 import { RegionControlButton } from "../Components/RegionControlButton";
 import { RegionContextMenu } from "../Components/RegionContextMenu";
@@ -68,7 +67,6 @@ interface OutlinerInnerTreeProps {
   regionsTree: any[];
 }
 
-const iconGetter = ({ entity }: any) => <NodeIconComponent node={entity} />;
 const switcherIconGetter = ({ isLeaf }: any) => <SwitcherIcon isLeaf={isLeaf} />;
 const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regions, regionsTree }) => {
   const blockRef = useRef<HTMLElement>();
@@ -179,7 +177,7 @@ const OutlinerInnerTreeComponent: FC<OutlinerInnerTreeProps> = observer(({ regio
           className={rootClass.toClassName()}
           treeData={regionsTree}
           selectedKeys={selectedKeys}
-          icon={iconGetter}
+          showIcon={false}
           switcherIcon={switcherIconGetter}
           virtual
           itemHeight={MIN_REGIONS_TREE_ROW_HEIGHT}
@@ -376,10 +374,6 @@ const SwitcherIcon: FC<any> = observer(({ isLeaf }) => {
   return isLeaf ? null : <IconArrow />;
 });
 
-const NodeIconComponent: FC<any> = observer(({ node }) => {
-  return node ? <NodeIcon node={node} /> : null;
-});
-
 const RootTitle: FC<any> = observer(
   ({
     item, // can be undefined for group titles in Labels or Tools mode
@@ -482,6 +476,68 @@ const RegionControls: FC<RegionControlsProps> = injector(
       return false;
     }, [entity, type, regions]);
 
+    const isRegionNode = useMemo(() => {
+      return type?.includes("region") || type?.includes("range");
+    }, [type]);
+
+    const { rgbText, areaText, statsText } = useMemo(() => {
+      if (!isRegionNode) {
+        return {
+          rgbText: "",
+          areaText: "",
+          statsText: "",
+        };
+      }
+
+      const meta = (item as any)?.meta ?? (entity as any)?.meta ?? {};
+      const meanR = typeof meta?.mean_r === "number" && Number.isFinite(meta.mean_r) ? meta.mean_r : null;
+      const meanG = typeof meta?.mean_g === "number" && Number.isFinite(meta.mean_g) ? meta.mean_g : null;
+      const meanB = typeof meta?.mean_b === "number" && Number.isFinite(meta.mean_b) ? meta.mean_b : null;
+
+      let r = meanR;
+      let g = meanG;
+      let b = meanB;
+
+      if (r === null || g === null || b === null) {
+        const baseColor = (entity as any)?.background ?? (entity as any)?.getOneColor?.();
+
+        if (baseColor) {
+          const [cr, cg, cb] = chroma(baseColor).rgb();
+
+          r = cr;
+          g = cg;
+          b = cb;
+        }
+      }
+
+      const toInt = (value: number | null) => {
+        if (value === null || Number.isNaN(value)) return null;
+        return Math.round(value);
+      };
+
+      const rInt = toInt(r);
+      const gInt = toInt(g);
+      const bInt = toInt(b);
+
+      const hasRGB = rInt !== null && gInt !== null && bInt !== null;
+      const rgbText = hasRGB ? `${rInt},${gInt},${bInt}` : "";
+
+      const area =
+        typeof meta?.area === "number" && Number.isFinite(meta.area) ? Math.round(meta.area) : null;
+      const areaText = area != null ? `${area.toString()}px` : "";
+
+      const stats: string[] = [];
+
+      if (rgbText) stats.push(rgbText);
+      if (areaText) stats.push(areaText);
+
+      return {
+        rgbText,
+        areaText,
+        statsText: stats.join(" | "),
+      };
+    }, [isRegionNode, item, entity]);
+
     const onToggleHidden = useCallback(() => {
       if (type?.includes("region") || type?.includes("range")) {
         entity.toggleHidden();
@@ -506,28 +562,17 @@ const RegionControls: FC<RegionControlsProps> = injector(
     return (
       <Elem name="controls" mod={{ withControls: hasControls, newUI: isFF(FF_DEV_3873) }}>
         {isFF(FF_DEV_3873) ? (
-          <Tooltip title={"Confidence Score"}>
+          <Tooltip title={statsText ? "Region RGB and area" : undefined}>
             <Elem name="control-wrapper">
-              <Elem name="control" mod={{ type: "predict" }}>
-                {item?.origin === "prediction" && <IconSparks style={{ width: 18, height: 18 }} />}
-              </Elem>
               <Elem name="control" mod={{ type: "score" }}>
-                {isDefined(item?.score) && item.score.toFixed(2)}
+                {statsText}
               </Elem>
             </Elem>
           </Tooltip>
         ) : (
-          <>
-            <Elem name="control" mod={{ type: "score" }}>
-              {isDefined(item?.score) && item.score.toFixed(2)}
-            </Elem>
-            <Elem name="control" mod={{ type: "dirty" }}>
-              {/* dirtyness is not implemented yet */}
-            </Elem>
-            <Elem name="control" mod={{ type: "predict" }}>
-              {item?.origin === "prediction" && <IconSparks style={{ width: 18, height: 18 }} />}
-            </Elem>
-          </>
+          <Elem name="control" mod={{ type: "score" }}>
+            {statsText}
+          </Elem>
         )}
         <Elem name={"wrapper"}>
           {store.hasInterface("annotations:copy-link") && isDefined(item?.annotation?.pk) && (

@@ -201,7 +201,14 @@
       }
 
       .outliner-item__control_type_score {
-        font-size: 12px;
+        width: auto;
+        flex: 0 1 auto;
+        font-size: 11px;
+        max-width: 180px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        justify-content: flex-end;
       }
 
       .outliner-item__control_type_predict:empty,
