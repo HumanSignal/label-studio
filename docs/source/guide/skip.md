@@ -49,9 +49,9 @@ While you can disallow skipping entirely from the project settings, if you want 
 
 </div>
 
-## Unskippable tasks
+## Individual unskippable tasks
 
-To make a task unskippable, specify `"allow_skip": false` as part of the JSON task definition that you import to your project.
+To make an individual task unskippable, specify `"allow_skip": false` as part of the [JSON task definition](tasks#Basic-Label-Studio-JSON-format) that you import to your project.
 
 For example, the following JSON snippet would result in one skippable task and one unskippable task:
 
@@ -71,8 +71,24 @@ For example, the following JSON snippet would result in one skippable task and o
 ]
 ```
 
+<div class="enterprise-only">
+
+!!! note
+    Managers, Admins, and Owners can still skip these tasks. Only Annotators and Reviewers cannot skip tasks that have been marked unskippable using this method.  
+
+
 !!! info Tip
-    Use the Allow Skip column to see which tasks have skipping disabled. 
+    Use the **Allow Skip** column to see which tasks have skipping disabled and filter for unskippable tasks. This column is hidden by default and is only visible to Managers, Admins, and Owners. 
+
+</div>
+
+<div class="opensource-only">
+
+!!! info Tip
+    Use the **Allow Skip** column to see which tasks have skipping disabled and filter for unskippable tasks. 
+
+</div>
+
 
 
 

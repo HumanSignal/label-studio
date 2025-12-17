@@ -166,7 +166,7 @@ Configure settings related to the **Skip** action in the labeling stream.
 | **Require comment to skip** | When enabled, annotators are required to leave a comment when skipping a task. |
 
 !!! info Tip
-    You can configure individual tasks to be unskippable in the JSON source for the task. For more information, see [Unskippable tasks](skip#Unskippable-tasks)
+    You can configure individual tasks to be unskippable in the JSON source for the task. For more information, see [Individual unskippable tasks](skip#Individual-unskippable-tasks)
 
 </dd>
 
@@ -638,7 +638,7 @@ For more information about pausing annotators, including how to manually pause s
 
 </dd>
 
-<dt id="annotator-eval">Annotator Evaluation</dt>
+<dt id="annotator-eval">Annotator Evaluation<span class="badge"></span></dt>
 
 <dd>
 
@@ -650,7 +650,7 @@ When enabled, this setting looks at the agreement score for the annotator when c
     Enabling annotator evaluation means that ground truth tasks are not constrained by the [annotator overlap](#overlap). For example, if you set overlap to `2`, but you have 10 annotators, all 10 will still be able to add annotations to ground truth tasks. 
 
 !!! info Tip
-    You can specify that ground truth tasks should be unskippable by adding `"allow_skip": false` as part of the JSON task definition that you import to your project. For more information, see [Unskippable tasks](skip#Unskippable-tasks)
+    You can specify that ground truth tasks should be unskippable by adding `"allow_skip": false` as part of the JSON task definition that you import to your project. For more information, see [Individual unskippable tasks](skip#Individual-unskippable-tasks)
 
 <table>
 <thead>
@@ -700,7 +700,7 @@ To have all ground truths presented as part of continuous evaluation, set the **
 <tr>
 <td>
 
-**Pause annotator on failed evaluation** <br /><span class="badge"></span>
+**Pause annotator on failed evaluation** 
 </td>
 <td>
 
@@ -713,7 +713,7 @@ If you do not enable pausing, the other **Annotator Evaluation** options are sim
 <tr>
 <td>
 
-**Score required to pass evaluation** <br /><span class="badge"></span>
+**Score required to pass evaluation** 
 </td>
 <td>
 
@@ -726,7 +726,7 @@ If they do not meet this score, they are paused.
 <tr>
 <td>
 
-**Number of tasks for evaluation** <br /><span class="badge"></span>
+**Number of tasks for evaluation** 
 </td>
 <td>
 
