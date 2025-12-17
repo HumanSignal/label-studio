@@ -6,6 +6,7 @@
   - `meta.mean_g`
   - `meta.mean_b`
 - Grayscale / black-and-white regions are represented by `r ≈ g ≈ b`; there is no separate stored gray channel in `meta`.
+- Biowork CSV export (`SEG_CSV`) prefers RGB means from `result.meta` when present and falls back to legacy textarea values if needed.
 - Biowork CSV export continues to write `mean_r`, `mean_g`, `mean_b` columns for brush and polygon regions. A gray/luma value can be derived downstream if needed.
 
 Expected region `meta` schema (per result):

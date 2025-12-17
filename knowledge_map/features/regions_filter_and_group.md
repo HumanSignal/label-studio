@@ -36,6 +36,6 @@
 - Outliner view controls show a **Group** control whenever there is at least one selected region:
   - Opens a small dropdown with a single text input for the group name and an **Apply** button.
   - On apply, the same group string is written to all selected regions via `region.setMetaGroup(group)`.
-- Group assignment is purely a frontend meta field and does not change labels or geometry; it’s intended for downstream analysis and exports.
+- Group assignment is purely a frontend meta field and does not change labels or geometry; it’s intended for downstream analysis and exports, including Biowork CSV (`SEG_CSV`), which writes `meta.group` into a `group` column.
 
 

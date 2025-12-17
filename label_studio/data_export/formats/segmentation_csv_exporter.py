@@ -38,6 +38,7 @@ CSV_COLUMNS = [
     "annotation_id",
     "region_id",
     "label",
+    "group",
     "shape_type",
     "bbox_x_px",
     "bbox_y_px",
@@ -298,6 +299,183 @@ def _first_label_from_result_value(value: Dict, key: str) -> str:
     return str(labels)
 
 
+def compute_segmentation_metrics(
+    tasks: Iterable[Dict],
+    project,
+    download_resources: bool,
+    hostname: Optional[str] = None,
+) -> Dict[str, List[Dict]]:
+    """Compute segmentation metrics for the given tasks.
+
+    Returns a mapping of ``{image_key: [row, ...]}`` where each ``row`` matches
+    :data:`CSV_COLUMNS`. This logic is shared between the CSV exporter and the
+    JSON API to guarantee identical behaviour.
+    """
+    rows_by_image: Dict[str, List[Dict]] = defaultdict(list)
+
+    for task in tasks:
+        task_id = task.get("id")
+        data = task.get("data") or {}
+        annotations = task.get("annotations") or []
+
+        for ann in annotations:
+            ann_id = ann.get("id")
+            results = ann.get("result") or []
+            # Pre-scan labels and textarea means by region id to merge shape+label cases and reuse intensities
+            label_by_region: Dict[str, str] = {}
+            textarea_by_region: Dict[str, Tuple[Optional[float], Optional[float], Optional[float], Optional[float]]] = {}
+            for res in results:
+                value = res.get("value") or {}
+                region_id = res.get("id")
+                if region_id is None:
+                    continue
+                lb = None
+                if value.get("brushlabels"):
+                    lb = _first_label_from_result_value(value, "brushlabels")
+                elif value.get("polygonlabels"):
+                    lb = _first_label_from_result_value(value, "polygonlabels")
+                if lb:
+                    label_by_region[str(region_id)] = lb
+                # Reuse TextArea mean intensity if present
+                if res.get("type") == "textarea":
+                    texts = value.get("text") or []
+                    if isinstance(texts, list) and texts:
+                        parsed = _parse_textarea_means(texts)
+                        textarea_by_region[str(region_id)] = parsed
+
+            processed_region_ids: set[str] = set()
+            for res in results:
+                rtype = (res.get("type") or "").lower()
+                value = res.get("value") or {}
+                meta = res.get("meta") or {}
+
+                # Determine object/image URL but avoid fetching; rely on annotation dims
+                to_name = res.get("to_name") or ""
+                data_key = _get_object_value_key_for_result(project, to_name) or next(iter(data.keys()), None)
+                image_url = data.get(data_key) if data_key in data else next(iter(data.values()), None)
+                if not image_url:
+                    logger.debug("Skip region without image url")
+                    continue
+                source_filename = _best_effort_filename_from_url(str(image_url))
+
+                ow = res.get("original_width") or value.get("original_width")
+                oh = res.get("original_height") or value.get("original_height")
+                original_width = int(ow) if ow else 0
+                original_height = int(oh) if oh else 0
+                if not original_width or not original_height:
+                    logger.debug("Skip region without original image size (no fallback available)")
+                    continue
+
+                # Detect mask/polygon robustly
+                is_mask = (rtype == "brushlabels") or (value.get("format") == "rle" and isinstance(value.get("rle"), list))
+                is_polygon = (rtype == "polygonlabels") or (isinstance(value.get("points"), list) and value.get("points"))
+
+                region_id = res.get("id")
+                if region_id is None:
+                    # Avoid duplicates but still handle anonymous regions uniquely per index
+                    region_id = f"{rtype}-{id(res)}"
+                region_id_str = str(region_id)
+                if region_id_str in processed_region_ids:
+                    continue
+
+                if is_mask:
+                    rle = value.get("rle") or []
+                    try:
+                        mask = _decode_brush_rle_to_mask(list(rle), original_width, original_height)
+                    except Exception as exc:
+                        logger.debug(f"Failed to decode RLE: {exc}")
+                        continue
+                    shape_type = "mask"
+                    label = _first_label_from_result_value(value, "brushlabels") or label_by_region.get(region_id_str, "")
+                    poly_points_px: List[Tuple[float, float]] = []
+                elif is_polygon:
+                    points = value.get("points") or []
+                    poly_points_px = _polygon_points_percent_to_px(points, original_width, original_height)
+                    mask = _rasterize_polygon(poly_points_px, original_width, original_height)
+                    shape_type = "polygon"
+                    label = _first_label_from_result_value(value, "polygonlabels") or label_by_region.get(region_id_str, "")
+                else:
+                    continue
+
+                bbox_x, bbox_y, w, h, area = _compute_bbox_and_area(mask)
+
+                # Prefer geometry from result.meta when available (meta-first), with mask-based fallback
+                try:
+                    meta_bbox = meta.get("bbox") or {}
+                except Exception:
+                    meta_bbox = {}
+
+                area_meta = meta.get("area")
+                if isinstance(area_meta, (int, float)):
+                    area = int(area_meta)
+
+                if isinstance(meta_bbox, dict):
+                    bx = meta_bbox.get("x")
+                    by = meta_bbox.get("y")
+                    bw = meta_bbox.get("width")
+                    bh = meta_bbox.get("height")
+                    if isinstance(bx, (int, float)):
+                        bbox_x = int(bx)
+                    if isinstance(by, (int, float)):
+                        bbox_y = int(by)
+                    if isinstance(bw, (int, float)):
+                        w = int(bw)
+                    if isinstance(bh, (int, float)):
+                        h = int(bh)
+
+                # Prefer mean RGB from result.meta when available; fall back to legacy textarea values
+                text_means = textarea_by_region.get(region_id_str)
+                mean_gray = None
+
+                mean_r = meta.get("mean_r")
+                mean_g = meta.get("mean_g")
+                mean_b = meta.get("mean_b")
+
+                if text_means is not None:
+                    t_gray, t_r, t_g, t_b = text_means
+                    if mean_gray is None:
+                        mean_gray = t_gray
+                    if mean_r is None:
+                        mean_r = t_r
+                    if mean_g is None:
+                        mean_g = t_g
+                    if mean_b is None:
+                        mean_b = t_b
+
+                # Ensure all channels are populated; default missing values to 0.0
+                mean_gray = 0.0 if mean_gray is None else mean_gray
+                mean_r = 0.0 if mean_r is None else mean_r
+                mean_g = 0.0 if mean_g is None else mean_g
+                mean_b = 0.0 if mean_b is None else mean_b
+
+                row = {
+                    "image_filename": source_filename,
+                    "task_id": task_id,
+                    "annotation_id": ann_id,
+                    "region_id": region_id,
+                    "label": label,
+                    "group": str(meta.get("group")) if meta.get("group") is not None else "",
+                    "shape_type": shape_type,
+                    "bbox_x_px": bbox_x,
+                    "bbox_y_px": bbox_y,
+                    "x_length_px": w,
+                    "y_length_px": h,
+                    "area_px": area,
+                    "mean_gray": mean_gray,
+                    "mean_r": mean_r,
+                    "mean_g": mean_g,
+                    "mean_b": mean_b,
+                    "polygon_points_px": json.dumps(poly_points_px) if poly_points_px else "",
+                }
+
+                # Group per image (include task id to avoid collisions)
+                key = f"{source_filename}__task_{task_id}"
+                rows_by_image[key].append(row)
+                processed_region_ids.add(region_id_str)
+
+    return rows_by_image
+
+
 def export_segmentation_metrics(tasks: Iterable[Dict], project, download_resources: bool, hostname: Optional[str] = None):
     """Create a ZIP file with per-image CSVs and return (open_file, content_type, filename).
 
@@ -311,129 +489,7 @@ def export_segmentation_metrics(tasks: Iterable[Dict], project, download_resourc
     from core.utils.io import get_temp_dir, path_to_open_binary_file
 
     with get_temp_dir() as tmp_dir:
-        # Per-image rows accumulator
-        rows_by_image: Dict[str, List[Dict]] = defaultdict(list)
-
-        for task in tasks:
-            task_id = task.get("id")
-            data = task.get("data") or {}
-            annotations = task.get("annotations") or []
-
-            for ann in annotations:
-                ann_id = ann.get("id")
-                results = ann.get("result") or []
-                # Pre-scan labels and textarea means by region id to merge shape+label cases and reuse intensities
-                label_by_region: Dict[str, str] = {}
-                textarea_by_region: Dict[str, Tuple[Optional[float], Optional[float], Optional[float], Optional[float]]] = {}
-                for res in results:
-                    value = res.get("value") or {}
-                    region_id = res.get("id")
-                    if region_id is None:
-                        continue
-                    lb = None
-                    if value.get("brushlabels"):
-                        lb = _first_label_from_result_value(value, "brushlabels")
-                    elif value.get("polygonlabels"):
-                        lb = _first_label_from_result_value(value, "polygonlabels")
-                    if lb:
-                        label_by_region[str(region_id)] = lb
-                    # Reuse TextArea mean intensity if present
-                    if res.get("type") == "textarea":
-                        texts = value.get("text") or []
-                        if isinstance(texts, list) and texts:
-                            parsed = _parse_textarea_means(texts)
-                            textarea_by_region[str(region_id)] = parsed
-
-                processed_region_ids: set[str] = set()
-                for res in results:
-                    rtype = (res.get("type") or "").lower()
-                    value = res.get("value") or {}
-
-                    # Determine object/image URL but avoid fetching; rely on annotation dims
-                    to_name = res.get("to_name") or ""
-                    data_key = _get_object_value_key_for_result(project, to_name) or next(iter(data.keys()), None)
-                    image_url = data.get(data_key) if data_key in data else next(iter(data.values()), None)
-                    if not image_url:
-                        logger.debug("Skip region without image url")
-                        continue
-                    source_filename = _best_effort_filename_from_url(str(image_url))
-
-                    ow = res.get("original_width") or value.get("original_width")
-                    oh = res.get("original_height") or value.get("original_height")
-                    original_width = int(ow) if ow else 0
-                    original_height = int(oh) if oh else 0
-                    if not original_width or not original_height:
-                        logger.debug("Skip region without original image size (no fallback available)")
-                        continue
-
-                    # Detect mask/polygon robustly
-                    is_mask = (rtype == "brushlabels") or (value.get("format") == "rle" and isinstance(value.get("rle"), list))
-                    is_polygon = (rtype == "polygonlabels") or (isinstance(value.get("points"), list) and value.get("points"))
-
-                    region_id = res.get("id")
-                    if region_id is None:
-                        # Avoid duplicates but still handle anonymous regions uniquely per index
-                        region_id = f"{rtype}-{id(res)}"
-                    region_id_str = str(region_id)
-                    if region_id_str in processed_region_ids:
-                        continue
-
-                    if is_mask:
-                        rle = value.get("rle") or []
-                        try:
-                            mask = _decode_brush_rle_to_mask(list(rle), original_width, original_height)
-                        except Exception as exc:
-                            logger.debug(f"Failed to decode RLE: {exc}")
-                            continue
-                        shape_type = "mask"
-                        label = _first_label_from_result_value(value, "brushlabels") or label_by_region.get(region_id_str, "")
-                        poly_points_px: List[Tuple[float, float]] = []
-                    elif is_polygon:
-                        points = value.get("points") or []
-                        poly_points_px = _polygon_points_percent_to_px(points, original_width, original_height)
-                        mask = _rasterize_polygon(poly_points_px, original_width, original_height)
-                        shape_type = "polygon"
-                        label = _first_label_from_result_value(value, "polygonlabels") or label_by_region.get(region_id_str, "")
-                    else:
-                        continue
-
-                    bbox_x, bbox_y, w, h, area = _compute_bbox_and_area(mask)
-
-                    # Prefer existing TextArea mean intensity if available for this region
-                    text_means = textarea_by_region.get(region_id_str)
-                    mean_gray = mean_r = mean_g = mean_b = None
-                    if text_means is not None:
-                        mean_gray, mean_r, mean_g, mean_b = text_means
-
-                    # Ensure all channels are populated; default missing values to 0.0
-                    mean_gray = 0.0 if mean_gray is None else mean_gray
-                    mean_r = 0.0 if mean_r is None else mean_r
-                    mean_g = 0.0 if mean_g is None else mean_g
-                    mean_b = 0.0 if mean_b is None else mean_b
-
-                    row = {
-                        "image_filename": source_filename,
-                        "task_id": task_id,
-                        "annotation_id": ann_id,
-                        "region_id": region_id,
-                        "label": label,
-                        "shape_type": shape_type,
-                        "bbox_x_px": bbox_x,
-                        "bbox_y_px": bbox_y,
-                        "x_length_px": w,
-                        "y_length_px": h,
-                        "area_px": area,
-                        "mean_gray": mean_gray,
-                        "mean_r": mean_r,
-                        "mean_g": mean_g,
-                        "mean_b": mean_b,
-                        "polygon_points_px": json.dumps(poly_points_px) if poly_points_px else "",
-                    }
-
-                    # Group per image (include task id to avoid collisions)
-                    key = f"{source_filename}__task_{task_id}"
-                    rows_by_image[key].append(row)
-                    processed_region_ids.add(region_id_str)
+        rows_by_image = compute_segmentation_metrics(tasks, project, download_resources, hostname)
 
         # Write CSVs
         for key, rows in rows_by_image.items():
