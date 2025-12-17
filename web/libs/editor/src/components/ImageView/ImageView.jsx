@@ -20,14 +20,7 @@ import ResizeObserver from "../../utils/resize-observer";
 import { debounce } from "../../utils/debounce";
 import Constants from "../../core/Constants";
 import { fixRectToFit, mapKonvaBrightness } from "../../utils/image";
-import {
-  FF_DEV_1442,
-  FF_DEV_3077,
-  FF_LSDV_4583_6,
-  FF_LSDV_4930,
-  FF_ZOOM_OPTIM,
-  isFF,
-} from "../../utils/feature-flags";
+import { FF_DEV_1442, FF_DEV_3077, FF_LSDV_4583_6, FF_LSDV_4930, FF_ZOOM_OPTIM, isFF } from "../../utils/feature-flags";
 import { Pagination } from "../../common/Pagination/Pagination";
 import { Image } from "./Image";
 
