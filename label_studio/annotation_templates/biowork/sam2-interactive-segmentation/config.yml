@@ -1,6 +1,6 @@
 title: Semi Auto Detection
 type: community
-group: BioWork
+group: Biowork
 image: /static/templates/semantic-segmentation-with-masks.png
 order: 3
 config: |
@@ -24,12 +24,6 @@ config: |
       <Label value="Object" smart="true" background="#0000FF"/>
     </RectangleLabels>
     
-    <TextArea name="mean_intensity" toName="image"
-              perRegion="true"
-              rows="5"
-              placeholder="Mean Intensity (gray/R/G/B; gray=0 on RGB, R/G/B=0 on gray)"
-              displayMode="region-list"
-              />
     
     <!-- Brush Labels (tag1) -->
     <Header value="Result: Brush Labels"/>

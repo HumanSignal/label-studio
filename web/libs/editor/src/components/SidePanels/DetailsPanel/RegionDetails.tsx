@@ -87,6 +87,17 @@ export const RegionDetailsMain: FC<{ region: any }> = observer(({ region }) => {
   const area = meta?.area;
   const bbox = meta?.bbox;
 
+  const meanR = typeof meta?.mean_r === "number" && Number.isFinite(meta.mean_r) ? meta.mean_r : null;
+  const meanG = typeof meta?.mean_g === "number" && Number.isFinite(meta.mean_g) ? meta.mean_g : null;
+  const meanB = typeof meta?.mean_b === "number" && Number.isFinite(meta.mean_b) ? meta.mean_b : null;
+
+  const hasRGB = meanR !== null || meanG !== null || meanB !== null;
+
+  const formatChannel = (value: number | null) => {
+    if (value === null) return "0.00";
+    return value.toFixed(2);
+  };
+
   return (
     <>
       {area != null || bbox ? (
@@ -100,6 +111,18 @@ export const RegionDetailsMain: FC<{ region: any }> = observer(({ region }) => {
                   BBox (px): x={bbox.x}, y={bbox.y}, w={bbox.width}, h={bbox.height}
                 </div>
               )}
+            </Elem>
+          </Elem>
+        </Block>
+      ) : null}
+      {hasRGB ? (
+        <Block name="region-meta">
+          <Elem name="result">
+            <Text>Mean RGB (px):</Text>
+            <Elem name="value">
+              <div>
+                R={formatChannel(meanR)}, G={formatChannel(meanG)}, B={formatChannel(meanB)}
+              </div>
             </Elem>
           </Elem>
         </Block>
@@ -164,7 +187,7 @@ export const RegionDetailsMeta: FC<RegionDetailsMetaProps> = observer(
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
-                saveMeta(e.target.value);
+                saveMeta((e.target as HTMLTextAreaElement).value);
                 cancelEditMode?.();
               }
             }}

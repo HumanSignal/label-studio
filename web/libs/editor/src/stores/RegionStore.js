@@ -6,7 +6,7 @@ import { AllRegionsType } from "../regions";
 import { debounce } from "../utils/debounce";
 import Tree, { TRAVERSE_STOP } from "../core/Tree";
 import { FF_DEV_2755, isFF } from "../utils/feature-flags";
-import { computeColorIntensities, parseTextareaMeans } from "../utils/intensity";
+import { computeColorIntensities } from "../utils/intensity";
 
 const hotkeys = Hotkey("RegionStore");
 
@@ -166,39 +166,35 @@ export default types
   })
   .views((self) => {
     let lastClickedItem;
-    const getRegionIntensityFromText = (region) => {
-      const results = region?.results || [];
-      const meanResult = results.find(
-        (result) => result?.type === "textarea" && result?.from_name?.name === "mean_intensity",
-      );
+    const getRegionIntensityFromMeta = (region) => {
+      const meta = region?.meta;
 
-      if (!meanResult || !meanResult.value) return null;
+      if (!meta) return null;
 
-      const parsed = parseTextareaMeans(meanResult.value.text);
+      const meanR = meta.mean_r;
+      const meanG = meta.mean_g;
+      const meanB = meta.mean_b;
 
-      if (!parsed) return null;
+      const isFiniteNumber = (value) => typeof value === "number" && Number.isFinite(value);
 
-      const { gray, r, g, b } = parsed;
-      const hasAny =
-        (typeof gray === "number" && !Number.isNaN(gray)) ||
-        (typeof r === "number" && !Number.isNaN(r)) ||
-        (typeof g === "number" && !Number.isNaN(g)) ||
-        (typeof b === "number" && !Number.isNaN(b));
+      const hasAnyChannel = isFiniteNumber(meanR) || isFiniteNumber(meanG) || isFiniteNumber(meanB);
 
-      if (!hasAny) return null;
+      if (!hasAnyChannel) return null;
 
-      return {
-        gray: typeof gray === "number" && !Number.isNaN(gray) ? gray : 0,
-        r: typeof r === "number" && !Number.isNaN(r) ? r : 0,
-        g: typeof g === "number" && !Number.isNaN(g) ? g : 0,
-        b: typeof b === "number" && !Number.isNaN(b) ? b : 0,
-      };
+      const r = isFiniteNumber(meanR) ? meanR : 0;
+      const g = isFiniteNumber(meanG) ? meanG : 0;
+      const b = isFiniteNumber(meanB) ? meanB : 0;
+
+      // Luma approximation in 0–255 range, mirroring `computeColorIntensities`
+      const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+
+      return { gray, r, g, b };
     };
 
     const getRegionIntensities = (region) => {
-      const fromText = getRegionIntensityFromText(region);
+      const fromMeta = getRegionIntensityFromMeta(region);
 
-      if (fromText) return fromText;
+      if (fromMeta) return fromMeta;
 
       const colorSource = region?.background ?? (region?.getOneColor ? region.getOneColor() : "#666") ?? "#666";
 
