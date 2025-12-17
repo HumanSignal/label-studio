@@ -101,9 +101,6 @@ After you relate two annotation regions, you can modify the relation in the **Re
 - To change the direction of the relation, click the direction button between the two related regions.
 - To add labels to the direction arrow indicating the relation between two annotations, click the vertical ellipsis button next to the two related regions to add your predefined labels. You must have a [label configuration that includes relations](/tags/relations.html) to do this.
 
-### Skipping a task
-When annotators skip a task, the task no longer appears in the labeling queue for that annotator. Other annotators still see the task in their labeling queue. 
-
 ### Exiting a labeling flow 
 When annotators are not finished with their annotation work but would like to exit their labeling flow to, for example, pause the [lead time](/guide/task_format.html#Relevant-JSON-property-descriptions) calculation on their annotations, they can click the drop-down menu next to **Submit** and then select **Submit and Exit** (or **Update and Exit**). This will submit the current annotation and redirect them to the Projects page. 
 

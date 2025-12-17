@@ -592,7 +592,8 @@ main {
 
 dt {
   font-weight: bold;
-  font-size: 125%
+  font-size: 125%;
+  margin-top: 2.5em;
 }
 
 dd .admonition:first-child {
