@@ -17,7 +17,19 @@ import { Caption } from "../../components/Caption/Caption";
 import { FF_LSDV_E_297, isFF } from "../../utils/feature-flags";
 import { createURL } from "../../components/HeidiTips/utils";
 
-const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, setDescription, show = true, templateOptions = [], selectedTemplateTitle, onSelectTemplate }) =>
+const ProjectName = ({
+  name,
+  setName,
+  onSaveName,
+  onSubmit,
+  error,
+  description,
+  setDescription,
+  show = true,
+  templateOptions = [],
+  selectedTemplateTitle,
+  onSelectTemplate,
+}) =>
   !show ? null : (
     <form
       className={cn("project-name")}
@@ -62,7 +74,10 @@ const ProjectName = ({ name, setName, onSaveName, onSubmit, error, description, 
           </label>
           <Select
             placeholder="Select a template"
-            options={[{ value: "__none__", label: "None" }, ...templateOptions.map((t) => ({ value: t.title, label: t.title }))]}
+            options={[
+              { value: "__none__", label: "None" },
+              ...templateOptions.map((t) => ({ value: t.title, label: t.title })),
+            ]}
             value={selectedTemplateTitle ?? "__none__"}
             onChange={(val) => onSelectTemplate?.(val === "__none__" ? null : val)}
             triggerClassName="!flex-1"
@@ -163,7 +178,7 @@ export const CreateProject = ({ onClose }) => {
         updateProject({ ...project, label_config: recipe.config });
       }
     },
-    [templateOptions, project]
+    [templateOptions, project],
   );
 
   const { columns, uploading, uploadDisabled, finishUpload, pageProps, uploadSample } = useImportPage(project, sample);

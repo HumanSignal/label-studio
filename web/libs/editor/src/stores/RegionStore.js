@@ -136,10 +136,28 @@ const SelectionMap = types
 export default types
   .model("RegionStore", {
     sort: types.optional(
-      types.enumeration(["date", "score", "intensity_r", "intensity_g", "intensity_b", "area", "bbox_width", "bbox_height"]),
+      types.enumeration([
+        "date",
+        "score",
+        "intensity_r",
+        "intensity_g",
+        "intensity_b",
+        "area",
+        "bbox_width",
+        "bbox_height",
+      ]),
       (() => {
         const stored = window.localStorage.getItem(localStorageKeys.sort);
-        const allowed = new Set(["date", "score", "intensity_r", "intensity_g", "intensity_b", "area", "bbox_width", "bbox_height"]);
+        const allowed = new Set([
+          "date",
+          "score",
+          "intensity_r",
+          "intensity_g",
+          "intensity_b",
+          "area",
+          "bbox_width",
+          "bbox_height",
+        ]);
 
         if (!stored || !allowed.has(stored)) return "date";
         return stored;
@@ -594,7 +612,9 @@ export default types
      * @param {{min?: number, max?: number}} [criteria.meanB]
      */
     filterByMetrics(criteria = {}) {
-      const hasAnyConstraint = Object.values(criteria).some((range) => range && (isDefined(range.min) || isDefined(range.max)));
+      const hasAnyConstraint = Object.values(criteria).some(
+        (range) => range && (isDefined(range.min) || isDefined(range.max)),
+      );
 
       // No constraints — reset filters and selection.
       if (!hasAnyConstraint) {

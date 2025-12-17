@@ -46,9 +46,9 @@ export const useImportPage = (project, sample) => {
       const url = sample.url;
       const body = new URLSearchParams({ url });
       const { import_batch_id, import_tags } = reimportExtras || {};
-      if (import_batch_id) body.append('import_batch_id', import_batch_id);
-      if (Array.isArray(import_tags) && import_tags.length) body.append('import_tags', JSON.stringify(import_tags));
-      body.append('import_source', 'ui');
+      if (import_batch_id) body.append("import_batch_id", import_batch_id);
+      if (Array.isArray(import_tags) && import_tags.length) body.append("import_tags", JSON.stringify(import_tags));
+      body.append("import_source", "ui");
       await importFiles({
         files: [{ name: url }],
         body,

@@ -11,7 +11,7 @@ export function SegmentationMetricsPortal({ active }) {
     // Find the custom View div from label config: <View name="segmetrics_host">
     // Could refine selector if class/id is added instead
     const root = document.querySelector(
-      '.lsf-main-view [name="segmetrics_host"], .segmetrics-host, [data-segmetrics-host]'
+      '.lsf-main-view [name="segmetrics_host"], .segmetrics-host, [data-segmetrics-host]',
     );
     if (root && root !== lastRoot.current) {
       setHost(root);
@@ -22,4 +22,3 @@ export function SegmentationMetricsPortal({ active }) {
   if (!host || !active) return null;
   return createPortal(<SegmentationMetricsPane />, host);
 }
-

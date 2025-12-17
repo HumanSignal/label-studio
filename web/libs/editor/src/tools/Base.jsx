@@ -52,7 +52,7 @@ const BaseTool = types
         // Regular tools (non-dynamic) should always render if they have an icon
         // Smart tools (dynamic) should only render when smartEnabled
         if (!self.dynamic) {
-          return (self.isSeparated || self.iconClass);
+          return self.isSeparated || self.iconClass;
         }
         return (self.isSeparated || self.smartEnabled) && self.iconClass;
       },

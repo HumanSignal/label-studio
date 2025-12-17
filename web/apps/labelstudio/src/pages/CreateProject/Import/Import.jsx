@@ -232,11 +232,11 @@ export const ImportPage = ({
     async (files, body) => {
       // append optional tags and batch id for urlencoded or multipart forms
       if (body instanceof FormData) {
-        if (batchId) body.append('import_batch_id', batchId);
-        if (tags.length) body.append('import_tags', JSON.stringify(tags));
+        if (batchId) body.append("import_batch_id", batchId);
+        if (tags.length) body.append("import_tags", JSON.stringify(tags));
       } else if (body instanceof URLSearchParams) {
-        if (batchId) body.append('import_batch_id', batchId);
-        if (tags.length) body.append('import_tags', JSON.stringify(tags));
+        if (batchId) body.append("import_batch_id", batchId);
+        if (tags.length) body.append("import_tags", JSON.stringify(tags));
       }
 
       importFiles({
@@ -321,11 +321,11 @@ export const ImportPage = ({
 
   // propagate metadata to the reimport step so that finishUpload sends it
   useEffect(() => {
-    if (typeof setReimportExtras === 'function') {
+    if (typeof setReimportExtras === "function") {
       setReimportExtras({
         import_batch_id: batchId || undefined,
         import_tags: tags,
-        import_source: 'ui',
+        import_source: "ui",
       });
     }
   }, [batchId, tags, setReimportExtras]);
@@ -353,9 +353,9 @@ export const ImportPage = ({
             placeholder="Add import tag"
             value={tagInput}
             onChange={(e) => {
-              const next = e.target.value ?? '';
+              const next = e.target.value ?? "";
               const parts = next.split(/[;,]/);
-              const pending = parts.pop() ?? '';
+              const pending = parts.pop() ?? "";
               const newTags = parts.map((p) => p.trim()).filter(Boolean);
               if (newTags.length) {
                 const merged = [...tags];
@@ -365,16 +365,16 @@ export const ImportPage = ({
               setTagInput(pending);
             }}
             onBlur={() => {
-              const val = (tagInput || '').trim();
+              const val = (tagInput || "").trim();
               if (val && !tags.includes(val)) setTags([...tags, val]);
-              setTagInput('');
+              setTagInput("");
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 e.preventDefault();
-                const val = (tagInput || '').trim();
+                const val = (tagInput || "").trim();
                 if (val && !tags.includes(val)) setTags([...tags, val]);
-                setTagInput('');
+                setTagInput("");
               }
             }}
           />

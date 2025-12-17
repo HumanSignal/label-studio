@@ -523,8 +523,7 @@ const RegionControls: FC<RegionControlsProps> = injector(
       const hasRGB = rInt !== null && gInt !== null && bInt !== null;
       const rgbText = hasRGB ? `${rInt},${gInt},${bInt}` : "";
 
-      const area =
-        typeof meta?.area === "number" && Number.isFinite(meta.area) ? Math.round(meta.area) : null;
+      const area = typeof meta?.area === "number" && Number.isFinite(meta.area) ? Math.round(meta.area) : null;
       const areaText = area != null ? `${area.toString()}px` : "";
 
       const group = typeof meta?.group === "string" && meta.group ? meta.group : null;

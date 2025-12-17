@@ -26,7 +26,15 @@ const { Block, Elem } = BemWithSpecifiContext();
 
 export type GroupingOptions = "manual" | "label" | "type";
 
-export type OrderingOptions = "score" | "date" | "intensity_r" | "intensity_g" | "intensity_b" | "area" | "bbox_width" | "bbox_height";
+export type OrderingOptions =
+  | "score"
+  | "date"
+  | "intensity_r"
+  | "intensity_g"
+  | "intensity_b"
+  | "area"
+  | "bbox_width"
+  | "bbox_height";
 
 export type OrderingDirection = "asc" | "desc";
 
@@ -41,7 +49,15 @@ interface ViewControlsProps {
 }
 
 export const ViewControls: FC<ViewControlsProps> = observer(
-  ({ ordering, regions, orderingDirection, onOrderingChange, onOrderingDirectionToggle, onGroupingChange, onFilterChange }) => {
+  ({
+    ordering,
+    regions,
+    orderingDirection,
+    onOrderingChange,
+    onOrderingDirectionToggle,
+    onGroupingChange,
+    onFilterChange,
+  }) => {
     const grouping = regions.group;
     const context = useContext(SidePanelsContext);
     const getGroupingLabels = useCallback((value: GroupingOptions): LabelInfo => {
@@ -182,7 +198,16 @@ export const ViewControls: FC<ViewControlsProps> = observer(
             <Grouping
               value={ordering}
               direction={orderingDirection}
-              options={["score", "date", "area", "bbox_width", "bbox_height", "intensity_r", "intensity_g", "intensity_b"]}
+              options={[
+                "score",
+                "date",
+                "area",
+                "bbox_width",
+                "bbox_height",
+                "intensity_r",
+                "intensity_g",
+                "intensity_b",
+              ]}
               onChange={(value) => onOrderingChange(value)}
               readableValueForKey={getOrderingLabels}
               allowClickSelected={false}
@@ -446,105 +471,33 @@ const RegionMetricsFilter: FC<RegionMetricsFilterProps> = ({ regions }) => {
       <div className="view-controls__metrics-filter">
         <div className="view-controls__metrics-filter-row">
           <span>W (px)</span>
-          <input
-            type="number"
-            name="minWidth"
-            value={state.minWidth}
-            onChange={onChangeField}
-            placeholder="min"
-          />
-          <input
-            type="number"
-            name="maxWidth"
-            value={state.maxWidth}
-            onChange={onChangeField}
-            placeholder="max"
-          />
+          <input type="number" name="minWidth" value={state.minWidth} onChange={onChangeField} placeholder="min" />
+          <input type="number" name="maxWidth" value={state.maxWidth} onChange={onChangeField} placeholder="max" />
         </div>
         <div className="view-controls__metrics-filter-row">
           <span>H (px)</span>
-          <input
-            type="number"
-            name="minHeight"
-            value={state.minHeight}
-            onChange={onChangeField}
-            placeholder="min"
-          />
-          <input
-            type="number"
-            name="maxHeight"
-            value={state.maxHeight}
-            onChange={onChangeField}
-            placeholder="max"
-          />
+          <input type="number" name="minHeight" value={state.minHeight} onChange={onChangeField} placeholder="min" />
+          <input type="number" name="maxHeight" value={state.maxHeight} onChange={onChangeField} placeholder="max" />
         </div>
         <div className="view-controls__metrics-filter-row">
           <span>A (px²)</span>
-          <input
-            type="number"
-            name="minArea"
-            value={state.minArea}
-            onChange={onChangeField}
-            placeholder="min"
-          />
-          <input
-            type="number"
-            name="maxArea"
-            value={state.maxArea}
-            onChange={onChangeField}
-            placeholder="max"
-          />
+          <input type="number" name="minArea" value={state.minArea} onChange={onChangeField} placeholder="min" />
+          <input type="number" name="maxArea" value={state.maxArea} onChange={onChangeField} placeholder="max" />
         </div>
         <div className="view-controls__metrics-filter-row">
           <span>R</span>
-          <input
-            type="number"
-            name="minR"
-            value={state.minR}
-            onChange={onChangeField}
-            placeholder="min"
-          />
-          <input
-            type="number"
-            name="maxR"
-            value={state.maxR}
-            onChange={onChangeField}
-            placeholder="max"
-          />
+          <input type="number" name="minR" value={state.minR} onChange={onChangeField} placeholder="min" />
+          <input type="number" name="maxR" value={state.maxR} onChange={onChangeField} placeholder="max" />
         </div>
         <div className="view-controls__metrics-filter-row">
           <span>G</span>
-          <input
-            type="number"
-            name="minG"
-            value={state.minG}
-            onChange={onChangeField}
-            placeholder="min"
-          />
-          <input
-            type="number"
-            name="maxG"
-            value={state.maxG}
-            onChange={onChangeField}
-            placeholder="max"
-          />
+          <input type="number" name="minG" value={state.minG} onChange={onChangeField} placeholder="min" />
+          <input type="number" name="maxG" value={state.maxG} onChange={onChangeField} placeholder="max" />
         </div>
         <div className="view-controls__metrics-filter-row">
           <span>B</span>
-          <input
-            type="number"
-            name="minB"
-            value={state.minB}
-            onChange={onChangeField}
-            placeholder="min"
-          />
-          <input
-            type="number"
-            name="maxB"
-            value={state.maxB}
-            onChange={onChangeField}
-            placeholder="max"
-          />
+          <input type="number" name="minB" value={state.minB} onChange={onChangeField} placeholder="min" />
+          <input type="number" name="maxB" value={state.maxB} onChange={onChangeField} placeholder="max" />
         </div>
         <div className="view-controls__metrics-filter-actions">
           <Button type="text" onClick={clearFilter}>

@@ -12,7 +12,15 @@ import { getDocsUrl } from "../../../utils/docs";
 
 // Local type definitions based on ViewControls and RegionStore
 type GroupingOptions = "manual" | "label" | "type";
-type OrderingOptions = "score" | "date" | "intensity_r" | "intensity_g" | "intensity_b" | "area" | "bbox_width" | "bbox_height";
+type OrderingOptions =
+  | "score"
+  | "date"
+  | "intensity_r"
+  | "intensity_g"
+  | "intensity_b"
+  | "area"
+  | "bbox_width"
+  | "bbox_height";
 type Region = {
   id: string;
   [key: string]: any; // Allow other properties for flexibility

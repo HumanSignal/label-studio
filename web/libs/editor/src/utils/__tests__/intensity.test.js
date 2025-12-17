@@ -60,5 +60,3 @@ describe("computeColorIntensities", () => {
     expect(gray).toBeGreaterThan(0);
   });
 });
-
-

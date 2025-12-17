@@ -272,7 +272,7 @@ const StatsTab: FC<any> = inject("store")(
   observer(function StatsTab({ selection, currentEntity }: any): JSX.Element {
     const selectionHasRegions = selection && selection.size > 0;
     const allRegions: any[] = currentEntity?.regionStore?.list ?? [];
-    const sourceRegions: any[] = selectionHasRegions ? selection.list ?? [] : allRegions;
+    const sourceRegions: any[] = selectionHasRegions ? (selection.list ?? []) : allRegions;
 
     const stats = computeRegionStats(sourceRegions);
 
@@ -291,9 +291,7 @@ const StatsTab: FC<any> = inject("store")(
             <EmptyState
               icon={<IconCursor width={24} height={24} />}
               header="View region statistics"
-              description={
-                <>Create or select regions with geometry or RGB metadata to see summary statistics</>
-              }
+              description={<>Create or select regions with geometry or RGB metadata to see summary statistics</>}
             />
           </Elem>
         </Block>

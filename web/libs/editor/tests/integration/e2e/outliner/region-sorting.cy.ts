@@ -10,11 +10,7 @@ describe("Outliner - Region sorting by meta", () => {
   });
 
   const initWithSimpleRegions = () => {
-    LabelStudio.params()
-      .config(simpleRegionsConfig)
-      .data(simpleRegionsData)
-      .withResult(simpleRegionsResult)
-      .init();
+    LabelStudio.params().config(simpleRegionsConfig).data(simpleRegionsData).withResult(simpleRegionsResult).init();
 
     LabelStudio.waitForObjectsReady();
   };
@@ -61,5 +57,3 @@ describe("Outliner - Region sorting by meta", () => {
     });
   });
 });
-
-

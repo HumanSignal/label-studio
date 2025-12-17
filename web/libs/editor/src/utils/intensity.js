@@ -86,5 +86,3 @@ export const computeColorIntensities = (color) => {
 
   return { gray, r, g, b };
 };
-
-

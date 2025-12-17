@@ -81,7 +81,7 @@ export const useRegionStyles = (region: any, options: Partial<StyleOptions> = {}
   const [highlighted, setHighlighted] = useState(region.highlighted);
   const forceNoFill = options.forceNoFill ?? false;
   const [shouldFill, setShouldFill] = useState(
-    forceNoFill ? false : region.fill ?? (options.useStrokeAsFill || options.includeFill),
+    forceNoFill ? false : (region.fill ?? (options.useStrokeAsFill || options.includeFill)),
   );
 
   const styles = useMemo(() => {

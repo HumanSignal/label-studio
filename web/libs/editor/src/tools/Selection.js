@@ -26,6 +26,7 @@ const ToolView = observer(({ item }) => {
 
 const _Tool = types
   .model("SelectionTool", {
+    default: types.optional(types.boolean, true),
     shortcut: "V",
     group: "control",
   })
