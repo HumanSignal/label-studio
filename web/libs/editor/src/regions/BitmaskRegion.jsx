@@ -11,7 +11,6 @@ import { AreaMixin } from "../mixins/AreaMixin";
 import IsReadyMixin from "../mixins/IsReadyMixin";
 import { KonvaRegionMixin } from "../mixins/KonvaRegion";
 import { ImageModel } from "../tags/object/Image";
-import { FF_DEV_3793, isFF } from "../utils/feature-flags";
 import { AliveRegion } from "./AliveRegion";
 import { RegionWrapper } from "./RegionWrapper";
 import { BitmaskDrawing, getCanvasPixelBounds, isHoveringNonTransparentPixel } from "./BitmaskRegion/utils";
@@ -98,7 +97,6 @@ const Model = types
         const bbox = self.bbox;
 
         if (!bbox) return null;
-        if (!isFF(FF_DEV_3793)) return bbox;
 
         return {
           left: self.parent.canvasToInternalX(bbox.left),

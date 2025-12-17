@@ -1,5 +1,4 @@
 import Konva from "konva";
-import { FF_DEV_3793, isFF } from "./feature-flags";
 
 export function reverseCoordinates(r1, r2) {
   let r1X = r1.x;
@@ -143,10 +142,8 @@ export function createDragBoundFunc(item, offset = { x: 0, y: 0 }) {
     image.fixForZoomWrapper(pos, (pos) => {
       let { x, y } = pos;
 
-      if (isFF(FF_DEV_3793)) {
-        x = image.canvasToInternalX(x);
-        y = image.canvasToInternalY(y);
-      }
+      x = image.canvasToInternalX(x);
+      y = image.canvasToInternalY(y);
 
       x -= offset.x;
       y -= offset.y;
@@ -156,9 +153,7 @@ export function createDragBoundFunc(item, offset = { x: 0, y: 0 }) {
       const bbox = singleRegionDragging
         ? { x, y, width: right - left, height: bottom - top }
         : { x: srLeft - left + x, y: srTop - top + y, width: srRight - srLeft, height: srBottom - srTop };
-      const fixed = isFF(FF_DEV_3793)
-        ? fixRectToFit(bbox, 100, 100)
-        : fixRectToFit(bbox, image.stageWidth, image.stageHeight);
+      const fixed = fixRectToFit(bbox, 100, 100);
 
       if (fixed.width !== bbox.width) {
         x += (fixed.width - bbox.width) * (fixed.x !== bbox.x ? -1 : 1);
@@ -170,8 +165,6 @@ export function createDragBoundFunc(item, offset = { x: 0, y: 0 }) {
 
       x += offset.x;
       y += offset.y;
-
-      if (!isFF(FF_DEV_3793)) return { x, y };
 
       return { x: image.internalToCanvasX(x), y: image.internalToCanvasY(y) };
     });

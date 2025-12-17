@@ -23,7 +23,6 @@ import { fixRectToFit, mapKonvaBrightness } from "../../utils/image";
 import {
   FF_DEV_1442,
   FF_DEV_3077,
-  FF_DEV_3793,
   FF_LSDV_4583_6,
   FF_LSDV_4930,
   FF_ZOOM_OPTIM,
@@ -128,13 +127,6 @@ const SELECTION_DASH = [3, 3];
 const SelectionBorders = observer(({ item, selectionArea }) => {
   const { selectionBorders: bbox } = selectionArea;
 
-  if (!isFF(FF_DEV_3793)) {
-    bbox.left = bbox.left * item.stageScale;
-    bbox.right = bbox.right * item.stageScale;
-    bbox.top = bbox.top * item.stageScale;
-    bbox.bottom = bbox.bottom * item.stageScale;
-  }
-
   const points = bbox
     ? [
         {
@@ -155,7 +147,7 @@ const SelectionBorders = observer(({ item, selectionArea }) => {
         },
       ]
     : [];
-  const ANCHOR_SIZE = isFF(FF_DEV_3793) ? 6 / item.stageScale : 6;
+  const ANCHOR_SIZE = 6 / item.stageScale;
 
   return (
     <>
@@ -306,7 +298,7 @@ const SelectedRegions = observer(({ item, selectedRegions }) => {
 });
 
 const SelectionLayer = observer(({ item, selectionArea }) => {
-  const scale = isFF(FF_DEV_3793) ? 1 : 1 / (item.zoomScale || 1);
+  const scale = 1;
   const [isMouseWheelClick, setIsMouseWheelClick] = useState(false);
   const [shift, setShift] = useState(false);
   const isPanTool = item.getToolsManager().findSelectedTool()?.fullName === "ZoomPanTool";
