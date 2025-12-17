@@ -8,6 +8,7 @@
 - Grayscale / black-and-white regions are represented by `r ≈ g ≈ b`; there is no separate stored gray channel in `meta`.
 - Biowork CSV export (`SEG_CSV`) prefers RGB means from `result.meta` when present and falls back to legacy textarea values if needed.
 - Biowork CSV export continues to write `mean_r`, `mean_g`, `mean_b` columns for brush and polygon regions. A gray/luma value can be derived downstream if needed.
+- **Multi-image exports**: When exporting multiple images, Biowork creates a single Excel file (`.xlsx`) with a "Summary" sheet containing statistics across all regions, plus one sheet per image. Single-image exports remain as CSV for backward compatibility.
 
 Expected region `meta` schema (per result):
 

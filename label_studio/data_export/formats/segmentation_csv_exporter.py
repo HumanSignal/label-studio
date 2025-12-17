@@ -1,7 +1,9 @@
-"""Exporter that creates a ZIP with one CSV per image, with one row per segmentation annotation.
+"""Exporter that creates Excel file with Summary sheet + one sheet per image (multi-image) or CSV (single image), with one row per segmentation annotation.
 
 Computes bounding box (pixels), area (pixels), and mean intensities (gray and RGB) for
 both Brush (RLE mask) and Polygon regions.
+
+For multi-image exports, includes a Summary sheet with statistics across all regions.
 """
 
 import csv
@@ -18,9 +20,73 @@ from dataclasses import dataclass
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
+import pandas as pd
 import requests
 from django.conf import settings
 from PIL import Image, ImageDraw
+
+def _create_summary_dataframe(all_rows):
+    """Create a summary DataFrame with statistics across all regions."""
+    if not all_rows:
+        return pd.DataFrame()
+
+    # Convert to DataFrame for easier calculations
+    df = pd.DataFrame(all_rows)
+
+    # Calculate statistics
+    summary_data = []
+
+    # Total regions
+    total_regions = len(df)
+    summary_data.append({
+        'Metric': 'Total Regions',
+        'Value': total_regions,
+        'Unit': 'count'
+    })
+
+    # Number of groups (unique non-empty group values)
+    unique_groups = df['group'].dropna().str.strip().replace('', None).dropna().nunique()
+    summary_data.append({
+        'Metric': 'Number of Groups',
+        'Value': unique_groups,
+        'Unit': 'count'
+    })
+
+    # Numeric columns to calculate mean and std for
+    numeric_columns = [
+        ('bbox_x_px', 'pixels'),
+        ('bbox_y_px', 'pixels'),
+        ('x_length_px', 'pixels'),
+        ('y_length_px', 'pixels'),
+        ('area_px', 'pixels²'),
+        ('mean_gray', 'intensity'),
+        ('mean_r', 'intensity'),
+        ('mean_g', 'intensity'),
+        ('mean_b', 'intensity')
+    ]
+
+    for col_name, unit in numeric_columns:
+        if col_name in df.columns:
+            # Convert to numeric, drop NaN
+            values = pd.to_numeric(df[col_name], errors='coerce').dropna()
+
+            if len(values) > 0:
+                mean_val = values.mean()
+                std_val = values.std()
+
+                summary_data.append({
+                    'Metric': f'{col_name} Mean',
+                    'Value': round(mean_val, 2),
+                    'Unit': unit
+                })
+
+                summary_data.append({
+                    'Metric': f'{col_name} Std Dev',
+                    'Value': round(std_val, 2) if not pd.isna(std_val) else 0.0,
+                    'Unit': unit
+                })
+
+    return pd.DataFrame(summary_data)
 
 logger = logging.getLogger(__name__)
 
@@ -477,9 +543,12 @@ def compute_segmentation_metrics(
 
 
 def export_segmentation_metrics(tasks: Iterable[Dict], project, download_resources: bool, hostname: Optional[str] = None):
-    """Create a ZIP file with per-image CSVs and return (open_file, content_type, filename).
+    """Create a ZIP file with per-image CSVs or Excel file with multiple sheets and return (open_file, content_type, filename).
 
-    The filename will be like project-{id}-segmentation.zip
+    For multiple images: Creates an Excel file with one sheet per image.
+    For single image: Creates a CSV file for backward compatibility.
+
+    The filename will be like project-{id}-segmentation.xlsx (multi-image) or project-{id}-segmentation.csv (single-image)
     """
     # Prepare temp directory structure
     base_tmp_dir = os.path.join(settings.MEDIA_ROOT, settings.TMP_DIR if hasattr(settings, "TMP_DIR") else "tmp")
@@ -491,20 +560,6 @@ def export_segmentation_metrics(tasks: Iterable[Dict], project, download_resourc
     with get_temp_dir() as tmp_dir:
         rows_by_image = compute_segmentation_metrics(tasks, project, download_resources, hostname)
 
-        # Write CSVs
-        for key, rows in rows_by_image.items():
-            # sanitize filename
-            safe_name = key.replace("/", "_").replace("\\", "_")
-            if not safe_name.lower().endswith(".csv"):
-                safe_name = f"{safe_name}.csv"
-            csv_path = os.path.join(tmp_dir, safe_name)
-            os.makedirs(os.path.dirname(csv_path), exist_ok=True)
-            with open(csv_path, "w", newline="", encoding="utf-8") as f:
-                writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
-                writer.writeheader()
-                for r in rows:
-                    writer.writerow(r)
-
         # If no rows produced, include a README to clarify
         produced_any = any(rows_by_image.values())
         if not produced_any:
@@ -513,15 +568,78 @@ def export_segmentation_metrics(tasks: Iterable[Dict], project, download_resourc
                 rf.write(
                     "No segmentation rows were generated. Ensure annotations include Brush (RLE) or Polygon regions, and that original image dimensions are present."
                 )
+            # Package to ZIP and return file handle
+            archive_base = os.path.join(tmp_dir)
+            shutil.make_archive(archive_base, "zip", tmp_dir)
+            zip_path = archive_base + ".zip"
+            out = path_to_open_binary_file(os.path.abspath(zip_path))
+            filename = f"project-{project.id}-segmentation.zip"
+            return out, "application/zip", filename
 
-        # Package to ZIP and return file handle
-        archive_base = os.path.join(tmp_dir)
-        shutil.make_archive(archive_base, "zip", tmp_dir)
-        zip_path = archive_base + ".zip"
-        from core.utils.io import path_to_open_binary_file
+        # Check if we have multiple images
+        num_images = len(rows_by_image)
 
-        out = path_to_open_binary_file(os.path.abspath(zip_path))
-        filename = f"project-{project.id}-segmentation.csv.zip"
-        return out, "application/zip", filename
+        if num_images > 1:
+            # Create Excel file with multiple sheets
+            excel_path = os.path.join(tmp_dir, f"project-{project.id}-segmentation.xlsx")
+
+            # Collect all rows for statistics
+            all_rows = []
+            for rows in rows_by_image.values():
+                all_rows.extend(rows)
+
+            with pd.ExcelWriter(excel_path, engine='openpyxl') as writer:
+                # Create summary sheet first
+                if all_rows:
+                    summary_df = _create_summary_dataframe(all_rows)
+                    summary_df.to_excel(writer, sheet_name='Summary', index=False)
+
+                # Create individual image sheets
+                for key, rows in rows_by_image.items():
+                    if not rows:
+                        continue
+
+                    # Create DataFrame from rows
+                    df = pd.DataFrame(rows)
+
+                    # Clean up sheet name (remove invalid characters and limit length)
+                    sheet_name = key.replace("/", "_").replace("\\", "_").replace("__task_", "_")
+                    # Excel sheet names have a 31 character limit
+                    if len(sheet_name) > 31:
+                        sheet_name = sheet_name[:28] + "..."
+
+                    # Write sheet
+                    df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+            # Return Excel file directly
+            out = path_to_open_binary_file(excel_path)
+            filename = f"project-{project.id}-segmentation.xlsx"
+            return out, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename
+
+        else:
+            # Single image: create CSV (backward compatibility)
+            for key, rows in rows_by_image.items():
+                if not rows:
+                    continue
+
+                # sanitize filename
+                safe_name = key.replace("/", "_").replace("\\", "_")
+                if not safe_name.lower().endswith(".csv"):
+                    safe_name = f"{safe_name}.csv"
+                csv_path = os.path.join(tmp_dir, safe_name)
+                os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+                with open(csv_path, "w", newline="", encoding="utf-8") as f:
+                    writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
+                    writer.writeheader()
+                    for r in rows:
+                        writer.writerow(r)
+
+            # Package to ZIP and return file handle
+            archive_base = os.path.join(tmp_dir)
+            shutil.make_archive(archive_base, "zip", tmp_dir)
+            zip_path = archive_base + ".zip"
+            out = path_to_open_binary_file(os.path.abspath(zip_path))
+            filename = f"project-{project.id}-segmentation.csv.zip"
+            return out, "application/zip", filename
 
 

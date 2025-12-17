@@ -48,6 +48,7 @@ dependencies = [
     "numpy (>=1.26.4,<2.0.0)",
     "ordered-set (==4.0.2)",
     "pandas (>=2.2.3)",
+    "openpyxl (>=3.1.0)",
     "psycopg2-binary (==2.9.10)",
     "pyarrow (>=18.1.0,<19.0.0)",
     "pydantic (>=2.9.2)",

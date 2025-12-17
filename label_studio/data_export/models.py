@@ -169,7 +169,7 @@ class DataExport(object):
                 seg_format = {
                     'name': 'SEG_CSV',
                     'title': 'Biowork CSV',
-                    'description': 'ZIP with one CSV per image; rows per annotation with bbox (px) and mean intensities (gray, RGB).',
+                    'description': 'Excel file with Summary sheet + one sheet per image (multi-image) or CSV (single image); rows per annotation with bbox (px) and mean intensities (gray, RGB).',
                     'link': 'https://labelstud.io/guide/export.html#CSV',
                     'tags': ['image segmentation'],
                 }

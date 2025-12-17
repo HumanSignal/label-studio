@@ -151,3 +151,156 @@ def test_legacy_textarea_only_intensities_still_supported():
     assert row["group"] == ""
 
 
+def test_excel_export_multiple_images(_single_task, _first_row):
+    """Test that multiple images create an Excel file with multiple sheets."""
+    from label_studio.data_export.formats.segmentation_csv_exporter import export_segmentation_metrics
+
+    # Create mock project
+    project = _DummyProject()
+
+    # Create tasks with different images
+    tasks = [
+        {
+            "id": 1,
+            "data": {"image": "image1.jpg"},
+            "annotations": [{
+                "id": 1,
+                "result": [
+                    {
+                        "id": "brush1",
+                        "type": "brushlabels",
+                        "to_name": "image",
+                        "from_name": "tag1",
+                        "value": {
+                            "format": "rle",
+                            "rle": [1, 1],  # Minimal RLE
+                            "brushlabels": ["Object"]
+                        },
+                        "original_width": 10,
+                        "original_height": 10,
+                        "meta": {
+                            "area": 25,
+                            "bbox": {"x": 0, "y": 0, "width": 5, "height": 5},
+                            "mean_r": 100.0,
+                            "mean_g": 150.0,
+                            "mean_b": 200.0,
+                            "group": "GroupA"
+                        }
+                    }
+                ]
+            }]
+        },
+        {
+            "id": 2,
+            "data": {"image": "image2.jpg"},
+            "annotations": [{
+                "id": 2,
+                "result": [
+                    {
+                        "id": "brush2",
+                        "type": "brushlabels",
+                        "to_name": "image",
+                        "from_name": "tag1",
+                        "value": {
+                            "format": "rle",
+                            "rle": [1, 1],  # Minimal RLE
+                            "brushlabels": ["Object"]
+                        },
+                        "original_width": 10,
+                        "original_height": 10,
+                        "meta": {
+                            "area": 36,
+                            "bbox": {"x": 1, "y": 1, "width": 6, "height": 6},
+                            "mean_r": 110.0,
+                            "mean_g": 160.0,
+                            "mean_b": 210.0,
+                            "group": "GroupB"
+                        }
+                    }
+                ]
+            }]
+        }
+    ]
+
+    # Export segmentation metrics
+    file_obj, content_type, filename = export_segmentation_metrics(tasks, project, download_resources=False)
+
+    # Should create Excel file for multiple images
+    assert filename.endswith('.xlsx')
+    assert 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' in content_type
+
+    # Verify we can read the Excel file
+    import pandas as pd
+    excel_data = pd.read_excel(file_obj, sheet_name=None)
+    assert len(excel_data) == 3  # Summary + two image sheets
+
+    # Check that Summary sheet exists
+    assert 'Summary' in excel_data
+
+    # Check summary data
+    summary_df = excel_data['Summary']
+    assert len(summary_df) > 0
+
+    # Should have total regions count
+    total_regions_row = summary_df[summary_df['Metric'] == 'Total Regions']
+    assert len(total_regions_row) == 1
+    assert total_regions_row.iloc[0]['Value'] == 2  # Two regions total
+
+    # Should have number of groups
+    groups_row = summary_df[summary_df['Metric'] == 'Number of Groups']
+    assert len(groups_row) == 1
+    assert groups_row.iloc[0]['Value'] == 2  # Two different groups
+
+    # Check sheet names contain image info
+    sheet_names = [name for name in excel_data.keys() if name != 'Summary']
+    assert len(sheet_names) == 2
+    assert any('image1' in name for name in sheet_names)
+    assert any('image2' in name for name in sheet_names)
+
+    # Check data in image sheets
+    for sheet_name in sheet_names:
+        sheet_data = excel_data[sheet_name]
+        assert len(sheet_data) == 1
+        assert sheet_data.iloc[0]['area_px'] in [25, 36]  # Either image1 or image2 data
+
+
+def test_csv_export_single_image_fallback(_single_task, _first_row):
+    """Test that single image still creates CSV file for backward compatibility."""
+    from label_studio.data_export.formats.segmentation_csv_exporter import export_segmentation_metrics
+
+    # Create mock project
+    project = _DummyProject()
+
+    # Single task (already tested above)
+    tasks = [_single_task([
+        {
+            "id": "brush1",
+            "type": "brushlabels",
+            "to_name": "image",
+            "from_name": "tag1",
+            "value": {
+                "format": "rle",
+                "rle": [1, 1],
+                "brushlabels": ["Object"]
+            },
+            "original_width": 10,
+            "original_height": 10,
+            "meta": {
+                "area": 25,
+                "bbox": {"x": 0, "y": 0, "width": 5, "height": 5},
+                "mean_r": 100.0,
+                "mean_g": 150.0,
+                "mean_b": 200.0,
+                "group": "SingleGroup"
+            }
+        }
+    ])]
+
+    # Export segmentation metrics
+    file_obj, content_type, filename = export_segmentation_metrics(tasks, project, download_resources=False)
+
+    # Should create ZIP file containing CSV for single image
+    assert filename.endswith('.csv.zip')
+    assert content_type == 'application/zip'
+
+
