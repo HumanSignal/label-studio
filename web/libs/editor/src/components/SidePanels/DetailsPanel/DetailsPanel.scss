@@ -2,7 +2,8 @@
 .history,
 .relations,
 .info,
-.comments-panel {
+.comments-panel,
+.stats {
   --details-section-border-color: var(--color-neutral-border);
 
   width: 100%;
@@ -79,9 +80,53 @@
   }
 }
 
-.history, .info {
+.history, .info, .stats {
   &__section-tab {
     padding: 4px;
+  }
+}
+
+.stats {
+  &__scope {
+    margin: 2px 0 6px;
+    font-size: 12px;
+    color: var(--color-neutral-content-subtler);
+  }
+
+  &__section-content {
+    padding: 4px 4px 8px;
+    overflow-x: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+
+    th,
+    td {
+      padding: 4px 6px;
+      text-align: right;
+      border-bottom: 1px solid var(--color-neutral-border-subtle);
+      min-width: 52px;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+      white-space: nowrap;
+      min-width: 90px;
+    }
+
+    thead th {
+      font-weight: 500;
+      border-bottom-color: var(--color-neutral-border);
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: var(--color-neutral-surface);
+    }
   }
 }
 

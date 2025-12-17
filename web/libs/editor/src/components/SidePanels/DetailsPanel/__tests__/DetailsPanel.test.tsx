@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { Relations, Info } from "../DetailsPanel";
+import { Relations, Info, Stats } from "../DetailsPanel";
 
 // Mock the dependencies
 jest.mock("../../../../utils/bem", () => ({
@@ -314,6 +314,106 @@ describe("DetailsPanel", () => {
 
         // But also won't render region items since list is empty
         expect(screen.queryByTestId("region-item")).not.toBeInTheDocument();
+      });
+    });
+  });
+
+  describe("Stats", () => {
+    const baseRegion = (overrides: any = {}) => ({
+      id: "region-id",
+      meta: {},
+      ...overrides,
+    });
+
+    const makeSelection = (regions: any[]) => ({
+      size: regions.length,
+      list: regions,
+    });
+
+    const makeCurrentEntity = (regions: any[]) => ({
+      regionStore: {
+        list: regions,
+      },
+    });
+
+    describe("when there is no selection and no regions", () => {
+      it("renders empty state", () => {
+        const selection = makeSelection([]);
+        const currentEntity = makeCurrentEntity([]);
+
+        render(<Stats selection={selection} currentEntity={currentEntity} />);
+
+        const emptyState = screen.getByTestId("empty-state");
+        expect(emptyState).toBeInTheDocument();
+
+        const header = screen.getByTestId("empty-state-header");
+        expect(header).toHaveTextContent("View region statistics");
+      });
+    });
+
+    describe("when there is a selection with regions having meta", () => {
+      it("renders statistics table for selection", () => {
+        const regions = [
+          baseRegion({
+            meta: {
+              area: 10,
+              bbox: { width: 5, height: 2 },
+              mean_r: 1,
+              mean_g: 2,
+              mean_b: 3,
+            },
+          }),
+          baseRegion({
+            meta: {
+              area: 30,
+              bbox: { width: 15, height: 4 },
+              mean_r: 3,
+              mean_g: 4,
+              mean_b: 5,
+            },
+          }),
+        ];
+
+        const selection = makeSelection(regions);
+        const currentEntity = makeCurrentEntity(regions);
+
+        render(<Stats selection={selection} currentEntity={currentEntity} />);
+
+        const scope = screen.getByTestId("stats-scope");
+        expect(scope).toHaveTextContent("Selection (2 regions)");
+
+        const table = screen.getByTestId("region-stats-table");
+        expect(table).toBeInTheDocument();
+
+        // Area stats: values [10, 30] => mean 20, sd 10, p25 15, median 20, p75 25
+        expect(screen.getByText("Area (px)")).toBeInTheDocument();
+        expect(screen.getByText("2")).toBeInTheDocument();
+        expect(screen.getByText("20")).toBeInTheDocument();
+      });
+    });
+
+    describe("when there is no selection but regions exist", () => {
+      it("uses all regions in image as scope", () => {
+        const regions = [
+          baseRegion({
+            meta: {
+              area: 5,
+            },
+          }),
+          baseRegion({
+            meta: {
+              area: 15,
+            },
+          }),
+        ];
+
+        const selection = makeSelection([]);
+        const currentEntity = makeCurrentEntity(regions);
+
+        render(<Stats selection={selection} currentEntity={currentEntity} />);
+
+        const scope = screen.getByTestId("stats-scope");
+        expect(scope).toHaveTextContent("All regions in image (2 regions)");
       });
     });
   });

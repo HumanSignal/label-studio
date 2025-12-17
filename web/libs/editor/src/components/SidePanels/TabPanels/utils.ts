@@ -8,7 +8,7 @@ import {
   DEFAULT_PANEL_WIDTH,
   PANEL_HEADER_HEIGHT,
 } from "../constants";
-import { Comments, History, Info, Relations } from "../DetailsPanel/DetailsPanel";
+import { Comments, History, Info, Relations, Stats } from "../DetailsPanel/DetailsPanel";
 import { OutlinerComponent } from "../OutlinerPanel/OutlinerPanel";
 import type { PanelProps } from "../PanelBase";
 import {
@@ -125,6 +125,7 @@ export const panelComponents: { [key: string]: FC<PanelProps> } = {
   relations: Relations as FC<PanelProps>,
   comments: Comments as FC<PanelProps>,
   info: Info as FC<PanelProps>,
+  stats: Stats as FC<PanelProps>,
 };
 
 const panelViews = [
@@ -154,6 +155,12 @@ const panelViews = [
     active: true,
   },
   {
+    name: "stats",
+    title: "Stats",
+    component: panelComponents.stats as FC<PanelProps>,
+    active: false,
+  },
+  {
     name: "comments",
     title: "Comments",
     component: panelComponents.comments as FC<PanelProps>,
@@ -175,7 +182,7 @@ export const enterprisePanelDefault: Record<string, PanelBBox> = {
     detached: false,
     alignment: Side.right,
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
-    panelViews: [panelViews[3], panelViews[4], panelViews[1]],
+    panelViews: [panelViews[3], panelViews[4], panelViews[5], panelViews[1]],
   },
   "regions-relations": {
     order: 2,
@@ -208,7 +215,7 @@ export const openSourcePanelDefault: Record<string, PanelBBox> = {
     detached: false,
     alignment: Side.right,
     maxHeight: DEFAULT_PANEL_MAX_HEIGHT,
-    panelViews: [panelViews[3], panelViews[1]],
+    panelViews: [panelViews[3], panelViews[4], panelViews[1]],
   },
   "regions-relations": {
     order: 2,
@@ -245,7 +252,7 @@ export const partialEmptyBaseProps = {
   setSidePanelCollapsed: () => {},
   dragTop: false,
   dragBottom: false,
-  panelViews: [panelViews[0], panelViews[1], panelViews[2], panelViews[3], panelViews[4]],
+  panelViews: [panelViews[0], panelViews[1], panelViews[2], panelViews[3], panelViews[4], panelViews[5]],
 };
 
 export const resizers = ["top-left", "top-right", "bottom-left", "bottom-right", "top", "bottom", "right", "left"];
