@@ -7,10 +7,7 @@ const MIN_EDITOR_WIDTH = 300;
 const MIN_PREVIEW_WIDTH = 400;
 
 export const useConfigResizer = ({ projectId, containerWidth }) => {
-  const storageKey = useMemo(
-    () => (projectId ? `labelStudio:configPreviewWidth:${projectId}` : null),
-    [projectId],
-  );
+  const storageKey = useMemo(() => (projectId ? `labelStudio:configPreviewWidth:${projectId}` : null), [projectId]);
 
   const [previewWidthPercent, setPreviewWidthPercent] = useState(() => {
     if (!storageKey) return DEFAULT_PREVIEW_WIDTH;
@@ -67,4 +64,3 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
     constraints,
   };
 };
-
