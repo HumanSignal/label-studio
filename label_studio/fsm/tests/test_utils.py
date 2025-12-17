@@ -568,7 +568,7 @@ class TestGetOrInitializeStateParameters(TestCase):
                     mock_get_sm.return_value = mock_sm
 
                     # Mock state inference
-                    with patch('fsm.utils.infer_entity_state_from_data', return_value='IN_PROGRESS'):
+                    with patch('fsm.state_inference._get_or_infer_state', return_value='IN_PROGRESS'):
                         with patch('fsm.utils._get_initialization_transition_name', return_value='init_transition'):
                             # Call with reason
                             get_or_initialize_state(
@@ -612,7 +612,7 @@ class TestGetOrInitializeStateParameters(TestCase):
                     mock_get_sm.return_value = mock_sm
 
                     # Mock state inference
-                    with patch('fsm.utils.infer_entity_state_from_data', return_value='IN_PROGRESS'):
+                    with patch('fsm.state_inference._get_or_infer_state', return_value='IN_PROGRESS'):
                         with patch('fsm.utils._get_initialization_transition_name', return_value='init_transition'):
                             # Call with context_data
                             get_or_initialize_state(
@@ -658,7 +658,7 @@ class TestGetOrInitializeStateParameters(TestCase):
                     mock_get_sm.return_value = mock_sm
 
                     # Mock state inference
-                    with patch('fsm.utils.infer_entity_state_from_data', return_value='IN_PROGRESS'):
+                    with patch('fsm.state_inference._get_or_infer_state', return_value='IN_PROGRESS'):
                         with patch('fsm.utils._get_initialization_transition_name', return_value='init_transition'):
                             # Call with both reason and context_data
                             get_or_initialize_state(
@@ -698,7 +698,7 @@ class TestGetOrInitializeStateParameters(TestCase):
                     mock_get_sm.return_value = mock_sm
 
                     # Mock state inference
-                    with patch('fsm.utils.infer_entity_state_from_data', return_value='IN_PROGRESS'):
+                    with patch('fsm.state_inference._get_or_infer_state', return_value='IN_PROGRESS'):
                         with patch('fsm.utils._get_initialization_transition_name', return_value='init_transition'):
                             # Call without context_data
                             get_or_initialize_state(

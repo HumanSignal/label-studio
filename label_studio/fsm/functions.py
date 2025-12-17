@@ -4,8 +4,11 @@ FSM utility functions for backfilling and managing state transitions.
 This module contains reusable functions for FSM state management that are
 used across different parts of the codebase.
 """
-
 import logging
+
+from core.current_request import CurrentContext
+from fsm.state_inference import get_or_infer_state
+from fsm.utils import get_or_initialize_state
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +35,6 @@ def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
         return
 
     try:
-        from lse_fsm.state_inference import backfill_state_for_entity
         from tasks.models import Task
 
         # Get tasks created in this sync
@@ -48,12 +50,11 @@ def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
 
         # Backfill initial CREATED state for each task
         for task in tasks:
-            backfill_state_for_entity(task, 'task', create_record=True)
+
+            inferred_state = get_or_infer_state(task)
+            get_or_initialize_state(task, user=CurrentContext.get_user(), inferred_state=inferred_state)
 
         logger.info(f'Storage sync: FSM states created for {len(task_ids)} tasks')
-    except ImportError:
-        # LSE not available (OSS), skip FSM sync
-        logger.debug('LSE not available, skipping FSM state backfill for storage sync')
     except Exception as e:
         # Don't fail storage sync if FSM sync fails
         logger.error(f'FSM sync after storage sync failed: {e}', exc_info=True)
