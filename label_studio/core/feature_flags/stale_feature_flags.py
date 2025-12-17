@@ -6,8 +6,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_back_dev_3756_queue_enrollment_min_short': False,
     'fflag_fix_front_lsdv_4620_memory_leaks_100723_short': False,
     # Jan 16
-    'feat_all_optic_71_dashboard_multiple_labeling_group_support_v1_01092023_short': True,
-    'fflag_feat_front_prod_281_project_list_search_19072023_short': True,
     'fflag_feat_all_lsdv_e_295_project_level_roles_via_saml_scim_ldap_short': True,
     'ff_back_2884_comments_notifications_02092022_short': True,
     'ff_front_dev_1480_created_on_in_review_180122_short': True,
@@ -27,5 +25,4 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_front_leap_1198_unsaved_changes_180724': True,
     'fflag_fix_leap_246_multi_object_hotkeys_160124_short': True,
     'fflag_fix_leap_466_text_sanitization': True,
-    'fflag_fix_front_leap_218_improve_performance_of_taxonomy_search_short': True,
 }

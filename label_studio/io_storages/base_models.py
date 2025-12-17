@@ -29,6 +29,7 @@ from django.db.models import JSONField
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from fsm.functions import backfill_fsm_states_for_tasks
 from io_storages.utils import StorageObject, get_uri_via_regex, parse_bucket_uri
 from rest_framework.exceptions import ValidationError
 from rq.job import Job
@@ -646,9 +647,6 @@ class ImportStorage(Storage):
             )
 
         # Create initial FSM states for all tasks created during storage sync
-        # CurrentContext is now available because we use start_job_async_or_sync
-        from fsm.functions import backfill_fsm_states_for_tasks
-
         backfill_fsm_states_for_tasks(self.id, tasks_created, link_class)
 
         self.project.update_tasks_states(

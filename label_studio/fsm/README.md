@@ -310,3 +310,4 @@ When contributing:
 - Add performance tests for UUID7 optimizations
 - Document extension points and customization options
 - Ensure extensibility is preserved
+- When adding pytests, use and extend reusable helper functions in `fsm/tests/helpers.py` when appropriate

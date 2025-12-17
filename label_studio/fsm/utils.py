@@ -279,11 +279,9 @@ def is_fsm_enabled(user=None) -> bool:
 def get_current_state_safe(entity, user=None) -> Optional[str]:
     """
     Safely get current state with error handling.
-
     Args:
         entity: The entity to get state for
         user: The user making the request (for feature flag checking)
-
     Returns:
         Current state string or None if failed
     """
@@ -309,87 +307,21 @@ def get_current_state_safe(entity, user=None) -> Optional[str]:
         return None
 
 
-def infer_entity_state_from_data(entity) -> Optional[str]:
-    """
-    Infer what the FSM state should be based on entity's current data.
-
-    This is used for "cold start" scenarios where entities exist in the database
-    but don't have FSM state records yet (e.g., after FSM deployment to production
-    with pre-existing data).
-
-    Args:
-        entity: The entity to infer state for (Task, Project, or Annotation)
-
-    Returns:
-        Inferred state value, or None if entity type not supported
-
-    Examples:
-        >>> task = Task.objects.get(id=123)
-        >>> task.is_labeled = True
-        >>> infer_entity_state_from_data(task)
-        'COMPLETED'
-
-        >>> project = Project.objects.get(id=456)
-        >>> infer_entity_state_from_data(project)
-        'CREATED'
-    """
-    from fsm.state_choices import AnnotationStateChoices, ProjectStateChoices, TaskStateChoices
-
-    entity_type = entity._meta.model_name.lower()
-
-    if entity_type == 'task':
-        # Task state depends on whether it has been labeled
-        return TaskStateChoices.COMPLETED if entity.is_labeled else TaskStateChoices.CREATED
-    elif entity_type == 'project':
-        # Project state depends on task completion
-        # If no tasks exist, project is CREATED
-        # If any tasks are completed, project is at least IN_PROGRESS
-        # If all tasks are completed, project is COMPLETED
-        tasks = entity.tasks.all()
-        if not tasks.exists():
-            return ProjectStateChoices.CREATED
-
-        # Count labeled tasks to determine project state
-        total_tasks = tasks.count()
-        labeled_tasks = tasks.filter(is_labeled=True).count()
-
-        if labeled_tasks == 0:
-            return ProjectStateChoices.CREATED
-        elif labeled_tasks == total_tasks:
-            return ProjectStateChoices.COMPLETED
-        else:
-            return ProjectStateChoices.IN_PROGRESS
-    elif entity_type == 'annotation':
-        # Annotations are SUBMITTED when created
-        return AnnotationStateChoices.SUBMITTED
-    else:
-        logger.warning(
-            f'Cannot infer state for unknown entity type: {entity_type}',
-            extra={
-                'event': 'fsm.infer_state_unknown_type',
-                'entity_type': entity_type,
-                'entity_id': entity.pk,
-            },
-        )
-        return None
-
-
-def get_or_initialize_state(entity, user=None, inferred_state=None, reason=None, context_data=None) -> Optional[str]:
+def get_or_initialize_state(entity, user, inferred_state: str, reason=None, context_data=None) -> Optional[str]:
     """
     Get current state, or initialize it if it doesn't exist.
 
     This function handles "cold start" scenarios where pre-existing entities
     don't have FSM state records. It will:
-    1. Try to get the current state
-    2. If None, infer the state from entity data
-    3. Initialize the state with an appropriate transition
-    4. Return the state value (never returns None if initialization succeeds)
+    1. If the state already exists, use that
+    2. If the state doesn't exist, infer the state from the entity and initialize it with an appropriate transition
+    2. Return the state value (never returns None if initialization succeeds)
 
     Args:
         entity: The entity to get or initialize state for
-        user: User for FSM context (optional)
-        inferred_state: Pre-computed inferred state (optional, will compute if not provided)
-        reason: Custom reason for the state initialization (optional, overrides default)
+        user: User for FSM context
+        inferred_state: Pre-computed inferred state
+        reason: Custom reason for the state initialization (optional, overrides default reason)
         context_data: Additional context data to store with state record (optional)
 
     Returns:
@@ -397,7 +329,9 @@ def get_or_initialize_state(entity, user=None, inferred_state=None, reason=None,
 
     Examples:
         >>> task = Task.objects.get(id=123)  # Pre-existing task without state
-        >>> state = get_or_initialize_state(task, user=request.user)
+        >>> from fsm.state_inference import get_or_infer_state
+        >>> inferred_state = get_or_infer_state(task)
+        >>> state = get_or_initialize_state(task, user=request.user, inferred_state=inferred_state)
         >>> # state is now 'COMPLETED' or 'CREATED' based on task.is_labeled
         >>> # and a state record has been created
     """
@@ -419,10 +353,6 @@ def get_or_initialize_state(entity, user=None, inferred_state=None, reason=None,
         if current_state is not None:
             # State already exists, return it
             return current_state
-
-        # No state exists - need to initialize it
-        if inferred_state is None:
-            inferred_state = infer_entity_state_from_data(entity)
 
         if inferred_state is None:
             logger.warning(

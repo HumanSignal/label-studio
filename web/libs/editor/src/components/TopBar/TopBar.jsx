@@ -11,7 +11,6 @@ import { DynamicPreannotationsToggle } from "../AnnotationTab/DynamicPreannotati
 import { Actions } from "./Actions";
 import { Annotations } from "./Annotations";
 import { Controls } from "./Controls";
-import { CurrentTask } from "./CurrentTask";
 
 import "./TopBar.scss";
 
@@ -25,6 +24,10 @@ export const TopBar = observer(({ store }) => {
 
   if (isFF(FF_DEV_3873) && isBulkMode) return null;
 
+  // Hide TopBar for Labeling Stream (when annotations:view-all interface is not present)
+  // Keep TopBar visible for Review Stream and Quick View
+  if (isFF(FF_DEV_3873) && !store.hasInterface("annotations:view-all")) return null;
+
   return store ? (
     <div
       className={cn("topbar")
@@ -33,7 +36,6 @@ export const TopBar = observer(({ store }) => {
     >
       {isFF(FF_DEV_3873) ? (
         <div className={cn("topbar").elem("group").toClassName()}>
-          <CurrentTask store={store} />
           {store.hasInterface("annotations:view-all") && (
             <Button
               className={"topbar__button"}
@@ -78,7 +80,6 @@ export const TopBar = observer(({ store }) => {
       ) : (
         <>
           <div className={cn("topbar").elem("group").toClassName()}>
-            {!isBulkMode && <CurrentTask store={store} />}
             {!isViewAll && !isBulkMode && (
               <Annotations store={store} annotationStore={store.annotationStore} commentStore={store.commentStore} />
             )}

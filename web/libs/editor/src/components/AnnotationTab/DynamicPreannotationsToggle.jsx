@@ -30,6 +30,7 @@ export const DynamicPreannotationsToggle = inject("store")(
                 }
               }}
               label="Auto-Annotation"
+              data-testid="bottombar-auto-annotation-toggle"
             />
           </Space>
         </div>

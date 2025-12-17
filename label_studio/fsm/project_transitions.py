@@ -11,9 +11,10 @@ from core.utils.common import load_func
 from django.conf import settings
 from fsm.registry import register_state_transition
 from fsm.state_choices import ProjectStateChoices
+from fsm.state_inference import get_or_infer_state
 from fsm.state_manager import StateManager
 from fsm.transitions import ModelChangeTransition, TransitionContext
-from fsm.utils import get_or_initialize_state, infer_entity_state_from_data
+from fsm.utils import get_or_initialize_state
 
 
 @register_state_transition('project', 'project_created', triggers_on_create=True, triggers_on_update=False)
@@ -135,7 +136,7 @@ class ProjectInProgressFromCompletedTransition(ModelChangeTransition):
 
 def sync_project_state(project, user=None, reason=None, context_data=None):
     current_state = StateManager.get_current_state_value(project)
-    inferred_state = infer_entity_state_from_data(project)
+    inferred_state = get_or_infer_state(project)
 
     if current_state is None:
         get_or_initialize_state(project, user=user, inferred_state=inferred_state)
