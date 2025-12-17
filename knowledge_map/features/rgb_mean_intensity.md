@@ -31,6 +31,15 @@ Expected region `meta` schema (per result):
   - If `meta.mean_*` channels are missing or invalid for a region, the frontend falls back to the region display color (`background` or `getOneColor()`), computing a gray/luma approximation from the RGB components and using the raw `r`, `g`, `b` values.
 - The existing **By Time** (`date`) and **By Score** (`score`) ordering options remain available and unchanged.
 
+## Regions Tab Sorting by Area and Bounding Box
+
+- The Regions (Outliner) side panel also supports additional sort options based on region geometry when grouping is set to **Manual**:
+  - **By Area** (`area`) — uses `meta.area`
+  - **By Width** (`bbox_width`) — uses `meta.bbox.width`
+  - **By Height** (`bbox_height`) — uses `meta.bbox.height`
+- These sort modes rely on the `meta.area` and `meta.bbox.*` fields populated by ML backends or other upstream processing.
+- If a region is missing these fields, it is treated as `0` for the corresponding metric, so regions without geometry stats naturally fall to the beginning or end of the sorted list depending on sort direction.
+
 
 
 

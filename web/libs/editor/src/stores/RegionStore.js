@@ -136,10 +136,10 @@ const SelectionMap = types
 export default types
   .model("RegionStore", {
     sort: types.optional(
-      types.enumeration(["date", "score", "intensity_r", "intensity_g", "intensity_b"]),
+      types.enumeration(["date", "score", "intensity_r", "intensity_g", "intensity_b", "area", "bbox_width", "bbox_height"]),
       (() => {
         const stored = window.localStorage.getItem(localStorageKeys.sort);
-        const allowed = new Set(["date", "score", "intensity_r", "intensity_g", "intensity_b"]);
+        const allowed = new Set(["date", "score", "intensity_r", "intensity_g", "intensity_b", "area", "bbox_width", "bbox_height"]);
 
         if (!stored || !allowed.has(stored)) return "date";
         return stored;

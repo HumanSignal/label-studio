@@ -15,8 +15,11 @@ export const Sidebar = {
     return this.toolBar.get(".lsf-view-controls__sort button");
   },
   toggleOrderByTime() {
+    this.setOrderBy("Order by Time");
+  },
+  setOrderBy(optionLabel: string) {
     this.orderRegionsButton.click();
-    cy.get(".lsf-dropdown").contains("Order by Time").parent().click();
+    cy.get(".lsf-dropdown").contains(optionLabel).parent().click();
     // Cypress is bad at events emitting, so this is a hack to close the panel that
     // would be closed if the same action is done by a real person
     this.orderRegionsButton.click();
