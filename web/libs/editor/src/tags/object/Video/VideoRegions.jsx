@@ -238,6 +238,10 @@ const VideoRegionsPure = ({
 };
 
 const RegionsLayer = observer(({ regions, item, locked, isDrawing, workinAreaCoordinates, stageRef, onDragMove }) => {
+  // Access item.frame here to ensure the observer tracks frame changes
+  // This ensures regions update correctly during fast scrubbing
+  const frame = item.frame;
+
   return (
     <>
       {regions.map((reg) => (
@@ -245,7 +249,7 @@ const RegionsLayer = observer(({ regions, item, locked, isDrawing, workinAreaCoo
           id={reg.id}
           key={reg.id}
           reg={reg}
-          frame={item.frame}
+          item={item}
           workingArea={workinAreaCoordinates}
           draggable={!reg.isReadOnly() && !isDrawing && !locked}
           selected={reg.selected || reg.inSelection}
@@ -258,7 +262,11 @@ const RegionsLayer = observer(({ regions, item, locked, isDrawing, workinAreaCoo
   );
 });
 
-const Shape = observer(({ id, reg, frame, stageRef, ...props }) => {
+const Shape = observer(({ id, reg, item, stageRef, ...props }) => {
+  // Access item.frame directly inside the observer to ensure MobX tracks it
+  // Even though frame is volatile, accessing it here ensures the observer
+  // will re-render when frame changes during fast scrubbing
+  const frame = item.frame;
   const box = reg.getShape(frame);
 
   return (
