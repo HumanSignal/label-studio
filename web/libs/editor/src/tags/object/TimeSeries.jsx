@@ -1196,7 +1196,7 @@ const Overview = observer(({ item, data, series }) => {
             // so we swap prev as well
             [prev[0], prev[1]] = [prev[1], prev[0]];
           } else {
-            // This may happen at begining when range was not enough wide yet
+            // This may happen at beginning when range was not enough wide yet
             if (x1 === startX) {
               x2 = Math.min(width, x1 + MIN_OVERVIEW);
               x1 = Math.max(0, x2 - MIN_OVERVIEW);

@@ -18,13 +18,13 @@ repo_url: https://github.com/HumanSignal/awesome-label-studio-config/tree/main/l
 
 <img src="/images/templates/two-level-sentiment-analysis-of-x-twitter-posts.jpg" alt="" class="gif-border" width="552px" height="408px" />
 
-This labeling config lets you assign a sentiment (Positive, Negative, or Neutral) to X / Twitter post. After picking a sentiment, a second-level classification appears to categorize the text as Descriptive, Emotional, Mixed, Ambigous, or Sarcams. The labeling interface is styled to look like a X / Twitter post.
+This labeling config lets you assign a sentiment (Positive, Negative, or Neutral) to X / Twitter post. After picking a sentiment, a second-level classification appears to categorize the text as Descriptive, Emotional, Mixed, Ambiguous, or Sarcasm. The labeling interface is styled to look like a X / Twitter post.
 
 ## Labeling Configuration
 
 ```html
 <View>
-  <!-- CSS fix for the legacy plaground -->
+  <!-- CSS fix for the legacy playground -->
   <Style>
     .htx-text{padding:0; background: transparent; border:none;}
   </Style>
@@ -95,8 +95,8 @@ This labeling config lets you assign a sentiment (Positive, Negative, or Neutral
     <Choice value="Descriptive" />
     <Choice value="Emotional" hint="Click on it if it shows moderate to strong sentiment" />
     <Choice value="Mixed" hint="Click on it if multiple conflicting sentiments are present"/>
-    <Choice value="Ambigous" hint="Click on it if it is irrelevant or unclear"/>
-    <Choice value="Sarcams" hint="Click on it if it shows ironic or sarcastic content"/>
+    <Choice value="Ambiguous" hint="Click on it if it is irrelevant or unclear"/>
+    <Choice value="Sarcasm" hint="Click on it if it shows ironic or sarcastic content"/>
   </Choices>
 </View>
 ```

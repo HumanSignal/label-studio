@@ -22,7 +22,7 @@ const TaskStore = types
     agreement: types.maybeNull(types.number),
     /**
      * Data of task, may contain an object but in App Store will be transformed into string
-     * MST doesn't support processing of dynamic objects with unkown keys value
+     * MST doesn't support processing of dynamic objects with unknown keys value
      */
     data: types.maybeNull(types.string),
     queue: types.optional(types.maybeNull(types.string), null),

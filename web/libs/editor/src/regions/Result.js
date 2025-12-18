@@ -346,10 +346,10 @@ const Result = types
       self.meta = { ...self.meta, [key]: value };
     },
 
-    // update region appearence based on it's current states, for
+    // update region appearance based on it's current states, for
     // example bbox needs to update its colors when you change the
-    // label, becuase it takes color from the label
-    updateAppearenceFromState() {},
+    // label, because it takes color from the label
+    updateAppearanceFromState() {},
 
     serialize(options) {
       const sn = getSnapshot(self);

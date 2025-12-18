@@ -381,10 +381,10 @@ const Model = types
         imageDimension.item_index = index;
       }
 
-      // We're using raw region result instead of calulated one when
+      // We're using raw region result instead of calculated one when
       // the image data is not available (image is not yet loaded)
       // As the serialization also happens during region creation,
-      // we have to forsee this scenario and avoid using raw result
+      // we have to foresee this scenario and avoid using raw result
       // as it can only be present for already created (submitter) regions
       const useRawResult = !currentImageEntity.imageLoaded && isDefined(region._rawResult);
 

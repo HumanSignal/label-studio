@@ -16,7 +16,7 @@ export const AreaMixinBase = types
     parentID: types.maybeNull(types.string),
   })
   .views((self) => ({
-    // self id without annotation id added to uniquiness across all the tree
+    // self id without annotation id added to uniqueness across all the tree
     get cleanId() {
       return self.id.replace(/#.*/, "");
     },
@@ -170,7 +170,7 @@ export const AreaMixinBase = types
       self.results.forEach((r) => destroy(r));
 
       // Some region indexes have to be recalculated after destroying regions
-      self.annotation?.updateAppearenceFromState?.();
+      self.annotation?.updateAppearanceFromState?.();
     },
 
     setSelected(value) {
@@ -234,7 +234,7 @@ export const AreaMixinBase = types
           },
         });
       }
-      self.updateAppearenceFromState && self.updateAppearenceFromState();
+      self.updateAppearanceFromState && self.updateAppearanceFromState();
     },
   }));
 

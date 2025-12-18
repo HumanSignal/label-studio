@@ -52,7 +52,7 @@ const RectRegionAbsoluteCoordsDEV3793 = types
         }
       }
       self.checkSizes();
-      self.updateAppearenceFromState();
+      self.updateAppearanceFromState();
     },
     setPosition(x, y, width, height, rotation) {
       [x, y, width, height, rotation] = self.beforeSetPosition(x, y, width, height, rotation);

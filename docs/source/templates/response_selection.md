@@ -55,7 +55,7 @@ You can add a [header](/tags/header.html) to provide instructions to the annotat
 <Header value="Choose a response" />
 ```
 
-Use a new [View](/tags/view.html) tag to control the dsiplay of text and choices on the labeling interface:
+Use a new [View](/tags/view.html) tag to control the display of text and choices on the labeling interface:
 ```xml
   <View style="display: flex">
 ```

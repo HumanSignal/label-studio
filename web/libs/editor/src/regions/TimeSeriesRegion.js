@@ -69,7 +69,7 @@ const Model = types
       self.parent.scrollToRegion(self);
     },
 
-    updateAppearenceFromState() {
+    updateAppearanceFromState() {
       const s = self.labelsState;
 
       if (!s) return;

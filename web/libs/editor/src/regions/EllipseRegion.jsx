@@ -58,7 +58,7 @@ const EllipseRegionAbsoluteCoordsDEV3793 = types
         }
       }
       self.checkSizes();
-      self.updateAppearenceFromState();
+      self.updateAppearanceFromState();
     },
     setPosition(x, y, radiusX, radiusY, rotation) {
       self.x = x;

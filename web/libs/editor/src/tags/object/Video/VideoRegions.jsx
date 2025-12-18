@@ -45,19 +45,19 @@ const VideoRegionsPure = ({
   // so we observe all the sequences to rerender transformer
   regions.map((reg) => fixMobxObserve(reg.sequence));
 
-  const workinAreaCoordinates = useMemo(() => {
+  const workingAreaCoordinates = useMemo(() => {
     const resultWidth = videoDimensions.width * zoom;
     const resultHeight = videoDimensions.height * zoom;
     const overshotX = Math.abs(pan.x) >= Math.abs((width - resultWidth) / 2);
     const overshotY = Math.abs(pan.y) >= Math.abs((height - resultHeight) / 2);
     const panXDirection = pan.x > 0 ? 1 : -1;
     const panYDirection = pan.y > 0 ? 1 : -1;
-    const overshotXAmmount = (Math.abs(pan.x) - Math.abs((width - resultWidth) / 2)) * panXDirection;
-    const overshotYAmmount = (Math.abs(pan.y) - Math.abs((height - resultHeight) / 2)) * panYDirection;
-    const edgeZoomOffestX = overshotX ? overshotXAmmount : 0;
-    const edgeZoomOffestY = overshotY ? overshotYAmmount : 0;
-    const offsetLeft = (width - resultWidth) / 2 + pan.x - edgeZoomOffestX;
-    const offsetTop = (height - resultHeight) / 2 + pan.y - edgeZoomOffestY;
+    const overshotXAmount = (Math.abs(pan.x) - Math.abs((width - resultWidth) / 2)) * panXDirection;
+    const overshotYAmount = (Math.abs(pan.y) - Math.abs((height - resultHeight) / 2)) * panYDirection;
+    const edgeZoomOffsetX = overshotX ? overshotXAmount : 0;
+    const edgeZoomOffsetY = overshotY ? overshotYAmount : 0;
+    const offsetLeft = (width - resultWidth) / 2 + pan.x - edgeZoomOffsetX;
+    const offsetTop = (height - resultHeight) / 2 + pan.y - edgeZoomOffsetY;
 
     return {
       width: resultWidth,
@@ -72,28 +72,28 @@ const VideoRegionsPure = ({
 
   const layerProps = useMemo(
     () => ({
-      width: workinAreaCoordinates.width,
-      height: workinAreaCoordinates.height,
+      width: workingAreaCoordinates.width,
+      height: workingAreaCoordinates.height,
       scaleX: zoom,
       scaleY: zoom,
       position: {
-        x: workinAreaCoordinates.x,
-        y: workinAreaCoordinates.y,
+        x: workingAreaCoordinates.x,
+        y: workingAreaCoordinates.y,
       },
     }),
-    [workinAreaCoordinates, zoom],
+    [workingAreaCoordinates, zoom],
   );
 
   const normalizeMouseOffsets = useCallback(
     (x, y) => {
-      const { x: offsetLeft, y: offsetTop } = workinAreaCoordinates;
+      const { x: offsetLeft, y: offsetTop } = workingAreaCoordinates;
 
       return {
         x: (x - offsetLeft) / zoom,
         y: (y - offsetTop) / zoom,
       };
     },
-    [workinAreaCoordinates, zoom],
+    [workingAreaCoordinates, zoom],
   );
 
   useEffect(() => {
@@ -119,20 +119,20 @@ const VideoRegionsPure = ({
       item.addVideoRegion(fixedRegion);
       setNewRegion(null);
     }
-  }, [isDrawing, workinAreaCoordinates, videoDimensions]);
+  }, [isDrawing, workingAreaCoordinates, videoDimensions]);
 
   const inBounds = (x, y) => {
     if (allowRegionsOutsideWorkingArea) return true;
 
-    return x > 0 && y > 0 && x < workinAreaCoordinates.realWidth && y < workinAreaCoordinates.realHeight;
+    return x > 0 && y > 0 && x < workingAreaCoordinates.realWidth && y < workingAreaCoordinates.realHeight;
   };
 
   const limitCoordinates = ({ x, y }) => {
     if (allowRegionsOutsideWorkingArea) return { x, y };
 
     return {
-      x: clamp(x, 0, workinAreaCoordinates.realWidth),
-      y: clamp(y, 0, workinAreaCoordinates.realHeight),
+      x: clamp(x, 0, workingAreaCoordinates.realWidth),
+      y: clamp(y, 0, workingAreaCoordinates.realHeight),
     };
   };
 
@@ -211,8 +211,8 @@ const VideoRegionsPure = ({
           layerProps={layerProps}
           locked={locked}
           isDrawing={isDrawing}
-          workinAreaCoordinates={workinAreaCoordinates}
-          onDragMove={createOnDragMoveHandler(workinAreaCoordinates, !allowRegionsOutsideWorkingArea)}
+          workingAreaCoordinates={workingAreaCoordinates}
+          onDragMove={createOnDragMoveHandler(workingAreaCoordinates, !allowRegionsOutsideWorkingArea)}
           stageRef={stageRef}
         />
       </Layer>
@@ -228,8 +228,8 @@ const VideoRegionsPure = ({
             keepRatio={false}
             ignoreStroke
             flipEnabled={false}
-            boundBoxFunc={createBoundingBoxGetter(workinAreaCoordinates, !allowRegionsOutsideWorkingArea)}
-            onDragMove={createOnDragMoveHandler(workinAreaCoordinates, !allowRegionsOutsideWorkingArea)}
+            boundBoxFunc={createBoundingBoxGetter(workingAreaCoordinates, !allowRegionsOutsideWorkingArea)}
+            onDragMove={createOnDragMoveHandler(workingAreaCoordinates, !allowRegionsOutsideWorkingArea)}
           />
         </Layer>
       ) : null}
@@ -237,7 +237,7 @@ const VideoRegionsPure = ({
   );
 };
 
-const RegionsLayer = observer(({ regions, item, locked, isDrawing, workinAreaCoordinates, stageRef, onDragMove }) => {
+const RegionsLayer = observer(({ regions, item, locked, isDrawing, workingAreaCoordinates, stageRef, onDragMove }) => {
   return (
     <>
       {regions.map((reg) => (
@@ -246,7 +246,7 @@ const RegionsLayer = observer(({ regions, item, locked, isDrawing, workinAreaCoo
           key={reg.id}
           reg={reg}
           frame={item.frame}
-          workingArea={workinAreaCoordinates}
+          workingArea={workingAreaCoordinates}
           draggable={!reg.isReadOnly() && !isDrawing && !locked}
           selected={reg.selected || reg.inSelection}
           listening={!reg.locked && !reg.hidden}

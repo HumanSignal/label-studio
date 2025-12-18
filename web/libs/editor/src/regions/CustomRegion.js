@@ -77,7 +77,7 @@ const HtxCustomRegionView = ({ item, onFocus }) => {
   const { parent } = item;
   const { relationMode } = item.annotation;
   const editable = parent.isEditable && !item.isReadOnly();
-  const deleteable = parent.isDeleteable && !item.isReadOnly();
+  const deletable = parent.isDeletable && !item.isReadOnly();
 
   if (relationMode) {
     classes.push(styles.relation);
@@ -125,7 +125,7 @@ const HtxCustomRegionView = ({ item, onFocus }) => {
     <div {...divAttrs} className={cn("row").toString()} data-testid="custom-region">
       <HtxTextBox
         isEditable={editable}
-        isDeleteable={deleteable}
+        isDeletable={deletable}
         onlyEdit={parent.transcription}
         id={`CustomRegion-${item.id}`}
         name={name}

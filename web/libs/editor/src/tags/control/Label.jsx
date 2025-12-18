@@ -131,7 +131,7 @@ const Model = types
       if (self.annotation.selectedDrawingRegions.length > 0) {
         /*  here we are validating if we are drawing a new region or if region is already closed
           the way that new drawing region and a finished regions work is similar, but new drawing region
-          doesn't visualy select the polygons when you are drawing.
+          doesn't visually select the polygons when you are drawing.
        */
         sameObjectSelectedRegions = self.annotation.selectedDrawingRegions.filter((region) => {
           return region.parent?.name === self.parent?.toname;

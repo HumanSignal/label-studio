@@ -245,8 +245,8 @@
                 </Choice>
                 <Choice value="corpgov-fiduciaryduty-other">
                 </Choice>
-                <Choice value="corpgov-fiduciaryduty-responsibilites">
-                  <Choice value="corpgov-fiduciaryduty-responsibilites-stakeholders">
+                <Choice value="corpgov-fiduciaryduty-responsibilities">
+                  <Choice value="corpgov-fiduciaryduty-responsibilities-stakeholders">
                   </Choice>
                 </Choice>
                 <Choice value="corpgov-fiduciaryduty-seniormanagement">
@@ -548,7 +548,7 @@
                 <Choice value="corpgov-shareholderrights-other">
                 </Choice>
                 <Choice value="corpgov-shareholderrights-ownership">
-                  <Choice value="corpgov-shareholderrights-ownership-registeration">
+                  <Choice value="corpgov-shareholderrights-ownership-registration">
                   </Choice>
                 </Choice>
                 <Choice value="corpgov-shareholderrights-participate">

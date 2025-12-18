@@ -23,8 +23,8 @@ export interface RegionsGlobalEvents {
 export interface RegionsOptions {
   regions?: RegionOptions[];
   updateable?: boolean;
-  createable?: boolean;
-  deleteable?: boolean;
+  creatable?: boolean;
+  deletable?: boolean;
   defaultColor?: string | RgbaColorArray;
 }
 
@@ -38,9 +38,9 @@ export class Regions {
   private defaultColor = rgba("#787878");
   private drawingColor = rgba("#787878");
   private labels: string[] | undefined;
-  private createable = true;
+  private creatable = true;
   private updateable = true;
-  private deleteable = true;
+  private deletable = true;
   private drawableTarget = Segment;
   showLabels = false;
   layerGroup: LayerGroup;
@@ -51,9 +51,9 @@ export class Regions {
     this.initialRegions = options?.regions ?? [];
     this.defaultColor = options?.defaultColor ? rgba(options.defaultColor) : this.defaultColor;
     this.labels = undefined;
-    this.createable = options?.createable ?? this.createable;
+    this.creatable = options?.creatable ?? this.creatable;
     this.updateable = options?.updateable ?? this.updateable;
-    this.deleteable = options?.deleteable ?? this.deleteable;
+    this.deletable = options?.deletable ?? this.deletable;
     this.layerGroup = this.visualizer.getLayer("regions") as LayerGroup;
     this.showLabels = this.waveform.params.showLabels ?? false;
     this.init();
@@ -199,7 +199,7 @@ export class Regions {
   removeRegion(regionId: string, render = true) {
     const region = this.findRegion(regionId);
 
-    if (this.deleteable && region?.deleteable) {
+    if (this.deletable && region?.deletable) {
       region.destroy(false);
       this.regions = this.regions.filter((r) => r !== region);
     }
@@ -296,7 +296,7 @@ export class Regions {
   };
 
   private handleDrawRegion = (e: MouseEvent) => {
-    if (this.locked || !this.createable) return;
+    if (this.locked || !this.creatable) return;
     if (this.hoveredRegions.size > 0 && !this.isOverrideKeyPressed(e)) return;
     if (!this.layerGroup.isVisible) return;
 

@@ -106,7 +106,7 @@ export class HtxTextBox extends React.Component {
       // don't pass non-DOM props to Paragraph
       onDelete: _,
       isEditable: __,
-      isDeleteable: ___,
+      isDeletable: ___,
       ignoreShortcuts: ____,
     } = this.props;
     const { height, value } = this.state;
@@ -173,7 +173,7 @@ export class HtxTextBox extends React.Component {
       onChange,
       onDelete,
       isEditable,
-      isDeleteable,
+      isDeletable,
       text,
 
       // don't pass non-DOM props to Paragraph
@@ -212,7 +212,7 @@ export class HtxTextBox extends React.Component {
               onClick={this.startEditing}
             />
           )}
-          {isDeleteable && onDelete && (
+          {isDeletable && onDelete && (
             <Button
               type="text"
               variant="negative"

@@ -159,7 +159,7 @@ class RichTextPieceView extends Component {
    * @param {Document} _doc is not used in this implementation
    * @param {HTMLElement} region to wrap selection around
    */
-  _hightlightRegion = (_doc, region) => {
+  _highlightRegion = (_doc, region) => {
     const span = region._spans[0];
     const lastSpan = region._spans.at(-1);
     const selection = window.getSelection();
@@ -257,7 +257,7 @@ class RichTextPieceView extends Component {
 
   _onMouseDown = (ev) => {
     if (this.props.item.canResizeSpans) {
-      // we definitelly not in a process of adjusting any other region anymore, so reset flags
+      // we definitely not in a process of adjusting any other region anymore, so reset flags
       this._resetDragParams();
       this._removeSelectionStyle();
       // but might start to adjust this one
@@ -277,7 +277,7 @@ class RichTextPieceView extends Component {
         const tag = item.mountNodeRef.current;
         const doc = tag?.contentDocument ?? tag?.ownerDocument ?? tag;
         this.currentSelection = window.getSelection();
-        this._hightlightRegion(doc, this.draggableRegion);
+        this._highlightRegion(doc, this.draggableRegion);
         // attach global event for mouseup to always catch the end of dragging, even outside of the tag;
         // will be called after mouseup on the text tag
         document.addEventListener("mouseup", this._onMouseUpGlobal, { once: true });
@@ -514,7 +514,7 @@ class RichTextPieceView extends Component {
     style.textContent = "body a[href] { pointer-events: all; }";
     doc.head.appendChild(style);
 
-    // // @todo make links selectable; dragstart supressing doesn't help — they are still draggable
+    // // @todo make links selectable; dragstart suppressing doesn't help — they are still draggable
     // body.addEventListener("dragstart", e => {
     //   e.stopPropagation();
     //   e.preventDefault();

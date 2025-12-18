@@ -321,7 +321,7 @@ export const AudioModel = types.compose(
         if (!self._ws?.loaded || !isDefined(time)) return;
 
         try {
-          // setCurrentTime some times can take up to 76ms and it is syncronous
+          // setCurrentTime some times can take up to 76ms and it is synchronous
           self._ws.setCurrentTime(time, true);
           // syncCursor provides sync drawing which can cost up to 10ms which is too much for syncing playback
           setTimeout(() => {

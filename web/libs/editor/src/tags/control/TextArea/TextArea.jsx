@@ -109,7 +109,7 @@ const Model = types
       return self.editable && self.annotation.editable;
     },
 
-    get isDeleteable() {
+    get isDeletable() {
       return !self.isReadOnly();
     },
 

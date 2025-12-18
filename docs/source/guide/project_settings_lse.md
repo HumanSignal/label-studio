@@ -883,7 +883,7 @@ And the following actions are available from the overflow menu next to a connect
 | Action          | Description    |
 | ------------- | ------------ |
 | **Start Training**         | Manually initiate training. Use this action if you want to control when the model training occurs, such as after a specific number of annotations have been collected or at certain intervals.  |
-| **Send Test Request**         | (Available from the overflow menu next to the connected model)<br /><br />Use this for troubleshooting and sending a test resquest to the connected model.   |
+| **Send Test Request**         | (Available from the overflow menu next to the connected model)<br /><br />Use this for troubleshooting and sending a test request to the connected model.   |
 | **Edit**         | Edit the model name, URL, and parameters. For more information, see [Connect a model to Label Studio](ml#Connect-a-model-to-Label-Studio). |
 | **Delete**         | Remove the connection to the model. |
 

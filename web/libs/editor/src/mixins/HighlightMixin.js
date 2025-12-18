@@ -138,7 +138,7 @@ export const HighlightMixin = types
     /**
      * Update region's appearance if the label was changed
      */
-    updateAppearenceFromState() {
+    updateAppearanceFromState() {
       if (!self._spans?.length) return;
 
       // Update label visibility based on settings
@@ -271,7 +271,7 @@ export const HighlightMixin = types
       );
       // Extended/reduced parts of the region should be colored differently in a lighter color.
       // With extension it's simple, because it's the browser selection, so we just set a different color to it.
-      // But to color the reduced part we use opacity of overlayed blocks — region hightlight and browser selection,
+      // But to color the reduced part we use opacity of overlaid blocks — region highlight and browser selection,
       // and multiplication of them should be the same as original activeBackground.
       // Region color should also be different from the original one, and for simplicity we use just one color.
       // So this color should have an opacity twice closer to 1 than the original one: 1 - (1 - alpha) * 2

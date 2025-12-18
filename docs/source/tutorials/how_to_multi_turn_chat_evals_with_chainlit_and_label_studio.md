@@ -120,7 +120,7 @@ This is the label config from the [Evaluate Production Conversations for RLHF
 ](https://docs.humansignal.com/templates/chat_rlhf) example. It includes:
 - A chat interface for viewing conversations
 - Overall quality of message rating
-- Additinal comments
+- Additional comments
 
 
 ```python

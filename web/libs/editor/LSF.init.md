@@ -1,6 +1,6 @@
 # LSF init
 
-Different thoughts and investingations related to LSF init.
+Different thoughts and investigations related to LSF init.
 
 ## App render
 
@@ -136,7 +136,7 @@ prepareAnnotation -> fixBrokenAnnotation -> some changes on result json
 
 deserializeSingleResult for every result in JSON — some area/result/state manipulations,
 should be no side effects.
-it calls `updateAppearenceFromState` for merged labels and results (only Video tag regions),
+it calls `updateAppearanceFromState` for merged labels and results (only Video tag regions),
 but this should only be called on selected annotation.
 
 cleanClassificationAreas — WUT???
@@ -180,7 +180,7 @@ can be changed to usual method called only once.
 
 We have the concept of selecting annotation, when we not just assign it as current one, but also update data in tags, trigger external event, load annotation history, setup hotkeys, set initial values.
 
-Previosly it was required to select every annotation to do some extra work in regions/tags inside it because of some quirky legacy code. I fixed what I found so far and ran all possible tests — they all are green, so consider this change mostly safe.
+Previously it was required to select every annotation to do some extra work in regions/tags inside it because of some quirky legacy code. I fixed what I found so far and ran all possible tests — they all are green, so consider this change mostly safe.
 
 Benefits:
 - improved performance as only one annotation is selected, reducing number of calculations and renders

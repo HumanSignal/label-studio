@@ -107,7 +107,7 @@ const HtxTextAreaResult = observer(({ item, control, firstResultInputRef, onFocu
 
   const deleteHandler = useCallback(
     (idx) => {
-      if (!item.from_name.isDeleteable) return;
+      if (!item.from_name.isDeletable) return;
       const newValue = value.toJSON();
 
       newValue.splice(idx, 1);
@@ -130,7 +130,7 @@ const HtxTextAreaResult = observer(({ item, control, firstResultInputRef, onFocu
         onFocus={onFocus}
         collapsed={collapsed}
         validate={item.from_name.validateText}
-        canDelete={item.from_name.isDeleteable && canDelete}
+        canDelete={item.from_name.isDeletable && canDelete}
       />
     );
   });

@@ -181,10 +181,10 @@ const RegionsMixin = types
         return (vd * (self.scaleY || 1) * RELATIVE_STAGE_HEIGHT) / self.currentImageEntity.stageHeight;
       },
 
-      // update region appearence based on it's current states, for
+      // update region appearance based on it's current states, for
       // example bbox needs to update its colors when you change the
-      // label, becuase it takes color from the label
-      updateAppearenceFromState() {},
+      // label, because it takes color from the label
+      updateAppearanceFromState() {},
 
       serialize() {
         console.error("Region class needs to implement serialize");

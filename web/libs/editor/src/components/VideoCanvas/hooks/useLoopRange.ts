@@ -32,7 +32,7 @@ export const useLoopRange = ({
   const videoFrameCallbackIdRef = useRef<number | null>(null);
   const loopFrameRangeRef = useRef(loopFrameRange ?? false);
   loopFrameRangeRef.current = loopFrameRange ?? false;
-  const handeFrameChange = useCallback(
+  const handleFrameChange = useCallback(
     (_timestamp: number, { mediaTime }: { mediaTime: number }) => {
       const video = videoRef.current;
       if (!video || video.paused) return;
@@ -55,7 +55,7 @@ export const useLoopRange = ({
           videoFrameCallbackIdRef.current = video.requestVideoFrameCallback(() => {
             sourceRef.current.goToFrame(startFrame);
             onRedrawRequestRef.current?.();
-            videoFrameCallbackIdRef.current = video.requestVideoFrameCallback(handeFrameChange);
+            videoFrameCallbackIdRef.current = video.requestVideoFrameCallback(handleFrameChange);
           });
           return;
         }
@@ -65,7 +65,7 @@ export const useLoopRange = ({
         onRedrawRequestRef.current?.();
         return;
       }
-      videoFrameCallbackIdRef.current = video.requestVideoFrameCallback(handeFrameChange);
+      videoFrameCallbackIdRef.current = video.requestVideoFrameCallback(handleFrameChange);
     },
     [selectedFrameRange],
   );
@@ -80,7 +80,7 @@ export const useLoopRange = ({
     cancelCallback();
     const video = videoRef.current;
     if (video && selectedFrameRange) {
-      videoFrameCallbackIdRef.current = video.requestVideoFrameCallback(handeFrameChange);
+      videoFrameCallbackIdRef.current = video.requestVideoFrameCallback(handleFrameChange);
     }
     return cancelCallback;
   }, [selectedFrameRange]);

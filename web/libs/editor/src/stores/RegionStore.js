@@ -459,7 +459,7 @@ export default types
         return Array.from(self.selection.selected.values()).map((reg) => reg.id);
       },
 
-      get persistantView() {
+      get persistentView() {
         return window.localStorage.getItem(localStorageKeys.view) ?? self.view;
       },
     };
@@ -494,7 +494,7 @@ export default types
       window.localStorage.setItem(localStorageKeys.sortDirection, self.sortOrder);
 
       self.initHotkeys();
-      self.annotation.updateAppearenceFromState();
+      self.annotation.updateAppearanceFromState();
     },
 
     setGrouping(group) {
@@ -517,7 +517,7 @@ export default types
           else if (!region.hidden) region.toggleFiltered();
         });
       }
-      self.annotation.updateAppearenceFromState();
+      self.annotation.updateAppearanceFromState();
     },
 
     /**

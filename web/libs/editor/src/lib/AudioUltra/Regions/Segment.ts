@@ -16,7 +16,7 @@ export interface SegmentOptions {
   selected?: boolean;
   locked?: boolean;
   updateable?: boolean;
-  deleteable?: boolean;
+  deletable?: boolean;
   visible?: boolean;
   showInTimeline?: boolean;
   external?: boolean;
@@ -52,7 +52,7 @@ export class Segment extends Events<SegmentEvents> {
   active = false;
   updateable = true;
   locked = false;
-  deleteable = true;
+  deletable = true;
   visible = true;
   showInTimeline = false;
   external = false;
@@ -102,8 +102,8 @@ export class Segment extends Events<SegmentEvents> {
     if (options.updateable !== undefined) {
       this.updateable = options.updateable;
     }
-    if (options.deleteable !== undefined) {
-      this.deleteable = options.deleteable;
+    if (options.deletable !== undefined) {
+      this.deletable = options.deletable;
     }
     if (options.locked !== undefined) {
       this.locked = options.locked;
@@ -213,7 +213,7 @@ export class Segment extends Events<SegmentEvents> {
       selected: this.selected,
       updateable: this.updateable,
       locked: this.locked,
-      deleteable: this.deleteable,
+      deletable: this.deletable,
       visible: this.visible,
     };
   }
@@ -433,7 +433,7 @@ export class Segment extends Events<SegmentEvents> {
   }
 
   remove() {
-    if (!this.deleteable) return;
+    if (!this.deletable) return;
     this.waveform.invoke("regionRemoved", [this]);
   }
 
@@ -443,7 +443,7 @@ export class Segment extends Events<SegmentEvents> {
    * Remove region's layer
    */
   destroy(notify = true) {
-    if (!this.deleteable || this.isDestroyed) return;
+    if (!this.deletable || this.isDestroyed) return;
 
     if (notify) {
       this.remove();

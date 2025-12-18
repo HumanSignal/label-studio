@@ -23,7 +23,7 @@ type ResizeHandler = (name: PanelType, width: number, height: number, top: numbe
 
 type SnapHandler = (name: PanelType) => void;
 
-type PositonChangeHandler = (name: PanelType, top: number, left: number, detached: boolean) => void;
+type PositionChangeHandler = (name: PanelType, top: number, left: number, detached: boolean) => void;
 
 type VisibilityChangeHandler = (name: PanelType, visible: boolean) => void;
 
@@ -54,9 +54,9 @@ interface PanelBaseProps {
   onResizeStart: () => void;
   onResizeEnd: () => void;
   onSnap: SnapHandler;
-  onPositionChange: PositonChangeHandler;
+  onPositionChange: PositionChangeHandler;
   onVisibilityChange: VisibilityChangeHandler;
-  onPositionChangeBegin: PositonChangeHandler;
+  onPositionChangeBegin: PositionChangeHandler;
 }
 
 export type PanelProps = Omit<PanelBaseProps, PanelBaseExclusiveProps>;

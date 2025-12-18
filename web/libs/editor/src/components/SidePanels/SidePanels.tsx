@@ -88,7 +88,7 @@ const panelView: Record<PanelType, PanelView> = {
 };
 
 const SidePanelsComponent: FC<SidePanelsProps> = ({ currentEntity, panelsHidden, children }) => {
-  const snapTreshold = 5;
+  const snapThreshold = 5;
   const regions = currentEntity.regionStore;
   const viewportSize = useRef({ width: 0, height: 0 });
   const screenSizeMatch = useMedia(`screen and (max-width: ${maxWindowWidth}px)`);
@@ -179,9 +179,9 @@ const SidePanelsComponent: FC<SidePanelsProps> = ({ currentEntity, panelsHidden,
   const checkSnap = useCallback(
     (left: number, parentWidth: number, panelWidth: number) => {
       const right = left + panelWidth;
-      const rightLimit = parentWidth - snapTreshold;
+      const rightLimit = parentWidth - snapThreshold;
 
-      if (left >= 0 && left <= snapTreshold && spaceFree("left")) {
+      if (left >= 0 && left <= snapThreshold && spaceFree("left")) {
         setSnap("left");
       } else if (right <= parentWidth && right >= rightLimit && spaceFree("right")) {
         setSnap("right");

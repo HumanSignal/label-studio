@@ -22,7 +22,7 @@ export default types
       }
     },
 
-    updateAppearenceFromState() {
+    updateAppearanceFromState() {
       const labelColor = self.getLabelColor();
 
       self.updateSpansColor(labelColor, self.selected ? 0.8 : 0.3);
@@ -187,7 +187,7 @@ export default types
           });
         }
       } else {
-        self.updateAppearenceFromState();
+        self.updateAppearanceFromState();
       }
       e?.stopPropagation();
     },

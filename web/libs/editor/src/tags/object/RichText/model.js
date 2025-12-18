@@ -21,7 +21,7 @@ import ObjectBase from "../Base";
 import DomManager from "./domManager";
 
 const WARNING_MESSAGES = {
-  dataTypeMistmatch: () => "Do not put text directly in task data if you use valueType=url.",
+  dataTypeMismatch: () => "Do not put text directly in task data if you use valueType=url.",
   badURL: (url) => `URL (${escapeHtml(url)}) is not valid.`,
   secureMode: () => 'In SECURE MODE valueType is set to "url" by default.',
   loadingError: (url, error) => `Loading URL (${url}) unsuccessful: ${error}`,
@@ -40,7 +40,7 @@ const WARNING_MESSAGES = {
  * @name Text
  * @param {string} name                                   - name of the element
  * @param {string} value                                  - value of the element
- * @param {url|text} [valueType=url|text]                 – source of the data, check (Data retrieval)[https://labelstud.io/guide/tasks.html] page for more inforamtion
+ * @param {url|text} [valueType=url|text]                 – source of the data, check (Data retrieval)[https://labelstud.io/guide/tasks.html] page for more information
  * @param {boolean} [inline=false]                        - whether to embed html directly to LS or use iframe (only HyperText)
  * @param {boolean} [saveTextResult=true]                 – whether or not to save selected text to the serialized data
  * @param {boolean} [selectionEnabled=true]               - enable or disable selection
@@ -198,7 +198,7 @@ const Model = types
           const url = value;
 
           if (!isValidObjectURL(url, true)) {
-            const message = [WARNING_MESSAGES.badURL(url), WARNING_MESSAGES.dataTypeMistmatch()];
+            const message = [WARNING_MESSAGES.badURL(url), WARNING_MESSAGES.dataTypeMismatch()];
 
             if (window.LS_SECURE_MODE) message.unshift(WARNING_MESSAGES.secureMode());
 
@@ -256,7 +256,7 @@ const Model = types
 
         // security measure, if valuetype is set to url then LS
         // doesn't save the text into the result, otherwise it does
-        // can be aslo directly configured
+        // can be also directly configured
         if (self.savetextresult === "none") {
           if (self.valuetype === "url") self.savetextresult = "no";
           else if (self.valuetype === "text") self.savetextresult = "yes";

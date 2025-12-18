@@ -143,7 +143,7 @@ const SettingsModel = types
       // Update appearance of all regions to reflect the new setting
       const annotation = getRoot(self).annotationStore.selected;
       if (annotation) {
-        annotation.updateAppearenceFromState();
+        annotation.updateAppearanceFromState();
       }
     },
 

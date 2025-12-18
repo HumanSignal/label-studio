@@ -86,7 +86,7 @@ const MESSAGES = {
 /**
  * All Available rules are below.
  *
- * They recieve params and return function which recieves `items` and optional `field`.
+ * They receive params and return function which receives `items` and optional `field`.
  * If condition is met it returns warning message. If not — returns `false`.
  */
 

@@ -19,7 +19,7 @@ export class BoundingBox {
   }
 
   /**
-   * Contructor
+   * Constructor
    *
    * _source_ might be any object that provides its dimensions and position
    *

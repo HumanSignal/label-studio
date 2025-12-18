@@ -430,10 +430,10 @@ const _Annotation = types
       self.comment_count = val;
     },
 
-    setGroundTruth(value, ivokeEvent = true) {
+    setGroundTruth(value, invokeEvent = true) {
       const root = getRoot(self);
 
-      if (root && root !== self && ivokeEvent) {
+      if (root && root !== self && invokeEvent) {
         const as = root.annotationStore;
         const assignGroundTruths = (p) => {
           if (self !== p) p.setGroundTruth(false, false);
@@ -445,7 +445,7 @@ const _Annotation = types
 
       self.ground_truth = value;
 
-      if (ivokeEvent) {
+      if (invokeEvent) {
         getEnv(self).events.invoke("groundTruth", self.store, self, value);
       }
     },
@@ -697,7 +697,7 @@ const _Annotation = types
       if (force) self.unselectAll();
 
       self.names.forEach((tag) => tag.needsUpdate?.());
-      self.updateAppearenceFromState();
+      self.updateAppearanceFromState();
       const areas = Array.from(self.areas.values());
       // It should find just one unfinished region, but just in case we work with array
       const filtered = areas.filter((area) => area.isDrawing);
@@ -705,8 +705,8 @@ const _Annotation = types
       // Update UI to reflect the state of an unfinished region in case if it exists
       if (filtered.length) self.regionStore.selection._updateResultsFromRegions(filtered);
     },
-    updateAppearenceFromState() {
-      self.areas.forEach((area) => area.updateAppearenceFromState?.());
+    updateAppearanceFromState() {
+      self.areas.forEach((area) => area.updateAppearanceFromState?.());
     },
 
     setInitialValues() {
@@ -970,7 +970,7 @@ const _Annotation = types
       Hotkey.setScope(enableHotkeys ? Hotkey.DEFAULT_SCOPE : "__none__");
     },
 
-    createResult(areaValue, resultValue, control, object, skipAfrerCreate = false, additionalStates = []) {
+    createResult(areaValue, resultValue, control, object, skipAfterCreate = false, additionalStates = []) {
       // Without correct validation object may be null, but it it shouldn't be so in results - so we should find any
       if (!object && control.type === "textarea") {
         object = self.objects[0];
@@ -1014,10 +1014,10 @@ const _Annotation = types
       // This is added mostly for the reason of updating indexes in labels
       // for the elements (like highlights in text) that won't be dynamically changed
       // but are dependent on the whole region list values
-      self.updateAppearenceFromState();
+      self.updateAppearanceFromState();
 
       if (!area.classification) getEnv(self).events.invoke("entityCreate", area);
-      if (!skipAfrerCreate) self.afterCreateResult(area, control);
+      if (!skipAfterCreate) self.afterCreateResult(area, control);
 
       return area;
     },

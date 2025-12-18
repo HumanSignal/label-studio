@@ -531,7 +531,7 @@ const RegionControls: FC<RegionControlsProps> = injector(
               {isDefined(item?.score) && item.score.toFixed(2)}
             </div>
             <div className={cn("outliner-item").elem("control").mod({ type: "dirty" }).toClassName()}>
-              {/* dirtyness is not implemented yet */}
+              {/* dirtiness is not implemented yet */}
             </div>
             <div className={cn("outliner-item").elem("control").mod({ type: "predict" }).toClassName()}>
               {item?.origin === "prediction" && <IconSparks style={{ width: 18, height: 18 }} />}
