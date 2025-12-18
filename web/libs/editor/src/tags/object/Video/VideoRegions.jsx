@@ -239,31 +239,33 @@ const VideoRegionsPure = ({
   );
 };
 
-const RegionsLayer = observer(({ regions, item, locked, isDrawing, workinAreaCoordinates, stageRef, onDragMove, currentFrame }) => {
-  // Use currentFrame prop (from React state) to ensure regions update during fast scrubbing
-  // Since item.frame is volatile, we need React state to trigger re-renders
-  const frame = currentFrame ?? item.frame;
-  
-  return (
-    <>
-      {regions.map((reg) => (
-        <Shape
-          id={reg.id}
-          key={`${reg.id}-${frame}`}
-          reg={reg}
-          item={item}
-          workingArea={workinAreaCoordinates}
-          draggable={!reg.isReadOnly() && !isDrawing && !locked}
-          selected={reg.selected || reg.inSelection}
-          listening={!reg.locked && !reg.hidden}
-          stageRef={stageRef}
-          onDragMove={onDragMove}
-          currentFrame={frame}
-        />
-      ))}
-    </>
-  );
-});
+const RegionsLayer = observer(
+  ({ regions, item, locked, isDrawing, workinAreaCoordinates, stageRef, onDragMove, currentFrame }) => {
+    // Use currentFrame prop (from React state) to ensure regions update during fast scrubbing
+    // Since item.frame is volatile, we need React state to trigger re-renders
+    const frame = currentFrame ?? item.frame;
+
+    return (
+      <>
+        {regions.map((reg) => (
+          <Shape
+            id={reg.id}
+            key={`${reg.id}-${frame}`}
+            reg={reg}
+            item={item}
+            workingArea={workinAreaCoordinates}
+            draggable={!reg.isReadOnly() && !isDrawing && !locked}
+            selected={reg.selected || reg.inSelection}
+            listening={!reg.locked && !reg.hidden}
+            stageRef={stageRef}
+            onDragMove={onDragMove}
+            currentFrame={frame}
+          />
+        ))}
+      </>
+    );
+  },
+);
 
 const Shape = observer(({ id, reg, item, stageRef, currentFrame, ...props }) => {
   // Use currentFrame prop to ensure we get the latest frame value during fast scrubbing

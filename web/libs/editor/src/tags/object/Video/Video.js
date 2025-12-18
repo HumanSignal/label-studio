@@ -374,13 +374,13 @@ const Model = types
       setFrame(frame) {
         if (self.frame !== frame && self.framerate && self.ref.current) {
           self.frame = frame;
-          
+
           // Use requestAnimationFrame to batch rapid seeks during scrubbing
           // This prevents the video from getting stuck when scrubbing quickly
           // The parent component (HtxVideo) handles pausing/resuming playback during scrubbing
           requestAnimationFrame(() => {
             if (!self.ref.current) return;
-            
+
             try {
               if (isFF(FF_VIDEO_FRAME_SEEK_PRECISION)) {
                 self.ref.current.goToFrame(frame);
