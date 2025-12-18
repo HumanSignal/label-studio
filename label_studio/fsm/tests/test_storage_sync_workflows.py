@@ -248,9 +248,8 @@ class TestLocalStorageSyncWorkflows:
 class TestStorageSyncWithAnnotations:
     """Test FSM state management for storage sync with pre-labeled data."""
 
-    def test_sync_with_preannotated_tasks_including_predictions_and_annotations(
-        self, django_live_url, business_client, tmp_path, settings
-    ):
+    @pytest.fixture
+    def project_id(self, django_live_url, business_client, tmp_path, settings) -> int:
         setup_fsm_context(business_client.user)
         ls = create_sdk_client(django_live_url, business_client)
 
@@ -346,15 +345,17 @@ class TestStorageSyncWithAnnotations:
             use_blob_urls=False,
         )
 
-        # Trigger sync
         sync_result = ls.import_storage.local.sync(id=storage.id)
         assert sync_result.status == 'completed'
 
-        for task in Task.objects.filter(project_id=project.id).order_by('id'):
+        return project.id
+
+    def assert_preannotated_sync_states(self, project_id: int):
+        for task in Task.objects.filter(project_id=project_id).order_by('id'):
             assert_state_exists(task, 'task')
             assert_task_state(task.id, TaskStateChoices.COMPLETED)
 
-        for annotation in Annotation.objects.filter(project_id=project.id).order_by('id'):
+        for annotation in Annotation.objects.filter(project_id=project_id).order_by('id'):
             assert_state_exists(annotation, 'annotation')
             assert_annotation_state(annotation.id, AnnotationStateChoices.SUBMITTED)
 
