@@ -4,11 +4,13 @@ FSM utility functions for backfilling and managing state transitions.
 This module contains reusable functions for FSM state management that are
 used across different parts of the codebase.
 """
+
 import logging
 
 from core.current_request import CurrentContext
+from core.utils.iterators import iterate_queryset
 from fsm.state_inference import get_or_infer_state
-from fsm.utils import get_or_initialize_state
+from fsm.utils import get_or_initialize_state, is_fsm_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -30,29 +32,38 @@ def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
         - CurrentContext must be available before calling this function
         - This function is safe to call in both LSO and LSE environments
         - Failures are logged but don't propagate to prevent breaking storage sync
+        - FSM feature flag is checked before processing
+        - Tasks are processed in chunks via iterate_queryset to avoid OOM issues
     """
     if tasks_created <= 0:
+        return
+
+    # Check FSM feature flag - early return if FSM is not enabled
+    if not is_fsm_enabled():
         return
 
     try:
         from tasks.models import Task
 
-        # Get tasks created in this sync
+        # Get task IDs created in this sync
         task_ids = list(
             link_class.objects.filter(storage=storage_id)
             .order_by('-created_at')[:tasks_created]
             .values_list('task_id', flat=True)
         )
 
-        tasks = Task.objects.filter(id__in=task_ids)
+        if not task_ids:
+            return
 
         logger.info(f'Storage sync: creating initial FSM states for {len(task_ids)} tasks')
 
-        # Backfill initial CREATED state for each task
-        for task in tasks:
+        # Use iterate_queryset to process tasks in chunks, avoiding OOM issues
+        user = CurrentContext.get_user()
+        tasks_qs = Task.objects.filter(id__in=task_ids)
 
+        for task in iterate_queryset(tasks_qs):
             inferred_state = get_or_infer_state(task)
-            get_or_initialize_state(task, user=CurrentContext.get_user(), inferred_state=inferred_state)
+            get_or_initialize_state(task, user=user, inferred_state=inferred_state)
 
         logger.info(f'Storage sync: FSM states created for {len(task_ids)} tasks')
     except Exception as e:
