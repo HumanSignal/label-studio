@@ -12,11 +12,10 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 
-// Extend ColumnMeta to include noDivider and sortParam
+// Extend ColumnMeta to include noDivider
 declare module "@tanstack/react-table" {
   interface ColumnMeta<TData, TValue> {
     noDivider?: boolean;
-    sortParam?: string; // API field name for sorting (e.g., "user__first_name")
   }
 }
 import { memo, useState, useMemo, useCallback } from "react";
@@ -24,17 +23,25 @@ import { cn } from "../../utils/utils";
 import { useColumnSizing, useDataColumns } from "../../hooks/data-table";
 import { Checkbox } from "../checkbox/checkbox";
 import { Typography } from "../typography/typography";
-import { IconSortUp, IconSortDown, IconSearch } from "@humansignal/icons";
+import { Tooltip } from "../Tooltip/Tooltip";
+import { IconSortUp, IconSortDown, IconSearch, IconInfoOutline } from "@humansignal/icons";
 import { EmptyState } from "../empty-state/empty-state";
 import { Skeleton } from "../skeleton/skeleton";
 import styles from "./data-table.module.scss";
 
 export type DataShape = Record<string, any>[];
 
+/**
+ * Extended ColumnDef type that includes custom properties for generic DataTable
+ */
+export type ExtendedDataTableColumnDef<T> = ColumnDef<T> & {
+  help?: string; // Optional help text to display in a tooltip with info icon
+};
+
 export type DataTableProps<T extends DataShape> = {
   data: T;
   meta?: TableMeta<any>;
-  columns?: ColumnDef<T[number]>[];
+  columns?: ExtendedDataTableColumnDef<T[number]>[];
   extraColumns?: ColumnDef<any>[];
   includeColumns?: (keyof T[number])[];
   excludeColumns?: (keyof T[number])[];
@@ -158,7 +165,10 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   const columnsWithHeaders = useMemo(() => {
     return baseColumns.map((col) => {
       // TanStack Table uses accessorKey as id if id is not explicitly set
-      const columnId = col.id || (col as any).accessorKey;
+      const extendedCol = col as ExtendedDataTableColumnDef<T[number]>;
+      const columnId =
+        extendedCol.id ||
+        ("accessorKey" in extendedCol && extendedCol.accessorKey ? String(extendedCol.accessorKey) : undefined);
 
       // Get current sort state for this column
       const currentSort = sorting.length > 0 ? sorting[0] : null;
@@ -182,6 +192,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
             isDesc={isDesc}
             enableSorting={columnSortingEnabled}
             originalHeader={originalHeader}
+            help={extendedCol.help}
           />
         ),
       };
@@ -342,7 +353,8 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       : undefined,
     getRowId: (row, index) => {
       // Use id if available, otherwise fall back to index
-      return (row as any)?.id?.toString() ?? index.toString();
+      const rowId = row.original?.id;
+      return rowId !== undefined ? String(rowId) : String(index);
     },
     columnResizeMode: "onChange",
     enableSorting: enableSorting,
@@ -689,6 +701,7 @@ export type HeaderProps<T> = {
   isDesc?: boolean;
   enableSorting?: boolean;
   originalHeader?: string | React.ReactNode;
+  help?: string; // Optional help text to display in a tooltip with info icon
 };
 
 export const Header = <T,>({
@@ -697,6 +710,7 @@ export const Header = <T,>({
   isDesc = false,
   enableSorting = false,
   originalHeader,
+  help,
 }: HeaderProps<T>) => {
   // Get header label - use originalHeader if provided, otherwise try to extract from columnDef
   let headerLabel: string | React.ReactNode = undefined;
@@ -714,24 +728,29 @@ export const Header = <T,>({
     return null;
   }
 
-  if (!enableSorting) {
-    return (
-      <Typography variant="label" size="small">
-        {headerLabel}
-      </Typography>
-    );
-  }
-
-  // Determine icon: when sorted, show current direction; when hovering unsorted, show next direction (asc)
-  const sortIcon = isSorted ? isDesc ? <IconSortUp /> : <IconSortDown /> : <IconSortDown />;
-
-  return (
-    <div className={styles.headerContent}>
-      <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
-        {headerLabel}
-      </Typography>
-      {/* Always render icon container for sortable columns - CSS handles visibility */}
-      <div className={cn(styles.headerIcon, isSorted === true && styles.headerIconVisible)}>{sortIcon}</div>
+  const headerContent = (
+    <div className={cn(styles.headerContent, help && "gap-tighter")}>
+      <div className="flex items-center gap-2">
+        <Typography variant="label" size="small" className={cn(isSorted && styles.headerTextSorted)}>
+          {headerLabel}
+        </Typography>
+        {help && (
+          <Tooltip title={help} alignment="top-center">
+            <IconInfoOutline width={14} height={14} className="text-neutral-content-subtler cursor-help shrink-0" />
+          </Tooltip>
+        )}
+      </div>
+      {enableSorting && (
+        <div className={cn(styles.headerIcon, isSorted === true && styles.headerIconVisible)}>
+          {isSorted ? isDesc ? <IconSortUp /> : <IconSortDown /> : <IconSortDown />}
+        </div>
+      )}
     </div>
   );
+
+  if (!enableSorting) {
+    return headerContent;
+  }
+
+  return headerContent;
 };

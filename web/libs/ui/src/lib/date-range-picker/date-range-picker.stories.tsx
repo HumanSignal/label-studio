@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { DateRangePicker } from "./date-range-picker";
+import { DateRangePickerTrigger } from "./date-range-picker-trigger";
 import { convertDateToNumbers, dateWithoutTime, formatDateString, type DateOrDateTimeRange } from "./date-utils";
 import { Button } from "../button/button";
 import { DropdownTrigger } from "../dropdown/dropdown-trigger";
@@ -62,28 +63,22 @@ const defaultInitialDates: DateOrDateTimeRange = {
 // Basic Example
 export const Default: Story = {
   render: (args) => {
-    const [dates, setDates] = useState<DateOrDateTimeRange>(defaultInitialDates);
+    const [dates, setDates] = useState<DateOrDateTimeRange | null>(defaultInitialDates);
     const [appliedDates, setAppliedDates] = useState<{ fromString: string; toString: string } | null>(null);
 
     return (
       <div className="flex flex-col gap-base">
-        <DropdownTrigger
-          content={
-            <DateRangePicker
-              {...args}
-              initialDates={dates}
-              setAppliedDates={(selected, datesString) => {
-                setDates(selected);
-                setAppliedDates(datesString);
-                args.setAppliedDates?.(selected, datesString);
-              }}
-            />
-          }
-        >
-          <Button>
-            {appliedDates ? `${appliedDates.fromString} - ${appliedDates.toString}` : "Select Date Range"}
-          </Button>
-        </DropdownTrigger>
+        <DateRangePickerTrigger selected={dates}>
+          <DateRangePicker
+            {...args}
+            initialDates={dates ?? defaultInitialDates}
+            setAppliedDates={(selected, datesString) => {
+              setDates(selected);
+              setAppliedDates(datesString);
+              args.setAppliedDates?.(selected, datesString);
+            }}
+          />
+        </DateRangePickerTrigger>
         {appliedDates && (
           <div className="text-body-small text-neutral-content-subtle">
             Selected: {appliedDates.fromString} to {appliedDates.toString}
@@ -108,7 +103,7 @@ export const WithTimeMode: Story = {
     todayWithTime.hour = 17;
     todayWithTime.minute = 30;
 
-    const [dates, setDates] = useState<DateOrDateTimeRange>({
+    const [dates, setDates] = useState<DateOrDateTimeRange | null>({
       start: yesterdayWithTime,
       end: todayWithTime,
     });
@@ -116,23 +111,17 @@ export const WithTimeMode: Story = {
 
     return (
       <div className="flex flex-col gap-base">
-        <DropdownTrigger
-          content={
-            <DateRangePicker
-              {...args}
-              initialDates={dates}
-              setAppliedDates={(selected, datesString) => {
-                setDates(selected);
-                setAppliedDates(datesString);
-                args.setAppliedDates?.(selected, datesString);
-              }}
-            />
-          }
-        >
-          <Button>
-            {appliedDates ? `${appliedDates.fromString} - ${appliedDates.toString}` : "Select Date Range with Time"}
-          </Button>
-        </DropdownTrigger>
+        <DateRangePickerTrigger selected={dates}>
+          <DateRangePicker
+            {...args}
+            initialDates={dates ?? defaultInitialDates}
+            setAppliedDates={(selected, datesString) => {
+              setDates(selected);
+              setAppliedDates(datesString);
+              args.setAppliedDates?.(selected, datesString);
+            }}
+          />
+        </DateRangePickerTrigger>
         {appliedDates && (
           <div className="text-body-small text-neutral-content-subtle">
             Selected: {appliedDates.fromString} to {appliedDates.toString}
@@ -155,31 +144,23 @@ export const WithCreationDate: Story = {
     const creationDate = new Date();
     creationDate.setFullYear(creationDate.getFullYear() - 2);
 
-    const [dates, setDates] = useState<DateOrDateTimeRange>(defaultInitialDates);
+    const [dates, setDates] = useState<DateOrDateTimeRange | null>(defaultInitialDates);
     const [appliedDates, setAppliedDates] = useState<{ fromString: string; toString: string } | null>(null);
 
     return (
       <div className="flex flex-col gap-base">
-        <DropdownTrigger
-          content={
-            <DateRangePicker
-              {...args}
-              creationDate={creationDate}
-              initialDates={dates}
-              setAppliedDates={(selected, datesString) => {
-                setDates(selected);
-                setAppliedDates(datesString);
-                args.setAppliedDates?.(selected, datesString);
-              }}
-            />
-          }
-        >
-          <Button>
-            {appliedDates
-              ? `${appliedDates.fromString} - ${appliedDates.toString}`
-              : "Select Date Range (with All Time)"}
-          </Button>
-        </DropdownTrigger>
+        <DateRangePickerTrigger selected={dates}>
+          <DateRangePicker
+            {...args}
+            creationDate={creationDate}
+            initialDates={dates ?? defaultInitialDates}
+            setAppliedDates={(selected, datesString) => {
+              setDates(selected);
+              setAppliedDates(datesString);
+              args.setAppliedDates?.(selected, datesString);
+            }}
+          />
+        </DateRangePickerTrigger>
         {appliedDates && (
           <div className="text-body-small text-neutral-content-subtle">
             Selected: {appliedDates.fromString} to {appliedDates.toString}
@@ -228,7 +209,7 @@ export const Standalone: Story = {
 // With Clear Functionality
 export const WithClear: Story = {
   render: (args) => {
-    const [dates, setDates] = useState<DateOrDateTimeRange>(defaultInitialDates);
+    const [dates, setDates] = useState<DateOrDateTimeRange | null>(defaultInitialDates);
     const [appliedDates, setAppliedDates] = useState<{ fromString: string; toString: string } | null>({
       fromString: formatDateString({
         date: defaultInitialDates.start,
@@ -244,6 +225,7 @@ export const WithClear: Story = {
     const [hasSelection, setHasSelection] = useState(true);
 
     const handleClear = () => {
+      setDates(null);
       setAppliedDates(null);
       setHasSelection(false);
       args.onClear?.();
@@ -251,26 +233,20 @@ export const WithClear: Story = {
 
     return (
       <div className="flex flex-col gap-base">
-        <DropdownTrigger
-          content={
-            <DateRangePicker
-              {...args}
-              initialDates={dates}
-              hasSelection={hasSelection}
-              onClear={handleClear}
-              setAppliedDates={(selected, datesString) => {
-                setDates(selected);
-                setAppliedDates(datesString);
-                setHasSelection(true);
-                args.setAppliedDates?.(selected, datesString);
-              }}
-            />
-          }
-        >
-          <Button>
-            {appliedDates ? `${appliedDates.fromString} - ${appliedDates.toString}` : "Select Date Range"}
-          </Button>
-        </DropdownTrigger>
+        <DateRangePickerTrigger selected={dates}>
+          <DateRangePicker
+            {...args}
+            initialDates={dates ?? defaultInitialDates}
+            hasSelection={hasSelection}
+            onClear={handleClear}
+            setAppliedDates={(selected, datesString) => {
+              setDates(selected);
+              setAppliedDates(datesString);
+              setHasSelection(true);
+              args.setAppliedDates?.(selected, datesString);
+            }}
+          />
+        </DateRangePickerTrigger>
         {appliedDates ? (
           <div className="text-body-small text-neutral-content-subtle">
             Selected: {appliedDates.fromString} to {appliedDates.toString}
@@ -289,5 +265,49 @@ export const WithClear: Story = {
     onClear: () => {
       console.log("Clear button clicked");
     },
+  },
+};
+
+/**
+ * With Custom Button Trigger
+ *
+ * Example showing how to use DateRangePicker with a custom Button trigger
+ * instead of the default DateRangePickerTrigger component.
+ * This demonstrates flexibility in trigger implementation.
+ */
+export const WithCustomButtonTrigger: Story = {
+  render: (args) => {
+    const [dates, setDates] = useState<DateOrDateTimeRange>(defaultInitialDates);
+    const [appliedDates, setAppliedDates] = useState<{ fromString: string; toString: string } | null>(null);
+
+    return (
+      <div className="flex flex-col gap-base">
+        <DropdownTrigger
+          content={
+            <DateRangePicker
+              {...args}
+              initialDates={dates}
+              setAppliedDates={(selected, datesString) => {
+                setDates(selected);
+                setAppliedDates(datesString);
+                args.setAppliedDates?.(selected, datesString);
+              }}
+            />
+          }
+        >
+          <Button>
+            {appliedDates ? `${appliedDates.fromString} - ${appliedDates.toString}` : "Select Date Range"}
+          </Button>
+        </DropdownTrigger>
+        {appliedDates && (
+          <div className="text-body-small text-neutral-content-subtle">
+            Selected: {appliedDates.fromString} to {appliedDates.toString}
+          </div>
+        )}
+      </div>
+    );
+  },
+  args: {
+    initialDates: defaultInitialDates,
   },
 };
