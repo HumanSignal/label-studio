@@ -452,31 +452,29 @@ const HtxVideoView = ({ item, store }) => {
   const handleTimelinePositionChange = useCallback(
     (newPosition) => {
       if (position !== newPosition) {
-        // Pause video when scrubbing starts (if playing) to prevent conflicts
+        // Only pause/resume logic when video is actually playing
         if (playing && !isScrubbingRef.current) {
           wasPlayingBeforeScrubRef.current = true;
           isScrubbingRef.current = true;
           item.ref.current?.pause();
           item.triggerSyncPause();
-        } else if (!isScrubbingRef.current) {
-          isScrubbingRef.current = true;
-        }
 
-        // Clear timeout and set new one to detect when scrubbing ends
-        if (scrubTimeoutRef.current) {
-          clearTimeout(scrubTimeoutRef.current);
-        }
-        scrubTimeoutRef.current = setTimeout(() => {
-          isScrubbingRef.current = false;
-          // Resume playback if it was playing before
-          if (wasPlayingBeforeScrubRef.current && item.ref.current) {
-            wasPlayingBeforeScrubRef.current = false;
-            item.ref.current.play();
-            item.triggerSyncPlay();
-          } else {
-            wasPlayingBeforeScrubRef.current = false;
+          // Clear timeout and set new one to detect when scrubbing ends
+          if (scrubTimeoutRef.current) {
+            clearTimeout(scrubTimeoutRef.current);
           }
-        }, 150);
+          scrubTimeoutRef.current = setTimeout(() => {
+            isScrubbingRef.current = false;
+            // Resume playback only if it was playing before scrubbing started
+            if (wasPlayingBeforeScrubRef.current && item.ref.current && !item.ref.current.playing) {
+              wasPlayingBeforeScrubRef.current = false;
+              item.ref.current.play();
+              item.triggerSyncPlay();
+            } else {
+              wasPlayingBeforeScrubRef.current = false;
+            }
+          }, 200);
+        }
 
         setPosition(newPosition);
         item.setFrame(newPosition);
