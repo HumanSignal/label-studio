@@ -24,4 +24,4 @@ jobs:
 
       - uses: pre-commit/action@v3.0.1
         with:
-          extra_args: ruff --all-files --hook-stage pre-push
+          extra_args: ruff-check --all-files --hook-stage pre-push
