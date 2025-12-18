@@ -142,10 +142,12 @@ const HtxVideoView = ({ item, store }) => {
   const [videoLength, _setVideoLength] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [position, _setPosition] = useState(1);
-  const isScrubbingRef = useRef(false);
-  const wasPlayingBeforeScrubRef = useRef(false);
-  const scrubTimeoutRef = useRef(null);
-  const pendingSeekRef = useRef(null);
+  const scrubStateRef = useRef({
+    isScrubbing: false,
+    wasPlaying: false,
+    timeoutId: null,
+    lastChangeTime: 0,
+  });
   const seekRafRef = useRef(null);
 
   const [videoSize, setVideoSize] = useState(null);
@@ -454,63 +456,52 @@ const HtxVideoView = ({ item, store }) => {
   const handleTimelinePositionChange = useCallback(
     (newPosition) => {
       if (position !== newPosition) {
-        // Only pause/resume logic when video is actually playing
-        if (playing && !isScrubbingRef.current) {
-          wasPlayingBeforeScrubRef.current = true;
-          isScrubbingRef.current = true;
+        const now = Date.now();
+        const state = scrubStateRef.current;
+        const isRapidScrubbing = now - state.lastChangeTime < 100;
+        state.lastChangeTime = now;
+
+        // Handle pause/resume when scrubbing while playing
+        if (playing && !state.isScrubbing) {
+          state.isScrubbing = true;
+          state.wasPlaying = true;
           item.ref.current?.pause();
           item.triggerSyncPause();
 
-          // Clear timeout and set new one to detect when scrubbing ends
-          if (scrubTimeoutRef.current) {
-            clearTimeout(scrubTimeoutRef.current);
-          }
-          scrubTimeoutRef.current = setTimeout(() => {
-            isScrubbingRef.current = false;
-            // Resume playback only if it was playing before scrubbing started
-            if (wasPlayingBeforeScrubRef.current && item.ref.current && !item.ref.current.playing) {
-              wasPlayingBeforeScrubRef.current = false;
-              // Wait for any pending seeks to complete before resuming
+          // Resume after scrubbing ends
+          if (state.timeoutId) clearTimeout(state.timeoutId);
+          state.timeoutId = setTimeout(() => {
+            state.isScrubbing = false;
+            if (state.wasPlaying && item.ref.current && !item.ref.current.playing) {
               const video = item.ref.current.videoRef?.current;
-              if (video && video.seeking) {
-                const handleSeeked = () => {
-                  video.removeEventListener("seeked", handleSeeked);
-                  if (item.ref.current && !item.ref.current.playing) {
-                    item.ref.current.play();
-                    item.triggerSyncPlay();
-                  }
-                };
-                video.addEventListener("seeked", handleSeeked, { once: true });
-              } else {
-                item.ref.current.play();
-                item.triggerSyncPlay();
-              }
-            } else {
-              wasPlayingBeforeScrubRef.current = false;
+              const resume = () => {
+                if (item.ref.current && !item.ref.current.playing) {
+                  item.ref.current.play();
+                  item.triggerSyncPlay();
+                }
+              };
+              // Wait for seek to complete before resuming
+              video?.seeking ? video.addEventListener("seeked", resume, { once: true }) : resume();
             }
+            state.wasPlaying = false;
           }, 200);
         }
 
         setPosition(newPosition);
 
-        // Batch rapid seeks during scrubbing using requestAnimationFrame
-        // Store the latest position to seek to
-        pendingSeekRef.current = newPosition;
-
-        // Cancel any pending RAF
-        if (seekRafRef.current !== null) {
-          cancelAnimationFrame(seekRafRef.current);
+        // Batch rapid seeks, immediate seek for single changes
+        if (seekRafRef.current) cancelAnimationFrame(seekRafRef.current);
+        
+        if (isRapidScrubbing) {
+          // Batch rapid scrubbing seeks
+          seekRafRef.current = requestAnimationFrame(() => {
+            seekRafRef.current = null;
+            item.setFrame(newPosition);
+          });
+        } else {
+          // Immediate seek for single frame changes (tests, single clicks)
+          item.setFrame(newPosition);
         }
-
-        // Schedule seek for next frame
-        seekRafRef.current = requestAnimationFrame(() => {
-          seekRafRef.current = null;
-          const frameToSeek = pendingSeekRef.current;
-          if (frameToSeek !== null) {
-            pendingSeekRef.current = null;
-            item.setFrame(frameToSeek);
-          }
-        });
       }
     },
     [item, position, playing],
@@ -518,13 +509,10 @@ const HtxVideoView = ({ item, store }) => {
 
   useEffect(
     () => () => {
-      // Cleanup: clear scrub timeout and RAF
-      if (scrubTimeoutRef.current) {
-        clearTimeout(scrubTimeoutRef.current);
-      }
-      if (seekRafRef.current !== null) {
-        cancelAnimationFrame(seekRafRef.current);
-      }
+      // Cleanup
+      const state = scrubStateRef.current;
+      if (state.timeoutId) clearTimeout(state.timeoutId);
+      if (seekRafRef.current) cancelAnimationFrame(seekRafRef.current);
       item.ref.current = null;
     },
     [],
