@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class ProjectsConfig(AppConfig):
     name = 'projects'
 
-    def ready(self):
+    def ready(self) -> None:
         """
         Projects app initialization.
 

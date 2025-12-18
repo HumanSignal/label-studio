@@ -23,7 +23,7 @@ def create_organization(title, created_by, legacy_api_tokens_enabled=False, **kw
         return org
 
 
-def destroy_organization(org):
+def destroy_organization(org) -> None:
     with temporary_disconnect_all_signals():
         Project.objects.filter(organization=org).delete()
         if hasattr(org, 'saml'):

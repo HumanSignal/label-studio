@@ -33,7 +33,7 @@ class DataManagerAction(TypedDict):
     disabled_reason: Optional[str]
 
 
-def check_action_permission(user, action, project):
+def check_action_permission(user, action, project) -> bool:
     """Actions must have permissions, if only one is in the user role then the action is allowed"""
     if 'permission' not in action:
         logger.error('Action must have "permission" field: %s', str(action))
@@ -86,7 +86,7 @@ def get_all_actions(user, project):
     return actions
 
 
-def register_action(entry_point, title, order, **kwargs):
+def register_action(entry_point, title, order, **kwargs) -> None:
     """Register action in global _action instance,
     action_id will be automatically extracted from entry_point function name
     """
@@ -103,7 +103,7 @@ def register_action(entry_point, title, order, **kwargs):
     }
 
 
-def register_actions_from_dir(base_module, action_dir):
+def register_actions_from_dir(base_module, action_dir) -> None:
     """Find all python files nearby this file and try to load 'actions' from them"""
     for path in os.listdir(action_dir):
         # skip non module files

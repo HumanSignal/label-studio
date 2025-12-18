@@ -12,7 +12,7 @@ class FsmConfig(AppConfig):
     name = 'fsm'
     verbose_name = 'Label Studio FSM'
 
-    def ready(self):
+    def ready(self) -> None:
         """
         Import models and state_choices to ensure registration happens on Django startup.
 

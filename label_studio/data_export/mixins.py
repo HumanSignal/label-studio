@@ -40,7 +40,7 @@ class ExportMixin:
         user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
-    def get_default_title(self):
+    def get_default_title(self) -> str:
         return f"{self.project.title.replace(' ', '-')}-at-{dateformat.format(timezone.now(), 'Y-m-d-H-i')}"
 
     def _get_filtered_tasks(self, tasks, task_filter_options=None):
@@ -270,7 +270,7 @@ class ExportMixin:
         md5 = md5_object.hexdigest()
         return md5
 
-    def save_file(self, file, md5):
+    def save_file(self, file, md5) -> None:
         now = datetime.now()
         file_name = f'project-{self.project.id}-at-{now.strftime("%Y-%m-%d-%H-%M")}-{md5[0:8]}.json'
         file_path = f'{self.project.id}/{file_name}'  # finally file will be in settings.DELAYED_EXPORT_DIR/self.project.id/file_name
@@ -279,7 +279,7 @@ class ExportMixin:
         self.md5 = md5
         self.save(update_fields=['file', 'md5', 'counters'])
 
-    def export_to_file(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
+    def export_to_file(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None) -> None:
         logger.debug(
             f'Run export for {self.id} with params:\n'
             f'task_filter_options: {task_filter_options}\n'
@@ -316,7 +316,7 @@ class ExportMixin:
             self.finished_at = datetime.now()
             self.save(update_fields=['finished_at'])
 
-    def run_file_exporting(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None):
+    def run_file_exporting(self, task_filter_options=None, annotation_filter_options=None, serialization_options=None) -> None:
         if self.status == self.Status.IN_PROGRESS:
             logger.warning('Try to export with in progress stage')
             return
@@ -388,7 +388,7 @@ class ExportMixin:
 
 def export_background(
     export_id, task_filter_options, annotation_filter_options, serialization_options, *args, **kwargs
-):
+) -> None:
     from data_export.models import Export
 
     Export.objects.get(id=export_id).export_to_file(
@@ -398,7 +398,7 @@ def export_background(
     )
 
 
-def set_export_background_failure(job, connection, type, value, traceback):
+def set_export_background_failure(job, connection, type, value, traceback) -> None:
     from data_export.models import Export
 
     export_id = job.args[0]

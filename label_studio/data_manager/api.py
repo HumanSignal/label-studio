@@ -159,7 +159,7 @@ class ViewAPI(viewsets.ModelViewSet):
         DELETE=all_permissions.views_delete,
     )
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(user=self.request.user)
 
     @extend_schema(

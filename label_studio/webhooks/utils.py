@@ -63,7 +63,7 @@ def run_webhook_sync(webhook, action, payload=None):
         return
 
 
-def emit_webhooks_sync(organization, project, action, payload):
+def emit_webhooks_sync(organization, project, action, payload) -> None:
     """
     Run all active webhooks for the action.
     """
@@ -102,7 +102,7 @@ def _process_webhook_batch(webhooks, project, action, batch, action_meta):
         run_webhook_sync(wh, action, payload)
 
 
-def emit_webhooks_for_instance_sync(organization, project, action, instance=None):
+def emit_webhooks_for_instance_sync(organization, project, action, instance=None) -> None:
     """Run all active webhooks for the action using instances as payload.
 
     Be sure WebhookAction.ACTIONS contains all required fields.
@@ -146,7 +146,7 @@ def emit_webhooks_for_instance_sync(organization, project, action, instance=None
         _process_webhook_batch(webhooks, project, action, instance, action_meta)
 
 
-def run_webhook(webhook, action, payload=None):
+def run_webhook(webhook, action, payload=None) -> None:
     """Run one webhook for action.
 
     This function must not raise any exceptions.
@@ -165,7 +165,7 @@ def run_webhook(webhook, action, payload=None):
         run_webhook_sync(webhook, action, payload)
 
 
-def emit_webhooks_for_instance(organization, project, action, instance=None):
+def emit_webhooks_for_instance(organization, project, action, instance=None) -> None:
     """Run all active webhooks for the action using instances as payload.
 
     Be sure WebhookAction.ACTIONS contains all required fields.
@@ -178,7 +178,7 @@ def emit_webhooks_for_instance(organization, project, action, instance=None):
         emit_webhooks_for_instance_sync(organization, project, action, instance)
 
 
-def emit_webhooks(organization, project, action, payload):
+def emit_webhooks(organization, project, action, payload) -> None:
     """
     Run all active webhooks for the action.
 

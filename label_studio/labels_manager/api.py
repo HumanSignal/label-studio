@@ -107,7 +107,7 @@ class LabelAPI(viewsets.ModelViewSet):
             kwargs['many'] = True
         return super().get_serializer(*args, **kwargs)
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(created_by=self.request.user, organization=self.request.user.active_organization)
 
     def get_queryset(self):

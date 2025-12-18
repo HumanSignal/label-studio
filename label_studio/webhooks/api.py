@@ -69,7 +69,7 @@ class WebhookListAPI(generics.ListCreateAPIView):
     def get_queryset(self):
         return Webhook.objects.filter(organization=self.request.user.active_organization)
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         project = serializer.validated_data.get('project')
         if project is None or project.organization_id != self.request.user.active_organization.id:
             raise NotFound('Project not found.')

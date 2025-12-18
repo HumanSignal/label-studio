@@ -365,10 +365,10 @@ class Task(TaskMixin, FsmHistoryStateModel):
         user.project = self.project  # link for activity log
         return mixin_has_permission and self.project.has_permission(user)
 
-    def clear_expired_locks(self):
+    def clear_expired_locks(self) -> None:
         self.locks.filter(expire_at__lt=now()).delete()
 
-    def set_lock(self, user):
+    def set_lock(self, user) -> None:
         """Lock current task by specified user. Lock lifetime is set by `expire_in_secs`"""
         from projects.functions.next_task import get_next_task_logging_level
 
@@ -399,7 +399,7 @@ class Task(TaskMixin, FsmHistoryStateModel):
             )
         self.clear_expired_locks()
 
-    def release_lock(self, user=None):
+    def release_lock(self, user=None) -> None:
         """Release lock for the task.
         If user specified, it checks whether lock is released by the user who previously has locked that task
         """
@@ -514,20 +514,20 @@ class Task(TaskMixin, FsmHistoryStateModel):
         else:
             return self.annotations.filter(Q_finished_annotations)
 
-    def increase_project_summary_counters(self):
+    def increase_project_summary_counters(self) -> None:
         if hasattr(self.project, 'summary'):
             summary = self.project.summary
             summary.update_data_columns([self])
 
-    def decrease_project_summary_counters(self):
+    def decrease_project_summary_counters(self) -> None:
         if hasattr(self.project, 'summary'):
             summary = self.project.summary
             summary.remove_data_columns([self])
 
-    def ensure_unique_groundtruth(self, annotation_id):
+    def ensure_unique_groundtruth(self, annotation_id) -> None:
         self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
-    def save(self, *args, update_fields=None, **kwargs):
+    def save(self, *args, update_fields=None, **kwargs) -> None:
         if self.inner_id == 0:
             task = Task.objects.filter(project=self.project).order_by('-inner_id').first()
             max_inner_id = 1
@@ -759,19 +759,19 @@ class Annotation(AnnotationMixin, FsmHistoryStateModel):
         user.project = self.project  # link for activity log
         return mixin_has_permission and self.project.has_permission(user)
 
-    def increase_project_summary_counters(self):
+    def increase_project_summary_counters(self) -> None:
         if hasattr(self.project, 'summary'):
             logger.debug(f'Increase project.summary counters from {self}')
             summary = self.project.summary
             summary.update_created_annotations_and_labels([self])
 
-    def decrease_project_summary_counters(self):
+    def decrease_project_summary_counters(self) -> None:
         if hasattr(self.project, 'summary'):
             logger.debug(f'Decrease project.summary counters from {self}')
             summary = self.project.summary
             summary.remove_created_annotations_and_labels([self])
 
-    def update_task(self):
+    def update_task(self) -> None:
         update_fields = ['updated_at']
 
         # updated_by
@@ -814,7 +814,7 @@ class Annotation(AnnotationMixin, FsmHistoryStateModel):
 
         update_task_state_after_annotation_deletion(task, project)
 
-    def on_delete_update_counters(self):
+    def on_delete_update_counters(self) -> None:
         task = self.task
         project = self.project
 
@@ -962,14 +962,14 @@ class AnnotationDraft(FsmHistoryStateModel):
         user.project = self.task.project  # link for activity log
         return self.task.project.has_permission(user)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         with transaction.atomic():
             super().save(*args, **kwargs)
             project = self.task.project
             if hasattr(project, 'summary'):
                 project.summary.update_created_labels_drafts([self])
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> None:
         with transaction.atomic():
             project = self.task.project
             if hasattr(project, 'summary'):
@@ -1078,7 +1078,7 @@ class Prediction(models.Model):
         else:
             raise ValidationError(f'Incorrect format {type(result)} for prediction result {result}')
 
-    def update_task(self):
+    def update_task(self) -> None:
         update_fields = ['updated_at']
 
         # updated_by
@@ -1305,7 +1305,7 @@ class PredictionMeta(models.Model):
 
 
 @receiver(post_delete, sender=Task)
-def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
+def update_all_task_states_after_deleting_task(sender, instance, **kwargs) -> None:
     """after deleting_task
     use update_tasks_states for all project
     but call only tasks_number_changed section
@@ -1324,7 +1324,7 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
 
 
 @receiver(pre_delete, sender=Task)
-def remove_data_columns(sender, instance, **kwargs):
+def remove_data_columns(sender, instance, **kwargs) -> None:
     """Reduce data column counters after removing task"""
     instance.decrease_project_summary_counters()
 
@@ -1335,7 +1335,7 @@ def _task_data_is_not_updated(update_fields):
 
 
 @receiver(pre_save, sender=Task)
-def delete_project_summary_data_columns_before_updating_task(sender, instance, update_fields, **kwargs):
+def delete_project_summary_data_columns_before_updating_task(sender, instance, update_fields, **kwargs) -> None:
     """Before updating task fields - ensure previous info removed from project.summary"""
     if _task_data_is_not_updated(update_fields):
         # we don't need to update counters when other than task.data fields are updated
@@ -1349,7 +1349,7 @@ def delete_project_summary_data_columns_before_updating_task(sender, instance, u
 
 
 @receiver(post_save, sender=Task)
-def update_project_summary_data_columns(sender, instance, created, update_fields, **kwargs):
+def update_project_summary_data_columns(sender, instance, created, update_fields, **kwargs) -> None:
     """Update task counters in project summary in case when new task has been created"""
     if _task_data_is_not_updated(update_fields):
         # we don't need to update counters when other than task.data fields are updated
@@ -1358,7 +1358,7 @@ def update_project_summary_data_columns(sender, instance, created, update_fields
 
 
 @receiver(pre_save, sender=Annotation)
-def delete_project_summary_annotations_before_updating_annotation(sender, instance, **kwargs):
+def delete_project_summary_annotations_before_updating_annotation(sender, instance, **kwargs) -> None:
     """Before updating annotation fields - ensure previous info removed from project.summary"""
     try:
         old_annotation = sender.objects.get(id=instance.id)
@@ -1386,7 +1386,7 @@ def delete_project_summary_annotations_before_updating_annotation(sender, instan
 
 
 @receiver(post_save, sender=Annotation)
-def update_project_summary_annotations_and_is_labeled(sender, instance, created, **kwargs):
+def update_project_summary_annotations_and_is_labeled(sender, instance, created, **kwargs) -> None:
     """Update annotation counters in project summary"""
     instance.increase_project_summary_counters()
 
@@ -1402,7 +1402,7 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
 
 
 @receiver(pre_delete, sender=Prediction)
-def remove_predictions_from_project(sender, instance, **kwargs):
+def remove_predictions_from_project(sender, instance, **kwargs) -> None:
     """Remove predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count() - 1
     instance.task.save(update_fields=['total_predictions'])
@@ -1410,7 +1410,7 @@ def remove_predictions_from_project(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Prediction)
-def save_predictions_to_project(sender, instance, **kwargs):
+def save_predictions_to_project(sender, instance, **kwargs) -> None:
     """Add predictions counters"""
     instance.task.total_predictions = instance.task.predictions.all().count()
     instance.task.save(update_fields=['total_predictions'])
@@ -1421,7 +1421,7 @@ def save_predictions_to_project(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Annotation)
-def delete_draft(sender, instance, **kwargs):
+def delete_draft(sender, instance, **kwargs) -> None:
     task = instance.task
     query_args = {'task': task, 'annotation': instance}
     drafts = AnnotationDraft.objects.filter(**query_args)
@@ -1438,7 +1438,7 @@ def delete_draft(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Annotation)
-def update_ml_backend(sender, instance, **kwargs):
+def update_ml_backend(sender, instance, **kwargs) -> None:
     if instance.ground_truth:
         return
 
@@ -1453,7 +1453,7 @@ def update_ml_backend(sender, instance, **kwargs):
                 ml_backend.train()
 
 
-def update_task_stats(task, stats=('is_labeled',), save=True):
+def update_task_stats(task, stats=('is_labeled',), save=True) -> None:
     """Update single task statistics:
         accuracy
         is_labeled
@@ -1469,7 +1469,7 @@ def update_task_stats(task, stats=('is_labeled',), save=True):
         task.save()
 
 
-def deprecated_bulk_update_stats_project_tasks(tasks, project=None):
+def deprecated_bulk_update_stats_project_tasks(tasks, project=None) -> None:
     """bulk Task update accuracy
        ex: after change settings
        apply several update queries size of batch

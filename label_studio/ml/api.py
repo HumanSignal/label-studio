@@ -135,7 +135,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
 
         return ml_backends
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         ml_backend = serializer.save()
         ml_backend.update_state()
 
@@ -226,7 +226,7 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         ml_backend.update_state()
         return ml_backend
 
-    def perform_update(self, serializer):
+    def perform_update(self, serializer) -> None:
         ml_backend = serializer.save()
         ml_backend.update_state()
 

@@ -40,7 +40,7 @@ def csv_generate_header(file):
     return names
 
 
-def check_max_task_number(tasks):
+def check_max_task_number(tasks) -> None:
     # max tasks
     if len(tasks) > settings.TASKS_MAX_NUMBER:
         raise ValidationError(
@@ -48,7 +48,7 @@ def check_max_task_number(tasks):
         )
 
 
-def check_tasks_max_file_size(value):
+def check_tasks_max_file_size(value) -> None:
     if value >= settings.TASKS_MAX_FILE_SIZE:
         raise ValidationError(
             f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes, '
@@ -56,14 +56,14 @@ def check_tasks_max_file_size(value):
         )
 
 
-def check_extensions(files):
+def check_extensions(files) -> None:
     for filename, file_obj in files.items():
         _, ext = os.path.splitext(file_obj.name)
         if ext.lower() not in settings.SUPPORTED_EXTENSIONS:
             raise ValidationError(f'{ext} extension is not supported')
 
 
-def check_request_files_size(files):
+def check_request_files_size(files) -> None:
     total = sum([file.size for _, file in files.items()])
 
     check_tasks_max_file_size(total)

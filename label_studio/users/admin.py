@@ -72,7 +72,7 @@ class AsyncMigrationStatusAdmin(admin.ModelAdmin):
         migration.status = migration.STATUS_ERROR
         migration.save()
 
-    def run_scheduled_migrations(self, request, queryset):
+    def run_scheduled_migrations(self, request, queryset) -> None:
         """Run selected scheduled migrations manually.
 
         Expects AsyncMigrationStatus.name in one of forms:

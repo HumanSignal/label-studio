@@ -200,7 +200,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         context['created_by'] = self.request.user
         return context
 
-    def perform_create(self, ser):
+    def perform_create(self, ser) -> None:
         try:
             ser.save(organization=self.request.user.active_organization)
         except IntegrityError as e:
@@ -414,7 +414,7 @@ class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
 
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
-    def perform_destroy(self, instance):
+    def perform_destroy(self, instance) -> None:
         # we don't need to relaculate counters if we delete whole project
         with temporary_disconnect_all_signals():
             instance.delete()

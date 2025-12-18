@@ -10,13 +10,13 @@ if TYPE_CHECKING:
 
 
 class ProjectMixin:
-    def rearrange_overlap_cohort(self):
+    def rearrange_overlap_cohort(self) -> None:
         """
         Async start rearrange overlap depending on annotation count in tasks
         """
         start_job_async_or_sync(self._rearrange_overlap_cohort)
 
-    def update_tasks_counters_and_is_labeled(self, tasks_queryset, from_scratch=True):
+    def update_tasks_counters_and_is_labeled(self, tasks_queryset, from_scratch=True) -> None:
         """
         Async start updating tasks counters and than is_labeled
         :param tasks_queryset: Tasks to update queryset
@@ -34,7 +34,7 @@ class ProjectMixin:
         tasks_number_changed,
         from_scratch=True,
         recalculate_stats_counts: Optional[Mapping[str, int]] = None,
-    ):
+    ) -> None:
         """
         Async start updating tasks counters and than rearrange
         :param tasks_queryset: Tasks to update queryset
@@ -57,7 +57,7 @@ class ProjectMixin:
 
     def update_tasks_states(
         self, maximum_annotations_changed, overlap_cohort_percentage_changed, tasks_number_changed
-    ):
+    ) -> None:
         """
         Async start updating tasks states after settings change
         :param maximum_annotations_changed: If maximum_annotations param changed
@@ -71,7 +71,7 @@ class ProjectMixin:
             tasks_number_changed,
         )
 
-    def has_permission(self, user):
+    def has_permission(self, user) -> bool:
         """
         Dummy stub for has_permission
         """

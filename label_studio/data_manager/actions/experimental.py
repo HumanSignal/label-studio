@@ -214,7 +214,7 @@ add_data_field_examples = (
 )
 
 
-def add_expression(queryset, size, value, value_name):
+def add_expression(queryset, size, value, value_name) -> None:
     # simple parsing
     command, args = value.split('(')
     args = process_arrays(args)

@@ -7,7 +7,7 @@ TASK_ID_KEY = 'taskId'
 ANNOTATION_ID_KEY = 'annotationId'
 
 
-def add_stream_history(next_task, user, project):
+def add_stream_history(next_task, user, project) -> None:
     if next_task is not None:
         with transaction.atomic():
             history, created = LabelStreamHistory.objects.get_or_create(user=user, project=project)
@@ -23,7 +23,7 @@ def add_stream_history(next_task, user, project):
             history.save()
 
 
-def fill_history_annotation(user, task, annotation):
+def fill_history_annotation(user, task, annotation) -> None:
     history = user.histories.filter(project=task.project).first()
     if history and history.data:
         for item in history.data:

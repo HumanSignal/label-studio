@@ -674,11 +674,11 @@ PROJECT_FACTORY = 'projects.tests.factories.ProjectFactory'
 USER_FACTORY = 'users.tests.factories.UserFactory'
 
 
-def project_delete(project):
+def project_delete(project) -> None:
     project.delete()
 
 
-def user_auth(user_model, email, password):
+def user_auth(user_model, email, password) -> None:
     return None
 
 

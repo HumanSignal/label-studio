@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class DummyModelMixin:
-    def has_permission(self, user):
+    def has_permission(self, user) -> bool:
         return True
 
 

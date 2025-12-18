@@ -4,7 +4,7 @@ from label_studio.core.current_request import get_current_request
 
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
-    def add_fields(self, log_record, record, message_dict):
+    def add_fields(self, log_record, record, message_dict) -> None:
         super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
         request_id = None
         request = get_current_request()

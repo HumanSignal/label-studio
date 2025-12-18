@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 def async_import_background(
     import_id, user_id, recalculate_stats_func: Optional[Callable[..., None]] = None, **kwargs
-):
+) -> None:
     with transaction.atomic():
         try:
             project_import = ProjectImport.objects.get(id=import_id)
@@ -160,14 +160,14 @@ def async_import_background(
     project_import.save()
 
 
-def set_import_background_failure(job, connection, type, value, _):
+def set_import_background_failure(job, connection, type, value, _) -> None:
     import_id = job.args[0]
     ProjectImport.objects.filter(id=import_id).update(
         status=ProjectImport.Status.FAILED, traceback=traceback.format_exc(), error=str(value)
     )
 
 
-def set_reimport_background_failure(job, connection, type, value, _):
+def set_reimport_background_failure(job, connection, type, value, _) -> None:
     reimport_id = job.args[0]
     ProjectReimport.objects.filter(id=reimport_id).update(
         status=ProjectReimport.Status.FAILED,
@@ -557,7 +557,7 @@ def _async_import_background_streaming(project_import, user):
         raise
 
 
-def async_reimport_background(reimport_id, organization_id, user, **kwargs):
+def async_reimport_background(reimport_id, organization_id, user, **kwargs) -> None:
 
     with transaction.atomic():
         try:

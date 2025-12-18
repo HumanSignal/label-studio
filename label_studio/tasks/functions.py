@@ -23,7 +23,7 @@ from tasks.models import Annotation, Prediction, Task
 logger = logging.getLogger(__name__)
 
 
-def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_migrate_counters'):
+def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_migrate_counters') -> None:
     logger = logging.getLogger(__name__)
     # Don't load full Organization objects bc some columns (contact_info, verify_ssl_certs)
     # aren't created until after a migration calls this code
@@ -48,7 +48,7 @@ def calculate_stats_all_orgs(from_scratch, redis, migration_name='0018_manual_mi
     logger.debug('All organizations were recalculated')
 
 
-def redis_job_for_calculation(org_id, from_scratch, migration_name='0018_manual_migrate_counters'):
+def redis_job_for_calculation(org_id, from_scratch, migration_name='0018_manual_migrate_counters') -> None:
     """
     Recalculate counters for projects list
     :param org_id: ID of organization to recalculate
@@ -140,7 +140,7 @@ def _fill_annotations_project(project_id):
     Annotation.objects.filter(task__project_id=project_id).update(project_id=project_id)
 
 
-def fill_annotations_project():
+def fill_annotations_project() -> None:
     logger.info('Start filling project field for Annotation model')
 
     project_ids = Project.objects.all().values_list('id', flat=True)
@@ -169,7 +169,7 @@ def _fill_predictions_project(migration_name='0043_auto_20230825'):
         migration.save()
 
 
-def fill_predictions_project(migration_name):
+def fill_predictions_project(migration_name) -> None:
     logger.info('Start filling project field for Prediction model')
     start_job_async_or_sync(_fill_predictions_project, migration_name=migration_name)
     logger.info('Finished filling project field for Prediction model')
@@ -237,7 +237,7 @@ def update_tasks_counters(queryset, from_scratch=True):
     return updated_count
 
 
-def bulk_update_is_labeled_by_overlap(tasks_ids, project):
+def bulk_update_is_labeled_by_overlap(tasks_ids, project) -> None:
     if not tasks_ids:
         return
 

@@ -13,7 +13,7 @@ from fsm.utils import get_or_initialize_state
 logger = logging.getLogger(__name__)
 
 
-def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
+def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class) -> None:
     """
     Backfill initial FSM states for tasks created during storage sync.
 
@@ -60,7 +60,7 @@ def backfill_fsm_states_for_tasks(storage_id, tasks_created, link_class):
         logger.error(f'FSM sync after storage sync failed: {e}', exc_info=True)
 
 
-def update_task_state_after_annotation_deletion(task, project):
+def update_task_state_after_annotation_deletion(task, project) -> None:
     """
     Update task FSM state after an annotation has been deleted.
 

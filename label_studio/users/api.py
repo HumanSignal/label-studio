@@ -214,7 +214,7 @@ class UserAPI(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return super(UserAPI, self).create(request, *args, **kwargs)
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         instance = serializer.save()
         self.request.user.active_organization.add_user(instance)
 

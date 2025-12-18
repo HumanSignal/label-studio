@@ -36,7 +36,7 @@ def remove_duplicates(project, queryset, **kwargs):
     return {'response_code': 200}
 
 
-def remove_duplicates_job(project, queryset, **kwargs):
+def remove_duplicates_job(project, queryset, **kwargs) -> None:
     """Job for start_job_async_or_sync"""
     duplicates = find_duplicated_tasks_by_data(project, queryset)
     restore_storage_links_for_duplicated_tasks(duplicates)
@@ -102,7 +102,7 @@ def remove_duplicated_tasks(duplicates, project, queryset):
     return kept
 
 
-def move_annotations(duplicates):
+def move_annotations(duplicates) -> None:
     """Move annotations to the first task from duplicated tasks"""
     total_moved_annotations = 0
 

@@ -434,7 +434,7 @@ def get_sample_task(label_config, secure_mode=False):
     return generated_task, annotations, predictions
 
 
-def config_essential_data_has_changed(new_config_str, old_config_str):
+def config_essential_data_has_changed(new_config_str, old_config_str) -> bool | None:
     """Detect essential changes of the labeling config"""
     new_config = parse_config(new_config_str)
     old_config = parse_config(old_config_str)
@@ -451,7 +451,7 @@ def config_essential_data_has_changed(new_config_str, old_config_str):
             return True
 
 
-def replace_task_data_undefined_with_config_field(data, project, first_key=None):
+def replace_task_data_undefined_with_config_field(data, project, first_key=None) -> None:
     """Use first key is passed (for speed up) or project.data.types.keys()[0]"""
     # assign undefined key name from data to the first key from config, e.g. for txt loading
     if settings.DATA_UNDEFINED_NAME in data and (first_key or project.data_types.keys()):
@@ -460,7 +460,7 @@ def replace_task_data_undefined_with_config_field(data, project, first_key=None)
         del data[settings.DATA_UNDEFINED_NAME]
 
 
-def check_control_in_config_by_regex(config_string, control_type, filter=None):
+def check_control_in_config_by_regex(config_string, control_type, filter=None) -> bool:
     """
     Check if control type is in config including regex filter
     """
@@ -481,7 +481,7 @@ def check_control_in_config_by_regex(config_string, control_type, filter=None):
     return False
 
 
-def check_toname_in_config_by_regex(config_string, to_name, control_type=None):
+def check_toname_in_config_by_regex(config_string, to_name, control_type=None) -> bool:
     """
     Check if to_name is in config including regex filter
     :return: True if to_name is fullmatch to some pattern ion config

@@ -204,7 +204,7 @@ class ContextLog(object):
     def dont_send(self, request):
         return not settings.COLLECT_ANALYTICS or self._exclude_endpoint(request)
 
-    def send(self, request=None, response=None, body=None):
+    def send(self, request=None, response=None, body=None) -> None:
         if self.dont_send(request):
             return
         try:
@@ -322,7 +322,7 @@ class ContextLog(object):
             payload[key] = payload[key] or None
         return payload
 
-    def send_job(self, request, response, body):
+    def send_job(self, request, response, body) -> None:
         try:
             payload = self.create_payload(request, response, body)
         except:  # noqa: E722

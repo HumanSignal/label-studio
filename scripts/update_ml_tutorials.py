@@ -51,7 +51,7 @@ def parse_readme_file(file_path: str) -> dict:
     return {'header': header, 'body': body}
 
 
-def create_tutorial_files():
+def create_tutorial_files() -> None:
     readme_files = get_readme_files()
 
     files_and_headers = []
@@ -77,7 +77,7 @@ def create_tutorial_files():
     update_ml_tutorials_index(files_and_headers)
 
 
-def update_ml_tutorials_index(files_and_headers: List):
+def update_ml_tutorials_index(files_and_headers: List) -> None:
     # Navigate to '../docs/source/guide/ml_tutorials.html' relative to the current script
     p = Path(__file__).resolve().parent.parent / 'docs' / 'source' / 'guide' / 'ml_tutorials.html'
     print(f'Reading file from {str(p)}')

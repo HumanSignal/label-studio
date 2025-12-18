@@ -37,7 +37,7 @@ def fast_first_or_create(model, **model_params) -> Optional[ModelType]:
     return model.objects.create(**model_params)
 
 
-def batch_update_with_retry(queryset, batch_size=500, max_retries=3, **update_fields):
+def batch_update_with_retry(queryset, batch_size=500, max_retries=3, **update_fields) -> None:
     """
     Update objects in batches with retry logic to handle deadlocks.
 
@@ -196,7 +196,7 @@ def has_column_cached(table_name: str, column_name: str) -> bool:
 
 
 @receiver(post_migrate)
-def signal_clear_column_presence_cache(**_kwargs):
+def signal_clear_column_presence_cache(**_kwargs) -> None:
     """If some migration adds a column, we need to clear the column_presence_cache
     so that the next migration can introspect the new column using has_column_cached()."""
     logger.debug('Clearing column presence cache in post_migrate signal')

@@ -29,7 +29,7 @@ class StateChoicesRegistry:
     def __init__(self):
         self._choices: Dict[str, Type[TextChoices]] = {}
 
-    def register(self, entity_name: str, choices_class: Type[TextChoices]):
+    def register(self, entity_name: str, choices_class: Type[TextChoices]) -> None:
         """
         Register state choices for an entity type.
 
@@ -55,7 +55,7 @@ class StateChoicesRegistry:
         """Get a list of all registered entity types."""
         return list(self._choices.keys())
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Clear all registered choices.
 
@@ -114,7 +114,7 @@ class StateModelRegistry:
     def __init__(self):
         self._models: Dict[str, 'BaseState'] = {}
 
-    def register_model(self, entity_name: str, state_model: 'BaseState'):
+    def register_model(self, entity_name: str, state_model: 'BaseState') -> None:
         """
         Register a state model for an entity type.
 
@@ -161,7 +161,7 @@ class StateModelRegistry:
         """Check if a model is registered for an entity type."""
         return entity_name.lower() in self._models
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear all registered models (useful for testing)."""
         self._models.clear()
         logger.debug(
@@ -203,7 +203,7 @@ def register_state_model(entity_name: str):
     return decorator
 
 
-def register_state_model_class(entity_name: str, state_model: 'BaseState'):
+def register_state_model_class(entity_name: str, state_model: 'BaseState') -> None:
     """
     Convenience function to register a state model programmatically.
 
@@ -244,7 +244,7 @@ class TransitionRegistry:
     def __init__(self):
         self._transitions: Dict[str, Dict[str, 'BaseTransition']] = {}
 
-    def register(self, entity_name: str, transition_name: str, transition_class: 'BaseTransition'):
+    def register(self, entity_name: str, transition_name: str, transition_class: 'BaseTransition') -> None:
         """
         Register a transition class for an entity.
 
@@ -287,7 +287,7 @@ class TransitionRegistry:
         """Get a list of all registered entity types."""
         return list(self._transitions.keys())
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Clear all registered transitions.
 

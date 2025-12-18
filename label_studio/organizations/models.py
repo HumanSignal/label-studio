@@ -58,7 +58,7 @@ class OrganizationMember(OrganizationMemberMixin, models.Model):
     class Meta:
         ordering = ['pk']
 
-    def soft_delete(self):
+    def soft_delete(self) -> None:
         with transaction.atomic():
             self.deleted_at = timezone.now()
             self.save(update_fields=['deleted_at'])
@@ -148,17 +148,17 @@ class Organization(OrganizationMixin, models.Model):
 
             return om
 
-    def remove_user(self, user):
+    def remove_user(self, user) -> None:
         OrganizationMember.objects.filter(user=user, organization=self).delete()
         if user.active_organization_id == self.id:
             user.active_organization = user.organizations.filter(organizationmember__deleted_at__isnull=True).first()
             user.save(update_fields=['active_organization'])
 
-    def reset_token(self):
+    def reset_token(self) -> None:
         self.token = create_hash()
         self.save(update_fields=['token'])
 
-    def check_max_projects(self):
+    def check_max_projects(self) -> None:
         """This check raise an exception if the projects limit is hit"""
         pass
 
@@ -186,7 +186,7 @@ class Organization(OrganizationMixin, models.Model):
         return settings.VERIFY_SSL_CERTS
 
     @cached_property
-    def secure_mode(self):
+    def secure_mode(self) -> bool:
         return False
 
     @cached_property

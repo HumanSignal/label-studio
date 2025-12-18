@@ -151,10 +151,10 @@ def get_current_request():
 
 
 class ThreadLocalMiddleware(CommonMiddleware):
-    def process_request(self, request):
+    def process_request(self, request) -> None:
         CurrentContext.set_request(request)
 
 
 @receiver(request_finished)
-def clean_request(sender, **kwargs):
+def clean_request(sender, **kwargs) -> None:
     CurrentContext.clear()

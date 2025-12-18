@@ -10,10 +10,10 @@ log = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = 'Destroy organization'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument('organization_id', type=int)
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         org = Organization.objects.filter(pk=options['organization_id']).first()
         if org is None:
             print(f'Organization with id: {options["organization_id"]} not found')

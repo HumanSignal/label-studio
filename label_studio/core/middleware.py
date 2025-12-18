@@ -37,7 +37,7 @@ def enforce_csrf_checks(func):
 
 class DisableCSRF(MiddlewareMixin):
     # disable csrf for api requests
-    def process_view(self, request, callback, *args, **kwargs):
+    def process_view(self, request, callback, *args, **kwargs) -> None:
         if hasattr(callback, '_dont_enforce_csrf_checks'):
             setattr(request, '_dont_enforce_csrf_checks', callback._dont_enforce_csrf_checks)
         elif request.GET.get('enforce_csrf_checks'):  # _dont_enforce_csrf_checks is for test
@@ -98,7 +98,7 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
         return response
 
-    def should_redirect_with_slash(self, request):
+    def should_redirect_with_slash(self, request) -> bool:
         """
         Override the original method to keep global APPEND_SLASH setting false
         """
@@ -108,7 +108,7 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
 
 class SetSessionUIDMiddleware(CommonMiddleware):
-    def process_request(self, request):
+    def process_request(self, request) -> None:
         if 'uid' not in request.session:
             request.session['uid'] = str(uuid4())
 
@@ -136,7 +136,7 @@ class ContextLogMiddleware(CommonMiddleware):
 
         return response
 
-    def process_request(self, request):
+    def process_request(self, request) -> None:
         if 'server_id' not in request:
             setattr(request, 'server_id', self.log._get_server_id())
 
@@ -184,7 +184,7 @@ class XApiKeySupportMiddleware:
 
 
 class UpdateLastActivityMiddleware(CommonMiddleware):
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_view(self, request, view_func, view_args, view_kwargs) -> None:
         if hasattr(request, 'user') and request.method not in SAFE_METHODS:
             if request.user.is_authenticated:
                 request.user.update_last_activity()

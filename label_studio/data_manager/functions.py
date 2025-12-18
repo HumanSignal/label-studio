@@ -353,7 +353,7 @@ def filters_ordering_selected_items_exist(data):
     return data.get('filters') or data.get('ordering') or data.get('selectedItems')
 
 
-def custom_filter_expressions(*args, **kwargs):
+def custom_filter_expressions(*args, **kwargs) -> None:
     pass
 
 

@@ -95,7 +95,7 @@ class S3StorageMixin(models.Model):
         return client, s3.Bucket(self.bucket)
 
     @catch_and_reraise_from_none
-    def validate_connection(self, client=None):
+    def validate_connection(self, client=None) -> None:
         logger.debug('validate_connection')
         if client is None:
             client = self.get_client()
@@ -117,12 +117,12 @@ class S3StorageMixin(models.Model):
             client.head_bucket(Bucket=self.bucket)
 
     @property
-    def path_full(self):
+    def path_full(self) -> str:
         prefix = self.prefix or ''
         return f'{self.url_scheme}://{self.bucket}/{prefix}'
 
     @property
-    def type_full(self):
+    def type_full(self) -> str:
         return 'Amazon AWS S3'
 
     @catch_and_reraise_from_none
@@ -273,7 +273,7 @@ class S3ImportStorage(ProjectStorageMixin, S3ImportStorageBase):
 
 class S3ExportStorage(S3StorageMixin, ExportStorage):
     @catch_and_reraise_from_none
-    def save_annotation(self, annotation):
+    def save_annotation(self, annotation) -> None:
         client, s3 = self.get_client_and_resource()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
@@ -302,7 +302,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         S3ExportStorageLink.create(annotation, self)
 
     @catch_and_reraise_from_none
-    def delete_annotation(self, annotation):
+    def delete_annotation(self, annotation) -> None:
         client, s3 = self.get_client_and_resource()
         logger.debug(f'Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
 
@@ -317,7 +317,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         S3ExportStorageLink.objects.filter(storage=self, annotation=annotation).delete()
 
 
-def async_export_annotation_to_s3_storages(annotation):
+def async_export_annotation_to_s3_storages(annotation) -> None:
     project = annotation.project
     if hasattr(project, 'io_storages_s3exportstorages'):
         for storage in project.io_storages_s3exportstorages.all():
@@ -326,14 +326,14 @@ def async_export_annotation_to_s3_storages(annotation):
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_s3_storages(sender, instance, **kwargs):
+def export_annotation_to_s3_storages(sender, instance, **kwargs) -> None:
     storages = getattr(instance.project, 'io_storages_s3exportstorages', None)
     if storages and storages.exists():  # avoid excess jobs in rq
         start_job_async_or_sync(async_export_annotation_to_s3_storages, instance)
 
 
 @receiver(pre_delete, sender=Annotation)
-def delete_annotation_from_s3_storages(sender, instance, **kwargs):
+def delete_annotation_from_s3_storages(sender, instance, **kwargs) -> None:
     links = S3ExportStorageLink.objects.filter(annotation=instance)
     for link in links:
         storage = link.storage

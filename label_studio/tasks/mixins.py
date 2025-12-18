@@ -20,7 +20,7 @@ class TaskMixin:
     def post_process_bulk_update_stats(cls, tasks) -> None:
         pass
 
-    def before_delete_actions(self):
+    def before_delete_actions(self) -> None:
         """
         Actions to execute before task deletion
         """
@@ -33,7 +33,7 @@ class TaskMixin:
         """
         pass
 
-    def get_rejected_query(self):
+    def get_rejected_query(self) -> None:
         pass
 
 

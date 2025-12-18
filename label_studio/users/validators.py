@@ -8,7 +8,7 @@ class PasswordLengthValidator:
         self.min_length = min_length
         self.max_length = max_length
 
-    def validate(self, password, user=None):
+    def validate(self, password, user=None) -> None:
         if len(password) < self.min_length:
             raise ValidationError(
                 _('Please enter a password %(min_length)d–%(max_length)d characters in length.'),

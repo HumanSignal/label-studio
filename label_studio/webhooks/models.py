@@ -74,7 +74,7 @@ class Webhook(models.Model):
             raise ValidationError("Project webhook can't contain organization-only action.")
         return actions
 
-    def set_actions(self, actions):
+    def set_actions(self, actions) -> None:
         if not actions:
             actions = set()
         actions = set(actions)

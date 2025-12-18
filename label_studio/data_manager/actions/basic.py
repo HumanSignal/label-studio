@@ -163,7 +163,7 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
-def async_project_summary_recalculation(tasks_ids_list, project_id):
+def async_project_summary_recalculation(tasks_ids_list, project_id) -> None:
     queryset = Task.objects.filter(id__in=tasks_ids_list)
     project = Project.objects.get(id=project_id)
     project.summary.remove_created_annotations_and_labels(Annotation.objects.filter(task__in=queryset))

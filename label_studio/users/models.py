@@ -66,7 +66,7 @@ class UserManager(BaseUserManager):
 class UserLastActivityMixin(models.Model):
     last_activity = models.DateTimeField(_('last activity'), default=timezone.now, editable=False)
 
-    def update_last_activity(self):
+    def update_last_activity(self) -> None:
         """Update user's last activity timestamp using Redis caching."""
         current_time = timezone.now()
 
@@ -176,7 +176,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
             else:
                 return settings.HOSTNAME + self.avatar.url
 
-    def is_organization_admin(self, org_pk):
+    def is_organization_admin(self, org_pk) -> bool:
         return True
 
     def active_organization_annotations(self):
@@ -194,7 +194,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     def has_organization(self):
         return Organization.objects.filter(created_by=self).exists()
 
-    def clean(self):
+    def clean(self) -> None:
         super().clean()
         self.email = self.__class__.objects.normalize_email(self.email)
 
@@ -241,7 +241,7 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
 
 
 @receiver(post_save, sender=User)
-def init_user(sender, instance=None, created=False, **kwargs):
+def init_user(sender, instance=None, created=False, **kwargs) -> None:
     if created:
         # create token for user
         Token.objects.create(user=instance)

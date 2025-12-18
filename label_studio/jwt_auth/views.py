@@ -179,7 +179,7 @@ class LSAPITokenView(generics.ListCreateAPIView):
             return LSAPITokenCreateSerializer
         return LSAPITokenListSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         # Check for existing valid tokens
         existing_tokens = self.get_queryset()
         if existing_tokens.exists():

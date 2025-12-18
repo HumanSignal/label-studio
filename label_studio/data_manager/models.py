@@ -38,7 +38,7 @@ class ProjectViewMixin(models.Model):
         'projects.Project', related_name='views', on_delete=models.CASCADE, help_text='Project ID'
     )
 
-    def has_permission(self, user):
+    def has_permission(self, user) -> bool:
         user.project = self.project  # link for activity log
         if self.project.organization == user.active_organization:
             return True

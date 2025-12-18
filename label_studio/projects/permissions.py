@@ -7,5 +7,5 @@ class ProjectImportPermission(BasePermission):
     Default case is always true
     """
 
-    def has_permission(self, request, view):
+    def has_permission(self, request, view) -> bool:
         return True

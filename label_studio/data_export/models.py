@@ -85,7 +85,7 @@ class Export(ExportMixin, models.Model):
 
 
 @receiver(post_save, sender=Export)
-def set_export_default_name(sender, instance, created, **kwargs):
+def set_export_default_name(sender, instance, created, **kwargs) -> None:
     if created and not instance.title:
         instance.title = instance.get_default_title()
         instance.save()
@@ -246,7 +246,7 @@ class ConvertedFormat(models.Model):
         verbose_name=_('created by'),
     )
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> None:
         if flag_set('ff_back_dev_4664_remove_storage_file_on_export_delete_29032023_short'):
             if self.file:
                 self.file.delete()

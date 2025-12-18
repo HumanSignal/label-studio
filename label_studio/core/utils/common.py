@@ -223,7 +223,7 @@ def paginator_help(objects_name, tag):
     )
 
 
-def string_is_url(url):
+def string_is_url(url) -> bool:
     try:
         url_validator(url)
     except ValidationError:
@@ -296,7 +296,7 @@ def find_first_one_to_one_related_field_by_prefix(instance, prefix):
     return result
 
 
-def start_browser(ls_url, no_browser):
+def start_browser(ls_url, no_browser) -> None:
     import threading
     import webbrowser
 
@@ -389,7 +389,7 @@ def current_version_is_outdated(latest_version):
     return current_version < latest_version
 
 
-def check_for_the_latest_version(print_message):
+def check_for_the_latest_version(print_message) -> None:
     """Check latest pypi version"""
     if not settings.LATEST_VERSION_CHECK:
         return
@@ -598,11 +598,11 @@ class temporary_disconnect_all_signals(object):
         for signal in list(self.stashed_signals):
             self.reconnect(signal)
 
-    def disconnect(self, signal):
+    def disconnect(self, signal) -> None:
         self.stashed_signals[signal] = signal.receivers
         signal.receivers = []
 
-    def reconnect(self, signal):
+    def reconnect(self, signal) -> None:
         signal.receivers = self.stashed_signals.get(signal, [])
         del self.stashed_signals[signal]
 
@@ -744,7 +744,7 @@ def timeit(func):
     return wrapper
 
 
-def empty(*args, **kwargs):
+def empty(*args, **kwargs) -> None:
     pass
 
 
@@ -753,7 +753,7 @@ def get_ttl_hash(seconds: int = 60) -> int:
     return round(time.time() / seconds)
 
 
-def is_community():
+def is_community() -> bool | None:
     """Determine if the current Label Studio instance is the community edition (aka LSO).
 
     Returns

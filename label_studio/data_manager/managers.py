@@ -190,7 +190,7 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
     return queryset
 
 
-def cast_value(_filter):
+def cast_value(_filter) -> None:
     # range (is between)
     if hasattr(_filter.value, 'max'):
         if _filter.type == 'Number':
@@ -209,7 +209,7 @@ def cast_value(_filter):
             _filter.value = cast_bool_from_str(_filter.value)
 
 
-def add_result_filter(field_name, _filter, filter_expressions, project):
+def add_result_filter(field_name, _filter, filter_expressions, project) -> str | None:
     from django.db.models.expressions import RawSQL
     from tasks.models import Annotation, Prediction
 
@@ -255,7 +255,7 @@ def add_result_filter(field_name, _filter, filter_expressions, project):
         return 'continue'
 
 
-def add_user_filter(enabled, key, _filter, filter_expressions):
+def add_user_filter(enabled, key, _filter, filter_expressions) -> str | None:
     if enabled and _filter.operator == Operator.CONTAINS:
         filter_expressions.append(Q(**{key: int(_filter.value)}))
         return 'continue'
@@ -781,7 +781,7 @@ def get_annotations_map():
     return settings.DATA_MANAGER_ANNOTATIONS_MAP
 
 
-def update_annotation_map(obj):
+def update_annotation_map(obj) -> None:
     settings.DATA_MANAGER_ANNOTATIONS_MAP.update(obj)
 
 

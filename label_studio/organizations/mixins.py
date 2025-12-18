@@ -8,7 +8,7 @@ class OrganizationMixin:
 
 
 class OrganizationMemberMixin:
-    def has_permission(self, user):
+    def has_permission(self, user) -> bool:
         if user.active_organization_id == self.organization_id:
             return True
         return False

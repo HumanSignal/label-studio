@@ -53,7 +53,7 @@ def grouper(iterable, size):
         yield chunk
 
 
-def validate_fields(meta, fields):
+def validate_fields(meta, fields) -> None:
 
     fields = frozenset(fields)
     field_names = set()

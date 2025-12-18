@@ -74,7 +74,7 @@ def datetime2str(d):
 
 
 @register.filter
-def start_zero_padding(number):
+def start_zero_padding(number) -> str:
     return '%5.5i' % number
 
 
@@ -120,7 +120,7 @@ def custom_autocomplete(key=''):
 
 
 @register.simple_tag(takes_context=True)
-def var_exists(context, name):
+def var_exists(context, name) -> bool:
     dicts = context.dicts  # array of dicts
     if dicts:
         for d in dicts:

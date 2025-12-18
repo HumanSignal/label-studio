@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class TasksConfig(AppConfig):
     name = 'tasks'
 
-    def ready(self):
+    def ready(self) -> None:
         """
         Tasks app initialization.
 

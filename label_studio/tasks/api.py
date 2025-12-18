@@ -195,7 +195,7 @@ class TaskListAPI(DMTaskListAPI):
             context['project'] = generics.get_object_or_404(Project, pk=project_id)
         return context
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         project_id = self.request.data.get('project')
         project = generics.get_object_or_404(Project, pk=project_id)
         instance = serializer.save(project=project)
@@ -284,7 +284,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         DELETE=all_permissions.tasks_delete,
     )
 
-    def initial(self, request, *args, **kwargs):
+    def initial(self, request, *args, **kwargs) -> None:
         super().initial(request, *args, **kwargs)
         self.task = self.get_object()
 
@@ -454,7 +454,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AnnotationSerializer
     queryset = Annotation.objects.all()
 
-    def perform_destroy(self, annotation):
+    def perform_destroy(self, annotation) -> None:
         annotation.delete()
 
     def update(self, request, *args, **kwargs):
@@ -582,7 +582,7 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
         return Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
 
-    def delete_draft(self, draft_id, annotation_id):
+    def delete_draft(self, draft_id, annotation_id) -> None:
         try:
             draft = AnnotationDraft.objects.get(id=draft_id)
             # We call delete on the individual draft object because
@@ -679,7 +679,7 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
         task_id = self.kwargs['pk']
         return queryset.filter(task_id=task_id)
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         task_id = self.kwargs['pk']
         annotation_id = self.kwargs.get('annotation_id')
         user = self.request.user
@@ -885,7 +885,7 @@ class AnnotationConvertAPI(generics.RetrieveAPIView):
     permission_required = ViewClassPermission(POST=all_permissions.annotations_change)
     queryset = Annotation.objects.all()
 
-    def process_intermediate_state(self, annotation, draft):
+    def process_intermediate_state(self, annotation, draft) -> None:
         pass
 
     def post(self, request, *args, **kwargs):

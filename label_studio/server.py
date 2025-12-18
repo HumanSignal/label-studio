@@ -47,7 +47,7 @@ def _set_sqlite_fix_pragma(sender, connection, **kwargs):
         cursor.execute('PRAGMA journal_mode=wal;')
 
 
-def is_database_synchronized(database):
+def is_database_synchronized(database) -> bool:
     connection = connections[database]
     connection.prepare_database()
     executor = MigrationExecutor(connection)
@@ -273,7 +273,7 @@ def _project_exists(project_name):
     return Project.objects.filter(title=project_name).exists()
 
 
-def main():
+def main() -> None:
     input_args = parse_input_args(sys.argv[1:])
 
     # setup logging level

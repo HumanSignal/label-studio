@@ -81,7 +81,7 @@ class RedisStorageMixin(models.Model):
 class RedisImportStorageBase(ImportStorage, RedisStorageMixin):
     db = models.PositiveSmallIntegerField(_('db'), default=1, help_text='Server Database')
 
-    def can_resolve_url(self, url):
+    def can_resolve_url(self, url) -> bool:
         return False
 
     def iter_objects(self):
@@ -112,7 +112,7 @@ class RedisImportStorageBase(ImportStorage, RedisStorageMixin):
     def scan_and_create_links(self):
         return self._scan_and_create_links(RedisImportStorageLink)
 
-    def validate_connection(self, client=None):
+    def validate_connection(self, client=None) -> None:
         if client is None:
             client = self.get_client()
         client.ping()
@@ -129,7 +129,7 @@ class RedisImportStorage(ProjectStorageMixin, RedisImportStorageBase):
 class RedisExportStorage(RedisStorageMixin, ExportStorage):
     db = models.PositiveSmallIntegerField(_('db'), default=2, help_text='Server Database')
 
-    def save_annotation(self, annotation):
+    def save_annotation(self, annotation) -> None:
         client = self.get_client()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
@@ -143,14 +143,14 @@ class RedisExportStorage(RedisStorageMixin, ExportStorage):
         # create link if everything ok
         RedisExportStorageLink.create(annotation, self)
 
-    def validate_connection(self, client=None):
+    def validate_connection(self, client=None) -> None:
         if client is None:
             client = self.get_client()
         client.ping()
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_redis_storages(sender, instance, **kwargs):
+def export_annotation_to_redis_storages(sender, instance, **kwargs) -> None:
     project = instance.project
     if hasattr(project, 'io_storages_redisexportstorages'):
         for storage in project.io_storages_redisexportstorages.all():

@@ -135,7 +135,7 @@ class MLBackend(models.Model):
         super(MLBackend, self).__init__(*args, **kwargs)
         self.__original_title = self.title
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         """
         Overrides the save() method to update the associated project's model_version field.
         If the title of the model instance is changed and the model_version
@@ -220,7 +220,7 @@ class MLBackend(models.Model):
         self.save()
         return model_version
 
-    def train(self):
+    def train(self) -> None:
         train_response = self.api.train(self.project)
         if train_response.is_error:
             self.state = MLBackendState.ERROR
@@ -493,7 +493,7 @@ def _validate_ml_api_result(ml_api_result, tasks, curr_logger):
 
 
 @receiver(pre_delete, sender=MLBackend)
-def modify_project_model_version(sender, instance, **kwargs):
+def modify_project_model_version(sender, instance, **kwargs) -> None:
     project = instance.project
 
     if project.model_version == instance.title:
@@ -502,7 +502,7 @@ def modify_project_model_version(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=MLBackend)
-def create_ml_webhook(sender, instance, created, **kwargs):
+def create_ml_webhook(sender, instance, created, **kwargs) -> None:
     if not created:
         return
     ml_backend = instance

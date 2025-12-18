@@ -67,7 +67,7 @@ class GCSStorageMixin(models.Model):
             client = self.get_client()
         return client.get_bucket(bucket_name or self.bucket)
 
-    def validate_connection(self):
+    def validate_connection(self) -> None:
         GCS.validate_connection(
             self.bucket,
             self.google_project_id,
@@ -247,7 +247,7 @@ class GCSImportStorage(ProjectStorageMixin, GCSImportStorageBase):
 
 
 class GCSExportStorage(GCSStorageMixin, ExportStorage):
-    def save_annotation(self, annotation):
+    def save_annotation(self, annotation) -> None:
         bucket = self.get_bucket()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
@@ -264,7 +264,7 @@ class GCSExportStorage(GCSStorageMixin, ExportStorage):
         GCSExportStorageLink.create(annotation, self)
 
 
-def async_export_annotation_to_gcs_storages(annotation):
+def async_export_annotation_to_gcs_storages(annotation) -> None:
     project = annotation.project
     if hasattr(project, 'io_storages_gcsexportstorages'):
         for storage in project.io_storages_gcsexportstorages.all():
@@ -273,7 +273,7 @@ def async_export_annotation_to_gcs_storages(annotation):
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_gcs_storages(sender, instance, **kwargs):
+def export_annotation_to_gcs_storages(sender, instance, **kwargs) -> None:
     storages = getattr(instance.project, 'io_storages_gcsexportstorages', None)
     if storages and storages.exists():  # avoid excess jobs in rq
         start_job_async_or_sync(async_export_annotation_to_gcs_storages, instance)

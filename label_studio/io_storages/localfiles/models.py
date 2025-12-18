@@ -43,12 +43,12 @@ class LocalFilesMixin(models.Model):
         help_text='Interpret objects as BLOBs and generate URLs',
     )
 
-    def clean(self):
+    def clean(self) -> None:
         super().clean()
         if self.path is not None:
             self.path = normalize_storage_path(self.path)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         if self.path is not None:
             self.path = normalize_storage_path(self.path)
         super().save(*args, **kwargs)
@@ -76,7 +76,7 @@ class LocalFilesMixin(models.Model):
             )
         return ''
 
-    def validate_connection(self):
+    def validate_connection(self) -> None:
         normalized_path = self._get_storage_path_or_raise(ValidationError)
         self.path = normalized_path
         path = Path(normalized_path)
@@ -112,7 +112,7 @@ class LocalFilesMixin(models.Model):
 class LocalFilesImportStorageBase(LocalFilesMixin, ImportStorage):
     url_scheme = 'https'
 
-    def can_resolve_url(self, url):
+    def can_resolve_url(self, url) -> bool:
         return False
 
     recursive_scan = models.BooleanField(
@@ -181,7 +181,7 @@ class LocalFilesImportStorage(ProjectStorageMixin, LocalFilesImportStorageBase):
 
 
 class LocalFilesExportStorage(LocalFilesMixin, ExportStorage):
-    def save_annotation(self, annotation):
+    def save_annotation(self, annotation) -> None:
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
 
@@ -197,7 +197,7 @@ class LocalFilesExportStorage(LocalFilesMixin, ExportStorage):
         # Create export storage link
         LocalFilesExportStorageLink.create(annotation, self)
 
-    def delete_annotation(self, annotation):
+    def delete_annotation(self, annotation) -> None:
         logger.debug(f'Deleting object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         key = LocalFilesExportStorageLink.get_key(annotation)
         storage_path = self._get_storage_path_or_raise()
@@ -220,7 +220,7 @@ class LocalFilesExportStorageLink(ExportStorageLink):
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_local_files(sender, instance, **kwargs):
+def export_annotation_to_local_files(sender, instance, **kwargs) -> None:
     project = instance.project
     if hasattr(project, 'io_storages_localfilesexportstorages'):
         for storage in project.io_storages_localfilesexportstorages.all():
@@ -229,7 +229,7 @@ def export_annotation_to_local_files(sender, instance, **kwargs):
 
 
 @receiver(pre_delete, sender=Annotation)
-def delete_annotation_from_local_files(sender, instance, **kwargs):
+def delete_annotation_from_local_files(sender, instance, **kwargs) -> None:
     links = LocalFilesExportStorageLink.objects.filter(annotation=instance)
     for link in links:
         storage = link.storage

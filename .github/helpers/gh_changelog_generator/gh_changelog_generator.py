@@ -102,7 +102,7 @@ class JiraIssue:
         self.releases_tags = []
         self.ffs = self.get_ffs()
 
-    def set_releases_tags(self, tags: list[str]):
+    def set_releases_tags(self, tags: list[str]) -> None:
         pass
 
     def __str__(self):
@@ -361,7 +361,7 @@ def get_helm_chart_version(repo: str, path: str) -> str or None:
     return match.group(1)
 
 
-def main():
+def main() -> None:
     gh_release = get_github_release(PREVIOUS_REF, CURRENT_REF)
     print(f"Compare url: {gh_release.html_url}")
     print(f"Ahead by {gh_release.ahead_by}")

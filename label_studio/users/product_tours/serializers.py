@@ -43,7 +43,7 @@ class UserProductTourSerializer(serializers.ModelSerializer):
         with open(filepath, 'r') as f:
             return yaml.safe_load(f)
 
-    def get_awaiting(self, obj):
+    def get_awaiting(self, obj) -> bool:
         config = self.load_tour_config
         dependencies = config.get('dependencies', [])
         for dependency in dependencies:

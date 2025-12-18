@@ -17,7 +17,7 @@ MAX_WAIT_TIME = 300  # Maximum time to wait for the lock in seconds (5 minutes)
 class Command(MigrateCommand):
     help = 'Run Django migrations safely, using a lock'
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         MigrateCommand.add_arguments(self, parser)
         parser.add_argument(
             '--migrate-lock-id',
@@ -26,7 +26,7 @@ class Command(MigrateCommand):
             help='The id of the advisory lock to use',
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         lock_id = options.pop('migrate_lock_id')
 
         # Create a separate database connection to hold the lock
@@ -44,7 +44,7 @@ class Command(MigrateCommand):
             # Ensure the lock connection is closed to free resources
             separate_lock_connection.close()
 
-    def acquire_lock_with_retry(self, lock_connection, lock_id):
+    def acquire_lock_with_retry(self, lock_connection, lock_id) -> None:
         start_time = time.time()
 
         while True:

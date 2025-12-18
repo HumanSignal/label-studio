@@ -83,7 +83,7 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
         StorageClass.ensure_storage_statuses(storages)
         return storages
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         # double check: not export storages don't validate connection in serializer,
         # just make another explicit check here, note: in this create API we have credentials in request.data
         instance = serializer.Meta.model(**serializer.validated_data)

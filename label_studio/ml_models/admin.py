@@ -113,7 +113,7 @@ class ModelRunAdmin(admin.ModelAdmin):
 
     actions = ['delete_model_run_predictions']
 
-    def delete_model_run_predictions(self, request, queryset):
+    def delete_model_run_predictions(self, request, queryset) -> None:
         for model_run in queryset:
             model_run.delete_predictions()
         self.message_user(request, f'Deleted predictions for {queryset.count()} model runs.')

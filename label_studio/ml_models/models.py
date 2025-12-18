@@ -20,7 +20,7 @@ class SkillNames(models.TextChoices):
     NAMED_ENTITY_RECOGNITION = 'NamedEntityRecognition', _('NamedEntityRecognition')
 
 
-def validate_string_list(value):
+def validate_string_list(value) -> None:
     if not value:
         raise ValidationError('list should not be empty')
     if not isinstance(value, list):
@@ -73,10 +73,10 @@ class ModelVersion(models.Model):
     )
 
     @property
-    def full_title(self):
+    def full_title(self) -> str:
         return f'{self.parent_model.title}__{self.title}'
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> None:
         """
         Deletes Predictions associated with ModelVersion
         """
@@ -188,7 +188,7 @@ class ModelRun(models.Model):
     def has_permission(self, user):
         return user.active_organization == self.organization
 
-    def delete_predictions(self):
+    def delete_predictions(self) -> None:
         """
         Deletes any predictions that have originated from a ModelRun
 
@@ -225,7 +225,7 @@ class ModelRun(models.Model):
         predictions._raw_delete(predictions.db)
         failed_predictions._raw_delete(failed_predictions.db)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> None:
         """
         Deletes Predictions associated with ModelRun
         """

@@ -61,7 +61,7 @@ def event_processor(event, hint):
     return event  # to return all other events
 
 
-def init_sentry(release_name, release_version):
+def init_sentry(release_name, release_version) -> None:
     if settings.SENTRY_DSN:
         import sentry_sdk
         from sentry_sdk.integrations.django import DjangoIntegration

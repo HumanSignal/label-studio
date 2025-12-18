@@ -96,12 +96,12 @@ def get_cache_dir():
     return cache_dir
 
 
-def delete_dir_content(dirpath):
+def delete_dir_content(dirpath) -> None:
     for f in glob.glob(dirpath + '/*'):
         remove_file_or_dir(f)
 
 
-def remove_file_or_dir(path):
+def remove_file_or_dir(path) -> None:
     if os.path.isfile(path):
         os.remove(path)
     elif os.path.isdir(path):
@@ -175,7 +175,7 @@ class SerializableGenerator(list):
         return itertools.chain(self._head, *self[:1])
 
 
-def validate_upload_url(url, block_local_urls=True):
+def validate_upload_url(url, block_local_urls=True) -> None:
     """Utility function for defending against SSRF attacks. Raises
         - InvalidUploadUrlError if the url is not HTTP[S], or if block_local_urls is enabled
           and the URL resolves to a local address.

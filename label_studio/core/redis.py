@@ -59,7 +59,7 @@ except:  # noqa: E722
     _redis = None
 
 
-def redis_healthcheck():
+def redis_healthcheck() -> bool:
     if not _redis:
         return False
     try:
@@ -260,7 +260,7 @@ def is_job_on_worker(job_id, queue_name):
     return registry.connection.zscore(registry.key, member) is not None
 
 
-def delete_job_by_id(queue, id):
+def delete_job_by_id(queue, id) -> None:
     """
     Delete job by id from queue
     @param queue: Queue on redis to delete from

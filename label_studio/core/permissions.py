@@ -72,7 +72,7 @@ class ViewClassPermission(BaseModel):
     POST: Optional[str] = None
 
 
-def make_perm(name, pred, overwrite=False):
+def make_perm(name, pred, overwrite=False) -> None:
     if rules.perm_exists(name):
         if overwrite:
             rules.remove_perm(name)

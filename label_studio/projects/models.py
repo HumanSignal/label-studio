@@ -424,11 +424,11 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         return self.created_by.business
 
     @property
-    def is_private(self):
+    def is_private(self) -> None:
         return None
 
     @property
-    def secure_mode(self):
+    def secure_mode(self) -> bool:
         return False
 
     @property
@@ -471,7 +471,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         else:
             raise KeyError(f"Can't find Project by invite URL: {url}")
 
-    def reset_token(self):
+    def reset_token(self) -> None:
         self.token = create_hash()
         self.save(update_fields=['token'])
 
@@ -594,7 +594,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         # update is labeled after tasks rearrange overlap
         bulk_update_stats_project_tasks(all_project_tasks, project=self)
 
-    def remove_tasks_by_file_uploads(self, file_upload_ids):
+    def remove_tasks_by_file_uploads(self, file_upload_ids) -> None:
         self.tasks.filter(file_upload_id__in=file_upload_ids).delete()
 
     def advance_onboarding(self):
@@ -631,7 +631,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
     def validate_label_config(cls, config_string):
         validate_label_config(config_string)
 
-    def validate_config(self, config_string, strict=False):
+    def validate_config(self, config_string, strict=False) -> None:
         self.validate_label_config(config_string)
         if not hasattr(self, 'summary'):
             return
@@ -841,7 +841,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
             }
         return control_weights
 
-    def save(self, *args, update_fields=None, recalc=True, **kwargs):
+    def save(self, *args, update_fields=None, recalc=True, **kwargs) -> None:
         exists = True if self.pk else False
         project_with_config_just_created = not exists and self.label_config
 
@@ -1027,7 +1027,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
             return None
         return avg_lead_time * annotations_remain
 
-    def finished(self):
+    def finished(self) -> bool:
         return not self.tasks.filter(is_labeled=False).exists()
 
     def annotations_lead_time(self):
@@ -1363,7 +1363,7 @@ class ProjectOnboarding(models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         super(ProjectOnboarding, self).save(*args, **kwargs)
         if ProjectOnboarding.objects.filter(project=self.project, finished=True).count() == 4:
             self.project.skip_onboarding = True
@@ -1423,7 +1423,7 @@ class ProjectSummary(models.Model):
         user.project = self.project  # link for activity log
         return self.project.has_permission(user)
 
-    def reset(self, tasks_data_based=True):
+    def reset(self, tasks_data_based=True) -> None:
         if tasks_data_based:
             self.all_data_columns = {}
             self.common_data_columns = []
@@ -1432,7 +1432,7 @@ class ProjectSummary(models.Model):
         self.created_labels_drafts = {}
         self.save()
 
-    def update_data_columns(self, tasks):
+    def update_data_columns(self, tasks) -> None:
         common_data_columns = set()
         all_data_columns = dict(self.all_data_columns)
         for task in tasks:
@@ -1455,7 +1455,7 @@ class ProjectSummary(models.Model):
             self.common_data_columns = list(sorted(set(self.common_data_columns) & common_data_columns))
         self.save(update_fields=['all_data_columns', 'common_data_columns'])
 
-    def remove_data_columns(self, tasks):
+    def remove_data_columns(self, tasks) -> None:
         all_data_columns = dict(self.all_data_columns)
         keys_to_remove = []
 
@@ -1515,7 +1515,7 @@ class ProjectSummary(models.Model):
                 labels.append(str(label))
         return labels
 
-    def update_created_annotations_and_labels(self, annotations):
+    def update_created_annotations_and_labels(self, annotations) -> None:
         created_annotations = dict(self.created_annotations)
         labels = dict(self.created_labels)
         for annotation in annotations:
@@ -1544,7 +1544,7 @@ class ProjectSummary(models.Model):
         self.created_labels = labels
         self.save(update_fields=['created_annotations', 'created_labels'])
 
-    def remove_created_annotations_and_labels(self, annotations):
+    def remove_created_annotations_and_labels(self, annotations) -> None:
         # we are going to remove all annotations, so we'll reset the corresponding fields on the summary
         remove_all_annotations = self.project.annotations.count() == len(annotations)
         created_annotations, created_labels = (
@@ -1584,7 +1584,7 @@ class ProjectSummary(models.Model):
         self.created_labels = created_labels
         self.save(update_fields=['created_annotations', 'created_labels'])
 
-    def update_created_labels_drafts(self, drafts):
+    def update_created_labels_drafts(self, drafts) -> None:
         labels = dict(self.created_labels_drafts)
         for draft in drafts:
             results = get_attr_or_item(draft, 'result') or []
@@ -1607,7 +1607,7 @@ class ProjectSummary(models.Model):
         self.created_labels_drafts = labels
         self.save(update_fields=['created_labels_drafts'])
 
-    def remove_created_drafts_and_labels(self, drafts):
+    def remove_created_drafts_and_labels(self, drafts) -> None:
         # we are going to remove all drafts, so we'll reset the corresponding field on the summary
         remove_all_drafts = AnnotationDraft.objects.filter(task__project=self.project).count() == len(drafts)
         labels = {} if remove_all_drafts else dict(self.created_labels_drafts)

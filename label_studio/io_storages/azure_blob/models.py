@@ -79,7 +79,7 @@ class AzureBlobStorageMixin(models.Model):
         _, container = self.get_client_and_container()
         return container
 
-    def validate_connection(self, **kwargs):
+    def validate_connection(self, **kwargs) -> None:
         logger.debug('Validating Azure Blob Storage connection')
         client, container = self.get_client_and_container()
 
@@ -264,7 +264,7 @@ class AzureBlobImportStorage(ProjectStorageMixin, AzureBlobImportStorageBase):
 
 
 class AzureBlobExportStorage(AzureBlobStorageMixin, ExportStorage):  # note: order is important!
-    def save_annotation(self, annotation):
+    def save_annotation(self, annotation) -> None:
         container = self.get_container()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
         ser_annotation = self._get_serialized_data(annotation)
@@ -280,7 +280,7 @@ class AzureBlobExportStorage(AzureBlobStorageMixin, ExportStorage):  # note: ord
         AzureBlobExportStorageLink.create(annotation, self)
 
 
-def async_export_annotation_to_azure_storages(annotation):
+def async_export_annotation_to_azure_storages(annotation) -> None:
     project = annotation.project
     if hasattr(project, 'io_storages_azureblobexportstorages'):
         for storage in project.io_storages_azureblobexportstorages.all():
@@ -289,7 +289,7 @@ def async_export_annotation_to_azure_storages(annotation):
 
 
 @receiver(post_save, sender=Annotation)
-def export_annotation_to_azure_storages(sender, instance, **kwargs):
+def export_annotation_to_azure_storages(sender, instance, **kwargs) -> None:
     storages = getattr(instance.project, 'io_storages_azureblobexportstorages', None)
     if storages and storages.exists():  # avoid excess jobs in rq
         start_job_async_or_sync(async_export_annotation_to_azure_storages, instance)

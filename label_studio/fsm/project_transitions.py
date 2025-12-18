@@ -134,7 +134,7 @@ class ProjectInProgressFromCompletedTransition(ModelChangeTransition):
         }
 
 
-def sync_project_state(project, user=None, reason=None, context_data=None):
+def sync_project_state(project, user=None, reason=None, context_data=None) -> None:
     current_state = StateManager.get_current_state_value(project)
     inferred_state = get_or_infer_state(project)
 

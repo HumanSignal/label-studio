@@ -362,7 +362,7 @@ class ExportListAPI(generics.ListCreateAPIView):
         )
         return project
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         task_filter_options = serializer.validated_data.pop('task_filter_options')
         annotation_filter_options = serializer.validated_data.pop('annotation_filter_options')
         serialization_options = serializer.validated_data.pop('serialization_options')
@@ -605,7 +605,7 @@ class ExportDownloadAPI(generics.RetrieveAPIView):
             return response
 
 
-def async_convert(converted_format_id, export_type, project, hostname, download_resources=False, **kwargs):
+def async_convert(converted_format_id, export_type, project, hostname, download_resources=False, **kwargs) -> None:
     with transaction.atomic():
         try:
             converted_format = ConvertedFormat.objects.get(id=converted_format_id)
@@ -634,7 +634,7 @@ def async_convert(converted_format_id, export_type, project, hostname, download_
     converted_format.save(update_fields=['file', 'status'])
 
 
-def set_convert_background_failure(job, connection, type, value, traceback_obj):
+def set_convert_background_failure(job, connection, type, value, traceback_obj) -> None:
     from data_export.models import ConvertedFormat
 
     convert_id = job.args[0]

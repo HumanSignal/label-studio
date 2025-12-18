@@ -234,7 +234,7 @@ def _migrate_uploaded_files(project, project_path):
             FileUpload.objects.create(user=project.created_by, project=project, file=File(f, name=file_name))
 
 
-def migrate_existing_project(project_path, project, config):
+def migrate_existing_project(project_path, project, config) -> None:
     """Migration projects from previous version of Label Studio"""
 
     _migrate_tasks(project_path, project)
