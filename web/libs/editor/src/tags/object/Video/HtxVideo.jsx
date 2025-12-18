@@ -492,16 +492,16 @@ const HtxVideoView = ({ item, store }) => {
         }
 
         setPosition(newPosition);
-        
+
         // Batch rapid seeks during scrubbing using requestAnimationFrame
         // Store the latest position to seek to
         pendingSeekRef.current = newPosition;
-        
+
         // Cancel any pending RAF
         if (seekRafRef.current !== null) {
           cancelAnimationFrame(seekRafRef.current);
         }
-        
+
         // Schedule seek for next frame
         seekRafRef.current = requestAnimationFrame(() => {
           seekRafRef.current = null;
