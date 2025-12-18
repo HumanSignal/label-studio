@@ -13,7 +13,7 @@ When upgrading Label Studio, keep the following in mind:
 
 - **Backup Your Data**: Before starting the upgrade, make sure to back up your existing projects, databases, and any custom configurations. 
 - **Review Release Notes**: Check [the release notes](https://github.com/HumanSignal/label-studio/releases) for the version you're upgrading to. Pay attention to any breaking changes or migration steps that may be required. 
-- **Python Compatibility**: Ensure that your Python version is compatible with the new Label Studio release. Label Studio supports Python 3.9 through 3.13.  Using an incompatible Python version can lead to installation errors.
+- **Python Compatibility**: Ensure that your Python version is compatible with the new Label Studio release. Label Studio supports Python 3.10 through 3.13.  Using an incompatible Python version can lead to installation errors.
 - **Check for Dependency Issues**: After upgrading, verify that all dependencies are correctly installed. If you encounter missing package errors, you might need to install those packages manually. Running Label Studio in a clean Python environment or virtual environment can reduce the likelihood of package conflicts.
 - **Test Your Setup**: After upgrading, test your Label Studio instance to ensure everything works as expected. Check key functionalities like task loading, labeling interfaces, data export, and any integrations you use.
 - **Troubleshoot Installation Issues**: If you encounter any issues during the upgrade, see [Troubleshoot installation issues](install_troubleshoot). 

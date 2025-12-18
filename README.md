@@ -153,9 +153,6 @@ To run Label Studio on Windows, download and install the following wheel package
 # Upgrade pip 
 pip install -U pip
 
-# If you're running Win64 with Python 3.8, install the packages downloaded from Gohlke:
-pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
-
 # Install label studio
 pip install label-studio
 ```
