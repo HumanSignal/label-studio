@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   background-color: var(--color-neutral-background);
-  border-radius: 4px;
+  border-radius: var(--corner-radius-smaller);
 
   &.standalone {
     border: 1px solid var(--color-neutral-border);
@@ -22,18 +22,18 @@
 .calendarsWrapper {
   display: grid;
   grid-template-columns: 312px 312px;
-  grid-gap: 25px;
+  grid-gap: var(--spacing-wide);
 }
 
 .calendarContainer {
-  padding: 16px;
+  padding: var(--spacing-base);
 }
 
 .inputsWrapper {
   display: grid;
   grid-template-columns: 312px 25px 312px;
   align-items: center;
-  padding: 13px 0 0;
+  padding: var(--spacing-base) 0 0;
   text-align: center;
   color: var(--color-neutral-content-subtler);
 }
@@ -44,13 +44,14 @@
   width: 183px;
   background: var(--color-neutral-surface);
   border-right: 1px solid var(--color-neutral-border);
-  padding: 4px;
+  padding: var(--spacing-tighter);
 }
 
-.timeToggleLabel {
-  margin: 4px 8px 4px 10px;
-  font-weight: 400;
-  font-size: 16px;
+.timeToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  margin-right: var(--spacing-tight);
 }
 
 .right,
@@ -60,22 +61,14 @@
 }
 
 .daysSelected {
-  font-weight: 500;
-  display: inline-block;
-}
-
-.daysSelectedText {
-  color: var(--color-neutral-content-subtler);
-}
-
-.daysSelectedValue,
-.daysSelectedText {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tighter);
 }
 
 .footer {
   display: flex;
-  padding: 15px 20px;
+  padding: var(--spacing-base);
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid var(--color-neutral-border);

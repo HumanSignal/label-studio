@@ -1,11 +1,10 @@
 import type { ReactNode, ComponentPropsWithoutRef } from "react";
-import clsx from "clsx";
 import { DropdownTrigger } from "../dropdown/dropdown-trigger";
 import { Typography } from "../typography/typography";
 import { IconCalendar } from "@humansignal/icons";
 import type { DateOrDateTimeRange } from "./date-utils";
 import { formatDateString } from "./date-utils";
-import styles from "./date-range-picker-trigger.module.scss";
+import { cnm } from "../../utils/utils";
 
 type DateRangePickerTriggerProps = {
   /**
@@ -67,25 +66,25 @@ export const DateRangePickerTrigger = ({
   formatLabel,
   disabled,
   dataTestId,
-  inline = true,
+  inline = false,
   ...dropdownTriggerProps
 }: DateRangePickerTriggerProps) => {
   const appliedDatesString = dateStrings(selected);
 
   const defaultLabel = appliedDatesString ? (
-    <div className={styles.dateRange}>
-      <Typography variant="body" size="small" className={styles.dateText}>
+    <div className="flex items-center gap-tight">
+      <Typography variant="body" size="small" className="text-neutral-content-subtler">
         {appliedDatesString.fromString}
       </Typography>
-      <Typography variant="body" size="small" className={styles.separator}>
+      <Typography variant="body" size="small" className="text-neutral-content-subtlest">
         to
       </Typography>
-      <Typography variant="body" size="small" className={styles.dateText}>
+      <Typography variant="body" size="small" className="text-neutral-content-subtler">
         {appliedDatesString.toString}
       </Typography>
     </div>
   ) : (
-    <Typography variant="body" size="small" className={styles.dateText}>
+    <Typography variant="body" size="small" className="text-neutral-content-subtler">
       Any time
     </Typography>
   );
@@ -94,9 +93,16 @@ export const DateRangePickerTrigger = ({
 
   return (
     <DropdownTrigger {...dropdownTriggerProps} disabled={disabled} content={children} inline={inline}>
-      <div className={clsx(styles.trigger, disabled && styles.disabled)} data-testid={dataTestId}>
+      <div
+        className={cnm(
+          "flex items-center gap-tight py-tight px-base h-10 border border-neutral-border rounded-smaller cursor-pointer",
+          "hover:border-neutral-border-bold",
+          disabled && "opacity-50 cursor-not-allowed",
+        )}
+        data-testid={dataTestId}
+      >
         {label}
-        <IconCalendar height={18} width={18} className={styles.icon} />
+        <IconCalendar height={18} width={18} className="text-neutral-content-subtlest shrink-0" />
       </div>
     </DropdownTrigger>
   );

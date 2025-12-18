@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useStateWithCallback } from "./use-state-with-callback";
 import { Button, ButtonGroup } from "../button/button";
+import { Typography } from "../typography/typography";
 import {
   convertTo24HrTimeFromString,
   type DateTimeByNumbers,
@@ -242,9 +243,15 @@ export const DateTimeInput = ({
           onChange={dateInputUpdate}
         />
         {invalidDateOutOfFocus && !bothInvalid && (
-          <div className={styles.errorText}>Select or enter a valid {side} date.</div>
+          <Typography variant="body" size="smaller" className={styles.errorText}>
+            Select or enter a valid {side} date.
+          </Typography>
         )}
-        {bothInvalid && <div className={styles.errorText}>Select or enter a valid {side} date and time.</div>}
+        {bothInvalid && (
+          <Typography variant="body" size="smaller" className={styles.errorText}>
+            Select or enter a valid {side} date and time.
+          </Typography>
+        )}
       </div>
       {timeMode && (
         <>
@@ -257,7 +264,11 @@ export const DateTimeInput = ({
               onChange={timeInputUpdate}
               className={styles.timeInput}
             />
-            {invalidTimeOutOfFocus && !bothInvalid && <div className={styles.errorText}>Enter a valid time.</div>}
+            {invalidTimeOutOfFocus && !bothInvalid && (
+              <Typography variant="body" size="smaller" className={styles.errorText}>
+                Enter a valid time.
+              </Typography>
+            )}
           </div>
 
           {isTwelveHour && (

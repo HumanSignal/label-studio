@@ -1,7 +1,7 @@
 .inputContainer {
-  padding: 10px 17px;
+  padding: var(--spacing-tight) var(--spacing-base);
   display: flex;
-  gap: 2px;
+  gap: var(--spacing-tightest);
 }
 
 .validationSwitcher {
@@ -24,17 +24,17 @@
 .errorText {
   position: absolute;
   color: var(--color-negative-content);
-  font-size: 12px;
-  transform: translateY(7px);
+  transform: translateY(var(--spacing-tight));
 }
 
 .input {
   display: flex;
-  padding: 0 11px;
+  padding: 0 var(--spacing-tight);
 }
 
 .dateInput {
   width: 130px;
+  height: 40px;
 }
 
 .timeInput {
@@ -42,6 +42,7 @@
   padding-right: 0;
   width: 60px;
   text-align: center;
+  height: 40px;
 }
 
 .meridiemButton {
@@ -55,10 +56,9 @@
 }
 
 .inputField {
-  padding: 8px 12px;
+  padding: var(--spacing-tight) var(--spacing-tight);
   border: 1px solid var(--color-neutral-border);
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: var(--corner-radius-smaller);
   background-color: var(--color-neutral-background);
   color: var(--color-neutral-content);
   transition: border-color 0.15s ease-out;

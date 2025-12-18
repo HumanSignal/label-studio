@@ -25,6 +25,7 @@ import { Button } from "../button/button";
 import { Space } from "../space/space";
 import { Sidebar } from "./sidebar";
 import { DateTimeInput } from "./date-time-input";
+import { Typography } from "../typography/typography";
 import styles from "./date-range-picker.module.scss";
 
 const today = new Date();
@@ -246,7 +247,9 @@ export const DateRangePicker = ({
               setTimeReset={setTimeReset}
               side={Side.start}
             />
-            to
+            <Typography variant="body" size="medium" className="text-neutral-content-subtler text-center">
+              to
+            </Typography>
             <DateTimeInput
               timeMode={timeMode}
               handleCalenderSelectionChange={handleCalenderSelectionChange}
@@ -293,15 +296,21 @@ export const DateRangePicker = ({
         </div>
       </div>
       <div className={styles.footer}>
-        <div className={styles.left}>
-          <div className={styles.daysSelected} data-testid="days-selected">
-            <span className={styles.daysSelectedValue}>{numberOfDaysValue}</span>{" "}
-            <span className={styles.daysSelectedText}>{numberOfDaysText}</span>
-          </div>
+        <div className={styles.daysSelected} data-testid="days-selected">
+          <Typography variant="body" size="medium">
+            {numberOfDaysValue}
+          </Typography>{" "}
+          <Typography variant="body" size="medium" className="text-neutral-content-subtler">
+            {numberOfDaysText}
+          </Typography>
         </div>
         <Space align="end">
-          <Toggle data-testid="time-toggle" checked={timeMode} onChange={() => setTimeMode(!timeMode)} />
-          <span className={styles.timeToggleLabel}>Include time</span>
+          <div className={styles.timeToggle}>
+            <Toggle data-testid="time-toggle" checked={timeMode} onChange={() => setTimeMode(!timeMode)} />
+            <Typography variant="body" size="medium">
+              Include time
+            </Typography>
+          </div>
           {onClear && (
             <Button
               aria-label="Clear date selection"

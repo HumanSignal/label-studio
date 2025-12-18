@@ -99,7 +99,7 @@ export const CalendarPicker = memo(({ month, year, selectedDates, dayClickCallba
   );
 
   const Calendar = () => (
-    <div id="month_wrapper" ref={calendarRef}>
+    <div id="month_wrapper" ref={calendarRef} className={styles.monthWrapper}>
       {calendarDates &&
         calendarDates.map((week, index) => (
           <div key={`${week}-${month}`} className={styles.week}>

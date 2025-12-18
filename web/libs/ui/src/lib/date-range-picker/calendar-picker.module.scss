@@ -7,6 +7,11 @@
   cursor: default;
 }
 
+.monthWrapper {
+  display: grid;
+  gap: 3px;
+}
+
 .labels {
   height: 40px;
   width: 40px;
@@ -27,7 +32,6 @@
   font-size: 14px;
   vertical-align: middle;
   text-align: center;
-  border-top: 3px solid var(--color-neutral-background);
   transition: all 150ms ease-out;
 
   &.inRange {
@@ -35,14 +39,14 @@
   }
 
   &.rangeStart {
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
     background: var(--color-primary-emphasis);
   }
 
   &.rangeEnd {
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
+    border-top-right-radius: 50%;
+    border-bottom-right-radius: 50%;
     background: var(--color-primary-emphasis);
   }
 
@@ -63,14 +67,14 @@
   font-size: 14px;
   vertical-align: middle;
   cursor: pointer;
-  border-radius: 24px;
+  border-radius: 50%;
   transition: all 150ms ease-out;
   border: 2px solid transparent;
 
   &:hover {
     border: 2px solid var(--color-primary-border);
     color: var(--color-neutral-content);
-    border-radius: 24px;
+    border-radius: 50%;
   }
 
   &.inRange {
@@ -90,7 +94,7 @@
       content: '';
       position: absolute;
       left: calc(50% - 2px);
-      bottom: 2px;
+      bottom: 0;
       height: 4px;
       width: 4px;
       background: var(--color-primary-surface);
@@ -99,7 +103,7 @@
   }
 
   &.selected {
-    border-radius: 24px;
+    border-radius: 50%;
     background: var(--color-primary-surface);
     color: var(--color-primary-surface-content);
 

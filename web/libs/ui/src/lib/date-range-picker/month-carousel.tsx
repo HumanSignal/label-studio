@@ -1,17 +1,7 @@
-import { IconChevronLeftSmall, IconChevronRightSmall } from "@humansignal/icons";
+import { IconChevronLeft, IconChevronRight } from "@humansignal/icons";
 import { Button } from "../button/button";
+import { Typography } from "../typography/typography";
 import { incrementMonthByDate, isSameMonth, monthMap } from "./date-utils";
-import styles from "./month-carousel.module.scss";
-
-const buttonStyle = {
-  width: 40,
-  height: 40,
-  boxShadow: "none",
-  backgroundColor: "transparent",
-  borderRadius: "24px",
-  borderWidth: 0,
-  borderStyle: "none",
-};
 
 type MonthCarouselProps = {
   month: number;
@@ -30,23 +20,25 @@ export const MonthCarousel = ({ month, year, changeMonth, neighboringCalendar }:
     changeMonth({ month: newMonth.getMonth(), year: newMonth.getFullYear() });
 
   return (
-    <div className={styles.monthCarousel}>
+    <div className="flex justify-between items-center w-[280px] h-10">
       <Button
-        look="outlined"
+        look="string"
         data-testid="decrement-month"
-        style={buttonStyle}
         size="small"
-        leading={<IconChevronLeftSmall />}
+        className="w-[32px]"
+        leading={<IconChevronLeft />}
         disabled={neighboringCalendarMonth && isSameMonth(neighboringCalendarMonth, lastCalendarMonth)}
         onClick={() => handleChangeMonth(lastCalendarMonth)}
       />
-      <div className={styles.label} data-testid="month-label">{`${monthMap[month]} ${year}`}</div>
+      <Typography variant="body" size="medium" className="text-center" data-testid="month-label">
+        {`${monthMap[month]} ${year}`}
+      </Typography>
       <Button
-        look="outlined"
+        look="string"
         data-testid="increment-month"
-        style={buttonStyle}
         size="small"
-        leading={<IconChevronRightSmall />}
+        leading={<IconChevronRight />}
+        className="w-[32px]"
         disabled={
           (neighboringCalendarMonth && isSameMonth(neighboringCalendarMonth, nextCalendarMonth)) ||
           isSameMonth(calendarMonth, currentMonth)
