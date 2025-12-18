@@ -375,8 +375,7 @@ const Model = types
         if (self.frame !== frame && self.framerate && self.ref.current) {
           self.frame = frame;
 
-          // Seek immediately - requestAnimationFrame batching is handled by the parent component
-          // during scrubbing. For single frame changes (like tests), we need immediate seeks.
+          // Seek immediately - batching is handled at a higher level
           if (!self.ref.current) return;
 
           try {
