@@ -1,0 +1,76 @@
+.inputContainer {
+  padding: 10px 17px;
+  display: flex;
+  gap: 2px;
+}
+
+.validationSwitcher {
+  &:only-child {
+    flex: 1;
+    width: 100%;
+
+    .dateInput {
+      width: 100%;
+    }
+  }
+
+  &.invalid {
+    input {
+      color: var(--color-negative-content);
+    }
+  }
+}
+
+.errorText {
+  position: absolute;
+  color: var(--color-negative-content);
+  font-size: 12px;
+  transform: translateY(7px);
+}
+
+.input {
+  display: flex;
+  padding: 0 11px;
+}
+
+.dateInput {
+  width: 130px;
+}
+
+.timeInput {
+  padding-left: 0;
+  padding-right: 0;
+  width: 60px;
+  text-align: center;
+}
+
+.meridiemButton {
+  padding-left: 0;
+  padding-right: 0;
+
+  &.selected {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.inputField {
+  padding: 8px 12px;
+  border: 1px solid var(--color-neutral-border);
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: var(--color-neutral-background);
+  color: var(--color-neutral-content);
+  transition: border-color 0.15s ease-out;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary-border);
+    box-shadow: 0 0 0 3px var(--color-primary-focus-outline);
+  }
+
+  &.error {
+    border-color: var(--color-negative-content);
+  }
+}
+

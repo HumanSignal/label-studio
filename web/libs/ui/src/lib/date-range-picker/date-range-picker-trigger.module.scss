@@ -1,0 +1,39 @@
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  padding: var(--spacing-tight) var(--spacing-base);
+  height: 40px;
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--corner-radius-smaller);
+  cursor: pointer;
+
+  &:hover:not(.disabled) {
+    border-color: var(--color-neutral-border-bold);
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.dateRange {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+}
+
+.dateText {
+  color: var(--color-neutral-content-subtler);
+}
+
+.separator {
+  color: var(--color-neutral-content-subtlest);
+}
+
+.icon {
+  color: var(--color-neutral-content-subtlest);
+  flex-shrink: 0;
+}
+
