@@ -142,6 +142,9 @@ const HtxVideoView = ({ item, store }) => {
   const [videoLength, _setVideoLength] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [position, _setPosition] = useState(1);
+  const isScrubbingRef = useRef(false);
+  const wasPlayingBeforeScrubRef = useRef(false);
+  const scrubTimeoutRef = useRef(null);
 
   const [videoSize, setVideoSize] = useState(null);
   const [videoDimensions, setVideoDimensions] = useState({
@@ -449,11 +452,50 @@ const HtxVideoView = ({ item, store }) => {
   const handleTimelinePositionChange = useCallback(
     (newPosition) => {
       if (position !== newPosition) {
-        item.setFrame(newPosition);
+        // If video is playing and we start scrubbing, pause it to prevent conflicts
+        if (playing && !isScrubbingRef.current) {
+          wasPlayingBeforeScrubRef.current = true;
+          isScrubbingRef.current = true;
+          // Pause the video to prevent conflicts between playback loop and seeks
+          if (item.ref.current?.playing) {
+            item.ref.current.pause();
+            item.triggerSyncPause();
+          }
+        } else if (!isScrubbingRef.current) {
+          // Track that we're scrubbing even if video wasn't playing
+          isScrubbingRef.current = true;
+        }
+
+        // Clear any existing scrub timeout
+        if (scrubTimeoutRef.current) {
+          clearTimeout(scrubTimeoutRef.current);
+        }
+
+        // Set a timeout to detect when scrubbing ends
+        scrubTimeoutRef.current = setTimeout(() => {
+          isScrubbingRef.current = false;
+          // Resume playback if it was playing before scrubbing started
+          if (wasPlayingBeforeScrubRef.current && item.ref.current) {
+            wasPlayingBeforeScrubRef.current = false;
+            // Small delay to ensure seek completes before resuming
+            setTimeout(() => {
+              if (item.ref.current && !item.ref.current.playing) {
+                item.ref.current.play();
+                item.triggerSyncPlay();
+              }
+            }, 100);
+          } else {
+            wasPlayingBeforeScrubRef.current = false;
+          }
+        }, 150); // Consider scrubbing ended after 150ms of no position changes
+
+        // Update React state immediately for UI responsiveness
         setPosition(newPosition);
+        // Update frame in the model (this will be throttled internally to prevent conflicts)
+        item.setFrame(newPosition);
       }
     },
-    [item, position],
+    [item, position, playing],
   );
 
   useEffect(
@@ -528,6 +570,7 @@ const HtxVideoView = ({ item, store }) => {
                     workingArea={videoDimensions}
                     allowRegionsOutsideWorkingArea={!limitCanvasDrawingBoundaries}
                     stageRef={stageRef}
+                    currentFrame={position}
                   />
                 )}
                 <VideoCanvas
