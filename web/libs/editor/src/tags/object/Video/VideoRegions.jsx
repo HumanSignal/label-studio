@@ -32,6 +32,7 @@ const VideoRegionsPure = ({
   allowRegionsOutsideWorkingArea = true,
   pan = { x: 0, y: 0 },
   stageRef,
+  currentFrame, // Add currentFrame prop to force re-renders when frame changes
 }) => {
   const [newRegion, setNewRegion] = useState();
   const [isDrawing, setDrawingMode] = useState(false);
@@ -214,6 +215,7 @@ const VideoRegionsPure = ({
           workinAreaCoordinates={workinAreaCoordinates}
           onDragMove={createOnDragMoveHandler(workinAreaCoordinates, !allowRegionsOutsideWorkingArea)}
           stageRef={stageRef}
+          currentFrame={currentFrame}
         />
       </Layer>
       {!item.annotation?.isReadOnly() && isDrawing ? (
@@ -237,36 +239,38 @@ const VideoRegionsPure = ({
   );
 };
 
-const RegionsLayer = observer(({ regions, item, locked, isDrawing, workinAreaCoordinates, stageRef, onDragMove }) => {
-  // Access item.frame here to ensure the observer tracks frame changes
-  // This ensures regions update correctly during fast scrubbing
-  const frame = item.frame;
+const RegionsLayer = observer(
+  ({ regions, item, locked, isDrawing, workinAreaCoordinates, stageRef, onDragMove, currentFrame }) => {
+    // Use currentFrame prop (from React state) to ensure regions update during fast scrubbing
+    // Since item.frame is volatile, React state triggers re-renders
+    const frame = currentFrame ?? item.frame;
 
-  return (
-    <>
-      {regions.map((reg) => (
-        <Shape
-          id={reg.id}
-          key={reg.id}
-          reg={reg}
-          item={item}
-          workingArea={workinAreaCoordinates}
-          draggable={!reg.isReadOnly() && !isDrawing && !locked}
-          selected={reg.selected || reg.inSelection}
-          listening={!reg.locked && !reg.hidden}
-          stageRef={stageRef}
-          onDragMove={onDragMove}
-        />
-      ))}
-    </>
-  );
-});
+    return (
+      <>
+        {regions.map((reg) => (
+          <Shape
+            id={reg.id}
+            key={reg.id}
+            reg={reg}
+            item={item}
+            workingArea={workinAreaCoordinates}
+            draggable={!reg.isReadOnly() && !isDrawing && !locked}
+            selected={reg.selected || reg.inSelection}
+            listening={!reg.locked && !reg.hidden}
+            stageRef={stageRef}
+            onDragMove={onDragMove}
+            currentFrame={frame}
+          />
+        ))}
+      </>
+    );
+  },
+);
 
-const Shape = observer(({ id, reg, item, stageRef, ...props }) => {
-  // Access item.frame directly inside the observer to ensure MobX tracks it
-  // Even though frame is volatile, accessing it here ensures the observer
-  // will re-render when frame changes during fast scrubbing
-  const frame = item.frame;
+const Shape = observer(({ id, reg, item, stageRef, currentFrame, ...props }) => {
+  // Use currentFrame prop to ensure we get the latest frame value during fast scrubbing
+  // Since item.frame is volatile, React state (currentFrame) ensures proper updates
+  const frame = currentFrame ?? item.frame;
   const box = reg.getShape(frame);
 
   return (
