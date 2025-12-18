@@ -491,7 +491,7 @@ const HtxVideoView = ({ item, store }) => {
 
         // Batch rapid seeks, immediate seek for single changes
         if (seekRafRef.current) cancelAnimationFrame(seekRafRef.current);
-        
+
         if (isRapidScrubbing) {
           // Batch rapid scrubbing seeks
           seekRafRef.current = requestAnimationFrame(() => {
