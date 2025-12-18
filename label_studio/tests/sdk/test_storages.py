@@ -60,4 +60,4 @@ def test_connect_and_sync_s3(django_live_url, business_client, recursive_scan):
         # Non-recursive scan should only find files in root directory
         expected_files = {'image1.jpg'}
 
-    assert set(t.storage_filename for t in tasks) == expected_files
+    assert {t.storage_filename for t in tasks} == expected_files

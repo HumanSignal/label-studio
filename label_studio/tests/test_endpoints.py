@@ -308,7 +308,7 @@ def build_urls(project_id, task_id, annotation_id):
                     kwargs[key] = 1000
                 elif key in ['token', 'uidb64']:
                     kwargs[key] = 1000
-                elif key in ['key']:
+                elif key == 'key':
                     kwargs[key] = '1000'
                 elif key == 'sub_path':
                     kwargs[key] = 'settings'  # default sub_path for user account

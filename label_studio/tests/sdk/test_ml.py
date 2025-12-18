@@ -32,7 +32,7 @@ def test_batch_predictions_single_prediction_per_task(django_live_url, business_
         ],
     )
 
-    tasks = [task for task in ls.tasks.list(project=p.id)]
+    tasks = list(ls.tasks.list(project=p.id))
     assert len(tasks) == 3
 
     # setup ML backend with single prediction per task
@@ -117,7 +117,7 @@ def test_batch_predictions_multiple_predictions_per_task(
         ],
     )
 
-    tasks = [task for task in ls.tasks.list(project=p.id)]
+    tasks = list(ls.tasks.list(project=p.id))
     assert len(tasks) == 3
 
     # setup ML backend with multiple predictions per task

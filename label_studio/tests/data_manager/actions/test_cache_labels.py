@@ -86,6 +86,6 @@ def test_cache_labels_job(source, control_tag, with_counters, expected_cache_col
         if with_counters.lower() == 'yes':
             expected_cache = ', '.join(sorted([f'{label}: {all_labels.count(label)}' for label in set(all_labels)]))
         else:
-            expected_cache = ', '.join(sorted(list(set(all_labels))))
+            expected_cache = ', '.join(sorted(set(all_labels)))
 
         assert cached_labels == expected_cache

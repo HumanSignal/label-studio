@@ -80,8 +80,7 @@ class FilterSerializer(serializers.ModelSerializer):
 
         column_copy = column_copy[len(required_prefix) :]
 
-        if column_copy.startswith(optional_prefix):
-            column_copy = column_copy[len(optional_prefix) :]
+        column_copy = column_copy.removeprefix(optional_prefix)
 
         if column_copy.startswith('data.'):
             # Allow underscores if the filter is based on the `task.data` JSONField, because these don't leverage foreign keys.

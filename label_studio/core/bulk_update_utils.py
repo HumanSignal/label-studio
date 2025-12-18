@@ -166,7 +166,7 @@ def bulk_update(
                 cases=(case_template * len(placeholders[field])).format(*placeholders[field]),
                 type=_get_db_type(field, connection=connection),
             )
-            for field in parameters.keys()
+            for field in parameters
         )
 
         parameters = flatten(parameters.values(), types=list)

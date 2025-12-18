@@ -497,8 +497,7 @@ MEDIA_URL = '/data/'
 UPLOAD_DIR = 'upload'
 AVATAR_PATH = 'avatars'
 
-SUPPORTED_EXTENSIONS = set(
-    [
+SUPPORTED_EXTENSIONS = {
         '.bmp',
         '.csv',
         '.flac',
@@ -521,8 +520,7 @@ SUPPORTED_EXTENSIONS = set(
         '.webm',
         '.webp',
         '.pdf',
-    ]
-)
+    }
 
 # directory for files created during unit tests
 TEST_DATA_ROOT = os.path.join(BASE_DATA_DIR, 'test_data')

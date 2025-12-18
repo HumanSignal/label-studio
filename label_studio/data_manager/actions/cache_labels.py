@@ -53,7 +53,7 @@ def cache_labels_job(project, queryset, **kwargs):
             )
         # no counters
         else:
-            task.data[column_name] = ', '.join(sorted(list(set(task_labels))))
+            task.data[column_name] = ', '.join(sorted(set(task_labels)))
 
     Task.objects.bulk_update(tasks, fields=['data'], batch_size=1000)
     first_task = Task.objects.get(id=queryset.first().id)

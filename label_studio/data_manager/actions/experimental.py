@@ -166,7 +166,7 @@ def add_data_field(project, queryset, **kwargs):
     size = queryset.count()
 
     cast = {'String': str, 'Number': float, 'Expression': str}
-    assert value_type in cast.keys()
+    assert value_type in cast
     value = cast[value_type](value)
 
     if value_type == 'Expression':

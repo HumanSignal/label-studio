@@ -16,6 +16,6 @@ def test_connect_and_sync_s3(django_live_url, business_client):
     storage_id = storage_resp['id']
     ls.sync_storage('s3', storage_id)
 
-    assert set(t['storage_filename'] for t in p.get_tasks()) == {
+    assert {t['storage_filename'] for t in p.get_tasks()} == {
         'image1.jpg',
     }

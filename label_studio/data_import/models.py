@@ -158,7 +158,7 @@ class FileUpload(models.Model):
         if isinstance(tasks, dict):
             tasks = [tasks]
         tasks_formatted = []
-        for i, task in enumerate(tasks):
+        for task in tasks:
             if not task.get('data'):
                 task = {'data': task}
             if not isinstance(task['data'], dict):

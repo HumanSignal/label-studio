@@ -211,7 +211,7 @@ class InactivitySessionTimeoutMiddleWare(CommonMiddleware):
             return
 
         current_time = time.time()
-        last_login = request.session['last_login'] if 'last_login' in request.session else 0
+        last_login = request.session.get('last_login', 0)
 
         active_org = request.user.active_organization
         if active_org:

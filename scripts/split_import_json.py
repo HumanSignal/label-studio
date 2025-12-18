@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     total = len(j)
     chunk_size = int(total / float(CHUNKS))
-    chunk_size = 1 if chunk_size < 1 else chunk_size
+    chunk_size = max(chunk_size, 1)
 
     start = 0
     count = 0

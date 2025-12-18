@@ -118,9 +118,9 @@ def get_fields_for_evaluation(prepare_params, user, skip_regular=True):
 
         GET_ALL_COLUMNS = load_func(settings.DATA_MANAGER_GET_ALL_COLUMNS)
         all_columns = GET_ALL_COLUMNS(Project.objects.get(id=prepare_params.project), user)
-        all_columns = set(
-            [TASKS + ('data.' if c.get('parent', None) == 'data' else '') + c['id'] for c in all_columns['columns']]
-        )
+        all_columns = {
+            TASKS + ('data.' if c.get('parent', None) == 'data' else '') + c['id'] for c in all_columns['columns']
+        }
         hidden = set(fields['explore']) & set(fields['labeling'])
         shown = all_columns - hidden
         shown = {c[len(TASKS) :] for c in shown} - {'data'}  # remove tasks:
@@ -831,7 +831,7 @@ class PreparedTaskManager(models.Manager):
         project = None if first_task is None else first_task.project
 
         # db annotations applied only if we need them in ordering or filters
-        for field in annotations_map.keys():
+        for field in annotations_map:
             # Include field if it's explicitly requested or all_fields=True, but exclude if it's in the exclusion list
             if (field in fields_for_evaluation or all_fields) and field not in excluded_fields_for_evaluation:
                 queryset.project = project

@@ -97,7 +97,7 @@ def gcs_client_mock():
 
     def get_sample_blob_names_for_bucket(bucket_name):
         # Bucket-specific logic to avoid test bleed
-        if bucket_name in ['pytest-recursive-scan-bucket']:
+        if bucket_name == 'pytest-recursive-scan-bucket':
             result = ['dataset/', 'dataset/a.json', 'dataset/sub/b.json', 'other/c.json']
             logger.info(f'get_sample_blob_names_for_bucket({bucket_name}) -> {result} (recursive scan bucket)')
             return result

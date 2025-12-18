@@ -166,7 +166,7 @@ class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):
                             },
                             'required': ['name', 'description', 'key', 'organization-only'],
                         }
-                        for action in WebhookAction.ACTIONS.keys()
+                        for action in WebhookAction.ACTIONS
                     },
                 },
             ),

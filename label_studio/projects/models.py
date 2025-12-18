@@ -625,7 +625,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         return json.dumps(self.data_types)
 
     def available_data_keys(self):
-        return sorted(list(self.data_types.keys()))
+        return sorted(self.data_types.keys())
 
     @classmethod
     def validate_label_config(cls, config_string):
@@ -737,7 +737,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
                     labels_from_config_by_tag |= set(labels_from_config[key])
             if 'Taxonomy' in tag_types:
                 custom_tags = Label.objects.filter(links__project=self).values_list('value', flat=True)
-                flat_custom_tags = set([item for sublist in custom_tags for item in sublist])
+                flat_custom_tags = {item for sublist in custom_tags for item in sublist}
                 labels_from_config_by_tag |= flat_custom_tags
             # check if labels from is subset if config labels
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
@@ -842,7 +842,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         return control_weights
 
     def save(self, *args, update_fields=None, recalc=True, **kwargs):
-        exists = True if self.pk else False
+        exists = bool(self.pk)
         project_with_config_just_created = not exists and self.label_config
 
         label_config_has_changed = self._label_config_has_changed()
@@ -1450,9 +1450,9 @@ class ProjectSummary(models.Model):
 
         self.all_data_columns = all_data_columns
         if not self.common_data_columns:
-            self.common_data_columns = list(sorted(common_data_columns))
+            self.common_data_columns = sorted(common_data_columns)
         else:
-            self.common_data_columns = list(sorted(set(self.common_data_columns) & common_data_columns))
+            self.common_data_columns = sorted(set(self.common_data_columns) & common_data_columns)
         self.save(update_fields=['all_data_columns', 'common_data_columns'])
 
     def remove_data_columns(self, tasks):
@@ -1461,7 +1461,7 @@ class ProjectSummary(models.Model):
 
         for task in tasks:
             task_data = get_attr_or_item(task, 'data')
-            for key in task_data.keys():
+            for key in task_data:
                 if key in all_data_columns:
                     all_data_columns[key] -= 1
                     if all_data_columns[key] == 0:
@@ -1499,7 +1499,7 @@ class ProjectSummary(models.Model):
     def _get_labels(self, result):
         result_type = result.get('type')
         # DEV-1990 Workaround for Video labels as there are no labels in VideoRectangle tag
-        if result_type in ['videorectangle']:
+        if result_type == 'videorectangle':
             result_type = 'labels'
         result_value = result['value'].get(result_type)
         if not result_value or not isinstance(result_value, list) or result_type == 'text':

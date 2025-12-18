@@ -384,8 +384,7 @@ def preprocess_field_name(raw_field_name, project) -> Tuple[str, bool]:
     # For security reasons, these must only be removed when they fall at the beginning of the string (or after `-`).
     optional_prefixes = ['filter:', 'tasks:']
     for prefix in optional_prefixes:
-        if field_name.startswith(prefix):
-            field_name = field_name[len(prefix) :]
+        field_name = field_name.removeprefix(prefix)
 
     # Descending marker may also come after other prefixes. Double negative is not allowed.
     if ascending and field_name.startswith('-'):
@@ -400,7 +399,7 @@ def preprocess_field_name(raw_field_name, project) -> Tuple[str, bool]:
             # there is only one object tag in labeling config
             # and requested filter name == value from object tag
             len(project.data_types.keys()) == 1
-            and real_name in project.data_types.keys()
+            and real_name in project.data_types
             # file was uploaded before labeling config is set, `data.data` is system predefined name
             or len(project.data_types.keys()) == 0
             and real_name == 'data'

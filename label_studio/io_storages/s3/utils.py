@@ -126,7 +126,7 @@ class AWS(object):
 
         bucket_iter = bucket_iter.page_size(settings.CLOUD_STORAGE_CHECK_FOR_RECORDS_PAGE_SIZE).all()
 
-        for index, obj in enumerate(bucket_iter):
+        for obj in bucket_iter:
             key = obj.key
             # skip directories
             if key.endswith('/'):

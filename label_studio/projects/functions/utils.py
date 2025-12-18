@@ -31,7 +31,7 @@ def get_unique_ids_list(tasks_queryset):
             return list(set(tasks_queryset))  # Remove duplicates
 
         # It's a list of objects with 'id' attribute
-        return list(set(obj.id for obj in tasks_queryset))
+        return list({obj.id for obj in tasks_queryset})
 
     elif isinstance(tasks_queryset, set):
         if not tasks_queryset:
@@ -43,7 +43,7 @@ def get_unique_ids_list(tasks_queryset):
             return list(tasks_queryset)
 
         # It's a set of objects with 'id' attribute
-        return list(obj.id for obj in tasks_queryset)
+        return [obj.id for obj in tasks_queryset]
 
     elif isinstance(tasks_queryset, QuerySet):
         # It's a Django QuerySet

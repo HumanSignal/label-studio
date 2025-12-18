@@ -148,7 +148,7 @@ class AnnotationSerializer(FlexFieldsModelSerializer):
                 'UNIQUE constraint failed: task_completion.unique_id',
                 'duplicate key value violates unique constraint "task_completion_unique_id_key"',
             ]
-            if any([error in str(e) for error in errors]):
+            if any(error in str(e) for error in errors):
                 raise AnnotationDuplicateError()
             raise
 
@@ -663,7 +663,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             cancelled_annotations = len([ann for ann in task_annotations[i] if ann.get('was_cancelled', False)])
             total_annotations = len(task_annotations[i]) - cancelled_annotations
             if calculate_is_labeled_with_distinct_annotators:
-                current_overlap = len(set([ann.get('completed_by_id') for ann in task_annotations[i]]))
+                current_overlap = len({ann.get('completed_by_id') for ann in task_annotations[i]})
             else:
                 current_overlap = len(task_annotations[i])
             t = Task(

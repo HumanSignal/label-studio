@@ -15,7 +15,7 @@ def add_stream_history(next_task, user, project):
             if created:
                 history.data = [new_history_data]
             else:
-                task_ids = set([h[TASK_ID_KEY] for h in history.data])
+                task_ids = {h[TASK_ID_KEY] for h in history.data}
                 if next_task.id not in task_ids:
                     history.data.append(new_history_data)
                 if len(task_ids) + 1 > settings.LABEL_STREAM_HISTORY_LIMIT:
@@ -42,8 +42,8 @@ def get_label_stream_history(user, project):
 
         data = history.data
 
-        task_ids = set([h[TASK_ID_KEY] for h in history.data])
-        annotation_ids = set([h[ANNOTATION_ID_KEY] for h in history.data])
+        task_ids = {h[TASK_ID_KEY] for h in history.data}
+        annotation_ids = {h[ANNOTATION_ID_KEY] for h in history.data}
         existing_task_ids = set(Task.objects.filter(pk__in=task_ids).values_list('id', flat=True))
         existing_annotation_ids = set(Annotation.objects.filter(pk__in=annotation_ids).values_list('id', flat=True))
 

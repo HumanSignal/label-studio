@@ -78,7 +78,7 @@ def float_from_request(params, key, default):
         except ValueError:
             raise ValidationError({key: f'Incorrect value in key "{key}" = "{value}". It should be digit string.'})
     # float
-    elif isinstance(value, float) or isinstance(value, int):
+    elif isinstance(value, (float, int)):
         return float(value)
     # other
     else:
@@ -156,7 +156,7 @@ def get_env_list_int(key, default=None) -> Sequence[int]:
 
 def get_all_env_with_prefix(prefix=None, is_bool=True, default_value=None):
     out = {}
-    for key in os.environ.keys():
+    for key in os.environ:
         if not key.startswith(prefix):
             continue
         if is_bool:

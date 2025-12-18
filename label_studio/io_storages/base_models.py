@@ -384,7 +384,7 @@ class ImportStorage(Storage):
         # dict of objects
         elif isinstance(uri, dict):
             resolved = {}
-            for key in uri.keys():
+            for key in uri:
                 result = self.resolve_uri(uri[key], task)
                 resolved[key] = result if result else uri[key]
             return resolved

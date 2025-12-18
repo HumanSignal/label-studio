@@ -119,7 +119,7 @@ def test_json_task_annotation_and_meta_upload(setup_project_dialog, tasks, statu
     # annotations
     annotations = Annotation.objects.filter(task__project=setup_project_dialog.project.id)
     assert annotations.count() == annotation_count * multiply_files
-    for i, annotation in enumerate(annotations):
+    for annotation in annotations:
         assert annotation.ground_truth
 
 
@@ -162,8 +162,8 @@ def test_json_task_predictions(setup_project_dialog, tasks, status_code, task_co
     # predictions
     predictions = Prediction.objects.filter(project=setup_project_dialog.project.id)
     assert predictions.count() == prediction_count
-    for i, predictions in enumerate(predictions):
-        assert predictions.model_version == 'test'
+    for prediction in predictions:
+        assert prediction.model_version == 'test'
 
 
 @pytest.mark.parametrize('multiply_files', [1, 5])

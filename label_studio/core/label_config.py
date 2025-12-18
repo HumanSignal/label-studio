@@ -227,8 +227,8 @@ def get_task_from_labeling_config(config):
             logger.debug(json.dumps(body, indent=2))
             dont_use_root = 'predictions' in body or 'annotations' in body
             task_data = body['data'] if 'data' in body else (None if dont_use_root else body)
-            predictions = body['predictions'] if 'predictions' in body else None
-            annotations = body['annotations'] if 'annotations' in body else None
+            predictions = body.get('predictions', None)
+            annotations = body.get('annotations', None)
     return task_data, annotations, predictions
 
 

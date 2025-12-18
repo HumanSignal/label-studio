@@ -18,14 +18,14 @@ def test_task_CRUD(django_live_url, business_client):
     for task in task_data:
         ls.tasks.create(project=p.id, data=task['data'])
 
-    tasks = [task for task in ls.tasks.list(project=p.id)]
+    tasks = list(ls.tasks.list(project=p.id))
 
     assert len(tasks) == 1
     assert (task_id := tasks[0].id)
     assert tasks[0].data == task_data[0]['data']
 
     ls.tasks.update(id=task_id, data={'my_text': 'Updated task'})
-    tasks = [task for task in ls.tasks.list(project=p.id)]
+    tasks = list(ls.tasks.list(project=p.id))
     assert len(tasks) == 1
     assert tasks[0].data == {'my_text': 'Updated task'}
 
@@ -44,14 +44,14 @@ def test_delete_multi_tasks(django_live_url, business_client):
     for task in task_data:
         ls.tasks.create(project=p.id, data=task['data'])
 
-    tasks = [task for task in ls.tasks.list(project=p.id)]
+    tasks = list(ls.tasks.list(project=p.id))
     assert len(tasks) == 10
 
     tasks_ids_to_delete = [t.id for t in tasks[:5]]
 
     # delete specific tasks
     ls.actions.create(project=p.id, id='delete_tasks', selected_items={'all': False, 'included': tasks_ids_to_delete})
-    assert len([task for task in ls.tasks.list(project=p.id)]) == 5
+    assert len(list(ls.tasks.list(project=p.id))) == 5
 
     # another way of calling delete action instead of
     #     ls.actions.create(project=p.id, id='delete_tasks', selected_items={'all': True, 'excluded': [tasks[5].id]})
@@ -67,7 +67,7 @@ def test_delete_multi_tasks(django_live_url, business_client):
         },
     )
 
-    remaining_tasks = [task for task in ls.tasks.list(project=p.id)]
+    remaining_tasks = list(ls.tasks.list(project=p.id))
     assert len(remaining_tasks) == 1
     assert remaining_tasks[0].data['my_text'] == 'Test task 5'
 
@@ -107,7 +107,7 @@ def test_export_tasks(django_live_url, business_client):
     assert len(exported_tasks) == 1
     assert exported_tasks[0].data['my_text'] == 'Test task 7'
 
-    exported_tasks = [task for task in ls.tasks.list(project=p.id, fields='all')]
+    exported_tasks = list(ls.tasks.list(project=p.id, fields='all'))
     assert len(exported_tasks) == 10
 
 
@@ -118,7 +118,7 @@ def test_upload_and_list_tasks_does_not_log_to_stderr(django_live_url, business_
     p = ls.projects.create(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
     ls.projects.import_tasks(id=p.id, request=LABEL_CONFIG_AND_TASKS['tasks_for_import'])
 
-    tasks = [task for task in ls.tasks.list(project=p.id, fields='all')]
+    tasks = list(ls.tasks.list(project=p.id, fields='all'))
 
     assert len(tasks) == 1
     assert len(tasks[0].annotations) == 1
@@ -132,7 +132,7 @@ def test_get_empty_tasks_does_not_log_to_stderr(django_live_url, business_client
     ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
     p = ls.projects.create(title='New Project', label_config=LABEL_CONFIG_AND_TASKS['label_config'])
 
-    tasks = [task for task in ls.tasks.list(project=p.id)]
+    tasks = list(ls.tasks.list(project=p.id))
 
     assert not tasks
     assert not sdk_logs(caplog)

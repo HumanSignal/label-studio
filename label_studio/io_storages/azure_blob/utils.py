@@ -169,7 +169,7 @@ class AZURE(object):
             pattern = fnmatch.translate(pattern)
         regex = re.compile(str(pattern))
         # match pattern against all keys in the container
-        for index, key in enumerate(generator):
+        for key in generator:
             # skip directories
             if key.endswith('/'):
                 logger.debug(key + ' is skipped because it is a folder')

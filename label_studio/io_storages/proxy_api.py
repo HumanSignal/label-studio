@@ -173,7 +173,7 @@ class ResolveStorageUriAPIMixin:
                 end = start + max_range_size
             # 'bytes=123456-' + 'bytes=123456-789012'
             elif start >= 0 and end > 0:
-                end = start + max_range_size if end >= start + max_range_size else end
+                end = min(start + max_range_size, end)
             # 'bytes=-1024'
             elif start < 0:
                 logger.warning(f'Start range is negative and not supported: {rng}')

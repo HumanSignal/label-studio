@@ -88,7 +88,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
         annotations = annotations.filter(completed_by=int(annotator_id))
 
     # take only tasks where annotations are going to be deleted
-    real_task_ids = set(list(annotations.values_list('task__id', flat=True)))
+    real_task_ids = set(annotations.values_list('task__id', flat=True))
     annotations_ids = list(annotations.values('id'))
     # remove deleted annotations from project.summary
     project.summary.remove_created_annotations_and_labels(annotations)
@@ -155,7 +155,7 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     if flag_set('fflag_root_223_optimize_delete_predictions', organization=project.organization):
         real_task_ids = predictions.order_by().values_list('task_id', flat=True).distinct()
     else:
-        real_task_ids = set(list(predictions.values_list('task_id', flat=True)))
+        real_task_ids = set(predictions.values_list('task_id', flat=True))
 
     count = predictions.count()
     predictions.delete()

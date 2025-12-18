@@ -73,7 +73,7 @@ def create_file_upload(user, project, file):
     instance = FileUpload(user=user, project=project, file=file)
     if settings.SVG_SECURITY_CLEANUP:
         content_type, encoding = mimetypes.guess_type(str(instance.file.name))
-        if content_type in ['image/svg+xml']:
+        if content_type == 'image/svg+xml':
             clean_xml = allowlist_svg(instance.file.read().decode())
             instance.file.seek(0)
             instance.file.write(clean_xml.encode())

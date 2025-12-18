@@ -10,7 +10,7 @@ from .models import Label, LabelLink
 
 class LabelListSerializer(serializers.ListSerializer):
     def validate(self, items):
-        if len(set(item['project'] for item in items)) > 1:
+        if len({item['project'] for item in items}) > 1:
             raise ValidationError('Creating labels for different projects in one request not allowed')
         return items
 
