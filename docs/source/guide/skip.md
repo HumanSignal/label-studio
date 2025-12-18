@@ -1,7 +1,7 @@
 ---
 title: Skipping tasks
 short: Skipping tasks
-tier: enterprise
+tier: all
 type: guide
 order: 139
 order_enterprise: 139
@@ -12,6 +12,24 @@ parent_enterprise: "labeling"
 date: 2025-05-24 17:19:21
 ---
 
+<div class="opensource-only">
+
+The **Skip** action is available when viewing tasks through the labeling stream (selecting **Label All Tasks** or **Label Tasks as Displayed** instead of clicking tasks in the Data Manager).
+
+<img src="/images/label/skip.png" class="gif-border" style="max-width: 413px">
+
+When you skip a task, the task is removed from your labeling queue. 
+
+If another annotator is also working through the labeling queue, they will see the skipped task instead. If all annotators skip a task, it remains incomplete. 
+
+You can see which tasks have been skipped using the **Cancelled** column in the Data Manager. 
+
+!!! error Enterprise
+    Task skipping, and how tasks can be skipped, is highly configurable in Label Studio Enterprise and Starter Cloud. For more information, see [the Enterprise documentation](https://docs.humansignal.com/guide/skip). 
+
+</div>
+
+<div class="enterprise-only">
 
 The **Skip** action is available when viewing tasks through the labeling stream (selecting **Label All Tasks** or **Label Tasks as Displayed** instead of clicking tasks in the Data Manager).
 
@@ -56,10 +74,7 @@ For example, the following JSON snippet would result in one skippable task and o
 !!! info Tip
     Use the **Allow Skip** column to see which tasks have skipping disabled and filter for unskippable tasks. This column is hidden by default and is only visible to Managers, Admins, and Owners. 
 
-
-
-
-
+</div>
 
 
 
