@@ -736,7 +736,7 @@ export const Header = <T,>({
         </Typography>
         {help && (
           <Tooltip title={help} alignment="top-center">
-            <IconInfoOutline width={14} height={14} className="text-neutral-content-subtler cursor-help shrink-0" />
+            <IconInfoOutline width={18} height={18} className="text-neutral-content-subtler cursor-help shrink-0" />
           </Tooltip>
         )}
       </div>
