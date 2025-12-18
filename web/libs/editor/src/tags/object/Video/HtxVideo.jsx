@@ -477,7 +477,11 @@ const HtxVideoView = ({ item, store }) => {
         }
 
         setPosition(newPosition);
-        item.setFrame(newPosition);
+        // Use requestAnimationFrame to batch rapid seeks during scrubbing
+        // This prevents conflicts when scrubbing quickly, but allows immediate seeks for single changes
+        requestAnimationFrame(() => {
+          item.setFrame(newPosition);
+        });
       }
     },
     [item, position, playing],

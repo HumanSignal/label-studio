@@ -375,22 +375,19 @@ const Model = types
         if (self.frame !== frame && self.framerate && self.ref.current) {
           self.frame = frame;
 
-          // Use requestAnimationFrame to batch rapid seeks during scrubbing
-          // This prevents the video from getting stuck when scrubbing quickly
-          // The parent component (HtxVideo) handles pausing/resuming playback during scrubbing
-          requestAnimationFrame(() => {
-            if (!self.ref.current) return;
+          // Seek immediately - requestAnimationFrame batching is handled by the parent component
+          // during scrubbing. For single frame changes (like tests), we need immediate seeks.
+          if (!self.ref.current) return;
 
-            try {
-              if (isFF(FF_VIDEO_FRAME_SEEK_PRECISION)) {
-                self.ref.current.goToFrame(frame);
-              } else {
-                self.ref.current.currentTime = frame / self.framerate;
-              }
-            } catch (error) {
-              console.warn("Error seeking video:", error);
+          try {
+            if (isFF(FF_VIDEO_FRAME_SEEK_PRECISION)) {
+              self.ref.current.goToFrame(frame);
+            } else {
+              self.ref.current.currentTime = frame / self.framerate;
             }
-          });
+          } catch (error) {
+            console.warn("Error seeking video:", error);
+          }
         }
       },
 
