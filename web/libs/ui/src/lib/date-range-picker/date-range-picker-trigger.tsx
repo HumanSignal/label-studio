@@ -67,6 +67,7 @@ export const DateRangePickerTrigger = ({
   formatLabel,
   disabled,
   dataTestId,
+  inline = true,
   ...dropdownTriggerProps
 }: DateRangePickerTriggerProps) => {
   const appliedDatesString = dateStrings(selected);
@@ -92,7 +93,7 @@ export const DateRangePickerTrigger = ({
   const label = formatLabel ? formatLabel(appliedDatesString) : defaultLabel;
 
   return (
-    <DropdownTrigger {...dropdownTriggerProps} disabled={disabled} content={children}>
+    <DropdownTrigger {...dropdownTriggerProps} disabled={disabled} content={children} inline={inline}>
       <div className={clsx(styles.trigger, disabled && styles.disabled)} data-testid={dataTestId}>
         {label}
         <IconCalendar height={18} width={18} className={styles.icon} />
