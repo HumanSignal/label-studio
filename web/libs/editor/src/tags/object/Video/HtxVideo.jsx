@@ -469,25 +469,37 @@ const HtxVideoView = ({ item, store }) => {
         // Clear any existing scrub timeout
         if (scrubTimeoutRef.current) {
           clearTimeout(scrubTimeoutRef.current);
+          scrubTimeoutRef.current = null;
         }
 
         // Set a timeout to detect when scrubbing ends
+        // Use a longer timeout to be more reliable
         scrubTimeoutRef.current = setTimeout(() => {
           isScrubbingRef.current = false;
           // Resume playback if it was playing before scrubbing started
           if (wasPlayingBeforeScrubRef.current && item.ref.current) {
             wasPlayingBeforeScrubRef.current = false;
-            // Small delay to ensure seek completes before resuming
-            setTimeout(() => {
-              if (item.ref.current && !item.ref.current.playing) {
+            // Wait for video to finish seeking before resuming
+            const video = item.ref.current.videoRef?.current;
+            const checkAndResume = () => {
+              if (!item.ref.current) return;
+              const v = item.ref.current.videoRef?.current;
+              if (v && v.seeking) {
+                // Still seeking, wait for seeked event
+                v.addEventListener("seeked", checkAndResume, { once: true });
+                return;
+              }
+              // Seek completed, safe to resume
+              if (!item.ref.current.playing) {
                 item.ref.current.play();
                 item.triggerSyncPlay();
               }
-            }, 100);
+            };
+            checkAndResume();
           } else {
             wasPlayingBeforeScrubRef.current = false;
           }
-        }, 150); // Consider scrubbing ended after 150ms of no position changes
+        }, 200); // Consider scrubbing ended after 200ms of no position changes
 
         // Update React state immediately for UI responsiveness
         setPosition(newPosition);
