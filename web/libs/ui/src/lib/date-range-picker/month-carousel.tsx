@@ -20,12 +20,7 @@ type MonthCarouselProps = {
   neighboringCalendar?: { month: number; year: number };
 };
 
-export const MonthCarousel = ({
-  month,
-  year,
-  changeMonth,
-  neighboringCalendar,
-}: MonthCarouselProps) => {
+export const MonthCarousel = ({ month, year, changeMonth, neighboringCalendar }: MonthCarouselProps) => {
   const currentMonth = new Date();
   const calendarMonth = new Date(year, month);
   const nextCalendarMonth = incrementMonthByDate(calendarMonth, 1);
@@ -61,4 +56,3 @@ export const MonthCarousel = ({
     </div>
   );
 };
-

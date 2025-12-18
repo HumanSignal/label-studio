@@ -207,4 +207,3 @@ export const rangeSetters = (creationDate?: Date, includeTime = true): { [key: s
 
   return rangeList;
 };
-
