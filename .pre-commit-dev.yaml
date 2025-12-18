@@ -1,10 +1,13 @@
 default_stages: [ manual ]
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.285
+    rev: v0.14.9
     hooks:
-      - id: ruff
-        args: [ --fix, --show-fixes ]
+      # Run the linter.
+      - id: ruff-check
+        args: [ --fix ]
+      # Run the formatter.
+      - id: ruff-format
   - repo: https://github.com/grantjenks/blue
     rev: v0.9.1
     hooks:

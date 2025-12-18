@@ -86,7 +86,15 @@ label-studio = "label_studio.server:main"
 
 [project.optional-dependencies]
 uwsgi = ['pyuwsgi (==2.0.28.post1)', 'uwsgitop (==0.12)']
+
 [tool.ruff]
+# Assume Python 3.10 at a minimum
+target-version = "py310"
+
+# Same as Blue.
+line-length = 119
+
+[tool.ruff.lint]
 # Enable the pycodestyle (`E`) and Pyflakes (`F`) rules by default.
 # Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
 # McCabe complexity (`C901`) by default.
@@ -135,16 +143,10 @@ exclude = [
     "**/migrations/*.py",
 ]
 
-# Same as Blue.
-line-length = 119
-
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
-# Assume Python 3.8 at a minimum
-target-version = "py38"
-
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 # Ignore deleting imports in __init__.py files as they're actually being used.
 "__init__.py" = ["F401"]
 "**/settings/label_studio.py" = ["F405"]
@@ -187,7 +189,7 @@ force-exclude = '''
 )/
 '''
 
-target-version = ['py38']
+target-version = ['py310']
 
 [tool.poetry]
 
