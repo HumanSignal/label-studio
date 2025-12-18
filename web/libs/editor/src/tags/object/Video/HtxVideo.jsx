@@ -452,58 +452,33 @@ const HtxVideoView = ({ item, store }) => {
   const handleTimelinePositionChange = useCallback(
     (newPosition) => {
       if (position !== newPosition) {
-        // If video is playing and we start scrubbing, pause it to prevent conflicts
+        // Pause video when scrubbing starts (if playing) to prevent conflicts
         if (playing && !isScrubbingRef.current) {
           wasPlayingBeforeScrubRef.current = true;
           isScrubbingRef.current = true;
-          // Pause the video to prevent conflicts between playback loop and seeks
-          if (item.ref.current?.playing) {
-            item.ref.current.pause();
-            item.triggerSyncPause();
-          }
+          item.ref.current?.pause();
+          item.triggerSyncPause();
         } else if (!isScrubbingRef.current) {
-          // Track that we're scrubbing even if video wasn't playing
           isScrubbingRef.current = true;
         }
 
-        // Clear any existing scrub timeout
+        // Clear timeout and set new one to detect when scrubbing ends
         if (scrubTimeoutRef.current) {
           clearTimeout(scrubTimeoutRef.current);
-          scrubTimeoutRef.current = null;
         }
-
-        // Set a timeout to detect when scrubbing ends
-        // Use a longer timeout to be more reliable
         scrubTimeoutRef.current = setTimeout(() => {
           isScrubbingRef.current = false;
-          // Resume playback if it was playing before scrubbing started
+          // Resume playback if it was playing before
           if (wasPlayingBeforeScrubRef.current && item.ref.current) {
             wasPlayingBeforeScrubRef.current = false;
-            // Wait for video to finish seeking before resuming
-            const video = item.ref.current.videoRef?.current;
-            const checkAndResume = () => {
-              if (!item.ref.current) return;
-              const v = item.ref.current.videoRef?.current;
-              if (v && v.seeking) {
-                // Still seeking, wait for seeked event
-                v.addEventListener("seeked", checkAndResume, { once: true });
-                return;
-              }
-              // Seek completed, safe to resume
-              if (!item.ref.current.playing) {
-                item.ref.current.play();
-                item.triggerSyncPlay();
-              }
-            };
-            checkAndResume();
+            item.ref.current.play();
+            item.triggerSyncPlay();
           } else {
             wasPlayingBeforeScrubRef.current = false;
           }
-        }, 200); // Consider scrubbing ended after 200ms of no position changes
+        }, 150);
 
-        // Update React state immediately for UI responsiveness
         setPosition(newPosition);
-        // Update frame in the model (this will be throttled internally to prevent conflicts)
         item.setFrame(newPosition);
       }
     },

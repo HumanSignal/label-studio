@@ -242,7 +242,7 @@ const VideoRegionsPure = ({
 const RegionsLayer = observer(
   ({ regions, item, locked, isDrawing, workinAreaCoordinates, stageRef, onDragMove, currentFrame }) => {
     // Use currentFrame prop (from React state) to ensure regions update during fast scrubbing
-    // Since item.frame is volatile, we need React state to trigger re-renders
+    // Since item.frame is volatile, React state triggers re-renders
     const frame = currentFrame ?? item.frame;
 
     return (
@@ -250,7 +250,7 @@ const RegionsLayer = observer(
         {regions.map((reg) => (
           <Shape
             id={reg.id}
-            key={`${reg.id}-${frame}`}
+            key={reg.id}
             reg={reg}
             item={item}
             workingArea={workinAreaCoordinates}
