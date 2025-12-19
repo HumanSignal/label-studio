@@ -493,6 +493,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 self.add_drafts(task_drafts, db_tasks, annotation_mapping, self.project)
                 self.add_reviews(task_reviews, annotation_mapping, self.project)
 
+        # Backfill FSM states for bulk-created tasks
+        # bulk_create() bypasses save() so FSM transitions don't fire automatically
+        self._backfill_fsm_states(self.db_tasks)
+
         return db_tasks
 
     def add_predictions(self, task_predictions):
@@ -712,10 +716,6 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             self.db_tasks = Task.objects.bulk_create(db_tasks, batch_size=settings.BATCH_SIZE)
 
         logging.info(f'Tasks serialization success, len = {len(self.db_tasks)}')
-
-        # Backfill FSM states for bulk-created tasks
-        # bulk_create() bypasses save() so FSM transitions don't fire automatically
-        self._backfill_fsm_states(self.db_tasks)
 
         return db_tasks
 
