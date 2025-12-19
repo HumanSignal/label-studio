@@ -736,6 +736,48 @@ files = [
 ]
 
 [[package]]
+name = "dj-stripe"
+version = "2.9.1"
+description = "Django + Stripe made easy"
+optional = false
+python-versions = "<4.0.0,>=3.10.0"
+groups = ["main"]
+markers = "python_version == \"3.10\""
+files = [
+    {file = "dj_stripe-2.9.1-py3-none-any.whl", hash = "sha256:eb77f048a9a0e497367e44138190c0ad2ee469b852c9a272e8f56a241290c93a"},
+    {file = "dj_stripe-2.9.1.tar.gz", hash = "sha256:06824e8d6efaf1de9a63cf1cb338933a58a1d107633bba0541d9649a3136046b"},
+]
+
+[package.dependencies]
+django = ">=4.2"
+stripe = ">=8.0.0,<12.0.0"
+
+[package.extras]
+mysql = ["mysqlclient (>=1.4.0)"]
+postgres = ["psycopg (>=3.2.3,<4.0.0)"]
+
+[[package]]
+name = "dj-stripe"
+version = "2.10.3"
+description = "Django + Stripe made easy"
+optional = false
+python-versions = "<4.0,>=3.11"
+groups = ["main"]
+markers = "python_version >= \"3.11\""
+files = [
+    {file = "dj_stripe-2.10.3-py3-none-any.whl", hash = "sha256:035b8f991429d5a474d1d46e4f3ab36722250fa9dac39b5d835c694c49a19dea"},
+    {file = "dj_stripe-2.10.3.tar.gz", hash = "sha256:fe870a93dfcbb7f17432fb1da7291a2222c89b32a6d6fba16cb34ed6b37f1584"},
+]
+
+[package.dependencies]
+django = ">=5.0"
+stripe = ">=11.3.0"
+
+[package.extras]
+mysql = ["mysqlclient (>=1.4.0)"]
+postgres = ["psycopg (>=3.2.3,<4.0.0)"]
+
+[[package]]
 name = "django"
 version = "5.1.10"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
@@ -4574,6 +4616,43 @@ files = [
 pbr = ">=2.0.0,<2.1.0 || >2.1.0"
 
 [[package]]
+name = "stripe"
+version = "11.6.0"
+description = "Python bindings for the Stripe API"
+optional = false
+python-versions = ">=3.6"
+groups = ["main"]
+markers = "python_version == \"3.10\""
+files = [
+    {file = "stripe-11.6.0-py2.py3-none-any.whl", hash = "sha256:6e6cf09ebb6d5fc2d708401cb8868fd7bff987a6d09a0433caaa92c62f97dbc5"},
+    {file = "stripe-11.6.0.tar.gz", hash = "sha256:0ced7cce23a6cb1a393c86a1f7f9435c9d83ae7cbd556362868caf62cb44a92c"},
+]
+
+[package.dependencies]
+requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
+typing-extensions = {version = ">=4.5.0", markers = "python_version >= \"3.7\""}
+
+[[package]]
+name = "stripe"
+version = "14.1.0"
+description = "Python bindings for the Stripe API"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+markers = "python_version >= \"3.11\""
+files = [
+    {file = "stripe-14.1.0-py3-none-any.whl", hash = "sha256:0e687a2eed4d9a66e7602093f7ad02e6c30a0d0c993101848a8c97d7f7607748"},
+    {file = "stripe-14.1.0.tar.gz", hash = "sha256:d002ecd2966a984a52a43e865bc9346c389f20e768e13fdbbe9cb9474f917c23"},
+]
+
+[package.dependencies]
+requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
+typing_extensions = {version = ">=4.5.0", markers = "python_version >= \"3.7\""}
+
+[package.extras]
+async = ["httpx"]
+
+[[package]]
 name = "tavern"
 version = "2.3.0"
 description = "Simple testing of RESTful APIs"
@@ -5059,4 +5138,4 @@ uwsgi = ["pyuwsgi", "uwsgitop"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "a941e19be68bf6b84bb357698ecef416de667198ed0b5f4569bcd24070527117"
+content-hash = "4d04b737287ec3e56da9dc152c5b4b3c574f9419f51e2ec76c3fe05c95129a77"

@@ -89,6 +89,11 @@ export const API_CONFIG = {
 
     accessTokenSettings: "GET:/jwt/settings",
     accessTokenUpdateSettings: "POST:/jwt/settings",
+
+    // Billing
+    billingStatus: "GET:/billing/status",
+    createCheckout: "POST:/billing/checkout",
+    createPortal: "POST:/billing/portal",
   },
   alwaysExpectJSON: false,
 };

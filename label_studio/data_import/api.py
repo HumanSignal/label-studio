@@ -318,6 +318,8 @@ class ImportAPI(generics.CreateAPIView):
                         t['import_source'] = source
 
         if commit_to_project:
+            # Check task limits before creating tasks
+            project.organization.check_max_tasks(len(parsed_data))
             # Immediately create project tasks and update project states and counters
             tasks, serializer = self._save(parsed_data)
             task_count = len(tasks)
@@ -497,6 +499,8 @@ class ReImportAPI(ImportAPI):
 
         with transaction.atomic():
             project.remove_tasks_by_file_uploads(file_upload_ids)
+            # Check task limits for net-new tasks after removal
+            project.organization.check_max_tasks(len(tasks))
             tasks, serializer = self._save(tasks)
         duration = time.time() - start
 

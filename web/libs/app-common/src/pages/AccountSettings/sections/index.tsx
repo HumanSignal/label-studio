@@ -2,6 +2,7 @@ import { PersonalInfo } from "./PersonalInfo";
 import { EmailPreferences } from "./EmailPreferences";
 import { PersonalAccessToken, PersonalAccessTokenDescription } from "./PersonalAccessToken";
 import { MembershipInfo } from "./MembershipInfo";
+import { BillingInfo } from "./BillingInfo";
 import type React from "react";
 import { PersonalJWTToken } from "./PersonalJWTToken";
 import type { AuthTokenSettings } from "../types";
@@ -30,6 +31,11 @@ export const accountSettingsSections = (settings: AuthTokenSettings): SectionTyp
       title: "Membership Info",
       id: "membership-info",
       component: MembershipInfo,
+    },
+    {
+      title: "Billing",
+      id: "billing",
+      component: BillingInfo,
     },
     settings.api_tokens_enabled &&
       ff.isActive(ff.FF_AUTH_TOKENS) && {

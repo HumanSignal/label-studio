@@ -267,7 +267,11 @@ class ProjectListAPI(generics.ListCreateAPIView):
 
     def perform_create(self, ser):
         try:
-            project = ser.save(organization=self.request.user.active_organization)
+            # Check project limits before creating
+            organization = self.request.user.active_organization
+            organization.check_max_projects()
+
+            project = ser.save(organization=organization)
             
             # Auto-connect default ML backend if configured
             if settings.ADD_DEFAULT_ML_BACKENDS and settings.DEFAULT_ML_BACKEND_URL:
@@ -814,6 +818,8 @@ class ProjectTaskListAPI(GetParentObjectMixin, generics.ListCreateAPIView, gener
 
     def perform_create(self, serializer):
         project = self.parent_object
+        # Check task limits before creating task
+        project.organization.check_max_tasks(1)
         instance = serializer.save(project=project)
         emit_webhooks_for_instance(
             self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance]

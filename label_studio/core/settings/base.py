@@ -214,6 +214,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
     'django_rq',
+    'djstripe',
+    'billing',
     'django_filters',
     'rules',
     'annoying',
@@ -620,6 +622,23 @@ FEATURE_FLAGS_GET_USER_REPR = 'core.feature_flags.utils.get_user_repr'
 ORGANIZATION_FACTORY = 'organizations.tests.factories.OrganizationFactory'
 PROJECT_FACTORY = 'projects.tests.factories.ProjectFactory'
 USER_FACTORY = 'users.tests.factories.UserFactory'
+
+# dj-stripe settings
+DJSTRIPE_FOREIGN_KEY_TO_FIELD = 'id'
+DJSTRIPE_SUBSCRIBER_MODEL = 'organizations.Organization'
+DJSTRIPE_SUBSCRIBER_MODEL_REQUEST_CALLBACK = 'billing.services.subscriber_from_request'
+DJSTRIPE_SUBSCRIBER_EMAIL = 'get_stripe_email'
+DJSTRIPE_WEBHOOK_SECRET = get_env('DJSTRIPE_WEBHOOK_SECRET', '')
+
+# Stripe API keys (used by both dj-stripe and our direct stripe-python calls)
+STRIPE_LIVE_MODE = get_bool_env('STRIPE_LIVE_MODE', False)
+STRIPE_TEST_SECRET_KEY = get_env('STRIPE_TEST_SECRET_KEY', '')
+STRIPE_LIVE_SECRET_KEY = get_env('STRIPE_LIVE_SECRET_KEY', '')
+STRIPE_SECRET_KEY = STRIPE_LIVE_SECRET_KEY if STRIPE_LIVE_MODE else STRIPE_TEST_SECRET_KEY
+
+STRIPE_PRO_PRICE_ID = get_env('STRIPE_PRO_PRICE_ID', '')
+STRIPE_PRO_PRICE_LOOKUP_KEY = get_env('STRIPE_PRO_PRICE_LOOKUP_KEY', '')
+STRIPE_PORTAL_CONFIGURATION_ID = get_env('STRIPE_PORTAL_CONFIGURATION_ID', '')
 
 
 def project_delete(project):

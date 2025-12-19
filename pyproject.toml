@@ -37,6 +37,7 @@ dependencies = [
     "django-extensions (==3.2.3)",
     "django-user-agents (==0.4.0)",
     "django-ranged-fileresponse (>=0.1.2)",
+    "dj-stripe (>=2.8.0,<3.0.0)",
     "drf-dynamic-fields (==0.3.0)",
     "djangorestframework (==3.15.2)",
     "drf-flex-fields (==0.9.5)",

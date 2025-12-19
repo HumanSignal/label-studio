@@ -66,6 +66,14 @@ services:
       - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY:-1x0000000000000000000000000000000AA}
       - BASE_DATA_DIR=/label-studio/data
       - fflag_feat_front_hide_heidi_tips_short=true
+      # dj-stripe testing configuration
+      - STRIPE_LIVE_MODE=${STRIPE_LIVE_MODE:-false}
+      - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-}
+      - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY:-}
+      - DJSTRIPE_WEBHOOK_SECRET=${DJSTRIPE_WEBHOOK_SECRET:-whsec_test_webhook_secret}
+      - STRIPE_PRO_PRICE_ID=${STRIPE_PRO_PRICE_ID:-}
+      - STRIPE_PRO_PRICE_LOOKUP_KEY=${STRIPE_PRO_PRICE_LOOKUP_KEY:-pro_monthly}
+      - STRIPE_PORTAL_CONFIGURATION_ID=${STRIPE_PORTAL_CONFIGURATION_ID:-bpc_test_portal_config}
     volumes:
       - label-studio-data-dev:/label-studio/data:rw
     command: label-studio-uwsgi

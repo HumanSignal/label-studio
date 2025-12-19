@@ -1,0 +1,65 @@
+.billingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .section {
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    padding: 1rem;
+    background-color: hsl(var(--background));
+
+    .sectionTitle {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: hsl(var(--foreground));
+    }
+  }
+
+  .actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+
+    .upgradeButton {
+      background-color: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background-color: hsl(var(--primary) / 0.9);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    .manageButton {
+      background-color: hsl(var(--secondary));
+      color: hsl(var(--secondary-foreground));
+      border: 1px solid hsl(var(--border));
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background-color: hsl(var(--secondary) / 0.8);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
