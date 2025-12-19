@@ -197,9 +197,9 @@ packages = [
     { include = "label_studio" },
 ]
 include = [
-    { path = "web/dist/libs/datamanager/**/*", format = ["sdist", "wheel"] },
-    { path = "web/dist/libs/editor/**/*", format = ["sdist", "wheel"] },
-    { path = "web/dist/apps/labelstudio/**/*", format = ["sdist", "wheel"] },
+    { path = "web/libs/datamanager/**/*", format = ["sdist", "wheel"] },
+    { path = "web/libs/editor/**/*", format = ["sdist", "wheel"] },
+    { path = "web/apps/labelstudio/**/*", format = ["sdist", "wheel"] },
     { path = "label_studio/annotation_templates/**/*", format = ["sdist", "wheel"] },
     { path = "label_studio/core/static/**/*", format = ["sdist", "wheel"] },
     { path = "label_studio/core/static_build/**/*", format = ["sdist", "wheel"] },
@@ -208,10 +208,6 @@ include = [
     { path = "label_studio/core/version_.py", format = ["sdist", "wheel"] },
     { path = "label_studio/core/all_urls.json", format = ["sdist", "wheel"] },
     { path = "label_studio/io_storages/**/*.yml", format = ["sdist", "wheel"] },
-]
-
-exclude = [
-    { path = "label_studio/frontend", format = ["sdist", "wheel"] },
 ]
 
 requires-poetry = '>=2.0.0,<3.0.0'
