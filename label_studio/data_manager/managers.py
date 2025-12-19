@@ -806,7 +806,7 @@ class PreparedTaskManager(models.Manager):
         annotations_map = get_annotations_map()
         # If we have dynamic control-tag level agreement columns, inject into annotation map
         # without mutating the global map
-        if flag_set('fflag_utc_428_consensus_control_tag_agreement', user=request.user):
+        if flag_set('fflag_utc_428_consensus_control_tag_agreement', user='auto'):
             inject_path = getattr(settings, 'GET_DYNAMIC_DM_ANNOTATIONS', None)
             if inject_path:
                 overlay_func = load_func(inject_path)
