@@ -487,9 +487,8 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 self.add_drafts(task_drafts, db_tasks, annotation_mapping, self.project)
                 self.add_reviews(task_reviews, annotation_mapping, self.project)
 
-        # Backfill FSM states for bulk-created tasks
-        # bulk_create() bypasses save() so FSM transitions don't fire automatically
-        self._backfill_fsm_states(self.db_tasks)
+        # Do this again after all child entities states(annotations, drafts, reviews) have been backfilled
+        self._backfill_fsm_states(self.db_tasks, overwrite_state=True)
 
         return db_tasks
 
@@ -710,10 +709,14 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             self.db_tasks = Task.objects.bulk_create(db_tasks, batch_size=settings.BATCH_SIZE)
 
         logging.info(f'Tasks serialization success, len = {len(self.db_tasks)}')
+        
+        # Backfill FSM states for bulk-created tasks
+        # bulk_create() bypasses save() so FSM transitions don't fire automatically
+        self._backfill_fsm_states(self.db_tasks)
 
         return db_tasks
 
-    def _backfill_fsm_states(self, entities: list):
+    def _backfill_fsm_states(self, entities: list, overwrite_state=False):
         """
         Backfill FSM states for entities created via bulk_create().
 
@@ -726,7 +729,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
         for entity in entities:
             inferred_state = get_or_infer_state(entity)
-            get_or_initialize_state(entity, user=user, inferred_state=inferred_state)
+            get_or_initialize_state(entity, user=user, inferred_state=inferred_state, overwrite_state=overwrite_state)
 
     @staticmethod
     def post_process_annotations(user, db_annotations, action):
