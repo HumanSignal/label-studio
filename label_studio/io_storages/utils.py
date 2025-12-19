@@ -126,15 +126,15 @@ class StorageObject:
 
     @classmethod
     def bulk_create(
-        cls, task_datas: list[dict], key, row_indexes: list[int] | None = None, row_groups: list[int] | None = None
+        cls, task_data: list[dict], key, row_indexes: list[int] | None = None, row_groups: list[int] | None = None
     ) -> list['StorageObject']:
         if row_indexes is None:
-            row_indexes = [None] * len(task_datas)
+            row_indexes = [None] * len(task_data)
         if row_groups is None:
-            row_groups = [None] * len(task_datas)
+            row_groups = [None] * len(task_data)
         return [
             cls(key=key, row_index=row_idx, row_group=row_group, task_data=task_data)
-            for row_idx, row_group, task_data in zip(row_indexes, row_groups, task_datas)
+            for row_idx, row_group, task_data in zip(row_indexes, row_groups, task_data)
         ]
 
 

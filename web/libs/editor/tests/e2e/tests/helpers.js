@@ -706,7 +706,7 @@ const isRotaterExist = async () => {
   return !!rotaters.length;
 };
 
-const getRegionAbsoultePosition = async (shapeId) => {
+const getRegionAbsolutePosition = async (shapeId) => {
   const stage = window.Konva.stages[0];
   const region = stage.findOne((shape) => String(shape._id) === String(shapeId));
 
@@ -982,7 +982,7 @@ module.exports = {
   getCanvasSize,
   getImageSize,
   getImageFrameSize,
-  getRegionAbsoultePosition,
+  getRegionAbsolutePosition,
   setKonvaLayersOpacity,
   setZoom,
   getZoomProps,

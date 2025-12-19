@@ -244,7 +244,7 @@ These optimizations ensure that the Proxy API remains responsive and resource-ef
 
 ## Multiple Storages and URL Resolving
 
-There are use cases where multiple storages can/must be used in a single project. This can cause some confusion as to which storage gets used when. Here are some common cases and how to set up mutliple storages properly.
+There are use cases where multiple storages can/must be used in a single project. This can cause some confusion as to which storage gets used when. Here are some common cases and how to set up multiple storages properly.
 
 ### Case 1 - Tasks Referencing Other Buckets
 * bucket-A containing JSON tasks

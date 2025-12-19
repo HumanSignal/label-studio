@@ -196,7 +196,7 @@ module.exports = {
    * The coordinates are relative to the window
    * @returns {Promise<{x: number, y: number, width: number, height: number}>}
    */
-  async getRegionAbsoultePosition(regionId, includeStage = true) {
+  async getRegionAbsolutePosition(regionId, includeStage = true) {
     const [shapeId, coords] = await I.executeScript((regionId) => {
       const annotation = Htx.annotationStore.selected;
       const region = annotation.regions.find((r) => r.cleanId === regionId);
@@ -213,7 +213,7 @@ module.exports = {
           width: coords.right - coords.left,
           height: coords.bottom - coords.top,
         }
-      : await I.executeScript(Helpers.getRegionAbsoultePosition, shapeId);
+      : await I.executeScript(Helpers.getRegionAbsolutePosition, shapeId);
 
     return includeStage
       ? {
@@ -315,7 +315,7 @@ module.exports = {
 
     assert.notEqual(regionId, undefined, "Region not found");
 
-    const position = await this.getRegionAbsoultePosition(regionId, false);
+    const position = await this.getRegionAbsolutePosition(regionId, false);
 
     I.say("Clicking on a region at", `${position.x} ${position.y}`);
 
@@ -327,7 +327,7 @@ module.exports = {
 
     assert.notEqual(region, undefined, "Region not found");
 
-    const position = await this.getRegionAbsoultePosition(region.id);
+    const position = await this.getRegionAbsolutePosition(region.id);
 
     I.say(`Drag region by ${shiftX} ${shiftY}`);
     await I.dragAndDropMouse(position, {
