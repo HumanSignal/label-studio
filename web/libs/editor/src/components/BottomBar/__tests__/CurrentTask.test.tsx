@@ -5,11 +5,14 @@ import { mockFF } from "../../../../__mocks__/global";
 
 const ff = mockFF();
 
-// Helper to set up window.APP_SETTINGS for role-based tests
-const setupAppSettings = (role?: string) => {
+// Helper to set up window.APP_SETTINGS for role-based and enterprise tests
+const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {}) => {
   (window as any).APP_SETTINGS = {
     user: {
-      role,
+      role: options.role,
+    },
+    billing: {
+      enterprise: options.enterprise ?? false,
     },
   };
 };
@@ -131,7 +134,22 @@ describe("CurrentTask", () => {
     expect(getByTestId("next-task").disabled).toBe(true);
   });
 
-  it("disables postpone button when allow_skip=false", () => {
+  it("does NOT disable postpone button when allow_skip=false in LSO (non-enterprise)", () => {
+    // In LSO (non-enterprise), allow_skip field doesn't exist/affect behavior
+    setupAppSettings({ enterprise: false });
+    store.hasInterface.mockImplementation((interfaceName: string) =>
+      ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
+    );
+    store.task = { id: 6616, allow_skip: false, allow_postpone: true };
+
+    const { getByTestId } = render(<CurrentTask store={store} />);
+
+    // In LSO, postpone button should NOT be disabled even when allow_skip=false
+    expect(getByTestId("next-task").disabled).toBe(false);
+  });
+
+  it("disables postpone button when allow_skip=false in LSE (enterprise)", () => {
+    setupAppSettings({ enterprise: true });
     store.hasInterface.mockImplementation((interfaceName: string) =>
       ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
     );
@@ -142,7 +160,8 @@ describe("CurrentTask", () => {
     expect(getByTestId("next-task").disabled).toBe(true);
   });
 
-  it("enables postpone button when allow_skip=true", () => {
+  it("enables postpone button when allow_skip=true in LSE (enterprise)", () => {
+    setupAppSettings({ enterprise: true });
     store.hasInterface.mockImplementation((interfaceName: string) =>
       ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
     );
@@ -164,7 +183,8 @@ describe("CurrentTask", () => {
     expect(getByTestId("next-task").disabled).toBe(false);
   });
 
-  it("disables postpone button when both allow_skip=false and allow_postpone=false", () => {
+  it("disables postpone button when both allow_skip=false and allow_postpone=false in LSE (enterprise)", () => {
+    setupAppSettings({ enterprise: true });
     store.hasInterface.mockImplementation((interfaceName: string) =>
       ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
     );
@@ -190,9 +210,9 @@ describe("CurrentTask", () => {
     expect(getByTestId("next-task").disabled).toBe(false);
   });
 
-  // Role-based tests (OW=Owner, AD=Admin, MA=Manager can force-skip/postpone)
-  it("enables postpone button when allow_skip=false but user is Owner (OW)", () => {
-    setupAppSettings("OW");
+  // Role-based tests for LSE (enterprise) - OW=Owner, AD=Admin, MA=Manager can force-skip/postpone
+  it("enables postpone button when allow_skip=false but user is Owner (OW) in LSE", () => {
+    setupAppSettings({ role: "OW", enterprise: true });
     store.hasInterface.mockImplementation((interfaceName: string) =>
       ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
     );
@@ -203,8 +223,8 @@ describe("CurrentTask", () => {
     expect(getByTestId("next-task").disabled).toBe(false);
   });
 
-  it("enables postpone button when allow_skip=false but user is Manager (MA)", () => {
-    setupAppSettings("MA");
+  it("enables postpone button when allow_skip=false but user is Manager (MA) in LSE", () => {
+    setupAppSettings({ role: "MA", enterprise: true });
     store.hasInterface.mockImplementation((interfaceName: string) =>
       ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
     );
@@ -215,8 +235,8 @@ describe("CurrentTask", () => {
     expect(getByTestId("next-task").disabled).toBe(false);
   });
 
-  it("disables postpone button when allow_skip=false and user is Annotator (AN)", () => {
-    setupAppSettings("AN");
+  it("disables postpone button when allow_skip=false and user is Annotator (AN) in LSE", () => {
+    setupAppSettings({ role: "AN", enterprise: true });
     store.hasInterface.mockImplementation((interfaceName: string) =>
       ["skip", "postpone", "topbar:prevnext", "topbar:task-counter"].includes(interfaceName),
     );
