@@ -25,10 +25,7 @@ export function normalizeCellAlias(alias) {
 
   // Treat dimension agreement columns like the built-in agreement column
   // so they use the same percentage formatting and coloring.
-  if (
-    safeAlias === "agreement" ||
-    safeAlias.startsWith("dimension_agreement__")
-  ) {
+  if (safeAlias === "agreement" || safeAlias.startsWith("dimension_agreement__")) {
     return "Agreement";
   }
 
