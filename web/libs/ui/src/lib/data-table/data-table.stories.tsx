@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { DataTable } from "./data-table";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
+import type { ExtendedDataTableColumnDef } from "./data-table";
 import { Badge } from "../badge/badge";
 import { Button } from "../button/button";
 import { IconEdit, IconTrash } from "@humansignal/icons";
@@ -137,6 +138,45 @@ export const WithSorting: Story = {
         <DataTable
           data={sampleData}
           columns={baseColumns}
+          enableSorting
+          sorting={sorting}
+          onSortingChange={setSorting}
+        />
+      </div>
+    );
+  },
+};
+
+/**
+ * Table with Help Tooltips
+ *
+ * Demonstrates the `help` property on columns, which displays an info icon with a tooltip
+ * in the column header. Hover over the info icon next to "Last Active" to see the tooltip.
+ */
+export const WithHelpTooltips: Story = {
+  render: () => {
+    const [sorting, setSorting] = useState<SortingState>([]);
+
+    const columnsWithHelp: ExtendedDataTableColumnDef<User>[] = [
+      ...baseColumns.slice(0, -1), // All columns except lastActive
+      {
+        accessorKey: "lastActive",
+        header: "Last Active",
+        enableSorting: true,
+        help: "The date when the user was last active in the system. This includes any activity such as logging in, viewing content, or making changes.",
+      },
+    ];
+
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="p-4 bg-neutral-surface rounded-md">
+          <p className="text-sm text-neutral-content-subtle">
+            💡 Hover over the info icon next to "Last Active" header to see the help tooltip
+          </p>
+        </div>
+        <DataTable
+          data={sampleData}
+          columns={columnsWithHelp}
           enableSorting
           sorting={sorting}
           onSortingChange={setSorting}

@@ -45,10 +45,11 @@ export const CurrentTask = observer(({ store }) => {
   const showCounter = store.hasInterface("topbar:task-counter");
 
   const task = store.task;
-  const taskAllowSkip = task?.allow_skip !== false;
+  const isEnterprise = window.APP_SETTINGS?.billing?.enterprise;
+  const skipDisabled = isEnterprise ? task?.allow_skip === false : false;
   const userRole = window.APP_SETTINGS?.user?.role;
   const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
-  const canSkipOrPostpone = taskAllowSkip || hasForceSkipPermission;
+  const canSkipOrPostpone = !skipDisabled || hasForceSkipPermission;
 
   // Check if user has submitted an annotation (pk is defined means annotation is in database)
   const hasSubmittedAnnotation = isDefined(store.annotationStore.selected.pk);
@@ -65,7 +66,7 @@ export const CurrentTask = observer(({ store }) => {
 
   // For unskippable tasks, force user to submit annotation before navigating
   // Block both history navigation (next task) and postpone if no annotation submitted
-  const requiresAnnotationSubmission = !taskAllowSkip && !hasForceSkipPermission && !hasSubmittedAnnotation;
+  const requiresAnnotationSubmission = skipDisabled && !hasForceSkipPermission && !hasSubmittedAnnotation;
   const canNavigateNext = store.canGoNextTask && !requiresAnnotationSubmission;
   const canPostponeTask = canPostpone && !requiresAnnotationSubmission;
 

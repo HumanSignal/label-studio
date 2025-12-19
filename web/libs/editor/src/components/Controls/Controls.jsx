@@ -58,15 +58,16 @@ export default inject("store")(
     if (!store.annotationStore.predictSelect || store.explore) {
       const disabled = store.isSubmitting;
       const task = store.task;
-      const taskAllowSkip = task?.allow_skip !== false;
+      const isEnterprise = window.APP_SETTINGS?.billing?.enterprise;
+      const skipDisabled = isEnterprise ? task?.allow_skip === false : false;
       const userRole = window.APP_SETTINGS?.user?.role;
       const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
-      const canSkip = taskAllowSkip || hasForceSkipPermission;
-      const skipDisabled = disabled || !canSkip;
+      const canSkip = !skipDisabled || hasForceSkipPermission;
+      const skipButtonDisabled = disabled || !canSkip;
 
       const skipTooltip = canSkip ? "Cancel (skip) task: [ Ctrl+Space ]" : "This task cannot be skipped";
 
-      const showInfoIcon = !taskAllowSkip && hasForceSkipPermission;
+      const showInfoIcon = skipButtonDisabled && hasForceSkipPermission;
 
       if (store.hasInterface("skip")) {
         skipButton = (
@@ -77,7 +78,7 @@ export default inject("store")(
               </Tooltip>
             )}
             <Button
-              disabled={skipDisabled}
+              disabled={skipButtonDisabled}
               look="danger"
               onClick={canSkip ? store.skipTask : undefined}
               tooltip={skipTooltip}

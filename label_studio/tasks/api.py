@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 
 from core.feature_flags import flag_set
@@ -603,7 +603,7 @@ class AnnotationsListAPI(GetParentObjectMixin, generics.ListCreateAPIView):
         was_cancelled_data = self.request.data.get('was_cancelled', False)
         is_skipping = was_cancelled_get or was_cancelled_data
 
-        if is_skipping and not task.allow_skip:
+        if is_skipping and not task.can_be_skipped():
             raise ValidationError({'detail': 'This task cannot be skipped.'})
 
         # updates history
