@@ -353,7 +353,8 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       : undefined,
     getRowId: (row, index) => {
       // Use id if available, otherwise fall back to index
-      const rowId = row.original?.id;
+      // Note: 'row' parameter is the row data object itself, not a Row object
+      const rowId = (row as any)?.id;
       return rowId !== undefined ? String(rowId) : String(index);
     },
     columnResizeMode: "onChange",
