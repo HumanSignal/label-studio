@@ -934,6 +934,7 @@ DM_MAX_USERS_TO_DISPLAY = int(get_env('DM_MAX_USERS_TO_DISPLAY', 10))
 FSM_CACHE_TTL = 300  # Cache TTL in seconds (5 minutes)
 FSM_SYNC_PROJECT_STATE = 'fsm.project_transitions.sync_project_state'
 FSM_INFERENCE_FUNCTION = 'fsm.state_inference._get_or_infer_state'
+FSM_INITIALIZATION_TRANSITION_NAME = 'fsm.utils._get_initialization_transition_name'
 
 # Used for async migrations. In LSE this is set to a real queue name, including here so we
 # can use settings.SERVICE_QUEUE_NAME in async migrations in LSO
