@@ -102,7 +102,31 @@ class TestTaskCreationWorkflows:
         for task in tasks:
             self.assert_created_task_state(task.id)
 
-    @pytest.mark.skip(reason='fix annotation states')
+    def _setup_test_task_with_annotations_import(self, ls, project_id):
+
+        task_with_annotation_json = """
+        {
+          "data": {"text": "Labeled task"},
+          "annotations": [
+            {
+              "result": [
+                {
+                  "from_name": "sentiment",
+                  "to_name": "text",
+                  "type": "choices",
+                  "value": {"choices": ["positive"]}
+                }
+              ],
+              "ground_truth": true
+            }
+          ]
+        }
+        """.strip()
+        task_with_annotation = json.loads(task_with_annotation_json)
+
+        # Import task
+        ls.projects.import_tasks(id=project_id, request=[task_with_annotation])
+
     def test_task_with_annotations_import(self, ls, project_id):
         """Test importing tasks with ground truth annotations.
 
@@ -115,36 +139,12 @@ class TestTaskCreationWorkflows:
         task FSM state records created during import.
         """
 
-        user_id = ls.users.whoami().id
-
-        task_with_annotation_json = f"""
-        {{
-          "data": {{"text": "Labeled task"}},
-          "annotations": [
-            {{
-              "result": [
-                {{
-                  "from_name": "sentiment",
-                  "to_name": "text",
-                  "type": "choices",
-                  "value": {{"choices": ["positive"]}}
-                }}
-              ],
-              "ground_truth": true,
-              "completed_by": {user_id}
-            }}
-          ]
-        }}
-        """.strip()
-        task_with_annotation = json.loads(task_with_annotation_json)
-
-        # Import task
-        ls.projects.import_tasks(id=project_id, request=[task_with_annotation])
+        self._setup_test_task_with_annotations_import(ls, project_id)
 
         # Verify task FSM state exists
         task = Task.objects.get(project_id=project_id)
         assert_state_exists(task, 'task')
-        assert_task_state(task.id, TaskStateChoices.IN_PROGRESS)
+        assert_task_state(task.id, TaskStateChoices.COMPLETED)
 
         annotation = Annotation.objects.get(task_id=task.id)
         assert_state_exists(annotation, 'annotation')

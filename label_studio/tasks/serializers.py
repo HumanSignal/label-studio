@@ -602,6 +602,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         self.db_drafts = AnnotationDraft.objects.bulk_create(db_drafts, batch_size=settings.BATCH_SIZE)
         logging.info(f'drafts serialization success, len = {len(self.db_drafts)}')
 
+        # Backfill FSM states for bulk-created drafts
+        # bulk_create() bypasses save() so FSM transitions don't fire automatically
+        self._backfill_fsm_states(self.db_drafts)
+
         return self.db_drafts
 
     def add_annotations(self, task_annotations, user):
@@ -646,6 +650,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         else:
             self.db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
         logging.info(f'Annotations serialization success, len = {len(self.db_annotations)}')
+
+        # Backfill FSM states for bulk-created annotations
+        # bulk_create() bypasses save() so FSM transitions don't fire automatically
+        self._backfill_fsm_states(self.db_annotations)
 
         return self.db_annotations
 
@@ -711,21 +719,20 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
         return db_tasks
 
-    def _backfill_fsm_states(self, tasks):
+    def _backfill_fsm_states(self, entities: list):
         """
-        Backfill FSM states for tasks created via bulk_create().
+        Backfill FSM states for entities created via bulk_create().
 
         bulk_create() bypasses the model's save() method, so FSM transitions
-        don't fire automatically. This sets initial state for newly imported tasks.
+        don't fire automatically. This sets initial state for newly imported entities.
         """
-        # TODO: extend this to importing other bulk objects
         user = CurrentContext.get_user()
-        if not tasks or not is_fsm_enabled(user):
+        if not entities or not is_fsm_enabled(user):
             return
 
-        for task in tasks:
-            inferred_state = get_or_infer_state(task)
-            get_or_initialize_state(task, user=user, inferred_state=inferred_state)
+        for entity in entities:
+            inferred_state = get_or_infer_state(entity)
+            get_or_initialize_state(entity, user=user, inferred_state=inferred_state)
 
     @staticmethod
     def post_process_annotations(user, db_annotations, action):
