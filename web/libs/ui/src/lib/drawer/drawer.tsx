@@ -85,6 +85,11 @@ export interface DrawerProps {
    * Set to `(e) => e.preventDefault()` to prevent auto-focus on the first focusable element
    */
   onOpenAutoFocus?: (event: Event) => void;
+  /**
+   * Inline styles for the drawer content container.
+   * Useful for dynamic positioning calculations (e.g., top offset based on navbar/ribbon height).
+   */
+  contentStyle?: React.CSSProperties;
 }
 
 /**
@@ -122,6 +127,7 @@ export const Drawer = ({
   contentClassName,
   dataTestId = "drawer",
   onOpenAutoFocus,
+  contentStyle,
 }: DrawerProps) => {
   const defaultWidth = side === "left" || side === "right" ? "w-1/4" : undefined;
   const computedContentClassName = cnm(
@@ -136,6 +142,7 @@ export const Drawer = ({
       <SheetContent
         side={side}
         className={computedContentClassName}
+        style={contentStyle}
         showCloseButton={closeOnClickOutside === false ? true : showCloseButton}
         closeOnClickOutside={closeOnClickOutside}
         data-slot="drawer-content"
