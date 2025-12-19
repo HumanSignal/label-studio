@@ -27,8 +27,6 @@ You can see which tasks have been skipped using the **Cancelled** column in the 
 !!! error Enterprise
     Task skipping, and how tasks can be skipped, is highly configurable in Label Studio Enterprise and Starter Cloud. For more information, see [the Enterprise documentation](https://docs.humansignal.com/guide/skip). 
 
-To make tasks unskippable, you can include a special key in the JSON task definition that you import to your project.
-
 </div>
 
 <div class="enterprise-only">
@@ -46,8 +44,6 @@ Whether annotators can skip tasks, and what should happen to skipped tasks, is c
 * [**Annotation > Skip Queue**](project_settings_lse#skip-queue)
 
 While you can disallow skipping entirely from the project settings, if you want to have specific tasks be unskippable, you will need to configure that by adding a special key as part of the JSON task definition that you import to your project.
-
-</div>
 
 ## Individual unskippable tasks
 
@@ -71,8 +67,6 @@ For example, the following JSON snippet would result in one skippable task and o
 ]
 ```
 
-<div class="enterprise-only">
-
 !!! note
     Managers, Admins, and Owners can still skip these tasks. Only Annotators and Reviewers cannot skip tasks that have been marked unskippable using this method.  
 
@@ -81,14 +75,6 @@ For example, the following JSON snippet would result in one skippable task and o
     Use the **Allow Skip** column to see which tasks have skipping disabled and filter for unskippable tasks. This column is hidden by default and is only visible to Managers, Admins, and Owners. 
 
 </div>
-
-<div class="opensource-only">
-
-!!! info Tip
-    Use the **Allow Skip** column to see which tasks have skipping disabled and filter for unskippable tasks. 
-
-</div>
-
 
 
 

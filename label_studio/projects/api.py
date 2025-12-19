@@ -603,7 +603,7 @@ class ProjectSummaryResetAPI(GetParentObjectMixin, generics.CreateAPIView):
     name='get',
     decorator=extend_schema(
         tags=['Projects'],
-        summary='Get project import status',
+        summary='Get project import status ',
         description="""
             Poll the status of an asynchronous project import operation.
             
