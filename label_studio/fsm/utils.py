@@ -309,7 +309,9 @@ def get_current_state_safe(entity, user=None) -> Optional[str]:
         return None
 
 
-def get_or_initialize_state(entity, user, inferred_state: str, reason=None, context_data=None, overwrite_state=False) -> Optional[str]:
+def get_or_initialize_state(
+    entity, user, inferred_state: str, reason=None, context_data=None, overwrite_state=False
+) -> Optional[str]:
     """
     Get current state, or initialize it if it doesn't exist.
 
