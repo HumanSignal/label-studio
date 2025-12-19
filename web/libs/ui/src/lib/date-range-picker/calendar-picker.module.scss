@@ -9,7 +9,7 @@
 
 .monthWrapper {
   display: grid;
-  gap: 3px;
+  gap: var(--spacing-tighter);
 }
 
 .labels {
@@ -52,7 +52,7 @@
 
   &.disabled {
     cursor: default;
-    color: var(--sand_300);
+    color: var(--color-neutral-content-subtlest);
     pointer-events: none;
     background: unset;
   }
