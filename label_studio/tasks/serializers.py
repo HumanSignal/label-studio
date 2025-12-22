@@ -587,6 +587,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                         'annotation_id': annotation_mapping[draft.get('annotation')],
                         'project': self.project,
                         'import_id': draft.get('id'),
+                        'was_postponed': draft.get('was_postponed', False),
                     }
                 )
                 # remove redundant fields
