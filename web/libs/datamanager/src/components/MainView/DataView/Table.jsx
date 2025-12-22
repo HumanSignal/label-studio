@@ -131,6 +131,22 @@ export const DataView = injector(
             {original?.readableType ?? parent.title}
           </Tag>,
         );
+      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement__")) {
+        // Show a short tag for per-dimension agreement columns (root columns, no parent)
+        children.push(
+          <Tag
+            key="column-type"
+            color="blue"
+            style={{
+              fontWeight: "500",
+              fontSize: 14,
+              cursor: "pointer",
+              padding: "0 6px",
+            }}
+          >
+            {original.readableType}
+          </Tag>,
+        );
       }
 
       if (help && decoration?.help !== false) {

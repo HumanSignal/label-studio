@@ -23,5 +23,11 @@ export function normalizeCellAlias(alias) {
   // remove trailing separators to make `toStudlyCaps` safe
   const safeAlias = alias.replace(/[-_\s]+$/g, "");
 
+  // Treat dimension agreement columns like the built-in agreement column
+  // so they use the same percentage formatting and coloring.
+  if (safeAlias === "agreement" || safeAlias.startsWith("dimension_agreement__")) {
+    return "Agreement";
+  }
+
   return toStudlyCaps(safeAlias);
 }

@@ -1,13 +1,72 @@
-<%- partial("component/heading", {text: "Tutorials", size: "XLarge", tag: "h1", customClass: "home-page-title"}) %>
+<%- partial("component/heading", {text: "Tutorials" , size: "XLarge" , tag: "h1" , customClass: "home-page-title" }) %>
 
-<div class="templates-grid">
-  <% site.pages
-    .filter(p => p.source.startsWith('tutorials/') && p.source !== 'tutorials/index.md')
-    .sort((a,b) => (a.order || 9999) - (b.order || 9999))
-    .forEach(function(p){ %>
-    <div class="templates-card">
-      <% if (p.thumbnail) { %><img src="<%= p.thumbnail %>" alt="<%= p.title %>" /><% } %>
-      <a href="<%= url_for(p.path) %>"><%- partial("component/heading", {text: p.title, size: "XXSmall", tag: "span" }) %></a>
-    </div>
-  <% }); %>
-</div>
+  <div class="templates-grid">
+    <% site.pages .filter(p=> p.source.startsWith('tutorials/') && p.source !== 'tutorials/index.md')
+      .sort((a,b) => (a.order || 9999) - (b.order || 9999))
+      .forEach(function(p){ %>
+      <div class="templates-card">
+        <% if (p.thumbnail) { %><img src="<%= p.thumbnail %>" alt="<%= p.title %>" />
+          <% } %>
+            <a href="<%= url_for(p.path) %>"><%- partial("component/heading", {text: p.title, size: "XXSmall" ,
+                tag: "span" }) %></a>
+            <% if (p.badges || p.is_enterprise || p.is_starter_cloud) { %>
+              <div class="tutorial-badges">
+                <% if (p.is_enterprise) { %>
+                  <span class="tutorial-badge tutorial-badge--enterprise">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M11.0834 0.583344L10.3484 2.18751L8.75004 2.91668L10.3484 3.65168L11.0834 5.25001L11.8125 3.65168L13.4167 2.91668L11.8125 2.18751M5.25004 2.33334L3.79171 5.54168L0.583374 7.00001L3.79171 8.45834L5.25004 11.6667L6.70837 8.45834L9.91671 7.00001L6.70837 5.54168M11.0834 8.75001L10.3484 10.3483L8.75004 11.0833L10.3484 11.8125L11.0834 13.4167L11.8125 11.8125L13.4167 11.0833L11.8125 10.3483"
+                        fill="url(#ent-gradient)" />
+                      <defs>
+                        <linearGradient id="ent-gradient" x1="0.583374" y1="0.583344" x2="16.0237" y2="6.04081"
+                          gradientUnits="userSpaceOnUse">
+                          <stop stop-color="#FFA663" />
+                          <stop offset="0.515625" stop-color="#FF7557" />
+                          <stop offset="1" stop-color="#E37BD3" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    Enterprise
+                  </span>
+                  <% } %>
+                    <% if (p.is_starter_cloud) { %>
+                      <span class="tutorial-badge tutorial-badge--starter-cloud">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M11.0834 0.583344L10.3484 2.18751L8.75004 2.91668L10.3484 3.65168L11.0834 5.25001L11.8125 3.65168L13.4167 2.91668L11.8125 2.18751M5.25004 2.33334L3.79171 5.54168L0.583374 7.00001L3.79171 8.45834L5.25004 11.6667L6.70837 8.45834L9.91671 7.00001L6.70837 5.54168M11.0834 8.75001L10.3484 10.3483L8.75004 11.0833L10.3484 11.8125L11.0834 13.4167L11.8125 11.8125L13.4167 11.0833L11.8125 10.3483"
+                            fill="url(#sc-gradient)" />
+                          <defs>
+                            <linearGradient id="sc-gradient" x1="0.583374" y1="0.583344" x2="16.0237" y2="6.04081"
+                              gradientUnits="userSpaceOnUse">
+                              <stop stop-color="#6D87F1" />
+                              <stop offset="1" stop-color="#E37BD3" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        Starter Cloud
+                      </span>
+                      <% } %>
+                        <% if (p.badges) { p.badges.split(',').forEach(function(badge) { %>
+                          <span class="tutorial-badge">
+                            <%= badge.trim() %>
+                          </span>
+                          <% }); } %>
+              </div>
+              <% } %>
+                <% if (p.community_author || p.duration) { %>
+                  <div class="tutorial-meta">
+                    <% if (p.community_author) { %>
+                      <span class="tutorial-author">
+                        <%= p.community_author %>
+                      </span>
+                      <% } %>
+                        <% if (p.duration) { %>
+                          <span class="tutorial-duration">
+                            <%= p.duration %>
+                          </span>
+                          <% } %>
+                  </div>
+                  <% } %>
+      </div>
+      <% }); %>
+  </div>

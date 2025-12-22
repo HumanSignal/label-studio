@@ -804,6 +804,22 @@ class PreparedTaskManager(models.Manager):
         queryset, fields_for_evaluation=None, all_fields=False, excluded_fields_for_evaluation=None, request=None
     ):
         annotations_map = get_annotations_map()
+        # If we have dynamic control-tag level agreement columns, inject into annotation map
+        # without mutating the global map
+        if flag_set('fflag_utc_428_consensus_control_tag_agreement', user='auto'):
+            inject_path = getattr(settings, 'GET_DYNAMIC_DM_ANNOTATIONS', None)
+            if inject_path:
+                overlay_func = load_func(inject_path)
+                # Expect a dict of {field_name: function that annotates the queryset}
+                overlay_map = overlay_func(request=request, project=getattr(queryset.first(), 'project', None)) or {}
+                if isinstance(overlay_map, dict) and overlay_map:
+                    # Ensure dynamic fields are evaluated even if not explicitly selected
+                    if fields_for_evaluation is None:
+                        fields_for_evaluation = list(overlay_map.keys())
+                    else:
+                        fields_for_evaluation = list(set(fields_for_evaluation) | set(overlay_map.keys()))
+                    # Merge overlay with base map for this call only
+                    annotations_map = {**annotations_map, **overlay_map}
 
         if fields_for_evaluation is None:
             fields_for_evaluation = []
