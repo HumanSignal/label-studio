@@ -174,27 +174,27 @@ class TestAzureStorageSyncWorkflows:
         # Create project
         project = ls.projects.create(title='FSM Azure Sync Test', label_config=IMAGE_CLASSIFICATION_CONFIG)
 
-        # Try to create Azure import storage
-        try:
-            storage = ls.import_storage.azure.create(
-                project=project.id, container='pytest-azure-container', regex_filter='.*', use_blob_urls=False
-            )
+        storage = ls.import_storage.azure.create(
+            project=project.id,
+            container='pytest-azure-container',
+            regex_filter='.*',
+            use_blob_urls=True,
+            account_name='pytest-azure-account',
+            account_key='pytest-azure-key',
+        )
 
-            # Trigger sync
-            sync_result = ls.import_storage.azure.sync(id=storage.id)
-            assert sync_result.status in ('initialized', 'queued', 'completed')
+        # Trigger sync
+        sync_result = ls.import_storage.azure.sync(id=storage.id)
+        assert sync_result.status == 'completed'
 
-            # Get tasks created by sync
-            tasks = list(ls.tasks.list(project=project.id))
+        # Get tasks created by sync
+        tasks = list(ls.tasks.list(project=project.id))
 
-            # Verify each task has FSM state
-            for task in tasks:
-                task_obj = Task.objects.get(id=task.id)
-                assert_state_exists(task_obj, 'task')
-                assert_task_state(task.id, TaskStateChoices.CREATED)
-        except Exception as e:
-            # Azure might not be configured in test environment
-            pytest.skip(f'Azure storage not available in test environment: {e}')
+        # Verify each task has FSM state
+        for task in tasks:
+            task_obj = Task.objects.get(id=task.id)
+            assert_state_exists(task_obj, 'task')
+            assert_task_state(task.id, TaskStateChoices.CREATED)
 
 
 class TestLocalStorageSyncWorkflows:
@@ -245,41 +245,21 @@ class TestLocalStorageSyncWorkflows:
             assert_task_state(task.id, TaskStateChoices.CREATED)
 
 
-@pytest.mark.skip(reason='TODO')
 class TestStorageSyncWithAnnotations:
     """Test FSM state management for storage sync with pre-labeled data."""
 
-    def test_sync_with_preannotated_tasks_including_predictions_and_annotations(
-        self, django_live_url, business_client, tmp_path, settings
-    ):
-        """Test local storage sync imports tasks with predictions and annotations.
-
-        This test validates step by step:
-        - Creating a local import storage pointing to a directory containing a JSON file
-          with Label Studio tasks that include both "annotations" and "predictions"
-        - Running a storage sync to create tasks, predictions, and annotations in the database
-        - Verifying each created Task has an FSM state
-        - Verifying each imported Annotation has an FSM state (Submitted/Completed)
-        - Verifying Prediction rows are created and linked to the imported tasks
-
-        Critical validation: Storage sync must support fully pre-labeled task JSON
-        payloads (tasks + predictions + annotations) and still initialize FSM states
-        correctly for tasks and annotations.
-        """
+    @pytest.fixture
+    def project_id(self, django_live_url, business_client, tmp_path, settings) -> int:
         setup_fsm_context(business_client.user)
         ls = create_sdk_client(django_live_url, business_client)
 
-        # Create a project whose label config matches the annotation/prediction results we import.
         project = ls.projects.create(title='FSM Sync with Annots+Preds Test', label_config=NER_CONFIG)
 
-        # Make the test deterministic: storage import sets task.is_labeled based on project.maximum_annotations.
-        # If we ever change defaults, explicitly keep this test in the 1-annotation overlap regime.
         from projects.models import Project
 
+        # tasks should be COMPLETED with 1 annotation
         Project.objects.filter(id=project.id).update(maximum_annotations=1)
 
-        # Local files storage requires the storage path to be under LOCAL_FILES_DOCUMENT_ROOT and
-        # requires local file serving to be explicitly enabled (security guard).
         local_root = tmp_path / 'local-storage-json'
         local_root.mkdir()
         settings.LOCAL_FILES_DOCUMENT_ROOT = tmp_path
@@ -365,17 +345,18 @@ class TestStorageSyncWithAnnotations:
             use_blob_urls=False,
         )
 
-        # Trigger sync
         sync_result = ls.import_storage.local.sync(id=storage.id)
         assert sync_result.status == 'completed'
 
-        # FSM assertions only (avoid coupling to DB counters/content beyond what we need to locate entities)
-        for task in Task.objects.filter(project_id=project.id).order_by('id'):
+        return project.id
+
+    def assert_preannotated_sync_states(self, project_id: int):
+        for task in Task.objects.filter(project_id=project_id).order_by('id'):
             assert_state_exists(task, 'task')
-            # Imported tasks include annotations, therefore task.is_labeled=True and inferred state is COMPLETED.
             assert_task_state(task.id, TaskStateChoices.COMPLETED)
 
-        for annotation in Annotation.objects.filter(project_id=project.id).order_by('id'):
+        for annotation in Annotation.objects.filter(project_id=project_id).order_by('id'):
             assert_state_exists(annotation, 'annotation')
-            # Cold-start inference for imported annotations is SUBMITTED.
             assert_annotation_state(annotation.id, AnnotationStateChoices.SUBMITTED)
+
+        # no states for Predictions
