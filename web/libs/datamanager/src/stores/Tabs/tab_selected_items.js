@@ -84,24 +84,33 @@ export const TabSelectedItems = types
     },
 
     /**
-     * Select multiple items by their IDs (used for shift-click range selection).
-     * When in normal mode (all=false), adds all IDs to the included list.
-     * When in "all selected" mode (all=true), removes all IDs from the excluded list.
+     * Select or unselect multiple items by their IDs (used for shift-click range selection).
+     * @param {Array} ids - Array of item IDs to select/unselect
+     * @param {boolean} select - true to select, false to unselect
      */
-    selectRange(ids) {
+    selectRange(ids, select = true) {
       if (self.all) {
-        // In "all selected" mode, remove IDs from the excluded list
+        // In "all selected" mode:
+        // - To select: remove IDs from the excluded list
+        // - To unselect: add IDs to the excluded list
         for (const id of ids) {
           const index = self.list.indexOf(id);
-          if (index !== -1) {
+          if (select && index !== -1) {
             self.list.splice(index, 1);
+          } else if (!select && index === -1) {
+            self.list.push(id);
           }
         }
       } else {
-        // In normal mode, add IDs to the included list
+        // In normal mode:
+        // - To select: add IDs to the included list
+        // - To unselect: remove IDs from the included list
         for (const id of ids) {
-          if (!self.list.includes(id)) {
+          const index = self.list.indexOf(id);
+          if (select && index === -1) {
             self.list.push(id);
+          } else if (!select && index !== -1) {
+            self.list.splice(index, 1);
           }
         }
       }

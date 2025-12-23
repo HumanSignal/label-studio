@@ -164,7 +164,7 @@ export const DataView = injector(
 
     const onRowSelect = useCallback((id) => view.toggleSelected(id), [view]);
 
-    const onRangeSelect = useCallback((ids) => view.selectRange(ids), [view]);
+    const onRangeSelect = useCallback((ids, select) => view.selectRange(ids, select), [view]);
 
     const onRowClick = useCallback(
       async (item, e) => {

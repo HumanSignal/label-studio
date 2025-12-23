@@ -90,8 +90,8 @@ export const Table = observer(
           <TableCheckboxCell
             checked={isChecked}
             onChange={(checked, shiftKey) => {
-              // Handle shift-click for range selection (only when selecting, not unselecting)
-              if (checked && shiftKey && lastClickedId.current !== null && onRangeSelect) {
+              // Handle shift-click for range selection (works for both select and unselect)
+              if (shiftKey && lastClickedId.current !== null && onRangeSelect) {
                 const lastClickedIndex = data.findIndex((item) => item.id === lastClickedId.current);
                 const currentIndex = data.findIndex((item) => item.id === rowData.id);
 
@@ -100,7 +100,8 @@ export const Table = observer(
                   const endIndex = Math.max(lastClickedIndex, currentIndex);
                   const rangeIds = data.slice(startIndex, endIndex + 1).map((item) => item.id);
 
-                  onRangeSelect(rangeIds);
+                  // Pass the select state: true = select range, false = unselect range
+                  onRangeSelect(rangeIds, checked);
                   lastClickedId.current = rowData.id;
                   return;
                 }
@@ -108,13 +109,8 @@ export const Table = observer(
 
               // Normal single-item toggle
               props.onSelectRow(rowData.id);
-
-              // Only remember last clicked when selecting, clear when unselecting
-              if (checked) {
-                lastClickedId.current = rowData.id;
-              } else {
-                lastClickedId.current = null;
-              }
+              // Always remember last clicked for shift-click range
+              lastClickedId.current = rowData.id;
             }}
             ariaLabel={`${isChecked ? "Unselect" : "Select"} Task ${rowData.id}`}
           />
