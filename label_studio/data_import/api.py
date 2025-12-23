@@ -999,13 +999,13 @@ class DownloadStorageData(APIView):
         if settings.USE_NGINX_FOR_UPLOADS:
             if isinstance(file_obj.storage, FileSystemStorage):
                 logger.warning(
-                    "USE_NGINX_FOR_UPLOADS is enabled, but FileSystemStorage "
-                    "does not support storage_url=True; Set USE_NGINX_FOR_UPLOADS=False."
+                    'USE_NGINX_FOR_UPLOADS is enabled, but FileSystemStorage '
+                    'does not support storage_url=True; Set USE_NGINX_FOR_UPLOADS=False.'
                 )
                 return Response(
                     {
-                        "detail": "NGINX mode for uploads is not supported when using local FileSystemStorage. "
-                        "Disable USE_NGINX_FOR_UPLOADS or switch to a cloud storage backend that supports proxy URLs like S3/GCS/Azure."
+                        'detail': 'NGINX mode for uploads is not supported when using local FileSystemStorage. '
+                        'Disable USE_NGINX_FOR_UPLOADS or switch to a cloud storage backend that supports proxy URLs like S3/GCS/Azure.'
                     },
                     status=status.HTTP_400_BAD_REQUEST,
                 )
