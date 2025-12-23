@@ -34,19 +34,6 @@ export const AppStore = types
 
     users: types.optional(types.array(User), []),
 
-    taskStore: types.optional(
-      types.late(() => {
-        return DynamicModel.get("tasksStore");
-      }),
-      {},
-    ),
-
-    annotationStore: types.optional(
-      types.late(() => {
-        return DynamicModel.get("annotationsStore");
-      }),
-      {},
-    ),
 
     availableActions: types.optional(types.array(Action), []),
 
