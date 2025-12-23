@@ -2,7 +2,7 @@ import ReactDOM from "react-dom";
 import { App } from "../components/App/App";
 import { AppStore } from "../stores/AppStore";
 import * as DataStores from "../stores/DataStores";
-import { DynamicModel, registerModel, registryReset } from "../stores/DynamicModel";
+import { DynamicModel, registerModel } from "../stores/DynamicModel";
 import { types } from "mobx-state-tree";
 
 const createDynamicModels = (columns) => {
@@ -33,7 +33,6 @@ const createDynamicModels = (columns) => {
  * @returns {Promise<AppStore>}
  */
 export const createApp = async (rootNode, datamanager) => {
-  registryReset();
   const isLabelStream = datamanager.mode === "labelstream";
 
   const response = await datamanager.api.columns();
