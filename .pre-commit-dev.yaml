@@ -6,8 +6,6 @@ repos:
       # Run the linter.
       - id: ruff-check
         args: [ --fix ]
-      # Run the formatter.
-      - id: ruff-format
   - repo: https://github.com/grantjenks/blue
     rev: v0.9.1
     hooks:
