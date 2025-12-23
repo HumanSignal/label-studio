@@ -359,6 +359,13 @@ export const Tab = types
       self.selected.toggleItem(id);
     },
 
+    /**
+     * Select a range of items by their IDs (used for shift-click range selection)
+     */
+    selectRange(ids) {
+      self.selected.selectRange(ids);
+    },
+
     setColumnWidth(columnID, width) {
       if (width) {
         self.columnsWidth.set(columnID, width);

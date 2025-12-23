@@ -83,6 +83,31 @@ export const TabSelectedItems = types
       self._invokeChangeEvent();
     },
 
+    /**
+     * Select multiple items by their IDs (used for shift-click range selection).
+     * When in normal mode (all=false), adds all IDs to the included list.
+     * When in "all selected" mode (all=true), removes all IDs from the excluded list.
+     */
+    selectRange(ids) {
+      if (self.all) {
+        // In "all selected" mode, remove IDs from the excluded list
+        for (const id of ids) {
+          const index = self.list.indexOf(id);
+          if (index !== -1) {
+            self.list.splice(index, 1);
+          }
+        }
+      } else {
+        // In normal mode, add IDs to the included list
+        for (const id of ids) {
+          if (!self.list.includes(id)) {
+            self.list.push(id);
+          }
+        }
+      }
+      self._invokeChangeEvent();
+    },
+
     update(data) {
       self.all = data?.all ?? self.all;
       self.list = data?.[self.listName] ?? self.list;
