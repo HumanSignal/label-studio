@@ -3606,6 +3606,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_fit_1158_unlimit_analytics_mp": {
+      "key": "fflag_fit_1158_unlimit_analytics_mp",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "7cdd2d830a194423bab9e645666dc45b",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_fix_all_leap_877_annotator_membership_api_03042024_short": {
       "key": "fflag_fix_all_leap_877_annotator_membership_api_03042024_short",
       "on": false,
