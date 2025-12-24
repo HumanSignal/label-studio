@@ -10,4 +10,9 @@ urlpatterns = [
     path('status/', views.billing_status, name='billing-status'),
     path('checkout/', views.create_checkout, name='create-checkout'),
     path('portal/', views.create_portal_session, name='create-portal'),
+    path('sync/', views.sync_billing_status, name='sync-billing-status'),
 ]
+
+
+
+

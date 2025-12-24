@@ -71,6 +71,73 @@ def stripe_webhook(request: HttpRequest) -> HttpResponse:
         logger.exception("Stripe webhook: failed to process event via dj-stripe")
         return HttpResponse(status=500)
 
+    # Post-processing: Handle specific events that need explicit syncing
+    try:
+        event_type = (event_data or {}).get("type")
+        event_data_obj = (event_data or {}).get("data") or {}
+        event_object = event_data_obj.get("object") or {}
+
+        if event_type == "checkout.session.completed":
+            # Option A: Pricing Table checkout creates Checkout Sessions without our custom API.
+            # Bind the Stripe Customer created during checkout to the active Organization via client_reference_id.
+            client_reference_id = event_object.get("client_reference_id")
+            stripe_customer_id = event_object.get("customer")
+
+            if client_reference_id and stripe_customer_id:
+                from organizations.models import Organization
+                from djstripe.models import Customer
+
+                org = Organization.objects.filter(id=int(client_reference_id)).first()
+                if not org:
+                    logger.warning(f"Stripe webhook: unknown organization id {client_reference_id} in checkout session")
+                else:
+                    # dj-stripe should have synced the Customer already; if not, sync it now.
+                    dj_customer = Customer.objects.filter(id=stripe_customer_id).first()
+                    if not dj_customer:
+                        stripe_customer = stripe.Customer.retrieve(stripe_customer_id)
+                        sync = getattr(Customer, "sync_from_stripe_data", None)
+                        if callable(sync):
+                            dj_customer = sync(stripe_customer)
+                        else:
+                            # Fallback: try get_or_create using subscriber (will create in Stripe if missing)
+                            dj_customer, _ = Customer.get_or_create(subscriber=org)
+
+                    if dj_customer:
+                        # Attach subscriber/org
+                        dj_customer.subscriber = org
+                        dj_customer.save()
+                        logger.info(f"Stripe webhook: linked Stripe customer {stripe_customer_id} to org {org.id}")
+
+        elif event_type in ("customer.subscription.updated", "customer.subscription.deleted"):
+            # Force sync subscription when it's updated or deleted to ensure plan changes are reflected
+            subscription_id = event_object.get("id")
+            customer_id = event_object.get("customer")
+
+            if subscription_id and customer_id:
+                from djstripe.models import Subscription, Customer
+                from billing.services.stripe import sync_org_from_stripe
+
+                # Find the organization via customer (handle multiple customers by using most recent)
+                customer = Customer.objects.filter(id=customer_id).order_by('-created').first()
+                if customer and customer.subscriber:
+                    org = customer.subscriber
+                    logger.info(f"Stripe webhook: subscription {subscription_id} updated/deleted for org {org.id}, forcing sync")
+                    try:
+                        # Force sync from Stripe API to get latest subscription data
+                        sync_org_from_stripe(org)
+                        logger.info(f"Stripe webhook: successfully synced subscription changes for org {org.id}")
+                    except Exception as sync_error:
+                        logger.error(f"Stripe webhook: failed to sync subscription for org {org.id}: {sync_error}")
+                else:
+                    logger.warning(f"Stripe webhook: subscription {subscription_id} (customer {customer_id}) has no linked organization")
+
+    except Exception:
+        logger.exception("Stripe webhook: post-processing failed")
+
     return HttpResponse(status=200)
+
+
+
+
 
 

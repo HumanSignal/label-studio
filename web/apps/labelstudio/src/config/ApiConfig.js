@@ -94,6 +94,7 @@ export const API_CONFIG = {
     billingStatus: "GET:/billing/status",
     createCheckout: "POST:/billing/checkout",
     createPortal: "POST:/billing/portal",
+    syncBillingStatus: "POST:/billing/sync",
   },
   alwaysExpectJSON: false,
 };

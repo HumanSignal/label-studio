@@ -2,6 +2,7 @@ import { createContext, useCallback, useEffect, useMemo, useRef, useState } from
 import { StaticContent } from "../../app/StaticContent/StaticContent";
 import {
   IconBook,
+  IconDocument,
   IconFolder,
   IconHome,
   IconPersonInCircle,
@@ -31,6 +32,7 @@ import { FF_HOMEPAGE } from "../../utils/feature-flags";
 import { pages } from "@humansignal/app-common";
 import { isFF } from "../../utils/feature-flags";
 import { ff } from "@humansignal/core";
+import { PlanBadge } from "../plan-badge/plan-badge";
 
 export const MenubarContext = createContext();
 
@@ -59,6 +61,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
   const location = useFixedLocation();
 
   const config = useConfig();
+  const showThemeToggle = ff.isActive(ff.FF_THEME_TOGGLE);
   const [sidebarOpened, setSidebarOpened] = useState(defaultOpened ?? false);
   const [sidebarPinned, setSidebarPinned] = useState(defaultPinned ?? false);
   const [PageContext, setPageContext] = useState({
@@ -150,7 +153,8 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
 
           <div className={menubarClass.elem("spacer").toString()} />
 
-          {ff.isActive(ff.FF_THEME_TOGGLE) && <ThemeToggle />}
+          <PlanBadge className={showThemeToggle ? menubarClass.elem("plan-badge").toString() : undefined} />
+          {showThemeToggle && <ThemeToggle />}
 
           <Dropdown.Trigger
             ref={useMenuRef}
@@ -199,6 +203,7 @@ export const Menubar = ({ enabled, defaultOpened, defaultPinned, children, onSid
                 {isFF(FF_HOMEPAGE) && <Menu.Item label="Home" to="/" icon={<IconHome />} data-external exact />}
                 <Menu.Item label="Projects" to="/projects" icon={<IconFolder />} data-external exact />
                 <Menu.Item label="Organization" to="/organization" icon={<IconPersonInCircle />} data-external exact />
+                <Menu.Item label="Billing" to="/billing" icon={<IconDocument />} data-external exact />
 
                 <Menu.Spacer />
 

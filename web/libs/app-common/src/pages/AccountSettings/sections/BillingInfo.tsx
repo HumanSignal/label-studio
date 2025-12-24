@@ -4,8 +4,11 @@ import { API } from "apps/labelstudio/src/providers/ApiProvider";
 import { useToast } from "@humansignal/ui";
 import styles from "./BillingInfo.module.scss";
 
+type BillingInterval = "monthly" | "yearly";
+type BillingPlan = "free" | "standard" | "pro" | "enterprise";
+
 interface BillingStatus {
-  plan: "free" | "pro";
+  plan: BillingPlan;
   limits: {
     max_projects: number | null;
     max_tasks: number | null;
@@ -15,9 +18,11 @@ interface BillingStatus {
     tasks_count: number;
   };
   subscription?: {
-    subscription_id: string;
-    status: string;
-    current_period_end: string;
+    plan?: BillingPlan;
+    interval?: BillingInterval;
+    subscription_id: string | null;
+    status: string | null;
+    current_period_end: string | null;
   };
 }
 
@@ -36,26 +41,9 @@ export const BillingInfo = () => {
     },
   });
 
-  const handleUpgrade = async () => {
-    setIsLoading(true);
-    try {
-      const response = await API.invoke("createCheckout");
-      if (!response.$meta.ok) {
-        throw new Error(response.error || "Failed to create checkout session");
-      }
-
-      // Redirect to Stripe Checkout
-      window.location.href = response.checkout_url;
-    } catch (error) {
-      console.error("Failed to create checkout:", error);
-      toast({
-        title: "Error",
-        description: "Failed to start checkout process. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const handleViewPlans = () => {
+    if (!window?.location) return;
+    window.location.href = "/billing";
   };
 
   const handleManageBilling = async () => {
@@ -90,7 +78,10 @@ export const BillingInfo = () => {
   };
 
   const getPlanDisplayName = (plan: string): string => {
-    return plan === "pro" ? "Pro" : "Free";
+    if (plan === "standard") return "Standard";
+    if (plan === "pro") return "Pro";
+    if (plan === "enterprise") return "Enterprise";
+    return "Free";
   };
 
   const getSubscriptionStatus = (status?: string): string => {
@@ -128,8 +119,8 @@ export const BillingInfo = () => {
         </div>
       </div>
 
-      {/* Subscription Status (only for Pro) */}
-      {billingStatus.plan === "pro" && billingStatus.subscription && (
+      {/* Subscription Status (paid plans) */}
+      {(billingStatus.plan === "standard" || billingStatus.plan === "pro") && billingStatus.subscription && (
         <div className="flex gap-2 w-full justify-between mb-4">
           <div>Subscription Status</div>
           <div>{getSubscriptionStatus(billingStatus.subscription.status)}</div>
@@ -166,8 +157,8 @@ export const BillingInfo = () => {
         </div>
       </div>
 
-      {/* Subscription Details (only for Pro) */}
-      {billingStatus.plan === "pro" && billingStatus.subscription && (
+      {/* Subscription Details (paid plans) */}
+      {(billingStatus.plan === "standard" || billingStatus.plan === "pro") && billingStatus.subscription && (
         <div className={styles.section}>
           <h3 className={styles.sectionTitle}>Subscription Details</h3>
           <div className="space-y-2">
@@ -182,23 +173,28 @@ export const BillingInfo = () => {
       {/* Action Buttons */}
       <div className={styles.actions}>
         {billingStatus.plan === "free" ? (
-          <button
-            onClick={handleUpgrade}
-            disabled={isLoading}
-            className={styles.upgradeButton}
-          >
-            {isLoading ? "Processing..." : "Upgrade to Pro"}
+          <button onClick={handleViewPlans} disabled={isLoading} className={styles.upgradeButton} type="button">
+            View Plans
           </button>
-        ) : (
+        ) : billingStatus.plan === "standard" || billingStatus.plan === "pro" ? (
           <button
             onClick={handleManageBilling}
             disabled={isLoading}
             className={styles.manageButton}
+            type="button"
           >
             {isLoading ? "Loading..." : "Manage Billing"}
+          </button>
+        ) : (
+          <button onClick={handleViewPlans} disabled={isLoading} className={styles.manageButton} type="button">
+            View Plans
           </button>
         )}
       </div>
     </div>
   );
 };
+
+
+
+

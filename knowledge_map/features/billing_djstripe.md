@@ -2,15 +2,22 @@
 
 ## Overview
 
-Label Studio implements subscription billing via Stripe using the `dj-stripe` Django package. Organizations can upgrade from the Free tier (1 project, 20 tasks) to the Pro tier (unlimited) through monthly subscriptions.
+Label Studio implements subscription billing via Stripe using the `dj-stripe` Django package.
+
+This repo supports **multi-tier self-serve billing** with **monthly/yearly** intervals:
+
+- **Free**: 1 project, 2 tasks/images total
+- **Standard**: $5/mo, $50/yr, 5 projects, 50 tasks/images total
+- **Pro**: $10/mo, $100/yr, 100 projects, 50 tasks/images total
+- **Enterprise**: “Please contact” (no self-serve checkout)
 
 ## Architecture
 
 ### Billing State Management
 
 - **Subscriber Model**: `organizations.Organization` (configured via `DJSTRIPE_SUBSCRIBER_MODEL`)
-- **Plan Detection**: Organizations are considered Pro if they have an active or trialing Stripe subscription
-- **Limits**: Free tier enforces hard limits; Pro tier has no limits
+- **Plan Detection**: Organizations are considered paid (Standard/Pro) if they have an active or trialing Stripe subscription. The system detects the plan and interval by retrieving the Stripe subscription with expanded price info and matching configured Stripe price IDs/lookup keys.
+- **Limits**: Limits are enforced server-side on project/task creation by `Organization.check_max_projects()` / `Organization.check_max_tasks()`.
 
 ### Key Components
 
@@ -28,17 +35,36 @@ Label Studio implements subscription billing via Stripe using the `dj-stripe` Dj
 ```env
 # dj-stripe settings
 DJSTRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_PRO_PRICE_ID=price_...
+STRIPE_PORTAL_CONFIGURATION_ID=bpc_...
 
-# Optional: Customer Portal configuration
-STRIPE_PORTAL_CONFIGURATION_ID=portal_...
+# Stripe secret key selection
+STRIPE_LIVE_MODE=false
+STRIPE_TEST_SECRET_KEY=sk_test_...
+STRIPE_LIVE_SECRET_KEY=sk_live_...
+
+# Plan price IDs (recommended)
+STRIPE_STANDARD_MONTHLY_PRICE_ID=price_...
+STRIPE_STANDARD_YEARLY_PRICE_ID=price_...
+STRIPE_PRO_MONTHLY_PRICE_ID=price_...
+STRIPE_PRO_YEARLY_PRICE_ID=price_...
+
+# Or plan price lookup keys (optional alternative)
+STRIPE_STANDARD_MONTHLY_PRICE_LOOKUP_KEY=standard_monthly
+STRIPE_STANDARD_YEARLY_PRICE_LOOKUP_KEY=standard_yearly
+STRIPE_PRO_MONTHLY_PRICE_LOOKUP_KEY=pro_monthly
+STRIPE_PRO_YEARLY_PRICE_LOOKUP_KEY=pro_yearly
+
+# Legacy fallback (Pro monthly only)
+STRIPE_PRO_PRICE_ID=price_...
+STRIPE_PRO_PRICE_LOOKUP_KEY=pro_monthly
 ```
 
 ### Stripe Configuration
 
 1. **Create Products/Prices** in Stripe Dashboard:
-   - Pro Plan: Recurring monthly subscription
-   - Configure pricing and billing intervals
+   - Standard Plan: recurring monthly + yearly prices
+   - Pro Plan: recurring monthly + yearly prices
+   - Use a stable `lookup_key` per price if you prefer lookup-key configuration
 
 2. **Webhook Configuration**:
    - Endpoint URL: `https://your-domain/stripe/webhook/`
@@ -59,16 +85,18 @@ GET /api/billing/status/
 Returns:
 ```json
 {
-  "plan": "free|pro",
+  "plan": "free|standard|pro",
   "limits": {
     "max_projects": 1,
-    "max_tasks": 20
+    "max_tasks": 2
   },
   "usage": {
     "projects_count": 1,
     "tasks_count": 15
   },
   "subscription": {
+    "plan": "free|standard|pro",
+    "interval": "monthly|yearly",
     "subscription_id": "sub_...",
     "status": "active",
     "current_period_end": "2024-01-01T00:00:00Z"
@@ -81,7 +109,13 @@ Returns:
 POST /api/billing/checkout/
 ```
 
-Creates a Stripe Checkout session for upgrading to Pro. Returns `checkout_url` to redirect users to Stripe Checkout with promotion code support enabled.
+Creates a Stripe Checkout session for upgrading to a paid plan. Expects JSON body:
+
+```json
+{ "plan": "standard|pro", "interval": "monthly|yearly" }
+```
+
+Returns `checkout_url` to redirect users to Stripe Checkout with promotion code support enabled.
 
 ### Create Customer Portal Session
 ```http
@@ -95,7 +129,17 @@ Creates a Stripe Customer Portal session for managing subscriptions. Returns `po
 ### Free Tier Limits
 
 - **Projects**: Maximum 1 project per organization
-- **Tasks**: Maximum 20 tasks total across all projects in the organization
+- **Tasks**: Maximum 2 tasks total across all projects in the organization
+
+### Standard Tier Limits
+
+- **Projects**: Maximum 5 projects per organization
+- **Tasks**: Maximum 50 tasks total across all projects in the organization
+
+### Pro Tier Limits
+
+- **Projects**: Maximum 100 projects per organization
+- **Tasks**: Maximum 50 tasks total across all projects in the organization
 
 ### Enforcement Points
 

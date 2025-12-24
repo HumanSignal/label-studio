@@ -27,6 +27,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
+from billing import views as billing_views
 from billing.stripe_webhook import stripe_webhook
 
 versions = collect_versions()
@@ -77,6 +78,7 @@ urlpatterns = [
         views.static_file_with_host_resolver('static/fonts/roboto/roboto.css', content_type='text/css'),
     ),
     re_path(r'^static/(?P<path>.*)$', serve, kwargs={'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
+    path('billing/', billing_views.billing_page, name='billing-page'),
     re_path(r'^', include('organizations.urls')),
     re_path(r'^', include('projects.urls')),
     re_path(r'^', include('data_import.urls')),

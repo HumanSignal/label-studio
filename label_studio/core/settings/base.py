@@ -636,9 +636,28 @@ STRIPE_TEST_SECRET_KEY = get_env('STRIPE_TEST_SECRET_KEY', '')
 STRIPE_LIVE_SECRET_KEY = get_env('STRIPE_LIVE_SECRET_KEY', '')
 STRIPE_SECRET_KEY = STRIPE_LIVE_SECRET_KEY if STRIPE_LIVE_MODE else STRIPE_TEST_SECRET_KEY
 
+# Stripe publishable keys (for Pricing Table embed)
+STRIPE_TEST_PUBLISHABLE_KEY = get_env('STRIPE_TEST_PUBLISHABLE_KEY', '')
+STRIPE_LIVE_PUBLISHABLE_KEY = get_env('STRIPE_LIVE_PUBLISHABLE_KEY', '')
+STRIPE_PUBLISHABLE_KEY = STRIPE_LIVE_PUBLISHABLE_KEY if STRIPE_LIVE_MODE else STRIPE_TEST_PUBLISHABLE_KEY
+
+# Stripe Pricing Table configuration
+STRIPE_PRICING_TABLE_ID = get_env('STRIPE_PRICING_TABLE_ID', '')
+
 STRIPE_PRO_PRICE_ID = get_env('STRIPE_PRO_PRICE_ID', '')
 STRIPE_PRO_PRICE_LOOKUP_KEY = get_env('STRIPE_PRO_PRICE_LOOKUP_KEY', '')
 STRIPE_PORTAL_CONFIGURATION_ID = get_env('STRIPE_PORTAL_CONFIGURATION_ID', '')
+
+# Multi-tier Stripe prices (IDs recommended; used for plan/interval selection and detection)
+STRIPE_STANDARD_MONTHLY_PRICE_ID = get_env('STRIPE_STANDARD_MONTHLY_PRICE_ID', '')
+STRIPE_STANDARD_YEARLY_PRICE_ID = get_env('STRIPE_STANDARD_YEARLY_PRICE_ID', '')
+STRIPE_PRO_MONTHLY_PRICE_ID = get_env('STRIPE_PRO_MONTHLY_PRICE_ID', '')
+STRIPE_PRO_YEARLY_PRICE_ID = get_env('STRIPE_PRO_YEARLY_PRICE_ID', '')
+
+STRIPE_STANDARD_MONTHLY_PRICE_LOOKUP_KEY = get_env('STRIPE_STANDARD_MONTHLY_PRICE_LOOKUP_KEY', '')
+STRIPE_STANDARD_YEARLY_PRICE_LOOKUP_KEY = get_env('STRIPE_STANDARD_YEARLY_PRICE_LOOKUP_KEY', '')
+STRIPE_PRO_MONTHLY_PRICE_LOOKUP_KEY = get_env('STRIPE_PRO_MONTHLY_PRICE_LOOKUP_KEY', '')
+STRIPE_PRO_YEARLY_PRICE_LOOKUP_KEY = get_env('STRIPE_PRO_YEARLY_PRICE_LOOKUP_KEY', '')
 
 
 def project_delete(project):
@@ -828,6 +847,8 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
     CSP_FRAME_SRC = (
         "'self'",
         'https://challenges.cloudflare.com',
+        'https://js.stripe.com',
+        'https://*.stripe.com',
     )
     CSP_CONNECT_SRC = (
         "'self'",
@@ -838,6 +859,7 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
         'https://*.googletagmanager.com',
         'https://*.g.double' + 'click.net',  # hacky way of suppressing codespell complaint
         'https://*.ingest.sentry.io',
+        'http://localhost:7243',  # Debug log server
     )
     # Note that this will be overridden to real CSP for views that use the override_report_only_csp decorator
     CSP_REPORT_ONLY = get_bool_env('LS_CSP_REPORT_ONLY', True)

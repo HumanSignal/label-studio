@@ -1,23 +1,26 @@
 # This file and its contents are licensed under the Apache License 2.0. Please see the Apache License 2.0 for more details.
 
 from enum import Enum
-from typing import Dict, Any
-
-from django.db.models import Count
-from djstripe.models import Subscription
+from typing import Any, Dict
 
 from .stripe import get_org_subscription_status
 
 
 class PlanTier(Enum):
     FREE = 'free'
+    STANDARD = 'standard'
     PRO = 'pro'
 
 
 def get_org_plan(organization) -> PlanTier:
     """Determine the current plan tier for an organization."""
     status = get_org_subscription_status(organization)
-    return PlanTier.PRO if status['plan'] == 'pro' else PlanTier.FREE
+    plan = (status or {}).get('plan')
+    if plan == PlanTier.PRO.value:
+        return PlanTier.PRO
+    if plan == PlanTier.STANDARD.value:
+        return PlanTier.STANDARD
+    return PlanTier.FREE
 
 
 def get_org_limits(organization) -> Dict[str, int]:
@@ -25,17 +28,10 @@ def get_org_limits(organization) -> Dict[str, int]:
     plan = get_org_plan(organization)
 
     if plan == PlanTier.PRO:
-        # Unlimited for Pro
-        return {
-            'max_projects': None,  # None means unlimited
-            'max_tasks': None,
-        }
-    else:
-        # Free tier limits
-        return {
-            'max_projects': 1,
-            'max_tasks': 20,
-        }
+        return {'max_projects': 100, 'max_tasks': 50}
+    if plan == PlanTier.STANDARD:
+        return {'max_projects': 5, 'max_tasks': 50}
+    return {'max_projects': 1, 'max_tasks': 2}
 
 
 def get_org_usage(organization) -> Dict[str, int]:
@@ -76,14 +72,46 @@ def check_org_limits(organization, additional_projects: int = 0, additional_task
 
 def get_billing_status(organization) -> Dict[str, Any]:
     """Get complete billing status including plan, limits, usage, and subscription details."""
-    plan = get_org_plan(organization)
-    limits = get_org_limits(organization)
-    usage = get_org_usage(organization)
-    subscription_info = get_org_subscription_status(organization)
+    try:
+        plan = get_org_plan(organization)
+        limits = get_org_limits(organization)
+        usage = get_org_usage(organization)
+        subscription_info = get_org_subscription_status(organization)
 
-    return {
-        'plan': plan.value,
-        'limits': limits,
-        'usage': usage,
-        'subscription': subscription_info,
-    }
+        # subscription_info is always a dict with 'subscription' key
+        subscription = subscription_info.get('subscription') if isinstance(subscription_info, dict) else None
+
+        # Get Stripe customer ID if it exists (for pricing table)
+        stripe_customer_id = None
+        try:
+            from djstripe.models import Customer
+            customer = Customer.objects.filter(subscriber=organization).first()
+            if customer:
+                stripe_customer_id = customer.id  # This is the Stripe customer ID (e.g., "cus_...")
+        except Exception:
+            pass  # Ignore if customer doesn't exist
+
+        return {
+            'plan': plan.value,
+            'limits': limits,
+            'usage': usage,
+            'subscription': subscription,
+            'stripe_customer_id': stripe_customer_id,
+        }
+    except Exception as e:
+        # Log and return safe defaults
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error getting billing status for org {organization.id}: {e}", exc_info=True)
+        # Return free tier as safe default
+        return {
+            'plan': 'free',
+            'limits': {'max_projects': 1, 'max_tasks': 2},
+            'usage': {'projects_count': 0, 'tasks_count': 0},
+            'subscription': None,
+            'stripe_customer_id': None,
+        }
+
+
+
+
