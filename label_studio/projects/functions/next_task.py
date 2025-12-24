@@ -6,7 +6,7 @@ from core.feature_flags import flag_set
 from core.utils.common import conditional_atomic, db_is_not_sqlite, load_func
 from core.utils.db import fast_first
 from django.conf import settings
-from django.db.models import BooleanField, Case, Count, Exists, F, Max, OuterRef, Q, QuerySet, Value, When
+from django.db.models import Case, Count, Exists, F, Max, OuterRef, Q, QuerySet, When
 from django.db.models.fields import DecimalField
 from projects.functions.stream_history import add_stream_history
 from projects.models import Project
@@ -75,37 +75,50 @@ def _try_tasks_with_overlap(tasks: QuerySet[Task]) -> Tuple[Union[Task, None], Q
         return None, tasks.filter(overlap=1)
 
 
-def _try_breadth_first(
-    tasks: QuerySet[Task], user: User, project: Project, attempt_gt_first: bool = False
-) -> Union[Task, None]:
+def _try_breadth_first_evaluation_enabled(tasks: QuerySet[Task], user: User) -> Union[Task, None]:
+    """Same as _try_breadth_first, but we blend candidate ground truth tasks into the candidate pool"""
+    tasks = _annotate_has_ground_truths(tasks)
+
+    # Exclude user's annotations AND GT annotations from count
+    annotation_filter = ~Q(annotations__completed_by=user) & ~Q(annotations__ground_truth=True)
+    tasks = tasks.annotate(annotations_count=Count('annotations', filter=annotation_filter))
+
+    # Get max from non GT tasks only
+    max_annotations_count = tasks.filter(has_ground_truths=False).aggregate(Max('annotations_count'))[
+        'annotations_count__max'
+    ]
+
+    if max_annotations_count == 0 or max_annotations_count is None:
+        # No non GT tasks with annotations, let the next step in the pipeline handle it
+        return None
+
+    # Regular at max + GT at/above max (blended)
+    candidates = tasks.filter(annotations_count__gte=max_annotations_count)
+
+    if candidates.exists():
+        # Select randomly from candidates
+        return _get_random_unlocked(candidates, user)
+    return None
+
+
+def _try_breadth_first(tasks: QuerySet[Task], user: User, project: Project) -> Union[Task, None]:
     """Try to find tasks with maximum amount of annotations, since we are trying to label tasks as fast as possible"""
 
-    # Exclude ground truth annotations from the count when not in onboarding window
-    # to prevent GT tasks from being prioritized via breadth-first logic
-    annotation_filter = ~Q(annotations__completed_by=user)
-    if not attempt_gt_first:
-        annotation_filter &= ~Q(annotations__ground_truth=True)
+    if project.annotator_evaluation_enabled:
+        return _try_breadth_first_evaluation_enabled(tasks, user)
 
-    tasks = tasks.annotate(annotations_count=Count('annotations', filter=annotation_filter))
+    tasks = tasks.annotate(annotations_count=Count('annotations', filter=~Q(annotations__completed_by=user)))
     max_annotations_count = tasks.aggregate(Max('annotations_count'))['annotations_count__max']
-    if max_annotations_count == 0:
-        # there is no any labeled tasks found
-        return
+    if max_annotations_count == 0 or max_annotations_count is None:
+        # No tasks with annotations, let the next step in the pipeline handle it
+        return None
 
-    # find any task with maximal amount of created annotations
-    not_solved_tasks_labeling_started = tasks.annotate(
-        reach_max_annotations_count=Case(
-            When(annotations_count=max_annotations_count, then=Value(True)),
-            default=Value(False),
-            output_field=BooleanField(),
-        )
-    )
-    not_solved_tasks_labeling_with_max_annotations = not_solved_tasks_labeling_started.filter(
-        reach_max_annotations_count=True
-    )
-    if not_solved_tasks_labeling_with_max_annotations.exists():
-        # try to complete tasks that are already in progress
-        return _get_random_unlocked(not_solved_tasks_labeling_with_max_annotations, user)
+    # Find tasks at the maximum amount of annotations
+    candidates = tasks.filter(annotations_count=max_annotations_count)
+    if candidates.exists():
+        # Select randomly from candidates
+        return _get_random_unlocked(candidates, user)
+    return None
 
 
 def _try_uncertainty_sampling(
@@ -289,7 +302,7 @@ def get_next_task_without_dm_queue(
     if not next_task and project.maximum_annotations > 1:
         # if there are already labeled tasks, but task.overlap still < project.maximum_annotations, randomly sampling from them
         logger.debug(f'User={user} tries depth first from prepared tasks')
-        next_task = _try_breadth_first(not_solved_tasks, user, project, attempt_gt_first)
+        next_task = _try_breadth_first(not_solved_tasks, user, project)
         if next_task:
             queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
 
