@@ -10,6 +10,7 @@ from core.feature_flags import flag_set
 from core.permissions import all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import batch
+from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.core.files import File
 from django.core.files.storage import FileSystemStorage
@@ -462,7 +463,7 @@ class ExportDetailAPI(generics.RetrieveDestroyAPIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     data={
                         'detail': 'Could not delete file from storage. Check that your user has permissions to delete files: %s'
-                        % str(e)
+                        % extract_message(e)
                     },
                 )
 

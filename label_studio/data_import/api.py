@@ -11,6 +11,7 @@ from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import retry_database_locked, timeit
+from core.utils.exceptions import extract_message
 from core.utils.params import bool_from_request, list_of_strings_from_request
 from csp.decorators import csp
 from django.conf import settings
@@ -304,7 +305,7 @@ class ImportAPI(generics.CreateAPIView):
                                 for error in validation_errors_list:
                                     validation_errors.append(f'Task {i}, prediction {j}: {error}')
                         except Exception as e:
-                            error_msg = f'Task {i}, prediction {j}: Error validating prediction - {str(e)}'
+                            error_msg = f'Task {i}, prediction {j}: Error validating prediction - {extract_message(e)}'
                             validation_errors.append(error_msg)
 
             if validation_errors:
@@ -610,7 +611,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                     continue
 
             except Exception as e:
-                validation_errors.append(f'Prediction {i}: Error validating prediction - {str(e)}')
+                validation_errors.append(f'Prediction {i}: Error validating prediction - {extract_message(e)}')
                 continue
 
             # If prediction is valid, add it to predictions list to be created
@@ -625,7 +626,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                     )
                 )
             except Exception as e:
-                validation_errors.append(f'Prediction {i}: Failed to create prediction - {str(e)}')
+                validation_errors.append(f'Prediction {i}: Failed to create prediction - {extract_message(e)}')
                 continue
 
         # If there are validation errors, raise them before creating any predictions
