@@ -276,7 +276,7 @@ class UserResetTokenAPI(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         token = user.reset_token()
-        logger.debug(f'New token for user {user.pk} is {token.key}')
+        logger.debug(f'Token reset for user {user.pk}')
         return Response({'token': token.key}, status=201)
 
 
