@@ -3363,33 +3363,6 @@
       "version": 3,
       "deleted": false
     },
-    "fflag_feat_utc_135_duplicate_project_explicit": {
-      "key": "fflag_feat_utc_135_duplicate_project_explicit",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "510fe10de3224a9a8cc3c95e2e06a211",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "fflag_feat_utc_161_bulk_queue_total_11072025_short": {
       "key": "fflag_feat_utc_161_bulk_queue_total_11072025_short",
       "on": false,
