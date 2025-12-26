@@ -16,6 +16,8 @@ from typing import Optional, Tuple
 
 import uuid_utils
 from core.current_request import CurrentContext
+from core.utils.common import load_func
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -307,7 +309,9 @@ def get_current_state_safe(entity, user=None) -> Optional[str]:
         return None
 
 
-def get_or_initialize_state(entity, user, inferred_state: str, reason=None, context_data=None) -> Optional[str]:
+def get_or_initialize_state(
+    entity, user, inferred_state: str, reason=None, context_data=None, overwrite_state=False
+) -> Optional[str]:
     """
     Get current state, or initialize it if it doesn't exist.
 
@@ -323,7 +327,7 @@ def get_or_initialize_state(entity, user, inferred_state: str, reason=None, cont
         inferred_state: Pre-computed inferred state
         reason: Custom reason for the state initialization (optional, overrides default reason)
         context_data: Additional context data to store with state record (optional)
-
+        overwrite_state: Overwrite the state if it already exists (optional)
     Returns:
         Current or newly initialized state value, or None if FSM disabled or failed
 
@@ -350,7 +354,7 @@ def get_or_initialize_state(entity, user, inferred_state: str, reason=None, cont
         # Try to get existing state
         current_state = StateManager.get_current_state_value(entity)
 
-        if current_state is not None:
+        if current_state is not None and (current_state == inferred_state or not overwrite_state):
             # State already exists, return it
             return current_state
 
@@ -367,7 +371,7 @@ def get_or_initialize_state(entity, user, inferred_state: str, reason=None, cont
 
         # Initialize state with appropriate transition
         entity_type = entity._meta.model_name.lower()
-        transition_name = _get_initialization_transition_name(entity_type, inferred_state)
+        transition_name = get_initialization_transition_name(entity_type, inferred_state)
 
         if transition_name:
             logger.info(
@@ -449,3 +453,7 @@ def _get_initialization_transition_name(entity_type: str, target_state: str) -> 
             return 'annotation_submitted'  # Use submitted transition for initialization
 
     return None
+
+
+def get_initialization_transition_name(entity_type: str, target_state: str) -> Optional[str]:
+    return load_func(settings.FSM_INITIALIZATION_TRANSITION_NAME)(entity_type, target_state)
