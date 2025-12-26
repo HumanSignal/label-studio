@@ -60,7 +60,7 @@ export const createApp = async (rootNode, datamanager) => {
   // in incorrect dynamic columns and mapping mismatch
   const FinalStore = types.compose(
     AppStore,
-    types.model("Base", {
+    types.model("DataStore", {
       taskStore: types.optional(
         types.late(() => DynamicModel.get("tasksStore")),
         {},
