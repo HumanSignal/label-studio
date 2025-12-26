@@ -237,6 +237,8 @@ INSTALLED_APPS = [
     'ml_model_providers',
     'jwt_auth',
     'session_policy',
+    'djstripe',
+    'billing',
 ]
 
 MIDDLEWARE = [
@@ -870,3 +872,18 @@ RESOLVER_PROXY_CACHE_TIMEOUT = int(get_env('RESOLVER_PROXY_CACHE_TIMEOUT', 3600)
 
 # Advanced validator for ImportStorageSerializer in enterprise
 IMPORT_STORAGE_SERIALIZER_VALIDATE = None
+
+# dj-stripe configuration
+STRIPE_LIVE_SECRET_KEY = get_env('STRIPE_LIVE_SECRET_KEY', '')
+STRIPE_TEST_SECRET_KEY = get_env('STRIPE_TEST_SECRET_KEY', '')
+STRIPE_LIVE_PUBLISHABLE_KEY = get_env('STRIPE_LIVE_PUBLISHABLE_KEY', '')
+STRIPE_TEST_PUBLISHABLE_KEY = get_env('STRIPE_TEST_PUBLISHABLE_KEY', '')
+STRIPE_LIVE_MODE = get_bool_env('STRIPE_LIVE_MODE', False)
+STRIPE_PRICING_TABLE_ID = get_env('STRIPE_PRICING_TABLE_ID', 'prctbl_1ShORfAaooP90eyYgWNjXf6b')
+
+# dj-stripe settings
+DJSTRIPE_USE_NATIVE_JSONFIELD = True
+DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
+# Hardcoded webhook secret from Stripe CLI for local development
+DJSTRIPE_WEBHOOK_SECRET = get_env('DJSTRIPE_WEBHOOK_SECRET', 'whsec_2bda9783e2dc0138bd725e60445f781ad4358cce01d96c6c4e0d9204a2f73be5')
+DJSTRIPE_WEBHOOK_VALIDATION = 'retrieve_event'  # or 'verify_signature' for production

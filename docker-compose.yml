@@ -49,6 +49,7 @@ services:
       - "8000"
     depends_on:
       - db-dev
+      - redis-dev
     environment:
       - DJANGO_DB=default
       - POSTGRE_NAME=postgres
@@ -56,6 +57,8 @@ services:
       - POSTGRE_PASSWORD=postgres
       - POSTGRE_PORT=5432
       - POSTGRE_HOST=db-dev
+      - REDIS_HOST=redis-dev
+      - REDIS_PORT=6379
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-http://localhost:8082}
       - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:-http://localhost:8082}
       - SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE:-1}
@@ -69,6 +72,37 @@ services:
     volumes:
       - label-studio-data-dev:/label-studio/data:rw
     command: label-studio-uwsgi
+    networks:
+      - label-studio-dev-network
+
+  rqworker-dev:
+    image: gavinlouuu/label-studio-custom:dev
+    container_name: label-studio-rqworker-dev
+    restart: unless-stopped
+    depends_on:
+      - db-dev
+      - redis-dev
+    environment:
+      - DJANGO_DB=default
+      - POSTGRE_NAME=postgres
+      - POSTGRE_USER=postgres
+      - POSTGRE_PASSWORD=postgres
+      - POSTGRE_PORT=5432
+      - POSTGRE_HOST=db-dev
+      - REDIS_HOST=redis-dev
+      - REDIS_PORT=6379
+      - BASE_DATA_DIR=/label-studio/data
+    volumes:
+      - label-studio-data-dev:/label-studio/data:rw
+    command: python3 /label-studio/label_studio/manage.py rqworker default
+    networks:
+      - label-studio-dev-network
+
+  redis-dev:
+    image: redis:7-alpine
+    container_name: label-studio-redis-dev
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
     networks:
       - label-studio-dev-network
 

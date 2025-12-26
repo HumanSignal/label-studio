@@ -1,0 +1,58 @@
+.billing-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  &__container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__title {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ls-color-text);
+  }
+
+  &__subtitle {
+    font-size: 14px;
+    color: var(--ls-color-text-secondary);
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    background: var(--ls-color-bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--ls-color-border);
+  }
+
+  &__section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ls-color-text);
+    margin-bottom: 8px;
+  }
+
+  &__loading {
+    padding: 24px;
+    text-align: center;
+    color: var(--ls-color-text-secondary);
+  }
+}
+

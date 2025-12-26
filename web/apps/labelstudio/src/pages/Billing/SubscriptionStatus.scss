@@ -1,0 +1,118 @@
+.subscription-status {
+  &__empty {
+    padding: 24px;
+    text-align: center;
+    background: var(--ls-color-bg);
+    border-radius: 8px;
+    border: 1px solid var(--ls-color-border);
+  }
+
+  &__message {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ls-color-text);
+    margin-bottom: 8px;
+  }
+
+  &__description {
+    font-size: 14px;
+    color: var(--ls-color-text-secondary);
+  }
+
+  &__card {
+    background: var(--ls-color-bg);
+    border-radius: 8px;
+    border: 1px solid var(--ls-color-border);
+    padding: 24px;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--ls-color-border);
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ls-color-text);
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--ls-color-border-light);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ls-color-text-secondary);
+  }
+
+  &__value {
+    font-size: 14px;
+    color: var(--ls-color-text);
+    text-align: right;
+  }
+
+  &__badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    &_status-active {
+      background: var(--ls-color-success-light);
+      color: var(--ls-color-success);
+    }
+
+    &_status-canceled {
+      background: var(--ls-color-warning-light);
+      color: var(--ls-color-warning);
+    }
+
+    &_status-past-due {
+      background: var(--ls-color-danger-light);
+      color: var(--ls-color-danger);
+    }
+
+    &_status-unpaid {
+      background: var(--ls-color-danger-light);
+      color: var(--ls-color-danger);
+    }
+
+    &_status-trialing {
+      background: var(--ls-color-info-light);
+      color: var(--ls-color-info);
+    }
+
+    &_status-none {
+      background: var(--ls-color-bg-secondary);
+      color: var(--ls-color-text-secondary);
+    }
+
+    &_status-unknown {
+      background: var(--ls-color-bg-secondary);
+      color: var(--ls-color-text-secondary);
+    }
+  }
+}
+

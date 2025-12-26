@@ -4,6 +4,7 @@ import json
 
 from core.settings.base import *  # noqa
 from core.utils.secret_key import generate_secret_key_if_missing
+from core.utils.common import get_bool_env, get_env
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = generate_secret_key_if_missing(BASE_DATA_DIR)
@@ -30,7 +31,27 @@ SESSION_COOKIE_SECURE = get_bool_env('SESSION_COOKIE_SECURE', False)
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
-RQ_QUEUES = {}
+# RQ: enable async jobs when Redis is configured.
+#
+# Historically this settings file disabled RQ entirely (RQ_QUEUES = {}),
+# which forces the codebase to run all `start_job_async_or_sync()` calls
+# synchronously. For dev/staging, we want the ability to run background jobs.
+REDIS_HOST = get_env('REDIS_HOST', None)
+REDIS_PORT = int(get_env('REDIS_PORT', '6379'))
+REDIS_DB = int(get_env('REDIS_DB', '0'))
+RQ_ENABLED = get_bool_env('RQ_ENABLED', default=bool(REDIS_HOST))
+
+if RQ_ENABLED:
+    redis_host = REDIS_HOST or 'localhost'
+    RQ_DEFAULT_TIMEOUT = int(get_env('RQ_DEFAULT_TIMEOUT', '180'))
+    RQ_QUEUES = {
+        'critical': {'HOST': redis_host, 'PORT': REDIS_PORT, 'DB': REDIS_DB, 'DEFAULT_TIMEOUT': RQ_DEFAULT_TIMEOUT},
+        'high': {'HOST': redis_host, 'PORT': REDIS_PORT, 'DB': REDIS_DB, 'DEFAULT_TIMEOUT': RQ_DEFAULT_TIMEOUT},
+        'default': {'HOST': redis_host, 'PORT': REDIS_PORT, 'DB': REDIS_DB, 'DEFAULT_TIMEOUT': RQ_DEFAULT_TIMEOUT},
+        'low': {'HOST': redis_host, 'PORT': REDIS_PORT, 'DB': REDIS_DB, 'DEFAULT_TIMEOUT': RQ_DEFAULT_TIMEOUT},
+    }
+else:
+    RQ_QUEUES = {}
 
 SENTRY_DSN = get_env('SENTRY_DSN', 'https://68b045ab408a4d32a910d339be8591a4@o227124.ingest.sentry.io/5820521')
 SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'opensource')

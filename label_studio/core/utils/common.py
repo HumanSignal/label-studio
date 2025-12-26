@@ -23,7 +23,7 @@ import pytz
 import requests
 import ujson as json
 from colorama import Fore
-from core.utils.params import get_env
+from core.utils.params import get_env, get_bool_env
 from django.conf import settings
 from django.contrib.postgres.operations import BtreeGinExtension, TrigramExtension
 from django.core.exceptions import ValidationError
