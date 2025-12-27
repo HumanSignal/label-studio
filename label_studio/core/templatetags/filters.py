@@ -128,6 +128,7 @@ def var_exists(context, name):
                 return True
     return False
 
+
 @register.filter
 def replace(value, arg):
     """
@@ -139,4 +140,3 @@ def replace(value, arg):
 
     what, to = arg.split('|')
     return value.replace(what, to)
-
