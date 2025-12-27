@@ -26,9 +26,18 @@ def process_stripe_webhook_ingest(*, ingest_id: int) -> str:
     if ingest.status == STRIPE_WEBHOOK_STATUS_PROCESSED:
         return ingest.stripe_event_id
 
+    # Determine which API key to use based on webhook livemode
+    mode_name = 'live' if ingest.livemode else 'test'
     api_key = settings.STRIPE_LIVE_SECRET_KEY if ingest.livemode else settings.STRIPE_TEST_SECRET_KEY
+    
     if not api_key:
-        raise RuntimeError('Stripe API key is not configured for this webhook livemode')
+        error_msg = (
+            f'Stripe API key is not configured for webhook livemode={ingest.livemode} (mode={mode_name}). '
+            f'Event ID: {ingest.stripe_event_id}, Event Type: {ingest.event_type}. '
+            f'Please configure STRIPE_{mode_name.upper()}_SECRET_KEY environment variable.'
+        )
+        logger.error(error_msg)
+        raise RuntimeError(error_msg)
 
     stripe.api_key = api_key
 

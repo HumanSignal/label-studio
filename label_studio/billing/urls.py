@@ -1,5 +1,6 @@
 """URL configuration for billing app."""
 from django.urls import path
+from django.views.generic import RedirectView
 
 from billing import api, views
 
@@ -17,6 +18,8 @@ urlpatterns = [
     path('api/billing/status/', api.SubscriptionStatusAPI.as_view(), name='billing-status'),
     # Webhook endpoint (handled by dj-stripe)
     path('api/billing/webhook/', views.webhook_view, name='billing-webhook'),
+    # Backward compatibility redirect for old webhook URL
+    path('stripe/webhook/', RedirectView.as_view(url='/api/billing/webhook/', permanent=False), name='stripe-webhook-legacy'),
     # Success and cancel pages
     path('billing/success/', views.billing_success, name='billing-success'),
     path('billing/cancel/', views.billing_cancel, name='billing-cancel'),

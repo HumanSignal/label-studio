@@ -69,7 +69,7 @@ def checkout_session_completed_handler(sender, event, **kwargs):
         
         # Get or sync customer from dj-stripe
         try:
-            customer = Customer.objects.get(stripe_id=customer_id)
+            customer = Customer.objects.get(id=customer_id)
         except Customer.DoesNotExist:
             # Sync customer from Stripe
             stripe_customer = stripe.Customer.retrieve(customer_id)
@@ -136,7 +136,7 @@ def subscription_created_handler(sender, event, **kwargs):
         
         # Get customer from dj-stripe
         try:
-            customer = Customer.objects.get(stripe_id=customer_id)
+            customer = Customer.objects.get(id=customer_id)
         except Customer.DoesNotExist:
             logger.warning(f"Customer {customer_id} not found in dj-stripe for subscription {subscription_id}")
             return
@@ -202,7 +202,7 @@ def subscription_updated_handler(sender, event, **kwargs):
         # Ensure customer is linked to an organization (same logic as created)
         if customer_id:
             try:
-                customer = Customer.objects.get(stripe_id=customer_id)
+                customer = Customer.objects.get(id=customer_id)
                 try:
                     org_customer = OrganizationCustomer.objects.get(customer=customer)
                     logger.info(

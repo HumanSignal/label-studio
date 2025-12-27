@@ -20,9 +20,17 @@ from django.core.exceptions import ImproperlyConfigured
 import environ
 from label_studio.core.utils.params import get_bool_env, get_env_list
 
-# Load environment variables from .env file in data directory
+# Load environment variables from .env files
+# Priority: 1) Docker environment variables, 2) root .env, 3) data/.env
 env = environ.Env()
-env.read_env(os.path.join(os.path.dirname(__file__), '../../../data/.env'))
+# Load from root .env if it exists (for docker-compose)
+root_env_path = os.path.join(os.path.dirname(__file__), '../../../.env')
+if os.path.exists(root_env_path):
+    env.read_env(root_env_path, overwrite=False)  # Don't overwrite existing env vars
+# Load from data/.env if it exists (for local development)
+data_env_path = os.path.join(os.path.dirname(__file__), '../../../data/.env')
+if os.path.exists(data_env_path):
+    env.read_env(data_env_path, overwrite=False)  # Don't overwrite existing env vars
 
 formatter = 'standard'
 JSON_LOG = get_bool_env('JSON_LOG', False)
@@ -874,16 +882,18 @@ RESOLVER_PROXY_CACHE_TIMEOUT = int(get_env('RESOLVER_PROXY_CACHE_TIMEOUT', 3600)
 IMPORT_STORAGE_SERIALIZER_VALIDATE = None
 
 # dj-stripe configuration
+# All Stripe credentials should be provided via environment variables
+# See .env.example for required variables
 STRIPE_LIVE_SECRET_KEY = get_env('STRIPE_LIVE_SECRET_KEY', '')
 STRIPE_TEST_SECRET_KEY = get_env('STRIPE_TEST_SECRET_KEY', '')
 STRIPE_LIVE_PUBLISHABLE_KEY = get_env('STRIPE_LIVE_PUBLISHABLE_KEY', '')
 STRIPE_TEST_PUBLISHABLE_KEY = get_env('STRIPE_TEST_PUBLISHABLE_KEY', '')
 STRIPE_LIVE_MODE = get_bool_env('STRIPE_LIVE_MODE', False)
-STRIPE_PRICING_TABLE_ID = get_env('STRIPE_PRICING_TABLE_ID', 'prctbl_1ShORfAaooP90eyYgWNjXf6b')
+STRIPE_PRICING_TABLE_ID = get_env('STRIPE_PRICING_TABLE_ID', '')
 
 # dj-stripe settings
 DJSTRIPE_USE_NATIVE_JSONFIELD = True
 DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
-# Hardcoded webhook secret from Stripe CLI for local development
-DJSTRIPE_WEBHOOK_SECRET = get_env('DJSTRIPE_WEBHOOK_SECRET', 'whsec_2bda9783e2dc0138bd725e60445f781ad4358cce01d96c6c4e0d9204a2f73be5')
-DJSTRIPE_WEBHOOK_VALIDATION = 'retrieve_event'  # or 'verify_signature' for production
+# Webhook secret must be provided via DJSTRIPE_WEBHOOK_SECRET environment variable
+DJSTRIPE_WEBHOOK_SECRET = get_env('DJSTRIPE_WEBHOOK_SECRET', '')
+DJSTRIPE_WEBHOOK_VALIDATION = 'verify_signature'  # Recommended: uses signature verification instead of API retrieval

@@ -29,10 +29,21 @@ logger = logging.getLogger(__name__)
 # Configure Stripe API key using dj-stripe settings
 # dj-stripe automatically sets stripe.api_key based on STRIPE_LIVE_MODE
 # But we ensure it's set here for direct Stripe API calls
-if settings.STRIPE_LIVE_MODE:
-    stripe.api_key = settings.STRIPE_LIVE_SECRET_KEY
-else:
-    stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+# API key is read from environment variables via Django settings
+def _get_stripe_api_key():
+    """Get Stripe API key from environment variables via settings."""
+    if settings.STRIPE_LIVE_MODE:
+        api_key = settings.STRIPE_LIVE_SECRET_KEY
+        if not api_key:
+            logger.warning('STRIPE_LIVE_SECRET_KEY is not set in environment variables')
+    else:
+        api_key = settings.STRIPE_TEST_SECRET_KEY
+        if not api_key:
+            logger.warning('STRIPE_TEST_SECRET_KEY is not set in environment variables')
+    return api_key
+
+# Set Stripe API key at module level (will be None if not configured)
+stripe.api_key = _get_stripe_api_key()
 
 
 @method_decorator(

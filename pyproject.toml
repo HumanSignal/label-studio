@@ -12,7 +12,7 @@ classifiers = [
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
 ]
-requires-python = ">=3.10,<4"
+requires-python = ">=3.11,<4"
 dependencies = [
     "wheel (>=0.38.1,<=0.40.0)",
     "appdirs (>=1.4.3)",
@@ -74,7 +74,7 @@ dependencies = [
     "setuptools (>=75.4.0)",
     "djangorestframework-simplejwt[crypto] (>=5.4.0,<6.0.0)",
     "tldextract (>=5.1.3)",
-    "dj-stripe (>=2.9.0,<2.10.0)",
+    "dj-stripe (>=2.10.0)",
     ## HumanSignal repo dependencies :start
     "label-studio-sdk (==1.0.18)"
     ## HumanSignal repo dependencies :end
@@ -216,7 +216,7 @@ exclude = [
 requires-poetry = '>=2.0.0,<3.0.0'
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4"
+python = ">=3.11,<4"
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.2.2"
