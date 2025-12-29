@@ -1,8 +1,34 @@
+import { useState } from "react";
 import { Button } from "@humansignal/ui";
 import { Block, Elem } from "../../utils/bem";
 import "./SubscriptionStatus.scss";
 
 export const SubscriptionStatus = ({ data, onRefresh }) => {
+  const [isLoadingPortal, setIsLoadingPortal] = useState(false);
+
+  const handleOpenPortal = async () => {
+    setIsLoadingPortal(true);
+    try {
+      const response = await fetch("/api/billing/portal/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create portal session");
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error("Error opening customer portal:", error);
+      alert("Failed to open customer portal. Please try again.");
+      setIsLoadingPortal(false);
+    }
+  };
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     try {
@@ -117,6 +143,16 @@ export const SubscriptionStatus = ({ data, onRefresh }) => {
               <Elem name="value">{formatDate(data.canceled_at)}</Elem>
             </Elem>
           )}
+        </Elem>
+
+        <Elem name="actions">
+          <Button
+            onClick={handleOpenPortal}
+            disabled={isLoadingPortal}
+            waiting={isLoadingPortal}
+          >
+            {isLoadingPortal ? "Opening..." : "Manage Subscription"}
+          </Button>
         </Elem>
       </Elem>
     </Block>

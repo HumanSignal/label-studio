@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/billing/subscription/', api.SubscriptionStatusAPI.as_view(), name='billing-subscription'),
     # Alias for backward compatibility
     path('api/billing/status/', api.SubscriptionStatusAPI.as_view(), name='billing-status'),
+    path('api/billing/portal/', api.CustomerPortalAPI.as_view(), name='billing-portal'),
     # Webhook endpoint (handled by dj-stripe)
     path('api/billing/webhook/', views.webhook_view, name='billing-webhook'),
     # Backward compatibility redirect for old webhook URL

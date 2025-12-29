@@ -19,6 +19,7 @@ from billing.models import OrganizationCustomer
 from billing.serializers import (
     CheckoutSessionResponseSerializer,
     CheckoutSessionSerializer,
+    CustomerPortalResponseSerializer,
     PriceSerializer,
     PricingTableSerializer,
     StripeConfigSerializer,
@@ -147,9 +148,9 @@ class CheckoutSessionAPI(APIView):
             cancel_url = serializer.validated_data.get('cancel_url')
 
             if not success_url:
-                success_url = request.build_absolute_uri(reverse('billing-success'))
+                success_url = request.build_absolute_uri(reverse('billing:billing-success'))
             if not cancel_url:
-                cancel_url = request.build_absolute_uri(reverse('billing-cancel'))
+                cancel_url = request.build_absolute_uri(reverse('billing:billing-cancel'))
 
             # Create checkout session using Stripe API directly
             checkout_session = stripe.checkout.Session.create(
@@ -387,4 +388,55 @@ class StripeConfigAPI(APIView):
         except Exception as e:
             logger.exception('Error fetching Stripe config: %s', e)
             return Response({'error': 'Failed to fetch Stripe config'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
+        tags=['Billing'],
+        x_fern_sdk_group_name='billing',
+        x_fern_sdk_method_name='create_customer_portal',
+        operation_summary='Create customer portal session',
+        operation_description='Create a Stripe billing portal session for managing subscription.',
+        responses={200: CustomerPortalResponseSerializer()},
+    ),
+)
+class CustomerPortalAPI(APIView):
+    """API endpoint to create Stripe billing portal session."""
+
+    permission_classes = [IsAuthenticated]
+    permission_required = all_permissions.organizations_view
+
+    def post(self, request):
+        """Create customer portal session."""
+        organization = request.user.active_organization
+        if not organization:
+            return Response({'error': 'No active organization'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Get Stripe customer for organization
+            org_customer = OrganizationCustomer.objects.get(organization=organization)
+            customer = org_customer.customer
+
+            # Build return URL to redirect back to billing page after portal interaction
+            return_url = request.build_absolute_uri(reverse('billing:billing-page'))
+
+            # Create billing portal session using Stripe API directly
+            portal_session = stripe.billing_portal.Session.create(
+                customer=customer.id,
+                return_url=return_url,
+            )
+
+            response_serializer = CustomerPortalResponseSerializer({
+                'url': portal_session.url,
+            })
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
+        except OrganizationCustomer.DoesNotExist:
+            return Response({'error': 'No customer found for organization'}, status=status.HTTP_404_NOT_FOUND)
+        except stripe.error.StripeError as e:
+            logger.exception('Stripe API error creating portal session: %s', e)
+            return Response({'error': f'Stripe error: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.exception('Error creating portal session: %s', e)
+            return Response({'error': 'Failed to create portal session'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

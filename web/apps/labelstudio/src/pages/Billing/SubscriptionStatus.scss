@@ -114,5 +114,13 @@
       color: var(--ls-color-text-secondary);
     }
   }
+
+  &__actions {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--ls-color-border);
+    display: flex;
+    justify-content: flex-start;
+  }
 }
 

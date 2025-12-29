@@ -61,19 +61,21 @@ export const BillingPage = () => {
             )}
           </Elem>
 
-          <Elem name="section">
-            <Elem name="section-title">Available Plans</Elem>
-            {stripeConfigLoading ? (
-              <Elem name="loading">Loading pricing information...</Elem>
-            ) : (
-              <PricingTable
-                pricingTableId={stripeConfig?.pricing_table_id}
-                publishableKey={stripeConfig?.publishable_key}
-                customerEmail={stripeConfig?.customer_email}
-                customerId={stripeConfig?.customer_id}
-              />
-            )}
-          </Elem>
+          {!subscriptionData?.has_subscription && (
+            <Elem name="section">
+              <Elem name="section-title">Available Plans</Elem>
+              {stripeConfigLoading ? (
+                <Elem name="loading">Loading pricing information...</Elem>
+              ) : (
+                <PricingTable
+                  pricingTableId={stripeConfig?.pricing_table_id}
+                  publishableKey={stripeConfig?.publishable_key}
+                  customerEmail={stripeConfig?.customer_email}
+                  customerId={stripeConfig?.customer_id}
+                />
+              )}
+            </Elem>
+          )}
         </Elem>
       </Elem>
     </Block>

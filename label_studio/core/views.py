@@ -59,7 +59,12 @@ def main(request):
             return redirect(reverse('projects:project-index'))
 
     # not authenticated
-    return redirect(reverse('user-login'))
+    return render(request, 'landing.html')
+
+
+def landing_page(request):
+    """Landing page for unauthenticated users"""
+    return render(request, 'landing.html')
 
 
 def version_page(request):

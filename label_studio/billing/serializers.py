@@ -60,3 +60,9 @@ class StripeConfigSerializer(serializers.Serializer):
     customer_email = serializers.EmailField(required=False, allow_null=True)
     customer_id = serializers.CharField(required=False, allow_null=True)
 
+
+class CustomerPortalResponseSerializer(serializers.Serializer):
+    """Serializer for customer portal session response."""
+
+    url = serializers.URLField()
+

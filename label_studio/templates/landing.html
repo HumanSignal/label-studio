@@ -1,0 +1,23 @@
+{% extends 'simple.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block page_labeling %}
+  <title>Welcome - Label Studio</title>
+  <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; text-align: center;">
+  <h1>Welcome to Label Studio</h1>
+  <p style="font-size: 1.2rem; margin: 1rem 0;">A full-fledged open source solution for data labeling</p>
+  
+  <div style="margin-top: 2rem;">
+    {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
+      <a href="{{ settings.HOSTNAME }}/user/signup" style="margin: 0 1rem; padding: 0.75rem 1.5rem; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px; display: inline-block;">Sign up</a>
+    {% endif %}
+    <a href="{{ settings.HOSTNAME }}/user/login" style="margin: 0 1rem; padding: 0.75rem 1.5rem; background-color: #2196F3; color: white; text-decoration: none; border-radius: 4px; display: inline-block;">Log in</a>
+  </div>
+</div>
+{% endblock %}
+
