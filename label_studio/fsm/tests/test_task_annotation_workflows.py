@@ -148,4 +148,4 @@ class TestTaskCreationWorkflows:
 
         annotation = Annotation.objects.get(task_id=task.id)
         assert_state_exists(annotation, 'annotation')
-        assert_annotation_state(annotation.id, AnnotationStateChoices.SUBMITTED)
+        assert_annotation_state(annotation.id, AnnotationStateChoices.CREATED)

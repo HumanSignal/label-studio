@@ -217,13 +217,13 @@ class FSMEntityHistoryAPITests(APITestCase):
         assert response.json()['results'] == []
 
     def test_annotation_history(self):
-        state_1 = AnnotationStateFactory(annotation=self.annotation, state=AnnotationStateChoices.SUBMITTED)
+        state_1 = AnnotationStateFactory(annotation=self.annotation, state=AnnotationStateChoices.CREATED)
         state_1.created_at = state_1.created_at - timedelta(seconds=10)
         state_1.save()
         state_2 = AnnotationStateFactory(
             annotation=self.annotation,
             state=AnnotationStateChoices.COMPLETED,
-            previous_state=AnnotationStateChoices.SUBMITTED,
+            previous_state=AnnotationStateChoices.CREATED,
             triggered_by=self.user,
             transition_name='complete_annotation',
         )
@@ -252,7 +252,7 @@ class FSMEntityHistoryAPITests(APITestCase):
 
         # Test previous_state filtering
         response = self.client.get(
-            f'/api/fsm/entities/annotation/{self.annotation.id}/history?previous_state={AnnotationStateChoices.SUBMITTED}'
+            f'/api/fsm/entities/annotation/{self.annotation.id}/history?previous_state={AnnotationStateChoices.CREATED}'
         )
         assert response.status_code == 200
         assert len(response.json()['results']) == 1
