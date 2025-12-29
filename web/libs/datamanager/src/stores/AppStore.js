@@ -5,7 +5,7 @@ import { History } from "../utils/history";
 import { isDefined } from "../utils/utils";
 import { Action } from "./Action";
 import * as DataStores from "./DataStores";
-import { DynamicModel, registerModel } from "./DynamicModel";
+import { registerModel } from "./DynamicModel";
 import { TabStore } from "./Tabs";
 import { CustomJSON } from "./types";
 import { User } from "./Users";
@@ -33,20 +33,6 @@ export const AppStore = types
     loadingData: false,
 
     users: types.optional(types.array(User), []),
-
-    taskStore: types.optional(
-      types.late(() => {
-        return DynamicModel.get("tasksStore");
-      }),
-      {},
-    ),
-
-    annotationStore: types.optional(
-      types.late(() => {
-        return DynamicModel.get("annotationsStore");
-      }),
-      {},
-    ),
 
     availableActions: types.optional(types.array(Action), []),
 

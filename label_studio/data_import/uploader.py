@@ -12,6 +12,7 @@ except:  # noqa: E722
     import json
 
 from core.utils.common import timeit
+from core.utils.exceptions import extract_message
 from core.utils.io import ssrf_safe_get
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -167,7 +168,7 @@ def tasks_from_url(file_upload_ids, project, user, url, could_be_tasks_list):
     except ValidationError as e:
         raise e
     except Exception as e:
-        raise ValidationError(str(e))
+        raise ValidationError(extract_message(e))
     return data_keys, found_formats, tasks, file_upload_ids, could_be_tasks_list
 
 
