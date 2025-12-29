@@ -5,23 +5,107 @@
 {% block page_labeling %}
   <title>Welcome - Label Studio</title>
   <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
+  <link href="{{settings.HOSTNAME}}{% static 'css/landing.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
-<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; text-align: center;">
-  <h1>Welcome to Label Studio</h1>
-  <p style="font-size: 1.2rem; margin: 1rem 0;">A full-fledged open source solution for data labeling</p>
-  
-  <video autoplay loop muted playsinline style="max-width: 800px; width: 100%; margin: 2rem 0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-    <source src="{% static 'videos/landing_page.mp4' %}" type="video/mp4">
-  </video>
-  
-  <div style="margin-top: 2rem;">
-    {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
-      <a href="{{ settings.HOSTNAME }}/user/signup" style="margin: 0 1rem; padding: 0.75rem 1.5rem; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 4px; display: inline-block;">Sign up</a>
-    {% endif %}
-    <a href="{{ settings.HOSTNAME }}/user/login" style="margin: 0 1rem; padding: 0.75rem 1.5rem; background-color: #2196F3; color: white; text-decoration: none; border-radius: 4px; display: inline-block;">Log in</a>
-  </div>
+<div class="landing-page">
+  <!-- Header Navigation -->
+  <header class="landing-header">
+    <div class="landing-header-content">
+      <a href="{{ settings.HOSTNAME }}/" class="landing-logo">Label Studio</a>
+      <button class="landing-mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+      <nav class="landing-nav" id="landing-nav">
+        <a href="{{ settings.HOSTNAME }}/features/">Features</a>
+        <a href="{{ settings.HOSTNAME }}/pricing/">Pricing</a>
+        <a href="{{ settings.HOSTNAME }}/user/login/">Sign In</a>
+        {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
+          <a href="{{ settings.HOSTNAME }}/user/signup/" class="nav-button">Sign Up Free</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <!-- Block 1: Hero Section -->
+  <section class="landing-hero">
+    <div class="landing-hero-content">
+      <h1>Automate Cell, Particle, and Fluorescent Image Counting and Annotation</h1>
+      <p>Leverage AI-powered tools to streamline your image analysis workflow. Count cells, detect particles, and annotate fluorescent images with precision and speed.</p>
+      {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
+        <a href="{{ settings.HOSTNAME }}/user/signup/" class="landing-hero-button">Sign Up Free</a>
+      {% endif %}
+    </div>
+    <div>
+      <video autoplay loop muted playsinline class="landing-hero-video">
+        <source src="{% static 'videos/landing_page.mp4' %}" type="video/mp4">
+      </video>
+    </div>
+  </section>
+
+  <!-- Block 2: Trusted Institutions -->
+  <section class="landing-institutions">
+    <div class="landing-institutions-content">
+      <h2>Used by hundreds of trusted institutions</h2>
+      <div class="landing-logos">
+        <div class="landing-logo-placeholder">Institution Logo 1</div>
+        <div class="landing-logo-placeholder">Institution Logo 2</div>
+        <div class="landing-logo-placeholder">Institution Logo 3</div>
+        <div class="landing-logo-placeholder">Institution Logo 4</div>
+        <div class="landing-logo-placeholder">Institution Logo 5</div>
+        <div class="landing-logo-placeholder">Institution Logo 6</div>
+        <div class="landing-logo-placeholder">Institution Logo 7</div>
+        <div class="landing-logo-placeholder">Institution Logo 8</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Block 3: Features Section -->
+  <section class="landing-features">
+    <div class="landing-features-content">
+      <h2>AI-Assisted Object Counting and Annotation Features</h2>
+      <div class="landing-features-grid">
+        <div class="landing-feature-card">
+          <h3>Automated Cell Detection</h3>
+          <p>AI-powered algorithms automatically identify and count cells in your images with high accuracy, reducing manual counting time by up to 90%.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Particle Counting & Analysis</h3>
+          <p>Detect and analyze particles of various sizes with advanced image processing techniques, providing detailed statistics and measurements.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Fluorescent Image Processing</h3>
+          <p>Specialized tools for processing fluorescent microscopy images with support for multiple channels and advanced filtering options.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>AI-Powered Annotation Suggestions</h3>
+          <p>Get intelligent suggestions for annotations based on your previous work, learning from your patterns to accelerate the labeling process.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Batch Processing</h3>
+          <p>Process hundreds of images simultaneously with our batch processing capabilities, saving hours of manual work.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Export & Integration</h3>
+          <p>Export your annotations in multiple formats and integrate seamlessly with your existing analysis pipelines and tools.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Quality Control Tools</h3>
+          <p>Built-in quality control features help ensure annotation accuracy with validation rules and review workflows.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Custom Workflow Builder</h3>
+          <p>Create custom annotation workflows tailored to your specific research needs with our flexible configuration system.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
+
+<script>
+  function toggleMobileMenu() {
+    const nav = document.getElementById('landing-nav');
+    nav.classList.toggle('mobile-open');
+  }
+</script>
 {% endblock %}
 

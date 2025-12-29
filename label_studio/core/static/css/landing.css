@@ -1,0 +1,297 @@
+/* Landing Page Styles */
+
+.landing-page {
+  font-family: var(--font-sans);
+  color: var(--sand_900);
+  line-height: 1.6;
+}
+
+/* Header Navigation */
+.landing-header {
+  position: sticky;
+  top: 0;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 1rem 2rem;
+}
+
+.landing-header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.landing-logo {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--grape_600);
+  text-decoration: none;
+}
+
+.landing-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.landing-nav a {
+  color: var(--sand_700);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.landing-nav a:hover {
+  color: var(--grape_600);
+}
+
+.landing-nav .nav-button {
+  background-color: var(--grape_600);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.landing-nav .nav-button:hover {
+  background-color: var(--grape_700);
+  color: white;
+}
+
+/* Mobile Menu */
+.landing-mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--sand_700);
+}
+
+@media (max-width: 768px) {
+  .landing-mobile-menu-toggle {
+    display: block;
+  }
+  
+  .landing-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    flex-direction: column;
+    padding: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .landing-nav.mobile-open {
+    display: flex;
+  }
+}
+
+/* Hero Section - Block 1 */
+.landing-hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.landing-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.landing-hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--sand_900);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.landing-hero p {
+  font-size: 1.25rem;
+  color: var(--sand_600);
+  margin: 0;
+}
+
+.landing-hero-video {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.landing-hero-button {
+  display: inline-block;
+  background-color: var(--grape_600);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: background-color 0.2s;
+  align-self: flex-start;
+  margin-top: 1rem;
+}
+
+.landing-hero-button:hover {
+  background-color: var(--grape_700);
+  color: white;
+}
+
+@media (max-width: 968px) {
+  .landing-hero {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .landing-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .landing-hero-video {
+    order: -1;
+  }
+}
+
+/* Trusted Institutions - Block 2 */
+.landing-institutions {
+  background-color: var(--sand_100);
+  padding: 4rem 2rem;
+}
+
+.landing-institutions-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.landing-institutions h2 {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--sand_800);
+  margin-bottom: 3rem;
+}
+
+.landing-logos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 2rem;
+  align-items: center;
+}
+
+.landing-logo-placeholder {
+  background-color: var(--sand_200);
+  border: 2px dashed var(--sand_400);
+  border-radius: 8px;
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--sand_600);
+  font-size: 0.9rem;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s;
+}
+
+.landing-logo-placeholder:hover {
+  border-color: var(--grape_400);
+}
+
+/* Features Section - Block 3 */
+.landing-features {
+  padding: 4rem 2rem;
+  background-color: white;
+}
+
+.landing-features-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.landing-features h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--sand_900);
+  margin-bottom: 3rem;
+}
+
+.landing-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.landing-feature-card {
+  background-color: var(--sand_0);
+  border: 1px solid var(--sand_200);
+  border-radius: 8px;
+  padding: 2rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.landing-feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.landing-feature-card h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--grape_700);
+  margin: 0 0 1rem 0;
+}
+
+.landing-feature-card p {
+  color: var(--sand_600);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .landing-hero {
+    padding: 2rem 1rem;
+  }
+  
+  .landing-hero h1 {
+    font-size: 1.75rem;
+  }
+  
+  .landing-hero p {
+    font-size: 1rem;
+  }
+  
+  .landing-institutions,
+  .landing-features {
+    padding: 3rem 1rem;
+  }
+  
+  .landing-features h2,
+  .landing-institutions h2 {
+    font-size: 1.75rem;
+  }
+  
+  .landing-features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .landing-logos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+

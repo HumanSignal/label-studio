@@ -49,6 +49,8 @@ public_schema_view = get_schema_view(
 
 urlpatterns = [
     re_path(r'^$', views.main, name='main'),
+    path('features/', views.features_page, name='features'),
+    path('pricing/', views.pricing_page, name='pricing'),
     re_path(r'^sw\.js$', views.static_file_with_host_resolver('static/js/sw.js', content_type='text/javascript')),
     re_path(
         r'^sw-fallback\.js$',

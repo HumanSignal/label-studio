@@ -1,0 +1,97 @@
+{% extends 'simple.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block page_labeling %}
+  <title>Pricing - Label Studio</title>
+  <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
+  <link href="{{settings.HOSTNAME}}{% static 'css/landing.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+<div class="landing-page">
+  <!-- Header Navigation -->
+  <header class="landing-header">
+    <div class="landing-header-content">
+      <a href="{{ settings.HOSTNAME }}/" class="landing-logo">Label Studio</a>
+      <button class="landing-mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+      <nav class="landing-nav" id="landing-nav">
+        <a href="{{ settings.HOSTNAME }}/features/">Features</a>
+        <a href="{{ settings.HOSTNAME }}/pricing/">Pricing</a>
+        <a href="{{ settings.HOSTNAME }}/user/login/">Sign In</a>
+        {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
+          <a href="{{ settings.HOSTNAME }}/user/signup/" class="nav-button">Sign Up Free</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <!-- Pricing Page Content -->
+  <section class="landing-features" style="padding-top: 4rem;">
+    <div class="landing-features-content">
+      <h1 style="text-align: center; font-size: 3rem; margin-bottom: 1rem;">Pricing</h1>
+      <p style="text-align: center; font-size: 1.25rem; color: var(--sand_600); margin-bottom: 4rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+        Choose the plan that fits your needs. Start free and scale as you grow.
+      </p>
+      
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <a href="{{ settings.HOSTNAME }}/billing/" style="display: inline-block; background-color: var(--grape_600); color: white; padding: 1rem 2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1.1rem; transition: background-color 0.2s;">
+          View Detailed Pricing & Billing
+        </a>
+      </div>
+
+      <div class="landing-features-grid" style="max-width: 1000px; margin: 0 auto;">
+        <div class="landing-feature-card" style="text-align: center;">
+          <h3 style="color: var(--grape_700); font-size: 2rem; margin-bottom: 0.5rem;">Free</h3>
+          <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">$0/month</p>
+          <p style="margin-bottom: 1.5rem;">Perfect for getting started</p>
+          <ul style="text-align: left; list-style: none; padding: 0; margin-bottom: 2rem;">
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Basic annotation tools</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Limited storage</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Community support</li>
+          </ul>
+          {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
+            <a href="{{ settings.HOSTNAME }}/user/signup/" class="landing-hero-button" style="width: 100%; text-align: center; display: block;">Get Started</a>
+          {% endif %}
+        </div>
+        
+        <div class="landing-feature-card" style="text-align: center; border: 2px solid var(--grape_600);">
+          <h3 style="color: var(--grape_700); font-size: 2rem; margin-bottom: 0.5rem;">Professional</h3>
+          <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Custom Pricing</p>
+          <p style="margin-bottom: 1.5rem;">For teams and organizations</p>
+          <ul style="text-align: left; list-style: none; padding: 0; margin-bottom: 2rem;">
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ All Free features</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Advanced AI features</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Priority support</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Team collaboration</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Custom integrations</li>
+          </ul>
+          <a href="{{ settings.HOSTNAME }}/billing/" class="landing-hero-button" style="width: 100%; text-align: center; display: block;">Contact Sales</a>
+        </div>
+        
+        <div class="landing-feature-card" style="text-align: center;">
+          <h3 style="color: var(--grape_700); font-size: 2rem; margin-bottom: 0.5rem;">Enterprise</h3>
+          <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Custom Pricing</p>
+          <p style="margin-bottom: 1.5rem;">For large organizations</p>
+          <ul style="text-align: left; list-style: none; padding: 0; margin-bottom: 2rem;">
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ All Professional features</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ On-premise deployment</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Dedicated support</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ SLA guarantees</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Custom training</li>
+          </ul>
+          <a href="{{ settings.HOSTNAME }}/billing/" class="landing-hero-button" style="width: 100%; text-align: center; display: block;">Contact Sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  function toggleMobileMenu() {
+    const nav = document.getElementById('landing-nav');
+    nav.classList.toggle('mobile-open');
+  }
+</script>
+{% endblock %}
+

@@ -67,6 +67,16 @@ def landing_page(request):
     return render(request, 'landing.html')
 
 
+def features_page(request):
+    """Features page"""
+    return render(request, 'features.html')
+
+
+def pricing_page(request):
+    """Pricing page"""
+    return render(request, 'pricing.html')
+
+
 def version_page(request):
     """Get platform version"""
     # update the latest version from pypi response

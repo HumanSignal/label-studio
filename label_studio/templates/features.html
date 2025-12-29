@@ -1,0 +1,98 @@
+{% extends 'simple.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block page_labeling %}
+  <title>Features - Label Studio</title>
+  <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
+  <link href="{{settings.HOSTNAME}}{% static 'css/landing.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block content %}
+<div class="landing-page">
+  <!-- Header Navigation -->
+  <header class="landing-header">
+    <div class="landing-header-content">
+      <a href="{{ settings.HOSTNAME }}/" class="landing-logo">Label Studio</a>
+      <button class="landing-mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
+      <nav class="landing-nav" id="landing-nav">
+        <a href="{{ settings.HOSTNAME }}/features/">Features</a>
+        <a href="{{ settings.HOSTNAME }}/pricing/">Pricing</a>
+        <a href="{{ settings.HOSTNAME }}/user/login/">Sign In</a>
+        {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
+          <a href="{{ settings.HOSTNAME }}/user/signup/" class="nav-button">Sign Up Free</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <!-- Features Page Content -->
+  <section class="landing-features" style="padding-top: 4rem;">
+    <div class="landing-features-content">
+      <h1 style="text-align: center; font-size: 3rem; margin-bottom: 1rem;">Features</h1>
+      <p style="text-align: center; font-size: 1.25rem; color: var(--sand_600); margin-bottom: 4rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+        Discover the powerful features that make Label Studio the leading platform for AI-assisted image counting and annotation.
+      </p>
+      
+      <div class="landing-features-grid">
+        <div class="landing-feature-card">
+          <h3>Automated Cell Detection</h3>
+          <p>AI-powered algorithms automatically identify and count cells in your images with high accuracy, reducing manual counting time by up to 90%. Supports various cell types and staining methods.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Particle Counting & Analysis</h3>
+          <p>Detect and analyze particles of various sizes with advanced image processing techniques, providing detailed statistics and measurements. Ideal for quality control and research applications.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Fluorescent Image Processing</h3>
+          <p>Specialized tools for processing fluorescent microscopy images with support for multiple channels and advanced filtering options. Handle complex multi-channel imaging workflows with ease.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>AI-Powered Annotation Suggestions</h3>
+          <p>Get intelligent suggestions for annotations based on your previous work, learning from your patterns to accelerate the labeling process. Continuously improves with use.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Batch Processing</h3>
+          <p>Process hundreds of images simultaneously with our batch processing capabilities, saving hours of manual work. Queue and manage large-scale annotation projects efficiently.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Export & Integration</h3>
+          <p>Export your annotations in multiple formats (JSON, CSV, COCO, YOLO, etc.) and integrate seamlessly with your existing analysis pipelines and tools. API access available.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Quality Control Tools</h3>
+          <p>Built-in quality control features help ensure annotation accuracy with validation rules and review workflows. Set up custom quality checks and approval processes.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Custom Workflow Builder</h3>
+          <p>Create custom annotation workflows tailored to your specific research needs with our flexible configuration system. No coding required.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Collaborative Annotation</h3>
+          <p>Work together with your team in real-time. Assign tasks, track progress, and maintain consistency across multiple annotators with built-in collaboration tools.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Advanced Analytics</h3>
+          <p>Track annotation progress, measure inter-annotator agreement, and generate detailed reports. Gain insights into your annotation workflow efficiency.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Model Training Integration</h3>
+          <p>Train custom AI models directly from your annotations. Export labeled data in formats compatible with popular machine learning frameworks.</p>
+        </div>
+        <div class="landing-feature-card">
+          <h3>Cloud & On-Premise</h3>
+          <p>Deploy on our cloud platform or install on your own infrastructure. Full control over your data with enterprise-grade security options.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  function toggleMobileMenu() {
+    const nav = document.getElementById('landing-nav');
+    nav.classList.toggle('mobile-open');
+  }
+</script>
+{% endblock %}
+
