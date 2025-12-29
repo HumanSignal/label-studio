@@ -8,6 +8,7 @@ from core.feature_flags import flag_set
 from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func, retry_database_locked
 from core.utils.db import fast_first
+from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema_field
@@ -524,7 +525,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                             continue
 
                     except Exception as e:
-                        validation_errors.append(f'Task {i}, prediction {j}: Error validating prediction - {str(e)}')
+                        validation_errors.append(
+                            f'Task {i}, prediction {j}: Error validating prediction - {extract_message(e)}'
+                        )
                         continue
 
                 try:
@@ -551,7 +554,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                         )
                     )
                 except Exception as e:
-                    validation_errors.append(f'Task {i}, prediction {j}: Failed to create prediction - {str(e)}')
+                    validation_errors.append(
+                        f'Task {i}, prediction {j}: Failed to create prediction - {extract_message(e)}'
+                    )
                     continue
 
         # Return validation errors if they exist

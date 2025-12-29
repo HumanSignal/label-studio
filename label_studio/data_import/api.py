@@ -11,9 +11,11 @@ from core.feature_flags import flag_set
 from core.permissions import ViewClassPermission, all_permissions
 from core.redis import start_job_async_or_sync
 from core.utils.common import retry_database_locked, timeit
+from core.utils.exceptions import extract_message
 from core.utils.params import bool_from_request, list_of_strings_from_request
 from csp.decorators import csp
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
@@ -304,7 +306,7 @@ class ImportAPI(generics.CreateAPIView):
                                 for error in validation_errors_list:
                                     validation_errors.append(f'Task {i}, prediction {j}: {error}')
                         except Exception as e:
-                            error_msg = f'Task {i}, prediction {j}: Error validating prediction - {str(e)}'
+                            error_msg = f'Task {i}, prediction {j}: Error validating prediction - {extract_message(e)}'
                             validation_errors.append(error_msg)
 
             if validation_errors:
@@ -610,7 +612,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                     continue
 
             except Exception as e:
-                validation_errors.append(f'Prediction {i}: Error validating prediction - {str(e)}')
+                validation_errors.append(f'Prediction {i}: Error validating prediction - {extract_message(e)}')
                 continue
 
             # If prediction is valid, add it to predictions list to be created
@@ -625,7 +627,7 @@ class ImportPredictionsAPI(generics.CreateAPIView):
                     )
                 )
             except Exception as e:
-                validation_errors.append(f'Prediction {i}: Failed to create prediction - {str(e)}')
+                validation_errors.append(f'Prediction {i}: Failed to create prediction - {extract_message(e)}')
                 continue
 
         # If there are validation errors, raise them before creating any predictions
@@ -996,6 +998,18 @@ class DownloadStorageData(APIView):
 
         # NGINX handling is the default for better performance
         if settings.USE_NGINX_FOR_UPLOADS:
+            if isinstance(file_obj.storage, FileSystemStorage):
+                logger.warning(
+                    'USE_NGINX_FOR_UPLOADS is enabled, but FileSystemStorage '
+                    'does not support storage_url=True; Set USE_NGINX_FOR_UPLOADS=False.'
+                )
+                return Response(
+                    {
+                        'detail': 'NGINX mode for uploads is not supported when using local FileSystemStorage. '
+                        'Disable USE_NGINX_FOR_UPLOADS or switch to a cloud storage backend that supports proxy URLs like S3/GCS/Azure.'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             url = file_obj.storage.url(file_obj.name, storage_url=True)
 
             protocol = urlparse(url).scheme

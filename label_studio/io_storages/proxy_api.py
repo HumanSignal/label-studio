@@ -5,6 +5,7 @@ from typing import Union
 from urllib.parse import unquote
 
 from core.feature_flags import flag_set
+from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, StreamingHttpResponse
 from drf_spectacular.utils import extend_schema
@@ -272,7 +273,7 @@ class ResolveStorageUriAPIMixin:
         except Exception as e:
             logger.error(f'Error in direct proxy from storage: {e}', exc_info=True)
             return Response(
-                {'error': 'Storage stream failed while proxying data', 'detail': str(e)},
+                {'error': 'Storage stream failed while proxying data', 'detail': extract_message(e)},
                 status=status.HTTP_424_FAILED_DEPENDENCY,
             )
 

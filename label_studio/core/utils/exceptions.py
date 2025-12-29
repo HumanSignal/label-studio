@@ -32,3 +32,11 @@ class InvalidUploadUrlError(LabelStudioAPIException):
         'The provided URL was not valid. URLs must begin with http:// or https://, and cannot be local IPs.'
     )
     status_code = status.HTTP_403_FORBIDDEN
+
+
+def extract_message(exc):
+    if not exc.args:
+        return ''
+    if len(exc.args) == 1:
+        return str(exc.args[0])
+    return ' '.join(str(arg) for arg in exc.args)
