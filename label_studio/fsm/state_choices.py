@@ -45,7 +45,7 @@ class AnnotationStateChoices(models.TextChoices):
     """
 
     # Working States
-    SUBMITTED = 'SUBMITTED', _('Submitted')
+    CREATED = 'CREATED', _('Created')
 
     # Terminal State
     COMPLETED = 'COMPLETED', _('Completed')
