@@ -17,3 +17,5 @@
 - Geometry values are in **pixels** (consistent with `GEOMETRY_METADATA_IMPLEMENTATION.md`), and RGB means match the behavior described in `rgb_mean_intensity.md`.
 
 
+
+

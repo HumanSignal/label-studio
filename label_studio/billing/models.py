@@ -82,3 +82,5 @@ class StripeWebhookIngest(models.Model):
     def __str__(self):
         return f'{self.stripe_event_id} ({self.event_type}) [{self.status}]'
 
+
+

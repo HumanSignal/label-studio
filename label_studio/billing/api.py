@@ -3,9 +3,11 @@ import logging
 
 import djstripe
 import stripe
+from datetime import datetime, timezone as dt_timezone
 from django.conf import settings
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils import timezone
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -72,14 +74,16 @@ class PricingTableAPI(APIView):
             price_data = []
             for price in prices:
                 product = price.product
+                recurring = price.recurring or {}
                 price_data.append({
-                    'id': price.stripe_id,  # Use Stripe ID for checkout
-                    'product_id': product.stripe_id,
+                    # dj-stripe stores the Stripe object ID in the `id` field
+                    'id': price.id,
+                    'product_id': product.id,
                     'product_name': product.name,
                     'amount': price.unit_amount or 0,
                     'currency': price.currency,
-                    'interval': price.recurring.interval if price.recurring else None,
-                    'interval_count': price.recurring.interval_count if price.recurring else 1,
+                    'interval': recurring.get('interval'),
+                    'interval_count': recurring.get('interval_count', 1),
                     'active': price.active,
                     'description': product.description,
                 })
@@ -125,12 +129,18 @@ class CheckoutSessionAPI(APIView):
             # Get price (price_id should be Stripe price ID)
             price_id = serializer.validated_data['price_id']
             try:
-                # Try to get by stripe_id first (if passed as Stripe ID)
-                price = djstripe.models.Price.objects.get(stripe_id=price_id)
-            except djstripe.models.Price.DoesNotExist:
-                # Fallback to Django model ID
-                price = djstripe.models.Price.objects.get(id=price_id)
-                price_id = price.stripe_id
+                # dj-stripe uses `id` for the Stripe Price ID.
+                # Allow both Stripe price IDs and local primary keys (djstripe_id).
+                try:
+                    # Prefer matching by Stripe price ID
+                    price = djstripe.models.Price.objects.get(id=price_id)
+                except djstripe.models.Price.DoesNotExist:
+                    # Fallback to local primary key (e.g. when an internal ID is passed)
+                    price = djstripe.models.Price.objects.get(pk=price_id)
+                stripe_price_id = price.id
+            except (djstripe.models.Price.DoesNotExist, ValueError, TypeError):
+                # Normalize lookup errors to Price.DoesNotExist so outer handler can return 404
+                raise djstripe.models.Price.DoesNotExist()
 
             # Build success and cancel URLs
             success_url = serializer.validated_data.get('success_url')
@@ -143,10 +153,12 @@ class CheckoutSessionAPI(APIView):
 
             # Create checkout session using Stripe API directly
             checkout_session = stripe.checkout.Session.create(
-                customer=customer.stripe_id,
+                # dj-stripe stores Stripe customer ID in `id`
+                customer=customer.id,
                 payment_method_types=['card'],
                 line_items=[{
-                    'price': price_id,  # Use Stripe price ID
+                    # Use Stripe price ID from dj-stripe model
+                    'price': stripe_price_id,
                     'quantity': 1,
                 }],
                 mode='subscription',
@@ -161,7 +173,8 @@ class CheckoutSessionAPI(APIView):
             checkout_session_obj = djstripe.models.CheckoutSession.sync_from_stripe_data(checkout_session)
 
             response_serializer = CheckoutSessionResponseSerializer({
-                'session_id': checkout_session_obj.stripe_id,
+                # dj-stripe stores Checkout Session ID in `id`
+                'session_id': checkout_session_obj.id,
                 'url': checkout_session.url,
             })
             return Response(response_serializer.data, status=status.HTTP_200_OK)
@@ -223,58 +236,82 @@ class SubscriptionStatusAPI(APIView):
             org_customer = OrganizationCustomer.objects.get(organization=organization)
             customer = org_customer.customer
 
-            # Get active subscription
-            subscriptions = djstripe.models.Subscription.objects.filter(customer=customer, status='active').order_by('-created')
-            if subscriptions.exists():
-                subscription = subscriptions.first()
-                price = subscription.items.first().price if subscription.items.exists() else None
-                product = price.product if price else None
+            # Fetch all subscriptions for this customer and evaluate status in Python.
+            # dj-stripe stores status in `stripe_data`, so we avoid filtering on a non-existent DB field.
+            all_subscriptions_qs = djstripe.models.Subscription.objects.filter(
+                customer=customer
+            ).order_by('-created')
+
+            subscriptions = list(all_subscriptions_qs)
+
+            # Prefer a valid, current subscription (trialing or active)
+            active_subscription = next(
+                (s for s in subscriptions if s.is_status_current()),
+                None,
+            )
+
+            if active_subscription is not None:
+                subscription = active_subscription
+            elif subscriptions:
+                # Fall back to the most recent subscription of any status
+                subscription = subscriptions[0]
+            else:
+                subscription = None
+
+            if subscription is not None:
+                # Use related SubscriptionItem records to derive the current price/product.
+                subscription_items_qs = subscription.items.all()
+                price = None
+                product = None
+                if subscription_items_qs.exists():
+                    first_item = subscription_items_qs.first()
+                    if first_item and first_item.price:
+                        price = first_item.price
+                        product = price.product
+
+                # Convert dj-stripe datetime properties to timezone-aware datetime objects
+                # dj-stripe properties can return integers (Unix timestamps) instead of datetime objects
+                def to_datetime(value):
+                    """Convert integer timestamp or datetime to timezone-aware datetime."""
+                    if value is None:
+                        return None
+                    if isinstance(value, int):
+                        # Unix timestamp - convert to datetime
+                        return datetime.fromtimestamp(value, tz=dt_timezone.utc)
+                    if isinstance(value, datetime):
+                        # Already a datetime - ensure timezone-aware
+                        if value.tzinfo is None:
+                            return timezone.make_aware(value)
+                        return value
+                    return value
 
                 data = {
                     'status': subscription.status,
-                    'current_period_start': subscription.current_period_start,
-                    'current_period_end': subscription.current_period_end,
+                    'current_period_start': to_datetime(subscription.current_period_start),
+                    'current_period_end': to_datetime(subscription.current_period_end),
                     'cancel_at_period_end': subscription.cancel_at_period_end,
-                    'canceled_at': subscription.canceled_at,
+                    'canceled_at': to_datetime(subscription.canceled_at),
                     'plan_name': product.name if product else None,
                     'plan_amount': price.unit_amount if price else None,
                     'plan_currency': price.currency if price else None,
-                    'plan_interval': price.recurring.interval if price and price.recurring else None,
+                    'plan_interval': (
+                        price.recurring.get('interval') if price and price.recurring else None
+                    ),
                     'has_subscription': True,
                 }
             else:
-                # Check for other subscription statuses
-                all_subscriptions = djstripe.models.Subscription.objects.filter(customer=customer).order_by('-created')
-                if all_subscriptions.exists():
-                    subscription = all_subscriptions.first()
-                    price = subscription.items.first().price if subscription.items.exists() else None
-                    product = price.product if price else None
-
-                    data = {
-                        'status': subscription.status,
-                        'current_period_start': subscription.current_period_start,
-                        'current_period_end': subscription.current_period_end,
-                        'cancel_at_period_end': subscription.cancel_at_period_end,
-                        'canceled_at': subscription.canceled_at,
-                        'plan_name': product.name if product else None,
-                        'plan_amount': price.unit_amount if price else None,
-                        'plan_currency': price.currency if price else None,
-                        'plan_interval': price.recurring.interval if price and price.recurring else None,
-                        'has_subscription': True,
-                    }
-                else:
-                    data = {
-                        'status': None,
-                        'current_period_start': None,
-                        'current_period_end': None,
-                        'cancel_at_period_end': False,
-                        'canceled_at': None,
-                        'plan_name': None,
-                        'plan_amount': None,
-                        'plan_currency': None,
-                        'plan_interval': None,
-                        'has_subscription': False,
-                    }
+                data = {
+                    'status': None,
+                    'current_period_start': None,
+                    'current_period_end': None,
+                    'cancel_at_period_end': False,
+                    'canceled_at': None,
+                    'plan_name': None,
+                    'plan_amount': None,
+                    'plan_currency': None,
+                    'plan_interval': None,
+                    'has_subscription': False,
+                }
 
             serializer = SubscriptionStatusSerializer(data)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -332,7 +369,8 @@ class StripeConfigAPI(APIView):
             if organization:
                 try:
                     org_customer = OrganizationCustomer.objects.get(organization=organization)
-                    customer_id = org_customer.customer.stripe_id
+                    # dj-stripe uses `id` for the Stripe customer ID
+                    customer_id = org_customer.customer.id
                 except OrganizationCustomer.DoesNotExist:
                     # No existing customer for this organization
                     pass

@@ -22,3 +22,5 @@ export function SegmentationMetricsPortal({ active }) {
   if (!host || !active) return null;
   return createPortal(<SegmentationMetricsPane />, host);
 }
+
+

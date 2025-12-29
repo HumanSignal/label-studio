@@ -13,3 +13,5 @@ class OrganizationCustomerAdmin(admin.ModelAdmin):
     search_fields = ('organization__title', 'customer__id')
     readonly_fields = ('created_at', 'updated_at')
 
+
+
