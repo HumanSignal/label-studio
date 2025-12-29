@@ -38,10 +38,18 @@
       </div>
 
       {% if settings.TURNSTILE_ENABLED and settings.TURNSTILE_SITE_KEY %}
-      <div class="cf-turnstile" data-sitekey="{{ settings.TURNSTILE_SITE_KEY }}"></div>
+      <div class="cf-turnstile" 
+           data-sitekey="{{ settings.TURNSTILE_SITE_KEY }}"
+           data-callback="onTurnstileSuccess"
+           data-error-callback="onTurnstileError"
+           data-expired-callback="onTurnstileExpired"></div>
       {% endif %}
 
-      <button type="submit" aria-label="Log In" class="lsf-button-ls lsf-button-ls_look_primary">Log in</button>
+      <button type="submit" 
+              id="login-submit-btn" 
+              aria-label="Log In" 
+              class="lsf-button-ls lsf-button-ls_look_primary"
+              {% if settings.TURNSTILE_ENABLED and settings.TURNSTILE_SITE_KEY %}disabled{% endif %}>Log in</button>
     </form>
   </div>
   {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
@@ -49,5 +57,31 @@
     <p class="">Don't have an account?</p>
     <a href="{% url 'user-signup' %}{% querystring %}">Sign up</a>
   </div>
+  {% endif %}
+  {% if settings.TURNSTILE_ENABLED and settings.TURNSTILE_SITE_KEY %}
+  <script nonce="{{request.csp_nonce}}">
+    (function() {
+      const submitBtn = document.getElementById('login-submit-btn');
+      if (!submitBtn) return;
+
+      window.onTurnstileSuccess = function() {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+        }
+      };
+
+      window.onTurnstileError = function() {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+        }
+      };
+
+      window.onTurnstileExpired = function() {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+        }
+      };
+    })();
+  </script>
   {% endif %}
 {% endblock %}

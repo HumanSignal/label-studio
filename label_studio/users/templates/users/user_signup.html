@@ -52,10 +52,44 @@
     {% endif %}
 
     {% if settings.TURNSTILE_ENABLED and settings.TURNSTILE_SITE_KEY %}
-    <div class="cf-turnstile" data-sitekey="{{ settings.TURNSTILE_SITE_KEY }}"></div>
+    <div class="cf-turnstile" 
+         data-sitekey="{{ settings.TURNSTILE_SITE_KEY }}"
+         data-callback="onTurnstileSuccessSignup"
+         data-error-callback="onTurnstileErrorSignup"
+         data-expired-callback="onTurnstileExpiredSignup"></div>
     {% endif %}
 
-    <p><button type="submit" aria-label="Create Account" class="lsf-button-ls lsf-button-ls_look_primary">Create Account</button></p>
+    <p><button type="submit" 
+               id="signup-submit-btn" 
+               aria-label="Create Account" 
+               class="lsf-button-ls lsf-button-ls_look_primary"
+               {% if settings.TURNSTILE_ENABLED and settings.TURNSTILE_SITE_KEY %}disabled{% endif %}>Create Account</button></p>
   </form>
+  {% if settings.TURNSTILE_ENABLED and settings.TURNSTILE_SITE_KEY %}
+  <script nonce="{{request.csp_nonce}}">
+    (function() {
+      const submitBtn = document.getElementById('signup-submit-btn');
+      if (!submitBtn) return;
+
+      window.onTurnstileSuccessSignup = function() {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+        }
+      };
+
+      window.onTurnstileErrorSignup = function() {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+        }
+      };
+
+      window.onTurnstileExpiredSignup = function() {
+        if (submitBtn) {
+          submitBtn.disabled = true;
+        }
+      };
+    })();
+  </script>
+  {% endif %}
 
 {% endblock %}
