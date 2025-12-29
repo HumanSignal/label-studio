@@ -8,6 +8,7 @@ from core.utils.common import load_func
 from django.conf import settings
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from organizations.models import Organization, OrganizationMember
@@ -100,6 +101,14 @@ class OrganizationMemberListPagination(PageNumberPagination):
         tags=['Organizations'],
         summary='Get organization members list',
         description='Retrieve a list of the organization members and their IDs.',
+        parameters=[
+            OpenApiParameter(
+                name='contributed_to_projects',
+                type=OpenApiTypes.BOOL,
+                location='query',
+                description='Whether to include projects created and contributed to by the members.',
+            ),
+        ],
         extensions={
             'x-fern-sdk-group-name': ['organizations', 'members'],
             'x-fern-sdk-method-name': 'list',
@@ -122,8 +131,12 @@ class OrganizationMemberListAPI(generics.ListAPIView):
     serializer_class = OrganizationMemberListSerializer
     pagination_class = OrganizationMemberListPagination
 
+    @cached_property
+    def paginated_members(self):
+        return self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+
     def _get_created_projects_map(self):
-        members = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+        members = self.paginated_members
         user_ids = [member.user_id for member in members]
         projects = (
             Project.objects.filter(created_by_id__in=user_ids, organization=self.request.user.active_organization)
@@ -141,7 +154,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
         return projects_map
 
     def _get_contributed_to_projects_map(self):
-        members = self.paginate_queryset(self.filter_queryset(self.get_queryset()))
+        members = self.paginated_members
         user_ids = [member.user_id for member in members]
         org_project_ids = Project.objects.filter(organization=self.request.user.active_organization).values_list(
             'id', flat=True
@@ -193,6 +206,11 @@ class OrganizationMemberListAPI(generics.ListAPIView):
         else:
             return org.members.prefetch_related('user__om_through').order_by('user__username')
 
+    def list(self, request, *args, **kwargs):
+        page = self.paginated_members   # Using cached property to avoid multiple queries
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
 
 @method_decorator(
     name='get',
@@ -206,6 +224,12 @@ class OrganizationMemberListAPI(generics.ListAPIView):
                 type=OpenApiTypes.INT,
                 location='path',
                 description='A unique integer value identifying the user to get organization details for.',
+            ),
+            OpenApiParameter(
+                name='contributed_to_projects',
+                type=OpenApiTypes.BOOL,
+                location='query',
+                description='Whether to include projects created and contributed to by the member.',
             ),
         ],
         responses={200: OrganizationMemberSerializer()},
@@ -260,18 +284,18 @@ class OrganizationMemberDetailAPI(GetParentObjectMixin, generics.RetrieveDestroy
         return api_settings.DEFAULT_PERMISSION_CLASSES
 
     def get_queryset(self):
-        return OrganizationMember.objects.filter(organization=self.parent_object)
+        return OrganizationMember.objects.filter(organization=self.parent_object).select_related('user')
 
     def get_serializer_context(self):
         return {
             **super().get_serializer_context(),
             'organization': self.parent_object,
+            'contributed_to_projects': bool_from_request(self.request.GET, 'contributed_to_projects', False),
         }
 
     def get(self, request, pk, user_pk):
         queryset = self.get_queryset()
-        user = get_object_or_404(User, pk=user_pk)
-        member = get_object_or_404(queryset, user=user)
+        member = get_object_or_404(queryset, user=user_pk)
         self.check_object_permissions(request, member)
         serializer = self.get_serializer(member)
         return Response(serializer.data)

@@ -1,7 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+
 import os
 
+from core.utils.exceptions import extract_message
 from io_storages.gcs.models import GCSExportStorage, GCSImportStorage
 from io_storages.serializers import ExportStorageSerializer, ImportStorageSerializer
 from rest_framework import serializers
@@ -38,7 +40,7 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
         try:
             storage.validate_connection()
         except Exception as exc:
-            raise ValidationError(exc)
+            raise ValidationError(extract_message(exc))
         return data
 
 
