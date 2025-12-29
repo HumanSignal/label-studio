@@ -324,6 +324,15 @@
       box-shadow: inset 0 1px 0 rgb(var(--black-raw) / 10%);
     }
   }
+
+  :global([data-color-scheme="dark"]) &:not(:disabled) {
+    --text-color: var(--text-outline, var(--color-neutral-content));
+    --border-color: color-mix(in srgb, var(--border-outline) 70%, rgb(var(--white-raw) / 35%));
+    --border-color-hover: color-mix(in srgb, var(--border-color-hover, var(--border-outline)) 70%, rgb(var(--white-raw) / 45%));
+    --background-color: color-mix(in srgb, var(--color-neutral-background) 80%, rgb(var(--white-raw) / 6%));
+    --background-color-hover: color-mix(in srgb, var(--color-neutral-background-hover, var(--color-neutral-background)) 70%, rgb(var(--white-raw) / 10%));
+    --background-color-active: color-mix(in srgb, var(--color-neutral-background-active, var(--color-neutral-background)) 60%, rgb(var(--white-raw) / 14%));
+  }
 }
 
 .look-string {
