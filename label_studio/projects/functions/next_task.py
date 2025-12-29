@@ -92,7 +92,7 @@ def _try_breadth_first_evaluation_enabled(tasks: QuerySet[Task], user: User) -> 
         # No non GT tasks with annotations, let the next step in the pipeline handle it
         return None
 
-    # Regular at max + GT at/above max (blended)
+    # Non GT tasks at max + GT tasks at/above max (blended)
     candidates = tasks.filter(annotations_count__gte=max_annotations_count)
 
     if candidates.exists():
@@ -105,10 +105,15 @@ def _try_breadth_first(tasks: QuerySet[Task], user: User, project: Project) -> U
     """Try to find tasks with maximum amount of annotations, since we are trying to label tasks as fast as possible"""
 
     if project.annotator_evaluation_enabled:
-        return _try_breadth_first_evaluation_enabled(tasks, user)
+        tasks = _annotate_has_ground_truths(tasks)
+        gt_count_before = tasks.filter(has_ground_truths=True).count()
+        tasks = tasks.filter(has_ground_truths=False)
+        logger.info(f'Breadth-first: excluded {gt_count_before} GT tasks, {tasks.count()} regular remain')
 
     tasks = tasks.annotate(annotations_count=Count('annotations', filter=~Q(annotations__completed_by=user)))
     max_annotations_count = tasks.aggregate(Max('annotations_count'))['annotations_count__max']
+
+    logger.info(f'Breadth-first: max_annotations_count={max_annotations_count}')  # ADD THIS
     if max_annotations_count == 0 or max_annotations_count is None:
         # No tasks with annotations, let the next step in the pipeline handle it
         return None
@@ -117,7 +122,9 @@ def _try_breadth_first(tasks: QuerySet[Task], user: User, project: Project) -> U
     candidates = tasks.filter(annotations_count=max_annotations_count)
     if candidates.exists():
         # Select randomly from candidates
-        return _get_random_unlocked(candidates, user)
+        result = _get_random_unlocked(candidates, user)
+        logger.info(f'Breadth-first: _get_random_unlocked returned {result}')  # ADD THIS
+        return result
     return None
 
 
