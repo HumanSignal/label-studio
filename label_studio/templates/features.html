@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block page_labeling %}
-  <title>Features - Label Studio</title>
+  <title>Features - Biowork</title>
   <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' %}" rel="shortcut icon"/>
   <link href="{{settings.HOSTNAME}}{% static 'css/landing.css' %}" rel="stylesheet"/>
 {% endblock %}
@@ -13,7 +13,7 @@
   <!-- Header Navigation -->
   <header class="landing-header">
     <div class="landing-header-content">
-      <a href="{{ settings.HOSTNAME }}/" class="landing-logo">Label Studio</a>
+      <a href="{{ settings.HOSTNAME }}/" class="landing-logo">Biowork</a>
       <button class="landing-mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
       <nav class="landing-nav" id="landing-nav">
         <a href="{{ settings.HOSTNAME }}/features/">Features</a>
@@ -26,12 +26,28 @@
     </div>
   </header>
 
+  <!-- Hero Section with Video -->
+  <section class="landing-hero">
+    <div class="landing-hero-content">
+      <h1>Automate Cell, Particle, and Fluorescent Image Counting and Annotation</h1>
+      <p>Leverage AI-powered tools to streamline your image analysis workflow. Count cells, detect particles, and annotate fluorescent images with precision and speed.</p>
+      {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
+        <a href="{{ settings.HOSTNAME }}/user/signup/" class="landing-hero-button">Sign Up Now</a>
+      {% endif %}
+    </div>
+    <div>
+      <video autoplay loop muted playsinline class="landing-hero-video">
+        <source src="{% static 'videos/landing_page.mp4' %}" type="video/mp4">
+      </video>
+    </div>
+  </section>
+
   <!-- Features Page Content -->
-  <section class="landing-features" style="padding-top: 4rem;">
+  <section class="landing-features">
     <div class="landing-features-content">
       <h1 style="text-align: center; font-size: 3rem; margin-bottom: 1rem;">Features</h1>
       <p style="text-align: center; font-size: 1.25rem; color: var(--sand_600); margin-bottom: 4rem; max-width: 800px; margin-left: auto; margin-right: auto;">
-        Discover the powerful features that make Label Studio the leading platform for AI-assisted image counting and annotation.
+        Discover the powerful features that make Biowork the leading platform for AI-assisted image counting and annotation.
       </p>
       
       <div class="landing-features-grid">

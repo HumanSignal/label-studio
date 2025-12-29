@@ -234,6 +234,14 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
+  align-items: stretch;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  align-items: stretch;
 }
 
 .landing-feature-card {
@@ -242,6 +250,24 @@
   border-radius: 8px;
   padding: 2rem;
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.landing-feature-card > a:last-child,
+.landing-feature-card > ul + a {
+  margin-top: auto;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* Ensure buttons in pricing cards don't overflow */
+.pricing-grid .landing-feature-card .landing-hero-button {
+  width: 100%;
+  box-sizing: border-box;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .landing-feature-card:hover {
@@ -286,7 +312,8 @@
     font-size: 1.75rem;
   }
   
-  .landing-features-grid {
+  .landing-features-grid,
+  .pricing-grid {
     grid-template-columns: 1fr;
   }
   
