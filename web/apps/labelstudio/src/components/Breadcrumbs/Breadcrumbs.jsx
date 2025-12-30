@@ -14,6 +14,7 @@ export const Breadcrumbs = () => {
   const reactBreadcrumbs = useBreadcrumbs();
   const findComponent = useFindRouteComponent();
   const [breadcrumbs, setBreadcrumbs] = useState(reactBreadcrumbs);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (reactBreadcrumbs.length) {
@@ -35,14 +36,13 @@ export const Breadcrumbs = () => {
 
           const isInternal = findComponent(href) !== null;
 
-          const { t } = useTranslation();
           const renderedTitle = typeof item.title === "string" ? t(item.title, { defaultValue: item.title }) : item.title;
 
           const title = (
             <span
               className={cn("breadcrumbs")
                 .elem("label")
-                .mod({ faded: index === item.length - 1 })
+                .mod({ faded: index === list.length - 1 })
                 .toClassName()}
             >
               {renderedTitle}
