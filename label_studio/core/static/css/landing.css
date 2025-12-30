@@ -27,10 +27,13 @@
 .landing-logo {
   display: flex;
   align-items: center;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--grape_600);
   text-decoration: none;
+}
+
+.landing-header-logo {
+  height: 30px;
+  width: auto;
+  display: block;
 }
 
 .landing-nav {

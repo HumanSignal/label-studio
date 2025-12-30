@@ -13,7 +13,9 @@
   <!-- Header Navigation -->
   <header class="landing-header">
     <div class="landing-header-content">
-      <a href="{{ settings.HOSTNAME }}/" class="landing-logo">Biowork</a>
+      <a href="{{ settings.HOSTNAME }}/" class="landing-logo">
+        <img src="{% static 'icons/logo.svg' %}" alt="Biowork" class="landing-header-logo">
+      </a>
       <button class="landing-mobile-menu-toggle" onclick="toggleMobileMenu()">☰</button>
       <nav class="landing-nav" id="landing-nav">
         <a href="{{ settings.HOSTNAME }}/features/">Features</a>
