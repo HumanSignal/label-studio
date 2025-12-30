@@ -49,12 +49,9 @@
       <div class="landing-logos">
         <img src="{% static 'images/logo_wall/Chinese_University_of_Hong_Kong-Logo.wine.svg' %}" alt="Chinese University of Hong Kong" class="landing-logo-img">
         <img src="{% static 'images/logo_wall/Columbia_University-Logo.wine.svg' %}" alt="Columbia University" class="landing-logo-img">
-        <img src="{% static 'images/logo_wall/Duke_University-Logo.wine.svg' %}" alt="Duke University" class="landing-logo-img">
         <img src="{% static 'images/logo_wall/Hong_Kong_University_of_Science_and_Technology-Logo.wine.svg' %}" alt="Hong Kong University of Science and Technology" class="landing-logo-img">
         <img src="{% static 'images/logo_wall/Johns_Hopkins_University-Logo.wine.svg' %}" alt="Johns Hopkins University" class="landing-logo-img">
-        <img src="{% static 'images/logo_wall/Massachusetts_Institute_of_Technology-Logo.wine.svg' %}" alt="Massachusetts Institute of Technology" class="landing-logo-img">
         <img src="{% static 'images/logo_wall/University_of_Hong_Kong-Logo.wine.svg' %}" alt="University of Hong Kong" class="landing-logo-img">
-        <img src="{% static 'images/logo_wall/Yale_University-Logo.wine.svg' %}" alt="Yale University" class="landing-logo-img">
       </div>
     </div>
   </section>
@@ -63,38 +60,44 @@
   <section class="landing-features">
     <div class="landing-features-content">
       <h2>AI-Assisted Object Counting and Annotation Features</h2>
-      <div class="landing-features-grid">
-        <div class="landing-feature-card">
+      
+      <div class="landing-feature-row landing-feature-row-left">
+        <div class="landing-feature-image">
+          <img src="{% static 'images/features/fig1_auto.png' %}" alt="Automated Cell Detection">
+        </div>
+        <div class="landing-feature-content">
           <h3>Automated Cell Detection</h3>
-          <p>AI-powered algorithms automatically identify and count cells in your images with high accuracy, reducing manual counting time by up to 90%.</p>
+          <p>AI-powered algorithms automatically identify and count cells in your images with high accuracy, reducing manual counting time by up to 90%. Supports various cell types and staining methods.</p>
         </div>
-        <div class="landing-feature-card">
-          <h3>Particle Counting & Analysis</h3>
-          <p>Detect and analyze particles of various sizes with advanced image processing techniques, providing detailed statistics and measurements.</p>
+      </div>
+
+      <div class="landing-feature-row landing-feature-row-right">
+        <div class="landing-feature-content">
+          <h3>Keypoint Annotation</h3>
+          <p>Precise keypoint annotation tools for marking specific locations in your images. Perfect for tracking landmarks, joints, or critical points in biological and medical imaging workflows.</p>
         </div>
-        <div class="landing-feature-card">
-          <h3>Fluorescent Image Processing</h3>
-          <p>Specialized tools for processing fluorescent microscopy images with support for multiple channels and advanced filtering options.</p>
+        <div class="landing-feature-image">
+          <img src="{% static 'images/features/fig2_keypoint.png' %}" alt="Keypoint Annotation">
         </div>
-        <div class="landing-feature-card">
-          <h3>AI-Powered Annotation Suggestions</h3>
-          <p>Get intelligent suggestions for annotations based on your previous work, learning from your patterns to accelerate the labeling process.</p>
+      </div>
+
+      <div class="landing-feature-row landing-feature-row-left">
+        <div class="landing-feature-image">
+          <img src="{% static 'images/features/fig3_box.png' %}" alt="Bounding Box/Rectangle Annotation">
         </div>
-        <div class="landing-feature-card">
-          <h3>Batch Processing</h3>
-          <p>Process hundreds of images simultaneously with our batch processing capabilities, saving hours of manual work.</p>
+        <div class="landing-feature-content">
+          <h3>Bounding Box/Rectangle Annotation</h3>
+          <p>Efficient bounding box and rectangle annotation tools for object detection tasks. Quickly draw and adjust rectangular regions to mark objects of interest in your images.</p>
         </div>
-        <div class="landing-feature-card">
-          <h3>Export & Integration</h3>
-          <p>Export your annotations in multiple formats and integrate seamlessly with your existing analysis pipelines and tools.</p>
+      </div>
+
+      <div class="landing-feature-row landing-feature-row-right">
+        <div class="landing-feature-content">
+          <h3>Diverse Annotation Types</h3>
+          <p>Comprehensive annotation toolkit supporting multiple annotation types including polygons, brush masks, keypoints, rectangles, and more. Choose the right tool for your specific annotation needs.</p>
         </div>
-        <div class="landing-feature-card">
-          <h3>Quality Control Tools</h3>
-          <p>Built-in quality control features help ensure annotation accuracy with validation rules and review workflows.</p>
-        </div>
-        <div class="landing-feature-card">
-          <h3>Custom Workflow Builder</h3>
-          <p>Create custom annotation workflows tailored to your specific research needs with our flexible configuration system.</p>
+        <div class="landing-feature-image">
+          <img src="{% static 'images/features/fig4_diverse.png' %}" alt="Diverse Annotation Types">
         </div>
       </div>
     </div>

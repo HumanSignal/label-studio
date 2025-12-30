@@ -97,11 +97,11 @@
 
 /* Hero Section - Block 1 */
 .landing-hero {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 4rem 2rem;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1.5fr;
   gap: 4rem;
   align-items: center;
 }
@@ -128,6 +128,8 @@
 
 .landing-hero-video {
   width: 100%;
+  max-width: 100%;
+  height: auto;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
@@ -187,7 +189,7 @@
 
 .landing-logos {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 2rem;
   align-items: center;
 }
@@ -305,6 +307,74 @@
   line-height: 1.6;
 }
 
+/* Staggered Feature Rows */
+.landing-feature-row {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  margin-bottom: 4rem;
+}
+
+.landing-feature-row:last-child {
+  margin-bottom: 0;
+}
+
+.landing-feature-row.landing-feature-row-left {
+  flex-direction: row;
+}
+
+.landing-feature-row.landing-feature-row-left .landing-feature-image {
+  order: 1;
+}
+
+.landing-feature-row.landing-feature-row-left .landing-feature-content {
+  order: 2;
+}
+
+.landing-feature-row.landing-feature-row-right {
+  flex-direction: row;
+}
+
+.landing-feature-row.landing-feature-row-right .landing-feature-image {
+  order: 2;
+}
+
+.landing-feature-row.landing-feature-row-right .landing-feature-content {
+  order: 1;
+}
+
+.landing-feature-image {
+  flex: 1;
+  max-width: 50%;
+}
+
+.landing-feature-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: block;
+}
+
+.landing-feature-content {
+  flex: 1;
+  max-width: 50%;
+}
+
+.landing-feature-content h3 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--grape_700);
+  margin: 0 0 1rem 0;
+}
+
+.landing-feature-content p {
+  font-size: 1.125rem;
+  color: var(--sand_600);
+  margin: 0;
+  line-height: 1.7;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .landing-hero {
@@ -336,6 +406,34 @@
   
   .landing-logos {
     grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .landing-feature-row {
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .landing-feature-row-left,
+  .landing-feature-row-right {
+    flex-direction: column;
+  }
+  
+  .landing-feature-image {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .landing-feature-content {
+    max-width: 100%;
+  }
+  
+  .landing-feature-content h3 {
+    font-size: 1.5rem;
+  }
+  
+  .landing-feature-content p {
+    font-size: 1rem;
   }
 }
 

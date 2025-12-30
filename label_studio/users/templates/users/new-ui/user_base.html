@@ -78,25 +78,9 @@ gtag('config', 'UA-129877673-1');
 </script>
 
 <div class="login_page_new_ui">
-  <div class="left">
-    <div class="ls-logo logo-placeholder" style="width: 194px; height: 30px; background-color: #f0f0f0; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; color: #666; font-size: 12px;">Logo Placeholder</div>
-      
-    <h3>A full-fledged open source solution for data labeling</h3>
-
-    {% if not feature_flags.fflag_feat_front_hide_heidi_tips_short %}
-    {% include 'users/new-ui/user_tips.html' %}
-    {% endif %}
-
-    <div class="by">
-      Brought to you by
-      <div class="hs-logo logo-placeholder" style="width: 200px; height: 29px; background-color: #f0f0f0; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; color: #666; font-size: 12px;">Brand Logo Placeholder</div>
-        
-    </div>
-  </div>
   <div class="right">
     {% block user_content %}
+    {% endblock %}
   </div>
 </div>
-
-  {% endblock %}
 {% endblock %}

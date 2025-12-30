@@ -4,6 +4,8 @@ html, body {
 
 .login_page_new_ui {
   display: flex;
+  justify-content: center;
+  align-items: center;
   font-weight: 400;
   height: 100%;
   font-family: 'Hellix', sans-serif;
@@ -139,6 +141,7 @@ html, body {
   justify-content: center;
   align-items: center;
   height: 100%;
+  width: 100%;
 }
 
 .login_page_new_ui .toggle {
