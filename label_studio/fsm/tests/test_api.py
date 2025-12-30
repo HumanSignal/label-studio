@@ -359,10 +359,10 @@ class FSMEntityTransitionAPITests(APITestCase):
 
     @patch('fsm.state_manager.flag_set', return_value=True)
     def test_cannot_trigger_auto_triggered_transitions_manually(self, _mock_flag):
-        # 'annotation_submitted' is auto-triggered on create
+        # 'annotation_created' is auto-triggered on create
         response = self.client.post(
             f'/api/fsm/entities/annotation/{self.annotation.id}/transition/',
-            data={'transition_name': 'annotation_submitted'},
+            data={'transition_name': 'annotation_created'},
             format='json',
         )
         assert response.status_code == 400

@@ -12,7 +12,7 @@ from fsm.state_choices import AnnotationStateChoices
 from fsm.transitions import ModelChangeTransition, StateModelType, TransitionContext
 
 
-@register_state_transition('annotation', 'annotation_submitted', triggers_on_create=True, triggers_on_update=False)
+@register_state_transition('annotation', 'annotation_created', triggers_on_create=True, triggers_on_update=False)
 class AnnotationCreatedTransition(ModelChangeTransition):
     """
     Transition when an annotation is created.
