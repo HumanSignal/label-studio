@@ -2,6 +2,7 @@ import { IconExternal, IconFolderAdd, IconHumanSignal, IconUserAdd, IconFolderOp
 import { Button, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { useUpdatePageTitle } from "@humansignal/core";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -48,11 +49,13 @@ const actions = [
     title: "Create Project",
     icon: IconFolderAdd,
     type: "createProject",
+    i18nKey: "home.actions.createProject",
   },
   {
     title: "Invite Members",
     icon: IconUserAdd,
     type: "inviteMembers",
+    i18nKey: "home.actions.inviteMembers",
   },
 ] as const;
 
@@ -68,7 +71,9 @@ export const HomePage: Page = () => {
   const sortedProjects = useAtomValue(sortedProjectsAtom);
   const visitedIds = useAtomValue(visitedIdsAtom);
 
-  useUpdatePageTitle("Home");
+  const { t } = useTranslation();
+
+  useUpdatePageTitle(t("home.title", { defaultValue: "Home" }));
 
   // Fetch regular projects
   const { data, isFetching, isSuccess, isError } = useQuery({
@@ -136,10 +141,10 @@ export const HomePage: Page = () => {
         <section className="flex flex-col gap-6">
           <div className="flex flex-col gap-1">
             <Typography variant="headline" size="small">
-              Welcome 👋
+              {t("home.welcome", { defaultValue: "Welcome 👋" })}
             </Typography>
             <Typography size="small" className="text-neutral-content-subtler">
-              Let's get you started.
+              {t("home.getStarted", { defaultValue: "Let's get you started." })}
             </Typography>
           </div>
           <div className="flex justify-start gap-4">
@@ -153,7 +158,7 @@ export const HomePage: Page = () => {
                   onClick={handleActions(action.type)}
                   leading={<action.icon />}
                 >
-                  {action.title}
+                  {t(action.i18nKey, { defaultValue: action.title })}
                 </Button>
               );
             })}
@@ -163,9 +168,9 @@ export const HomePage: Page = () => {
             title={
               data && data?.count > 0 ? (
                 <>
-                  Recent Projects{" "}
+                  {t("home.recentProjects", { defaultValue: "Recent Projects" })}{" "}
                   <a href="/projects" className="text-lg font-normal hover:underline">
-                    View All
+                    {t("home.viewAll", { defaultValue: "View All" })}
                   </a>
                 </>
               ) : null
@@ -186,14 +191,14 @@ export const HomePage: Page = () => {
                 >
                   <IconFolderOpen />
                 </div>
-                <Typography variant="headline" size="small">
-                  Create your first project
+                  <Typography variant="headline" size="small">
+                  {t("home.createFirstProject.title", { defaultValue: "Create your first project" })}
                 </Typography>
                 <Typography size="small" className="text-neutral-content-subtler">
-                  Import your data and set up the labeling interface to start annotating
+                  {t("home.createFirstProject.desc", { defaultValue: "Import your data and set up the labeling interface to start annotating" })}
                 </Typography>
-                <Button className="mt-4" onClick={() => setModalIsOpen(true)} aria-label="Create new project">
-                  Create Project
+                <Button className="mt-4" onClick={() => setModalIsOpen(true)} aria-label={t("home.createFirstProject.aria", { defaultValue: "Create new project" })}>
+                  {t("home.createFirstProject.button", { defaultValue: "Create Project" })}
                 </Button>
               </div>
             ) : isSuccess && data && sortedProjects.length > 0 ? (

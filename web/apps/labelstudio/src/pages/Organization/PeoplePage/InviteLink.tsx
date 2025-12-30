@@ -1,4 +1,5 @@
 import { Button, Typography } from "@humansignal/ui";
+import { useTranslation } from "react-i18next";
 import { Space } from "@humansignal/ui/lib/space/space";
 import { cn } from "apps/labelstudio/src/utils/bem";
 import { Modal } from "apps/labelstudio/src/components/Modal/ModalPopup";
@@ -28,6 +29,7 @@ export function InviteLink({
   onClosed?: () => void;
 }) {
   const modalRef = useRef<Modal>();
+  const { t } = useTranslation();
   useEffect(() => {
     if (modalRef.current && opened) {
       modalRef.current?.show?.();
@@ -39,7 +41,7 @@ export function InviteLink({
   return (
     <Modal
       ref={modalRef}
-      title="Invite members"
+      title={t("organization.invite.title", "Invite members")}
       opened={opened}
       bareFooter={true}
       body={<InvitationModal />}
@@ -52,13 +54,13 @@ export function InviteLink({
 }
 
 const InvitationModal = () => {
+  const { t } = useTranslation();
   const { data: link } = useAtomValue(linkAtom);
   return (
     <div className={cn("invite").toClassName()}>
       <Input value={link} style={{ width: "100%" }} readOnly />
       <Typography size="small" className="text-neutral-content-subtler mt-base mb-wider">
-        Invite members to join your Label Studio instance. People that you invite have full access to all of your
-        projects.{" "}
+        {t("organization.invite.desc", "Invite members to join your Label Studio instance. People that you invite have full access to all of your projects.")}{" "}
         <a
           href="https://labelstud.io/guide/signup.html"
           target="_blank"
@@ -69,8 +71,9 @@ const InvitationModal = () => {
               href: "https://labelstud.io/guide/signup.html",
             })
           }
+          aria-label={t("organization.invite.learnMoreAria", "Learn more (opens in a new tab)")}
         >
-          Learn more
+          {t("organization.invite.learnMore", "Learn more")}
         </a>
         .
       </Typography>
@@ -79,6 +82,7 @@ const InvitationModal = () => {
 };
 
 const InvitationFooter = () => {
+  const { t } = useTranslation();
   const { copyText, copied } = useTextCopy();
   const { refetch, data: link } = useAtomValue(linkAtom);
 
@@ -90,9 +94,9 @@ const InvitationFooter = () => {
           look="outlined"
           style={{ width: 170 }}
           onClick={() => refetch()}
-          aria-label="Refresh invite link"
+          aria-label={t("organization.invite.refreshAria", "Refresh invite link")}
         >
-          Reset Link
+          {t("organization.invite.resetLink", "Reset Link")}
         </Button>
       </Space>
       <Space>
@@ -100,9 +104,9 @@ const InvitationFooter = () => {
           variant={copied ? "positive" : "primary"}
           className="w-[170px]"
           onClick={() => copyText(link!)}
-          aria-label="Copy invite link"
+          aria-label={t("organization.invite.copyAria", "Copy invite link")}
         >
-          {copied ? "Copied!" : "Copy link"}
+          {copied ? t("organization.invite.copied", "Copied!") : t("organization.invite.copyLink", "Copy link")}
         </Button>
       </Space>
     </Space>

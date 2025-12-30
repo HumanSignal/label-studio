@@ -1,4 +1,5 @@
 import { Fragment, useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import sanitizeHtml from "sanitize-html";
 import { IconSlack } from "@humansignal/icons";
 import { cn } from "../../utils/bem";
@@ -21,6 +22,7 @@ export const ErrorWrapper = ({
   possum = false,
   minimal = false,
 }) => {
+  const { t } = useTranslation();
   const preparedStackTrace = useMemo(() => {
     return (stacktrace ?? "").trim();
   }, [stacktrace]);
@@ -36,12 +38,12 @@ export const ErrorWrapper = ({
   return (
     <div className={cn("error-message").toClassName()}>
       {!minimal && possum !== false && (
-        <img
-          className={cn("error-message").elem("heidi").toClassName()}
-          src={absoluteURL("/static/images/opossum_broken.svg")}
-          height="111"
-          alt="Heidi's down"
-        />
+          <img
+            className={cn("error-message").elem("heidi").toClassName()}
+            src={absoluteURL("/static/images/opossum_broken.svg")}
+            height="111"
+            alt={t("error.heidiAlt", { defaultValue: "Heidi's down" })}
+          />
       )}
 
       {!minimal && title && <div className={cn("error-message").elem("title").toClassName()}>{title}</div>}
@@ -83,8 +85,8 @@ export const ErrorWrapper = ({
       {!minimal && (version || errorId) && (
         <div className={cn("error-message").elem("version").toClassName()}>
           <Space>
-            {version && `Version: ${version}`}
-            {errorId && `Error ID: ${errorId}`}
+            {version && t("error.version", { defaultValue: "Version: {{version}}", version })}
+            {errorId && t("error.errorId", { defaultValue: "Error ID: {{id}}", id: errorId })}
           </Space>
         </div>
       )}
@@ -98,28 +100,28 @@ export const ErrorWrapper = ({
               icon={<IconSlack />}
               href={SLACK_INVITE_URL}
             >
-              Ask on Slack
+              {t("error.askOnSlack", { defaultValue: "Ask on Slack" })}
             </Button>
 
             <Space size="small">
               {preparedStackTrace && (
                 <Button
-                  disabled={copied}
-                  onClick={copyStacktrace}
-                  className="w-[100px]"
-                  aria-label="Copy error stacktrace"
-                >
-                  {copied ? "Copied" : "Copy Stacktrace"}
-                </Button>
+                      disabled={copied}
+                      onClick={copyStacktrace}
+                      className="w-[100px]"
+                      aria-label={t('error.copyStacktraceAria', { defaultValue: 'Copy error stacktrace' })}
+                    >
+                      {copied ? t('error.copied', { defaultValue: 'Copied' }) : t('error.copyStacktrace', { defaultValue: 'Copy Stacktrace' })}
+                    </Button>
               )}
               {onGoBack && (
-                <Button onClick={onGoBack} aria-label="Go back">
-                  Go Back
+                <Button onClick={onGoBack} aria-label={t('error.goBackAria', { defaultValue: 'Go back' })}>
+                  {t('error.goBack', { defaultValue: 'Go Back' })}
                 </Button>
               )}
               {onReload && (
-                <Button onClick={onReload} aria-label="Reload page">
-                  Reload
+                <Button onClick={onReload} aria-label={t('error.reloadAria', { defaultValue: 'Reload page' })}>
+                  {t('error.reload', { defaultValue: 'Reload' })}
                 </Button>
               )}
             </Space>

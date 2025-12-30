@@ -3,12 +3,14 @@ import { Button, EmptyState, SimpleCard, Typography } from "@humansignal/ui";
 import clsx from "clsx";
 import { format } from "date-fns";
 import { useCallback } from "react";
+import { useTranslation } from 'react-i18next';
 import { Toggle } from "../../components/Form";
 import { useAPI } from "../../providers/ApiProvider";
 import { WebhookDeleteModal } from "./WebhookDeleteModal";
 import { ABILITY, useAuth } from "@humansignal/core/providers/AuthProvider";
 
 const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, canChangeWebhooks }) => {
+  const { t } = useTranslation();
   return (
     <li
       className={clsx(
@@ -43,7 +45,7 @@ const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, ca
       {canChangeWebhooks && (
         <div className="hidden group-hover:flex gap-2">
           <Button variant="primary" look="outlined" onClick={() => onSelectActive(webhook.id)} icon={<IconPencil />}>
-            Edit
+            {t('webhook.edit')}
           </Button>
           <Button
             variant="negative"
@@ -55,7 +57,7 @@ const WebhookListItem = ({ webhook, onSelectActive, onActiveChange, onDelete, ca
             }
             icon={<IconCross />}
           >
-            Delete
+            {t('webhook.delete')}
           </Button>
         </div>
       )}
@@ -88,12 +90,11 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
     <>
       <header className="mb-base">
         <Typography variant="headline" size="medium" className="mb-tight">
-          Webhooks
+          {t('webhook.title')}
         </Typography>
         {webhooks.length > 0 && (
           <Typography size="small" className="text-neutral-content-subtler">
-            Setup integrations that subscribe to certain events using Webhooks. When an event is triggered, {"app name"}{" "}
-            sends an HTTP POST request to the configured webhook URL.
+            {t('webhook.description')}
           </Typography>
         )}
       </header>
@@ -104,16 +105,16 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
               size="medium"
               variant="primary"
               icon={<IconWebhook />}
-              title="Add your first webhook"
-              description="Setup integrations that subscribe to certain events using Webhooks. When an event is triggered, Label Studio sends an HTTP POST request to the configured webhook URL."
+              title={t('webhook.emptyTitle')}
+              description={t('webhook.emptyDesc')}
               actions={
                 canChangeWebhooks ? (
                   <Button variant="primary" look="filled" onClick={onAddWebhook}>
-                    Add Webhook
+                    {t('webhook.addButton')}
                   </Button>
                 ) : (
                   <Typography variant="body" size="small">
-                    Contact your administrator to create Webhooks
+                    {t('webhook.contactAdmin')}
                   </Typography>
                 )
               }
@@ -125,9 +126,9 @@ const WebhookList = ({ onSelectActive, onAddWebhook, webhooks, fetchWebhooks }) 
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 hover:underline"
-                      aria-label="Learn more about webhooks (opens in new window)"
+                      aria-label={t('webhook.learnMoreAria')}
                     >
-                      Learn more
+                      {t('webhook.learnMore')}
                       <IconExternal width={16} height={16} />
                     </a>
                   </Typography>

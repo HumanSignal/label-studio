@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "../../utils/bem";
 import { clamp, isDefined } from "../../utils/helpers";
 import { useValueTracker } from "../Form/Utils";
@@ -181,11 +182,15 @@ export const Pagination: FC<PaginationProps> = forwardRef(
       return () => window.removeEventListener("popstate", popStateHandler);
     }, [props.urlParamName]);
 
+    const { t } = useTranslation();
+
+    const renderedLabel = typeof props.label === "string" ? t(props.label, { defaultValue: props.label }) : props.label;
+
     return totalPages > 1 ? (
       <div className={cn("pagination-ls").mod({ disabled, size, waiting }).toClassName()} style={props.style}>
         {props.label && isDefined(pageSize) && (
           <div className={cn("pagination-ls").elem("label").toClassName()}>
-            {props.label}: {visibleItems.start}-{visibleItems.end}
+            {renderedLabel}: {visibleItems.start}-{visibleItems.end}
           </div>
         )}
         <div className={cn("pagination-ls").elem("navigation").toClassName()}>
@@ -232,7 +237,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
                   if (allowInput) setInputMode(true);
                 }}
               >
-                {currentPage} <span>of {totalPages}</span>
+                {currentPage} <span>{t("pagination.of", { defaultValue: "of {{total}}", total: totalPages })}</span>
                 <div
                   onClick={() => {
                     /*  */
@@ -262,7 +267,7 @@ export const Pagination: FC<PaginationProps> = forwardRef(
           <div className={cn("pagination-ls").elem("page-size").toClassName()}>
             <Select
               value={pageSize}
-              options={pageSizeOptions.map((v) => ({ label: `${v} per page`, value: v }))}
+              options={pageSizeOptions.map((v) => ({ label: t("pagination.perPage", { defaultValue: "{{count}} per page", count: v }), value: v }))}
               onChange={(val: string) => {
                 const newPageSize = Number.parseInt(val);
 

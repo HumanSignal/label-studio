@@ -1,4 +1,5 @@
 import { forwardRef, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "../../utils/bem";
 import { useDropdown } from "@humansignal/ui";
 import "./Menu.scss";
@@ -81,9 +82,12 @@ Menu.Builder = (url, menuItems) => {
 };
 
 Menu.Group = ({ children, title, className, style }) => {
+  const { t } = useTranslation();
+  const renderedTitle = typeof title === "string" ? t(title, { defaultValue: title }) : title;
+
   return (
     <div className={cn("menu-group").mix(className).toClassName()} style={style}>
-      <div className={cn("menu-group").elem("title").toClassName()}>{title}</div>
+      <div className={cn("menu-group").elem("title").toClassName()}>{renderedTitle}</div>
       <ul className={cn("menu-group").elem("list").toClassName()}>{children}</ul>
     </div>
   );

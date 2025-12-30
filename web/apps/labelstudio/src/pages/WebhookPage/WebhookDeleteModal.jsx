@@ -3,17 +3,19 @@ import { modal } from "../../components/Modal/Modal";
 import { useModalControls } from "../../components/Modal/ModalPopup";
 import { Space } from "../../components/Space/Space";
 import { cn } from "../../utils/bem";
+import { useTranslation } from 'react-i18next';
 
 export const WebhookDeleteModal = ({ onDelete }) => {
+  const { t } = useTranslation();
   return modal({
-    title: "Delete",
+    title: t('webhook.deleteTitle'),
     body: () => {
       const ctrl = useModalControls();
       const rootClass = cn("webhook-delete-modal");
       return (
         <div className={rootClass}>
           <div className={rootClass.elem("modal-text")}>
-            Are you sure you want to delete the webhook? This action cannot be undone.
+            {t('webhook.deleteConfirm')}
           </div>
         </div>
       );
@@ -28,9 +30,9 @@ export const WebhookDeleteModal = ({ onDelete }) => {
             onClick={() => {
               ctrl.hide();
             }}
-            aria-label="Cancel webhook deletion"
+            aria-label={t('webhook.cancelAria')}
           >
-            Cancel
+            {t('webhook.cancel')}
           </Button>
           <Button
             variant="negative"
@@ -38,9 +40,9 @@ export const WebhookDeleteModal = ({ onDelete }) => {
               await onDelete();
               ctrl.hide();
             }}
-            aria-label="Confirm webhook deletion"
+            aria-label={t('webhook.confirmAria')}
           >
-            Delete Webhook
+            {t('webhook.deleteButton')}
           </Button>
         </Space>
       );

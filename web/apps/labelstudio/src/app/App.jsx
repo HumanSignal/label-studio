@@ -2,7 +2,9 @@
 
 import { createBrowserHistory } from "history";
 import { render } from "react-dom";
+import "../i18n";
 import { Router } from "react-router-dom";
+import LanguageSwitcher from "../components/LanguageSwitcher/LanguageSwitcher";
 import { LEAVE_BLOCKER_KEY, leaveBlockerCallback } from "../components/LeaveBlocker/LeaveBlocker";
 import { initSentry } from "../config/Sentry";
 import { ApiProvider, useAPI } from "../providers/ApiProvider";
@@ -59,6 +61,7 @@ initSentry(browserHistory);
 const App = ({ content }) => {
   return (
     <ErrorBoundary>
+      <LanguageSwitcher />
       <Router history={browserHistory}>
         <MultiProvider
           providers={[

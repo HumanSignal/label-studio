@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import CM from "codemirror";
 import { Button, cnm } from "@humansignal/ui";
 import { IconTrash } from "@humansignal/icons";
@@ -22,19 +23,24 @@ import snakeCase from "lodash/snakeCase";
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
 
-const EmptyConfigPlaceholder = () => (
-  <div className={configClass.elem("empty-config")}>
-    <p>Your labeling configuration is empty. It is required to label your data.</p>
-    <p>
-      Start from one of our predefined templates or create your own config on the Code panel. The labeling config is
-      XML-based and you can{" "}
-      <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">
-        read about the available tags in our documentation
-      </a>
-      .
-    </p>
-  </div>
-);
+const EmptyConfigPlaceholder = () => {
+  const { t } = useTranslation();
+  return (
+    <div className={configClass.elem("empty-config")}>
+      <p>{t("createProject.config.empty.required", "Your labeling configuration is empty. It is required to label your data.")}</p>
+      <p>
+        {t(
+          "createProject.config.empty.hint",
+          "Start from one of our predefined templates or create your own config on the Code panel. The labeling config is XML-based and you can ",
+        )}
+        <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">
+          {t("createProject.config.empty.readTags", "read about the available tags in our documentation")}
+        </a>
+        .
+      </p>
+    </div>
+  );
+};
 
 const Label = ({ label, template, color }) => {
   const value = label.getAttribute("value");
@@ -365,6 +371,7 @@ const Configurator = ({
 
   const debounceTimer = React.useRef();
   const api = useAPI();
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     // config may change during init, so wait for that, but for a very short time only
@@ -486,7 +493,7 @@ const Configurator = ({
   return (
     <div className={configClass}>
       <div className={configClass.elem("container")}>
-        <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
+        <h1>{t("createProject.config.labelingInterface", { defaultValue: "Labeling Interface" })}{hasChanges ? " *" : ""}</h1>
         <header>
           <Button
             type="button"
@@ -494,11 +501,18 @@ const Configurator = ({
             onClick={onBrowse}
             size="small"
             look="outlined"
-            aria-label="Browse templates"
+            aria-label={t("createProject.config.browseTemplates", { defaultValue: "Browse templates" })}
           >
-            Browse Templates
+            {t("createProject.config.browseTemplates", { defaultValue: "Browse templates" })}
           </Button>
-          <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
+          <ToggleItems
+            items={{
+              code: t("createProject.config.code", { defaultValue: "Code" }),
+              visual: t("createProject.config.visual", { defaultValue: "Visual" }),
+            }}
+            active={configure}
+            onSelect={onSelect}
+          />
         </header>
         <div className={configClass.elem("editor")}>
           {configure === "code" && (

@@ -1,0 +1,1480 @@
+{
+  "messages": {
+    "created at": {
+      "occurrences": [
+        "label_studio/core/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/jwt_auth/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_model_providers/models.py",
+        "label_studio/organizations/models.py",
+        "label_studio/organizations/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/session_policy/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "updated at": {
+      "occurrences": [
+        "label_studio/core/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/jwt_auth/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_model_providers/models.py",
+        "label_studio/organizations/models.py",
+        "label_studio/organizations/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/session_policy/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Directory indexes are not allowed here.": {
+      "occurrences": [
+        "label_studio/core/utils/static_serve.py"
+      ]
+    },
+    "“%(path)s” does not exist": {
+      "occurrences": [
+        "label_studio/core/utils/static_serve.py"
+      ]
+    },
+    "Created": {
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/fsm/registry.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "In progress": {
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "Failed": {
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "Completed": {
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/fsm/registry.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "title": {
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "md5 of file": {
+      "occurrences": [
+        "label_studio/data_export/models.py"
+      ]
+    },
+    "finished at": {
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "Export status": {
+      "occurrences": [
+        "label_studio/data_export/models.py"
+      ]
+    },
+    "Exporting meta data": {
+      "occurrences": [
+        "label_studio/data_export/models.py"
+      ]
+    },
+    "created by": {
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "data": {
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "ordering": {
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "order": {
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "selected items": {
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "conjunction": {
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "index": {
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "column": {
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "type": {
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "operator": {
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "value": {
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "In Progress": {
+      "occurrences": [
+        "label_studio/fsm/registry.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/fsm/state_choices.py"
+      ]
+    },
+    "Submitted": {
+      "occurrences": [
+        "label_studio/fsm/state_choices.py",
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Initialized": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "Queued": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "Completed with errors": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "last sync": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "last sync count": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "last_sync_job": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "description": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "synchronizable": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "can_delete_objects": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "key": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "object exists": {
+      "occurrences": [
+        "label_studio/io_storages/base_models.py",
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "container": {
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py"
+      ]
+    },
+    "prefix": {
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "regex_filter": {
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/localfiles/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "use_blob_urls": {
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/localfiles/models.py",
+        "label_studio/io_storages/redis/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "account_name": {
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py"
+      ]
+    },
+    "account_key": {
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py"
+      ]
+    },
+    "presign": {
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "presign_ttl": {
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "recursive scan": {
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/localfiles/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "Perform recursive scan over the container content": {
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py"
+      ]
+    },
+    "bucket": {
+      "occurrences": [
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "google_application_credentials": {
+      "occurrences": [
+        "label_studio/io_storages/gcs/models.py"
+      ]
+    },
+    "Google Project ID": {
+      "occurrences": [
+        "label_studio/io_storages/gcs/models.py"
+      ]
+    },
+    "Perform recursive scan over the bucket content": {
+      "occurrences": [
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "path": {
+      "occurrences": [
+        "label_studio/io_storages/localfiles/models.py",
+        "label_studio/io_storages/redis/models.py"
+      ]
+    },
+    "Perform recursive scan over the directory content": {
+      "occurrences": [
+        "label_studio/io_storages/localfiles/models.py"
+      ]
+    },
+    "host": {
+      "occurrences": [
+        "label_studio/io_storages/redis/models.py"
+      ]
+    },
+    "port": {
+      "occurrences": [
+        "label_studio/io_storages/redis/models.py",
+        "label_studio/io_storages/redis/models.py"
+      ]
+    },
+    "password": {
+      "occurrences": [
+        "label_studio/io_storages/redis/models.py"
+      ]
+    },
+    "db": {
+      "occurrences": [
+        "label_studio/io_storages/redis/models.py",
+        "label_studio/io_storages/redis/models.py"
+      ]
+    },
+    "aws_access_key_id": {
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "aws_secret_access_key": {
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "aws_session_token": {
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "aws_sse_kms_key_id": {
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "region_name": {
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "s3_endpoint": {
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "JWT API tokens enabled": {
+      "occurrences": [
+        "label_studio/jwt_auth/models.py"
+      ]
+    },
+    "JWT API token time to live (days)": {
+      "occurrences": [
+        "label_studio/jwt_auth/models.py"
+      ]
+    },
+    "legacy API tokens enabled": {
+      "occurrences": [
+        "label_studio/jwt_auth/models.py"
+      ]
+    },
+    "Created at": {
+      "occurrences": [
+        "label_studio/labels_manager/models.py"
+      ]
+    },
+    "Updated at": {
+      "occurrences": [
+        "label_studio/labels_manager/models.py"
+      ]
+    },
+    "Title": {
+      "occurrences": [
+        "label_studio/labels_manager/models.py"
+      ]
+    },
+    "Description": {
+      "occurrences": [
+        "label_studio/labels_manager/models.py"
+      ]
+    },
+    "Tag name": {
+      "occurrences": [
+        "label_studio/labels_manager/models.py"
+      ]
+    },
+    "Connected": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "Disconnected": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "Error": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "Training": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "Predicting": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "None": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "Basic Auth": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "is_interactive": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "url": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "error_message": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "basic auth user": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "basic auth password": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "extra params": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "model version": {
+      "occurrences": [
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "timeout": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "auto_update": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "batch size": {
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "TextClassification": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "NamedEntityRecognition": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "prompt": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "All": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "HasGT": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "Sample": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "Input": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "Output": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "Pending": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "InProgress": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "total predictions": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "total correct predictions": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "total tasks": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "triggered at": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "predictions updated at": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "completed at": {
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "OpenAI": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "AzureOpenAI": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "AzureAIFoundry": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "VertexAI": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "Gemini": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "Anthropic": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "Custom": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "Organization": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "User": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "Model": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "api_key": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "auth_token": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "google application credentials": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "google project id": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "google location": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "is_internal": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "budget_limit": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "budget_last_reset_date": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "budget_reset_period": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "budget_total_spent": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "budget_alert_threshold": {
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "deleted at": {
+      "occurrences": [
+        "label_studio/organizations/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "organization title": {
+      "occurrences": [
+        "label_studio/organizations/models.py"
+      ]
+    },
+    "token": {
+      "occurrences": [
+        "label_studio/organizations/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "created_by": {
+      "occurrences": [
+        "label_studio/organizations/models.py"
+      ]
+    },
+    "contact info": {
+      "occurrences": [
+        "label_studio/organizations/models.py"
+      ]
+    },
+    "label config": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "parsed label config": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "expert instruction": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show instruction": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show skip button": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "enable empty annotation": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "reveal_preannotations_interactively": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show annotation history": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show predictions to annotator": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "evaluate predictions automatically": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "result count": {
+      "occurrences": [
+        "label_studio/projects/models.py",
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "color": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "maximum annotation number": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "min_annotations_to_start_training": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "control weights": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "data_types": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "is draft": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "published": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show ground truth first": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "annotator evaluation enabled": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show overlap first": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "overlap_cohort_percentage": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "task_data_login": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "task_data_password": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "pinned at": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "custom_task_lock_ttl": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "deleted by": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "purge at": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "Business number %d": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "all data columns": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "common data columns": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "created annotations": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "created labels": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "created labels in drafts": {
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "Max session age (minutes)": {
+      "occurrences": [
+        "label_studio/session_policy/models.py"
+      ]
+    },
+    "Max time (minutes) between activity": {
+      "occurrences": [
+        "label_studio/session_policy/models.py"
+      ]
+    },
+    "Created from prediction": {
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Created from another annotation": {
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Imported": {
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Updated": {
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Skipped": {
+      "occurrences": [
+        "label_studio/tasks/choices.py",
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "Accepted": {
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Rejected": {
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Fixed and accepted": {
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Deleted review": {
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "updated by": {
+      "occurrences": [
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "is_labeled": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "allow_skip": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "overlap": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "inner id": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "total_annotations": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "cancelled_annotations": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "total_predictions": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "precomputed_agreement": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "comment count": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "unresolved comment count": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "last comment updated at": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "was cancelled": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "ground_truth": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "draft created at": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "lead time": {
+      "occurrences": [
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "prediction": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "last action": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "last created by": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "bulk created": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "expire_at": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "result": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "was postponed": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "score": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "cluster": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "mislabeling": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "message": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "error_type": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Reference to the associated prediction": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Reference to the associated failed prediction": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "inference time": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Time taken for inference in seconds": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "prompt tokens count": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Number of tokens in the prompt": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "completion tokens count": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Number of tokens in the completion": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "total tokens count": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Total number of tokens": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "prompt cost": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Cost of the prompt": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "completion cost": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Cost of the completion": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "total cost": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Total cost": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "extra": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Additional metadata in JSON format": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Prediction Meta": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Prediction Metas": {
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Create": {
+      "occurrences": [
+        "label_studio/templates/standard_form.html"
+      ]
+    },
+    "year": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "last activity": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "username": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "email address": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "first name": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "last name": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "phone": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "custom hotkeys": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "Custom keyboard shortcuts configuration for the user interface": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "staff status": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "Designates whether the user can log into this admin site.": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "active": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "Designates whether to treat this user as active. Unselect this instead of deleting accounts.": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "date joined": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "last annotation activity": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "allow newsletters": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "Allow sending newsletters to user": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "user": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "users": {
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "Please enter a password %(min_length)d–%(max_length)d characters in length.": {
+      "occurrences": [
+        "label_studio/users/validators.py",
+        "label_studio/users/validators.py"
+      ]
+    },
+    "Your password must be between %(min_length)d and %(max_length)d characters.": {
+      "occurrences": [
+        "label_studio/users/validators.py"
+      ]
+    },
+    "Ready": {
+      "occurrences": [
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "Name": {
+      "occurrences": [
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "State": {
+      "occurrences": [
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "Interaction Data": {
+      "occurrences": [
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "URL of webhook": {
+      "occurrences": [
+        "label_studio/webhooks/models.py",
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "does webhook send the payload": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Use webhook for all actions": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "request extra headers of webhook": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "is webhook active": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Creation time": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Last update time": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Project created": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Project updated": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Project deleted": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Task created": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Task deleted": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Annotation created": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Annotations created": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Annotation updated": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Annotation deleted": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Label link created": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Label link updated": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Label link deleted": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "action of webhook": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Action value": {
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    }
+  }
+}

@@ -39,7 +39,7 @@ const pages = {
 };
 
 export const SettingsPage = {
-  title: "Settings",
+  title: "settings.title",
   path: "/settings",
   exact: true,
   layout: MenuLayout,

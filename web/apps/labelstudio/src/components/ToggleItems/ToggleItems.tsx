@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { cn } from "../../utils/bem";
+import { useTranslation } from "react-i18next";
 import "./ToggleItems.scss";
 
 export const ToggleItems = ({
@@ -17,6 +18,7 @@ export const ToggleItems = ({
   active: string;
   onSelect: (name: string) => any;
 }) => {
+  const { t } = useTranslation();
   const rootClass = cn("toggle-items");
 
   return (
@@ -30,7 +32,7 @@ export const ToggleItems = ({
             .toString()}
           onClick={() => onSelect(item)}
         >
-          {items[item]}
+          {typeof items[item] === "string" ? t(items[item], { defaultValue: items[item] }) : items[item]}
         </li>
       ))}
     </ul>

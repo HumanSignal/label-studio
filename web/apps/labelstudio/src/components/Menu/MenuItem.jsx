@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { cn } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
+import { useTranslation } from "react-i18next";
 
 export const MenuItem = ({
   children,
@@ -16,6 +17,7 @@ export const MenuItem = ({
   onClick,
   ...rest
 }) => {
+  const { t } = useTranslation();
   const rootClass = cn("main-menu", { elem: "item" });
   const classList = [rootClass.toClassName()];
   const isActive = (() => {
@@ -34,10 +36,16 @@ export const MenuItem = ({
 
   if (className) classList.push(className);
 
+  const renderLabel = () => {
+    const raw = children ?? label;
+    if (typeof raw === "string") return t(raw, { defaultValue: raw });
+    return raw;
+  };
+
   const linkContent = (
     <>
       {icon && <span className={rootClass.elem("item-icon")}>{icon}</span>}
-      {children ?? label}
+      {renderLabel()}
     </>
   );
 

@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  frontend-build:
+    build:
+      context: ../../
+      dockerfile: docker/ci/frontend.Dockerfile
+    container_name: ls_frontend_build
+    volumes:
+      - ../../:/app:cached
+    working_dir: /app/web
+    tty: true
+
+  backend-test:
+    build:
+      context: ../../
+      dockerfile: docker/ci/backend.Dockerfile
+    container_name: ls_backend_test
+    volumes:
+      - ../../:/app:cached
+    working_dir: /app
+    depends_on:
+      - frontend-build

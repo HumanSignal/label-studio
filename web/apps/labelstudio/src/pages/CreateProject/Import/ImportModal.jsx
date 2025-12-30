@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { Button } from "@humansignal/ui";
 import { Modal } from "../../../components/Modal/Modal";
+import { useTranslation } from "react-i18next";
 import { Space } from "../../../components/Space/Space";
 import { useAPI } from "../../../providers/ApiProvider";
 import { ProjectProvider, useProject } from "../../../providers/ProjectProvider";
@@ -20,6 +21,7 @@ export const Inner = () => {
   const [waiting, setWaitingStatus] = useState(false);
   const [sample, setSample] = useState(null);
   const api = useAPI();
+  const { t } = useTranslation();
 
   const { uploading, uploadDisabled, finishUpload, fileIds, pageProps, uploadSample } = useImportPage(project);
 
@@ -63,7 +65,7 @@ export const Inner = () => {
 
   return (
     <Modal
-      title="Import data"
+      title={t("create_project.import.modalTitle", "Import data")}
       ref={modal}
       onHide={() => backToDM()}
       closeOnClickOutside={false}
@@ -72,7 +74,7 @@ export const Inner = () => {
       bare
     >
       <Modal.Header divided>
-        <div className={cn("modal").elem("title").toClassName()}>Import Data</div>
+        <div className={cn("modal").elem("title").toClassName()}>{t("create_project.import.header", "Import Data")}</div>
 
         <Space>
           <Button
@@ -81,18 +83,18 @@ export const Inner = () => {
             look="outlined"
             waiting={waiting}
             onClick={onCancel}
-            aria-label="Cancel import"
+            aria-label={t("create_project.import.cancelAria", "Cancel import")}
           >
-            Cancel
+            {t("create_project.import.cancel", "Cancel")}
           </Button>
           <Button
             size="small"
             onClick={onFinish}
             waiting={waiting || uploading}
             disabled={uploadDisabled}
-            aria-label="Finish import"
+            aria-label={t("create_project.import.finishAria", "Finish import")}
           >
-            Import
+            {t("create_project.import.finish", "Import")}
           </Button>
         </Space>
       </Modal.Header>

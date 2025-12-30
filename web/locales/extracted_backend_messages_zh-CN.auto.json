@@ -1,0 +1,2020 @@
+{
+  "messages": {
+    "created at": {
+      "msgid": "created at",
+      "msgstr": "创建于",
+      "occurrences": [
+        "label_studio/core/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/jwt_auth/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_model_providers/models.py",
+        "label_studio/organizations/models.py",
+        "label_studio/organizations/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/session_policy/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "updated at": {
+      "msgid": "updated at",
+      "msgstr": "更新于",
+      "occurrences": [
+        "label_studio/core/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/jwt_auth/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_model_providers/models.py",
+        "label_studio/organizations/models.py",
+        "label_studio/organizations/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/session_policy/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Directory indexes are not allowed here.": {
+      "msgid": "Directory indexes are not allowed here.",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/core/utils/static_serve.py"
+      ]
+    },
+    "“%(path)s” does not exist": {
+      "msgid": "“%(path)s” does not exist",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/core/utils/static_serve.py"
+      ]
+    },
+    "Created": {
+      "msgid": "Created",
+      "msgstr": "创建",
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/fsm/registry.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "In progress": {
+      "msgid": "In progress",
+      "msgstr": "进行中",
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "Failed": {
+      "msgid": "Failed",
+      "msgstr": "失败",
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "Completed": {
+      "msgid": "Completed",
+      "msgstr": "已完成",
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/fsm/registry.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "title": {
+      "msgid": "title",
+      "msgstr": "标题",
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/io_storages/base_models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "md5 of file": {
+      "msgid": "md5 of file",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_export/models.py"
+      ]
+    },
+    "finished at": {
+      "msgid": "finished at",
+      "msgstr": "完成于",
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "Export status": {
+      "msgid": "Export status",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_export/models.py"
+      ]
+    },
+    "Exporting meta data": {
+      "msgid": "Exporting meta data",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_export/models.py"
+      ]
+    },
+    "created by": {
+      "msgid": "created by",
+      "msgstr": "创建者",
+      "occurrences": [
+        "label_studio/data_export/models.py",
+        "label_studio/data_export/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "data": {
+      "msgid": "data",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "ordering": {
+      "msgid": "ordering",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "order": {
+      "msgid": "order",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "selected items": {
+      "msgid": "selected items",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "conjunction": {
+      "msgid": "conjunction",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "index": {
+      "msgid": "index",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "column": {
+      "msgid": "column",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "type": {
+      "msgid": "type",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "operator": {
+      "msgid": "operator",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "value": {
+      "msgid": "value",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/data_manager/models.py"
+      ]
+    },
+    "In Progress": {
+      "msgid": "In Progress",
+      "msgstr": "进行中",
+      "occurrences": [
+        "label_studio/fsm/registry.py",
+        "label_studio/fsm/state_choices.py",
+        "label_studio/fsm/state_choices.py"
+      ]
+    },
+    "Submitted": {
+      "msgid": "Submitted",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/fsm/state_choices.py",
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Initialized": {
+      "msgid": "Initialized",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "Queued": {
+      "msgid": "Queued",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "Completed with errors": {
+      "msgid": "Completed with errors",
+      "msgstr": "已完成 with errors",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "last sync": {
+      "msgid": "last sync",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "last sync count": {
+      "msgid": "last sync count",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "last_sync_job": {
+      "msgid": "last_sync_job",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "description": {
+      "msgid": "description",
+      "msgstr": "描述",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml_models/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "synchronizable": {
+      "msgid": "synchronizable",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "can_delete_objects": {
+      "msgid": "can_delete_objects",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "key": {
+      "msgid": "key",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "object exists": {
+      "msgid": "object exists",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/base_models.py",
+        "label_studio/io_storages/base_models.py"
+      ]
+    },
+    "container": {
+      "msgid": "container",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py"
+      ]
+    },
+    "prefix": {
+      "msgid": "prefix",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "regex_filter": {
+      "msgid": "regex_filter",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/localfiles/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "use_blob_urls": {
+      "msgid": "use_blob_urls",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/localfiles/models.py",
+        "label_studio/io_storages/redis/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "account_name": {
+      "msgid": "account_name",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py"
+      ]
+    },
+    "account_key": {
+      "msgid": "account_key",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py"
+      ]
+    },
+    "presign": {
+      "msgid": "presign",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "presign_ttl": {
+      "msgid": "presign_ttl",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "recursive scan": {
+      "msgid": "recursive scan",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py",
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/localfiles/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "Perform recursive scan over the container content": {
+      "msgid": "Perform recursive scan over the container content",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/azure_blob/models.py"
+      ]
+    },
+    "bucket": {
+      "msgid": "bucket",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "google_application_credentials": {
+      "msgid": "google_application_credentials",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/gcs/models.py"
+      ]
+    },
+    "Google Project ID": {
+      "msgid": "Google Project ID",
+      "msgstr": "Google 项目 ID",
+      "occurrences": [
+        "label_studio/io_storages/gcs/models.py"
+      ]
+    },
+    "Perform recursive scan over the bucket content": {
+      "msgid": "Perform recursive scan over the bucket content",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/gcs/models.py",
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "path": {
+      "msgid": "path",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/localfiles/models.py",
+        "label_studio/io_storages/redis/models.py"
+      ]
+    },
+    "Perform recursive scan over the directory content": {
+      "msgid": "Perform recursive scan over the directory content",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/localfiles/models.py"
+      ]
+    },
+    "host": {
+      "msgid": "host",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/redis/models.py"
+      ]
+    },
+    "port": {
+      "msgid": "port",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/redis/models.py",
+        "label_studio/io_storages/redis/models.py"
+      ]
+    },
+    "password": {
+      "msgid": "password",
+      "msgstr": "密码",
+      "occurrences": [
+        "label_studio/io_storages/redis/models.py"
+      ]
+    },
+    "db": {
+      "msgid": "db",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/redis/models.py",
+        "label_studio/io_storages/redis/models.py"
+      ]
+    },
+    "aws_access_key_id": {
+      "msgid": "aws_access_key_id",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "aws_secret_access_key": {
+      "msgid": "aws_secret_access_key",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "aws_session_token": {
+      "msgid": "aws_session_token",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "aws_sse_kms_key_id": {
+      "msgid": "aws_sse_kms_key_id",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "region_name": {
+      "msgid": "region_name",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "s3_endpoint": {
+      "msgid": "s3_endpoint",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/io_storages/s3/models.py"
+      ]
+    },
+    "JWT API tokens enabled": {
+      "msgid": "JWT API tokens enabled",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/jwt_auth/models.py"
+      ]
+    },
+    "JWT API token time to live (days)": {
+      "msgid": "JWT API token time to live (days)",
+      "msgstr": "JWT API 令牌 time to live (days))",
+      "occurrences": [
+        "label_studio/jwt_auth/models.py"
+      ]
+    },
+    "legacy API tokens enabled": {
+      "msgid": "legacy API tokens enabled",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/jwt_auth/models.py"
+      ]
+    },
+    "Created at": {
+      "msgid": "Created at",
+      "msgstr": "创建于",
+      "occurrences": [
+        "label_studio/labels_manager/models.py"
+      ]
+    },
+    "Updated at": {
+      "msgid": "Updated at",
+      "msgstr": "更新于",
+      "occurrences": [
+        "label_studio/labels_manager/models.py"
+      ]
+    },
+    "Title": {
+      "msgid": "Title",
+      "msgstr": "标题",
+      "occurrences": [
+        "label_studio/labels_manager/models.py"
+      ]
+    },
+    "Description": {
+      "msgid": "Description",
+      "msgstr": "描述",
+      "occurrences": [
+        "label_studio/labels_manager/models.py"
+      ]
+    },
+    "Tag name": {
+      "msgid": "Tag name",
+      "msgstr": "Tag 名称",
+      "occurrences": [
+        "label_studio/labels_manager/models.py"
+      ]
+    },
+    "Connected": {
+      "msgid": "Connected",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "Disconnected": {
+      "msgid": "Disconnected",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "Error": {
+      "msgid": "Error",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "Training": {
+      "msgid": "Training",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "Predicting": {
+      "msgid": "Predicting",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "None": {
+      "msgid": "None",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "Basic Auth": {
+      "msgid": "Basic Auth",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "is_interactive": {
+      "msgid": "is_interactive",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "url": {
+      "msgid": "url",
+      "msgstr": "URL",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "error_message": {
+      "msgid": "error_message",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "basic auth user": {
+      "msgid": "basic auth user",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "basic auth password": {
+      "msgid": "basic auth password",
+      "msgstr": "basic auth 密码",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "extra params": {
+      "msgid": "extra params",
+      "msgstr": "附加信息 params",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "model version": {
+      "msgid": "model version",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/ml/models.py",
+        "label_studio/projects/models.py",
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "timeout": {
+      "msgid": "timeout",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "auto_update": {
+      "msgid": "auto_update",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "batch size": {
+      "msgid": "batch size",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml/models.py"
+      ]
+    },
+    "TextClassification": {
+      "msgid": "TextClassification",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "NamedEntityRecognition": {
+      "msgid": "NamedEntityRecognition",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "prompt": {
+      "msgid": "prompt",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "All": {
+      "msgid": "All",
+      "msgstr": "全部",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "HasGT": {
+      "msgid": "HasGT",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "Sample": {
+      "msgid": "Sample",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "Input": {
+      "msgid": "Input",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "Output": {
+      "msgid": "Output",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "Pending": {
+      "msgid": "Pending",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "InProgress": {
+      "msgid": "InProgress",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "total predictions": {
+      "msgid": "total predictions",
+      "msgstr": "total 预测",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "total correct predictions": {
+      "msgid": "total correct predictions",
+      "msgstr": "total correct 预测",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "total tasks": {
+      "msgid": "total tasks",
+      "msgstr": "total 任务",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "triggered at": {
+      "msgid": "triggered at",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "predictions updated at": {
+      "msgid": "predictions updated at",
+      "msgstr": "预测 更新 at",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "completed at": {
+      "msgid": "completed at",
+      "msgstr": "已完成 at",
+      "occurrences": [
+        "label_studio/ml_models/models.py"
+      ]
+    },
+    "OpenAI": {
+      "msgid": "OpenAI",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "AzureOpenAI": {
+      "msgid": "AzureOpenAI",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "AzureAIFoundry": {
+      "msgid": "AzureAIFoundry",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "VertexAI": {
+      "msgid": "VertexAI",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "Gemini": {
+      "msgid": "Gemini",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "Anthropic": {
+      "msgid": "Anthropic",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "Custom": {
+      "msgid": "Custom",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "Organization": {
+      "msgid": "Organization",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "User": {
+      "msgid": "User",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "Model": {
+      "msgid": "Model",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "api_key": {
+      "msgid": "api_key",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "auth_token": {
+      "msgid": "auth_token",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "google application credentials": {
+      "msgid": "google application credentials",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "google project id": {
+      "msgid": "google project id",
+      "msgstr": "google 项目 id",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "google location": {
+      "msgid": "google location",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "is_internal": {
+      "msgid": "is_internal",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "budget_limit": {
+      "msgid": "budget_limit",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "budget_last_reset_date": {
+      "msgid": "budget_last_reset_date",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "budget_reset_period": {
+      "msgid": "budget_reset_period",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "budget_total_spent": {
+      "msgid": "budget_total_spent",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "budget_alert_threshold": {
+      "msgid": "budget_alert_threshold",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/ml_model_providers/models.py"
+      ]
+    },
+    "deleted at": {
+      "msgid": "deleted at",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/organizations/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "organization title": {
+      "msgid": "organization title",
+      "msgstr": "organization 标题",
+      "occurrences": [
+        "label_studio/organizations/models.py"
+      ]
+    },
+    "token": {
+      "msgid": "token",
+      "msgstr": "令牌",
+      "occurrences": [
+        "label_studio/organizations/models.py",
+        "label_studio/projects/models.py"
+      ]
+    },
+    "created_by": {
+      "msgid": "created_by",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/organizations/models.py"
+      ]
+    },
+    "contact info": {
+      "msgid": "contact info",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/organizations/models.py"
+      ]
+    },
+    "label config": {
+      "msgid": "label config",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "parsed label config": {
+      "msgid": "parsed label config",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "expert instruction": {
+      "msgid": "expert instruction",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show instruction": {
+      "msgid": "show instruction",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show skip button": {
+      "msgid": "show skip button",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "enable empty annotation": {
+      "msgid": "enable empty annotation",
+      "msgstr": "enable empty 标注",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "reveal_preannotations_interactively": {
+      "msgid": "reveal_preannotations_interactively",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show annotation history": {
+      "msgid": "show annotation history",
+      "msgstr": "show 标注 history",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show predictions to annotator": {
+      "msgid": "show predictions to annotator",
+      "msgstr": "show 预测 to annotator",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "evaluate predictions automatically": {
+      "msgid": "evaluate predictions automatically",
+      "msgstr": "evaluate 预测 automatically",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "result count": {
+      "msgid": "result count",
+      "msgstr": "结果数量",
+      "occurrences": [
+        "label_studio/projects/models.py",
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "color": {
+      "msgid": "color",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "maximum annotation number": {
+      "msgid": "maximum annotation number",
+      "msgstr": "maximum 标注 number",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "min_annotations_to_start_training": {
+      "msgid": "min_annotations_to_start_training",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "control weights": {
+      "msgid": "control weights",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "data_types": {
+      "msgid": "data_types",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "is draft": {
+      "msgid": "is draft",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "published": {
+      "msgid": "published",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show ground truth first": {
+      "msgid": "show ground truth first",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "annotator evaluation enabled": {
+      "msgid": "annotator evaluation enabled",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "show overlap first": {
+      "msgid": "show overlap first",
+      "msgstr": "show 重叠 first",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "overlap_cohort_percentage": {
+      "msgid": "overlap_cohort_percentage",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "task_data_login": {
+      "msgid": "task_data_login",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "task_data_password": {
+      "msgid": "task_data_password",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "pinned at": {
+      "msgid": "pinned at",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "custom_task_lock_ttl": {
+      "msgid": "custom_task_lock_ttl",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "deleted by": {
+      "msgid": "deleted by",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "purge at": {
+      "msgid": "purge at",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "Business number %d": {
+      "msgid": "Business number %d",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "all data columns": {
+      "msgid": "all data columns",
+      "msgstr": "全部 data columns",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "common data columns": {
+      "msgid": "common data columns",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "created annotations": {
+      "msgid": "created annotations",
+      "msgstr": "创建 标注",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "created labels": {
+      "msgid": "created labels",
+      "msgstr": "创建 labels",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "created labels in drafts": {
+      "msgid": "created labels in drafts",
+      "msgstr": "创建 labels in drafts",
+      "occurrences": [
+        "label_studio/projects/models.py"
+      ]
+    },
+    "Max session age (minutes)": {
+      "msgid": "Max session age (minutes)",
+      "msgstr": "Max session age (minutes))",
+      "occurrences": [
+        "label_studio/session_policy/models.py"
+      ]
+    },
+    "Max time (minutes) between activity": {
+      "msgid": "Max time (minutes) between activity",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/session_policy/models.py"
+      ]
+    },
+    "Created from prediction": {
+      "msgid": "Created from prediction",
+      "msgstr": "创建 from 预测",
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Created from another annotation": {
+      "msgid": "Created from another annotation",
+      "msgstr": "创建 from another 标注",
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Imported": {
+      "msgid": "Imported",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Updated": {
+      "msgid": "Updated",
+      "msgstr": "更新",
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Skipped": {
+      "msgid": "Skipped",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/choices.py",
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "Accepted": {
+      "msgid": "Accepted",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Rejected": {
+      "msgid": "Rejected",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Fixed and accepted": {
+      "msgid": "Fixed and accepted",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "Deleted review": {
+      "msgid": "Deleted review",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/choices.py"
+      ]
+    },
+    "updated by": {
+      "msgid": "updated by",
+      "msgstr": "更新 by",
+      "occurrences": [
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "is_labeled": {
+      "msgid": "is_labeled",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "allow_skip": {
+      "msgid": "allow_skip",
+      "msgstr": "允许跳过",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "overlap": {
+      "msgid": "overlap",
+      "msgstr": "重叠",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "inner id": {
+      "msgid": "inner id",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "total_annotations": {
+      "msgid": "total_annotations",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "cancelled_annotations": {
+      "msgid": "cancelled_annotations",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "total_predictions": {
+      "msgid": "total_predictions",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "precomputed_agreement": {
+      "msgid": "precomputed_agreement",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "comment count": {
+      "msgid": "comment count",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "unresolved comment count": {
+      "msgid": "unresolved comment count",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "last comment updated at": {
+      "msgid": "last comment updated at",
+      "msgstr": "last comment 更新 at",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "was cancelled": {
+      "msgid": "was cancelled",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "ground_truth": {
+      "msgid": "ground_truth",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "draft created at": {
+      "msgid": "draft created at",
+      "msgstr": "draft 创建 at",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "lead time": {
+      "msgid": "lead time",
+      "msgstr": "耗时",
+      "occurrences": [
+        "label_studio/tasks/models.py",
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "prediction": {
+      "msgid": "prediction",
+      "msgstr": "预测",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "last action": {
+      "msgid": "last action",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "last created by": {
+      "msgid": "last created by",
+      "msgstr": "last 创建 by",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "bulk created": {
+      "msgid": "bulk created",
+      "msgstr": "bulk 创建",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "expire_at": {
+      "msgid": "expire_at",
+      "msgstr": "过期时间",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "result": {
+      "msgid": "result",
+      "msgstr": "结果",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "was postponed": {
+      "msgid": "was postponed",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "score": {
+      "msgid": "score",
+      "msgstr": "得分",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "cluster": {
+      "msgid": "cluster",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "mislabeling": {
+      "msgid": "mislabeling",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "message": {
+      "msgid": "message",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "error_type": {
+      "msgid": "error_type",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Reference to the associated prediction": {
+      "msgid": "Reference to the associated prediction",
+      "msgstr": "Reference to the associated 预测",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Reference to the associated failed prediction": {
+      "msgid": "Reference to the associated failed prediction",
+      "msgstr": "Reference to the associated 失败 预测",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "inference time": {
+      "msgid": "inference time",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Time taken for inference in seconds": {
+      "msgid": "Time taken for inference in seconds",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "prompt tokens count": {
+      "msgid": "prompt tokens count",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Number of tokens in the prompt": {
+      "msgid": "Number of tokens in the prompt",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "completion tokens count": {
+      "msgid": "completion tokens count",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Number of tokens in the completion": {
+      "msgid": "Number of tokens in the completion",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "total tokens count": {
+      "msgid": "total tokens count",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Total number of tokens": {
+      "msgid": "Total number of tokens",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "prompt cost": {
+      "msgid": "prompt cost",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Cost of the prompt": {
+      "msgid": "Cost of the prompt",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "completion cost": {
+      "msgid": "completion cost",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Cost of the completion": {
+      "msgid": "Cost of the completion",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "total cost": {
+      "msgid": "total cost",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Total cost": {
+      "msgid": "Total cost",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "extra": {
+      "msgid": "extra",
+      "msgstr": "附加信息",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Additional metadata in JSON format": {
+      "msgid": "Additional metadata in JSON format",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Prediction Meta": {
+      "msgid": "Prediction Meta",
+      "msgstr": "预测 Meta",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Prediction Metas": {
+      "msgid": "Prediction Metas",
+      "msgstr": "预测 Metas",
+      "occurrences": [
+        "label_studio/tasks/models.py"
+      ]
+    },
+    "Create": {
+      "msgid": "Create",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/templates/standard_form.html"
+      ]
+    },
+    "year": {
+      "msgid": "year",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "last activity": {
+      "msgid": "last activity",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "username": {
+      "msgid": "username",
+      "msgstr": "用户名",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "email address": {
+      "msgid": "email address",
+      "msgstr": "电子邮件 address",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "first name": {
+      "msgid": "first name",
+      "msgstr": "first 名称",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "last name": {
+      "msgid": "last name",
+      "msgstr": "last 名称",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "phone": {
+      "msgid": "phone",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "custom hotkeys": {
+      "msgid": "custom hotkeys",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "Custom keyboard shortcuts configuration for the user interface": {
+      "msgid": "Custom keyboard shortcuts configuration for the user interface",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "staff status": {
+      "msgid": "staff status",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "Designates whether the user can log into this admin site.": {
+      "msgid": "Designates whether the user can log into this admin site.",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "active": {
+      "msgid": "active",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "Designates whether to treat this user as active. Unselect this instead of deleting accounts.": {
+      "msgid": "Designates whether to treat this user as active. Unselect this instead of deleting accounts.",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "date joined": {
+      "msgid": "date joined",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "last annotation activity": {
+      "msgid": "last annotation activity",
+      "msgstr": "last 标注 activity",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "allow newsletters": {
+      "msgid": "allow newsletters",
+      "msgstr": "允许 newsletters",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "Allow sending newsletters to user": {
+      "msgid": "Allow sending newsletters to user",
+      "msgstr": "允许向用户发送简报",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "user": {
+      "msgid": "user",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "users": {
+      "msgid": "users",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/models.py"
+      ]
+    },
+    "Please enter a password %(min_length)d–%(max_length)d characters in length.": {
+      "msgid": "Please enter a password %(min_length)d–%(max_length)d characters in length.",
+      "msgstr": "Please enter a 密码 %(min_length)d–%(max_length)d characters in length.",
+      "occurrences": [
+        "label_studio/users/validators.py",
+        "label_studio/users/validators.py"
+      ]
+    },
+    "Your password must be between %(min_length)d and %(max_length)d characters.": {
+      "msgid": "Your password must be between %(min_length)d and %(max_length)d characters.",
+      "msgstr": "Your 密码 must be between %(min_length)d and %(max_length)d characters.",
+      "occurrences": [
+        "label_studio/users/validators.py"
+      ]
+    },
+    "Ready": {
+      "msgid": "Ready",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "Name": {
+      "msgid": "Name",
+      "msgstr": "名称",
+      "occurrences": [
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "State": {
+      "msgid": "State",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "Interaction Data": {
+      "msgid": "Interaction Data",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/users/product_tours/models.py"
+      ]
+    },
+    "URL of webhook": {
+      "msgid": "URL of webhook",
+      "msgstr": "URL of Webhook",
+      "occurrences": [
+        "label_studio/webhooks/models.py",
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "does webhook send the payload": {
+      "msgid": "does webhook send the payload",
+      "msgstr": "does Webhook send the payload",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Use webhook for all actions": {
+      "msgid": "Use webhook for all actions",
+      "msgstr": "Use Webhook for 全部 actions",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "request extra headers of webhook": {
+      "msgid": "request extra headers of webhook",
+      "msgstr": "request 附加信息 headers of Webhook",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "is webhook active": {
+      "msgid": "is webhook active",
+      "msgstr": "is Webhook active",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Creation time": {
+      "msgid": "Creation time",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Last update time": {
+      "msgid": "Last update time",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Project created": {
+      "msgid": "Project created",
+      "msgstr": "项目 创建",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Project updated": {
+      "msgid": "Project updated",
+      "msgstr": "项目 更新",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Project deleted": {
+      "msgid": "Project deleted",
+      "msgstr": "项目 deleted",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Task created": {
+      "msgid": "Task created",
+      "msgstr": "任务 创建",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Task deleted": {
+      "msgid": "Task deleted",
+      "msgstr": "任务 deleted",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Annotation created": {
+      "msgid": "Annotation created",
+      "msgstr": "已创建标注",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Annotations created": {
+      "msgid": "Annotations created",
+      "msgstr": "标注 创建",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Annotation updated": {
+      "msgid": "Annotation updated",
+      "msgstr": "标注已更新",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Annotation deleted": {
+      "msgid": "Annotation deleted",
+      "msgstr": "标注已删除",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Label link created": {
+      "msgid": "Label link created",
+      "msgstr": "Label link 创建",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Label link updated": {
+      "msgid": "Label link updated",
+      "msgstr": "Label link 更新",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Label link deleted": {
+      "msgid": "Label link deleted",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "action of webhook": {
+      "msgid": "action of webhook",
+      "msgstr": "action of Webhook",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    },
+    "Action value": {
+      "msgid": "Action value",
+      "msgstr": "",
+      "occurrences": [
+        "label_studio/webhooks/models.py"
+      ]
+    }
+  }
+}

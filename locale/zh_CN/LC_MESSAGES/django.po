@@ -1,0 +1,818 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: label-studio\n"
+"POT-Creation-Date: 2025-01-01 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Accepted"
+msgstr ""
+
+msgid "Action value"
+msgstr ""
+
+msgid "Additional metadata in JSON format"
+msgstr ""
+
+msgid "All"
+msgstr "全部"
+
+msgid "Allow sending newsletters to user"
+msgstr "允许向用户发送简报"
+
+msgid "Annotation created"
+msgstr "已创建标注"
+
+msgid "Annotation deleted"
+msgstr "标注已删除"
+
+msgid "Annotation updated"
+msgstr "标注已更新"
+
+msgid "Annotations created"
+msgstr "标注 创建"
+
+msgid "Anthropic"
+msgstr ""
+
+msgid "AzureAIFoundry"
+msgstr ""
+
+msgid "AzureOpenAI"
+msgstr ""
+
+msgid "Basic Auth"
+msgstr ""
+
+msgid "Business number %d"
+msgstr ""
+
+msgid "Completed"
+msgstr "已完成"
+
+msgid "Completed with errors"
+msgstr "已完成 with errors"
+
+msgid "Connected"
+msgstr ""
+
+msgid "Cost of the completion"
+msgstr ""
+
+msgid "Cost of the prompt"
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+msgid "Created"
+msgstr "创建"
+
+msgid "Created at"
+msgstr "创建于"
+
+msgid "Created from another annotation"
+msgstr "创建 from another 标注"
+
+msgid "Created from prediction"
+msgstr "创建 from 预测"
+
+msgid "Creation time"
+msgstr ""
+
+msgid "Custom"
+msgstr ""
+
+msgid "Custom keyboard shortcuts configuration for the user interface"
+msgstr ""
+
+msgid "Deleted review"
+msgstr ""
+
+msgid "Description"
+msgstr "描述"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+msgid "Designates whether to treat this user as active. Unselect this instead of deleting accounts."
+msgstr ""
+
+msgid "Directory indexes are not allowed here."
+msgstr ""
+
+msgid "Disconnected"
+msgstr ""
+
+msgid "Error"
+msgstr ""
+
+msgid "Export status"
+msgstr ""
+
+msgid "Exporting meta data"
+msgstr ""
+
+msgid "Failed"
+msgstr "失败"
+
+msgid "Fixed and accepted"
+msgstr ""
+
+msgid "Gemini"
+msgstr ""
+
+msgid "Google Project ID"
+msgstr "Google 项目 ID"
+
+msgid "HasGT"
+msgstr ""
+
+msgid "Imported"
+msgstr ""
+
+msgid "In Progress"
+msgstr "进行中"
+
+msgid "In progress"
+msgstr "进行中"
+
+msgid "InProgress"
+msgstr ""
+
+msgid "Initialized"
+msgstr ""
+
+msgid "Input"
+msgstr ""
+
+msgid "Interaction Data"
+msgstr ""
+
+msgid "JWT API token time to live (days)"
+msgstr "JWT API 令牌 time to live (days))"
+
+msgid "JWT API tokens enabled"
+msgstr ""
+
+msgid "Label link created"
+msgstr "Label link 创建"
+
+msgid "Label link deleted"
+msgstr ""
+
+msgid "Label link updated"
+msgstr "Label link 更新"
+
+msgid "Last update time"
+msgstr ""
+
+msgid "Max session age (minutes)"
+msgstr "Max session age (minutes))"
+
+msgid "Max time (minutes) between activity"
+msgstr ""
+
+msgid "Model"
+msgstr ""
+
+msgid "Name"
+msgstr "名称"
+
+msgid "NamedEntityRecognition"
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "Number of tokens in the completion"
+msgstr ""
+
+msgid "Number of tokens in the prompt"
+msgstr ""
+
+msgid "OpenAI"
+msgstr ""
+
+msgid "Organization"
+msgstr ""
+
+msgid "Output"
+msgstr ""
+
+msgid "Pending"
+msgstr ""
+
+msgid "Perform recursive scan over the bucket content"
+msgstr ""
+
+msgid "Perform recursive scan over the container content"
+msgstr ""
+
+msgid "Perform recursive scan over the directory content"
+msgstr ""
+
+msgid "Please enter a password %(min_length)d–%(max_length)d characters in length."
+msgstr "Please enter a 密码 %(min_length)d–%(max_length)d characters in length."
+
+msgid "Predicting"
+msgstr ""
+
+msgid "Prediction Meta"
+msgstr "预测 Meta"
+
+msgid "Prediction Metas"
+msgstr "预测 Metas"
+
+msgid "Project created"
+msgstr "项目 创建"
+
+msgid "Project deleted"
+msgstr "项目 deleted"
+
+msgid "Project updated"
+msgstr "项目 更新"
+
+msgid "Queued"
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "Reference to the associated failed prediction"
+msgstr "Reference to the associated 失败 预测"
+
+msgid "Reference to the associated prediction"
+msgstr "Reference to the associated 预测"
+
+msgid "Rejected"
+msgstr ""
+
+msgid "Sample"
+msgstr ""
+
+msgid "Skipped"
+msgstr ""
+
+msgid "State"
+msgstr ""
+
+msgid "Submitted"
+msgstr ""
+
+msgid "Tag name"
+msgstr "Tag 名称"
+
+msgid "Task created"
+msgstr "任务 创建"
+
+msgid "Task deleted"
+msgstr "任务 deleted"
+
+msgid "TextClassification"
+msgstr ""
+
+msgid "Time taken for inference in seconds"
+msgstr ""
+
+msgid "Title"
+msgstr "标题"
+
+msgid "Total cost"
+msgstr ""
+
+msgid "Total number of tokens"
+msgstr ""
+
+msgid "Training"
+msgstr ""
+
+msgid "URL of webhook"
+msgstr "URL of Webhook"
+
+msgid "Updated"
+msgstr "更新"
+
+msgid "Updated at"
+msgstr "更新于"
+
+msgid "Use webhook for all actions"
+msgstr "Use Webhook for 全部 actions"
+
+msgid "User"
+msgstr ""
+
+msgid "VertexAI"
+msgstr ""
+
+msgid "Your password must be between %(min_length)d and %(max_length)d characters."
+msgstr "Your 密码 must be between %(min_length)d and %(max_length)d characters."
+
+msgid "account_key"
+msgstr ""
+
+msgid "account_name"
+msgstr ""
+
+msgid "action of webhook"
+msgstr "action of Webhook"
+
+msgid "active"
+msgstr ""
+
+msgid "all data columns"
+msgstr "全部 data columns"
+
+msgid "allow newsletters"
+msgstr "允许 newsletters"
+
+msgid "allow_skip"
+msgstr "允许跳过"
+
+msgid "annotator evaluation enabled"
+msgstr ""
+
+msgid "api_key"
+msgstr ""
+
+msgid "auth_token"
+msgstr ""
+
+msgid "auto_update"
+msgstr ""
+
+msgid "aws_access_key_id"
+msgstr ""
+
+msgid "aws_secret_access_key"
+msgstr ""
+
+msgid "aws_session_token"
+msgstr ""
+
+msgid "aws_sse_kms_key_id"
+msgstr ""
+
+msgid "basic auth password"
+msgstr "basic auth 密码"
+
+msgid "basic auth user"
+msgstr ""
+
+msgid "batch size"
+msgstr ""
+
+msgid "bucket"
+msgstr ""
+
+msgid "budget_alert_threshold"
+msgstr ""
+
+msgid "budget_last_reset_date"
+msgstr ""
+
+msgid "budget_limit"
+msgstr ""
+
+msgid "budget_reset_period"
+msgstr ""
+
+msgid "budget_total_spent"
+msgstr ""
+
+msgid "bulk created"
+msgstr "bulk 创建"
+
+msgid "can_delete_objects"
+msgstr ""
+
+msgid "cancelled_annotations"
+msgstr ""
+
+msgid "cluster"
+msgstr ""
+
+msgid "color"
+msgstr ""
+
+msgid "column"
+msgstr ""
+
+msgid "comment count"
+msgstr ""
+
+msgid "common data columns"
+msgstr ""
+
+msgid "completed at"
+msgstr "已完成 at"
+
+msgid "completion cost"
+msgstr ""
+
+msgid "completion tokens count"
+msgstr ""
+
+msgid "conjunction"
+msgstr ""
+
+msgid "contact info"
+msgstr ""
+
+msgid "container"
+msgstr ""
+
+msgid "control weights"
+msgstr ""
+
+msgid "created annotations"
+msgstr "创建 标注"
+
+msgid "created at"
+msgstr "创建于"
+
+msgid "created by"
+msgstr "创建者"
+
+msgid "created labels"
+msgstr "创建 labels"
+
+msgid "created labels in drafts"
+msgstr "创建 labels in drafts"
+
+msgid "created_by"
+msgstr ""
+
+msgid "custom hotkeys"
+msgstr ""
+
+msgid "custom_task_lock_ttl"
+msgstr ""
+
+msgid "data"
+msgstr ""
+
+msgid "data_types"
+msgstr ""
+
+msgid "date joined"
+msgstr ""
+
+msgid "db"
+msgstr ""
+
+msgid "deleted at"
+msgstr ""
+
+msgid "deleted by"
+msgstr ""
+
+msgid "description"
+msgstr "描述"
+
+msgid "does webhook send the payload"
+msgstr "does Webhook send the payload"
+
+msgid "draft created at"
+msgstr "draft 创建 at"
+
+msgid "email address"
+msgstr "电子邮件 address"
+
+msgid "enable empty annotation"
+msgstr "enable empty 标注"
+
+msgid "error_message"
+msgstr ""
+
+msgid "error_type"
+msgstr ""
+
+msgid "evaluate predictions automatically"
+msgstr "evaluate 预测 automatically"
+
+msgid "expert instruction"
+msgstr ""
+
+msgid "expire_at"
+msgstr "过期时间"
+
+msgid "extra"
+msgstr "附加信息"
+
+msgid "extra params"
+msgstr "附加信息 params"
+
+msgid "finished at"
+msgstr "完成于"
+
+msgid "first name"
+msgstr "first 名称"
+
+msgid "google application credentials"
+msgstr ""
+
+msgid "google location"
+msgstr ""
+
+msgid "google project id"
+msgstr "google 项目 id"
+
+msgid "google_application_credentials"
+msgstr ""
+
+msgid "ground_truth"
+msgstr ""
+
+msgid "host"
+msgstr ""
+
+msgid "index"
+msgstr ""
+
+msgid "inference time"
+msgstr ""
+
+msgid "inner id"
+msgstr ""
+
+msgid "is draft"
+msgstr ""
+
+msgid "is webhook active"
+msgstr "is Webhook active"
+
+msgid "is_interactive"
+msgstr ""
+
+msgid "is_internal"
+msgstr ""
+
+msgid "is_labeled"
+msgstr ""
+
+msgid "key"
+msgstr ""
+
+msgid "label config"
+msgstr ""
+
+msgid "last action"
+msgstr ""
+
+msgid "last activity"
+msgstr ""
+
+msgid "last annotation activity"
+msgstr "last 标注 activity"
+
+msgid "last comment updated at"
+msgstr "last comment 更新 at"
+
+msgid "last created by"
+msgstr "last 创建 by"
+
+msgid "last name"
+msgstr "last 名称"
+
+msgid "last sync"
+msgstr ""
+
+msgid "last sync count"
+msgstr ""
+
+msgid "last_sync_job"
+msgstr ""
+
+msgid "lead time"
+msgstr "耗时"
+
+msgid "legacy API tokens enabled"
+msgstr ""
+
+msgid "maximum annotation number"
+msgstr "maximum 标注 number"
+
+msgid "md5 of file"
+msgstr ""
+
+msgid "message"
+msgstr ""
+
+msgid "min_annotations_to_start_training"
+msgstr ""
+
+msgid "mislabeling"
+msgstr ""
+
+msgid "model version"
+msgstr ""
+
+msgid "object exists"
+msgstr ""
+
+msgid "operator"
+msgstr ""
+
+msgid "order"
+msgstr ""
+
+msgid "ordering"
+msgstr ""
+
+msgid "organization title"
+msgstr "organization 标题"
+
+msgid "overlap"
+msgstr "重叠"
+
+msgid "overlap_cohort_percentage"
+msgstr ""
+
+msgid "parsed label config"
+msgstr ""
+
+msgid "password"
+msgstr "密码"
+
+msgid "path"
+msgstr ""
+
+msgid "phone"
+msgstr ""
+
+msgid "pinned at"
+msgstr ""
+
+msgid "port"
+msgstr ""
+
+msgid "precomputed_agreement"
+msgstr ""
+
+msgid "prediction"
+msgstr "预测"
+
+msgid "predictions updated at"
+msgstr "预测 更新 at"
+
+msgid "prefix"
+msgstr ""
+
+msgid "presign"
+msgstr ""
+
+msgid "presign_ttl"
+msgstr ""
+
+msgid "prompt"
+msgstr ""
+
+msgid "prompt cost"
+msgstr ""
+
+msgid "prompt tokens count"
+msgstr ""
+
+msgid "published"
+msgstr ""
+
+msgid "purge at"
+msgstr ""
+
+msgid "recursive scan"
+msgstr ""
+
+msgid "regex_filter"
+msgstr ""
+
+msgid "region_name"
+msgstr ""
+
+msgid "request extra headers of webhook"
+msgstr "request 附加信息 headers of Webhook"
+
+msgid "result"
+msgstr "结果"
+
+msgid "result count"
+msgstr "结果数量"
+
+msgid "reveal_preannotations_interactively"
+msgstr ""
+
+msgid "s3_endpoint"
+msgstr ""
+
+msgid "score"
+msgstr "得分"
+
+msgid "selected items"
+msgstr ""
+
+msgid "show annotation history"
+msgstr "show 标注 history"
+
+msgid "show ground truth first"
+msgstr ""
+
+msgid "show instruction"
+msgstr ""
+
+msgid "show overlap first"
+msgstr "show 重叠 first"
+
+msgid "show predictions to annotator"
+msgstr "show 预测 to annotator"
+
+msgid "show skip button"
+msgstr ""
+
+msgid "staff status"
+msgstr ""
+
+msgid "synchronizable"
+msgstr ""
+
+msgid "task_data_login"
+msgstr ""
+
+msgid "task_data_password"
+msgstr ""
+
+msgid "timeout"
+msgstr ""
+
+msgid "title"
+msgstr "标题"
+
+msgid "token"
+msgstr "令牌"
+
+msgid "total correct predictions"
+msgstr "total correct 预测"
+
+msgid "total cost"
+msgstr ""
+
+msgid "total predictions"
+msgstr "total 预测"
+
+msgid "total tasks"
+msgstr "total 任务"
+
+msgid "total tokens count"
+msgstr ""
+
+msgid "total_annotations"
+msgstr ""
+
+msgid "total_predictions"
+msgstr ""
+
+msgid "triggered at"
+msgstr ""
+
+msgid "type"
+msgstr ""
+
+msgid "unresolved comment count"
+msgstr ""
+
+msgid "updated at"
+msgstr "更新于"
+
+msgid "updated by"
+msgstr "更新 by"
+
+msgid "url"
+msgstr "URL"
+
+msgid "use_blob_urls"
+msgstr ""
+
+msgid "user"
+msgstr ""
+
+msgid "username"
+msgstr "用户名"
+
+msgid "users"
+msgstr ""
+
+msgid "value"
+msgstr ""
+
+msgid "was cancelled"
+msgstr ""
+
+msgid "was postponed"
+msgstr ""
+
+msgid "year"
+msgstr ""
+
+msgid "“%(path)s” does not exist"
+msgstr ""
+

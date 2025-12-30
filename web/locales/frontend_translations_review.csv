@@ -1,0 +1,176 @@
+key,english,chinese
+"Hello, world!","Hello, world!",你好，世界！
+Language,Language,语言
+Large project detected ({count} tasks),Large project detected ({count} tasks),检测到大型项目（{{count}} 个任务）
+UNBLOCK_HISTORY,UNBLOCK_HISTORY,允许导航
+apps.labelstudio.src.app.ErrorBoundary.jsx.runtime_error.50c894b7,Runtime error,Runtime error
+apps.labelstudio.src.components.Error.Error.jsx.copy_error_stacktrace.0955769e,Copy error stacktrace,Copy error stacktrace
+apps.labelstudio.src.components.Error.Error.jsx.go_back.e84712fb,Go back,Go back
+apps.labelstudio.src.components.Error.Error.jsx.heidi_s_down.d272565d,Heidi's down,Heidi's down
+apps.labelstudio.src.components.Error.Error.jsx.reload_page.37614e96,Reload page,Reload page
+apps.labelstudio.src.components.Form.Form.jsx.submit_form.a610e2e7,Submit form,Submit form
+apps.labelstudio.src.components.LanguageSwitcher.LanguageSwitcher.jsx.switch_to_english.5bb1416f,Switch to English,Switch to English
+apps.labelstudio.src.components.Menubar.Menubar.jsx.account_amp_settings.cb29c52a,Account &amp; Settings,Account &amp; 设置
+apps.labelstudio.src.components.Menubar.Menubar.jsx.api.d93d10ff,API,API
+apps.labelstudio.src.components.Menubar.Menubar.jsx.dark_mode.e7f8b9dc,Dark Mode,Dark Mode
+apps.labelstudio.src.components.Menubar.Menubar.jsx.docs.68a41942,Docs,Docs
+apps.labelstudio.src.components.Menubar.Menubar.jsx.github.5442e2b6,GitHub,GitHub
+apps.labelstudio.src.components.Menubar.Menubar.jsx.home.70f8bb9a,Home,Home
+apps.labelstudio.src.components.Menubar.Menubar.jsx.keyboard_shortcuts.b465751c,Keyboard Shortcuts,Keyboard Shortcuts
+apps.labelstudio.src.components.Menubar.Menubar.jsx.label_studio_logo.773128c6,Label Studio Logo,Label Studio Logo
+apps.labelstudio.src.components.Menubar.Menubar.jsx.log_out.4e8131ca,Log Out,Log Out
+apps.labelstudio.src.components.Menubar.Menubar.jsx.organization.519255ae,Organization,Organization
+apps.labelstudio.src.components.Menubar.Menubar.jsx.slack_community.85fe170e,Slack Community,Slack Community
+apps.labelstudio.src.pages.CreateProject.Config.Config.jsx.add_labels.ef456e98,Add labels,添加 labels
+apps.labelstudio.src.pages.CreateProject.Config.Config.jsx.browse_templates.6d9e4bc8,Browse templates,Browse templates
+apps.labelstudio.src.pages.CreateProject.Config.Config.jsx.delete_label.d9fadca3,delete label,删除 label
+apps.labelstudio.src.pages.CreateProject.Config.Config.jsx.save_configuration.33e5a546,Save configuration,保存 configuration
+apps.labelstudio.src.pages.CreateProject.Config.TemplatesList.jsx.create_custom_template.1b7726ee,Create custom template,创建 custom template
+apps.labelstudio.src.pages.CreateProject.CreateProject.jsx.cancel_project_creation.0181844d,Cancel project creation,取消 项目 creation
+apps.labelstudio.src.pages.CreateProject.CreateProject.jsx.optional_description_of_your_project.c107f04f,Optional description of your project,Optional 描述 of your 项目
+apps.labelstudio.src.pages.CreateProject.CreateProject.jsx.select_an_option.08d7aa35,Select an option,Select an option
+apps.labelstudio.src.pages.CreateProject.Import.Import.jsx.add_url.0b9c93c2,Add URL,添加 URL
+apps.labelstudio.src.pages.CreateProject.Import.Import.jsx.cloud_storage_documentation_opens_in_a_n.0ede4e24,Cloud Storage documentation (opens in a new tab),Cloud Storage documentation (opens in a new tab)
+apps.labelstudio.src.pages.CreateProject.Import.Import.jsx.dataset_url.451ea31c,Dataset URL,Dataset URL
+apps.labelstudio.src.pages.CreateProject.Import.Import.jsx.expected_input_preview.f35cfbf7,Expected Input Preview,Expected Input Preview
+apps.labelstudio.src.pages.CreateProject.Import.Import.jsx.files.6ce6c512,Files,Files
+apps.labelstudio.src.pages.CreateProject.Import.Import.jsx.learn_more_about_video_format_support_op.a2186f35,Learn more about video format support (opens in a new tab),Learn more about video format support (opens in a new tab)
+apps.labelstudio.src.pages.CreateProject.Import.Import.jsx.multi_image_labeling_documentation_opens.d42a6a63,Multi-image labeling documentation (opens in a new tab),Multi-image labeling documentation (opens in a new tab)
+apps.labelstudio.src.pages.CreateProject.Import.Import.jsx.upload_file.503a3d8c,Upload file,Upload file
+apps.labelstudio.src.pages.CreateProject.Import.Import.jsx.upload_limitations_documentation_opens_i.fff78afc,Upload limitations documentation (opens in a new tab),Upload limitations documentation (opens in a new tab)
+apps.labelstudio.src.pages.CreateProject.Import.Import.jsx.video_format_support_depends_on_your_bro.0d88cdbd,Video format support depends on your browser. Click to learn more.,Video format support depends on your browser. Click to learn more.
+apps.labelstudio.src.pages.CreateProject.Import.ImportModal.jsx.import_data.d82c9379,Import data,Import data
+apps.labelstudio.src.pages.DataManager.DataManager.jsx.back_to_projects.0559813d,Back to projects,Back to 项目
+apps.labelstudio.src.pages.ExportPage.ExportPage.jsx.copy_command.a8e10478,Copy command,Copy command
+apps.labelstudio.src.pages.ExportPage.ExportPage.jsx.export_data.deadb481,Export data,Export data
+apps.labelstudio.src.pages.Organization.PeoplePage.PeoplePage.jsx.invite_new_member.c079dc96,Invite new member,Invite new member
+apps.labelstudio.src.pages.Organization.PeoplePage.PeoplePage.jsx.people.b37554f6,People,People
+apps.labelstudio.src.pages.Organization.PeoplePage.PeoplePage.jsx.show_api_token_settings.fc0a4b01,Show API token settings,Show API token 设置
+apps.labelstudio.src.pages.Organization.PeoplePage.SelectedUser.jsx.close_user_details.051026d0,Close user details,Close user details
+apps.labelstudio.src.pages.Settings.AnnotationSettings.jsx.annotation.de3b78b6,Annotation,Annotation
+apps.labelstudio.src.pages.Settings.AnnotationSettings.jsx.save_annotation_settings.4fb5a76c,Save annotation settings,保存 annotation 设置
+apps.labelstudio.src.pages.Settings.AnnotationSettings.jsx.show_before_labeling.a4ca1bf2,Show before labeling,Show before labeling
+apps.labelstudio.src.pages.Settings.AnnotationSettings.jsx.use_predictions_to_prelabel_tasks.f5e3795f,Use predictions to prelabel tasks,Use 预测 to prelabel 任务
+apps.labelstudio.src.pages.Settings.DangerZone.jsx.danger_zone.8fc83aac,Danger Zone,Danger Zone
+apps.labelstudio.src.pages.Settings.GeneralSettings.jsx.color.1d0c8304,Color,Color
+apps.labelstudio.src.pages.Settings.GeneralSettings.jsx.description.55f8ebc8,Description,描述
+apps.labelstudio.src.pages.Settings.GeneralSettings.jsx.project_name.5f950764,Project Name,项目 名称
+apps.labelstudio.src.pages.Settings.GeneralSettings.jsx.save_general_settings.5c90f8c4,Save general settings,保存 general 设置
+apps.labelstudio.src.pages.Settings.GeneralSettings.jsx.task_sampling.2efad52a,Task Sampling,任务 Sampling
+apps.labelstudio.src.pages.Settings.LabelingSettings.jsx.labeling_interface.40342855,Labeling Interface,Labeling Interface
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.Forms.jsx.any_extra_params_to_pass_during_model_co.aaa59a3b,Any extra params to pass during model connection,Any extra params to pass during model connection
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.Forms.jsx.backend_url.61290c20,Backend URL,Backend URL
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.Forms.jsx.basic_auth_pass.6c2a5846,Basic auth pass,Basic auth pass
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.Forms.jsx.basic_auth_user.a387bcd4,Basic auth user,Basic auth user
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.Forms.jsx.enter_a_name.7e5fe97f,Enter a name,Enter a 名称
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.Forms.jsx.interactive_preannotations.29f45e05,Interactive preannotations,Interactive preannotations
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.Forms.jsx.name.709a2322,Name,名称
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.Forms.jsx.save_machine_learning_form.9221a582,Save machine learning form,保存 machine learning form
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.Forms.jsx.select_authentication_method.38ce92f9,Select authentication method,Select authentication method
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.MachineLearningList.jsx.machine_learning_model_options.fee6d434,Machine learning model options,Machine learning model options
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.MachineLearningSettings.jsx.add_machine_learning_model.a807fa1e,Add machine learning model,添加 machine learning model
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.MachineLearningSettings.jsx.learn_more_about_machine_learning_models.ff3fb3a2,Learn more about machine learning models (opens in new window),Learn more about machine learning models (opens in new window)
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.MachineLearningSettings.jsx.let_s_connect_your_first_model.1cce1b25,Let's connect your first model,Let's connect your first model
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.MachineLearningSettings.jsx.model.68c2cc7f,Model,Model
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.MachineLearningSettings.jsx.save_machine_learning_settings.02c49be3,Save machine learning settings,保存 machine learning 设置
+apps.labelstudio.src.pages.Settings.MachineLearningSettings.MachineLearningSettings.jsx.start_model_training_on_annotation_submi.642ee6fa,Start model training on annotation submission,Start model training on annotation submission
+apps.labelstudio.src.pages.Settings.PredictionsSettings.PredictionsSettings.jsx.predictions_title.82268848,predictions.title,预测.标题
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageCard.jsx.storage_options.f24345ff,Storage options,Storage options
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageCard.jsx.sync_storage.77400588,Sync Storage,Sync Storage
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageForm.jsx.test_storage_connection.c6bdcb58,Test storage connection,Test storage connection
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.add_source_storage.b799a157,Add Source Storage,添加 Source Storage
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.add_target_storage.9eb2d931,Add Target Storage,添加 Target Storage
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.add_your_first_cloud_storage.5e55b639,Add your first cloud storage,添加 your first cloud storage
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.amazon_s3.7b11a423,Amazon S3,Amazon S3
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.azure_blob_storage.32c53839,Azure Blob Storage,Azure Blob Storage
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.cloud_storage.ff7f9006,Cloud Storage,Cloud Storage
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.google_cloud_storage.eb9df2d0,Google Cloud Storage,Google Cloud Storage
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.learn_more_about_cloud_storage_opens_in.94b6f51c,Learn more about cloud storage (opens in new window),Learn more about cloud storage (opens in new window)
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.redis_storage.3a1b8873,Redis Storage,Redis Storage
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.source_cloud_storage.646c39e3,Source Cloud Storage,Source Cloud Storage
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSettings.jsx.target_cloud_storage.2f202a99,Target Cloud Storage,Target Cloud Storage
+apps.labelstudio.src.pages.Settings.StorageSettings.StorageSummary.jsx.learn_more_about_cloud_storage_troublesh.24240da3,Learn more about cloud storage troubleshooting,Learn more about cloud storage troubleshooting
+apps.labelstudio.src.pages.WebhookPage.WebhookDetail.jsx.cancel_webhook_edit.97e337c2,Cancel webhook edit,取消 Webhook 编辑
+createProject.config.browseTemplates,Browse templates,Browse templates
+createProject.config.code,Code,Code
+createProject.config.empty.hint,Start from one of our predefined templates or create your own config on the Code panel. The labeling config is XML-based and you can ,Start from one of our predefined templates or 创建 your own config on the Code panel. The labeling config is XML-based and you can
+createProject.config.empty.readTags,read about the available tags in our documentation,read about the available tags in our documentation
+createProject.config.empty.required,Your labeling configuration is empty. It is required to label your data.,Your labeling configuration is empty. It is required to label your data.
+createProject.config.labelingInterface,Labeling Interface,Labeling Interface
+createProject.config.visual,Visual,Visual
+createProject.preview.title,UI Preview,UI Preview
+error.copied,Copied,Copied
+error.copyStacktrace,Copy Stacktrace,Copy Stacktrace
+error.copyStacktraceAria,Copy error stacktrace,Copy error stacktrace
+error.goBack,Go Back,Go Back
+error.goBackAria,Go back,Go back
+error.reload,Reload,Reload
+error.reloadAria,Reload page,Reload page
+home.actions.createProject,Create Project,创建 项目
+home.actions.inviteMembers,Invite Members,邀请成员
+home.createFirstProject.aria,Create new project,创建新项目
+home.createFirstProject.button,Create Project,创建项目
+home.createFirstProject.desc,Import your data and set up the labeling interface to start annotating,导入数据并完成标注界面的配置，以启动标注流程
+home.createFirstProject.title,Create your first project,创建你的第一个项目
+home.getStarted,Let's get you started.,现在就带你入门.
+home.title,Home,首页
+home.welcome,Welcome 👋,欢迎使用 👋
+menubar.accountSettings,Account &amp; Settings,账户与设置
+menubar.api,API,API
+menubar.docs,Docs,Docs
+menubar.github,GitHub,GitHub
+menubar.home,Home,Home
+menubar.keyboardShortcuts,Keyboard Shortcuts,快捷键
+menubar.logOut,Log Out,登出
+menubar.newsletterNotice,Please check new notification settings in the Account & Settings page,请前往账户与设置页面，查看新通知相关设置
+menubar.organization,Organization,Organization
+menubar.pinMenu,Pin menu,Pin menu
+menubar.projects,Projects,项目
+menubar.slack,Slack Community,Slack Community
+menubar.unpinMenu,Unpin menu,Unpin menu
+predictions.emptyDesc,"Upload predictions to automatically prelabel your data and speed up annotation. Import predictions from multiple model versions to compare their performance, or connect live models from the Model page to generate predictions on demand.",上传预测以自动预标注你的数据并加快标注速度。可以从多个模型版本导入预测以比较性能，或从 Model 页面连接实时模型以按需生成预测。
+predictions.emptyTitle,No predictions uploaded yet,尚未上传预测
+predictions.learnMoreAria,Learn more about predictions (opens in new window),了解有关预测的更多信息（在新窗口打开）
+predictions.listTitle,Predictions List,预测列表
+predictions.title,Predictions,预测
+project.label,Label,标注
+project.new,New project,新项目
+project.options,Project options,项目选项
+project.settings,Settings,设置
+projects.createAria,Create new project,创建新项目
+projects.createButton,Create Project,创建项目
+projects.emptyDesc,Create one and start labeling your data.,创建一个项目并开始标注你的数据。
+projects.emptyHeader,Heidi doesn't see any projects here!,Heidi 没有在这里看到任何项目！
+projects.emptyImageAlt,Heidi looking for projects,Heidi 在寻找项目
+projects.title,Projects,项目
+settings.title,Settings,设置
+webhook.addAria,Add Webhook,添加 Webhook
+webhook.addButton,Add Webhook,添加 Webhook
+webhook.addHeader,Add Header,添加请求头
+webhook.cancel,Cancel,取消
+webhook.cancelAria,Cancel webhook deletion,取消删除 Webhook
+webhook.confirmAria,Confirm webhook deletion,确认删除 Webhook
+webhook.contactAdmin,Contact your administrator to create Webhooks,联系管理员以创建 Webhooks
+webhook.delete,Delete,删除
+webhook.deleteAria,Delete webhook,删除 Webhook
+webhook.deleteButton,Delete Webhook,删除 Webhook
+webhook.deleteConfirm,Are you sure you want to delete the webhook? This action cannot be undone.,你确定要删除该 Webhook 吗？此操作不可撤销。
+webhook.deleteTitle,Delete Webhook,删除 Webhook
+webhook.description,"Setup integrations that subscribe to certain events using Webhooks. When an event is triggered, the app sends an HTTP POST request to the configured webhook URL.",设置订阅特定事件的集成（Webhook）。当触发事件时，系统会向配置的 webhook URL 发送 HTTP POST 请求。
+webhook.edit,Edit,编辑
+webhook.emptyDesc,"Setup integrations that subscribe to certain events using Webhooks. When an event is triggered, Label Studio sends an HTTP POST request to the configured webhook URL.",设置订阅特定事件的集成（Webhook）。当触发事件时，系统会向配置的 webhook URL 发送 HTTP POST 请求。
+webhook.emptyTitle,Add your first webhook,添加你的第一个 Webhook
+webhook.headerPlaceholder,header,请求头
+webhook.headers,Headers,请求头
+webhook.isActive,Is Active,是否启用
+webhook.learnMore,Learn more,了解更多
+webhook.payloadUrl,Payload URL,有效负载 URL
+webhook.removeHeader,Remove Header,删除请求头
+webhook.saveAria,Save Changes,保存更改
+webhook.saveButton,Save Changes,保存更改
+webhook.sendFor,Send Payload for,发送有效负载给
+webhook.sendForAllActions,Send for all actions,对所有操作发送
+webhook.sendPayload,Send payload,发送有效负载
+webhook.title,Webhooks,Webhooks
+webhook.urlPlaceholder,URL,URL
+webhook.valuePlaceholder,value,值

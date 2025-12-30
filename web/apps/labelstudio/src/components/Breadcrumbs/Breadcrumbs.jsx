@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import { useConfig } from "../../providers/ConfigProvider";
 import { useBreadcrumbs, useFindRouteComponent } from "../../providers/RoutesProvider";
@@ -34,6 +35,9 @@ export const Breadcrumbs = () => {
 
           const isInternal = findComponent(href) !== null;
 
+          const { t } = useTranslation();
+          const renderedTitle = typeof item.title === "string" ? t(item.title, { defaultValue: item.title }) : item.title;
+
           const title = (
             <span
               className={cn("breadcrumbs")
@@ -41,7 +45,7 @@ export const Breadcrumbs = () => {
                 .mod({ faded: index === item.length - 1 })
                 .toClassName()}
             >
-              {item.title}
+              {renderedTitle}
             </span>
           );
 

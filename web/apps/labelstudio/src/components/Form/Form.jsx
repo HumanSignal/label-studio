@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { shallowEqualObjects } from "shallow-equal";
 import { ApiProvider } from "../../providers/ApiProvider";
 import { MultiProvider } from "../../providers/MultiProvider";
@@ -524,9 +525,7 @@ Form.Builder = React.forwardRef(
         {children}
         {props.autosubmit !== true && withActions === true && (
           <Form.Actions>
-            <Button type="submit" className="w-[120px]" aria-label="Submit form">
-              Save
-            </Button>
+            <SubmitButton />
           </Form.Actions>
         )}
       </Form>
@@ -546,14 +545,24 @@ Form.Actions = ({ children, valid, extra, size }) => {
   );
 };
 
+const SubmitButton = () => {
+  const { t } = useTranslation();
+  return (
+    <Button type="submit" className="w-[120px]" aria-label={t("components.form.submitAria", { defaultValue: "Submit form" })}>
+      {t("components.form.save", { defaultValue: "Save" })}
+    </Button>
+  );
+};
+
 Form.Indicator = () => {
   const state = React.useContext(FormStateContext);
+  const { t } = useTranslation();
 
   return (
     <div className={cn("form-indicator").toClassName()}>
       <Oneof value={state}>
         <span className={cn("form-indicator").elem("item").mod({ type: state }).toClassName()} case="success">
-          Saved!
+          {t("components.form.saved", { defaultValue: "Saved!" })}
         </span>
       </Oneof>
     </div>

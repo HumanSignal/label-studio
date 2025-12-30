@@ -12,6 +12,7 @@ import { unique } from "../../../utils/helpers";
 import { sampleDatasetAtom } from "../utils/atoms";
 import "./Import.scss";
 import { Button, CodeBlock, SimpleCard, Spinner, Tooltip, Typography } from "@humansignal/ui";
+import { useTranslation } from "react-i18next";
 import truncate from "truncate-middle";
 import samples from "./samples.json";
 import { importFiles } from "./utils";
@@ -155,6 +156,7 @@ export const ImportPage = ({
   openLabelingConfig,
 }) => {
   const [error, setError] = useState();
+  const { t } = useTranslation();
   const [newlyUploadedFiles, setNewlyUploadedFiles] = useState(new Set());
   const prevUploadedRef = useRef(new Set());
   const api = useAPI();
@@ -382,12 +384,12 @@ export const ImportPage = ({
           method="POST"
           onSubmit={onLoadURL}
         >
-          <Input placeholder="Dataset URL" name="url" ref={urlRef} rawClassName="h-[40px]" />
-          <Button variant="primary" look="outlined" type="submit" aria-label="Add URL">
-            Add URL
+          <Input placeholder={t("create_project.import.datasetUrl", "Dataset URL")} name="url" ref={urlRef} rawClassName="h-[40px]" />
+          <Button variant="primary" look="outlined" type="submit" aria-label={t("create_project.import.addUrl", "Add URL")}>
+            {t("create_project.import.addUrl", "Add URL")}
           </Button>
         </form>
-        <span>or</span>
+        <span>{t("common.or", "or")}</span>
         <Button
           variant="primary"
           look="outlined"
@@ -396,7 +398,12 @@ export const ImportPage = ({
           leading={<IconUpload />}
           aria-label="Upload file"
         >
-          Upload {files.uploaded.length ? "More " : ""}Files
+          {(() => {
+            const uploadLabel = files.uploaded.length
+              ? t("create_project.import.uploadMoreFiles", "Upload More Files")
+              : t("create_project.import.uploadFiles", "Upload Files");
+            return uploadLabel;
+          })()}
         </Button>
         {ff.isActive(ff.FF_SAMPLE_DATASETS) && (
           <SampleDatasetSelect samples={samples} sample={sample} onSampleApplied={onSampleDatasetSelect} />
@@ -404,12 +411,12 @@ export const ImportPage = ({
         <div
           className={importClass.elem("csv-handling").mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })}
         >
-          <span>Treat CSV/TSV as</span>
+          <span>{t("create_project.import.treatCsvAs", "Treat CSV/TSV as")}</span>
           <label>
-            <input {...csvProps} value="tasks" checked={csvHandling === "tasks"} /> List of tasks
+            <input {...csvProps} value="tasks" checked={csvHandling === "tasks"} /> {t("create_project.import.csvAsTasks", "List of tasks")}
           </label>
           <label>
-            <input {...csvProps} value="ts" checked={csvHandling === "ts"} /> Time Series or Whole Text File
+            <input {...csvProps} value="ts" checked={csvHandling === "ts"} /> {t("create_project.import.csvAsTs", "Time Series or Whole Text File")}
           </label>
         </div>
         <div className={importClass.elem("status")}>
@@ -429,29 +436,29 @@ export const ImportPage = ({
             {!showList && (
               <div className="flex gap-4 justify-center items-start w-full h-full">
                 <label htmlFor="file-input" className="w-full h-full">
-                  <div className={`${dropzoneClass.elem("content")} w-full`}>
-                    <IconFileUpload height="64" className={dropzoneClass.elem("icon")} />
-                    <header>
-                      Drag & drop files here
-                      <br />
-                      or click to browse
-                    </header>
+                          <div className={`${dropzoneClass.elem("content")} w-full`}>
+                            <IconFileUpload height="64" className={dropzoneClass.elem("icon")} />
+                            <header>
+                              {t("create_project.import.dragDrop", "Drag & drop files here")}
+                              <br />
+                              {t("create_project.import.orClick", "or click to browse")}
+                            </header>
 
                     <dl>
-                      <dt>Images</dt>
+                      <dt>{t("create_project.import.dt.images", "Images")}</dt>
                       <dd>{supportedExtensions.image.join(", ")}</dd>
-                      <dt>Audio</dt>
+                      <dt>{t("create_project.import.dt.audio", "Audio")}</dt>
                       <dd>{supportedExtensions.audio.join(", ")}</dd>
                       <dt>
                         <div className="flex items-center gap-1">
-                          Video
-                          <Tooltip title="Video format support depends on your browser. Click to learn more.">
+                          {t("create_project.import.dt.video", "Video")}
+                          <Tooltip title={t("create_project.import.videoTooltip", "Video format support depends on your browser. Click to learn more.")}>
                             <a
                               href="https://labelstud.io/tags/video#Video-format"
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center"
-                              aria-label="Learn more about video format support (opens in a new tab)"
+                              aria-label={t("create_project.import.videoAria", "Learn more about video format support (opens in a new tab)")}
                             >
                               <IconInfoOutline className="w-4 h-4 text-primary-content hover:text-primary-content-hover" />
                             </a>
@@ -459,36 +466,36 @@ export const ImportPage = ({
                         </div>
                       </dt>
                       <dd>{supportedExtensions.video.join(", ")}</dd>
-                      <dt>HTML / HyperText</dt>
+                      <dt>{t("create_project.import.dt.html", "HTML / HyperText")}</dt>
                       <dd>{supportedExtensions.html.join(", ")}</dd>
-                      <dt>Text</dt>
+                      <dt>{t("create_project.import.dt.text", "Text")}</dt>
                       <dd>{supportedExtensions.text.join(", ")}</dd>
-                      <dt>Structured data</dt>
+                      <dt>{t("create_project.import.dt.structured", "Structured data")}</dt>
                       <dd>{supportedExtensions.structuredData.join(", ")}</dd>
-                      <dt>PDF</dt>
+                      <dt>{t("create_project.import.dt.pdf", "PDF")}</dt>
                       <dd>{supportedExtensions.pdf.join(", ")}</dd>
                     </dl>
                     <div className="tips">
-                      <b>Important:</b>
+                      <b>{t("create_project.import.important", "Important:")}</b>
                       <ul className="mt-2 ml-4 list-disc font-normal">
                         <li>
-                          We recommend{" "}
+                          {t("create_project.import.tip.cloudStoragePrefix", "We recommend")}{" "}
                           <a
                             href="https://labelstud.io/guide/storage.html"
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="Cloud Storage documentation (opens in a new tab)"
+                            aria-label={t("create_project.import.cloudStorageAria", "Cloud Storage documentation (opens in a new tab)")}
                           >
-                            Cloud Storage
+                            {t("create_project.import.cloudStorage", "Cloud Storage")}
                           </a>{" "}
-                          over direct uploads due to{" "}
+                          {t("create_project.import.tip.overDirectUploads", "over direct uploads due to")}{" "}
                           <a
                             href="https://labelstud.io/guide/tasks.html#Import-data-from-the-Label-Studio-UI"
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="Upload limitations documentation (opens in a new tab)"
+                            aria-label={t("create_project.import.uploadLimitationsAria", "Upload limitations documentation (opens in a new tab)")}
                           >
-                            upload limitations
+                            {t("create_project.import.uploadLimitations", "upload limitations")}
                           </a>
                           .
                         </li>
