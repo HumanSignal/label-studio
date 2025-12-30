@@ -187,7 +187,7 @@
 
 .landing-logos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
   align-items: center;
 }
@@ -209,6 +209,23 @@
 
 .landing-logo-placeholder:hover {
   border-color: var(--grape_400);
+}
+
+.landing-logo-img {
+  max-width: 100%;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.landing-logo-img:hover {
+  opacity: 1;
+  transform: scale(1.05);
 }
 
 /* Features Section - Block 3 */
