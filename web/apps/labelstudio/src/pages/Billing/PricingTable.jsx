@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Block, Elem } from "../../utils/bem";
 import "./PricingTable.scss";
 
-export const PricingTable = ({ pricingTableId, publishableKey, customerEmail, customerId }) => {
+export const PricingTable = ({ pricingTableId, publishableKey, customerEmail, customerSessionClientSecret }) => {
   // Default values for Stripe pricing table
   const defaultPricingTableId = "prctbl_1ShORfAaooP90eyYgWNjXf6b";
   const defaultPublishableKey = "pk_test_51S916EAaooP90eyYnQBmd8BVWaiRnmakquDXIiswn74iCB2MlCgQ1NLgZZkPhGFI3ynXU8mLwmyw0AJBLX7ae8HR00amTOteUF";
@@ -119,14 +119,23 @@ export const PricingTable = ({ pricingTableId, publishableKey, customerEmail, cu
     );
   }
 
+  // Stripe doesn't allow both customer-email and customer-session-client-secret
+  // Prefer customer-session-client-secret when available for better customer recognition
+  const pricingTableProps = {
+    "pricing-table-id": finalPricingTableId,
+    "publishable-key": finalPublishableKey,
+  };
+
+  if (customerSessionClientSecret) {
+    pricingTableProps["customer-session-client-secret"] = customerSessionClientSecret;
+  } else if (customerEmail) {
+    // Only use customer-email as fallback when customer session is not available
+    pricingTableProps["customer-email"] = customerEmail;
+  }
+
   return (
     <Block name="pricing-table">
-      <stripe-pricing-table
-        pricing-table-id={finalPricingTableId}
-        publishable-key={finalPublishableKey}
-        {...(customerEmail && { "customer-email": customerEmail })}
-        {...(customerId && { "customer-id": customerId })}
-      />
+      <stripe-pricing-table {...pricingTableProps} />
     </Block>
   );
 };

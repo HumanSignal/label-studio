@@ -59,6 +59,7 @@ class StripeConfigSerializer(serializers.Serializer):
     pricing_table_id = serializers.CharField()
     customer_email = serializers.EmailField(required=False, allow_null=True)
     customer_id = serializers.CharField(required=False, allow_null=True)
+    customer_session_client_secret = serializers.CharField(required=False, allow_null=True)
 
 
 class CustomerPortalResponseSerializer(serializers.Serializer):

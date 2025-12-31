@@ -1,6 +1,7 @@
 """Tests for billing API views."""
 
 from datetime import datetime, timedelta, timezone
+from unittest.mock import patch
 
 import djstripe
 import pytest
@@ -37,11 +38,13 @@ def test_stripe_config_no_customer(django_user_model):
     # No OrganizationCustomer mapping yet
     assert body["customer_email"] == user.email
     assert body["customer_id"] is None
+    assert body["customer_session_client_secret"] is None
 
 
 @pytest.mark.django_db
-def test_stripe_config_with_customer(django_user_model, settings):
-    """StripeConfigAPI exposes the dj-stripe Customer.id as customer_id."""
+@patch('billing.api.stripe.CustomerSession.create')
+def test_stripe_config_with_customer(mock_customer_session_create, django_user_model, settings):
+    """StripeConfigAPI exposes the dj-stripe Customer.id as customer_id and creates customer session."""
     user = django_user_model.objects.create_user(
         username="user-with-customer",
         email="with-customer@example.com",
@@ -62,6 +65,12 @@ def test_stripe_config_with_customer(django_user_model, settings):
     )
     OrganizationCustomer.objects.create(organization=organization, customer=customer)
 
+    # Mock customer session creation
+    mock_customer_session = type('obj', (object,), {
+        'client_secret': 'cs_test_client_secret_123'
+    })()
+    mock_customer_session_create.return_value = mock_customer_session
+
     client = APIClient()
     client.force_authenticate(user=user)
 
@@ -74,6 +83,13 @@ def test_stripe_config_with_customer(django_user_model, settings):
     assert body["customer_email"] == user.email
     # Use Stripe customer ID from dj-stripe
     assert body["customer_id"] == "cus_test_123"
+    # Customer session should be created and returned
+    assert body["customer_session_client_secret"] == "cs_test_client_secret_123"
+    # Verify customer session was created with correct parameters
+    mock_customer_session_create.assert_called_once_with(
+        customer="cus_test_123",
+        components={"pricing_table": {"enabled": True}}
+    )
 
 
 @pytest.mark.django_db

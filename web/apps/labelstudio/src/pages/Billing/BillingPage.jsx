@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { useAPI } from "../../providers/ApiProvider";
 import { useCurrentUser } from "../../providers/CurrentUser";
 import { Block, Elem } from "../../utils/bem";
@@ -9,8 +10,9 @@ import "./BillingPage.scss";
 export const BillingPage = () => {
   const api = useAPI();
   const { user } = useCurrentUser();
+  const sessionRefreshTimerRef = useRef(null);
 
-  const { data: stripeConfig, isLoading: stripeConfigLoading } = useQuery({
+  const { data: stripeConfig, isLoading: stripeConfigLoading, refetch: refetchStripeConfig } = useQuery({
     queryKey: ["billing", "stripe-config"],
     async queryFn() {
       const response = await fetch("/api/billing/stripe-config/", {
@@ -25,6 +27,30 @@ export const BillingPage = () => {
       return response.json();
     },
   });
+
+  // Handle customer session expiration (sessions expire after 30 minutes)
+  useEffect(() => {
+    if (stripeConfig?.customer_session_client_secret) {
+      // Clear any existing timer
+      if (sessionRefreshTimerRef.current) {
+        clearTimeout(sessionRefreshTimerRef.current);
+      }
+
+      // Refresh session 5 minutes before expiration (at 25 minutes)
+      // This gives us a buffer in case of network delays
+      const refreshInterval = 25 * 60 * 1000; // 25 minutes in milliseconds
+
+      sessionRefreshTimerRef.current = setTimeout(() => {
+        refetchStripeConfig();
+      }, refreshInterval);
+
+      return () => {
+        if (sessionRefreshTimerRef.current) {
+          clearTimeout(sessionRefreshTimerRef.current);
+        }
+      };
+    }
+  }, [stripeConfig?.customer_session_client_secret, refetchStripeConfig]);
 
   const { data: subscriptionData, isLoading: subscriptionLoading, isRefetching: isRefetchingSubscription, refetch: refetchSubscription } = useQuery({
     queryKey: ["billing", "subscription"],
@@ -61,7 +87,7 @@ export const BillingPage = () => {
             )}
           </Elem>
 
-          {(!subscriptionData?.has_subscription || subscriptionData?.status === "canceled") && (
+          {subscriptionData?.status !== "active" && (
             <Elem name="section">
               <Elem name="section-title">Available Plans</Elem>
               {stripeConfigLoading ? (
@@ -71,7 +97,7 @@ export const BillingPage = () => {
                   pricingTableId={stripeConfig?.pricing_table_id}
                   publishableKey={stripeConfig?.publishable_key}
                   customerEmail={stripeConfig?.customer_email}
-                  customerId={stripeConfig?.customer_id}
+                  customerSessionClientSecret={stripeConfig?.customer_session_client_secret}
                 />
               )}
             </Elem>

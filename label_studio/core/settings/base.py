@@ -819,6 +819,7 @@ if ENABLE_CSP := get_bool_env('ENABLE_CSP', True):
     CSP_FRAME_SRC = (
         "'self'",
         'https://challenges.cloudflare.com',
+        'https://js.stripe.com',
     )
     CSP_CONNECT_SRC = (
         "'self'",
