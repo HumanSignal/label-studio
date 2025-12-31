@@ -3,7 +3,7 @@ import { Button } from "@humansignal/ui";
 import { Block, Elem } from "../../utils/bem";
 import "./SubscriptionStatus.scss";
 
-export const SubscriptionStatus = ({ data, onRefresh }) => {
+export const SubscriptionStatus = ({ data, onRefresh, isRefetching }) => {
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
 
   const handleOpenPortal = async () => {
@@ -83,7 +83,7 @@ export const SubscriptionStatus = ({ data, onRefresh }) => {
         <Elem name="header">
           <Elem name="title">Subscription Details</Elem>
           {onRefresh && (
-            <Button size="compact" onClick={() => onRefresh()}>
+            <Button size="compact" onClick={() => onRefresh()} waiting={isRefetching}>
               Refresh
             </Button>
           )}
@@ -146,13 +146,21 @@ export const SubscriptionStatus = ({ data, onRefresh }) => {
         </Elem>
 
         <Elem name="actions">
-          <Button
-            onClick={handleOpenPortal}
-            disabled={isLoadingPortal}
-            waiting={isLoadingPortal}
-          >
-            {isLoadingPortal ? "Opening..." : "Manage Subscription"}
-          </Button>
+          {data.status === "canceled" ? (
+            <Elem name="canceled-message">
+              <Elem name="message-text">
+                Your subscription has been canceled. You can start a new subscription using the plans below.
+              </Elem>
+            </Elem>
+          ) : (
+            <Button
+              onClick={handleOpenPortal}
+              disabled={isLoadingPortal}
+              waiting={isLoadingPortal}
+            >
+              {isLoadingPortal ? "Opening..." : "Manage Subscription"}
+            </Button>
+          )}
         </Elem>
       </Elem>
     </Block>

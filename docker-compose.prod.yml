@@ -61,12 +61,23 @@ services:
       - POSTGRE_HOST=db-dev
       - REDIS_HOST=redis-dev
       - REDIS_PORT=6379
+      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-http://localhost:8082}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:-http://localhost:8082}
       - SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE:-1}
       - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-1}
       - JSON_LOG=1
-      - LOG_LEVEL=DEBUG
       - TURNSTILE_ENABLED=${TURNSTILE_ENABLED:-true}
+      - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY:-1x00000000000000000000AA}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY:-1x0000000000000000000000000000000AA}
       - BASE_DATA_DIR=/label-studio/data
+      - fflag_feat_front_hide_heidi_tips_short=true
+      - STRIPE_LIVE_MODE=${STRIPE_LIVE_MODE:-false}
+      - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY:-}
+      - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-}
+      - STRIPE_LIVE_PUBLISHABLE_KEY=${STRIPE_LIVE_PUBLISHABLE_KEY:-}
+      - STRIPE_TEST_PUBLISHABLE_KEY=${STRIPE_TEST_PUBLISHABLE_KEY:-}
+      - STRIPE_PRICING_TABLE_ID=${STRIPE_PRICING_TABLE_ID:-}
+      - DJSTRIPE_WEBHOOK_SECRET=${DJSTRIPE_WEBHOOK_SECRET:-}
     volumes:
       - label-studio-data-dev:/label-studio/data:rw
     command: label-studio-uwsgi
@@ -91,8 +102,14 @@ services:
       - POSTGRE_HOST=db-dev
       - REDIS_HOST=redis-dev
       - REDIS_PORT=6379
-      - LOG_LEVEL=DEBUG
       - BASE_DATA_DIR=/label-studio/data
+      - STRIPE_LIVE_MODE=${STRIPE_LIVE_MODE:-false}
+      - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY:-}
+      - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-}
+      - STRIPE_LIVE_PUBLISHABLE_KEY=${STRIPE_LIVE_PUBLISHABLE_KEY:-}
+      - STRIPE_TEST_PUBLISHABLE_KEY=${STRIPE_TEST_PUBLISHABLE_KEY:-}
+      - STRIPE_PRICING_TABLE_ID=${STRIPE_PRICING_TABLE_ID:-}
+      - DJSTRIPE_WEBHOOK_SECRET=${DJSTRIPE_WEBHOOK_SECRET:-}
     volumes:
       - label-studio-data-dev:/label-studio/data:rw
     command: python3 /label-studio/label_studio/manage.py rqworker default

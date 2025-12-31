@@ -237,6 +237,25 @@ class SubscriptionStatusAPI(APIView):
             org_customer = OrganizationCustomer.objects.get(organization=organization)
             customer = org_customer.customer
 
+            # Sync customer and subscriptions from Stripe API to ensure we have the latest data
+            try:
+                # Retrieve and sync customer from Stripe
+                stripe_customer = stripe.Customer.retrieve(customer.id)
+                djstripe.models.Customer.sync_from_stripe_data(stripe_customer)
+                logger.debug(f"Synced customer {customer.id} from Stripe")
+
+                # Retrieve and sync all subscriptions for this customer from Stripe
+                stripe_subscriptions = stripe.Subscription.list(customer=customer.id, limit=100)
+                for stripe_subscription in stripe_subscriptions.data:
+                    djstripe.models.Subscription.sync_from_stripe_data(stripe_subscription)
+                logger.debug(f"Synced {len(stripe_subscriptions.data)} subscriptions for customer {customer.id} from Stripe")
+            except stripe.error.StripeError as e:
+                # If Stripe API call fails, log the error but continue with local data
+                logger.warning(f"Failed to sync from Stripe API: {e}. Using local data as fallback.")
+            except Exception as e:
+                # Catch any other unexpected errors during sync
+                logger.warning(f"Unexpected error during Stripe sync: {e}. Using local data as fallback.")
+
             # Fetch all subscriptions for this customer and evaluate status in Python.
             # dj-stripe stores status in `stripe_data`, so we avoid filtering on a non-existent DB field.
             all_subscriptions_qs = djstripe.models.Subscription.objects.filter(

@@ -1,0 +1,8 @@
+tunnel: 902ffca7-0938-42cd-a911-a9cc2d25f54d
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: mib.biowork.app
+    service: http://nginx:8085
+  - service: http_status:404
+

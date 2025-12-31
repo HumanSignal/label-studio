@@ -1,3 +1,4 @@
+.mib.env
 backups/
 
 data/
@@ -63,6 +64,9 @@ deploy/nginx/certs/*
 mydata/
 deploy/pgsql/certs/*
 !deploy/pgsql/certs/.placeholder
+
+# Cloudflare tunnel credentials
+deploy/cloudflare/credentials.json
 
 *.swp
 *.swo

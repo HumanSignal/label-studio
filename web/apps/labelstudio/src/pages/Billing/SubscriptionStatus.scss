@@ -122,5 +122,19 @@
     display: flex;
     justify-content: flex-start;
   }
+
+  &__canceled-message {
+    width: 100%;
+    padding: 16px;
+    background: var(--ls-color-warning-light);
+    border-radius: 8px;
+    border: 1px solid var(--ls-color-warning);
+  }
+
+  &__message-text {
+    font-size: 14px;
+    color: var(--ls-color-text);
+    line-height: 1.5;
+  }
 }
 

@@ -15,9 +15,10 @@ services:
       - "8081:8086"
     depends_on:
       - app
+    env_file:
+      - .mib.env
     environment:
       - APP_HOST=app
-      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-http://localhost:8080}
     volumes:
       - label-studio-data:/label-studio/data:rw
       - ./deploy/nginx/certs:/certs:ro
@@ -38,6 +39,9 @@ services:
       - "8000"
     depends_on:
       - db
+      - redis
+    env_file:
+      - .mib.env
     environment:
       - DJANGO_DB=default
       - POSTGRE_NAME=postgres
@@ -45,22 +49,68 @@ services:
       - POSTGRE_PASSWORD=postgres
       - POSTGRE_PORT=5432
       - POSTGRE_HOST=db
-      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-http://localhost:8080}
-      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS:-http://localhost:8080}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE:-1}
       - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-1}
       - JSON_LOG=1
       - LOG_LEVEL=ERROR
       # Cloudflare Turnstile
       - TURNSTILE_ENABLED=${TURNSTILE_ENABLED:-true}
-      - TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY:-1x00000000000000000000AA}
-      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY:-1x0000000000000000000000000000000AA}
       # Base Data Directory (inside container)
       - BASE_DATA_DIR=/label-studio/data
-      
+      # Stripe Configuration
+      - STRIPE_LIVE_MODE=${STRIPE_LIVE_MODE:-false}
+      - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY:-}
+      - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-}
+      - STRIPE_LIVE_PUBLISHABLE_KEY=${STRIPE_LIVE_PUBLISHABLE_KEY:-}
+      - STRIPE_TEST_PUBLISHABLE_KEY=${STRIPE_TEST_PUBLISHABLE_KEY:-}
+      - STRIPE_PRICING_TABLE_ID=${STRIPE_PRICING_TABLE_ID:-}
+      - DJSTRIPE_WEBHOOK_SECRET=${DJSTRIPE_WEBHOOK_SECRET:-}
     volumes:
       - label-studio-data:/label-studio/data:rw
     command: label-studio-uwsgi
+    networks:
+      - label-studio-network
+
+  rqworker:
+    image: gavinlouuu/label-studio-custom:${IMAGE_TAG:-latest}
+    container_name: label-studio-rqworker
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .mib.env
+    environment:
+      - DJANGO_DB=default
+      - POSTGRE_NAME=postgres
+      - POSTGRE_USER=postgres
+      - POSTGRE_PASSWORD=postgres
+      - POSTGRE_PORT=5432
+      - POSTGRE_HOST=db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BASE_DATA_DIR=/label-studio/data
+      # Stripe Configuration
+      - STRIPE_LIVE_MODE=${STRIPE_LIVE_MODE:-false}
+      - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY:-}
+      - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-}
+      - STRIPE_LIVE_PUBLISHABLE_KEY=${STRIPE_LIVE_PUBLISHABLE_KEY:-}
+      - STRIPE_TEST_PUBLISHABLE_KEY=${STRIPE_TEST_PUBLISHABLE_KEY:-}
+      - STRIPE_PRICING_TABLE_ID=${STRIPE_PRICING_TABLE_ID:-}
+      - DJSTRIPE_WEBHOOK_SECRET=${DJSTRIPE_WEBHOOK_SECRET:-}
+    volumes:
+      - label-studio-data:/label-studio/data:rw
+    command: python3 /label-studio/label_studio/manage.py rqworker default
+    networks:
+      - label-studio-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: label-studio-redis
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
     networks:
       - label-studio-network
 
@@ -91,8 +141,10 @@ services:
     restart: unless-stopped
     depends_on:
       - nginx
-    # Remember to add CLOUDFLARE_TUNNEL_TOKEN to environment variables i.e., source biowork_profile
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    command: tunnel --no-autoupdate --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./deploy/cloudflare/config.yml:/etc/cloudflared/config.yml:ro
+      - ./deploy/cloudflare/credentials.json:/etc/cloudflared/credentials.json:ro
     environment:
       - TUNNEL_TRANSPORT_PROTOCOL=quic
     networks:

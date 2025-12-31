@@ -26,7 +26,7 @@ export const BillingPage = () => {
     },
   });
 
-  const { data: subscriptionData, isLoading: subscriptionLoading, refetch: refetchSubscription } = useQuery({
+  const { data: subscriptionData, isLoading: subscriptionLoading, isRefetching: isRefetchingSubscription, refetch: refetchSubscription } = useQuery({
     queryKey: ["billing", "subscription"],
     async queryFn() {
       const response = await fetch("/api/billing/subscription/", {
@@ -57,11 +57,11 @@ export const BillingPage = () => {
             {subscriptionLoading ? (
               <Elem name="loading">Loading subscription status...</Elem>
             ) : (
-              <SubscriptionStatus data={subscriptionData} onRefresh={refetchSubscription} />
+              <SubscriptionStatus data={subscriptionData} onRefresh={refetchSubscription} isRefetching={isRefetchingSubscription} />
             )}
           </Elem>
 
-          {!subscriptionData?.has_subscription && (
+          {(!subscriptionData?.has_subscription || subscriptionData?.status === "canceled") && (
             <Elem name="section">
               <Elem name="section-title">Available Plans</Elem>
               {stripeConfigLoading ? (
