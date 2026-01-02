@@ -276,8 +276,7 @@ const ExportLargeProjectWarning = ({ taskCount }) => {
         Large project detected ({taskCount.toLocaleString()} tasks)
       </div>
       <div className={cn("export-page").elem("warning-body").toClassName()}>
-        The export in Community Edition runs in your browser request and might time out (502/504 errors) for large
-        datasets. If you hit a timeout, use the{" "}
+        To avoid potential timeouts during large dataset exports in the Community Edition, use the{" "}
         <a className="no-go" href={EXPORT_TIMEOUT_DOCS_URL} target="_blank" rel="noreferrer">
           CLI/SDK export options
         </a>{" "}

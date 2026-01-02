@@ -58,8 +58,8 @@ def _get_or_infer_state(entity) -> Optional[str]:
         else:
             return ProjectStateChoices.IN_PROGRESS
     elif entity_type == 'annotation':
-        # Annotations are SUBMITTED when created
-        return AnnotationStateChoices.SUBMITTED
+        # Annotations start in CREATED state
+        return AnnotationStateChoices.CREATED
     else:
         logger.warning(
             f'Cannot infer state for unknown entity type: {entity_type}',
