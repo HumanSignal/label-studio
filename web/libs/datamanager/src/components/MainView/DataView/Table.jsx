@@ -164,6 +164,8 @@ export const DataView = injector(
 
     const onRowSelect = useCallback((id) => view.toggleSelected(id), [view]);
 
+    const onRangeSelect = useCallback((ids, select) => view.selectRange(ids, select), [view]);
+
     const onRowClick = useCallback(
       async (item, e) => {
         const itemID = item.task_id ?? item.id;
@@ -365,6 +367,7 @@ export const DataView = injector(
           selectedItems={selectedItems}
           onSelectAll={onSelectAll}
           onSelectRow={onRowSelect}
+          onRangeSelect={onRangeSelect}
           onRowClick={onRowClick}
           stopInteractions={isLocked}
           onTypeChange={(col, type) => col.original.setType(type)}
