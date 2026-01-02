@@ -59,14 +59,6 @@ services:
       - TURNSTILE_ENABLED=${TURNSTILE_ENABLED:-true}
       # Base Data Directory (inside container)
       - BASE_DATA_DIR=/label-studio/data
-      # Stripe Configuration
-      - STRIPE_LIVE_MODE=${STRIPE_LIVE_MODE:-false}
-      - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY:-}
-      - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-}
-      - STRIPE_LIVE_PUBLISHABLE_KEY=${STRIPE_LIVE_PUBLISHABLE_KEY:-}
-      - STRIPE_TEST_PUBLISHABLE_KEY=${STRIPE_TEST_PUBLISHABLE_KEY:-}
-      - STRIPE_PRICING_TABLE_ID=${STRIPE_PRICING_TABLE_ID:-}
-      - DJSTRIPE_WEBHOOK_SECRET=${DJSTRIPE_WEBHOOK_SECRET:-}
     volumes:
       - label-studio-data:/label-studio/data:rw
     command: label-studio-uwsgi
@@ -92,14 +84,6 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - BASE_DATA_DIR=/label-studio/data
-      # Stripe Configuration
-      - STRIPE_LIVE_MODE=${STRIPE_LIVE_MODE:-false}
-      - STRIPE_LIVE_SECRET_KEY=${STRIPE_LIVE_SECRET_KEY:-}
-      - STRIPE_TEST_SECRET_KEY=${STRIPE_TEST_SECRET_KEY:-}
-      - STRIPE_LIVE_PUBLISHABLE_KEY=${STRIPE_LIVE_PUBLISHABLE_KEY:-}
-      - STRIPE_TEST_PUBLISHABLE_KEY=${STRIPE_TEST_PUBLISHABLE_KEY:-}
-      - STRIPE_PRICING_TABLE_ID=${STRIPE_PRICING_TABLE_ID:-}
-      - DJSTRIPE_WEBHOOK_SECRET=${DJSTRIPE_WEBHOOK_SECRET:-}
     volumes:
       - label-studio-data:/label-studio/data:rw
     command: python3 /label-studio/label_studio/manage.py rqworker default

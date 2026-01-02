@@ -57,6 +57,7 @@ from tasks.serializers import (
 from webhooks.models import WebhookAction
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 
+from billing.utils import validate_project_creation
 from label_studio.core.utils.common import load_func
 
 logger = logging.getLogger(__name__)
@@ -266,8 +267,12 @@ class ProjectListAPI(generics.ListCreateAPIView):
         return context
 
     def perform_create(self, ser):
+        # Check project limit before creating
+        organization = self.request.user.active_organization
+        validate_project_creation(organization)
+        
         try:
-            project = ser.save(organization=self.request.user.active_organization)
+            project = ser.save(organization=organization)
             
             # Auto-connect default ML backend if configured
             if settings.ADD_DEFAULT_ML_BACKENDS and settings.DEFAULT_ML_BACKEND_URL:

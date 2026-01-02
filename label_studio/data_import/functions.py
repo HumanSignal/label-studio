@@ -11,6 +11,7 @@ from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
 
+from billing.utils import validate_task_import
 from .models import FileUpload
 from .serializers import ImportApiSerializer
 from .uploader import load_tasks_for_async_import
@@ -45,6 +46,12 @@ def async_import_background(
     if project_import.preannotated_from_fields:
         # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]
         tasks = reformat_predictions(tasks, project_import.preannotated_from_fields)
+
+    # Check task limit before importing (only if committing to project)
+    if project_import.commit_to_project:
+        organization = project.organization
+        task_count = len(tasks)
+        validate_task_import(organization, task_count)
 
     if project_import.commit_to_project:
         with transaction.atomic():

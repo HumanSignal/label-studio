@@ -65,7 +65,6 @@ services:
       - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-1}
       - JSON_LOG=1
       - LOG_LEVEL=DEBUG
-      - TURNSTILE_ENABLED=${TURNSTILE_ENABLED:-true}
       - BASE_DATA_DIR=/label-studio/data
     volumes:
       - label-studio-data-dev:/label-studio/data:rw

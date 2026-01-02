@@ -89,6 +89,9 @@ export const API_CONFIG = {
 
     accessTokenSettings: "GET:/jwt/settings",
     accessTokenUpdateSettings: "POST:/jwt/settings",
+
+    // Billing
+    usageLimits: "GET:/billing/usage-limits",
   },
   alwaysExpectJSON: false,
 };

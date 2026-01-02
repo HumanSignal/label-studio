@@ -67,3 +67,15 @@ class CustomerPortalResponseSerializer(serializers.Serializer):
 
     url = serializers.URLField()
 
+
+class UsageLimitsSerializer(serializers.Serializer):
+    """Serializer for usage limits status."""
+
+    tier = serializers.CharField(help_text='Membership tier: FREE, PLUS, or PRO')
+    current_projects = serializers.IntegerField(help_text='Current number of projects')
+    max_projects = serializers.IntegerField(required=False, allow_null=True, help_text='Maximum allowed projects (None for unlimited)')
+    current_tasks = serializers.IntegerField(help_text='Current number of tasks across all projects')
+    max_tasks = serializers.IntegerField(required=False, allow_null=True, help_text='Maximum allowed tasks (None for unlimited)')
+    can_create_project = serializers.BooleanField(help_text='Whether a new project can be created')
+    can_import_tasks = serializers.BooleanField(help_text='Whether tasks can be imported')
+

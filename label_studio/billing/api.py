@@ -24,7 +24,9 @@ from billing.serializers import (
     PricingTableSerializer,
     StripeConfigSerializer,
     SubscriptionStatusSerializer,
+    UsageLimitsSerializer,
 )
+from billing.utils import check_project_limit, check_task_limit, get_membership_tier
 from core.permissions import all_permissions
 
 logger = logging.getLogger(__name__)
@@ -476,4 +478,49 @@ class CustomerPortalAPI(APIView):
         except Exception as e:
             logger.exception('Error creating portal session: %s', e)
             return Response({'error': 'Failed to create portal session'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Billing'],
+        x_fern_sdk_group_name='billing',
+        x_fern_sdk_method_name='get_usage_limits',
+        operation_summary='Get usage limits',
+        operation_description='Get current usage limits and status for the organization.',
+        responses={200: UsageLimitsSerializer()},
+    ),
+)
+class UsageLimitsAPI(APIView):
+    """API endpoint to get usage limits status."""
+
+    permission_classes = [IsAuthenticated]
+    permission_required = all_permissions.organizations_view
+
+    def get(self, request):
+        """Get usage limits status."""
+        organization = request.user.active_organization
+        if not organization:
+            return Response({'error': 'No active organization'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            tier = get_membership_tier(organization)
+            current_projects, max_projects, can_create_project = check_project_limit(organization)
+            current_tasks, max_tasks, can_import_tasks = check_task_limit(organization)
+
+            data = {
+                'tier': tier,
+                'current_projects': current_projects,
+                'max_projects': max_projects,
+                'current_tasks': current_tasks,
+                'max_tasks': max_tasks,
+                'can_create_project': can_create_project,
+                'can_import_tasks': can_import_tasks,
+            }
+
+            serializer = UsageLimitsSerializer(data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.exception('Error fetching usage limits: %s', e)
+            return Response({'error': 'Failed to fetch usage limits'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

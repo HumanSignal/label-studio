@@ -1,5 +1,5 @@
 import type { Page } from "../types/Page";
-import { SimpleCard, Spinner } from "@humansignal/ui";
+import { SimpleCard, Spinner, Tooltip } from "@humansignal/ui";
 import { IconFolderAdd, IconUserAdd, IconFolderOpen } from "@humansignal/icons";
 import { HeidiTips } from "../../components/HeidiTips/HeidiTips";
 import { useQuery } from "@tanstack/react-query";
@@ -43,6 +43,18 @@ export const HomePage: Page = () => {
     },
   });
 
+  const { data: usageLimits } = useQuery({
+    queryKey: ["usageLimits"],
+    queryFn: async () => {
+      try {
+        return await api.callApi("usageLimits");
+      } catch (error) {
+        // If API fails, return null to allow button to work (graceful degradation)
+        return null;
+      }
+    },
+  });
+
   const handleActions = (action: Action) => {
     return () => {
       switch (action) {
@@ -66,16 +78,36 @@ export const HomePage: Page = () => {
           </div>
           <div className="flex justify-start gap-4">
             {actions.map((action) => {
-              return (
+              const canCreateProject = usageLimits?.can_create_project !== false;
+              const isDisabled = action.type === "createProject" && !canCreateProject;
+              const tooltipText = isDisabled 
+                ? `Project limit reached. Your ${usageLimits?.tier || 'Free'} plan allows ${usageLimits?.max_projects || 1} project(s).`
+                : undefined;
+              
+              const button = (
                 <Button
                   key={action.title}
                   rawClassName="flex-grow-0 text-16/24 gap-2 text-primary-content text-left min-w-[250px] [&_svg]:w-6 [&_svg]:h-6 pl-2"
                   onClick={handleActions(action.type)}
+                  disabled={isDisabled}
+                  style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                 >
                   <action.icon className="text-primary-icon" />
                   {action.title}
                 </Button>
               );
+
+              if (isDisabled && tooltipText) {
+                return (
+                  <Tooltip key={action.title} title={tooltipText}>
+                    <span style={{ display: 'inline-block' }}>
+                      {button}
+                    </span>
+                  </Tooltip>
+                );
+              }
+
+              return button;
             })}
           </div>
 
@@ -108,9 +140,36 @@ export const HomePage: Page = () => {
                 </div>
                 <Heading size={2}>Create your first project</Heading>
                 <Sub>Import your data and set up the labeling interface to start annotating</Sub>
-                <Button primary rawClassName="mt-4" onClick={() => setCreationDialogOpen(true)}>
-                  Create Project
-                </Button>
+                {(() => {
+                  const isDisabled = usageLimits?.can_create_project === false;
+                  const tooltipText = isDisabled 
+                    ? `Project limit reached. Your ${usageLimits?.tier || 'Free'} plan allows ${usageLimits?.max_projects || 1} project(s).`
+                    : undefined;
+                  
+                  const button = (
+                    <Button 
+                      primary 
+                      rawClassName="mt-4" 
+                      onClick={() => setCreationDialogOpen(true)}
+                      disabled={isDisabled}
+                      style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                    >
+                      Create Project
+                    </Button>
+                  );
+
+                  if (isDisabled && tooltipText) {
+                    return (
+                      <Tooltip title={tooltipText}>
+                        <span style={{ display: 'inline-block' }}>
+                          {button}
+                        </span>
+                      </Tooltip>
+                    );
+                  }
+
+                  return button;
+                })()}
               </div>
             ) : isSuccess && data.results.length > 0 ? (
               <div className="flex flex-col gap-1">

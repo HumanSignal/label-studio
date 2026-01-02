@@ -13,6 +13,8 @@ import { SettingsPage } from "../Settings";
 import "./Projects.scss";
 import { EmptyProjectsList, ProjectsList } from "./ProjectsList";
 import { useAbortController } from "@humansignal/core";
+import { useQuery } from "@tanstack/react-query";
+import { Tooltip } from "@humansignal/ui";
 
 const getCurrentPage = () => {
   const pageNumberFromURL = new URLSearchParams(location.search).get("page");
@@ -107,11 +109,29 @@ export const ProjectsPage = () => {
     fetchProjects();
   }, []);
 
+  const { data: usageLimits } = useQuery({
+    queryKey: ["usageLimits"],
+    queryFn: async () => {
+      try {
+        return await api.callApi("usageLimits");
+      } catch (error) {
+        // If API fails, return null to allow button to work (graceful degradation)
+        return null;
+      }
+    },
+  });
+
   React.useEffect(() => {
     // there is a nice page with Create button when list is empty
     // so don't show the context button in that case
-    setContextProps({ openModal, showButton: projectsList.length > 0 });
-  }, [projectsList.length]);
+    const canCreateProject = usageLimits?.can_create_project !== false;
+    setContextProps({ 
+      openModal, 
+      showButton: projectsList.length > 0,
+      usageLimits,
+      canCreateProject: canCreateProject,
+    });
+  }, [projectsList.length, usageLimits]);
 
   return (
     <Block name="projects-page">
@@ -129,7 +149,7 @@ export const ProjectsPage = () => {
               pageSize={defaultPageSize}
             />
           ) : (
-            <EmptyProjectsList openModal={openModal} />
+            <EmptyProjectsList openModal={openModal} usageLimits={usageLimits} />
           )}
           {modal && <CreateProject onClose={closeModal} />}
         </Elem>
@@ -157,11 +177,35 @@ ProjectsPage.routes = ({ store }) => [
     },
   },
 ];
-ProjectsPage.context = ({ openModal, showButton }) => {
+ProjectsPage.context = ({ openModal, showButton, usageLimits, canCreateProject }) => {
   if (!showButton) return null;
-  return (
-    <Button onClick={openModal} look="primary" size="compact">
+  
+  const isDisabled = canCreateProject === false;
+  const tooltipText = isDisabled 
+    ? `Project limit reached. Your ${usageLimits?.tier || 'Free'} plan allows ${usageLimits?.max_projects || 1} project(s).`
+    : 'Create Project';
+
+  const button = (
+    <Button 
+      onClick={openModal} 
+      look="primary" 
+      size="compact"
+      disabled={isDisabled}
+      style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+    >
       Create
     </Button>
   );
+
+  if (isDisabled) {
+    return (
+      <Tooltip title={tooltipText}>
+        <span style={{ display: 'inline-block' }}>
+          {button}
+        </span>
+      </Tooltip>
+    );
+  }
+
+  return button;
 };

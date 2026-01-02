@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { useMemo } from "react";
 import { NavLink } from "react-router-dom";
 import { IconCheck, IconEllipsis, IconMinus, IconSparks } from "@humansignal/icons";
-import { Userpic } from "@humansignal/ui";
+import { Userpic, Tooltip } from "@humansignal/ui";
 import { Button, Dropdown, Menu, Pagination } from "../../components";
 import { Block, Elem } from "../../utils/bem";
 import { absoluteURL } from "../../utils/helpers";
@@ -34,17 +34,42 @@ export const ProjectsList = ({ projects, currentPage, totalItems, loadNextPage, 
   );
 };
 
-export const EmptyProjectsList = ({ openModal }) => {
+export const EmptyProjectsList = ({ openModal, usageLimits }) => {
+  const canCreateProject = usageLimits?.can_create_project !== false;
+  const isDisabled = !canCreateProject;
+  const tooltipText = isDisabled 
+    ? `Project limit reached. Your ${usageLimits?.tier || 'Free'} plan allows ${usageLimits?.max_projects || 1} project(s).`
+    : 'Create Project';
+
+  const button = (
+    <Elem 
+      name="action" 
+      tag={Button} 
+      onClick={openModal} 
+      look="primary"
+      disabled={isDisabled}
+      style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+    >
+      Create Project
+    </Elem>
+  );
+
   return (
     <Block name="empty-projects-page">
       <Elem name="heidi" tag="img" src={absoluteURL("/static/images/opossum_looking.png")} />
       <Elem name="header" tag="h1">
-        Heidi doesn’t see any projects here!
+        Heidi doesn't see any projects here!
       </Elem>
       <p>Create one and start labeling your data.</p>
-      <Elem name="action" tag={Button} onClick={openModal} look="primary">
-        Create Project
-      </Elem>
+      {isDisabled ? (
+        <Tooltip title={tooltipText}>
+          <span style={{ display: 'inline-block' }}>
+            {button}
+          </span>
+        </Tooltip>
+      ) : (
+        button
+      )}
     </Block>
   );
 };

@@ -34,6 +34,7 @@ from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
 
+from billing.utils import validate_task_import
 from label_studio.core.utils.common import load_func
 
 from .functions import (
@@ -304,6 +305,12 @@ class ImportAPI(generics.CreateAPIView):
         if preannotated_from_fields:
             # turn flat task JSONs {"column1": value, "column2": value} into {"data": {"column1"..}, "predictions": [{..."column2"}]
             parsed_data = reformat_predictions(parsed_data, preannotated_from_fields)
+
+        # Check task limit before importing (only if committing to project)
+        if commit_to_project:
+            organization = project.organization
+            task_count = len(parsed_data)
+            validate_task_import(organization, task_count)
 
         # Attach optional import tags/batch metadata to every task before saving
         tags, batch_id, source = self._parse_import_meta_from_request(request)
