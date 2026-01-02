@@ -84,6 +84,14 @@ export const HomePage: Page = () => {
                 ? `Project limit reached. Your ${usageLimits?.tier || 'Free'} plan allows ${usageLimits?.max_projects || 1} project(s).`
                 : undefined;
               
+              const currentProjects = usageLimits?.current_projects ?? 0;
+              const maxProjects = usageLimits?.max_projects;
+              const displayTitle = action.type === "createProject"
+                ? maxProjects !== null && maxProjects !== undefined
+                  ? `(Create ${currentProjects}/${maxProjects})`
+                  : `(Create ${currentProjects}/∞)`
+                : action.title;
+              
               const button = (
                 <Button
                   key={action.title}
@@ -93,7 +101,7 @@ export const HomePage: Page = () => {
                   style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                 >
                   <action.icon className="text-primary-icon" />
-                  {action.title}
+                  {displayTitle}
                 </Button>
               );
 
@@ -146,6 +154,12 @@ export const HomePage: Page = () => {
                     ? `Project limit reached. Your ${usageLimits?.tier || 'Free'} plan allows ${usageLimits?.max_projects || 1} project(s).`
                     : undefined;
                   
+                  const currentProjects = usageLimits?.current_projects ?? 0;
+                  const maxProjects = usageLimits?.max_projects;
+                  const buttonText = maxProjects !== null && maxProjects !== undefined
+                    ? `(Create ${currentProjects}/${maxProjects})`
+                    : `(Create ${currentProjects}/∞)`;
+                  
                   const button = (
                     <Button 
                       primary 
@@ -154,7 +168,7 @@ export const HomePage: Page = () => {
                       disabled={isDisabled}
                       style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                     >
-                      Create Project
+                      {buttonText}
                     </Button>
                   );
 

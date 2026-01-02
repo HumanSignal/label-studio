@@ -185,6 +185,12 @@ ProjectsPage.context = ({ openModal, showButton, usageLimits, canCreateProject }
     ? `Project limit reached. Your ${usageLimits?.tier || 'Free'} plan allows ${usageLimits?.max_projects || 1} project(s).`
     : 'Create Project';
 
+  const currentProjects = usageLimits?.current_projects ?? 0;
+  const maxProjects = usageLimits?.max_projects;
+  const buttonText = maxProjects !== null && maxProjects !== undefined
+    ? `(Create ${currentProjects}/${maxProjects})`
+    : `(Create ${currentProjects}/∞)`;
+
   const button = (
     <Button 
       onClick={openModal} 
@@ -193,7 +199,7 @@ ProjectsPage.context = ({ openModal, showButton, usageLimits, canCreateProject }
       disabled={isDisabled}
       style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
     >
-      Create
+      {buttonText}
     </Button>
   );
 

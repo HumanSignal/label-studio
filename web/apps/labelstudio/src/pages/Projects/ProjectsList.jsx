@@ -41,6 +41,12 @@ export const EmptyProjectsList = ({ openModal, usageLimits }) => {
     ? `Project limit reached. Your ${usageLimits?.tier || 'Free'} plan allows ${usageLimits?.max_projects || 1} project(s).`
     : 'Create Project';
 
+  const currentProjects = usageLimits?.current_projects ?? 0;
+  const maxProjects = usageLimits?.max_projects;
+  const buttonText = maxProjects !== null && maxProjects !== undefined
+    ? `(Create ${currentProjects}/${maxProjects})`
+    : `(Create ${currentProjects}/∞)`;
+
   const button = (
     <Elem 
       name="action" 
@@ -50,7 +56,7 @@ export const EmptyProjectsList = ({ openModal, usageLimits }) => {
       disabled={isDisabled}
       style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
     >
-      Create Project
+      {buttonText}
     </Elem>
   );
 

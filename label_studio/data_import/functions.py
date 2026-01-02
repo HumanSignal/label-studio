@@ -7,6 +7,7 @@ from core.utils.common import load_func
 from django.conf import settings
 from django.db import transaction
 from projects.models import ProjectImport, ProjectReimport, ProjectSummary
+from rest_framework.exceptions import ValidationError
 from users.models import User
 from webhooks.models import WebhookAction
 from webhooks.utils import emit_webhooks_for_instance
@@ -49,9 +50,18 @@ def async_import_background(
 
     # Check task limit before importing (only if committing to project)
     if project_import.commit_to_project:
-        organization = project.organization
-        task_count = len(tasks)
-        validate_task_import(organization, task_count)
+        try:
+            organization = project.organization
+            task_count = len(tasks)
+            validate_task_import(organization, task_count)
+        except ValidationError as e:
+            # Mark import as failed and re-raise the error
+            project_import.status = ProjectImport.Status.FAILED
+            project_import.error = str(e)
+            project_import.traceback = traceback.format_exc()
+            project_import.save(update_fields=['status', 'error', 'traceback'])
+            logger.error(f'Task import failed due to usage limit: {e}')
+            raise
 
     if project_import.commit_to_project:
         with transaction.atomic():

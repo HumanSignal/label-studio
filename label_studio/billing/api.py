@@ -26,7 +26,7 @@ from billing.serializers import (
     SubscriptionStatusSerializer,
     UsageLimitsSerializer,
 )
-from billing.utils import check_project_limit, check_task_limit, get_membership_tier
+from billing.utils import check_project_limit, check_task_limit, get_membership_tier, get_usage_limits
 from core.permissions import all_permissions
 
 logger = logging.getLogger(__name__)
@@ -505,6 +505,7 @@ class UsageLimitsAPI(APIView):
 
         try:
             tier = get_membership_tier(organization)
+            limits = get_usage_limits(organization)
             current_projects, max_projects, can_create_project = check_project_limit(organization)
             current_tasks, max_tasks, can_import_tasks = check_task_limit(organization)
 

@@ -2,7 +2,7 @@
 import logging
 
 import djstripe
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 
 from billing.models import OrganizationCustomer
 from projects.models import Project
@@ -32,14 +32,14 @@ USAGE_LIMITS = {
 }
 
 
-def get_membership_tier(organization):
-    """Get membership tier for an organization.
+def _get_product_from_organization(organization):
+    """Get the Stripe product for an organization's active subscription.
     
     Args:
         organization: Organization instance
         
     Returns:
-        str: One of TIER_FREE, TIER_PLUS, or TIER_PRO
+        djstripe.models.Product or None: The product if found, None otherwise
     """
     try:
         org_customer = OrganizationCustomer.objects.get(organization=organization)
@@ -72,49 +72,121 @@ def get_membership_tier(organization):
             if subscription_items_qs.exists():
                 first_item = subscription_items_qs.first()
                 if first_item and first_item.price and first_item.price.product:
-                    product = first_item.price.product
-                    product_name = product.name or ''
-                    
-                    # Normalize product name (case-insensitive, strip whitespace)
-                    product_name_normalized = product_name.strip().upper()
-                    
-                    # Map product name to tier
-                    if 'PRO' in product_name_normalized:
-                        return TIER_PRO
-                    elif 'PLUS' in product_name_normalized:
-                        return TIER_PLUS
-                    elif 'FREE' in product_name_normalized:
-                        return TIER_FREE
-                    else:
-                        # Unknown product name, default to Free with logging
-                        logger.warning(
-                            f'Unknown product name "{product_name}" for organization {organization.id}. '
-                            f'Defaulting to Free tier.'
-                        )
-                        return TIER_FREE
+                    return first_item.price.product
 
-        # No subscription or no product found, default to Free tier
-        return TIER_FREE
+        return None
 
     except OrganizationCustomer.DoesNotExist:
-        # No customer linked to organization, default to Free tier
-        return TIER_FREE
+        return None
     except Exception as e:
-        # Log error and default to Free tier
-        logger.exception(f'Error determining membership tier for organization {organization.id}: {e}')
-        return TIER_FREE
+        logger.exception(f'Error getting product for organization {organization.id}: {e}')
+        return None
 
 
-def get_usage_limits(tier):
-    """Get usage limits for a given tier.
+def get_membership_tier(organization):
+    """Get membership tier for an organization.
     
     Args:
-        tier: One of TIER_FREE, TIER_PLUS, or TIER_PRO
+        organization: Organization instance
+        
+    Returns:
+        str: One of TIER_FREE, TIER_PLUS, or TIER_PRO
+    """
+    product = _get_product_from_organization(organization)
+    
+    if product:
+        product_name = product.name or ''
+        
+        # Normalize product name (case-insensitive, strip whitespace)
+        product_name_normalized = product_name.strip().upper()
+        
+        # Map product name to tier
+        if 'PRO' in product_name_normalized:
+            return TIER_PRO
+        elif 'PLUS' in product_name_normalized:
+            return TIER_PLUS
+        elif 'FREE' in product_name_normalized:
+            return TIER_FREE
+        else:
+            # Unknown product name, default to Free with logging
+            logger.warning(
+                f'Unknown product name "{product_name}" for organization {organization.id}. '
+                f'Defaulting to Free tier.'
+            )
+            return TIER_FREE
+
+    # No subscription or no product found, default to Free tier
+    return TIER_FREE
+
+
+def get_usage_limits(organization):
+    """Get usage limits for an organization from Stripe product metadata.
+    
+    Reads limits from Stripe product metadata with fallback to defaults.
+    Expected metadata keys:
+    - max_projects: Maximum number of projects (null/empty for unlimited)
+    - max_tasks: Maximum number of tasks (null/empty for unlimited)
+    - tier: Optional tier identifier (FREE, PLUS, PRO)
+    
+    Args:
+        organization: Organization instance
         
     Returns:
         dict: Dictionary with 'max_projects' and 'max_tasks' keys.
               Values are None for unlimited.
     """
+    product = _get_product_from_organization(organization)
+    
+    if product:
+        # Try to get metadata from product
+        # dj-stripe stores metadata in stripe_data or as a property
+        metadata = {}
+        try:
+            # Try accessing metadata property directly
+            if hasattr(product, 'metadata') and product.metadata:
+                metadata = product.metadata
+            # Fallback to stripe_data
+            elif hasattr(product, 'stripe_data') and product.stripe_data:
+                metadata = product.stripe_data.get('metadata', {})
+        except Exception as e:
+            logger.warning(f'Error accessing product metadata for organization {organization.id}: {e}')
+        
+        # Parse limits from metadata
+        if metadata:
+            result = {}
+            metadata_used = False
+            
+            # Parse max_projects from metadata
+            if 'max_projects' in metadata:
+                metadata_used = True
+                max_projects = metadata.get('max_projects')
+                if isinstance(max_projects, str):
+                    max_projects = int(max_projects) if max_projects.lower() not in ('null', 'none', 'unlimited', '') else None
+                elif max_projects == '':
+                    max_projects = None
+                result['max_projects'] = max_projects
+            
+            # Parse max_tasks from metadata
+            if 'max_tasks' in metadata:
+                metadata_used = True
+                max_tasks = metadata.get('max_tasks')
+                if isinstance(max_tasks, str):
+                    max_tasks = int(max_tasks) if max_tasks.lower() not in ('null', 'none', 'unlimited', '') else None
+                elif max_tasks == '':
+                    max_tasks = None
+                result['max_tasks'] = max_tasks
+            
+            # If we found any metadata keys, use them (fill missing ones from fallback)
+            if metadata_used:
+                # Get fallback values for any missing keys
+                tier = get_membership_tier(organization)
+                fallback_limits = USAGE_LIMITS.get(tier, USAGE_LIMITS[TIER_FREE])
+                result.setdefault('max_projects', fallback_limits['max_projects'])
+                result.setdefault('max_tasks', fallback_limits['max_tasks'])
+                return result
+    
+    # Fallback to hardcoded defaults based on tier
+    tier = get_membership_tier(organization)
     return USAGE_LIMITS.get(tier, USAGE_LIMITS[TIER_FREE])
 
 
@@ -130,8 +202,7 @@ def check_project_limit(organization):
                - max_count: Maximum allowed projects (None for unlimited)
                - can_create: Boolean indicating if a new project can be created
     """
-    tier = get_membership_tier(organization)
-    limits = get_usage_limits(tier)
+    limits = get_usage_limits(organization)
     max_projects = limits['max_projects']
     
     # Count current projects for this organization
@@ -160,8 +231,7 @@ def check_task_limit(organization, additional_tasks=0):
                - max_count: Maximum allowed tasks (None for unlimited)
                - can_import: Boolean indicating if tasks can be imported
     """
-    tier = get_membership_tier(organization)
-    limits = get_usage_limits(tier)
+    limits = get_usage_limits(organization)
     max_tasks = limits['max_tasks']
     
     # Count current tasks across all projects in this organization
