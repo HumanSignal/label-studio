@@ -2,6 +2,7 @@
 """
 import logging
 import os
+import re
 import uuid
 from collections import Counter
 
@@ -26,6 +27,39 @@ def upload_name_generator(instance, filename):
     os.makedirs(project_dir, exist_ok=True)
     path = settings.UPLOAD_DIR + '/' + project + '/' + str(uuid.uuid4())[0:8] + '-' + filename
     return path
+
+
+def extract_original_filename(file_path):
+    """Extract the original filename from a Label Studio upload path.
+    
+    Label Studio uploads files with the pattern: {8-char-hash}-{original-filename}
+    This function extracts the original filename by removing the hash prefix.
+    
+    Args:
+        file_path: Full path or basename containing the hash-prefixed filename
+                  e.g., "/data/upload/179/79f40485-Screenshot_2025-09-03_at_4.26.22PM.png"
+    
+    Returns:
+        str: The original filename without the hash prefix, or None if extraction fails
+             e.g., "Screenshot_2025-09-03_at_4.26.22PM.png"
+    
+    Example:
+        >>> extract_original_filename("/data/upload/179/79f40485-image.png")
+        "image.png"
+        >>> extract_original_filename("79f40485-image.png")
+        "image.png"
+    """
+    if not file_path or not isinstance(file_path, str):
+        return None
+    
+    # Extract filename from path pattern: {8-char-hash}-{original-filename}
+    # Pattern matches: 8 hexadecimal characters (case-insensitive), hyphen, then the rest
+    match = re.search(r'([a-f0-9]{8})-([^/]+)$', file_path, re.IGNORECASE)
+    if match:
+        return match.group(2)
+    
+    # Fallback: if pattern doesn't match, try to get basename
+    return os.path.basename(file_path) if file_path else None
 
 
 class FileUpload(models.Model):

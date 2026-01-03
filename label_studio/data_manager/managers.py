@@ -358,9 +358,13 @@ def apply_filters(queryset, filters, project, request):
                     filter_expressions.append(~Q(Q(import_tags__isnull=True) | Q(import_tags=[])))
                 continue
 
-        if field_name == 'import_batch_id':
-            # supports equal/not_equal/contains/not_contains/empty via generic handling below
-            pass
+        if field_name == 'filename':
+            # filename is a computed field from task.data['image']
+            # Filtering should be done on the underlying data.image field
+            # Convert to data.image for filtering
+            field_name = 'data__image'
+            # Note: The filename extraction happens in the serializer,
+            # so filtering will work on the full path, not the extracted filename
 
         # use other name because of model names conflict
         if field_name == 'file_upload':

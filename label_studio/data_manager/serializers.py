@@ -3,6 +3,7 @@
 import os
 
 import ujson as json
+from data_import.models import extract_original_filename
 from data_manager.models import Filter, FilterGroup, View
 from django.conf import settings
 from django.db import transaction
@@ -351,6 +352,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_score = serializers.FloatField(required=False)
     file_upload = serializers.SerializerMethodField(required=False)
     storage_filename = serializers.SerializerMethodField(required=False)
+    filename = serializers.SerializerMethodField(required=False)
     annotations_ids = serializers.SerializerMethodField(required=False)
     predictions_model_versions = serializers.SerializerMethodField(required=False)
     avg_lead_time = serializers.FloatField(required=False)
@@ -415,6 +417,20 @@ class DataManagerTaskSerializer(TaskSerializer):
     @staticmethod
     def get_storage_filename(task):
         return task.get_storage_filename()
+
+    @staticmethod
+    def get_filename(task):
+        """Extract original filename from image path.
+        
+        Extracts filename from paths like:
+        /data/upload/179/79f40485-Screenshot_2025-09-03_at_4.26.22PM.png
+        Returns: Screenshot_2025-09-03_at_4.26.22PM.png
+        """
+        image_path = task.data.get('image') if hasattr(task, 'data') and task.data else None
+        if not image_path or not isinstance(image_path, str):
+            return None
+        
+        return extract_original_filename(image_path)
 
     @staticmethod
     def get_updated_by(obj):
