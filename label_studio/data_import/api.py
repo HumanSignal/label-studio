@@ -243,36 +243,48 @@ class ImportAPI(generics.CreateAPIView):
     queryset = Task.objects.all()
 
     def _parse_import_meta_from_request(self, request):
-        """Parse optional import metadata (tags, batch id, source) from any request type.
+        """Parse optional import metadata (per-file tags, source) from any request type.
 
-        - Accepts JSON arrays, comma-separated strings, or native lists for tags
+        - Accepts file_upload_tags as a JSON object mapping file_upload_id -> [tags]
+        - Also supports legacy import_tags for backward compatibility (applies to all tasks)
         - Works for multipart/form-data, x-www-form-urlencoded, and application/json
         """
+        file_upload_tags = {}
+        raw_file_tags = request.data.get('file_upload_tags') if hasattr(request, 'data') else None
+        
+        if raw_file_tags:
+            if isinstance(raw_file_tags, dict):
+                file_upload_tags = raw_file_tags
+            elif isinstance(raw_file_tags, str):
+                try:
+                    parsed = json.loads(raw_file_tags)
+                    if isinstance(parsed, dict):
+                        file_upload_tags = parsed
+                except Exception:
+                    pass
+
+        # Legacy support: import_tags applies to all tasks if no per-file tags specified
+        legacy_tags = []
         raw_tags = request.data.get('import_tags') if hasattr(request, 'data') else None
-
-        tags = []
-        if isinstance(raw_tags, (list, tuple)):
-            tags = list(raw_tags)
-        elif raw_tags is not None and raw_tags != '':
-            try:
-                parsed = json.loads(raw_tags)
-                if isinstance(parsed, list):
-                    tags = parsed
-                elif parsed is not None:
-                    tags = [str(parsed)]
-            except Exception:
-                # Fallback to comma-separated string
-                tags = [t.strip() for t in str(raw_tags).split(',') if t.strip()]
-
-        batch_id = request.data.get('import_batch_id') if hasattr(request, 'data') else None
-        batch_id = batch_id if batch_id not in ('', None) else None
+        if raw_tags and not file_upload_tags:
+            if isinstance(raw_tags, (list, tuple)):
+                legacy_tags = list(raw_tags)
+            elif raw_tags is not None and raw_tags != '':
+                try:
+                    parsed = json.loads(raw_tags)
+                    if isinstance(parsed, list):
+                        legacy_tags = parsed
+                    elif parsed is not None:
+                        legacy_tags = [str(parsed)]
+                except Exception:
+                    legacy_tags = [t.strip() for t in str(raw_tags).split(',') if t.strip()]
 
         source = request.data.get('import_source') if hasattr(request, 'data') else None
         if not source:
             # Default to UI for web-based imports; JSON POSTs from API can leave it empty
             source = 'ui'
 
-        return tags, batch_id, source
+        return file_upload_tags, legacy_tags, source
 
     def get_serializer_context(self):
         project_id = self.kwargs.get('pk')
@@ -312,15 +324,29 @@ class ImportAPI(generics.CreateAPIView):
             task_count = len(parsed_data)
             validate_task_import(organization, task_count)
 
-        # Attach optional import tags/batch metadata to every task before saving
-        tags, batch_id, source = self._parse_import_meta_from_request(request)
-        if tags or batch_id or source:
+        # Attach optional import tags metadata to every task before saving
+        file_upload_tags, legacy_tags, source = self._parse_import_meta_from_request(request)
+        if file_upload_tags or legacy_tags or source:
             for t in parsed_data:
                 if isinstance(t, dict):
-                    if tags and 'import_tags' not in t:
-                        t['import_tags'] = tags
-                    if batch_id and 'import_batch_id' not in t:
-                        t['import_batch_id'] = batch_id
+                    # Apply per-file tags if available, otherwise use legacy tags
+                    file_upload_id = t.get('file_upload_id')
+                    if file_upload_tags and file_upload_id:
+                        # Try both string and integer keys for flexibility
+                        tags_for_file = None
+                        if file_upload_id in file_upload_tags:
+                            tags_for_file = file_upload_tags[file_upload_id]
+                        elif str(file_upload_id) in file_upload_tags:
+                            tags_for_file = file_upload_tags[str(file_upload_id)]
+                        
+                        if tags_for_file:
+                            if isinstance(tags_for_file, list):
+                                t['import_tags'] = tags_for_file
+                            elif tags_for_file:
+                                t['import_tags'] = [str(tags_for_file)]
+                    elif legacy_tags and 'import_tags' not in t:
+                        t['import_tags'] = legacy_tags
+                    
                     if source and 'import_source' not in t:
                         t['import_source'] = source
 
@@ -497,14 +523,28 @@ class ReImportAPI(ImportAPI):
             validate_task_import(organization, task_count)
 
         # Attach optional import metadata coming from request body
-        tags, batch_id, source = self._parse_import_meta_from_request(self.request)
-        if tags or batch_id or source:
+        file_upload_tags, legacy_tags, source = self._parse_import_meta_from_request(self.request)
+        if file_upload_tags or legacy_tags or source:
             for t in tasks:
                 if isinstance(t, dict):
-                    if tags and 'import_tags' not in t:
-                        t['import_tags'] = tags
-                    if batch_id and 'import_batch_id' not in t:
-                        t['import_batch_id'] = batch_id
+                    # Apply per-file tags if available, otherwise use legacy tags
+                    file_upload_id = t.get('file_upload_id')
+                    if file_upload_tags and file_upload_id:
+                        # Try both string and integer keys for flexibility
+                        tags_for_file = None
+                        if file_upload_id in file_upload_tags:
+                            tags_for_file = file_upload_tags[file_upload_id]
+                        elif str(file_upload_id) in file_upload_tags:
+                            tags_for_file = file_upload_tags[str(file_upload_id)]
+                        
+                        if tags_for_file:
+                            if isinstance(tags_for_file, list):
+                                t['import_tags'] = tags_for_file
+                            elif tags_for_file:
+                                t['import_tags'] = [str(tags_for_file)]
+                    elif legacy_tags and 'import_tags' not in t:
+                        t['import_tags'] = legacy_tags
+                    
                     if source and 'import_source' not in t:
                         t['import_source'] = source
 

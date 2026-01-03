@@ -94,7 +94,7 @@ export const useImportPage = (project, sample) => {
         files_as_tasks_list: csvHandling === "tasks",
         ...reimportExtras,
         // propagate optional import metadata captured in Import.jsx via setReimportExtras
-        // Expected keys: import_batch_id (string), import_tags (array)
+        // Expected keys: file_upload_tags (object mapping file_upload_id -> [tags]), import_source (string)
       },
     });
 
@@ -107,10 +107,11 @@ export const useImportPage = (project, sample) => {
       onStart?.();
       const url = sample.url;
       const body = new URLSearchParams({ url });
-      const { import_batch_id, import_tags } = reimportExtras || {};
-      if (import_batch_id) body.append("import_batch_id", import_batch_id);
-      if (Array.isArray(import_tags) && import_tags.length) body.append("import_tags", JSON.stringify(import_tags));
-      body.append("import_source", "ui");
+      const { file_upload_tags, import_source } = reimportExtras || {};
+      if (file_upload_tags && Object.keys(file_upload_tags).length > 0) {
+        body.append("file_upload_tags", JSON.stringify(file_upload_tags));
+      }
+      body.append("import_source", import_source || "ui");
       await importFiles({
         files: [{ name: url }],
         body,

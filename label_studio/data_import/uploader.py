@@ -361,8 +361,9 @@ def load_tasks(request, project):
     if not tasks:
         raise ValidationError('load_tasks: No tasks added')
 
-    # Attach optional import tags/batch metadata to every task before returning
+    # Attach optional import tags metadata to every task before returning
     # Support multipart/form-data and x-www-form-urlencoded as well
+    # Note: Per-file tags are handled during reimport, not initial upload
     def _parse_meta(req):
         raw_tags = req.data.get('import_tags') if hasattr(req, 'data') else None
         tags = []
@@ -377,18 +378,14 @@ def load_tasks(request, project):
                     tags = [str(parsed)]
             except Exception:
                 tags = [t.strip() for t in str(raw_tags).split(',') if t.strip()]
-        batch_id = req.data.get('import_batch_id') if hasattr(req, 'data') else None
-        batch_id = batch_id if batch_id not in ('', None) else None
-        return tags, batch_id
+        return tags
 
-    tags, batch_id = _parse_meta(request)
-    if tags or batch_id:
+    tags = _parse_meta(request)
+    if tags:
         for t in tasks:
             if isinstance(t, dict):
                 if tags and 'import_tags' not in t:
                     t['import_tags'] = tags
-                if batch_id and 'import_batch_id' not in t:
-                    t['import_batch_id'] = batch_id
                 if 'import_source' not in t:
                     t['import_source'] = 'ui'
 

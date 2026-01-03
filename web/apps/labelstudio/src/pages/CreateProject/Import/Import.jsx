@@ -135,6 +135,76 @@ const ErrorMessage = ({ error }) => {
   );
 };
 
+const FileRow = ({
+  file,
+  fileTags,
+  setFileTags,
+  isSelected,
+  onSelect,
+  onMouseDown,
+  onMouseEnter,
+}) => {
+  const fileId = file.id;
+  const currentTags = fileTags[fileId] || [];
+
+  const removeTag = (tagToRemove) => {
+    setFileTags({
+      ...fileTags,
+      [fileId]: currentTags.filter((t) => t !== tagToRemove),
+    });
+  };
+
+  return (
+    <tr
+      key={file.file}
+      className={scn(isSelected ? "bg-primary-background-subtle" : "", "cursor-pointer select-none")}
+      onMouseDown={onMouseDown}
+      onMouseEnter={onMouseEnter}
+      style={{ userSelect: "none" }}
+    >
+      <td>
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={(e) => {
+              e.stopPropagation();
+              onSelect(fileId, e.target.checked);
+            }}
+            onClick={(e) => e.stopPropagation()}
+            className="cursor-pointer"
+          />
+          {file.file}
+        </div>
+      </td>
+      <td>
+        <span className={importClass.elem("file-status")} />
+      </td>
+      <td>
+        {currentTags.length > 0 ? (
+          <div className="flex flex-wrap gap-1">
+            {currentTags.map((t) => (
+              <Badge
+                key={t}
+                variant="secondary"
+                className="h-5 text-xs cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  removeTag(t);
+                }}
+              >
+                {t} ×
+              </Badge>
+            ))}
+          </div>
+        ) : (
+          <span className="text-neutral-content-subtler text-xs">No tags</span>
+        )}
+      </td>
+    </tr>
+  );
+};
+
 export const ImportPage = ({
   project,
   sample,
@@ -154,9 +224,12 @@ export const ImportPage = ({
   isTaskLimitExceeded = false,
 }) => {
   const [error, setError] = useState();
-  const [batchId, setBatchId] = useState("");
-  const [tagInput, setTagInput] = useState("");
-  const [tags, setTags] = useState([]);
+  const [fileTags, setFileTags] = useState({}); // Map of file_upload_id -> [tags]
+  const [selectedFiles, setSelectedFiles] = useState(new Set()); // Set of selected file IDs
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(null);
+  const [dragStartSelected, setDragStartSelected] = useState(false);
+  const [bulkTagInput, setBulkTagInput] = useState("");
   const api = useAPI();
   const projectConfigured = project?.label_config !== "<View></View>";
   const sampleConfig = useAtomValue(sampleDatasetAtom);
@@ -176,6 +249,14 @@ export const ImportPage = ({
 
       onFileListUpdate?.(ids);
       return { ...state, ids };
+    }
+    if (action.deleted) {
+      const deletedId = action.deleted;
+      const updatedUploaded = state.uploaded.filter((f) => f.id !== deletedId);
+      const updatedIds = state.ids.filter((id) => id !== deletedId);
+
+      onFileListUpdate?.(updatedIds);
+      return { ...state, uploaded: updatedUploaded, ids: updatedIds };
     }
     return state;
   };
@@ -202,7 +283,211 @@ export const ImportPage = ({
       }
       return files;
     },
-    [project?.id],
+    [project?.id, api],
+  );
+
+  const handleDeleteFile = useCallback(
+    async (fileId) => {
+      try {
+        await api.callApi("deleteFileUploads", {
+          params: { pk: project.id },
+          body: { file_upload_ids: [fileId] },
+        });
+        dispatch({ deleted: fileId });
+        // Remove from selection if deleted
+        setSelectedFiles((prev) => {
+          const next = new Set(prev);
+          next.delete(fileId);
+          return next;
+        });
+      } catch (err) {
+        onError(err);
+      }
+    },
+    [api, project?.id],
+  );
+
+  const handleDeleteSelected = useCallback(async () => {
+    if (selectedFiles.size === 0) return;
+    
+    try {
+      const fileIdsToDelete = Array.from(selectedFiles);
+      await api.callApi("deleteFileUploads", {
+        params: { pk: project.id },
+        body: { file_upload_ids: fileIdsToDelete },
+      });
+      // Delete all selected files from state
+      fileIdsToDelete.forEach((fileId) => {
+        dispatch({ deleted: fileId });
+      });
+      // Clear selection
+      setSelectedFiles(new Set());
+    } catch (err) {
+      onError(err);
+    }
+  }, [selectedFiles, api, project?.id]);
+
+  // Selection handlers
+  const handleSelectFile = useCallback((fileId, selected) => {
+    setSelectedFiles((prev) => {
+      const next = new Set(prev);
+      if (selected) {
+        next.add(fileId);
+      } else {
+        next.delete(fileId);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedFiles.size === files.uploaded.length) {
+      setSelectedFiles(new Set());
+    } else {
+      setSelectedFiles(new Set(files.uploaded.map((f) => f.id)));
+    }
+  }, [selectedFiles, files.uploaded]);
+
+  // Drag selection handlers
+  const tableBodyRef = useRef(null);
+  const lastHoveredRef = useRef(null);
+
+  const handleMouseDown = useCallback(
+    (e, fileId) => {
+      if (e.button !== 0) return; // Only left mouse button
+      if (
+        e.target.type === "checkbox" ||
+        e.target.closest("input") ||
+        e.target.closest("button") ||
+        e.target.closest("a")
+      ) {
+        return; // Don't start drag on interactive elements
+      }
+      // Store starting selection state before toggling
+      const wasSelected = selectedFiles.has(fileId);
+      setDragStartSelected(wasSelected);
+      setIsDragging(true);
+      setDragStart(fileId);
+      lastHoveredRef.current = fileId;
+      // Toggle selection of starting file
+      handleSelectFile(fileId, !wasSelected);
+    },
+    [selectedFiles, handleSelectFile],
+  );
+
+  const handleMouseEnter = useCallback(
+    (fileId) => {
+      if (isDragging && dragStart !== null) {
+        lastHoveredRef.current = fileId;
+        // Apply selection state based on starting file's state
+        const fileIds = files.uploaded.map((f) => f.id);
+        const startIdx = fileIds.indexOf(dragStart);
+        const endIdx = fileIds.indexOf(fileId);
+        if (startIdx !== -1 && endIdx !== -1) {
+          const minIdx = Math.min(startIdx, endIdx);
+          const maxIdx = Math.max(startIdx, endIdx);
+          const rangeFiles = fileIds.slice(minIdx, maxIdx + 1);
+          setSelectedFiles((prev) => {
+            const next = new Set(prev);
+            if (dragStartSelected) {
+              // Starting file was selected, so deselect files in range
+              rangeFiles.forEach((id) => next.delete(id));
+            } else {
+              // Starting file was unselected, so select files in range
+              rangeFiles.forEach((id) => next.add(id));
+            }
+            return next;
+          });
+        }
+      }
+    },
+    [isDragging, dragStart, dragStartSelected, files.uploaded],
+  );
+
+  useEffect(() => {
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      setDragStart(null);
+      setDragStartSelected(false);
+      lastHoveredRef.current = null;
+    };
+
+    if (isDragging) {
+      document.addEventListener("mouseup", handleMouseUp);
+      return () => document.removeEventListener("mouseup", handleMouseUp);
+    }
+  }, [isDragging]);
+
+  // Bulk tag assignment
+  const handleBulkTagChange = useCallback((e) => {
+    const next = e.target.value ?? "";
+    const parts = next.split(/[;,]/);
+    const pending = parts.pop() ?? "";
+    const newTags = parts.map((p) => p.trim()).filter(Boolean);
+    if (newTags.length) {
+      const updatedTags = { ...fileTags };
+      const targetFiles = selectedFiles.size > 0 ? Array.from(selectedFiles) : files.uploaded.map((f) => f.id);
+      targetFiles.forEach((fileId) => {
+        const current = updatedTags[fileId] || [];
+        const merged = [...current];
+        for (const t of newTags) if (!merged.includes(t)) merged.push(t);
+        updatedTags[fileId] = merged;
+      });
+      setFileTags(updatedTags);
+    }
+    setBulkTagInput(pending);
+  }, [fileTags, selectedFiles, files.uploaded]);
+
+  const handleBulkTagBlur = useCallback(() => {
+    const val = (bulkTagInput || "").trim();
+    if (val) {
+      const updatedTags = { ...fileTags };
+      const targetFiles = selectedFiles.size > 0 ? Array.from(selectedFiles) : files.uploaded.map((f) => f.id);
+      targetFiles.forEach((fileId) => {
+        const current = updatedTags[fileId] || [];
+        if (!current.includes(val)) {
+          updatedTags[fileId] = [...current, val];
+        }
+      });
+      setFileTags(updatedTags);
+    }
+    setBulkTagInput("");
+  }, [bulkTagInput, fileTags, selectedFiles, files.uploaded]);
+
+  const handleBulkTagKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const val = (bulkTagInput || "").trim();
+        if (val) {
+          const updatedTags = { ...fileTags };
+          const targetFiles = selectedFiles.size > 0 ? Array.from(selectedFiles) : files.uploaded.map((f) => f.id);
+          targetFiles.forEach((fileId) => {
+            const current = updatedTags[fileId] || [];
+            if (!current.includes(val)) {
+              updatedTags[fileId] = [...current, val];
+            }
+          });
+          setFileTags(updatedTags);
+        }
+        setBulkTagInput("");
+      }
+    },
+    [bulkTagInput, fileTags, selectedFiles, files.uploaded],
+  );
+
+  const handleRemoveBulkTag = useCallback(
+    (tagToRemove) => {
+      const updatedTags = { ...fileTags };
+      const targetFiles = selectedFiles.size > 0 ? Array.from(selectedFiles) : files.uploaded.map((f) => f.id);
+      targetFiles.forEach((fileId) => {
+        if (updatedTags[fileId]) {
+          updatedTags[fileId] = updatedTags[fileId].filter((t) => t !== tagToRemove);
+        }
+      });
+      setFileTags(updatedTags);
+    },
+    [fileTags, selectedFiles, files.uploaded],
   );
 
   const onError = (err) => {
@@ -233,15 +518,6 @@ export const ImportPage = ({
 
   const importFilesImmediately = useCallback(
     async (files, body) => {
-      // append optional tags and batch id for urlencoded or multipart forms
-      if (body instanceof FormData) {
-        if (batchId) body.append("import_batch_id", batchId);
-        if (tags.length) body.append("import_tags", JSON.stringify(tags));
-      } else if (body instanceof URLSearchParams) {
-        if (batchId) body.append("import_batch_id", batchId);
-        if (tags.length) body.append("import_tags", JSON.stringify(tags));
-      }
-
       importFiles({
         files,
         body,
@@ -253,7 +529,7 @@ export const ImportPage = ({
         dontCommitToProject,
       });
     },
-    [project, onFinish, batchId, tags],
+    [project, onFinish],
   );
 
   const sendFiles = useCallback(
@@ -326,12 +602,11 @@ export const ImportPage = ({
   useEffect(() => {
     if (typeof setReimportExtras === "function") {
       setReimportExtras({
-        import_batch_id: batchId || undefined,
-        import_tags: tags,
+        file_upload_tags: fileTags,
         import_source: "ui",
       });
     }
-  }, [batchId, tags, setReimportExtras]);
+  }, [fileTags, setReimportExtras]);
 
   const urlRef = useRef();
 
@@ -365,43 +640,6 @@ export const ImportPage = ({
       <input id="file-input" type="file" name="file" multiple onChange={onUpload} style={{ display: "none" }} />
 
       <header className="flex gap-4">
-        <div className="flex gap-2 items-center">
-          <Input placeholder="Batch ID (optional)" value={batchId} onChange={(e) => setBatchId(e.target.value)} />
-          <Input
-            placeholder="Add import tag"
-            value={tagInput}
-            onChange={(e) => {
-              const next = e.target.value ?? "";
-              const parts = next.split(/[;,]/);
-              const pending = parts.pop() ?? "";
-              const newTags = parts.map((p) => p.trim()).filter(Boolean);
-              if (newTags.length) {
-                const merged = [...tags];
-                for (const t of newTags) if (!merged.includes(t)) merged.push(t);
-                setTags(merged);
-              }
-              setTagInput(pending);
-            }}
-            onBlur={() => {
-              const val = (tagInput || "").trim();
-              if (val && !tags.includes(val)) setTags([...tags, val]);
-              setTagInput("");
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                const val = (tagInput || "").trim();
-                if (val && !tags.includes(val)) setTags([...tags, val]);
-                setTagInput("");
-              }
-            }}
-          />
-          {tags.map((t) => (
-            <Badge key={t} variant="secondary" className="h-6 text-xs">
-              {t}
-            </Badge>
-          ))}
-        </div>
         <form className={`${importClass.elem("url-form")} inline-flex`} method="POST" onSubmit={onLoadURL}>
           <Input placeholder="Dataset URL" name="url" ref={urlRef} style={{ height: 40 }} />
           <Button type="submit" look="primary">
@@ -529,8 +767,101 @@ export const ImportPage = ({
             {showList && (
               <div className="w-full">
                 <SimpleCard title="Files" className="w-full h-full">
+                  <div className="flex flex-col gap-4 mb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={files.uploaded.length > 0 && selectedFiles.size === files.uploaded.length}
+                            onChange={handleSelectAll}
+                            className="cursor-pointer"
+                          />
+                          <span className="text-sm">
+                            {selectedFiles.size > 0
+                              ? `${selectedFiles.size} of ${files.uploaded.length} selected`
+                              : `Select files (${files.uploaded.length} total)`}
+                          </span>
+                        </div>
+                        {selectedFiles.size > 0 && (
+                          <>
+                            <Button
+                              size="small"
+                              look="secondary"
+                              onClick={() => setSelectedFiles(new Set())}
+                            >
+                              Clear Selection
+                            </Button>
+                            <Button
+                              size="small"
+                              look="destructive"
+                              onClick={handleDeleteSelected}
+                            >
+                              <IconTrash className="w-4 h-4 mr-1" />
+                              Delete Selected ({selectedFiles.size})
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2 p-3 bg-neutral-background rounded border">
+                      <div className="text-sm font-medium">
+                        {selectedFiles.size > 0
+                          ? `Apply tags to ${selectedFiles.size} selected file(s)`
+                          : "Apply tags to all files"}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Input
+                          placeholder="Add import tag (e.g., ds_a) - applies to selected/all files"
+                          value={bulkTagInput}
+                          onChange={handleBulkTagChange}
+                          onBlur={handleBulkTagBlur}
+                          onKeyDown={handleBulkTagKeyDown}
+                          className="h-8 text-xs"
+                        />
+                        <div className="flex flex-wrap gap-1">
+                          {(() => {
+                            // Get common tags from selected files, or all files if none selected
+                            const targetFiles =
+                              selectedFiles.size > 0 ? Array.from(selectedFiles) : files.uploaded.map((f) => f.id);
+                            const allTags = new Set();
+                            targetFiles.forEach((fileId) => {
+                              (fileTags[fileId] || []).forEach((tag) => allTags.add(tag));
+                            });
+                            return Array.from(allTags).map((t) => (
+                              <Badge
+                                key={t}
+                                variant="secondary"
+                                className="h-5 text-xs cursor-pointer"
+                                onClick={() => handleRemoveBulkTag(t)}
+                              >
+                                {t} ×
+                              </Badge>
+                            ));
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <table>
-                    <tbody>
+                    <thead>
+                      <tr>
+                        <th>File</th>
+                        <th>Status</th>
+                        <th>Import Tags</th>
+                      </tr>
+                    </thead>
+                    <tbody
+                      ref={tableBodyRef}
+                      style={{ userSelect: "none" }}
+                      onMouseLeave={() => {
+                        if (isDragging) {
+                          setIsDragging(false);
+                          setDragStart(null);
+                          setDragStartSelected(false);
+                        }
+                      }}
+                    >
                       {sample && (
                         <tr key={sample.url}>
                           <td>
@@ -542,6 +873,7 @@ export const ImportPage = ({
                             </div>
                           </td>
                           <td>{sample.description}</td>
+                          <td colSpan={2}></td>
                           <td>
                             <Button
                               size="icon"
@@ -563,13 +895,16 @@ export const ImportPage = ({
                         </tr>
                       ))}
                       {files.uploaded.map((file) => (
-                        <tr key={file.file}>
-                          <td>{file.file}</td>
-                          <td>
-                            <span className={importClass.elem("file-status")} />
-                          </td>
-                          <td>{file.size}</td>
-                        </tr>
+                        <FileRow
+                          key={file.file}
+                          file={file}
+                          fileTags={fileTags}
+                          setFileTags={setFileTags}
+                          isSelected={selectedFiles.has(file.id)}
+                          onSelect={handleSelectFile}
+                          onMouseDown={(e) => handleMouseDown(e, file.id)}
+                          onMouseEnter={() => handleMouseEnter(file.id)}
+                        />
                       ))}
                     </tbody>
                   </table>
