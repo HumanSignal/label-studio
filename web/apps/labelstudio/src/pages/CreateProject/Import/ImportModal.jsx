@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router";
 import { Button } from "../../../components";
 import { Modal } from "../../../components/Modal/Modal";
@@ -20,6 +20,12 @@ export const Inner = () => {
   const [waiting, setWaitingStatus] = useState(false);
   const [sample, setSample] = useState(null);
   const api = useAPI();
+
+  // #region agent log
+  useEffect(() => {
+    fetch('http://localhost:7242/ingest/72ea390b-662d-4988-92ef-c2108a4eb656',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ImportModal.jsx:19',message:'ImportModal Inner rendered',data:{hasProject:!!project,projectId:project?.id,pathname:location.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  }, [project, location.pathname]);
+  // #endregion
 
   const { uploading, uploadDisabled, finishUpload, fileIds, pageProps, uploadSample } = useImportPage(project);
 
@@ -47,6 +53,8 @@ export const Inner = () => {
   }, [modal, project, fileIds, backToDM]);
 
   const onFinish = useCallback(async () => {
+    if (uploadDisabled) return;
+
     if (sample) {
       await uploadSample(
         sample,
@@ -59,7 +67,7 @@ export const Inner = () => {
 
     if (!imported) return;
     backToDM();
-  }, [backToDM, finishUpload, sample]);
+  }, [backToDM, finishUpload, sample, uploadSample, uploadDisabled]);
 
   return (
     <Modal
@@ -94,6 +102,8 @@ export const Inner = () => {
           history.push(`/projects/${project.id}/settings/labeling`);
         }}
         setReimportExtras={pageProps.setReimportExtras}
+        tasksToImport={pageProps.tasksToImport}
+        usageLimits={pageProps.usageLimits}
         {...pageProps}
       />
     </Modal>

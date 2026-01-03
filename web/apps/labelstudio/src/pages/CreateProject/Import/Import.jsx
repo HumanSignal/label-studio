@@ -149,6 +149,9 @@ export const ImportPage = ({
   addColumns,
   openLabelingConfig,
   setReimportExtras,
+  tasksToImport = 0,
+  usageLimits = null,
+  isTaskLimitExceeded = false,
 }) => {
   const [error, setError] = useState();
   const [batchId, setBatchId] = useState("");
@@ -332,6 +335,11 @@ export const ImportPage = ({
 
   const urlRef = useRef();
 
+  // #region agent log
+  useEffect(() => {
+    fetch('http://localhost:7242/ingest/72ea390b-662d-4988-92ef-c2108a4eb656',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Import.jsx:337',message:'Import component render check',data:{hasProject:!!project,show,pathname:window.location.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+  }, [project, show]);
+  // #endregion
   if (!project) return null;
   if (!show) return null;
 
@@ -340,6 +348,16 @@ export const ImportPage = ({
     type: "radio",
     onChange: (e) => setCsvHandling(e.target.value),
   };
+
+  let limitError = null;
+  if (usageLimits && usageLimits.max_tasks !== null && usageLimits.max_tasks !== undefined && isTaskLimitExceeded) {
+    const currentTasks = usageLimits.current_tasks || 0;
+    const maxTasks = usageLimits.max_tasks;
+    const wouldHave = currentTasks + tasksToImport;
+    limitError = {
+      detail: `Task limit would be exceeded. Your plan allows ${maxTasks} task(s), you currently have ${currentTasks}, and importing ${tasksToImport} would result in ${wouldHave}.`,
+    };
+  }
 
   return (
     <div className={importClass}>
@@ -397,7 +415,15 @@ export const ImportPage = ({
           className={importClass.elem("upload-button")}
         >
           <IconUpload width="16" height="16" className={importClass.elem("upload-icon")} />
-          Upload {files.uploaded.length ? "More " : ""}Files
+          {(() => {
+            if (usageLimits && usageLimits.max_tasks !== null && usageLimits.max_tasks !== undefined) {
+              const currentTasks = usageLimits.current_tasks || 0;
+              const totalWithImport = currentTasks + tasksToImport;
+              const maxTasks = usageLimits.max_tasks;
+              return `Upload (${totalWithImport}/${maxTasks})`;
+            }
+            return `Upload ${files.uploaded.length ? "More " : ""}Files`;
+          })()}
         </Button>
         {ff.isActive(ff.FF_SAMPLE_DATASETS) && (
           <SampleDatasetSelect samples={samples} sample={sample} onSampleApplied={onSampleDatasetSelect} />
@@ -418,7 +444,7 @@ export const ImportPage = ({
         </div>
       </header>
 
-      <ErrorMessage error={error} />
+      <ErrorMessage error={limitError || error} />
 
       <main>
         <Upload sendFiles={sendFiles} project={project}>

@@ -32,6 +32,7 @@ export const API_CONFIG = {
     createSampleTask: "POST:/projects/:pk/sample-task",
     fileUploads: "/projects/:pk/file-uploads",
     deleteFileUploads: "DELETE:/projects/:pk/file-uploads",
+    fileUploadTaskCount: "POST:/projects/:pk/file-uploads/count-tasks",
     importFiles: "POST:/projects/:pk/import",
     reimportFiles: "POST:/projects/:pk/reimport",
     dataSummary: "/projects/:pk/summary",

@@ -490,6 +490,12 @@ class ReImportAPI(ImportAPI):
             project, file_upload_ids, files_as_tasks_list=files_as_tasks_list
         )
 
+        # Validate task limit before importing
+        organization = project.organization
+        if organization:
+            task_count = len(tasks)
+            validate_task_import(organization, task_count)
+
         # Attach optional import metadata coming from request body
         tags, batch_id, source = self._parse_import_meta_from_request(self.request)
         if tags or batch_id or source:
@@ -679,6 +685,74 @@ class FileUploadListAPI(generics.mixins.ListModelMixin, generics.mixins.DestroyM
         else:
             raise ValueError('"file_upload_ids" parameter must be a list of integers')
         return Response({'deleted': deleted}, status=status.HTTP_200_OK)
+
+
+@method_decorator(
+    name='post',
+    decorator=swagger_auto_schema(
+        tags=['Import'],
+        x_fern_sdk_group_name=['files'],
+        x_fern_sdk_method_name='count_tasks',
+        x_fern_audiences=['public'],
+        operation_summary='Count tasks from file uploads',
+        operation_description='Count the number of tasks that would be imported from the specified file upload IDs without actually importing them.',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'file_upload_ids': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(type=openapi.TYPE_INTEGER),
+                    description='List of file upload IDs to count tasks from',
+                ),
+                'files_as_tasks_list': openapi.Schema(
+                    type=openapi.TYPE_BOOLEAN,
+                    description='Whether to treat files as task lists (for CSV/TSV)',
+                    default=True,
+                ),
+            },
+            required=['file_upload_ids'],
+        ),
+        responses={
+            200: openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'task_count': openapi.Schema(type=openapi.TYPE_INTEGER, description='Total number of tasks'),
+                },
+            ),
+        },
+    ),
+)
+class FileUploadTaskCountAPI(APIView):
+    """API endpoint to count tasks from file uploads without importing them."""
+
+    permission_classes = [IsAuthenticated]
+    permission_required = all_permissions.projects_view
+
+    def post(self, request, *args, **kwargs):
+        """Count tasks from file uploads."""
+        project = generics.get_object_or_404(Project.objects.for_user(request.user), pk=kwargs['pk'])
+        file_upload_ids = request.data.get('file_upload_ids', [])
+        files_as_tasks_list = bool_from_request(request.data, 'files_as_tasks_list', True)
+
+        if not file_upload_ids:
+            return Response({'task_count': 0}, status=status.HTTP_200_OK)
+
+        if not isinstance(file_upload_ids, list):
+            return Response({'error': 'file_upload_ids must be a list'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Count tasks from uploaded files without saving
+            tasks, _, _ = FileUpload.load_tasks_from_uploaded_files(
+                project, file_upload_ids, files_as_tasks_list=files_as_tasks_list
+            )
+            task_count = len(tasks)
+
+            return Response({'task_count': task_count}, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.exception(f'Error counting tasks from file uploads: {e}')
+            return Response(
+                {'error': f'Failed to count tasks: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 @method_decorator(

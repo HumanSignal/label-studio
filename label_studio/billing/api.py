@@ -28,6 +28,8 @@ from billing.serializers import (
 )
 from billing.utils import check_project_limit, check_task_limit, get_membership_tier, get_usage_limits
 from core.permissions import all_permissions
+from projects.models import Project
+from tasks.models import Task
 
 logger = logging.getLogger(__name__)
 
@@ -487,7 +489,16 @@ class CustomerPortalAPI(APIView):
         x_fern_sdk_group_name='billing',
         x_fern_sdk_method_name='get_usage_limits',
         operation_summary='Get usage limits',
-        operation_description='Get current usage limits and status for the organization.',
+        operation_description='Get current usage limits and status for the organization. Optionally include project_id to get task count for a specific project.',
+        manual_parameters=[
+            openapi.Parameter(
+                name='project_id',
+                type=openapi.TYPE_INTEGER,
+                in_=openapi.IN_QUERY,
+                description='Optional project ID to get task count for a specific project',
+                required=False,
+            ),
+        ],
         responses={200: UsageLimitsSerializer()},
     ),
 )
@@ -509,12 +520,23 @@ class UsageLimitsAPI(APIView):
             current_projects, max_projects, can_create_project = check_project_limit(organization)
             current_tasks, max_tasks, can_import_tasks = check_task_limit(organization)
 
+            # Get project task count if project_id is provided
+            project_task_count = None
+            project_id = request.query_params.get('project_id')
+            if project_id:
+                try:
+                    project = Project.objects.for_user(request.user).get(pk=project_id)
+                    project_task_count = Task.objects.filter(project=project).count()
+                except Project.DoesNotExist:
+                    return Response({'error': 'Project not found'}, status=status.HTTP_404_NOT_FOUND)
+
             data = {
                 'tier': tier,
                 'current_projects': current_projects,
                 'max_projects': max_projects,
                 'current_tasks': current_tasks,
                 'max_tasks': max_tasks,
+                'project_task_count': project_task_count,
                 'can_create_project': can_create_project,
                 'can_import_tasks': can_import_tasks,
             }

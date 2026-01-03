@@ -15,6 +15,7 @@ _api_projects_urlpatterns = [
     path('<int:pk>/import/predictions', api.ImportPredictionsAPI.as_view(), name='project-import-predictions'),
     path('<int:pk>/reimport', api.ReImportAPI.as_view(), name='project-reimport'),
     path('<int:pk>/file-uploads', api.FileUploadListAPI.as_view(), name='project-file-upload-list'),
+    path('<int:pk>/file-uploads/count-tasks', api.FileUploadTaskCountAPI.as_view(), name='project-file-upload-count-tasks'),
 ]
 
 urlpatterns = [

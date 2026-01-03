@@ -15,6 +15,7 @@ import { ImportModal } from "../CreateProject/Import/ImportModal";
 import { ExportPage } from "../ExportPage/ExportPage";
 import { APIConfig } from "./api-config";
 import { ToastContext, ToastType } from "@humansignal/ui";
+import { useQuery } from "@tanstack/react-query";
 
 import "./DataManager.scss";
 
@@ -72,6 +73,32 @@ export const DataManagerPage = ({ ...props }) => {
   const dataManagerRef = useRef();
   const projectId = project?.id;
 
+  // Fetch usage limits for import button
+  const { data: usageLimits } = useQuery({
+    queryKey: ["usageLimits", projectId],
+    queryFn: async () => {
+      try {
+        return await api.callApi("usageLimits", {
+          params: projectId ? { project_id: projectId } : {},
+        });
+      } catch (error) {
+        return null;
+      }
+    },
+    enabled: !!projectId,
+  });
+
+  // Store usage limits in window.APP_SETTINGS for datamanager library access
+  useEffect(() => {
+    if (usageLimits && project) {
+      if (!window.APP_SETTINGS.billing) {
+        window.APP_SETTINGS.billing = {};
+      }
+      window.APP_SETTINGS.billing.usageLimits = usageLimits;
+      window.APP_SETTINGS.billing.projectTaskNumber = project.task_number;
+    }
+  }, [usageLimits, project]);
+
   const init = useCallback(async () => {
     if (!window.LabelStudio) return;
     if (!window.DataManager) return;
@@ -124,6 +151,9 @@ export const DataManagerPage = ({ ...props }) => {
     });
 
     dataManager.on("importClicked", () => {
+      // #region agent log
+      fetch('http://localhost:7242/ingest/72ea390b-662d-4988-92ef-c2108a4eb656',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'DataManager.jsx:154',message:'importClicked event fired',data:{projectId:params.id,hasHtx:!!window.Htx,hasAnnotationStore:!!window.Htx?.annotationStore},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
       history.push(buildLink("/data/import", { id: params.id }));
     });
 
@@ -187,9 +217,15 @@ export const DataManagerPage = ({ ...props }) => {
   }, [projectId]);
 
   const destroyDM = useCallback(() => {
+    // #region agent log
+    fetch('http://localhost:7242/ingest/72ea390b-662d-4988-92ef-c2108a4eb656',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'DataManager.jsx:217',message:'destroyDM called',data:{hasDataManager:!!dataManagerRef.current,pathname:window.location.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     if (dataManagerRef.current) {
       dataManagerRef.current.destroy();
       dataManagerRef.current = null;
+      // #region agent log
+      fetch('http://localhost:7242/ingest/72ea390b-662d-4988-92ef-c2108a4eb656',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'DataManager.jsx:221',message:'DataManager destroyed',data:{hasHtx:!!window.Htx,hasAnnotationStore:!!window.Htx?.annotationStore},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
     }
   }, []);
 

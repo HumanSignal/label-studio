@@ -76,6 +76,7 @@ class UsageLimitsSerializer(serializers.Serializer):
     max_projects = serializers.IntegerField(required=False, allow_null=True, help_text='Maximum allowed projects (None for unlimited)')
     current_tasks = serializers.IntegerField(help_text='Current number of tasks across all projects')
     max_tasks = serializers.IntegerField(required=False, allow_null=True, help_text='Maximum allowed tasks (None for unlimited)')
+    project_task_count = serializers.IntegerField(required=False, allow_null=True, help_text='Current number of tasks in the specified project (if project_id provided)')
     can_create_project = serializers.BooleanField(help_text='Whether a new project can be created')
     can_import_tasks = serializers.BooleanField(help_text='Whether tasks can be imported')
 

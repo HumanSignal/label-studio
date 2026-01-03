@@ -24,14 +24,30 @@ const style = {
 /**
  * Checks for Starter Cloud trial expiration.
  * If expired it renders disabled Import button with a tooltip.
+ * Also shows task limit information (Import X/Y) and disables if limit exceeded.
  */
 const ImportButtonWithChecks = ({ size }) => {
-  const simpleButton = <ImportButton size={size}>Import</ImportButton>;
+  const usageLimits = window.APP_SETTINGS.billing?.usageLimits;
+  const projectTaskNumber = window.APP_SETTINGS.billing?.projectTaskNumber;
+  const maxTasks = usageLimits?.max_tasks;
+  const currentTasks = usageLimits?.current_tasks;
+  const canImportTasks = usageLimits?.can_import_tasks;
+
+  // Build button text with task count if limits are available
+  const getButtonText = () => {
+    if (maxTasks !== null && maxTasks !== undefined && projectTaskNumber !== undefined) {
+      return `Import ${projectTaskNumber}/${maxTasks}`;
+    }
+    return "Import";
+  };
+
+  const buttonText = getButtonText();
   const isOpenSource = !window.APP_SETTINGS.billing;
   // Check if user is self-serve; Enterprise flag === false is the main condition
   const isSelfServe = isFF(FF_SELF_SERVE) && window.APP_SETTINGS.billing?.enterprise === false;
 
-  if (isOpenSource || !isSelfServe) return simpleButton;
+  // Check task limit (organization level)
+  const isTaskLimitExceeded = maxTasks !== null && maxTasks !== undefined && canImportTasks === false;
 
   // Check if user is on trial
   const isTrialExpired = window.APP_SETTINGS.billing.checks?.is_license_expired;
@@ -45,24 +61,55 @@ const ImportButtonWithChecks = ({ size }) => {
   // Check if user is self-serve and has expired trial or subscription
   const isSelfServeExpired = isSelfServeExpiredTrial || isSelfServeExpiredSubscription;
 
-  if (!isSelfServeExpired) return simpleButton;
+  const isDisabled = isTaskLimitExceeded || isSelfServeExpired;
 
-  // Disabled buttons ignore hover, so we use wrapper to properly handle a tooltip
-  return (
-    <Tooltip
-      title="You must upgrade your plan to import data"
-      style={{
-        maxWidth: 200,
-        textAlign: "center",
-      }}
-    >
-      <Block name="button-wrapper">
-        <ImportButton disabled size={size}>
-          Import
-        </ImportButton>
-      </Block>
-    </Tooltip>
-  );
+  // If open source or not self-serve, show simple button (may still show task count)
+  if (isOpenSource || !isSelfServe) {
+    if (isTaskLimitExceeded) {
+      return (
+        <Tooltip
+          title={`Task limit reached. Your plan allows ${maxTasks} task(s), and you currently have ${currentTasks}.`}
+          style={{
+            maxWidth: 200,
+            textAlign: "center",
+          }}
+        >
+          <Block name="button-wrapper">
+            <ImportButton disabled size={size}>
+              {buttonText}
+            </ImportButton>
+          </Block>
+        </Tooltip>
+      );
+    }
+    return <ImportButton size={size}>{buttonText}</ImportButton>;
+  }
+
+  // For self-serve users, check both trial expiration and task limits
+  if (isDisabled) {
+    let tooltipTitle = "You must upgrade your plan to import data";
+    if (isTaskLimitExceeded && !isSelfServeExpired) {
+      tooltipTitle = `Task limit reached. Your plan allows ${maxTasks} task(s), and you currently have ${currentTasks}.`;
+    }
+
+    return (
+      <Tooltip
+        title={tooltipTitle}
+        style={{
+          maxWidth: 200,
+          textAlign: "center",
+        }}
+      >
+        <Block name="button-wrapper">
+          <ImportButton disabled size={size}>
+            {buttonText}
+          </ImportButton>
+        </Block>
+      </Tooltip>
+    );
+  }
+
+  return <ImportButton size={size}>{buttonText}</ImportButton>;
 };
 
 export const instruments = {
