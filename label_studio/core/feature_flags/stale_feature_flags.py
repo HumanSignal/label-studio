@@ -26,7 +26,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_leap_246_multi_object_hotkeys_160124_short': True,
     'fflag_fix_leap_466_text_sanitization': True,
     # Dec 29
-    'fflag_feat_all_leap_2042_average_agreement_score_popover': True,
     'fflag_feat_all_optic_1811_automax_project_setup_streaming': True,
     'fflag_feat_all_leap_1682_plugins_v0': True,
     # Dec 31
