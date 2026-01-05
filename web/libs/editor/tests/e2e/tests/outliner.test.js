@@ -186,12 +186,8 @@ Scenario("Basic details", async ({ I, LabelStudio, AtOutliner, AtDetails }) => {
   I.say("Select image region");
   AtOutliner.clickRegion(3);
 
-  const isRelativeCoords = await LabelStudio.hasFF("fflag_fix_front_dev_3793_relative_coords_short");
-
-  if (isRelativeCoords) {
-    AtDetails.seeFieldWithValue("X", "25");
-    AtDetails.seeFieldWithValue("H", "50");
-  }
+  AtDetails.seeFieldWithValue("X", "25");
+  AtDetails.seeFieldWithValue("H", "50");
 
   I.say("Check perregions displaying");
 

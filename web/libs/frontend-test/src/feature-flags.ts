@@ -36,9 +36,6 @@ export const FF_DEV_3377 = "fflag_fix_front_dev_3377_image_regions_shift_on_resi
 // Refactoring to use separate trees for every annotation to allow real annotations in View All
 export const FF_DEV_3391 = "fflag_fix_front_dev_3391_interactive_view_all";
 
-// Use only relative coords internally to improve performance and reduce bugs
-export const FF_DEV_3793 = "fflag_fix_front_dev_3793_relative_coords_short";
-
 /**
  * Label stream ablation experiment for solving overlap issue
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_back_dev_4174_overlap_issue_experiments_10012023_short
@@ -82,7 +79,7 @@ Object.assign(window, {
 function getFeatureFlags() {
   return {
     ...(window.APP_SETTINGS?.feature_flags ?? {}),
-    // could be used to explicitly set flags for testing, i.e. [FF_DEV_3793]: true
+    // could be used to explicitly set flags for testing
   };
 }
 
