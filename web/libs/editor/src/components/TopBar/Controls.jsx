@@ -146,15 +146,17 @@ export const Controls = controlsInjector(
 
       if (store.hasInterface("skip")) {
         const task = store.task;
-        const taskAllowSkip = task?.allow_skip !== false;
+
+        const isEnterprise = window.APP_SETTINGS?.billing?.enterprise;
+        const skipDisabled = isEnterprise ? task?.allow_skip === false : false;
         const userRole = window.APP_SETTINGS?.user?.role;
         const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
-        const canSkip = taskAllowSkip || hasForceSkipPermission;
+        const canSkip = !skipDisabled || hasForceSkipPermission;
         const isDisabled = disabled || !canSkip;
 
         const tooltip = canSkip ? "Cancel (skip) task: [ Ctrl+Space ]" : "This task cannot be skipped";
 
-        const showInfoIcon = !taskAllowSkip && hasForceSkipPermission;
+        const showInfoIcon = skipDisabled && hasForceSkipPermission;
 
         if (showInfoIcon) {
           buttons.push(

@@ -2,6 +2,7 @@
 """
 import os
 
+from core.utils.exceptions import extract_message
 from django.core.exceptions import ValidationError as DjangoValidationError  # type: ignore[import]
 from io_storages.localfiles.models import (
     LocalFilesExportStorage,
@@ -41,7 +42,7 @@ class LocalFilesImportStorageSerializer(ImportStorageSerializer):
             detail = getattr(exc, 'detail', getattr(exc, 'messages', str(exc)))
             raise DRFValidationError(_stringify_detail(detail))
         except Exception as exc:
-            raise DRFValidationError(str(exc))
+            raise DRFValidationError(extract_message(exc))
         return data
 
 
@@ -64,5 +65,5 @@ class LocalFilesExportStorageSerializer(ExportStorageSerializer):
             detail = getattr(exc, 'detail', getattr(exc, 'messages', str(exc)))
             raise DRFValidationError(_stringify_detail(detail))
         except Exception as exc:
-            raise DRFValidationError(str(exc))
+            raise DRFValidationError(extract_message(exc))
         return data

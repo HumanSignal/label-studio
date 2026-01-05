@@ -154,7 +154,7 @@ Configure additional settings for annotators.
 
 </dd>
 
-<dt>Task Skipping</dt>
+<dt id="skip">Task Skipping</dt>
 
 <dd>
 
@@ -165,10 +165,13 @@ Configure settings related to the **Skip** action in the labeling stream.
 | **Allow skipping tasks**         | Use this to show or hide the **Skip** action for annotators. |
 | **Require comment to skip** | When enabled, annotators are required to leave a comment when skipping a task. |
 
+!!! info Tip
+    You can configure individual tasks to be unskippable in the JSON source for the task. For more information, see [Individual unskippable tasks](skip#Individual-unskippable-tasks)
+
 </dd>
 
 
-<dt>Skip Queue</dt>
+<dt id="skip-queue">Skip Queue</dt>
 
 <dd>
 
@@ -635,14 +638,19 @@ For more information about pausing annotators, including how to manually pause s
 
 </dd>
 
-<dt id="annotator-eval">Annotator Evaluation</dt>
+<dt id="annotator-eval">Annotator Evaluation<span class="badge"></span></dt>
 
 <dd>
 
-Evaluate annotators against ground truth annotations within a project. 
+Evaluate annotators against [ground truths](ground_truths) within a project. A “ground truth” annotation is a verified, high-quality annotation that serves as the correct answer for a specific task.
 
-When configured, this setting looks at the agreement score for the annotator when compared solely against ground truth annotations. You can decide to automatically pause an annotator within the project if their ground truth agreement score falls below a certain threshold. 
- 
+When enabled, this setting looks at the agreement score for the annotator when compared solely against ground truth annotations. You can decide to automatically pause an annotator within the project if their ground truth agreement score falls below a certain threshold. 
+
+!!! note 
+    Enabling annotator evaluation means that ground truth tasks are not constrained by the [annotator overlap](#overlap). For example, if you set overlap to `2`, but you have 10 annotators, all 10 will still be able to add annotations to ground truth tasks. 
+
+!!! info Tip
+    You can specify that ground truth tasks should be unskippable by adding `"allow_skip": false` as part of the JSON task definition that you import to your project. For more information, see [Individual unskippable tasks](skip#Individual-unskippable-tasks)
 
 <table>
 <thead>
@@ -654,44 +662,62 @@ When configured, this setting looks at the agreement score for the annotator whe
 <tr>
 <td>
 
-**Evaluation method**
+**Evaluate all annotators against ground truth** 
 </td>
 <td>
 
-Use this option to determine what types of tasks annotators will see first. 
-
-* **Ongoing** - Annotators are presented with tasks in the order that is configured under [**Task Ordering Method**](#task-ordering ). 
-
-    Keep in mind that ongoing evaluation respects the [annotator overlap](#overlap) you set above. For example, if you set overlap to `2`, then only 2 annotators will be able to complete annotations on ground truth tasks before the task is considered complete and removed from the labeling stream for other users.  
-* **Onboarding** - Annotators are first presented with tasks that have a ground truth annotation. This ensures that all annotators are evaluated and that they meet your evaluation standards before progressing through the remaining project tasks. 
-
-    Onboarding evaluation disregards the [annotator overlap](#overlap) for ground truth tasks. For example, if you set overlap to `2`, but you have 10 annotators, all 10 will still be able to add annotations to ground truth tasks. 
-
-**Note:** This setting only appears when the project is configured to [automatically assign tasks](#distribute-tasks). If you are using Manual distribution, annotators will see tasks ordered by ID number. If you would like them to see ground truth tasks first, you should add ground truth annotations in the same order. 
+Select this to enable annotator evaluation for the project. 
 
 </td>
 </tr>
 <tr>
 <td>
 
-**Pause annotator on failed evaluation** <br /><span class="badge"></span>
+**Onboarding evaluation**
+</td>
+<td>
+
+When annotators enter the labeling stream, they are first presented with tasks that have a ground truth annotation. This ensures that annotators meet your evaluation standards before progressing through the remaining project tasks. 
+
+Use the counter to determine how many ground truth tasks should be presented first before the annotator progresses through the remaining project tasks. 
+
+**Note:** This option is only active when the project is configured to [automatically assign tasks](#distribute-tasks). If you are using Manual distribution, annotators will see tasks ordered by ID number. If you would like them to see ground truth tasks first, you should add ground truth annotations in the same order. 
+</td>
+</tr>
+<tr>
+<td>
+
+**Continuous evaluation**
+</td>
+<td>
+
+Annotators are presented with tasks in the order that is configured under [**Task Ordering Method**](#task-ordering). 
+
+To have all ground truths presented as part of continuous evaluation, set the **Onboarding evaluation** counter to zero. You can also use a combination of both, so that annotators see a subset of ground truths immediately, and then are presented the remaining ground truths periodically as they progress through the project (depending on your task ordering method). 
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Pause annotator on failed evaluation** 
 </td>
 <td>
 
 Determines whether annotators should be paused if they do not meet the required score set below. If they fail to meet the score, they are immediately paused and unable to access the project. 
 
-If you do not enable pausing, the other **Annotator Evaluation** options are simply calculated in the background and can be reviewed in the [Members Dashboard](dashboard_members).
+If you do not enable pausing, the other **Annotator Evaluation** options are simply calculated in the background and can be reviewed in the [Members dashboard](dashboard_members).
 
 </td>
 </tr>
 <tr>
 <td>
 
-**Score required to pass evaluation** <br /><span class="badge"></span>
+**Score required to pass evaluation** 
 </td>
 <td>
 
-This is the agreement score threshold that an annotator must meet when evaluated against ground truth annotations. How agreement is calculate depends on what you select in the [**Agreement** section](#task-agreement). 
+This is the agreement score threshold that an annotator must meet when evaluated against ground truth annotations. How agreement is calculated depends on what you select in the [**Agreement** section](#task-agreement). 
 
 If they do not meet this score, they are paused. 
 
@@ -700,7 +726,7 @@ If they do not meet this score, they are paused.
 <tr>
 <td>
 
-**Number of tasks for evaluation** <br /><span class="badge"></span>
+**Number of tasks for evaluation** 
 </td>
 <td>
 
@@ -714,7 +740,9 @@ If they reach 10 tasks and meet the required score, they will continue progressi
 </tr>
 </table> 
 
-You can see which users are paused from the **Members** page. To unpause a user, you will need to relax the evaluation settings for the project by increasing the minimum number of tasks or the score threshold.  
+You can see which users are paused from the **Members** page. 
+
+When users are paused as part of the annotator evaluation workflow, you cannot manually unpause them. To unpause a user, you will need to relax the evaluation settings for the project by increasing the minimum number of tasks or the score threshold.  
 
 For more information about pausing annotators, including how to manually pause specific annotators, see [Pause an annotator](quality#Pause-an-annotator).
 

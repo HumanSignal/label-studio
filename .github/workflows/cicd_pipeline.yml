@@ -29,7 +29,9 @@ jobs:
       src: ${{ steps.changes.outputs.src }}
       frontend: ${{ steps.changes.outputs.frontend }}
       docker: ${{ steps.changes.outputs.docker }}
+      migrations: ${{ steps.changes.outputs.migrations }}
       commit-message: ${{ steps.commit-details.outputs.commit-message }}
+      membership: ${{ steps.check-membership.outputs.membership }}
     timeout-minutes: 25
     steps:
       - uses: hmarr/debug-action@v3.0.0
@@ -67,6 +69,8 @@ jobs:
               - 'pyproject.toml'
               - '.github/workflows/cicd_pipeline.yml'
               - '.github/workflows/docker-build.yml'
+            migrations:
+              - 'label_studio/*/migrations/**'
 
       - uses: actions/github-script@v8
         id: commit-details
@@ -80,6 +84,22 @@ jobs:
             });
             console.log(`Last commit message is "${commit.commit.message}"`)
             core.setOutput("commit-message", commit.commit.message);
+
+      - name: Check user's membership
+        uses: actions/github-script@v8
+        id: check-membership
+        env:
+          ACTOR: ${{ github.actor }}
+        with:
+          github-token: ${{ secrets.GIT_PAT }}
+          script: |
+            const { repo, owner } = context.repo;
+            const actor = process.env.ACTOR;
+            const { data: membership } = await github.rest.orgs.getMembershipForUser({
+              org: owner,
+              username: actor,
+            });
+            core.setOutput("membership", membership.state);
 
   gitleaks:
     name: "Linter"
@@ -210,6 +230,21 @@ jobs:
     uses: ./.github/workflows/test_migrations.yml
     with:
       head_sha: ${{ github.event.pull_request.head.sha || github.event.after }}
+    secrets: inherit
+
+  cursor-review:
+    name: "Tests"
+    needs:
+      - changed_files
+    if: needs.changed_files.outputs.migrations == 'true' && github.event_name == 'pull_request' && needs.changed_files.outputs.membership == 'active'
+    uses: ./.github/workflows/cursor-review.yml
+    with:
+      head_sha: ${{ github.event.pull_request.head.sha }}
+      base_sha: ${{ github.event.pull_request.base.sha }}
+      pr_number: ${{ github.event.pull_request.number }}
+    permissions:
+      contents: read
+      pull-requests: write
     secrets: inherit
 
   conda-test:
@@ -497,15 +532,17 @@ jobs:
       - tests-yarn-unit
       - tests-yarn-integration
       - tests-yarn-e2e
+      - cursor-review
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
         with:
-          allowed-skips: gitleaks, bandit, ruff, blue, biome, stylelint, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e
+          allowed-skips: gitleaks, bandit, ruff, blue, biome, stylelint, pytest, migrations, conda-test, build-docker, tests-yarn-unit, tests-yarn-integration, tests-yarn-e2e, cursor-review
           allowed-failures: |
             [
-              "gitleaks"
+              "gitleaks",
+              "cursor-review",
             ]
           jobs: ${{ toJSON(needs) }}
 

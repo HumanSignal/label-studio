@@ -11,6 +11,7 @@
   border: 1px solid rgba(var(--color-neutral-shadow-raw) / 10% );
   box-shadow: none;
   transition: all 150ms ease-out;
+  user-select: none;
 
   .avatar {
     opacity: 0;
@@ -34,6 +35,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    user-select: none;
   }
 
   .badge {

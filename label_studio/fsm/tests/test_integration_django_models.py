@@ -300,7 +300,7 @@ class DjangoModelIntegrationTests(TestCase):
             review_requested: bool = Field(True, description='Whether review is requested')
 
             def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
-                return AnnotationStateChoices.SUBMITTED
+                return AnnotationStateChoices.CREATED
 
             def validate_transition(self, context: TransitionContext) -> bool:
                 # Check annotation has content
@@ -339,11 +339,11 @@ class DjangoModelIntegrationTests(TestCase):
                 if self.reviewer_decision == 'approve':
                     return AnnotationStateChoices.COMPLETED
                 else:
-                    return AnnotationStateChoices.SUBMITTED  # Back to submitted for changes
+                    return AnnotationStateChoices.CREATED  # Back to created for changes
 
             def validate_transition(self, context: TransitionContext) -> bool:
-                if context.current_state != AnnotationStateChoices.SUBMITTED:
-                    raise TransitionValidationError('Can only review submitted annotations')
+                if context.current_state != AnnotationStateChoices.CREATED:
+                    raise TransitionValidationError('Can only review created annotations')
 
                 valid_decisions = ['approve', 'reject', 'request_changes']
                 if self.reviewer_decision not in valid_decisions:
@@ -387,7 +387,7 @@ class DjangoModelIntegrationTests(TestCase):
         context = TransitionContext(
             entity=self.annotation,
             current_user=self.user,
-            current_state=AnnotationStateChoices.SUBMITTED,
+            current_state=AnnotationStateChoices.CREATED,
             target_state=submit_transition.get_target_state(),
         )
 
@@ -413,7 +413,7 @@ class DjangoModelIntegrationTests(TestCase):
         context = TransitionContext(
             entity=self.annotation,
             current_user=self.user,
-            current_state=AnnotationStateChoices.SUBMITTED,
+            current_state=AnnotationStateChoices.CREATED,
             current_state_object=mock_submission_state,
             target_state=review_transition.get_target_state(),
         )
@@ -436,7 +436,7 @@ class DjangoModelIntegrationTests(TestCase):
             corrections_made=False,
         )
 
-        assert reject_transition.get_target_state() == AnnotationStateChoices.SUBMITTED
+        assert reject_transition.get_target_state() == AnnotationStateChoices.CREATED
 
         # Test validation failure
         invalid_review = ReviewAndApproveAnnotation(

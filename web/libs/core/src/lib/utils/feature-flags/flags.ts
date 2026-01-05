@@ -16,10 +16,6 @@ export const FF_DEV_1682 = "ff_front_dev_1682_model_version_dropdown_070622_shor
  */
 export const FF_LSDV_E_297 = "fflag_feat_front_lsdv_e_297_increase_oss_to_enterprise_adoption_short";
 
-/**
- * Project list search
- */
-export const FF_PROD_281 = "fflag_feat_front_prod_281_project_list_search_19072023_short";
 //// END OF LEGACY FLAGS ////
 
 /**

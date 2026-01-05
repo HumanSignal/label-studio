@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import logging
 
 import ujson as json
@@ -8,12 +8,13 @@ from core.feature_flags import flag_set
 from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func, retry_database_locked
 from core.utils.db import fast_first
+from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema_field
 from fsm.serializer_fields import FSMStateField
-from fsm.state_manager import get_state_manager
-from fsm.utils import is_fsm_enabled
+from fsm.state_inference import get_or_infer_state
+from fsm.utils import get_or_initialize_state, is_fsm_enabled
 from label_studio_sdk.label_interface import LabelInterface
 from projects.models import Project
 from rest_flex_fields import FlexFieldsModelSerializer
@@ -213,7 +214,7 @@ class TaskSimpleSerializer(ModelSerializer):
 
     class Meta:
         model = Task
-        exclude = ('precomputed_agreement',)
+        exclude = ('precomputed_agreement', 'allow_skip')
 
 
 class BaseTaskSerializer(FlexFieldsModelSerializer):
@@ -266,16 +267,11 @@ class BaseTaskSerializer(FlexFieldsModelSerializer):
             data = instance.data
             replace_task_data_undefined_with_config_field(data, project)
 
-        ret = super().to_representation(instance)
-        # Ensure allow_skip is always present in the response, even if None
-        # This is important for frontend logic that checks allow_skip !== false
-        if 'allow_skip' not in ret:
-            ret['allow_skip'] = instance.allow_skip
-        return ret
+        return super().to_representation(instance)
 
     class Meta:
         model = Task
-        exclude = ('precomputed_agreement',)
+        exclude = ('precomputed_agreement', 'allow_skip')
 
 
 class BaseTaskSerializerBulk(serializers.ListSerializer):
@@ -439,7 +435,6 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
         # to be sure we add tasks with annotations at the same time
         with transaction.atomic():
-
             # extract annotations, predictions, drafts, reviews, etc
             # all these lists will be grouped by tasks, e.g.:
             # task_annotations = [ [a1, a2], [a3, a4, a5], ... ]
@@ -493,6 +488,11 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 self.add_drafts(task_drafts, db_tasks, annotation_mapping, self.project)
                 self.add_reviews(task_reviews, annotation_mapping, self.project)
 
+        # Backfill FSM states for bulk-created tasks
+        # bulk_create() bypasses save() so FSM transitions don't fire automatically
+        # Do this after all child entities states(annotations, drafts, reviews) have been backfilled
+        self._backfill_fsm_states(self.db_tasks)
+
         return db_tasks
 
     def add_predictions(self, task_predictions):
@@ -525,7 +525,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                             continue
 
                     except Exception as e:
-                        validation_errors.append(f'Task {i}, prediction {j}: Error validating prediction - {str(e)}')
+                        validation_errors.append(
+                            f'Task {i}, prediction {j}: Error validating prediction - {extract_message(e)}'
+                        )
                         continue
 
                 try:
@@ -537,7 +539,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                             prediction_score = float(prediction_score)
                         except ValueError:
                             logger.error(
-                                "Can't upload prediction score: should be in float format." 'Fallback to score=None'
+                                "Can't upload prediction score: should be in float format.Fallback to score=None"
                             )
                             prediction_score = None
 
@@ -552,7 +554,9 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                         )
                     )
                 except Exception as e:
-                    validation_errors.append(f'Task {i}, prediction {j}: Failed to create prediction - {str(e)}')
+                    validation_errors.append(
+                        f'Task {i}, prediction {j}: Failed to create prediction - {extract_message(e)}'
+                    )
                     continue
 
         # Return validation errors if they exist
@@ -602,6 +606,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         self.db_drafts = AnnotationDraft.objects.bulk_create(db_drafts, batch_size=settings.BATCH_SIZE)
         logging.info(f'drafts serialization success, len = {len(self.db_drafts)}')
 
+        # Backfill FSM states for bulk-created drafts
+        # bulk_create() bypasses save() so FSM transitions don't fire automatically
+        self._backfill_fsm_states(self.db_drafts)
+
         return self.db_drafts
 
     def add_annotations(self, task_annotations, user):
@@ -647,6 +655,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
             self.db_annotations = Annotation.objects.bulk_create(db_annotations, batch_size=settings.BATCH_SIZE)
         logging.info(f'Annotations serialization success, len = {len(self.db_annotations)}')
 
+        # Backfill FSM states for bulk-created annotations
+        # bulk_create() bypasses save() so FSM transitions don't fire automatically
+        self._backfill_fsm_states(self.db_annotations)
+
         return self.db_annotations
 
     def add_tasks(self, task_annotations, task_predictions, validated_tasks):
@@ -661,17 +673,10 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
         prev_inner_id = last_task.inner_id if last_task else 0
         max_inner_id = (prev_inner_id + 1) if prev_inner_id else 1
 
-        calculate_is_labeled_with_distinct_annotators = flag_set(
-            'fflag_fix_fit_1082_overlap_use_distinct_annotators', user='auto'
-        )
-
         for i, task in enumerate(validated_tasks):
             cancelled_annotations = len([ann for ann in task_annotations[i] if ann.get('was_cancelled', False)])
             total_annotations = len(task_annotations[i]) - cancelled_annotations
-            if calculate_is_labeled_with_distinct_annotators:
-                current_overlap = len(set([ann.get('completed_by_id') for ann in task_annotations[i]]))
-            else:
-                current_overlap = len(task_annotations[i])
+            current_overlap = len(set([ann.get('completed_by_id') for ann in task_annotations[i]]))
             t = Task(
                 project=self.project,
                 data=task['data'],
@@ -683,7 +688,7 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
                 total_predictions=len(task_predictions[i]),
                 total_annotations=total_annotations,
                 cancelled_annotations=cancelled_annotations,
-                allow_skip=task.get('allow_skip', True),  # Default to True for backward compatibility
+                allow_skip=task.get('allow_skip', True),
             )
             db_tasks.append(t)
 
@@ -705,25 +710,22 @@ class BaseTaskSerializerBulk(serializers.ListSerializer):
 
         logging.info(f'Tasks serialization success, len = {len(self.db_tasks)}')
 
-        # Backfill FSM states for bulk-created tasks
-        # bulk_create() bypasses save() so FSM transitions don't fire automatically
-        self._backfill_fsm_states(self.db_tasks)
-
         return db_tasks
 
-    def _backfill_fsm_states(self, tasks):
+    def _backfill_fsm_states(self, entities: list, overwrite_state=False):
         """
-        Backfill FSM states for tasks created via bulk_create().
+        Backfill FSM states for entities created via bulk_create().
 
         bulk_create() bypasses the model's save() method, so FSM transitions
-        don't fire automatically. This sets initial CREATED state for newly imported tasks.
+        don't fire automatically. This sets initial state for newly imported entities.
         """
-        if not tasks or not is_fsm_enabled(user=None):
+        user = CurrentContext.get_user()
+        if not entities or not is_fsm_enabled(user):
             return
 
-        StateManager = get_state_manager()
-        for task in tasks:
-            StateManager.execute_transition(entity=task, transition_name='task_created', user=None)
+        for entity in entities:
+            inferred_state = get_or_infer_state(entity)
+            get_or_initialize_state(entity, user=user, inferred_state=inferred_state, overwrite_state=overwrite_state)
 
     @staticmethod
     def post_process_annotations(user, db_annotations, action):
@@ -805,7 +807,6 @@ class AnnotationDraftSerializer(ModelSerializer):
 
 
 class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
-
     predictions = serializers.SerializerMethodField(default=[], read_only=True)
     annotations = serializers.SerializerMethodField(default=[], read_only=True)
     drafts = serializers.SerializerMethodField(default=[], read_only=True)

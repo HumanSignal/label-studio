@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 from core.label_config import replace_task_data_undefined_with_config_field
 from core.utils.common import load_func
 from data_export.models import DataExport
@@ -168,8 +168,7 @@ class TaskFilterOptionsSerializer(serializers.Serializer):
         choices=ONLY_OR_EXCLUDE_CHOICE,
         allow_null=True,
         required=False,
-        help_text='`only` - include all finished tasks (is_labeled = true)<br>'
-        '`exclude` - exclude all finished tasks',
+        help_text='`only` - include all finished tasks (is_labeled = true)<br>`exclude` - exclude all finished tasks',
     )
     annotated = serializers.ChoiceField(
         choices=ONLY_OR_EXCLUDE_CHOICE,
