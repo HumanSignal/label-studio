@@ -644,6 +644,8 @@ For more information about pausing annotators, including how to manually pause s
 
 !!! note
     Annotator Evaluation settings are only available when the project is configured to [automatically assign tasks](#distribute-tasks). If you are using Manual distribution, this section will not appear in your project settings.
+    
+    If you switch a project from Automatic to Manual distribution, annotator evaluation is automatically disabled.
 
 Evaluate annotators against [ground truths](ground_truths) within a project. A "ground truth" annotation is a verified, high-quality annotation that serves as the correct answer for a specific task.
 
