@@ -79,6 +79,11 @@ def _try_breadth_first(tasks: QuerySet[Task], user: User, project: Project) -> U
     """Try to find tasks with maximum amount of annotations, since we are trying to label tasks as fast as possible"""
 
     if project.annotator_evaluation_enabled:
+        # When annotator evaluation is enabled, ground truth tasks accumulate overlap regardless of the maximum annotations setting.
+        # If we include them, they will eventually be front-loaded by the breadth first logic.
+        # So we exclude them from the candidates.
+        # Onboarding tasks are served by _try_ground_truth.
+        # When no in progress tasks are found by breadth first, the next step in the pipeline will serve the remaining GT tasks.
         tasks = _annotate_has_ground_truths(tasks)
         tasks = tasks.filter(has_ground_truths=False)
 
