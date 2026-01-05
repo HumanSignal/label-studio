@@ -122,7 +122,6 @@ export { ReactComponent as IconFast } from "./fast.svg";
 export { ReactComponent as IconFastForward } from "./fastforward.svg";
 export { ReactComponent as IconFileCopy } from "./file-copy.svg";
 export { ReactComponent as IconFileDownload } from "./file-download.svg";
-export { ReactComponent as IconFileDownloadBlack } from "./file-download-black.svg";
 export { ReactComponent as IconFileUpload } from "./file-upload.svg";
 export { ReactComponent as IconFilter } from "./filter.svg";
 export { ReactComponent as IconFolder } from "./folder.svg";

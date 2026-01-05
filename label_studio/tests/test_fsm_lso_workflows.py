@@ -7,7 +7,7 @@ Validates that FSM correctly tracks state changes during actual user journeys.
 This test file focuses on LSO-specific functionality:
 - Project lifecycle: CREATED -> IN_PROGRESS -> COMPLETED
 - Task lifecycle: CREATED -> COMPLETED -> IN_PROGRESS -> COMPLETED
-- Annotation lifecycle: SUBMITTED (on create), SUBMITTED (on update)
+- Annotation lifecycle: CREATED (on create), CREATED (on update)
 
 LSE-specific transitions (reviews, project settings, annotation drafts) are tested in LSE.
 """
@@ -219,7 +219,7 @@ class TestTaskWorkflows:
 
         Validates:
         - Task transitions to COMPLETED when annotation is submitted
-        - Annotation is in SUBMITTED state
+        - Annotation is in CREATED state
         """
         ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
 
@@ -244,7 +244,7 @@ class TestTaskWorkflows:
 
         # Verify task completed
         assert_task_state(task_id, TaskStateChoices.COMPLETED)
-        assert_annotation_state(annotation.id, AnnotationStateChoices.SUBMITTED)
+        assert_annotation_state(annotation.id, AnnotationStateChoices.CREATED)
 
     def test_task_in_progress_workflow(self, django_live_url, business_client):
         """
@@ -321,10 +321,10 @@ class TestAnnotationWorkflows:
 
     def test_annotation_submission_workflow(self, django_live_url, business_client):
         """
-        User submits annotation -> Annotation state = SUBMITTED
+        User submits annotation -> Annotation state = CREATED
 
         Validates:
-        - Annotation is created with SUBMITTED state
+        - Annotation is created with CREATED state
         - FSM captures annotation creation
         """
         ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
@@ -345,7 +345,7 @@ class TestAnnotationWorkflows:
         )
 
         # Verify annotation state
-        assert_annotation_state(annotation.id, AnnotationStateChoices.SUBMITTED)
+        assert_annotation_state(annotation.id, AnnotationStateChoices.CREATED)
 
         # Verify FSM state record count
         annotation_obj = Annotation.objects.get(pk=annotation.id)
@@ -354,11 +354,11 @@ class TestAnnotationWorkflows:
 
     def test_annotation_update_workflow(self, django_live_url, business_client):
         """
-        User updates annotation -> New state record (still SUBMITTED)
+        User updates annotation -> New state record (still CREATED)
 
         Validates:
         - Annotation update creates new FSM state record
-        - State remains SUBMITTED
+        - State remains CREATED
         """
         ls = LabelStudio(base_url=django_live_url, api_key=business_client.api_key)
 
@@ -376,7 +376,7 @@ class TestAnnotationWorkflows:
             result=[{'value': {'choices': ['positive']}, 'from_name': 'label', 'to_name': 'text', 'type': 'choices'}],
             lead_time=5.0,
         )
-        assert_annotation_state(annotation.id, AnnotationStateChoices.SUBMITTED)
+        assert_annotation_state(annotation.id, AnnotationStateChoices.CREATED)
 
         # Update annotation
         ls.annotations.update(
@@ -384,8 +384,8 @@ class TestAnnotationWorkflows:
             result=[{'value': {'choices': ['negative']}, 'from_name': 'label', 'to_name': 'text', 'type': 'choices'}],
         )
 
-        # Verify state still SUBMITTED but new state record created
-        assert_annotation_state(annotation.id, AnnotationStateChoices.SUBMITTED)
+        # Verify state still CREATED but new state record created
+        assert_annotation_state(annotation.id, AnnotationStateChoices.CREATED)
         annotation_obj = Annotation.objects.get(pk=annotation.id)
         state_count = StateManager.get_state_history(annotation_obj).count()
         assert state_count == 2, f'Expected 2 state records, got {state_count}'
@@ -433,7 +433,7 @@ class TestEndToEndWorkflows:
         )
         assert_task_state(task1_id, TaskStateChoices.COMPLETED)
         assert_project_state(project.id, ProjectStateChoices.IN_PROGRESS)
-        assert_annotation_state(annotation1.id, AnnotationStateChoices.SUBMITTED)
+        assert_annotation_state(annotation1.id, AnnotationStateChoices.CREATED)
 
         # Step 4: Submit annotation on task2
         annotation2 = ls.annotations.create(
@@ -443,7 +443,7 @@ class TestEndToEndWorkflows:
         )
         assert_task_state(task2_id, TaskStateChoices.COMPLETED)
         assert_project_state(project.id, ProjectStateChoices.COMPLETED)
-        assert_annotation_state(annotation2.id, AnnotationStateChoices.SUBMITTED)
+        assert_annotation_state(annotation2.id, AnnotationStateChoices.CREATED)
 
         # Step 5: Delete annotation from task1
         ls.annotations.delete(id=annotation1.id)
@@ -458,7 +458,7 @@ class TestEndToEndWorkflows:
         )
         assert_task_state(task1_id, TaskStateChoices.COMPLETED)
         assert_project_state(project.id, ProjectStateChoices.COMPLETED)
-        assert_annotation_state(annotation3.id, AnnotationStateChoices.SUBMITTED)
+        assert_annotation_state(annotation3.id, AnnotationStateChoices.CREATED)
 
 
 class TestColdStartScenarios:

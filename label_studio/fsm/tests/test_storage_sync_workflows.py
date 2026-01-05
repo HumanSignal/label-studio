@@ -357,6 +357,6 @@ class TestStorageSyncWithAnnotations:
 
         for annotation in Annotation.objects.filter(project_id=project_id).order_by('id'):
             assert_state_exists(annotation, 'annotation')
-            assert_annotation_state(annotation.id, AnnotationStateChoices.SUBMITTED)
+            assert_annotation_state(annotation.id, AnnotationStateChoices.CREATED)
 
         # no states for Predictions
