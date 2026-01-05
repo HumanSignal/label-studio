@@ -203,7 +203,7 @@ module.exports = {
 
       console.log(region);
 
-      return [region.shapeRef._id, region.bboxCoords];
+      return [region.shapeRef._id, region.bboxCoordsCanvas];
     }, regionId);
 
     const position = coords

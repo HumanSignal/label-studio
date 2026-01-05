@@ -13,66 +13,11 @@ import { useRegionStyles } from "../hooks/useRegionColor";
 import { AreaMixin } from "../mixins/AreaMixin";
 import { KonvaRegionMixin } from "../mixins/KonvaRegion";
 import { ImageModel } from "../tags/object/Image";
-import { FF_DEV_3793, isFF } from "../utils/feature-flags";
 import { createDragBoundFunc } from "../utils/image";
 import { AliveRegion } from "./AliveRegion";
 import { EditableRegion } from "./EditableRegion";
 import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import Constants from "../core/Constants";
-
-const KeyPointRegionAbsoluteCoordsDEV3793 = types
-  .model({
-    coordstype: types.optional(types.enumeration(["px", "perc"]), "perc"),
-  })
-  .volatile(() => ({
-    relativeX: 0,
-    relativeY: 0,
-  }))
-  .actions((self) => ({
-    afterCreate() {
-      if (self.coordstype === "perc") {
-        // deserialization
-        self.relativeX = self.x;
-        self.relativeY = self.y;
-        self.checkSizes();
-      } else {
-        // creation
-        const { stageWidth: width, stageHeight: height } = self.parent;
-
-        if (width && height) {
-          self.relativeX = (self.x / width) * RELATIVE_STAGE_WIDTH;
-          self.relativeY = (self.y / height) * RELATIVE_STAGE_HEIGHT;
-        }
-      }
-    },
-
-    setPosition(x, y) {
-      const point = self.control?.getSnappedPoint({
-        x: self.parent.canvasToInternalX(x),
-        y: self.parent.canvasToInternalY(y),
-      });
-
-      self.x = point.x;
-      self.y = point.y;
-
-      self.relativeX = (point.x / self.parent.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeY = (point.y / self.parent.stageHeight) * RELATIVE_STAGE_HEIGHT;
-    },
-
-    updateImageSize(wp, hp, sw, sh) {
-      if (self.coordstype === "px") {
-        self.x = (sw * self.relativeX) / RELATIVE_STAGE_WIDTH;
-        self.y = (sh * self.relativeY) / RELATIVE_STAGE_HEIGHT;
-      }
-
-      if (self.coordstype === "perc") {
-        self.x = (sw * self.x) / RELATIVE_STAGE_WIDTH;
-        self.y = (sh * self.y) / RELATIVE_STAGE_HEIGHT;
-        self.width = (sw * self.width) / RELATIVE_STAGE_WIDTH;
-        self.coordstype = "px";
-      }
-    },
-  }));
 
 const Model = types
   .model({
@@ -111,13 +56,13 @@ const Model = types
       };
     },
     get canvasX() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.x) : self.x;
+      return self.parent?.internalToCanvasX(self.x);
     },
     get canvasY() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.y) : self.y;
+      return self.parent?.internalToCanvasY(self.y);
     },
     get canvasWidth() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.width) : self.width;
+      return self.parent?.internalToCanvasX(self.width);
     },
   }))
   .actions((self) => ({
@@ -161,9 +106,9 @@ const Model = types
      */
     serialize() {
       const value = {
-        x: isFF(FF_DEV_3793) ? self.x : self.convertXToPerc(self.x),
-        y: isFF(FF_DEV_3793) ? self.y : self.convertYToPerc(self.y),
-        width: isFF(FF_DEV_3793) ? self.width : self.convertHDimensionToPerc(self.width),
+        x: self.x,
+        y: self.y,
+        width: self.width,
       };
 
       const result = self.parent.createSerializedResult(self, value);
@@ -185,7 +130,6 @@ const KeyPointRegionModel = types.compose(
   KonvaRegionMixin,
   EditableRegion,
   Model,
-  ...(isFF(FF_DEV_3793) ? [] : [KeyPointRegionAbsoluteCoordsDEV3793]),
 );
 
 const HtxKeyPointView = ({ item, setShapeRef }) => {

@@ -346,7 +346,6 @@ Data(shapesTable.filter(({ shapeName }) => shapes[shapeName].hasMoveToolTransfor
 
     LabelStudio.setFeatureFlags({
       fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short: true,
-      fflag_fix_front_dev_3793_relative_coords_short: true,
     });
 
     I.amOnPage("/");
