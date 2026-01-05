@@ -1,3 +1,6 @@
+/** Placeholder for CustomInterface tag to display Enterprise-only warning. **/
+/** Tag is renamed to ReactCode so we support both names. **/
+
 import { types } from "mobx-state-tree";
 import { observer } from "mobx-react";
 import { EnterpriseBadge } from "@humansignal/ui";
@@ -27,7 +30,8 @@ if (!APP_SETTINGS?.billing?.enterprise && !Registry.models.custominterface) {
       <div className="py-base">
         <EnterpriseBadge />
         {" "}
-        <Code>CustomInterface</Code> / <Code>React</Code> tag is only available in{" "}
+        <Code>{item.type === "custominterface" ? "CustomInterface" : "React"}</Code>
+        {" "}tag is only available in{" "}
         <a className="no-go" href={ENTERPRISE_URL} target="_blank" rel="noreferrer">Enterprise</a>
         .
       </div>
