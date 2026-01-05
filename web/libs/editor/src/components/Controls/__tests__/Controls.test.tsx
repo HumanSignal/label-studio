@@ -44,11 +44,14 @@ const createMockStore = (overrides: any = {}) => ({
   ...overrides,
 });
 
-// Helper to set up window.APP_SETTINGS for role-based tests
-const setupAppSettings = (role?: string) => {
+// Helper to set up window.APP_SETTINGS for role-based and enterprise tests
+const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {}) => {
   (window as any).APP_SETTINGS = {
     user: {
-      role,
+      role: options.role,
+    },
+    billing: {
+      enterprise: options.enterprise ?? false,
     },
   };
 };
@@ -60,7 +63,9 @@ describe("Controls", () => {
     (window as any).APP_SETTINGS = undefined;
   });
 
-  test("Skip button disabled when allow_skip=false", () => {
+  test("Skip button NOT disabled when allow_skip=false in LSO (non-enterprise)", () => {
+    // In LSO (non-enterprise), allow_skip field doesn't exist/affect behavior
+    setupAppSettings({ enterprise: false });
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
       interfaces: ["skip"],
@@ -71,7 +76,31 @@ describe("Controls", () => {
       versions: {},
     };
 
-    const { container, getByText } = render(
+    const { getByText } = render(
+      <Provider store={mockStore}>
+        <Controls store={mockStore as any} item={item} />
+      </Provider>,
+    );
+
+    const skipButton = getByText(/Skip/i).closest("button");
+    // In LSO, skip button should NOT be disabled even when allow_skip=false
+    expect(skipButton).not.toBeDisabled();
+    expect(skipButton).toHaveAttribute("title", "Cancel (skip) task: [ Ctrl+Space ]");
+  });
+
+  test("Skip button disabled when allow_skip=false in LSE (enterprise)", () => {
+    setupAppSettings({ enterprise: true });
+    const mockStore = createMockStore({
+      task: { id: 1, allow_skip: false },
+      interfaces: ["skip"],
+    });
+    const item = {
+      userGenerate: false,
+      sentUserGenerate: false,
+      versions: {},
+    };
+
+    const { getByText } = render(
       <Provider store={mockStore}>
         <Controls store={mockStore as any} item={item} />
       </Provider>,
@@ -82,7 +111,8 @@ describe("Controls", () => {
     expect(skipButton).toHaveAttribute("title", "This task cannot be skipped");
   });
 
-  test("Skip button enabled when allow_skip=true", () => {
+  test("Skip button enabled when allow_skip=true in LSE (enterprise)", () => {
+    setupAppSettings({ enterprise: true });
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: true },
       interfaces: ["skip"],
@@ -104,7 +134,8 @@ describe("Controls", () => {
     expect(skipButton).toHaveAttribute("title", "Cancel (skip) task: [ Ctrl+Space ]");
   });
 
-  test("Skip button onClick is undefined when allow_skip=false", () => {
+  test("Skip button onClick is blocked when allow_skip=false in LSE (enterprise)", () => {
+    setupAppSettings({ enterprise: true });
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
       interfaces: ["skip"],
@@ -128,7 +159,8 @@ describe("Controls", () => {
     expect(mockStore.skipTask).not.toHaveBeenCalled();
   });
 
-  test("Skip button onClick triggers skipTask when allow_skip=true", () => {
+  test("Skip button onClick triggers skipTask when allow_skip=true in LSE (enterprise)", () => {
+    setupAppSettings({ enterprise: true });
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: true },
       interfaces: ["skip"],
@@ -151,9 +183,9 @@ describe("Controls", () => {
     expect(mockStore.skipTask).toHaveBeenCalled();
   });
 
-  // Role-based tests (OW=Owner, AD=Admin, MA=Manager can force-skip)
-  test("Skip button enabled when allow_skip=false but user is Owner (OW)", () => {
-    setupAppSettings("OW");
+  // Role-based tests for LSE (enterprise) - OW=Owner, AD=Admin, MA=Manager can force-skip
+  test("Skip button enabled when allow_skip=false but user is Owner (OW) in LSE", () => {
+    setupAppSettings({ role: "OW", enterprise: true });
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
       interfaces: ["skip"],
@@ -175,8 +207,8 @@ describe("Controls", () => {
     expect(skipButton).toHaveAttribute("title", "Cancel (skip) task: [ Ctrl+Space ]");
   });
 
-  test("Skip button enabled when allow_skip=false but user is Manager (MA)", () => {
-    setupAppSettings("MA");
+  test("Skip button enabled when allow_skip=false but user is Manager (MA) in LSE", () => {
+    setupAppSettings({ role: "MA", enterprise: true });
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
       interfaces: ["skip"],
@@ -197,8 +229,8 @@ describe("Controls", () => {
     expect(skipButton).not.toBeDisabled();
   });
 
-  test("Skip button disabled when allow_skip=false and user is Annotator (AN)", () => {
-    setupAppSettings("AN");
+  test("Skip button disabled when allow_skip=false and user is Annotator (AN) in LSE", () => {
+    setupAppSettings({ role: "AN", enterprise: true });
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
       interfaces: ["skip"],
@@ -219,8 +251,8 @@ describe("Controls", () => {
     expect(skipButton).toBeDisabled();
   });
 
-  test("Skip button onClick triggers skipTask when allow_skip=false but user is Manager", () => {
-    setupAppSettings("MA");
+  test("Skip button onClick triggers skipTask when allow_skip=false but user is Manager in LSE", () => {
+    setupAppSettings({ role: "MA", enterprise: true });
     const mockStore = createMockStore({
       task: { id: 1, allow_skip: false },
       interfaces: ["skip"],

@@ -12,7 +12,23 @@ from django.core.cache import cache
 from fsm.registry import state_choices_registry, state_model_registry, transition_registry
 from fsm.state_manager import StateManager
 
+from label_studio.tests import conftest as ls_tests_conftest
+
 logger = logging.getLogger(__name__)
+
+
+# Re-export core fixtures from main LS test suite so FSM tests behave like OSS tests.
+# NOTE: We alias the same underlying functions so pytest registers them as fixtures
+# in this module as well (including their autouse behavior).
+django_live_url = ls_tests_conftest.get_server_url
+business_client = ls_tests_conftest.business_client
+
+# Storage-related fixtures to mock cloud providers for import storages
+aws_credentials = ls_tests_conftest.aws_credentials
+s3 = ls_tests_conftest.s3
+s3_with_images = ls_tests_conftest.s3_with_images
+gcs_client = ls_tests_conftest.gcs_client
+azure_client = ls_tests_conftest.azure_client
 
 
 @pytest.fixture(autouse=True, scope='function')

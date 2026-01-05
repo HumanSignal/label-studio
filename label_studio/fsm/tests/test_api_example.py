@@ -216,7 +216,7 @@ class APIIntegrationExampleTests(TestCase):
             )
 
             def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
-                return 'SUBMITTED'
+                return 'CREATED'
 
             def transition(self, context: TransitionContext) -> Dict[str, Any]:
                 return {

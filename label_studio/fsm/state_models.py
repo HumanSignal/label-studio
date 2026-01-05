@@ -283,7 +283,7 @@ class AnnotationState(BaseState):
     """
     Core annotation state tracking for Label Studio.
     Provides basic annotation state management with:
-    - Simple 3-state workflow (DRAFT → SUBMITTED → COMPLETED)
+    - Simple 2-state workflow (CREATED → COMPLETED)
     """
 
     # Entity Relationship

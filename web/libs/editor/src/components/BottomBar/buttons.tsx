@@ -65,6 +65,7 @@ export const AcceptButton = memo(
           await store.commentStore.commentFormSubmit();
           store.acceptAnnotation();
         }}
+        data-testid="bottombar-accept-button"
       >
         {hasChanges ? "Fix + Accept" : "Accept"}
       </Button>
@@ -100,15 +101,16 @@ const MANAGER_ROLES = ["OW", "AD", "MA"];
 export const SkipButton = memo(
   observer(({ disabled, store, onSkipWithComment }: SkipButtonProps) => {
     const task = store.task;
-    const taskAllowSkip = (task as any)?.allow_skip !== false;
+    const isEnterprise = (window as any).APP_SETTINGS?.billing?.enterprise;
+    const skipDisabled = isEnterprise ? (task as any)?.allow_skip === false : false;
     const userRole = (window as any).APP_SETTINGS?.user?.role;
     const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
-    const canSkip = taskAllowSkip || hasForceSkipPermission;
+    const canSkip = !skipDisabled || hasForceSkipPermission;
     const isDisabled = disabled || !canSkip;
 
     const tooltip: string = canSkip ? "Cancel (skip) task [ Ctrl+Space ]" : "This task cannot be skipped";
 
-    const showInfoIcon = !taskAllowSkip && hasForceSkipPermission;
+    const showInfoIcon = skipDisabled && hasForceSkipPermission;
 
     return (
       <>
@@ -135,6 +137,7 @@ export const SkipButton = memo(
               store.skipTask({});
             }
           }}
+          data-testid="bottombar-skip-button"
         >
           Skip
         </Button>
@@ -159,6 +162,7 @@ export const UnskipButton = memo(
           await store.commentStore.commentFormSubmit();
           store.unskipTask();
         }}
+        data-testid="bottombar-unskip-button"
       >
         Cancel skip
       </Button>

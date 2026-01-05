@@ -87,14 +87,6 @@ export const FF_LSDV_4583 = "fflag_feat_front_lsdv_4583_multi_image_segmentation
 export const FF_LSDV_4583_6 = "fflag_feat_front_lsdv_4583_6_images_preloading_short";
 
 /**
- * Removing interrupting from the draft saving
- *
- * Without this flag we have a situation when changes in history leading to the empty results break functionality of adding comments and make the draft saving process indicator stay forever.
- * @link https://app.launchdarkly.com/default/production/features/fflag_fix_font_lsdv_3009_draft_saving_stuck_130223_short
- */
-export const FF_LSDV_3009 = "fflag_fix_font_lsdv_3009_draft_saving_stuck_130223_short";
-
-/**
  * Allows to count time spend on textarea results and store it to lead_time meta field
  * @link https://app.launchdarkly.com/default/production/features/fflag_fix_front_lsdv_4600_lead_time_27072023_short
  */
@@ -126,8 +118,6 @@ export const FF_LSDV_4998 = "fflag_fix_front_lsdv_4998_missed_dynamic_children_0
  * @link https://app.launchdarkly.com/default/production/features/fflag_feat_front_lsdv_5451_async_taxonomy_110823_short
  */
 export const FF_TAXONOMY_ASYNC = "fflag_feat_front_lsdv_5451_async_taxonomy_110823_short";
-
-export const FF_LEAP_218 = "fflag_fix_front_leap_218_improve_performance_of_taxonomy_search_short";
 
 /**
  * Allow to label NER directly with Taxonomy instead of Labels

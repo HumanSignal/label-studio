@@ -97,7 +97,7 @@ class TestLSOFSMIntegration:
         Validates:
         - Annotation model extends FsmHistoryStateModel
         - Automatic state transition on creation
-        - State is SUBMITTED for new annotations in LSO
+        - State is CREATED for new annotations in LSO
         """
         project = ProjectFactory(organization=self.org)
         task = TaskFactory(project=project)
@@ -105,12 +105,12 @@ class TestLSOFSMIntegration:
 
         # Check state was created
         state = StateManager.get_current_state_value(annotation)
-        assert state == AnnotationStateChoices.SUBMITTED, f'Expected SUBMITTED, got {state}'
+        assert state == AnnotationStateChoices.CREATED, f'Expected CREATED, got {state}'
 
         # Check state history exists
         history = list(AnnotationState.objects.filter(annotation=annotation).order_by('created_at'))
         assert len(history) >= 1
-        assert history[0].state == AnnotationStateChoices.SUBMITTED
+        assert history[0].state == AnnotationStateChoices.CREATED
 
     def test_cache_functionality(self):
         """
@@ -275,7 +275,7 @@ class TestLSOFSMIntegration:
         Validates:
         - Draft-based annotation workflow
         - Correct transition triggered
-        - State is SUBMITTED in LSO
+        - State is CREATED in LSO
         """
         project = ProjectFactory(organization=self.org)
         task = TaskFactory(project=project)
@@ -289,9 +289,9 @@ class TestLSOFSMIntegration:
         )
         annotation.save()
 
-        # Should be in SUBMITTED state
+        # Should be in CREATED state
         state = StateManager.get_current_state_value(annotation)
-        assert state == AnnotationStateChoices.SUBMITTED
+        assert state == AnnotationStateChoices.CREATED
 
     def test_state_manager_with_multiple_transitions(self):
         """

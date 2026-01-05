@@ -30,16 +30,19 @@ class TestOrganizationMemberListAPI(APITestCase):
         assert owner['user']['id'] == self.owner.id
         assert owner['user']['created_projects'] is None
         assert owner['user']['contributed_to_projects'] is None
+        assert owner['contributed_to_projects'] is None
 
         user_1 = response.json()['results'][1]
         assert user_1['user']['id'] == self.user_1.id
         assert user_1['user']['created_projects'] is None
         assert user_1['user']['contributed_to_projects'] is None
+        assert user_1['contributed_to_projects'] is None
 
         user_2 = response.json()['results'][2]
         assert user_2['user']['id'] == self.user_2.id
         assert user_2['user']['created_projects'] is None
         assert user_2['user']['contributed_to_projects'] is None
+        assert user_2['contributed_to_projects'] is None
 
     def test_list_with_contributed_to_projects(self):
         project_1 = ProjectFactory(created_by=self.user_1, organization=self.organization)
@@ -55,8 +58,15 @@ class TestOrganizationMemberListAPI(APITestCase):
         assert response.status_code == 200
         assert len(response.json()['results']) == 3
 
-        owner = response.json()['results'][0]['user']
+        owner = response.json()['results'][0]
+        assert owner['user']['created_projects'] == []
         assert owner['created_projects'] == []
+        assert owner['user']['contributed_to_projects'] == [
+            {
+                'id': project_2.id,
+                'title': project_2.title,
+            }
+        ]
         assert owner['contributed_to_projects'] == [
             {
                 'id': project_2.id,
@@ -64,8 +74,20 @@ class TestOrganizationMemberListAPI(APITestCase):
             }
         ]
 
-        user_1 = response.json()['results'][1]['user']
+        user_1 = response.json()['results'][1]
+        assert user_1['user']['contributed_to_projects'] == [
+            {
+                'id': project_1.id,
+                'title': project_1.title,
+            }
+        ]
         assert user_1['contributed_to_projects'] == [
+            {
+                'id': project_1.id,
+                'title': project_1.title,
+            }
+        ]
+        assert user_1['user']['created_projects'] == [
             {
                 'id': project_1.id,
                 'title': project_1.title,
@@ -78,8 +100,20 @@ class TestOrganizationMemberListAPI(APITestCase):
             }
         ]
 
-        user_2 = response.json()['results'][2]['user']
+        user_2 = response.json()['results'][2]
+        assert user_2['user']['contributed_to_projects'] == [
+            {
+                'id': project_2.id,
+                'title': project_2.title,
+            }
+        ]
         assert user_2['contributed_to_projects'] == [
+            {
+                'id': project_2.id,
+                'title': project_2.title,
+            }
+        ]
+        assert user_2['user']['created_projects'] == [
             {
                 'id': project_2.id,
                 'title': project_2.title,

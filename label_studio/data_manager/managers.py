@@ -605,34 +605,19 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
     queryset = get_tasks_agreement_queryset(queryset)
     max_additional_annotators_assignable = lse_project['max_additional_annotators_assignable']
 
-    if flag_set('fflag_fix_fit_1082_overlap_use_distinct_annotators', user='auto'):
-        completed_at_case = Case(
-            When(
-                # If agreement_threshold is set, evaluate all conditions
-                Q(is_labeled=True)
-                & (
-                    Q(_agreement__gte=agreement_threshold)
-                    | Q(annotator_count__gte=(F('overlap') + max_additional_annotators_assignable))
-                ),
-                then=newest_annotation_subquery(),
+    completed_at_case = Case(
+        When(
+            # If agreement_threshold is set, evaluate all conditions
+            Q(is_labeled=True)
+            & (
+                Q(_agreement__gte=agreement_threshold)
+                | Q(annotator_count__gte=(F('overlap') + max_additional_annotators_assignable))
             ),
-            default=Value(None),
-            output_field=DateTimeField(),
-        )
-    else:
-        completed_at_case = Case(
-            When(
-                # If agreement_threshold is set, evaluate all conditions
-                Q(is_labeled=True)
-                & (
-                    Q(_agreement__gte=agreement_threshold)
-                    | Q(annotation_count__gte=(F('overlap') + max_additional_annotators_assignable))
-                ),
-                then=newest_annotation_subquery(),
-            ),
-            default=Value(None),
-            output_field=DateTimeField(),
-        )
+            then=newest_annotation_subquery(),
+        ),
+        default=Value(None),
+        output_field=DateTimeField(),
+    )
 
     return queryset.annotate(completed_at=completed_at_case)
 
@@ -804,6 +789,22 @@ class PreparedTaskManager(models.Manager):
         queryset, fields_for_evaluation=None, all_fields=False, excluded_fields_for_evaluation=None, request=None
     ):
         annotations_map = get_annotations_map()
+        # If we have dynamic control-tag level agreement columns, inject into annotation map
+        # without mutating the global map
+        if flag_set('fflag_utc_428_consensus_control_tag_agreement', user='auto'):
+            inject_path = getattr(settings, 'GET_DYNAMIC_DM_ANNOTATIONS', None)
+            if inject_path:
+                overlay_func = load_func(inject_path)
+                # Expect a dict of {field_name: function that annotates the queryset}
+                overlay_map = overlay_func(request=request, project=getattr(queryset.first(), 'project', None)) or {}
+                if isinstance(overlay_map, dict) and overlay_map:
+                    # Ensure dynamic fields are evaluated even if not explicitly selected
+                    if fields_for_evaluation is None:
+                        fields_for_evaluation = list(overlay_map.keys())
+                    else:
+                        fields_for_evaluation = list(set(fields_for_evaluation) | set(overlay_map.keys()))
+                    # Merge overlay with base map for this call only
+                    annotations_map = {**annotations_map, **overlay_map}
 
         if fields_for_evaluation is None:
             fields_for_evaluation = []

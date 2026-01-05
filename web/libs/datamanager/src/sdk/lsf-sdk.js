@@ -1,12 +1,4 @@
-import {
-  FF_DEV_1752,
-  FF_DEV_2186,
-  FF_DEV_2887,
-  FF_DEV_3034,
-  FF_LSDV_4620_3_ML,
-  FF_REGION_VISIBILITY_FROM_URL,
-  isFF,
-} from "../utils/feature-flags";
+import { FF_DEV_1752, FF_DEV_2186, FF_DEV_2887, FF_DEV_3034, FF_LSDV_4620_3_ML, isFF } from "../utils/feature-flags";
 import { isDefined } from "../utils/utils";
 import { Modal } from "../components/Common/Modal/Modal";
 import { CommentsSdk } from "./comments-sdk";
@@ -141,10 +133,8 @@ export class LSFWrapper {
         "annotations:delete",
         "annotations:tabs",
         "predictions:tabs",
+        "annotations:copy-link",
       );
-      if (isFF(FF_REGION_VISIBILITY_FROM_URL)) {
-        interfaces.push("annotations:copy-link");
-      }
     }
 
     if (this.datamanager.hasInterface("instruction")) {
@@ -815,10 +805,11 @@ export class LSFWrapper {
     // Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
     const MANAGER_ROLES = ["OW", "AD", "MA"];
     const task = this.task;
-    const taskAllowSkip = task?.allow_skip !== false;
+    const isEnterprise = window.APP_SETTINGS?.billing?.enterprise;
+    const skipDisabled = isEnterprise ? task?.allow_skip === false : false;
     const userRole = window.APP_SETTINGS?.user?.role;
     const hasForceSkipPermission = MANAGER_ROLES.includes(userRole);
-    const canSkip = taskAllowSkip || hasForceSkipPermission;
+    const canSkip = !skipDisabled || hasForceSkipPermission;
     if (!canSkip) {
       console.warn("Task cannot be skipped: allow_skip is false and user lacks manager role");
       this.showOperationToast(400, null, "This task cannot be skipped", { error: "Task cannot be skipped" });

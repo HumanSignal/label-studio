@@ -37,11 +37,9 @@ const TemplatesInGroup = ({ templates, group, onSelectRecipe, isEdition }) => {
             title={isDisabled ? "Enterprise feature - Available in Label Studio Enterprise" : ""}
           >
             <img src={recipe.image} alt={""} />
-            <div className="flex w-full relative">
-              <h3 className="flex flex-1 justify-center text-center">{recipe.title}</h3>
-              {isEnterpriseTemplate && isCommunityEdition && (
-                <EnterpriseBadge className="absolute bottom-[-10px] left-1/2 translate-x-[-40px]" />
-              )}
+            <div className="flex flex-col items-center w-full">
+              <h3 className="flex flex-1 justify-center text-center w-full">{recipe.title}</h3>
+              {isEnterpriseTemplate && isCommunityEdition && <EnterpriseBadge className="mb-base" />}
             </div>
           </li>
         );

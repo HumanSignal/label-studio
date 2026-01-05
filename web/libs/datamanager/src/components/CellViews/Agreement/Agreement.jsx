@@ -29,8 +29,20 @@ export const Agreement = (cell) => {
   const { value, original: task } = cell;
   const sdk = useSDK();
   const [content, setContent] = useState(null);
-  const isAgreementPopoverEnabled =
-    window.APP_SETTINGS.billing?.enterprise && ff.isActive(FF_AVERAGE_AGREEMENT_SCORE_POPOVER);
+  const basePopoverEnabled = window.APP_SETTINGS.billing?.enterprise && ff.isActive(FF_AVERAGE_AGREEMENT_SCORE_POPOVER);
+
+  const colId =
+    (cell && cell.column && typeof cell.column.id === "string" && cell.column.id) ||
+    (cell &&
+      cell.column &&
+      cell.column.original &&
+      typeof cell.column.original.alias === "string" &&
+      cell.column.original.alias) ||
+    "";
+
+  const colPath = String(colId).split(":").pop() || "";
+  const isDimensionAgreementColumn = colPath.startsWith("dimension_agreement__");
+  const isAgreementPopoverEnabled = basePopoverEnabled && !isDimensionAgreementColumn;
 
   const handleClick = isAgreementPopoverEnabled
     ? (e) => {
