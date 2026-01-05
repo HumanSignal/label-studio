@@ -642,7 +642,10 @@ For more information about pausing annotators, including how to manually pause s
 
 <dd>
 
-Evaluate annotators against [ground truths](ground_truths) within a project. A “ground truth” annotation is a verified, high-quality annotation that serves as the correct answer for a specific task.
+!!! note
+    Annotator Evaluation settings are only available when the project is configured to [automatically assign tasks](#distribute-tasks). If you are using Manual distribution, this section will not appear in your project settings.
+
+Evaluate annotators against [ground truths](ground_truths) within a project. A "ground truth" annotation is a verified, high-quality annotation that serves as the correct answer for a specific task.
 
 When enabled, this setting looks at the agreement score for the annotator when compared solely against ground truth annotations. You can decide to automatically pause an annotator within the project if their ground truth agreement score falls below a certain threshold. 
 
@@ -681,7 +684,7 @@ When annotators enter the labeling stream, they are first presented with tasks t
 
 Use the counter to determine how many ground truth tasks should be presented first before the annotator progresses through the remaining project tasks. 
 
-**Note:** This option is only active when the project is configured to [automatically assign tasks](#distribute-tasks). If you are using Manual distribution, annotators will see tasks ordered by ID number. If you would like them to see ground truth tasks first, you should add ground truth annotations in the same order. 
+Set this counter to zero if you want to skip onboarding and only use continuous evaluation. 
 </td>
 </tr>
 <tr>
