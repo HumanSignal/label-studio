@@ -520,8 +520,7 @@ const Configurator = ({
         ref={containerRef}
         style={{
           display: "grid",
-          gridTemplateColumns: `${editorWidthPixels}px minmax(400px, 1fr)`,
-          gap: "16px",
+          gridTemplateColumns: `${editorWidthPixels}px minmax(500px, 1fr)`,
           position: "relative",
         }}
       >
