@@ -559,7 +559,7 @@ By default, each task only needs to be annotated by one annotator. If you want m
 
 The number of distinct annotations you want to allow per task. 
 
-Note that in certain situations, this may be exceeded. For example, if there are long-standing drafts within a project or you have a very low [task reservation](#task-lock) time. 
+Note that in certain situations, this may be exceeded. For example, if there are long-standing drafts within a project or you have a very low [task reservation](#lock-tasks) time. 
 
 Also note that only annotations created by distinct users count towards the overlap. For example, if the overlap is `2` and a user creates and submits two annotations on a single task (which can be done in Quick View), the overlap threshold will not be reached until another user submits an annotation. 
 
