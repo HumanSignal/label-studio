@@ -13,6 +13,7 @@ try:
 except:  # noqa: E722
     import json
 
+from core.utils.exceptions import extract_message
 from django.conf import settings
 from django.db import models
 from django.utils.functional import cached_property
@@ -214,7 +215,7 @@ class FileUpload(models.Model):
                     yield batch
 
         except Exception as exc:
-            raise ValidationError(f'Failed to parse JSON file {self.file_name}: {str(exc)}')
+            raise ValidationError(f'Failed to parse JSON file {self.file_name}: {extract_message(exc)}')
 
     def _format_task_for_json_streaming(self, task):
         """Format task data for JSON streaming consistency with read_tasks_list_from_json"""
@@ -275,7 +276,7 @@ class FileUpload(models.Model):
                 tasks = self.read_task_from_uploaded_file()
 
         except Exception as exc:
-            raise ValidationError('Failed to parse input file ' + self.file_name + ': ' + str(exc))
+            raise ValidationError('Failed to parse input file ' + self.file_name + ': ' + extract_message(exc))
         return tasks
 
     def read_tasks_streaming(self, file_as_tasks_list=True, batch_size=100):
@@ -313,7 +314,7 @@ class FileUpload(models.Model):
                     yield batch
 
         except Exception as exc:
-            raise ValidationError('Failed to parse input file ' + self.file_name + ': ' + str(exc))
+            raise ValidationError('Failed to parse input file ' + self.file_name + ': ' + extract_message(exc))
 
     @classmethod
     def load_tasks_from_uploaded_files(

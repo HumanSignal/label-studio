@@ -12,10 +12,10 @@ from fsm.state_choices import AnnotationStateChoices
 from fsm.transitions import ModelChangeTransition, StateModelType, TransitionContext
 
 
-@register_state_transition('annotation', 'annotation_submitted', triggers_on_create=True, triggers_on_update=False)
-class AnnotationSubmittedTransition(ModelChangeTransition):
+@register_state_transition('annotation', 'annotation_created', triggers_on_create=True, triggers_on_update=False)
+class AnnotationCreatedTransition(ModelChangeTransition):
     """
-    Transition when an annotation is submitted.
+    Transition when an annotation is created.
 
     This is the default transition for newly created annotations.
 
@@ -23,11 +23,11 @@ class AnnotationSubmittedTransition(ModelChangeTransition):
     """
 
     def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
-        return AnnotationStateChoices.SUBMITTED
+        return AnnotationStateChoices.CREATED
 
     def get_reason(self, context: TransitionContext) -> str:
-        """Return detailed reason for annotation submission."""
-        return 'Annotation submitted for review'
+        """Return detailed reason for annotation creation."""
+        return 'Annotation created'
 
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         """Execute annotation submission transition."""
@@ -42,9 +42,9 @@ class AnnotationSubmittedTransition(ModelChangeTransition):
 
     def post_transition_hook(self, context: TransitionContext, state_record: StateModelType) -> None:
         """
-        Post-transition hook for annotation submission.
+        Post-transition hook for annotation creation.
 
-        Updates task state to COMPLETED when annotation is submitted.
+        Updates task state to COMPLETED when annotation is created.
         Then updates project state based on task completion status.
         Handles "cold start" scenarios where task may not have state record yet.
         """
@@ -62,7 +62,7 @@ class AnnotationSubmittedTransition(ModelChangeTransition):
 
         if current_task_state is None:
             # Task has no state record - initialize it
-            # Since annotation was just submitted, task should be COMPLETED
+            # Since annotation was just created, task should be COMPLETED
             current_task_state = get_or_initialize_state(
                 task, user=context.current_user, inferred_state=TaskStateChoices.COMPLETED
             )
@@ -82,13 +82,13 @@ class AnnotationUpdatedTransition(ModelChangeTransition):
     """
     Transition when an annotation is updated.
 
-    Updates keep the annotation in SUBMITTED state but create audit trail records.
+    Updates keep the annotation in CREATED state but create audit trail records.
 
     Trigger: On update (triggers_on_create=False, triggers_on_update=True, force_state_record=True)
     """
 
     def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
-        return AnnotationStateChoices.SUBMITTED
+        return AnnotationStateChoices.CREATED
 
     def get_reason(self, context: TransitionContext) -> str:
         """Return detailed reason for annotation update."""

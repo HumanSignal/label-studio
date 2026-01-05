@@ -101,8 +101,7 @@
 </template>
 
 <script id="app-settings" nonce="{{request.csp_nonce}}">
-
-  var __customHotkeys = {{ user.custom_hotkeys|json_dumps_ensure_ascii|safe }};
+  var __customHotkeys = {{ user.custom_hotkeys|json_dumps_ensure_ascii|escape_lt_gt|safe }};
 
   // Filter custom hotkeys for editor-specific ones
   var editorCustomHotkeys = {};

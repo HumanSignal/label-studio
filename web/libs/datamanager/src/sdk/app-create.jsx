@@ -2,7 +2,8 @@ import ReactDOM from "react-dom";
 import { App } from "../components/App/App";
 import { AppStore } from "../stores/AppStore";
 import * as DataStores from "../stores/DataStores";
-import { registerModel } from "../stores/DynamicModel";
+import { DynamicModel, registerModel } from "../stores/DynamicModel";
+import { types } from "mobx-state-tree";
 
 const createDynamicModels = (columns) => {
   const grouppedColumns = columns.reduce((res, column) => {
@@ -50,7 +51,28 @@ export const createApp = async (rootNode, datamanager) => {
 
   createDynamicModels(columns);
 
-  const appStore = AppStore.create({
+  // types.late is resolved once in MST, although,
+  // we need it to be resolved each time DM is initialized
+  // so both taskStore and annotationStore moved here to dynamically
+  // initialized
+  //
+  // without it the columns set will be cached during navigation resulting
+  // in incorrect dynamic columns and mapping mismatch
+  const FinalStore = types.compose(
+    AppStore,
+    types.model("DataStore", {
+      taskStore: types.optional(
+        types.late(() => DynamicModel.get("tasksStore")),
+        {},
+      ),
+      annotationStore: types.optional(
+        types.late(() => DynamicModel.get("annotationsStore")),
+        {},
+      ),
+    }),
+  );
+
+  const appStore = FinalStore.create({
     viewsStore: {
       views: [],
       columnsRaw: columns,

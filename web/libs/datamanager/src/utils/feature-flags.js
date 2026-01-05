@@ -38,11 +38,6 @@ export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
 export const FF_GRID_PREVIEW = "fflag_feat_front_leap_1424_grid_preview_short";
 
 /**
- * Add ability to show average agreement score popover in Agreement cell.
- */
-export const FF_AVERAGE_AGREEMENT_SCORE_POPOVER = "fflag_feat_all_leap_2042_average_agreement_score_popover";
-
-/**
  * Allow to filter tasks in Data Manager by control tag labels used in annotation results
  * @link https://app.launchdarkly.com/projects/default/flags/fflag_root_13_annotation_results_filtering
  */
