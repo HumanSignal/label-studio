@@ -559,7 +559,7 @@ By default, each task only needs to be annotated by one annotator. If you want m
 
 The number of distinct annotations you want to allow per task. 
 
-Note that in certain situations, this may be exceeded. For example, if there are long-standing drafts within a project or you have a very low [task reservation](#task-lock) time. 
+Note that in certain situations, this may be exceeded. For example, if there are long-standing drafts within a project or you have a very low [task reservation](#lock-tasks) time. 
 
 Also note that only annotations created by distinct users count towards the overlap. For example, if the overlap is `2` and a user creates and submits two annotations on a single task (which can be done in Quick View), the overlap threshold will not be reached until another user submits an annotation. 
 
@@ -642,7 +642,12 @@ For more information about pausing annotators, including how to manually pause s
 
 <dd>
 
-Evaluate annotators against [ground truths](ground_truths) within a project. A “ground truth” annotation is a verified, high-quality annotation that serves as the correct answer for a specific task.
+!!! note
+    Annotator Evaluation settings are only available when the project is configured to [automatically assign tasks](#distribute-tasks). If you are using Manual distribution, this section will not appear in your project settings.
+    
+    If you switch a project from Automatic to Manual distribution, annotator evaluation is automatically disabled.
+
+Evaluate annotators against [ground truths](ground_truths) within a project. A "ground truth" annotation is a verified, high-quality annotation that serves as the correct answer for a specific task.
 
 When enabled, this setting looks at the agreement score for the annotator when compared solely against ground truth annotations. You can decide to automatically pause an annotator within the project if their ground truth agreement score falls below a certain threshold. 
 
@@ -681,7 +686,7 @@ When annotators enter the labeling stream, they are first presented with tasks t
 
 Use the counter to determine how many ground truth tasks should be presented first before the annotator progresses through the remaining project tasks. 
 
-**Note:** This option is only active when the project is configured to [automatically assign tasks](#distribute-tasks). If you are using Manual distribution, annotators will see tasks ordered by ID number. If you would like them to see ground truth tasks first, you should add ground truth annotations in the same order. 
+Set this counter to zero if you want to skip onboarding and only use continuous evaluation. 
 </td>
 </tr>
 <tr>
