@@ -18,7 +18,6 @@ import { rotateBboxCoords } from "../utils/bboxCoords";
 import { createDragBoundFunc } from "../utils/image";
 import { AliveRegion } from "./AliveRegion";
 import { EditableRegion } from "./EditableRegion";
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 
 /**
  * Ellipse object for Bounding Box
