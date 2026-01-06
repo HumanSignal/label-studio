@@ -504,10 +504,9 @@ const Configurator = ({
 
   const extra = (
     <p className={configClass.elem("tags-link")}>
-      Configure the labeling interface with tags.
-      <br />
+      Configure the labeling interface with tags.&nbsp;
       <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">
-        See all available tags
+        See all tags
       </a>
       .
     </p>
