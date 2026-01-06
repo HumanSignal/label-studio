@@ -117,15 +117,6 @@ class BaseState(models.Model):
         """Extract timestamp from UUID7 ID"""
         return timestamp_from_uuid7(self.id)
 
-    @property
-    def is_terminal_state(self) -> bool:
-        """
-        Check if this is a terminal state (no outgoing transitions).
-
-        Override in subclasses with specific terminal states.
-        """
-        return False
-
     def _get_entity_name(self) -> str:
         """Extract entity name from model name (e.g., TaskState → task)"""
         model_name = self.__class__.__name__
@@ -272,11 +263,6 @@ class TaskState(BaseState):
             'project_id': entity.project_id,
         }
 
-    @property
-    def is_terminal_state(self) -> bool:
-        """Check if this is a terminal task state"""
-        return self.state == TaskStateChoices.COMPLETED
-
 
 @register_state_model('annotation')
 class AnnotationState(BaseState):
@@ -324,11 +310,6 @@ class AnnotationState(BaseState):
             'completed_by_id': entity.completed_by_id if entity.completed_by_id else None,
         }
 
-    @property
-    def is_terminal_state(self) -> bool:
-        """Check if this is a terminal annotation state"""
-        return self.state == AnnotationStateChoices.COMPLETED
-
 
 @register_state_model('project')
 class ProjectState(BaseState):
@@ -366,8 +347,3 @@ class ProjectState(BaseState):
         return {
             'created_by_id': entity.created_by_id if entity.created_by_id else None,
         }
-
-    @property
-    def is_terminal_state(self) -> bool:
-        """Check if this is a terminal project state"""
-        return self.state == ProjectStateChoices.COMPLETED
