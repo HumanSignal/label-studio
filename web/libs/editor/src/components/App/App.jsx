@@ -7,7 +7,6 @@ import { getEnv, getRoot } from "mobx-state-tree";
 import { observer, Provider } from "mobx-react";
 
 /**
- * adding something to force dependency update
  * Core
  */
 import { CommentsOverlay } from "../InteractiveOverlays/CommentsOverlay";
