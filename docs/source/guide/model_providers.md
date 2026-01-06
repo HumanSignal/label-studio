@@ -15,7 +15,7 @@ date: 2025-02-18 12:03:59
 
 To use certain AI features across your organization, you must first set up a model provider. You can set up model providers from **Organization > Settings**.
 
-For example, if you want to interact with an LLM when using the [`<Chat>` tag](/tags/chat), you will first need to configure access to the model.
+For example, if you want to interact with an LLM when using the [`<Chat>` tag](/tags/chat.html), you will first need to configure access to the model.
 
 
 !!! note

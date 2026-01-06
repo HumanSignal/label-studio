@@ -5,6 +5,7 @@ import logging
 from typing import Any, Mapping, Optional
 
 from annoying.fields import AutoOneToOneField
+from core.current_request import CurrentContext
 from core.label_config import (
     check_control_in_config_by_regex,
     check_toname_in_config_by_regex,
@@ -35,6 +36,7 @@ from django.db.models.expressions import RawSQL
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from fsm.models import FsmHistoryStateModel
+from fsm.project_transitions import update_project_state_after_task_change
 from fsm.queryset_mixins import FSMStateQuerySetMixin
 from label_studio_sdk._extensions.label_studio_tools.core.label_config import parse_config
 from labels_manager.models import Label
@@ -313,11 +315,21 @@ class Project(ProjectMixin, FsmHistoryStateModel):
     skip_queue = models.CharField(
         max_length=100, choices=SkipQueue.choices, null=True, default=SkipQueue.REQUEUE_FOR_OTHERS
     )
+
+    # Deprecated in favor of annotator_evaluation_enabled
     show_ground_truth_first = models.BooleanField(
         _('show ground truth first'),
         default=False,
         help_text='Onboarding mode (true): show ground truth tasks first in the labeling stream',
     )
+
+    annotator_evaluation_enabled = models.BooleanField(
+        _('annotator evaluation enabled'),
+        default=False,
+        db_default=False,
+        help_text='Enable annotator evaluation for the project',
+    )
+
     show_overlap_first = models.BooleanField(_('show overlap first'), default=False)
     overlap_cohort_percentage = models.IntegerField(_('overlap_cohort_percentage'), default=100)
 
@@ -528,6 +540,11 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             self._rearrange_overlap_cohort()
+
+        if tasks_number_changed:
+            # FSM: Recalculate project state after task deletion or import
+            user = CurrentContext.get_user()
+            update_project_state_after_task_change(self, user=user)
 
     def _batch_update_with_retry(self, queryset, batch_size=500, max_retries=3, **update_fields):
         batch_update_with_retry(queryset, batch_size, max_retries, **update_fields)
@@ -836,7 +853,7 @@ class Project(ProjectMixin, FsmHistoryStateModel):
         if label_config_has_changed or project_with_config_just_created:
             self.data_types = extract_data_types(self.label_config)
             self.parsed_label_config = parse_config(self.label_config)
-            self.label_config_hash = hash(str(self.parsed_label_config))
+            self.label_config_hash = hash(str(self.label_config))
             if update_fields is not None:
                 update_fields = {'data_types', 'parsed_label_config', 'label_config_hash'}.union(update_fields)
 
@@ -894,6 +911,15 @@ class Project(ProjectMixin, FsmHistoryStateModel):
                     summary.reset()
                 elif self.num_annotations == 0 and self.num_drafts == 0:
                     summary.reset(tasks_data_based=False)
+
+        # Call dimensions postprocess if configured (LSE feature)
+        dimensions_postprocess = load_func(settings.PROJECT_SAVE_DIMENSIONS_POSTPROCESS)
+        if dimensions_postprocess is not None:
+            dimensions_postprocess(
+                project=self,
+                created=not exists,
+                label_config_has_changed=label_config_has_changed,
+            )
 
     # ============================================================================
     # FSM Integration

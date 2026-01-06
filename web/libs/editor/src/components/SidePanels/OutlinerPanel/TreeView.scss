@@ -233,15 +233,25 @@
     }
 
     .region-context-menu button {
-      display: none;
+      transition: none;
+      opacity: 0;
+    }
+
+    .region-context-menu_open button {
+      opacity: 1;
     }
   }
 
-  &:hover &__controls {
+  &:hover &__controls,
+  &:has(.region-context-menu_open) &__controls {
     display: flex;
 
     .outliner-item__control_type_lock {
       display: flex;
+    }
+
+    .region-context-menu button {
+      opacity: 1;
     }
   }
 }

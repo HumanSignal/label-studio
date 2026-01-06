@@ -101,7 +101,7 @@ export const AnnotationButton = observer(
 
       if (!selected) {
         if (type === "prediction") {
-          annotationStore.selectPrediction(id);
+          annotationStore.selectPrediction(id, { exitViewAll: true });
         } else {
           annotationStore.selectAnnotation(id, { exitViewAll: true });
         }

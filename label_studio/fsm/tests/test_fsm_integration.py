@@ -70,11 +70,8 @@ class TestFSMModels(TestCase):
         assert annotation_state.state == 'DRAFT'
         assert annotation_state.annotation == annotation
 
-        # Check terminal state property
-        assert not annotation_state.is_terminal_state
-
         # Test completed state
-        completed_state = AnnotationState.objects.create(
+        AnnotationState.objects.create(
             annotation=annotation,
             task_id=annotation.task.id,
             project_id=annotation.task.project_id,
@@ -82,7 +79,6 @@ class TestFSMModels(TestCase):
             state='COMPLETED',
             triggered_by=self.user,
         )
-        assert completed_state.is_terminal_state
 
     def test_project_state_creation(self):
         """Test ProjectState creation and basic functionality"""
@@ -94,11 +90,7 @@ class TestFSMModels(TestCase):
         assert project_state.state == 'CREATED'
         assert project_state.project == self.project
 
-        # Test terminal state
-        assert not project_state.is_terminal_state
-
-        completed_state = ProjectState.objects.create(project=self.project, state='COMPLETED', triggered_by=self.user)
-        assert completed_state.is_terminal_state
+        ProjectState.objects.create(project=self.project, state='COMPLETED', triggered_by=self.user)
 
 
 class TestStateManager(TestCase):

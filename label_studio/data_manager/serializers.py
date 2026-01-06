@@ -1,5 +1,5 @@
-"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
-"""
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license."""
+
 import os
 
 import ujson as json
@@ -117,7 +117,7 @@ class FilterGroupSerializer(serializers.ModelSerializer):
             # Add child filter if exists (only one level of nesting)
             child_filters = filter_obj.children.all()
             if child_filters:
-                child = child_filters[0]   # Only support one child
+                child = child_filters[0]  # Only support one child
                 child_item = {
                     'filter': child.column,
                     'operator': child.operator,
@@ -228,7 +228,6 @@ class ViewSerializer(serializers.ModelSerializer):
         """
 
         def _create_recursive(data, parent=None, index=None):
-
             # Extract nested children early (if any) and remove them from payload
             child_filter = data.pop('child_filter', None)
 
@@ -466,7 +465,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     class Meta:
         model = Task
         ref_name = 'data_manager_task_serializer'
-        exclude = ('precomputed_agreement',)
+        exclude = ('precomputed_agreement', 'allow_skip')
         expandable_fields = {'annotations': (AnnotationSerializer, {'many': True})}
 
     def to_representation(self, obj):

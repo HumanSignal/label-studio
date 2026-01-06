@@ -1,11 +1,11 @@
 /**
- * StateHistoryPopoverContent - Popover content for displaying state history
+ * StateHistoryPopoverContent - Popover content for displaying state history as a timeline
  */
 
-import { Badge, Button, Typography } from "@humansignal/ui";
+import { Button, Typography } from "@humansignal/ui";
 import { IconSync, IconError, IconHistoryRewind, IconCross } from "@humansignal/icons";
 import { useStateHistory, type StateHistoryItem } from "../../hooks/useStateHistory";
-import { getStateColorClass, formatStateName, formatTimestamp, formatUserName } from "./utils";
+import { StateHistoryTimeline } from "./StateHistoryTimeline";
 
 export interface StateHistoryPopoverContentProps {
   entityType: "task" | "annotation" | "project";
@@ -25,14 +25,14 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
 
   return (
     <div
-      className="flex flex-col w-[320px] max-h-[400px] bg-primary-background rounded-lg shadow-lg"
+      className="flex flex-col w-[360px] max-h-[400px] bg-neutral-background rounded-lg shadow-lg"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header */}
       <div className="px-4 py-3 border-b border-neutral-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <IconHistoryRewind className="w-4 h-4 text-muted-foreground" />
+            <IconHistoryRewind className="w-4 h-4" />
             <Typography variant="body" size="small" className="font-medium text-neutral-foreground">
               State History
             </Typography>
@@ -96,23 +96,7 @@ export function StateHistoryPopoverContent({ entityType, entityId, isOpen, onClo
           </div>
         )}
 
-        {!isLoading && !isError && history.length > 0 && (
-          <div className="space-y-3">
-            {history.map((item: StateHistoryItem, index: number) => (
-              <div key={index} className="pb-3 border-b border-neutral-border last:border-0 last:pb-0">
-                <div className="flex items-center justify-between mb-2">
-                  <Badge className={getStateColorClass(item.state)}>{formatStateName(item.state)}</Badge>
-                  <Typography variant="body" size="smallest" className="text-neutral-content-subtle">
-                    {formatTimestamp(item.created_at)}
-                  </Typography>
-                </div>
-                <Typography variant="body" size="smallest" className="text-muted-foreground">
-                  By: {formatUserName(item.triggered_by)}
-                </Typography>
-              </div>
-            ))}
-          </div>
-        )}
+        {!isLoading && !isError && history.length > 0 && <StateHistoryTimeline history={history} />}
       </div>
     </div>
   );

@@ -97,6 +97,12 @@ class Task(TaskMixin, FsmHistoryStateModel):
         help_text='True if the number of annotations for this task is greater than or equal '
         'to the number of maximum_completions for the project',
     )
+    allow_skip = models.BooleanField(
+        _('allow_skip'),
+        default=True,
+        null=True,
+        help_text='Whether this task can be skipped. Set to False to make task unskippable.',
+    )
     overlap = models.IntegerField(
         _('overlap'),
         default=1,
@@ -283,10 +289,8 @@ class Task(TaskMixin, FsmHistoryStateModel):
         """
         from projects.functions.next_task import get_next_task_logging_level
 
-        if self.project.show_ground_truth_first:
-            # in show_ground_truth_first mode(onboarding)
-            # we ignore overlap setting for ground_truth tasks
-            # https://humansignal.atlassian.net/browse/LEAP-1963
+        if self.project.annotator_evaluation_enabled:
+            # In annotator evaluation mode, ignore overlap setting for ground truth tasks
             if self.annotations.filter(ground_truth=True).exists():
                 return False
 

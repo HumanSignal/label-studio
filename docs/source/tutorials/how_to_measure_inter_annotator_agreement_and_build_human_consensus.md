@@ -11,6 +11,10 @@ report_bug_url: https://github.com/HumanSignal/awesome-label-studio-tutorials/is
 thumbnail: /images/tutorials/tutorials-inter-annotator-agreement-and-consensus.png
 meta_title: "How to Measure Inter-Annotator Agreement and Build Human Consensus with Label Studio"
 meta_description: Learn how to measure inter-annotator agreement, build human consensus, establish ground truth and compare model predictions using the Label Studio SDK.
+is_enterprise: true
+is_starter_cloud: true
+badges: SDK, Agreement, Colab
+duration: 5-10 mins
 ---
 
 This tutorial walks through a practical workflow to measure inter-annotator agreement, build human consensus, establish ground truth and

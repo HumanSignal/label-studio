@@ -10,15 +10,7 @@ import Types from "../../core/Types";
 import Area from "../../regions/Area";
 import Result from "../../regions/Result";
 import Utils from "../../utils";
-import {
-  FF_DEV_1284,
-  FF_DEV_3391,
-  FF_LLM_EPIC,
-  FF_LSDV_3009,
-  FF_LSDV_4583,
-  FF_REVIEWER_FLOW,
-  isFF,
-} from "../../utils/feature-flags";
+import { FF_DEV_1284, FF_DEV_3391, FF_LLM_EPIC, FF_LSDV_4583, FF_REVIEWER_FLOW, isFF } from "../../utils/feature-flags";
 import { delay, isDefined } from "../../utils/utilities";
 import { CommentStore } from "../Comment/CommentStore";
 import RegionStore from "../RegionStore";
@@ -809,9 +801,6 @@ const _Annotation = types
       if (!self.editable) return;
 
       const result = self.serializeAnnotation({ fast: true });
-      // if this is new annotation and no regions added yet
-
-      if (!isFF(FF_LSDV_3009) && !self.pk && !result.length) return;
 
       self.setDraftSelected();
       self.versions.draft = result;
@@ -977,7 +966,8 @@ const _Annotation = types
       //   }
       // };
 
-      Hotkey.setScope(Hotkey.DEFAULT_SCOPE);
+      const { enableHotkeys } = self.store.settings;
+      Hotkey.setScope(enableHotkeys ? Hotkey.DEFAULT_SCOPE : "__none__");
     },
 
     createResult(areaValue, resultValue, control, object, skipAfrerCreate = false, additionalStates = []) {

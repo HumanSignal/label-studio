@@ -11,9 +11,6 @@ section: "Manage Your Organization"
 date: 2025-01-28 16:40:16
 ---
 
-!!! note
-    This feature is only available if your organization has [early feature adoption](admin_usage#Features) enabled (**Organization > Usage & License > Early Adopter**).
-
 The command palette is an enhanced search and navigation tool. 
 
 To open it, click the search icon in the upper right or press `Ctrl+K` (`Cmd+K` on Mac)

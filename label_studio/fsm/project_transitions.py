@@ -7,11 +7,14 @@ replacing the previous signal-based approach with explicit, testable transitions
 
 from typing import Any, Dict, Optional
 
+from core.utils.common import load_func
+from django.conf import settings
 from fsm.registry import register_state_transition
 from fsm.state_choices import ProjectStateChoices
+from fsm.state_inference import get_or_infer_state
 from fsm.state_manager import StateManager
 from fsm.transitions import ModelChangeTransition, TransitionContext
-from fsm.utils import get_or_initialize_state, infer_entity_state_from_data
+from fsm.utils import get_or_initialize_state
 
 
 @register_state_transition('project', 'project_created', triggers_on_create=True, triggers_on_update=False)
@@ -49,7 +52,6 @@ class ProjectCreatedTransition(ModelChangeTransition):
         project = context.entity
 
         return {
-            'reason': 'Project created',
             'organization_id': project.organization_id,
             'title': project.title,
             'created_by_id': project.created_by_id if project.created_by_id else None,
@@ -79,7 +81,6 @@ class ProjectInProgressTransition(ModelChangeTransition):
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         project = context.entity
         return {
-            'reason': 'Project moved to in progress - first annotation submitted',
             'organization_id': project.organization_id,
             'total_tasks': project.tasks.count(),
         }
@@ -103,7 +104,6 @@ class ProjectCompletedTransition(ModelChangeTransition):
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         project = context.entity
         return {
-            'reason': 'Project completed - all tasks completed',
             'organization_id': project.organization_id,
             'total_tasks': project.tasks.count(),
         }
@@ -129,15 +129,14 @@ class ProjectInProgressFromCompletedTransition(ModelChangeTransition):
     def transition(self, context: TransitionContext) -> Dict[str, Any]:
         project = context.entity
         return {
-            'reason': 'Project moved back to in progress - task became incomplete',
             'organization_id': project.organization_id,
             'total_tasks': project.tasks.count(),
         }
 
 
-def update_project_state_after_task_change(project, user=None):
+def sync_project_state(project, user=None, reason=None, context_data=None):
     current_state = StateManager.get_current_state_value(project)
-    inferred_state = infer_entity_state_from_data(project)
+    inferred_state = get_or_infer_state(project)
 
     if current_state is None:
         get_or_initialize_state(project, user=user, inferred_state=inferred_state)
@@ -154,3 +153,8 @@ def update_project_state_after_task_change(project, user=None):
                 )
         elif inferred_state == ProjectStateChoices.COMPLETED:
             StateManager.execute_transition(entity=project, transition_name='project_completed', user=user)
+
+
+def update_project_state_after_task_change(project, user=None):
+    update_func = load_func(settings.FSM_SYNC_PROJECT_STATE)
+    return update_func(project, user)

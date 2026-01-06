@@ -1,17 +1,11 @@
 import { destroy, flow, types } from "mobx-state-tree";
 import { Modal } from "../components/Common/Modal/Modal";
-import {
-  FF_DEV_2887,
-  FF_DISABLE_GLOBAL_USER_FETCHING,
-  FF_LOPS_E_3,
-  FF_REGION_VISIBILITY_FROM_URL,
-  isFF,
-} from "../utils/feature-flags";
+import { FF_DEV_2887, FF_DISABLE_GLOBAL_USER_FETCHING, FF_LOPS_E_3, isFF } from "../utils/feature-flags";
 import { History } from "../utils/history";
 import { isDefined } from "../utils/utils";
 import { Action } from "./Action";
 import * as DataStores from "./DataStores";
-import { DynamicModel, registerModel } from "./DynamicModel";
+import { registerModel } from "./DynamicModel";
 import { TabStore } from "./Tabs";
 import { CustomJSON } from "./types";
 import { User } from "./Users";
@@ -39,20 +33,6 @@ export const AppStore = types
     loadingData: false,
 
     users: types.optional(types.array(User), []),
-
-    taskStore: types.optional(
-      types.late(() => {
-        return DynamicModel.get("tasksStore");
-      }),
-      {},
-    ),
-
-    annotationStore: types.optional(
-      types.late(() => {
-        return DynamicModel.get("annotationsStore");
-      }),
-      {},
-    ),
 
     availableActions: types.optional(types.array(Action), []),
 
@@ -215,7 +195,7 @@ export const AppStore = types
           interaction: null,
           region: null,
         });
-      } else if (isFF(FF_REGION_VISIBILITY_FROM_URL)) {
+      } else {
         const { task, region, annotation } = History.getParams();
         History.navigate(
           {
@@ -262,27 +242,25 @@ export const AppStore = types
 
           self.LSF?.setLSFTask(self.taskStore.selected, id);
 
-          if (isFF(FF_REGION_VISIBILITY_FROM_URL)) {
-            const { annotation: annIDFromUrl, region: regionIDFromUrl } = History.getParams();
-            const annotationStore = self.LSF?.lsf?.annotationStore;
+          const { annotation: annIDFromUrl, region: regionIDFromUrl } = History.getParams();
+          const annotationStore = self.LSF?.lsf?.annotationStore;
 
-            if (annIDFromUrl && annotationStore) {
-              const lsfAnnotation = [...annotationStore.annotations, ...annotationStore.predictions].find((a) => {
-                return a.pk === annIDFromUrl || a.id === annIDFromUrl;
-              });
+          if (annIDFromUrl && annotationStore) {
+            const lsfAnnotation = [...annotationStore.annotations, ...annotationStore.predictions].find((a) => {
+              return a.pk === annIDFromUrl || a.id === annIDFromUrl;
+            });
 
-              if (lsfAnnotation) {
-                const annID = lsfAnnotation.pk ?? lsfAnnotation.id;
-                self.LSF?.setLSFTask(self.taskStore.selected, annID, undefined, lsfAnnotation.type === "prediction");
-              }
+            if (lsfAnnotation) {
+              const annID = lsfAnnotation.pk ?? lsfAnnotation.id;
+              self.LSF?.setLSFTask(self.taskStore.selected, annID, undefined, lsfAnnotation.type === "prediction");
             }
-            if (regionIDFromUrl) {
-              const currentAnn = self.LSF?.currentAnnotation;
-              // Focus on the region by hiding all other regions
-              currentAnn?.regionStore?.setRegionVisible(regionIDFromUrl);
-              // Select the region so outliner details are visible
-              currentAnn?.regionStore?.selectRegionByID(regionIDFromUrl);
-            }
+          }
+          if (regionIDFromUrl) {
+            const currentAnn = self.LSF?.currentAnnotation;
+            // Focus on the region by hiding all other regions
+            currentAnn?.regionStore?.setRegionVisible(regionIDFromUrl);
+            // Select the region so outliner details are visible
+            currentAnn?.regionStore?.selectRegionByID(regionIDFromUrl);
           }
         } else {
           console.error("LSF not initialized properly");

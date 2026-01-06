@@ -359,6 +359,15 @@ export const Tab = types
       self.selected.toggleItem(id);
     },
 
+    /**
+     * Select or unselect a range of items by their IDs (used for shift-click range selection)
+     * @param {Array} ids - Array of item IDs
+     * @param {boolean} select - true to select, false to unselect
+     */
+    selectRange(ids, select = true) {
+      self.selected.selectRange(ids, select);
+    },
+
     setColumnWidth(columnID, width) {
       if (width) {
         self.columnsWidth.set(columnID, width);

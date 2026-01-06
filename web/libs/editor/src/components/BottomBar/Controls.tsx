@@ -59,6 +59,7 @@ const ControlButton = observer(({ button, disabled, onClick, variant, look }: Co
       aria-label={button.ariaLabel}
       disabled={button.disabled || disabled}
       onClick={onClick}
+      data-testid={`bottombar-custom-${button.name}-button`}
     >
       {button.title}
     </Button>
@@ -231,6 +232,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                 await store.commentStore.commentFormSubmit();
                 onClickMethod();
               }}
+              data-testid={`bottombar-${isUpdate ? "update" : "submit"}-and-exit-button`}
             >
               {`${isUpdate ? "Update" : "Submit"} and exit`}
             </Button>
@@ -258,6 +260,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                     await store.commentStore.commentFormSubmit();
                     store.submitAnnotation();
                   }}
+                  data-testid="bottombar-submit-button"
                 >
                   Submit
                 </Button>
@@ -270,7 +273,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                       </div>
                     }
                   >
-                    <Button disabled={isDisabled} aria-label="Submit annotation">
+                    <Button
+                      disabled={isDisabled}
+                      aria-label="Submit annotation"
+                      data-testid="bottombar-submit-dropdown"
+                    >
                       <IconChevronDown />
                     </Button>
                   </Dropdown.Trigger>
@@ -300,6 +307,7 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                   await store.commentStore.commentFormSubmit();
                   store.updateAnnotation();
                 }}
+                data-testid="bottombar-update-button"
               >
                 {isUpdate ? "Update" : "Submit"}
               </Button>
@@ -308,7 +316,11 @@ export const Controls = controlsInjector<{ annotation: MSTAnnotation }>(
                   alignment="top-right"
                   content={<SubmitOption onClickMethod={store.updateAnnotation} isUpdate={isUpdate} />}
                 >
-                  <Button disabled={isUpdateDisabled} aria-label="Update annotation">
+                  <Button
+                    disabled={isUpdateDisabled}
+                    aria-label="Update annotation"
+                    data-testid="bottombar-update-dropdown"
+                  >
                     <IconChevronDown />
                   </Button>
                 </Dropdown.Trigger>

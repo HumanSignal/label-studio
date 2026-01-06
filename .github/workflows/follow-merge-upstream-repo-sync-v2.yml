@@ -242,6 +242,8 @@ jobs:
         uses: slackapi/slack-github-action@v2.1.1
         env:
           MENTION: "<@${{ steps.team_details.outputs.slack-user-id }}>"
+          UPSTREAM_PR: "<${{ steps.upstream-prs.outputs.first_upstream_pr_url }}|upstream pr>, "
+          DOWNSTREAM_PR: "<${{ steps.get-pr.outputs.html_url }}|downstream pr>, "
           WORKFLOW: "<https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|workflow>"
         with:
           method: chat.postMessage
@@ -250,7 +252,7 @@ jobs:
             channel: "${{ env.SLACK_CHANNEL_ID }}"
             text: >+
               :x: Follow Merge downstream workflow has been failed in <https://github.com/${{ github.repository }}|${{ github.repository }}>.
-              [ ${{ env.WORKFLOW }} ]
+              [ ${{ steps.upstream-prs.outputs.first_upstream_pr_url && env.UPSTREAM_PR || '' }}${{ steps.get-pr.outputs.html_url && env.DOWNSTREAM_PR || '' }}${{ env.WORKFLOW }} ]
               ${{ steps.team_details.outputs.slack-user-id && env.MENTION || '' }}
 
       - name: Add reaction to chat ops command comment

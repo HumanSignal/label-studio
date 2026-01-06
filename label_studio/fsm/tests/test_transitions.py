@@ -950,3 +950,246 @@ def test_skip_validation_flag():
     result_valid = transition_valid.prepare_and_validate(context_valid)
     assert result_valid['action'] == 'valid_action'
     assert result_valid['completed'] is True
+
+
+def test_transition_context_reason_field():
+    """
+    Test the reason field in TransitionContext.
+
+    This test validates step by step:
+    - Creating a TransitionContext with no reason (defaults to None)
+    - Creating a TransitionContext with a custom reason
+    - Verifying the reason is accessible on the context
+
+    Critical validation: The reason field allows callers to provide context-specific
+    reasons for transitions (e.g., "Bulk import completed") that override the
+    transition's default get_reason() method.
+    """
+    mock_entity = MockEntity()
+
+    # Test 1: Default reason is None
+    context_default = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+    )
+    assert context_default.reason is None
+
+    # Test 2: Custom reason can be set
+    custom_reason = 'Bulk import completed - 100 tasks added'
+    context_with_reason = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+        reason=custom_reason,
+    )
+    assert context_with_reason.reason == custom_reason
+
+
+def test_transition_context_context_data_field():
+    """
+    Test the context_data field in TransitionContext.
+
+    This test validates step by step:
+    - Creating a TransitionContext with no context_data (defaults to empty dict)
+    - Creating a TransitionContext with custom context_data
+    - Verifying the context_data is accessible and correct
+
+    Critical validation: The context_data field allows callers to add additional
+    data to be stored in the state record's JSONB context_data field for
+    historical tracking and auditing purposes.
+    """
+    mock_entity = MockEntity()
+
+    # Test 1: Default context_data is empty dict
+    context_default = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+    )
+    assert context_default.context_data == {}
+
+    # Test 2: Custom context_data can be set
+    custom_context_data = {
+        'import_source': 'cloud_storage',
+        'import_id': 123,
+        'task_count': 100,
+        'triggered_by': 'api',
+        'batch_id': 456,
+        'is_automatic': False,
+    }
+    context_with_data = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+        context_data=custom_context_data,
+    )
+    assert context_with_data.context_data == custom_context_data
+    assert context_with_data.context_data['import_id'] == 123
+    assert context_with_data.context_data['is_automatic'] is False
+
+
+def test_transition_reason_override():
+    """
+    Test that context.reason overrides transition.get_reason() in executor.
+
+    This test validates step by step:
+    - Creating a transition with a custom get_reason() implementation
+    - Executing with no context.reason (should use transition's get_reason)
+    - Executing with context.reason set (should override get_reason)
+
+    Critical validation: The reason override mechanism allows for context-specific
+    reasons without modifying transition classes.
+    """
+
+    class CustomReasonTransition(BaseTransition):
+        """Transition with custom get_reason"""
+
+        def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
+            return TestStateChoices.IN_PROGRESS
+
+        def get_reason(self, context: TransitionContext) -> str:
+            return 'Default transition reason'
+
+        def transition(self, context: TransitionContext) -> Dict[str, Any]:
+            return {'executed': True}
+
+    mock_entity = MockEntity()
+    transition = CustomReasonTransition()
+
+    # Test 1: Without reason override - uses transition's get_reason
+    context_no_override = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+    )
+    default_reason = transition.get_reason(context_no_override)
+    assert default_reason == 'Default transition reason'
+
+    # Verify context.reason is None
+    assert context_no_override.reason is None
+
+    # The executor would use: context.reason if context.reason else transition.get_reason(context)
+    effective_reason = (
+        context_no_override.reason if context_no_override.reason else transition.get_reason(context_no_override)
+    )
+    assert effective_reason == 'Default transition reason'
+
+    # Test 2: With reason override - uses context.reason
+    custom_reason = 'Bulk import completed with 500 tasks'
+    context_with_override = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+        reason=custom_reason,
+    )
+
+    # The executor would use: context.reason if context.reason else transition.get_reason(context)
+    effective_reason = (
+        context_with_override.reason if context_with_override.reason else transition.get_reason(context_with_override)
+    )
+    assert effective_reason == custom_reason
+
+
+def test_transition_context_data_merge():
+    """
+    Test that context.context_data is merged with transition output.
+
+    This test validates step by step:
+    - Creating a transition that returns context data
+    - Adding additional context_data via TransitionContext
+    - Verifying both are merged correctly
+
+    Critical validation: Additional context_data from TransitionContext should
+    be merged with the data returned by transition.transition() method.
+    """
+
+    class DataProducingTransition(BaseTransition):
+        """Transition that produces context data"""
+
+        action: str = 'test_action'
+
+        def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
+            return TestStateChoices.IN_PROGRESS
+
+        def transition(self, context: TransitionContext) -> Dict[str, Any]:
+            return {
+                'action': self.action,
+                'timestamp': context.timestamp.isoformat(),
+            }
+
+    mock_entity = MockEntity()
+    transition = DataProducingTransition(action='bulk_import')
+
+    # Create context with additional context_data
+    additional_context_data = {
+        'import_source_id': 123,
+        'task_count': 456,
+    }
+    context = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+        context_data=additional_context_data,
+    )
+
+    # Get transition output
+    transition_output = transition.transition(context)
+
+    # Simulate merge (as done in transition_executor.py)
+    merged_data = {**transition_output, **context.context_data}
+
+    # Verify both transition output and additional context_data are present
+    assert merged_data['action'] == 'bulk_import'
+    assert 'timestamp' in merged_data
+    assert merged_data['import_source_id'] == 123
+    assert merged_data['task_count'] == 456
+
+
+def test_transition_context_data_override():
+    """
+    Test that context.context_data can override transition output keys.
+
+    This test validates step by step:
+    - Creating a transition that returns a key
+    - Adding the same key in context_data with different value
+    - Verifying context_data wins (as it's merged second)
+
+    Critical validation: When the same key exists in both transition output
+    and context_data, the context_data value should win since it represents
+    caller-provided context that should take precedence.
+    """
+
+    class OverrideTestTransition(BaseTransition):
+        """Transition that produces a 'reason_code' key"""
+
+        def get_target_state(self, context: Optional[TransitionContext] = None) -> str:
+            return TestStateChoices.IN_PROGRESS
+
+        def transition(self, context: TransitionContext) -> Dict[str, Any]:
+            return {
+                'reason_code': 'default_reason',
+                'other_data': 'preserved',
+            }
+
+    mock_entity = MockEntity()
+    transition = OverrideTestTransition()
+
+    # Create context with context_data that overrides 'reason_code'
+    context = TransitionContext(
+        entity=mock_entity,
+        current_state=TestStateChoices.CREATED,
+        target_state=TestStateChoices.IN_PROGRESS,
+        context_data={'reason_code': 'custom_reason'},
+    )
+
+    # Get transition output
+    transition_output = transition.transition(context)
+
+    # Simulate merge (as done in transition_executor.py)
+    merged_data = {**transition_output, **context.context_data}
+
+    # Verify context_data wins for 'reason_code'
+    assert merged_data['reason_code'] == 'custom_reason'
+    # Other data should be preserved
+    assert merged_data['other_data'] == 'preserved'

@@ -1,0 +1,76 @@
+.datePickerCalendar {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-neutral-background);
+  border-radius: var(--corner-radius-smaller);
+
+  &.standalone {
+    border: 1px solid var(--color-neutral-border);
+    overflow: hidden;
+  }
+}
+
+.top {
+  display: flex;
+}
+
+.mainContentWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.calendarsWrapper {
+  display: grid;
+  grid-template-columns: 312px 312px;
+  grid-gap: var(--spacing-wide);
+}
+
+.calendarContainer {
+  padding: var(--spacing-base);
+}
+
+.inputsWrapper {
+  display: grid;
+  grid-template-columns: 312px 25px 312px;
+  align-items: center;
+  padding: var(--spacing-base) 0 0;
+  text-align: center;
+  color: var(--color-neutral-content-subtler);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 183px;
+  background: var(--color-neutral-surface);
+  border-right: 1px solid var(--color-neutral-border);
+  padding: var(--spacing-tighter);
+}
+
+.timeToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tight);
+  margin-right: var(--spacing-tight);
+}
+
+.right,
+.left {
+  display: flex;
+  align-items: center;
+}
+
+.daysSelected {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-tighter);
+}
+
+.footer {
+  display: flex;
+  padding: var(--spacing-base);
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--color-neutral-border);
+}
+

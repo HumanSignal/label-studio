@@ -34,6 +34,7 @@ const mockStore = {
   settings: {
     enableTooltips: true,
   },
+  task: { id: 1, allow_skip: true },
   skipTask: jest.fn(),
   commentStore: {
     currentComment: {
@@ -68,7 +69,27 @@ const mockAnnotation = {
   editable: true,
 };
 
+// Helper to set up window.APP_SETTINGS for enterprise and role-based tests
+const setupAppSettings = (options: { role?: string; enterprise?: boolean } = {}) => {
+  (window as any).APP_SETTINGS = {
+    user: {
+      role: options.role,
+    },
+    billing: {
+      enterprise: options.enterprise ?? false,
+    },
+  };
+};
+
 describe("Controls", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Reset APP_SETTINGS before each test
+    (window as any).APP_SETTINGS = undefined;
+    // Reset mockStore task to default
+    mockStore.task = { id: 1, allow_skip: true };
+  });
+
   test("When skip button is clicked, if there is no currentComment and annotators must leave a comment on skip, it must not submit and setToolTipMessage", () => {
     mockStore.hasInterface = (a: string) => (a === "skip" || a === "comments:skip") ?? true;
 
@@ -118,5 +139,70 @@ describe("Controls", () => {
 
     await expect(mockStore.commentStore.commentFormSubmit).toHaveBeenCalled();
     expect(mockStore.skipTask).toHaveBeenCalled();
+  });
+
+  test("Skip button NOT disabled when allow_skip=false in LSO (non-enterprise)", () => {
+    // In LSO (non-enterprise), allow_skip field doesn't exist/affect behavior
+    setupAppSettings({ enterprise: false });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    const skipTask = getByLabelText("skip-task");
+    // In LSO, skip button should NOT be disabled even when allow_skip=false
+    expect(skipTask).not.toBeDisabled();
+  });
+
+  test("Skip button disabled when allow_skip=false in LSE (enterprise)", () => {
+    setupAppSettings({ enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    const skipTask = getByLabelText("skip-task");
+    expect(skipTask).toBeDisabled();
+  });
+
+  test("Skip button enabled when allow_skip=true in LSE (enterprise)", () => {
+    setupAppSettings({ enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: true };
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    const skipTask = getByLabelText("skip-task");
+    expect(skipTask).not.toBeDisabled();
+  });
+
+  test("Skip action blocked when allow_skip=false in LSE (enterprise)", () => {
+    setupAppSettings({ enterprise: true });
+    mockStore.hasInterface = (a: string) => a === "skip";
+    mockStore.task = { id: 1, allow_skip: false };
+    mockStore.skipTask.mockClear();
+
+    const { getByLabelText } = render(
+      <Provider store={mockStore}>
+        <Controls history={mockHistory} annotation={mockAnnotation} />
+      </Provider>,
+    );
+
+    const skipTask = getByLabelText("skip-task");
+    fireEvent.click(skipTask);
+
+    expect(mockStore.skipTask).not.toHaveBeenCalled();
   });
 });

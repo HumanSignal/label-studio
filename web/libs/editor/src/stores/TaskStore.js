@@ -26,6 +26,10 @@ const TaskStore = types
      */
     data: types.maybeNull(types.string),
     queue: types.optional(types.maybeNull(types.string), null),
+    /**
+     * Whether this task can be skipped. Defaults to true if undefined.
+     */
+    allow_skip: types.optional(types.maybeNull(types.boolean), true),
   })
   .views((self) => ({
     get app() {

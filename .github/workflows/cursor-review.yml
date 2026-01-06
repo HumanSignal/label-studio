@@ -1,0 +1,71 @@
+name: "Cursor Code Review"
+
+on:
+  workflow_call:
+    inputs:
+      head_sha:
+        required: true
+        type: string
+      base_sha:
+        required: true
+        type: string
+      pr_number:
+        required: true
+        type: number
+
+jobs:
+  code-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.head_sha }}
+
+      - name: Install Cursor CLI
+        run: |
+          curl https://cursor.com/install -fsS | bash
+          echo "${HOME}/.cursor/bin" >> "${GITHUB_PATH}"
+
+      - name: Perform code review
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cursor-agent --force --model "$MODEL" --output-format=text --print "You are operating in a GitHub Actions runner performing automated code review. The gh CLI is available and authenticated via GH_TOKEN. You may review the pull request.
+
+          Context:
+          - Repo: Humansignal/label-studio
+          - PR Number: ${{ inputs.pr_number }}
+          - PR Head SHA: ${{ inputs.head_sha }}
+          - PR Base SHA: ${{ inputs.base_sha }}
+
+          Objectives:
+          1) Re-check existing review comments and reply resolved when addressed
+          2) Review the current PR diff and flag only clear, high-severity issues
+          3) Review only database migrations scripts under label_studio/*/migrations/ directory
+          4) Do not comment on style, formatting, or nitpick issues
+          5) Leave very short inline comments (1-2 sentences) on changed lines
+
+          Procedure:
+          - Get existing comments: gh pr view --json comments
+          - Get diff: gh pr diff
+          - Avoid duplicates: skip if similar feedback already exists on or near the same lines
+
+          Commenting rules:
+          - Max 10 inline comments total; prioritize the most critical issues
+          - One issue per comment; place on the exact changed line
+          - Natural tone, specific and actionable; do not mention automated or high-confidence
+          - Use emojis: 🚨 Critical 🔒 Security ⚡ Performance ⚠️ Logic ✅ Resolved ✨ Improvement
+
+          Submission:
+          - Submit only one review
+          - Do not comment outside of a review
+          - Review right side of the PR diff viewer only
+          - Use only: gh pr review --comment
+          - Do not use: gh pr review --approve or --request-changes"

@@ -1,6 +1,7 @@
 import logging
 
 from core.permissions import all_permissions
+from core.utils.exceptions import extract_message
 from core.utils.filterset_to_openapi_params import filterset_to_openapi_params
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
@@ -183,13 +184,13 @@ class FSMEntityTransitionAPI(FSMAPIMixin, generics.GenericAPIView):
             )
         except PydanticValidationError as e:
             # Pydantic schema validation errors from transition instantiation
-            raise ValidationError({'detail': str(e)})
+            raise ValidationError({'detail': extract_message(e)})
         except TransitionValidationError as e:
             # Explicit validation failure
             logger.warning(
                 f'Transition validation failed with context: {e.context} and error: {e} for entity: {entity.id}'
             )
-            raise ValidationError({'detail': str(e)})
+            raise ValidationError({'detail': extract_message(e)})
         # Handle feature-flag disabled path (no state record created)
         if state_record is None:
             response_payload = {

@@ -131,6 +131,22 @@ export const DataView = injector(
             {original?.readableType ?? parent.title}
           </Tag>,
         );
+      } else if (typeof original?.alias === "string" && original.alias.startsWith("dimension_agreement__")) {
+        // Show a short tag for per-dimension agreement columns (root columns, no parent)
+        children.push(
+          <Tag
+            key="column-type"
+            color="blue"
+            style={{
+              fontWeight: "500",
+              fontSize: 14,
+              cursor: "pointer",
+              padding: "0 6px",
+            }}
+          >
+            {original.readableType}
+          </Tag>,
+        );
       }
 
       if (help && decoration?.help !== false) {
@@ -147,6 +163,8 @@ export const DataView = injector(
     const onSelectAll = useCallback(() => view.selectAll(), [view]);
 
     const onRowSelect = useCallback((id) => view.toggleSelected(id), [view]);
+
+    const onRangeSelect = useCallback((ids, select) => view.selectRange(ids, select), [view]);
 
     const onRowClick = useCallback(
       async (item, e) => {
@@ -349,6 +367,7 @@ export const DataView = injector(
           selectedItems={selectedItems}
           onSelectAll={onSelectAll}
           onSelectRow={onRowSelect}
+          onRangeSelect={onRangeSelect}
           onRowClick={onRowClick}
           stopInteractions={isLocked}
           onTypeChange={(col, type) => col.original.setType(type)}

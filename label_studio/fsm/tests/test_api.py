@@ -49,21 +49,29 @@ class FSMEntityHistoryAPITests(APITestCase):
             state=ProjectStateChoices.IN_PROGRESS,
             previous_state=ProjectStateChoices.CREATED,
             triggered_by=self.user,
+            reason='Project started by user',
         )
         state_3 = ProjectStateFactory(
             project=self.project,
             state=ProjectStateChoices.COMPLETED,
             previous_state=ProjectStateChoices.IN_PROGRESS,
             transition_name='complete_project',
+            reason='All tasks completed',
         )
 
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/fsm/entities/project/{self.project.id}/history')
         assert response.status_code == 200
-        assert len(response.json()['results']) == 3
-        assert response.json()['results'][0]['id'] == str(state_3.id)
-        assert response.json()['results'][1]['id'] == str(state_2.id)
-        assert response.json()['results'][2]['id'] == str(state_1.id)
+        results = response.json()['results']
+        assert len(results) == 3
+        assert results[0]['id'] == str(state_3.id)
+        assert results[1]['id'] == str(state_2.id)
+        assert results[2]['id'] == str(state_1.id)
+
+        # Test that reason is returned as a top-level field (not nested in context_data)
+        assert 'reason' in results[0]
+        assert results[0]['reason'] == 'All tasks completed'
+        assert results[1]['reason'] == 'Project started by user'
 
         # Test ordering
         response = self.client.get(f'/api/fsm/entities/project/{self.project.id}/history?ordering=id')
@@ -209,13 +217,13 @@ class FSMEntityHistoryAPITests(APITestCase):
         assert response.json()['results'] == []
 
     def test_annotation_history(self):
-        state_1 = AnnotationStateFactory(annotation=self.annotation, state=AnnotationStateChoices.SUBMITTED)
+        state_1 = AnnotationStateFactory(annotation=self.annotation, state=AnnotationStateChoices.CREATED)
         state_1.created_at = state_1.created_at - timedelta(seconds=10)
         state_1.save()
         state_2 = AnnotationStateFactory(
             annotation=self.annotation,
             state=AnnotationStateChoices.COMPLETED,
-            previous_state=AnnotationStateChoices.SUBMITTED,
+            previous_state=AnnotationStateChoices.CREATED,
             triggered_by=self.user,
             transition_name='complete_annotation',
         )
@@ -244,7 +252,7 @@ class FSMEntityHistoryAPITests(APITestCase):
 
         # Test previous_state filtering
         response = self.client.get(
-            f'/api/fsm/entities/annotation/{self.annotation.id}/history?previous_state={AnnotationStateChoices.SUBMITTED}'
+            f'/api/fsm/entities/annotation/{self.annotation.id}/history?previous_state={AnnotationStateChoices.CREATED}'
         )
         assert response.status_code == 200
         assert len(response.json()['results']) == 1
@@ -351,10 +359,10 @@ class FSMEntityTransitionAPITests(APITestCase):
 
     @patch('fsm.state_manager.flag_set', return_value=True)
     def test_cannot_trigger_auto_triggered_transitions_manually(self, _mock_flag):
-        # 'annotation_submitted' is auto-triggered on create
+        # 'annotation_created' is auto-triggered on create
         response = self.client.post(
             f'/api/fsm/entities/annotation/{self.annotation.id}/transition/',
-            data={'transition_name': 'annotation_submitted'},
+            data={'transition_name': 'annotation_created'},
             format='json',
         )
         assert response.status_code == 400

@@ -4,7 +4,7 @@ class TaskMixin:
         return True
 
     def _get_is_labeled_value(self) -> bool:
-        n = self.completed_annotations.count()
+        n = self.completed_annotations.values('completed_by').distinct().count()
         return n >= self.overlap
 
     def update_is_labeled(self, *args, **kwargs) -> None:
@@ -29,6 +29,9 @@ class TaskMixin:
 
     def get_rejected_query(self):
         pass
+
+    def can_be_skipped(self) -> bool:
+        return True
 
 
 class AnnotationMixin:

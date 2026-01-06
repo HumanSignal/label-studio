@@ -187,6 +187,12 @@ export const TabColumn = types
     },
 
     get readableType() {
+      // Show a friendly tag for per-dimension agreement columns
+      if (typeof self.alias === "string") {
+        if (self.alias.startsWith("dimension_agreement__")) {
+          return "agreement";
+        }
+      }
       return ViewColumnTypeShort(self.currentType);
     },
 

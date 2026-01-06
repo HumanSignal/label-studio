@@ -31,6 +31,7 @@ from django.db.models import (
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Coalesce, Concat
 from fsm.queryset_mixins import FSMStateQuerySetMixin
+from fsm.registry import get_state_choices
 from pydantic import BaseModel
 from rest_framework.exceptions import ValidationError
 
@@ -172,6 +173,13 @@ def apply_ordering(queryset, ordering, project, request, view_data=None):
                 queryset = queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data'))
             f = F('ordering_field').asc(nulls_last=True) if ascending else F('ordering_field').desc(nulls_last=True)
 
+        elif field_name == 'state':
+            state_choices = get_state_choices('task')
+            whens = [When(current_state=state, then=Value(i + 1)) for i, state in enumerate(state_choices.values)]
+            queryset = queryset.annotate(
+                state_order=Case(*whens, default=Value(0), output_field=models.IntegerField())
+            )
+            f = F('state_order').asc(nulls_last=True) if ascending else F('state_order').desc(nulls_last=True)
         else:
             f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
 
@@ -498,6 +506,10 @@ class TaskQuerySet(FSMStateQuerySetMixin, models.QuerySet):
 
         :param prepare_params: prepare params with project, filters, orderings, etc
         :return: ordered and filtered queryset
+
+        Note: For multi-project queries, filters and ordering will use the first project's
+        configuration (label config, custom fields, etc.). This is backwards compatible
+        with single-project queries.
         """
         from projects.models import Project
 
@@ -506,7 +518,14 @@ class TaskQuerySet(FSMStateQuerySetMixin, models.QuerySet):
         if prepare_params is None:
             return queryset
 
-        project = Project.objects.get(pk=prepare_params.project)
+        # Get the project for filter/ordering configuration
+        # For multi-project queries, use the first project's configuration
+        if prepare_params.is_multi_project:
+            project = Project.objects.get(pk=prepare_params.projects[0])
+        else:
+            # Backwards compatible: prepare_params.project is an int
+            project = Project.objects.get(pk=prepare_params.project)
+
         request = prepare_params.request
         queryset = apply_filters(queryset, prepare_params.filters, project, request)
         queryset = apply_ordering(queryset, prepare_params.ordering, project, request, view_data=prepare_params.data)
@@ -592,7 +611,7 @@ def annotated_completed_at_considering_agreement_threshold(queryset):
             Q(is_labeled=True)
             & (
                 Q(_agreement__gte=agreement_threshold)
-                | Q(annotation_count__gte=(F('overlap') + max_additional_annotators_assignable))
+                | Q(annotator_count__gte=(F('overlap') + max_additional_annotators_assignable))
             ),
             then=newest_annotation_subquery(),
         ),
@@ -770,6 +789,22 @@ class PreparedTaskManager(models.Manager):
         queryset, fields_for_evaluation=None, all_fields=False, excluded_fields_for_evaluation=None, request=None
     ):
         annotations_map = get_annotations_map()
+        # If we have dynamic control-tag level agreement columns, inject into annotation map
+        # without mutating the global map
+        if flag_set('fflag_utc_428_consensus_control_tag_agreement', user='auto'):
+            inject_path = getattr(settings, 'GET_DYNAMIC_DM_ANNOTATIONS', None)
+            if inject_path:
+                overlay_func = load_func(inject_path)
+                # Expect a dict of {field_name: function that annotates the queryset}
+                overlay_map = overlay_func(request=request, project=getattr(queryset.first(), 'project', None)) or {}
+                if isinstance(overlay_map, dict) and overlay_map:
+                    # Ensure dynamic fields are evaluated even if not explicitly selected
+                    if fields_for_evaluation is None:
+                        fields_for_evaluation = list(overlay_map.keys())
+                    else:
+                        fields_for_evaluation = list(set(fields_for_evaluation) | set(overlay_map.keys()))
+                    # Merge overlay with base map for this call only
+                    annotations_map = {**annotations_map, **overlay_map}
 
         if fields_for_evaluation is None:
             fields_for_evaluation = []
@@ -825,7 +860,11 @@ class PreparedTaskManager(models.Manager):
 
     def only_filtered(self, prepare_params=None):
         request = prepare_params.request
-        queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
+        # Support both single and multiple projects
+        if prepare_params.is_multi_project:
+            queryset = TaskQuerySet(self.model).filter(project__in=prepare_params.projects)
+        else:
+            queryset = TaskQuerySet(self.model).filter(project=prepare_params.project)
         fields_for_filter_ordering = get_fields_for_filter_ordering(prepare_params)
         queryset = self.annotate_queryset(queryset, fields_for_evaluation=fields_for_filter_ordering, request=request)
         return queryset.prepared(prepare_params=prepare_params)
