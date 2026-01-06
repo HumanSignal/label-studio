@@ -195,10 +195,10 @@ The `Chat` tag provides an interface where the annotator can type and send messa
 
 * `editable`: In this example, you are not allowing the annotator to edit messages. 
 
-For more information and additional parameters, see the [Chat tag](/tags/chat). 
+For more information and additional parameters, see the [Chat tag](/tags/chat.html). 
 
 !!! note
-    This template is designed to be used to evaluate an imported conversation, so you will likely want to import messages from an external source as [predictions](/tags/chat#Prediction-format). 
+    This template is designed to be used to evaluate an imported conversation, so you will likely want to import messages from an external source as [predictions](/tags/chat.html#Prediction-format). 
 
 ### Conversation evaluation
 
@@ -296,7 +296,7 @@ You can also import demo chat messages as follows:
 
 ### Predictions
 
-If you want to be able to select messages and evaluate them, then you can use [predictions](/tags/chat#Prediction-format). For example:
+If you want to be able to select messages and evaluate them, then you can use [predictions](/tags/chat.html#Prediction-format). For example:
 
 ```json
 [
@@ -346,7 +346,7 @@ If you want to be able to select messages and evaluate them, then you can use [p
 
 ## Related tags
 
-* [Chat](/tags/chat)
+* [Chat](/tags/chat.html)
 * [Style](/tags/style)
 * [View](/tags/view)
 * [Text](/tags/text)

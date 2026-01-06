@@ -11,7 +11,6 @@ STALE_FEATURE_FLAGS = {
     'ff_front_dev_1480_created_on_in_review_180122_short': True,
     'fflag_fix_front_leap_32_zoom_perf_190923_short': True,
     'fflag_feat_front_lsdv_5452_taxonomy_labeling_110823_short': True,
-    'fflag_fix_front_dev_3793_relative_coords_short': True,
     # Feb 5
     'fflag_feature_all_optic_1421_cold_start_v2': False,
     'fflag_fix_back_optic_1407_optimize_tasks_api_pagination_counts': True,
@@ -26,8 +25,6 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_leap_246_multi_object_hotkeys_160124_short': True,
     'fflag_fix_leap_466_text_sanitization': True,
     # Dec 29
-    'fflag_feat_utc_365_include_all_controls_in_agreement': True,
-    'fflag_feat_all_leap_2042_average_agreement_score_popover': True,
     'fflag_feat_all_optic_1811_automax_project_setup_streaming': True,
     'fflag_feat_all_leap_1682_plugins_v0': True,
     # Dec 31
@@ -48,4 +45,22 @@ STALE_FEATURE_FLAGS = {
     'fflag_fix_front_lsdv_4998_missed_dynamic_children_030523_short': True,
     'fflag_fix_back_lsdv_4929_limit_exports_10042023_short': True,
     'fflag_fix_front_dev_3377_image_regions_shift_on_resize_280922_short': True,
+    # Jan 5
+    'fflag_feat_all_fit_524_review_time_chart': True,
+    'fflag_feat_523_emitting_task_events_for_annotation_and_review': True,
+    'fflag_feat_all_fit_162_workspaces_projects_ui_improvements': True,
+    'fflag_feat_front_fit_183_email_notifications_short': True,
+    'fflag_fix_back_optic_1380_dashboard_task_chart_grouped_by_completed_at_reviewed_at_short': True,
+    'fflag_feat_front_optic_1746_improve_global_error_messages_short': True,
+    'ff_front_optic_1610_ask_ai_questions': True,
+    'fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short': True,
+    'fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short': True,
+    'ff_front_optic_1494_saved_templates_to_custom_templates': True,
+    'fflag_feat_all_optic_1354_sum_annotation_region_count_short': True,
+    'fflag_feat_front_optic_1217_theme_toggle_short': True,
+    'feat_optic_1098_annotation_history_lead_time_charts': True,
+    'fflag_feat_back_optic_428_scim_multi_mapping': True,
+    # Jan 6
+    'fflag_root_223_optimize_delete_predictions': True,
+    'fflag_root_212_reduce_importstoragelink_counts': True,
 }

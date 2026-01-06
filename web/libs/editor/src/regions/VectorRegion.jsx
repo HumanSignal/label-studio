@@ -7,7 +7,6 @@ import { guidGenerator } from "../core/Helpers";
 import { AreaMixin } from "../mixins/AreaMixin";
 import { useRegionStyles } from "../hooks/useRegionColor";
 import { KonvaRegionMixin } from "../mixins/KonvaRegion";
-import { FF_DEV_3793, isFF } from "../utils/feature-flags";
 import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { KonvaVector } from "../components/KonvaVector/KonvaVector";
 import { observer } from "mobx-react";
@@ -102,7 +101,6 @@ const Model = types
       const bbox = self.bbox;
 
       if (!bbox) return null;
-      if (!isFF(FF_DEV_3793)) return bbox;
 
       return {
         left: self.parent.imageToInternalX(bbox.left),

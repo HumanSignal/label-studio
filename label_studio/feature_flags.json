@@ -2391,6 +2391,33 @@
       "version": 2,
       "deleted": false
     },
+    "fflag_feat_fit_890_ask_ai_event_stream": {
+      "key": "fflag_feat_fit_890_ask_ai_event_stream",
+      "on": false,
+      "prerequisites": [],
+      "targets": [],
+      "contextTargets": [],
+      "rules": [],
+      "fallthrough": {
+        "variation": 0
+      },
+      "offVariation": 1,
+      "variations": [
+        true,
+        false
+      ],
+      "clientSideAvailability": {
+        "usingMobileKey": false,
+        "usingEnvironmentId": false
+      },
+      "clientSide": false,
+      "salt": "a71b7adde0c9412bbdd1d76e6214e082",
+      "trackEvents": false,
+      "trackEventsFallthrough": false,
+      "debugEventsUntilDate": null,
+      "version": 2,
+      "deleted": false
+    },
     "fflag_feat_front_bros_194_custom_tags_short": {
       "key": "fflag_feat_front_bros_194_custom_tags_short",
       "on": true,

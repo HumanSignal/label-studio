@@ -782,6 +782,7 @@ export class LSFWrapper {
       const res = await this.datamanager.apiCall("updateDraft", { draftID: annotation.draftId }, data);
 
       showToast && this.draftToast(res.$meta?.status, res);
+      this.datamanager.invoke("submitDraft", this, annotation, res);
       return res;
     }
     let response;
@@ -797,6 +798,7 @@ export class LSFWrapper {
     }
     response?.id && annotation.setDraftId(response?.id);
     showToast && this.draftToast(response.$meta?.status, response);
+    this.datamanager.invoke("submitDraft", this, annotation, response);
 
     return response;
   };

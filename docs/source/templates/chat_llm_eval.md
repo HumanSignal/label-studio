@@ -16,7 +16,7 @@ While this template focuses on conversation-level evaluation, you can modify it 
 !!! error Enterprise
     This template requires Label Studio Enterprise. 
 
-    Starter Cloud users can use the `Chat` tag, but have limited access to LLM integration. Instead, you can conduct a manual chat or import messages as predictions. See the [Chat tag documentation](/tags/chat#Prediction-format). 
+    Starter Cloud users can use the `Chat` tag, but have limited access to LLM integration. Instead, you can conduct a manual chat or import messages as predictions. See the [Chat tag documentation](/tags/chat.html#Prediction-format). 
 
     For Community users, see our [Conversation AI templates](gallery_conversational_ai) or the [Multi-Turn Chat Evaluation template](multi_turn_chat). 
 
@@ -163,7 +163,7 @@ The `Chat` tag provides an interface where the annotator can type and send messa
 
 * `value`: This is required, and should use a variable referencing your [input data](#Input-data). In this example, we use `$chat` because the input JSON uses `"chat"`.
 
-* `llm`: Messages from the annotator will be sent to an LLM and the response returned within the chat area of the labeling configuration. For more information, see [Chat tag - Use with an LLM](/tags/chat#Use-with-an-LLM). 
+* `llm`: Messages from the annotator will be sent to an LLM and the response returned within the chat area of the labeling configuration. For more information, see [Chat tag - Use with an LLM](/tags/chat.html#Use-with-an-LLM). 
 
 * `minMessages`: The minimum number of messages users must submit to complete the task. You can also set a maximum. 
 
@@ -171,7 +171,7 @@ The `Chat` tag provides an interface where the annotator can type and send messa
 
 * `editable`: Messages from the annotator and from the LLM are editable. To modify this so that only messages from certain roles are editable, you can specify them (for example, `editable="user,assistant"`). 
 
-For more information and additional parameters, see the [Chat tag](/tags/chat). 
+For more information and additional parameters, see the [Chat tag](/tags/chat.html). 
 
 ### Choices and TextArea
 
@@ -224,11 +224,11 @@ You can also import demo chat messages as follows:
 !!! attention
     The chat messages that you import are not selectable. This means that you cannot edit them or apply annotations (ratings, choices, etc) to them.
 
-    You can only select and annotate messages that are added to the chat by an annotator or that are imported as [predictions](/tags/chat#Prediction-format).
+    You can only select and annotate messages that are added to the chat by an annotator or that are imported as [predictions](/tags/chat.html#Prediction-format).
 
 ## Related tags
 
-* [Chat](/tags/chat)
+* [Chat](/tags/chat.html)
 * [Style](/tags/style)
 * [Text](/tags/text)
 * [View](/tags/view)

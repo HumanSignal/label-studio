@@ -148,7 +148,10 @@ export const Userpic = forwardRef(
                 ref={imgRef}
                 src={finalSrc}
                 alt={(displayName ?? "").toUpperCase()}
-                style={{ opacity: imgVisible ? (faded ? 0.3 : 1) : 0 }}
+                style={{
+                  opacity: imgVisible ? (faded ? 0.3 : 1) : 0,
+                  pointerEvents: imgVisible ? "auto" : "none",
+                }}
                 onLoad={onImageLoaded}
                 onError={() => setFinalSrc(FALLBACK_IMAGE)}
               />
