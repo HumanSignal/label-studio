@@ -54,21 +54,29 @@ $scroll-width: 5px;
   }
 }
 
+// Apply max-height only in Create Project wizard context (not in Labeling Settings)
+.create-project .wizard .configure__container > div {
+  --create-project-header-height: 73px;
+  --create-project-modal-padding: calc(var(--spacing-widest) * 2);
+
+  max-height: calc(100vh - var(--create-project-header-height) - var(--create-project-modal-padding));
+}
+
 .templates-list {
   display: grid;
   height: 100%;
   grid-template: 1fr auto / 224px auto;
 
   &__sidebar {
-    padding: 16px 8px 16px 32px;
+    padding: var(--spacing-base) var(--spacing-tight) var(--spacing-base) var(--spacing-wider);
 
     h3:not(:first-child) {
-      margin-top: 2em;
+      margin-top: var(--spacing-wide);
     }
 
     .templates-list__custom-template {
       margin-top: 20px;
-      padding-left: 8px;
+      padding-left: var(--spacing-tight);
       font-weight: 500;
       border: none;
       color: var(--grape_500);
