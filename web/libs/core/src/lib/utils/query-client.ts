@@ -16,6 +16,10 @@ export const queryClient = new QC({
     queries: {
       refetchOnWindowFocus: false,
       cacheTime: shouldBypassCache ? TEST_CACHE_TIME : DEFAULT_CACHE_TIME,
+      // Always attempt to fetch regardless of browser's network status detection.
+      // This is critical for air-gapped environments where navigator.onLine may
+      // return false even though the local Label Studio server is reachable.
+      networkMode: "always",
     },
   },
 });
