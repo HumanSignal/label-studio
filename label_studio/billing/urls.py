@@ -12,6 +12,7 @@ urlpatterns = [
     # API endpoints
     path('api/billing/pricing/', api.PricingTableAPI.as_view(), name='billing-pricing'),
     path('api/billing/stripe-config/', api.StripeConfigAPI.as_view(), name='billing-stripe-config'),
+    path('api/billing/public-stripe-config/', api.PublicStripeConfigAPI.as_view(), name='billing-public-stripe-config'),
     path('api/billing/checkout/', api.CheckoutSessionAPI.as_view(), name='billing-checkout'),
     path('api/billing/subscription/', api.SubscriptionStatusAPI.as_view(), name='billing-subscription'),
     # Alias for backward compatibility

@@ -33,54 +33,32 @@
       <p style="text-align: center; font-size: 1.25rem; color: var(--sand_600); margin-bottom: 4rem; max-width: 800px; margin-left: auto; margin-right: auto;">
         Choose the plan that fits your needs. Start free and scale as you grow.
       </p>
-      
-      <div style="text-align: center; margin-bottom: 3rem;">
-        <a href="{{ settings.HOSTNAME }}/billing/" style="display: inline-block; background-color: var(--grape_600); color: white; padding: 1rem 2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1.1rem; transition: background-color 0.2s;">
-          View Detailed Pricing & Billing
-        </a>
-      </div>
 
-      <div class="pricing-grid" style="max-width: 1000px; margin: 0 auto;">
-        <div class="landing-feature-card" style="text-align: center;">
+      <!-- Free Tier Card -->
+      <div style="max-width: 1200px; margin: 0 auto 3rem;">
+        <div class="landing-feature-card" style="text-align: center; max-width: 400px; margin: 0 auto;">
           <h3 style="color: var(--grape_700); font-size: 2rem; margin-bottom: 0.5rem;">Free</h3>
           <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">$0/month</p>
           <p style="margin-bottom: 1.5rem;">Perfect for getting started</p>
           <ul style="text-align: left; list-style: none; padding: 0; margin-bottom: 2rem;">
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ 1 project</li>
+            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ 1 task</li>
             <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Basic annotation tools</li>
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Limited storage</li>
             <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Community support</li>
           </ul>
           {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
             <a href="{{ settings.HOSTNAME }}/user/signup/" class="landing-hero-button" style="width: 100%; text-align: center; display: block; box-sizing: border-box;">Get Started</a>
           {% endif %}
         </div>
-        
-        <div class="landing-feature-card" style="text-align: center; border: 2px solid var(--grape_600);">
-          <h3 style="color: var(--grape_700); font-size: 2rem; margin-bottom: 0.5rem;">Professional</h3>
-          <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Custom Pricing</p>
-          <p style="margin-bottom: 1.5rem;">For teams and organizations</p>
-          <ul style="text-align: left; list-style: none; padding: 0; margin-bottom: 2rem;">
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ All Free features</li>
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Advanced AI features</li>
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Priority support</li>
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Team collaboration</li>
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Custom integrations</li>
-          </ul>
-          <a href="{{ settings.HOSTNAME }}/billing/" class="landing-hero-button" style="width: 100%; text-align: center; display: block; box-sizing: border-box;">Contact Sales</a>
+      </div>
+
+      <!-- Stripe Pricing Table -->
+      <div id="pricing-table-container" style="max-width: 1200px; margin: 0 auto;">
+        <div id="pricing-table-loading" style="text-align: center; padding: 2rem;">
+          <p style="color: var(--sand_600);">Loading pricing information...</p>
         </div>
-        
-        <div class="landing-feature-card" style="text-align: center;">
-          <h3 style="color: var(--grape_700); font-size: 2rem; margin-bottom: 0.5rem;">Enterprise</h3>
-          <p style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">Custom Pricing</p>
-          <p style="margin-bottom: 1.5rem;">For large organizations</p>
-          <ul style="text-align: left; list-style: none; padding: 0; margin-bottom: 2rem;">
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ All Professional features</li>
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ On-premise deployment</li>
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Dedicated support</li>
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ SLA guarantees</li>
-            <li style="padding: 0.5rem 0; color: var(--sand_600);">✓ Custom training</li>
-          </ul>
-          <a href="{{ settings.HOSTNAME }}/billing/" class="landing-hero-button" style="width: 100%; text-align: center; display: block; box-sizing: border-box;">Contact Sales</a>
+        <div id="pricing-table-error" style="text-align: center; padding: 2rem; display: none;">
+          <p style="color: var(--grape_600);">Unable to load pricing information. Please <a href="{{ settings.HOSTNAME }}/billing/" style="color: var(--grape_600);">visit the billing page</a> to view available plans.</p>
         </div>
       </div>
     </div>
@@ -92,6 +70,80 @@
     const nav = document.getElementById('landing-nav');
     nav.classList.toggle('mobile-open');
   }
+
+  // Load Stripe pricing table
+  (function() {
+    const container = document.getElementById('pricing-table-container');
+    const loadingEl = document.getElementById('pricing-table-loading');
+    const errorEl = document.getElementById('pricing-table-error');
+
+    // Fetch Stripe configuration
+    fetch('/api/billing/public-stripe-config/')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch Stripe configuration');
+        }
+        return response.json();
+      })
+      .then(config => {
+        if (!config.pricing_table_id || !config.publishable_key) {
+          throw new Error('Missing Stripe configuration');
+        }
+
+        // Load Stripe pricing table script if not already loaded
+        if (!document.querySelector('script[src="https://js.stripe.com/v3/pricing-table.js"]')) {
+          const script = document.createElement('script');
+          script.src = 'https://js.stripe.com/v3/pricing-table.js';
+          script.async = true;
+          script.onload = function() {
+            initializePricingTable(config);
+          };
+          script.onerror = function() {
+            showError();
+          };
+          document.head.appendChild(script);
+        } else {
+          // Script already loaded, wait a bit for custom element to be available
+          const checkInterval = setInterval(function() {
+            if (window.customElements && window.customElements.get('stripe-pricing-table')) {
+              clearInterval(checkInterval);
+              initializePricingTable(config);
+            }
+          }, 100);
+
+          // Timeout after 5 seconds
+          setTimeout(function() {
+            clearInterval(checkInterval);
+            if (!container.querySelector('stripe-pricing-table')) {
+              showError();
+            }
+          }, 5000);
+        }
+      })
+      .catch(error => {
+        console.error('Error loading pricing table:', error);
+        showError();
+      });
+
+    function initializePricingTable(config) {
+      // Hide loading message
+      loadingEl.style.display = 'none';
+
+      // Create Stripe pricing table element
+      const pricingTable = document.createElement('stripe-pricing-table');
+      pricingTable.setAttribute('pricing-table-id', config.pricing_table_id);
+      pricingTable.setAttribute('publishable-key', config.publishable_key);
+
+      // Clear container and add pricing table
+      container.innerHTML = '';
+      container.appendChild(pricingTable);
+    }
+
+    function showError() {
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+    }
+  })();
 </script>
 {% endblock %}
 

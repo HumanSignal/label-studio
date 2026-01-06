@@ -376,8 +376,26 @@ class StripeConfigAPI(APIView):
     permission_classes = [IsAuthenticated]
     permission_required = all_permissions.organizations_view
 
+
+@method_decorator(
+    name='get',
+    decorator=swagger_auto_schema(
+        tags=['Billing'],
+        x_fern_sdk_group_name='billing',
+        x_fern_sdk_method_name='get_public_stripe_config',
+        operation_summary='Get public Stripe configuration',
+        operation_description='Get Stripe publishable key and pricing table ID for public pricing page (no authentication required).',
+        responses={200: StripeConfigSerializer()},
+    ),
+)
+class PublicStripeConfigAPI(APIView):
+    """Public API endpoint to get Stripe configuration for public pricing page."""
+
+    permission_classes = []
+    authentication_classes = []
+
     def get(self, request):
-        """Get Stripe configuration."""
+        """Get public Stripe configuration (no authentication required)."""
         try:
             # Determine publishable key based on live mode
             if settings.STRIPE_LIVE_MODE:
@@ -385,49 +403,18 @@ class StripeConfigAPI(APIView):
             else:
                 publishable_key = settings.STRIPE_TEST_PUBLISHABLE_KEY
 
-            # Get customer information for the current user's organization
-            customer_email = request.user.email if request.user.is_authenticated else None
-            customer_id = None
-            customer_session_client_secret = None
-
-            organization = request.user.active_organization
-            if organization:
-                try:
-                    org_customer = OrganizationCustomer.objects.get(organization=organization)
-                    # dj-stripe uses `id` for the Stripe customer ID
-                    customer_id = org_customer.customer.id
-                    
-                    # Create customer session for pricing table
-                    try:
-                        customer_session = stripe.CustomerSession.create(
-                            customer=customer_id,
-                            components={"pricing_table": {"enabled": True}}
-                        )
-                        customer_session_client_secret = customer_session.client_secret
-                        logger.debug(f"Created customer session for customer {customer_id}")
-                    except stripe.error.StripeError as e:
-                        # Log error but don't fail the request
-                        logger.warning(f"Failed to create customer session for customer {customer_id}: {e}")
-                        # Continue without customer session - pricing table will still work
-                    except Exception as e:
-                        # Catch any other unexpected errors
-                        logger.warning(f"Unexpected error creating customer session: {e}")
-                except OrganizationCustomer.DoesNotExist:
-                    # No existing customer for this organization
-                    pass
-
             config_data = {
                 'publishable_key': publishable_key,
                 'pricing_table_id': settings.STRIPE_PRICING_TABLE_ID,
-                'customer_email': customer_email,
-                'customer_id': customer_id,
-                'customer_session_client_secret': customer_session_client_secret,
+                'customer_email': None,
+                'customer_id': None,
+                'customer_session_client_secret': None,
             }
 
             serializer = StripeConfigSerializer(config_data)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            logger.exception('Error fetching Stripe config: %s', e)
+            logger.exception('Error fetching public Stripe config: %s', e)
             return Response({'error': 'Failed to fetch Stripe config'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
