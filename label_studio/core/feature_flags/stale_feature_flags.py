@@ -60,4 +60,7 @@ STALE_FEATURE_FLAGS = {
     'fflag_feat_front_optic_1217_theme_toggle_short': True,
     'feat_optic_1098_annotation_history_lead_time_charts': True,
     'fflag_feat_back_optic_428_scim_multi_mapping': True,
+    # Jan 6
+    'fflag_root_223_optimize_delete_predictions': True,
+    'fflag_root_212_reduce_importstoragelink_counts': True,
 }
