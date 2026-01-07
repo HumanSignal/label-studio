@@ -4,13 +4,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 const COLUMN_GAP = 16;
 
 // Minimum widths in pixels
-const MIN_EDITOR_WIDTH = 400;
-const MIN_PREVIEW_WIDTH = 500;
+// These values ensure editor and preview remain usable at minimum sizes
+const MIN_EDITOR_WIDTH = 400; // Minimum width to display code editor comfortably
+const MIN_PREVIEW_WIDTH = 500; // Minimum width to display labeling interface preview effectively
 
-// Left side menu width
+// Left side menu width (sidebar navigation)
 const LEFT_MENU_WIDTH = 240;
 
 // Default editor width (left side)
+// Comfortable default width for the editor column
 const DEFAULT_EDITOR_WIDTH = 500;
 
 export const useConfigResizer = ({ projectId, containerWidth }) => {
@@ -44,21 +46,19 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
     return DEFAULT_EDITOR_WIDTH;
   });
 
-  // Track previous storage key to detect key changes (project switches)
+  // Track previous storage key to prevent writes during key switches
+  // This is necessary because when the storage key changes (e.g., switching projects),
+  // we need to load the new value from localStorage without writing the old value to the new key
   const prevStorageKeyRef = useRef(storageKey);
-  // Track if we just loaded a value from localStorage (to prevent clamping from resetting it)
-  const justLoadedFromStorageRef = useRef(false);
 
-  // Single effect that handles both:
-  // 1. Reading from localStorage when storage key changes (project switch)
-  // 2. Writing to localStorage when the value changes
+  // Read from localStorage when storage key changes (project switch)
+  // Separate effect for reading ensures we don't write stale values when switching contexts
   useEffect(() => {
     const currentKey = storageKey;
     const prevKey = prevStorageKeyRef.current;
 
-    // If storage key changed, reload value from localStorage for the new key
+    // Only read if storage key changed (project switch)
     if (prevKey !== currentKey) {
-      justLoadedFromStorageRef.current = true;
       try {
         const item = window.localStorage.getItem(currentKey);
         if (item) {
@@ -79,8 +79,19 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
         setEditorWidthPixelsInternal(DEFAULT_EDITOR_WIDTH);
       }
       prevStorageKeyRef.current = currentKey;
-    } else {
-      // Key hasn't changed, just write current value to localStorage
+    }
+  }, [storageKey]);
+
+  // Write to localStorage when width changes (but not during key switches)
+  // This effect persists user's width preference, but skips writing when switching
+  // between projects to avoid overwriting the new project's stored value
+  useEffect(() => {
+    const currentKey = storageKey;
+    const prevKey = prevStorageKeyRef.current;
+
+    // Only write if storage key hasn't changed (to avoid writing during key switch)
+    // When key changes, the read effect handles loading the new value
+    if (prevKey === currentKey) {
       try {
         window.localStorage.setItem(currentKey, JSON.stringify(editorWidthPixels));
       } catch {
@@ -113,23 +124,20 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
   // Track previous container width to only clamp when container actually resizes
   const prevContainerWidthRef = useRef(containerWidth);
 
-  // Clamp width when container resizes (not when project switches)
+  // Clamp width when container resizes
   // This ensures the editor width stays within valid bounds when container size changes
+  // We only clamp on actual container resize, not on project switches, because project switches
+  // load values from localStorage which are already validated, and clamping would override
+  // the user's saved preference unnecessarily
   useEffect(() => {
     if (!constraints.minEditorWidth || !constraints.maxEditorWidth) {
       prevContainerWidthRef.current = containerWidth;
       return;
     }
 
-    // Don't clamp if we just loaded a value from localStorage (project switch)
-    // Reset the flag after checking it
-    if (justLoadedFromStorageRef.current) {
-      justLoadedFromStorageRef.current = false;
-      prevContainerWidthRef.current = containerWidth;
-      return;
-    }
-
-    // Only clamp if container width actually changed
+    // Only clamp if container width actually changed (not just constraints)
+    // This distinction is important: project switches change storage keys but shouldn't trigger clamping,
+    // while actual window/container resizes should clamp to ensure preview remains usable
     const containerWidthChanged =
       prevContainerWidthRef.current !== undefined && prevContainerWidthRef.current !== containerWidth;
 

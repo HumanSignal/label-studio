@@ -361,6 +361,9 @@ const Configurator = ({
   });
 
   // Track container width for resizer constraints
+  // Observes container dimensions to provide the resizer hook with container width for calculating valid min/max bounds
+  // Uses ResizeObserver with 16ms debounce (~1 frame) to prevent ResizeObserver loop errors
+  // The debounce ensures we don't trigger excessive updates during rapid resize events
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -617,7 +620,6 @@ const Configurator = ({
             containerRef={containerRef}
             editorWidthPixels={editorWidthPixels}
             onResize={setEditorWidthPixels}
-            onResizeFinished={setEditorWidthPixels}
             constraints={constraints}
           />
           <Preview

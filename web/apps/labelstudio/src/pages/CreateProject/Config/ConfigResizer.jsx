@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { cn } from "../../../utils/bem";
 import "./ConfigResizer.scss";
 
@@ -10,9 +10,8 @@ const calculateEditorWidth = (initialWidth, initialX, currentX, minWidth, maxWid
   return Math.max(minWidth, Math.min(maxWidth, newWidth));
 };
 
-export const ConfigResizer = ({ containerRef, editorWidthPixels, onResize, onResizeFinished, constraints }) => {
+export const ConfigResizer = ({ containerRef, editorWidthPixels, onResize, constraints }) => {
   const [isResizing, setIsResizing] = useState(false);
-  const handleRef = useRef(null);
 
   const handleMouseDown = useCallback(
     (evt) => {
@@ -45,10 +44,6 @@ export const ConfigResizer = ({ containerRef, editorWidthPixels, onResize, onRes
         document.body.style.removeProperty("cursor");
 
         setIsResizing(false);
-
-        if (newWidth !== editorWidthPixels && onResizeFinished) {
-          onResizeFinished(newWidth);
-        }
       };
 
       document.addEventListener("mousemove", onMouseMove);
@@ -57,12 +52,11 @@ export const ConfigResizer = ({ containerRef, editorWidthPixels, onResize, onRes
       document.body.style.cursor = "col-resize";
       setIsResizing(true);
     },
-    [containerRef, editorWidthPixels, onResize, onResizeFinished, constraints],
+    [containerRef, editorWidthPixels, onResize, constraints],
   );
 
   return (
     <div
-      ref={handleRef}
       className={cn("config-resizer").elem("handle").mod({ resizing: isResizing }).toString()}
       onMouseDown={handleMouseDown}
     />
