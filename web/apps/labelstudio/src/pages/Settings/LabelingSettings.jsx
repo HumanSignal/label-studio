@@ -71,8 +71,7 @@ export const LabelingSettings = () => {
 
   const onUpdate = useCallback((config) => {
     setConfig(config);
-    fetchProject();
-  });
+  }, []);
 
   const onValidate = useCallback((validation) => {
     setEssentialDataChanged(validation.config_essential_data_has_changed);
