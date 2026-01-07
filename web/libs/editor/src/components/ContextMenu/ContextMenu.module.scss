@@ -54,5 +54,6 @@
 .trigger {
   &.open {
     opacity: 1;
+    right: var(--spacing-tighter);
   }
 }

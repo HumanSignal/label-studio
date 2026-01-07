@@ -336,7 +336,6 @@ export const AnnotationButton = observer(
         className={cn("annotation-button")
           .mod({
             selected: entity.selected,
-            prediction: isPrediction,
             groundTruth: isGroundTruth,
             draft: isDraft,
             submitted: isSubmitted,

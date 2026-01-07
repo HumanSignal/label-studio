@@ -126,13 +126,6 @@
     }
   }
 
-  &_prediction {
-    &::before {
-      display: block;
-      border-color: var(--color-accent-plum-base);
-    }
-  }
-
   &_selected {
     background-color: var(--color-neutral-background);
     border-color: var(--color-neutral-border);
