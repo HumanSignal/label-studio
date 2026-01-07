@@ -18,7 +18,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  POETRY_VERSION: 2.1.4
+  POETRY_VERSION: 2.2.1
   SLACK_CHANNEL_ID: "C02LMULF4NA"
 
 jobs:

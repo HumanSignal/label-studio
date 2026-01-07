@@ -9,7 +9,7 @@ on:
 
 env:
   CACHE_NAME_PREFIX: v1
-  POETRY_VERSION: 2.1.4
+  POETRY_VERSION: 2.2.1
 
 jobs:
   conda:
