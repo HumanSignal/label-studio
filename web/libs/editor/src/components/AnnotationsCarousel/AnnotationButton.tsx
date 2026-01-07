@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { inject, observer } from "mobx-react";
+import truncate from "truncate-middle";
 import { useCopyText } from "@humansignal/core";
 import { isDefined, userDisplayName } from "@humansignal/core/lib/utils/helpers";
 import { cn } from "../../utils/bem";
@@ -29,6 +30,37 @@ import { isFF } from "../../utils/feature-flags";
 import { confirm } from "../../common/Modal/Modal";
 import { type ContextMenuAction, ContextMenu, ContextMenuTrigger, type MenuActionOnClick } from "../ContextMenu";
 import "./AnnotationButton.scss";
+
+// Constants for name truncation
+const NAME_TRUNCATE_START = 9;
+const NAME_TRUNCATE_END = 8;
+const NAME_TRUNCATE_THRESHOLD = 20;
+
+// Utility function to detect if text is a person's name
+const isPersonName = (text: string): boolean => {
+  if (!text || text.includes("@")) return false; // Exclude emails
+  const parts = text.trim().split(/\s+/);
+  if (parts.length < 2) return false; // Need at least first + last name
+  // Check if all parts are valid name parts (letters, hyphens, no numbers)
+  return parts.every((part) => /^[a-zA-Z-]+$/.test(part) && part.length >= 2);
+};
+
+// Utility function to truncate person names
+const truncatePersonName = (name: string): string => {
+  // Only truncate if length exceeds threshold
+  if (name.length <= NAME_TRUNCATE_THRESHOLD) return name;
+
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0) return name;
+  if (parts.length === 1) return name; // Single word, don't truncate
+
+  const firstName = parts[0]; // Keep full
+  const middleParts = parts.slice(1, -1).map((p) => `${p[0]}.`); // Middle names to initials
+  const lastName = parts[parts.length - 1];
+  const lastNameInitial = `${lastName[0]}.`;
+
+  return [firstName, ...middleParts, lastNameInitial].join(" ");
+};
 
 interface AnnotationButtonInterface {
   entity?: any;
@@ -87,6 +119,16 @@ export const AnnotationButton = observer(
     }
 
     const displayUsername = hiddenUser ? hiddenUser.email : username;
+
+    // Apply smart truncation based on content type
+    const isName = isPersonName(displayUsername);
+    const displayNameTruncated = isName
+      ? displayUsername.length > NAME_TRUNCATE_THRESHOLD
+        ? truncatePersonName(displayUsername)
+        : displayUsername
+      : displayUsername.length > NAME_TRUNCATE_THRESHOLD
+        ? truncate(displayUsername, NAME_TRUNCATE_START, NAME_TRUNCATE_END, "...")
+        : displayUsername;
 
     const CommentIcon = renderCommentIcon(entity);
     // need to find a more reliable way to grab this value
@@ -320,7 +362,7 @@ export const AnnotationButton = observer(
           <div className={cn("annotation-button").elem("main").toClassName()}>
             <div className={cn("annotation-button").elem("user").toClassName()}>
               <Tooltip title={displayUsername}>
-                <span className={cn("annotation-button").elem("name").toClassName()}>{displayUsername}</span>
+                <span className={cn("annotation-button").elem("name").toClassName()}>{displayNameTruncated}</span>
               </Tooltip>
             </div>
             {!infoIsHidden && (
