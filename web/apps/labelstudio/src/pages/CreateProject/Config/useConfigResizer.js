@@ -7,6 +7,9 @@ const COLUMN_GAP = 16;
 const MIN_EDITOR_WIDTH = 400;
 const MIN_PREVIEW_WIDTH = 500;
 
+// Left side menu width
+const LEFT_MENU_WIDTH = 240;
+
 // Default editor width (left side)
 const DEFAULT_EDITOR_WIDTH = 500;
 
@@ -21,10 +24,19 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
   // Initialize state from localStorage or use default
   // This runs once on mount and handles initial localStorage read
   const [editorWidthPixels, setEditorWidthPixelsInternal] = useState(() => {
+    // Calculate storage key inline (can't use useMemo value in initializer)
+    const initialStorageKey = projectId ? `config-editor-width:${projectId}` : "config-editor-width";
+
     try {
-      const item = window.localStorage.getItem(storageKey);
+      const item = window.localStorage.getItem(initialStorageKey);
       if (item) {
-        return JSON.parse(item);
+        const storedWidth = JSON.parse(item);
+        // Check if stored width + left menu width exceeds screen width
+        // If so, reset to default to ensure resizer is visible
+        if (storedWidth + LEFT_MENU_WIDTH > window.innerWidth) {
+          return DEFAULT_EDITOR_WIDTH;
+        }
+        return storedWidth;
       }
     } catch {
       // If error reading from localStorage, use default
@@ -51,7 +63,13 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
         const item = window.localStorage.getItem(currentKey);
         if (item) {
           const parsedValue = JSON.parse(item);
-          setEditorWidthPixelsInternal(parsedValue);
+          // Check if stored width + left menu width exceeds screen width
+          // If so, reset to default to ensure resizer is visible
+          if (parsedValue + LEFT_MENU_WIDTH > window.innerWidth) {
+            setEditorWidthPixelsInternal(DEFAULT_EDITOR_WIDTH);
+          } else {
+            setEditorWidthPixelsInternal(parsedValue);
+          }
         } else {
           // No stored value for this key, use default
           setEditorWidthPixelsInternal(DEFAULT_EDITOR_WIDTH);
