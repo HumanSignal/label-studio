@@ -240,7 +240,9 @@ const ConfigureColumn = ({ template, obj, columns }) => {
   const [newValue, setNewValue] = useState(`$${value}`);
 
   // update local state when external value changes
-  useEffect(() => setNewValue(`$${value}`), [value]);
+  useEffect(() => {
+    setNewValue(`$${value}`);
+  }, [value]);
 
   const updateValue = (value) => {
     const newValue = value.replace(/^\$/, "");
@@ -278,40 +280,35 @@ const ConfigureColumn = ({ template, obj, columns }) => {
     }
   };
 
-  const columnsList = useMemo(() => {
-    const cols = (columns ?? []).map((col) => {
-      return {
-        value: col,
-        label: col === DEFAULT_COLUMN ? "<imported file>" : `$${col}`,
-      };
-    });
+  const options = useMemo(() => {
+    const columnOptions =
+      columns?.map((column) => ({
+        value: column,
+        label: column === DEFAULT_COLUMN ? "<imported file>" : `$${column}`,
+      })) ?? [];
     if (!columns?.length) {
-      cols.push({ value, label: "<imported file>" });
+      columnOptions.push({ value, label: "<imported file>" });
     }
-    cols.push({ value: "-", label: "<set manually>" });
-    return cols;
-  }, [columns, DEFAULT_COLUMN, value]);
+    columnOptions.push({ value: "-", label: "<set manually>" });
+    return columnOptions;
+  }, [columns, value]);
 
   return (
-    <>
+    <p>
+      Use {obj.tagName.toLowerCase()}
+      {template.objects > 1 && ` for ${obj.getAttribute("name")}`}
+      {" from "}
+      {columns?.length > 0 && columns[0] !== DEFAULT_COLUMN && "field "}
       <Select
+        triggerClassName="border"
         onChange={selectValue}
         value={isManual ? "-" : value}
-        options={columnsList}
+        options={options}
         isInline={true}
-        label={
-          <>
-            Use {obj.tagName.toLowerCase()}
-            {template.objects > 1 && ` for ${obj.getAttribute("name")}`}
-            {" from "}
-            {columns?.length > 0 && columns[0] !== DEFAULT_COLUMN && "field "}
-          </>
-        }
-        labelProps={{ className: "inline-flex" }}
-        dataTestid={`select-trigger-use-image-from-field-${isManual ? "-" : value}`}
+        dataTestid={`select-trigger-use-${obj.tagName.toLowerCase().replace(/\s/g, "-")}-from-field-${isManual ? "-" : value}`}
       />
       {isManual && <Input value={newValue} onChange={handleChange} onBlur={handleBlur} onKeyDown={handleKeyDown} />}
-    </>
+    </p>
   );
 };
 
