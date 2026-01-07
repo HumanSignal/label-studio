@@ -367,10 +367,14 @@ const Configurator = ({
   useEffect(() => {
     if (!containerRef.current) return;
 
+    let timeoutId;
     const updateWidth = () => {
-      if (containerRef.current) {
-        setContainerWidth(containerRef.current.clientWidth);
-      }
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        if (containerRef.current) {
+          setContainerWidth(containerRef.current.clientWidth);
+        }
+      }, 16); // ~1 frame debounce to prevent ResizeObserver loop errors
     };
 
     const resizeObserver = new ResizeObserver(updateWidth);
@@ -379,6 +383,7 @@ const Configurator = ({
     updateWidth();
 
     return () => {
+      clearTimeout(timeoutId);
       resizeObserver.disconnect();
     };
   }, []);
@@ -686,7 +691,7 @@ export const ConfigPage = ({
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (!externalColumns || (project && !columns)) {
+      if (!externalColumns && project?.id && !columns) {
         const res = await api.callApi("dataSummary", {
           params: { pk: project.id },
           // 404 is ok, and errors here don't matter
@@ -699,7 +704,7 @@ export const ConfigPage = ({
       }
     };
     fetchData();
-  }, [columns, project]);
+  }, [project?.id, externalColumns]);
 
   const onSelectRecipe = React.useCallback((recipe) => {
     if (!recipe) {
