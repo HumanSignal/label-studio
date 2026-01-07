@@ -971,6 +971,11 @@ class AnnotationDraft(FsmHistoryStateModel):
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
+            # Keep lock order consistent to avoid deadlocks. PATCH draft updates
+            # lock the draft row first, then touch project summary. DELETE used to
+            # do summary first and draft second, so two requests could block each
+            # other in opposite order. Lock the draft row here to match PATCH.
+            AnnotationDraft.objects.select_for_update().filter(pk=self.pk).first()
             project = self.task.project
             if hasattr(project, 'summary'):
                 project.summary.remove_created_drafts_and_labels([self])
