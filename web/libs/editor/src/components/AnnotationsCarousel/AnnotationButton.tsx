@@ -108,6 +108,9 @@ export const AnnotationButton = observer(
       },
     );
     const [isGroundTruth, setIsGroundTruth] = useState<boolean>();
+    const isDraft = !isPrediction && !isDefined(entity.pk);
+    const isSkipped = !isPrediction && entity.skipped === true;
+    const isSubmitted = !isPrediction && !isDraft && !isGroundTruth && !isSkipped;
     const infoIsHidden = annotationStore.store?.hasInterface("annotations:hide-info");
     let hiddenUser = null;
 
@@ -330,7 +333,16 @@ export const AnnotationButton = observer(
 
     return (
       <div
-        className={cn("annotation-button").mod({ selected: entity.selected }).toClassName()}
+        className={cn("annotation-button")
+          .mod({
+            selected: entity.selected,
+            prediction: isPrediction,
+            groundTruth: isGroundTruth,
+            draft: isDraft,
+            submitted: isSubmitted,
+            skipped: isSkipped,
+          })
+          .toClassName()}
         data-annotation-id={entity.pk ?? entity.id}
       >
         <div className={cn("annotation-button").elem("mainSection").toClassName()} onClick={clickHandler}>
