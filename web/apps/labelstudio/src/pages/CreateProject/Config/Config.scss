@@ -328,6 +328,8 @@ $scroll-width: 5px;
 
   input,
   select {
+    flex: 1;
+    min-width: 160px;
     padding: 4px 8px;
     font: inherit;
     color: inherit;
@@ -342,14 +344,28 @@ $scroll-width: 5px;
     color: var(--color-neutral-content);
   }
 
-  >p {
+  &>p {
     line-height: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-tight);
     color: var(--color-neutral-content-subtler);
+
+    button {
+      min-width: 160px;
+      flex: 1;
+    }
+
+    .input-ls {
+      min-width: 160px;
+      flex: 1;
+      margin-left: 0;
+    }
   }
 
-  >p.configure__object-error {
-    line-height: 22px;
-    margin-top: 8px;
+  &>p.configure__object-error {
+    line-height: 140%;
     color: var(--color-negative-content);
   }
 
