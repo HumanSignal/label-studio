@@ -54,6 +54,39 @@ const browserHistory = createBrowserHistory({
 
 window.LSH = browserHistory;
 
+// Suppress ResizeObserver loop errors - these are non-critical warnings that occur
+// when ResizeObserver callbacks cause layout changes within the same frame.
+// This is common in video/media components and doesn't affect functionality.
+// We need to suppress at multiple levels to prevent React's dev overlay from showing.
+const isResizeObserverError = (e) => {
+  return (
+    e?.message?.includes?.("ResizeObserver loop") ||
+    e?.error?.message?.includes?.("ResizeObserver loop") ||
+    (typeof e === "string" && e.includes("ResizeObserver loop"))
+  );
+};
+
+// Handle via window.onerror (runs first)
+const originalOnError = window.onerror;
+window.onerror = (message, source, lineno, colno, error) => {
+  if (isResizeObserverError({ message, error })) {
+    return true; // Prevents the error from propagating
+  }
+  return originalOnError?.(message, source, lineno, colno, error);
+};
+
+// Also handle via addEventListener for ErrorEvent objects (capture phase)
+window.addEventListener(
+  "error",
+  (event) => {
+    if (isResizeObserverError(event)) {
+      event.stopImmediatePropagation();
+      event.preventDefault();
+    }
+  },
+  true,
+);
+
 initSentry(browserHistory);
 
 const App = ({ content }) => {
