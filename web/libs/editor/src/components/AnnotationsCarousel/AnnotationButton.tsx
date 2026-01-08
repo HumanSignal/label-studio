@@ -38,9 +38,9 @@ import { type ContextMenuAction, ContextMenu, ContextMenuTrigger, type MenuActio
 import "./AnnotationButton.scss";
 
 // Constants for name truncation
-const NAME_TRUNCATE_START = 9;
-const NAME_TRUNCATE_END = 8;
-const NAME_TRUNCATE_THRESHOLD = 20;
+const NAME_TRUNCATE_START = 8;
+const NAME_TRUNCATE_END = 6;
+const NAME_TRUNCATE_THRESHOLD = 15;
 
 // Utility function to detect if text is a person's name
 const isPersonName = (text: string): boolean => {
@@ -382,6 +382,7 @@ export const AnnotationButton = observer(
     const leaveTimeoutRef = useRef<number>();
     const [isTooltipOpen, setTooltipOpen] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | undefined>(undefined);
+    const [isContextMenuOpen, setContextMenuOpen] = useState(false);
 
     if (infoIsHidden) {
       // this data can be missing in tests, but we don't have `infoIsHidden` there, so hiding logic like this
@@ -513,6 +514,11 @@ export const AnnotationButton = observer(
 
     const handleTooltipEnter = useCallback(
       (e: React.MouseEvent) => {
+        // Don't show tooltip if context menu is open
+        if (isContextMenuOpen) {
+          return;
+        }
+
         // Clear any pending leave timeout
         if (leaveTimeoutRef.current) {
           clearTimeout(leaveTimeoutRef.current);
@@ -535,7 +541,7 @@ export const AnnotationButton = observer(
           setTooltipOpen(true);
         }, hoverIntentDelay);
       },
-      [recalculateTooltipPosition],
+      [recalculateTooltipPosition, isContextMenuOpen],
     );
 
     const handleTooltipLeave = useCallback((e: React.MouseEvent | React.FocusEvent) => {
@@ -600,6 +606,10 @@ export const AnnotationButton = observer(
     }, []);
 
     const handleTooltipFocus = useCallback(() => {
+      if (isContextMenuOpen) {
+        return;
+      }
+
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -608,7 +618,20 @@ export const AnnotationButton = observer(
         recalculateTooltipPosition();
         setTooltipOpen(true);
       }, hoverIntentDelay);
-    }, [recalculateTooltipPosition]);
+    }, [recalculateTooltipPosition, isContextMenuOpen]);
+
+    const handleTriggerEnter = useCallback(() => {
+      // Close tooltip immediately when hovering over trigger
+      setTooltipOpen(false);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = undefined;
+      }
+      if (leaveTimeoutRef.current) {
+        clearTimeout(leaveTimeoutRef.current);
+        leaveTimeoutRef.current = undefined;
+      }
+    }, []);
 
     const clickHandler = useCallback(() => {
       const { selected, id, type } = entity;
@@ -938,19 +961,31 @@ export const AnnotationButton = observer(
             position={tooltipPosition}
           />
         </div>
-        <ContextMenuTrigger
-          className={cn("annotation-button").elem("trigger").toClassName()}
-          content={
-            <AnnotationButtonContextMenu
-              entity={entity}
-              capabilities={capabilities}
-              annotationStore={annotationStore}
-              store={annotationStore.store}
-            />
-          }
-        >
-          <IconEllipsisVertical width={20} height={20} />
-        </ContextMenuTrigger>
+        <div className={cn("annotation-button").elem("trigger").toClassName()} onMouseEnter={handleTriggerEnter}>
+          <ContextMenuTrigger
+            content={
+              <AnnotationButtonContextMenu
+                entity={entity}
+                capabilities={capabilities}
+                annotationStore={annotationStore}
+                store={annotationStore.store}
+              />
+            }
+            onToggle={(isOpen) => {
+              setContextMenuOpen(isOpen);
+              // Close tooltip when context menu opens
+              if (isOpen) {
+                setTooltipOpen(false);
+                if (timeoutRef.current) {
+                  clearTimeout(timeoutRef.current);
+                  timeoutRef.current = undefined;
+                }
+              }
+            }}
+          >
+            <IconEllipsisVertical width={20} height={20} />
+          </ContextMenuTrigger>
+        </div>
       </div>
     );
   },
