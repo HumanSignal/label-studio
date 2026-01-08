@@ -27,14 +27,14 @@
   box-shadow: 0 0 0 2px var(--color-neutral-background);
 
   &_accepted {
-    background-color: #64BF00;
+    background-color: var(--color-accent-kale-base);
   }
 
   &_rejected {
-    background-color: #D00;
+    background-color: var(--color-accent-persimmon-base);
   }
 
   &_fixed {
-    background-color: #FA8C16;
+    background-color: var(--color-accent-canteloupe-base);
   }
 }
