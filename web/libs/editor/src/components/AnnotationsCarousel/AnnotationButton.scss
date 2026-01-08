@@ -61,7 +61,7 @@
         }
   
         &_fixed {
-          background-color: var(--color-accent-grape-base);
+          background-color: var(--color-accent-canteloupe-base);
         }
       }
     }
@@ -258,8 +258,7 @@
     padding: 8px 16px;
     opacity: 0;
     pointer-events: none;
-    white-space: nowrap;
-    max-width: 300px;
+    max-width: 360px;
     z-index: 9999;
     transition: opacity 150ms ease-out;
 
@@ -282,12 +281,25 @@
     }
   }
 
+  &__tooltipBadges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__tooltipStatusBadge {
+    display: inline-block;
+  }
+
   &__tooltipContainerTitle {
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
     align-items: center;
     max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     margin-bottom: 8px;
   }
 
@@ -310,10 +322,12 @@
   }
 
   &__infoRowLabel {
+    font-size: var(--font-size-body-small);
     white-space: nowrap;
   }
 
   &__infoRowValue {
+    font-size: var(--font-size-label-small);
     white-space: nowrap;
     font-weight: 500;
   }
