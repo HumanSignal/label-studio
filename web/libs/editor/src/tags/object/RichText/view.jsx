@@ -561,11 +561,7 @@ class RichTextPieceView extends Component {
         <ObjectTag item={item} className={cn("richtext").toClassName()}>
           <div
             key="root"
-            className={cn("richtext")
-              .elem("container")
-              .mod({ canResizeSpans: true })
-              .mix("htx-richtext")
-              .toClassName()}
+            className={cn("richtext").elem("container").mix("htx-richtext").toClassName()}
             ref={(el) => {
               item.mountNodeRef.current = el;
               el && this.markObjectAsLoaded();
