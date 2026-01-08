@@ -368,8 +368,9 @@ export const AnnotationButton = observer(
     );
     const [isGroundTruth, setIsGroundTruth] = useState<boolean>();
     const isDraft = !isPrediction && !isDefined(entity.pk);
+    const isDraftSaved = !isPrediction && entity.draftId > 0;
     const isSkipped = !isPrediction && entity.skipped === true;
-    const isSubmitted = !isPrediction && !isDraft && !isGroundTruth && !isSkipped;
+    const isSubmitted = !isPrediction && !isDraft && !isDraftSaved && !isGroundTruth && !isSkipped;
     const infoIsHidden = annotationStore.store?.hasInterface("annotations:hide-info");
     let hiddenUser = null;
 
@@ -825,7 +826,8 @@ export const AnnotationButton = observer(
           .mod({
             selected: isAlive(entity) ? entity.selected : false,
             groundTruth: isGroundTruth,
-            draft: isDraft,
+            draft: isDraft && !isDraftSaved, // Ephemeral draft only
+            draftSaved: isDraftSaved, // Saved draft
             submitted: isSubmitted,
             skipped: isSkipped,
           })
@@ -889,7 +891,7 @@ export const AnnotationButton = observer(
           </div>
           {!isPrediction && (
             <div className={cn("annotation-button").elem("icons").toClassName()}>
-              {entity.draftId > 0 && (
+              {(entity.draftId > 0 || isDraft) && (
                 <Tooltip title="Draft">
                   <div className={cn("annotation-button").elem("icon").mod({ draft: true }).toClassName()}>
                     <IconDraftCreated2 color="#617ADA" />

@@ -143,7 +143,7 @@
     }
   }
 
-  &_draft {
+  &_draft, &_draftSaved {
     &::before {
       display: block;
       border-color: var(--color-accent-grape-base);
@@ -153,6 +153,29 @@
       }
     }
 
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: block;
+      border-color: var(--color-accent-grape-base);
+      background-image: repeating-linear-gradient(-63.43deg, 
+      transparent 1px, 
+      var(--color-accent-grape-base) 2px, 
+      var(--color-accent-grape-base) 7px, 
+      var(--color-accent-grape-subtle) 8px, 
+      var(--color-accent-grape-subtle) 12px);
+      background-repeat: repeat-x;
+      background-position: top;
+      background-size: 100% 2px;
+      overflow: hidden;
+      border-top-left-radius: var(--corner-radius-small);
+      border-top-right-radius: var(--corner-radius-small);
+      height: 10px;
+      transform: translateY(-1px);
+    }
   }
 
   &_skipped {
