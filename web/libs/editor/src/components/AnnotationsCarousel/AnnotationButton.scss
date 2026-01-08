@@ -34,6 +34,37 @@
       background-color: var(--color-accent-plum-subtle);
       color: var(--color-accent-plum-bold);
     }
+
+    & .annotation-button__userpic {      
+      .userpic-badge {
+        width: 10px;
+        height: 10px;
+        color: var(--color-neutral-background);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 2px;
+        box-shadow: 0 0 0 2px var(--color-neutral-background);
+        transform: translate(2px,2px);
+  
+        svg {
+          width: 6px;
+          height: 6px;
+        }
+  
+        &_accepted {
+          background-color: var(--color-accent-kale-base);
+        }
+  
+        &_rejected {
+          background-color: var(--color-accent-persimmon-base);
+        }
+  
+        &_fixed {
+          background-color: var(--color-accent-grape-base);
+        }
+      }
+    }
   }
 
   &__name {
@@ -116,7 +147,12 @@
     &::before {
       display: block;
       border-color: var(--color-accent-grape-base);
+
+      & .annotation-button__name {
+        font-style: italic;
+      }
     }
+
   }
 
   &_skipped {
@@ -208,6 +244,78 @@
     position: relative;
     opacity: 0.7;
     transition: opacity 150ms ease-out;
+  }
+
+  // Badge styles - matching Annotators component (global styles)
+
+
+
+  &__tooltipContainer {
+    position: fixed;
+    background: var(--color-neutral-inverted-background);
+    border-radius: 4px;
+    color: var(--color-neutral-inverted-content);
+    padding: 8px 16px;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    max-width: 300px;
+    z-index: 9999;
+    transition: opacity 150ms ease-out;
+
+    &_open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    &::after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid var(--color-neutral-inverted-background);
+      position: absolute;
+      left: 0;
+      bottom: 99%;
+      translate: var(--tooltip-arrow-position, 2px);
+    }
+  }
+
+  &__tooltipContainerTitle {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    align-items: center;
+    max-width: 100%;
+    margin-bottom: 8px;
+  }
+
+  &__tooltipContainerInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__infoRow {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 400;
+    gap: 20px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  &__infoRowLabel {
+    white-space: nowrap;
+  }
+
+  &__infoRowValue {
+    white-space: nowrap;
+    font-weight: 500;
   }
 
   &__status {
