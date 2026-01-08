@@ -3498,60 +3498,6 @@
       "version": 2,
       "deleted": false
     },
-    "fflag_feat_utc_320_use_precomputed_agreement_score_short": {
-      "key": "fflag_feat_utc_320_use_precomputed_agreement_score_short",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "8f420e8ef6764411b381046cd9dbb989",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
-    "fflag_feat_utc_365_include_all_controls_in_agreement": {
-      "key": "fflag_feat_utc_365_include_all_controls_in_agreement",
-      "on": false,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "fef16ee5a09c498886b62eb1935c5c53",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 2,
-      "deleted": false
-    },
     "fflag_feat_utc_384_manage_members_v2": {
       "key": "fflag_feat_utc_384_manage_members_v2",
       "on": false,

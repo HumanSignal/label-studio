@@ -43,7 +43,7 @@ export const DataSummary = ({ data_types }: { data_types: ObjectTypes }) => {
           // List: [{ id: <id>, body: text, title: text }, ...]
           // Paragraphs: [{ <nameKey>: name, <textKey>: text }, ...]
           if (Array.isArray(value)) {
-            return JSON.stringify(value);
+            return <div className="whitespace-pre-wrap">{JSON.stringify(value, null, 2)}</div>;
           }
 
           // Timeseries: <channel name>: [array of values]
