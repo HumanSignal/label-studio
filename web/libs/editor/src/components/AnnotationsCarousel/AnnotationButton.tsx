@@ -26,7 +26,7 @@ import {
   IconCrossAlt,
   IconEllipsisVertical,
 } from "@humansignal/icons";
-import { Tooltip, Userpic, ToastType, useToast } from "@humansignal/ui";
+import { Tooltip, Userpic, ToastType, useToast, Badge } from "@humansignal/ui";
 import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
 import { useDropdown } from "@humansignal/ui";
 import { isFF } from "../../utils/feature-flags";
@@ -149,9 +149,13 @@ const hoverIntentDelay = 300;
 function AnnotationButtonTooltip({
   displayUsername,
   isDraft,
-  isGroundTruth,
   isPrediction,
+  isSkipped,
+  isSubmitted,
+  isGroundTruth,
   acceptedState,
+  predictionScore,
+  lastUpdated,
   containerRef,
   isTooltipOpen,
   onMouseEnter,
@@ -160,50 +164,123 @@ function AnnotationButtonTooltip({
 }: {
   displayUsername: string;
   isDraft: boolean;
-  isGroundTruth: boolean;
   isPrediction: boolean;
+  isSkipped: boolean;
+  isSubmitted: boolean;
+  isGroundTruth?: boolean;
   acceptedState: string | null | undefined;
+  predictionScore?: number | null;
+  lastUpdated?: string | null;
   containerRef?: React.MutableRefObject<HTMLElement | undefined>;
   isTooltipOpen?: boolean;
   onMouseEnter?: (e: React.MouseEvent) => void;
   onMouseLeave?: (e: React.MouseEvent) => void;
   position?: { top: number; left: number };
 }) {
+  // Determine status badge (only for annotations, not predictions)
+  const statusBadge = useMemo(() => {
+    if (isPrediction) {
+      return null; // Status doesn't apply to predictions
+    }
+
+    // Priority order: Draft > Skipped > Accepted/Rejected/Fixed > Submitted
+    if (isDraft) {
+      return {
+        label: "Draft",
+        backgroundColor: "var(--color-accent-grape-subtle)",
+        color: "var(--color-accent-grape-bold)",
+      };
+    }
+    if (isSkipped) {
+      return {
+        label: "Skipped",
+        backgroundColor: "var(--color-accent-persimmon-subtle)",
+        color: "var(--color-accent-persimmon-bold)",
+      };
+    }
+    if (acceptedState) {
+      switch (acceptedState) {
+        case "accepted":
+          return {
+            label: "Accepted",
+            backgroundColor: "var(--color-accent-kale-subtle)",
+            color: "var(--color-accent-kale-bold)",
+          };
+        case "rejected":
+          return {
+            label: "Rejected",
+            backgroundColor: "var(--color-accent-persimmon-subtle)",
+            color: "var(--color-accent-persimmon-bold)",
+          };
+        case "fixed":
+        case "fixed_and_accepted":
+          return {
+            label: "Fixed",
+            backgroundColor: "var(--color-accent-canteloupe-subtle)",
+            color: "var(--color-accent-canteloupe-bold)",
+          };
+        default:
+          break;
+      }
+    }
+    if (isSubmitted) {
+      return {
+        label: "Submitted",
+        backgroundColor: "var(--color-accent-kale-subtle)",
+        color: "var(--color-accent-kale-bold)",
+      };
+    }
+
+    return null;
+  }, [isPrediction, isDraft, isSkipped, acceptedState, isSubmitted]);
+
+  // Format date as "MMM DD YYYY, hh:mm:ss" (e.g., "Jan 15 2024, 14:30:45")
+  const formatDate = useCallback((dateString: string | null | undefined): string | null => {
+    if (!dateString) return null;
+
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return null;
+
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = months[date.getMonth()];
+      const day = date.getDate().toString().padStart(2, "0");
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
+      const seconds = date.getSeconds().toString().padStart(2, "0");
+
+      return `${month} ${day} ${year}, ${hours}:${minutes}:${seconds}`;
+    } catch {
+      return null;
+    }
+  }, []);
+
   const tooltipData = useMemo(() => {
     const rows: Array<{ label: string; value: string }> = [];
 
-    if (isDraft) {
-      rows.push({ label: "Status", value: "Draft" });
-    }
-    if (isGroundTruth) {
-      rows.push({ label: "Status", value: "Ground Truth" });
-    }
+    // Add Type for all annotations/predictions
     if (isPrediction) {
       rows.push({ label: "Type", value: "Prediction" });
-    }
-    if (acceptedState) {
-      let reviewStatus = "";
-      switch (acceptedState) {
-        case "accepted":
-          reviewStatus = "Accepted";
-          break;
-        case "rejected":
-          reviewStatus = "Rejected";
-          break;
-        case "fixed":
-        case "fixed_and_accepted": // Backward compatibility
-          reviewStatus = "Fix + Accepted";
-          break;
+      if (isDefined(predictionScore)) {
+        rows.push({ label: "Prediction Score", value: `${(predictionScore * 100).toFixed(2)}%` });
       }
-      if (reviewStatus) {
-        rows.push({ label: "Review Status", value: reviewStatus });
+    } else {
+      rows.push({ label: "Type", value: "Annotation" });
+    }
+
+    // Add Last Updated after Type
+    if (lastUpdated) {
+      const formattedDate = formatDate(lastUpdated);
+      if (formattedDate) {
+        rows.push({ label: "Last Updated", value: formattedDate });
       }
     }
 
     return rows;
-  }, [isDraft, isGroundTruth, isPrediction, acceptedState]);
+  }, [isPrediction, predictionScore, lastUpdated, formatDate]);
 
-  const isRenderable = tooltipData.length > 0 || !!displayUsername;
+  const isRenderable = tooltipData.length > 0 || !!displayUsername || !!statusBadge || !!isGroundTruth;
 
   if (!isRenderable) {
     return null;
@@ -225,6 +302,34 @@ function AnnotationButtonTooltip({
         left: `${position.left}px`,
       }}
     >
+      {(statusBadge || isGroundTruth) && (
+        <div className={cn("annotation-button").elem("tooltipBadges").toClassName()}>
+          {statusBadge && (
+            <Badge
+              className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
+              style={{
+                backgroundColor: statusBadge.backgroundColor,
+                color: statusBadge.color,
+                border: "none",
+              }}
+            >
+              {statusBadge.label}
+            </Badge>
+          )}
+          {isGroundTruth && (
+            <Badge
+              className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
+              style={{
+                backgroundColor: "var(--color-accent-canteloupe-subtle)",
+                color: "var(--color-accent-canteloupe-bold)",
+                border: "none",
+              }}
+            >
+              Ground Truth
+            </Badge>
+          )}
+        </div>
+      )}
       {displayUsername && (
         <div className={cn("annotation-button").elem("tooltipContainerTitle").toClassName()}>{displayUsername}</div>
       )}
@@ -817,9 +922,13 @@ export const AnnotationButton = observer(
           <AnnotationButtonTooltip
             displayUsername={displayUsername}
             isDraft={isDraft}
-            isGroundTruth={isGroundTruth ?? false}
             isPrediction={isPrediction}
+            isSkipped={isSkipped}
+            isSubmitted={isSubmitted}
+            isGroundTruth={isGroundTruth}
             acceptedState={acceptedState}
+            predictionScore={isPrediction ? entity.score : null}
+            lastUpdated={entity.createdDate}
             containerRef={tooltipContainerRef}
             isTooltipOpen={isTooltipOpen}
             onMouseEnter={handleTooltipEnter}
