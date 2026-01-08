@@ -34,9 +34,6 @@ export const FF_LSDV_4620_3_ML = "fflag_fix_front_lsdv_4620_memory_leaks_100723_
  */
 export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
 
-/** Add ability to preview image tasks in Data Manager Grid View */
-export const FF_GRID_PREVIEW = "fflag_feat_front_leap_1424_grid_preview_short";
-
 /**
  * Allow to filter tasks in Data Manager by control tag labels used in annotation results
  * @link https://app.launchdarkly.com/projects/default/flags/fflag_root_13_annotation_results_filtering

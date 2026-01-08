@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import { ff } from "@humansignal/core";
 import { usePersistentState } from "@humansignal/core/lib/hooks/usePersistentState";
 import type { MSTAnnotation, MSTStore } from "../../stores/types";
 import TaskSummary from "../TaskSummary/TaskSummary";
@@ -24,7 +23,7 @@ const Tab = ({ title, active, onSelect }: { title: string; active: boolean; onSe
 export const ViewAll = ({ store: annotationStore, annotations, root }: Props) => {
   const [tab, setTab] = usePersistentState<"summary" | "compare">("view-all-tab", "summary");
 
-  if (annotationStore.store.hasInterface("annotations:summary") && ff.isActive(ff.FF_SUMMARY)) {
+  if (annotationStore.store.hasInterface("annotations:summary")) {
     return (
       <div>
         <div className={styles.tabs}>

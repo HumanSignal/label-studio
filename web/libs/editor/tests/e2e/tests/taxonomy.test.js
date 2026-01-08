@@ -4,10 +4,7 @@ const assert = require("assert");
 Feature("Taxonomy");
 
 Before(({ LabelStudio }) => {
-  LabelStudio.setFeatureFlags({
-    fflag_feat_front_lsdv_5451_async_taxonomy_110823_short: false,
-    ff_front_dev_1536_taxonomy_user_labels_150222_long: true,
-  });
+  LabelStudio.setFeatureFlags({});
 });
 
 Scenario("Lines overlap", async ({ I, LabelStudio, AtTaxonomy }) => {

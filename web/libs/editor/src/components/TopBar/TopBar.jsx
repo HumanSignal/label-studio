@@ -2,7 +2,6 @@ import { observer } from "mobx-react";
 
 import { IconViewAll, IconPlus } from "@humansignal/icons";
 import { Button } from "@humansignal/ui";
-import { ff } from "@humansignal/core";
 import { cn } from "../../utils/bem";
 import { isSelfServe } from "../../utils/billing";
 import { FF_BULK_ANNOTATION, FF_DEV_3873, isFF } from "../../utils/feature-flags";
@@ -69,13 +68,11 @@ export const TopBar = observer(({ store }) => {
               <IconPlus />
             </Button>
           )}
-          {(!isViewAll || ff.isActive(ff.FF_SUMMARY)) && (
-            <AnnotationsCarousel
-              store={store}
-              annotationStore={store.annotationStore}
-              commentStore={store.commentStore}
-            />
-          )}
+          <AnnotationsCarousel
+            store={store}
+            annotationStore={store.annotationStore}
+            commentStore={store.commentStore}
+          />
         </div>
       ) : (
         <>

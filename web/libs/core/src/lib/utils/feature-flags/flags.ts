@@ -55,11 +55,6 @@ export const FF_SAMPLE_DATASETS = "fflag_feat_dia_1920_project_creation_sample_d
 export const FF_JSON_PREVIEW = "fflag_feat_dia_1925_view_sample_raw_json_short";
 
 /**
- * Allow to resize spans in Text tag
- */
-export const FF_ADJUSTABLE_SPANS = "fflag_feat_front_leap_1973_adjustable_spans_090425_short";
-
-/**
  * Enables the theme toggle in the UI to enable the dark mode
  */
 export const FF_THEME_TOGGLE = "fflag_feat_front_optic_1217_theme_toggle_short";
@@ -68,11 +63,6 @@ export const FF_THEME_TOGGLE = "fflag_feat_front_optic_1217_theme_toggle_short";
  * Fixes synced audio/video buffering
  */
 export const FF_SYNCED_BUFFERING = "fflag_fix_front_fit_31_synced_media_buffering";
-
-/**
- * Enables the summary view for annotations
- */
-export const FF_SUMMARY = "fflag_feat_front_leap_2036_annotations_summary";
 
 /**
  * Enables enterprise email notifications

@@ -83,7 +83,7 @@ const Model = types
   })
   .views((self) => ({
     get canResizeSpans() {
-      return ff.isActive(ff.FF_ADJUSTABLE_SPANS) && self.type === "text" && !self.isReadOnly();
+      return self.type === "text" && !self.isReadOnly();
     },
     get hasStates() {
       const states = self.states();

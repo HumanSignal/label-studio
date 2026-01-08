@@ -20,7 +20,6 @@ import {
   FF_DEV_3377,
   FF_DEV_3391,
   FF_LSDV_4583,
-  FF_LSDV_4583_6,
   FF_ZOOM_OPTIM,
   isFF,
 } from "../../../utils/feature-flags";
@@ -793,7 +792,7 @@ const Model = types
 
       self.currentImage = index;
       self.currentImageEntity = self.findImageEntity(index);
-      if (isFF(FF_LSDV_4583_6)) self.preloadImages();
+      self.preloadImages();
     },
 
     preloadImages() {
