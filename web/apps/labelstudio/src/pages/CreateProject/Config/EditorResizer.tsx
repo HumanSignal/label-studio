@@ -1,8 +1,25 @@
+import type React from "react";
 import { useCallback, useState } from "react";
 import { cn } from "../../../utils/bem";
-import "./ConfigResizer.scss";
+import "./EditorResizer.scss";
 
-const calculateEditorWidth = (initialWidth, initialX, currentX, minWidth, maxWidth) => {
+interface EditorResizerProps {
+  containerRef: React.RefObject<HTMLDivElement>;
+  editorWidthPixels: number;
+  onResize: (pixels: number) => void;
+  constraints: {
+    minEditorWidth: number;
+    maxEditorWidth: number;
+  };
+}
+
+const calculateEditorWidth = (
+  initialWidth: number,
+  initialX: number,
+  currentX: number,
+  minWidth: number,
+  maxWidth: number,
+): number => {
   // Calculate offset from initial position
   // Dragging right (currentX > initialX) should increase editor width
   const offset = currentX - initialX;
@@ -10,11 +27,16 @@ const calculateEditorWidth = (initialWidth, initialX, currentX, minWidth, maxWid
   return Math.max(minWidth, Math.min(maxWidth, newWidth));
 };
 
-export const ConfigResizer = ({ containerRef, editorWidthPixels, onResize, constraints }) => {
+export const EditorResizer: React.FC<EditorResizerProps> = ({
+  containerRef,
+  editorWidthPixels,
+  onResize,
+  constraints,
+}) => {
   const [isResizing, setIsResizing] = useState(false);
 
   const handleMouseDown = useCallback(
-    (evt) => {
+    (evt: React.MouseEvent) => {
       evt.stopPropagation();
       evt.preventDefault();
 
@@ -25,7 +47,7 @@ export const ConfigResizer = ({ containerRef, editorWidthPixels, onResize, const
       const initialWidth = editorWidthPixels;
       let newWidth = editorWidthPixels;
 
-      const onMouseMove = (e) => {
+      const onMouseMove = (e: MouseEvent) => {
         newWidth = calculateEditorWidth(
           initialWidth,
           initialX,
@@ -57,7 +79,7 @@ export const ConfigResizer = ({ containerRef, editorWidthPixels, onResize, const
 
   return (
     <div
-      className={cn("config-resizer").elem("handle").mod({ resizing: isResizing }).toString()}
+      className={cn("editor-resizer").elem("handle").mod({ resizing: isResizing }).toString()}
       onMouseDown={handleMouseDown}
     />
   );
