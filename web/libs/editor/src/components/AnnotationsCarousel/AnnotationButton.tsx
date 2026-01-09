@@ -360,33 +360,8 @@ function AnnotationButtonTooltip({
   return typeof document !== "undefined" ? createPortal(tooltipContent, document.body) : null;
 }
 
-// Role constants matching ROLES enum from AuthProvider
-const ROLE_VALUES = {
-  OWNER: "OW",
-  ADMIN: "AD",
-  MANAGER: "MA",
-  REVIEWER: "RE",
-  ANNOTATOR: "AN",
-} as const;
-
-// Helper functions to check roles, matching the pattern from AuthProvider
-// These work with window.APP_SETTINGS when AuthProvider is not available
-const getEffectiveRole = (): string | null => {
-  if (typeof window === "undefined") return null;
-  return (window as any).APP_SETTINGS?.user?.role ?? null;
-};
-
-const isManagingRole = (role?: string | null): boolean => {
-  if (!role) role = getEffectiveRole();
-  if (!role) return false;
-  return role === ROLE_VALUES.OWNER || role === ROLE_VALUES.ADMIN || role === ROLE_VALUES.MANAGER;
-};
-
-const isReviewerRole = (role?: string | null): boolean => {
-  if (!role) role = getEffectiveRole();
-  if (!role) return false;
-  return role === ROLE_VALUES.REVIEWER;
-};
+// Manager roles that can force-skip unskippable tasks (OW=Owner, AD=Admin, MA=Manager)
+const MANAGER_ROLES = ["OW", "AD", "MA"];
 
 // AnnotationButtonContextMenu component - must be defined outside AnnotationButton
 // to maintain stable component reference and prevent hooks order issues
@@ -903,8 +878,9 @@ export const AnnotationButton = observer(
     // Note: acceptedState is set from serialized data: sn.accepted_state ?? sn.acceptedState ?? null
     // The badge will only display when the backend includes review status in the annotation serialization.
     // Review status is only visible to owners/administrators or reviewers with data manager access
-    const isManager = isManagingRole();
-    const isReviewer = isReviewerRole();
+    const userRole = (window as any).APP_SETTINGS?.user?.role;
+    const isManager = MANAGER_ROLES.includes(userRole);
+    const isReviewer = userRole === "RE";
     const hasDataManagerAccess =
       isReviewer && (window as any).APP_SETTINGS?.project?.review_settings?.show_data_manager_to_reviewers !== false;
     const canViewReviewStatus = isManager || hasDataManagerAccess;
