@@ -77,10 +77,5 @@ export const EditorResizer: React.FC<EditorResizerProps> = ({
     [containerRef, editorWidthPixels, onResize, constraints],
   );
 
-  return (
-    <div
-      className={clsx(styles.handle, { [styles.handleResizing]: isResizing })}
-      onMouseDown={handleMouseDown}
-    />
-  );
+  return <div className={clsx(styles.handle, { [styles.handleResizing]: isResizing })} onMouseDown={handleMouseDown} />;
 };
