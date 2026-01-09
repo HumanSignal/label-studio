@@ -149,6 +149,7 @@ const hoverIntentDelay = 300;
 function AnnotationButtonTooltip({
   displayUsername,
   isDraft,
+  isDraftSaved,
   isPrediction,
   isSkipped,
   isSubmitted,
@@ -165,6 +166,7 @@ function AnnotationButtonTooltip({
 }: {
   displayUsername: string;
   isDraft: boolean;
+  isDraftSaved: boolean;
   isPrediction: boolean;
   isSkipped: boolean;
   isSubmitted: boolean;
@@ -180,24 +182,20 @@ function AnnotationButtonTooltip({
   position?: { top: number; left: number };
 }) {
   // Determine status badge (only for annotations, not predictions)
+  // Draft/Submitted are separate from Skipped/Ground Truth
   const statusBadge = useMemo(() => {
     if (isPrediction) {
       return null; // Status doesn't apply to predictions
     }
 
-    // Priority order: Draft > Skipped > Accepted/Rejected/Fixed > Submitted
-    if (isDraft) {
+    // Priority order: Draft > Accepted/Rejected/Fixed > Submitted
+    // Skipped and Ground Truth are handled separately
+    // Check for both ephemeral drafts (isDraft) and saved drafts (isDraftSaved)
+    if (isDraft || isDraftSaved) {
       return {
         label: "Draft",
         backgroundColor: "var(--color-accent-grape-subtle)",
         color: "var(--color-accent-grape-bold)",
-      };
-    }
-    if (isSkipped) {
-      return {
-        label: "Skipped",
-        backgroundColor: "var(--color-accent-persimmon-subtle)",
-        color: "var(--color-accent-persimmon-bold)",
       };
     }
     if (acceptedState) {
@@ -234,7 +232,7 @@ function AnnotationButtonTooltip({
     }
 
     return null;
-  }, [isPrediction, isDraft, isSkipped, acceptedState, isSubmitted]);
+  }, [isPrediction, isDraft, isDraftSaved, acceptedState, isSubmitted]);
 
   // Format date as "MMM DD YYYY, hh:mm:ss" (e.g., "Jan 15 2024, 14:30:45")
   const formatDate = useCallback((dateString: string | null | undefined): string | null => {
@@ -288,7 +286,7 @@ function AnnotationButtonTooltip({
   }, [annotationId, isPrediction, predictionScore, lastUpdated, formatDate]);
 
   const isRenderable =
-    tooltipData.length > 0 || !!displayUsername || !!statusBadge || !!isGroundTruth || !!annotationId;
+    tooltipData.length > 0 || !!displayUsername || !!statusBadge || !!isSkipped || !!isGroundTruth || !!annotationId;
 
   if (!isRenderable) {
     return null;
@@ -310,8 +308,9 @@ function AnnotationButtonTooltip({
         left: `${position.left}px`,
       }}
     >
-      {(statusBadge || isGroundTruth) && (
+      {(statusBadge || isSkipped || isGroundTruth) && (
         <div className={cn("annotation-button").elem("tooltipBadges").toClassName()}>
+          {/* Draft/Submitted badges shown first */}
           {statusBadge && (
             <Badge
               className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
@@ -324,6 +323,20 @@ function AnnotationButtonTooltip({
               {statusBadge.label}
             </Badge>
           )}
+          {/* Skipped badge shown after Draft/Submitted */}
+          {isSkipped && (
+            <Badge
+              className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
+              style={{
+                backgroundColor: "var(--color-accent-persimmon-subtle)",
+                color: "var(--color-accent-persimmon-bold)",
+                border: "none",
+              }}
+            >
+              Skipped
+            </Badge>
+          )}
+          {/* Ground Truth badge shown last */}
           {isGroundTruth && (
             <Badge
               className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
@@ -378,7 +391,8 @@ export const AnnotationButton = observer(
     const isDraft = !isPrediction && !isDefined(entity.pk);
     const isDraftSaved = !isPrediction && entity.draftId > 0;
     const isSkipped = !isPrediction && entity.skipped === true;
-    const isSubmitted = !isPrediction && !isDraft && !isDraftSaved && !isGroundTruth && !isSkipped;
+    // isSubmitted should be independent of skipped/ground truth status
+    const isSubmitted = !isPrediction && !isDraft && !isDraftSaved;
     const infoIsHidden = annotationStore.store?.hasInterface("annotations:hide-info");
     let hiddenUser = null;
 
@@ -956,6 +970,7 @@ export const AnnotationButton = observer(
           <AnnotationButtonTooltip
             displayUsername={displayUsername}
             isDraft={isDraft}
+            isDraftSaved={isDraftSaved}
             isPrediction={isPrediction}
             isSkipped={isSkipped}
             isSubmitted={isSubmitted}

@@ -52,7 +52,7 @@
           height: 6px;
         }
   
-        &_accepted {
+        &_accepted {          
           background-color: var(--color-accent-kale-base);
         }
   
@@ -136,17 +136,13 @@
     border-color: transparent;
   }
 
-  &_groundTruth {
-    &::before {
-      display: block;
-      border-color: var(--color-accent-canteloupe-base);
-    }
-  }
-
   &_draft, &_draftSaved {
+    --accent-base: var(--color-accent-grape-base);
+    --accent-subtle: var(--color-accent-grape-subtle);
+
     &::before {
       display: block;
-      border-color: var(--color-accent-grape-base);
+      border-color: var(--accent-base);
 
       & .annotation-button__name {
         font-style: italic;
@@ -160,13 +156,13 @@
       left: 0;
       width: 100%;
       display: block;
-      border-color: var(--color-accent-grape-base);
+      border-color: var(--accent-base);
       background-image: repeating-linear-gradient(-63.43deg, 
       transparent 1px, 
-      var(--color-accent-grape-base) 2px, 
-      var(--color-accent-grape-base) 7px, 
-      var(--color-accent-grape-subtle) 8px, 
-      var(--color-accent-grape-subtle) 12px);
+      var(--accent-base) 2px, 
+      var(--accent-base) 7px, 
+      var(--accent-subtle) 8px, 
+      var(--accent-subtle) 12px);
       background-repeat: repeat-x;
       background-position: top;
       background-size: 100% 2px;
@@ -178,10 +174,23 @@
     }
   }
 
-  &_skipped {
+  &_groundTruth {
+    --accent-base: var(--color-accent-canteloupe-base);
+    --accent-subtle: var(--color-accent-canteloupe-subtle);
+
     &::before {
       display: block;
-      border-color: var(--color-accent-persimmon-base);
+      border-color: var(--accent-base);
+    }
+  }
+
+  &_skipped {
+    --accent-base: var(--color-accent-persimmon-base);
+    --accent-subtle: var(--color-accent-persimmon-subtle);
+
+    &::before {
+      display: block;
+      border-color: var(--accent-base);
     }
   }
 
