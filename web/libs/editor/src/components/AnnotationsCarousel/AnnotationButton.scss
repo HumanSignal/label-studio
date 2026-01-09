@@ -234,11 +234,14 @@
     top: var(--spacing-tighter);
     right: var(--spacing-tightest);
     transform: rotate(90deg);
-    display: flex;
     border-radius: var(--corner-radius-smaller);
     color: var(--color-neutral-content-subtler);
     opacity: 0;
-    padding: var(--spacing-tighter);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid var(--trigger-border-color);
     background-color: var(--color-neutral-background);
     transition: opacity 150ms ease-out, background-color 150ms ease-out, right 150ms ease-out;
@@ -260,6 +263,13 @@
       svg {
         color: var(--color-neutral-content);
       }
+    }
+  }
+
+  &_triggerOpened {
+    & .annotation-button__trigger {
+      opacity: 1;
+      right: var(--spacing-tighter);
     }
   }
 

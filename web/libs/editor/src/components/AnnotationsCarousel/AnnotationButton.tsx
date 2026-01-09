@@ -26,7 +26,7 @@ import {
   IconCrossAlt,
   IconEllipsisVertical,
 } from "@humansignal/icons";
-import { Tooltip, Userpic, ToastType, useToast, Badge } from "@humansignal/ui";
+import { Tooltip, Userpic, ToastType, useToast, Badge, DropdownTrigger } from "@humansignal/ui";
 import { TimeAgo } from "../../common/TimeAgo/TimeAgo";
 import { useDropdown } from "@humansignal/ui";
 import { isFF } from "../../utils/feature-flags";
@@ -34,7 +34,7 @@ import { isFF } from "../../utils/feature-flags";
 // eslint-disable-next-line
 // @ts-ignore
 import { confirm } from "../../common/Modal/Modal";
-import { type ContextMenuAction, ContextMenu, ContextMenuTrigger, type MenuActionOnClick } from "../ContextMenu";
+import { type ContextMenuAction, ContextMenu, type MenuActionOnClick } from "../ContextMenu";
 import "./AnnotationButton.scss";
 
 // Constants for name truncation
@@ -861,6 +861,7 @@ export const AnnotationButton = observer(
             draftSaved: isDraftSaved, // Saved draft
             submitted: isSubmitted,
             skipped: isSkipped,
+            triggerOpened: isContextMenuOpen,
           })
           .toClassName()}
         data-annotation-id={isAlive(entity) ? (entity.pk ?? entity.id) : undefined}
@@ -970,31 +971,35 @@ export const AnnotationButton = observer(
             position={tooltipPosition}
           />
         </div>
-        <div className={cn("annotation-button").elem("trigger").toClassName()} onMouseEnter={handleTriggerEnter}>
-          <ContextMenuTrigger
-            content={
-              <AnnotationButtonContextMenu
-                entity={entity}
-                capabilities={capabilities}
-                annotationStore={annotationStore}
-                store={annotationStore.store}
-              />
-            }
-            onToggle={(isOpen) => {
-              setContextMenuOpen(isOpen);
-              // Close tooltip when context menu opens
-              if (isOpen) {
-                setTooltipOpen(false);
-                if (timeoutRef.current) {
-                  clearTimeout(timeoutRef.current);
-                  timeoutRef.current = undefined;
-                }
+        <DropdownTrigger
+          content={
+            <AnnotationButtonContextMenu
+              entity={entity}
+              capabilities={capabilities}
+              annotationStore={annotationStore}
+              store={annotationStore.store}
+            />
+          }
+          onToggle={(isOpen) => {
+            setContextMenuOpen(isOpen);
+            // Close tooltip when context menu opens
+            if (isOpen) {
+              setTooltipOpen(false);
+              if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+                timeoutRef.current = undefined;
               }
-            }}
+            }
+          }}
+        >
+          <div
+            className={cn("annotation-button").elem("trigger").toClassName()}
+            onMouseEnter={handleTriggerEnter}
+            onClick={(e) => e.stopPropagation()}
           >
             <IconEllipsisVertical width={20} height={20} />
-          </ContextMenuTrigger>
-        </div>
+          </div>
+        </DropdownTrigger>
       </div>
     );
   },
