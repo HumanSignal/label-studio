@@ -654,7 +654,7 @@ export const AnnotationButton = observer(
         ? truncate(displayUsername, NAME_TRUNCATE_START, NAME_TRUNCATE_END, "...")
         : displayUsername;
 
-    const CommentIcon = entityIsAlive ? renderCommentIcon(entity) : null;
+    const CommentIcon = renderCommentIcon(entity);
     // need to find a more reliable way to grab this value
     // const historyActionType = annotationStore.history.toJSON()?.[0]?.actionType;
 
@@ -909,19 +909,20 @@ export const AnnotationButton = observer(
       isReviewer && (window as any).APP_SETTINGS?.project?.review_settings?.show_data_manager_to_reviewers !== false;
     const canViewReviewStatus = isManager || hasDataManagerAccess;
 
-    const acceptedState = canViewReviewStatus && entityIsAlive ? entity.accepted_state || entity.acceptedState : null;
-    const reviewBadge = canViewReviewStatus ? getReviewBadge(acceptedState) : null;
-
     // Return null if entity is not alive, but only after all hooks have been called
     if (!entityIsAlive) {
       return null;
     }
 
+    // After this point, entityIsAlive is guaranteed to be true, so we can safely access entity properties
+    const acceptedState = canViewReviewStatus ? entity.accepted_state || entity.acceptedState : null;
+    const reviewBadge = canViewReviewStatus ? getReviewBadge(acceptedState) : null;
+
     return (
       <div
         className={cn("annotation-button")
           .mod({
-            selected: entityIsAlive && entity.selected ? entity.selected : false,
+            selected: entity.selected,
             groundTruth: isGroundTruth,
             draft: isDraft && !isDraftSaved, // Ephemeral draft only
             draftSaved: isDraftSaved, // Saved draft
@@ -930,7 +931,7 @@ export const AnnotationButton = observer(
             triggerOpened: isContextMenuOpen,
           })
           .toClassName()}
-        data-annotation-id={entityIsAlive ? (entity.pk ?? entity.id) : undefined}
+        data-annotation-id={entity.pk ?? entity.id}
         ref={buttonRef as any}
         onMouseEnter={handleTooltipEnter}
         onMouseLeave={handleTooltipLeave}
@@ -1030,7 +1031,7 @@ export const AnnotationButton = observer(
             acceptedState={acceptedState}
             predictionScore={isPrediction ? entity.score : null}
             lastUpdated={entity.createdDate}
-            annotationId={entityIsAlive ? (entity.pk ?? entity.id) : undefined}
+            annotationId={entity.pk ?? entity.id}
             containerRef={tooltipContainerRef}
             isTooltipOpen={isTooltipOpen}
             onMouseEnter={handleTooltipEnter}
