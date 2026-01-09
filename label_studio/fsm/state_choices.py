@@ -37,18 +37,9 @@ class TaskStateChoices(models.TextChoices):
 
 @register_state_choices('annotation')
 class AnnotationStateChoices(models.TextChoices):
-    """
-    Core annotation states for basic Label Studio workflow.
-    Simplified states covering the essential annotation lifecycle:
-    - Submission
-    - Completion
-    """
+    """Annotations don't carry state in LSO, but this can still be used for tracking history."""
 
-    # Working States
     CREATED = 'CREATED', _('Created')
-
-    # Terminal State
-    COMPLETED = 'COMPLETED', _('Completed')
 
 
 @register_state_choices('project')

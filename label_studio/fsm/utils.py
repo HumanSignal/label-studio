@@ -449,8 +449,6 @@ def _get_initialization_transition_name(entity_type: str, target_state: str) -> 
     elif entity_type == 'annotation':
         if target_state == AnnotationStateChoices.CREATED:
             return 'annotation_created'
-        elif target_state == AnnotationStateChoices.COMPLETED:
-            return 'annotation_created'  # Use create transition for initialization
 
     return None
 

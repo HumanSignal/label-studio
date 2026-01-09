@@ -220,70 +220,37 @@ class FSMEntityHistoryAPITests(APITestCase):
         state_1 = AnnotationStateFactory(annotation=self.annotation, state=AnnotationStateChoices.CREATED)
         state_1.created_at = state_1.created_at - timedelta(seconds=10)
         state_1.save()
-        state_2 = AnnotationStateFactory(
-            annotation=self.annotation,
-            state=AnnotationStateChoices.COMPLETED,
-            previous_state=AnnotationStateChoices.CREATED,
-            triggered_by=self.user,
-            transition_name='complete_annotation',
-        )
 
         self.client.force_authenticate(user=self.user)
         response = self.client.get(f'/api/fsm/entities/annotation/{self.annotation.id}/history')
         assert response.status_code == 200
-        assert len(response.json()['results']) == 2
-        assert response.json()['results'][0]['id'] == str(state_2.id)
-        assert response.json()['results'][1]['id'] == str(state_1.id)
-
-        # Test ordering
-        response = self.client.get(f'/api/fsm/entities/annotation/{self.annotation.id}/history?ordering=id')
-        assert response.status_code == 200
-        assert len(response.json()['results']) == 2
+        assert len(response.json()['results']) == 1
         assert response.json()['results'][0]['id'] == str(state_1.id)
-        assert response.json()['results'][1]['id'] == str(state_2.id)
 
         # Test state filtering
         response = self.client.get(
-            f'/api/fsm/entities/annotation/{self.annotation.id}/history?state={AnnotationStateChoices.COMPLETED}'
+            f'/api/fsm/entities/annotation/{self.annotation.id}/history?state={AnnotationStateChoices.CREATED}'
         )
         assert response.status_code == 200
         assert len(response.json()['results']) == 1
-        assert response.json()['results'][0]['id'] == str(state_2.id)
+        assert response.json()['results'][0]['id'] == str(state_1.id)
 
-        # Test previous_state filtering
+        # No previous_state, triggered_by, or transition_name filtering because initial transition is not provided by factory
         response = self.client.get(
             f'/api/fsm/entities/annotation/{self.annotation.id}/history?previous_state={AnnotationStateChoices.CREATED}'
         )
         assert response.status_code == 200
-        assert len(response.json()['results']) == 1
-        assert response.json()['results'][0]['id'] == str(state_2.id)
-
-        # Test transition_name filtering
-        response = self.client.get(
-            f'/api/fsm/entities/annotation/{self.annotation.id}/history?transition_name=complete_annotation'
-        )
-        assert response.status_code == 200
-        assert len(response.json()['results']) == 1
-        assert response.json()['results'][0]['id'] == str(state_2.id)
-
-        # Test triggered_by filtering
-        response = self.client.get(
-            f'/api/fsm/entities/annotation/{self.annotation.id}/history?triggered_by={self.user.id}'
-        )
-        assert response.status_code == 200
-        assert len(response.json()['results']) == 1
-        assert response.json()['results'][0]['id'] == str(state_2.id)
-        assert response.json()['results'][0]['triggered_by']['id'] == self.user.id
+        assert len(response.json()['results']) == 0
 
         # Test date filtering
-        created_at_from = (state_2.created_at - timedelta(seconds=1)).isoformat()
-        created_at_to = state_2.created_at.isoformat()
+        created_at_from = (state_1.created_at - timedelta(seconds=1)).isoformat()
+        created_at_to = state_1.created_at.isoformat()
         response = self.client.get(
             f'/api/fsm/entities/annotation/{self.annotation.id}/history?created_at_from={quote(created_at_from)}&created_at_to={quote(created_at_to)}'
         )
         assert response.status_code == 200
         assert len(response.json()['results']) == 1
-        assert response.json()['results'][0]['id'] == str(state_2.id)
+        assert response.json()['results'][0]['id'] == str(state_1.id)
 
 
 class FSMEntityTransitionAPITests(APITestCase):

@@ -36,8 +36,13 @@ def _get_or_infer_state(entity) -> Optional[str]:
     entity_type = entity._meta.model_name.lower()
 
     if entity_type == 'task':
-        # Task state depends on whether it has been labeled
-        return TaskStateChoices.COMPLETED if entity.is_labeled else TaskStateChoices.CREATED
+        # Task state depends on whether it has been partially or fully labeled
+        if entity.is_labeled:
+            return TaskStateChoices.COMPLETED
+        elif entity.total_annotations > 0:
+            return TaskStateChoices.IN_PROGRESS
+        else:
+            return TaskStateChoices.CREATED
     elif entity_type == 'project':
         # Project state depends on task completion
         # If no tasks exist, project is CREATED

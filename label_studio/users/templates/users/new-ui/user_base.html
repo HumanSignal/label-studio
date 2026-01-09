@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/fonts.hellix.css' %}"/>
 <link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/login.css' %}"/>
 
+{% if settings.COLLECT_ANALYTICS %}
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129877673-1" nonce="{{request.csp_nonce}}"></script>
 <script nonce="{{request.csp_nonce}}">
 window.dataLayer = window.dataLayer || [];
@@ -15,6 +16,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'UA-129877673-1');
 </script>
+{% endif %}
 {% endblock %}
 
 {% block content %}
