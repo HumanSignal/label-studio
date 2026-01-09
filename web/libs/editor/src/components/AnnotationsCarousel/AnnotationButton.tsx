@@ -4,6 +4,7 @@ import { inject, observer } from "mobx-react";
 import { isAlive } from "mobx-state-tree";
 import truncate from "truncate-middle";
 import clsx from "clsx";
+import { format, isValid } from "date-fns";
 import { useCopyText } from "@humansignal/core";
 import { isDefined, userDisplayName } from "@humansignal/core/lib/utils/helpers";
 import { cn } from "../../utils/bem";
@@ -146,6 +147,19 @@ const injector = inject(({ store }) => {
 
 const hoverIntentDelay = 300;
 
+// Helper function to create badge style objects with consistent CSS variable pattern
+const createBadgeStyle = (label: string, colorName: string) => ({
+  label,
+  backgroundColor: `var(--color-accent-${colorName}-subtle)`,
+  color: `var(--color-accent-${colorName}-bold)`,
+});
+
+// Helper function to get just the CSS variable style properties
+const getBadgeColors = (colorName: string) => ({
+  backgroundColor: `var(--color-accent-${colorName}-subtle)`,
+  color: `var(--color-accent-${colorName}-bold)`,
+});
+
 function AnnotationButtonTooltip({
   displayUsername,
   isDraft,
@@ -193,66 +207,39 @@ function AnnotationButtonTooltip({
     // Check for both ephemeral drafts (isDraft) and saved drafts (isDraftSaved)
     // Exception: If Draft AND Skipped, show both Draft and Skipped
     if (isDraft || isDraftSaved) {
-      return {
-        label: "Draft",
-        backgroundColor: "var(--color-accent-grape-subtle)",
-        color: "var(--color-accent-grape-bold)",
-      };
+      return createBadgeStyle("Draft", "grape");
     }
     if (acceptedState) {
       switch (acceptedState) {
         case "accepted":
-          return {
-            label: "Accepted",
-            backgroundColor: "var(--color-accent-kale-subtle)",
-            color: "var(--color-accent-kale-bold)",
-          };
+          return createBadgeStyle("Accepted", "kale");
         case "rejected":
-          return {
-            label: "Rejected",
-            backgroundColor: "var(--color-accent-persimmon-subtle)",
-            color: "var(--color-accent-persimmon-bold)",
-          };
+          return createBadgeStyle("Rejected", "persimmon");
         case "fixed":
         case "fixed_and_accepted":
-          return {
-            label: "Fixed",
-            backgroundColor: "var(--color-accent-canteloupe-subtle)",
-            color: "var(--color-accent-canteloupe-bold)",
-          };
+          return createBadgeStyle("Fixed", "canteloupe");
         default:
           break;
       }
     }
     // Exception: If Submitted AND Skipped, only show Skipped (don't show Submitted)
     if (isSubmitted && !isSkipped) {
-      return {
-        label: "Submitted",
-        backgroundColor: "var(--color-accent-kale-subtle)",
-        color: "var(--color-accent-kale-bold)",
-      };
+      return createBadgeStyle("Submitted", "kale");
     }
 
     return null;
   }, [isPrediction, isDraft, isDraftSaved, acceptedState, isSubmitted, isSkipped]);
 
-  // Format date as "MMM DD YYYY, hh:mm:ss" (e.g., "Jan 15 2024, 14:30:45")
+  // Format date using date-fns, matching Data Manager format: "MMM dd yyyy, HH:mm:ss" (e.g., "Jan 15 2024, 14:30:45")
   const formatDate = useCallback((dateString: string | null | undefined): string | null => {
     if (!dateString) return null;
 
     try {
       const date = new Date(dateString);
-      if (isNaN(date.getTime())) return null;
+      if (!isValid(date)) return null;
 
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      const month = months[date.getMonth()];
-      const day = date.getDate().toString().padStart(2, "0");
-      const year = date.getFullYear();
-      const hours = date.getHours().toString().padStart(2, "0");
-      const minutes = date.getMinutes().toString().padStart(2, "0");
-      const seconds = date.getSeconds().toString().padStart(2, "0");
-
-      return `${month} ${day} ${year}, ${hours}:${minutes}:${seconds}`;
+      // Use the same format as Data Manager's DateTimeCell
+      return format(date, "MMM dd yyyy, HH:mm:ss");
     } catch {
       return null;
     }
@@ -330,8 +317,7 @@ function AnnotationButtonTooltip({
             <Badge
               className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
               style={{
-                backgroundColor: "var(--color-accent-persimmon-subtle)",
-                color: "var(--color-accent-persimmon-bold)",
+                ...getBadgeColors("persimmon"),
                 border: "none",
               }}
             >
@@ -343,8 +329,7 @@ function AnnotationButtonTooltip({
             <Badge
               className={cn("annotation-button").elem("tooltipStatusBadge").toClassName()}
               style={{
-                backgroundColor: "var(--color-accent-canteloupe-subtle)",
-                color: "var(--color-accent-canteloupe-bold)",
+                ...getBadgeColors("canteloupe"),
                 border: "none",
               }}
             >
@@ -374,6 +359,31 @@ function AnnotationButtonTooltip({
 
   return typeof document !== "undefined" ? createPortal(tooltipContent, document.body) : null;
 }
+
+// Role constants matching ROLES enum from AuthProvider
+const ROLE_VALUES = {
+  OWNER: "OW",
+  ADMIN: "AD",
+  MANAGER: "MA",
+  REVIEWER: "RE",
+  ANNOTATOR: "AN",
+} as const;
+
+// Helper functions to check roles, matching the pattern from AuthProvider
+// These work with window.APP_SETTINGS when AuthProvider is not available
+const getEffectiveRole = (): string | null => {
+  return (window as any).APP_SETTINGS?.user?.role ?? null;
+};
+
+const isManagingRole = (role?: string | null): boolean => {
+  if (!role) role = getEffectiveRole();
+  return role === ROLE_VALUES.OWNER || role === ROLE_VALUES.ADMIN || role === ROLE_VALUES.MANAGER;
+};
+
+const isReviewerRole = (role?: string | null): boolean => {
+  if (!role) role = getEffectiveRole();
+  return role === ROLE_VALUES.REVIEWER;
+};
 
 export const AnnotationButton = observer(
   ({ entity, capabilities, annotationStore, onAnnotationChange }: AnnotationButtonInterface) => {
@@ -673,13 +683,13 @@ export const AnnotationButton = observer(
     // Note: acceptedState is set from serialized data: sn.accepted_state ?? sn.acceptedState ?? null
     // The badge will only display when the backend includes review status in the annotation serialization.
     // Review status is only visible to owners/administrators or reviewers with data manager access
-    const userRole = (window as any).APP_SETTINGS?.user?.role;
-    const MANAGER_ROLES = ["OW", "AD", "MA"]; // Owner, Admin, Manager
-    const isManager = MANAGER_ROLES.includes(userRole);
-    const isReviewer = userRole === "RE"; // Reviewer role
-    const hasDataManagerAccess =
-      isReviewer && (window as any).APP_SETTINGS?.project?.review_settings?.show_data_manager_to_reviewers !== false;
-    const canViewReviewStatus = isManager || hasDataManagerAccess;
+    const canViewReviewStatus = useMemo(() => {
+      const isManager = isManagingRole();
+      const isReviewer = isReviewerRole();
+      const hasDataManagerAccess =
+        isReviewer && (window as any).APP_SETTINGS?.project?.review_settings?.show_data_manager_to_reviewers !== false;
+      return isManager || hasDataManagerAccess;
+    }, []);
 
     const acceptedState = canViewReviewStatus ? entity.accepted_state || entity.acceptedState : null;
     const reviewBadge = canViewReviewStatus ? getReviewBadge(acceptedState) : null;
