@@ -798,13 +798,18 @@ class PreparedTaskManager(models.Manager):
                 # Expect a dict of {field_name: function that annotates the queryset}
                 overlay_map = overlay_func(request=request, project=getattr(queryset.first(), 'project', None)) or {}
                 if isinstance(overlay_map, dict) and overlay_map:
-                    # Ensure dynamic fields are evaluated even if not explicitly selected
-                    if fields_for_evaluation is None:
-                        fields_for_evaluation = list(overlay_map.keys())
-                    else:
-                        fields_for_evaluation = list(set(fields_for_evaluation) | set(overlay_map.keys()))
-                    # Merge overlay with base map for this call only
+                    # Only add overlay_map keys if they're explicitly requested in fields_for_evaluation
+                    # or if all_fields=True. Don't automatically add all overlay_map keys to avoid
+                    # processing all tasks when only a page is needed (e.g., in only_filtered).
+                    # Merge overlay with base map for this call only (all keys available, but only used if requested)
                     annotations_map = {**annotations_map, **overlay_map}
+                    # Only add overlay_map keys to fields_for_evaluation if they're explicitly requested
+                    if fields_for_evaluation is not None:
+                        # Only include overlay_map keys that are already in fields_for_evaluation
+                        overlay_keys_in_request = [k for k in overlay_map.keys() if k in fields_for_evaluation]
+                        if overlay_keys_in_request:
+                            # Ensure they're in the list (they already are, but this makes it explicit)
+                            fields_for_evaluation = list(set(fields_for_evaluation) | set(overlay_keys_in_request))
 
         if fields_for_evaluation is None:
             fields_for_evaluation = []
