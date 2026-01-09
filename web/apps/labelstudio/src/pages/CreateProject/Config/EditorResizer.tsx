@@ -1,7 +1,7 @@
 import type React from "react";
 import { useCallback, useState } from "react";
-import { cn } from "../../../utils/bem";
-import "./EditorResizer.scss";
+import clsx from "clsx";
+import styles from "./EditorResizer.module.scss";
 
 interface EditorResizerProps {
   containerRef: React.RefObject<HTMLDivElement>;
@@ -79,7 +79,7 @@ export const EditorResizer: React.FC<EditorResizerProps> = ({
 
   return (
     <div
-      className={cn("editor-resizer").elem("handle").mod({ resizing: isResizing }).toString()}
+      className={clsx(styles.handle, { [styles.handleResizing]: isResizing })}
       onMouseDown={handleMouseDown}
     />
   );
