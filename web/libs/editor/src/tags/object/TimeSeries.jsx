@@ -28,7 +28,6 @@ import { fixMobxObserve } from "../../utils/utilities";
 import "./TimeSeries/MultiChannel";
 import "./TimeSeries/Channel";
 import { getChannelColor } from "./TimeSeries/palette";
-import { FF_TIMESERIES_SYNC, isFF } from "../../utils/feature-flags";
 import { ff } from "@humansignal/core";
 /**
  * The `TimeSeries` tag can be used to label time series data. Read more about Time Series Labeling on [the time series template page](../templates/time_series.html).
@@ -1022,16 +1021,13 @@ const Model = types
 
     registerSyncHandlers() {
       if (!isAlive(self)) return;
-      if (isFF(FF_TIMESERIES_SYNC)) {
-        self.syncHandlers.set("seek", self._handleSeek);
-        self.syncHandlers.set("play", self._handlePlay);
-        self.syncHandlers.set("pause", self._handlePause);
-      }
+      self.syncHandlers.set("seek", self._handleSeek);
+      self.syncHandlers.set("play", self._handlePlay);
+      self.syncHandlers.set("pause", self._handlePause);
     },
 
     emitSeekSync() {
       if (!isAlive(self)) return;
-      if (!isFF(FF_TIMESERIES_SYNC)) return;
       if (self.suppressSync) return;
 
       const centerTime = self.centerTime; // centerTime is in NATIVE units (ms if isDate, else seconds/indices)
@@ -1056,7 +1052,7 @@ const Model = types
     },
 
     plotClickHandler(timeClicked) {
-      if (!isAlive(self) || !isFF(FF_TIMESERIES_SYNC) || !self.sync) return;
+      if (!isAlive(self) || !self.sync) return;
       if (self.isNotReady) return;
 
       const [minKey, maxKey] = self.keysRange;

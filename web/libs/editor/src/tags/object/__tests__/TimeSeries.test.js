@@ -2,7 +2,6 @@
 import * as d3 from "d3";
 import { types } from "mobx-state-tree";
 import { mockFF } from "../../../../__mocks__/global";
-import { FF_TIMESERIES_SYNC } from "../../../utils/feature-flags";
 import { TimeSeriesModel } from "../TimeSeries";
 
 const ff = mockFF();
@@ -36,7 +35,6 @@ const MockStore = types
 
 // Set up feature flags
 ff.setup();
-ff.set(FF_TIMESERIES_SYNC, true);
 
 describe("TimeSeries brush range calculation", () => {
   // creating models can be a long one, so all tests will share one model
