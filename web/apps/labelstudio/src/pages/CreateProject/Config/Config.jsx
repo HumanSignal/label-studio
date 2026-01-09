@@ -19,7 +19,7 @@ import { UnsavedChanges } from "./UnsavedChanges";
 import { Checkbox, CodeEditor, Select } from "@humansignal/ui";
 import snakeCase from "lodash/snakeCase";
 import { useConfigResizer } from "./useConfigResizer";
-import { ConfigResizer } from "./ConfigResizer";
+import { EditorResizer } from "./EditorResizer";
 
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
@@ -616,7 +616,7 @@ const Configurator = ({
             position: "relative",
           }}
         >
-          <ConfigResizer
+          <EditorResizer
             containerRef={containerRef}
             editorWidthPixels={editorWidthPixels}
             onResize={setEditorWidthPixels}
