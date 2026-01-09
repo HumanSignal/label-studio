@@ -34,7 +34,6 @@ export * from "./lib/auto-sizer-table/auto-sizer-table";
 export * from "./lib/data-table";
 export * from "./lib/pagination";
 export * from "./lib/drawer";
-export * from "./lib/date-range-picker";
 
 export * from "./utils/utils";
 
