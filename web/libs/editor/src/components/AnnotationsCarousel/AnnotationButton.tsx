@@ -922,6 +922,8 @@ export const AnnotationButton = observer(
           <div className={cn("annotation-button").elem("picSection").toClassName()}>
             <Userpic
               className={cn("annotation-button").elem("userpic").mod({ prediction: isPrediction }).toClassName()}
+              // @ts-expect-error - block attribute for Selenium test compatibility
+              block="lsf-annotation-button"
               username={isPrediction ? entity.createdBy : null}
               user={hiddenUser ?? entity.user ?? { email: entity.createdBy }}
               size={24}
