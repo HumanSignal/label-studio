@@ -156,6 +156,7 @@ function AnnotationButtonTooltip({
   acceptedState,
   predictionScore,
   lastUpdated,
+  annotationId,
   containerRef,
   isTooltipOpen,
   onMouseEnter,
@@ -171,6 +172,7 @@ function AnnotationButtonTooltip({
   acceptedState: string | null | undefined;
   predictionScore?: number | null;
   lastUpdated?: string | null;
+  annotationId?: string | number | null;
   containerRef?: React.MutableRefObject<HTMLElement | undefined>;
   isTooltipOpen?: boolean;
   onMouseEnter?: (e: React.MouseEvent) => void;
@@ -259,6 +261,11 @@ function AnnotationButtonTooltip({
   const tooltipData = useMemo(() => {
     const rows: Array<{ label: string; value: string }> = [];
 
+    // Add Annotation ID first if available
+    if (annotationId) {
+      rows.push({ label: "Annotation ID", value: String(annotationId) });
+    }
+
     // Add Type for all annotations/predictions
     if (isPrediction) {
       rows.push({ label: "Type", value: "Prediction" });
@@ -278,9 +285,10 @@ function AnnotationButtonTooltip({
     }
 
     return rows;
-  }, [isPrediction, predictionScore, lastUpdated, formatDate]);
+  }, [annotationId, isPrediction, predictionScore, lastUpdated, formatDate]);
 
-  const isRenderable = tooltipData.length > 0 || !!displayUsername || !!statusBadge || !!isGroundTruth;
+  const isRenderable =
+    tooltipData.length > 0 || !!displayUsername || !!statusBadge || !!isGroundTruth || !!annotationId;
 
   if (!isRenderable) {
     return null;
@@ -954,6 +962,7 @@ export const AnnotationButton = observer(
             acceptedState={acceptedState}
             predictionScore={isPrediction ? entity.score : null}
             lastUpdated={entity.createdDate}
+            annotationId={isAlive(entity) ? (entity.pk ?? entity.id) : undefined}
             containerRef={tooltipContainerRef}
             isTooltipOpen={isTooltipOpen}
             onMouseEnter={handleTooltipEnter}
