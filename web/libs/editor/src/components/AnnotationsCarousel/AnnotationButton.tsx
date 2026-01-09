@@ -372,39 +372,256 @@ const ROLE_VALUES = {
 // Helper functions to check roles, matching the pattern from AuthProvider
 // These work with window.APP_SETTINGS when AuthProvider is not available
 const getEffectiveRole = (): string | null => {
+  if (typeof window === "undefined") return null;
   return (window as any).APP_SETTINGS?.user?.role ?? null;
 };
 
 const isManagingRole = (role?: string | null): boolean => {
   if (!role) role = getEffectiveRole();
+  if (!role) return false;
   return role === ROLE_VALUES.OWNER || role === ROLE_VALUES.ADMIN || role === ROLE_VALUES.MANAGER;
 };
 
 const isReviewerRole = (role?: string | null): boolean => {
   if (!role) role = getEffectiveRole();
+  if (!role) return false;
   return role === ROLE_VALUES.REVIEWER;
 };
 
+// AnnotationButtonContextMenu component - must be defined outside AnnotationButton
+// to maintain stable component reference and prevent hooks order issues
+const AnnotationButtonContextMenu = injector(
+  observer(
+    ({
+      entity,
+      capabilities,
+      store,
+      isGroundTruth,
+      iconSize,
+      onAnnotationChange,
+      annotationStore,
+    }: AnnotationButtonInterface & {
+      isGroundTruth?: boolean;
+      iconSize: number;
+      onAnnotationChange?: () => void;
+      annotationStore: any;
+    }) => {
+      // Check if entity is alive - must be done before any hooks
+      const entityIsAlive = isAlive(entity);
+
+      const annotationLink = useMemo(() => {
+        if (!entityIsAlive || !entity.pk) {
+          return "";
+        }
+        const url = new URL(window.location.href);
+        if (entity.pk) {
+          url.searchParams.set("annotation", entity.pk);
+        }
+        // In case of targeting directly an annotation, we don't want to show the region in the URL
+        // otherwise it will be shown as a region link
+        url.searchParams.delete("region");
+        return url.toString();
+      }, [entityIsAlive, entity.pk]);
+      const [copyLink] = useCopyText({ defaultText: annotationLink });
+      const toast = useToast();
+      const dropdown = useDropdown();
+      const clickHandler = () => {
+        onAnnotationChange?.();
+        dropdown?.close();
+      };
+      const setGroundTruth = useCallback<MenuActionOnClick>(() => {
+        entity.setGroundTruth(!isGroundTruth);
+        clickHandler();
+      }, [entity, isGroundTruth]);
+      const duplicateAnnotation = useCallback<MenuActionOnClick>(() => {
+        const c = annotationStore.addAnnotationFromPrediction(entity);
+
+        window.setTimeout(() => {
+          annotationStore.selectAnnotation(c.id, { exitViewAll: true });
+          clickHandler();
+        });
+      }, [entity, annotationStore]);
+      const linkAnnotation = useCallback<MenuActionOnClick>(() => {
+        copyLink();
+        dropdown?.close();
+        toast?.show({
+          message: "Annotation link copied to clipboard",
+          type: ToastType.info,
+        });
+      }, [copyLink, toast, dropdown]);
+      const [copyAnnotationId] = useCopyText({ defaultText: entity.pk?.toString() ?? entity.id?.toString() ?? "" });
+      const copyAnnotationIdHandler = useCallback<MenuActionOnClick>(() => {
+        copyAnnotationId();
+        dropdown?.close();
+        toast?.show({
+          message: "Annotation ID copied to clipboard",
+          type: ToastType.info,
+        });
+      }, [copyAnnotationId, toast, dropdown]);
+      const openPerformanceDashboard = useCallback<MenuActionOnClick>(() => {
+        // Only available in LSE
+        const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
+        if (!isLSE) return;
+
+        const url = new URL(window.location.origin);
+        const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
+
+        // Route to different dashboards based on feature flag
+        if (useNewAnalytics) {
+          url.pathname = "/analytics/member-performance";
+        } else {
+          url.pathname = "/performance";
+        }
+
+        // Add user, project, and annotation context
+        if (entity.user?.id) {
+          url.searchParams.set("user", entity.user.id);
+        }
+
+        const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
+        if (projectMatch) {
+          url.searchParams.set("project", projectMatch[1]);
+        }
+
+        window.open(url.toString(), "_blank");
+        dropdown?.close();
+      }, [entity, dropdown]);
+      const showOtherAnnotations = useCallback<MenuActionOnClick>(() => {
+        annotationStore.toggleViewingAllAnnotations();
+        clickHandler();
+      }, [annotationStore, onAnnotationChange]);
+      const deleteAnnotation = useCallback(() => {
+        clickHandler();
+        confirm({
+          title: "Delete annotation?",
+          body: (
+            <>
+              This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
+              <br />
+              This action cannot be undone.
+            </>
+          ),
+          buttonLook: "negative",
+          okText: "Delete",
+          onOk: () => {
+            entity.list.deleteAnnotation(entity);
+          },
+        });
+      }, [entity, onAnnotationChange]);
+      const isPrediction = entity.type === "prediction";
+      const isDraft = !isDefined(entity.pk);
+      const showGroundTruth = capabilities.groundTruthEnabled && !isPrediction && !isDraft;
+      const showDuplicateAnnotation = capabilities.enableCreateAnnotation && !isDraft;
+      const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
+
+      // Check if project ID is available (from store or URL)
+      const hasProjectId = !!window.location.pathname.match(/\/projects\/(\d+)/);
+
+      const actions = useMemo<ContextMenuAction[]>(
+        () => [
+          {
+            label: "Copy Annotation ID",
+            onClick: copyAnnotationIdHandler,
+            icon: <IconClipboardCheck width={20} height={20} />,
+            enabled: !isDraft,
+          },
+          {
+            label: `${isGroundTruth ? "Unset " : "Set "} as Ground Truth`,
+            onClick: setGroundTruth,
+            icon: isGroundTruth ? (
+              <IconStar color="#FFC53D" width={iconSize} height={iconSize} />
+            ) : (
+              <IconStarOutline width={iconSize} height={iconSize} />
+            ),
+            enabled: showGroundTruth,
+          },
+          {
+            label: "Duplicate Annotation",
+            onClick: duplicateAnnotation,
+            icon: <IconDuplicate width={20} height={20} />,
+            enabled: showDuplicateAnnotation,
+          },
+          {
+            label: "Copy Annotation Link",
+            onClick: linkAnnotation,
+            icon: <IconLink />,
+            enabled: !isDraft && store.hasInterface("annotations:copy-link"),
+          },
+          {
+            label: "Open Performance Dashboard",
+            onClick: openPerformanceDashboard,
+            icon: <IconAnalytics width={20} height={20} />,
+            enabled: isLSE && hasProjectId && !isDraft && !isPrediction,
+          },
+          {
+            label: "Show Other Annotations",
+            onClick: showOtherAnnotations,
+            icon: <IconViewAll width={20} height={20} />,
+            enabled: true,
+          },
+          {
+            label: "Delete Annotation",
+            onClick: deleteAnnotation,
+            icon: <IconTrashRect />,
+            separator: true,
+            danger: true,
+            enabled: capabilities.enableAnnotationDelete && !isPrediction,
+          },
+        ],
+        [
+          entity,
+          isGroundTruth,
+          isPrediction,
+          isDraft,
+          isLSE,
+          hasProjectId,
+          capabilities.enableAnnotationDelete,
+          capabilities.enableCreateAnnotation,
+          capabilities.groundTruthEnabled,
+          copyAnnotationIdHandler,
+          openPerformanceDashboard,
+          showOtherAnnotations,
+          deleteAnnotation,
+          setGroundTruth,
+          duplicateAnnotation,
+          linkAnnotation,
+          iconSize,
+          store,
+        ],
+      );
+
+      // Return null if entity is not alive, but only after all hooks have been called
+      if (!entityIsAlive) {
+        return null;
+      }
+
+      return <ContextMenu actions={actions} />;
+    },
+  ),
+);
+
 export const AnnotationButton = observer(
   ({ entity, capabilities, annotationStore, onAnnotationChange }: AnnotationButtonInterface) => {
-    // Early return if entity is no longer part of the state tree
-    if (!isAlive(entity)) {
-      return null;
-    }
+    // Check if entity is alive - must be done before any hooks to avoid accessing dead entity
+    // But we'll return null AFTER all hooks are called to maintain hook order
+    const entityIsAlive = isAlive(entity);
 
     const iconSize = 32;
-    const isPrediction = entity.type === "prediction";
-    const username = userDisplayName(
-      entity.user ?? {
-        firstName: entity.createdBy || "Admin",
-      },
-    );
+    // Guard entity property access - use safe defaults if entity is not alive
+    const isPrediction = entityIsAlive ? entity.type === "prediction" : false;
+    const username = entityIsAlive
+      ? userDisplayName(
+          entity.user ?? {
+            firstName: entity.createdBy || "Admin",
+          },
+        )
+      : "Unknown";
     const [isGroundTruth, setIsGroundTruth] = useState<boolean>();
-    const isDraft = !isPrediction && !isDefined(entity.pk);
-    const isDraftSaved = !isPrediction && entity.draftId > 0;
-    const isSkipped = !isPrediction && entity.skipped === true;
+    const isDraft = entityIsAlive && !isPrediction && !isDefined(entity.pk);
+    const isDraftSaved = entityIsAlive && !isPrediction && entity.draftId > 0;
+    const isSkipped = entityIsAlive && !isPrediction && entity.skipped === true;
     // isSubmitted should be independent of skipped/ground truth status
-    const isSubmitted = !isPrediction && !isDraft && !isDraftSaved;
+    const isSubmitted = entityIsAlive && !isPrediction && !isDraft && !isDraftSaved;
     const infoIsHidden = annotationStore.store?.hasInterface("annotations:hide-info");
     let hiddenUser = null;
 
@@ -418,7 +635,7 @@ export const AnnotationButton = observer(
     const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number } | undefined>(undefined);
     const [isContextMenuOpen, setContextMenuOpen] = useState(false);
 
-    if (infoIsHidden) {
+    if (infoIsHidden && entityIsAlive) {
       // this data can be missing in tests, but we don't have `infoIsHidden` there, so hiding logic like this
       const currentUser = annotationStore.store.user;
       const isCurrentUser = entity.user?.id === currentUser.id || entity.createdBy === currentUser.email;
@@ -437,13 +654,15 @@ export const AnnotationButton = observer(
         ? truncate(displayUsername, NAME_TRUNCATE_START, NAME_TRUNCATE_END, "...")
         : displayUsername;
 
-    const CommentIcon = renderCommentIcon(entity);
+    const CommentIcon = entityIsAlive ? renderCommentIcon(entity) : null;
     // need to find a more reliable way to grab this value
     // const historyActionType = annotationStore.history.toJSON()?.[0]?.actionType;
 
     useEffect(() => {
-      setIsGroundTruth(entity.ground_truth);
-    }, [entity, entity.ground_truth]);
+      if (entityIsAlive) {
+        setIsGroundTruth(entity.ground_truth);
+      }
+    }, [entityIsAlive, entity, entity.ground_truth]);
 
     // Click outside handler for tooltip
     useEffect(() => {
@@ -668,6 +887,7 @@ export const AnnotationButton = observer(
     }, []);
 
     const clickHandler = useCallback(() => {
+      if (!entityIsAlive) return;
       const { selected, id, type } = entity;
 
       if (!selected) {
@@ -677,211 +897,31 @@ export const AnnotationButton = observer(
           annotationStore.selectAnnotation(id, { exitViewAll: true });
         }
       }
-    }, [entity]);
+    }, [entityIsAlive, entity, annotationStore]);
 
     // Get review badge
     // Note: acceptedState is set from serialized data: sn.accepted_state ?? sn.acceptedState ?? null
     // The badge will only display when the backend includes review status in the annotation serialization.
     // Review status is only visible to owners/administrators or reviewers with data manager access
-    const canViewReviewStatus = useMemo(() => {
-      const isManager = isManagingRole();
-      const isReviewer = isReviewerRole();
-      const hasDataManagerAccess =
-        isReviewer && (window as any).APP_SETTINGS?.project?.review_settings?.show_data_manager_to_reviewers !== false;
-      return isManager || hasDataManagerAccess;
-    }, []);
+    const isManager = isManagingRole();
+    const isReviewer = isReviewerRole();
+    const hasDataManagerAccess =
+      isReviewer && (window as any).APP_SETTINGS?.project?.review_settings?.show_data_manager_to_reviewers !== false;
+    const canViewReviewStatus = isManager || hasDataManagerAccess;
 
-    const acceptedState = canViewReviewStatus ? entity.accepted_state || entity.acceptedState : null;
+    const acceptedState = canViewReviewStatus && entityIsAlive ? entity.accepted_state || entity.acceptedState : null;
     const reviewBadge = canViewReviewStatus ? getReviewBadge(acceptedState) : null;
 
-    const AnnotationButtonContextMenu = injector(
-      observer(({ entity, capabilities, store }: AnnotationButtonInterface) => {
-        // Early return if entity is no longer part of the state tree
-        if (!isAlive(entity)) {
-          return null;
-        }
-
-        const annotationLink = useMemo(() => {
-          const url = new URL(window.location.href);
-          if (entity.pk) {
-            url.searchParams.set("annotation", entity.pk);
-          }
-          // In case of targeting directly an annotation, we don't want to show the region in the URL
-          // otherwise it will be shown as a region link
-          url.searchParams.delete("region");
-          return url.toString();
-        }, [entity.pk]);
-        const [copyLink] = useCopyText({ defaultText: annotationLink });
-        const toast = useToast();
-        const dropdown = useDropdown();
-        const clickHandler = () => {
-          onAnnotationChange?.();
-          dropdown?.close();
-        };
-        const setGroundTruth = useCallback<MenuActionOnClick>(() => {
-          entity.setGroundTruth(!isGroundTruth);
-          clickHandler();
-        }, [entity]);
-        const duplicateAnnotation = useCallback<MenuActionOnClick>(() => {
-          const c = annotationStore.addAnnotationFromPrediction(entity);
-
-          window.setTimeout(() => {
-            annotationStore.selectAnnotation(c.id, { exitViewAll: true });
-            clickHandler();
-          });
-        }, [entity]);
-        const linkAnnotation = useCallback<MenuActionOnClick>(() => {
-          copyLink();
-          dropdown?.close();
-          toast?.show({
-            message: "Annotation link copied to clipboard",
-            type: ToastType.info,
-          });
-        }, [entity, copyLink]);
-        const [copyAnnotationId] = useCopyText({ defaultText: entity.pk?.toString() ?? entity.id?.toString() ?? "" });
-        const copyAnnotationIdHandler = useCallback<MenuActionOnClick>(() => {
-          copyAnnotationId();
-          dropdown?.close();
-          toast?.show({
-            message: "Annotation ID copied to clipboard",
-            type: ToastType.info,
-          });
-        }, [entity, copyAnnotationId]);
-        const openPerformanceDashboard = useCallback<MenuActionOnClick>(() => {
-          // Only available in LSE
-          const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
-          if (!isLSE) return;
-
-          const url = new URL(window.location.origin);
-          const useNewAnalytics = isFF("fflag_feat_all_fit_778_analytics_short");
-
-          // Route to different dashboards based on feature flag
-          if (useNewAnalytics) {
-            url.pathname = "/analytics/member-performance";
-          } else {
-            url.pathname = "/performance";
-          }
-
-          // Add user, project, and annotation context
-          if (entity.user?.id) {
-            url.searchParams.set("user", entity.user.id);
-          }
-
-          const projectMatch = window.location.pathname.match(/\/projects\/(\d+)/);
-          if (projectMatch) {
-            url.searchParams.set("project", projectMatch[1]);
-          }
-
-          window.open(url.toString(), "_blank");
-          dropdown?.close();
-        }, [entity, annotationStore]);
-        const showOtherAnnotations = useCallback<MenuActionOnClick>(() => {
-          annotationStore.toggleViewingAllAnnotations();
-          clickHandler();
-        }, [annotationStore]);
-        const deleteAnnotation = useCallback(() => {
-          clickHandler();
-          confirm({
-            title: "Delete annotation?",
-            body: (
-              <>
-                This will <strong>delete all existing regions</strong>. Are you sure you want to delete them?
-                <br />
-                This action cannot be undone.
-              </>
-            ),
-            buttonLook: "negative",
-            okText: "Delete",
-            onOk: () => {
-              entity.list.deleteAnnotation(entity);
-            },
-          });
-        }, [entity]);
-        const isPrediction = entity.type === "prediction";
-        const isDraft = !isDefined(entity.pk);
-        const showGroundTruth = capabilities.groundTruthEnabled && !isPrediction && !isDraft;
-        const showDuplicateAnnotation = capabilities.enableCreateAnnotation && !isDraft;
-        const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
-
-        // Check if project ID is available (from store or URL)
-        const hasProjectId = !!window.location.pathname.match(/\/projects\/(\d+)/);
-
-        const actions = useMemo<ContextMenuAction[]>(
-          () => [
-            {
-              label: "Copy Annotation ID",
-              onClick: copyAnnotationIdHandler,
-              icon: <IconClipboardCheck width={20} height={20} />,
-              enabled: !isDraft,
-            },
-            {
-              label: `${isGroundTruth ? "Unset " : "Set "} as Ground Truth`,
-              onClick: setGroundTruth,
-              icon: isGroundTruth ? (
-                <IconStar color="#FFC53D" width={iconSize} height={iconSize} />
-              ) : (
-                <IconStarOutline width={iconSize} height={iconSize} />
-              ),
-              enabled: showGroundTruth,
-            },
-            {
-              label: "Duplicate Annotation",
-              onClick: duplicateAnnotation,
-              icon: <IconDuplicate width={20} height={20} />,
-              enabled: showDuplicateAnnotation,
-            },
-            {
-              label: "Copy Annotation Link",
-              onClick: linkAnnotation,
-              icon: <IconLink />,
-              enabled: !isDraft && store.hasInterface("annotations:copy-link"),
-            },
-            {
-              label: "Open Performance Dashboard",
-              onClick: openPerformanceDashboard,
-              icon: <IconAnalytics width={20} height={20} />,
-              enabled: isLSE && hasProjectId && !isDraft && !isPrediction,
-            },
-            {
-              label: "Show Other Annotations",
-              onClick: showOtherAnnotations,
-              icon: <IconViewAll width={20} height={20} />,
-              enabled: true,
-            },
-            {
-              label: "Delete Annotation",
-              onClick: deleteAnnotation,
-              icon: <IconTrashRect />,
-              separator: true,
-              danger: true,
-              enabled: capabilities.enableAnnotationDelete && !isPrediction,
-            },
-          ],
-          [
-            entity,
-            isGroundTruth,
-            isPrediction,
-            isDraft,
-            isLSE,
-            hasProjectId,
-            capabilities.enableAnnotationDelete,
-            capabilities.enableCreateAnnotation,
-            capabilities.groundTruthEnabled,
-            copyAnnotationIdHandler,
-            openPerformanceDashboard,
-            showOtherAnnotations,
-          ],
-        );
-
-        return <ContextMenu actions={actions} />;
-      }),
-    );
+    // Return null if entity is not alive, but only after all hooks have been called
+    if (!entityIsAlive) {
+      return null;
+    }
 
     return (
       <div
         className={cn("annotation-button")
           .mod({
-            selected: isAlive(entity) ? entity.selected : false,
+            selected: entityIsAlive && entity.selected ? entity.selected : false,
             groundTruth: isGroundTruth,
             draft: isDraft && !isDraftSaved, // Ephemeral draft only
             draftSaved: isDraftSaved, // Saved draft
@@ -890,7 +930,7 @@ export const AnnotationButton = observer(
             triggerOpened: isContextMenuOpen,
           })
           .toClassName()}
-        data-annotation-id={isAlive(entity) ? (entity.pk ?? entity.id) : undefined}
+        data-annotation-id={entityIsAlive ? (entity.pk ?? entity.id) : undefined}
         ref={buttonRef as any}
         onMouseEnter={handleTooltipEnter}
         onMouseLeave={handleTooltipLeave}
@@ -990,7 +1030,7 @@ export const AnnotationButton = observer(
             acceptedState={acceptedState}
             predictionScore={isPrediction ? entity.score : null}
             lastUpdated={entity.createdDate}
-            annotationId={isAlive(entity) ? (entity.pk ?? entity.id) : undefined}
+            annotationId={entityIsAlive ? (entity.pk ?? entity.id) : undefined}
             containerRef={tooltipContainerRef}
             isTooltipOpen={isTooltipOpen}
             onMouseEnter={handleTooltipEnter}
@@ -998,35 +1038,40 @@ export const AnnotationButton = observer(
             position={tooltipPosition}
           />
         </div>
-        <DropdownTrigger
-          content={
-            <AnnotationButtonContextMenu
-              entity={entity}
-              capabilities={capabilities}
-              annotationStore={annotationStore}
-              store={annotationStore.store}
-            />
-          }
-          onToggle={(isOpen) => {
-            setContextMenuOpen(isOpen);
-            // Close tooltip when context menu opens
-            if (isOpen) {
-              setTooltipOpen(false);
-              if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = undefined;
-              }
+        {entityIsAlive && (
+          <DropdownTrigger
+            content={
+              <AnnotationButtonContextMenu
+                entity={entity}
+                capabilities={capabilities}
+                annotationStore={annotationStore}
+                store={annotationStore.store}
+                isGroundTruth={isGroundTruth}
+                iconSize={iconSize}
+                onAnnotationChange={onAnnotationChange}
+              />
             }
-          }}
-        >
-          <div
-            className={cn("annotation-button").elem("trigger").toClassName()}
-            onMouseEnter={handleTriggerEnter}
-            onClick={(e) => e.stopPropagation()}
+            onToggle={(isOpen) => {
+              setContextMenuOpen(isOpen);
+              // Close tooltip when context menu opens
+              if (isOpen) {
+                setTooltipOpen(false);
+                if (timeoutRef.current) {
+                  clearTimeout(timeoutRef.current);
+                  timeoutRef.current = undefined;
+                }
+              }
+            }}
           >
-            <IconEllipsisVertical width={20} height={20} />
-          </div>
-        </DropdownTrigger>
+            <div
+              className={cn("annotation-button").elem("trigger").toClassName()}
+              onMouseEnter={handleTriggerEnter}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <IconEllipsisVertical width={20} height={20} />
+            </div>
+          </DropdownTrigger>
+        )}
       </div>
     );
   },
