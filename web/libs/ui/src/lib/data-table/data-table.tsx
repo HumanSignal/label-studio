@@ -116,7 +116,6 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
   } = props;
   const [internalRowSelection, setInternalRowSelection] = useState<Record<string, boolean>>({});
   const [internalSorting, setInternalSorting] = useState<SortingState>([]);
-  const [internalActiveRowId, setInternalActiveRowId] = useState<string | undefined>(undefined);
 
   // Restore column sizes from localStorage if storageKey is provided
   const restoredColumnSizing = useMemo(() => {
@@ -145,11 +144,11 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
 
   const [internalColumnSizing, setInternalColumnSizing] = useState<Record<string, number>>(restoredColumnSizing);
 
-  // Use controlled activeRowId if onRowClick is provided (parent controls state via clicks)
-  // OR if activeRowId is explicitly provided (not undefined)
+  // Use controlled activeRowId ONLY if onRowClick is provided (parent controls state via clicks)
+  // Active state should only be enabled when rows are clickable
   // When onRowClick is provided, activeRowId is read-only for display purposes
-  const isActiveRowControlled = props.onRowClick !== undefined || controlledActiveRowId !== undefined;
-  const activeRowId = isActiveRowControlled ? (controlledActiveRowId ?? undefined) : internalActiveRowId;
+  const isActiveRowControlled = props.onRowClick !== undefined;
+  const activeRowId = isActiveRowControlled ? (controlledActiveRowId ?? undefined) : undefined;
 
   // Use controlled selection if provided, otherwise use internal state
   const rowSelection = controlledRowSelection ?? internalRowSelection;
@@ -374,14 +373,11 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
       // Call parent's onRowClick handler if provided
       if (props.onRowClick) {
         props.onRowClick(row);
-      } else if (!isActiveRowControlled && row) {
-        // Only manage internal state if uncontrolled AND no onRowClick provided
-        // When controlled, parent handles all state via onRowClick
-        const newActiveRowId = activeRowId === row.id ? undefined : row.id;
-        setInternalActiveRowId(newActiveRowId);
       }
+      // Active state is only enabled when onRowClick is provided
+      // No internal state management for active rows
     },
-    [props.onRowClick, activeRowId, isActiveRowControlled],
+    [props.onRowClick],
   );
 
   // Check if we should show empty state
@@ -415,7 +411,7 @@ export const DataTable = <T extends DataShape>(props: DataTableProps<T>) => {
         <MemoizedDataTableBody
           rows={rows}
           rowClassName={props.rowClassName}
-          onRowClick={handleRowClick}
+          onRowClick={props.onRowClick ? handleRowClick : undefined}
           columnVisibility={props.columnVisibility}
           columnSizing={columnSizing}
           rowSelection={rowSelection}
@@ -531,7 +527,7 @@ const DataTableRow = <T,>({ row, className, onRowClick, isSelected, isActive }: 
         isActive && styles.bodyRowActive,
         className,
       )}
-      onClick={handleRowClick}
+      onClick={onRowClick ? handleRowClick : undefined}
       data-testid={`data-table-row-${row.id}`}
     >
       {row.getVisibleCells().map((cell) => {

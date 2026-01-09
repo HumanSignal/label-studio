@@ -1513,33 +1513,6 @@
       "version": 3,
       "deleted": false
     },
-    "fflag_feat_all_leap_2042_average_agreement_score_popover": {
-      "key": "fflag_feat_all_leap_2042_average_agreement_score_popover",
-      "on": true,
-      "prerequisites": [],
-      "targets": [],
-      "contextTargets": [],
-      "rules": [],
-      "fallthrough": {
-        "variation": 0
-      },
-      "offVariation": 1,
-      "variations": [
-        true,
-        false
-      ],
-      "clientSideAvailability": {
-        "usingMobileKey": false,
-        "usingEnvironmentId": false
-      },
-      "clientSide": false,
-      "salt": "68a21fc8190441fb85b49b49a32583b0",
-      "trackEvents": false,
-      "trackEventsFallthrough": false,
-      "debugEventsUntilDate": null,
-      "version": 3,
-      "deleted": false
-    },
     "fflag_feat_all_leap_883_custom_script_270524_short": {
       "key": "fflag_feat_all_leap_883_custom_script_270524_short",
       "on": true,
