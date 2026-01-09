@@ -37,8 +37,7 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
         const leftSideExceedsScreen = storedWidth + LEFT_MENU_WIDTH > window.innerWidth;
         // Check if right column would be too small (only if containerWidth is available)
         const rightColumnTooSmall =
-          containerWidth !== undefined &&
-          containerWidth - storedWidth - COLUMN_GAP < MIN_PREVIEW_WIDTH;
+          containerWidth !== undefined && containerWidth - storedWidth - COLUMN_GAP < MIN_PREVIEW_WIDTH;
         // Reset to default if either condition is true
         if (leftSideExceedsScreen || rightColumnTooSmall) {
           return DEFAULT_EDITOR_WIDTH;
@@ -72,8 +71,7 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
           const leftSideExceedsScreen = parsedValue + LEFT_MENU_WIDTH > window.innerWidth;
           // Check if right column would be too small (only if containerWidth is available)
           const rightColumnTooSmall =
-            containerWidth !== undefined &&
-            containerWidth - parsedValue - COLUMN_GAP < MIN_PREVIEW_WIDTH;
+            containerWidth !== undefined && containerWidth - parsedValue - COLUMN_GAP < MIN_PREVIEW_WIDTH;
           // Reset to default if either condition is true
           if (leftSideExceedsScreen || rightColumnTooSmall) {
             setEditorWidthPixelsInternal(DEFAULT_EDITOR_WIDTH);
@@ -177,8 +175,7 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
       // Check if right column (preview) width is less than minimum
       // Right column width = containerWidth - editorWidthPixels - COLUMN_GAP
       const rightColumnTooSmall =
-        containerWidth !== undefined &&
-        containerWidth - editorWidthPixels - COLUMN_GAP < MIN_PREVIEW_WIDTH;
+        containerWidth !== undefined && containerWidth - editorWidthPixels - COLUMN_GAP < MIN_PREVIEW_WIDTH;
 
       // Reset to default if either condition is true
       if (leftSideExceedsScreen || rightColumnTooSmall) {
