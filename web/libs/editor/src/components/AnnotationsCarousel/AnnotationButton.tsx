@@ -191,6 +191,7 @@ function AnnotationButtonTooltip({
     // Priority order: Draft > Accepted/Rejected/Fixed > Submitted
     // Skipped and Ground Truth are handled separately
     // Check for both ephemeral drafts (isDraft) and saved drafts (isDraftSaved)
+    // Exception: If Draft AND Skipped, show both Draft and Skipped
     if (isDraft || isDraftSaved) {
       return {
         label: "Draft",
@@ -223,7 +224,8 @@ function AnnotationButtonTooltip({
           break;
       }
     }
-    if (isSubmitted) {
+    // Exception: If Submitted AND Skipped, only show Skipped (don't show Submitted)
+    if (isSubmitted && !isSkipped) {
       return {
         label: "Submitted",
         backgroundColor: "var(--color-accent-kale-subtle)",
@@ -232,7 +234,7 @@ function AnnotationButtonTooltip({
     }
 
     return null;
-  }, [isPrediction, isDraft, isDraftSaved, acceptedState, isSubmitted]);
+  }, [isPrediction, isDraft, isDraftSaved, acceptedState, isSubmitted, isSkipped]);
 
   // Format date as "MMM DD YYYY, hh:mm:ss" (e.g., "Jan 15 2024, 14:30:45")
   const formatDate = useCallback((dateString: string | null | undefined): string | null => {
