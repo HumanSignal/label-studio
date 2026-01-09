@@ -287,18 +287,6 @@ module.exports = composePlugins(
               publicPath: `${FRONTEND_HOSTNAME}/react-app/`,
             },
             allowedHosts: "all", // Allow access from Django's server
-            // Filter out ResizeObserver loop errors from the error overlay
-            // These are non-critical warnings common in video/media components
-            client: {
-              overlay: {
-                runtimeErrors: (error) => {
-                  if (error?.message?.includes?.("ResizeObserver loop")) {
-                    return false;
-                  }
-                  return true;
-                },
-              },
-            },
             proxy: [
               {
                 context: ["/api"],
