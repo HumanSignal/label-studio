@@ -22,13 +22,19 @@ export interface ProjectStateChipProps {
    * Whether the chip should be interactive (show history popover)
    */
   interactive?: boolean;
+
+  /**
+   * Optional custom description to override the default tooltip.
+   * Use this to provide context-specific tooltips.
+   */
+  description?: string;
 }
 
-export function ProjectStateChip({ state, projectId, interactive = true }: ProjectStateChipProps) {
+export function ProjectStateChip({ state, projectId, interactive = true, description }: ProjectStateChipProps) {
   const [open, setOpen] = useState(false);
 
   const label = formatStateName(state);
-  const description = getStateDescription(state, "project");
+  const defaultDescription = getStateDescription(state, "project");
   const colorClasses = getStateColorClass(state);
 
   const popoverContent = projectId ? (
@@ -43,7 +49,7 @@ export function ProjectStateChip({ state, projectId, interactive = true }: Proje
   return (
     <StateChip
       label={label}
-      description={description}
+      description={description ?? defaultDescription}
       className={colorClasses}
       interactive={interactive && !!projectId}
       popoverContent={popoverContent}
