@@ -34,8 +34,13 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
       if (item) {
         const storedWidth = JSON.parse(item);
         // Check if stored width + left menu width exceeds screen width
-        // If so, reset to default to ensure resizer is visible
-        if (storedWidth + LEFT_MENU_WIDTH > window.innerWidth) {
+        const leftSideExceedsScreen = storedWidth + LEFT_MENU_WIDTH > window.innerWidth;
+        // Check if right column would be too small (only if containerWidth is available)
+        const rightColumnTooSmall =
+          containerWidth !== undefined &&
+          containerWidth - storedWidth - COLUMN_GAP < MIN_PREVIEW_WIDTH;
+        // Reset to default if either condition is true
+        if (leftSideExceedsScreen || rightColumnTooSmall) {
           return DEFAULT_EDITOR_WIDTH;
         }
         return storedWidth;
@@ -64,8 +69,13 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
         if (item) {
           const parsedValue = JSON.parse(item);
           // Check if stored width + left menu width exceeds screen width
-          // If so, reset to default to ensure resizer is visible
-          if (parsedValue + LEFT_MENU_WIDTH > window.innerWidth) {
+          const leftSideExceedsScreen = parsedValue + LEFT_MENU_WIDTH > window.innerWidth;
+          // Check if right column would be too small (only if containerWidth is available)
+          const rightColumnTooSmall =
+            containerWidth !== undefined &&
+            containerWidth - parsedValue - COLUMN_GAP < MIN_PREVIEW_WIDTH;
+          // Reset to default if either condition is true
+          if (leftSideExceedsScreen || rightColumnTooSmall) {
             setEditorWidthPixelsInternal(DEFAULT_EDITOR_WIDTH);
           } else {
             setEditorWidthPixelsInternal(parsedValue);
@@ -80,7 +90,7 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
       }
       prevStorageKeyRef.current = currentKey;
     }
-  }, [storageKey]);
+  }, [storageKey, containerWidth]);
 
   // Write to localStorage when width changes (but not during key switches)
   // This effect persists user's width preference, but skips writing when switching
@@ -156,6 +166,35 @@ export const useConfigResizer = ({ projectId, containerWidth }) => {
 
     prevContainerWidthRef.current = containerWidth;
   }, [containerWidth, constraints.minEditorWidth, constraints.maxEditorWidth, editorWidthPixels]);
+
+  // Reset width when window resizes and current width exceeds screen size or right column is too small
+  // This ensures the resizer remains visible and usable when screen size decreases
+  useEffect(() => {
+    const checkAndReset = () => {
+      // Check if current width + left menu width exceeds screen width
+      const leftSideExceedsScreen = editorWidthPixels + LEFT_MENU_WIDTH > window.innerWidth;
+
+      // Check if right column (preview) width is less than minimum
+      // Right column width = containerWidth - editorWidthPixels - COLUMN_GAP
+      const rightColumnTooSmall =
+        containerWidth !== undefined &&
+        containerWidth - editorWidthPixels - COLUMN_GAP < MIN_PREVIEW_WIDTH;
+
+      // Reset to default if either condition is true
+      if (leftSideExceedsScreen || rightColumnTooSmall) {
+        setEditorWidthPixelsInternal(DEFAULT_EDITOR_WIDTH);
+      }
+    };
+
+    // Check immediately when dependencies change
+    checkAndReset();
+
+    // Also listen to window resize events
+    window.addEventListener("resize", checkAndReset);
+    return () => {
+      window.removeEventListener("resize", checkAndReset);
+    };
+  }, [editorWidthPixels, containerWidth]);
 
   // Wrapped setter that automatically clamps values to valid constraints
   // This ensures all width updates respect min/max bounds
