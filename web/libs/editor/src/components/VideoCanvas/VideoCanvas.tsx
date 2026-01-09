@@ -411,13 +411,20 @@ export const VideoCanvas = memo(
     }, [filters, zoom, pan, canvasWidth, canvasHeight]);
 
     useEffect(() => {
+      let rafId: number;
       const observer = new ResizeObserver(() => {
-        props.onResize?.(videoDimensions);
+        rafId && cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          props.onResize?.(videoDimensions);
+        });
       });
 
       observer.observe(rootRef.current!);
 
-      return () => observer.disconnect();
+      return () => {
+        rafId && cancelAnimationFrame(rafId);
+        observer.disconnect();
+      };
     }, [videoDimensions]);
 
     const refSource: VideoRef = {

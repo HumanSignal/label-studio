@@ -362,19 +362,17 @@ const Configurator = ({
 
   // Track container width for resizer constraints
   // Observes container dimensions to provide the resizer hook with container width for calculating valid min/max bounds
-  // Uses ResizeObserver with 16ms debounce (~1 frame) to prevent ResizeObserver loop errors
-  // The debounce ensures we don't trigger excessive updates during rapid resize events
   useEffect(() => {
     if (!containerRef.current) return;
 
-    let timeoutId;
+    let rafId;
     const updateWidth = () => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
+      rafId && cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
         if (containerRef.current) {
           setContainerWidth(containerRef.current.clientWidth);
         }
-      }, 16); // ~1 frame debounce to prevent ResizeObserver loop errors
+      });
     };
 
     const resizeObserver = new ResizeObserver(updateWidth);
@@ -383,7 +381,7 @@ const Configurator = ({
     updateWidth();
 
     return () => {
-      clearTimeout(timeoutId);
+      rafId && cancelAnimationFrame(rafId);
       resizeObserver.disconnect();
     };
   }, []);
