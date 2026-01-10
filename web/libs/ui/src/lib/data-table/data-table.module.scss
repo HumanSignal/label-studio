@@ -103,16 +103,18 @@
 .bodyRow {
   @apply min-w-min flex justify-start transition-all duration-150 ease-out w-full;
 
+  cursor: default;
+
   &:nth-child(2n) {
     @apply bg-neutral-surface;
   }
-}
-
-.bodyRowClickable {
-  @apply cursor-pointer;
 
   &:hover:not(.bodyRowError, .bodyRowActive) {
     @apply bg-primary-emphasis-subtle;
+  }
+
+  &.bodyRowClickable {
+    cursor: pointer !important;
   }
 }
 

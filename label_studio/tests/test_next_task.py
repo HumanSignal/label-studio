@@ -8,8 +8,13 @@ import pytest
 from core.redis import redis_healthcheck
 from django.apps import apps
 from django.db.models import Q
+from django.test import TestCase
+from projects.functions.next_task import _try_breadth_first
 from projects.models import Project
+from projects.tests.factories import ProjectFactory
 from tasks.models import Annotation, Prediction, Task
+from tasks.tests.factories import AnnotationFactory, TaskFactory
+from users.tests.factories import UserFactory
 
 from .utils import (
     _client_is_annotator,
@@ -1327,3 +1332,93 @@ def test_overlap_first(business_client, setup_before_upload, show_overlap_first)
     else:
         assert not all_tasks_with_overlap_are_labeled
         assert not all_tasks_without_overlap_are_not_labeled
+
+
+class TestTryBreadthFirst(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.other_user = UserFactory()
+
+        # Project with evaluation enabled
+        cls.project_with_eval = ProjectFactory(
+            maximum_annotations=3,
+            annotator_evaluation_enabled=True,
+        )
+
+        # Project without evaluation
+        cls.project_without_eval = ProjectFactory(
+            maximum_annotations=3,
+            annotator_evaluation_enabled=False,
+        )
+
+    def test_excludes_ground_truth_tasks_when_evaluation_enabled(self):
+        """
+        Test that _try_breadth_first excludes GT tasks when annotator_evaluation_enabled=True.
+        """
+        # Create tasks with varying annotation counts
+        task_1 = TaskFactory(project=self.project_with_eval)  # 2 regular annotations (max)
+        task_2 = TaskFactory(project=self.project_with_eval)  # 1 regular annotation
+        task_3_gt = TaskFactory(project=self.project_with_eval)  # 3 annotations BUT has GT
+
+        # Add regular annotations to task_1 (should be selected)
+        AnnotationFactory.create_batch(2, task=task_1, ground_truth=False)
+
+        # Add regular annotation to task_2
+        AnnotationFactory(task=task_2, ground_truth=False)
+
+        # Add GT annotation to task_3_gt plus a regular one
+        AnnotationFactory(task=task_3_gt, ground_truth=True)
+        AnnotationFactory(task=task_3_gt, ground_truth=False)
+        AnnotationFactory(task=task_3_gt, ground_truth=False)
+
+        # Get all tasks
+        tasks = Task.objects.filter(project=self.project_with_eval)
+
+        # Execute
+        result = _try_breadth_first(tasks, self.user, self.project_with_eval)
+
+        # Assert: should return task_1 (max annotations, not GT), not task_3_gt
+        assert result == task_1
+
+    def test_includes_ground_truth_tasks_when_evaluation_disabled(self):
+        """
+        Test that _try_breadth_first includes GT tasks when annotator_evaluation_enabled=False.
+        """
+        # Create tasks with varying annotation counts
+        task_1 = TaskFactory(project=self.project_without_eval)  # 2 regular annotations (max)
+        task_2 = TaskFactory(project=self.project_without_eval)  # 1 regular annotation
+        task_3_gt = TaskFactory(project=self.project_without_eval)  # 3 annotations BUT has GT
+
+        # Add regular annotations to task_1 (should be selected)
+        AnnotationFactory.create_batch(2, task=task_1, ground_truth=False)
+
+        # Add regular annotation to task_2
+        AnnotationFactory(task=task_2, ground_truth=False)
+
+        # Add GT annotation to task_3_gt plus a regular one
+        AnnotationFactory(task=task_3_gt, ground_truth=True)
+        AnnotationFactory(task=task_3_gt, ground_truth=False)
+        AnnotationFactory(task=task_3_gt, ground_truth=False)
+
+        # Get all tasks
+        tasks = Task.objects.filter(project=self.project_without_eval)
+
+        # Execute
+        result = _try_breadth_first(tasks, self.user, self.project_without_eval)
+
+        # Assert: should return task_3_gt (max annotations, GT), not task_1 or task_2
+        assert result == task_3_gt
+
+    def test_returns_none_when_no_tasks_with_annotations_and_evaluation_enabled(self):
+
+        task_gt = TaskFactory(project=self.project_with_eval)
+        AnnotationFactory(task=task_gt, ground_truth=True)
+
+        tasks = Task.objects.filter(project=self.project_with_eval)
+
+        # Execute
+        result = _try_breadth_first(tasks, self.user, self.project_with_eval)
+
+        # Assert: should return None
+        assert result is None

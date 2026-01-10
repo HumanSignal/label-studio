@@ -15,6 +15,7 @@ class TaskFactory(factory.django.DjangoModelFactory):
         }
     )
     project = factory.SubFactory(load_func(settings.PROJECT_FACTORY))
+    overlap = factory.LazyAttribute(lambda obj: obj.project.maximum_annotations if obj.project else 1)
 
     class Meta:
         model = Task

@@ -15,86 +15,9 @@ import { AreaMixin } from "../mixins/AreaMixin";
 import { KonvaRegionMixin } from "../mixins/KonvaRegion";
 import { ImageModel } from "../tags/object/Image";
 import { rotateBboxCoords } from "../utils/bboxCoords";
-import { FF_DEV_3793, isFF } from "../utils/feature-flags";
 import { createDragBoundFunc } from "../utils/image";
 import { AliveRegion } from "./AliveRegion";
 import { EditableRegion } from "./EditableRegion";
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
-
-const EllipseRegionAbsoluteCoordsDEV3793 = types
-  .model({
-    coordstype: types.optional(types.enumeration(["px", "perc"]), "perc"),
-  })
-  .volatile(() => ({
-    relativeX: 0,
-    relativeY: 0,
-    relativeWidth: 0,
-    relativeHeight: 0,
-    relativeRadiusX: 0,
-    relativeRadiusY: 0,
-  }))
-  .actions((self) => ({
-    afterCreate() {
-      self.startX = self.x;
-      self.startY = self.y;
-
-      switch (self.coordstype) {
-        case "perc": {
-          self.relativeX = self.x;
-          self.relativeY = self.y;
-          self.relativeRadiusX = self.radiusX;
-          self.relativeRadiusY = self.radiusY;
-          self.relativeWidth = self.width;
-          self.relativeHeight = self.height;
-          break;
-        }
-        case "px": {
-          const { stageWidth, stageHeight } = self.parent;
-
-          if (stageWidth && stageHeight) {
-            self.setPosition(self.x, self.y, self.radiusX, self.radiusY, self.rotation);
-          }
-          break;
-        }
-      }
-      self.checkSizes();
-      self.updateAppearenceFromState();
-    },
-    setPosition(x, y, radiusX, radiusY, rotation) {
-      self.x = x;
-      self.y = y;
-      self.radiusX = radiusX;
-      self.radiusY = radiusY;
-
-      self.relativeX = (x / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeY = (y / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
-
-      self.relativeRadiusX = (radiusX / self.parent?.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeRadiusY = (radiusY / self.parent?.stageHeight) * RELATIVE_STAGE_HEIGHT;
-
-      self.rotation = (rotation + 360) % 360;
-    },
-    setPositionInternal(x, y, radiusX, radiusY, rotation) {
-      return self.setPosition(x, y, radiusX, radiusY, rotation);
-    },
-    updateImageSize(wp, hp, sw, sh) {
-      self.sw = sw;
-      self.sh = sh;
-
-      if (self.coordstype === "px") {
-        self.x = (sw * self.relativeX) / RELATIVE_STAGE_WIDTH;
-        self.y = (sh * self.relativeY) / RELATIVE_STAGE_HEIGHT;
-        self.radiusX = (sw * self.relativeRadiusX) / RELATIVE_STAGE_WIDTH;
-        self.radiusY = (sh * self.relativeRadiusY) / RELATIVE_STAGE_HEIGHT;
-      } else if (self.coordstype === "perc") {
-        self.x = (sw * self.x) / RELATIVE_STAGE_WIDTH;
-        self.y = (sh * self.y) / RELATIVE_STAGE_HEIGHT;
-        self.radiusX = (sw * self.radiusX) / RELATIVE_STAGE_WIDTH;
-        self.radiusY = (sh * self.radiusY) / RELATIVE_STAGE_HEIGHT;
-        self.coordstype = "px";
-      }
-    },
-  }));
 
 /**
  * Ellipse object for Bounding Box
@@ -167,16 +90,16 @@ const Model = types
       return rotateBboxCoords(bboxCoords, self.rotation, { x: self.x, y: self.y }, self.parent.whRatio);
     },
     get canvasX() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.x) : self.x;
+      return self.parent?.internalToCanvasX(self.x);
     },
     get canvasY() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.y) : self.y;
+      return self.parent?.internalToCanvasY(self.y);
     },
     get canvasRadiusX() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasX(self.radiusX) : self.radiusX;
+      return self.parent?.internalToCanvasX(self.radiusX);
     },
     get canvasRadiusY() {
-      return isFF(FF_DEV_3793) ? self.parent?.internalToCanvasY(self.radiusY) : self.radiusY;
+      return self.parent?.internalToCanvasY(self.radiusY);
     },
   }))
   .actions((self) => ({
@@ -280,10 +203,10 @@ const Model = types
      */
     serialize() {
       const value = {
-        x: isFF(FF_DEV_3793) ? self.x : self.convertXToPerc(self.x),
-        y: isFF(FF_DEV_3793) ? self.y : self.convertYToPerc(self.y),
-        radiusX: isFF(FF_DEV_3793) ? self.radiusX : self.convertHDimensionToPerc(self.radiusX),
-        radiusY: isFF(FF_DEV_3793) ? self.radiusY : self.convertVDimensionToPerc(self.radiusY),
+        x: self.x,
+        y: self.y,
+        radiusX: self.radiusX,
+        radiusY: self.radiusY,
         rotation: self.rotation,
       };
 
@@ -299,7 +222,6 @@ const EllipseRegionModel = types.compose(
   KonvaRegionMixin,
   EditableRegion,
   Model,
-  ...(isFF(FF_DEV_3793) ? [] : [EllipseRegionAbsoluteCoordsDEV3793]),
 );
 
 const HtxEllipseView = ({ item, setShapeRef }) => {

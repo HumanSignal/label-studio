@@ -3,63 +3,11 @@ import { Circle, Rect } from "react-konva";
 import { observer } from "mobx-react";
 import { getParent, hasParent, types } from "mobx-state-tree";
 
-import { RELATIVE_STAGE_HEIGHT, RELATIVE_STAGE_WIDTH } from "../components/ImageView/Image";
 import { guidGenerator } from "../core/Helpers";
 import { useRegionStyles } from "../hooks/useRegionColor";
 import { AnnotationMixin } from "../mixins/AnnotationMixin";
-import { FF_DEV_3793, isFF } from "../utils/feature-flags";
 
-const PolygonPointAbsoluteCoordsDEV3793 = types
-  .model()
-  .volatile(() => ({
-    relativeX: 0,
-    relativeY: 0,
-    initX: 0,
-    initY: 0,
-  }))
-  .actions((self) => ({
-    afterCreate() {
-      self.initX = self.x;
-      self.initY = self.y;
-
-      if (self.parent.coordstype === "perc") {
-        self.relativeX = self.x;
-        self.relativeY = self.y;
-      } else {
-        self.relativeX = (self.x / self.stage.stageWidth) * RELATIVE_STAGE_WIDTH;
-        self.relativeY = (self.y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
-      }
-    },
-    movePoint(offsetX, offsetY) {
-      self.initX = self.initX + offsetX;
-      self.initY = self.initY + offsetY;
-      self.x = self.x + offsetX;
-      self.y = self.y + offsetY;
-
-      self.relativeX = (self.x / self.stage.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeY = (self.y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
-    },
-    _setPos(x, y) {
-      self.initX = x;
-      self.initY = y;
-
-      self.relativeX = (x / self.stage.stageWidth) * RELATIVE_STAGE_WIDTH;
-      self.relativeY = (y / self.stage.stageHeight) * RELATIVE_STAGE_HEIGHT;
-
-      self.x = x;
-      self.y = y;
-    },
-    _movePoint(x, y) {
-      const point = self.parent.control?.getSnappedPoint({
-        x: self.stage.canvasToInternalX(x),
-        y: self.stage.canvasToInternalY(y),
-      });
-
-      self._setPos(point.x, point.y);
-    },
-  }));
-
-const PolygonPointRelativeCoords = types
+const PolygonPointModel = types
   .model("PolygonPoint", {
     id: types.optional(types.identifier, guidGenerator),
 
@@ -85,11 +33,11 @@ const PolygonPointRelativeCoords = types
     },
 
     get canvasX() {
-      return isFF(FF_DEV_3793) ? self.stage?.internalToCanvasX(self.x) : self.x;
+      return self.stage?.internalToCanvasX(self.x);
     },
 
     get canvasY() {
-      return isFF(FF_DEV_3793) ? self.stage?.internalToCanvasY(self.y) : self.y;
+      return self.stage?.internalToCanvasY(self.y);
     },
   }))
   .actions((self) => ({
@@ -194,10 +142,6 @@ const PolygonPointRelativeCoords = types
       return self.parent.control.obj.getSkipInteractions();
     },
   }));
-
-const PolygonPointModel = isFF(FF_DEV_3793)
-  ? PolygonPointRelativeCoords
-  : types.compose("PolygonPoint", PolygonPointRelativeCoords, PolygonPointAbsoluteCoordsDEV3793);
 
 const PolygonPoint = types.compose("PolygonPoint", AnnotationMixin, PolygonPointModel);
 
