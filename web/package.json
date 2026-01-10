@@ -89,6 +89,7 @@
     "nanoid": "^3.3.8",
     "pako": "^2.1.0",
     "papaparse": "^5.4.1",
+    "pdfjs-dist": "^4.0.379",
     "pleasejs": "^0.4.2",
     "rc-tree": "^5.7.8",
     "react": "18.3.1",

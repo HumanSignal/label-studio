@@ -1,0 +1,325 @@
+/**
+ * PdfOcr component styles
+ *
+ * Uses BEM naming convention compatible with Label Studio frontend.
+ * Class names map to:
+ * - .container -> .lsf-pdfocr__container
+ * - .toolbar -> .lsf-pdfocr__toolbar
+ * - etc.
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--ls-color-background, #f5f5f5);
+  border: 1px solid var(--ls-color-border, #ddd);
+  border-radius: 4px;
+  overflow: hidden;
+
+  :global(.lsf-pdfocr__container) {
+    @extend .container;
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 12px;
+  background: var(--ls-color-toolbar-bg, #fff);
+  border-bottom: 1px solid var(--ls-color-border, #ddd);
+  flex-wrap: wrap;
+
+  :global(.lsf-pdfocr__toolbar) {
+    @extend .toolbar;
+  }
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbarButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--ls-color-border, #ddd);
+  border-radius: 4px;
+  background: var(--ls-color-button-bg, #fff);
+  color: var(--ls-color-text, #333);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--ls-color-button-hover, #f0f0f0);
+    border-color: var(--ls-color-primary, #2196f3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.pageInfo {
+  min-width: 60px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ls-color-text-secondary, #666);
+  user-select: none;
+
+  :global(.lsf-pdfocr__page-info) {
+    @extend .pageInfo;
+  }
+}
+
+.zoomInfo {
+  min-width: 45px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ls-color-text-secondary, #666);
+  user-select: none;
+
+  :global(.lsf-pdfocr__zoom-info) {
+    @extend .zoomInfo;
+  }
+}
+
+.viewerWrapper {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  background: var(--ls-color-viewer-bg, #e0e0e0);
+
+  :global(.lsf-pdfocr__viewer) {
+    @extend .viewerWrapper;
+  }
+}
+
+.pageContainer {
+  position: relative;
+  display: inline-block;
+  margin: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background: #fff;
+
+  :global(.lsf-pdfocr__page-container) {
+    @extend .pageContainer;
+  }
+}
+
+.canvasWrapper {
+  position: relative;
+  line-height: 0;
+}
+
+.pdfCanvas {
+  display: block;
+
+  :global(.lsf-pdfocr__canvas) {
+    @extend .pdfCanvas;
+  }
+}
+
+.renderingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--ls-color-text-secondary, #666);
+  font-size: 14px;
+}
+
+.tokenOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  :global(.lsf-pdfocr__tokens) {
+    @extend .tokenOverlay;
+  }
+}
+
+.token {
+  position: absolute;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: all 0.15s ease;
+  pointer-events: auto;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(33, 150, 243, 0.2);
+    border-color: rgba(33, 150, 243, 0.5);
+  }
+
+  :global(.lsf-pdfocr__token) {
+    @extend .token;
+  }
+}
+
+.tokenText {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  padding: 2px 6px;
+  background: var(--ls-color-primary, #2196f3);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  border-radius: 2px;
+  z-index: 10;
+
+  .token:hover & {
+    display: block;
+  }
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 12px;
+  color: var(--ls-color-text-secondary, #666);
+
+  :global(.lsf-pdfocr__loading) {
+    @extend .loading;
+  }
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  gap: 12px;
+  color: var(--ls-color-error, #d32f2f);
+
+  :global(.lsf-pdfocr__error) {
+    @extend .error;
+  }
+}
+
+.errorIcon {
+  font-size: 32px;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--ls-color-border, #ddd);
+  border-top-color: var(--ls-color-primary, #2196f3);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Region overlay styles */
+.regionOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.region {
+  position: absolute;
+  border: 2px solid;
+  box-sizing: border-box;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    z-index: 10;
+  }
+}
+
+.regionSelected {
+  z-index: 20;
+  border-width: 2px;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.5);
+}
+
+.regionLabel {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* Drawing rectangle styles */
+.drawingRect {
+  position: absolute;
+  border: 2px dashed var(--ls-color-primary, #2196f3);
+  background: rgba(33, 150, 243, 0.1);
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Table region styles */
+.tableRegion {
+  border-style: solid;
+  position: relative;
+}
+
+.tableGridlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tableGridline {
+  position: absolute;
+  background: var(--ls-color-primary, #2196f3);
+  z-index: 5;
+}
+
+.tableGridlineHorizontal {
+  left: 0;
+  right: 0;
+  height: 2px;
+  margin-top: -1px;
+}
+
+.tableGridlineVertical {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+}

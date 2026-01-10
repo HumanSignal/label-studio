@@ -1,0 +1,71 @@
+/**
+ * CellOverlay styles
+ */
+
+.cellOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.cell {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 4px;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  pointer-events: auto;
+  overflow: hidden;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(33, 150, 243, 0.1);
+    border-color: rgba(33, 150, 243, 0.3);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.selected {
+  background: rgba(33, 150, 243, 0.15);
+  border-color: var(--ls-color-primary, #2196f3);
+  border-width: 2px;
+  z-index: 10;
+
+  &:hover {
+    background: rgba(33, 150, 243, 0.2);
+  }
+}
+
+.highlighted {
+  background: rgba(255, 152, 0, 0.2);
+  border-color: rgba(255, 152, 0, 0.5);
+}
+
+.cellText {
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--ls-color-text, #333);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  user-select: none;
+}
+
+/* Cell index indicator (for debugging/development) */
+.cellIndex {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 8px;
+  color: rgba(33, 150, 243, 0.6);
+  user-select: none;
+}

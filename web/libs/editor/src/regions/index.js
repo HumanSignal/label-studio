@@ -4,6 +4,7 @@ import { AudioRegionModel } from "./AudioRegion";
 import { BrushRegionModel, HtxBrush } from "./BrushRegion";
 import { BitmaskRegionModel, HtxBitmask } from "./BitmaskRegion";
 import { ParagraphsRegionModel } from "./ParagraphsRegion";
+import { PdfRegionModel, HtxPdfRegion } from "./PdfRegion";
 import { TimeSeriesRegionModel } from "./TimeSeriesRegion";
 import { HtxKeyPoint, KeyPointRegionModel } from "./KeyPointRegion";
 import { PolygonPoint, PolygonPointView } from "./PolygonPoint";
@@ -23,6 +24,8 @@ const AllRegionsType = types.union(
   EllipseRegionModel,
   TimeSeriesRegionModel,
   KeyPointRegionModel,
+  ParagraphsRegionModel,
+  PdfRegionModel,
   PolygonRegionModel,
   VectorRegionModel,
   RectRegionModel,
@@ -30,7 +33,6 @@ const AllRegionsType = types.union(
   RichTextRegionModel,
   TimeSeriesRegionModel,
   TimelineRegionModel,
-  ParagraphsRegionModel,
   VideoRectangleRegionModel,
   ...Registry.customTags.map((t) => t.region).filter(Boolean),
 );
@@ -45,11 +47,13 @@ export {
   HtxEllipse,
   HtxKeyPoint,
   HtxPolygon,
+  HtxPdfRegion,
   HtxVector,
   HtxRectangle,
   HtxTextAreaRegion,
   RichTextRegionModel,
   ParagraphsRegionModel,
+  PdfRegionModel,
   TimeSeriesRegionModel,
   KeyPointRegionModel,
   PolygonPoint,

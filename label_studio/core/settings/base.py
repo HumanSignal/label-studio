@@ -244,6 +244,7 @@ INSTALLED_APPS = [
     'ml_model_providers',
     'jwt_auth',
     'session_policy',
+    'ocr',  # PDF OCR labeling with table structure annotation
 ]
 
 MIDDLEWARE = [

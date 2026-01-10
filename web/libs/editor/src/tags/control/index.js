@@ -10,7 +10,9 @@ import { TextAreaModel } from "./TextArea/TextArea";
 
 import { HyperTextLabelsModel } from "./HyperTextLabels";
 import { LabelsModel } from "./Labels/Labels";
+import { OcrTokenLabelsModel } from "./OcrTokenLabels";
 import { ParagraphLabelsModel } from "./ParagraphLabels";
+import { TableLabelsModel } from "./TableLabels";
 import { TimeSeriesLabelsModel } from "./TimeSeriesLabels";
 import { TimelineLabelsModel } from "./TimelineLabels";
 import { VideoRectangleModel } from "./VideoRectangle";
@@ -46,9 +48,11 @@ export {
   TextAreaModel,
   HyperTextLabelsModel,
   LabelsModel,
+  OcrTokenLabelsModel,
   ParagraphLabelsModel,
   BitmaskLabelsModel,
   BitmaskModel,
+  TableLabelsModel,
   TimeSeriesLabelsModel,
   TimelineLabelsModel,
   VideoRectangleModel,

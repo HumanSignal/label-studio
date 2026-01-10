@@ -1,0 +1,116 @@
+/**
+ * PdfRegion styles
+ */
+
+.region {
+  position: absolute;
+  border: 2px solid;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    z-index: 10;
+  }
+}
+
+.selected {
+  z-index: 20;
+  border-style: solid;
+}
+
+.label {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border: 1px solid #333;
+  border-radius: 2px;
+}
+
+.handleNW {
+  top: -4px;
+  left: -4px;
+  cursor: nw-resize;
+}
+
+.handleNE {
+  top: -4px;
+  right: -4px;
+  cursor: ne-resize;
+}
+
+.handleSW {
+  bottom: -4px;
+  left: -4px;
+  cursor: sw-resize;
+}
+
+.handleSE {
+  bottom: -4px;
+  right: -4px;
+  cursor: se-resize;
+}
+
+/* Table region styles */
+.tableRegion {
+  border-style: solid;
+}
+
+.tableGridlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.gridline {
+  position: absolute;
+  background: var(--ls-color-primary, #2196f3);
+  z-index: 5;
+}
+
+.gridlineHorizontal {
+  left: 0;
+  right: 0;
+  height: 2px;
+  margin-top: -1px;
+}
+
+.gridlineVertical {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+}
+
+.cellIndicator {
+  position: absolute;
+  border: 1px dashed rgba(33, 150, 243, 0.3);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.cellLabel {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 9px;
+  color: rgba(33, 150, 243, 0.7);
+  user-select: none;
+}

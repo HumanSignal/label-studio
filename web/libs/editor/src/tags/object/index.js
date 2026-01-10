@@ -2,6 +2,7 @@ import { AudioModel } from "./Audio";
 import { ImageModel } from "./Image";
 import { ParagraphsModel } from "./Paragraphs";
 import { PdfModel } from "./Pdf";
+import { PdfOcrModel } from "./PdfOcr";
 import { RichTextModel } from "./RichText";
 import { TableModel } from "./Table";
 import { TimeSeriesModel } from "./TimeSeries";
@@ -24,4 +25,5 @@ export {
   PagedViewModel,
   ListModel,
   PdfModel,
+  PdfOcrModel,
 };

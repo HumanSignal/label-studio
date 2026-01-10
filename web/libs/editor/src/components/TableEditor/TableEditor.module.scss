@@ -1,0 +1,230 @@
+/**
+ * TableEditor component styles
+ *
+ * Provides styling for:
+ * - Gridline handles (horizontal and vertical)
+ * - Cell preview grid
+ * - Toolbar controls
+ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+
+  &.active {
+    pointer-events: auto;
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 4px;
+  position: absolute;
+  top: -40px;
+  left: 0;
+  z-index: 100;
+  pointer-events: auto;
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  &.active {
+    background: var(--ls-color-primary, #2196f3);
+    border-color: var(--ls-color-primary, #2196f3);
+  }
+}
+
+.toolbarInfo {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  margin-left: auto;
+}
+
+.gridArea {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+/* Gridline styles */
+.gridline {
+  position: absolute;
+  z-index: 50;
+  transition: background-color 0.15s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+  }
+
+  &:hover {
+    z-index: 60;
+  }
+}
+
+.gridlineHorizontal {
+  left: 0;
+  right: 0;
+  height: 3px;
+  margin-top: -1.5px;
+  cursor: ns-resize;
+  background: var(--ls-color-primary, #2196f3);
+
+  &::before {
+    top: -4px;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+  }
+
+  &:hover,
+  &.dragging {
+    height: 4px;
+    margin-top: -2px;
+    background: #ff9800;
+  }
+}
+
+.gridlineVertical {
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1.5px;
+  cursor: ew-resize;
+  background: var(--ls-color-primary, #2196f3);
+
+  &::before {
+    left: -4px;
+    right: -4px;
+    top: 0;
+    bottom: 0;
+  }
+
+  &:hover,
+  &.dragging {
+    width: 4px;
+    margin-left: -2px;
+    background: #ff9800;
+  }
+}
+
+.dragging {
+  background: #ff9800 !important;
+  z-index: 70;
+}
+
+/* Cell preview styles */
+.cellPreview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cell {
+  position: absolute;
+  border: 1px dashed rgba(33, 150, 243, 0.4);
+  background: transparent;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: rgba(33, 150, 243, 0.1);
+  }
+}
+
+.cellIndex {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  font-size: 9px;
+  color: rgba(33, 150, 243, 0.7);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Add line hint overlay */
+.addLineHint {
+  position: absolute;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.addLineHintHorizontal {
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(76, 175, 80, 0.6);
+}
+
+.addLineHintVertical {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(76, 175, 80, 0.6);
+}
+
+/* Table region indicator */
+.tableIndicator {
+  position: absolute;
+  top: -24px;
+  right: 0;
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  font-size: 11px;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .toolButton {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+}
