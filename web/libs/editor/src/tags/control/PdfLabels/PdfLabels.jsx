@@ -56,11 +56,21 @@ const ModelAttrs = types.model("PdfLabelsModel", {
   children: Types.unionArray(["label", "header", "view", "hypertext"]),
 });
 
+/**
+ * Override to NOT use Konva-based tools since PdfOcr handles its own drawing.
+ * The Rect tools expect Konva stage events (stageX/stageY) which don't exist
+ * in the DOM-based PDF viewer.
+ */
+const PdfToolOverride = types.model().volatile(() => ({
+  toolNames: [], // Empty - PdfOcr component handles drawing directly
+}));
+
 const Composition = types.compose(
   ControlBase,
   LabelsModel,
   ModelAttrs,
   RectangleModel,
+  PdfToolOverride, // Override toolNames AFTER RectangleModel
   Validation,
   LabelMixin,
   SelectedModelMixin.props({ _child: "LabelModel" }),

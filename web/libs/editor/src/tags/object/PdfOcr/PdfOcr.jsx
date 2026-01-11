@@ -377,7 +377,7 @@ const HtxPdfOcr = inject('store')(
             rotation: 0,
             page: item._currentPage,
           },
-          control.selectedLabels.map((l) => l.value),
+          control.getResultValue(),
           control,
           item
         );

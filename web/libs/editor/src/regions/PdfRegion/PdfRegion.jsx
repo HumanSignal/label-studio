@@ -18,8 +18,6 @@ import { AreaMixin } from '../../mixins/AreaMixin';
 import NormalizationMixin from '../../mixins/Normalization';
 import RegionsMixin from '../../mixins/Regions';
 import { EditableRegion } from '../EditableRegion';
-
-// Import PdfOcrModel to trigger its registration with Registry
 import { PdfOcrModel } from '../../tags/object/PdfOcr';
 
 import styles from './PdfRegion.module.scss';
@@ -32,6 +30,9 @@ const Model = types
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     type: 'pdfregion',
+
+    // Reference to the parent PdfOcr object tag
+    object: types.late(() => types.reference(PdfOcrModel)),
 
     // Coordinates (0-100 percentage)
     x: types.number,
@@ -620,9 +621,18 @@ const HtxPdfRegion = observer(({ item }) => {
   );
 });
 
+// Detector function helps MST union determine when to use PdfRegionModel
+const detectPdfRegion = (value) => {
+  // PDF regions have page number and percentage-based coordinates
+  return value && (
+    value.page !== undefined ||
+    (typeof value.x === 'number' && typeof value.y === 'number')
+  );
+};
+
 // Register the region
 Registry.addTag('pdfregion', PdfRegionModel, HtxPdfRegion);
-Registry.addRegionType(PdfRegionModel, 'pdfocr');
+Registry.addRegionType(PdfRegionModel, 'pdfocr', detectPdfRegion);
 
 export { PdfRegionModel, HtxPdfRegion };
 export default PdfRegionModel;

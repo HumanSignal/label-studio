@@ -14,6 +14,9 @@ import ProcessAttrsMixin from '../../../mixins/ProcessAttrs';
 import ObjectBase from '../Base';
 import { parseValue } from '../../../utils/data';
 
+// Import PdfRegionModel to ensure it's registered with Registry before region creation
+import { PdfRegionModel } from '../../../regions/PdfRegion';
+
 /**
  * Tag attributes from XML configuration
  */
