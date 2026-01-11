@@ -635,7 +635,7 @@ const getCanvasSize = () => {
   };
 };
 const getImageSize = () => {
-  const image = window.document.querySelector('img[alt="LS"]');
+  const image = window.document.querySelector('img[alt="image"]');
   const clientRect = image.getBoundingClientRect();
 
   return {
@@ -644,7 +644,7 @@ const getImageSize = () => {
   };
 };
 const getImageFrameSize = () => {
-  const image = window.document.querySelector('img[alt="LS"]').parentElement;
+  const image = window.document.querySelector('img[alt="image"]').parentElement;
   const clientRect = image.getBoundingClientRect();
 
   return {
