@@ -12,6 +12,7 @@ import { HyperTextLabelsModel } from "./HyperTextLabels";
 import { LabelsModel } from "./Labels/Labels";
 import { OcrTokenLabelsModel } from "./OcrTokenLabels";
 import { ParagraphLabelsModel } from "./ParagraphLabels";
+import { PdfLabelsModel } from "./PdfLabels";
 import { TableLabelsModel } from "./TableLabels";
 import { TimeSeriesLabelsModel } from "./TimeSeriesLabels";
 import { TimelineLabelsModel } from "./TimelineLabels";
@@ -50,6 +51,7 @@ export {
   LabelsModel,
   OcrTokenLabelsModel,
   ParagraphLabelsModel,
+  PdfLabelsModel,
   BitmaskLabelsModel,
   BitmaskModel,
   TableLabelsModel,

@@ -19,6 +19,9 @@ import NormalizationMixin from '../../mixins/Normalization';
 import RegionsMixin from '../../mixins/Regions';
 import { EditableRegion } from '../EditableRegion';
 
+// Import PdfOcrModel to trigger its registration with Registry
+import { PdfOcrModel } from '../../tags/object/PdfOcr';
+
 import styles from './PdfRegion.module.scss';
 
 /**
@@ -618,7 +621,8 @@ const HtxPdfRegion = observer(({ item }) => {
 });
 
 // Register the region
-Registry.addRegion('pdfregion', PdfRegionModel, HtxPdfRegion);
+Registry.addTag('pdfregion', PdfRegionModel, HtxPdfRegion);
+Registry.addRegionType(PdfRegionModel, 'pdfocr');
 
 export { PdfRegionModel, HtxPdfRegion };
 export default PdfRegionModel;

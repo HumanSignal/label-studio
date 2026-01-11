@@ -125,6 +125,8 @@ const Model = types
       "paragraphs",
       "paragraphlabels",
       "pdf",
+      "pdfocr",
+      "pdflabels",
       "video",
       "videorectangle",
       "timelinelabels",

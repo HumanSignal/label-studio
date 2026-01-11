@@ -17,7 +17,9 @@ const logEvent: LogEventFn = (eventName, metadata = {}) => {
   };
 
   // Use requestIdleCallback to send the event after the main thread is free
-  window.requestIdleCallback(() => {
+  // Fallback to setTimeout for Safari which doesn't support requestIdleCallback
+  const scheduleCallback = window.requestIdleCallback || ((cb: () => void) => setTimeout(cb, 1));
+  scheduleCallback(() => {
     const params = new URLSearchParams({ __: JSON.stringify(payload) });
     const url = `/__lsa/?${params}`;
     // Use sendBeacon if available for better reliability during page unload

@@ -2,6 +2,9 @@ import { useMemo } from "react";
 import { Group, Image, Line, Rect } from "react-konva";
 import { isAlive, types } from "mobx-state-tree";
 
+// Polyfill for Safari which doesn't support requestIdleCallback
+const scheduleIdleCallback = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
+
 import Registry from "../core/Registry";
 import NormalizationMixin from "../mixins/Normalization";
 import RegionsMixin from "../mixins/Regions";
@@ -203,7 +206,7 @@ const Model = types
 
       redraw() {
         if (self.bitmaskCanvasRef && self.offscreenCanvasRef && self.imageDataURL) {
-          requestIdleCallback(() => {
+          scheduleIdleCallback(() => {
             const ctx = self.offscreenCanvasRef.getContext("2d");
             ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
             self.restoreFromImageDataURL();

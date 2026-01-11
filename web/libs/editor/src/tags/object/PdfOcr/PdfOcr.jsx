@@ -642,11 +642,9 @@ const HtxPdfOcr = inject('store')(
   })
 );
 
-// Register tag with Registry
-if (!Registry.models.pdfocr) {
-  Registry.addTag('pdfocr', PdfOcrModel, HtxPdfOcr);
-  Registry.addObjectType(PdfOcrModel);
-}
+// Register tag with Registry (unconditional like Image tag)
+Registry.addTag('pdfocr', PdfOcrModel, HtxPdfOcr);
+Registry.addObjectType(PdfOcrModel);
 
 export { HtxPdfOcr, PdfOcrModel };
-export default HtxPdfOcr;
+export default PdfOcrModel;

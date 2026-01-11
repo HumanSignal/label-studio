@@ -1,5 +1,6 @@
 /**
  * PdfOcr Tag exports
+ *
+ * Re-export everything from PdfOcr.jsx which handles registration
  */
-export { PdfOcrModel } from './PdfOcrModel';
-export { HtxPdfOcr } from './PdfOcr';
+export { PdfOcrModel, HtxPdfOcr } from './PdfOcr';
