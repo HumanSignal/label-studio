@@ -7,13 +7,13 @@ type MouseInteractionOptions = Partial<TriggerOptions & ObjectLike & MouseEvent>
 export const ImageView = {
   get image() {
     cy.log("Get main image");
-    return cy.get("img[alt=LS]");
+    return cy.get("img[alt=image]");
   },
   get root() {
     return this.image.closest(".lsf-object");
   },
   get drawingFrame() {
-    return this.image.closest('[class^="frame--"]');
+    return this.image.closest('.lsf-image');
   },
   get drawingArea() {
     cy.log("Get Konva.js root");
