@@ -13,7 +13,7 @@ export const ImageView = {
     return this.image.closest(".lsf-object");
   },
   get drawingFrame() {
-    return this.image.closest('.lsf-image');
+    return this.image.closest(".lsf-image");
   },
   get drawingArea() {
     cy.log("Get Konva.js root");
