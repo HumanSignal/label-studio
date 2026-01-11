@@ -180,11 +180,17 @@ Scenario("Consistency of empty labels", async ({ I, LabelStudio, AtOutliner, AtI
   });
   params.config = Utils.renderXml(configTree);
 
+  LabelStudio.setFeatureFlags({
+    fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short: true,
+  });
+
   I.amOnPage("/");
   LabelStudio.init(params);
   AtDetailsPanel.collapsePanel();
   AtOutliner.seeRegions(0);
   LabelStudio.waitForObjectsReady();
+  await AtImageView.lookForStage();
+  I.waitForInvisible(".lsf-image-progress", 30);
   AtLabels.clickLabel("1");
   AtImageView.dragKonva(200, 200, 100, 100);
   const shapesNum = await AtImageView.countKonvaShapes();

@@ -62,14 +62,14 @@ Data(imageExamples).Scenario("Classification Readonly Annotations", async ({ I, 
    * Checking the Taxonomy input
    */
   I.say("Checking the Taxonomy input");
-  I.click("Click to add...", ".htx-taxonomy");
+  I.click(".htx-taxonomy span");
   I.seeElement(".htx-taxonomy input:disabled");
 
   I.say("Checking selected values");
   I.dontSee({ css: ".htx-taxonomy-selected input[type=button]" });
 
   I.say("Try selecting anyways");
-  I.see("Choice 1", ".htx-taxonomy");
+  I.see("Choice 2.1", ".htx-taxonomy");
 
   I.say("Results are equal after editing attempt");
   await LabelStudio.resultsNotChanged(result);
