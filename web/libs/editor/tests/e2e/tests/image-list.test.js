@@ -94,6 +94,7 @@ const result = [
 Before(async ({ LabelStudio }) => {
   LabelStudio.setFeatureFlags({
     fflag_feat_front_lsdv_4583_multi_image_segmentation_short: true,
+    fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short: true,
   });
 });
 
