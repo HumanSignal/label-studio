@@ -2,7 +2,6 @@
 
 import logging
 
-from core.feature_flags import flag_set
 from core.mixins import GetParentObjectMixin
 from core.permissions import ViewClassPermission, all_permissions
 from core.utils.common import is_community
@@ -343,13 +342,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         if review:
             kwargs = {'fields_for_evaluation': ['annotators', 'reviewed']}
         else:
-            if flag_set('fflag_fix_back_bros_182_api_task_optimizations', user=self.request.user):
-                kwargs = {
-                    'all_fields': True,
-                    'excluded_fields_for_evaluation': self.get_excluded_fields_for_evaluation(),
-                }
-            else:
-                kwargs = {'all_fields': True}
+            kwargs = {
+                'all_fields': True,
+                'excluded_fields_for_evaluation': self.get_excluded_fields_for_evaluation(),
+            }
         project = self.request.query_params.get('project') or self.request.data.get('project')
         if not project:
             project = task.project.id

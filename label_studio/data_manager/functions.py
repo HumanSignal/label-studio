@@ -254,8 +254,8 @@ def get_all_columns(project, *_):
         {
             'id': 'avg_lead_time',
             'title': 'Lead Time',
-            'type': 'Number',
-            'help': 'Average lead time over all annotations (seconds)',
+            'type': 'Time',
+            'help': 'Average lead time over all annotations',
             'target': 'tasks',
             'visibility_defaults': {'explore': False, 'labeling': False},
             'project_defined': False,
