@@ -5,7 +5,7 @@ const Helpers = require("../tests/helpers");
 
 module.exports = {
   _stageSelector: ".konvajs-content",
-  _stageFrameSelector: '[class^="frame--"]',
+  _stageFrameSelector: ".lsf-image",
   _stageBBox: null,
 
   _toolBarSelector: ".lsf-toolbar",
