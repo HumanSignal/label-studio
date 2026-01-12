@@ -19,6 +19,8 @@ The labeling interface provides a full-featured spreadsheet experience with capa
 * Reordering columns by dragging
 * Editing individual cells
 
+![Screenshot](/images/templates-misc/react-spreadsheet.png)
+
 !!! error Enterprise
     This template can only be used in Label Studio Enterprise.
 
