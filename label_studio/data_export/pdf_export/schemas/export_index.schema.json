@@ -1,0 +1,172 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://labelstud.io/schemas/pdf-ml-export/export_index.schema.json",
+  "title": "PDF ML Export Index",
+  "description": "Schema for export_index.json file listing all documents and counts",
+  "type": "object",
+  "required": [
+    "export_id",
+    "export_schema_version",
+    "project_id",
+    "created_at",
+    "status",
+    "statistics",
+    "documents"
+  ],
+  "properties": {
+    "export_id": {
+      "type": "string",
+      "description": "Export job UUID",
+      "format": "uuid"
+    },
+    "export_schema_version": {
+      "type": "string",
+      "description": "Semantic version of export schema",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "project_id": {
+      "type": "integer",
+      "description": "Label Studio project ID",
+      "minimum": 1
+    },
+    "created_at": {
+      "type": "string",
+      "description": "Export creation timestamp (ISO8601)",
+      "format": "date-time"
+    },
+    "created_by": {
+      "type": ["integer", "null"],
+      "description": "User ID who triggered export",
+      "minimum": 1
+    },
+    "status": {
+      "type": "string",
+      "description": "Export completion status",
+      "enum": ["completed", "partial", "failed"]
+    },
+    "statistics": {
+      "type": "object",
+      "description": "Export statistics",
+      "required": ["total_documents", "completed_documents", "total_pages", "total_annotations"],
+      "properties": {
+        "total_documents": {
+          "type": "integer",
+          "description": "Total documents attempted",
+          "minimum": 0
+        },
+        "completed_documents": {
+          "type": "integer",
+          "description": "Successfully exported documents",
+          "minimum": 0
+        },
+        "failed_documents": {
+          "type": "integer",
+          "description": "Failed documents",
+          "minimum": 0
+        },
+        "total_pages": {
+          "type": "integer",
+          "description": "Total pages across all documents",
+          "minimum": 0
+        },
+        "total_annotations": {
+          "type": "integer",
+          "description": "Total annotation records",
+          "minimum": 0
+        },
+        "total_words": {
+          "type": "integer",
+          "description": "Total words extracted",
+          "minimum": 0
+        },
+        "total_tables": {
+          "type": "integer",
+          "description": "Total tables detected",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "documents": {
+      "type": "array",
+      "description": "List of exported documents",
+      "items": {
+        "type": "object",
+        "required": ["doc_id", "task_id", "status", "manifest_path"],
+        "properties": {
+          "doc_id": {
+            "type": "string",
+            "description": "Document ID",
+            "pattern": "^[a-f0-9]{12}$"
+          },
+          "task_id": {
+            "type": "integer",
+            "description": "Label Studio task ID",
+            "minimum": 1
+          },
+          "status": {
+            "type": "string",
+            "description": "Document export status",
+            "enum": ["completed", "failed"]
+          },
+          "manifest_path": {
+            "type": "string",
+            "description": "Relative path to document manifest"
+          },
+          "num_pages": {
+            "type": "integer",
+            "description": "Number of pages",
+            "minimum": 0
+          },
+          "num_annotations": {
+            "type": "integer",
+            "description": "Number of annotations",
+            "minimum": 0
+          },
+          "error": {
+            "type": ["string", "null"],
+            "description": "Error message if failed"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "annotation_files": {
+      "type": "array",
+      "description": "List of annotation JSONL files (may be sharded)",
+      "items": {
+        "type": "object",
+        "required": ["path", "record_count"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path to annotation file"
+          },
+          "record_count": {
+            "type": "integer",
+            "description": "Number of records in file",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "errors": {
+      "type": "array",
+      "description": "List of export errors",
+      "items": {
+        "type": "object",
+        "required": ["doc_id", "task_id", "error_type", "error_message", "timestamp"],
+        "properties": {
+          "doc_id": {"type": "string"},
+          "task_id": {"type": "integer"},
+          "error_type": {"type": "string"},
+          "error_message": {"type": "string"},
+          "timestamp": {"type": "string", "format": "date-time"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

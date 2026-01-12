@@ -1,0 +1,455 @@
+openapi: 3.0.3
+info:
+  title: PDF Annotation Export API
+  description: |
+    API endpoints for exporting PDF annotations with layout context, deterministic IDs,
+    and W3C Web Annotation support.
+
+    These endpoints extend the existing Label Studio export API.
+  version: 1.0.0
+  contact:
+    name: Label Studio
+    url: https://labelstud.io
+
+servers:
+  - url: /api
+    description: Label Studio API
+
+tags:
+  - name: PDF Export
+    description: PDF-specific export operations
+
+paths:
+  /projects/{project_id}/exports/pdf-ml:
+    post:
+      summary: Create PDF ML Export
+      description: |
+        Creates an asynchronous export job for PDF annotations with full layout context.
+        Returns immediately with export job ID; poll for completion.
+
+        **Permissions**: Project owner or manager only.
+      operationId: createPdfMlExport
+      tags:
+        - PDF Export
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PdfExportRequest'
+            examples:
+              default:
+                summary: Default export
+                value:
+                  format: pdf_ml
+                  dpi: 200
+                  include_page_images: true
+              w3c:
+                summary: With W3C format
+                value:
+                  format: pdf_ml
+                  dpi: 150
+                  include_page_images: true
+                  include_w3c: true
+              filtered:
+                summary: Filtered tasks
+                value:
+                  format: pdf_ml
+                  task_filter:
+                    only_with_annotations: true
+                    view: 123
+      responses:
+        '201':
+          description: Export job created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PdfExportJob'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
+
+  /projects/{project_id}/exports/pdf-ml/{export_id}:
+    get:
+      summary: Get PDF Export Status
+      description: |
+        Returns the status and details of a PDF ML export job.
+        Poll this endpoint to check for completion.
+      operationId: getPdfMlExportStatus
+      tags:
+        - PDF Export
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ExportId'
+      responses:
+        '200':
+          description: Export job status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PdfExportJob'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
+
+    delete:
+      summary: Cancel/Delete PDF Export
+      description: |
+        Cancels a running export or deletes a completed export.
+        Removes all generated files.
+      operationId: deletePdfMlExport
+      tags:
+        - PDF Export
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ExportId'
+      responses:
+        '204':
+          description: Export deleted
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
+
+  /projects/{project_id}/exports/pdf-ml/{export_id}/download:
+    get:
+      summary: Download PDF Export
+      description: |
+        Downloads the completed PDF ML export as a ZIP archive.
+        Only available when export status is 'completed' or 'partial'.
+      operationId: downloadPdfMlExport
+      tags:
+        - PDF Export
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ExportId'
+      responses:
+        '200':
+          description: Export ZIP file
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: 'attachment; filename="project_123_pdf_export.zip"'
+        '202':
+          description: Export still in progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PdfExportJob'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
+
+  /projects/{project_id}/exports/pdf-ml/{export_id}/manifest:
+    get:
+      summary: Get Export Manifest
+      description: |
+        Returns the top-level manifest.json from a completed export.
+        Useful for inspecting export contents without downloading full archive.
+      operationId: getPdfMlExportManifest
+      tags:
+        - PDF Export
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ExportId'
+      responses:
+        '200':
+          description: Export manifest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportManifest'
+        '202':
+          description: Export still in progress
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+        - bearerAuth: []
+
+components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: Label Studio project ID
+      schema:
+        type: integer
+        example: 123
+
+    ExportId:
+      name: export_id
+      in: path
+      required: true
+      description: Export job ID (UUID)
+      schema:
+        type: string
+        format: uuid
+        example: "550e8400-e29b-41d4-a716-446655440000"
+
+  schemas:
+    PdfExportRequest:
+      type: object
+      required:
+        - format
+      properties:
+        format:
+          type: string
+          enum: [pdf_ml]
+          description: Export format identifier
+        dpi:
+          type: integer
+          minimum: 72
+          maximum: 600
+          default: 200
+          description: DPI for page image rendering
+        include_page_images:
+          type: boolean
+          default: true
+          description: Include PNG renders of each page
+        include_w3c:
+          type: boolean
+          default: false
+          description: Include W3C Web Annotation format alongside JSONL
+        task_filter:
+          $ref: '#/components/schemas/TaskFilter'
+        annotation_filter:
+          $ref: '#/components/schemas/AnnotationFilter'
+
+    TaskFilter:
+      type: object
+      description: Filter which tasks to include in export
+      properties:
+        view:
+          type: integer
+          description: Data Manager view ID to filter by
+        only_with_annotations:
+          type: boolean
+          default: true
+          description: Only export tasks that have annotations
+        task_ids:
+          type: array
+          items:
+            type: integer
+          description: Specific task IDs to export
+
+    AnnotationFilter:
+      type: object
+      description: Filter which annotations to include
+      properties:
+        ground_truth:
+          type: boolean
+          description: Include ground truth annotations
+        reviewed:
+          type: boolean
+          description: Only include reviewed annotations
+        annotator_ids:
+          type: array
+          items:
+            type: integer
+          description: Filter by annotator user IDs
+
+    PdfExportJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Export job ID
+        project_id:
+          type: integer
+        status:
+          type: string
+          enum: [queued, in_progress, completed, partial, failed]
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: integer
+          description: User ID who triggered export
+        started_at:
+          type: string
+          format: date-time
+        finished_at:
+          type: string
+          format: date-time
+        progress:
+          $ref: '#/components/schemas/ExportProgress'
+        options:
+          $ref: '#/components/schemas/PdfExportRequest'
+        download_url:
+          type: string
+          format: uri
+          description: URL to download completed export (when status=completed/partial)
+        error_message:
+          type: string
+          description: Error description (when status=failed)
+      required:
+        - id
+        - project_id
+        - status
+        - created_at
+
+    ExportProgress:
+      type: object
+      properties:
+        total_tasks:
+          type: integer
+        processed_tasks:
+          type: integer
+        total_pages:
+          type: integer
+        processed_pages:
+          type: integer
+        failed_tasks:
+          type: integer
+        percent_complete:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+
+    ExportManifest:
+      type: object
+      description: Top-level export bundle manifest
+      properties:
+        export_id:
+          type: string
+          format: uuid
+        export_schema_version:
+          type: string
+          example: "1.0.0"
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+        project_id:
+          type: integer
+        total_documents:
+          type: integer
+        total_annotations:
+          type: integer
+        total_pages:
+          type: integer
+        options:
+          $ref: '#/components/schemas/PdfExportRequest'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentRef'
+        annotation_files:
+          type: array
+          items:
+            type: string
+          description: Relative paths to annotation JSONL files
+        status:
+          type: string
+          enum: [completed, partial]
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExportError'
+
+    DocumentRef:
+      type: object
+      properties:
+        doc_id:
+          type: string
+        task_id:
+          type: integer
+        manifest_path:
+          type: string
+          example: "docs/abc123def456/manifest.json"
+        page_count:
+          type: integer
+        annotation_count:
+          type: integer
+
+    ExportError:
+      type: object
+      properties:
+        doc_id:
+          type: string
+        task_id:
+          type: integer
+        error_type:
+          type: string
+          example: "pdf_parse_error"
+        error_message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+        code:
+          type: string
+          description: Error code
+      required:
+        - detail
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            detail: "Invalid DPI value. Must be between 72 and 600."
+            code: "invalid_parameter"
+
+    Forbidden:
+      description: Permission denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            detail: "You don't have permission to export this project."
+            code: "permission_denied"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            detail: "Export not found."
+            code: "not_found"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Label Studio API token
