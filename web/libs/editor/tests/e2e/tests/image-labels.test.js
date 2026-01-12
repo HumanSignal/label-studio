@@ -3,6 +3,12 @@ const { kebabCase } = require("lodash");
 
 Feature("Images' labels type matching");
 
+Before(({ LabelStudio }) => {
+  LabelStudio.setFeatureFlags({
+    fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short: true,
+  });
+});
+
 const IMAGE =
   "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
 
@@ -130,6 +136,8 @@ DataStore.Scenario(
     LabelStudio.init(params);
     AtDetailsPanel.collapsePanel();
     LabelStudio.waitForObjectsReady();
+    await AtImageView.lookForStage();
+    I.waitForInvisible(".lsf-image-progress", 30);
     AtOutliner.seeRegions(0);
     const canvasSize = await AtImageView.getCanvasSize();
     const size = Math.min(canvasSize.width, canvasSize.height);
@@ -172,9 +180,10 @@ DataStore.Scenario(
 
       LabelStudio.init(params);
       LabelStudio.waitForObjectsReady();
+      await AtImageView.lookForStage();
+      I.waitForInvisible(".lsf-image-progress", 30);
       AtOutliner.seeRegions(0);
       I.click(toolSelector);
-      await AtImageView.lookForStage();
       I.say(`${shape}: Drawing.`);
 
       regions.forEach((region, idx) => {

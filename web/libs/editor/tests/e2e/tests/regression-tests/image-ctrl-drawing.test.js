@@ -3,6 +3,12 @@ const Asserts = require("../../utils/asserts");
 
 Feature("Creating regions over other regions").tag("@regress");
 
+Before(({ LabelStudio }) => {
+  LabelStudio.setFeatureFlags({
+    fflag_feat_front_optic_1479_improve_image_tag_memory_usage_short: true,
+  });
+});
+
 const IMAGE =
   "https://htx-pub.s3.us-east-1.amazonaws.com/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg";
 
@@ -125,8 +131,9 @@ Scenario("Drawing with ctrl pressed", async ({ I, LabelStudio, AtOutliner, AtIma
   AtDetailsPanel.collapsePanel();
   AtDetailsPanel.seeExpandButton();
   LabelStudio.waitForObjectsReady();
+  await AtImageView.lookForStage();
+  I.waitForInvisible(".lsf-image-progress", 30);
   AtOutliner.seeRegions(0);
-  I.waitTicks(2);
   const canvasSize = await AtImageView.getCanvasSize();
   const size = Math.min(canvasSize.width, canvasSize.height);
   const convertToImageSize = Helpers.getSizeConvertor(canvasSize.width, canvasSize.height);
@@ -155,10 +162,11 @@ Scenario("Drawing with ctrl pressed", async ({ I, LabelStudio, AtOutliner, AtIma
 
     LabelStudio.init(params);
     LabelStudio.waitForObjectsReady();
+    await AtImageView.lookForStage();
+    I.waitForInvisible(".lsf-image-progress", 30);
     AtOutliner.seeRegions(0);
     AtDetailsPanel.seeExpandButton();
     I.say(`Drawing ${innerRegion.shape} on ${outerRegion.shape}`);
-    await AtImageView.lookForStage();
     I.pressKey(outerRegion.hotKey);
     AtImageView[outerRegion.action](...outerRegion.params);
     AtOutliner.seeRegions(1);
@@ -190,6 +198,8 @@ Scenario("How it works without ctrl", async ({ I, LabelStudio, AtOutliner, AtIma
   I.amOnPage("/");
   LabelStudio.init(params);
   LabelStudio.waitForObjectsReady();
+  await AtImageView.lookForStage();
+  I.waitForInvisible(".lsf-image-progress", 30);
   AtOutliner.seeRegions(0);
   const canvasSize = await AtImageView.getCanvasSize();
   const size = Math.min(canvasSize.width, canvasSize.height);
@@ -223,10 +233,11 @@ Scenario("How it works without ctrl", async ({ I, LabelStudio, AtOutliner, AtIma
 
     LabelStudio.init(params);
     LabelStudio.waitForObjectsReady();
+    await AtImageView.lookForStage();
+    I.waitForInvisible(".lsf-image-progress", 30);
     AtOutliner.seeRegions(0);
     I.say(`Drawing ${innerRegion.shape} on ${outerRegion.shape}`);
     I.pressKey(["u"]);
-    await AtImageView.lookForStage();
     I.pressKey(outerRegion.hotKey);
     AtImageView[outerRegion.action](...outerRegion.params);
     I.pressKey(["u"]);
