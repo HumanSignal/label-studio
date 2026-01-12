@@ -92,6 +92,21 @@
     cursor: pointer;
     background-color: var(--color-neutral-background);
 
+
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      flex: 1;
+      width: var(--spacing-base);
+      height: 100%;
+      background: inherit;
+      z-index: -1;
+      transform: translateX(100%);
+    }
+
     &_disabled,
     &_loading {
       opacity: 0.6;
@@ -113,7 +128,6 @@
         height: 100%;
         background: inherit;
         z-index: -1;
-        pointer-events: none;
         transform: translateX(100%);
       }
     }
