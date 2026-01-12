@@ -57,6 +57,13 @@ const Model = types
     // Cell texts - map of "row-col" -> text
     // Uses MST map type for observable updates
     cellTexts: types.optional(types.map(types.string), {}),
+
+    // User-entered text content (for text labeling feature)
+    text: types.maybeNull(types.string),
+
+    // Position reference for text (page, line, paragraph, offsets)
+    // Schema: { page, line?, lineEnd?, paragraph?, startOffset?, endOffset?, tokenStart?, tokenEnd? }
+    position: types.maybeNull(types.frozen()),
   })
   .volatile(() => ({
     // Visual properties
@@ -77,6 +84,7 @@ const Model = types
       { property: 'width', label: 'W' },
       { property: 'height', label: 'H' },
       { property: 'page', label: 'Page' },
+      { property: 'text', label: 'Text' },
     ],
 
     // Table editing state
@@ -109,6 +117,31 @@ const Model = types
         right: self.x + self.width,
         bottom: self.y + self.height,
       };
+    },
+
+    /**
+     * Get formatted position string for display
+     * Shows page and line information
+     */
+    get positionDisplay() {
+      if (!self.position) {
+        return `Page ${self.page}`;
+      }
+
+      const pos = self.position;
+      const parts = [`Page ${pos.page}`];
+
+      if (pos.line) {
+        if (pos.lineEnd && pos.lineEnd !== pos.line) {
+          parts.push(`Lines ${pos.line}-${pos.lineEnd}`);
+        } else {
+          parts.push(`Line ${pos.line}`);
+        }
+      } else if (pos.paragraph) {
+        parts.push(`Paragraph ${pos.paragraph}`);
+      }
+
+      return parts.join(', ');
     },
 
     /**
@@ -224,6 +257,16 @@ const Model = types
         result.value.extractedText = self.extractedText;
       }
 
+      // Include user-entered text if present
+      if (self.text) {
+        result.value.text = self.text;
+      }
+
+      // Include position reference if present
+      if (self.position) {
+        result.value.position = { ...self.position };
+      }
+
       return result;
     },
   }))
@@ -252,6 +295,16 @@ const Model = types
       // Restore extracted text
       if (value.extractedText) {
         self.extractedText = value.extractedText;
+      }
+
+      // Restore user-entered text
+      if (value.text !== undefined) {
+        self.text = value.text;
+      }
+
+      // Restore position reference
+      if (value.position) {
+        self.position = value.position;
       }
 
       // Restore table structure
@@ -307,6 +360,58 @@ const Model = types
      */
     setExtractedText(text) {
       self.extractedText = text;
+    },
+
+    /**
+     * Set user-entered text content
+     * @param {string} text - The text content (max 1000 characters)
+     */
+    setText(text) {
+      // Enforce max length validation
+      const maxLength = 1000;
+      if (text && text.length > maxLength) {
+        self.text = text.substring(0, maxLength);
+      } else {
+        self.text = text || null;
+      }
+    },
+
+    /**
+     * Set position reference
+     * @param {Object} position - Position reference object
+     * @param {number} position.page - Page number (required)
+     * @param {number} [position.line] - Line number (1-based)
+     * @param {number} [position.lineEnd] - End line number for multi-line
+     * @param {number} [position.paragraph] - Paragraph index (fallback)
+     * @param {number} [position.startOffset] - Start character offset (fallback)
+     * @param {number} [position.endOffset] - End character offset (fallback)
+     * @param {number} [position.tokenStart] - Start token index
+     * @param {number} [position.tokenEnd] - End token index
+     */
+    setPosition(position) {
+      if (!position) {
+        self.position = null;
+        return;
+      }
+
+      // Ensure page is always present, default to current page
+      const normalizedPosition = {
+        page: position.page ?? self.page,
+        ...position,
+      };
+
+      self.position = normalizedPosition;
+    },
+
+    /**
+     * Update position with line information from PositionTracker
+     * @param {Object} positionRef - Position reference from PositionTracker.getPositionReference()
+     */
+    updatePositionFromTracker(positionRef) {
+      self.position = {
+        ...self.position,
+        ...positionRef,
+      };
     },
 
     /**

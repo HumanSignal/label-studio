@@ -323,3 +323,147 @@
   width: 2px;
   margin-left: -1px;
 }
+
+/* Interactive token layer for text selection */
+.interactiveTokenLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+
+  :global(.lsf-pdfocr__interactive-tokens) {
+    @extend .interactiveTokenLayer;
+  }
+}
+
+.interactiveToken {
+  position: absolute;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: text;
+  transition: background-color 0.1s ease, border-color 0.1s ease;
+  user-select: none;
+
+  &:hover {
+    background: rgba(66, 133, 244, 0.15);
+    border-color: rgba(66, 133, 244, 0.3);
+  }
+}
+
+.tokenSelected {
+  background: rgba(66, 133, 244, 0.35) !important;
+  border-color: rgba(66, 133, 244, 0.6) !important;
+}
+
+/* Text selection preview - shows selected tokens before label is applied */
+.selectionPreviewContainer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 45;
+
+  :global(.lsf-pdfocr__selection-preview) {
+    @extend .selectionPreviewContainer;
+  }
+}
+
+.selectionPreviewToken {
+  position: absolute;
+  background: rgba(66, 133, 244, 0.3);
+  border: 1px dashed rgba(66, 133, 244, 0.6);
+  border-radius: 2px;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* Text highlight region styles */
+.highlightGroup {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.highlight {
+  position: absolute;
+  box-sizing: border-box;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background-color 0.15s ease;
+  pointer-events: auto;
+
+  &:hover {
+    z-index: 10;
+  }
+}
+
+.highlightToken {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 2px;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    z-index: 10;
+  }
+}
+
+.highlightSelected {
+  z-index: 20;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.5);
+}
+
+.highlightLabel {
+  position: absolute;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 11px;
+  white-space: nowrap;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 25;
+}
+
+/* No text layer message */
+.noTextLayerMessage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 32px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--ls-color-border, #ddd);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  z-index: 100;
+  pointer-events: none;
+
+  :global(.lsf-pdfocr__no-text-layer) {
+    @extend .noTextLayerMessage;
+  }
+}
+
+.noTextLayerIcon {
+  font-size: 32px;
+}
+
+.noTextLayerHint {
+  font-size: 12px;
+  color: var(--ls-color-text-secondary, #666);
+  max-width: 250px;
+}

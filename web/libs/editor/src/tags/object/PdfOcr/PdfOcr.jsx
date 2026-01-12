@@ -14,6 +14,14 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 import Registry from '../../../core/Registry';
 import { PdfOcrModel } from './PdfOcrModel';
 import { PdfDocument } from '../../../utils/pdfLoader';
+import { getPositionReference } from './components/PositionTracker';
+import {
+  getTokenIndicesInRect,
+  extractTextFromTokens,
+  calculateBoundingBox,
+  getSelectedTokens,
+  findClosestToken,
+} from '../../../utils/pdf-selection';
 
 import styles from './PdfOcr.module.scss';
 
@@ -174,6 +182,85 @@ const OcrTokenOverlay = observer(({ tokens, scale, pageWidth, pageHeight, visibl
 });
 
 /**
+ * Text selection preview component - shows selected tokens before label is applied
+ */
+const TextSelectionPreview = observer(({ tokens, startIndex, endIndex, visible }) => {
+  if (!visible || startIndex === null || endIndex === null || !tokens || tokens.length === 0) {
+    return null;
+  }
+
+  const selectedTokens = getSelectedTokens(tokens, startIndex, endIndex);
+  if (selectedTokens.length === 0) return null;
+
+  return (
+    <div className={styles.selectionPreviewContainer}>
+      {selectedTokens.map((token, index) => {
+        const [x, y, width, height] = token.bbox;
+        return (
+          <div
+            key={token.id || index}
+            className={styles.selectionPreviewToken}
+            style={{
+              left: `${x * 100}%`,
+              top: `${y * 100}%`,
+              width: `${width * 100}%`,
+              height: `${height * 100}%`,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+});
+
+/**
+ * Interactive OCR token layer for text selection
+ */
+const InteractiveTokenLayer = observer(({
+  tokens,
+  visible,
+  onTokenMouseDown,
+  onTokenMouseEnter,
+  selectionStart,
+  selectionEnd,
+}) => {
+  if (!visible || !tokens || tokens.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={styles.interactiveTokenLayer}>
+      {tokens.map((token, index) => {
+        const [x, y, width, height] = token.bbox;
+        const isSelected =
+          selectionStart !== null &&
+          selectionEnd !== null &&
+          index >= Math.min(selectionStart, selectionEnd) &&
+          index <= Math.max(selectionStart, selectionEnd);
+
+        return (
+          <div
+            key={token.id || index}
+            className={`${styles.interactiveToken} ${isSelected ? styles.tokenSelected : ''}`}
+            style={{
+              left: `${x * 100}%`,
+              top: `${y * 100}%`,
+              width: `${width * 100}%`,
+              height: `${height * 100}%`,
+            }}
+            onMouseDown={(e) => onTokenMouseDown(e, index)}
+            onMouseEnter={(e) => onTokenMouseEnter(e, index)}
+            data-token-index={index}
+            data-token-id={token.id}
+            title={token.text}
+          />
+        );
+      })}
+    </div>
+  );
+});
+
+/**
  * Table gridlines component - renders gridlines for table regions
  */
 const TableGridlinesOverlay = observer(({ region }) => {
@@ -210,6 +297,94 @@ const TableGridlinesOverlay = observer(({ region }) => {
 });
 
 /**
+ * Text highlight region component - displays text highlight regions
+ */
+const TextHighlightRegion = observer(({ region }) => {
+  const isSelected = region.selected;
+  const color = region.getOneColor?.() || '#ffeb3b';
+  const tokenBoxes = region.tokenBoundingBoxes || [];
+
+  const handleClick = useCallback((e) => {
+    e.stopPropagation();
+    region.onClickRegion?.(e);
+  }, [region]);
+
+  const handleMouseEnter = useCallback(() => {
+    region.setHighlight?.(true);
+  }, [region]);
+
+  const handleMouseLeave = useCallback(() => {
+    region.setHighlight?.(false);
+  }, [region]);
+
+  // Render individual token highlights for precise multi-line selection
+  if (tokenBoxes.length > 0) {
+    return (
+      <div
+        className={`${styles.highlightGroup} lsf-region ${isSelected ? 'lsf-region_selected' : ''}`}
+        onClick={handleClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        data-region-id={region.id}
+        data-page={region.page}
+      >
+        {tokenBoxes.map((box, index) => (
+          <div
+            key={box.tokenId || index}
+            className={`${styles.highlightToken} ${isSelected ? styles.highlightSelected : ''}`}
+            style={{
+              left: `${box.x}%`,
+              top: `${box.y}%`,
+              width: `${box.width}%`,
+              height: `${box.height}%`,
+              backgroundColor: `${color}66`,
+              opacity: region.hidden ? 0 : 1,
+            }}
+          />
+        ))}
+
+        {/* Label display */}
+        {region.labeling?.selectedLabels?.length > 0 && tokenBoxes.length > 0 && (
+          <div
+            className={styles.highlightLabel}
+            style={{
+              left: `${tokenBoxes[0].x}%`,
+              top: `${tokenBoxes[0].y}%`,
+              transform: 'translateY(-100%)',
+            }}
+          >
+            {region.labeling.selectedLabels.map((l) => l.value).join(', ')}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Fallback: render single bounding box
+  const bbox = region.boundingBox;
+  if (!bbox) return null;
+
+  return (
+    <div
+      className={`${styles.highlight} lsf-region ${isSelected ? `${styles.highlightSelected} lsf-region_selected` : ''}`}
+      style={{
+        left: `${bbox.x}%`,
+        top: `${bbox.y}%`,
+        width: `${bbox.width}%`,
+        height: `${bbox.height}%`,
+        backgroundColor: `${color}66`,
+        opacity: region.hidden ? 0 : 1,
+      }}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      data-region-id={region.id}
+      data-page={region.page}
+    />
+  );
+});
+
+/**
  * Region overlay component - displays existing regions
  */
 const RegionOverlay = observer(({ item, regions, currentPage }) => {
@@ -223,6 +398,12 @@ const RegionOverlay = observer(({ item, regions, currentPage }) => {
   return (
     <div className={styles.regionOverlay}>
       {pageRegions.map((region) => {
+        // Check if this is a text highlight region
+        if (region.type === 'pdftexthighlight') {
+          return <TextHighlightRegion key={region.id} region={region} />;
+        }
+
+        // Box region rendering
         const isSelected = region.selected;
         const color = region.getOneColor?.() || '#ff8800';
         const isTable = region.isTable;
@@ -263,6 +444,23 @@ const RegionOverlay = observer(({ item, regions, currentPage }) => {
 });
 
 /**
+ * No text layer message - shown when text selection is enabled but no OCR tokens available
+ */
+const NoTextLayerMessage = observer(({ visible }) => {
+  if (!visible) return null;
+
+  return (
+    <div className={styles.noTextLayerMessage}>
+      <span className={styles.noTextLayerIcon}>📄</span>
+      <span>No text layer available</span>
+      <span className={styles.noTextLayerHint}>
+        This PDF does not contain selectable text. Draw bounding boxes to annotate regions.
+      </span>
+    </div>
+  );
+});
+
+/**
  * Drawing overlay component - shows region being drawn
  */
 const DrawingOverlay = observer(({ isDrawing, startPoint, currentPoint }) => {
@@ -298,10 +496,15 @@ const HtxPdfOcr = inject('store')(
     const [pdfDoc, setPdfDoc] = useState(null);
     const [tokens, setTokens] = useState([]);
 
-    // Drawing state
+    // Drawing state (for box regions)
     const [isDrawing, setIsDrawing] = useState(false);
     const [startPoint, setStartPoint] = useState(null);
     const [currentPoint, setCurrentPoint] = useState(null);
+
+    // Text selection state (for highlight regions)
+    const [isSelectingText, setIsSelectingText] = useState(false);
+    const [selectionStart, setSelectionStart] = useState(null);
+    const [selectionEnd, setSelectionEnd] = useState(null);
 
     // Get mouse position as percentage of page container
     const getMousePosition = useCallback((e) => {
@@ -382,12 +585,38 @@ const HtxPdfOcr = inject('store')(
           item
         );
 
-        // Extract OCR text from region
+        // Extract OCR text from region and calculate position
         if (region && tokens.length > 0) {
           const extractedText = extractTextFromRegion(tokens, { x, y, width, height });
           if (extractedText) {
             region.setExtractedText?.(extractedText);
           }
+
+          // Calculate position reference with line numbers
+          // Convert region coords from 0-100 to 0-1 for token matching
+          const normalizedRect = {
+            x: x / 100,
+            y: y / 100,
+            width: width / 100,
+            height: height / 100,
+          };
+
+          const tokenIndices = getTokenIndicesInRect(tokens, normalizedRect, { normalized: true });
+          if (tokenIndices) {
+            const positionRef = getPositionReference({
+              tokens,
+              tokenStart: tokenIndices.startIndex,
+              tokenEnd: tokenIndices.endIndex,
+              page: item._currentPage,
+            });
+            region.setPosition?.(positionRef);
+          } else {
+            // Fallback: set position with just page number
+            region.setPosition?.({ page: item._currentPage });
+          }
+        } else if (region) {
+          // No tokens, just set page
+          region.setPosition?.({ page: item._currentPage });
         }
       }
 
@@ -426,6 +655,115 @@ const HtxPdfOcr = inject('store')(
 
       return intersectingTokens.map((t) => t.text).join(' ');
     }, []);
+
+    // Text selection handlers
+    const handleTokenMouseDown = useCallback((e, tokenIndex) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      // Start text selection
+      setIsSelectingText(true);
+      setSelectionStart(tokenIndex);
+      setSelectionEnd(tokenIndex);
+    }, []);
+
+    const handleTokenMouseEnter = useCallback((e, tokenIndex) => {
+      if (!isSelectingText) return;
+
+      // Extend selection
+      setSelectionEnd(tokenIndex);
+    }, [isSelectingText]);
+
+    const handleTextSelectionEnd = useCallback((e) => {
+      if (!isSelectingText) return;
+
+      setIsSelectingText(false);
+
+      // If we have a valid selection, keep it visible until label is applied
+      // The selection will be cleared when a highlight is created or user clicks elsewhere
+    }, [isSelectingText]);
+
+    // Create text highlight from current selection
+    const createTextHighlight = useCallback(() => {
+      if (selectionStart === null || selectionEnd === null) return null;
+      if (!tokens || tokens.length === 0) return null;
+
+      const control = item.annotation?.names?.get(item.controlTagName);
+      if (!control?.selectedLabels?.length) return null;
+
+      const startIdx = Math.min(selectionStart, selectionEnd);
+      const endIdx = Math.max(selectionStart, selectionEnd);
+      const selectedTokens = getSelectedTokens(tokens, startIdx, endIdx);
+
+      if (selectedTokens.length === 0) return null;
+
+      // Extract text from selected tokens
+      const text = extractTextFromTokens(selectedTokens);
+
+      // Calculate bounding box
+      const bbox = calculateBoundingBox(selectedTokens);
+
+      // Calculate position reference
+      const positionRef = getPositionReference({
+        tokens,
+        tokenStart: startIdx,
+        tokenEnd: endIdx,
+        page: item._currentPage,
+      });
+
+      // Create the highlight region
+      const region = item.annotation.createResult(
+        {
+          text,
+          page: item._currentPage,
+          tokenStart: startIdx,
+          tokenEnd: endIdx,
+          // Include bbox for rendering
+          x: bbox ? bbox.x * 100 : 0,
+          y: bbox ? bbox.y * 100 : 0,
+          width: bbox ? bbox.width * 100 : 0,
+          height: bbox ? bbox.height * 100 : 0,
+          position: positionRef,
+        },
+        control.getResultValue(),
+        control,
+        item
+      );
+
+      // Clear selection after creating highlight
+      setSelectionStart(null);
+      setSelectionEnd(null);
+
+      return region;
+    }, [selectionStart, selectionEnd, tokens, item]);
+
+    // Clear text selection when clicking outside tokens
+    const handleContainerClick = useCallback((e) => {
+      // Don't clear if we're clicking on a token or region
+      if (e.target.closest('[data-token-index]') || e.target.closest('[data-region-id]')) {
+        return;
+      }
+
+      // Clear selection if clicking on empty area
+      if (selectionStart !== null || selectionEnd !== null) {
+        setSelectionStart(null);
+        setSelectionEnd(null);
+      }
+    }, [selectionStart, selectionEnd]);
+
+    // Watch for label selection to create highlight from current text selection
+    useEffect(() => {
+      if (selectionStart === null || selectionEnd === null) return;
+
+      const control = item.annotation?.names?.get(item.controlTagName);
+      if (control?.selectedLabels?.length > 0 && !isSelectingText) {
+        // Label was selected while we have a text selection - create highlight
+        createTextHighlight();
+      }
+    }, [item.annotation?.names?.get(item.controlTagName)?.selectedLabels?.length, selectionStart, selectionEnd, isSelectingText, createTextHighlight, item.controlTagName]);
+
+    // Check if text selection mode is active
+    const hasTextSelection = selectionStart !== null && selectionEnd !== null;
 
     // Keyboard shortcuts handler
     const handleKeyDown = useCallback((e) => {
@@ -516,10 +854,23 @@ const HtxPdfOcr = inject('store')(
 
       const loadTokens = async () => {
         try {
+          // Check if tokens are already cached in the model
+          const cachedTokens = item.getPageTokens(item._currentPage);
+          if (cachedTokens && cachedTokens.length > 0) {
+            setTokens(cachedTokens);
+            item.setOcrAvailable(true);
+            return;
+          }
+
           // Try to get tokens from embedded text layer first
           const pageTokens = await pdfDoc.getTokens(item._currentPage);
           setTokens(pageTokens);
           item.setOcrAvailable(pageTokens.length > 0);
+
+          // Store tokens in model for region access
+          if (pageTokens && pageTokens.length > 0) {
+            item.setPageTokens(item._currentPage, pageTokens);
+          }
         } catch (error) {
           console.error('Error loading tokens:', error);
           setTokens([]);
@@ -603,8 +954,15 @@ const HtxPdfOcr = inject('store')(
             }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
+            onMouseUp={(e) => {
+              handleMouseUp(e);
+              handleTextSelectionEnd(e);
+            }}
+            onMouseLeave={(e) => {
+              handleMouseUp(e);
+              handleTextSelectionEnd(e);
+            }}
+            onClick={handleContainerClick}
           >
             <PdfCanvas
               pdfDoc={pdfDoc}
@@ -619,7 +977,25 @@ const HtxPdfOcr = inject('store')(
               scale={item._scale}
               pageWidth={item._pageWidth}
               pageHeight={item._pageHeight}
-              visible={item.tokenoverlay}
+              visible={item.tokenoverlay && !item.textselection}
+            />
+
+            {/* Interactive token layer for text selection */}
+            <InteractiveTokenLayer
+              tokens={tokens}
+              visible={item.tokenoverlay && item.textselection}
+              onTokenMouseDown={handleTokenMouseDown}
+              onTokenMouseEnter={handleTokenMouseEnter}
+              selectionStart={selectionStart}
+              selectionEnd={selectionEnd}
+            />
+
+            {/* Text selection preview */}
+            <TextSelectionPreview
+              tokens={tokens}
+              startIndex={selectionStart}
+              endIndex={selectionEnd}
+              visible={hasTextSelection && !isSelectingText}
             />
 
             {/* Existing regions */}
@@ -634,6 +1010,11 @@ const HtxPdfOcr = inject('store')(
               isDrawing={isDrawing}
               startPoint={startPoint}
               currentPoint={currentPoint}
+            />
+
+            {/* No text layer message */}
+            <NoTextLayerMessage
+              visible={item.textselection && tokens.length === 0 && !item._loading}
             />
           </div>
         </div>

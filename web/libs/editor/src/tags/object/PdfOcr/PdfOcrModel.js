@@ -31,6 +31,7 @@ const TagAttrs = types.model({
   rotatecontrol: types.optional(types.boolean, true),
   pagenavigation: types.optional(types.boolean, true),
   tokenoverlay: types.optional(types.boolean, true),
+  textselection: types.optional(types.boolean, true), // Enable text selection mode for highlights
 
   // Layout
   maxwidth: types.optional(types.string, '100%'),
@@ -69,6 +70,8 @@ const Model = types
   .volatile(() => ({
     // PDF document reference (not serialized)
     _pdfDocument: null,
+    // OCR tokens per page (not serialized)
+    _pageTokens: new Map(),
   }))
   .views((self) => ({
     /**
@@ -160,6 +163,22 @@ const Model = types
      */
     get displayScale() {
       return self._scale * (window.devicePixelRatio || 1);
+    },
+
+    /**
+     * Get OCR tokens for a specific page
+     * @param {number} pageNum - Page number (1-based)
+     * @returns {Array} Array of token objects
+     */
+    getPageTokens(pageNum) {
+      return self._pageTokens.get(pageNum) || [];
+    },
+
+    /**
+     * Get current page tokens
+     */
+    get currentPageTokens() {
+      return self.getPageTokens(self._currentPage);
     },
   }))
   .actions((self) => ({
@@ -350,6 +369,22 @@ const Model = types
      */
     setPdfDocument(doc) {
       self._pdfDocument = doc;
+    },
+
+    /**
+     * Store OCR tokens for a page
+     * @param {number} pageNum - Page number (1-based)
+     * @param {Array} tokens - Array of token objects
+     */
+    setPageTokens(pageNum, tokens) {
+      self._pageTokens.set(pageNum, tokens || []);
+    },
+
+    /**
+     * Clear all cached tokens
+     */
+    clearTokens() {
+      self._pageTokens.clear();
     },
   }));
 

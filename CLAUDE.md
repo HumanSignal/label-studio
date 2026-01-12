@@ -19,3 +19,10 @@
 ## Context 7
 - Always consult the Context7 MCP server when planning and developing a new feature. 
 - This will give you up to date information about best practices and technical concepts.
+
+## Active Technologies
+- JavaScript/React (Frontend), Python 3.10+ (Backend - minimal changes) (002-pdf-text-label)
+- N/A (annotations stored via existing Label Studio annotation system) (002-pdf-text-label)
+
+## Recent Changes
+- 002-pdf-text-label: Added JavaScript/React (Frontend), Python 3.10+ (Backend - minimal changes)

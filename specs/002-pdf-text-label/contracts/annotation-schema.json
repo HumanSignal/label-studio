@@ -1,0 +1,220 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PDF Text Labeling Annotation Schema",
+  "description": "JSON Schema for PDF text labeling annotation results",
+  "definitions": {
+    "PositionReference": {
+      "type": "object",
+      "description": "Position metadata for annotations",
+      "required": ["page"],
+      "properties": {
+        "page": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based page number (required)"
+        },
+        "line": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based line number (start)"
+        },
+        "lineEnd": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "End line for multi-line selections"
+        },
+        "paragraph": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based paragraph index (fallback)"
+        },
+        "startOffset": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Character offset from page start"
+        },
+        "endOffset": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Character offset end"
+        },
+        "tokenStart": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Token index start"
+        },
+        "tokenEnd": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Token index end"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PdfRegionValue": {
+      "type": "object",
+      "description": "Value object for PDF box region with optional text",
+      "required": ["pdflabels", "x", "y", "width", "height", "page"],
+      "properties": {
+        "pdflabels": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Applied labels"
+        },
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "X coordinate (percentage)"
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Y coordinate (percentage)"
+        },
+        "width": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Width (percentage)"
+        },
+        "height": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Height (percentage)"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based page number"
+        },
+        "rotation": {
+          "type": "integer",
+          "enum": [0, 90, 180, 270],
+          "default": 0,
+          "description": "Rotation in degrees"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Manually entered text content"
+        },
+        "position": {
+          "$ref": "#/definitions/PositionReference",
+          "description": "Position metadata"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PdfTextHighlightValue": {
+      "type": "object",
+      "description": "Value object for PDF text highlight",
+      "required": ["pdflabels", "text", "position", "x", "y", "width", "height", "page", "tokenStart", "tokenEnd"],
+      "properties": {
+        "pdflabels": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Applied labels"
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Auto-captured text content"
+        },
+        "position": {
+          "$ref": "#/definitions/PositionReference",
+          "description": "Position metadata (required for highlights)"
+        },
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Bounding box X (computed from tokens)"
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Bounding box Y (computed from tokens)"
+        },
+        "width": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Bounding box width (computed from tokens)"
+        },
+        "height": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Bounding box height (computed from tokens)"
+        },
+        "page": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based page number"
+        },
+        "tokenStart": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Start token index"
+        },
+        "tokenEnd": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "End token index"
+        }
+      },
+      "additionalProperties": false
+    },
+    "PdfLabelResult": {
+      "type": "object",
+      "description": "Annotation result for PDF labeling",
+      "required": ["id", "type", "from_name", "to_name", "value"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique result identifier"
+        },
+        "type": {
+          "type": "string",
+          "const": "pdflabels",
+          "description": "Result type"
+        },
+        "from_name": {
+          "type": "string",
+          "description": "Control tag name (e.g., 'label')"
+        },
+        "to_name": {
+          "type": "string",
+          "description": "Object tag name (e.g., 'pdf')"
+        },
+        "value": {
+          "oneOf": [
+            { "$ref": "#/definitions/PdfRegionValue" },
+            { "$ref": "#/definitions/PdfTextHighlightValue" }
+          ],
+          "description": "Result value (box region or text highlight)"
+        },
+        "origin": {
+          "type": "string",
+          "enum": ["manual", "prediction"],
+          "description": "Origin of the annotation"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "type": "object",
+  "properties": {
+    "result": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PdfLabelResult"
+      },
+      "description": "Array of annotation results"
+    }
+  }
+}

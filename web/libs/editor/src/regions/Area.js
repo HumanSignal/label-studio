@@ -16,6 +16,7 @@ import { TimelineRegionModel } from "./TimelineRegion";
 import { TimeSeriesRegionModel } from "./TimeSeriesRegion";
 import { ParagraphsRegionModel } from "./ParagraphsRegion";
 import { PdfRegionModel } from "./PdfRegion";
+import { PdfTextHighlightModel } from "./PdfRegion/PdfTextHighlight";
 import { VideoRectangleRegionModel } from "./VideoRectangleRegion";
 import { BitmaskRegionModel } from "./BitmaskRegion";
 
@@ -89,6 +90,7 @@ const Area = types.union(
   AudioRegionModel,
   ParagraphsRegionModel,
   PdfRegionModel,
+  PdfTextHighlightModel,
   TimelineRegionModel,
   TimeSeriesRegionModel,
   RectRegionModel,
