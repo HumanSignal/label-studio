@@ -37,10 +37,8 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
         result = self.mixin.resolve(self.request, 'test_fileuri', self.task)
         assert result.status_code == status.HTTP_403_FORBIDDEN
 
-    @patch('io_storages.proxy_api.flag_set')
     @patch('io_storages.proxy_api.get_storage_by_url')
-    def test_resolve_with_base64_decoding(self, mock_get_storage, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_resolve_with_base64_decoding(self, mock_get_storage):
         mock_get_storage.return_value = self.storage
         fileuri = base64.urlsafe_b64encode(b'test_uri').decode()
 
@@ -49,10 +47,8 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
             self.mixin.resolve(self.request, fileuri, self.task)
             mock_redirect.assert_called_once_with('test_uri', self.task, 'Task')
 
-    @patch('io_storages.proxy_api.flag_set')
     @patch('io_storages.proxy_api.get_storage_by_url')
-    def test_resolve_with_url_unquote_fallback(self, mock_get_storage, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_resolve_with_url_unquote_fallback(self, mock_get_storage):
         mock_get_storage.return_value = self.storage
 
         with patch.object(self.mixin, 'redirect_to_presign_url') as mock_redirect:
@@ -61,28 +57,22 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
             self.mixin.resolve(self.request, 's3://bucket/file.jpg', self.task)
             mock_redirect.assert_called_once_with('s3://bucket/file.jpg', self.task, 'Task')
 
-    @patch('io_storages.proxy_api.flag_set')
     @patch('io_storages.proxy_api.get_storage_by_url')
-    def test_resolve_storage_not_found(self, mock_get_storage, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_resolve_storage_not_found(self, mock_get_storage):
         mock_get_storage.return_value = None
         result = self.mixin.resolve(self.request, 'fileuri', self.task)
         assert result.status_code == status.HTTP_404_NOT_FOUND
 
-    @patch('io_storages.proxy_api.flag_set')
     @patch('io_storages.proxy_api.get_storage_by_url')
-    def test_resolve_storage_no_presign_support(self, mock_get_storage, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_resolve_storage_no_presign_support(self, mock_get_storage):
         mock_storage = MagicMock()
         delattr(mock_storage, 'presign')
         mock_get_storage.return_value = mock_storage
         result = self.mixin.resolve(self.request, 'fileuri', self.task)
         assert result.status_code == status.HTTP_404_NOT_FOUND
 
-    @patch('io_storages.proxy_api.flag_set')
     @patch('io_storages.proxy_api.get_storage_by_url')
-    def test_resolve_with_presign_true(self, mock_get_storage, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_resolve_with_presign_true(self, mock_get_storage):
         mock_storage = MagicMock()
         mock_storage.presign = True
         mock_get_storage.return_value = mock_storage
@@ -92,10 +82,8 @@ class TestResolveStorageUriAPIMixin(unittest.TestCase):
             self.mixin.resolve(self.request, 'fileuri', self.task)
             mock_redirect.assert_called_once()
 
-    @patch('io_storages.proxy_api.flag_set')
     @patch('io_storages.proxy_api.get_storage_by_url')
-    def test_resolve_with_presign_false(self, mock_get_storage, mock_flag_set):
-        mock_flag_set.return_value = True
+    def test_resolve_with_presign_false(self, mock_get_storage):
         mock_storage = MagicMock()
         mock_storage.presign = False
         mock_get_storage.return_value = mock_storage

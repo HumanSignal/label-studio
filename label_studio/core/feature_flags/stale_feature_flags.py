@@ -64,6 +64,20 @@ STALE_FEATURE_FLAGS = {
     'fflag_root_223_optimize_delete_predictions': True,
     'fflag_root_212_reduce_importstoragelink_counts': True,
     # Jan 8
+    'fflag_feat_all_dia_2067_tasks_table_component': True,  # Removed from code
+    'fflag_feat_front_dia_1747_projects_list_banner': True,  # Removed from code
+    'fflag_feat_front_leap_1424_grid_preview_short': True,  # Removed from code
+    'ff_front_dev_1536_taxonomy_user_labels_150222_long': True,  # Removed from code
+    'fflag_feat_front_leap_2036_annotations_summary': True,  # Removed from code
+    'fflag_feat_front_leap_1973_adjustable_spans_090425_short': True,  # Removed from code
+    'fflag_feat_front_lsdv_5451_async_taxonomy_110823_short': True,  # Removed from code
+    'fflag_feat_all_lsdv_e_294_llm_annotations_180723_long': True,  # Removed from code
+    'fflag_fix_front_dev_3793_relative_coords_short': True,  # Removed from code
+    'fflag_feat_front_lsdv_4583_6_images_preloading_short': True,  # Removed from code
+    'fflag_feat_all_leap_1821_annotation_limit_short': True,
+    'fflag_all_feat_dia_1777_ls_homepage_short': True,
+    'fflag_feat_all_leap_1181_bulk_annotation_short': True,
+    'fflag_feat_front_lsdv_4583_multi_image_segmentation_short': True,
     'fflag_fix_back_plt_914_projects_list_cache_sdk_09102025_short': True,
     'fflag_fix_back_plt_913_cache_annotator_queue_total_07102025_short': True,
     'fflag_fix_back_plt_913_cache_finished_task_number_06102025_short': True,
