@@ -439,7 +439,7 @@ const Model = types
       clearJustSelectedFlag() {
         self._justSelected = false;
       },
-      
+
       /**
        * Override selectRegion to reset transform mode when selecting from sidebar
        * This ensures transform mode is reset whether selecting by clicking on the shape
@@ -524,7 +524,6 @@ const Model = types
       setTransformMode(transformMode) {
         self.transformMode = transformMode;
       },
-      
 
       /**
        * Apply transformations from ImageTransformer to the vector points
@@ -832,7 +831,7 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             if (!item.selected) {
               return;
             }
-            
+
             // Ignore double-click if region was just selected (prevents double-click on unselected
             // region from enabling transform mode after the first click selects it)
             if (item._justSelected) {
@@ -842,12 +841,12 @@ const HtxVectorView = observer(({ item, suggestion }) => {
               e.cancelBubble = true;
               return;
             }
-            
+
             e.evt.stopImmediatePropagation();
             e.evt.stopPropagation();
             e.evt.preventDefault();
             e.cancelBubble = true;
-            
+
             // Toggle transform mode for selected regions
             item.toggleTransformMode();
           }}
