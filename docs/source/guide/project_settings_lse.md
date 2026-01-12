@@ -793,7 +793,7 @@ Select the [metric](stats#Available-agreement-metrics) that should determine tas
 
 **Assign additional annotator**
 
-<i class="ent"></i>
+<span class="badge"></span>
 </td>
 <td>
 Enable this option to automatically assign an additional annotator to any tasks that have a low agreement score. 
@@ -809,7 +809,7 @@ Note that to see this setting, the project must be set up with [automatic task a
 
 **Agreement threshold**
 
-<i class="ent"></i>
+<span class="badge"></span>
 </td>
 <td>
 
@@ -822,7 +822,7 @@ Enter the agreement score that a task must meet before it can be considered comp
 
 **Maximum additional annotators**
 
-<i class="ent"></i>
+<span class="badge"></span>
 </td>
 <td>
 
