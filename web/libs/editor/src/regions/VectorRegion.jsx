@@ -14,7 +14,6 @@ import Constants from "../core/Constants";
 import { RegionWrapper } from "./RegionWrapper";
 import { LabelOnPolygon } from "../components/ImageView/LabelOnRegion";
 import { Group } from "react-konva";
-import { useRef } from "react";
 
 /**
  * VectorRegion - Vector graphics region with coordinate system conversion
@@ -72,7 +71,7 @@ const Model = types
     isDrawing: false,
     vectorRef: null,
     groupRef: null,
-    _enteringTransformViaDoubleClick: false,
+    _justSelected: false,
   }))
   .views((self) => ({
     get store() {
@@ -236,8 +235,7 @@ const Model = types
 
       _selectArea(additiveMode = false, preserveTransformMode = false) {
         const annotation = self.annotation;
-        // Don't reset transform mode if we're entering via double-click
-        if (!preserveTransformMode && !self._enteringTransformViaDoubleClick) {
+        if (!preserveTransformMode) {
           self.setTransformMode(false);
         }
         if (!annotation) return;
@@ -436,16 +434,28 @@ const Model = types
       },
 
       /**
+       * Clear the just-selected flag (action for use in setTimeout)
+       */
+      clearJustSelectedFlag() {
+        self._justSelected = false;
+      },
+      
+      /**
        * Override selectRegion to reset transform mode when selecting from sidebar
        * This ensures transform mode is reset whether selecting by clicking on the shape
        * or selecting from the sidebar/outliner
        */
       selectRegion(preserveTransformMode = false) {
         // Reset transform mode when region is selected (from sidebar or elsewhere)
-        // unless preserveTransformMode is true or we're entering transform mode via double-click
-        if (!preserveTransformMode && !self._enteringTransformViaDoubleClick) {
+        // unless preserveTransformMode is true
+        if (!preserveTransformMode) {
           self.setTransformMode(false);
         }
+        // Mark that we just selected this region (to prevent double-click from enabling transform mode)
+        self._justSelected = true;
+        setTimeout(() => {
+          self.clearJustSelectedFlag();
+        }, 300); // Clear after double-click detection window
         // Call parent selectRegion to handle scrolling
         self.scrollToRegion();
       },
@@ -515,66 +525,6 @@ const Model = types
         self.transformMode = transformMode;
       },
       
-      /**
-       * Handle delayed click for unselected regions (to detect double-clicks)
-       * This is an action so it can be called from setTimeout
-       */
-      handleDelayedClick(additiveMode = false) {
-        const annotation = self.annotation;
-        if (!annotation) return;
-        
-        if (!annotation.isReadOnly() && annotation.isLinkingMode) {
-          annotation.addLinkedRegion(self);
-          annotation.stopLinkingMode();
-          annotation.regionStore.unselectAll();
-        } else {
-          self._selectArea(additiveMode);
-        }
-      },
-      
-      /**
-       * Clear the double-click flag (action for use in setTimeout)
-       */
-      clearDoubleClickFlag() {
-        self._enteringTransformViaDoubleClick = false;
-      },
-      
-      /**
-       * Handle double-click for unselected regions
-       * This is an action so it can be called from event handlers
-       */
-      handleDoubleClickForUnselected() {
-        // Set flag to prevent transform mode from being reset during selection
-        self._enteringTransformViaDoubleClick = true;
-        
-        // Select the region (this will call selectRegion which checks the flag)
-        const annotation = self.annotation;
-        if (annotation) {
-          // Store the previous selected state
-          const wasSelected = self.selected;
-          
-          annotation.selectArea(self);
-          
-          // Verify that selection actually happened
-          // Selection is synchronous, so if it worked, self.selected should be true now
-          if (self.selected && !wasSelected) {
-            // Set transform mode - the flag prevents selectRegion from resetting it
-            self.setTransformMode(true);
-            
-            // Keep the flag set for a bit longer to prevent any late-running reactive code
-            // from resetting transform mode. Clear it after a delay.
-            setTimeout(() => {
-              self.clearDoubleClickFlag();
-            }, 200);
-          } else {
-            // Selection didn't work as expected, clear the flag
-            self.clearDoubleClickFlag();
-          }
-        } else {
-          // No annotation, clear the flag
-          self.clearDoubleClickFlag();
-        }
-      },
 
       /**
        * Apply transformations from ImageTransformer to the vector points
@@ -655,9 +605,6 @@ const HtxVectorView = observer(({ item, suggestion }) => {
   const regionStyles = useRegionStyles(item, {
     useStrokeAsFill: true,
   });
-  
-  // Ref to track click timeout for double-click detection
-  const clickTimeoutRef = useRef(null);
 
   // Get stage dimensions and scaling from the parent image view
   const stage = item.parent?.stageRef;
@@ -850,52 +797,13 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             if (item.isDrawing) return;
             if (e.evt.altKey || e.evt.ctrlKey || e.evt.shiftKey || e.evt.metaKey) return;
 
-            // If we're entering transform mode via double-click, don't let the click handler
-            // reset transform mode. The double-click handler will handle selection and transform mode.
-            if (item._enteringTransformViaDoubleClick) {
+            // If region was just selected (part of a double-click on unselected region),
+            // ignore this click to prevent it from unselecting
+            if (item._justSelected) {
               e.cancelBubble = true;
               return;
             }
-            
-            // For unselected regions, delay the click handler to detect double-clicks
-            // This prevents the first click from resetting transform mode when double-clicking
-            // Note: KonvaVector doesn't fire onDblClick for unselected regions, so we handle it here
-            if (!item.selected) {
-              // Clear any existing timeout - this means it's a double-click
-              if (clickTimeoutRef.current) {
-                clearTimeout(clickTimeoutRef.current);
-                clickTimeoutRef.current = null;
-                
-                // Handle double-click for unselected regions
-                e.evt.stopImmediatePropagation();
-                e.evt.stopPropagation();
-                e.evt.preventDefault();
-                e.cancelBubble = true;
-                
-                // Use the action method to handle double-click
-                item.handleDoubleClickForUnselected();
-                return;
-              }
-              
-              // Set a timeout to handle single-click after a delay
-              // Capture the additive mode from the event
-              const additiveMode = e.evt?.ctrlKey || e.evt?.metaKey;
-              clickTimeoutRef.current = setTimeout(() => {
-                clickTimeoutRef.current = null;
-                // Now we know it's a single click, so handle it
-                // Use the action method to handle the click
-                if (store.annotationStore.selected.isLinkingMode) {
-                  stage.container().style.cursor = Constants.DEFAULT_CURSOR;
-                }
-                item.setHighlight(false);
-                item.handleDelayedClick(additiveMode);
-              }, 300); // 300ms delay to detect double-clicks
-              
-              // Don't cancel bubble immediately for unselected regions - wait for double-click detection
-              return;
-            }
-            
-            // Region is already selected, handle click immediately
+
             e.cancelBubble = true;
 
             // Allow selection regardless of whether the path is closed
@@ -920,23 +828,28 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             item.updateCursor();
           }}
           onDblClick={(e) => {
+            // Only allow double-click when region is selected
+            if (!item.selected) {
+              return;
+            }
+            
+            // Ignore double-click if region was just selected (prevents double-click on unselected
+            // region from enabling transform mode after the first click selects it)
+            if (item._justSelected) {
+              e.evt.stopImmediatePropagation();
+              e.evt.stopPropagation();
+              e.evt.preventDefault();
+              e.cancelBubble = true;
+              return;
+            }
+            
             e.evt.stopImmediatePropagation();
             e.evt.stopPropagation();
             e.evt.preventDefault();
             e.cancelBubble = true;
             
-            // Clear any pending click timeout to prevent single-click handler from firing
-            if (clickTimeoutRef.current) {
-              clearTimeout(clickTimeoutRef.current);
-              clickTimeoutRef.current = null;
-            }
-            
-            // This handler only fires for selected regions (KonvaVector sets onDblClick to undefined for unselected)
-            // For unselected regions, double-click is handled in the onClick handler via debouncing
-            if (item.selected) {
-              // Region is already selected, just toggle transform mode
-              item.toggleTransformMode();
-            }
+            // Toggle transform mode for selected regions
+            item.toggleTransformMode();
           }}
           closed={item.closed}
           width={stageWidth}
