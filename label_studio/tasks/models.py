@@ -964,19 +964,29 @@ class AnnotationDraft(FsmHistoryStateModel):
 
     def save(self, *args, **kwargs):
         with transaction.atomic():
-            super().save(*args, **kwargs)
             project = self.task.project
+            # Lock projectsummary first to avoid deadlocks with annotation-reviews
+            # which accesses projectsummary before annotationdraft
+            if hasattr(project, 'summary'):
+                from projects.models import ProjectSummary
+
+                ProjectSummary.objects.select_for_update().filter(pk=project.summary.pk).first()
+            super().save(*args, **kwargs)
             if hasattr(project, 'summary'):
                 project.summary.update_created_labels_drafts([self])
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():
-            # Keep lock order consistent to avoid deadlocks. PATCH draft updates
-            # lock the draft row first, then touch project summary. DELETE used to
-            # do summary first and draft second, so two requests could block each
-            # other in opposite order. Lock the draft row here to match PATCH.
-            AnnotationDraft.objects.select_for_update().filter(pk=self.pk).first()
             project = self.task.project
+            # Lock projectsummary first to match save() and annotation-reviews lock ordering.
+            # This prevents deadlocks with concurrent operations that access
+            # projectsummary before annotationdraft.
+            if hasattr(project, 'summary'):
+                from projects.models import ProjectSummary
+
+                ProjectSummary.objects.select_for_update().filter(pk=project.summary.pk).first()
+            # Then lock annotationdraft row
+            AnnotationDraft.objects.select_for_update().filter(pk=self.pk).first()
             if hasattr(project, 'summary'):
                 project.summary.remove_created_drafts_and_labels([self])
             super().delete(*args, **kwargs)
