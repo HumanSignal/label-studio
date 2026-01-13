@@ -23,7 +23,7 @@ Importantly, this allows you to continue leveraging Label Studio's annotation ma
 | [toName] | string | — | If this is a [self-referencing tags ](#Self-referencing-tag), this parameter is required and should match `name` |
 | [data] | string | — | The [task data](#Data-parameter), e.g., `data="$image"` or `data="$text"` |
 | [inputs] | string | — | Defines the JSON schema for the input data (`data`)  |
-| [outputs] | string | — | Defines the JSON schema for the output  |
+| [outputs] | string | — | Defines the JSON schema for the [output](#Using-the-ouputs-parameter)  |
 | [style] | string | — | Inline styles or CSS string for the iframe container  |
 | [classname] | string | — | Additional CSS classes for the wrapper  |
 
@@ -602,3 +602,7 @@ If `outputs` is empty or not specified, the schema defaults to an empty object:
 
 
 ## Related templates
+
+- [Spreadsheet Editor](/templates/react_spreadsheet)
+- [Multi-channel audio transcription](/templates/react_audio)
+- [Agentic tracing for claims](/templates/react_claims)
