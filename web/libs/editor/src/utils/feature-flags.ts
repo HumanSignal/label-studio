@@ -169,14 +169,6 @@ export const FF_IMAGE_MEMORY_USAGE = "fflag_feat_front_optic_1479_improve_image_
 
 export const FF_VIDEO_FRAME_SEEK_PRECISION = "fflag_fix_front_optic_1608_improve_video_frame_seek_precision_short";
 
-/**
- * Allows the time series component to participate in synchronized playback with other media components (like audio and video)
- * when the feature flag is enabled, while maintaining independent operation when the flag is disabled.
- *
- * @link https://app.launchdarkly.com/projects/default/flags/fflag_feat_optic_2125_timeseries_sync
- */
-export const FF_TIMESERIES_SYNC = "fflag_feat_optic_2125_timeseries_sync";
-
 Object.assign(window, {
   APP_SETTINGS: {
     ...(window.APP_SETTINGS ?? {}),
