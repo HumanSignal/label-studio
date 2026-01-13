@@ -205,7 +205,7 @@ export const AggregationTableRow = ({
           <td
             key={header.id}
             className={cnm(
-              "px-4 py-2.5 overflow-hidden border-r border-r-neutral-border border-l border-y-2 border-neutral-border-bold bg-white",
+              "px-4 py-2.5 overflow-hidden border-r border-r-neutral-border border-l border-y-2 border-neutral-border-bold bg-neutral-background",
               "sticky left-0 z-20",
             )}
             style={{ width: header.getSize() }}

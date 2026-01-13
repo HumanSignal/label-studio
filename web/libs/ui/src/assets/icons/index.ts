@@ -31,6 +31,7 @@ export { ReactComponent as IconBanSquare } from "./ban.svg";
 export { ReactComponent as IconBanner } from "./banner-icon.svg";
 export { ReactComponent as IconBell } from "./bell.svg";
 export { ReactComponent as IconBlueCheckmark } from "./blue-checkmark.svg";
+export { ReactComponent as IconBlock } from "./block.svg";
 export { ReactComponent as IconBlog } from "./blog.svg";
 export { ReactComponent as IconBook } from "./book.svg";
 export { ReactComponent as IconBookEdit } from "./book-edit.svg";
@@ -161,6 +162,7 @@ export { ReactComponent as IconKeypointDisabled } from "./keypoint-disabled.svg"
 export { ReactComponent as IconKeypointsTool } from "./keypoints-tool.svg";
 export { ReactComponent as IconKeypointsToolSmart } from "./keypoints-tool-smart.svg";
 export { ReactComponent as IconLaunch } from "./launch.svg";
+export { ReactComponent as IconLayers2 } from "./layers2.svg";
 export { ReactComponent as IconLink } from "./link.svg";
 export { ReactComponent as IconList } from "./list.svg";
 export { ReactComponent as IconLockLocked } from "./locked.svg";
