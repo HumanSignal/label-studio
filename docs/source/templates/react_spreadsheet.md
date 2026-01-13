@@ -4,8 +4,8 @@ type: templates
 category: Programmable Interfaces
 order: 750
 is_new: t
-meta_title: Video Object Detection Data Labeling Template
-meta_description: Template for detecting objects in videos with Label Studio for your machine learning and data science projects.
+meta_title: Template for spreadsheet editing
+meta_description: Template that uses a custom UI to edit a spreadsheet and then output any changes. 
 ---
 
 
@@ -22,11 +22,22 @@ The labeling interface provides a full-featured spreadsheet experience with capa
 ![Screenshot](/images/templates-misc/react-spreadsheet.png)
 
 !!! error Enterprise
-    This template can only be used in Label Studio Enterprise.
+    This template and the `ReactCode` tag can only be used in Label Studio Enterprise.
+
+    For more information, including simplified code examples, see [ReactCode](/tags/reactcode).
 
 ## Labeling configuration
 
-You must be using Label Studio Enterprise to access the `ReactCode` tag. For more information, see [ReactCode](/tags/reactcode)
+This labeling configuration creates a spreadsheet editor that tracks and exports only the changes made to the original data, rather than saving the entire spreadsheet state. 
+
+The `ReactCode` follows a **change-tracking pattern** where:
+1. Original data is stored separately and never modified
+2. Changes (edits, additions, deletions) are tracked in a dedicated `changes` object
+3. Current view is computed by applying changes to the original data
+4. Exported region contains only the changes, not the full dataset
+
+
+{% details <b>Click to expand</b> %}
 
 ```xml
 <View>
@@ -966,11 +977,17 @@ You must be using Label Studio Enterprise to access the `ReactCode` tag. For mor
 </View>
 ```
 
+{% enddetails %}
+
 
 
 ## Example input 
 
-Import this as a JSON file to create three example rows in the spreadsheet:
+Copy this into a JSON file and then import it into a project with the example code above. 
+
+This will create three rows in your spreadsheet editor. 
+
+{% details <b>Click to expand</b> %}
 
 ```json
 {
@@ -1097,6 +1114,8 @@ Import this as a JSON file to create three example rows in the spreadsheet:
 }
 }
 ```
+
+{% enddetails %}
 
 ## Example output
 

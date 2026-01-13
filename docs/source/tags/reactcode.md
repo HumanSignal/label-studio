@@ -386,8 +386,6 @@ An interface that displays an image and allows adding metadata annotations:
 -->
 ```
 
-
-
 ## Output format for regions
 
 Regions created with `ReactCode` follow Label Studio's standard format:
