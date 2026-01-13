@@ -31,8 +31,8 @@ $scroll-width: 5px;
 }
 
 .wizard .configure__container {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  position: relative;
   padding: 0;
   overflow-y: scroll;
   background-color: var(--color-neutral-background);
@@ -648,4 +648,10 @@ div[class^="App_menu"]>div {
 :global(input.lsf-configure__add:hover) {
   color: var(--color-neutral-content);
   background: var(--color-primary-emphasis-subtle);
+}
+
+.form {
+  &__submit {
+    gap: var(--spacing-base);
+  }
 }

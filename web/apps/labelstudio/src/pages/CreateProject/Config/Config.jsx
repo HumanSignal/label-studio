@@ -518,20 +518,13 @@ const Configurator = ({
   return (
     <div className={configClass}>
       <div
-        className={configClass.elem("container")}
+        className={configClass.elem("container").toClassName()}
         ref={containerRef}
         style={{
-          display: "grid",
           gridTemplateColumns: `${editorWidthPixels}px minmax(516px, 1fr)`,
-          position: "relative",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+        <div className="flex flex-col">
           <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
           <header>
             <Button
@@ -548,7 +541,7 @@ const Configurator = ({
           </header>
           <div className={configClass.elem("editor")}>
             {configure === "code" && (
-              <div className={configClass.elem("code")} style={{ display: configure === "code" ? undefined : "none" }}>
+              <div className={cnm(configClass.elem("code").toClassName(), configure !== "code" ? "!hidden" : "")}>
                 <CodeEditor
                   name="code"
                   id="edit_code"
@@ -580,10 +573,7 @@ const Configurator = ({
               </div>
             )}
             {visualLoaded && (
-              <div
-                className={configClass.elem("visual")}
-                style={{ display: configure === "visual" ? undefined : "none" }}
-              >
+              <div className={cnm(configClass.elem("visual").toClassName(), configure !== "visual" ? "!hidden" : "")}>
                 {isEmptyConfig(config) && <EmptyConfigPlaceholder />}
                 <ConfigureColumns columns={columns} project={project} template={template} />
                 {template.controls.map((control) => (
@@ -609,11 +599,7 @@ const Configurator = ({
             </Form.Actions>
           )}
         </div>
-        <div
-          style={{
-            position: "relative",
-          }}
-        >
+        <div className="relative">
           <EditorResizer
             containerRef={containerRef}
             editorWidthPixels={editorWidthPixels}
