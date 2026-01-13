@@ -214,12 +214,10 @@ export const LabelingSummary = ({ hideInfo, annotations: all, controls, onSelect
                         left: isSticky ? 0 : "auto",
                         width: cell.column.getSize(),
                         zIndex: isSticky ? 10 : "auto",
-                        // @todo fix with proper tailwind classes
-                        backgroundColor: isEvenRow ? undefined : "white",
                       }}
                       className={cnm(
                         "px-4 py-2.5 align-top overflow-hidden transition-colors",
-                        isEvenRow ? "bg-neutral-surface" : "bg-white",
+                        isEvenRow ? "bg-neutral-surface" : "bg-neutral-background",
                         "group-hover:bg-neutral-surface-subtle",
                         !isLastRow && "border-b border-neutral-border-subtle",
                         isSticky && "border-r border-neutral-border",
