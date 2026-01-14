@@ -285,7 +285,7 @@ Label Studio is available to everyone as open source software (Label Studio Comm
   <tr>
     <td><b>Automatic task reassignment</b><br/><a href="https://docs.humansignal.com/guide/quality.html">Reassign tasks with low agreement scores to new annotators.</a></td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✅</td>
+    <td style="text-align:center">❌</td>
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
