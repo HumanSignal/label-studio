@@ -1,0 +1,7759 @@
+{
+  "page_id": "fb3c59894bd2:page_015",
+  "page_number": 15,
+  "doc_id": "fb3c59894bd2",
+  "layout_version_id": "c84625f1-3db9-43c5-a4da-12ffc5948c74",
+  "geometry": {
+    "pdf_page_width_pt": 595.276,
+    "pdf_page_height_pt": 841.89,
+    "rotation_deg": 0,
+    "media_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "crop_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "render_dpi": 200,
+    "render_scale": 2.7777777777777777,
+    "rendered_width_px": 1654,
+    "rendered_height_px": 2339
+  },
+  "layers": {
+    "pdf_text": {
+      "layer_id": "pdf_text",
+      "source_engine": "pdfplumber/0.11.9",
+      "coverage": 0.039995285245247376,
+      "word_count": 183,
+      "tokens": [
+        {
+          "token_id": "tok_000000",
+          "text": "Green",
+          "bbox": {
+            "x": 194,
+            "y": 134,
+            "width": 146,
+            "height": 53
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 19.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000001",
+          "text": "Projects",
+          "bbox": {
+            "x": 354,
+            "y": 134,
+            "width": 188,
+            "height": 53
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 19.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000002",
+          "text": "Overview",
+          "bbox": {
+            "x": 194,
+            "y": 251,
+            "width": 155,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000003",
+          "text": "As",
+          "bbox": {
+            "x": 194,
+            "y": 362,
+            "width": 29,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000004",
+          "text": "of",
+          "bbox": {
+            "x": 231,
+            "y": 362,
+            "width": 22,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000005",
+          "text": "31",
+          "bbox": {
+            "x": 259,
+            "y": 362,
+            "width": 27,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000006",
+          "text": "August",
+          "bbox": {
+            "x": 293,
+            "y": 362,
+            "width": 80,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000007",
+          "text": "2025,",
+          "bbox": {
+            "x": 380,
+            "y": 362,
+            "width": 62,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000008",
+          "text": "the",
+          "bbox": {
+            "x": 450,
+            "y": 362,
+            "width": 36,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000009",
+          "text": "following",
+          "bbox": {
+            "x": 492,
+            "y": 362,
+            "width": 101,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000010",
+          "text": "116",
+          "bbox": {
+            "x": 600,
+            "y": 362,
+            "width": 38,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000011",
+          "text": "projects",
+          "bbox": {
+            "x": 646,
+            "y": 362,
+            "width": 92,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000012",
+          "text": "under",
+          "bbox": {
+            "x": 745,
+            "y": 362,
+            "width": 66,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000013",
+          "text": "six",
+          "bbox": {
+            "x": 818,
+            "y": 362,
+            "width": 32,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000014",
+          "text": "eligible",
+          "bbox": {
+            "x": 856,
+            "y": 362,
+            "width": 80,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000015",
+          "text": "categories",
+          "bbox": {
+            "x": 943,
+            "y": 362,
+            "width": 119,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000016",
+          "text": "have",
+          "bbox": {
+            "x": 1069,
+            "y": 362,
+            "width": 53,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000017",
+          "text": "been",
+          "bbox": {
+            "x": 1129,
+            "y": 362,
+            "width": 57,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000018",
+          "text": "included",
+          "bbox": {
+            "x": 1193,
+            "y": 362,
+            "width": 97,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000019",
+          "text": "in",
+          "bbox": {
+            "x": 1297,
+            "y": 362,
+            "width": 20,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000020",
+          "text": "the",
+          "bbox": {
+            "x": 1324,
+            "y": 362,
+            "width": 36,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000021",
+          "text": "GSBP.",
+          "bbox": {
+            "x": 1367,
+            "y": 362,
+            "width": 73,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000022",
+          "text": "Details",
+          "bbox": {
+            "x": 194,
+            "y": 399,
+            "width": 78,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000023",
+          "text": "of",
+          "bbox": {
+            "x": 279,
+            "y": 399,
+            "width": 22,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000024",
+          "text": "all",
+          "bbox": {
+            "x": 308,
+            "y": 399,
+            "width": 25,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000025",
+          "text": "the",
+          "bbox": {
+            "x": 340,
+            "y": 399,
+            "width": 36,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000026",
+          "text": "projects",
+          "bbox": {
+            "x": 382,
+            "y": 399,
+            "width": 92,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000027",
+          "text": "including",
+          "bbox": {
+            "x": 482,
+            "y": 399,
+            "width": 103,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000028",
+          "text": "their",
+          "bbox": {
+            "x": 591,
+            "y": 399,
+            "width": 50,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000029",
+          "text": "major",
+          "bbox": {
+            "x": 649,
+            "y": 399,
+            "width": 64,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000030",
+          "text": "expected",
+          "bbox": {
+            "x": 720,
+            "y": 399,
+            "width": 106,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000031",
+          "text": "impacts",
+          "bbox": {
+            "x": 832,
+            "y": 399,
+            "width": 90,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000032",
+          "text": "can",
+          "bbox": {
+            "x": 930,
+            "y": 399,
+            "width": 41,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000033",
+          "text": "be",
+          "bbox": {
+            "x": 978,
+            "y": 399,
+            "width": 29,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000034",
+          "text": "found",
+          "bbox": {
+            "x": 1014,
+            "y": 399,
+            "width": 65,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000035",
+          "text": "in",
+          "bbox": {
+            "x": 1086,
+            "y": 399,
+            "width": 20,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000036",
+          "text": "Appendix",
+          "bbox": {
+            "x": 1112,
+            "y": 399,
+            "width": 116,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 9.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000037",
+          "text": "A",
+          "bbox": {
+            "x": 1235,
+            "y": 399,
+            "width": 17,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 9.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000038",
+          "text": ".",
+          "bbox": {
+            "x": 1253,
+            "y": 399,
+            "width": 7,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000039",
+          "text": "Waste",
+          "bbox": {
+            "x": 463,
+            "y": 1849,
+            "width": 45,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000040",
+          "text": "Management",
+          "bbox": {
+            "x": 512,
+            "y": 1849,
+            "width": 95,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000041",
+          "text": "and",
+          "bbox": {
+            "x": 611,
+            "y": 1849,
+            "width": 27,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000042",
+          "text": "Resource",
+          "bbox": {
+            "x": 463,
+            "y": 1867,
+            "width": 69,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000043",
+          "text": "Recovery",
+          "bbox": {
+            "x": 536,
+            "y": 1867,
+            "width": 68,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000044",
+          "text": "Green",
+          "bbox": {
+            "x": 787,
+            "y": 1856,
+            "width": 44,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000045",
+          "text": "Buildings",
+          "bbox": {
+            "x": 835,
+            "y": 1856,
+            "width": 67,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000046",
+          "text": "Energy",
+          "bbox": {
+            "x": 460,
+            "y": 2060,
+            "width": 50,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000047",
+          "text": "Efficiency",
+          "bbox": {
+            "x": 515,
+            "y": 2060,
+            "width": 71,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000048",
+          "text": "and",
+          "bbox": {
+            "x": 590,
+            "y": 2060,
+            "width": 27,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000049",
+          "text": "Conservation",
+          "bbox": {
+            "x": 460,
+            "y": 2079,
+            "width": 96,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000050",
+          "text": "Pollution",
+          "bbox": {
+            "x": 789,
+            "y": 2060,
+            "width": 64,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000051",
+          "text": "Prevention",
+          "bbox": {
+            "x": 856,
+            "y": 2060,
+            "width": 78,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000052",
+          "text": "and",
+          "bbox": {
+            "x": 789,
+            "y": 2079,
+            "width": 27,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000053",
+          "text": "Control",
+          "bbox": {
+            "x": 820,
+            "y": 2079,
+            "width": 54,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000054",
+          "text": "Climate",
+          "bbox": {
+            "x": 1079,
+            "y": 2060,
+            "width": 55,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000055",
+          "text": "Change",
+          "bbox": {
+            "x": 1139,
+            "y": 2060,
+            "width": 56,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000056",
+          "text": "Adaptation",
+          "bbox": {
+            "x": 1079,
+            "y": 2079,
+            "width": 79,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.4432000000000045,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000057",
+          "text": "45",
+          "bbox": {
+            "x": 949,
+            "y": 965,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000058",
+          "text": "24",
+          "bbox": {
+            "x": 1001,
+            "y": 938,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000059",
+          "text": "24",
+          "bbox": {
+            "x": 1145,
+            "y": 1009,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000060",
+          "text": "78",
+          "bbox": {
+            "x": 1298,
+            "y": 944,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000061",
+          "text": "29",
+          "bbox": {
+            "x": 868,
+            "y": 1038,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000062",
+          "text": "26",
+          "bbox": {
+            "x": 844,
+            "y": 1057,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000063",
+          "text": "12",
+          "bbox": {
+            "x": 800,
+            "y": 1049,
+            "width": 20,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000064",
+          "text": "32",
+          "bbox": {
+            "x": 983,
+            "y": 981,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000065",
+          "text": "52",
+          "bbox": {
+            "x": 595,
+            "y": 792,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000066",
+          "text": "5",
+          "bbox": {
+            "x": 569,
+            "y": 764,
+            "width": 11,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000067",
+          "text": "30",
+          "bbox": {
+            "x": 526,
+            "y": 783,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000068",
+          "text": "59",
+          "bbox": {
+            "x": 983,
+            "y": 1031,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000069",
+          "text": "16",
+          "bbox": {
+            "x": 1014,
+            "y": 1054,
+            "width": 20,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000070",
+          "text": "95",
+          "bbox": {
+            "x": 965,
+            "y": 1099,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000071",
+          "text": "11",
+          "bbox": {
+            "x": 1004,
+            "y": 1100,
+            "width": 20,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000072",
+          "text": "63",
+          "bbox": {
+            "x": 974,
+            "y": 1127,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000073",
+          "text": "64",
+          "bbox": {
+            "x": 982,
+            "y": 1157,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000074",
+          "text": "85",
+          "bbox": {
+            "x": 1037,
+            "y": 1094,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000075",
+          "text": "68",
+          "bbox": {
+            "x": 1048,
+            "y": 1121,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000076",
+          "text": "4",
+          "bbox": {
+            "x": 1019,
+            "y": 1130,
+            "width": 11,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000077",
+          "text": "40",
+          "bbox": {
+            "x": 1011,
+            "y": 1161,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000078",
+          "text": "83",
+          "bbox": {
+            "x": 1014,
+            "y": 1192,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000079",
+          "text": "17",
+          "bbox": {
+            "x": 1042,
+            "y": 1157,
+            "width": 20,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000080",
+          "text": "87",
+          "bbox": {
+            "x": 1100,
+            "y": 1146,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000081",
+          "text": "61",
+          "bbox": {
+            "x": 1103,
+            "y": 1178,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000082",
+          "text": "65",
+          "bbox": {
+            "x": 1131,
+            "y": 1138,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000083",
+          "text": "19",
+          "bbox": {
+            "x": 1136,
+            "y": 1166,
+            "width": 19,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000084",
+          "text": "23",
+          "bbox": {
+            "x": 1166,
+            "y": 1182,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000085",
+          "text": "93",
+          "bbox": {
+            "x": 1172,
+            "y": 1217,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000086",
+          "text": "100",
+          "bbox": {
+            "x": 1130,
+            "y": 1194,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000087",
+          "text": "43",
+          "bbox": {
+            "x": 919,
+            "y": 595,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000088",
+          "text": "58",
+          "bbox": {
+            "x": 941,
+            "y": 619,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000089",
+          "text": "35",
+          "bbox": {
+            "x": 939,
+            "y": 1277,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000090",
+          "text": "2",
+          "bbox": {
+            "x": 458,
+            "y": 1225,
+            "width": 11,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000091",
+          "text": "13",
+          "bbox": {
+            "x": 1127,
+            "y": 669,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000092",
+          "text": "42",
+          "bbox": {
+            "x": 937,
+            "y": 824,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000093",
+          "text": "73",
+          "bbox": {
+            "x": 945,
+            "y": 896,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000094",
+          "text": "31",
+          "bbox": {
+            "x": 427,
+            "y": 1247,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000095",
+          "text": "37",
+          "bbox": {
+            "x": 478,
+            "y": 967,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000096",
+          "text": "44",
+          "bbox": {
+            "x": 718,
+            "y": 891,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000097",
+          "text": "80",
+          "bbox": {
+            "x": 718,
+            "y": 719,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000098",
+          "text": "33",
+          "bbox": {
+            "x": 901,
+            "y": 638,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000099",
+          "text": "48",
+          "bbox": {
+            "x": 509,
+            "y": 977,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000100",
+          "text": "79",
+          "bbox": {
+            "x": 504,
+            "y": 913,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000071,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000101",
+          "text": "50",
+          "bbox": {
+            "x": 564,
+            "y": 1477,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000102",
+          "text": "5455",
+          "bbox": {
+            "x": 415,
+            "y": 1374,
+            "width": 50,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000103",
+          "text": "74",
+          "bbox": {
+            "x": 482,
+            "y": 1307,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000104",
+          "text": "77",
+          "bbox": {
+            "x": 597,
+            "y": 1272,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000105",
+          "text": "49",
+          "bbox": {
+            "x": 883,
+            "y": 1282,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000106",
+          "text": "6",
+          "bbox": {
+            "x": 405,
+            "y": 1257,
+            "width": 11,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000107",
+          "text": "34",
+          "bbox": {
+            "x": 910,
+            "y": 675,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000108",
+          "text": "71",
+          "bbox": {
+            "x": 865,
+            "y": 1087,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000109",
+          "text": "18",
+          "bbox": {
+            "x": 772,
+            "y": 1058,
+            "width": 20,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000110",
+          "text": "75",
+          "bbox": {
+            "x": 973,
+            "y": 635,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000111",
+          "text": "81",
+          "bbox": {
+            "x": 819,
+            "y": 1077,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000112",
+          "text": "82",
+          "bbox": {
+            "x": 893,
+            "y": 715,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000113",
+          "text": "108",
+          "bbox": {
+            "x": 1076,
+            "y": 1118,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000114",
+          "text": "116",
+          "bbox": {
+            "x": 946,
+            "y": 663,
+            "width": 28,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000115",
+          "text": "22",
+          "bbox": {
+            "x": 791,
+            "y": 1093,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000116",
+          "text": "9",
+          "bbox": {
+            "x": 812,
+            "y": 1131,
+            "width": 11,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000117",
+          "text": "56",
+          "bbox": {
+            "x": 835,
+            "y": 1108,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000118",
+          "text": "98",
+          "bbox": {
+            "x": 894,
+            "y": 1103,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000119",
+          "text": "60",
+          "bbox": {
+            "x": 860,
+            "y": 1130,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000120",
+          "text": "76",
+          "bbox": {
+            "x": 893,
+            "y": 1136,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000121",
+          "text": "27",
+          "bbox": {
+            "x": 868,
+            "y": 1160,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000122",
+          "text": "28",
+          "bbox": {
+            "x": 1071,
+            "y": 1153,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000123",
+          "text": "24",
+          "bbox": {
+            "x": 1076,
+            "y": 1187,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000124",
+          "text": "25",
+          "bbox": {
+            "x": 1043,
+            "y": 1187,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000125",
+          "text": "41",
+          "bbox": {
+            "x": 1074,
+            "y": 1217,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000126",
+          "text": "53",
+          "bbox": {
+            "x": 1106,
+            "y": 1216,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000127",
+          "text": "14",
+          "bbox": {
+            "x": 931,
+            "y": 1134,
+            "width": 20,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000128",
+          "text": "7",
+          "bbox": {
+            "x": 960,
+            "y": 1170,
+            "width": 11,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000129",
+          "text": "1",
+          "bbox": {
+            "x": 471,
+            "y": 1504,
+            "width": 11,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000130",
+          "text": "47",
+          "bbox": {
+            "x": 1277,
+            "y": 881,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000131",
+          "text": "46",
+          "bbox": {
+            "x": 398,
+            "y": 1302,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000132",
+          "text": "51",
+          "bbox": {
+            "x": 801,
+            "y": 1449,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000133",
+          "text": "8",
+          "bbox": {
+            "x": 889,
+            "y": 578,
+            "width": 11,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000134",
+          "text": "70",
+          "bbox": {
+            "x": 784,
+            "y": 850,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000135",
+          "text": "72",
+          "bbox": {
+            "x": 669,
+            "y": 891,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000136",
+          "text": "113",
+          "bbox": {
+            "x": 1038,
+            "y": 1217,
+            "width": 28,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000137",
+          "text": "20",
+          "bbox": {
+            "x": 328,
+            "y": 1291,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000138",
+          "text": "38",
+          "bbox": {
+            "x": 945,
+            "y": 698,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000139",
+          "text": "36",
+          "bbox": {
+            "x": 898,
+            "y": 834,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000140",
+          "text": "91",
+          "bbox": {
+            "x": 979,
+            "y": 805,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000141",
+          "text": "105",
+          "bbox": {
+            "x": 1016,
+            "y": 778,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000142",
+          "text": "103",
+          "bbox": {
+            "x": 1012,
+            "y": 999,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000143",
+          "text": "107",
+          "bbox": {
+            "x": 1042,
+            "y": 1029,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000144",
+          "text": "99",
+          "bbox": {
+            "x": 1084,
+            "y": 932,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000145",
+          "text": "101",
+          "bbox": {
+            "x": 727,
+            "y": 1042,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000146",
+          "text": "106",
+          "bbox": {
+            "x": 1324,
+            "y": 975,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000147",
+          "text": "69",
+          "bbox": {
+            "x": 917,
+            "y": 975,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000148",
+          "text": "67",
+          "bbox": {
+            "x": 915,
+            "y": 1021,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000149",
+          "text": "88",
+          "bbox": {
+            "x": 742,
+            "y": 1109,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000150",
+          "text": "89",
+          "bbox": {
+            "x": 951,
+            "y": 1007,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000151",
+          "text": "86",
+          "bbox": {
+            "x": 1266,
+            "y": 955,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000152",
+          "text": "66",
+          "bbox": {
+            "x": 908,
+            "y": 1379,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000153",
+          "text": "10",
+          "bbox": {
+            "x": 811,
+            "y": 1314,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000154",
+          "text": "90",
+          "bbox": {
+            "x": 841,
+            "y": 1277,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000155",
+          "text": "21",
+          "bbox": {
+            "x": 1096,
+            "y": 1337,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000156",
+          "text": "96",
+          "bbox": {
+            "x": 1030,
+            "y": 1297,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000157",
+          "text": "97",
+          "bbox": {
+            "x": 1062,
+            "y": 1246,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000158",
+          "text": "39",
+          "bbox": {
+            "x": 1060,
+            "y": 1324,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000159",
+          "text": "57",
+          "bbox": {
+            "x": 831,
+            "y": 1151,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000160",
+          "text": "3",
+          "bbox": {
+            "x": 897,
+            "y": 1184,
+            "width": 11,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000161",
+          "text": "62",
+          "bbox": {
+            "x": 929,
+            "y": 1193,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000162",
+          "text": "112",
+          "bbox": {
+            "x": 904,
+            "y": 1222,
+            "width": 28,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000163",
+          "text": "102",
+          "bbox": {
+            "x": 981,
+            "y": 1190,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000164",
+          "text": "94",
+          "bbox": {
+            "x": 1185,
+            "y": 1252,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000165",
+          "text": "109",
+          "bbox": {
+            "x": 1183,
+            "y": 1294,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000166",
+          "text": "110",
+          "bbox": {
+            "x": 1213,
+            "y": 1315,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000167",
+          "text": "104",
+          "bbox": {
+            "x": 1133,
+            "y": 1224,
+            "width": 29,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000168",
+          "text": "15",
+          "bbox": {
+            "x": 1153,
+            "y": 1257,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684500000000014,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000169",
+          "text": "Water",
+          "bbox": {
+            "x": 1078,
+            "y": 1849,
+            "width": 43,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000170",
+          "text": "and",
+          "bbox": {
+            "x": 1125,
+            "y": 1849,
+            "width": 27,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000171",
+          "text": "Wastewater",
+          "bbox": {
+            "x": 1156,
+            "y": 1849,
+            "width": 86,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000172",
+          "text": "Management",
+          "bbox": {
+            "x": 1078,
+            "y": 1867,
+            "width": 95,
+            "height": 15
+          },
+          "font_name": "WBLURF+HelveticaNeue-Bold",
+          "font_size": 5.44319999999999,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000173",
+          "text": "111",
+          "bbox": {
+            "x": 601,
+            "y": 832,
+            "width": 28,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000174",
+          "text": "114",
+          "bbox": {
+            "x": 523,
+            "y": 814,
+            "width": 28,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000175",
+          "text": "115",
+          "bbox": {
+            "x": 561,
+            "y": 824,
+            "width": 28,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000176",
+          "text": "92",
+          "bbox": {
+            "x": 511,
+            "y": 853,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000177",
+          "text": "84",
+          "bbox": {
+            "x": 540,
+            "y": 879,
+            "width": 21,
+            "height": 21
+          },
+          "font_name": "WBLURF+HelveticaLTStd-BoldCond",
+          "font_size": 7.684499999999957,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000178",
+          "text": "15",
+          "bbox": {
+            "x": 194,
+            "y": 2256,
+            "width": 28,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Bold",
+          "font_size": 9.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000179",
+          "text": "Green",
+          "bbox": {
+            "x": 275,
+            "y": 2256,
+            "width": 63,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000180",
+          "text": "Bond",
+          "bbox": {
+            "x": 343,
+            "y": 2256,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000181",
+          "text": "Report",
+          "bbox": {
+            "x": 404,
+            "y": 2256,
+            "width": 71,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000182",
+          "text": "2025",
+          "bbox": {
+            "x": 480,
+            "y": 2256,
+            "width": 51,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        }
+      ]
+    }
+  },
+  "canonical": {
+    "layer_id": "pdf_text",
+    "reason": "selected_layer_pdf_text"
+  },
+  "canonical_text": "Green Projects\nOverview\nAs of 31 August 2025, the following 116 projects under six eligible categories have been included in the GSBP.\nDetails of all the projects including their major expected impacts can be found in Appendix A .\n\n8\n43\n58\n33 75\n116 13\n34\n38\n80 82\n5\n30 105\n52\n114 91\n115 111 36 42\n92 70\n84 47\n72 44 73\n79\n24 99\n78\n45 86\n37 48 69 106\n32\n89 103 24\n67 59 107\n101 29\n18 12 26 16\n81 71\n22 98 95 11 85\n88 56 108\n9 60 63 4 68\n76 14 65\n57 28 87\n27 64 40 17 19\n7 61\n3 102 83 25 24 23\n62 100\n2 112 113 41 53 104 93\n31 97 94\n6 15\n77 90 49 35\n20 96 109\n46 74\n10 39 110\n21\n5455 66\n51\n50\n1\n\nWaste Management and Green Buildings Water and Wastewater\nResource Recovery Management\n\nEnergy Efficiency and Pollution Prevention Climate Change\nConservation and Control Adaptation\n\n15 Green Bond Report 2025",
+  "canonical_index": {
+    "words": {
+      "w_94b9ccff": {
+        "char_start": 0,
+        "char_end": 5
+      },
+      "w_7cb98595": {
+        "char_start": 6,
+        "char_end": 14
+      },
+      "w_267c81d4": {
+        "char_start": 15,
+        "char_end": 23
+      },
+      "w_6bf3c94e": {
+        "char_start": 24,
+        "char_end": 26
+      },
+      "w_e298c3f9": {
+        "char_start": 27,
+        "char_end": 29
+      },
+      "w_5fba1a26": {
+        "char_start": 30,
+        "char_end": 32
+      },
+      "w_7b820446": {
+        "char_start": 33,
+        "char_end": 39
+      },
+      "w_085a06c5": {
+        "char_start": 40,
+        "char_end": 45
+      },
+      "w_650bce4d": {
+        "char_start": 46,
+        "char_end": 49
+      },
+      "w_f256a35c": {
+        "char_start": 50,
+        "char_end": 59
+      },
+      "w_b1a32548": {
+        "char_start": 60,
+        "char_end": 63
+      },
+      "w_9a7a741c": {
+        "char_start": 64,
+        "char_end": 72
+      },
+      "w_4bf34222": {
+        "char_start": 73,
+        "char_end": 78
+      },
+      "w_99b1e3e7": {
+        "char_start": 79,
+        "char_end": 82
+      },
+      "w_bfc93107": {
+        "char_start": 83,
+        "char_end": 91
+      },
+      "w_3f34a9a3": {
+        "char_start": 92,
+        "char_end": 102
+      },
+      "w_341f6d1e": {
+        "char_start": 103,
+        "char_end": 107
+      },
+      "w_cbface75": {
+        "char_start": 108,
+        "char_end": 112
+      },
+      "w_ed703536": {
+        "char_start": 113,
+        "char_end": 121
+      },
+      "w_7361fa36": {
+        "char_start": 122,
+        "char_end": 124
+      },
+      "w_ca4e1e59": {
+        "char_start": 125,
+        "char_end": 128
+      },
+      "w_27756824": {
+        "char_start": 129,
+        "char_end": 134
+      },
+      "w_ad0a27ce": {
+        "char_start": 135,
+        "char_end": 142
+      },
+      "w_e2f55b4f": {
+        "char_start": 143,
+        "char_end": 145
+      },
+      "w_7446c7fd": {
+        "char_start": 146,
+        "char_end": 149
+      },
+      "w_fa269c43": {
+        "char_start": 150,
+        "char_end": 153
+      },
+      "w_19432ca1": {
+        "char_start": 154,
+        "char_end": 162
+      },
+      "w_b34cde34": {
+        "char_start": 163,
+        "char_end": 172
+      },
+      "w_8ca03c63": {
+        "char_start": 173,
+        "char_end": 178
+      },
+      "w_58809125": {
+        "char_start": 179,
+        "char_end": 184
+      },
+      "w_64759f6c": {
+        "char_start": 185,
+        "char_end": 193
+      },
+      "w_95fee482": {
+        "char_start": 194,
+        "char_end": 201
+      },
+      "w_713140ab": {
+        "char_start": 202,
+        "char_end": 205
+      },
+      "w_cb618df8": {
+        "char_start": 206,
+        "char_end": 208
+      },
+      "w_f8b79da5": {
+        "char_start": 209,
+        "char_end": 214
+      },
+      "w_3322cecf": {
+        "char_start": 215,
+        "char_end": 217
+      },
+      "w_ddc1e5eb": {
+        "char_start": 218,
+        "char_end": 226
+      },
+      "w_6aa8a26b": {
+        "char_start": 227,
+        "char_end": 228
+      },
+      "w_13703dc8": {
+        "char_start": 229,
+        "char_end": 230
+      },
+      "w_624da4ef": {
+        "char_start": 232,
+        "char_end": 233
+      },
+      "w_5cec217b": {
+        "char_start": 234,
+        "char_end": 236
+      },
+      "w_02daddf7": {
+        "char_start": 237,
+        "char_end": 239
+      },
+      "w_d0a687cf": {
+        "char_start": 240,
+        "char_end": 242
+      },
+      "w_0e65bb6b": {
+        "char_start": 243,
+        "char_end": 245
+      },
+      "w_6fbb4a46": {
+        "char_start": 246,
+        "char_end": 249
+      },
+      "w_221c82bf": {
+        "char_start": 250,
+        "char_end": 252
+      },
+      "w_f8246b3f": {
+        "char_start": 253,
+        "char_end": 255
+      },
+      "w_7396ff62": {
+        "char_start": 256,
+        "char_end": 258
+      },
+      "w_faf15be3": {
+        "char_start": 259,
+        "char_end": 261
+      },
+      "w_56e27eae": {
+        "char_start": 262,
+        "char_end": 264
+      },
+      "w_48555574": {
+        "char_start": 265,
+        "char_end": 266
+      },
+      "w_352a154f": {
+        "char_start": 267,
+        "char_end": 269
+      },
+      "w_56d8d844": {
+        "char_start": 270,
+        "char_end": 273
+      },
+      "w_01aa1242": {
+        "char_start": 274,
+        "char_end": 276
+      },
+      "w_ded76bf1": {
+        "char_start": 277,
+        "char_end": 280
+      },
+      "w_587894d0": {
+        "char_start": 281,
+        "char_end": 283
+      },
+      "w_97eee6ee": {
+        "char_start": 284,
+        "char_end": 287
+      },
+      "w_38b7ad3f": {
+        "char_start": 288,
+        "char_end": 291
+      },
+      "w_128af8e5": {
+        "char_start": 292,
+        "char_end": 294
+      },
+      "w_9b38a05d": {
+        "char_start": 295,
+        "char_end": 297
+      },
+      "w_cd329f55": {
+        "char_start": 298,
+        "char_end": 300
+      },
+      "w_1b9e817b": {
+        "char_start": 301,
+        "char_end": 303
+      },
+      "w_27de490d": {
+        "char_start": 304,
+        "char_end": 306
+      },
+      "w_5938f8a7": {
+        "char_start": 307,
+        "char_end": 309
+      },
+      "w_75375076": {
+        "char_start": 310,
+        "char_end": 312
+      },
+      "w_e39716c1": {
+        "char_start": 313,
+        "char_end": 315
+      },
+      "w_1fd48a36": {
+        "char_start": 316,
+        "char_end": 318
+      },
+      "w_e98c703d": {
+        "char_start": 319,
+        "char_end": 321
+      },
+      "w_a0397ded": {
+        "char_start": 322,
+        "char_end": 324
+      },
+      "w_ad440413": {
+        "char_start": 325,
+        "char_end": 327
+      },
+      "w_a532cf07": {
+        "char_start": 328,
+        "char_end": 330
+      },
+      "w_16979509": {
+        "char_start": 331,
+        "char_end": 333
+      },
+      "w_ad72c00b": {
+        "char_start": 334,
+        "char_end": 336
+      },
+      "w_b0a1758e": {
+        "char_start": 337,
+        "char_end": 339
+      },
+      "w_a13c54ca": {
+        "char_start": 340,
+        "char_end": 342
+      },
+      "w_aeb4d0b8": {
+        "char_start": 343,
+        "char_end": 345
+      },
+      "w_58bdfa1d": {
+        "char_start": 346,
+        "char_end": 349
+      },
+      "w_344bc33d": {
+        "char_start": 350,
+        "char_end": 352
+      },
+      "w_f15ad1fe": {
+        "char_start": 353,
+        "char_end": 355
+      },
+      "w_33d2db2d": {
+        "char_start": 356,
+        "char_end": 359
+      },
+      "w_00ca684e": {
+        "char_start": 360,
+        "char_end": 362
+      },
+      "w_2f7652d6": {
+        "char_start": 363,
+        "char_end": 365
+      },
+      "w_66cba16e": {
+        "char_start": 366,
+        "char_end": 368
+      },
+      "w_ac2420dd": {
+        "char_start": 369,
+        "char_end": 372
+      },
+      "w_3cbcad5d": {
+        "char_start": 373,
+        "char_end": 376
+      },
+      "w_842e8a82": {
+        "char_start": 377,
+        "char_end": 379
+      },
+      "w_210d1740": {
+        "char_start": 380,
+        "char_end": 382
+      },
+      "w_8eb0ec7c": {
+        "char_start": 383,
+        "char_end": 385
+      },
+      "w_e2f139fb": {
+        "char_start": 386,
+        "char_end": 388
+      },
+      "w_0b5329b6": {
+        "char_start": 389,
+        "char_end": 391
+      },
+      "w_4573c85a": {
+        "char_start": 392,
+        "char_end": 394
+      },
+      "w_c992e173": {
+        "char_start": 395,
+        "char_end": 397
+      },
+      "w_1092f573": {
+        "char_start": 398,
+        "char_end": 400
+      },
+      "w_59cde24c": {
+        "char_start": 401,
+        "char_end": 403
+      },
+      "w_dd65b775": {
+        "char_start": 404,
+        "char_end": 406
+      },
+      "w_c602d916": {
+        "char_start": 407,
+        "char_end": 409
+      },
+      "w_f971cb20": {
+        "char_start": 410,
+        "char_end": 412
+      },
+      "w_eeae1e5c": {
+        "char_start": 413,
+        "char_end": 415
+      },
+      "w_98c70db6": {
+        "char_start": 416,
+        "char_end": 418
+      },
+      "w_557e27be": {
+        "char_start": 419,
+        "char_end": 422
+      },
+      "w_25a9ce1f": {
+        "char_start": 423,
+        "char_end": 424
+      },
+      "w_402b1943": {
+        "char_start": 425,
+        "char_end": 427
+      },
+      "w_6aa9d6d2": {
+        "char_start": 428,
+        "char_end": 430
+      },
+      "w_db3cb49e": {
+        "char_start": 431,
+        "char_end": 432
+      },
+      "w_1baf3837": {
+        "char_start": 433,
+        "char_end": 435
+      },
+      "w_ae9a2fca": {
+        "char_start": 436,
+        "char_end": 438
+      },
+      "w_e28deb92": {
+        "char_start": 439,
+        "char_end": 441
+      },
+      "w_343ebc9c": {
+        "char_start": 442,
+        "char_end": 444
+      },
+      "w_3f205cd8": {
+        "char_start": 445,
+        "char_end": 447
+      },
+      "w_bd4ac82e": {
+        "char_start": 448,
+        "char_end": 450
+      },
+      "w_866b6c28": {
+        "char_start": 451,
+        "char_end": 453
+      },
+      "w_9f54e422": {
+        "char_start": 454,
+        "char_end": 456
+      },
+      "w_03c36238": {
+        "char_start": 457,
+        "char_end": 459
+      },
+      "w_9a3c6d40": {
+        "char_start": 460,
+        "char_end": 462
+      },
+      "w_e82d2a9f": {
+        "char_start": 463,
+        "char_end": 465
+      },
+      "w_092db112": {
+        "char_start": 466,
+        "char_end": 468
+      },
+      "w_763de7cb": {
+        "char_start": 469,
+        "char_end": 470
+      },
+      "w_5252e339": {
+        "char_start": 471,
+        "char_end": 473
+      },
+      "w_5463508c": {
+        "char_start": 474,
+        "char_end": 475
+      },
+      "w_1105d753": {
+        "char_start": 476,
+        "char_end": 479
+      },
+      "w_497a2641": {
+        "char_start": 480,
+        "char_end": 482
+      },
+      "w_da7ddcd1": {
+        "char_start": 483,
+        "char_end": 485
+      },
+      "w_1907bdd3": {
+        "char_start": 486,
+        "char_end": 488
+      },
+      "w_f8623a93": {
+        "char_start": 489,
+        "char_end": 491
+      },
+      "w_e66ebce2": {
+        "char_start": 492,
+        "char_end": 494
+      },
+      "w_4a377ddb": {
+        "char_start": 495,
+        "char_end": 498
+      },
+      "w_f4f092be": {
+        "char_start": 499,
+        "char_end": 500
+      },
+      "w_0fff149c": {
+        "char_start": 501,
+        "char_end": 504
+      },
+      "w_03fc075d": {
+        "char_start": 505,
+        "char_end": 508
+      },
+      "w_1d824c28": {
+        "char_start": 509,
+        "char_end": 511
+      },
+      "w_0965b121": {
+        "char_start": 512,
+        "char_end": 514
+      },
+      "w_fdecd03c": {
+        "char_start": 515,
+        "char_end": 518
+      },
+      "w_56100384": {
+        "char_start": 519,
+        "char_end": 521
+      },
+      "w_9555af3b": {
+        "char_start": 522,
+        "char_end": 524
+      },
+      "w_39e65312": {
+        "char_start": 525,
+        "char_end": 527
+      },
+      "w_054b205b": {
+        "char_start": 528,
+        "char_end": 530
+      },
+      "w_dc4612cc": {
+        "char_start": 531,
+        "char_end": 532
+      },
+      "w_f4f8daaa": {
+        "char_start": 533,
+        "char_end": 535
+      },
+      "w_9cf5d111": {
+        "char_start": 536,
+        "char_end": 538
+      },
+      "w_b9c568fc": {
+        "char_start": 539,
+        "char_end": 541
+      },
+      "w_91036eab": {
+        "char_start": 542,
+        "char_end": 544
+      },
+      "w_9ac3f1de": {
+        "char_start": 545,
+        "char_end": 547
+      },
+      "w_1aace0de": {
+        "char_start": 548,
+        "char_end": 550
+      },
+      "w_9433dc0d": {
+        "char_start": 551,
+        "char_end": 553
+      },
+      "w_28c2c237": {
+        "char_start": 554,
+        "char_end": 557
+      },
+      "w_b6d0b881": {
+        "char_start": 558,
+        "char_end": 560
+      },
+      "w_a12bd9b6": {
+        "char_start": 561,
+        "char_end": 563
+      },
+      "w_094798e0": {
+        "char_start": 564,
+        "char_end": 566
+      },
+      "w_be94e16b": {
+        "char_start": 567,
+        "char_end": 569
+      },
+      "w_348444a7": {
+        "char_start": 570,
+        "char_end": 573
+      },
+      "w_1d620d72": {
+        "char_start": 574,
+        "char_end": 576
+      },
+      "w_7962ec0b": {
+        "char_start": 577,
+        "char_end": 581
+      },
+      "w_d8bb328a": {
+        "char_start": 582,
+        "char_end": 584
+      },
+      "w_63e87913": {
+        "char_start": 585,
+        "char_end": 587
+      },
+      "w_10f956ba": {
+        "char_start": 588,
+        "char_end": 590
+      },
+      "w_68c52523": {
+        "char_start": 591,
+        "char_end": 592
+      },
+      "w_6bd85e19": {
+        "char_start": 594,
+        "char_end": 599
+      },
+      "w_a1f0f325": {
+        "char_start": 600,
+        "char_end": 610
+      },
+      "w_e036d6d6": {
+        "char_start": 611,
+        "char_end": 614
+      },
+      "w_07badc36": {
+        "char_start": 615,
+        "char_end": 620
+      },
+      "w_793741ea": {
+        "char_start": 621,
+        "char_end": 630
+      },
+      "w_d7b814a5": {
+        "char_start": 631,
+        "char_end": 636
+      },
+      "w_0010fa87": {
+        "char_start": 637,
+        "char_end": 640
+      },
+      "w_58361a80": {
+        "char_start": 641,
+        "char_end": 651
+      },
+      "w_ed13d5e5": {
+        "char_start": 652,
+        "char_end": 660
+      },
+      "w_00ee5f59": {
+        "char_start": 661,
+        "char_end": 669
+      },
+      "w_6ced5c9a": {
+        "char_start": 670,
+        "char_end": 680
+      },
+      "w_93d531ac": {
+        "char_start": 682,
+        "char_end": 688
+      },
+      "w_1d531038": {
+        "char_start": 689,
+        "char_end": 699
+      },
+      "w_aee77085": {
+        "char_start": 700,
+        "char_end": 703
+      },
+      "w_d046c1e1": {
+        "char_start": 704,
+        "char_end": 713
+      },
+      "w_3099193d": {
+        "char_start": 714,
+        "char_end": 724
+      },
+      "w_dbb2989b": {
+        "char_start": 725,
+        "char_end": 732
+      },
+      "w_1c970ecd": {
+        "char_start": 733,
+        "char_end": 739
+      },
+      "w_42bc540f": {
+        "char_start": 740,
+        "char_end": 752
+      },
+      "w_8557bcaf": {
+        "char_start": 753,
+        "char_end": 756
+      },
+      "w_1aff5d69": {
+        "char_start": 757,
+        "char_end": 764
+      },
+      "w_48c72c1e": {
+        "char_start": 765,
+        "char_end": 775
+      },
+      "w_15ef6db8": {
+        "char_start": 777,
+        "char_end": 779
+      },
+      "w_fcb4bf50": {
+        "char_start": 780,
+        "char_end": 785
+      },
+      "w_125eb03c": {
+        "char_start": 786,
+        "char_end": 790
+      },
+      "w_d0037c12": {
+        "char_start": 791,
+        "char_end": 797
+      },
+      "w_e06e109e": {
+        "char_start": 798,
+        "char_end": 802
+      }
+    },
+    "lines": {
+      "l_5021ece6": {
+        "char_start": 0,
+        "char_end": 14
+      },
+      "l_0ca62156": {
+        "char_start": 15,
+        "char_end": 23
+      },
+      "l_1803959f": {
+        "char_start": 24,
+        "char_end": 134
+      },
+      "l_4b1ad50d": {
+        "char_start": 135,
+        "char_end": 230
+      },
+      "l_06044467": {
+        "char_start": 232,
+        "char_end": 233
+      },
+      "l_6925f50f": {
+        "char_start": 234,
+        "char_end": 236
+      },
+      "l_c9241ae6": {
+        "char_start": 237,
+        "char_end": 239
+      },
+      "l_c714b50f": {
+        "char_start": 240,
+        "char_end": 245
+      },
+      "l_288e7dfe": {
+        "char_start": 246,
+        "char_end": 252
+      },
+      "l_758dc57a": {
+        "char_start": 253,
+        "char_end": 255
+      },
+      "l_18622c1c": {
+        "char_start": 256,
+        "char_end": 258
+      },
+      "l_82411561": {
+        "char_start": 259,
+        "char_end": 264
+      },
+      "l_ca5da1da": {
+        "char_start": 265,
+        "char_end": 266
+      },
+      "l_c5d7b648": {
+        "char_start": 267,
+        "char_end": 273
+      },
+      "l_7addb28e": {
+        "char_start": 274,
+        "char_end": 276
+      },
+      "l_bcfc2023": {
+        "char_start": 277,
+        "char_end": 283
+      },
+      "l_99783697": {
+        "char_start": 284,
+        "char_end": 297
+      },
+      "l_80da383f": {
+        "char_start": 298,
+        "char_end": 303
+      },
+      "l_c500da13": {
+        "char_start": 304,
+        "char_end": 309
+      },
+      "l_304b10ac": {
+        "char_start": 310,
+        "char_end": 318
+      },
+      "l_5ff47ef4": {
+        "char_start": 319,
+        "char_end": 321
+      },
+      "l_a1c441a1": {
+        "char_start": 322,
+        "char_end": 327
+      },
+      "l_5285bac1": {
+        "char_start": 328,
+        "char_end": 330
+      },
+      "l_9a056ee5": {
+        "char_start": 331,
+        "char_end": 336
+      },
+      "l_4a63af58": {
+        "char_start": 337,
+        "char_end": 349
+      },
+      "l_a73a7e32": {
+        "char_start": 350,
+        "char_end": 352
+      },
+      "l_cff57b9e": {
+        "char_start": 353,
+        "char_end": 362
+      },
+      "l_e6a8cac9": {
+        "char_start": 363,
+        "char_end": 372
+      },
+      "l_d56b26a6": {
+        "char_start": 373,
+        "char_end": 379
+      },
+      "l_6d51efc7": {
+        "char_start": 380,
+        "char_end": 391
+      },
+      "l_d6b1afe1": {
+        "char_start": 392,
+        "char_end": 397
+      },
+      "l_1a78e601": {
+        "char_start": 398,
+        "char_end": 412
+      },
+      "l_8ab448eb": {
+        "char_start": 413,
+        "char_end": 422
+      },
+      "l_9630c57b": {
+        "char_start": 423,
+        "char_end": 435
+      },
+      "l_6eef9c6d": {
+        "char_start": 436,
+        "char_end": 444
+      },
+      "l_eae0ad16": {
+        "char_start": 445,
+        "char_end": 453
+      },
+      "l_8e60a81d": {
+        "char_start": 454,
+        "char_end": 468
+      },
+      "l_ed4c6e84": {
+        "char_start": 469,
+        "char_end": 473
+      },
+      "l_3348ef17": {
+        "char_start": 474,
+        "char_end": 491
+      },
+      "l_830bec65": {
+        "char_start": 492,
+        "char_end": 498
+      },
+      "l_86071950": {
+        "char_start": 499,
+        "char_end": 521
+      },
+      "l_22ce2db1": {
+        "char_start": 522,
+        "char_end": 530
+      },
+      "l_6ecdc0a5": {
+        "char_start": 531,
+        "char_end": 535
+      },
+      "l_5fca646e": {
+        "char_start": 536,
+        "char_end": 547
+      },
+      "l_d90deade": {
+        "char_start": 548,
+        "char_end": 557
+      },
+      "l_71f4c597": {
+        "char_start": 558,
+        "char_end": 563
+      },
+      "l_be919f45": {
+        "char_start": 564,
+        "char_end": 573
+      },
+      "l_7a8edcfc": {
+        "char_start": 574,
+        "char_end": 576
+      },
+      "l_3df8662c": {
+        "char_start": 577,
+        "char_end": 584
+      },
+      "l_8f8d6352": {
+        "char_start": 585,
+        "char_end": 587
+      },
+      "l_8e23b365": {
+        "char_start": 588,
+        "char_end": 590
+      },
+      "l_b8edba65": {
+        "char_start": 591,
+        "char_end": 592
+      },
+      "l_9e48ed6a": {
+        "char_start": 594,
+        "char_end": 651
+      },
+      "l_4ecd449d": {
+        "char_start": 652,
+        "char_end": 680
+      },
+      "l_ace9841e": {
+        "char_start": 682,
+        "char_end": 739
+      },
+      "l_881147e2": {
+        "char_start": 740,
+        "char_end": 775
+      },
+      "l_326daa77": {
+        "char_start": 777,
+        "char_end": 802
+      }
+    },
+    "blocks": {
+      "b_30df4378": {
+        "char_start": 0,
+        "char_end": 230
+      },
+      "b_19746d43": {
+        "char_start": 232,
+        "char_end": 592
+      },
+      "b_22cd3fd5": {
+        "char_start": 594,
+        "char_end": 680
+      },
+      "b_8ee27360": {
+        "char_start": 682,
+        "char_end": 775
+      },
+      "b_d6fdf48c": {
+        "char_start": 777,
+        "char_end": 802
+      }
+    }
+  },
+  "words": [
+    {
+      "word_id": "w_94b9ccff",
+      "text": "Green",
+      "bbox": {
+        "x": 194,
+        "y": 134,
+        "width": 146,
+        "height": 53
+      },
+      "line_id": "l_5021ece6",
+      "block_id": "b_30df4378",
+      "reading_order": 0,
+      "char_start": 0,
+      "char_end": 5,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7cb98595",
+      "text": "Projects",
+      "bbox": {
+        "x": 354,
+        "y": 134,
+        "width": 188,
+        "height": 53
+      },
+      "line_id": "l_5021ece6",
+      "block_id": "b_30df4378",
+      "reading_order": 1,
+      "char_start": 6,
+      "char_end": 14,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_267c81d4",
+      "text": "Overview",
+      "bbox": {
+        "x": 194,
+        "y": 251,
+        "width": 155,
+        "height": 36
+      },
+      "line_id": "l_0ca62156",
+      "block_id": "b_30df4378",
+      "reading_order": 2,
+      "char_start": 15,
+      "char_end": 23,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6bf3c94e",
+      "text": "As",
+      "bbox": {
+        "x": 194,
+        "y": 362,
+        "width": 29,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 3,
+      "char_start": 24,
+      "char_end": 26,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e298c3f9",
+      "text": "of",
+      "bbox": {
+        "x": 231,
+        "y": 362,
+        "width": 22,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 4,
+      "char_start": 27,
+      "char_end": 29,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5fba1a26",
+      "text": "31",
+      "bbox": {
+        "x": 259,
+        "y": 362,
+        "width": 27,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 5,
+      "char_start": 30,
+      "char_end": 32,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7b820446",
+      "text": "August",
+      "bbox": {
+        "x": 293,
+        "y": 362,
+        "width": 80,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 6,
+      "char_start": 33,
+      "char_end": 39,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_085a06c5",
+      "text": "2025,",
+      "bbox": {
+        "x": 380,
+        "y": 362,
+        "width": 62,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 7,
+      "char_start": 40,
+      "char_end": 45,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_650bce4d",
+      "text": "the",
+      "bbox": {
+        "x": 450,
+        "y": 362,
+        "width": 36,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 8,
+      "char_start": 46,
+      "char_end": 49,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f256a35c",
+      "text": "following",
+      "bbox": {
+        "x": 492,
+        "y": 362,
+        "width": 101,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 9,
+      "char_start": 50,
+      "char_end": 59,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b1a32548",
+      "text": "116",
+      "bbox": {
+        "x": 600,
+        "y": 362,
+        "width": 38,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 10,
+      "char_start": 60,
+      "char_end": 63,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9a7a741c",
+      "text": "projects",
+      "bbox": {
+        "x": 646,
+        "y": 362,
+        "width": 92,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 11,
+      "char_start": 64,
+      "char_end": 72,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4bf34222",
+      "text": "under",
+      "bbox": {
+        "x": 745,
+        "y": 362,
+        "width": 66,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 12,
+      "char_start": 73,
+      "char_end": 78,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_99b1e3e7",
+      "text": "six",
+      "bbox": {
+        "x": 818,
+        "y": 362,
+        "width": 32,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 13,
+      "char_start": 79,
+      "char_end": 82,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_bfc93107",
+      "text": "eligible",
+      "bbox": {
+        "x": 856,
+        "y": 362,
+        "width": 80,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 14,
+      "char_start": 83,
+      "char_end": 91,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3f34a9a3",
+      "text": "categories",
+      "bbox": {
+        "x": 943,
+        "y": 362,
+        "width": 119,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 15,
+      "char_start": 92,
+      "char_end": 102,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_341f6d1e",
+      "text": "have",
+      "bbox": {
+        "x": 1069,
+        "y": 362,
+        "width": 53,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 16,
+      "char_start": 103,
+      "char_end": 107,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_cbface75",
+      "text": "been",
+      "bbox": {
+        "x": 1129,
+        "y": 362,
+        "width": 57,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 17,
+      "char_start": 108,
+      "char_end": 112,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ed703536",
+      "text": "included",
+      "bbox": {
+        "x": 1193,
+        "y": 362,
+        "width": 97,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 18,
+      "char_start": 113,
+      "char_end": 121,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7361fa36",
+      "text": "in",
+      "bbox": {
+        "x": 1297,
+        "y": 362,
+        "width": 20,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 19,
+      "char_start": 122,
+      "char_end": 124,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ca4e1e59",
+      "text": "the",
+      "bbox": {
+        "x": 1324,
+        "y": 362,
+        "width": 36,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 20,
+      "char_start": 125,
+      "char_end": 128,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_27756824",
+      "text": "GSBP.",
+      "bbox": {
+        "x": 1367,
+        "y": 362,
+        "width": 73,
+        "height": 25
+      },
+      "line_id": "l_1803959f",
+      "block_id": "b_30df4378",
+      "reading_order": 21,
+      "char_start": 129,
+      "char_end": 134,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ad0a27ce",
+      "text": "Details",
+      "bbox": {
+        "x": 194,
+        "y": 399,
+        "width": 78,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 22,
+      "char_start": 135,
+      "char_end": 142,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e2f55b4f",
+      "text": "of",
+      "bbox": {
+        "x": 279,
+        "y": 399,
+        "width": 22,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 23,
+      "char_start": 143,
+      "char_end": 145,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7446c7fd",
+      "text": "all",
+      "bbox": {
+        "x": 308,
+        "y": 399,
+        "width": 25,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 24,
+      "char_start": 146,
+      "char_end": 149,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_fa269c43",
+      "text": "the",
+      "bbox": {
+        "x": 340,
+        "y": 399,
+        "width": 36,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 25,
+      "char_start": 150,
+      "char_end": 153,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_19432ca1",
+      "text": "projects",
+      "bbox": {
+        "x": 382,
+        "y": 399,
+        "width": 92,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 26,
+      "char_start": 154,
+      "char_end": 162,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b34cde34",
+      "text": "including",
+      "bbox": {
+        "x": 482,
+        "y": 399,
+        "width": 103,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 27,
+      "char_start": 163,
+      "char_end": 172,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8ca03c63",
+      "text": "their",
+      "bbox": {
+        "x": 591,
+        "y": 399,
+        "width": 50,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 28,
+      "char_start": 173,
+      "char_end": 178,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_58809125",
+      "text": "major",
+      "bbox": {
+        "x": 649,
+        "y": 399,
+        "width": 64,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 29,
+      "char_start": 179,
+      "char_end": 184,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_64759f6c",
+      "text": "expected",
+      "bbox": {
+        "x": 720,
+        "y": 399,
+        "width": 106,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 30,
+      "char_start": 185,
+      "char_end": 193,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_95fee482",
+      "text": "impacts",
+      "bbox": {
+        "x": 832,
+        "y": 399,
+        "width": 90,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 31,
+      "char_start": 194,
+      "char_end": 201,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_713140ab",
+      "text": "can",
+      "bbox": {
+        "x": 930,
+        "y": 399,
+        "width": 41,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 32,
+      "char_start": 202,
+      "char_end": 205,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_cb618df8",
+      "text": "be",
+      "bbox": {
+        "x": 978,
+        "y": 399,
+        "width": 29,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 33,
+      "char_start": 206,
+      "char_end": 208,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f8b79da5",
+      "text": "found",
+      "bbox": {
+        "x": 1014,
+        "y": 399,
+        "width": 65,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 34,
+      "char_start": 209,
+      "char_end": 214,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3322cecf",
+      "text": "in",
+      "bbox": {
+        "x": 1086,
+        "y": 399,
+        "width": 20,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 35,
+      "char_start": 215,
+      "char_end": 217,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ddc1e5eb",
+      "text": "Appendix",
+      "bbox": {
+        "x": 1112,
+        "y": 399,
+        "width": 116,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 36,
+      "char_start": 218,
+      "char_end": 226,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6aa8a26b",
+      "text": "A",
+      "bbox": {
+        "x": 1235,
+        "y": 399,
+        "width": 17,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 37,
+      "char_start": 227,
+      "char_end": 228,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_13703dc8",
+      "text": ".",
+      "bbox": {
+        "x": 1253,
+        "y": 399,
+        "width": 7,
+        "height": 25
+      },
+      "line_id": "l_4b1ad50d",
+      "block_id": "b_30df4378",
+      "reading_order": 38,
+      "char_start": 229,
+      "char_end": 230,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_624da4ef",
+      "text": "8",
+      "bbox": {
+        "x": 889,
+        "y": 578,
+        "width": 11,
+        "height": 21
+      },
+      "line_id": "l_06044467",
+      "block_id": "b_19746d43",
+      "reading_order": 39,
+      "char_start": 232,
+      "char_end": 233,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5cec217b",
+      "text": "43",
+      "bbox": {
+        "x": 919,
+        "y": 595,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_6925f50f",
+      "block_id": "b_19746d43",
+      "reading_order": 40,
+      "char_start": 234,
+      "char_end": 236,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_02daddf7",
+      "text": "58",
+      "bbox": {
+        "x": 941,
+        "y": 619,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_c9241ae6",
+      "block_id": "b_19746d43",
+      "reading_order": 41,
+      "char_start": 237,
+      "char_end": 239,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d0a687cf",
+      "text": "33",
+      "bbox": {
+        "x": 901,
+        "y": 638,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_c714b50f",
+      "block_id": "b_19746d43",
+      "reading_order": 42,
+      "char_start": 240,
+      "char_end": 242,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0e65bb6b",
+      "text": "75",
+      "bbox": {
+        "x": 973,
+        "y": 635,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_c714b50f",
+      "block_id": "b_19746d43",
+      "reading_order": 43,
+      "char_start": 243,
+      "char_end": 245,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6fbb4a46",
+      "text": "116",
+      "bbox": {
+        "x": 946,
+        "y": 663,
+        "width": 28,
+        "height": 21
+      },
+      "line_id": "l_288e7dfe",
+      "block_id": "b_19746d43",
+      "reading_order": 44,
+      "char_start": 246,
+      "char_end": 249,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_221c82bf",
+      "text": "13",
+      "bbox": {
+        "x": 1127,
+        "y": 669,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_288e7dfe",
+      "block_id": "b_19746d43",
+      "reading_order": 45,
+      "char_start": 250,
+      "char_end": 252,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f8246b3f",
+      "text": "34",
+      "bbox": {
+        "x": 910,
+        "y": 675,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_758dc57a",
+      "block_id": "b_19746d43",
+      "reading_order": 46,
+      "char_start": 253,
+      "char_end": 255,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7396ff62",
+      "text": "38",
+      "bbox": {
+        "x": 945,
+        "y": 698,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_18622c1c",
+      "block_id": "b_19746d43",
+      "reading_order": 47,
+      "char_start": 256,
+      "char_end": 258,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_faf15be3",
+      "text": "80",
+      "bbox": {
+        "x": 718,
+        "y": 719,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_82411561",
+      "block_id": "b_19746d43",
+      "reading_order": 48,
+      "char_start": 259,
+      "char_end": 261,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_56e27eae",
+      "text": "82",
+      "bbox": {
+        "x": 893,
+        "y": 715,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_82411561",
+      "block_id": "b_19746d43",
+      "reading_order": 49,
+      "char_start": 262,
+      "char_end": 264,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_48555574",
+      "text": "5",
+      "bbox": {
+        "x": 569,
+        "y": 764,
+        "width": 11,
+        "height": 21
+      },
+      "line_id": "l_ca5da1da",
+      "block_id": "b_19746d43",
+      "reading_order": 50,
+      "char_start": 265,
+      "char_end": 266,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_352a154f",
+      "text": "30",
+      "bbox": {
+        "x": 526,
+        "y": 783,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_c5d7b648",
+      "block_id": "b_19746d43",
+      "reading_order": 51,
+      "char_start": 267,
+      "char_end": 269,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_56d8d844",
+      "text": "105",
+      "bbox": {
+        "x": 1016,
+        "y": 778,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_c5d7b648",
+      "block_id": "b_19746d43",
+      "reading_order": 52,
+      "char_start": 270,
+      "char_end": 273,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_01aa1242",
+      "text": "52",
+      "bbox": {
+        "x": 595,
+        "y": 792,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_7addb28e",
+      "block_id": "b_19746d43",
+      "reading_order": 53,
+      "char_start": 274,
+      "char_end": 276,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ded76bf1",
+      "text": "114",
+      "bbox": {
+        "x": 523,
+        "y": 814,
+        "width": 28,
+        "height": 21
+      },
+      "line_id": "l_bcfc2023",
+      "block_id": "b_19746d43",
+      "reading_order": 54,
+      "char_start": 277,
+      "char_end": 280,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_587894d0",
+      "text": "91",
+      "bbox": {
+        "x": 979,
+        "y": 805,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_bcfc2023",
+      "block_id": "b_19746d43",
+      "reading_order": 55,
+      "char_start": 281,
+      "char_end": 283,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_97eee6ee",
+      "text": "115",
+      "bbox": {
+        "x": 561,
+        "y": 824,
+        "width": 28,
+        "height": 21
+      },
+      "line_id": "l_99783697",
+      "block_id": "b_19746d43",
+      "reading_order": 56,
+      "char_start": 284,
+      "char_end": 287,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_38b7ad3f",
+      "text": "111",
+      "bbox": {
+        "x": 601,
+        "y": 832,
+        "width": 28,
+        "height": 21
+      },
+      "line_id": "l_99783697",
+      "block_id": "b_19746d43",
+      "reading_order": 57,
+      "char_start": 288,
+      "char_end": 291,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_128af8e5",
+      "text": "36",
+      "bbox": {
+        "x": 898,
+        "y": 834,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_99783697",
+      "block_id": "b_19746d43",
+      "reading_order": 58,
+      "char_start": 292,
+      "char_end": 294,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9b38a05d",
+      "text": "42",
+      "bbox": {
+        "x": 937,
+        "y": 824,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_99783697",
+      "block_id": "b_19746d43",
+      "reading_order": 59,
+      "char_start": 295,
+      "char_end": 297,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_cd329f55",
+      "text": "92",
+      "bbox": {
+        "x": 511,
+        "y": 853,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_80da383f",
+      "block_id": "b_19746d43",
+      "reading_order": 60,
+      "char_start": 298,
+      "char_end": 300,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1b9e817b",
+      "text": "70",
+      "bbox": {
+        "x": 784,
+        "y": 850,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_80da383f",
+      "block_id": "b_19746d43",
+      "reading_order": 61,
+      "char_start": 301,
+      "char_end": 303,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_27de490d",
+      "text": "84",
+      "bbox": {
+        "x": 540,
+        "y": 879,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_c500da13",
+      "block_id": "b_19746d43",
+      "reading_order": 62,
+      "char_start": 304,
+      "char_end": 306,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5938f8a7",
+      "text": "47",
+      "bbox": {
+        "x": 1277,
+        "y": 881,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_c500da13",
+      "block_id": "b_19746d43",
+      "reading_order": 63,
+      "char_start": 307,
+      "char_end": 309,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_75375076",
+      "text": "72",
+      "bbox": {
+        "x": 669,
+        "y": 891,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_304b10ac",
+      "block_id": "b_19746d43",
+      "reading_order": 64,
+      "char_start": 310,
+      "char_end": 312,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e39716c1",
+      "text": "44",
+      "bbox": {
+        "x": 718,
+        "y": 891,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_304b10ac",
+      "block_id": "b_19746d43",
+      "reading_order": 65,
+      "char_start": 313,
+      "char_end": 315,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1fd48a36",
+      "text": "73",
+      "bbox": {
+        "x": 945,
+        "y": 896,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_304b10ac",
+      "block_id": "b_19746d43",
+      "reading_order": 66,
+      "char_start": 316,
+      "char_end": 318,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e98c703d",
+      "text": "79",
+      "bbox": {
+        "x": 504,
+        "y": 913,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_5ff47ef4",
+      "block_id": "b_19746d43",
+      "reading_order": 67,
+      "char_start": 319,
+      "char_end": 321,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a0397ded",
+      "text": "24",
+      "bbox": {
+        "x": 1001,
+        "y": 938,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_a1c441a1",
+      "block_id": "b_19746d43",
+      "reading_order": 68,
+      "char_start": 322,
+      "char_end": 324,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ad440413",
+      "text": "99",
+      "bbox": {
+        "x": 1084,
+        "y": 932,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_a1c441a1",
+      "block_id": "b_19746d43",
+      "reading_order": 69,
+      "char_start": 325,
+      "char_end": 327,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a532cf07",
+      "text": "78",
+      "bbox": {
+        "x": 1298,
+        "y": 944,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_5285bac1",
+      "block_id": "b_19746d43",
+      "reading_order": 70,
+      "char_start": 328,
+      "char_end": 330,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_16979509",
+      "text": "45",
+      "bbox": {
+        "x": 949,
+        "y": 965,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_9a056ee5",
+      "block_id": "b_19746d43",
+      "reading_order": 71,
+      "char_start": 331,
+      "char_end": 333,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ad72c00b",
+      "text": "86",
+      "bbox": {
+        "x": 1266,
+        "y": 955,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_9a056ee5",
+      "block_id": "b_19746d43",
+      "reading_order": 72,
+      "char_start": 334,
+      "char_end": 336,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b0a1758e",
+      "text": "37",
+      "bbox": {
+        "x": 478,
+        "y": 967,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_4a63af58",
+      "block_id": "b_19746d43",
+      "reading_order": 73,
+      "char_start": 337,
+      "char_end": 339,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a13c54ca",
+      "text": "48",
+      "bbox": {
+        "x": 509,
+        "y": 977,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_4a63af58",
+      "block_id": "b_19746d43",
+      "reading_order": 74,
+      "char_start": 340,
+      "char_end": 342,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_aeb4d0b8",
+      "text": "69",
+      "bbox": {
+        "x": 917,
+        "y": 975,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_4a63af58",
+      "block_id": "b_19746d43",
+      "reading_order": 75,
+      "char_start": 343,
+      "char_end": 345,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_58bdfa1d",
+      "text": "106",
+      "bbox": {
+        "x": 1324,
+        "y": 975,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_4a63af58",
+      "block_id": "b_19746d43",
+      "reading_order": 76,
+      "char_start": 346,
+      "char_end": 349,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_344bc33d",
+      "text": "32",
+      "bbox": {
+        "x": 983,
+        "y": 981,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_a73a7e32",
+      "block_id": "b_19746d43",
+      "reading_order": 77,
+      "char_start": 350,
+      "char_end": 352,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f15ad1fe",
+      "text": "89",
+      "bbox": {
+        "x": 951,
+        "y": 1007,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_cff57b9e",
+      "block_id": "b_19746d43",
+      "reading_order": 78,
+      "char_start": 353,
+      "char_end": 355,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_33d2db2d",
+      "text": "103",
+      "bbox": {
+        "x": 1012,
+        "y": 999,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_cff57b9e",
+      "block_id": "b_19746d43",
+      "reading_order": 79,
+      "char_start": 356,
+      "char_end": 359,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_00ca684e",
+      "text": "24",
+      "bbox": {
+        "x": 1145,
+        "y": 1009,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_cff57b9e",
+      "block_id": "b_19746d43",
+      "reading_order": 80,
+      "char_start": 360,
+      "char_end": 362,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2f7652d6",
+      "text": "67",
+      "bbox": {
+        "x": 915,
+        "y": 1021,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_e6a8cac9",
+      "block_id": "b_19746d43",
+      "reading_order": 81,
+      "char_start": 363,
+      "char_end": 365,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_66cba16e",
+      "text": "59",
+      "bbox": {
+        "x": 983,
+        "y": 1031,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_e6a8cac9",
+      "block_id": "b_19746d43",
+      "reading_order": 82,
+      "char_start": 366,
+      "char_end": 368,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ac2420dd",
+      "text": "107",
+      "bbox": {
+        "x": 1042,
+        "y": 1029,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_e6a8cac9",
+      "block_id": "b_19746d43",
+      "reading_order": 83,
+      "char_start": 369,
+      "char_end": 372,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3cbcad5d",
+      "text": "101",
+      "bbox": {
+        "x": 727,
+        "y": 1042,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_d56b26a6",
+      "block_id": "b_19746d43",
+      "reading_order": 84,
+      "char_start": 373,
+      "char_end": 376,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_842e8a82",
+      "text": "29",
+      "bbox": {
+        "x": 868,
+        "y": 1038,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_d56b26a6",
+      "block_id": "b_19746d43",
+      "reading_order": 85,
+      "char_start": 377,
+      "char_end": 379,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_210d1740",
+      "text": "18",
+      "bbox": {
+        "x": 772,
+        "y": 1058,
+        "width": 20,
+        "height": 21
+      },
+      "line_id": "l_6d51efc7",
+      "block_id": "b_19746d43",
+      "reading_order": 86,
+      "char_start": 380,
+      "char_end": 382,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8eb0ec7c",
+      "text": "12",
+      "bbox": {
+        "x": 800,
+        "y": 1049,
+        "width": 20,
+        "height": 21
+      },
+      "line_id": "l_6d51efc7",
+      "block_id": "b_19746d43",
+      "reading_order": 87,
+      "char_start": 383,
+      "char_end": 385,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e2f139fb",
+      "text": "26",
+      "bbox": {
+        "x": 844,
+        "y": 1057,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_6d51efc7",
+      "block_id": "b_19746d43",
+      "reading_order": 88,
+      "char_start": 386,
+      "char_end": 388,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0b5329b6",
+      "text": "16",
+      "bbox": {
+        "x": 1014,
+        "y": 1054,
+        "width": 20,
+        "height": 21
+      },
+      "line_id": "l_6d51efc7",
+      "block_id": "b_19746d43",
+      "reading_order": 89,
+      "char_start": 389,
+      "char_end": 391,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4573c85a",
+      "text": "81",
+      "bbox": {
+        "x": 819,
+        "y": 1077,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_d6b1afe1",
+      "block_id": "b_19746d43",
+      "reading_order": 90,
+      "char_start": 392,
+      "char_end": 394,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c992e173",
+      "text": "71",
+      "bbox": {
+        "x": 865,
+        "y": 1087,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_d6b1afe1",
+      "block_id": "b_19746d43",
+      "reading_order": 91,
+      "char_start": 395,
+      "char_end": 397,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1092f573",
+      "text": "22",
+      "bbox": {
+        "x": 791,
+        "y": 1093,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_1a78e601",
+      "block_id": "b_19746d43",
+      "reading_order": 92,
+      "char_start": 398,
+      "char_end": 400,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_59cde24c",
+      "text": "98",
+      "bbox": {
+        "x": 894,
+        "y": 1103,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_1a78e601",
+      "block_id": "b_19746d43",
+      "reading_order": 93,
+      "char_start": 401,
+      "char_end": 403,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_dd65b775",
+      "text": "95",
+      "bbox": {
+        "x": 965,
+        "y": 1099,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_1a78e601",
+      "block_id": "b_19746d43",
+      "reading_order": 94,
+      "char_start": 404,
+      "char_end": 406,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c602d916",
+      "text": "11",
+      "bbox": {
+        "x": 1004,
+        "y": 1100,
+        "width": 20,
+        "height": 21
+      },
+      "line_id": "l_1a78e601",
+      "block_id": "b_19746d43",
+      "reading_order": 95,
+      "char_start": 407,
+      "char_end": 409,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f971cb20",
+      "text": "85",
+      "bbox": {
+        "x": 1037,
+        "y": 1094,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_1a78e601",
+      "block_id": "b_19746d43",
+      "reading_order": 96,
+      "char_start": 410,
+      "char_end": 412,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_eeae1e5c",
+      "text": "88",
+      "bbox": {
+        "x": 742,
+        "y": 1109,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_8ab448eb",
+      "block_id": "b_19746d43",
+      "reading_order": 97,
+      "char_start": 413,
+      "char_end": 415,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_98c70db6",
+      "text": "56",
+      "bbox": {
+        "x": 835,
+        "y": 1108,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_8ab448eb",
+      "block_id": "b_19746d43",
+      "reading_order": 98,
+      "char_start": 416,
+      "char_end": 418,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_557e27be",
+      "text": "108",
+      "bbox": {
+        "x": 1076,
+        "y": 1118,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_8ab448eb",
+      "block_id": "b_19746d43",
+      "reading_order": 99,
+      "char_start": 419,
+      "char_end": 422,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_25a9ce1f",
+      "text": "9",
+      "bbox": {
+        "x": 812,
+        "y": 1131,
+        "width": 11,
+        "height": 21
+      },
+      "line_id": "l_9630c57b",
+      "block_id": "b_19746d43",
+      "reading_order": 100,
+      "char_start": 423,
+      "char_end": 424,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_402b1943",
+      "text": "60",
+      "bbox": {
+        "x": 860,
+        "y": 1130,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_9630c57b",
+      "block_id": "b_19746d43",
+      "reading_order": 101,
+      "char_start": 425,
+      "char_end": 427,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6aa9d6d2",
+      "text": "63",
+      "bbox": {
+        "x": 974,
+        "y": 1127,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_9630c57b",
+      "block_id": "b_19746d43",
+      "reading_order": 102,
+      "char_start": 428,
+      "char_end": 430,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_db3cb49e",
+      "text": "4",
+      "bbox": {
+        "x": 1019,
+        "y": 1130,
+        "width": 11,
+        "height": 21
+      },
+      "line_id": "l_9630c57b",
+      "block_id": "b_19746d43",
+      "reading_order": 103,
+      "char_start": 431,
+      "char_end": 432,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1baf3837",
+      "text": "68",
+      "bbox": {
+        "x": 1048,
+        "y": 1121,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_9630c57b",
+      "block_id": "b_19746d43",
+      "reading_order": 104,
+      "char_start": 433,
+      "char_end": 435,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ae9a2fca",
+      "text": "76",
+      "bbox": {
+        "x": 893,
+        "y": 1136,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_6eef9c6d",
+      "block_id": "b_19746d43",
+      "reading_order": 105,
+      "char_start": 436,
+      "char_end": 438,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e28deb92",
+      "text": "14",
+      "bbox": {
+        "x": 931,
+        "y": 1134,
+        "width": 20,
+        "height": 21
+      },
+      "line_id": "l_6eef9c6d",
+      "block_id": "b_19746d43",
+      "reading_order": 106,
+      "char_start": 439,
+      "char_end": 441,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_343ebc9c",
+      "text": "65",
+      "bbox": {
+        "x": 1131,
+        "y": 1138,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_6eef9c6d",
+      "block_id": "b_19746d43",
+      "reading_order": 107,
+      "char_start": 442,
+      "char_end": 444,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3f205cd8",
+      "text": "57",
+      "bbox": {
+        "x": 831,
+        "y": 1151,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_eae0ad16",
+      "block_id": "b_19746d43",
+      "reading_order": 108,
+      "char_start": 445,
+      "char_end": 447,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_bd4ac82e",
+      "text": "28",
+      "bbox": {
+        "x": 1071,
+        "y": 1153,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_eae0ad16",
+      "block_id": "b_19746d43",
+      "reading_order": 109,
+      "char_start": 448,
+      "char_end": 450,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_866b6c28",
+      "text": "87",
+      "bbox": {
+        "x": 1100,
+        "y": 1146,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_eae0ad16",
+      "block_id": "b_19746d43",
+      "reading_order": 110,
+      "char_start": 451,
+      "char_end": 453,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9f54e422",
+      "text": "27",
+      "bbox": {
+        "x": 868,
+        "y": 1160,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_8e60a81d",
+      "block_id": "b_19746d43",
+      "reading_order": 111,
+      "char_start": 454,
+      "char_end": 456,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_03c36238",
+      "text": "64",
+      "bbox": {
+        "x": 982,
+        "y": 1157,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_8e60a81d",
+      "block_id": "b_19746d43",
+      "reading_order": 112,
+      "char_start": 457,
+      "char_end": 459,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9a3c6d40",
+      "text": "40",
+      "bbox": {
+        "x": 1011,
+        "y": 1161,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_8e60a81d",
+      "block_id": "b_19746d43",
+      "reading_order": 113,
+      "char_start": 460,
+      "char_end": 462,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e82d2a9f",
+      "text": "17",
+      "bbox": {
+        "x": 1042,
+        "y": 1157,
+        "width": 20,
+        "height": 21
+      },
+      "line_id": "l_8e60a81d",
+      "block_id": "b_19746d43",
+      "reading_order": 114,
+      "char_start": 463,
+      "char_end": 465,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_092db112",
+      "text": "19",
+      "bbox": {
+        "x": 1136,
+        "y": 1166,
+        "width": 19,
+        "height": 21
+      },
+      "line_id": "l_8e60a81d",
+      "block_id": "b_19746d43",
+      "reading_order": 115,
+      "char_start": 466,
+      "char_end": 468,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_763de7cb",
+      "text": "7",
+      "bbox": {
+        "x": 960,
+        "y": 1170,
+        "width": 11,
+        "height": 21
+      },
+      "line_id": "l_ed4c6e84",
+      "block_id": "b_19746d43",
+      "reading_order": 116,
+      "char_start": 469,
+      "char_end": 470,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5252e339",
+      "text": "61",
+      "bbox": {
+        "x": 1103,
+        "y": 1178,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_ed4c6e84",
+      "block_id": "b_19746d43",
+      "reading_order": 117,
+      "char_start": 471,
+      "char_end": 473,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5463508c",
+      "text": "3",
+      "bbox": {
+        "x": 897,
+        "y": 1184,
+        "width": 11,
+        "height": 21
+      },
+      "line_id": "l_3348ef17",
+      "block_id": "b_19746d43",
+      "reading_order": 118,
+      "char_start": 474,
+      "char_end": 475,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1105d753",
+      "text": "102",
+      "bbox": {
+        "x": 981,
+        "y": 1190,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_3348ef17",
+      "block_id": "b_19746d43",
+      "reading_order": 119,
+      "char_start": 476,
+      "char_end": 479,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_497a2641",
+      "text": "83",
+      "bbox": {
+        "x": 1014,
+        "y": 1192,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_3348ef17",
+      "block_id": "b_19746d43",
+      "reading_order": 120,
+      "char_start": 480,
+      "char_end": 482,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_da7ddcd1",
+      "text": "25",
+      "bbox": {
+        "x": 1043,
+        "y": 1187,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_3348ef17",
+      "block_id": "b_19746d43",
+      "reading_order": 121,
+      "char_start": 483,
+      "char_end": 485,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1907bdd3",
+      "text": "24",
+      "bbox": {
+        "x": 1076,
+        "y": 1187,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_3348ef17",
+      "block_id": "b_19746d43",
+      "reading_order": 122,
+      "char_start": 486,
+      "char_end": 488,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f8623a93",
+      "text": "23",
+      "bbox": {
+        "x": 1166,
+        "y": 1182,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_3348ef17",
+      "block_id": "b_19746d43",
+      "reading_order": 123,
+      "char_start": 489,
+      "char_end": 491,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e66ebce2",
+      "text": "62",
+      "bbox": {
+        "x": 929,
+        "y": 1193,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_830bec65",
+      "block_id": "b_19746d43",
+      "reading_order": 124,
+      "char_start": 492,
+      "char_end": 494,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4a377ddb",
+      "text": "100",
+      "bbox": {
+        "x": 1130,
+        "y": 1194,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_830bec65",
+      "block_id": "b_19746d43",
+      "reading_order": 125,
+      "char_start": 495,
+      "char_end": 498,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f4f092be",
+      "text": "2",
+      "bbox": {
+        "x": 458,
+        "y": 1225,
+        "width": 11,
+        "height": 21
+      },
+      "line_id": "l_86071950",
+      "block_id": "b_19746d43",
+      "reading_order": 126,
+      "char_start": 499,
+      "char_end": 500,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0fff149c",
+      "text": "112",
+      "bbox": {
+        "x": 904,
+        "y": 1222,
+        "width": 28,
+        "height": 21
+      },
+      "line_id": "l_86071950",
+      "block_id": "b_19746d43",
+      "reading_order": 127,
+      "char_start": 501,
+      "char_end": 504,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_03fc075d",
+      "text": "113",
+      "bbox": {
+        "x": 1038,
+        "y": 1217,
+        "width": 28,
+        "height": 21
+      },
+      "line_id": "l_86071950",
+      "block_id": "b_19746d43",
+      "reading_order": 128,
+      "char_start": 505,
+      "char_end": 508,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1d824c28",
+      "text": "41",
+      "bbox": {
+        "x": 1074,
+        "y": 1217,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_86071950",
+      "block_id": "b_19746d43",
+      "reading_order": 129,
+      "char_start": 509,
+      "char_end": 511,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0965b121",
+      "text": "53",
+      "bbox": {
+        "x": 1106,
+        "y": 1216,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_86071950",
+      "block_id": "b_19746d43",
+      "reading_order": 130,
+      "char_start": 512,
+      "char_end": 514,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_fdecd03c",
+      "text": "104",
+      "bbox": {
+        "x": 1133,
+        "y": 1224,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_86071950",
+      "block_id": "b_19746d43",
+      "reading_order": 131,
+      "char_start": 515,
+      "char_end": 518,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_56100384",
+      "text": "93",
+      "bbox": {
+        "x": 1172,
+        "y": 1217,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_86071950",
+      "block_id": "b_19746d43",
+      "reading_order": 132,
+      "char_start": 519,
+      "char_end": 521,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9555af3b",
+      "text": "31",
+      "bbox": {
+        "x": 427,
+        "y": 1247,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_22ce2db1",
+      "block_id": "b_19746d43",
+      "reading_order": 133,
+      "char_start": 522,
+      "char_end": 524,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_39e65312",
+      "text": "97",
+      "bbox": {
+        "x": 1062,
+        "y": 1246,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_22ce2db1",
+      "block_id": "b_19746d43",
+      "reading_order": 134,
+      "char_start": 525,
+      "char_end": 527,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_054b205b",
+      "text": "94",
+      "bbox": {
+        "x": 1185,
+        "y": 1252,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_22ce2db1",
+      "block_id": "b_19746d43",
+      "reading_order": 135,
+      "char_start": 528,
+      "char_end": 530,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_dc4612cc",
+      "text": "6",
+      "bbox": {
+        "x": 405,
+        "y": 1257,
+        "width": 11,
+        "height": 21
+      },
+      "line_id": "l_6ecdc0a5",
+      "block_id": "b_19746d43",
+      "reading_order": 136,
+      "char_start": 531,
+      "char_end": 532,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f4f8daaa",
+      "text": "15",
+      "bbox": {
+        "x": 1153,
+        "y": 1257,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_6ecdc0a5",
+      "block_id": "b_19746d43",
+      "reading_order": 137,
+      "char_start": 533,
+      "char_end": 535,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9cf5d111",
+      "text": "77",
+      "bbox": {
+        "x": 597,
+        "y": 1272,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_5fca646e",
+      "block_id": "b_19746d43",
+      "reading_order": 138,
+      "char_start": 536,
+      "char_end": 538,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b9c568fc",
+      "text": "90",
+      "bbox": {
+        "x": 841,
+        "y": 1277,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_5fca646e",
+      "block_id": "b_19746d43",
+      "reading_order": 139,
+      "char_start": 539,
+      "char_end": 541,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_91036eab",
+      "text": "49",
+      "bbox": {
+        "x": 883,
+        "y": 1282,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_5fca646e",
+      "block_id": "b_19746d43",
+      "reading_order": 140,
+      "char_start": 542,
+      "char_end": 544,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9ac3f1de",
+      "text": "35",
+      "bbox": {
+        "x": 939,
+        "y": 1277,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_5fca646e",
+      "block_id": "b_19746d43",
+      "reading_order": 141,
+      "char_start": 545,
+      "char_end": 547,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1aace0de",
+      "text": "20",
+      "bbox": {
+        "x": 328,
+        "y": 1291,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_d90deade",
+      "block_id": "b_19746d43",
+      "reading_order": 142,
+      "char_start": 548,
+      "char_end": 550,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9433dc0d",
+      "text": "96",
+      "bbox": {
+        "x": 1030,
+        "y": 1297,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_d90deade",
+      "block_id": "b_19746d43",
+      "reading_order": 143,
+      "char_start": 551,
+      "char_end": 553,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_28c2c237",
+      "text": "109",
+      "bbox": {
+        "x": 1183,
+        "y": 1294,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_d90deade",
+      "block_id": "b_19746d43",
+      "reading_order": 144,
+      "char_start": 554,
+      "char_end": 557,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b6d0b881",
+      "text": "46",
+      "bbox": {
+        "x": 398,
+        "y": 1302,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_71f4c597",
+      "block_id": "b_19746d43",
+      "reading_order": 145,
+      "char_start": 558,
+      "char_end": 560,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a12bd9b6",
+      "text": "74",
+      "bbox": {
+        "x": 482,
+        "y": 1307,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_71f4c597",
+      "block_id": "b_19746d43",
+      "reading_order": 146,
+      "char_start": 561,
+      "char_end": 563,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_094798e0",
+      "text": "10",
+      "bbox": {
+        "x": 811,
+        "y": 1314,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_be919f45",
+      "block_id": "b_19746d43",
+      "reading_order": 147,
+      "char_start": 564,
+      "char_end": 566,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_be94e16b",
+      "text": "39",
+      "bbox": {
+        "x": 1060,
+        "y": 1324,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_be919f45",
+      "block_id": "b_19746d43",
+      "reading_order": 148,
+      "char_start": 567,
+      "char_end": 569,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_348444a7",
+      "text": "110",
+      "bbox": {
+        "x": 1213,
+        "y": 1315,
+        "width": 29,
+        "height": 21
+      },
+      "line_id": "l_be919f45",
+      "block_id": "b_19746d43",
+      "reading_order": 149,
+      "char_start": 570,
+      "char_end": 573,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1d620d72",
+      "text": "21",
+      "bbox": {
+        "x": 1096,
+        "y": 1337,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_7a8edcfc",
+      "block_id": "b_19746d43",
+      "reading_order": 150,
+      "char_start": 574,
+      "char_end": 576,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7962ec0b",
+      "text": "5455",
+      "bbox": {
+        "x": 415,
+        "y": 1374,
+        "width": 50,
+        "height": 21
+      },
+      "line_id": "l_3df8662c",
+      "block_id": "b_19746d43",
+      "reading_order": 151,
+      "char_start": 577,
+      "char_end": 581,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d8bb328a",
+      "text": "66",
+      "bbox": {
+        "x": 908,
+        "y": 1379,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_3df8662c",
+      "block_id": "b_19746d43",
+      "reading_order": 152,
+      "char_start": 582,
+      "char_end": 584,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_63e87913",
+      "text": "51",
+      "bbox": {
+        "x": 801,
+        "y": 1449,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_8f8d6352",
+      "block_id": "b_19746d43",
+      "reading_order": 153,
+      "char_start": 585,
+      "char_end": 587,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_10f956ba",
+      "text": "50",
+      "bbox": {
+        "x": 564,
+        "y": 1477,
+        "width": 21,
+        "height": 21
+      },
+      "line_id": "l_8e23b365",
+      "block_id": "b_19746d43",
+      "reading_order": 154,
+      "char_start": 588,
+      "char_end": 590,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_68c52523",
+      "text": "1",
+      "bbox": {
+        "x": 471,
+        "y": 1504,
+        "width": 11,
+        "height": 21
+      },
+      "line_id": "l_b8edba65",
+      "block_id": "b_19746d43",
+      "reading_order": 155,
+      "char_start": 591,
+      "char_end": 592,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6bd85e19",
+      "text": "Waste",
+      "bbox": {
+        "x": 463,
+        "y": 1849,
+        "width": 45,
+        "height": 15
+      },
+      "line_id": "l_9e48ed6a",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 156,
+      "char_start": 594,
+      "char_end": 599,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a1f0f325",
+      "text": "Management",
+      "bbox": {
+        "x": 512,
+        "y": 1849,
+        "width": 95,
+        "height": 15
+      },
+      "line_id": "l_9e48ed6a",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 157,
+      "char_start": 600,
+      "char_end": 610,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e036d6d6",
+      "text": "and",
+      "bbox": {
+        "x": 611,
+        "y": 1849,
+        "width": 27,
+        "height": 15
+      },
+      "line_id": "l_9e48ed6a",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 158,
+      "char_start": 611,
+      "char_end": 614,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_07badc36",
+      "text": "Green",
+      "bbox": {
+        "x": 787,
+        "y": 1856,
+        "width": 44,
+        "height": 15
+      },
+      "line_id": "l_9e48ed6a",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 159,
+      "char_start": 615,
+      "char_end": 620,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_793741ea",
+      "text": "Buildings",
+      "bbox": {
+        "x": 835,
+        "y": 1856,
+        "width": 67,
+        "height": 15
+      },
+      "line_id": "l_9e48ed6a",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 160,
+      "char_start": 621,
+      "char_end": 630,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d7b814a5",
+      "text": "Water",
+      "bbox": {
+        "x": 1078,
+        "y": 1849,
+        "width": 43,
+        "height": 15
+      },
+      "line_id": "l_9e48ed6a",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 161,
+      "char_start": 631,
+      "char_end": 636,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0010fa87",
+      "text": "and",
+      "bbox": {
+        "x": 1125,
+        "y": 1849,
+        "width": 27,
+        "height": 15
+      },
+      "line_id": "l_9e48ed6a",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 162,
+      "char_start": 637,
+      "char_end": 640,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_58361a80",
+      "text": "Wastewater",
+      "bbox": {
+        "x": 1156,
+        "y": 1849,
+        "width": 86,
+        "height": 15
+      },
+      "line_id": "l_9e48ed6a",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 163,
+      "char_start": 641,
+      "char_end": 651,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ed13d5e5",
+      "text": "Resource",
+      "bbox": {
+        "x": 463,
+        "y": 1867,
+        "width": 69,
+        "height": 15
+      },
+      "line_id": "l_4ecd449d",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 164,
+      "char_start": 652,
+      "char_end": 660,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_00ee5f59",
+      "text": "Recovery",
+      "bbox": {
+        "x": 536,
+        "y": 1867,
+        "width": 68,
+        "height": 15
+      },
+      "line_id": "l_4ecd449d",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 165,
+      "char_start": 661,
+      "char_end": 669,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6ced5c9a",
+      "text": "Management",
+      "bbox": {
+        "x": 1078,
+        "y": 1867,
+        "width": 95,
+        "height": 15
+      },
+      "line_id": "l_4ecd449d",
+      "block_id": "b_22cd3fd5",
+      "reading_order": 166,
+      "char_start": 670,
+      "char_end": 680,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_93d531ac",
+      "text": "Energy",
+      "bbox": {
+        "x": 460,
+        "y": 2060,
+        "width": 50,
+        "height": 15
+      },
+      "line_id": "l_ace9841e",
+      "block_id": "b_8ee27360",
+      "reading_order": 167,
+      "char_start": 682,
+      "char_end": 688,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1d531038",
+      "text": "Efficiency",
+      "bbox": {
+        "x": 515,
+        "y": 2060,
+        "width": 71,
+        "height": 15
+      },
+      "line_id": "l_ace9841e",
+      "block_id": "b_8ee27360",
+      "reading_order": 168,
+      "char_start": 689,
+      "char_end": 699,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_aee77085",
+      "text": "and",
+      "bbox": {
+        "x": 590,
+        "y": 2060,
+        "width": 27,
+        "height": 15
+      },
+      "line_id": "l_ace9841e",
+      "block_id": "b_8ee27360",
+      "reading_order": 169,
+      "char_start": 700,
+      "char_end": 703,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d046c1e1",
+      "text": "Pollution",
+      "bbox": {
+        "x": 789,
+        "y": 2060,
+        "width": 64,
+        "height": 15
+      },
+      "line_id": "l_ace9841e",
+      "block_id": "b_8ee27360",
+      "reading_order": 170,
+      "char_start": 704,
+      "char_end": 713,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3099193d",
+      "text": "Prevention",
+      "bbox": {
+        "x": 856,
+        "y": 2060,
+        "width": 78,
+        "height": 15
+      },
+      "line_id": "l_ace9841e",
+      "block_id": "b_8ee27360",
+      "reading_order": 171,
+      "char_start": 714,
+      "char_end": 724,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_dbb2989b",
+      "text": "Climate",
+      "bbox": {
+        "x": 1079,
+        "y": 2060,
+        "width": 55,
+        "height": 15
+      },
+      "line_id": "l_ace9841e",
+      "block_id": "b_8ee27360",
+      "reading_order": 172,
+      "char_start": 725,
+      "char_end": 732,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1c970ecd",
+      "text": "Change",
+      "bbox": {
+        "x": 1139,
+        "y": 2060,
+        "width": 56,
+        "height": 15
+      },
+      "line_id": "l_ace9841e",
+      "block_id": "b_8ee27360",
+      "reading_order": 173,
+      "char_start": 733,
+      "char_end": 739,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_42bc540f",
+      "text": "Conservation",
+      "bbox": {
+        "x": 460,
+        "y": 2079,
+        "width": 96,
+        "height": 15
+      },
+      "line_id": "l_881147e2",
+      "block_id": "b_8ee27360",
+      "reading_order": 174,
+      "char_start": 740,
+      "char_end": 752,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8557bcaf",
+      "text": "and",
+      "bbox": {
+        "x": 789,
+        "y": 2079,
+        "width": 27,
+        "height": 15
+      },
+      "line_id": "l_881147e2",
+      "block_id": "b_8ee27360",
+      "reading_order": 175,
+      "char_start": 753,
+      "char_end": 756,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1aff5d69",
+      "text": "Control",
+      "bbox": {
+        "x": 820,
+        "y": 2079,
+        "width": 54,
+        "height": 15
+      },
+      "line_id": "l_881147e2",
+      "block_id": "b_8ee27360",
+      "reading_order": 176,
+      "char_start": 757,
+      "char_end": 764,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_48c72c1e",
+      "text": "Adaptation",
+      "bbox": {
+        "x": 1079,
+        "y": 2079,
+        "width": 79,
+        "height": 15
+      },
+      "line_id": "l_881147e2",
+      "block_id": "b_8ee27360",
+      "reading_order": 177,
+      "char_start": 765,
+      "char_end": 775,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_15ef6db8",
+      "text": "15",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 28,
+        "height": 25
+      },
+      "line_id": "l_326daa77",
+      "block_id": "b_d6fdf48c",
+      "reading_order": 178,
+      "char_start": 777,
+      "char_end": 779,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_fcb4bf50",
+      "text": "Green",
+      "bbox": {
+        "x": 275,
+        "y": 2256,
+        "width": 63,
+        "height": 25
+      },
+      "line_id": "l_326daa77",
+      "block_id": "b_d6fdf48c",
+      "reading_order": 179,
+      "char_start": 780,
+      "char_end": 785,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_125eb03c",
+      "text": "Bond",
+      "bbox": {
+        "x": 343,
+        "y": 2256,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_326daa77",
+      "block_id": "b_d6fdf48c",
+      "reading_order": 180,
+      "char_start": 786,
+      "char_end": 790,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d0037c12",
+      "text": "Report",
+      "bbox": {
+        "x": 404,
+        "y": 2256,
+        "width": 71,
+        "height": 25
+      },
+      "line_id": "l_326daa77",
+      "block_id": "b_d6fdf48c",
+      "reading_order": 181,
+      "char_start": 791,
+      "char_end": 797,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e06e109e",
+      "text": "2025",
+      "bbox": {
+        "x": 480,
+        "y": 2256,
+        "width": 51,
+        "height": 25
+      },
+      "line_id": "l_326daa77",
+      "block_id": "b_d6fdf48c",
+      "reading_order": 182,
+      "char_start": 798,
+      "char_end": 802,
+      "layer_id": "pdf_text"
+    }
+  ],
+  "lines": [
+    {
+      "line_id": "l_5021ece6",
+      "bbox": {
+        "x": 194,
+        "y": 134,
+        "width": 348,
+        "height": 53
+      },
+      "block_id": "b_30df4378",
+      "word_ids": [
+        "w_94b9ccff",
+        "w_7cb98595"
+      ],
+      "text": "Green Projects",
+      "char_start": 0,
+      "char_end": 14,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_0ca62156",
+      "bbox": {
+        "x": 194,
+        "y": 251,
+        "width": 155,
+        "height": 36
+      },
+      "block_id": "b_30df4378",
+      "word_ids": [
+        "w_267c81d4"
+      ],
+      "text": "Overview",
+      "char_start": 15,
+      "char_end": 23,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_1803959f",
+      "bbox": {
+        "x": 194,
+        "y": 362,
+        "width": 1246,
+        "height": 25
+      },
+      "block_id": "b_30df4378",
+      "word_ids": [
+        "w_6bf3c94e",
+        "w_e298c3f9",
+        "w_5fba1a26",
+        "w_7b820446",
+        "w_085a06c5",
+        "w_650bce4d",
+        "w_f256a35c",
+        "w_b1a32548",
+        "w_9a7a741c",
+        "w_4bf34222",
+        "w_99b1e3e7",
+        "w_bfc93107",
+        "w_3f34a9a3",
+        "w_341f6d1e",
+        "w_cbface75",
+        "w_ed703536",
+        "w_7361fa36",
+        "w_ca4e1e59",
+        "w_27756824"
+      ],
+      "text": "As of 31 August 2025, the following 116 projects under six eligible categories have been included in the GSBP.",
+      "char_start": 24,
+      "char_end": 134,
+      "reading_order": 2
+    },
+    {
+      "line_id": "l_4b1ad50d",
+      "bbox": {
+        "x": 194,
+        "y": 399,
+        "width": 1066,
+        "height": 25
+      },
+      "block_id": "b_30df4378",
+      "word_ids": [
+        "w_ad0a27ce",
+        "w_e2f55b4f",
+        "w_7446c7fd",
+        "w_fa269c43",
+        "w_19432ca1",
+        "w_b34cde34",
+        "w_8ca03c63",
+        "w_58809125",
+        "w_64759f6c",
+        "w_95fee482",
+        "w_713140ab",
+        "w_cb618df8",
+        "w_f8b79da5",
+        "w_3322cecf",
+        "w_ddc1e5eb",
+        "w_6aa8a26b",
+        "w_13703dc8"
+      ],
+      "text": "Details of all the projects including their major expected impacts can be found in Appendix A .",
+      "char_start": 135,
+      "char_end": 230,
+      "reading_order": 3
+    },
+    {
+      "line_id": "l_06044467",
+      "bbox": {
+        "x": 889,
+        "y": 578,
+        "width": 11,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_624da4ef"
+      ],
+      "text": "8",
+      "char_start": 232,
+      "char_end": 233,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_6925f50f",
+      "bbox": {
+        "x": 919,
+        "y": 595,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_5cec217b"
+      ],
+      "text": "43",
+      "char_start": 234,
+      "char_end": 236,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_c9241ae6",
+      "bbox": {
+        "x": 941,
+        "y": 619,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_02daddf7"
+      ],
+      "text": "58",
+      "char_start": 237,
+      "char_end": 239,
+      "reading_order": 2
+    },
+    {
+      "line_id": "l_c714b50f",
+      "bbox": {
+        "x": 901,
+        "y": 635,
+        "width": 93,
+        "height": 24
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_d0a687cf",
+        "w_0e65bb6b"
+      ],
+      "text": "33 75",
+      "char_start": 240,
+      "char_end": 245,
+      "reading_order": 3
+    },
+    {
+      "line_id": "l_288e7dfe",
+      "bbox": {
+        "x": 946,
+        "y": 663,
+        "width": 202,
+        "height": 27
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_6fbb4a46",
+        "w_221c82bf"
+      ],
+      "text": "116 13",
+      "char_start": 246,
+      "char_end": 252,
+      "reading_order": 4
+    },
+    {
+      "line_id": "l_758dc57a",
+      "bbox": {
+        "x": 910,
+        "y": 675,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_f8246b3f"
+      ],
+      "text": "34",
+      "char_start": 253,
+      "char_end": 255,
+      "reading_order": 5
+    },
+    {
+      "line_id": "l_18622c1c",
+      "bbox": {
+        "x": 945,
+        "y": 698,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_7396ff62"
+      ],
+      "text": "38",
+      "char_start": 256,
+      "char_end": 258,
+      "reading_order": 6
+    },
+    {
+      "line_id": "l_82411561",
+      "bbox": {
+        "x": 718,
+        "y": 715,
+        "width": 196,
+        "height": 25
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_faf15be3",
+        "w_56e27eae"
+      ],
+      "text": "80 82",
+      "char_start": 259,
+      "char_end": 264,
+      "reading_order": 7
+    },
+    {
+      "line_id": "l_ca5da1da",
+      "bbox": {
+        "x": 569,
+        "y": 764,
+        "width": 11,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_48555574"
+      ],
+      "text": "5",
+      "char_start": 265,
+      "char_end": 266,
+      "reading_order": 8
+    },
+    {
+      "line_id": "l_c5d7b648",
+      "bbox": {
+        "x": 526,
+        "y": 778,
+        "width": 519,
+        "height": 26
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_352a154f",
+        "w_56d8d844"
+      ],
+      "text": "30 105",
+      "char_start": 267,
+      "char_end": 273,
+      "reading_order": 9
+    },
+    {
+      "line_id": "l_7addb28e",
+      "bbox": {
+        "x": 595,
+        "y": 792,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_01aa1242"
+      ],
+      "text": "52",
+      "char_start": 274,
+      "char_end": 276,
+      "reading_order": 10
+    },
+    {
+      "line_id": "l_bcfc2023",
+      "bbox": {
+        "x": 523,
+        "y": 805,
+        "width": 477,
+        "height": 30
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_ded76bf1",
+        "w_587894d0"
+      ],
+      "text": "114 91",
+      "char_start": 277,
+      "char_end": 283,
+      "reading_order": 11
+    },
+    {
+      "line_id": "l_99783697",
+      "bbox": {
+        "x": 561,
+        "y": 824,
+        "width": 397,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_97eee6ee",
+        "w_38b7ad3f",
+        "w_128af8e5",
+        "w_9b38a05d"
+      ],
+      "text": "115 111 36 42",
+      "char_start": 284,
+      "char_end": 297,
+      "reading_order": 12
+    },
+    {
+      "line_id": "l_80da383f",
+      "bbox": {
+        "x": 511,
+        "y": 850,
+        "width": 294,
+        "height": 24
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_cd329f55",
+        "w_1b9e817b"
+      ],
+      "text": "92 70",
+      "char_start": 298,
+      "char_end": 303,
+      "reading_order": 13
+    },
+    {
+      "line_id": "l_c500da13",
+      "bbox": {
+        "x": 540,
+        "y": 879,
+        "width": 758,
+        "height": 23
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_27de490d",
+        "w_5938f8a7"
+      ],
+      "text": "84 47",
+      "char_start": 304,
+      "char_end": 309,
+      "reading_order": 14
+    },
+    {
+      "line_id": "l_304b10ac",
+      "bbox": {
+        "x": 669,
+        "y": 891,
+        "width": 297,
+        "height": 26
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_75375076",
+        "w_e39716c1",
+        "w_1fd48a36"
+      ],
+      "text": "72 44 73",
+      "char_start": 310,
+      "char_end": 318,
+      "reading_order": 15
+    },
+    {
+      "line_id": "l_5ff47ef4",
+      "bbox": {
+        "x": 504,
+        "y": 913,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_e98c703d"
+      ],
+      "text": "79",
+      "char_start": 319,
+      "char_end": 321,
+      "reading_order": 16
+    },
+    {
+      "line_id": "l_a1c441a1",
+      "bbox": {
+        "x": 1001,
+        "y": 932,
+        "width": 104,
+        "height": 27
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_a0397ded",
+        "w_ad440413"
+      ],
+      "text": "24 99",
+      "char_start": 322,
+      "char_end": 327,
+      "reading_order": 17
+    },
+    {
+      "line_id": "l_5285bac1",
+      "bbox": {
+        "x": 1298,
+        "y": 944,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_a532cf07"
+      ],
+      "text": "78",
+      "char_start": 328,
+      "char_end": 330,
+      "reading_order": 18
+    },
+    {
+      "line_id": "l_9a056ee5",
+      "bbox": {
+        "x": 949,
+        "y": 955,
+        "width": 338,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_16979509",
+        "w_ad72c00b"
+      ],
+      "text": "45 86",
+      "char_start": 331,
+      "char_end": 336,
+      "reading_order": 19
+    },
+    {
+      "line_id": "l_4a63af58",
+      "bbox": {
+        "x": 478,
+        "y": 967,
+        "width": 875,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_b0a1758e",
+        "w_a13c54ca",
+        "w_aeb4d0b8",
+        "w_58bdfa1d"
+      ],
+      "text": "37 48 69 106",
+      "char_start": 337,
+      "char_end": 349,
+      "reading_order": 20
+    },
+    {
+      "line_id": "l_a73a7e32",
+      "bbox": {
+        "x": 983,
+        "y": 981,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_344bc33d"
+      ],
+      "text": "32",
+      "char_start": 350,
+      "char_end": 352,
+      "reading_order": 21
+    },
+    {
+      "line_id": "l_cff57b9e",
+      "bbox": {
+        "x": 951,
+        "y": 999,
+        "width": 215,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_f15ad1fe",
+        "w_33d2db2d",
+        "w_00ca684e"
+      ],
+      "text": "89 103 24",
+      "char_start": 353,
+      "char_end": 362,
+      "reading_order": 22
+    },
+    {
+      "line_id": "l_e6a8cac9",
+      "bbox": {
+        "x": 915,
+        "y": 1021,
+        "width": 156,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_2f7652d6",
+        "w_66cba16e",
+        "w_ac2420dd"
+      ],
+      "text": "67 59 107",
+      "char_start": 363,
+      "char_end": 372,
+      "reading_order": 23
+    },
+    {
+      "line_id": "l_d56b26a6",
+      "bbox": {
+        "x": 727,
+        "y": 1038,
+        "width": 162,
+        "height": 25
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_3cbcad5d",
+        "w_842e8a82"
+      ],
+      "text": "101 29",
+      "char_start": 373,
+      "char_end": 379,
+      "reading_order": 24
+    },
+    {
+      "line_id": "l_6d51efc7",
+      "bbox": {
+        "x": 772,
+        "y": 1049,
+        "width": 262,
+        "height": 30
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_210d1740",
+        "w_8eb0ec7c",
+        "w_e2f139fb",
+        "w_0b5329b6"
+      ],
+      "text": "18 12 26 16",
+      "char_start": 380,
+      "char_end": 391,
+      "reading_order": 25
+    },
+    {
+      "line_id": "l_d6b1afe1",
+      "bbox": {
+        "x": 819,
+        "y": 1077,
+        "width": 67,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_4573c85a",
+        "w_c992e173"
+      ],
+      "text": "81 71",
+      "char_start": 392,
+      "char_end": 397,
+      "reading_order": 26
+    },
+    {
+      "line_id": "l_1a78e601",
+      "bbox": {
+        "x": 791,
+        "y": 1093,
+        "width": 267,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_1092f573",
+        "w_59cde24c",
+        "w_dd65b775",
+        "w_c602d916",
+        "w_f971cb20"
+      ],
+      "text": "22 98 95 11 85",
+      "char_start": 398,
+      "char_end": 412,
+      "reading_order": 27
+    },
+    {
+      "line_id": "l_8ab448eb",
+      "bbox": {
+        "x": 742,
+        "y": 1108,
+        "width": 363,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_eeae1e5c",
+        "w_98c70db6",
+        "w_557e27be"
+      ],
+      "text": "88 56 108",
+      "char_start": 413,
+      "char_end": 422,
+      "reading_order": 28
+    },
+    {
+      "line_id": "l_9630c57b",
+      "bbox": {
+        "x": 812,
+        "y": 1121,
+        "width": 257,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_25a9ce1f",
+        "w_402b1943",
+        "w_6aa9d6d2",
+        "w_db3cb49e",
+        "w_1baf3837"
+      ],
+      "text": "9 60 63 4 68",
+      "char_start": 423,
+      "char_end": 435,
+      "reading_order": 29
+    },
+    {
+      "line_id": "l_6eef9c6d",
+      "bbox": {
+        "x": 893,
+        "y": 1134,
+        "width": 259,
+        "height": 25
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_ae9a2fca",
+        "w_e28deb92",
+        "w_343ebc9c"
+      ],
+      "text": "76 14 65",
+      "char_start": 436,
+      "char_end": 444,
+      "reading_order": 30
+    },
+    {
+      "line_id": "l_eae0ad16",
+      "bbox": {
+        "x": 831,
+        "y": 1146,
+        "width": 290,
+        "height": 28
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_3f205cd8",
+        "w_bd4ac82e",
+        "w_866b6c28"
+      ],
+      "text": "57 28 87",
+      "char_start": 445,
+      "char_end": 453,
+      "reading_order": 31
+    },
+    {
+      "line_id": "l_8e60a81d",
+      "bbox": {
+        "x": 868,
+        "y": 1157,
+        "width": 287,
+        "height": 30
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_9f54e422",
+        "w_03c36238",
+        "w_9a3c6d40",
+        "w_e82d2a9f",
+        "w_092db112"
+      ],
+      "text": "27 64 40 17 19",
+      "char_start": 454,
+      "char_end": 468,
+      "reading_order": 32
+    },
+    {
+      "line_id": "l_ed4c6e84",
+      "bbox": {
+        "x": 960,
+        "y": 1170,
+        "width": 164,
+        "height": 29
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_763de7cb",
+        "w_5252e339"
+      ],
+      "text": "7 61",
+      "char_start": 469,
+      "char_end": 473,
+      "reading_order": 33
+    },
+    {
+      "line_id": "l_3348ef17",
+      "bbox": {
+        "x": 897,
+        "y": 1182,
+        "width": 290,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_5463508c",
+        "w_1105d753",
+        "w_497a2641",
+        "w_da7ddcd1",
+        "w_1907bdd3",
+        "w_f8623a93"
+      ],
+      "text": "3 102 83 25 24 23",
+      "char_start": 474,
+      "char_end": 491,
+      "reading_order": 34
+    },
+    {
+      "line_id": "l_830bec65",
+      "bbox": {
+        "x": 929,
+        "y": 1193,
+        "width": 230,
+        "height": 22
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_e66ebce2",
+        "w_4a377ddb"
+      ],
+      "text": "62 100",
+      "char_start": 492,
+      "char_end": 498,
+      "reading_order": 35
+    },
+    {
+      "line_id": "l_86071950",
+      "bbox": {
+        "x": 458,
+        "y": 1216,
+        "width": 735,
+        "height": 30
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_f4f092be",
+        "w_0fff149c",
+        "w_03fc075d",
+        "w_1d824c28",
+        "w_0965b121",
+        "w_fdecd03c",
+        "w_56100384"
+      ],
+      "text": "2 112 113 41 53 104 93",
+      "char_start": 499,
+      "char_end": 521,
+      "reading_order": 36
+    },
+    {
+      "line_id": "l_22ce2db1",
+      "bbox": {
+        "x": 427,
+        "y": 1246,
+        "width": 779,
+        "height": 27
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_9555af3b",
+        "w_39e65312",
+        "w_054b205b"
+      ],
+      "text": "31 97 94",
+      "char_start": 522,
+      "char_end": 530,
+      "reading_order": 37
+    },
+    {
+      "line_id": "l_6ecdc0a5",
+      "bbox": {
+        "x": 405,
+        "y": 1257,
+        "width": 769,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_dc4612cc",
+        "w_f4f8daaa"
+      ],
+      "text": "6 15",
+      "char_start": 531,
+      "char_end": 535,
+      "reading_order": 38
+    },
+    {
+      "line_id": "l_5fca646e",
+      "bbox": {
+        "x": 597,
+        "y": 1272,
+        "width": 363,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_9cf5d111",
+        "w_b9c568fc",
+        "w_91036eab",
+        "w_9ac3f1de"
+      ],
+      "text": "77 90 49 35",
+      "char_start": 536,
+      "char_end": 547,
+      "reading_order": 39
+    },
+    {
+      "line_id": "l_d90deade",
+      "bbox": {
+        "x": 328,
+        "y": 1291,
+        "width": 884,
+        "height": 27
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_1aace0de",
+        "w_9433dc0d",
+        "w_28c2c237"
+      ],
+      "text": "20 96 109",
+      "char_start": 548,
+      "char_end": 557,
+      "reading_order": 40
+    },
+    {
+      "line_id": "l_71f4c597",
+      "bbox": {
+        "x": 398,
+        "y": 1302,
+        "width": 105,
+        "height": 26
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_b6d0b881",
+        "w_a12bd9b6"
+      ],
+      "text": "46 74",
+      "char_start": 558,
+      "char_end": 563,
+      "reading_order": 41
+    },
+    {
+      "line_id": "l_be919f45",
+      "bbox": {
+        "x": 811,
+        "y": 1314,
+        "width": 431,
+        "height": 31
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_094798e0",
+        "w_be94e16b",
+        "w_348444a7"
+      ],
+      "text": "10 39 110",
+      "char_start": 564,
+      "char_end": 573,
+      "reading_order": 42
+    },
+    {
+      "line_id": "l_7a8edcfc",
+      "bbox": {
+        "x": 1096,
+        "y": 1337,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_1d620d72"
+      ],
+      "text": "21",
+      "char_start": 574,
+      "char_end": 576,
+      "reading_order": 43
+    },
+    {
+      "line_id": "l_3df8662c",
+      "bbox": {
+        "x": 415,
+        "y": 1374,
+        "width": 514,
+        "height": 26
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_7962ec0b",
+        "w_d8bb328a"
+      ],
+      "text": "5455 66",
+      "char_start": 577,
+      "char_end": 584,
+      "reading_order": 44
+    },
+    {
+      "line_id": "l_8f8d6352",
+      "bbox": {
+        "x": 801,
+        "y": 1449,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_63e87913"
+      ],
+      "text": "51",
+      "char_start": 585,
+      "char_end": 587,
+      "reading_order": 45
+    },
+    {
+      "line_id": "l_8e23b365",
+      "bbox": {
+        "x": 564,
+        "y": 1477,
+        "width": 21,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_10f956ba"
+      ],
+      "text": "50",
+      "char_start": 588,
+      "char_end": 590,
+      "reading_order": 46
+    },
+    {
+      "line_id": "l_b8edba65",
+      "bbox": {
+        "x": 471,
+        "y": 1504,
+        "width": 11,
+        "height": 21
+      },
+      "block_id": "b_19746d43",
+      "word_ids": [
+        "w_68c52523"
+      ],
+      "text": "1",
+      "char_start": 591,
+      "char_end": 592,
+      "reading_order": 47
+    },
+    {
+      "line_id": "l_9e48ed6a",
+      "bbox": {
+        "x": 463,
+        "y": 1849,
+        "width": 779,
+        "height": 22
+      },
+      "block_id": "b_22cd3fd5",
+      "word_ids": [
+        "w_6bd85e19",
+        "w_a1f0f325",
+        "w_e036d6d6",
+        "w_07badc36",
+        "w_793741ea",
+        "w_d7b814a5",
+        "w_0010fa87",
+        "w_58361a80"
+      ],
+      "text": "Waste Management and Green Buildings Water and Wastewater",
+      "char_start": 594,
+      "char_end": 651,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_4ecd449d",
+      "bbox": {
+        "x": 463,
+        "y": 1867,
+        "width": 710,
+        "height": 15
+      },
+      "block_id": "b_22cd3fd5",
+      "word_ids": [
+        "w_ed13d5e5",
+        "w_00ee5f59",
+        "w_6ced5c9a"
+      ],
+      "text": "Resource Recovery Management",
+      "char_start": 652,
+      "char_end": 680,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_ace9841e",
+      "bbox": {
+        "x": 460,
+        "y": 2060,
+        "width": 735,
+        "height": 15
+      },
+      "block_id": "b_8ee27360",
+      "word_ids": [
+        "w_93d531ac",
+        "w_1d531038",
+        "w_aee77085",
+        "w_d046c1e1",
+        "w_3099193d",
+        "w_dbb2989b",
+        "w_1c970ecd"
+      ],
+      "text": "Energy Efficiency and Pollution Prevention Climate Change",
+      "char_start": 682,
+      "char_end": 739,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_881147e2",
+      "bbox": {
+        "x": 460,
+        "y": 2079,
+        "width": 698,
+        "height": 15
+      },
+      "block_id": "b_8ee27360",
+      "word_ids": [
+        "w_42bc540f",
+        "w_8557bcaf",
+        "w_1aff5d69",
+        "w_48c72c1e"
+      ],
+      "text": "Conservation and Control Adaptation",
+      "char_start": 740,
+      "char_end": 775,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_326daa77",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 337,
+        "height": 25
+      },
+      "block_id": "b_d6fdf48c",
+      "word_ids": [
+        "w_15ef6db8",
+        "w_fcb4bf50",
+        "w_125eb03c",
+        "w_d0037c12",
+        "w_e06e109e"
+      ],
+      "text": "15 Green Bond Report 2025",
+      "char_start": 777,
+      "char_end": 802,
+      "reading_order": 0
+    }
+  ],
+  "blocks": [
+    {
+      "block_id": "b_30df4378",
+      "bbox": {
+        "x": 194,
+        "y": 134,
+        "width": 1246,
+        "height": 290
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_5021ece6",
+        "l_0ca62156",
+        "l_1803959f",
+        "l_4b1ad50d"
+      ],
+      "text": "Green Projects\nOverview\nAs of 31 August 2025, the following 116 projects under six eligible categories have been included in the GSBP.\nDetails of all the projects including their major expected impacts can be found in Appendix A .",
+      "char_start": 0,
+      "char_end": 230,
+      "reading_order": 0
+    },
+    {
+      "block_id": "b_19746d43",
+      "bbox": {
+        "x": 328,
+        "y": 578,
+        "width": 1025,
+        "height": 947
+      },
+      "block_type": "list_item",
+      "line_ids": [
+        "l_06044467",
+        "l_6925f50f",
+        "l_c9241ae6",
+        "l_c714b50f",
+        "l_288e7dfe",
+        "l_758dc57a",
+        "l_18622c1c",
+        "l_82411561",
+        "l_ca5da1da",
+        "l_c5d7b648",
+        "l_7addb28e",
+        "l_bcfc2023",
+        "l_99783697",
+        "l_80da383f",
+        "l_c500da13",
+        "l_304b10ac",
+        "l_5ff47ef4",
+        "l_a1c441a1",
+        "l_5285bac1",
+        "l_9a056ee5",
+        "l_4a63af58",
+        "l_a73a7e32",
+        "l_cff57b9e",
+        "l_e6a8cac9",
+        "l_d56b26a6",
+        "l_6d51efc7",
+        "l_d6b1afe1",
+        "l_1a78e601",
+        "l_8ab448eb",
+        "l_9630c57b",
+        "l_6eef9c6d",
+        "l_eae0ad16",
+        "l_8e60a81d",
+        "l_ed4c6e84",
+        "l_3348ef17",
+        "l_830bec65",
+        "l_86071950",
+        "l_22ce2db1",
+        "l_6ecdc0a5",
+        "l_5fca646e",
+        "l_d90deade",
+        "l_71f4c597",
+        "l_be919f45",
+        "l_7a8edcfc",
+        "l_3df8662c",
+        "l_8f8d6352",
+        "l_8e23b365",
+        "l_b8edba65"
+      ],
+      "text": "8\n43\n58\n33 75\n116 13\n34\n38\n80 82\n5\n30 105\n52\n114 91\n115 111 36 42\n92 70\n84 47\n72 44 73\n79\n24 99\n78\n45 86\n37 48 69 106\n32\n89 103 24\n67 59 107\n101 29\n18 12 26 16\n81 71\n22 98 95 11 85\n88 56 108\n9 60 63 4 68\n76 14 65\n57 28 87\n27 64 40 17 19\n7 61\n3 102 83 25 24 23\n62 100\n2 112 113 41 53 104 93\n31 97 94\n6 15\n77 90 49 35\n20 96 109\n46 74\n10 39 110\n21\n5455 66\n51\n50\n1",
+      "char_start": 232,
+      "char_end": 592,
+      "reading_order": 1
+    },
+    {
+      "block_id": "b_22cd3fd5",
+      "bbox": {
+        "x": 463,
+        "y": 1849,
+        "width": 779,
+        "height": 33
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_9e48ed6a",
+        "l_4ecd449d"
+      ],
+      "text": "Waste Management and Green Buildings Water and Wastewater\nResource Recovery Management",
+      "char_start": 594,
+      "char_end": 680,
+      "reading_order": 2
+    },
+    {
+      "block_id": "b_8ee27360",
+      "bbox": {
+        "x": 460,
+        "y": 2060,
+        "width": 735,
+        "height": 34
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_ace9841e",
+        "l_881147e2"
+      ],
+      "text": "Energy Efficiency and Pollution Prevention Climate Change\nConservation and Control Adaptation",
+      "char_start": 682,
+      "char_end": 775,
+      "reading_order": 3
+    },
+    {
+      "block_id": "b_d6fdf48c",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 337,
+        "height": 25
+      },
+      "block_type": "list_item",
+      "line_ids": [
+        "l_326daa77"
+      ],
+      "text": "15 Green Bond Report 2025",
+      "char_start": 777,
+      "char_end": 802,
+      "reading_order": 4
+    }
+  ],
+  "tables": []
+}

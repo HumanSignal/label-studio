@@ -1,0 +1,33 @@
+{
+  "export_id": "3b1809e9-543c-4ba9-8010-ecbf603e783f",
+  "export_schema_version": "1.0.0",
+  "project_id": 7,
+  "created_at": "2026-01-14T15:31:46.040457Z",
+  "status": "completed",
+  "statistics": {
+    "total_documents": 1,
+    "completed_documents": 1,
+    "failed_documents": 0,
+    "total_pages": 56,
+    "total_annotations": 12,
+    "total_words": 21788,
+    "total_tables": 0
+  },
+  "documents": [
+    {
+      "doc_id": "fb3c59894bd2",
+      "task_id": 4,
+      "status": "completed",
+      "manifest_path": "docs/fb3c59894bd2/manifest.json",
+      "num_pages": 56,
+      "num_annotations": 0
+    }
+  ],
+  "annotation_files": [
+    {
+      "path": "annotations.jsonl",
+      "record_count": 12
+    }
+  ],
+  "created_by": 2
+}

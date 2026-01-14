@@ -1,0 +1,4871 @@
+{
+  "page_id": "fb3c59894bd2:page_012",
+  "page_number": 12,
+  "doc_id": "fb3c59894bd2",
+  "layout_version_id": "c84625f1-3db9-43c5-a4da-12ffc5948c74",
+  "geometry": {
+    "pdf_page_width_pt": 595.276,
+    "pdf_page_height_pt": 841.89,
+    "rotation_deg": 0,
+    "media_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "crop_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "render_dpi": 200,
+    "render_scale": 2.7777777777777777,
+    "rendered_width_px": 1654,
+    "rendered_height_px": 2339
+  },
+  "layers": {
+    "pdf_text": {
+      "layer_id": "pdf_text",
+      "source_engine": "pdfplumber/0.11.9",
+      "coverage": 0.04751950652233589,
+      "word_count": 125,
+      "tokens": [
+        {
+          "token_id": "tok_000000",
+          "text": "Breakthroughs",
+          "bbox": {
+            "x": 191,
+            "y": 611,
+            "width": 236,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000001",
+          "text": "Achieved",
+          "bbox": {
+            "x": 436,
+            "y": 611,
+            "width": 150,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000002",
+          "text": "Cumulative",
+          "bbox": {
+            "x": 194,
+            "y": 173,
+            "width": 125,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000003",
+          "text": "Government",
+          "bbox": {
+            "x": 326,
+            "y": 173,
+            "width": 141,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000004",
+          "text": "Green",
+          "bbox": {
+            "x": 473,
+            "y": 173,
+            "width": 69,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000005",
+          "text": "Bond",
+          "bbox": {
+            "x": 548,
+            "y": 173,
+            "width": 60,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000006",
+          "text": "Issuances:",
+          "bbox": {
+            "x": 614,
+            "y": 173,
+            "width": 111,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000007",
+          "text": "Institutional:",
+          "bbox": {
+            "x": 841,
+            "y": 172,
+            "width": 138,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000008",
+          "text": "Retail:",
+          "bbox": {
+            "x": 841,
+            "y": 372,
+            "width": 70,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000009",
+          "text": "~HK$",
+          "bbox": {
+            "x": 438,
+            "y": 346,
+            "width": 44,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000010",
+          "text": "240",
+          "bbox": {
+            "x": 419,
+            "y": 366,
+            "width": 30,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000011",
+          "text": "billion",
+          "bbox": {
+            "x": 455,
+            "y": 366,
+            "width": 50,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000012",
+          "text": "~HK$",
+          "bbox": {
+            "x": 683,
+            "y": 346,
+            "width": 44,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000013",
+          "text": "200",
+          "bbox": {
+            "x": 665,
+            "y": 366,
+            "width": 30,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000014",
+          "text": "billion",
+          "bbox": {
+            "x": 700,
+            "y": 366,
+            "width": 50,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000015",
+          "text": "HK$",
+          "bbox": {
+            "x": 939,
+            "y": 346,
+            "width": 32,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000016",
+          "text": "40",
+          "bbox": {
+            "x": 917,
+            "y": 366,
+            "width": 20,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000017",
+          "text": "billion",
+          "bbox": {
+            "x": 942,
+            "y": 366,
+            "width": 50,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000018",
+          "text": "(~US$5",
+          "bbox": {
+            "x": 895,
+            "y": 432,
+            "width": 59,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000019",
+          "text": "billion)",
+          "bbox": {
+            "x": 959,
+            "y": 432,
+            "width": 56,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000020",
+          "text": "(~US$26",
+          "bbox": {
+            "x": 642,
+            "y": 432,
+            "width": 69,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000021",
+          "text": "billion)",
+          "bbox": {
+            "x": 717,
+            "y": 432,
+            "width": 56,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000022",
+          "text": "(~US$31",
+          "bbox": {
+            "x": 397,
+            "y": 432,
+            "width": 69,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000023",
+          "text": "billion)",
+          "bbox": {
+            "x": 471,
+            "y": 432,
+            "width": 56,
+            "height": 19
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 7.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000024",
+          "text": "~HK$",
+          "bbox": {
+            "x": 955,
+            "y": 225,
+            "width": 37,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000025",
+          "text": "240",
+          "bbox": {
+            "x": 939,
+            "y": 242,
+            "width": 26,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000026",
+          "text": "billion",
+          "bbox": {
+            "x": 970,
+            "y": 242,
+            "width": 43,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000027",
+          "text": "~HK$",
+          "bbox": {
+            "x": 1164,
+            "y": 225,
+            "width": 37,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000028",
+          "text": "200",
+          "bbox": {
+            "x": 1149,
+            "y": 242,
+            "width": 26,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000029",
+          "text": "billion",
+          "bbox": {
+            "x": 1179,
+            "y": 242,
+            "width": 43,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000030",
+          "text": "HK$",
+          "bbox": {
+            "x": 1382,
+            "y": 225,
+            "width": 27,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000031",
+          "text": "40",
+          "bbox": {
+            "x": 1364,
+            "y": 242,
+            "width": 17,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000032",
+          "text": "billion",
+          "bbox": {
+            "x": 1385,
+            "y": 242,
+            "width": 43,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000033",
+          "text": "(~US$5",
+          "bbox": {
+            "x": 1344,
+            "y": 298,
+            "width": 51,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000034",
+          "text": "billion)",
+          "bbox": {
+            "x": 1399,
+            "y": 298,
+            "width": 48,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000035",
+          "text": "(~US$26",
+          "bbox": {
+            "x": 1129,
+            "y": 298,
+            "width": 59,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000036",
+          "text": "billion)",
+          "bbox": {
+            "x": 1193,
+            "y": 298,
+            "width": 48,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000037",
+          "text": "(~US$31",
+          "bbox": {
+            "x": 920,
+            "y": 298,
+            "width": 59,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000038",
+          "text": "billion)",
+          "bbox": {
+            "x": 984,
+            "y": 298,
+            "width": 48,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000039",
+          "text": "~HK$",
+          "bbox": {
+            "x": 748,
+            "y": 423,
+            "width": 37,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000040",
+          "text": "240",
+          "bbox": {
+            "x": 732,
+            "y": 440,
+            "width": 26,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000041",
+          "text": "billion",
+          "bbox": {
+            "x": 762,
+            "y": 440,
+            "width": 43,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000042",
+          "text": "~HK$",
+          "bbox": {
+            "x": 957,
+            "y": 423,
+            "width": 37,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000043",
+          "text": "200",
+          "bbox": {
+            "x": 941,
+            "y": 440,
+            "width": 26,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000044",
+          "text": "billion",
+          "bbox": {
+            "x": 971,
+            "y": 440,
+            "width": 43,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000045",
+          "text": "HK$",
+          "bbox": {
+            "x": 1175,
+            "y": 423,
+            "width": 27,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000046",
+          "text": "40",
+          "bbox": {
+            "x": 1156,
+            "y": 440,
+            "width": 17,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000047",
+          "text": "billion",
+          "bbox": {
+            "x": 1178,
+            "y": 440,
+            "width": 43,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000048",
+          "text": "(~US$5",
+          "bbox": {
+            "x": 1137,
+            "y": 496,
+            "width": 51,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000049",
+          "text": "billion)",
+          "bbox": {
+            "x": 1192,
+            "y": 496,
+            "width": 48,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000050",
+          "text": "(~US$26",
+          "bbox": {
+            "x": 922,
+            "y": 496,
+            "width": 59,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000051",
+          "text": "billion)",
+          "bbox": {
+            "x": 985,
+            "y": 496,
+            "width": 48,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000052",
+          "text": "(~US$31",
+          "bbox": {
+            "x": 713,
+            "y": 496,
+            "width": 59,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000053",
+          "text": "billion)",
+          "bbox": {
+            "x": 776,
+            "y": 496,
+            "width": 48,
+            "height": 17
+          },
+          "font_name": "WBLURF+HelveticaNeue-CondensedBlack",
+          "font_size": 5.967399999999998,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000054",
+          "text": "Year",
+          "bbox": {
+            "x": 218,
+            "y": 701,
+            "width": 49,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000055",
+          "text": "Breakthroughs",
+          "bbox": {
+            "x": 423,
+            "y": 701,
+            "width": 163,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000056",
+          "text": "at",
+          "bbox": {
+            "x": 593,
+            "y": 701,
+            "width": 23,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000057",
+          "text": "Issuance",
+          "bbox": {
+            "x": 621,
+            "y": 701,
+            "width": 93,
+            "height": 25
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000058",
+          "text": "2021",
+          "bbox": {
+            "x": 218,
+            "y": 772,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000060",
+          "text": "The",
+          "bbox": {
+            "x": 445,
+            "y": 772,
+            "width": 42,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000061",
+          "text": "world’s",
+          "bbox": {
+            "x": 494,
+            "y": 772,
+            "width": 81,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000062",
+          "text": "largest",
+          "bbox": {
+            "x": 583,
+            "y": 772,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000063",
+          "text": "USD",
+          "bbox": {
+            "x": 667,
+            "y": 772,
+            "width": 52,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000064",
+          "text": "government",
+          "bbox": {
+            "x": 726,
+            "y": 772,
+            "width": 135,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000065",
+          "text": "green",
+          "bbox": {
+            "x": 868,
+            "y": 772,
+            "width": 65,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000066",
+          "text": "bond",
+          "bbox": {
+            "x": 940,
+            "y": 772,
+            "width": 59,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000067",
+          "text": "deal",
+          "bbox": {
+            "x": 1006,
+            "y": 772,
+            "width": 48,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000069",
+          "text": "The",
+          "bbox": {
+            "x": 445,
+            "y": 808,
+            "width": 42,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000070",
+          "text": "longest",
+          "bbox": {
+            "x": 494,
+            "y": 808,
+            "width": 84,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000071",
+          "text": "tenor",
+          "bbox": {
+            "x": 585,
+            "y": 808,
+            "width": 59,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000072",
+          "text": "USD",
+          "bbox": {
+            "x": 651,
+            "y": 808,
+            "width": 52,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000073",
+          "text": "government",
+          "bbox": {
+            "x": 710,
+            "y": 808,
+            "width": 135,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000074",
+          "text": "green",
+          "bbox": {
+            "x": 852,
+            "y": 808,
+            "width": 65,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000075",
+          "text": "bond",
+          "bbox": {
+            "x": 924,
+            "y": 808,
+            "width": 59,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000076",
+          "text": "ever",
+          "bbox": {
+            "x": 990,
+            "y": 808,
+            "width": 48,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000077",
+          "text": "in",
+          "bbox": {
+            "x": 1045,
+            "y": 808,
+            "width": 20,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000078",
+          "text": "Asia",
+          "bbox": {
+            "x": 1071,
+            "y": 808,
+            "width": 49,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000080",
+          "text": "The",
+          "bbox": {
+            "x": 445,
+            "y": 844,
+            "width": 42,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000081",
+          "text": "longest",
+          "bbox": {
+            "x": 494,
+            "y": 844,
+            "width": 84,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000082",
+          "text": "tenor",
+          "bbox": {
+            "x": 585,
+            "y": 844,
+            "width": 59,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000083",
+          "text": "EUR",
+          "bbox": {
+            "x": 651,
+            "y": 844,
+            "width": 51,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000084",
+          "text": "government",
+          "bbox": {
+            "x": 708,
+            "y": 844,
+            "width": 135,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000085",
+          "text": "green",
+          "bbox": {
+            "x": 850,
+            "y": 844,
+            "width": 65,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000086",
+          "text": "bond",
+          "bbox": {
+            "x": 922,
+            "y": 844,
+            "width": 59,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000087",
+          "text": "ever",
+          "bbox": {
+            "x": 988,
+            "y": 844,
+            "width": 48,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000088",
+          "text": "in",
+          "bbox": {
+            "x": 1043,
+            "y": 844,
+            "width": 20,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000089",
+          "text": "Asia",
+          "bbox": {
+            "x": 1069,
+            "y": 844,
+            "width": 49,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000090",
+          "text": "2022",
+          "bbox": {
+            "x": 218,
+            "y": 912,
+            "width": 56,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000092",
+          "text": "The",
+          "bbox": {
+            "x": 445,
+            "y": 912,
+            "width": 42,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000093",
+          "text": "world’s",
+          "bbox": {
+            "x": 494,
+            "y": 912,
+            "width": 81,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000094",
+          "text": "largest",
+          "bbox": {
+            "x": 583,
+            "y": 912,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000095",
+          "text": "retail",
+          "bbox": {
+            "x": 667,
+            "y": 912,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000096",
+          "text": "green",
+          "bbox": {
+            "x": 729,
+            "y": 912,
+            "width": 65,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000097",
+          "text": "bond",
+          "bbox": {
+            "x": 801,
+            "y": 912,
+            "width": 59,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000098",
+          "text": "issuance",
+          "bbox": {
+            "x": 867,
+            "y": 912,
+            "width": 101,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000099",
+          "text": "2023",
+          "bbox": {
+            "x": 218,
+            "y": 977,
+            "width": 56,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000101",
+          "text": "The",
+          "bbox": {
+            "x": 445,
+            "y": 977,
+            "width": 42,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000102",
+          "text": "largest",
+          "bbox": {
+            "x": 494,
+            "y": 977,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000103",
+          "text": "ESG",
+          "bbox": {
+            "x": 579,
+            "y": 977,
+            "width": 50,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000104",
+          "text": "bond",
+          "bbox": {
+            "x": 636,
+            "y": 977,
+            "width": 59,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000105",
+          "text": "issuance",
+          "bbox": {
+            "x": 702,
+            "y": 977,
+            "width": 101,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000106",
+          "text": "ever",
+          "bbox": {
+            "x": 810,
+            "y": 977,
+            "width": 48,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000107",
+          "text": "in",
+          "bbox": {
+            "x": 865,
+            "y": 977,
+            "width": 20,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000108",
+          "text": "Asia",
+          "bbox": {
+            "x": 891,
+            "y": 977,
+            "width": 49,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000110",
+          "text": "The",
+          "bbox": {
+            "x": 445,
+            "y": 1014,
+            "width": 42,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000111",
+          "text": "world’s",
+          "bbox": {
+            "x": 494,
+            "y": 1014,
+            "width": 81,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000112",
+          "text": "first",
+          "bbox": {
+            "x": 583,
+            "y": 1014,
+            "width": 43,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000113",
+          "text": "government",
+          "bbox": {
+            "x": 632,
+            "y": 1014,
+            "width": 135,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000114",
+          "text": "tokenised",
+          "bbox": {
+            "x": 775,
+            "y": 1014,
+            "width": 110,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000115",
+          "text": "green",
+          "bbox": {
+            "x": 892,
+            "y": 1014,
+            "width": 65,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000116",
+          "text": "bond",
+          "bbox": {
+            "x": 964,
+            "y": 1014,
+            "width": 59,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000117",
+          "text": "issuance",
+          "bbox": {
+            "x": 1029,
+            "y": 1014,
+            "width": 101,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000118",
+          "text": "2024",
+          "bbox": {
+            "x": 218,
+            "y": 1079,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000120",
+          "text": "The",
+          "bbox": {
+            "x": 445,
+            "y": 1079,
+            "width": 42,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000121",
+          "text": "world’s",
+          "bbox": {
+            "x": 494,
+            "y": 1079,
+            "width": 81,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000122",
+          "text": "first",
+          "bbox": {
+            "x": 583,
+            "y": 1079,
+            "width": 43,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000123",
+          "text": "multi-currency",
+          "bbox": {
+            "x": 632,
+            "y": 1079,
+            "width": 165,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000124",
+          "text": "digitally",
+          "bbox": {
+            "x": 804,
+            "y": 1079,
+            "width": 87,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000125",
+          "text": "native",
+          "bbox": {
+            "x": 898,
+            "y": 1079,
+            "width": 67,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000126",
+          "text": "bond",
+          "bbox": {
+            "x": 973,
+            "y": 1079,
+            "width": 59,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000127",
+          "text": "12",
+          "bbox": {
+            "x": 194,
+            "y": 2256,
+            "width": 28,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Bold",
+          "font_size": 9.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000128",
+          "text": "Green",
+          "bbox": {
+            "x": 275,
+            "y": 2256,
+            "width": 63,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000129",
+          "text": "Bond",
+          "bbox": {
+            "x": 343,
+            "y": 2256,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000130",
+          "text": "Report",
+          "bbox": {
+            "x": 404,
+            "y": 2256,
+            "width": 71,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000131",
+          "text": "2025",
+          "bbox": {
+            "x": 480,
+            "y": 2256,
+            "width": 51,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        }
+      ]
+    }
+  },
+  "canonical": {
+    "layer_id": "pdf_text",
+    "reason": "selected_layer_pdf_text"
+  },
+  "canonical_text": "Cumulative Government Green Bond Issuances: Institutional:\n~HK$ ~HK$ HK$\n240 billion 200 billion 40 billion\n(~US$31 billion) (~US$26 billion) (~US$5 billion)\n~HK$ ~HK$ HK$\n240 billion 200 billion Retail: 40 billion\n(~US$31 billion) (~US$26 billion) ~HK$ (~US$5 ~HK$ billion) HK$\n240 billion 200 billion 40 billion\n(~US$31 billion) (~US$26 billion) (~US$5 billion)\nBreakthroughs Achieved\nYear Breakthroughs at Issuance\n2021 The world’s largest USD government green bond deal\nThe longest tenor USD government green bond ever in Asia\nThe longest tenor EUR government green bond ever in Asia\n2022 The world’s largest retail green bond issuance\n2023 The largest ESG bond issuance ever in Asia\nThe world’s first government tokenised green bond issuance\n2024 The world’s first multi-currency digitally native bond\n\n12 Green Bond Report 2025",
+  "canonical_index": {
+    "words": {
+      "w_fa25378c": {
+        "char_start": 0,
+        "char_end": 10
+      },
+      "w_a515e7cb": {
+        "char_start": 11,
+        "char_end": 21
+      },
+      "w_a40c8625": {
+        "char_start": 22,
+        "char_end": 27
+      },
+      "w_96d918b2": {
+        "char_start": 28,
+        "char_end": 32
+      },
+      "w_19d4f971": {
+        "char_start": 33,
+        "char_end": 43
+      },
+      "w_ef73ff49": {
+        "char_start": 44,
+        "char_end": 58
+      },
+      "w_66fe034a": {
+        "char_start": 59,
+        "char_end": 63
+      },
+      "w_a0b06eea": {
+        "char_start": 64,
+        "char_end": 68
+      },
+      "w_6e2a35d7": {
+        "char_start": 69,
+        "char_end": 72
+      },
+      "w_5bbf66d1": {
+        "char_start": 73,
+        "char_end": 76
+      },
+      "w_dd83bf48": {
+        "char_start": 77,
+        "char_end": 84
+      },
+      "w_707f4f6a": {
+        "char_start": 85,
+        "char_end": 88
+      },
+      "w_5a44f6d2": {
+        "char_start": 89,
+        "char_end": 96
+      },
+      "w_d5d7ed19": {
+        "char_start": 97,
+        "char_end": 99
+      },
+      "w_0d468e4f": {
+        "char_start": 100,
+        "char_end": 107
+      },
+      "w_cd5cc8ae": {
+        "char_start": 108,
+        "char_end": 115
+      },
+      "w_18a0a0c6": {
+        "char_start": 116,
+        "char_end": 124
+      },
+      "w_f050fa15": {
+        "char_start": 125,
+        "char_end": 132
+      },
+      "w_3112f590": {
+        "char_start": 133,
+        "char_end": 141
+      },
+      "w_e7ee5d9e": {
+        "char_start": 142,
+        "char_end": 148
+      },
+      "w_0d2dca61": {
+        "char_start": 149,
+        "char_end": 157
+      },
+      "w_8a493fdc": {
+        "char_start": 158,
+        "char_end": 162
+      },
+      "w_845891f7": {
+        "char_start": 163,
+        "char_end": 167
+      },
+      "w_f9fbbeac": {
+        "char_start": 168,
+        "char_end": 171
+      },
+      "w_5b5afdd2": {
+        "char_start": 172,
+        "char_end": 175
+      },
+      "w_16f4ce46": {
+        "char_start": 176,
+        "char_end": 183
+      },
+      "w_9a64c9cd": {
+        "char_start": 184,
+        "char_end": 187
+      },
+      "w_730f12b4": {
+        "char_start": 188,
+        "char_end": 195
+      },
+      "w_7aa1b67c": {
+        "char_start": 196,
+        "char_end": 203
+      },
+      "w_3ea8163a": {
+        "char_start": 204,
+        "char_end": 206
+      },
+      "w_62d8e20f": {
+        "char_start": 207,
+        "char_end": 214
+      },
+      "w_b68c30e0": {
+        "char_start": 215,
+        "char_end": 222
+      },
+      "w_19ef0ce5": {
+        "char_start": 223,
+        "char_end": 231
+      },
+      "w_df3bd81b": {
+        "char_start": 232,
+        "char_end": 239
+      },
+      "w_f456e066": {
+        "char_start": 240,
+        "char_end": 248
+      },
+      "w_32a5ca71": {
+        "char_start": 249,
+        "char_end": 253
+      },
+      "w_021babb9": {
+        "char_start": 254,
+        "char_end": 260
+      },
+      "w_6d492d0c": {
+        "char_start": 261,
+        "char_end": 265
+      },
+      "w_c101f695": {
+        "char_start": 266,
+        "char_end": 274
+      },
+      "w_e26b7da1": {
+        "char_start": 275,
+        "char_end": 278
+      },
+      "w_3b3bab60": {
+        "char_start": 279,
+        "char_end": 282
+      },
+      "w_f9c72bb9": {
+        "char_start": 283,
+        "char_end": 290
+      },
+      "w_b03d32cc": {
+        "char_start": 291,
+        "char_end": 294
+      },
+      "w_0c99c4d0": {
+        "char_start": 295,
+        "char_end": 302
+      },
+      "w_bb782701": {
+        "char_start": 303,
+        "char_end": 305
+      },
+      "w_3766eaeb": {
+        "char_start": 306,
+        "char_end": 313
+      },
+      "w_340e9e35": {
+        "char_start": 314,
+        "char_end": 321
+      },
+      "w_5bc6beca": {
+        "char_start": 322,
+        "char_end": 330
+      },
+      "w_496774cf": {
+        "char_start": 331,
+        "char_end": 338
+      },
+      "w_0c29d64a": {
+        "char_start": 339,
+        "char_end": 347
+      },
+      "w_13617bb7": {
+        "char_start": 348,
+        "char_end": 354
+      },
+      "w_78cdf54c": {
+        "char_start": 355,
+        "char_end": 363
+      },
+      "w_2dd1a80a": {
+        "char_start": 364,
+        "char_end": 377
+      },
+      "w_f4a6779e": {
+        "char_start": 378,
+        "char_end": 386
+      },
+      "w_85ff071e": {
+        "char_start": 387,
+        "char_end": 391
+      },
+      "w_4088a4c4": {
+        "char_start": 392,
+        "char_end": 405
+      },
+      "w_de96d941": {
+        "char_start": 406,
+        "char_end": 408
+      },
+      "w_0c3c8745": {
+        "char_start": 409,
+        "char_end": 417
+      },
+      "w_007ff27f": {
+        "char_start": 418,
+        "char_end": 422
+      },
+      "w_7b796879": {
+        "char_start": 423,
+        "char_end": 426
+      },
+      "w_68f4e2cb": {
+        "char_start": 427,
+        "char_end": 434
+      },
+      "w_1c782571": {
+        "char_start": 435,
+        "char_end": 442
+      },
+      "w_4c5b25b6": {
+        "char_start": 443,
+        "char_end": 446
+      },
+      "w_27c68958": {
+        "char_start": 447,
+        "char_end": 457
+      },
+      "w_514621c0": {
+        "char_start": 458,
+        "char_end": 463
+      },
+      "w_9b934364": {
+        "char_start": 464,
+        "char_end": 468
+      },
+      "w_e97fa000": {
+        "char_start": 469,
+        "char_end": 473
+      },
+      "w_ec8a0fd3": {
+        "char_start": 474,
+        "char_end": 477
+      },
+      "w_03b6f4cd": {
+        "char_start": 478,
+        "char_end": 485
+      },
+      "w_c03f8bb9": {
+        "char_start": 486,
+        "char_end": 491
+      },
+      "w_bd86b456": {
+        "char_start": 492,
+        "char_end": 495
+      },
+      "w_2f0d9514": {
+        "char_start": 496,
+        "char_end": 506
+      },
+      "w_fe5241ce": {
+        "char_start": 507,
+        "char_end": 512
+      },
+      "w_826b057a": {
+        "char_start": 513,
+        "char_end": 517
+      },
+      "w_485840ab": {
+        "char_start": 518,
+        "char_end": 522
+      },
+      "w_68052d65": {
+        "char_start": 523,
+        "char_end": 525
+      },
+      "w_2ceabfd5": {
+        "char_start": 526,
+        "char_end": 530
+      },
+      "w_74a41084": {
+        "char_start": 531,
+        "char_end": 534
+      },
+      "w_d0b45509": {
+        "char_start": 535,
+        "char_end": 542
+      },
+      "w_f1e0d68d": {
+        "char_start": 543,
+        "char_end": 548
+      },
+      "w_e596f0d9": {
+        "char_start": 549,
+        "char_end": 552
+      },
+      "w_68057ff1": {
+        "char_start": 553,
+        "char_end": 563
+      },
+      "w_63ab6265": {
+        "char_start": 564,
+        "char_end": 569
+      },
+      "w_8ce57021": {
+        "char_start": 570,
+        "char_end": 574
+      },
+      "w_7f620fec": {
+        "char_start": 575,
+        "char_end": 579
+      },
+      "w_03b8e7da": {
+        "char_start": 580,
+        "char_end": 582
+      },
+      "w_e806508b": {
+        "char_start": 583,
+        "char_end": 587
+      },
+      "w_3339dbc5": {
+        "char_start": 588,
+        "char_end": 592
+      },
+      "w_6a47e76e": {
+        "char_start": 593,
+        "char_end": 596
+      },
+      "w_abe5922a": {
+        "char_start": 597,
+        "char_end": 604
+      },
+      "w_b7abacf8": {
+        "char_start": 605,
+        "char_end": 612
+      },
+      "w_3eea4eb3": {
+        "char_start": 613,
+        "char_end": 619
+      },
+      "w_835846f7": {
+        "char_start": 620,
+        "char_end": 625
+      },
+      "w_eecd3cef": {
+        "char_start": 626,
+        "char_end": 630
+      },
+      "w_5a3c0192": {
+        "char_start": 631,
+        "char_end": 639
+      },
+      "w_98763c34": {
+        "char_start": 640,
+        "char_end": 644
+      },
+      "w_0d0d6fd1": {
+        "char_start": 645,
+        "char_end": 648
+      },
+      "w_31a5f195": {
+        "char_start": 649,
+        "char_end": 656
+      },
+      "w_d3ccdcb9": {
+        "char_start": 657,
+        "char_end": 660
+      },
+      "w_01dcba24": {
+        "char_start": 661,
+        "char_end": 665
+      },
+      "w_a0e3062d": {
+        "char_start": 666,
+        "char_end": 674
+      },
+      "w_f7564fde": {
+        "char_start": 675,
+        "char_end": 679
+      },
+      "w_97dfa482": {
+        "char_start": 680,
+        "char_end": 682
+      },
+      "w_63cac9b9": {
+        "char_start": 683,
+        "char_end": 687
+      },
+      "w_62489a07": {
+        "char_start": 688,
+        "char_end": 691
+      },
+      "w_d0a57ef8": {
+        "char_start": 692,
+        "char_end": 699
+      },
+      "w_f049927e": {
+        "char_start": 700,
+        "char_end": 705
+      },
+      "w_786d001d": {
+        "char_start": 706,
+        "char_end": 716
+      },
+      "w_515ed83a": {
+        "char_start": 717,
+        "char_end": 726
+      },
+      "w_ede1a0d0": {
+        "char_start": 727,
+        "char_end": 732
+      },
+      "w_a9f88a46": {
+        "char_start": 733,
+        "char_end": 737
+      },
+      "w_3fc436fc": {
+        "char_start": 738,
+        "char_end": 746
+      },
+      "w_5e6038b2": {
+        "char_start": 747,
+        "char_end": 751
+      },
+      "w_9a52406e": {
+        "char_start": 752,
+        "char_end": 755
+      },
+      "w_a160b09f": {
+        "char_start": 756,
+        "char_end": 763
+      },
+      "w_f5aefa9b": {
+        "char_start": 764,
+        "char_end": 769
+      },
+      "w_bee37d83": {
+        "char_start": 770,
+        "char_end": 784
+      },
+      "w_0c3b84cd": {
+        "char_start": 785,
+        "char_end": 794
+      },
+      "w_d2aaea7b": {
+        "char_start": 795,
+        "char_end": 801
+      },
+      "w_efe58f5b": {
+        "char_start": 802,
+        "char_end": 806
+      },
+      "w_2cfcc576": {
+        "char_start": 808,
+        "char_end": 810
+      },
+      "w_6cf1e069": {
+        "char_start": 811,
+        "char_end": 816
+      },
+      "w_d1d2a643": {
+        "char_start": 817,
+        "char_end": 821
+      },
+      "w_23e5cde0": {
+        "char_start": 822,
+        "char_end": 828
+      },
+      "w_70cdae82": {
+        "char_start": 829,
+        "char_end": 833
+      }
+    },
+    "lines": {
+      "l_163845cb": {
+        "char_start": 0,
+        "char_end": 58
+      },
+      "l_dc992ea3": {
+        "char_start": 59,
+        "char_end": 72
+      },
+      "l_cf7b0af5": {
+        "char_start": 73,
+        "char_end": 107
+      },
+      "l_eaeb9676": {
+        "char_start": 108,
+        "char_end": 157
+      },
+      "l_7b70bc2b": {
+        "char_start": 158,
+        "char_end": 171
+      },
+      "l_a43c05fd": {
+        "char_start": 172,
+        "char_end": 214
+      },
+      "l_26f719c6": {
+        "char_start": 215,
+        "char_end": 278
+      },
+      "l_e0a80615": {
+        "char_start": 279,
+        "char_end": 313
+      },
+      "l_343672c7": {
+        "char_start": 314,
+        "char_end": 363
+      },
+      "l_8f4da093": {
+        "char_start": 364,
+        "char_end": 386
+      },
+      "l_5ab24ede": {
+        "char_start": 387,
+        "char_end": 417
+      },
+      "l_55ab2525": {
+        "char_start": 418,
+        "char_end": 473
+      },
+      "l_9c546152": {
+        "char_start": 474,
+        "char_end": 530
+      },
+      "l_b541a67d": {
+        "char_start": 531,
+        "char_end": 587
+      },
+      "l_e1f56534": {
+        "char_start": 588,
+        "char_end": 639
+      },
+      "l_f8a5499c": {
+        "char_start": 640,
+        "char_end": 687
+      },
+      "l_cc4f6ebf": {
+        "char_start": 688,
+        "char_end": 746
+      },
+      "l_344dfab6": {
+        "char_start": 747,
+        "char_end": 806
+      },
+      "l_acc8a363": {
+        "char_start": 808,
+        "char_end": 833
+      }
+    },
+    "blocks": {
+      "b_3d5478ba": {
+        "char_start": 0,
+        "char_end": 806
+      },
+      "b_0180297a": {
+        "char_start": 808,
+        "char_end": 833
+      }
+    }
+  },
+  "words": [
+    {
+      "word_id": "w_fa25378c",
+      "text": "Cumulative",
+      "bbox": {
+        "x": 194,
+        "y": 173,
+        "width": 125,
+        "height": 25
+      },
+      "line_id": "l_163845cb",
+      "block_id": "b_3d5478ba",
+      "reading_order": 0,
+      "char_start": 0,
+      "char_end": 10,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a515e7cb",
+      "text": "Government",
+      "bbox": {
+        "x": 326,
+        "y": 173,
+        "width": 141,
+        "height": 25
+      },
+      "line_id": "l_163845cb",
+      "block_id": "b_3d5478ba",
+      "reading_order": 1,
+      "char_start": 11,
+      "char_end": 21,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a40c8625",
+      "text": "Green",
+      "bbox": {
+        "x": 473,
+        "y": 173,
+        "width": 69,
+        "height": 25
+      },
+      "line_id": "l_163845cb",
+      "block_id": "b_3d5478ba",
+      "reading_order": 2,
+      "char_start": 22,
+      "char_end": 27,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_96d918b2",
+      "text": "Bond",
+      "bbox": {
+        "x": 548,
+        "y": 173,
+        "width": 60,
+        "height": 25
+      },
+      "line_id": "l_163845cb",
+      "block_id": "b_3d5478ba",
+      "reading_order": 3,
+      "char_start": 28,
+      "char_end": 32,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_19d4f971",
+      "text": "Issuances:",
+      "bbox": {
+        "x": 614,
+        "y": 173,
+        "width": 111,
+        "height": 25
+      },
+      "line_id": "l_163845cb",
+      "block_id": "b_3d5478ba",
+      "reading_order": 4,
+      "char_start": 33,
+      "char_end": 43,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ef73ff49",
+      "text": "Institutional:",
+      "bbox": {
+        "x": 841,
+        "y": 172,
+        "width": 138,
+        "height": 25
+      },
+      "line_id": "l_163845cb",
+      "block_id": "b_3d5478ba",
+      "reading_order": 5,
+      "char_start": 44,
+      "char_end": 58,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_66fe034a",
+      "text": "~HK$",
+      "bbox": {
+        "x": 955,
+        "y": 225,
+        "width": 37,
+        "height": 17
+      },
+      "line_id": "l_dc992ea3",
+      "block_id": "b_3d5478ba",
+      "reading_order": 6,
+      "char_start": 59,
+      "char_end": 63,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a0b06eea",
+      "text": "~HK$",
+      "bbox": {
+        "x": 1164,
+        "y": 225,
+        "width": 37,
+        "height": 17
+      },
+      "line_id": "l_dc992ea3",
+      "block_id": "b_3d5478ba",
+      "reading_order": 7,
+      "char_start": 64,
+      "char_end": 68,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6e2a35d7",
+      "text": "HK$",
+      "bbox": {
+        "x": 1382,
+        "y": 225,
+        "width": 27,
+        "height": 17
+      },
+      "line_id": "l_dc992ea3",
+      "block_id": "b_3d5478ba",
+      "reading_order": 8,
+      "char_start": 69,
+      "char_end": 72,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5bbf66d1",
+      "text": "240",
+      "bbox": {
+        "x": 939,
+        "y": 242,
+        "width": 26,
+        "height": 17
+      },
+      "line_id": "l_cf7b0af5",
+      "block_id": "b_3d5478ba",
+      "reading_order": 9,
+      "char_start": 73,
+      "char_end": 76,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_dd83bf48",
+      "text": "billion",
+      "bbox": {
+        "x": 970,
+        "y": 242,
+        "width": 43,
+        "height": 17
+      },
+      "line_id": "l_cf7b0af5",
+      "block_id": "b_3d5478ba",
+      "reading_order": 10,
+      "char_start": 77,
+      "char_end": 84,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_707f4f6a",
+      "text": "200",
+      "bbox": {
+        "x": 1149,
+        "y": 242,
+        "width": 26,
+        "height": 17
+      },
+      "line_id": "l_cf7b0af5",
+      "block_id": "b_3d5478ba",
+      "reading_order": 11,
+      "char_start": 85,
+      "char_end": 88,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5a44f6d2",
+      "text": "billion",
+      "bbox": {
+        "x": 1179,
+        "y": 242,
+        "width": 43,
+        "height": 17
+      },
+      "line_id": "l_cf7b0af5",
+      "block_id": "b_3d5478ba",
+      "reading_order": 12,
+      "char_start": 89,
+      "char_end": 96,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d5d7ed19",
+      "text": "40",
+      "bbox": {
+        "x": 1364,
+        "y": 242,
+        "width": 17,
+        "height": 17
+      },
+      "line_id": "l_cf7b0af5",
+      "block_id": "b_3d5478ba",
+      "reading_order": 13,
+      "char_start": 97,
+      "char_end": 99,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0d468e4f",
+      "text": "billion",
+      "bbox": {
+        "x": 1385,
+        "y": 242,
+        "width": 43,
+        "height": 17
+      },
+      "line_id": "l_cf7b0af5",
+      "block_id": "b_3d5478ba",
+      "reading_order": 14,
+      "char_start": 100,
+      "char_end": 107,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_cd5cc8ae",
+      "text": "(~US$31",
+      "bbox": {
+        "x": 920,
+        "y": 298,
+        "width": 59,
+        "height": 17
+      },
+      "line_id": "l_eaeb9676",
+      "block_id": "b_3d5478ba",
+      "reading_order": 15,
+      "char_start": 108,
+      "char_end": 115,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_18a0a0c6",
+      "text": "billion)",
+      "bbox": {
+        "x": 984,
+        "y": 298,
+        "width": 48,
+        "height": 17
+      },
+      "line_id": "l_eaeb9676",
+      "block_id": "b_3d5478ba",
+      "reading_order": 16,
+      "char_start": 116,
+      "char_end": 124,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f050fa15",
+      "text": "(~US$26",
+      "bbox": {
+        "x": 1129,
+        "y": 298,
+        "width": 59,
+        "height": 17
+      },
+      "line_id": "l_eaeb9676",
+      "block_id": "b_3d5478ba",
+      "reading_order": 17,
+      "char_start": 125,
+      "char_end": 132,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3112f590",
+      "text": "billion)",
+      "bbox": {
+        "x": 1193,
+        "y": 298,
+        "width": 48,
+        "height": 17
+      },
+      "line_id": "l_eaeb9676",
+      "block_id": "b_3d5478ba",
+      "reading_order": 18,
+      "char_start": 133,
+      "char_end": 141,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e7ee5d9e",
+      "text": "(~US$5",
+      "bbox": {
+        "x": 1344,
+        "y": 298,
+        "width": 51,
+        "height": 17
+      },
+      "line_id": "l_eaeb9676",
+      "block_id": "b_3d5478ba",
+      "reading_order": 19,
+      "char_start": 142,
+      "char_end": 148,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0d2dca61",
+      "text": "billion)",
+      "bbox": {
+        "x": 1399,
+        "y": 298,
+        "width": 48,
+        "height": 17
+      },
+      "line_id": "l_eaeb9676",
+      "block_id": "b_3d5478ba",
+      "reading_order": 20,
+      "char_start": 149,
+      "char_end": 157,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8a493fdc",
+      "text": "~HK$",
+      "bbox": {
+        "x": 438,
+        "y": 346,
+        "width": 44,
+        "height": 19
+      },
+      "line_id": "l_7b70bc2b",
+      "block_id": "b_3d5478ba",
+      "reading_order": 21,
+      "char_start": 158,
+      "char_end": 162,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_845891f7",
+      "text": "~HK$",
+      "bbox": {
+        "x": 683,
+        "y": 346,
+        "width": 44,
+        "height": 19
+      },
+      "line_id": "l_7b70bc2b",
+      "block_id": "b_3d5478ba",
+      "reading_order": 22,
+      "char_start": 163,
+      "char_end": 167,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f9fbbeac",
+      "text": "HK$",
+      "bbox": {
+        "x": 939,
+        "y": 346,
+        "width": 32,
+        "height": 19
+      },
+      "line_id": "l_7b70bc2b",
+      "block_id": "b_3d5478ba",
+      "reading_order": 23,
+      "char_start": 168,
+      "char_end": 171,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5b5afdd2",
+      "text": "240",
+      "bbox": {
+        "x": 419,
+        "y": 366,
+        "width": 30,
+        "height": 19
+      },
+      "line_id": "l_a43c05fd",
+      "block_id": "b_3d5478ba",
+      "reading_order": 24,
+      "char_start": 172,
+      "char_end": 175,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_16f4ce46",
+      "text": "billion",
+      "bbox": {
+        "x": 455,
+        "y": 366,
+        "width": 50,
+        "height": 19
+      },
+      "line_id": "l_a43c05fd",
+      "block_id": "b_3d5478ba",
+      "reading_order": 25,
+      "char_start": 176,
+      "char_end": 183,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9a64c9cd",
+      "text": "200",
+      "bbox": {
+        "x": 665,
+        "y": 366,
+        "width": 30,
+        "height": 19
+      },
+      "line_id": "l_a43c05fd",
+      "block_id": "b_3d5478ba",
+      "reading_order": 26,
+      "char_start": 184,
+      "char_end": 187,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_730f12b4",
+      "text": "billion",
+      "bbox": {
+        "x": 700,
+        "y": 366,
+        "width": 50,
+        "height": 19
+      },
+      "line_id": "l_a43c05fd",
+      "block_id": "b_3d5478ba",
+      "reading_order": 27,
+      "char_start": 188,
+      "char_end": 195,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7aa1b67c",
+      "text": "Retail:",
+      "bbox": {
+        "x": 841,
+        "y": 372,
+        "width": 70,
+        "height": 25
+      },
+      "line_id": "l_a43c05fd",
+      "block_id": "b_3d5478ba",
+      "reading_order": 28,
+      "char_start": 196,
+      "char_end": 203,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3ea8163a",
+      "text": "40",
+      "bbox": {
+        "x": 917,
+        "y": 366,
+        "width": 20,
+        "height": 19
+      },
+      "line_id": "l_a43c05fd",
+      "block_id": "b_3d5478ba",
+      "reading_order": 29,
+      "char_start": 204,
+      "char_end": 206,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_62d8e20f",
+      "text": "billion",
+      "bbox": {
+        "x": 942,
+        "y": 366,
+        "width": 50,
+        "height": 19
+      },
+      "line_id": "l_a43c05fd",
+      "block_id": "b_3d5478ba",
+      "reading_order": 30,
+      "char_start": 207,
+      "char_end": 214,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b68c30e0",
+      "text": "(~US$31",
+      "bbox": {
+        "x": 397,
+        "y": 432,
+        "width": 69,
+        "height": 19
+      },
+      "line_id": "l_26f719c6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 31,
+      "char_start": 215,
+      "char_end": 222,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_19ef0ce5",
+      "text": "billion)",
+      "bbox": {
+        "x": 471,
+        "y": 432,
+        "width": 56,
+        "height": 19
+      },
+      "line_id": "l_26f719c6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 32,
+      "char_start": 223,
+      "char_end": 231,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_df3bd81b",
+      "text": "(~US$26",
+      "bbox": {
+        "x": 642,
+        "y": 432,
+        "width": 69,
+        "height": 19
+      },
+      "line_id": "l_26f719c6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 33,
+      "char_start": 232,
+      "char_end": 239,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f456e066",
+      "text": "billion)",
+      "bbox": {
+        "x": 717,
+        "y": 432,
+        "width": 56,
+        "height": 19
+      },
+      "line_id": "l_26f719c6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 34,
+      "char_start": 240,
+      "char_end": 248,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_32a5ca71",
+      "text": "~HK$",
+      "bbox": {
+        "x": 748,
+        "y": 423,
+        "width": 37,
+        "height": 17
+      },
+      "line_id": "l_26f719c6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 35,
+      "char_start": 249,
+      "char_end": 253,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_021babb9",
+      "text": "(~US$5",
+      "bbox": {
+        "x": 895,
+        "y": 432,
+        "width": 59,
+        "height": 19
+      },
+      "line_id": "l_26f719c6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 36,
+      "char_start": 254,
+      "char_end": 260,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6d492d0c",
+      "text": "~HK$",
+      "bbox": {
+        "x": 957,
+        "y": 423,
+        "width": 37,
+        "height": 17
+      },
+      "line_id": "l_26f719c6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 37,
+      "char_start": 261,
+      "char_end": 265,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c101f695",
+      "text": "billion)",
+      "bbox": {
+        "x": 959,
+        "y": 432,
+        "width": 56,
+        "height": 19
+      },
+      "line_id": "l_26f719c6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 38,
+      "char_start": 266,
+      "char_end": 274,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e26b7da1",
+      "text": "HK$",
+      "bbox": {
+        "x": 1175,
+        "y": 423,
+        "width": 27,
+        "height": 17
+      },
+      "line_id": "l_26f719c6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 39,
+      "char_start": 275,
+      "char_end": 278,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3b3bab60",
+      "text": "240",
+      "bbox": {
+        "x": 732,
+        "y": 440,
+        "width": 26,
+        "height": 17
+      },
+      "line_id": "l_e0a80615",
+      "block_id": "b_3d5478ba",
+      "reading_order": 40,
+      "char_start": 279,
+      "char_end": 282,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f9c72bb9",
+      "text": "billion",
+      "bbox": {
+        "x": 762,
+        "y": 440,
+        "width": 43,
+        "height": 17
+      },
+      "line_id": "l_e0a80615",
+      "block_id": "b_3d5478ba",
+      "reading_order": 41,
+      "char_start": 283,
+      "char_end": 290,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b03d32cc",
+      "text": "200",
+      "bbox": {
+        "x": 941,
+        "y": 440,
+        "width": 26,
+        "height": 17
+      },
+      "line_id": "l_e0a80615",
+      "block_id": "b_3d5478ba",
+      "reading_order": 42,
+      "char_start": 291,
+      "char_end": 294,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0c99c4d0",
+      "text": "billion",
+      "bbox": {
+        "x": 971,
+        "y": 440,
+        "width": 43,
+        "height": 17
+      },
+      "line_id": "l_e0a80615",
+      "block_id": "b_3d5478ba",
+      "reading_order": 43,
+      "char_start": 295,
+      "char_end": 302,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_bb782701",
+      "text": "40",
+      "bbox": {
+        "x": 1156,
+        "y": 440,
+        "width": 17,
+        "height": 17
+      },
+      "line_id": "l_e0a80615",
+      "block_id": "b_3d5478ba",
+      "reading_order": 44,
+      "char_start": 303,
+      "char_end": 305,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3766eaeb",
+      "text": "billion",
+      "bbox": {
+        "x": 1178,
+        "y": 440,
+        "width": 43,
+        "height": 17
+      },
+      "line_id": "l_e0a80615",
+      "block_id": "b_3d5478ba",
+      "reading_order": 45,
+      "char_start": 306,
+      "char_end": 313,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_340e9e35",
+      "text": "(~US$31",
+      "bbox": {
+        "x": 713,
+        "y": 496,
+        "width": 59,
+        "height": 17
+      },
+      "line_id": "l_343672c7",
+      "block_id": "b_3d5478ba",
+      "reading_order": 46,
+      "char_start": 314,
+      "char_end": 321,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5bc6beca",
+      "text": "billion)",
+      "bbox": {
+        "x": 776,
+        "y": 496,
+        "width": 48,
+        "height": 17
+      },
+      "line_id": "l_343672c7",
+      "block_id": "b_3d5478ba",
+      "reading_order": 47,
+      "char_start": 322,
+      "char_end": 330,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_496774cf",
+      "text": "(~US$26",
+      "bbox": {
+        "x": 922,
+        "y": 496,
+        "width": 59,
+        "height": 17
+      },
+      "line_id": "l_343672c7",
+      "block_id": "b_3d5478ba",
+      "reading_order": 48,
+      "char_start": 331,
+      "char_end": 338,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0c29d64a",
+      "text": "billion)",
+      "bbox": {
+        "x": 985,
+        "y": 496,
+        "width": 48,
+        "height": 17
+      },
+      "line_id": "l_343672c7",
+      "block_id": "b_3d5478ba",
+      "reading_order": 49,
+      "char_start": 339,
+      "char_end": 347,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_13617bb7",
+      "text": "(~US$5",
+      "bbox": {
+        "x": 1137,
+        "y": 496,
+        "width": 51,
+        "height": 17
+      },
+      "line_id": "l_343672c7",
+      "block_id": "b_3d5478ba",
+      "reading_order": 50,
+      "char_start": 348,
+      "char_end": 354,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_78cdf54c",
+      "text": "billion)",
+      "bbox": {
+        "x": 1192,
+        "y": 496,
+        "width": 48,
+        "height": 17
+      },
+      "line_id": "l_343672c7",
+      "block_id": "b_3d5478ba",
+      "reading_order": 51,
+      "char_start": 355,
+      "char_end": 363,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2dd1a80a",
+      "text": "Breakthroughs",
+      "bbox": {
+        "x": 191,
+        "y": 611,
+        "width": 236,
+        "height": 36
+      },
+      "line_id": "l_8f4da093",
+      "block_id": "b_3d5478ba",
+      "reading_order": 52,
+      "char_start": 364,
+      "char_end": 377,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f4a6779e",
+      "text": "Achieved",
+      "bbox": {
+        "x": 436,
+        "y": 611,
+        "width": 150,
+        "height": 36
+      },
+      "line_id": "l_8f4da093",
+      "block_id": "b_3d5478ba",
+      "reading_order": 53,
+      "char_start": 378,
+      "char_end": 386,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_85ff071e",
+      "text": "Year",
+      "bbox": {
+        "x": 218,
+        "y": 701,
+        "width": 49,
+        "height": 25
+      },
+      "line_id": "l_5ab24ede",
+      "block_id": "b_3d5478ba",
+      "reading_order": 54,
+      "char_start": 387,
+      "char_end": 391,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4088a4c4",
+      "text": "Breakthroughs",
+      "bbox": {
+        "x": 423,
+        "y": 701,
+        "width": 163,
+        "height": 25
+      },
+      "line_id": "l_5ab24ede",
+      "block_id": "b_3d5478ba",
+      "reading_order": 55,
+      "char_start": 392,
+      "char_end": 405,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_de96d941",
+      "text": "at",
+      "bbox": {
+        "x": 593,
+        "y": 701,
+        "width": 23,
+        "height": 25
+      },
+      "line_id": "l_5ab24ede",
+      "block_id": "b_3d5478ba",
+      "reading_order": 56,
+      "char_start": 406,
+      "char_end": 408,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0c3c8745",
+      "text": "Issuance",
+      "bbox": {
+        "x": 621,
+        "y": 701,
+        "width": 93,
+        "height": 25
+      },
+      "line_id": "l_5ab24ede",
+      "block_id": "b_3d5478ba",
+      "reading_order": 57,
+      "char_start": 409,
+      "char_end": 417,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_007ff27f",
+      "text": "2021",
+      "bbox": {
+        "x": 218,
+        "y": 772,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_55ab2525",
+      "block_id": "b_3d5478ba",
+      "reading_order": 58,
+      "char_start": 418,
+      "char_end": 422,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7b796879",
+      "text": "The",
+      "bbox": {
+        "x": 445,
+        "y": 772,
+        "width": 42,
+        "height": 25
+      },
+      "line_id": "l_55ab2525",
+      "block_id": "b_3d5478ba",
+      "reading_order": 59,
+      "char_start": 423,
+      "char_end": 426,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_68f4e2cb",
+      "text": "world’s",
+      "bbox": {
+        "x": 494,
+        "y": 772,
+        "width": 81,
+        "height": 25
+      },
+      "line_id": "l_55ab2525",
+      "block_id": "b_3d5478ba",
+      "reading_order": 60,
+      "char_start": 427,
+      "char_end": 434,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1c782571",
+      "text": "largest",
+      "bbox": {
+        "x": 583,
+        "y": 772,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_55ab2525",
+      "block_id": "b_3d5478ba",
+      "reading_order": 61,
+      "char_start": 435,
+      "char_end": 442,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4c5b25b6",
+      "text": "USD",
+      "bbox": {
+        "x": 667,
+        "y": 772,
+        "width": 52,
+        "height": 25
+      },
+      "line_id": "l_55ab2525",
+      "block_id": "b_3d5478ba",
+      "reading_order": 62,
+      "char_start": 443,
+      "char_end": 446,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_27c68958",
+      "text": "government",
+      "bbox": {
+        "x": 726,
+        "y": 772,
+        "width": 135,
+        "height": 25
+      },
+      "line_id": "l_55ab2525",
+      "block_id": "b_3d5478ba",
+      "reading_order": 63,
+      "char_start": 447,
+      "char_end": 457,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_514621c0",
+      "text": "green",
+      "bbox": {
+        "x": 868,
+        "y": 772,
+        "width": 65,
+        "height": 25
+      },
+      "line_id": "l_55ab2525",
+      "block_id": "b_3d5478ba",
+      "reading_order": 64,
+      "char_start": 458,
+      "char_end": 463,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9b934364",
+      "text": "bond",
+      "bbox": {
+        "x": 940,
+        "y": 772,
+        "width": 59,
+        "height": 25
+      },
+      "line_id": "l_55ab2525",
+      "block_id": "b_3d5478ba",
+      "reading_order": 65,
+      "char_start": 464,
+      "char_end": 468,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e97fa000",
+      "text": "deal",
+      "bbox": {
+        "x": 1006,
+        "y": 772,
+        "width": 48,
+        "height": 25
+      },
+      "line_id": "l_55ab2525",
+      "block_id": "b_3d5478ba",
+      "reading_order": 66,
+      "char_start": 469,
+      "char_end": 473,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ec8a0fd3",
+      "text": "The",
+      "bbox": {
+        "x": 445,
+        "y": 808,
+        "width": 42,
+        "height": 25
+      },
+      "line_id": "l_9c546152",
+      "block_id": "b_3d5478ba",
+      "reading_order": 67,
+      "char_start": 474,
+      "char_end": 477,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_03b6f4cd",
+      "text": "longest",
+      "bbox": {
+        "x": 494,
+        "y": 808,
+        "width": 84,
+        "height": 25
+      },
+      "line_id": "l_9c546152",
+      "block_id": "b_3d5478ba",
+      "reading_order": 68,
+      "char_start": 478,
+      "char_end": 485,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c03f8bb9",
+      "text": "tenor",
+      "bbox": {
+        "x": 585,
+        "y": 808,
+        "width": 59,
+        "height": 25
+      },
+      "line_id": "l_9c546152",
+      "block_id": "b_3d5478ba",
+      "reading_order": 69,
+      "char_start": 486,
+      "char_end": 491,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_bd86b456",
+      "text": "USD",
+      "bbox": {
+        "x": 651,
+        "y": 808,
+        "width": 52,
+        "height": 25
+      },
+      "line_id": "l_9c546152",
+      "block_id": "b_3d5478ba",
+      "reading_order": 70,
+      "char_start": 492,
+      "char_end": 495,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2f0d9514",
+      "text": "government",
+      "bbox": {
+        "x": 710,
+        "y": 808,
+        "width": 135,
+        "height": 25
+      },
+      "line_id": "l_9c546152",
+      "block_id": "b_3d5478ba",
+      "reading_order": 71,
+      "char_start": 496,
+      "char_end": 506,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_fe5241ce",
+      "text": "green",
+      "bbox": {
+        "x": 852,
+        "y": 808,
+        "width": 65,
+        "height": 25
+      },
+      "line_id": "l_9c546152",
+      "block_id": "b_3d5478ba",
+      "reading_order": 72,
+      "char_start": 507,
+      "char_end": 512,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_826b057a",
+      "text": "bond",
+      "bbox": {
+        "x": 924,
+        "y": 808,
+        "width": 59,
+        "height": 25
+      },
+      "line_id": "l_9c546152",
+      "block_id": "b_3d5478ba",
+      "reading_order": 73,
+      "char_start": 513,
+      "char_end": 517,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_485840ab",
+      "text": "ever",
+      "bbox": {
+        "x": 990,
+        "y": 808,
+        "width": 48,
+        "height": 25
+      },
+      "line_id": "l_9c546152",
+      "block_id": "b_3d5478ba",
+      "reading_order": 74,
+      "char_start": 518,
+      "char_end": 522,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_68052d65",
+      "text": "in",
+      "bbox": {
+        "x": 1045,
+        "y": 808,
+        "width": 20,
+        "height": 25
+      },
+      "line_id": "l_9c546152",
+      "block_id": "b_3d5478ba",
+      "reading_order": 75,
+      "char_start": 523,
+      "char_end": 525,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2ceabfd5",
+      "text": "Asia",
+      "bbox": {
+        "x": 1071,
+        "y": 808,
+        "width": 49,
+        "height": 25
+      },
+      "line_id": "l_9c546152",
+      "block_id": "b_3d5478ba",
+      "reading_order": 76,
+      "char_start": 526,
+      "char_end": 530,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_74a41084",
+      "text": "The",
+      "bbox": {
+        "x": 445,
+        "y": 844,
+        "width": 42,
+        "height": 25
+      },
+      "line_id": "l_b541a67d",
+      "block_id": "b_3d5478ba",
+      "reading_order": 77,
+      "char_start": 531,
+      "char_end": 534,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d0b45509",
+      "text": "longest",
+      "bbox": {
+        "x": 494,
+        "y": 844,
+        "width": 84,
+        "height": 25
+      },
+      "line_id": "l_b541a67d",
+      "block_id": "b_3d5478ba",
+      "reading_order": 78,
+      "char_start": 535,
+      "char_end": 542,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f1e0d68d",
+      "text": "tenor",
+      "bbox": {
+        "x": 585,
+        "y": 844,
+        "width": 59,
+        "height": 25
+      },
+      "line_id": "l_b541a67d",
+      "block_id": "b_3d5478ba",
+      "reading_order": 79,
+      "char_start": 543,
+      "char_end": 548,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e596f0d9",
+      "text": "EUR",
+      "bbox": {
+        "x": 651,
+        "y": 844,
+        "width": 51,
+        "height": 25
+      },
+      "line_id": "l_b541a67d",
+      "block_id": "b_3d5478ba",
+      "reading_order": 80,
+      "char_start": 549,
+      "char_end": 552,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_68057ff1",
+      "text": "government",
+      "bbox": {
+        "x": 708,
+        "y": 844,
+        "width": 135,
+        "height": 25
+      },
+      "line_id": "l_b541a67d",
+      "block_id": "b_3d5478ba",
+      "reading_order": 81,
+      "char_start": 553,
+      "char_end": 563,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_63ab6265",
+      "text": "green",
+      "bbox": {
+        "x": 850,
+        "y": 844,
+        "width": 65,
+        "height": 25
+      },
+      "line_id": "l_b541a67d",
+      "block_id": "b_3d5478ba",
+      "reading_order": 82,
+      "char_start": 564,
+      "char_end": 569,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8ce57021",
+      "text": "bond",
+      "bbox": {
+        "x": 922,
+        "y": 844,
+        "width": 59,
+        "height": 25
+      },
+      "line_id": "l_b541a67d",
+      "block_id": "b_3d5478ba",
+      "reading_order": 83,
+      "char_start": 570,
+      "char_end": 574,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7f620fec",
+      "text": "ever",
+      "bbox": {
+        "x": 988,
+        "y": 844,
+        "width": 48,
+        "height": 25
+      },
+      "line_id": "l_b541a67d",
+      "block_id": "b_3d5478ba",
+      "reading_order": 84,
+      "char_start": 575,
+      "char_end": 579,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_03b8e7da",
+      "text": "in",
+      "bbox": {
+        "x": 1043,
+        "y": 844,
+        "width": 20,
+        "height": 25
+      },
+      "line_id": "l_b541a67d",
+      "block_id": "b_3d5478ba",
+      "reading_order": 85,
+      "char_start": 580,
+      "char_end": 582,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e806508b",
+      "text": "Asia",
+      "bbox": {
+        "x": 1069,
+        "y": 844,
+        "width": 49,
+        "height": 25
+      },
+      "line_id": "l_b541a67d",
+      "block_id": "b_3d5478ba",
+      "reading_order": 86,
+      "char_start": 583,
+      "char_end": 587,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3339dbc5",
+      "text": "2022",
+      "bbox": {
+        "x": 218,
+        "y": 912,
+        "width": 56,
+        "height": 25
+      },
+      "line_id": "l_e1f56534",
+      "block_id": "b_3d5478ba",
+      "reading_order": 87,
+      "char_start": 588,
+      "char_end": 592,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6a47e76e",
+      "text": "The",
+      "bbox": {
+        "x": 445,
+        "y": 912,
+        "width": 42,
+        "height": 25
+      },
+      "line_id": "l_e1f56534",
+      "block_id": "b_3d5478ba",
+      "reading_order": 88,
+      "char_start": 593,
+      "char_end": 596,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_abe5922a",
+      "text": "world’s",
+      "bbox": {
+        "x": 494,
+        "y": 912,
+        "width": 81,
+        "height": 25
+      },
+      "line_id": "l_e1f56534",
+      "block_id": "b_3d5478ba",
+      "reading_order": 89,
+      "char_start": 597,
+      "char_end": 604,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b7abacf8",
+      "text": "largest",
+      "bbox": {
+        "x": 583,
+        "y": 912,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_e1f56534",
+      "block_id": "b_3d5478ba",
+      "reading_order": 90,
+      "char_start": 605,
+      "char_end": 612,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3eea4eb3",
+      "text": "retail",
+      "bbox": {
+        "x": 667,
+        "y": 912,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_e1f56534",
+      "block_id": "b_3d5478ba",
+      "reading_order": 91,
+      "char_start": 613,
+      "char_end": 619,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_835846f7",
+      "text": "green",
+      "bbox": {
+        "x": 729,
+        "y": 912,
+        "width": 65,
+        "height": 25
+      },
+      "line_id": "l_e1f56534",
+      "block_id": "b_3d5478ba",
+      "reading_order": 92,
+      "char_start": 620,
+      "char_end": 625,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_eecd3cef",
+      "text": "bond",
+      "bbox": {
+        "x": 801,
+        "y": 912,
+        "width": 59,
+        "height": 25
+      },
+      "line_id": "l_e1f56534",
+      "block_id": "b_3d5478ba",
+      "reading_order": 93,
+      "char_start": 626,
+      "char_end": 630,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5a3c0192",
+      "text": "issuance",
+      "bbox": {
+        "x": 867,
+        "y": 912,
+        "width": 101,
+        "height": 25
+      },
+      "line_id": "l_e1f56534",
+      "block_id": "b_3d5478ba",
+      "reading_order": 94,
+      "char_start": 631,
+      "char_end": 639,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_98763c34",
+      "text": "2023",
+      "bbox": {
+        "x": 218,
+        "y": 977,
+        "width": 56,
+        "height": 25
+      },
+      "line_id": "l_f8a5499c",
+      "block_id": "b_3d5478ba",
+      "reading_order": 95,
+      "char_start": 640,
+      "char_end": 644,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0d0d6fd1",
+      "text": "The",
+      "bbox": {
+        "x": 445,
+        "y": 977,
+        "width": 42,
+        "height": 25
+      },
+      "line_id": "l_f8a5499c",
+      "block_id": "b_3d5478ba",
+      "reading_order": 96,
+      "char_start": 645,
+      "char_end": 648,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_31a5f195",
+      "text": "largest",
+      "bbox": {
+        "x": 494,
+        "y": 977,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_f8a5499c",
+      "block_id": "b_3d5478ba",
+      "reading_order": 97,
+      "char_start": 649,
+      "char_end": 656,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d3ccdcb9",
+      "text": "ESG",
+      "bbox": {
+        "x": 579,
+        "y": 977,
+        "width": 50,
+        "height": 25
+      },
+      "line_id": "l_f8a5499c",
+      "block_id": "b_3d5478ba",
+      "reading_order": 98,
+      "char_start": 657,
+      "char_end": 660,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_01dcba24",
+      "text": "bond",
+      "bbox": {
+        "x": 636,
+        "y": 977,
+        "width": 59,
+        "height": 25
+      },
+      "line_id": "l_f8a5499c",
+      "block_id": "b_3d5478ba",
+      "reading_order": 99,
+      "char_start": 661,
+      "char_end": 665,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a0e3062d",
+      "text": "issuance",
+      "bbox": {
+        "x": 702,
+        "y": 977,
+        "width": 101,
+        "height": 25
+      },
+      "line_id": "l_f8a5499c",
+      "block_id": "b_3d5478ba",
+      "reading_order": 100,
+      "char_start": 666,
+      "char_end": 674,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f7564fde",
+      "text": "ever",
+      "bbox": {
+        "x": 810,
+        "y": 977,
+        "width": 48,
+        "height": 25
+      },
+      "line_id": "l_f8a5499c",
+      "block_id": "b_3d5478ba",
+      "reading_order": 101,
+      "char_start": 675,
+      "char_end": 679,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_97dfa482",
+      "text": "in",
+      "bbox": {
+        "x": 865,
+        "y": 977,
+        "width": 20,
+        "height": 25
+      },
+      "line_id": "l_f8a5499c",
+      "block_id": "b_3d5478ba",
+      "reading_order": 102,
+      "char_start": 680,
+      "char_end": 682,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_63cac9b9",
+      "text": "Asia",
+      "bbox": {
+        "x": 891,
+        "y": 977,
+        "width": 49,
+        "height": 25
+      },
+      "line_id": "l_f8a5499c",
+      "block_id": "b_3d5478ba",
+      "reading_order": 103,
+      "char_start": 683,
+      "char_end": 687,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_62489a07",
+      "text": "The",
+      "bbox": {
+        "x": 445,
+        "y": 1014,
+        "width": 42,
+        "height": 25
+      },
+      "line_id": "l_cc4f6ebf",
+      "block_id": "b_3d5478ba",
+      "reading_order": 104,
+      "char_start": 688,
+      "char_end": 691,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d0a57ef8",
+      "text": "world’s",
+      "bbox": {
+        "x": 494,
+        "y": 1014,
+        "width": 81,
+        "height": 25
+      },
+      "line_id": "l_cc4f6ebf",
+      "block_id": "b_3d5478ba",
+      "reading_order": 105,
+      "char_start": 692,
+      "char_end": 699,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f049927e",
+      "text": "first",
+      "bbox": {
+        "x": 583,
+        "y": 1014,
+        "width": 43,
+        "height": 25
+      },
+      "line_id": "l_cc4f6ebf",
+      "block_id": "b_3d5478ba",
+      "reading_order": 106,
+      "char_start": 700,
+      "char_end": 705,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_786d001d",
+      "text": "government",
+      "bbox": {
+        "x": 632,
+        "y": 1014,
+        "width": 135,
+        "height": 25
+      },
+      "line_id": "l_cc4f6ebf",
+      "block_id": "b_3d5478ba",
+      "reading_order": 107,
+      "char_start": 706,
+      "char_end": 716,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_515ed83a",
+      "text": "tokenised",
+      "bbox": {
+        "x": 775,
+        "y": 1014,
+        "width": 110,
+        "height": 25
+      },
+      "line_id": "l_cc4f6ebf",
+      "block_id": "b_3d5478ba",
+      "reading_order": 108,
+      "char_start": 717,
+      "char_end": 726,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ede1a0d0",
+      "text": "green",
+      "bbox": {
+        "x": 892,
+        "y": 1014,
+        "width": 65,
+        "height": 25
+      },
+      "line_id": "l_cc4f6ebf",
+      "block_id": "b_3d5478ba",
+      "reading_order": 109,
+      "char_start": 727,
+      "char_end": 732,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a9f88a46",
+      "text": "bond",
+      "bbox": {
+        "x": 964,
+        "y": 1014,
+        "width": 59,
+        "height": 25
+      },
+      "line_id": "l_cc4f6ebf",
+      "block_id": "b_3d5478ba",
+      "reading_order": 110,
+      "char_start": 733,
+      "char_end": 737,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3fc436fc",
+      "text": "issuance",
+      "bbox": {
+        "x": 1029,
+        "y": 1014,
+        "width": 101,
+        "height": 25
+      },
+      "line_id": "l_cc4f6ebf",
+      "block_id": "b_3d5478ba",
+      "reading_order": 111,
+      "char_start": 738,
+      "char_end": 746,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5e6038b2",
+      "text": "2024",
+      "bbox": {
+        "x": 218,
+        "y": 1079,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_344dfab6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 112,
+      "char_start": 747,
+      "char_end": 751,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9a52406e",
+      "text": "The",
+      "bbox": {
+        "x": 445,
+        "y": 1079,
+        "width": 42,
+        "height": 25
+      },
+      "line_id": "l_344dfab6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 113,
+      "char_start": 752,
+      "char_end": 755,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a160b09f",
+      "text": "world’s",
+      "bbox": {
+        "x": 494,
+        "y": 1079,
+        "width": 81,
+        "height": 25
+      },
+      "line_id": "l_344dfab6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 114,
+      "char_start": 756,
+      "char_end": 763,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f5aefa9b",
+      "text": "first",
+      "bbox": {
+        "x": 583,
+        "y": 1079,
+        "width": 43,
+        "height": 25
+      },
+      "line_id": "l_344dfab6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 115,
+      "char_start": 764,
+      "char_end": 769,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_bee37d83",
+      "text": "multi-currency",
+      "bbox": {
+        "x": 632,
+        "y": 1079,
+        "width": 165,
+        "height": 25
+      },
+      "line_id": "l_344dfab6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 116,
+      "char_start": 770,
+      "char_end": 784,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0c3b84cd",
+      "text": "digitally",
+      "bbox": {
+        "x": 804,
+        "y": 1079,
+        "width": 87,
+        "height": 25
+      },
+      "line_id": "l_344dfab6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 117,
+      "char_start": 785,
+      "char_end": 794,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d2aaea7b",
+      "text": "native",
+      "bbox": {
+        "x": 898,
+        "y": 1079,
+        "width": 67,
+        "height": 25
+      },
+      "line_id": "l_344dfab6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 118,
+      "char_start": 795,
+      "char_end": 801,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_efe58f5b",
+      "text": "bond",
+      "bbox": {
+        "x": 973,
+        "y": 1079,
+        "width": 59,
+        "height": 25
+      },
+      "line_id": "l_344dfab6",
+      "block_id": "b_3d5478ba",
+      "reading_order": 119,
+      "char_start": 802,
+      "char_end": 806,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2cfcc576",
+      "text": "12",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 28,
+        "height": 25
+      },
+      "line_id": "l_acc8a363",
+      "block_id": "b_0180297a",
+      "reading_order": 120,
+      "char_start": 808,
+      "char_end": 810,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6cf1e069",
+      "text": "Green",
+      "bbox": {
+        "x": 275,
+        "y": 2256,
+        "width": 63,
+        "height": 25
+      },
+      "line_id": "l_acc8a363",
+      "block_id": "b_0180297a",
+      "reading_order": 121,
+      "char_start": 811,
+      "char_end": 816,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d1d2a643",
+      "text": "Bond",
+      "bbox": {
+        "x": 343,
+        "y": 2256,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_acc8a363",
+      "block_id": "b_0180297a",
+      "reading_order": 122,
+      "char_start": 817,
+      "char_end": 821,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_23e5cde0",
+      "text": "Report",
+      "bbox": {
+        "x": 404,
+        "y": 2256,
+        "width": 71,
+        "height": 25
+      },
+      "line_id": "l_acc8a363",
+      "block_id": "b_0180297a",
+      "reading_order": 123,
+      "char_start": 822,
+      "char_end": 828,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_70cdae82",
+      "text": "2025",
+      "bbox": {
+        "x": 480,
+        "y": 2256,
+        "width": 51,
+        "height": 25
+      },
+      "line_id": "l_acc8a363",
+      "block_id": "b_0180297a",
+      "reading_order": 124,
+      "char_start": 829,
+      "char_end": 833,
+      "layer_id": "pdf_text"
+    }
+  ],
+  "lines": [
+    {
+      "line_id": "l_163845cb",
+      "bbox": {
+        "x": 194,
+        "y": 172,
+        "width": 785,
+        "height": 26
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_fa25378c",
+        "w_a515e7cb",
+        "w_a40c8625",
+        "w_96d918b2",
+        "w_19d4f971",
+        "w_ef73ff49"
+      ],
+      "text": "Cumulative Government Green Bond Issuances: Institutional:",
+      "char_start": 0,
+      "char_end": 58,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_dc992ea3",
+      "bbox": {
+        "x": 955,
+        "y": 225,
+        "width": 454,
+        "height": 17
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_66fe034a",
+        "w_a0b06eea",
+        "w_6e2a35d7"
+      ],
+      "text": "~HK$ ~HK$ HK$",
+      "char_start": 59,
+      "char_end": 72,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_cf7b0af5",
+      "bbox": {
+        "x": 939,
+        "y": 242,
+        "width": 489,
+        "height": 17
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_5bbf66d1",
+        "w_dd83bf48",
+        "w_707f4f6a",
+        "w_5a44f6d2",
+        "w_d5d7ed19",
+        "w_0d468e4f"
+      ],
+      "text": "240 billion 200 billion 40 billion",
+      "char_start": 73,
+      "char_end": 107,
+      "reading_order": 2
+    },
+    {
+      "line_id": "l_eaeb9676",
+      "bbox": {
+        "x": 920,
+        "y": 298,
+        "width": 527,
+        "height": 17
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_cd5cc8ae",
+        "w_18a0a0c6",
+        "w_f050fa15",
+        "w_3112f590",
+        "w_e7ee5d9e",
+        "w_0d2dca61"
+      ],
+      "text": "(~US$31 billion) (~US$26 billion) (~US$5 billion)",
+      "char_start": 108,
+      "char_end": 157,
+      "reading_order": 3
+    },
+    {
+      "line_id": "l_7b70bc2b",
+      "bbox": {
+        "x": 438,
+        "y": 346,
+        "width": 533,
+        "height": 19
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_8a493fdc",
+        "w_845891f7",
+        "w_f9fbbeac"
+      ],
+      "text": "~HK$ ~HK$ HK$",
+      "char_start": 158,
+      "char_end": 171,
+      "reading_order": 4
+    },
+    {
+      "line_id": "l_a43c05fd",
+      "bbox": {
+        "x": 419,
+        "y": 366,
+        "width": 573,
+        "height": 31
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_5b5afdd2",
+        "w_16f4ce46",
+        "w_9a64c9cd",
+        "w_730f12b4",
+        "w_7aa1b67c",
+        "w_3ea8163a",
+        "w_62d8e20f"
+      ],
+      "text": "240 billion 200 billion Retail: 40 billion",
+      "char_start": 172,
+      "char_end": 214,
+      "reading_order": 5
+    },
+    {
+      "line_id": "l_26f719c6",
+      "bbox": {
+        "x": 397,
+        "y": 423,
+        "width": 805,
+        "height": 28
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_b68c30e0",
+        "w_19ef0ce5",
+        "w_df3bd81b",
+        "w_f456e066",
+        "w_32a5ca71",
+        "w_021babb9",
+        "w_6d492d0c",
+        "w_c101f695",
+        "w_e26b7da1"
+      ],
+      "text": "(~US$31 billion) (~US$26 billion) ~HK$ (~US$5 ~HK$ billion) HK$",
+      "char_start": 215,
+      "char_end": 278,
+      "reading_order": 6
+    },
+    {
+      "line_id": "l_e0a80615",
+      "bbox": {
+        "x": 732,
+        "y": 440,
+        "width": 489,
+        "height": 17
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_3b3bab60",
+        "w_f9c72bb9",
+        "w_b03d32cc",
+        "w_0c99c4d0",
+        "w_bb782701",
+        "w_3766eaeb"
+      ],
+      "text": "240 billion 200 billion 40 billion",
+      "char_start": 279,
+      "char_end": 313,
+      "reading_order": 7
+    },
+    {
+      "line_id": "l_343672c7",
+      "bbox": {
+        "x": 713,
+        "y": 496,
+        "width": 527,
+        "height": 17
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_340e9e35",
+        "w_5bc6beca",
+        "w_496774cf",
+        "w_0c29d64a",
+        "w_13617bb7",
+        "w_78cdf54c"
+      ],
+      "text": "(~US$31 billion) (~US$26 billion) (~US$5 billion)",
+      "char_start": 314,
+      "char_end": 363,
+      "reading_order": 8
+    },
+    {
+      "line_id": "l_8f4da093",
+      "bbox": {
+        "x": 191,
+        "y": 611,
+        "width": 395,
+        "height": 36
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_2dd1a80a",
+        "w_f4a6779e"
+      ],
+      "text": "Breakthroughs Achieved",
+      "char_start": 364,
+      "char_end": 386,
+      "reading_order": 9
+    },
+    {
+      "line_id": "l_5ab24ede",
+      "bbox": {
+        "x": 218,
+        "y": 701,
+        "width": 496,
+        "height": 25
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_85ff071e",
+        "w_4088a4c4",
+        "w_de96d941",
+        "w_0c3c8745"
+      ],
+      "text": "Year Breakthroughs at Issuance",
+      "char_start": 387,
+      "char_end": 417,
+      "reading_order": 10
+    },
+    {
+      "line_id": "l_55ab2525",
+      "bbox": {
+        "x": 218,
+        "y": 772,
+        "width": 836,
+        "height": 25
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_007ff27f",
+        "w_7b796879",
+        "w_68f4e2cb",
+        "w_1c782571",
+        "w_4c5b25b6",
+        "w_27c68958",
+        "w_514621c0",
+        "w_9b934364",
+        "w_e97fa000"
+      ],
+      "text": "2021 The world’s largest USD government green bond deal",
+      "char_start": 418,
+      "char_end": 473,
+      "reading_order": 11
+    },
+    {
+      "line_id": "l_9c546152",
+      "bbox": {
+        "x": 445,
+        "y": 808,
+        "width": 675,
+        "height": 25
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_ec8a0fd3",
+        "w_03b6f4cd",
+        "w_c03f8bb9",
+        "w_bd86b456",
+        "w_2f0d9514",
+        "w_fe5241ce",
+        "w_826b057a",
+        "w_485840ab",
+        "w_68052d65",
+        "w_2ceabfd5"
+      ],
+      "text": "The longest tenor USD government green bond ever in Asia",
+      "char_start": 474,
+      "char_end": 530,
+      "reading_order": 12
+    },
+    {
+      "line_id": "l_b541a67d",
+      "bbox": {
+        "x": 445,
+        "y": 844,
+        "width": 673,
+        "height": 25
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_74a41084",
+        "w_d0b45509",
+        "w_f1e0d68d",
+        "w_e596f0d9",
+        "w_68057ff1",
+        "w_63ab6265",
+        "w_8ce57021",
+        "w_7f620fec",
+        "w_03b8e7da",
+        "w_e806508b"
+      ],
+      "text": "The longest tenor EUR government green bond ever in Asia",
+      "char_start": 531,
+      "char_end": 587,
+      "reading_order": 13
+    },
+    {
+      "line_id": "l_e1f56534",
+      "bbox": {
+        "x": 218,
+        "y": 912,
+        "width": 750,
+        "height": 25
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_3339dbc5",
+        "w_6a47e76e",
+        "w_abe5922a",
+        "w_b7abacf8",
+        "w_3eea4eb3",
+        "w_835846f7",
+        "w_eecd3cef",
+        "w_5a3c0192"
+      ],
+      "text": "2022 The world’s largest retail green bond issuance",
+      "char_start": 588,
+      "char_end": 639,
+      "reading_order": 14
+    },
+    {
+      "line_id": "l_f8a5499c",
+      "bbox": {
+        "x": 218,
+        "y": 977,
+        "width": 722,
+        "height": 25
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_98763c34",
+        "w_0d0d6fd1",
+        "w_31a5f195",
+        "w_d3ccdcb9",
+        "w_01dcba24",
+        "w_a0e3062d",
+        "w_f7564fde",
+        "w_97dfa482",
+        "w_63cac9b9"
+      ],
+      "text": "2023 The largest ESG bond issuance ever in Asia",
+      "char_start": 640,
+      "char_end": 687,
+      "reading_order": 15
+    },
+    {
+      "line_id": "l_cc4f6ebf",
+      "bbox": {
+        "x": 445,
+        "y": 1014,
+        "width": 685,
+        "height": 25
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_62489a07",
+        "w_d0a57ef8",
+        "w_f049927e",
+        "w_786d001d",
+        "w_515ed83a",
+        "w_ede1a0d0",
+        "w_a9f88a46",
+        "w_3fc436fc"
+      ],
+      "text": "The world’s first government tokenised green bond issuance",
+      "char_start": 688,
+      "char_end": 746,
+      "reading_order": 16
+    },
+    {
+      "line_id": "l_344dfab6",
+      "bbox": {
+        "x": 218,
+        "y": 1079,
+        "width": 814,
+        "height": 25
+      },
+      "block_id": "b_3d5478ba",
+      "word_ids": [
+        "w_5e6038b2",
+        "w_9a52406e",
+        "w_a160b09f",
+        "w_f5aefa9b",
+        "w_bee37d83",
+        "w_0c3b84cd",
+        "w_d2aaea7b",
+        "w_efe58f5b"
+      ],
+      "text": "2024 The world’s first multi-currency digitally native bond",
+      "char_start": 747,
+      "char_end": 806,
+      "reading_order": 17
+    },
+    {
+      "line_id": "l_acc8a363",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 337,
+        "height": 25
+      },
+      "block_id": "b_0180297a",
+      "word_ids": [
+        "w_2cfcc576",
+        "w_6cf1e069",
+        "w_d1d2a643",
+        "w_23e5cde0",
+        "w_70cdae82"
+      ],
+      "text": "12 Green Bond Report 2025",
+      "char_start": 808,
+      "char_end": 833,
+      "reading_order": 0
+    }
+  ],
+  "blocks": [
+    {
+      "block_id": "b_3d5478ba",
+      "bbox": {
+        "x": 191,
+        "y": 172,
+        "width": 1256,
+        "height": 932
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_163845cb",
+        "l_dc992ea3",
+        "l_cf7b0af5",
+        "l_eaeb9676",
+        "l_7b70bc2b",
+        "l_a43c05fd",
+        "l_26f719c6",
+        "l_e0a80615",
+        "l_343672c7",
+        "l_8f4da093",
+        "l_5ab24ede",
+        "l_55ab2525",
+        "l_9c546152",
+        "l_b541a67d",
+        "l_e1f56534",
+        "l_f8a5499c",
+        "l_cc4f6ebf",
+        "l_344dfab6"
+      ],
+      "text": "Cumulative Government Green Bond Issuances: Institutional:\n~HK$ ~HK$ HK$\n240 billion 200 billion 40 billion\n(~US$31 billion) (~US$26 billion) (~US$5 billion)\n~HK$ ~HK$ HK$\n240 billion 200 billion Retail: 40 billion\n(~US$31 billion) (~US$26 billion) ~HK$ (~US$5 ~HK$ billion) HK$\n240 billion 200 billion 40 billion\n(~US$31 billion) (~US$26 billion) (~US$5 billion)\nBreakthroughs Achieved\nYear Breakthroughs at Issuance\n2021 The world’s largest USD government green bond deal\nThe longest tenor USD government green bond ever in Asia\nThe longest tenor EUR government green bond ever in Asia\n2022 The world’s largest retail green bond issuance\n2023 The largest ESG bond issuance ever in Asia\nThe world’s first government tokenised green bond issuance\n2024 The world’s first multi-currency digitally native bond",
+      "char_start": 0,
+      "char_end": 806,
+      "reading_order": 0
+    },
+    {
+      "block_id": "b_0180297a",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 337,
+        "height": 25
+      },
+      "block_type": "list_item",
+      "line_ids": [
+        "l_acc8a363"
+      ],
+      "text": "12 Green Bond Report 2025",
+      "char_start": 808,
+      "char_end": 833,
+      "reading_order": 1
+    }
+  ],
+  "tables": []
+}

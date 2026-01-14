@@ -1,0 +1,706 @@
+{
+  "page_id": "fb3c59894bd2:page_001",
+  "page_number": 1,
+  "doc_id": "fb3c59894bd2",
+  "layout_version_id": "c84625f1-3db9-43c5-a4da-12ffc5948c74",
+  "geometry": {
+    "pdf_page_width_pt": 595.276,
+    "pdf_page_height_pt": 841.89,
+    "rotation_deg": 0,
+    "media_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "crop_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "render_dpi": 200,
+    "render_scale": 2.7777777777777777,
+    "rendered_width_px": 1654,
+    "rendered_height_px": 2339
+  },
+  "layers": {
+    "pdf_text": {
+      "layer_id": "pdf_text",
+      "source_engine": "pdfplumber/0.11.9",
+      "coverage": 0.024347675941257876,
+      "word_count": 15,
+      "tokens": [
+        {
+          "token_id": "tok_000000",
+          "text": "Green",
+          "bbox": {
+            "x": 1065,
+            "y": 459,
+            "width": 243,
+            "height": 84
+          },
+          "font_name": "WBLURF+Avenir-Black",
+          "font_size": 30.299999999999955,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000001",
+          "text": "Bond",
+          "bbox": {
+            "x": 1341,
+            "y": 459,
+            "width": 207,
+            "height": 84
+          },
+          "font_name": "WBLURF+Avenir-Black",
+          "font_size": 30.299999999999955,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000002",
+          "text": "Report",
+          "bbox": {
+            "x": 1065,
+            "y": 539,
+            "width": 275,
+            "height": 84
+          },
+          "font_name": "WBLURF+Avenir-Black",
+          "font_size": 30.299999999999955,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000003",
+          "text": "2025",
+          "bbox": {
+            "x": 1365,
+            "y": 532,
+            "width": 185,
+            "height": 78
+          },
+          "font_name": "WBLURF+FuturaStd-Book",
+          "font_size": 28.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000004",
+          "text": "Hong",
+          "bbox": {
+            "x": 1070,
+            "y": 313,
+            "width": 61,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000005",
+          "text": "Kong",
+          "bbox": {
+            "x": 1138,
+            "y": 313,
+            "width": 59,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000006",
+          "text": "Special",
+          "bbox": {
+            "x": 1204,
+            "y": 313,
+            "width": 84,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000007",
+          "text": "Administrative",
+          "bbox": {
+            "x": 1296,
+            "y": 313,
+            "width": 161,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000008",
+          "text": "Region",
+          "bbox": {
+            "x": 1464,
+            "y": 313,
+            "width": 80,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000009",
+          "text": "of",
+          "bbox": {
+            "x": 1118,
+            "y": 343,
+            "width": 22,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000010",
+          "text": "the",
+          "bbox": {
+            "x": 1147,
+            "y": 343,
+            "width": 35,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000011",
+          "text": "People’s",
+          "bbox": {
+            "x": 1190,
+            "y": 343,
+            "width": 97,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000012",
+          "text": "Republic",
+          "bbox": {
+            "x": 1294,
+            "y": 343,
+            "width": 100,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000013",
+          "text": "of",
+          "bbox": {
+            "x": 1401,
+            "y": 343,
+            "width": 22,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000014",
+          "text": "China",
+          "bbox": {
+            "x": 1431,
+            "y": 343,
+            "width": 65,
+            "height": 24
+          },
+          "font_name": "WBLURF+HelveticaNeueLTStd-Roman",
+          "font_size": 8.733299999999986,
+          "is_bold": false,
+          "is_italic": false
+        }
+      ]
+    }
+  },
+  "canonical": {
+    "layer_id": "pdf_text",
+    "reason": "selected_layer_pdf_text"
+  },
+  "canonical_text": "Hong Kong Special Administrative Region\nof the People’s Republic of China\n\nGreen Bond\nReport 2025",
+  "canonical_index": {
+    "words": {
+      "w_fa5352fe": {
+        "char_start": 0,
+        "char_end": 4
+      },
+      "w_18e06946": {
+        "char_start": 5,
+        "char_end": 9
+      },
+      "w_6651bc7c": {
+        "char_start": 10,
+        "char_end": 17
+      },
+      "w_db0a0051": {
+        "char_start": 18,
+        "char_end": 32
+      },
+      "w_880cb56f": {
+        "char_start": 33,
+        "char_end": 39
+      },
+      "w_b3c22564": {
+        "char_start": 40,
+        "char_end": 42
+      },
+      "w_82da0fc2": {
+        "char_start": 43,
+        "char_end": 46
+      },
+      "w_55803c78": {
+        "char_start": 47,
+        "char_end": 55
+      },
+      "w_c2eb4aa3": {
+        "char_start": 56,
+        "char_end": 64
+      },
+      "w_e21feb4d": {
+        "char_start": 65,
+        "char_end": 67
+      },
+      "w_dae48fd8": {
+        "char_start": 68,
+        "char_end": 73
+      },
+      "w_f88fd8f0": {
+        "char_start": 75,
+        "char_end": 80
+      },
+      "w_60c963fc": {
+        "char_start": 81,
+        "char_end": 85
+      },
+      "w_bfe88c3f": {
+        "char_start": 86,
+        "char_end": 92
+      },
+      "w_c623f4dc": {
+        "char_start": 93,
+        "char_end": 97
+      }
+    },
+    "lines": {
+      "l_c1e7346c": {
+        "char_start": 0,
+        "char_end": 39
+      },
+      "l_610652b2": {
+        "char_start": 40,
+        "char_end": 73
+      },
+      "l_b5c939e9": {
+        "char_start": 75,
+        "char_end": 85
+      },
+      "l_728759b6": {
+        "char_start": 86,
+        "char_end": 97
+      }
+    },
+    "blocks": {
+      "b_2b5cb9ac": {
+        "char_start": 0,
+        "char_end": 73
+      },
+      "b_469db54f": {
+        "char_start": 75,
+        "char_end": 97
+      }
+    }
+  },
+  "words": [
+    {
+      "word_id": "w_fa5352fe",
+      "text": "Hong",
+      "bbox": {
+        "x": 1070,
+        "y": 313,
+        "width": 61,
+        "height": 24
+      },
+      "line_id": "l_c1e7346c",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 0,
+      "char_start": 0,
+      "char_end": 4,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_18e06946",
+      "text": "Kong",
+      "bbox": {
+        "x": 1138,
+        "y": 313,
+        "width": 59,
+        "height": 24
+      },
+      "line_id": "l_c1e7346c",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 1,
+      "char_start": 5,
+      "char_end": 9,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6651bc7c",
+      "text": "Special",
+      "bbox": {
+        "x": 1204,
+        "y": 313,
+        "width": 84,
+        "height": 24
+      },
+      "line_id": "l_c1e7346c",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 2,
+      "char_start": 10,
+      "char_end": 17,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_db0a0051",
+      "text": "Administrative",
+      "bbox": {
+        "x": 1296,
+        "y": 313,
+        "width": 161,
+        "height": 24
+      },
+      "line_id": "l_c1e7346c",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 3,
+      "char_start": 18,
+      "char_end": 32,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_880cb56f",
+      "text": "Region",
+      "bbox": {
+        "x": 1464,
+        "y": 313,
+        "width": 80,
+        "height": 24
+      },
+      "line_id": "l_c1e7346c",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 4,
+      "char_start": 33,
+      "char_end": 39,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b3c22564",
+      "text": "of",
+      "bbox": {
+        "x": 1118,
+        "y": 343,
+        "width": 22,
+        "height": 24
+      },
+      "line_id": "l_610652b2",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 5,
+      "char_start": 40,
+      "char_end": 42,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_82da0fc2",
+      "text": "the",
+      "bbox": {
+        "x": 1147,
+        "y": 343,
+        "width": 35,
+        "height": 24
+      },
+      "line_id": "l_610652b2",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 6,
+      "char_start": 43,
+      "char_end": 46,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_55803c78",
+      "text": "People’s",
+      "bbox": {
+        "x": 1190,
+        "y": 343,
+        "width": 97,
+        "height": 24
+      },
+      "line_id": "l_610652b2",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 7,
+      "char_start": 47,
+      "char_end": 55,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c2eb4aa3",
+      "text": "Republic",
+      "bbox": {
+        "x": 1294,
+        "y": 343,
+        "width": 100,
+        "height": 24
+      },
+      "line_id": "l_610652b2",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 8,
+      "char_start": 56,
+      "char_end": 64,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e21feb4d",
+      "text": "of",
+      "bbox": {
+        "x": 1401,
+        "y": 343,
+        "width": 22,
+        "height": 24
+      },
+      "line_id": "l_610652b2",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 9,
+      "char_start": 65,
+      "char_end": 67,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_dae48fd8",
+      "text": "China",
+      "bbox": {
+        "x": 1431,
+        "y": 343,
+        "width": 65,
+        "height": 24
+      },
+      "line_id": "l_610652b2",
+      "block_id": "b_2b5cb9ac",
+      "reading_order": 10,
+      "char_start": 68,
+      "char_end": 73,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f88fd8f0",
+      "text": "Green",
+      "bbox": {
+        "x": 1065,
+        "y": 459,
+        "width": 243,
+        "height": 84
+      },
+      "line_id": "l_b5c939e9",
+      "block_id": "b_469db54f",
+      "reading_order": 11,
+      "char_start": 75,
+      "char_end": 80,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_60c963fc",
+      "text": "Bond",
+      "bbox": {
+        "x": 1341,
+        "y": 459,
+        "width": 207,
+        "height": 84
+      },
+      "line_id": "l_b5c939e9",
+      "block_id": "b_469db54f",
+      "reading_order": 12,
+      "char_start": 81,
+      "char_end": 85,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_bfe88c3f",
+      "text": "Report",
+      "bbox": {
+        "x": 1065,
+        "y": 539,
+        "width": 275,
+        "height": 84
+      },
+      "line_id": "l_728759b6",
+      "block_id": "b_469db54f",
+      "reading_order": 13,
+      "char_start": 86,
+      "char_end": 92,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c623f4dc",
+      "text": "2025",
+      "bbox": {
+        "x": 1365,
+        "y": 532,
+        "width": 185,
+        "height": 78
+      },
+      "line_id": "l_728759b6",
+      "block_id": "b_469db54f",
+      "reading_order": 14,
+      "char_start": 93,
+      "char_end": 97,
+      "layer_id": "pdf_text"
+    }
+  ],
+  "lines": [
+    {
+      "line_id": "l_c1e7346c",
+      "bbox": {
+        "x": 1070,
+        "y": 313,
+        "width": 474,
+        "height": 24
+      },
+      "block_id": "b_2b5cb9ac",
+      "word_ids": [
+        "w_fa5352fe",
+        "w_18e06946",
+        "w_6651bc7c",
+        "w_db0a0051",
+        "w_880cb56f"
+      ],
+      "text": "Hong Kong Special Administrative Region",
+      "char_start": 0,
+      "char_end": 39,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_610652b2",
+      "bbox": {
+        "x": 1118,
+        "y": 343,
+        "width": 378,
+        "height": 24
+      },
+      "block_id": "b_2b5cb9ac",
+      "word_ids": [
+        "w_b3c22564",
+        "w_82da0fc2",
+        "w_55803c78",
+        "w_c2eb4aa3",
+        "w_e21feb4d",
+        "w_dae48fd8"
+      ],
+      "text": "of the People’s Republic of China",
+      "char_start": 40,
+      "char_end": 73,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_b5c939e9",
+      "bbox": {
+        "x": 1065,
+        "y": 459,
+        "width": 483,
+        "height": 84
+      },
+      "block_id": "b_469db54f",
+      "word_ids": [
+        "w_f88fd8f0",
+        "w_60c963fc"
+      ],
+      "text": "Green Bond",
+      "char_start": 75,
+      "char_end": 85,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_728759b6",
+      "bbox": {
+        "x": 1065,
+        "y": 532,
+        "width": 485,
+        "height": 91
+      },
+      "block_id": "b_469db54f",
+      "word_ids": [
+        "w_bfe88c3f",
+        "w_c623f4dc"
+      ],
+      "text": "Report 2025",
+      "char_start": 86,
+      "char_end": 97,
+      "reading_order": 1
+    }
+  ],
+  "blocks": [
+    {
+      "block_id": "b_2b5cb9ac",
+      "bbox": {
+        "x": 1070,
+        "y": 313,
+        "width": 474,
+        "height": 54
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_c1e7346c",
+        "l_610652b2"
+      ],
+      "text": "Hong Kong Special Administrative Region\nof the People’s Republic of China",
+      "char_start": 0,
+      "char_end": 73,
+      "reading_order": 0
+    },
+    {
+      "block_id": "b_469db54f",
+      "bbox": {
+        "x": 1065,
+        "y": 459,
+        "width": 485,
+        "height": 164
+      },
+      "block_type": "heading",
+      "line_ids": [
+        "l_b5c939e9",
+        "l_728759b6"
+      ],
+      "text": "Green Bond\nReport 2025",
+      "char_start": 75,
+      "char_end": 97,
+      "reading_order": 1
+    }
+  ],
+  "tables": []
+}

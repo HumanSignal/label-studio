@@ -1,0 +1,871 @@
+{
+  "page_id": "fb3c59894bd2:page_010",
+  "page_number": 10,
+  "doc_id": "fb3c59894bd2",
+  "layout_version_id": "861bb6a4-5907-4490-9c77-004cf53d7bea",
+  "geometry": {
+    "pdf_page_width_pt": 595.276,
+    "pdf_page_height_pt": 841.89,
+    "rotation_deg": 0,
+    "media_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "crop_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "render_dpi": 200,
+    "render_scale": 2.7777777777777777,
+    "rendered_width_px": 1654,
+    "rendered_height_px": 2339
+  },
+  "layers": {
+    "pdf_text": {
+      "layer_id": "pdf_text",
+      "source_engine": "pdfplumber/0.11.9",
+      "coverage": 0.01585749860547687,
+      "word_count": 15,
+      "tokens": [
+        {
+          "token_id": "tok_000000",
+          "text": "Clean",
+          "bbox": {
+            "x": 1126,
+            "y": 726,
+            "width": 91,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000001",
+          "text": "Transportation",
+          "bbox": {
+            "x": 1126,
+            "y": 768,
+            "width": 234,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000002",
+          "text": "Green",
+          "bbox": {
+            "x": 194,
+            "y": 1199,
+            "width": 100,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000003",
+          "text": "Buildings",
+          "bbox": {
+            "x": 303,
+            "y": 1199,
+            "width": 147,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000004",
+          "text": "Nature",
+          "bbox": {
+            "x": 194,
+            "y": 253,
+            "width": 113,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000005",
+          "text": "Conservation",
+          "bbox": {
+            "x": 194,
+            "y": 295,
+            "width": 213,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000007",
+          "text": "Biodiversity",
+          "bbox": {
+            "x": 194,
+            "y": 336,
+            "width": 189,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000008",
+          "text": "Climate",
+          "bbox": {
+            "x": 1126,
+            "y": 1672,
+            "width": 124,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000009",
+          "text": "Change",
+          "bbox": {
+            "x": 1259,
+            "y": 1672,
+            "width": 125,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000010",
+          "text": "Adaptation",
+          "bbox": {
+            "x": 1126,
+            "y": 1714,
+            "width": 182,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000011",
+          "text": "10",
+          "bbox": {
+            "x": 194,
+            "y": 2256,
+            "width": 28,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Bold",
+          "font_size": 9.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000012",
+          "text": "Green",
+          "bbox": {
+            "x": 275,
+            "y": 2256,
+            "width": 63,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000013",
+          "text": "Bond",
+          "bbox": {
+            "x": 343,
+            "y": 2256,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000014",
+          "text": "Report",
+          "bbox": {
+            "x": 404,
+            "y": 2256,
+            "width": 71,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000015",
+          "text": "2025",
+          "bbox": {
+            "x": 480,
+            "y": 2256,
+            "width": 51,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        }
+      ]
+    }
+  },
+  "canonical": {
+    "layer_id": "pdf_text",
+    "reason": "selected_layer_pdf_text"
+  },
+  "canonical_text": "Nature\nConservation\nBiodiversity\n\nClean\nTransportation\n\nGreen Buildings\n\nClimate Change\nAdaptation\n\n10 Green Bond Report 2025",
+  "canonical_index": {
+    "words": {
+      "w_e6e2d36e": {
+        "char_start": 0,
+        "char_end": 6
+      },
+      "w_cfd6972d": {
+        "char_start": 7,
+        "char_end": 19
+      },
+      "w_da09c877": {
+        "char_start": 20,
+        "char_end": 32
+      },
+      "w_1505c82c": {
+        "char_start": 34,
+        "char_end": 39
+      },
+      "w_462fe073": {
+        "char_start": 40,
+        "char_end": 54
+      },
+      "w_3bf0854b": {
+        "char_start": 56,
+        "char_end": 61
+      },
+      "w_8af1f31c": {
+        "char_start": 62,
+        "char_end": 71
+      },
+      "w_8c58ea69": {
+        "char_start": 73,
+        "char_end": 80
+      },
+      "w_5413728b": {
+        "char_start": 81,
+        "char_end": 87
+      },
+      "w_fe77f58f": {
+        "char_start": 88,
+        "char_end": 98
+      },
+      "w_5a9d2305": {
+        "char_start": 100,
+        "char_end": 102
+      },
+      "w_4642842c": {
+        "char_start": 103,
+        "char_end": 108
+      },
+      "w_c0fbf806": {
+        "char_start": 109,
+        "char_end": 113
+      },
+      "w_5085cda4": {
+        "char_start": 114,
+        "char_end": 120
+      },
+      "w_60d5bf3e": {
+        "char_start": 121,
+        "char_end": 125
+      }
+    },
+    "lines": {
+      "l_59a210af": {
+        "char_start": 0,
+        "char_end": 6
+      },
+      "l_62adbae6": {
+        "char_start": 7,
+        "char_end": 19
+      },
+      "l_4d8139c7": {
+        "char_start": 20,
+        "char_end": 32
+      },
+      "l_9bd1d40b": {
+        "char_start": 34,
+        "char_end": 39
+      },
+      "l_d048f480": {
+        "char_start": 40,
+        "char_end": 54
+      },
+      "l_e090ff22": {
+        "char_start": 56,
+        "char_end": 71
+      },
+      "l_45b0920b": {
+        "char_start": 73,
+        "char_end": 87
+      },
+      "l_ae8cc836": {
+        "char_start": 88,
+        "char_end": 98
+      },
+      "l_654e6f6a": {
+        "char_start": 100,
+        "char_end": 125
+      }
+    },
+    "blocks": {
+      "b_68fae5f7": {
+        "char_start": 0,
+        "char_end": 32
+      },
+      "b_a5c39807": {
+        "char_start": 34,
+        "char_end": 54
+      },
+      "b_7562d9e7": {
+        "char_start": 56,
+        "char_end": 71
+      },
+      "b_f30046c4": {
+        "char_start": 73,
+        "char_end": 98
+      },
+      "b_427826a5": {
+        "char_start": 100,
+        "char_end": 125
+      }
+    }
+  },
+  "words": [
+    {
+      "word_id": "w_e6e2d36e",
+      "text": "Nature",
+      "bbox": {
+        "x": 194,
+        "y": 253,
+        "width": 113,
+        "height": 36
+      },
+      "line_id": "l_59a210af",
+      "block_id": "b_68fae5f7",
+      "reading_order": 0,
+      "char_start": 0,
+      "char_end": 6,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_cfd6972d",
+      "text": "Conservation",
+      "bbox": {
+        "x": 194,
+        "y": 295,
+        "width": 213,
+        "height": 36
+      },
+      "line_id": "l_62adbae6",
+      "block_id": "b_68fae5f7",
+      "reading_order": 1,
+      "char_start": 7,
+      "char_end": 19,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_da09c877",
+      "text": "Biodiversity",
+      "bbox": {
+        "x": 194,
+        "y": 336,
+        "width": 189,
+        "height": 36
+      },
+      "line_id": "l_4d8139c7",
+      "block_id": "b_68fae5f7",
+      "reading_order": 2,
+      "char_start": 20,
+      "char_end": 32,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1505c82c",
+      "text": "Clean",
+      "bbox": {
+        "x": 1126,
+        "y": 726,
+        "width": 91,
+        "height": 36
+      },
+      "line_id": "l_9bd1d40b",
+      "block_id": "b_a5c39807",
+      "reading_order": 3,
+      "char_start": 34,
+      "char_end": 39,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_462fe073",
+      "text": "Transportation",
+      "bbox": {
+        "x": 1126,
+        "y": 768,
+        "width": 234,
+        "height": 36
+      },
+      "line_id": "l_d048f480",
+      "block_id": "b_a5c39807",
+      "reading_order": 4,
+      "char_start": 40,
+      "char_end": 54,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3bf0854b",
+      "text": "Green",
+      "bbox": {
+        "x": 194,
+        "y": 1199,
+        "width": 100,
+        "height": 36
+      },
+      "line_id": "l_e090ff22",
+      "block_id": "b_7562d9e7",
+      "reading_order": 5,
+      "char_start": 56,
+      "char_end": 61,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8af1f31c",
+      "text": "Buildings",
+      "bbox": {
+        "x": 303,
+        "y": 1199,
+        "width": 147,
+        "height": 36
+      },
+      "line_id": "l_e090ff22",
+      "block_id": "b_7562d9e7",
+      "reading_order": 6,
+      "char_start": 62,
+      "char_end": 71,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8c58ea69",
+      "text": "Climate",
+      "bbox": {
+        "x": 1126,
+        "y": 1672,
+        "width": 124,
+        "height": 36
+      },
+      "line_id": "l_45b0920b",
+      "block_id": "b_f30046c4",
+      "reading_order": 7,
+      "char_start": 73,
+      "char_end": 80,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5413728b",
+      "text": "Change",
+      "bbox": {
+        "x": 1259,
+        "y": 1672,
+        "width": 125,
+        "height": 36
+      },
+      "line_id": "l_45b0920b",
+      "block_id": "b_f30046c4",
+      "reading_order": 8,
+      "char_start": 81,
+      "char_end": 87,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_fe77f58f",
+      "text": "Adaptation",
+      "bbox": {
+        "x": 1126,
+        "y": 1714,
+        "width": 182,
+        "height": 36
+      },
+      "line_id": "l_ae8cc836",
+      "block_id": "b_f30046c4",
+      "reading_order": 9,
+      "char_start": 88,
+      "char_end": 98,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5a9d2305",
+      "text": "10",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 28,
+        "height": 25
+      },
+      "line_id": "l_654e6f6a",
+      "block_id": "b_427826a5",
+      "reading_order": 10,
+      "char_start": 100,
+      "char_end": 102,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4642842c",
+      "text": "Green",
+      "bbox": {
+        "x": 275,
+        "y": 2256,
+        "width": 63,
+        "height": 25
+      },
+      "line_id": "l_654e6f6a",
+      "block_id": "b_427826a5",
+      "reading_order": 11,
+      "char_start": 103,
+      "char_end": 108,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c0fbf806",
+      "text": "Bond",
+      "bbox": {
+        "x": 343,
+        "y": 2256,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_654e6f6a",
+      "block_id": "b_427826a5",
+      "reading_order": 12,
+      "char_start": 109,
+      "char_end": 113,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5085cda4",
+      "text": "Report",
+      "bbox": {
+        "x": 404,
+        "y": 2256,
+        "width": 71,
+        "height": 25
+      },
+      "line_id": "l_654e6f6a",
+      "block_id": "b_427826a5",
+      "reading_order": 13,
+      "char_start": 114,
+      "char_end": 120,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_60d5bf3e",
+      "text": "2025",
+      "bbox": {
+        "x": 480,
+        "y": 2256,
+        "width": 51,
+        "height": 25
+      },
+      "line_id": "l_654e6f6a",
+      "block_id": "b_427826a5",
+      "reading_order": 14,
+      "char_start": 121,
+      "char_end": 125,
+      "layer_id": "pdf_text"
+    }
+  ],
+  "lines": [
+    {
+      "line_id": "l_59a210af",
+      "bbox": {
+        "x": 194,
+        "y": 253,
+        "width": 113,
+        "height": 36
+      },
+      "block_id": "b_68fae5f7",
+      "word_ids": [
+        "w_e6e2d36e"
+      ],
+      "text": "Nature",
+      "char_start": 0,
+      "char_end": 6,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_62adbae6",
+      "bbox": {
+        "x": 194,
+        "y": 295,
+        "width": 213,
+        "height": 36
+      },
+      "block_id": "b_68fae5f7",
+      "word_ids": [
+        "w_cfd6972d"
+      ],
+      "text": "Conservation",
+      "char_start": 7,
+      "char_end": 19,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_4d8139c7",
+      "bbox": {
+        "x": 194,
+        "y": 336,
+        "width": 189,
+        "height": 36
+      },
+      "block_id": "b_68fae5f7",
+      "word_ids": [
+        "w_da09c877"
+      ],
+      "text": "Biodiversity",
+      "char_start": 20,
+      "char_end": 32,
+      "reading_order": 2
+    },
+    {
+      "line_id": "l_9bd1d40b",
+      "bbox": {
+        "x": 1126,
+        "y": 726,
+        "width": 91,
+        "height": 36
+      },
+      "block_id": "b_a5c39807",
+      "word_ids": [
+        "w_1505c82c"
+      ],
+      "text": "Clean",
+      "char_start": 34,
+      "char_end": 39,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_d048f480",
+      "bbox": {
+        "x": 1126,
+        "y": 768,
+        "width": 234,
+        "height": 36
+      },
+      "block_id": "b_a5c39807",
+      "word_ids": [
+        "w_462fe073"
+      ],
+      "text": "Transportation",
+      "char_start": 40,
+      "char_end": 54,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_e090ff22",
+      "bbox": {
+        "x": 194,
+        "y": 1199,
+        "width": 256,
+        "height": 36
+      },
+      "block_id": "b_7562d9e7",
+      "word_ids": [
+        "w_3bf0854b",
+        "w_8af1f31c"
+      ],
+      "text": "Green Buildings",
+      "char_start": 56,
+      "char_end": 71,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_45b0920b",
+      "bbox": {
+        "x": 1126,
+        "y": 1672,
+        "width": 258,
+        "height": 36
+      },
+      "block_id": "b_f30046c4",
+      "word_ids": [
+        "w_8c58ea69",
+        "w_5413728b"
+      ],
+      "text": "Climate Change",
+      "char_start": 73,
+      "char_end": 87,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_ae8cc836",
+      "bbox": {
+        "x": 1126,
+        "y": 1714,
+        "width": 182,
+        "height": 36
+      },
+      "block_id": "b_f30046c4",
+      "word_ids": [
+        "w_fe77f58f"
+      ],
+      "text": "Adaptation",
+      "char_start": 88,
+      "char_end": 98,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_654e6f6a",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 337,
+        "height": 25
+      },
+      "block_id": "b_427826a5",
+      "word_ids": [
+        "w_5a9d2305",
+        "w_4642842c",
+        "w_c0fbf806",
+        "w_5085cda4",
+        "w_60d5bf3e"
+      ],
+      "text": "10 Green Bond Report 2025",
+      "char_start": 100,
+      "char_end": 125,
+      "reading_order": 0
+    }
+  ],
+  "blocks": [
+    {
+      "block_id": "b_68fae5f7",
+      "bbox": {
+        "x": 194,
+        "y": 253,
+        "width": 213,
+        "height": 119
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_59a210af",
+        "l_62adbae6",
+        "l_4d8139c7"
+      ],
+      "text": "Nature\nConservation\nBiodiversity",
+      "char_start": 0,
+      "char_end": 32,
+      "reading_order": 0
+    },
+    {
+      "block_id": "b_a5c39807",
+      "bbox": {
+        "x": 1126,
+        "y": 726,
+        "width": 234,
+        "height": 78
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_9bd1d40b",
+        "l_d048f480"
+      ],
+      "text": "Clean\nTransportation",
+      "char_start": 34,
+      "char_end": 54,
+      "reading_order": 1
+    },
+    {
+      "block_id": "b_7562d9e7",
+      "bbox": {
+        "x": 194,
+        "y": 1199,
+        "width": 256,
+        "height": 36
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_e090ff22"
+      ],
+      "text": "Green Buildings",
+      "char_start": 56,
+      "char_end": 71,
+      "reading_order": 2
+    },
+    {
+      "block_id": "b_f30046c4",
+      "bbox": {
+        "x": 1126,
+        "y": 1672,
+        "width": 258,
+        "height": 78
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_45b0920b",
+        "l_ae8cc836"
+      ],
+      "text": "Climate Change\nAdaptation",
+      "char_start": 73,
+      "char_end": 98,
+      "reading_order": 3
+    },
+    {
+      "block_id": "b_427826a5",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 337,
+        "height": 25
+      },
+      "block_type": "list_item",
+      "line_ids": [
+        "l_654e6f6a"
+      ],
+      "text": "10 Green Bond Report 2025",
+      "char_start": 100,
+      "char_end": 125,
+      "reading_order": 4
+    }
+  ],
+  "tables": []
+}

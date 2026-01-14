@@ -223,12 +223,13 @@ def convert_ls_annotation_to_records(
         to_name = result.get("to_name", "")
         value = result.get("value", {})
 
-        # Extract label
-        labels = value.get("labels", value.get("choices", []))
+        # Extract label - check value.{result_type} first (e.g., value.pdflabels),
+        # then fallback to value.labels or value.choices
+        labels = value.get(result_type, value.get("labels", value.get("choices", [])))
         label = labels[0] if labels else result_type
 
-        # Get text value if present
-        text_value = value.get("text")
+        # Get text value if present - check multiple possible keys
+        text_value = value.get("text") or value.get("extractedText")
 
         # Determine annotation type
         annotation_type = determine_annotation_type(result_type)
@@ -251,8 +252,8 @@ def convert_ls_annotation_to_records(
             )
             bboxes = calculate_multi_bboxes(word_ids, page_layout.words, page_layout.lines)
 
-        elif result_type == "rectanglelabels":
-            # Bounding box selection
+        elif result_type in ("rectanglelabels", "pdflabels"):
+            # Bounding box selection (PDF labels use percentage coords like rectanglelabels)
             x = value.get("x", 0)
             y = value.get("y", 0)
             width = value.get("width", 0)
@@ -274,6 +275,21 @@ def convert_ls_annotation_to_records(
             matching_words = find_words_in_bbox(bbox, page_layout.words)
             matching_words.sort(key=lambda w: w.reading_order)
             word_ids = [w.word_id for w in matching_words]
+
+            # For pdflabels, also try to use position offsets if available
+            if result_type == "pdflabels" and not word_ids:
+                position = value.get("position", {})
+                start_offset = position.get("startOffset", 0)
+                end_offset = position.get("endOffset", 0)
+                if start_offset or end_offset:
+                    from .canonical_text import find_word_ids_in_range
+                    word_ids = find_word_ids_in_range(
+                        start_offset, end_offset, page_layout.canonical_index
+                    )
+                    if word_ids:
+                        bboxes = calculate_multi_bboxes(
+                            word_ids, page_layout.words, page_layout.lines
+                        )
 
         # Get char positions if we have word IDs
         char_start = 0

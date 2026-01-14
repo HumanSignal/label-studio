@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://labelstud.io/schemas/pdf-ml-export/annotation_record.schema.json",
+  "title": "PDF ML Export Annotation Record",
+  "description": "Schema for annotation records in JSONL export files",
+  "type": "object",
+  "required": [
+    "annotation_id",
+    "task_id",
+    "doc_id",
+    "annotation_type",
+    "label",
+    "evidence",
+    "metadata"
+  ],
+  "definitions": {
+    "bbox_xywh": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": {"type": "integer", "minimum": 0},
+        "y": {"type": "integer", "minimum": 0},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "annotation_evidence": {
+      "type": "object",
+      "description": "Spatial and textual evidence for annotation",
+      "required": ["bboxes", "word_ids", "quote", "char_start", "char_end", "page_id", "layer_id"],
+      "properties": {
+        "bboxes": {
+          "type": "array",
+          "description": "Bounding boxes (one per text fragment/line)",
+          "items": {"$ref": "#/definitions/bbox_xywh"},
+          "minItems": 0
+        },
+        "word_ids": {
+          "type": "array",
+          "description": "Word IDs covered by annotation",
+          "items": {"type": "string", "pattern": "^w_[a-f0-9]{8}$"}
+        },
+        "quote": {
+          "type": "string",
+          "description": "Exact text content of annotation"
+        },
+        "char_start": {
+          "type": "integer",
+          "description": "Start position in canonical text",
+          "minimum": 0
+        },
+        "char_end": {
+          "type": "integer",
+          "description": "End position in canonical text",
+          "minimum": 0
+        },
+        "page_id": {
+          "type": "string",
+          "description": "Page identifier"
+        },
+        "layer_id": {
+          "type": "string",
+          "description": "Source layer",
+          "enum": ["pdf_text", "ocr"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "annotation_metadata": {
+      "type": "object",
+      "description": "Provenance information for annotation",
+      "required": ["annotator_id", "source", "created_at"],
+      "properties": {
+        "annotator_id": {
+          "type": "integer",
+          "description": "User ID who created annotation"
+        },
+        "source": {
+          "type": "string",
+          "description": "How annotation was created",
+          "enum": ["manual", "model_assisted", "imported"]
+        },
+        "created_at": {
+          "type": "string",
+          "description": "Creation timestamp (ISO8601)",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": ["string", "null"],
+          "description": "Last update timestamp (ISO8601)",
+          "format": "date-time"
+        },
+        "annotator_email": {
+          "type": ["string", "null"],
+          "description": "Email of annotator",
+          "format": "email"
+        },
+        "lead_time_seconds": {
+          "type": ["number", "null"],
+          "description": "Time spent on annotation",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "annotation_id": {
+      "type": "string",
+      "description": "Unique annotation identifier"
+    },
+    "task_id": {
+      "type": "integer",
+      "description": "Label Studio task ID",
+      "minimum": 1
+    },
+    "doc_id": {
+      "type": "string",
+      "description": "Document ID",
+      "pattern": "^[a-f0-9]{12}$"
+    },
+    "annotation_type": {
+      "type": "string",
+      "description": "Annotation type classification",
+      "enum": ["field", "region", "table_region", "table_cell_field"]
+    },
+    "label": {
+      "type": "string",
+      "description": "Annotation label/tag name"
+    },
+    "value": {
+      "type": ["string", "null"],
+      "description": "Annotation value (for fields)"
+    },
+    "evidence": {
+      "$ref": "#/definitions/annotation_evidence"
+    },
+    "metadata": {
+      "$ref": "#/definitions/annotation_metadata"
+    },
+    "result_id": {
+      "type": ["string", "null"],
+      "description": "Label Studio result ID"
+    },
+    "from_name": {
+      "type": ["string", "null"],
+      "description": "Label Studio control tag name"
+    },
+    "to_name": {
+      "type": ["string", "null"],
+      "description": "Label Studio object tag name"
+    }
+  },
+  "additionalProperties": false
+}

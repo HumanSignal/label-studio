@@ -1,0 +1,7283 @@
+{
+  "page_id": "fb3c59894bd2:page_031",
+  "page_number": 31,
+  "doc_id": "fb3c59894bd2",
+  "layout_version_id": "861bb6a4-5907-4490-9c77-004cf53d7bea",
+  "geometry": {
+    "pdf_page_width_pt": 595.276,
+    "pdf_page_height_pt": 841.89,
+    "rotation_deg": 0,
+    "media_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "crop_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "render_dpi": 200,
+    "render_scale": 2.7777777777777777,
+    "rendered_width_px": 1654,
+    "rendered_height_px": 2339
+  },
+  "layers": {
+    "pdf_text": {
+      "layer_id": "pdf_text",
+      "source_engine": "pdfplumber/0.11.9",
+      "coverage": 0.07333925090198118,
+      "word_count": 170,
+      "tokens": [
+        {
+          "token_id": "tok_000000",
+          "text": "The",
+          "bbox": {
+            "x": 194,
+            "y": 134,
+            "width": 60,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000001",
+          "text": "July",
+          "bbox": {
+            "x": 264,
+            "y": 134,
+            "width": 64,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000002",
+          "text": "2024",
+          "bbox": {
+            "x": 337,
+            "y": 134,
+            "width": 83,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000003",
+          "text": "Issuances",
+          "bbox": {
+            "x": 428,
+            "y": 134,
+            "width": 150,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000004",
+          "text": "Allocation",
+          "bbox": {
+            "x": 194,
+            "y": 239,
+            "width": 131,
+            "height": 29
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 10.5,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000005",
+          "text": "by",
+          "bbox": {
+            "x": 332,
+            "y": 239,
+            "width": 33,
+            "height": 29
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 10.5,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000006",
+          "text": "Financial",
+          "bbox": {
+            "x": 372,
+            "y": 239,
+            "width": 113,
+            "height": 29
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 10.5,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000007",
+          "text": "Year",
+          "bbox": {
+            "x": 492,
+            "y": 239,
+            "width": 57,
+            "height": 29
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 10.5,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000008",
+          "text": "The",
+          "bbox": {
+            "x": 194,
+            "y": 306,
+            "width": 42,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000009",
+          "text": "total",
+          "bbox": {
+            "x": 244,
+            "y": 306,
+            "width": 50,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000010",
+          "text": "proceeds",
+          "bbox": {
+            "x": 300,
+            "y": 306,
+            "width": 108,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000011",
+          "text": "of",
+          "bbox": {
+            "x": 415,
+            "y": 306,
+            "width": 22,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000012",
+          "text": "the",
+          "bbox": {
+            "x": 444,
+            "y": 306,
+            "width": 36,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000013",
+          "text": "July",
+          "bbox": {
+            "x": 486,
+            "y": 306,
+            "width": 46,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000014",
+          "text": "2024",
+          "bbox": {
+            "x": 539,
+            "y": 306,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000015",
+          "text": "issuances",
+          "bbox": {
+            "x": 601,
+            "y": 306,
+            "width": 114,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000016",
+          "text": "amounting",
+          "bbox": {
+            "x": 721,
+            "y": 306,
+            "width": 121,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000017",
+          "text": "to",
+          "bbox": {
+            "x": 849,
+            "y": 306,
+            "width": 22,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000018",
+          "text": "HK$24,880",
+          "bbox": {
+            "x": 878,
+            "y": 306,
+            "width": 126,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000019",
+          "text": "million",
+          "bbox": {
+            "x": 1010,
+            "y": 306,
+            "width": 73,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000020",
+          "text": "were",
+          "bbox": {
+            "x": 1090,
+            "y": 306,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000021",
+          "text": "fully",
+          "bbox": {
+            "x": 1152,
+            "y": 306,
+            "width": 46,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000022",
+          "text": "allocated",
+          "bbox": {
+            "x": 1205,
+            "y": 306,
+            "width": 104,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000023",
+          "text": "or",
+          "bbox": {
+            "x": 1316,
+            "y": 306,
+            "width": 23,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000024",
+          "text": "earmarked",
+          "bbox": {
+            "x": 194,
+            "y": 342,
+            "width": 122,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000025",
+          "text": "to",
+          "bbox": {
+            "x": 323,
+            "y": 342,
+            "width": 22,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000026",
+          "text": "80",
+          "bbox": {
+            "x": 352,
+            "y": 342,
+            "width": 28,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000027",
+          "text": "green",
+          "bbox": {
+            "x": 387,
+            "y": 342,
+            "width": 65,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000028",
+          "text": "projects",
+          "bbox": {
+            "x": 459,
+            "y": 342,
+            "width": 92,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000029",
+          "text": "across",
+          "bbox": {
+            "x": 558,
+            "y": 342,
+            "width": 76,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000030",
+          "text": "three",
+          "bbox": {
+            "x": 641,
+            "y": 342,
+            "width": 58,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000031",
+          "text": "financial",
+          "bbox": {
+            "x": 706,
+            "y": 342,
+            "width": 94,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000032",
+          "text": "years",
+          "bbox": {
+            "x": 808,
+            "y": 342,
+            "width": 61,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000033",
+          "text": "from",
+          "bbox": {
+            "x": 876,
+            "y": 342,
+            "width": 52,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000034",
+          "text": "2024-25",
+          "bbox": {
+            "x": 935,
+            "y": 342,
+            "width": 93,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000035",
+          "text": "to",
+          "bbox": {
+            "x": 1035,
+            "y": 342,
+            "width": 22,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000036",
+          "text": "2026-27",
+          "bbox": {
+            "x": 1064,
+            "y": 342,
+            "width": 94,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000037",
+          "text": "as",
+          "bbox": {
+            "x": 1164,
+            "y": 342,
+            "width": 26,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000038",
+          "text": "shown",
+          "bbox": {
+            "x": 1198,
+            "y": 342,
+            "width": 74,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000039",
+          "text": "in",
+          "bbox": {
+            "x": 1279,
+            "y": 342,
+            "width": 20,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000040",
+          "text": "the",
+          "bbox": {
+            "x": 1305,
+            "y": 342,
+            "width": 36,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000041",
+          "text": "table",
+          "bbox": {
+            "x": 194,
+            "y": 378,
+            "width": 56,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000042",
+          "text": "below.",
+          "bbox": {
+            "x": 258,
+            "y": 378,
+            "width": 74,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000043",
+          "text": "(cid:31)(cid:30)(cid:29)",
+          "bbox": {
+            "x": 93,
+            "y": 138,
+            "width": 45,
+            "height": 26
+          },
+          "font_name": "WBLURF+SourceSansVariable-Roman",
+          "font_size": 9.244300000000067,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000044",
+          "text": "2024-25",
+          "bbox": {
+            "x": 636,
+            "y": 481,
+            "width": 83,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000045",
+          "text": "(allocated",
+          "bbox": {
+            "x": 540,
+            "y": 507,
+            "width": 97,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000046",
+          "text": "for",
+          "bbox": {
+            "x": 642,
+            "y": 507,
+            "width": 29,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000047",
+          "text": "new",
+          "bbox": {
+            "x": 677,
+            "y": 507,
+            "width": 42,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000048",
+          "text": "financing)",
+          "bbox": {
+            "x": 724,
+            "y": 507,
+            "width": 96,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000049",
+          "text": "HK$",
+          "bbox": {
+            "x": 620,
+            "y": 560,
+            "width": 44,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000050",
+          "text": "million",
+          "bbox": {
+            "x": 669,
+            "y": 560,
+            "width": 65,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000051",
+          "text": "2025-26",
+          "bbox": {
+            "x": 894,
+            "y": 481,
+            "width": 83,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000053",
+          "text": "2026-27",
+          "bbox": {
+            "x": 1004,
+            "y": 481,
+            "width": 83,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000054",
+          "text": "(earmarked",
+          "bbox": {
+            "x": 841,
+            "y": 507,
+            "width": 114,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000055",
+          "text": "for",
+          "bbox": {
+            "x": 961,
+            "y": 507,
+            "width": 29,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000056",
+          "text": "new",
+          "bbox": {
+            "x": 995,
+            "y": 507,
+            "width": 42,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000057",
+          "text": "financing)",
+          "bbox": {
+            "x": 1042,
+            "y": 507,
+            "width": 96,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000058",
+          "text": "HK$",
+          "bbox": {
+            "x": 933,
+            "y": 560,
+            "width": 44,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000059",
+          "text": "million",
+          "bbox": {
+            "x": 982,
+            "y": 560,
+            "width": 65,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000060",
+          "text": "Total",
+          "bbox": {
+            "x": 1175,
+            "y": 483,
+            "width": 48,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000061",
+          "text": "proceeds",
+          "bbox": {
+            "x": 1228,
+            "y": 483,
+            "width": 92,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000062",
+          "text": "allocated",
+          "bbox": {
+            "x": 1326,
+            "y": 483,
+            "width": 91,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000064",
+          "text": "earmarked",
+          "bbox": {
+            "x": 1249,
+            "y": 510,
+            "width": 108,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000065",
+          "text": "HK$",
+          "bbox": {
+            "x": 1245,
+            "y": 562,
+            "width": 44,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000066",
+          "text": "million",
+          "bbox": {
+            "x": 1294,
+            "y": 562,
+            "width": 65,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000067",
+          "text": "3-year",
+          "bbox": {
+            "x": 301,
+            "y": 678,
+            "width": 60,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000068",
+          "text": "USD",
+          "bbox": {
+            "x": 365,
+            "y": 678,
+            "width": 43,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000069",
+          "text": "(US43858AAP57",
+          "bbox": {
+            "x": 269,
+            "y": 712,
+            "width": 158,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000071",
+          "text": "USY3422VDC91)",
+          "bbox": {
+            "x": 274,
+            "y": 745,
+            "width": 162,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000072",
+          "text": "101",
+          "bbox": {
+            "x": 657,
+            "y": 654,
+            "width": 40,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000073",
+          "text": "(1.3%)",
+          "bbox": {
+            "x": 643,
+            "y": 685,
+            "width": 69,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000074",
+          "text": "7,689",
+          "bbox": {
+            "x": 960,
+            "y": 654,
+            "width": 61,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000075",
+          "text": "(98.7%)",
+          "bbox": {
+            "x": 947,
+            "y": 685,
+            "width": 85,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000076",
+          "text": "7,790",
+          "bbox": {
+            "x": 1273,
+            "y": 700,
+            "width": 60,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000077",
+          "text": "(100%)",
+          "bbox": {
+            "x": 1264,
+            "y": 731,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000078",
+          "text": "Total",
+          "bbox": {
+            "x": 702,
+            "y": 747,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000079",
+          "text": "for",
+          "bbox": {
+            "x": 764,
+            "y": 747,
+            "width": 30,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000080",
+          "text": "new",
+          "bbox": {
+            "x": 801,
+            "y": 747,
+            "width": 47,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000081",
+          "text": "financing:",
+          "bbox": {
+            "x": 855,
+            "y": 747,
+            "width": 110,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000082",
+          "text": "(100%)",
+          "bbox": {
+            "x": 795,
+            "y": 777,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000083",
+          "text": "7-year",
+          "bbox": {
+            "x": 301,
+            "y": 881,
+            "width": 60,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000084",
+          "text": "EUR",
+          "bbox": {
+            "x": 366,
+            "y": 881,
+            "width": 42,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000085",
+          "text": "(HK0001031944)",
+          "bbox": {
+            "x": 275,
+            "y": 914,
+            "width": 160,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000086",
+          "text": "48",
+          "bbox": {
+            "x": 663,
+            "y": 840,
+            "width": 28,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000087",
+          "text": "(0.8%)",
+          "bbox": {
+            "x": 642,
+            "y": 870,
+            "width": 71,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000088",
+          "text": "6,330",
+          "bbox": {
+            "x": 958,
+            "y": 840,
+            "width": 64,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000089",
+          "text": "(99.2%)",
+          "bbox": {
+            "x": 947,
+            "y": 870,
+            "width": 86,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000090",
+          "text": "6,379",
+          "bbox": {
+            "x": 1271,
+            "y": 886,
+            "width": 62,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000091",
+          "text": "(100%)",
+          "bbox": {
+            "x": 1264,
+            "y": 917,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000092",
+          "text": "Total",
+          "bbox": {
+            "x": 702,
+            "y": 933,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000093",
+          "text": "for",
+          "bbox": {
+            "x": 764,
+            "y": 933,
+            "width": 30,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000094",
+          "text": "new",
+          "bbox": {
+            "x": 801,
+            "y": 933,
+            "width": 47,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000095",
+          "text": "financing:",
+          "bbox": {
+            "x": 855,
+            "y": 933,
+            "width": 110,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000096",
+          "text": "(100%)",
+          "bbox": {
+            "x": 795,
+            "y": 963,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000097",
+          "text": "2-year",
+          "bbox": {
+            "x": 297,
+            "y": 1066,
+            "width": 62,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000098",
+          "text": "RMB",
+          "bbox": {
+            "x": 365,
+            "y": 1066,
+            "width": 48,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000099",
+          "text": "(HK0001038410)",
+          "bbox": {
+            "x": 275,
+            "y": 1100,
+            "width": 160,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000100",
+          "text": "351",
+          "bbox": {
+            "x": 657,
+            "y": 1025,
+            "width": 41,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000101",
+          "text": "(16.4%)",
+          "bbox": {
+            "x": 636,
+            "y": 1056,
+            "width": 83,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000102",
+          "text": "1,792",
+          "bbox": {
+            "x": 960,
+            "y": 1025,
+            "width": 61,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000103",
+          "text": "(83.6%)",
+          "bbox": {
+            "x": 947,
+            "y": 1056,
+            "width": 86,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000104",
+          "text": "2,143",
+          "bbox": {
+            "x": 1273,
+            "y": 1072,
+            "width": 59,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000105",
+          "text": "(100%)",
+          "bbox": {
+            "x": 1264,
+            "y": 1102,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000106",
+          "text": "Total",
+          "bbox": {
+            "x": 702,
+            "y": 1118,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000107",
+          "text": "for",
+          "bbox": {
+            "x": 764,
+            "y": 1118,
+            "width": 30,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000108",
+          "text": "new",
+          "bbox": {
+            "x": 801,
+            "y": 1118,
+            "width": 47,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000109",
+          "text": "financing:",
+          "bbox": {
+            "x": 855,
+            "y": 1118,
+            "width": 110,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000110",
+          "text": "(100%)",
+          "bbox": {
+            "x": 795,
+            "y": 1149,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000111",
+          "text": "5-year",
+          "bbox": {
+            "x": 297,
+            "y": 1251,
+            "width": 62,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000112",
+          "text": "RMB",
+          "bbox": {
+            "x": 365,
+            "y": 1251,
+            "width": 48,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000113",
+          "text": "(HK0001031951)",
+          "bbox": {
+            "x": 275,
+            "y": 1285,
+            "width": 160,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000114",
+          "text": "61",
+          "bbox": {
+            "x": 664,
+            "y": 1211,
+            "width": 27,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000115",
+          "text": "(2.8%)",
+          "bbox": {
+            "x": 642,
+            "y": 1242,
+            "width": 71,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000116",
+          "text": "2,081",
+          "bbox": {
+            "x": 959,
+            "y": 1211,
+            "width": 62,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000117",
+          "text": "(97.2%)",
+          "bbox": {
+            "x": 948,
+            "y": 1242,
+            "width": 83,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000118",
+          "text": "2,142",
+          "bbox": {
+            "x": 1273,
+            "y": 1258,
+            "width": 58,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000119",
+          "text": "(100%)",
+          "bbox": {
+            "x": 1264,
+            "y": 1288,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000120",
+          "text": "Total",
+          "bbox": {
+            "x": 702,
+            "y": 1304,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000121",
+          "text": "for",
+          "bbox": {
+            "x": 764,
+            "y": 1304,
+            "width": 30,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000122",
+          "text": "new",
+          "bbox": {
+            "x": 801,
+            "y": 1304,
+            "width": 47,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000123",
+          "text": "financing:",
+          "bbox": {
+            "x": 855,
+            "y": 1304,
+            "width": 110,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000124",
+          "text": "(100%)",
+          "bbox": {
+            "x": 795,
+            "y": 1334,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000125",
+          "text": "10-year",
+          "bbox": {
+            "x": 291,
+            "y": 1437,
+            "width": 75,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000126",
+          "text": "RMB",
+          "bbox": {
+            "x": 371,
+            "y": 1437,
+            "width": 48,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000127",
+          "text": "(HK0001031969)",
+          "bbox": {
+            "x": 275,
+            "y": 1471,
+            "width": 160,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000128",
+          "text": "-",
+          "bbox": {
+            "x": 672,
+            "y": 1412,
+            "width": 10,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000129",
+          "text": "2,142",
+          "bbox": {
+            "x": 961,
+            "y": 1397,
+            "width": 58,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000130",
+          "text": "(100%)",
+          "bbox": {
+            "x": 951,
+            "y": 1427,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000131",
+          "text": "2,142",
+          "bbox": {
+            "x": 1273,
+            "y": 1443,
+            "width": 58,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000132",
+          "text": "(100%)",
+          "bbox": {
+            "x": 1264,
+            "y": 1474,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000133",
+          "text": "Total",
+          "bbox": {
+            "x": 702,
+            "y": 1490,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000134",
+          "text": "for",
+          "bbox": {
+            "x": 764,
+            "y": 1490,
+            "width": 30,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000135",
+          "text": "new",
+          "bbox": {
+            "x": 801,
+            "y": 1490,
+            "width": 47,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000136",
+          "text": "financing:",
+          "bbox": {
+            "x": 855,
+            "y": 1490,
+            "width": 110,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000137",
+          "text": "(100%)",
+          "bbox": {
+            "x": 795,
+            "y": 1520,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000138",
+          "text": "20-year",
+          "bbox": {
+            "x": 293,
+            "y": 1623,
+            "width": 72,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.000000000000028,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000139",
+          "text": "RMB",
+          "bbox": {
+            "x": 370,
+            "y": 1623,
+            "width": 47,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.000000000000028,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000140",
+          "text": "(HK0001031977)",
+          "bbox": {
+            "x": 275,
+            "y": 1657,
+            "width": 160,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000141",
+          "text": "-",
+          "bbox": {
+            "x": 672,
+            "y": 1598,
+            "width": 10,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000142",
+          "text": "2,142",
+          "bbox": {
+            "x": 961,
+            "y": 1582,
+            "width": 58,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000143",
+          "text": "(100%)",
+          "bbox": {
+            "x": 951,
+            "y": 1613,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000144",
+          "text": "2,142",
+          "bbox": {
+            "x": 1273,
+            "y": 1629,
+            "width": 58,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000145",
+          "text": "(100%)",
+          "bbox": {
+            "x": 1264,
+            "y": 1659,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000146",
+          "text": "Total",
+          "bbox": {
+            "x": 702,
+            "y": 1675,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000147",
+          "text": "for",
+          "bbox": {
+            "x": 764,
+            "y": 1675,
+            "width": 30,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000148",
+          "text": "new",
+          "bbox": {
+            "x": 801,
+            "y": 1675,
+            "width": 47,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000149",
+          "text": "financing:",
+          "bbox": {
+            "x": 855,
+            "y": 1675,
+            "width": 110,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000150",
+          "text": "(100%)",
+          "bbox": {
+            "x": 795,
+            "y": 1706,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000151",
+          "text": "30-year",
+          "bbox": {
+            "x": 293,
+            "y": 1809,
+            "width": 72,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000152",
+          "text": "RMB",
+          "bbox": {
+            "x": 370,
+            "y": 1809,
+            "width": 47,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000153",
+          "text": "(HK0001041943)",
+          "bbox": {
+            "x": 275,
+            "y": 1843,
+            "width": 160,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Medium",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000154",
+          "text": "-",
+          "bbox": {
+            "x": 672,
+            "y": 1783,
+            "width": 10,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000155",
+          "text": "2,142",
+          "bbox": {
+            "x": 961,
+            "y": 1768,
+            "width": 58,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000156",
+          "text": "(100%)",
+          "bbox": {
+            "x": 951,
+            "y": 1799,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000157",
+          "text": "2,142",
+          "bbox": {
+            "x": 1273,
+            "y": 1815,
+            "width": 58,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000158",
+          "text": "(100%)",
+          "bbox": {
+            "x": 1264,
+            "y": 1845,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000159",
+          "text": "Total",
+          "bbox": {
+            "x": 702,
+            "y": 1861,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000160",
+          "text": "for",
+          "bbox": {
+            "x": 764,
+            "y": 1861,
+            "width": 30,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000161",
+          "text": "new",
+          "bbox": {
+            "x": 801,
+            "y": 1861,
+            "width": 47,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000162",
+          "text": "financing:",
+          "bbox": {
+            "x": 855,
+            "y": 1861,
+            "width": 110,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000163",
+          "text": "(100%)",
+          "bbox": {
+            "x": 795,
+            "y": 1892,
+            "width": 77,
+            "height": 25
+          },
+          "font_name": "WBLURF+HelveticaNeue",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000164",
+          "text": "Green",
+          "bbox": {
+            "x": 234,
+            "y": 547,
+            "width": 60,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000165",
+          "text": "Bond",
+          "bbox": {
+            "x": 298,
+            "y": 547,
+            "width": 52,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000166",
+          "text": "(ISIN)",
+          "bbox": {
+            "x": 265,
+            "y": 574,
+            "width": 53,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000167",
+          "text": "Year",
+          "bbox": {
+            "x": 418,
+            "y": 482,
+            "width": 44,
+            "height": 22
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 8.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000168",
+          "text": "31",
+          "bbox": {
+            "x": 194,
+            "y": 2256,
+            "width": 28,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Bold",
+          "font_size": 9.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000169",
+          "text": "Green",
+          "bbox": {
+            "x": 275,
+            "y": 2256,
+            "width": 63,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000170",
+          "text": "Bond",
+          "bbox": {
+            "x": 343,
+            "y": 2256,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000171",
+          "text": "Report",
+          "bbox": {
+            "x": 404,
+            "y": 2256,
+            "width": 71,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000172",
+          "text": "2025",
+          "bbox": {
+            "x": 480,
+            "y": 2256,
+            "width": 51,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        }
+      ]
+    }
+  },
+  "canonical": {
+    "layer_id": "pdf_text",
+    "reason": "selected_layer_pdf_text"
+  },
+  "canonical_text": "(cid:31)(cid:30)(cid:29) The July 2024 Issuances\n\nAllocation by Financial Year\nThe total proceeds of the July 2024 issuances amounting to HK$24,880 million were fully allocated or\nearmarked to 80 green projects across three financial years from 2024-25 to 2026-27 as shown in the\ntable below.\n\nYear 2024-25 2025-26 2026-27 Total proceeds allocated\n(allocated for new financing) (earmarked for new financing) earmarked\nGreen Bond\nHK$ million HK$ million HK$ million\n(ISIN)\n\n101 7,689\n3-year USD (1.3%) (98.7%)\n(US43858AAP57 7,790\n(100%)\nUSY3422VDC91) Total for new financing:\n(100%)\n48 6,330\n7-year EUR (0.8%) (99.2%)\n6,379\n(HK0001031944) (100%)\nTotal for new financing:\n(100%)\n351 1,792\n2-year RMB (16.4%) (83.6%)\n2,143\n(HK0001038410) (100%)\nTotal for new financing:\n(100%)\n61 2,081\n5-year RMB (2.8%) (97.2%)\n2,142\n(HK0001031951) (100%)\nTotal for new financing:\n(100%)\n2,142\n-\n10-year RMB (100%)\n2,142\n(HK0001031969) (100%)\nTotal for new financing:\n(100%)\n2,142\n-\n20-year RMB (100%)\n2,142\n(HK0001031977) (100%)\nTotal for new financing:\n(100%)\n2,142\n-\n30-year RMB (100%)\n2,142\n(HK0001041943) (100%)\nTotal for new financing:\n(100%)\n\n31 Green Bond Report 2025",
+  "canonical_index": {
+    "words": {
+      "w_cad9182f": {
+        "char_start": 0,
+        "char_end": 24
+      },
+      "w_5372e649": {
+        "char_start": 25,
+        "char_end": 28
+      },
+      "w_4080be3d": {
+        "char_start": 29,
+        "char_end": 33
+      },
+      "w_4da118bd": {
+        "char_start": 34,
+        "char_end": 38
+      },
+      "w_77acb2f0": {
+        "char_start": 39,
+        "char_end": 48
+      },
+      "w_2d0aeb5a": {
+        "char_start": 50,
+        "char_end": 60
+      },
+      "w_e28d348d": {
+        "char_start": 61,
+        "char_end": 63
+      },
+      "w_deeed7fb": {
+        "char_start": 64,
+        "char_end": 73
+      },
+      "w_89939b93": {
+        "char_start": 74,
+        "char_end": 78
+      },
+      "w_3f4345b1": {
+        "char_start": 79,
+        "char_end": 82
+      },
+      "w_964fde73": {
+        "char_start": 83,
+        "char_end": 88
+      },
+      "w_24e90c45": {
+        "char_start": 89,
+        "char_end": 97
+      },
+      "w_a3b9bacc": {
+        "char_start": 98,
+        "char_end": 100
+      },
+      "w_249f177c": {
+        "char_start": 101,
+        "char_end": 104
+      },
+      "w_025abb73": {
+        "char_start": 105,
+        "char_end": 109
+      },
+      "w_4b1671c0": {
+        "char_start": 110,
+        "char_end": 114
+      },
+      "w_6112b6d1": {
+        "char_start": 115,
+        "char_end": 124
+      },
+      "w_00a96cba": {
+        "char_start": 125,
+        "char_end": 134
+      },
+      "w_83c18bc4": {
+        "char_start": 135,
+        "char_end": 137
+      },
+      "w_049bef00": {
+        "char_start": 138,
+        "char_end": 147
+      },
+      "w_b87866ff": {
+        "char_start": 148,
+        "char_end": 155
+      },
+      "w_160232ce": {
+        "char_start": 156,
+        "char_end": 160
+      },
+      "w_52e99cda": {
+        "char_start": 161,
+        "char_end": 166
+      },
+      "w_29d9efcd": {
+        "char_start": 167,
+        "char_end": 176
+      },
+      "w_eed2ecf6": {
+        "char_start": 177,
+        "char_end": 179
+      },
+      "w_33a83b7d": {
+        "char_start": 180,
+        "char_end": 189
+      },
+      "w_23af39cf": {
+        "char_start": 190,
+        "char_end": 192
+      },
+      "w_519c1a5f": {
+        "char_start": 193,
+        "char_end": 195
+      },
+      "w_0daa3b3a": {
+        "char_start": 196,
+        "char_end": 201
+      },
+      "w_0b050317": {
+        "char_start": 202,
+        "char_end": 210
+      },
+      "w_7f3f4f52": {
+        "char_start": 211,
+        "char_end": 217
+      },
+      "w_e00eda7a": {
+        "char_start": 218,
+        "char_end": 223
+      },
+      "w_a2f5e7c8": {
+        "char_start": 224,
+        "char_end": 233
+      },
+      "w_2cd504b1": {
+        "char_start": 234,
+        "char_end": 239
+      },
+      "w_41bb37f8": {
+        "char_start": 240,
+        "char_end": 244
+      },
+      "w_fe1b6644": {
+        "char_start": 245,
+        "char_end": 252
+      },
+      "w_0181e445": {
+        "char_start": 253,
+        "char_end": 255
+      },
+      "w_c46289fb": {
+        "char_start": 256,
+        "char_end": 263
+      },
+      "w_1a207499": {
+        "char_start": 264,
+        "char_end": 266
+      },
+      "w_17166d1b": {
+        "char_start": 267,
+        "char_end": 272
+      },
+      "w_edd77872": {
+        "char_start": 273,
+        "char_end": 275
+      },
+      "w_a52002b9": {
+        "char_start": 276,
+        "char_end": 279
+      },
+      "w_247c97be": {
+        "char_start": 280,
+        "char_end": 285
+      },
+      "w_ceb20203": {
+        "char_start": 286,
+        "char_end": 292
+      },
+      "w_babf4e4d": {
+        "char_start": 294,
+        "char_end": 298
+      },
+      "w_a1b3c201": {
+        "char_start": 299,
+        "char_end": 306
+      },
+      "w_5d8936a0": {
+        "char_start": 307,
+        "char_end": 314
+      },
+      "w_bbb6385e": {
+        "char_start": 315,
+        "char_end": 322
+      },
+      "w_6b032950": {
+        "char_start": 323,
+        "char_end": 328
+      },
+      "w_14ef2a65": {
+        "char_start": 329,
+        "char_end": 337
+      },
+      "w_f400140b": {
+        "char_start": 338,
+        "char_end": 347
+      },
+      "w_73a7ff64": {
+        "char_start": 348,
+        "char_end": 358
+      },
+      "w_4bf227d6": {
+        "char_start": 359,
+        "char_end": 362
+      },
+      "w_133cab4e": {
+        "char_start": 363,
+        "char_end": 366
+      },
+      "w_2ff155e2": {
+        "char_start": 367,
+        "char_end": 377
+      },
+      "w_1475c9f0": {
+        "char_start": 378,
+        "char_end": 388
+      },
+      "w_9f6fb85f": {
+        "char_start": 389,
+        "char_end": 392
+      },
+      "w_477111ed": {
+        "char_start": 393,
+        "char_end": 396
+      },
+      "w_b4be62a9": {
+        "char_start": 397,
+        "char_end": 407
+      },
+      "w_e8e333c1": {
+        "char_start": 408,
+        "char_end": 417
+      },
+      "w_3981abb0": {
+        "char_start": 418,
+        "char_end": 423
+      },
+      "w_ccf3921f": {
+        "char_start": 424,
+        "char_end": 428
+      },
+      "w_92ac442c": {
+        "char_start": 429,
+        "char_end": 432
+      },
+      "w_ce21e2b7": {
+        "char_start": 433,
+        "char_end": 440
+      },
+      "w_b6371143": {
+        "char_start": 441,
+        "char_end": 444
+      },
+      "w_aa2fa540": {
+        "char_start": 445,
+        "char_end": 452
+      },
+      "w_e1cd3ebb": {
+        "char_start": 453,
+        "char_end": 456
+      },
+      "w_4afd42f4": {
+        "char_start": 457,
+        "char_end": 464
+      },
+      "w_aa13c0bc": {
+        "char_start": 465,
+        "char_end": 471
+      },
+      "w_95d3947e": {
+        "char_start": 473,
+        "char_end": 476
+      },
+      "w_35fd691b": {
+        "char_start": 477,
+        "char_end": 482
+      },
+      "w_c48ccc14": {
+        "char_start": 483,
+        "char_end": 489
+      },
+      "w_2f6878ed": {
+        "char_start": 490,
+        "char_end": 493
+      },
+      "w_f6f55fd1": {
+        "char_start": 494,
+        "char_end": 500
+      },
+      "w_36fd9368": {
+        "char_start": 501,
+        "char_end": 508
+      },
+      "w_dcb01206": {
+        "char_start": 509,
+        "char_end": 522
+      },
+      "w_16a618cf": {
+        "char_start": 523,
+        "char_end": 528
+      },
+      "w_97fdcaa7": {
+        "char_start": 529,
+        "char_end": 535
+      },
+      "w_f5f2fcd8": {
+        "char_start": 536,
+        "char_end": 549
+      },
+      "w_ec573a01": {
+        "char_start": 550,
+        "char_end": 555
+      },
+      "w_a22a5779": {
+        "char_start": 556,
+        "char_end": 559
+      },
+      "w_a07ae936": {
+        "char_start": 560,
+        "char_end": 563
+      },
+      "w_6b19d8ce": {
+        "char_start": 564,
+        "char_end": 574
+      },
+      "w_17291c20": {
+        "char_start": 575,
+        "char_end": 581
+      },
+      "w_68f0be66": {
+        "char_start": 582,
+        "char_end": 584
+      },
+      "w_956d03ee": {
+        "char_start": 585,
+        "char_end": 590
+      },
+      "w_5b1873bc": {
+        "char_start": 591,
+        "char_end": 597
+      },
+      "w_90f9d9a6": {
+        "char_start": 598,
+        "char_end": 601
+      },
+      "w_666c6456": {
+        "char_start": 602,
+        "char_end": 608
+      },
+      "w_f6488d2c": {
+        "char_start": 609,
+        "char_end": 616
+      },
+      "w_b9ab18ae": {
+        "char_start": 617,
+        "char_end": 622
+      },
+      "w_154989cc": {
+        "char_start": 623,
+        "char_end": 637
+      },
+      "w_199caa2a": {
+        "char_start": 638,
+        "char_end": 644
+      },
+      "w_bfa22d0a": {
+        "char_start": 645,
+        "char_end": 650
+      },
+      "w_e66160f5": {
+        "char_start": 651,
+        "char_end": 654
+      },
+      "w_6610a3c0": {
+        "char_start": 655,
+        "char_end": 658
+      },
+      "w_3b8aac5c": {
+        "char_start": 659,
+        "char_end": 669
+      },
+      "w_3b3f0e69": {
+        "char_start": 670,
+        "char_end": 676
+      },
+      "w_9e5c3599": {
+        "char_start": 677,
+        "char_end": 680
+      },
+      "w_a605d35f": {
+        "char_start": 681,
+        "char_end": 686
+      },
+      "w_e44ff848": {
+        "char_start": 687,
+        "char_end": 693
+      },
+      "w_3892e06d": {
+        "char_start": 694,
+        "char_end": 697
+      },
+      "w_6a654c2f": {
+        "char_start": 698,
+        "char_end": 705
+      },
+      "w_0d8d50bf": {
+        "char_start": 706,
+        "char_end": 713
+      },
+      "w_816fdd82": {
+        "char_start": 714,
+        "char_end": 719
+      },
+      "w_b8b19b04": {
+        "char_start": 720,
+        "char_end": 734
+      },
+      "w_41b41f24": {
+        "char_start": 735,
+        "char_end": 741
+      },
+      "w_46dfc2ee": {
+        "char_start": 742,
+        "char_end": 747
+      },
+      "w_7851c1d8": {
+        "char_start": 748,
+        "char_end": 751
+      },
+      "w_cbff1780": {
+        "char_start": 752,
+        "char_end": 755
+      },
+      "w_0f5c1eaf": {
+        "char_start": 756,
+        "char_end": 766
+      },
+      "w_ef123958": {
+        "char_start": 767,
+        "char_end": 773
+      },
+      "w_d83b9d7a": {
+        "char_start": 774,
+        "char_end": 776
+      },
+      "w_1ef32ef1": {
+        "char_start": 777,
+        "char_end": 782
+      },
+      "w_69c5527b": {
+        "char_start": 783,
+        "char_end": 789
+      },
+      "w_b9b42768": {
+        "char_start": 790,
+        "char_end": 793
+      },
+      "w_c236a475": {
+        "char_start": 794,
+        "char_end": 800
+      },
+      "w_611b5cd5": {
+        "char_start": 801,
+        "char_end": 808
+      },
+      "w_f5c73c3f": {
+        "char_start": 809,
+        "char_end": 814
+      },
+      "w_a1f6abc2": {
+        "char_start": 815,
+        "char_end": 829
+      },
+      "w_f49ea467": {
+        "char_start": 830,
+        "char_end": 836
+      },
+      "w_e079a4a2": {
+        "char_start": 837,
+        "char_end": 842
+      },
+      "w_6e00619b": {
+        "char_start": 843,
+        "char_end": 846
+      },
+      "w_79e747e9": {
+        "char_start": 847,
+        "char_end": 850
+      },
+      "w_eb02a3f9": {
+        "char_start": 851,
+        "char_end": 861
+      },
+      "w_368b72a6": {
+        "char_start": 862,
+        "char_end": 868
+      },
+      "w_145c9bb8": {
+        "char_start": 869,
+        "char_end": 874
+      },
+      "w_7c4b2e8f": {
+        "char_start": 875,
+        "char_end": 876
+      },
+      "w_60f3a833": {
+        "char_start": 877,
+        "char_end": 884
+      },
+      "w_8fb83935": {
+        "char_start": 885,
+        "char_end": 888
+      },
+      "w_c2bbd6b2": {
+        "char_start": 889,
+        "char_end": 895
+      },
+      "w_675720fb": {
+        "char_start": 896,
+        "char_end": 901
+      },
+      "w_4da54671": {
+        "char_start": 902,
+        "char_end": 916
+      },
+      "w_709a0c70": {
+        "char_start": 917,
+        "char_end": 923
+      },
+      "w_01ab24b4": {
+        "char_start": 924,
+        "char_end": 929
+      },
+      "w_77fd7143": {
+        "char_start": 930,
+        "char_end": 933
+      },
+      "w_7299a471": {
+        "char_start": 934,
+        "char_end": 937
+      },
+      "w_d7b50aff": {
+        "char_start": 938,
+        "char_end": 948
+      },
+      "w_ecca8bc2": {
+        "char_start": 949,
+        "char_end": 955
+      },
+      "w_d0481ee8": {
+        "char_start": 956,
+        "char_end": 961
+      },
+      "w_d88d059e": {
+        "char_start": 962,
+        "char_end": 963
+      },
+      "w_2da2cd51": {
+        "char_start": 964,
+        "char_end": 971
+      },
+      "w_cb79eafc": {
+        "char_start": 972,
+        "char_end": 975
+      },
+      "w_ddb72fcd": {
+        "char_start": 976,
+        "char_end": 982
+      },
+      "w_510e9121": {
+        "char_start": 983,
+        "char_end": 988
+      },
+      "w_ba3f984e": {
+        "char_start": 989,
+        "char_end": 1003
+      },
+      "w_4a00f8fd": {
+        "char_start": 1004,
+        "char_end": 1010
+      },
+      "w_d7702508": {
+        "char_start": 1011,
+        "char_end": 1016
+      },
+      "w_f9bc7676": {
+        "char_start": 1017,
+        "char_end": 1020
+      },
+      "w_59db5e8f": {
+        "char_start": 1021,
+        "char_end": 1024
+      },
+      "w_5e1d857d": {
+        "char_start": 1025,
+        "char_end": 1035
+      },
+      "w_26b8f3d2": {
+        "char_start": 1036,
+        "char_end": 1042
+      },
+      "w_5fef9613": {
+        "char_start": 1043,
+        "char_end": 1048
+      },
+      "w_4d94d759": {
+        "char_start": 1049,
+        "char_end": 1050
+      },
+      "w_2219ee33": {
+        "char_start": 1051,
+        "char_end": 1058
+      },
+      "w_0a8a6652": {
+        "char_start": 1059,
+        "char_end": 1062
+      },
+      "w_76a9490d": {
+        "char_start": 1063,
+        "char_end": 1069
+      },
+      "w_42a36d12": {
+        "char_start": 1070,
+        "char_end": 1075
+      },
+      "w_668c09f3": {
+        "char_start": 1076,
+        "char_end": 1090
+      },
+      "w_1734487d": {
+        "char_start": 1091,
+        "char_end": 1097
+      },
+      "w_0eb96244": {
+        "char_start": 1098,
+        "char_end": 1103
+      },
+      "w_8e83c72f": {
+        "char_start": 1104,
+        "char_end": 1107
+      },
+      "w_4958e470": {
+        "char_start": 1108,
+        "char_end": 1111
+      },
+      "w_bc68efa2": {
+        "char_start": 1112,
+        "char_end": 1122
+      },
+      "w_87757091": {
+        "char_start": 1123,
+        "char_end": 1129
+      },
+      "w_43f926d8": {
+        "char_start": 1131,
+        "char_end": 1133
+      },
+      "w_35be4cc4": {
+        "char_start": 1134,
+        "char_end": 1139
+      },
+      "w_3cdf7365": {
+        "char_start": 1140,
+        "char_end": 1144
+      },
+      "w_07bca923": {
+        "char_start": 1145,
+        "char_end": 1151
+      },
+      "w_f61153f4": {
+        "char_start": 1152,
+        "char_end": 1156
+      }
+    },
+    "lines": {
+      "l_47afe1be": {
+        "char_start": 0,
+        "char_end": 48
+      },
+      "l_379363eb": {
+        "char_start": 50,
+        "char_end": 78
+      },
+      "l_b98b6425": {
+        "char_start": 79,
+        "char_end": 179
+      },
+      "l_b97fee1f": {
+        "char_start": 180,
+        "char_end": 279
+      },
+      "l_095a3fa9": {
+        "char_start": 280,
+        "char_end": 292
+      },
+      "l_6eb051d7": {
+        "char_start": 294,
+        "char_end": 347
+      },
+      "l_d8e3096c": {
+        "char_start": 348,
+        "char_end": 417
+      },
+      "l_422ca487": {
+        "char_start": 418,
+        "char_end": 428
+      },
+      "l_0d14693b": {
+        "char_start": 429,
+        "char_end": 464
+      },
+      "l_b1fc6aeb": {
+        "char_start": 465,
+        "char_end": 471
+      },
+      "l_53c3298a": {
+        "char_start": 473,
+        "char_end": 482
+      },
+      "l_6392d529": {
+        "char_start": 483,
+        "char_end": 508
+      },
+      "l_07482c24": {
+        "char_start": 509,
+        "char_end": 528
+      },
+      "l_19764239": {
+        "char_start": 529,
+        "char_end": 535
+      },
+      "l_c63546b3": {
+        "char_start": 536,
+        "char_end": 574
+      },
+      "l_ffb1f4b0": {
+        "char_start": 575,
+        "char_end": 581
+      },
+      "l_d24af27c": {
+        "char_start": 582,
+        "char_end": 590
+      },
+      "l_9df543c6": {
+        "char_start": 591,
+        "char_end": 616
+      },
+      "l_63aae60e": {
+        "char_start": 617,
+        "char_end": 622
+      },
+      "l_516b707d": {
+        "char_start": 623,
+        "char_end": 644
+      },
+      "l_275b7d7f": {
+        "char_start": 645,
+        "char_end": 669
+      },
+      "l_3e0efa62": {
+        "char_start": 670,
+        "char_end": 676
+      },
+      "l_d841673c": {
+        "char_start": 677,
+        "char_end": 686
+      },
+      "l_df5b004c": {
+        "char_start": 687,
+        "char_end": 713
+      },
+      "l_60974f6a": {
+        "char_start": 714,
+        "char_end": 719
+      },
+      "l_4e16620d": {
+        "char_start": 720,
+        "char_end": 741
+      },
+      "l_82f5df65": {
+        "char_start": 742,
+        "char_end": 766
+      },
+      "l_ff225299": {
+        "char_start": 767,
+        "char_end": 773
+      },
+      "l_28f561b2": {
+        "char_start": 774,
+        "char_end": 782
+      },
+      "l_8dee1053": {
+        "char_start": 783,
+        "char_end": 808
+      },
+      "l_ed6d56bb": {
+        "char_start": 809,
+        "char_end": 814
+      },
+      "l_d4257721": {
+        "char_start": 815,
+        "char_end": 836
+      },
+      "l_66814e0e": {
+        "char_start": 837,
+        "char_end": 861
+      },
+      "l_5ab101fb": {
+        "char_start": 862,
+        "char_end": 868
+      },
+      "l_55957f49": {
+        "char_start": 869,
+        "char_end": 874
+      },
+      "l_3bfe9017": {
+        "char_start": 875,
+        "char_end": 876
+      },
+      "l_6aec380e": {
+        "char_start": 877,
+        "char_end": 895
+      },
+      "l_c7288632": {
+        "char_start": 896,
+        "char_end": 901
+      },
+      "l_506e6533": {
+        "char_start": 902,
+        "char_end": 923
+      },
+      "l_c3f65a16": {
+        "char_start": 924,
+        "char_end": 948
+      },
+      "l_23d53ccd": {
+        "char_start": 949,
+        "char_end": 955
+      },
+      "l_d81af964": {
+        "char_start": 956,
+        "char_end": 961
+      },
+      "l_5f9e2ee4": {
+        "char_start": 962,
+        "char_end": 963
+      },
+      "l_c6b7abf6": {
+        "char_start": 964,
+        "char_end": 982
+      },
+      "l_d77b6078": {
+        "char_start": 983,
+        "char_end": 988
+      },
+      "l_7d9a9fd0": {
+        "char_start": 989,
+        "char_end": 1010
+      },
+      "l_d347008a": {
+        "char_start": 1011,
+        "char_end": 1035
+      },
+      "l_5f5aa982": {
+        "char_start": 1036,
+        "char_end": 1042
+      },
+      "l_e71c7615": {
+        "char_start": 1043,
+        "char_end": 1048
+      },
+      "l_f740fe90": {
+        "char_start": 1049,
+        "char_end": 1050
+      },
+      "l_abcc856b": {
+        "char_start": 1051,
+        "char_end": 1069
+      },
+      "l_e1126cfe": {
+        "char_start": 1070,
+        "char_end": 1075
+      },
+      "l_f9548e1d": {
+        "char_start": 1076,
+        "char_end": 1097
+      },
+      "l_cba23971": {
+        "char_start": 1098,
+        "char_end": 1122
+      },
+      "l_9ee09eda": {
+        "char_start": 1123,
+        "char_end": 1129
+      },
+      "l_6acc871c": {
+        "char_start": 1131,
+        "char_end": 1156
+      }
+    },
+    "blocks": {
+      "b_8d578f31": {
+        "char_start": 0,
+        "char_end": 48
+      },
+      "b_a44ff4c8": {
+        "char_start": 50,
+        "char_end": 292
+      },
+      "b_1390bd04": {
+        "char_start": 294,
+        "char_end": 471
+      },
+      "b_b16ba32e": {
+        "char_start": 473,
+        "char_end": 1129
+      },
+      "b_f0bb5e70": {
+        "char_start": 1131,
+        "char_end": 1156
+      }
+    }
+  },
+  "words": [
+    {
+      "word_id": "w_cad9182f",
+      "text": "(cid:31)(cid:30)(cid:29)",
+      "bbox": {
+        "x": 93,
+        "y": 138,
+        "width": 45,
+        "height": 26
+      },
+      "line_id": "l_47afe1be",
+      "block_id": "b_8d578f31",
+      "reading_order": 0,
+      "char_start": 0,
+      "char_end": 24,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5372e649",
+      "text": "The",
+      "bbox": {
+        "x": 194,
+        "y": 134,
+        "width": 60,
+        "height": 36
+      },
+      "line_id": "l_47afe1be",
+      "block_id": "b_8d578f31",
+      "reading_order": 1,
+      "char_start": 25,
+      "char_end": 28,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4080be3d",
+      "text": "July",
+      "bbox": {
+        "x": 264,
+        "y": 134,
+        "width": 64,
+        "height": 36
+      },
+      "line_id": "l_47afe1be",
+      "block_id": "b_8d578f31",
+      "reading_order": 2,
+      "char_start": 29,
+      "char_end": 33,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4da118bd",
+      "text": "2024",
+      "bbox": {
+        "x": 337,
+        "y": 134,
+        "width": 83,
+        "height": 36
+      },
+      "line_id": "l_47afe1be",
+      "block_id": "b_8d578f31",
+      "reading_order": 3,
+      "char_start": 34,
+      "char_end": 38,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_77acb2f0",
+      "text": "Issuances",
+      "bbox": {
+        "x": 428,
+        "y": 134,
+        "width": 150,
+        "height": 36
+      },
+      "line_id": "l_47afe1be",
+      "block_id": "b_8d578f31",
+      "reading_order": 4,
+      "char_start": 39,
+      "char_end": 48,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2d0aeb5a",
+      "text": "Allocation",
+      "bbox": {
+        "x": 194,
+        "y": 239,
+        "width": 131,
+        "height": 29
+      },
+      "line_id": "l_379363eb",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 5,
+      "char_start": 50,
+      "char_end": 60,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e28d348d",
+      "text": "by",
+      "bbox": {
+        "x": 332,
+        "y": 239,
+        "width": 33,
+        "height": 29
+      },
+      "line_id": "l_379363eb",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 6,
+      "char_start": 61,
+      "char_end": 63,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_deeed7fb",
+      "text": "Financial",
+      "bbox": {
+        "x": 372,
+        "y": 239,
+        "width": 113,
+        "height": 29
+      },
+      "line_id": "l_379363eb",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 7,
+      "char_start": 64,
+      "char_end": 73,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_89939b93",
+      "text": "Year",
+      "bbox": {
+        "x": 492,
+        "y": 239,
+        "width": 57,
+        "height": 29
+      },
+      "line_id": "l_379363eb",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 8,
+      "char_start": 74,
+      "char_end": 78,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3f4345b1",
+      "text": "The",
+      "bbox": {
+        "x": 194,
+        "y": 306,
+        "width": 42,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 9,
+      "char_start": 79,
+      "char_end": 82,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_964fde73",
+      "text": "total",
+      "bbox": {
+        "x": 244,
+        "y": 306,
+        "width": 50,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 10,
+      "char_start": 83,
+      "char_end": 88,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_24e90c45",
+      "text": "proceeds",
+      "bbox": {
+        "x": 300,
+        "y": 306,
+        "width": 108,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 11,
+      "char_start": 89,
+      "char_end": 97,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a3b9bacc",
+      "text": "of",
+      "bbox": {
+        "x": 415,
+        "y": 306,
+        "width": 22,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 12,
+      "char_start": 98,
+      "char_end": 100,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_249f177c",
+      "text": "the",
+      "bbox": {
+        "x": 444,
+        "y": 306,
+        "width": 36,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 13,
+      "char_start": 101,
+      "char_end": 104,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_025abb73",
+      "text": "July",
+      "bbox": {
+        "x": 486,
+        "y": 306,
+        "width": 46,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 14,
+      "char_start": 105,
+      "char_end": 109,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4b1671c0",
+      "text": "2024",
+      "bbox": {
+        "x": 539,
+        "y": 306,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 15,
+      "char_start": 110,
+      "char_end": 114,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6112b6d1",
+      "text": "issuances",
+      "bbox": {
+        "x": 601,
+        "y": 306,
+        "width": 114,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 16,
+      "char_start": 115,
+      "char_end": 124,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_00a96cba",
+      "text": "amounting",
+      "bbox": {
+        "x": 721,
+        "y": 306,
+        "width": 121,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 17,
+      "char_start": 125,
+      "char_end": 134,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_83c18bc4",
+      "text": "to",
+      "bbox": {
+        "x": 849,
+        "y": 306,
+        "width": 22,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 18,
+      "char_start": 135,
+      "char_end": 137,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_049bef00",
+      "text": "HK$24,880",
+      "bbox": {
+        "x": 878,
+        "y": 306,
+        "width": 126,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 19,
+      "char_start": 138,
+      "char_end": 147,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b87866ff",
+      "text": "million",
+      "bbox": {
+        "x": 1010,
+        "y": 306,
+        "width": 73,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 20,
+      "char_start": 148,
+      "char_end": 155,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_160232ce",
+      "text": "were",
+      "bbox": {
+        "x": 1090,
+        "y": 306,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 21,
+      "char_start": 156,
+      "char_end": 160,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_52e99cda",
+      "text": "fully",
+      "bbox": {
+        "x": 1152,
+        "y": 306,
+        "width": 46,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 22,
+      "char_start": 161,
+      "char_end": 166,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_29d9efcd",
+      "text": "allocated",
+      "bbox": {
+        "x": 1205,
+        "y": 306,
+        "width": 104,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 23,
+      "char_start": 167,
+      "char_end": 176,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_eed2ecf6",
+      "text": "or",
+      "bbox": {
+        "x": 1316,
+        "y": 306,
+        "width": 23,
+        "height": 25
+      },
+      "line_id": "l_b98b6425",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 24,
+      "char_start": 177,
+      "char_end": 179,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_33a83b7d",
+      "text": "earmarked",
+      "bbox": {
+        "x": 194,
+        "y": 342,
+        "width": 122,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 25,
+      "char_start": 180,
+      "char_end": 189,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_23af39cf",
+      "text": "to",
+      "bbox": {
+        "x": 323,
+        "y": 342,
+        "width": 22,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 26,
+      "char_start": 190,
+      "char_end": 192,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_519c1a5f",
+      "text": "80",
+      "bbox": {
+        "x": 352,
+        "y": 342,
+        "width": 28,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 27,
+      "char_start": 193,
+      "char_end": 195,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0daa3b3a",
+      "text": "green",
+      "bbox": {
+        "x": 387,
+        "y": 342,
+        "width": 65,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 28,
+      "char_start": 196,
+      "char_end": 201,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0b050317",
+      "text": "projects",
+      "bbox": {
+        "x": 459,
+        "y": 342,
+        "width": 92,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 29,
+      "char_start": 202,
+      "char_end": 210,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7f3f4f52",
+      "text": "across",
+      "bbox": {
+        "x": 558,
+        "y": 342,
+        "width": 76,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 30,
+      "char_start": 211,
+      "char_end": 217,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e00eda7a",
+      "text": "three",
+      "bbox": {
+        "x": 641,
+        "y": 342,
+        "width": 58,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 31,
+      "char_start": 218,
+      "char_end": 223,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a2f5e7c8",
+      "text": "financial",
+      "bbox": {
+        "x": 706,
+        "y": 342,
+        "width": 94,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 32,
+      "char_start": 224,
+      "char_end": 233,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2cd504b1",
+      "text": "years",
+      "bbox": {
+        "x": 808,
+        "y": 342,
+        "width": 61,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 33,
+      "char_start": 234,
+      "char_end": 239,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_41bb37f8",
+      "text": "from",
+      "bbox": {
+        "x": 876,
+        "y": 342,
+        "width": 52,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 34,
+      "char_start": 240,
+      "char_end": 244,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_fe1b6644",
+      "text": "2024-25",
+      "bbox": {
+        "x": 935,
+        "y": 342,
+        "width": 93,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 35,
+      "char_start": 245,
+      "char_end": 252,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0181e445",
+      "text": "to",
+      "bbox": {
+        "x": 1035,
+        "y": 342,
+        "width": 22,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 36,
+      "char_start": 253,
+      "char_end": 255,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c46289fb",
+      "text": "2026-27",
+      "bbox": {
+        "x": 1064,
+        "y": 342,
+        "width": 94,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 37,
+      "char_start": 256,
+      "char_end": 263,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1a207499",
+      "text": "as",
+      "bbox": {
+        "x": 1164,
+        "y": 342,
+        "width": 26,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 38,
+      "char_start": 264,
+      "char_end": 266,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_17166d1b",
+      "text": "shown",
+      "bbox": {
+        "x": 1198,
+        "y": 342,
+        "width": 74,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 39,
+      "char_start": 267,
+      "char_end": 272,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_edd77872",
+      "text": "in",
+      "bbox": {
+        "x": 1279,
+        "y": 342,
+        "width": 20,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 40,
+      "char_start": 273,
+      "char_end": 275,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a52002b9",
+      "text": "the",
+      "bbox": {
+        "x": 1305,
+        "y": 342,
+        "width": 36,
+        "height": 25
+      },
+      "line_id": "l_b97fee1f",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 41,
+      "char_start": 276,
+      "char_end": 279,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_247c97be",
+      "text": "table",
+      "bbox": {
+        "x": 194,
+        "y": 378,
+        "width": 56,
+        "height": 25
+      },
+      "line_id": "l_095a3fa9",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 42,
+      "char_start": 280,
+      "char_end": 285,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ceb20203",
+      "text": "below.",
+      "bbox": {
+        "x": 258,
+        "y": 378,
+        "width": 74,
+        "height": 25
+      },
+      "line_id": "l_095a3fa9",
+      "block_id": "b_a44ff4c8",
+      "reading_order": 43,
+      "char_start": 286,
+      "char_end": 292,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_babf4e4d",
+      "text": "Year",
+      "bbox": {
+        "x": 418,
+        "y": 482,
+        "width": 44,
+        "height": 22
+      },
+      "line_id": "l_6eb051d7",
+      "block_id": "b_1390bd04",
+      "reading_order": 44,
+      "char_start": 294,
+      "char_end": 298,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a1b3c201",
+      "text": "2024-25",
+      "bbox": {
+        "x": 636,
+        "y": 481,
+        "width": 83,
+        "height": 22
+      },
+      "line_id": "l_6eb051d7",
+      "block_id": "b_1390bd04",
+      "reading_order": 45,
+      "char_start": 299,
+      "char_end": 306,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5d8936a0",
+      "text": "2025-26",
+      "bbox": {
+        "x": 894,
+        "y": 481,
+        "width": 83,
+        "height": 22
+      },
+      "line_id": "l_6eb051d7",
+      "block_id": "b_1390bd04",
+      "reading_order": 46,
+      "char_start": 307,
+      "char_end": 314,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_bbb6385e",
+      "text": "2026-27",
+      "bbox": {
+        "x": 1004,
+        "y": 481,
+        "width": 83,
+        "height": 22
+      },
+      "line_id": "l_6eb051d7",
+      "block_id": "b_1390bd04",
+      "reading_order": 47,
+      "char_start": 315,
+      "char_end": 322,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6b032950",
+      "text": "Total",
+      "bbox": {
+        "x": 1175,
+        "y": 483,
+        "width": 48,
+        "height": 22
+      },
+      "line_id": "l_6eb051d7",
+      "block_id": "b_1390bd04",
+      "reading_order": 48,
+      "char_start": 323,
+      "char_end": 328,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_14ef2a65",
+      "text": "proceeds",
+      "bbox": {
+        "x": 1228,
+        "y": 483,
+        "width": 92,
+        "height": 22
+      },
+      "line_id": "l_6eb051d7",
+      "block_id": "b_1390bd04",
+      "reading_order": 49,
+      "char_start": 329,
+      "char_end": 337,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f400140b",
+      "text": "allocated",
+      "bbox": {
+        "x": 1326,
+        "y": 483,
+        "width": 91,
+        "height": 22
+      },
+      "line_id": "l_6eb051d7",
+      "block_id": "b_1390bd04",
+      "reading_order": 50,
+      "char_start": 338,
+      "char_end": 347,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_73a7ff64",
+      "text": "(allocated",
+      "bbox": {
+        "x": 540,
+        "y": 507,
+        "width": 97,
+        "height": 22
+      },
+      "line_id": "l_d8e3096c",
+      "block_id": "b_1390bd04",
+      "reading_order": 51,
+      "char_start": 348,
+      "char_end": 358,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4bf227d6",
+      "text": "for",
+      "bbox": {
+        "x": 642,
+        "y": 507,
+        "width": 29,
+        "height": 22
+      },
+      "line_id": "l_d8e3096c",
+      "block_id": "b_1390bd04",
+      "reading_order": 52,
+      "char_start": 359,
+      "char_end": 362,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_133cab4e",
+      "text": "new",
+      "bbox": {
+        "x": 677,
+        "y": 507,
+        "width": 42,
+        "height": 22
+      },
+      "line_id": "l_d8e3096c",
+      "block_id": "b_1390bd04",
+      "reading_order": 53,
+      "char_start": 363,
+      "char_end": 366,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2ff155e2",
+      "text": "financing)",
+      "bbox": {
+        "x": 724,
+        "y": 507,
+        "width": 96,
+        "height": 22
+      },
+      "line_id": "l_d8e3096c",
+      "block_id": "b_1390bd04",
+      "reading_order": 54,
+      "char_start": 367,
+      "char_end": 377,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1475c9f0",
+      "text": "(earmarked",
+      "bbox": {
+        "x": 841,
+        "y": 507,
+        "width": 114,
+        "height": 22
+      },
+      "line_id": "l_d8e3096c",
+      "block_id": "b_1390bd04",
+      "reading_order": 55,
+      "char_start": 378,
+      "char_end": 388,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9f6fb85f",
+      "text": "for",
+      "bbox": {
+        "x": 961,
+        "y": 507,
+        "width": 29,
+        "height": 22
+      },
+      "line_id": "l_d8e3096c",
+      "block_id": "b_1390bd04",
+      "reading_order": 56,
+      "char_start": 389,
+      "char_end": 392,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_477111ed",
+      "text": "new",
+      "bbox": {
+        "x": 995,
+        "y": 507,
+        "width": 42,
+        "height": 22
+      },
+      "line_id": "l_d8e3096c",
+      "block_id": "b_1390bd04",
+      "reading_order": 57,
+      "char_start": 393,
+      "char_end": 396,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b4be62a9",
+      "text": "financing)",
+      "bbox": {
+        "x": 1042,
+        "y": 507,
+        "width": 96,
+        "height": 22
+      },
+      "line_id": "l_d8e3096c",
+      "block_id": "b_1390bd04",
+      "reading_order": 58,
+      "char_start": 397,
+      "char_end": 407,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e8e333c1",
+      "text": "earmarked",
+      "bbox": {
+        "x": 1249,
+        "y": 510,
+        "width": 108,
+        "height": 22
+      },
+      "line_id": "l_d8e3096c",
+      "block_id": "b_1390bd04",
+      "reading_order": 59,
+      "char_start": 408,
+      "char_end": 417,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3981abb0",
+      "text": "Green",
+      "bbox": {
+        "x": 234,
+        "y": 547,
+        "width": 60,
+        "height": 22
+      },
+      "line_id": "l_422ca487",
+      "block_id": "b_1390bd04",
+      "reading_order": 60,
+      "char_start": 418,
+      "char_end": 423,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ccf3921f",
+      "text": "Bond",
+      "bbox": {
+        "x": 298,
+        "y": 547,
+        "width": 52,
+        "height": 22
+      },
+      "line_id": "l_422ca487",
+      "block_id": "b_1390bd04",
+      "reading_order": 61,
+      "char_start": 424,
+      "char_end": 428,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_92ac442c",
+      "text": "HK$",
+      "bbox": {
+        "x": 620,
+        "y": 560,
+        "width": 44,
+        "height": 22
+      },
+      "line_id": "l_0d14693b",
+      "block_id": "b_1390bd04",
+      "reading_order": 62,
+      "char_start": 429,
+      "char_end": 432,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ce21e2b7",
+      "text": "million",
+      "bbox": {
+        "x": 669,
+        "y": 560,
+        "width": 65,
+        "height": 22
+      },
+      "line_id": "l_0d14693b",
+      "block_id": "b_1390bd04",
+      "reading_order": 63,
+      "char_start": 433,
+      "char_end": 440,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b6371143",
+      "text": "HK$",
+      "bbox": {
+        "x": 933,
+        "y": 560,
+        "width": 44,
+        "height": 22
+      },
+      "line_id": "l_0d14693b",
+      "block_id": "b_1390bd04",
+      "reading_order": 64,
+      "char_start": 441,
+      "char_end": 444,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_aa2fa540",
+      "text": "million",
+      "bbox": {
+        "x": 982,
+        "y": 560,
+        "width": 65,
+        "height": 22
+      },
+      "line_id": "l_0d14693b",
+      "block_id": "b_1390bd04",
+      "reading_order": 65,
+      "char_start": 445,
+      "char_end": 452,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e1cd3ebb",
+      "text": "HK$",
+      "bbox": {
+        "x": 1245,
+        "y": 562,
+        "width": 44,
+        "height": 22
+      },
+      "line_id": "l_0d14693b",
+      "block_id": "b_1390bd04",
+      "reading_order": 66,
+      "char_start": 453,
+      "char_end": 456,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4afd42f4",
+      "text": "million",
+      "bbox": {
+        "x": 1294,
+        "y": 562,
+        "width": 65,
+        "height": 22
+      },
+      "line_id": "l_0d14693b",
+      "block_id": "b_1390bd04",
+      "reading_order": 67,
+      "char_start": 457,
+      "char_end": 464,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_aa13c0bc",
+      "text": "(ISIN)",
+      "bbox": {
+        "x": 265,
+        "y": 574,
+        "width": 53,
+        "height": 22
+      },
+      "line_id": "l_b1fc6aeb",
+      "block_id": "b_1390bd04",
+      "reading_order": 68,
+      "char_start": 465,
+      "char_end": 471,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_95d3947e",
+      "text": "101",
+      "bbox": {
+        "x": 657,
+        "y": 654,
+        "width": 40,
+        "height": 25
+      },
+      "line_id": "l_53c3298a",
+      "block_id": "b_b16ba32e",
+      "reading_order": 69,
+      "char_start": 473,
+      "char_end": 476,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_35fd691b",
+      "text": "7,689",
+      "bbox": {
+        "x": 960,
+        "y": 654,
+        "width": 61,
+        "height": 25
+      },
+      "line_id": "l_53c3298a",
+      "block_id": "b_b16ba32e",
+      "reading_order": 70,
+      "char_start": 477,
+      "char_end": 482,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c48ccc14",
+      "text": "3-year",
+      "bbox": {
+        "x": 301,
+        "y": 678,
+        "width": 60,
+        "height": 22
+      },
+      "line_id": "l_6392d529",
+      "block_id": "b_b16ba32e",
+      "reading_order": 71,
+      "char_start": 483,
+      "char_end": 489,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2f6878ed",
+      "text": "USD",
+      "bbox": {
+        "x": 365,
+        "y": 678,
+        "width": 43,
+        "height": 22
+      },
+      "line_id": "l_6392d529",
+      "block_id": "b_b16ba32e",
+      "reading_order": 72,
+      "char_start": 490,
+      "char_end": 493,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f6f55fd1",
+      "text": "(1.3%)",
+      "bbox": {
+        "x": 643,
+        "y": 685,
+        "width": 69,
+        "height": 25
+      },
+      "line_id": "l_6392d529",
+      "block_id": "b_b16ba32e",
+      "reading_order": 73,
+      "char_start": 494,
+      "char_end": 500,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_36fd9368",
+      "text": "(98.7%)",
+      "bbox": {
+        "x": 947,
+        "y": 685,
+        "width": 85,
+        "height": 25
+      },
+      "line_id": "l_6392d529",
+      "block_id": "b_b16ba32e",
+      "reading_order": 74,
+      "char_start": 501,
+      "char_end": 508,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_dcb01206",
+      "text": "(US43858AAP57",
+      "bbox": {
+        "x": 269,
+        "y": 712,
+        "width": 158,
+        "height": 22
+      },
+      "line_id": "l_07482c24",
+      "block_id": "b_b16ba32e",
+      "reading_order": 75,
+      "char_start": 509,
+      "char_end": 522,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_16a618cf",
+      "text": "7,790",
+      "bbox": {
+        "x": 1273,
+        "y": 700,
+        "width": 60,
+        "height": 25
+      },
+      "line_id": "l_07482c24",
+      "block_id": "b_b16ba32e",
+      "reading_order": 76,
+      "char_start": 523,
+      "char_end": 528,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_97fdcaa7",
+      "text": "(100%)",
+      "bbox": {
+        "x": 1264,
+        "y": 731,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_19764239",
+      "block_id": "b_b16ba32e",
+      "reading_order": 77,
+      "char_start": 529,
+      "char_end": 535,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f5f2fcd8",
+      "text": "USY3422VDC91)",
+      "bbox": {
+        "x": 274,
+        "y": 745,
+        "width": 162,
+        "height": 22
+      },
+      "line_id": "l_c63546b3",
+      "block_id": "b_b16ba32e",
+      "reading_order": 78,
+      "char_start": 536,
+      "char_end": 549,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ec573a01",
+      "text": "Total",
+      "bbox": {
+        "x": 702,
+        "y": 747,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_c63546b3",
+      "block_id": "b_b16ba32e",
+      "reading_order": 79,
+      "char_start": 550,
+      "char_end": 555,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a22a5779",
+      "text": "for",
+      "bbox": {
+        "x": 764,
+        "y": 747,
+        "width": 30,
+        "height": 25
+      },
+      "line_id": "l_c63546b3",
+      "block_id": "b_b16ba32e",
+      "reading_order": 80,
+      "char_start": 556,
+      "char_end": 559,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a07ae936",
+      "text": "new",
+      "bbox": {
+        "x": 801,
+        "y": 747,
+        "width": 47,
+        "height": 25
+      },
+      "line_id": "l_c63546b3",
+      "block_id": "b_b16ba32e",
+      "reading_order": 81,
+      "char_start": 560,
+      "char_end": 563,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6b19d8ce",
+      "text": "financing:",
+      "bbox": {
+        "x": 855,
+        "y": 747,
+        "width": 110,
+        "height": 25
+      },
+      "line_id": "l_c63546b3",
+      "block_id": "b_b16ba32e",
+      "reading_order": 82,
+      "char_start": 564,
+      "char_end": 574,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_17291c20",
+      "text": "(100%)",
+      "bbox": {
+        "x": 795,
+        "y": 777,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_ffb1f4b0",
+      "block_id": "b_b16ba32e",
+      "reading_order": 83,
+      "char_start": 575,
+      "char_end": 581,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_68f0be66",
+      "text": "48",
+      "bbox": {
+        "x": 663,
+        "y": 840,
+        "width": 28,
+        "height": 25
+      },
+      "line_id": "l_d24af27c",
+      "block_id": "b_b16ba32e",
+      "reading_order": 84,
+      "char_start": 582,
+      "char_end": 584,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_956d03ee",
+      "text": "6,330",
+      "bbox": {
+        "x": 958,
+        "y": 840,
+        "width": 64,
+        "height": 25
+      },
+      "line_id": "l_d24af27c",
+      "block_id": "b_b16ba32e",
+      "reading_order": 85,
+      "char_start": 585,
+      "char_end": 590,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5b1873bc",
+      "text": "7-year",
+      "bbox": {
+        "x": 301,
+        "y": 881,
+        "width": 60,
+        "height": 22
+      },
+      "line_id": "l_9df543c6",
+      "block_id": "b_b16ba32e",
+      "reading_order": 86,
+      "char_start": 591,
+      "char_end": 597,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_90f9d9a6",
+      "text": "EUR",
+      "bbox": {
+        "x": 366,
+        "y": 881,
+        "width": 42,
+        "height": 22
+      },
+      "line_id": "l_9df543c6",
+      "block_id": "b_b16ba32e",
+      "reading_order": 87,
+      "char_start": 598,
+      "char_end": 601,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_666c6456",
+      "text": "(0.8%)",
+      "bbox": {
+        "x": 642,
+        "y": 870,
+        "width": 71,
+        "height": 25
+      },
+      "line_id": "l_9df543c6",
+      "block_id": "b_b16ba32e",
+      "reading_order": 88,
+      "char_start": 602,
+      "char_end": 608,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f6488d2c",
+      "text": "(99.2%)",
+      "bbox": {
+        "x": 947,
+        "y": 870,
+        "width": 86,
+        "height": 25
+      },
+      "line_id": "l_9df543c6",
+      "block_id": "b_b16ba32e",
+      "reading_order": 89,
+      "char_start": 609,
+      "char_end": 616,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b9ab18ae",
+      "text": "6,379",
+      "bbox": {
+        "x": 1271,
+        "y": 886,
+        "width": 62,
+        "height": 25
+      },
+      "line_id": "l_63aae60e",
+      "block_id": "b_b16ba32e",
+      "reading_order": 90,
+      "char_start": 617,
+      "char_end": 622,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_154989cc",
+      "text": "(HK0001031944)",
+      "bbox": {
+        "x": 275,
+        "y": 914,
+        "width": 160,
+        "height": 22
+      },
+      "line_id": "l_516b707d",
+      "block_id": "b_b16ba32e",
+      "reading_order": 91,
+      "char_start": 623,
+      "char_end": 637,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_199caa2a",
+      "text": "(100%)",
+      "bbox": {
+        "x": 1264,
+        "y": 917,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_516b707d",
+      "block_id": "b_b16ba32e",
+      "reading_order": 92,
+      "char_start": 638,
+      "char_end": 644,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_bfa22d0a",
+      "text": "Total",
+      "bbox": {
+        "x": 702,
+        "y": 933,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_275b7d7f",
+      "block_id": "b_b16ba32e",
+      "reading_order": 93,
+      "char_start": 645,
+      "char_end": 650,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e66160f5",
+      "text": "for",
+      "bbox": {
+        "x": 764,
+        "y": 933,
+        "width": 30,
+        "height": 25
+      },
+      "line_id": "l_275b7d7f",
+      "block_id": "b_b16ba32e",
+      "reading_order": 94,
+      "char_start": 651,
+      "char_end": 654,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6610a3c0",
+      "text": "new",
+      "bbox": {
+        "x": 801,
+        "y": 933,
+        "width": 47,
+        "height": 25
+      },
+      "line_id": "l_275b7d7f",
+      "block_id": "b_b16ba32e",
+      "reading_order": 95,
+      "char_start": 655,
+      "char_end": 658,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3b8aac5c",
+      "text": "financing:",
+      "bbox": {
+        "x": 855,
+        "y": 933,
+        "width": 110,
+        "height": 25
+      },
+      "line_id": "l_275b7d7f",
+      "block_id": "b_b16ba32e",
+      "reading_order": 96,
+      "char_start": 659,
+      "char_end": 669,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3b3f0e69",
+      "text": "(100%)",
+      "bbox": {
+        "x": 795,
+        "y": 963,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_3e0efa62",
+      "block_id": "b_b16ba32e",
+      "reading_order": 97,
+      "char_start": 670,
+      "char_end": 676,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9e5c3599",
+      "text": "351",
+      "bbox": {
+        "x": 657,
+        "y": 1025,
+        "width": 41,
+        "height": 25
+      },
+      "line_id": "l_d841673c",
+      "block_id": "b_b16ba32e",
+      "reading_order": 98,
+      "char_start": 677,
+      "char_end": 680,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a605d35f",
+      "text": "1,792",
+      "bbox": {
+        "x": 960,
+        "y": 1025,
+        "width": 61,
+        "height": 25
+      },
+      "line_id": "l_d841673c",
+      "block_id": "b_b16ba32e",
+      "reading_order": 99,
+      "char_start": 681,
+      "char_end": 686,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e44ff848",
+      "text": "2-year",
+      "bbox": {
+        "x": 297,
+        "y": 1066,
+        "width": 62,
+        "height": 22
+      },
+      "line_id": "l_df5b004c",
+      "block_id": "b_b16ba32e",
+      "reading_order": 100,
+      "char_start": 687,
+      "char_end": 693,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3892e06d",
+      "text": "RMB",
+      "bbox": {
+        "x": 365,
+        "y": 1066,
+        "width": 48,
+        "height": 22
+      },
+      "line_id": "l_df5b004c",
+      "block_id": "b_b16ba32e",
+      "reading_order": 101,
+      "char_start": 694,
+      "char_end": 697,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6a654c2f",
+      "text": "(16.4%)",
+      "bbox": {
+        "x": 636,
+        "y": 1056,
+        "width": 83,
+        "height": 25
+      },
+      "line_id": "l_df5b004c",
+      "block_id": "b_b16ba32e",
+      "reading_order": 102,
+      "char_start": 698,
+      "char_end": 705,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0d8d50bf",
+      "text": "(83.6%)",
+      "bbox": {
+        "x": 947,
+        "y": 1056,
+        "width": 86,
+        "height": 25
+      },
+      "line_id": "l_df5b004c",
+      "block_id": "b_b16ba32e",
+      "reading_order": 103,
+      "char_start": 706,
+      "char_end": 713,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_816fdd82",
+      "text": "2,143",
+      "bbox": {
+        "x": 1273,
+        "y": 1072,
+        "width": 59,
+        "height": 25
+      },
+      "line_id": "l_60974f6a",
+      "block_id": "b_b16ba32e",
+      "reading_order": 104,
+      "char_start": 714,
+      "char_end": 719,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b8b19b04",
+      "text": "(HK0001038410)",
+      "bbox": {
+        "x": 275,
+        "y": 1100,
+        "width": 160,
+        "height": 22
+      },
+      "line_id": "l_4e16620d",
+      "block_id": "b_b16ba32e",
+      "reading_order": 105,
+      "char_start": 720,
+      "char_end": 734,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_41b41f24",
+      "text": "(100%)",
+      "bbox": {
+        "x": 1264,
+        "y": 1102,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_4e16620d",
+      "block_id": "b_b16ba32e",
+      "reading_order": 106,
+      "char_start": 735,
+      "char_end": 741,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_46dfc2ee",
+      "text": "Total",
+      "bbox": {
+        "x": 702,
+        "y": 1118,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_82f5df65",
+      "block_id": "b_b16ba32e",
+      "reading_order": 107,
+      "char_start": 742,
+      "char_end": 747,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7851c1d8",
+      "text": "for",
+      "bbox": {
+        "x": 764,
+        "y": 1118,
+        "width": 30,
+        "height": 25
+      },
+      "line_id": "l_82f5df65",
+      "block_id": "b_b16ba32e",
+      "reading_order": 108,
+      "char_start": 748,
+      "char_end": 751,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_cbff1780",
+      "text": "new",
+      "bbox": {
+        "x": 801,
+        "y": 1118,
+        "width": 47,
+        "height": 25
+      },
+      "line_id": "l_82f5df65",
+      "block_id": "b_b16ba32e",
+      "reading_order": 109,
+      "char_start": 752,
+      "char_end": 755,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0f5c1eaf",
+      "text": "financing:",
+      "bbox": {
+        "x": 855,
+        "y": 1118,
+        "width": 110,
+        "height": 25
+      },
+      "line_id": "l_82f5df65",
+      "block_id": "b_b16ba32e",
+      "reading_order": 110,
+      "char_start": 756,
+      "char_end": 766,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ef123958",
+      "text": "(100%)",
+      "bbox": {
+        "x": 795,
+        "y": 1149,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_ff225299",
+      "block_id": "b_b16ba32e",
+      "reading_order": 111,
+      "char_start": 767,
+      "char_end": 773,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d83b9d7a",
+      "text": "61",
+      "bbox": {
+        "x": 664,
+        "y": 1211,
+        "width": 27,
+        "height": 25
+      },
+      "line_id": "l_28f561b2",
+      "block_id": "b_b16ba32e",
+      "reading_order": 112,
+      "char_start": 774,
+      "char_end": 776,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1ef32ef1",
+      "text": "2,081",
+      "bbox": {
+        "x": 959,
+        "y": 1211,
+        "width": 62,
+        "height": 25
+      },
+      "line_id": "l_28f561b2",
+      "block_id": "b_b16ba32e",
+      "reading_order": 113,
+      "char_start": 777,
+      "char_end": 782,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_69c5527b",
+      "text": "5-year",
+      "bbox": {
+        "x": 297,
+        "y": 1251,
+        "width": 62,
+        "height": 22
+      },
+      "line_id": "l_8dee1053",
+      "block_id": "b_b16ba32e",
+      "reading_order": 114,
+      "char_start": 783,
+      "char_end": 789,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_b9b42768",
+      "text": "RMB",
+      "bbox": {
+        "x": 365,
+        "y": 1251,
+        "width": 48,
+        "height": 22
+      },
+      "line_id": "l_8dee1053",
+      "block_id": "b_b16ba32e",
+      "reading_order": 115,
+      "char_start": 790,
+      "char_end": 793,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c236a475",
+      "text": "(2.8%)",
+      "bbox": {
+        "x": 642,
+        "y": 1242,
+        "width": 71,
+        "height": 25
+      },
+      "line_id": "l_8dee1053",
+      "block_id": "b_b16ba32e",
+      "reading_order": 116,
+      "char_start": 794,
+      "char_end": 800,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_611b5cd5",
+      "text": "(97.2%)",
+      "bbox": {
+        "x": 948,
+        "y": 1242,
+        "width": 83,
+        "height": 25
+      },
+      "line_id": "l_8dee1053",
+      "block_id": "b_b16ba32e",
+      "reading_order": 117,
+      "char_start": 801,
+      "char_end": 808,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f5c73c3f",
+      "text": "2,142",
+      "bbox": {
+        "x": 1273,
+        "y": 1258,
+        "width": 58,
+        "height": 25
+      },
+      "line_id": "l_ed6d56bb",
+      "block_id": "b_b16ba32e",
+      "reading_order": 118,
+      "char_start": 809,
+      "char_end": 814,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_a1f6abc2",
+      "text": "(HK0001031951)",
+      "bbox": {
+        "x": 275,
+        "y": 1285,
+        "width": 160,
+        "height": 22
+      },
+      "line_id": "l_d4257721",
+      "block_id": "b_b16ba32e",
+      "reading_order": 119,
+      "char_start": 815,
+      "char_end": 829,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f49ea467",
+      "text": "(100%)",
+      "bbox": {
+        "x": 1264,
+        "y": 1288,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_d4257721",
+      "block_id": "b_b16ba32e",
+      "reading_order": 120,
+      "char_start": 830,
+      "char_end": 836,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_e079a4a2",
+      "text": "Total",
+      "bbox": {
+        "x": 702,
+        "y": 1304,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_66814e0e",
+      "block_id": "b_b16ba32e",
+      "reading_order": 121,
+      "char_start": 837,
+      "char_end": 842,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_6e00619b",
+      "text": "for",
+      "bbox": {
+        "x": 764,
+        "y": 1304,
+        "width": 30,
+        "height": 25
+      },
+      "line_id": "l_66814e0e",
+      "block_id": "b_b16ba32e",
+      "reading_order": 122,
+      "char_start": 843,
+      "char_end": 846,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_79e747e9",
+      "text": "new",
+      "bbox": {
+        "x": 801,
+        "y": 1304,
+        "width": 47,
+        "height": 25
+      },
+      "line_id": "l_66814e0e",
+      "block_id": "b_b16ba32e",
+      "reading_order": 123,
+      "char_start": 847,
+      "char_end": 850,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_eb02a3f9",
+      "text": "financing:",
+      "bbox": {
+        "x": 855,
+        "y": 1304,
+        "width": 110,
+        "height": 25
+      },
+      "line_id": "l_66814e0e",
+      "block_id": "b_b16ba32e",
+      "reading_order": 124,
+      "char_start": 851,
+      "char_end": 861,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_368b72a6",
+      "text": "(100%)",
+      "bbox": {
+        "x": 795,
+        "y": 1334,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_5ab101fb",
+      "block_id": "b_b16ba32e",
+      "reading_order": 125,
+      "char_start": 862,
+      "char_end": 868,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_145c9bb8",
+      "text": "2,142",
+      "bbox": {
+        "x": 961,
+        "y": 1397,
+        "width": 58,
+        "height": 25
+      },
+      "line_id": "l_55957f49",
+      "block_id": "b_b16ba32e",
+      "reading_order": 126,
+      "char_start": 869,
+      "char_end": 874,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7c4b2e8f",
+      "text": "-",
+      "bbox": {
+        "x": 672,
+        "y": 1412,
+        "width": 10,
+        "height": 25
+      },
+      "line_id": "l_3bfe9017",
+      "block_id": "b_b16ba32e",
+      "reading_order": 127,
+      "char_start": 875,
+      "char_end": 876,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_60f3a833",
+      "text": "10-year",
+      "bbox": {
+        "x": 291,
+        "y": 1437,
+        "width": 75,
+        "height": 22
+      },
+      "line_id": "l_6aec380e",
+      "block_id": "b_b16ba32e",
+      "reading_order": 128,
+      "char_start": 877,
+      "char_end": 884,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8fb83935",
+      "text": "RMB",
+      "bbox": {
+        "x": 371,
+        "y": 1437,
+        "width": 48,
+        "height": 22
+      },
+      "line_id": "l_6aec380e",
+      "block_id": "b_b16ba32e",
+      "reading_order": 129,
+      "char_start": 885,
+      "char_end": 888,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c2bbd6b2",
+      "text": "(100%)",
+      "bbox": {
+        "x": 951,
+        "y": 1427,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_6aec380e",
+      "block_id": "b_b16ba32e",
+      "reading_order": 130,
+      "char_start": 889,
+      "char_end": 895,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_675720fb",
+      "text": "2,142",
+      "bbox": {
+        "x": 1273,
+        "y": 1443,
+        "width": 58,
+        "height": 25
+      },
+      "line_id": "l_c7288632",
+      "block_id": "b_b16ba32e",
+      "reading_order": 131,
+      "char_start": 896,
+      "char_end": 901,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4da54671",
+      "text": "(HK0001031969)",
+      "bbox": {
+        "x": 275,
+        "y": 1471,
+        "width": 160,
+        "height": 22
+      },
+      "line_id": "l_506e6533",
+      "block_id": "b_b16ba32e",
+      "reading_order": 132,
+      "char_start": 902,
+      "char_end": 916,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_709a0c70",
+      "text": "(100%)",
+      "bbox": {
+        "x": 1264,
+        "y": 1474,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_506e6533",
+      "block_id": "b_b16ba32e",
+      "reading_order": 133,
+      "char_start": 917,
+      "char_end": 923,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_01ab24b4",
+      "text": "Total",
+      "bbox": {
+        "x": 702,
+        "y": 1490,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_c3f65a16",
+      "block_id": "b_b16ba32e",
+      "reading_order": 134,
+      "char_start": 924,
+      "char_end": 929,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_77fd7143",
+      "text": "for",
+      "bbox": {
+        "x": 764,
+        "y": 1490,
+        "width": 30,
+        "height": 25
+      },
+      "line_id": "l_c3f65a16",
+      "block_id": "b_b16ba32e",
+      "reading_order": 135,
+      "char_start": 930,
+      "char_end": 933,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_7299a471",
+      "text": "new",
+      "bbox": {
+        "x": 801,
+        "y": 1490,
+        "width": 47,
+        "height": 25
+      },
+      "line_id": "l_c3f65a16",
+      "block_id": "b_b16ba32e",
+      "reading_order": 136,
+      "char_start": 934,
+      "char_end": 937,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d7b50aff",
+      "text": "financing:",
+      "bbox": {
+        "x": 855,
+        "y": 1490,
+        "width": 110,
+        "height": 25
+      },
+      "line_id": "l_c3f65a16",
+      "block_id": "b_b16ba32e",
+      "reading_order": 137,
+      "char_start": 938,
+      "char_end": 948,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ecca8bc2",
+      "text": "(100%)",
+      "bbox": {
+        "x": 795,
+        "y": 1520,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_23d53ccd",
+      "block_id": "b_b16ba32e",
+      "reading_order": 138,
+      "char_start": 949,
+      "char_end": 955,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d0481ee8",
+      "text": "2,142",
+      "bbox": {
+        "x": 961,
+        "y": 1582,
+        "width": 58,
+        "height": 25
+      },
+      "line_id": "l_d81af964",
+      "block_id": "b_b16ba32e",
+      "reading_order": 139,
+      "char_start": 956,
+      "char_end": 961,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d88d059e",
+      "text": "-",
+      "bbox": {
+        "x": 672,
+        "y": 1598,
+        "width": 10,
+        "height": 25
+      },
+      "line_id": "l_5f9e2ee4",
+      "block_id": "b_b16ba32e",
+      "reading_order": 140,
+      "char_start": 962,
+      "char_end": 963,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2da2cd51",
+      "text": "20-year",
+      "bbox": {
+        "x": 293,
+        "y": 1623,
+        "width": 72,
+        "height": 22
+      },
+      "line_id": "l_c6b7abf6",
+      "block_id": "b_b16ba32e",
+      "reading_order": 141,
+      "char_start": 964,
+      "char_end": 971,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_cb79eafc",
+      "text": "RMB",
+      "bbox": {
+        "x": 370,
+        "y": 1623,
+        "width": 47,
+        "height": 22
+      },
+      "line_id": "l_c6b7abf6",
+      "block_id": "b_b16ba32e",
+      "reading_order": 142,
+      "char_start": 972,
+      "char_end": 975,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ddb72fcd",
+      "text": "(100%)",
+      "bbox": {
+        "x": 951,
+        "y": 1613,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_c6b7abf6",
+      "block_id": "b_b16ba32e",
+      "reading_order": 143,
+      "char_start": 976,
+      "char_end": 982,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_510e9121",
+      "text": "2,142",
+      "bbox": {
+        "x": 1273,
+        "y": 1629,
+        "width": 58,
+        "height": 25
+      },
+      "line_id": "l_d77b6078",
+      "block_id": "b_b16ba32e",
+      "reading_order": 144,
+      "char_start": 983,
+      "char_end": 988,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_ba3f984e",
+      "text": "(HK0001031977)",
+      "bbox": {
+        "x": 275,
+        "y": 1657,
+        "width": 160,
+        "height": 22
+      },
+      "line_id": "l_7d9a9fd0",
+      "block_id": "b_b16ba32e",
+      "reading_order": 145,
+      "char_start": 989,
+      "char_end": 1003,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4a00f8fd",
+      "text": "(100%)",
+      "bbox": {
+        "x": 1264,
+        "y": 1659,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_7d9a9fd0",
+      "block_id": "b_b16ba32e",
+      "reading_order": 146,
+      "char_start": 1004,
+      "char_end": 1010,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_d7702508",
+      "text": "Total",
+      "bbox": {
+        "x": 702,
+        "y": 1675,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_d347008a",
+      "block_id": "b_b16ba32e",
+      "reading_order": 147,
+      "char_start": 1011,
+      "char_end": 1016,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f9bc7676",
+      "text": "for",
+      "bbox": {
+        "x": 764,
+        "y": 1675,
+        "width": 30,
+        "height": 25
+      },
+      "line_id": "l_d347008a",
+      "block_id": "b_b16ba32e",
+      "reading_order": 148,
+      "char_start": 1017,
+      "char_end": 1020,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_59db5e8f",
+      "text": "new",
+      "bbox": {
+        "x": 801,
+        "y": 1675,
+        "width": 47,
+        "height": 25
+      },
+      "line_id": "l_d347008a",
+      "block_id": "b_b16ba32e",
+      "reading_order": 149,
+      "char_start": 1021,
+      "char_end": 1024,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5e1d857d",
+      "text": "financing:",
+      "bbox": {
+        "x": 855,
+        "y": 1675,
+        "width": 110,
+        "height": 25
+      },
+      "line_id": "l_d347008a",
+      "block_id": "b_b16ba32e",
+      "reading_order": 150,
+      "char_start": 1025,
+      "char_end": 1035,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_26b8f3d2",
+      "text": "(100%)",
+      "bbox": {
+        "x": 795,
+        "y": 1706,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_5f5aa982",
+      "block_id": "b_b16ba32e",
+      "reading_order": 151,
+      "char_start": 1036,
+      "char_end": 1042,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5fef9613",
+      "text": "2,142",
+      "bbox": {
+        "x": 961,
+        "y": 1768,
+        "width": 58,
+        "height": 25
+      },
+      "line_id": "l_e71c7615",
+      "block_id": "b_b16ba32e",
+      "reading_order": 152,
+      "char_start": 1043,
+      "char_end": 1048,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4d94d759",
+      "text": "-",
+      "bbox": {
+        "x": 672,
+        "y": 1783,
+        "width": 10,
+        "height": 25
+      },
+      "line_id": "l_f740fe90",
+      "block_id": "b_b16ba32e",
+      "reading_order": 153,
+      "char_start": 1049,
+      "char_end": 1050,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2219ee33",
+      "text": "30-year",
+      "bbox": {
+        "x": 293,
+        "y": 1809,
+        "width": 72,
+        "height": 22
+      },
+      "line_id": "l_abcc856b",
+      "block_id": "b_b16ba32e",
+      "reading_order": 154,
+      "char_start": 1051,
+      "char_end": 1058,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0a8a6652",
+      "text": "RMB",
+      "bbox": {
+        "x": 370,
+        "y": 1809,
+        "width": 47,
+        "height": 22
+      },
+      "line_id": "l_abcc856b",
+      "block_id": "b_b16ba32e",
+      "reading_order": 155,
+      "char_start": 1059,
+      "char_end": 1062,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_76a9490d",
+      "text": "(100%)",
+      "bbox": {
+        "x": 951,
+        "y": 1799,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_abcc856b",
+      "block_id": "b_b16ba32e",
+      "reading_order": 156,
+      "char_start": 1063,
+      "char_end": 1069,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_42a36d12",
+      "text": "2,142",
+      "bbox": {
+        "x": 1273,
+        "y": 1815,
+        "width": 58,
+        "height": 25
+      },
+      "line_id": "l_e1126cfe",
+      "block_id": "b_b16ba32e",
+      "reading_order": 157,
+      "char_start": 1070,
+      "char_end": 1075,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_668c09f3",
+      "text": "(HK0001041943)",
+      "bbox": {
+        "x": 275,
+        "y": 1843,
+        "width": 160,
+        "height": 22
+      },
+      "line_id": "l_f9548e1d",
+      "block_id": "b_b16ba32e",
+      "reading_order": 158,
+      "char_start": 1076,
+      "char_end": 1090,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_1734487d",
+      "text": "(100%)",
+      "bbox": {
+        "x": 1264,
+        "y": 1845,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_f9548e1d",
+      "block_id": "b_b16ba32e",
+      "reading_order": 159,
+      "char_start": 1091,
+      "char_end": 1097,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0eb96244",
+      "text": "Total",
+      "bbox": {
+        "x": 702,
+        "y": 1861,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_cba23971",
+      "block_id": "b_b16ba32e",
+      "reading_order": 160,
+      "char_start": 1098,
+      "char_end": 1103,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8e83c72f",
+      "text": "for",
+      "bbox": {
+        "x": 764,
+        "y": 1861,
+        "width": 30,
+        "height": 25
+      },
+      "line_id": "l_cba23971",
+      "block_id": "b_b16ba32e",
+      "reading_order": 161,
+      "char_start": 1104,
+      "char_end": 1107,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4958e470",
+      "text": "new",
+      "bbox": {
+        "x": 801,
+        "y": 1861,
+        "width": 47,
+        "height": 25
+      },
+      "line_id": "l_cba23971",
+      "block_id": "b_b16ba32e",
+      "reading_order": 162,
+      "char_start": 1108,
+      "char_end": 1111,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_bc68efa2",
+      "text": "financing:",
+      "bbox": {
+        "x": 855,
+        "y": 1861,
+        "width": 110,
+        "height": 25
+      },
+      "line_id": "l_cba23971",
+      "block_id": "b_b16ba32e",
+      "reading_order": 163,
+      "char_start": 1112,
+      "char_end": 1122,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_87757091",
+      "text": "(100%)",
+      "bbox": {
+        "x": 795,
+        "y": 1892,
+        "width": 77,
+        "height": 25
+      },
+      "line_id": "l_9ee09eda",
+      "block_id": "b_b16ba32e",
+      "reading_order": 164,
+      "char_start": 1123,
+      "char_end": 1129,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_43f926d8",
+      "text": "31",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 28,
+        "height": 25
+      },
+      "line_id": "l_6acc871c",
+      "block_id": "b_f0bb5e70",
+      "reading_order": 165,
+      "char_start": 1131,
+      "char_end": 1133,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_35be4cc4",
+      "text": "Green",
+      "bbox": {
+        "x": 275,
+        "y": 2256,
+        "width": 63,
+        "height": 25
+      },
+      "line_id": "l_6acc871c",
+      "block_id": "b_f0bb5e70",
+      "reading_order": 166,
+      "char_start": 1134,
+      "char_end": 1139,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_3cdf7365",
+      "text": "Bond",
+      "bbox": {
+        "x": 343,
+        "y": 2256,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_6acc871c",
+      "block_id": "b_f0bb5e70",
+      "reading_order": 167,
+      "char_start": 1140,
+      "char_end": 1144,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_07bca923",
+      "text": "Report",
+      "bbox": {
+        "x": 404,
+        "y": 2256,
+        "width": 71,
+        "height": 25
+      },
+      "line_id": "l_6acc871c",
+      "block_id": "b_f0bb5e70",
+      "reading_order": 168,
+      "char_start": 1145,
+      "char_end": 1151,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f61153f4",
+      "text": "2025",
+      "bbox": {
+        "x": 480,
+        "y": 2256,
+        "width": 51,
+        "height": 25
+      },
+      "line_id": "l_6acc871c",
+      "block_id": "b_f0bb5e70",
+      "reading_order": 169,
+      "char_start": 1152,
+      "char_end": 1156,
+      "layer_id": "pdf_text"
+    }
+  ],
+  "lines": [
+    {
+      "line_id": "l_47afe1be",
+      "bbox": {
+        "x": 93,
+        "y": 134,
+        "width": 485,
+        "height": 36
+      },
+      "block_id": "b_8d578f31",
+      "word_ids": [
+        "w_cad9182f",
+        "w_5372e649",
+        "w_4080be3d",
+        "w_4da118bd",
+        "w_77acb2f0"
+      ],
+      "text": "(cid:31)(cid:30)(cid:29) The July 2024 Issuances",
+      "char_start": 0,
+      "char_end": 48,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_379363eb",
+      "bbox": {
+        "x": 194,
+        "y": 239,
+        "width": 355,
+        "height": 29
+      },
+      "block_id": "b_a44ff4c8",
+      "word_ids": [
+        "w_2d0aeb5a",
+        "w_e28d348d",
+        "w_deeed7fb",
+        "w_89939b93"
+      ],
+      "text": "Allocation by Financial Year",
+      "char_start": 50,
+      "char_end": 78,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_b98b6425",
+      "bbox": {
+        "x": 194,
+        "y": 306,
+        "width": 1145,
+        "height": 25
+      },
+      "block_id": "b_a44ff4c8",
+      "word_ids": [
+        "w_3f4345b1",
+        "w_964fde73",
+        "w_24e90c45",
+        "w_a3b9bacc",
+        "w_249f177c",
+        "w_025abb73",
+        "w_4b1671c0",
+        "w_6112b6d1",
+        "w_00a96cba",
+        "w_83c18bc4",
+        "w_049bef00",
+        "w_b87866ff",
+        "w_160232ce",
+        "w_52e99cda",
+        "w_29d9efcd",
+        "w_eed2ecf6"
+      ],
+      "text": "The total proceeds of the July 2024 issuances amounting to HK$24,880 million were fully allocated or",
+      "char_start": 79,
+      "char_end": 179,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_b97fee1f",
+      "bbox": {
+        "x": 194,
+        "y": 342,
+        "width": 1147,
+        "height": 25
+      },
+      "block_id": "b_a44ff4c8",
+      "word_ids": [
+        "w_33a83b7d",
+        "w_23af39cf",
+        "w_519c1a5f",
+        "w_0daa3b3a",
+        "w_0b050317",
+        "w_7f3f4f52",
+        "w_e00eda7a",
+        "w_a2f5e7c8",
+        "w_2cd504b1",
+        "w_41bb37f8",
+        "w_fe1b6644",
+        "w_0181e445",
+        "w_c46289fb",
+        "w_1a207499",
+        "w_17166d1b",
+        "w_edd77872",
+        "w_a52002b9"
+      ],
+      "text": "earmarked to 80 green projects across three financial years from 2024-25 to 2026-27 as shown in the",
+      "char_start": 180,
+      "char_end": 279,
+      "reading_order": 2
+    },
+    {
+      "line_id": "l_095a3fa9",
+      "bbox": {
+        "x": 194,
+        "y": 378,
+        "width": 138,
+        "height": 25
+      },
+      "block_id": "b_a44ff4c8",
+      "word_ids": [
+        "w_247c97be",
+        "w_ceb20203"
+      ],
+      "text": "table below.",
+      "char_start": 280,
+      "char_end": 292,
+      "reading_order": 3
+    },
+    {
+      "line_id": "l_6eb051d7",
+      "bbox": {
+        "x": 418,
+        "y": 481,
+        "width": 999,
+        "height": 24
+      },
+      "block_id": "b_1390bd04",
+      "word_ids": [
+        "w_babf4e4d",
+        "w_a1b3c201",
+        "w_5d8936a0",
+        "w_bbb6385e",
+        "w_6b032950",
+        "w_14ef2a65",
+        "w_f400140b"
+      ],
+      "text": "Year 2024-25 2025-26 2026-27 Total proceeds allocated",
+      "char_start": 294,
+      "char_end": 347,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_d8e3096c",
+      "bbox": {
+        "x": 540,
+        "y": 507,
+        "width": 817,
+        "height": 25
+      },
+      "block_id": "b_1390bd04",
+      "word_ids": [
+        "w_73a7ff64",
+        "w_4bf227d6",
+        "w_133cab4e",
+        "w_2ff155e2",
+        "w_1475c9f0",
+        "w_9f6fb85f",
+        "w_477111ed",
+        "w_b4be62a9",
+        "w_e8e333c1"
+      ],
+      "text": "(allocated for new financing) (earmarked for new financing) earmarked",
+      "char_start": 348,
+      "char_end": 417,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_422ca487",
+      "bbox": {
+        "x": 234,
+        "y": 547,
+        "width": 116,
+        "height": 22
+      },
+      "block_id": "b_1390bd04",
+      "word_ids": [
+        "w_3981abb0",
+        "w_ccf3921f"
+      ],
+      "text": "Green Bond",
+      "char_start": 418,
+      "char_end": 428,
+      "reading_order": 2
+    },
+    {
+      "line_id": "l_0d14693b",
+      "bbox": {
+        "x": 620,
+        "y": 560,
+        "width": 739,
+        "height": 24
+      },
+      "block_id": "b_1390bd04",
+      "word_ids": [
+        "w_92ac442c",
+        "w_ce21e2b7",
+        "w_b6371143",
+        "w_aa2fa540",
+        "w_e1cd3ebb",
+        "w_4afd42f4"
+      ],
+      "text": "HK$ million HK$ million HK$ million",
+      "char_start": 429,
+      "char_end": 464,
+      "reading_order": 3
+    },
+    {
+      "line_id": "l_b1fc6aeb",
+      "bbox": {
+        "x": 265,
+        "y": 574,
+        "width": 53,
+        "height": 22
+      },
+      "block_id": "b_1390bd04",
+      "word_ids": [
+        "w_aa13c0bc"
+      ],
+      "text": "(ISIN)",
+      "char_start": 465,
+      "char_end": 471,
+      "reading_order": 4
+    },
+    {
+      "line_id": "l_53c3298a",
+      "bbox": {
+        "x": 657,
+        "y": 654,
+        "width": 364,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_95d3947e",
+        "w_35fd691b"
+      ],
+      "text": "101 7,689",
+      "char_start": 473,
+      "char_end": 482,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_6392d529",
+      "bbox": {
+        "x": 301,
+        "y": 678,
+        "width": 731,
+        "height": 32
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_c48ccc14",
+        "w_2f6878ed",
+        "w_f6f55fd1",
+        "w_36fd9368"
+      ],
+      "text": "3-year USD (1.3%) (98.7%)",
+      "char_start": 483,
+      "char_end": 508,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_07482c24",
+      "bbox": {
+        "x": 269,
+        "y": 700,
+        "width": 1064,
+        "height": 34
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_dcb01206",
+        "w_16a618cf"
+      ],
+      "text": "(US43858AAP57 7,790",
+      "char_start": 509,
+      "char_end": 528,
+      "reading_order": 2
+    },
+    {
+      "line_id": "l_19764239",
+      "bbox": {
+        "x": 1264,
+        "y": 731,
+        "width": 77,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_97fdcaa7"
+      ],
+      "text": "(100%)",
+      "char_start": 529,
+      "char_end": 535,
+      "reading_order": 3
+    },
+    {
+      "line_id": "l_c63546b3",
+      "bbox": {
+        "x": 274,
+        "y": 745,
+        "width": 691,
+        "height": 27
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_f5f2fcd8",
+        "w_ec573a01",
+        "w_a22a5779",
+        "w_a07ae936",
+        "w_6b19d8ce"
+      ],
+      "text": "USY3422VDC91) Total for new financing:",
+      "char_start": 536,
+      "char_end": 574,
+      "reading_order": 4
+    },
+    {
+      "line_id": "l_ffb1f4b0",
+      "bbox": {
+        "x": 795,
+        "y": 777,
+        "width": 77,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_17291c20"
+      ],
+      "text": "(100%)",
+      "char_start": 575,
+      "char_end": 581,
+      "reading_order": 5
+    },
+    {
+      "line_id": "l_d24af27c",
+      "bbox": {
+        "x": 663,
+        "y": 840,
+        "width": 359,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_68f0be66",
+        "w_956d03ee"
+      ],
+      "text": "48 6,330",
+      "char_start": 582,
+      "char_end": 590,
+      "reading_order": 6
+    },
+    {
+      "line_id": "l_9df543c6",
+      "bbox": {
+        "x": 301,
+        "y": 870,
+        "width": 732,
+        "height": 33
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_5b1873bc",
+        "w_90f9d9a6",
+        "w_666c6456",
+        "w_f6488d2c"
+      ],
+      "text": "7-year EUR (0.8%) (99.2%)",
+      "char_start": 591,
+      "char_end": 616,
+      "reading_order": 7
+    },
+    {
+      "line_id": "l_63aae60e",
+      "bbox": {
+        "x": 1271,
+        "y": 886,
+        "width": 62,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_b9ab18ae"
+      ],
+      "text": "6,379",
+      "char_start": 617,
+      "char_end": 622,
+      "reading_order": 8
+    },
+    {
+      "line_id": "l_516b707d",
+      "bbox": {
+        "x": 275,
+        "y": 914,
+        "width": 1066,
+        "height": 28
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_154989cc",
+        "w_199caa2a"
+      ],
+      "text": "(HK0001031944) (100%)",
+      "char_start": 623,
+      "char_end": 644,
+      "reading_order": 9
+    },
+    {
+      "line_id": "l_275b7d7f",
+      "bbox": {
+        "x": 702,
+        "y": 933,
+        "width": 263,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_bfa22d0a",
+        "w_e66160f5",
+        "w_6610a3c0",
+        "w_3b8aac5c"
+      ],
+      "text": "Total for new financing:",
+      "char_start": 645,
+      "char_end": 669,
+      "reading_order": 10
+    },
+    {
+      "line_id": "l_3e0efa62",
+      "bbox": {
+        "x": 795,
+        "y": 963,
+        "width": 77,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_3b3f0e69"
+      ],
+      "text": "(100%)",
+      "char_start": 670,
+      "char_end": 676,
+      "reading_order": 11
+    },
+    {
+      "line_id": "l_d841673c",
+      "bbox": {
+        "x": 657,
+        "y": 1025,
+        "width": 364,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_9e5c3599",
+        "w_a605d35f"
+      ],
+      "text": "351 1,792",
+      "char_start": 677,
+      "char_end": 686,
+      "reading_order": 12
+    },
+    {
+      "line_id": "l_df5b004c",
+      "bbox": {
+        "x": 297,
+        "y": 1056,
+        "width": 736,
+        "height": 32
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_e44ff848",
+        "w_3892e06d",
+        "w_6a654c2f",
+        "w_0d8d50bf"
+      ],
+      "text": "2-year RMB (16.4%) (83.6%)",
+      "char_start": 687,
+      "char_end": 713,
+      "reading_order": 13
+    },
+    {
+      "line_id": "l_60974f6a",
+      "bbox": {
+        "x": 1273,
+        "y": 1072,
+        "width": 59,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_816fdd82"
+      ],
+      "text": "2,143",
+      "char_start": 714,
+      "char_end": 719,
+      "reading_order": 14
+    },
+    {
+      "line_id": "l_4e16620d",
+      "bbox": {
+        "x": 275,
+        "y": 1100,
+        "width": 1066,
+        "height": 27
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_b8b19b04",
+        "w_41b41f24"
+      ],
+      "text": "(HK0001038410) (100%)",
+      "char_start": 720,
+      "char_end": 741,
+      "reading_order": 15
+    },
+    {
+      "line_id": "l_82f5df65",
+      "bbox": {
+        "x": 702,
+        "y": 1118,
+        "width": 263,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_46dfc2ee",
+        "w_7851c1d8",
+        "w_cbff1780",
+        "w_0f5c1eaf"
+      ],
+      "text": "Total for new financing:",
+      "char_start": 742,
+      "char_end": 766,
+      "reading_order": 16
+    },
+    {
+      "line_id": "l_ff225299",
+      "bbox": {
+        "x": 795,
+        "y": 1149,
+        "width": 77,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_ef123958"
+      ],
+      "text": "(100%)",
+      "char_start": 767,
+      "char_end": 773,
+      "reading_order": 17
+    },
+    {
+      "line_id": "l_28f561b2",
+      "bbox": {
+        "x": 664,
+        "y": 1211,
+        "width": 357,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_d83b9d7a",
+        "w_1ef32ef1"
+      ],
+      "text": "61 2,081",
+      "char_start": 774,
+      "char_end": 782,
+      "reading_order": 18
+    },
+    {
+      "line_id": "l_8dee1053",
+      "bbox": {
+        "x": 297,
+        "y": 1242,
+        "width": 734,
+        "height": 31
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_69c5527b",
+        "w_b9b42768",
+        "w_c236a475",
+        "w_611b5cd5"
+      ],
+      "text": "5-year RMB (2.8%) (97.2%)",
+      "char_start": 783,
+      "char_end": 808,
+      "reading_order": 19
+    },
+    {
+      "line_id": "l_ed6d56bb",
+      "bbox": {
+        "x": 1273,
+        "y": 1258,
+        "width": 58,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_f5c73c3f"
+      ],
+      "text": "2,142",
+      "char_start": 809,
+      "char_end": 814,
+      "reading_order": 20
+    },
+    {
+      "line_id": "l_d4257721",
+      "bbox": {
+        "x": 275,
+        "y": 1285,
+        "width": 1066,
+        "height": 28
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_a1f6abc2",
+        "w_f49ea467"
+      ],
+      "text": "(HK0001031951) (100%)",
+      "char_start": 815,
+      "char_end": 836,
+      "reading_order": 21
+    },
+    {
+      "line_id": "l_66814e0e",
+      "bbox": {
+        "x": 702,
+        "y": 1304,
+        "width": 263,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_e079a4a2",
+        "w_6e00619b",
+        "w_79e747e9",
+        "w_eb02a3f9"
+      ],
+      "text": "Total for new financing:",
+      "char_start": 837,
+      "char_end": 861,
+      "reading_order": 22
+    },
+    {
+      "line_id": "l_5ab101fb",
+      "bbox": {
+        "x": 795,
+        "y": 1334,
+        "width": 77,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_368b72a6"
+      ],
+      "text": "(100%)",
+      "char_start": 862,
+      "char_end": 868,
+      "reading_order": 23
+    },
+    {
+      "line_id": "l_55957f49",
+      "bbox": {
+        "x": 961,
+        "y": 1397,
+        "width": 58,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_145c9bb8"
+      ],
+      "text": "2,142",
+      "char_start": 869,
+      "char_end": 874,
+      "reading_order": 24
+    },
+    {
+      "line_id": "l_3bfe9017",
+      "bbox": {
+        "x": 672,
+        "y": 1412,
+        "width": 10,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_7c4b2e8f"
+      ],
+      "text": "-",
+      "char_start": 875,
+      "char_end": 876,
+      "reading_order": 25
+    },
+    {
+      "line_id": "l_6aec380e",
+      "bbox": {
+        "x": 291,
+        "y": 1427,
+        "width": 737,
+        "height": 32
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_60f3a833",
+        "w_8fb83935",
+        "w_c2bbd6b2"
+      ],
+      "text": "10-year RMB (100%)",
+      "char_start": 877,
+      "char_end": 895,
+      "reading_order": 26
+    },
+    {
+      "line_id": "l_c7288632",
+      "bbox": {
+        "x": 1273,
+        "y": 1443,
+        "width": 58,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_675720fb"
+      ],
+      "text": "2,142",
+      "char_start": 896,
+      "char_end": 901,
+      "reading_order": 27
+    },
+    {
+      "line_id": "l_506e6533",
+      "bbox": {
+        "x": 275,
+        "y": 1471,
+        "width": 1066,
+        "height": 28
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_4da54671",
+        "w_709a0c70"
+      ],
+      "text": "(HK0001031969) (100%)",
+      "char_start": 902,
+      "char_end": 923,
+      "reading_order": 28
+    },
+    {
+      "line_id": "l_c3f65a16",
+      "bbox": {
+        "x": 702,
+        "y": 1490,
+        "width": 263,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_01ab24b4",
+        "w_77fd7143",
+        "w_7299a471",
+        "w_d7b50aff"
+      ],
+      "text": "Total for new financing:",
+      "char_start": 924,
+      "char_end": 948,
+      "reading_order": 29
+    },
+    {
+      "line_id": "l_23d53ccd",
+      "bbox": {
+        "x": 795,
+        "y": 1520,
+        "width": 77,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_ecca8bc2"
+      ],
+      "text": "(100%)",
+      "char_start": 949,
+      "char_end": 955,
+      "reading_order": 30
+    },
+    {
+      "line_id": "l_d81af964",
+      "bbox": {
+        "x": 961,
+        "y": 1582,
+        "width": 58,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_d0481ee8"
+      ],
+      "text": "2,142",
+      "char_start": 956,
+      "char_end": 961,
+      "reading_order": 31
+    },
+    {
+      "line_id": "l_5f9e2ee4",
+      "bbox": {
+        "x": 672,
+        "y": 1598,
+        "width": 10,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_d88d059e"
+      ],
+      "text": "-",
+      "char_start": 962,
+      "char_end": 963,
+      "reading_order": 32
+    },
+    {
+      "line_id": "l_c6b7abf6",
+      "bbox": {
+        "x": 293,
+        "y": 1613,
+        "width": 735,
+        "height": 32
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_2da2cd51",
+        "w_cb79eafc",
+        "w_ddb72fcd"
+      ],
+      "text": "20-year RMB (100%)",
+      "char_start": 964,
+      "char_end": 982,
+      "reading_order": 33
+    },
+    {
+      "line_id": "l_d77b6078",
+      "bbox": {
+        "x": 1273,
+        "y": 1629,
+        "width": 58,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_510e9121"
+      ],
+      "text": "2,142",
+      "char_start": 983,
+      "char_end": 988,
+      "reading_order": 34
+    },
+    {
+      "line_id": "l_7d9a9fd0",
+      "bbox": {
+        "x": 275,
+        "y": 1657,
+        "width": 1066,
+        "height": 27
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_ba3f984e",
+        "w_4a00f8fd"
+      ],
+      "text": "(HK0001031977) (100%)",
+      "char_start": 989,
+      "char_end": 1010,
+      "reading_order": 35
+    },
+    {
+      "line_id": "l_d347008a",
+      "bbox": {
+        "x": 702,
+        "y": 1675,
+        "width": 263,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_d7702508",
+        "w_f9bc7676",
+        "w_59db5e8f",
+        "w_5e1d857d"
+      ],
+      "text": "Total for new financing:",
+      "char_start": 1011,
+      "char_end": 1035,
+      "reading_order": 36
+    },
+    {
+      "line_id": "l_5f5aa982",
+      "bbox": {
+        "x": 795,
+        "y": 1706,
+        "width": 77,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_26b8f3d2"
+      ],
+      "text": "(100%)",
+      "char_start": 1036,
+      "char_end": 1042,
+      "reading_order": 37
+    },
+    {
+      "line_id": "l_e71c7615",
+      "bbox": {
+        "x": 961,
+        "y": 1768,
+        "width": 58,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_5fef9613"
+      ],
+      "text": "2,142",
+      "char_start": 1043,
+      "char_end": 1048,
+      "reading_order": 38
+    },
+    {
+      "line_id": "l_f740fe90",
+      "bbox": {
+        "x": 672,
+        "y": 1783,
+        "width": 10,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_4d94d759"
+      ],
+      "text": "-",
+      "char_start": 1049,
+      "char_end": 1050,
+      "reading_order": 39
+    },
+    {
+      "line_id": "l_abcc856b",
+      "bbox": {
+        "x": 293,
+        "y": 1799,
+        "width": 735,
+        "height": 32
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_2219ee33",
+        "w_0a8a6652",
+        "w_76a9490d"
+      ],
+      "text": "30-year RMB (100%)",
+      "char_start": 1051,
+      "char_end": 1069,
+      "reading_order": 40
+    },
+    {
+      "line_id": "l_e1126cfe",
+      "bbox": {
+        "x": 1273,
+        "y": 1815,
+        "width": 58,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_42a36d12"
+      ],
+      "text": "2,142",
+      "char_start": 1070,
+      "char_end": 1075,
+      "reading_order": 41
+    },
+    {
+      "line_id": "l_f9548e1d",
+      "bbox": {
+        "x": 275,
+        "y": 1843,
+        "width": 1066,
+        "height": 27
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_668c09f3",
+        "w_1734487d"
+      ],
+      "text": "(HK0001041943) (100%)",
+      "char_start": 1076,
+      "char_end": 1097,
+      "reading_order": 42
+    },
+    {
+      "line_id": "l_cba23971",
+      "bbox": {
+        "x": 702,
+        "y": 1861,
+        "width": 263,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_0eb96244",
+        "w_8e83c72f",
+        "w_4958e470",
+        "w_bc68efa2"
+      ],
+      "text": "Total for new financing:",
+      "char_start": 1098,
+      "char_end": 1122,
+      "reading_order": 43
+    },
+    {
+      "line_id": "l_9ee09eda",
+      "bbox": {
+        "x": 795,
+        "y": 1892,
+        "width": 77,
+        "height": 25
+      },
+      "block_id": "b_b16ba32e",
+      "word_ids": [
+        "w_87757091"
+      ],
+      "text": "(100%)",
+      "char_start": 1123,
+      "char_end": 1129,
+      "reading_order": 44
+    },
+    {
+      "line_id": "l_6acc871c",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 337,
+        "height": 25
+      },
+      "block_id": "b_f0bb5e70",
+      "word_ids": [
+        "w_43f926d8",
+        "w_35be4cc4",
+        "w_3cdf7365",
+        "w_07bca923",
+        "w_f61153f4"
+      ],
+      "text": "31 Green Bond Report 2025",
+      "char_start": 1131,
+      "char_end": 1156,
+      "reading_order": 0
+    }
+  ],
+  "blocks": [
+    {
+      "block_id": "b_8d578f31",
+      "bbox": {
+        "x": 93,
+        "y": 134,
+        "width": 485,
+        "height": 36
+      },
+      "block_type": "heading",
+      "line_ids": [
+        "l_47afe1be"
+      ],
+      "text": "(cid:31)(cid:30)(cid:29) The July 2024 Issuances",
+      "char_start": 0,
+      "char_end": 48,
+      "reading_order": 0
+    },
+    {
+      "block_id": "b_a44ff4c8",
+      "bbox": {
+        "x": 194,
+        "y": 239,
+        "width": 1147,
+        "height": 164
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_379363eb",
+        "l_b98b6425",
+        "l_b97fee1f",
+        "l_095a3fa9"
+      ],
+      "text": "Allocation by Financial Year\nThe total proceeds of the July 2024 issuances amounting to HK$24,880 million were fully allocated or\nearmarked to 80 green projects across three financial years from 2024-25 to 2026-27 as shown in the\ntable below.",
+      "char_start": 50,
+      "char_end": 292,
+      "reading_order": 1
+    },
+    {
+      "block_id": "b_1390bd04",
+      "bbox": {
+        "x": 234,
+        "y": 481,
+        "width": 1183,
+        "height": 115
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_6eb051d7",
+        "l_d8e3096c",
+        "l_422ca487",
+        "l_0d14693b",
+        "l_b1fc6aeb"
+      ],
+      "text": "Year 2024-25 2025-26 2026-27 Total proceeds allocated\n(allocated for new financing) (earmarked for new financing) earmarked\nGreen Bond\nHK$ million HK$ million HK$ million\n(ISIN)",
+      "char_start": 294,
+      "char_end": 471,
+      "reading_order": 2
+    },
+    {
+      "block_id": "b_b16ba32e",
+      "bbox": {
+        "x": 269,
+        "y": 654,
+        "width": 1072,
+        "height": 1263
+      },
+      "block_type": "list_item",
+      "line_ids": [
+        "l_53c3298a",
+        "l_6392d529",
+        "l_07482c24",
+        "l_19764239",
+        "l_c63546b3",
+        "l_ffb1f4b0",
+        "l_d24af27c",
+        "l_9df543c6",
+        "l_63aae60e",
+        "l_516b707d",
+        "l_275b7d7f",
+        "l_3e0efa62",
+        "l_d841673c",
+        "l_df5b004c",
+        "l_60974f6a",
+        "l_4e16620d",
+        "l_82f5df65",
+        "l_ff225299",
+        "l_28f561b2",
+        "l_8dee1053",
+        "l_ed6d56bb",
+        "l_d4257721",
+        "l_66814e0e",
+        "l_5ab101fb",
+        "l_55957f49",
+        "l_3bfe9017",
+        "l_6aec380e",
+        "l_c7288632",
+        "l_506e6533",
+        "l_c3f65a16",
+        "l_23d53ccd",
+        "l_d81af964",
+        "l_5f9e2ee4",
+        "l_c6b7abf6",
+        "l_d77b6078",
+        "l_7d9a9fd0",
+        "l_d347008a",
+        "l_5f5aa982",
+        "l_e71c7615",
+        "l_f740fe90",
+        "l_abcc856b",
+        "l_e1126cfe",
+        "l_f9548e1d",
+        "l_cba23971",
+        "l_9ee09eda"
+      ],
+      "text": "101 7,689\n3-year USD (1.3%) (98.7%)\n(US43858AAP57 7,790\n(100%)\nUSY3422VDC91) Total for new financing:\n(100%)\n48 6,330\n7-year EUR (0.8%) (99.2%)\n6,379\n(HK0001031944) (100%)\nTotal for new financing:\n(100%)\n351 1,792\n2-year RMB (16.4%) (83.6%)\n2,143\n(HK0001038410) (100%)\nTotal for new financing:\n(100%)\n61 2,081\n5-year RMB (2.8%) (97.2%)\n2,142\n(HK0001031951) (100%)\nTotal for new financing:\n(100%)\n2,142\n-\n10-year RMB (100%)\n2,142\n(HK0001031969) (100%)\nTotal for new financing:\n(100%)\n2,142\n-\n20-year RMB (100%)\n2,142\n(HK0001031977) (100%)\nTotal for new financing:\n(100%)\n2,142\n-\n30-year RMB (100%)\n2,142\n(HK0001041943) (100%)\nTotal for new financing:\n(100%)",
+      "char_start": 473,
+      "char_end": 1129,
+      "reading_order": 3
+    },
+    {
+      "block_id": "b_f0bb5e70",
+      "bbox": {
+        "x": 194,
+        "y": 2256,
+        "width": 337,
+        "height": 25
+      },
+      "block_type": "list_item",
+      "line_ids": [
+        "l_6acc871c"
+      ],
+      "text": "31 Green Bond Report 2025",
+      "char_start": 1131,
+      "char_end": 1156,
+      "reading_order": 4
+    }
+  ],
+  "tables": []
+}

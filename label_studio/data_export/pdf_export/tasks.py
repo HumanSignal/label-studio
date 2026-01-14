@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import Optional
 from uuid import uuid4
 
+import pdfplumber
+
 from django.conf import settings
 from django.core.files import File
 
@@ -117,11 +119,12 @@ def run_pdf_ml_export(export_job_id: int):
                 )
                 completed += 1
                 log_document_completed(
-                    str(export_job.export_id),
-                    task.id,
-                    doc_id,
-                    0,  # num_pages (not available here)
-                    0,  # num_annotations (not available here)
+                    export_id=str(export_job.export_id),
+                    doc_id=doc_id,
+                    task_id=task.id,
+                    page_count=0,  # not available here
+                    annotation_count=0,  # not available here
+                    duration_seconds=0.0,  # not tracked here
                 )
 
             except PdfExportError as e:
@@ -156,10 +159,11 @@ def run_pdf_ml_export(export_job_id: int):
                 )
 
                 log_document_failed(
-                    str(export_job.export_id),
-                    task.id,
-                    doc_id,
-                    str(e),
+                    export_id=str(export_job.export_id),
+                    doc_id=doc_id,
+                    task_id=task.id,
+                    error_type=e.error_type,
+                    error_message=str(e),
                 )
 
             except Exception as e:
@@ -194,10 +198,11 @@ def run_pdf_ml_export(export_job_id: int):
                 )
 
                 log_document_failed(
-                    str(export_job.export_id),
-                    task.id,
-                    doc_id,
-                    str(e),
+                    export_id=str(export_job.export_id),
+                    doc_id=doc_id,
+                    task_id=task.id,
+                    error_type="unexpected_error",
+                    error_message=str(e),
                 )
 
             # Update progress
@@ -318,6 +323,8 @@ def _get_tasks_to_export(export_job: PdfExportJob):
     Returns:
         QuerySet of tasks to export
     """
+    from django.db.models import Q
+
     from tasks.models import Task
 
     queryset = Task.objects.filter(project_id=export_job.project_id)
@@ -327,7 +334,18 @@ def _get_tasks_to_export(export_job: PdfExportJob):
         queryset = queryset.filter(id__in=export_job.task_ids)
 
     # Only export tasks with PDF data
-    queryset = queryset.filter(data__has_key="pdf")
+    # Check multiple possible keys where PDF URL might be stored
+    # Note: $undefined$ is used by Label Studio when data is imported without key mapping
+    pdf_filter = (
+        Q(data__has_key="pdf")
+        | Q(data__has_key="$pdf$")
+        | Q(data__has_key="document")
+        | Q(**{"data__$undefined$__iendswith": ".pdf"})  # $undefined$ key ending with .pdf
+        | Q(data__text__iendswith=".pdf")  # text key ending with .pdf
+        | Q(data__file__iendswith=".pdf")  # file key ending with .pdf
+        | Q(data__url__iendswith=".pdf")  # url key ending with .pdf
+    )
+    queryset = queryset.filter(pdf_filter)
 
     return queryset.order_by("id")
 
@@ -406,7 +424,12 @@ def _process_task(
     from .page_renderer import render_document_pages
 
     # Log document start
-    log_document_started(str(export_job.export_id), task.id, "")
+    log_document_started(
+        export_id=str(export_job.export_id),
+        doc_id="pending",  # doc_id not yet known
+        task_id=task.id,
+        page_count=0,  # not yet known
+    )
 
     # Get PDF path from task data
     pdf_path = _get_pdf_path_from_task(task)
@@ -466,38 +489,39 @@ def _process_task(
     total_words = 0
     total_tables = 0
 
-    for page_num in range(1, num_pages + 1):
-        page_layout = process_page(
-            pdf_path=pdf_path,
-            page_number=page_num,
-            doc_id=doc_id,
-            layout_version_id=layout_version_id,
-            render_dpi=options.render_dpi,
-        )
-        page_layouts.append(page_layout)
-
-        # Count words and tables
-        total_words += len(page_layout.words)
-        total_tables += len(page_layout.tables) if page_layout.tables else 0
-
-        # Save page layout file
-        doc_dir = builder.add_document(
-            manifest=DocumentManifest(
+    with pdfplumber.open(pdf_path) as pdf:
+        for page_num, page in enumerate(pdf.pages, start=1):
+            page_layout = process_page(
+                page=page,
+                page_number=page_num,
                 doc_id=doc_id,
-                task_id=task.id,
-                pdf_path=pdf_path,
-                sha256=pdf_hash,
-                num_pages=num_pages,
                 layout_version_id=layout_version_id,
-                id_algorithm_version=ID_ALGORITHM_VERSION,
-                export_schema_version=EXPORT_SCHEMA_VERSION,
-                pipeline=get_pipeline_versions(),
-                render={"dpi": options.render_dpi, "coordinate_system": "pixels"},
-                layout_files=[],
-            ),
-            num_words=total_words,
-            num_tables=total_tables,
-        ) if page_num == num_pages else None
+                dpi=options.render_dpi,
+            )
+            page_layouts.append(page_layout)
+
+            # Count words and tables
+            total_words += len(page_layout.words)
+            total_tables += len(page_layout.tables) if page_layout.tables else 0
+
+            # Save page layout file
+            doc_dir = builder.add_document(
+                manifest=DocumentManifest(
+                    doc_id=doc_id,
+                    task_id=task.id,
+                    pdf_path=pdf_path,
+                    sha256=pdf_hash,
+                    num_pages=num_pages,
+                    layout_version_id=layout_version_id,
+                    id_algorithm_version=ID_ALGORITHM_VERSION,
+                    export_schema_version=EXPORT_SCHEMA_VERSION,
+                    pipeline=get_pipeline_versions(),
+                    render={"dpi": options.render_dpi, "coordinate_system": "pixels"},
+                    layout_files=[],
+                ),
+                num_words=total_words,
+                num_tables=total_tables,
+            ) if page_num == num_pages else None
 
     # Save layout files
     doc_dir = str(builder.output_dir / "docs" / doc_id)
@@ -510,9 +534,8 @@ def _process_task(
     if options.include_page_images:
         page_images = render_document_pages(
             pdf_path=pdf_path,
-            doc_id=doc_id,
             output_dir=doc_dir,
-            dpi=options.render_dpi,
+            options=options,
         )
 
     # Update manifest with layout files and images
@@ -540,16 +563,45 @@ def _process_task(
         json.dump(manifest.to_dict(), f, ensure_ascii=False, indent=2)
 
     # Convert annotations to records
+    # Create page layout map for efficient lookup by page number
+    page_layout_map = {pl.page_number: pl for pl in page_layouts}
+
     annotations = task.annotations.all()
     for annotation in annotations:
-        records = convert_ls_annotation_to_records(
-            annotation=annotation,
-            doc_id=doc_id,
-            task_id=task.id,
-            page_layouts=page_layouts,
-        )
-        for record in records:
-            builder.add_annotation(record)
+        # Build annotation data dict from model
+        annotation_data = {
+            "id": annotation.id,
+            "result": annotation.result or [],
+            "completed_by": annotation.completed_by_id,
+            "created_at": annotation.created_at.isoformat() if annotation.created_at else "",
+            "updated_at": annotation.updated_at.isoformat() if annotation.updated_at else None,
+            "lead_time": annotation.lead_time,
+        }
+
+        # Process each result with its correct page layout
+        for result in annotation_data.get("result", []):
+            # Get page number from annotation result (default to page 1)
+            page_num = result.get("value", {}).get("page", 1)
+            page_layout = page_layout_map.get(page_num)
+
+            if page_layout:
+                # Create annotation data with only this result
+                single_result_data = {
+                    **annotation_data,
+                    "result": [result],  # Only process this result
+                }
+                records = convert_ls_annotation_to_records(
+                    annotation_data=single_result_data,
+                    task_id=task.id,
+                    doc_id=doc_id,
+                    page_layout=page_layout,
+                )
+                for record in records:
+                    builder.add_annotation(record)
+            else:
+                logger.warning(
+                    f"No page layout found for page {page_num} in annotation {annotation.id}"
+                )
 
 
 def _get_pdf_path_from_task(task) -> Optional[str]:
@@ -568,8 +620,9 @@ def _get_pdf_path_from_task(task) -> Optional[str]:
     # Check for 'pdf' key in task data
     pdf_url = data.get("pdf") or data.get("$pdf$")
     if not pdf_url:
-        # Check for other common keys
-        for key in ["document", "file", "url"]:
+        # Check for other common keys that might contain PDF URLs
+        # Note: $undefined$ is used by Label Studio when data is imported without key mapping
+        for key in ["document", "file", "url", "text", "$undefined$"]:
             if key in data and str(data[key]).lower().endswith(".pdf"):
                 pdf_url = data[key]
                 break
@@ -577,21 +630,26 @@ def _get_pdf_path_from_task(task) -> Optional[str]:
     if not pdf_url:
         return None
 
-    # Handle local file paths
-    if pdf_url.startswith("/"):
-        return pdf_url
-
-    # Handle /data/local-files/ URLs
+    # Handle /data/local-files/ URLs FIRST (before generic / check)
     if pdf_url.startswith("/data/local-files/"):
         local_path = pdf_url.replace("/data/local-files/", "")
         base_dir = getattr(settings, "LOCAL_FILES_DOCUMENT_ROOT", None)
         if base_dir:
             return os.path.join(base_dir, local_path)
 
-    # Handle /data/upload/ URLs
+    # Handle /data/upload/ URLs (maps MEDIA_URL /data/ to MEDIA_ROOT)
     if pdf_url.startswith("/data/upload/"):
-        upload_path = pdf_url.replace("/data/upload/", "")
-        return os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR, upload_path)
+        relative_path = pdf_url.replace("/data/", "")
+        return os.path.join(settings.MEDIA_ROOT, relative_path)
+
+    # Handle other /data/ URLs (generic handler)
+    if pdf_url.startswith("/data/"):
+        relative_path = pdf_url.replace("/data/", "")
+        return os.path.join(settings.MEDIA_ROOT, relative_path)
+
+    # Handle absolute local file paths (fallback for actual filesystem paths)
+    if pdf_url.startswith("/"):
+        return pdf_url
 
     # Handle s3:// or gs:// URLs - these need to be downloaded
     if pdf_url.startswith(("s3://", "gs://", "http://", "https://")):

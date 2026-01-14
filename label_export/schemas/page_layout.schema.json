@@ -1,0 +1,229 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://labelstud.io/schemas/pdf-ml-export/page_layout.schema.json",
+  "title": "PDF ML Export Page Layout",
+  "description": "Schema for page layout files in PDF ML export bundle",
+  "type": "object",
+  "required": [
+    "page_id",
+    "page_number",
+    "doc_id",
+    "layout_version_id",
+    "geometry",
+    "layers",
+    "canonical",
+    "canonical_text",
+    "canonical_index",
+    "words",
+    "lines",
+    "blocks"
+  ],
+  "definitions": {
+    "bbox_xywh": {
+      "type": "object",
+      "required": ["x", "y", "width", "height"],
+      "properties": {
+        "x": {"type": "integer", "minimum": 0},
+        "y": {"type": "integer", "minimum": 0},
+        "width": {"type": "integer", "minimum": 1},
+        "height": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "char_range": {
+      "type": "object",
+      "required": ["char_start", "char_end"],
+      "properties": {
+        "char_start": {"type": "integer", "minimum": 0},
+        "char_end": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "token": {
+      "type": "object",
+      "required": ["token_id", "text", "bbox"],
+      "properties": {
+        "token_id": {"type": "string"},
+        "text": {"type": "string"},
+        "bbox": {"$ref": "#/definitions/bbox_xywh"},
+        "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "font_name": {"type": ["string", "null"]},
+        "font_size": {"type": ["number", "null"]},
+        "is_bold": {"type": ["boolean", "null"]},
+        "is_italic": {"type": ["boolean", "null"]}
+      }
+    },
+    "text_layer": {
+      "type": "object",
+      "required": ["layer_id", "source_engine", "coverage", "word_count", "tokens"],
+      "properties": {
+        "layer_id": {"type": "string", "enum": ["pdf_text", "ocr"]},
+        "source_engine": {"type": "string"},
+        "coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "word_count": {"type": "integer", "minimum": 0},
+        "tokens": {"type": "array", "items": {"$ref": "#/definitions/token"}},
+        "avg_confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+      }
+    },
+    "word": {
+      "type": "object",
+      "required": ["word_id", "text", "bbox", "line_id", "block_id", "reading_order", "char_start", "char_end", "layer_id"],
+      "properties": {
+        "word_id": {"type": "string", "pattern": "^w_[a-f0-9]{8}$"},
+        "text": {"type": "string"},
+        "bbox": {"$ref": "#/definitions/bbox_xywh"},
+        "line_id": {"type": "string", "pattern": "^l_[a-f0-9]{8}$"},
+        "block_id": {"type": "string", "pattern": "^b_[a-f0-9]{8}$"},
+        "reading_order": {"type": "integer", "minimum": 0},
+        "char_start": {"type": "integer", "minimum": 0},
+        "char_end": {"type": "integer", "minimum": 0},
+        "layer_id": {"type": "string", "enum": ["pdf_text", "ocr"]},
+        "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+      }
+    },
+    "line": {
+      "type": "object",
+      "required": ["line_id", "bbox", "block_id", "word_ids", "text", "char_start", "char_end", "reading_order"],
+      "properties": {
+        "line_id": {"type": "string", "pattern": "^l_[a-f0-9]{8}$"},
+        "bbox": {"$ref": "#/definitions/bbox_xywh"},
+        "block_id": {"type": "string", "pattern": "^b_[a-f0-9]{8}$"},
+        "word_ids": {"type": "array", "items": {"type": "string", "pattern": "^w_[a-f0-9]{8}$"}},
+        "text": {"type": "string"},
+        "char_start": {"type": "integer", "minimum": 0},
+        "char_end": {"type": "integer", "minimum": 0},
+        "reading_order": {"type": "integer", "minimum": 0}
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": ["block_id", "bbox", "block_type", "line_ids", "text", "char_start", "char_end", "reading_order"],
+      "properties": {
+        "block_id": {"type": "string", "pattern": "^b_[a-f0-9]{8}$"},
+        "bbox": {"$ref": "#/definitions/bbox_xywh"},
+        "block_type": {"type": "string", "enum": ["paragraph", "heading", "list_item", "caption", "other"]},
+        "line_ids": {"type": "array", "items": {"type": "string", "pattern": "^l_[a-f0-9]{8}$"}},
+        "text": {"type": "string"},
+        "char_start": {"type": "integer", "minimum": 0},
+        "char_end": {"type": "integer", "minimum": 0},
+        "reading_order": {"type": "integer", "minimum": 0}
+      }
+    },
+    "cell": {
+      "type": "object",
+      "required": ["cell_id", "row", "col", "bbox", "text"],
+      "properties": {
+        "cell_id": {"type": "string"},
+        "row": {"type": "integer", "minimum": 0},
+        "col": {"type": "integer", "minimum": 0},
+        "rowspan": {"type": "integer", "minimum": 1, "default": 1},
+        "colspan": {"type": "integer", "minimum": 1, "default": 1},
+        "bbox": {"$ref": "#/definitions/bbox_xywh"},
+        "text": {"type": "string"},
+        "is_header": {"type": "boolean", "default": false},
+        "word_ids": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "table": {
+      "type": "object",
+      "required": ["table_id", "bbox", "page_id", "n_rows", "n_cols", "cells", "structure_confidence", "reading_order"],
+      "properties": {
+        "table_id": {"type": "string", "pattern": "^t_[a-f0-9]{8}$"},
+        "bbox": {"$ref": "#/definitions/bbox_xywh"},
+        "page_id": {"type": "string"},
+        "n_rows": {"type": "integer", "minimum": 0},
+        "n_cols": {"type": "integer", "minimum": 0},
+        "cells": {"type": "array", "items": {"$ref": "#/definitions/cell"}},
+        "structure_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "reading_order": {"type": "integer", "minimum": 0},
+        "structure_reason": {"type": ["string", "null"]}
+      }
+    }
+  },
+  "properties": {
+    "page_id": {
+      "type": "string",
+      "description": "Page identifier (format: {doc_id}:page_{NNN})",
+      "pattern": "^[a-f0-9]{12}:page_\\d{3}$"
+    },
+    "page_number": {
+      "type": "integer",
+      "description": "Page number (1-indexed)",
+      "minimum": 1
+    },
+    "doc_id": {
+      "type": "string",
+      "description": "Parent document ID",
+      "pattern": "^[a-f0-9]{12}$"
+    },
+    "layout_version_id": {
+      "type": "string",
+      "description": "UUID for this extraction run"
+    },
+    "geometry": {
+      "type": "object",
+      "description": "Page geometry information",
+      "required": ["pdf_page_width_pt", "pdf_page_height_pt", "rotation_deg", "media_box_pt", "crop_box_pt", "render_dpi", "render_scale", "rendered_width_px", "rendered_height_px"],
+      "properties": {
+        "pdf_page_width_pt": {"type": "number"},
+        "pdf_page_height_pt": {"type": "number"},
+        "rotation_deg": {"type": "integer", "enum": [0, 90, 180, 270]},
+        "media_box_pt": {"type": "array", "items": {"type": "number"}, "minItems": 4, "maxItems": 4},
+        "crop_box_pt": {"type": "array", "items": {"type": "number"}, "minItems": 4, "maxItems": 4},
+        "render_dpi": {"type": "integer", "minimum": 72, "maximum": 600},
+        "render_scale": {"type": "number"},
+        "rendered_width_px": {"type": "integer", "minimum": 1},
+        "rendered_height_px": {"type": "integer", "minimum": 1}
+      }
+    },
+    "layers": {
+      "type": "object",
+      "description": "Text layers (pdf_text and/or ocr)",
+      "additionalProperties": {"$ref": "#/definitions/text_layer"}
+    },
+    "canonical": {
+      "type": "object",
+      "description": "Canonical layer selection",
+      "required": ["layer_id", "reason"],
+      "properties": {
+        "layer_id": {"type": "string", "enum": ["pdf_text", "ocr"]},
+        "reason": {"type": "string"}
+      }
+    },
+    "canonical_text": {
+      "type": "string",
+      "description": "Full page text with normalized formatting"
+    },
+    "canonical_index": {
+      "type": "object",
+      "description": "Character offset index",
+      "required": ["words", "lines", "blocks"],
+      "properties": {
+        "words": {"type": "object", "additionalProperties": {"$ref": "#/definitions/char_range"}},
+        "lines": {"type": "object", "additionalProperties": {"$ref": "#/definitions/char_range"}},
+        "blocks": {"type": "object", "additionalProperties": {"$ref": "#/definitions/char_range"}}
+      }
+    },
+    "words": {
+      "type": "array",
+      "description": "All words on the page",
+      "items": {"$ref": "#/definitions/word"}
+    },
+    "lines": {
+      "type": "array",
+      "description": "All lines on the page",
+      "items": {"$ref": "#/definitions/line"}
+    },
+    "blocks": {
+      "type": "array",
+      "description": "All blocks on the page",
+      "items": {"$ref": "#/definitions/block"}
+    },
+    "tables": {
+      "type": "array",
+      "description": "All tables on the page",
+      "items": {"$ref": "#/definitions/table"}
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://labelstud.io/schemas/pdf-ml-export/manifest.schema.json",
+  "title": "PDF ML Export Document Manifest",
+  "description": "Schema for document manifest in PDF ML export bundle",
+  "type": "object",
+  "required": [
+    "doc_id",
+    "task_id",
+    "pdf_path",
+    "sha256",
+    "num_pages",
+    "layout_version_id",
+    "id_algorithm_version",
+    "export_schema_version",
+    "pipeline",
+    "render",
+    "layout_files"
+  ],
+  "properties": {
+    "doc_id": {
+      "type": "string",
+      "description": "Deterministic document ID (12-character hex)",
+      "pattern": "^[a-f0-9]{12}$"
+    },
+    "task_id": {
+      "type": "integer",
+      "description": "Label Studio task ID",
+      "minimum": 1
+    },
+    "pdf_path": {
+      "type": "string",
+      "description": "Relative path to PDF file in export bundle"
+    },
+    "sha256": {
+      "type": "string",
+      "description": "SHA-256 hash of PDF content",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "num_pages": {
+      "type": "integer",
+      "description": "Number of pages in the document",
+      "minimum": 1
+    },
+    "layout_version_id": {
+      "type": "string",
+      "description": "UUID for this extraction run",
+      "format": "uuid"
+    },
+    "id_algorithm_version": {
+      "type": "string",
+      "description": "Version of ID generation algorithm",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "export_schema_version": {
+      "type": "string",
+      "description": "Semantic version of export schema",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "pipeline": {
+      "type": "object",
+      "description": "Pipeline version information",
+      "required": ["pdf_text_engine", "layout_engine"],
+      "properties": {
+        "pdf_text_engine": {
+          "type": "string",
+          "description": "PDF text extraction engine and version"
+        },
+        "layout_engine": {
+          "type": "string",
+          "description": "Layout extraction engine and version"
+        },
+        "ocr_engine": {
+          "type": ["string", "null"],
+          "description": "OCR engine and version (if used)"
+        }
+      }
+    },
+    "render": {
+      "type": "object",
+      "description": "Render settings",
+      "required": ["dpi", "coordinate_system"],
+      "properties": {
+        "dpi": {
+          "type": "integer",
+          "description": "Render DPI",
+          "minimum": 72,
+          "maximum": 600
+        },
+        "coordinate_system": {
+          "type": "string",
+          "description": "Coordinate system identifier",
+          "enum": ["pixel_top_left_xywh"]
+        }
+      }
+    },
+    "layout_files": {
+      "type": "array",
+      "description": "List of layout file paths",
+      "items": {
+        "type": "string",
+        "pattern": "^layout/page_\\d{3}\\.json$"
+      },
+      "minItems": 1
+    },
+    "page_images": {
+      "type": "array",
+      "description": "List of page image paths (optional)",
+      "items": {
+        "type": "string",
+        "pattern": "^pages/page_\\d{3}\\.png$"
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "description": "Export timestamp (ISO8601)",
+      "format": "date-time"
+    }
+  },
+  "additionalProperties": false
+}

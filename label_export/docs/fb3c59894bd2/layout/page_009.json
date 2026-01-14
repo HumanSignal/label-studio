@@ -1,0 +1,1248 @@
+{
+  "page_id": "fb3c59894bd2:page_009",
+  "page_number": 9,
+  "doc_id": "fb3c59894bd2",
+  "layout_version_id": "c84625f1-3db9-43c5-a4da-12ffc5948c74",
+  "geometry": {
+    "pdf_page_width_pt": 595.276,
+    "pdf_page_height_pt": 841.89,
+    "rotation_deg": 0,
+    "media_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "crop_box_pt": [
+      0.0,
+      0.0,
+      595.276,
+      841.89
+    ],
+    "render_dpi": 200,
+    "render_scale": 2.7777777777777777,
+    "rendered_width_px": 1654,
+    "rendered_height_px": 2339
+  },
+  "layers": {
+    "pdf_text": {
+      "layer_id": "pdf_text",
+      "source_engine": "pdfplumber/0.11.9",
+      "coverage": 0.025593570563387343,
+      "word_count": 24,
+      "tokens": [
+        {
+          "token_id": "tok_000000",
+          "text": "Pollution",
+          "bbox": {
+            "x": 1126,
+            "y": 993,
+            "width": 143,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000001",
+          "text": "Prevention",
+          "bbox": {
+            "x": 1278,
+            "y": 993,
+            "width": 174,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000002",
+          "text": "and",
+          "bbox": {
+            "x": 1126,
+            "y": 1035,
+            "width": 61,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000003",
+          "text": "Control",
+          "bbox": {
+            "x": 1196,
+            "y": 1035,
+            "width": 121,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000004",
+          "text": "Water",
+          "bbox": {
+            "x": 1126,
+            "y": 1806,
+            "width": 99,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000005",
+          "text": "and",
+          "bbox": {
+            "x": 1234,
+            "y": 1806,
+            "width": 61,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000006",
+          "text": "Wastewater",
+          "bbox": {
+            "x": 1304,
+            "y": 1806,
+            "width": 193,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000007",
+          "text": "Management",
+          "bbox": {
+            "x": 1126,
+            "y": 1847,
+            "width": 215,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000008",
+          "text": "Waste",
+          "bbox": {
+            "x": 192,
+            "y": 1400,
+            "width": 101,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000009",
+          "text": "Management",
+          "bbox": {
+            "x": 301,
+            "y": 1400,
+            "width": 215,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000010",
+          "text": "and",
+          "bbox": {
+            "x": 192,
+            "y": 1441,
+            "width": 61,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000011",
+          "text": "Resource",
+          "bbox": {
+            "x": 262,
+            "y": 1441,
+            "width": 147,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000012",
+          "text": "Recovery",
+          "bbox": {
+            "x": 192,
+            "y": 1483,
+            "width": 149,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000013",
+          "text": "Energy",
+          "bbox": {
+            "x": 192,
+            "y": 587,
+            "width": 114,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000014",
+          "text": "Efficiency",
+          "bbox": {
+            "x": 314,
+            "y": 587,
+            "width": 153,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000015",
+          "text": "and",
+          "bbox": {
+            "x": 192,
+            "y": 629,
+            "width": 61,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000016",
+          "text": "Conservation",
+          "bbox": {
+            "x": 262,
+            "y": 629,
+            "width": 213,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000017",
+          "text": "Renewable",
+          "bbox": {
+            "x": 1126,
+            "y": 181,
+            "width": 179,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000018",
+          "text": "Energy",
+          "bbox": {
+            "x": 1314,
+            "y": 181,
+            "width": 114,
+            "height": 36
+          },
+          "font_name": "WBLURF+AvenirLTStd-Heavy",
+          "font_size": 13.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000019",
+          "text": "9",
+          "bbox": {
+            "x": 202,
+            "y": 2256,
+            "width": 14,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Bold",
+          "font_size": 9.0,
+          "is_bold": true,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000020",
+          "text": "Green",
+          "bbox": {
+            "x": 268,
+            "y": 2256,
+            "width": 63,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000021",
+          "text": "Bond",
+          "bbox": {
+            "x": 336,
+            "y": 2256,
+            "width": 55,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000022",
+          "text": "Report",
+          "bbox": {
+            "x": 397,
+            "y": 2256,
+            "width": 71,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        },
+        {
+          "token_id": "tok_000023",
+          "text": "2025",
+          "bbox": {
+            "x": 474,
+            "y": 2256,
+            "width": 51,
+            "height": 25
+          },
+          "font_name": "WBLURF+MyriadPro-Regular",
+          "font_size": 9.0,
+          "is_bold": false,
+          "is_italic": false
+        }
+      ]
+    }
+  },
+  "canonical": {
+    "layer_id": "pdf_text",
+    "reason": "selected_layer_pdf_text"
+  },
+  "canonical_text": "Renewable Energy\n\nEnergy Efficiency\nand Conservation\n\nPollution Prevention\nand Control\n\nWaste Management\nand Resource\nRecovery\n\nWater and Wastewater\nManagement\n\n9 Green Bond Report 2025",
+  "canonical_index": {
+    "words": {
+      "w_1bb18b9a": {
+        "char_start": 0,
+        "char_end": 9
+      },
+      "w_0e3b22d3": {
+        "char_start": 10,
+        "char_end": 16
+      },
+      "w_c613edda": {
+        "char_start": 18,
+        "char_end": 24
+      },
+      "w_fb0264f1": {
+        "char_start": 25,
+        "char_end": 35
+      },
+      "w_089c4095": {
+        "char_start": 36,
+        "char_end": 39
+      },
+      "w_8a4ec84a": {
+        "char_start": 40,
+        "char_end": 52
+      },
+      "w_83c0d41b": {
+        "char_start": 54,
+        "char_end": 63
+      },
+      "w_deabadec": {
+        "char_start": 64,
+        "char_end": 74
+      },
+      "w_5190f67b": {
+        "char_start": 75,
+        "char_end": 78
+      },
+      "w_71664984": {
+        "char_start": 79,
+        "char_end": 86
+      },
+      "w_2c4e6240": {
+        "char_start": 88,
+        "char_end": 93
+      },
+      "w_c6c368ba": {
+        "char_start": 94,
+        "char_end": 104
+      },
+      "w_8087d8c4": {
+        "char_start": 105,
+        "char_end": 108
+      },
+      "w_30931f6a": {
+        "char_start": 109,
+        "char_end": 117
+      },
+      "w_f8073e9b": {
+        "char_start": 118,
+        "char_end": 126
+      },
+      "w_eea249a5": {
+        "char_start": 128,
+        "char_end": 133
+      },
+      "w_4c6679f7": {
+        "char_start": 134,
+        "char_end": 137
+      },
+      "w_f1fc0385": {
+        "char_start": 138,
+        "char_end": 148
+      },
+      "w_576c8e0a": {
+        "char_start": 149,
+        "char_end": 159
+      },
+      "w_02b60431": {
+        "char_start": 161,
+        "char_end": 162
+      },
+      "w_56a74b31": {
+        "char_start": 163,
+        "char_end": 168
+      },
+      "w_180aca63": {
+        "char_start": 169,
+        "char_end": 173
+      },
+      "w_c62cbdc4": {
+        "char_start": 174,
+        "char_end": 180
+      },
+      "w_9e7ee4a3": {
+        "char_start": 181,
+        "char_end": 185
+      }
+    },
+    "lines": {
+      "l_3affe6ae": {
+        "char_start": 0,
+        "char_end": 16
+      },
+      "l_8ee8ba13": {
+        "char_start": 18,
+        "char_end": 35
+      },
+      "l_bb5f81c6": {
+        "char_start": 36,
+        "char_end": 52
+      },
+      "l_10be71b0": {
+        "char_start": 54,
+        "char_end": 74
+      },
+      "l_d4f0cbfd": {
+        "char_start": 75,
+        "char_end": 86
+      },
+      "l_7ce76eb5": {
+        "char_start": 88,
+        "char_end": 104
+      },
+      "l_0278b7f3": {
+        "char_start": 105,
+        "char_end": 117
+      },
+      "l_1be33ddb": {
+        "char_start": 118,
+        "char_end": 126
+      },
+      "l_3c762a37": {
+        "char_start": 128,
+        "char_end": 148
+      },
+      "l_b5f22078": {
+        "char_start": 149,
+        "char_end": 159
+      },
+      "l_f0a46f2b": {
+        "char_start": 161,
+        "char_end": 185
+      }
+    },
+    "blocks": {
+      "b_3d69d49b": {
+        "char_start": 0,
+        "char_end": 16
+      },
+      "b_df757bec": {
+        "char_start": 18,
+        "char_end": 52
+      },
+      "b_a2ea25f1": {
+        "char_start": 54,
+        "char_end": 86
+      },
+      "b_fcca013e": {
+        "char_start": 88,
+        "char_end": 126
+      },
+      "b_731ad377": {
+        "char_start": 128,
+        "char_end": 159
+      },
+      "b_d8a9d35f": {
+        "char_start": 161,
+        "char_end": 185
+      }
+    }
+  },
+  "words": [
+    {
+      "word_id": "w_1bb18b9a",
+      "text": "Renewable",
+      "bbox": {
+        "x": 1126,
+        "y": 181,
+        "width": 179,
+        "height": 36
+      },
+      "line_id": "l_3affe6ae",
+      "block_id": "b_3d69d49b",
+      "reading_order": 0,
+      "char_start": 0,
+      "char_end": 9,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_0e3b22d3",
+      "text": "Energy",
+      "bbox": {
+        "x": 1314,
+        "y": 181,
+        "width": 114,
+        "height": 36
+      },
+      "line_id": "l_3affe6ae",
+      "block_id": "b_3d69d49b",
+      "reading_order": 1,
+      "char_start": 10,
+      "char_end": 16,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c613edda",
+      "text": "Energy",
+      "bbox": {
+        "x": 192,
+        "y": 587,
+        "width": 114,
+        "height": 36
+      },
+      "line_id": "l_8ee8ba13",
+      "block_id": "b_df757bec",
+      "reading_order": 2,
+      "char_start": 18,
+      "char_end": 24,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_fb0264f1",
+      "text": "Efficiency",
+      "bbox": {
+        "x": 314,
+        "y": 587,
+        "width": 153,
+        "height": 36
+      },
+      "line_id": "l_8ee8ba13",
+      "block_id": "b_df757bec",
+      "reading_order": 3,
+      "char_start": 25,
+      "char_end": 35,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_089c4095",
+      "text": "and",
+      "bbox": {
+        "x": 192,
+        "y": 629,
+        "width": 61,
+        "height": 36
+      },
+      "line_id": "l_bb5f81c6",
+      "block_id": "b_df757bec",
+      "reading_order": 4,
+      "char_start": 36,
+      "char_end": 39,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8a4ec84a",
+      "text": "Conservation",
+      "bbox": {
+        "x": 262,
+        "y": 629,
+        "width": 213,
+        "height": 36
+      },
+      "line_id": "l_bb5f81c6",
+      "block_id": "b_df757bec",
+      "reading_order": 5,
+      "char_start": 40,
+      "char_end": 52,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_83c0d41b",
+      "text": "Pollution",
+      "bbox": {
+        "x": 1126,
+        "y": 993,
+        "width": 143,
+        "height": 36
+      },
+      "line_id": "l_10be71b0",
+      "block_id": "b_a2ea25f1",
+      "reading_order": 6,
+      "char_start": 54,
+      "char_end": 63,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_deabadec",
+      "text": "Prevention",
+      "bbox": {
+        "x": 1278,
+        "y": 993,
+        "width": 174,
+        "height": 36
+      },
+      "line_id": "l_10be71b0",
+      "block_id": "b_a2ea25f1",
+      "reading_order": 7,
+      "char_start": 64,
+      "char_end": 74,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_5190f67b",
+      "text": "and",
+      "bbox": {
+        "x": 1126,
+        "y": 1035,
+        "width": 61,
+        "height": 36
+      },
+      "line_id": "l_d4f0cbfd",
+      "block_id": "b_a2ea25f1",
+      "reading_order": 8,
+      "char_start": 75,
+      "char_end": 78,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_71664984",
+      "text": "Control",
+      "bbox": {
+        "x": 1196,
+        "y": 1035,
+        "width": 121,
+        "height": 36
+      },
+      "line_id": "l_d4f0cbfd",
+      "block_id": "b_a2ea25f1",
+      "reading_order": 9,
+      "char_start": 79,
+      "char_end": 86,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_2c4e6240",
+      "text": "Waste",
+      "bbox": {
+        "x": 192,
+        "y": 1400,
+        "width": 101,
+        "height": 36
+      },
+      "line_id": "l_7ce76eb5",
+      "block_id": "b_fcca013e",
+      "reading_order": 10,
+      "char_start": 88,
+      "char_end": 93,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c6c368ba",
+      "text": "Management",
+      "bbox": {
+        "x": 301,
+        "y": 1400,
+        "width": 215,
+        "height": 36
+      },
+      "line_id": "l_7ce76eb5",
+      "block_id": "b_fcca013e",
+      "reading_order": 11,
+      "char_start": 94,
+      "char_end": 104,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_8087d8c4",
+      "text": "and",
+      "bbox": {
+        "x": 192,
+        "y": 1441,
+        "width": 61,
+        "height": 36
+      },
+      "line_id": "l_0278b7f3",
+      "block_id": "b_fcca013e",
+      "reading_order": 12,
+      "char_start": 105,
+      "char_end": 108,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_30931f6a",
+      "text": "Resource",
+      "bbox": {
+        "x": 262,
+        "y": 1441,
+        "width": 147,
+        "height": 36
+      },
+      "line_id": "l_0278b7f3",
+      "block_id": "b_fcca013e",
+      "reading_order": 13,
+      "char_start": 109,
+      "char_end": 117,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f8073e9b",
+      "text": "Recovery",
+      "bbox": {
+        "x": 192,
+        "y": 1483,
+        "width": 149,
+        "height": 36
+      },
+      "line_id": "l_1be33ddb",
+      "block_id": "b_fcca013e",
+      "reading_order": 14,
+      "char_start": 118,
+      "char_end": 126,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_eea249a5",
+      "text": "Water",
+      "bbox": {
+        "x": 1126,
+        "y": 1806,
+        "width": 99,
+        "height": 36
+      },
+      "line_id": "l_3c762a37",
+      "block_id": "b_731ad377",
+      "reading_order": 15,
+      "char_start": 128,
+      "char_end": 133,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_4c6679f7",
+      "text": "and",
+      "bbox": {
+        "x": 1234,
+        "y": 1806,
+        "width": 61,
+        "height": 36
+      },
+      "line_id": "l_3c762a37",
+      "block_id": "b_731ad377",
+      "reading_order": 16,
+      "char_start": 134,
+      "char_end": 137,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_f1fc0385",
+      "text": "Wastewater",
+      "bbox": {
+        "x": 1304,
+        "y": 1806,
+        "width": 193,
+        "height": 36
+      },
+      "line_id": "l_3c762a37",
+      "block_id": "b_731ad377",
+      "reading_order": 17,
+      "char_start": 138,
+      "char_end": 148,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_576c8e0a",
+      "text": "Management",
+      "bbox": {
+        "x": 1126,
+        "y": 1847,
+        "width": 215,
+        "height": 36
+      },
+      "line_id": "l_b5f22078",
+      "block_id": "b_731ad377",
+      "reading_order": 18,
+      "char_start": 149,
+      "char_end": 159,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_02b60431",
+      "text": "9",
+      "bbox": {
+        "x": 202,
+        "y": 2256,
+        "width": 14,
+        "height": 25
+      },
+      "line_id": "l_f0a46f2b",
+      "block_id": "b_d8a9d35f",
+      "reading_order": 19,
+      "char_start": 161,
+      "char_end": 162,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_56a74b31",
+      "text": "Green",
+      "bbox": {
+        "x": 268,
+        "y": 2256,
+        "width": 63,
+        "height": 25
+      },
+      "line_id": "l_f0a46f2b",
+      "block_id": "b_d8a9d35f",
+      "reading_order": 20,
+      "char_start": 163,
+      "char_end": 168,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_180aca63",
+      "text": "Bond",
+      "bbox": {
+        "x": 336,
+        "y": 2256,
+        "width": 55,
+        "height": 25
+      },
+      "line_id": "l_f0a46f2b",
+      "block_id": "b_d8a9d35f",
+      "reading_order": 21,
+      "char_start": 169,
+      "char_end": 173,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_c62cbdc4",
+      "text": "Report",
+      "bbox": {
+        "x": 397,
+        "y": 2256,
+        "width": 71,
+        "height": 25
+      },
+      "line_id": "l_f0a46f2b",
+      "block_id": "b_d8a9d35f",
+      "reading_order": 22,
+      "char_start": 174,
+      "char_end": 180,
+      "layer_id": "pdf_text"
+    },
+    {
+      "word_id": "w_9e7ee4a3",
+      "text": "2025",
+      "bbox": {
+        "x": 474,
+        "y": 2256,
+        "width": 51,
+        "height": 25
+      },
+      "line_id": "l_f0a46f2b",
+      "block_id": "b_d8a9d35f",
+      "reading_order": 23,
+      "char_start": 181,
+      "char_end": 185,
+      "layer_id": "pdf_text"
+    }
+  ],
+  "lines": [
+    {
+      "line_id": "l_3affe6ae",
+      "bbox": {
+        "x": 1126,
+        "y": 181,
+        "width": 302,
+        "height": 36
+      },
+      "block_id": "b_3d69d49b",
+      "word_ids": [
+        "w_1bb18b9a",
+        "w_0e3b22d3"
+      ],
+      "text": "Renewable Energy",
+      "char_start": 0,
+      "char_end": 16,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_8ee8ba13",
+      "bbox": {
+        "x": 192,
+        "y": 587,
+        "width": 275,
+        "height": 36
+      },
+      "block_id": "b_df757bec",
+      "word_ids": [
+        "w_c613edda",
+        "w_fb0264f1"
+      ],
+      "text": "Energy Efficiency",
+      "char_start": 18,
+      "char_end": 35,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_bb5f81c6",
+      "bbox": {
+        "x": 192,
+        "y": 629,
+        "width": 283,
+        "height": 36
+      },
+      "block_id": "b_df757bec",
+      "word_ids": [
+        "w_089c4095",
+        "w_8a4ec84a"
+      ],
+      "text": "and Conservation",
+      "char_start": 36,
+      "char_end": 52,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_10be71b0",
+      "bbox": {
+        "x": 1126,
+        "y": 993,
+        "width": 326,
+        "height": 36
+      },
+      "block_id": "b_a2ea25f1",
+      "word_ids": [
+        "w_83c0d41b",
+        "w_deabadec"
+      ],
+      "text": "Pollution Prevention",
+      "char_start": 54,
+      "char_end": 74,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_d4f0cbfd",
+      "bbox": {
+        "x": 1126,
+        "y": 1035,
+        "width": 191,
+        "height": 36
+      },
+      "block_id": "b_a2ea25f1",
+      "word_ids": [
+        "w_5190f67b",
+        "w_71664984"
+      ],
+      "text": "and Control",
+      "char_start": 75,
+      "char_end": 86,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_7ce76eb5",
+      "bbox": {
+        "x": 192,
+        "y": 1400,
+        "width": 324,
+        "height": 36
+      },
+      "block_id": "b_fcca013e",
+      "word_ids": [
+        "w_2c4e6240",
+        "w_c6c368ba"
+      ],
+      "text": "Waste Management",
+      "char_start": 88,
+      "char_end": 104,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_0278b7f3",
+      "bbox": {
+        "x": 192,
+        "y": 1441,
+        "width": 217,
+        "height": 36
+      },
+      "block_id": "b_fcca013e",
+      "word_ids": [
+        "w_8087d8c4",
+        "w_30931f6a"
+      ],
+      "text": "and Resource",
+      "char_start": 105,
+      "char_end": 117,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_1be33ddb",
+      "bbox": {
+        "x": 192,
+        "y": 1483,
+        "width": 149,
+        "height": 36
+      },
+      "block_id": "b_fcca013e",
+      "word_ids": [
+        "w_f8073e9b"
+      ],
+      "text": "Recovery",
+      "char_start": 118,
+      "char_end": 126,
+      "reading_order": 2
+    },
+    {
+      "line_id": "l_3c762a37",
+      "bbox": {
+        "x": 1126,
+        "y": 1806,
+        "width": 371,
+        "height": 36
+      },
+      "block_id": "b_731ad377",
+      "word_ids": [
+        "w_eea249a5",
+        "w_4c6679f7",
+        "w_f1fc0385"
+      ],
+      "text": "Water and Wastewater",
+      "char_start": 128,
+      "char_end": 148,
+      "reading_order": 0
+    },
+    {
+      "line_id": "l_b5f22078",
+      "bbox": {
+        "x": 1126,
+        "y": 1847,
+        "width": 215,
+        "height": 36
+      },
+      "block_id": "b_731ad377",
+      "word_ids": [
+        "w_576c8e0a"
+      ],
+      "text": "Management",
+      "char_start": 149,
+      "char_end": 159,
+      "reading_order": 1
+    },
+    {
+      "line_id": "l_f0a46f2b",
+      "bbox": {
+        "x": 202,
+        "y": 2256,
+        "width": 323,
+        "height": 25
+      },
+      "block_id": "b_d8a9d35f",
+      "word_ids": [
+        "w_02b60431",
+        "w_56a74b31",
+        "w_180aca63",
+        "w_c62cbdc4",
+        "w_9e7ee4a3"
+      ],
+      "text": "9 Green Bond Report 2025",
+      "char_start": 161,
+      "char_end": 185,
+      "reading_order": 0
+    }
+  ],
+  "blocks": [
+    {
+      "block_id": "b_3d69d49b",
+      "bbox": {
+        "x": 1126,
+        "y": 181,
+        "width": 302,
+        "height": 36
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_3affe6ae"
+      ],
+      "text": "Renewable Energy",
+      "char_start": 0,
+      "char_end": 16,
+      "reading_order": 0
+    },
+    {
+      "block_id": "b_df757bec",
+      "bbox": {
+        "x": 192,
+        "y": 587,
+        "width": 283,
+        "height": 78
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_8ee8ba13",
+        "l_bb5f81c6"
+      ],
+      "text": "Energy Efficiency\nand Conservation",
+      "char_start": 18,
+      "char_end": 52,
+      "reading_order": 1
+    },
+    {
+      "block_id": "b_a2ea25f1",
+      "bbox": {
+        "x": 1126,
+        "y": 993,
+        "width": 326,
+        "height": 78
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_10be71b0",
+        "l_d4f0cbfd"
+      ],
+      "text": "Pollution Prevention\nand Control",
+      "char_start": 54,
+      "char_end": 86,
+      "reading_order": 2
+    },
+    {
+      "block_id": "b_fcca013e",
+      "bbox": {
+        "x": 192,
+        "y": 1400,
+        "width": 324,
+        "height": 119
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_7ce76eb5",
+        "l_0278b7f3",
+        "l_1be33ddb"
+      ],
+      "text": "Waste Management\nand Resource\nRecovery",
+      "char_start": 88,
+      "char_end": 126,
+      "reading_order": 3
+    },
+    {
+      "block_id": "b_731ad377",
+      "bbox": {
+        "x": 1126,
+        "y": 1806,
+        "width": 371,
+        "height": 77
+      },
+      "block_type": "paragraph",
+      "line_ids": [
+        "l_3c762a37",
+        "l_b5f22078"
+      ],
+      "text": "Water and Wastewater\nManagement",
+      "char_start": 128,
+      "char_end": 159,
+      "reading_order": 4
+    },
+    {
+      "block_id": "b_d8a9d35f",
+      "bbox": {
+        "x": 202,
+        "y": 2256,
+        "width": 323,
+        "height": 25
+      },
+      "block_type": "list_item",
+      "line_ids": [
+        "l_f0a46f2b"
+      ],
+      "text": "9 Green Bond Report 2025",
+      "char_start": 161,
+      "char_end": 185,
+      "reading_order": 5
+    }
+  ],
+  "tables": []
+}
