@@ -152,7 +152,350 @@ region.update({ ...region.value, status: 'updated' });
 region.delete();
 ```
 
-## Examples
+## Output format for regions
+
+Regions created with `ReactCode` follow Label Studio's standard format:
+
+```json
+{
+  "id": "7ZP46bpbNX",
+  "from_name": "custom",
+  "to_name": "custom",
+  "type": "reactcode",
+  "origin": "manual",
+  "value": {
+    "reactcode": {
+      "index": 1,
+      "labels": {
+        "category": "Food"
+      }
+    }
+  }
+}
+```
+
+The `value.reactcode` property contains whatever data you passed to `addRegion()`.
+
+## Using the `outputs` parameter 
+
+You can optionally use the `outputs` parameter to define the expected structure of annotation results. It specifies which fields your interface will produce and what data types they contain.
+
+```xml
+<ReactCode name="my_interface" toName="my_interface" outputs="summary, sentiment" />
+```
+
+!!! note
+    The `outputs` parameter defines the schema for validation and documentation purposes. The actual annotation JSON structure is always the same—your data from `addRegion()` is stored in `value.reactcode`. The `outputs` parameter helps Label Studio understand the expected structure for features like model predictions and data export.
+
+### Supported formats
+
+You can define outputs using three approaches (can be combined):
+
+#### Simple field list
+
+List field names separated by commas, semicolons, pipes, or whitespace. Each field defaults to a `string` type.
+
+!!! note
+
+    All separators (`,`, `;`, `|`) are functionally equivalent and can be used interchangeably. Choose based on preference or readability. Comma (`,`) is the most commonly used separator.
+
+```xml
+<!-- Comma-separated (most common) -->
+outputs="field1, field2, field3"
+
+<!-- Semicolon-separated -->
+outputs="field1; field2; field3"
+
+<!-- Pipe-separated -->
+outputs="field1|field2|field3"
+```
+
+**Result:** All fields become string properties in the schema.
+
+#### Type aliases
+
+Use shorthand syntax for common data patterns. Format: `fieldname:type(arguments)`
+
+| Type Alias | Syntax | Description |
+|------------|--------|-------------|
+| `choices` | `field:choices(opt1, opt2, opt3)` | Single selection from options (enum) |
+| `multichoices` | `field:multichoices(opt1, opt2, opt3)` | Multiple selections (array of enum) |
+| `number` | `field:number(min, max)` | Numeric value with optional range |
+| `rating` | `field:rating(max)` | Integer rating from 1 to max (default: 5) |
+
+**Examples:**
+
+```xml
+<!-- Single choice dropdown -->
+outputs="sentiment:choices(positive, negative, neutral)"
+
+<!-- Multi-select tags -->
+outputs="categories:multichoices(urgent, bug, feature, docs)"
+
+<!-- Number with range -->
+outputs="confidence:number(0, 100)"
+
+<!-- Rating scale 1-10 -->
+outputs="quality:rating(10)"
+
+<!-- Combined -->
+outputs="rating:choices(good, bad), tags:multichoices(urgent, review), score:number(0, 100)"
+```
+
+#### Raw JSON schema (advanced)
+
+For full control, provide a raw JSON Schema. The parser detects JSON when the string starts with `{`.
+
+```xml
+<!-- Properties only (auto-wrapped in object schema) -->
+outputs='{"name": {"type": "string"}, "age": {"type": "integer", "minimum": 0}}'
+
+<!-- Complete schema with nested objects -->
+outputs='{
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object", 
+      "properties": {
+        "author": {"type": "string"},
+        "timestamp": {"type": "string", "format": "date-time"}
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "required": ["metadata"]
+}'
+```
+### Empty outputs
+
+If `outputs` is empty or not specified, the schema defaults to an empty object:
+
+```json
+{"type": "object", "properties": {}}
+```
+
+### Examples of outputs usage
+
+#### Document review interface
+
+```xml
+<ReactCode 
+  name="review" 
+  toName="document" 
+  outputs="decision:choices(approve, reject, revise), notes, priority:rating(5)"
+/>
+```
+
+Produces schema:
+```json
+{
+  "type": "object",
+  "properties": {
+    "decision": {"type": "string", "enum": ["approve", "reject", "revise"]},
+    "notes": {"type": "string"},
+    "priority": {"type": "integer", "minimum": 1, "maximum": 5}
+  }
+}
+```
+
+#### Content tagging
+
+```xml
+<ReactCode
+  name="tagger" 
+  toName="text" 
+  outputs="topics:multichoices(sports, politics, tech, entertainment), confidence:number(0, 1)"
+/>
+```
+
+#### Complex JSON schema
+
+```xml
+<ReactCode 
+  name="entity_extractor" 
+  toName="text" 
+  outputs='{
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {"type": "string"},
+          "label": {"type": "string"},
+          "start": {"type": "integer"},
+          "end": {"type": "integer"}
+        },
+        "required": ["text", "label"]
+      }
+    }
+  }'
+/>
+```
+
+### Resulting output examples
+
+The `outputs` parameter defines the expected schema, and the annotation JSON structure always follows the same format. Here are examples showing how different `outputs` values affect the annotation JSON:
+
+#### Example 1: Simple field list
+
+<br />
+
+{% details <b>Click to expand</b> %}
+
+**Configuration:**
+```xml
+<ReactCode name="classifier" toName="classifier" outputs="summary, sentiment" />
+```
+
+**Code that creates annotation:**
+```javascript
+addRegion({
+  summary: "This is a positive review",
+  sentiment: "positive"
+}, { displayText: "Positive" });
+```
+
+**Resulting annotation JSON:**
+```json
+{
+  "id": "123",
+  "from_name": "classifier",
+  "to_name": "classifier",
+  "type": "reactcode",
+  "origin": "manual",
+  "value": {
+    "reactcode": {
+      "summary": "This is a positive review",
+      "sentiment": "positive"
+    }
+  }
+}
+```
+{% enddetails %}
+
+#### Example 2: Type aliases
+
+<br />
+
+{% details <b>Click to expand</b> %}
+
+**Configuration:**
+```xml
+<ReactCode 
+  name="review" 
+  toName="review" 
+  outputs="decision:choices(approve, reject, revise), notes, priority:rating(5)"
+/>
+```
+
+**Code that creates annotation:**
+```javascript
+addRegion({
+  decision: "approve",
+  notes: "Looks good, minor formatting issues",
+  priority: 4
+}, { displayText: "Approve - Priority 4" });
+```
+
+**Resulting annotation JSON:**
+```json
+{
+  "id": "def456",
+  "from_name": "review",
+  "to_name": "review",
+  "type": "reactcode",
+  "origin": "manual",
+  "value": {
+    "reactcode": {
+      "decision": "approve",
+      "notes": "Looks good, minor formatting issues",
+      "priority": 4
+    }
+  }
+}
+```
+
+{% enddetails %}
+
+#### Example 3: JSON schema with nested objects
+
+<br />
+
+{% details <b>Click to expand</b> %}
+
+**Configuration:**
+```xml
+<ReactCode 
+  name="entity_extractor" 
+  toName="entity_extractor" 
+  outputs='{
+    "entities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {"type": "string"},
+          "label": {"type": "string"},
+          "start": {"type": "integer"},
+          "end": {"type": "integer"}
+        }
+      }
+    }
+  }'
+/>
+```
+
+**Code that creates annotation:**
+```javascript
+addRegion({
+  entities: [
+    { text: "John Doe", label: "PERSON", start: 0, end: 8 },
+    { text: "New York", label: "LOCATION", start: 15, end: 23 }
+  ]
+}, { displayText: "2 entities found" });
+```
+
+**Resulting annotation JSON:**
+```json
+{
+  "id": "ghi789",
+  "from_name": "entity_extractor",
+  "to_name": "entity_extractor",
+  "type": "reactcode",
+  "origin": "manual",
+  "value": {
+    "reactcode": {
+      "entities": [
+        {
+          "text": "John Doe",
+          "label": "PERSON",
+          "start": 0,
+          "end": 8
+        },
+        {
+          "text": "New York",
+          "label": "LOCATION",
+          "start": 15,
+          "end": 23
+        }
+      ]
+    }
+  }
+}
+```
+{% enddetails %}
+
+### Best Practices
+
+1. **Keep it simple** — Use field lists or type aliases for straightforward cases
+2. **Use JSON Schema** — When you need validation rules, nested objects, or arrays
+3. **Name fields clearly** — Field names become keys in your annotation results
+4. **Match your UI** — Ensure the outputs definition matches what your custom React component actually produces
+
+## ReactCode examples
 
 ### Basic example
 
@@ -385,192 +728,6 @@ An interface that displays an image and allows adding metadata annotations:
 }
 -->
 ```
-
-## Output format for regions
-
-Regions created with `ReactCode` follow Label Studio's standard format:
-
-```json
-{
-  "id": "7ZP46bpbNX",
-  "from_name": "custom",
-  "to_name": "custom",
-  "type": "reactcode",
-  "origin": "manual",
-  "value": {
-    "reactcode": {
-      "index": 1,
-      "labels": {
-        "category": "Food"
-      }
-    }
-  }
-}
-```
-
-The `value.reactcode` property contains whatever data you passed to `addRegion()`.
-
-## Using the `outputs` parameter 
-
-You can optionally use the `outputs` parameter to define the expected structure of annotation results. It specifies which fields your interface will produce and what data types they contain.
-
-```xml
-<ReactCode name="my_interface" toName="my_interface" outputs="summary, sentiment" />
-```
-
-### Supported formats
-
-You can define outputs using three approaches (can be combined):
-
-#### Simple field list
-
-List field names separated by commas, semicolons, pipes, or whitespace. Each field defaults to a `string` type.
-
-```xml
-<!-- Comma-separated -->
-outputs="field1, field2, field3"
-
-<!-- Semicolon-separated -->
-outputs="field1; field2; field3"
-
-<!-- Pipe-separated -->
-outputs="field1|field2|field3"
-```
-
-**Result:** All fields become string properties in the schema.
-
-#### Type aliases
-
-Use shorthand syntax for common data patterns. Format: `fieldname:type(arguments)`
-
-| Type Alias | Syntax | Description |
-|------------|--------|-------------|
-| `choices` | `field:choices(opt1, opt2, opt3)` | Single selection from options (enum) |
-| `multichoices` | `field:multichoices(opt1, opt2, opt3)` | Multiple selections (array of enum) |
-| `number` | `field:number(min, max)` | Numeric value with optional range |
-| `rating` | `field:rating(max)` | Integer rating from 1 to max (default: 5) |
-
-**Examples:**
-
-```xml
-<!-- Single choice dropdown -->
-outputs="sentiment:choices(positive, negative, neutral)"
-
-<!-- Multi-select tags -->
-outputs="categories:multichoices(urgent, bug, feature, docs)"
-
-<!-- Number with range -->
-outputs="confidence:number(0, 100)"
-
-<!-- Rating scale 1-10 -->
-outputs="quality:rating(10)"
-
-<!-- Combined -->
-outputs="rating:choices(good, bad), tags:multichoices(urgent, review), score:number(0, 100)"
-```
-
-#### Raw JSON schema (advanced)
-
-For full control, provide a raw JSON Schema. The parser detects JSON when the string starts with `{`.
-
-```xml
-<!-- Properties only (auto-wrapped in object schema) -->
-outputs='{"name": {"type": "string"}, "age": {"type": "integer", "minimum": 0}}'
-
-<!-- Complete schema with nested objects -->
-outputs='{
-  "type": "object",
-  "properties": {
-    "metadata": {
-      "type": "object", 
-      "properties": {
-        "author": {"type": "string"},
-        "timestamp": {"type": "string", "format": "date-time"}
-      }
-    },
-    "tags": {
-      "type": "array",
-      "items": {"type": "string"}
-    }
-  },
-  "required": ["metadata"]
-}'
-```
-
----
-
-### Examples of outputs usage
-
-#### Document review interface
-
-```xml
-<ReactCode 
-  name="review" 
-  toName="document" 
-  outputs="decision:choices(approve, reject, revise), notes, priority:rating(5)"
-/>
-```
-
-Produces schema:
-```json
-{
-  "type": "object",
-  "properties": {
-    "decision": {"type": "string", "enum": ["approve", "reject", "revise"]},
-    "notes": {"type": "string"},
-    "priority": {"type": "integer", "minimum": 1, "maximum": 5}
-  }
-}
-```
-
-#### Content tagging
-
-```xml
-<CustomInterface 
-  name="tagger" 
-  toName="text" 
-  outputs="topics:multichoices(sports, politics, tech, entertainment), confidence:number(0, 1)"
-/>
-```
-
-#### Complex JSON schema
-
-```xml
-<CustomInterface 
-  name="entity_extractor" 
-  toName="text" 
-  outputs='{
-    "entities": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "text": {"type": "string"},
-          "label": {"type": "string"},
-          "start": {"type": "integer"},
-          "end": {"type": "integer"}
-        },
-        "required": ["text", "label"]
-      }
-    }
-  }'
-/>
-```
-
-### Empty outputs
-
-If `outputs` is empty or not specified, the schema defaults to an empty object:
-
-```json
-{"type": "object", "properties": {}}
-```
-
-### Best Practices
-
-1. **Keep it simple** — Use field lists or type aliases for straightforward cases
-2. **Use JSON Schema** — When you need validation rules, nested objects, or arrays
-3. **Name fields clearly** — Field names become keys in your annotation results
-4. **Match your UI** — Ensure the outputs definition matches what your custom React component actually produces
 
 ## Troubleshooting
 
