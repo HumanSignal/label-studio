@@ -3254,8 +3254,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
   // Click handler with debouncing for single/double-click detection
   const handleClickWithDebouncing = useCallback(
     (e: any, onClickHandler?: (e: any) => void, onDblClickHandler?: (e: any) => void) => {
-      // If disabled or not selected, fire onClick immediately (no need to wait for double-click detection)
-      if (disabled || !selected) {
+      // If disabled, fire onClick immediately
+      if (disabled) {
         if (onClickHandler) {
           const newEvent = {
             ...e,
@@ -3272,7 +3272,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         return;
       }
 
-      // Clear any existing timeout
+      // Clear any existing timeout (this detects a double-click)
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
         clickTimeoutRef.current = null;
@@ -3301,7 +3301,9 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
         return;
       }
 
-      // Set a timeout for single-click handling (only when selected, to detect double-clicks)
+      // Set a timeout for single-click handling
+      // This now works for both selected and unselected states to detect double-clicks
+      // Reduced to 150ms for better responsiveness while still detecting double-clicks
       clickTimeoutRef.current = setTimeout(() => {
         clickTimeoutRef.current = null;
         if (onClickHandler) {
@@ -3322,7 +3324,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
           };
           onClickHandler(newEvent);
         }
-      }, 200);
+      }, 150);
     },
     [selected, disabled],
   );
@@ -3496,7 +3498,7 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
             }
       }
       onDblClick={
-        !selected || disabled
+        disabled
           ? undefined
           : (e) => {
               // If we've already handled this double-click through debouncing, ignore it
@@ -3504,6 +3506,8 @@ export const KonvaVector = forwardRef<KonvaVectorRef, KonvaVectorProps>((props, 
                 return;
               }
               // Otherwise, call the original onDblClick handler
+              // This will work even when unselected - the handler in VectorRegion.jsx
+              // will ensure the region is selected before entering transform mode
               onDblClick?.(e);
             }
       }

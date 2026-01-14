@@ -246,9 +246,16 @@ const Model = types
           const wasNotSelected = !self.selected;
 
           if (wasNotSelected) {
+            // Set the flag before selecting to prevent double-click issues
+            // This will be cleared by selectRegion() when called from RegionStore
+            self._justSelected = true;
             annotation.selectArea(self);
           } else {
-            annotation.unselectAll();
+            // If _justSelected is true, it means this click is part of a double-click
+            // Don't unselect - let the double-click handler manage selection
+            if (!self._justSelected) {
+              annotation.unselectAll();
+            }
           }
         }
       },
@@ -805,6 +812,19 @@ const HtxVectorView = observer(({ item, suggestion }) => {
 
             e.cancelBubble = true;
 
+            // When clicking a selected region, set _justSelected flag temporarily
+            // to prevent unselection if this is part of a double-click
+            // The flag will be cleared by the double-click handler or after timeout
+            if (item.selected) {
+              item._justSelected = true;
+              setTimeout(() => {
+                // Only clear if still set (double-click handler might have cleared it)
+                if (item._justSelected) {
+                  item.clearJustSelectedFlag();
+                }
+              }, 200); // Slightly longer than debounce timeout to ensure double-click is detected
+            }
+
             // Allow selection regardless of whether the path is closed
             // The Selection tool will handle multi-selection logic
             if (store.annotationStore.selected.isLinkingMode) {
@@ -827,28 +847,36 @@ const HtxVectorView = observer(({ item, suggestion }) => {
             item.updateCursor();
           }}
           onDblClick={(e) => {
-            // Only allow double-click when region is selected
-            if (!item.selected) {
-              return;
-            }
-
-            // Ignore double-click if region was just selected (prevents double-click on unselected
-            // region from enabling transform mode after the first click selects it)
-            if (item._justSelected) {
-              e.evt.stopImmediatePropagation();
-              e.evt.stopPropagation();
-              e.evt.preventDefault();
-              e.cancelBubble = true;
-              return;
-            }
-
             e.evt.stopImmediatePropagation();
             e.evt.stopPropagation();
             e.evt.preventDefault();
             e.cancelBubble = true;
 
-            // Toggle transform mode for selected regions
+            // Clear the _justSelected flag if it was set (from first click of double-click)
+            // This prevents unselection logic from running
+            if (item._justSelected) {
+              item.clearJustSelectedFlag();
+            }
+
+            // Always ensure the region is selected first
+            // This handles the case where double-click starts from unselected state
+            const annotation = item.annotation;
+            if (!item.selected && annotation) {
+              // Select the region directly without going through _selectArea
+              // to avoid any potential unselection logic
+              annotation.selectArea(item);
+            }
+
+            // Always toggle transform mode for double-click (regardless of initial state)
+            // This ensures double-click always enters transform mode, whether starting from
+            // selected or unselected state
             item.toggleTransformMode();
+
+            // Ensure the region stays selected after entering transform mode
+            // Transform mode requires the region to be selected (see line 868: transformMode={item.selected && ...})
+            if (!item.selected && annotation) {
+              annotation.selectArea(item);
+            }
           }}
           closed={item.closed}
           width={stageWidth}
