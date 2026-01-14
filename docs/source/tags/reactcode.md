@@ -23,7 +23,7 @@ Importantly, this allows you to continue leveraging Label Studio's annotation ma
 | [toName] | string | — | If this is a [self-referencing tags ](#Self-referencing-tag), this parameter is required and should match `name` |
 | [data] | string | — | The [task data](#Data-parameter), e.g., `data="$image"` or `data="$text"` |
 | [inputs] | string | — | Defines the JSON schema for the input data (`data`)  |
-| [outputs] | string | — | Defines the JSON schema for the [output](#Using-the-ouputs-parameter)  |
+| [outputs] | string | — | Defines the JSON schema for the [output](#Using-the-outputs-parameter)  |
 | [style] | string | — | Inline styles or CSS string for the iframe container  |
 | [classname] | string | — | Additional CSS classes for the wrapper  |
 
@@ -56,6 +56,7 @@ function MyComponent({ React, addRegion, regions, data }) {
   return React.createElement('img', { src: imageUrl });
 }
 ```
+
 ## React usage notes
 
 Before you begin, you should be familiar with React and React hooks (`useState`, `useEffect`, `useRef`). 
