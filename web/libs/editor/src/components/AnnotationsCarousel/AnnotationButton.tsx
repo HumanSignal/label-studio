@@ -790,8 +790,7 @@ export const AnnotationButton = observer(
 
       // Check if we're moving to the tooltip container
       // Only call contains() if relatedTarget is actually a Node
-      const isMovingToTooltip =
-        relatedTarget && tooltipContainerRef.current?.contains(relatedTarget as Node);
+      const isMovingToTooltip = relatedTarget && tooltipContainerRef.current?.contains(relatedTarget as Node);
 
       // If not moving to tooltip, check if moving back to button (but not trigger)
       // Only call contains() if relatedTarget is actually a Node
