@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import CM from "codemirror";
 import { Button, cnm } from "@humansignal/ui";
 import { IconTrash } from "@humansignal/icons";
@@ -18,6 +18,8 @@ import tags from "@humansignal/core/lib/utils/schema/tags.json";
 import { UnsavedChanges } from "./UnsavedChanges";
 import { Checkbox, CodeEditor, Select } from "@humansignal/ui";
 import snakeCase from "lodash/snakeCase";
+import { useConfigResizer } from "./useConfigResizer";
+import { EditorResizer } from "./EditorResizer";
 
 const wizardClass = cn("wizard");
 const configClass = cn("configure");
@@ -238,7 +240,9 @@ const ConfigureColumn = ({ template, obj, columns }) => {
   const [newValue, setNewValue] = useState(`$${value}`);
 
   // update local state when external value changes
-  useEffect(() => setNewValue(`$${value}`), [value]);
+  useEffect(() => {
+    setNewValue(`$${value}`);
+  }, [value]);
 
   const updateValue = (value) => {
     const newValue = value.replace(/^\$/, "");
@@ -276,40 +280,35 @@ const ConfigureColumn = ({ template, obj, columns }) => {
     }
   };
 
-  const columnsList = useMemo(() => {
-    const cols = (columns ?? []).map((col) => {
-      return {
-        value: col,
-        label: col === DEFAULT_COLUMN ? "<imported file>" : `$${col}`,
-      };
-    });
+  const options = useMemo(() => {
+    const columnOptions =
+      columns?.map((column) => ({
+        value: column,
+        label: column === DEFAULT_COLUMN ? "<imported file>" : `$${column}`,
+      })) ?? [];
     if (!columns?.length) {
-      cols.push({ value, label: "<imported file>" });
+      columnOptions.push({ value, label: "<imported file>" });
     }
-    cols.push({ value: "-", label: "<set manually>" });
-    return cols;
-  }, [columns, DEFAULT_COLUMN, value]);
+    columnOptions.push({ value: "-", label: "<set manually>" });
+    return columnOptions;
+  }, [columns, value]);
 
   return (
-    <>
+    <p>
+      Use {obj.tagName.toLowerCase()}
+      {template.objects > 1 && ` for ${obj.getAttribute("name")}`}
+      {" from "}
+      {columns?.length > 0 && columns[0] !== DEFAULT_COLUMN && "field "}
       <Select
+        triggerClassName="border"
         onChange={selectValue}
         value={isManual ? "-" : value}
-        options={columnsList}
+        options={options}
         isInline={true}
-        label={
-          <>
-            Use {obj.tagName.toLowerCase()}
-            {template.objects > 1 && ` for ${obj.getAttribute("name")}`}
-            {" from "}
-            {columns?.length > 0 && columns[0] !== DEFAULT_COLUMN && "field "}
-          </>
-        }
-        labelProps={{ className: "inline-flex" }}
-        dataTestid={`select-trigger-use-image-from-field-${isManual ? "-" : value}`}
+        dataTestid={`select-trigger-use-${obj.tagName.toLowerCase().replace(/\s/g, "-")}-from-field-${isManual ? "-" : value}`}
       />
       {isManual && <Input value={newValue} onChange={handleChange} onBlur={handleBlur} onKeyDown={handleKeyDown} />}
-    </>
+    </p>
   );
 };
 
@@ -352,6 +351,40 @@ const Configurator = ({
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
   const [waiting, setWaiting] = React.useState(false);
   const [saved, setSaved] = React.useState(false);
+  const containerRef = useRef(null);
+  const [containerWidth, setContainerWidth] = useState(undefined);
+
+  // Resizer hook
+  const { editorWidthPixels, setEditorWidthPixels, constraints } = useConfigResizer({
+    projectId: project?.id,
+    containerWidth,
+  });
+
+  // Track container width for resizer constraints
+  // Observes container dimensions to provide the resizer hook with container width for calculating valid min/max bounds
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    let rafId;
+    const updateWidth = () => {
+      rafId && cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (containerRef.current) {
+          setContainerWidth(containerRef.current.clientWidth);
+        }
+      });
+    };
+
+    const resizeObserver = new ResizeObserver(updateWidth);
+    resizeObserver.observe(containerRef.current);
+
+    updateWidth();
+
+    return () => {
+      rafId && cancelAnimationFrame(rafId);
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   // config update is debounced because of user input
   const [configToCheck, setConfigToCheck] = React.useState();
@@ -474,10 +507,9 @@ const Configurator = ({
 
   const extra = (
     <p className={configClass.elem("tags-link")}>
-      Configure the labeling interface with tags.
-      <br />
+      Configure the labeling interface with tags.&nbsp;
       <a href="https://labelstud.io/tags/" target="_blank" rel="noreferrer">
-        See all available tags
+        See all tags
       </a>
       .
     </p>
@@ -485,95 +517,104 @@ const Configurator = ({
 
   return (
     <div className={configClass}>
-      <div className={configClass.elem("container")}>
-        <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
-        <header>
-          <Button
-            type="button"
-            data-leave={true}
-            onClick={onBrowse}
-            size="small"
-            look="outlined"
-            aria-label="Browse templates"
-          >
-            Browse Templates
-          </Button>
-          <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
-        </header>
-        <div className={configClass.elem("editor")}>
-          {configure === "code" && (
-            <div className={configClass.elem("code")} style={{ display: configure === "code" ? undefined : "none" }}>
-              <CodeEditor
-                name="code"
-                id="edit_code"
-                value={config}
-                autoCloseTags={true}
-                smartIndent={true}
-                detach
-                border
-                extensions={["hint", "xml-hint"]}
-                options={{
-                  mode: "xml",
-                  theme: "default",
-                  lineNumbers: true,
-                  extraKeys: {
-                    "'<'": completeAfter,
-                    // "'/'": completeIfAfterLt,
-                    "' '": completeIfInTag,
-                    "'='": completeIfInTag,
-                    "Ctrl-Space": "autocomplete",
-                  },
-                  hintOptions: { schemaInfo: tags },
-                }}
-                // don't close modal with Escape while editing config
-                onKeyDown={(editor, e) => {
-                  if (e.code === "Escape") e.stopPropagation();
-                }}
-                onChange={(editor, data, value) => onChange(value)}
-              />
-            </div>
-          )}
-          {visualLoaded && (
-            <div
-              className={configClass.elem("visual")}
-              style={{ display: configure === "visual" ? undefined : "none" }}
+      <div
+        className={configClass.elem("container").toClassName()}
+        ref={containerRef}
+        style={{
+          gridTemplateColumns: `${editorWidthPixels}px minmax(516px, 1fr)`,
+        }}
+      >
+        <div className="flex flex-col">
+          <h1>Labeling Interface{hasChanges ? " *" : ""}</h1>
+          <header>
+            <Button
+              type="button"
+              data-leave={true}
+              onClick={onBrowse}
+              size="small"
+              look="outlined"
+              aria-label="Browse templates"
             >
-              {isEmptyConfig(config) && <EmptyConfigPlaceholder />}
-              <ConfigureColumns columns={columns} project={project} template={template} />
-              {template.controls.map((control) => (
-                <ConfigureControl control={control} template={template} key={control.getAttribute("name")} />
-              ))}
-              <ConfigureSettings template={template} />
-            </div>
-          )}
-        </div>
-        {disableSaveButton !== true && onSaveClick && (
-          <Form.Actions size="small" extra={configure === "code" && extra} valid>
-            {saved && (
-              <div className={cn("form-indicator").toClassName()}>
-                <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()}>Saved!</span>
+              Browse Templates
+            </Button>
+            <ToggleItems items={{ code: "Code", visual: "Visual" }} active={configure} onSelect={onSelect} />
+          </header>
+          <div className={configClass.elem("editor")}>
+            {configure === "code" && (
+              <div className={cnm(configClass.elem("code").toClassName(), configure !== "code" ? "!hidden" : "")}>
+                <CodeEditor
+                  name="code"
+                  id="edit_code"
+                  value={config}
+                  autoCloseTags={true}
+                  smartIndent={true}
+                  detach
+                  border
+                  extensions={["hint", "xml-hint"]}
+                  options={{
+                    mode: "xml",
+                    theme: "default",
+                    lineNumbers: true,
+                    extraKeys: {
+                      "'<'": completeAfter,
+                      // "'/'": completeIfAfterLt,
+                      "' '": completeIfInTag,
+                      "'='": completeIfInTag,
+                      "Ctrl-Space": "autocomplete",
+                    },
+                    hintOptions: { schemaInfo: tags },
+                  }}
+                  // don't close modal with Escape while editing config
+                  onKeyDown={(_editor, e) => {
+                    if (e.code === "Escape") e.stopPropagation();
+                  }}
+                  onChange={(_editor, _data, value) => onChange(value)}
+                />
               </div>
             )}
-            <Button
-              size="small"
-              className="w-[120px]"
-              onClick={onSave}
-              waiting={waiting}
-              aria-label="Save configuration"
-            >
-              {waiting ? "Saving..." : "Save"}
-            </Button>
-            {isFF(FF_UNSAVED_CHANGES) && <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />}
-          </Form.Actions>
-        )}
+            {visualLoaded && (
+              <div className={cnm(configClass.elem("visual").toClassName(), configure !== "visual" ? "!hidden" : "")}>
+                {isEmptyConfig(config) && <EmptyConfigPlaceholder />}
+                <ConfigureColumns columns={columns} project={project} template={template} />
+                {template.controls.map((control) => (
+                  <ConfigureControl control={control} template={template} key={control.getAttribute("name")} />
+                ))}
+                <ConfigureSettings template={template} />
+              </div>
+            )}
+          </div>
+          {disableSaveButton !== true && onSaveClick && (
+            <Form.Actions size="small" extra={configure === "code" && extra} valid>
+              {saved && (
+                <div className={cn("form-indicator").toClassName()}>
+                  <span className={cn("form-indicator").elem("item").mod({ type: "success" }).toClassName()}>
+                    Saved!
+                  </span>
+                </div>
+              )}
+              <Button className="w-[120px]" onClick={onSave} waiting={waiting} aria-label="Save configuration">
+                {waiting ? "Saving..." : "Save"}
+              </Button>
+              {isFF(FF_UNSAVED_CHANGES) && <UnsavedChanges hasChanges={hasChanges} onSave={onSave} />}
+            </Form.Actions>
+          )}
+        </div>
+        <div className="relative">
+          <EditorResizer
+            containerRef={containerRef}
+            editorWidthPixels={editorWidthPixels}
+            onResize={setEditorWidthPixels}
+            constraints={constraints}
+          />
+          <Preview
+            config={configToDisplay}
+            data={data}
+            project={project}
+            loading={loading}
+            error={parserError || error || (configure === "code" && warning)}
+          />
+        </div>
       </div>
-      <Preview
-        config={configToDisplay}
-        data={data}
-        project={project}
-        loading={loading}
-        error={parserError || error || (configure === "code" && warning)}
-      />
     </div>
   );
 };
@@ -629,11 +670,11 @@ export const ConfigPage = ({
     if (externalColumns?.length) setColumns(externalColumns);
   }, [externalColumns]);
 
-  const [warning, setWarning] = React.useState();
+  const [warning, _setWarning] = React.useState();
 
   React.useEffect(() => {
     const fetchData = async () => {
-      if (!externalColumns || (project && !columns)) {
+      if (!externalColumns && project?.id && !columns) {
         const res = await api.callApi("dataSummary", {
           params: { pk: project.id },
           // 404 is ok, and errors here don't matter
@@ -644,9 +685,9 @@ export const ConfigPage = ({
           setColumns(res.common_data_columns);
         }
       }
-      fetchData();
     };
-  }, [columns, project]);
+    fetchData();
+  }, [project?.id, externalColumns]);
 
   const onSelectRecipe = React.useCallback((recipe) => {
     if (!recipe) {

@@ -239,7 +239,11 @@ const HtxVideoView = ({ item, store }) => {
 
     document.addEventListener("keydown", onKeyDown);
 
-    const observer = new ResizeObserver(() => onResize());
+    let rafId;
+    const observer = new ResizeObserver(() => {
+      rafId && cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => onResize());
+    });
     const [vContainer, vBlock] = [videoContainerRef.current, videoBlockRef.current];
 
     observer.observe(vContainer);
@@ -247,6 +251,7 @@ const HtxVideoView = ({ item, store }) => {
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      rafId && cancelAnimationFrame(rafId);
       observer.unobserve(vContainer);
       observer.unobserve(vBlock);
       observer.disconnect();
