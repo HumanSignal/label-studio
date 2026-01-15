@@ -91,7 +91,7 @@ export const Tab = types
     },
 
     get hiddenColumnsList() {
-      return self.columns.filter((c) => c.hidden).map((c) => c.key);
+      return self.columns.filter((c) => c.is_hidden).map((c) => c.key);
     },
 
     get availableFilters() {

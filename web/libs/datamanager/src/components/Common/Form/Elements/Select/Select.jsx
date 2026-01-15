@@ -20,7 +20,6 @@ const Select = ({
 }) => {
   const rootClass = cn("form-select");
   const [value, setValue] = useValueTracker(props.value, defaultValue);
-  console.log(contentClassName);
 
   const selectWrapper = (
     <FormField

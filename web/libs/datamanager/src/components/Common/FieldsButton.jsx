@@ -3,7 +3,6 @@ import { inject, observer } from "mobx-react";
 import React from "react";
 import { cn } from "../../utils/bem";
 import { Menu } from "./Menu/Menu";
-import { isReviewingAllowed } from "@humansignal/core";
 
 const injector = inject(({ store }) => {
   return {
@@ -13,12 +12,14 @@ const injector = inject(({ store }) => {
 
 const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, selected, resetTitle }) => {
   const MenuItem = (col, onClick) => {
-    const shouldDisable = col.disabled || col.enterprise;
+    console.log("col", col);
+    // const shouldDisable = col.disabled || col.enterprise_badge;
+    const shouldDisable = col.disabled;
 
     const titleContent = (
       <span className="flex items-center justify-between w-full gap-base">
         <span>{col.title}</span>
-        {col.enterprise && <EnterpriseBadge ghost />}
+        {col.enterprise_badge && <EnterpriseBadge ghost />}
       </span>
     );
 
@@ -143,12 +144,14 @@ export const FieldsButton = injector(
 );
 
 FieldsButton.Checkbox = observer(({ column, children, disabled }) => {
-  const shouldDisable = disabled || (column.enterprise === true && !isReviewingAllowed());
+  console.log("column", column);
+  // const shouldDisable = disabled || column.enterprise_badge;
+  const shouldDisable = disabled;
 
   return (
     <Checkbox
       size="small"
-      checked={!column.hidden}
+      checked={!column.is_hidden}
       onChange={column.toggleVisibility}
       style={{ width: "100%", height: "100%" }}
       disabled={shouldDisable}

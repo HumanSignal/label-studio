@@ -53,14 +53,14 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
             }}
             onChange={(value) => filter.setFilterDelayed(value)}
             optionRender={({ item: { original: filter } }) => {
-              const isEnterpriseFilter = filter.field.enterprise === true;
+              const showEnterpriseBadge = filter.field.enterprise_badge;
               return (
                 <div
                   className={cn("filterLine").elem("selector")}
                   style={{ display: "flex", alignItems: "center", gap: "8px" }}
                 >
                   <span>{filter.field.title}</span>
-                  {isEnterpriseFilter && <EnterpriseBadge ghost />}
+                  {showEnterpriseBadge && <EnterpriseBadge ghost />}
                   {filter.field.parent && (
                     <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
                       {filter.field.parent.title}
@@ -173,14 +173,14 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
           }}
           onChange={(value) => filter.setFilterDelayed(value)}
           optionRender={({ item: { original: filter } }) => {
-            const isEnterpriseFilter = filter.field.enterprise === true;
+            const showEnterpriseBadge = filter.field.enterprise_badge;
             return (
               <div
                 className={cn("filterLine").elem("selector")}
                 style={{ display: "flex", alignItems: "center", gap: "8px" }}
               >
                 <span>{filter.field.title}</span>
-                {isEnterpriseFilter && <EnterpriseBadge ghost />}
+                {showEnterpriseBadge && <EnterpriseBadge ghost />}
                 {filter.field.parent && (
                   <Tag size="small" className="filters-data-tag" color="#1d91e4" style={{ marginLeft: 7 }}>
                     {filter.field.parent.title}

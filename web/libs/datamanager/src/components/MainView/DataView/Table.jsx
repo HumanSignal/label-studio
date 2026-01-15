@@ -149,8 +149,8 @@ export const DataView = injector(
         );
       }
 
-      // Add EnterpriseBadge for review-related columns when enterprise flag is set
-      if (original.enterprise) {
+      // Add EnterpriseBadge when enterprise badge is set
+      if (original.enterprise_badge) {
         children.push(<EnterpriseBadge key="enterprise-badge" className="ml-2" compact />);
       }
 
