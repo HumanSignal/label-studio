@@ -12,8 +12,6 @@ const injector = inject(({ store }) => {
 
 const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, selected, resetTitle }) => {
   const MenuItem = (col, onClick) => {
-    console.log("col", col);
-    // const shouldDisable = col.disabled || col.enterprise_badge;
     const shouldDisable = col.disabled;
 
     const titleContent = (
@@ -144,8 +142,6 @@ export const FieldsButton = injector(
 );
 
 FieldsButton.Checkbox = observer(({ column, children, disabled }) => {
-  console.log("column", column);
-  // const shouldDisable = disabled || column.enterprise_badge;
   const shouldDisable = disabled;
 
   return (

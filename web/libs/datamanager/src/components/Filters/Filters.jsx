@@ -36,7 +36,6 @@ export const Filters = injector(({ views, currentView, filters }) => {
           options: [],
         };
 
-        // const shouldDisable = filter.field.disabled || filter.field.enterprise_badge;
         const shouldDisable = filter.field.disabled;
 
         group.options.push({
