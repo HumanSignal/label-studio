@@ -1,6 +1,7 @@
 import type Konva from "konva";
 import type { BezierPoint } from "../types";
 import { snapToPixel } from "../eventHandlers/utils";
+import { constrainPointToBounds } from "./boundsChecking";
 
 export interface TransformResult {
   newPoints: BezierPoint[];
@@ -168,7 +169,7 @@ export function applyTransformationToPoints(
     };
   },
   transformerCenter?: { x: number; y: number },
-  bounds?: { width: number; height: number },
+  bounds?: { x: number; y: number; width: number; height: number },
   getCurrentPointsRef?: () => BezierPoint[],
   updateCurrentPointsRef?: (points: BezierPoint[]) => void,
   pixelSnapping = false,
@@ -194,6 +195,44 @@ export function applyTransformationToPoints(
   const scaleX = transformer.scaleX();
   const scaleY = transformer.scaleY();
 
+  // First pass: check if ANY point would go out of bounds
+  // If so, prevent the entire transformation to avoid deformation
+  let wouldAnyPointGoOutOfBounds = false;
+  if (bounds) {
+    for (const node of nodes) {
+      if (!node || !node.name()) continue;
+
+      const pointIndex = Number.parseInt(node.name().split("-")[1]);
+      const originalPoint = currentPoints[pointIndex];
+      if (!originalPoint) continue;
+
+      // Get the node's transformed position
+      const transformedX = node.x();
+      const transformedY = node.y();
+      const snappedPos = snapToPixel({ x: transformedX, y: transformedY }, pixelSnapping);
+
+      // Check if this point would be out of bounds
+      const wouldBeOutOfBounds =
+        snappedPos.x < 0 ||
+        snappedPos.x > bounds.width ||
+        snappedPos.y < 0 ||
+        snappedPos.y > bounds.height;
+
+      // Check if current position is within bounds
+      const currentInBounds =
+        originalPoint.x >= 0 &&
+        originalPoint.x <= bounds.width &&
+        originalPoint.y >= 0 &&
+        originalPoint.y <= bounds.height;
+
+      if (wouldBeOutOfBounds && currentInBounds) {
+        // This point would go out of bounds - prevent entire transformation
+        wouldAnyPointGoOutOfBounds = true;
+        break;
+      }
+    }
+  }
+
   // Apply the transformation to each selected point
   for (const node of nodes) {
     if (!node || !node.name()) continue;
@@ -204,17 +243,31 @@ export function applyTransformationToPoints(
     const originalPoint = currentPoints[pointIndex];
 
     if (point && originalPoint) {
-      // Get the node's transformed position - trust the transformer
-      const transformedX = node.x();
-      const transformedY = node.y();
+      if (wouldAnyPointGoOutOfBounds) {
+        // Prevent entire transformation - keep all points at current positions
+        point.x = originalPoint.x;
+        point.y = originalPoint.y;
+      } else {
+        // Get the node's transformed position - trust the transformer
+        const transformedX = node.x();
+        const transformedY = node.y();
 
-      // Use stored original positions if available, otherwise use current positions
-      const originalPos = originalPositions?.[pointIndex] || originalPoint;
-
-      // Update the point position with pixel snapping if enabled
-      const snappedPos = snapToPixel({ x: transformedX, y: transformedY }, pixelSnapping);
-      point.x = snappedPos.x;
-      point.y = snappedPos.y;
+        // Update the point position with pixel snapping if enabled
+        const snappedPos = snapToPixel({ x: transformedX, y: transformedY }, pixelSnapping);
+        
+        // Constrain point to image boundaries (point-level constraint)
+        if (bounds) {
+          const constrainedPos = constrainPointToBounds(
+            snappedPos,
+            { width: bounds.width, height: bounds.height },
+          );
+          point.x = constrainedPos.x;
+          point.y = constrainedPos.y;
+        } else {
+          point.x = snappedPos.x;
+          point.y = snappedPos.y;
+        }
+      }
 
       // Don't update proxy node position - let transformer manage it
       // This prevents the update loop
@@ -222,9 +275,6 @@ export function applyTransformationToPoints(
       // Control points will be handled separately using delta transformation
     }
   }
-
-  // Let Konva's built-in dragBoundFunc and resizeBoundFunc handle all boundary constraints
-  // No need for custom point constraint logic
 
   return { newPoints, transformer };
 }

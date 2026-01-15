@@ -121,22 +121,7 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         const transformer = transformerRef.current;
         if (transformer && bounds) {
           try {
-            // Check if we need to constrain the transformer position
-            const constraints = calculateTransformerConstraints(
-              transformer,
-              bounds,
-              scaleX,
-              scaleY,
-              transform,
-              fitScale,
-            );
-
-            if (constraints) {
-              // Force the transformer to the constrained position
-              transformer.x(constraints.x);
-              transformer.y(constraints.y);
-            }
-
+            // Allow transformer to move freely - points will be constrained individually
             const transformerCenter = {
               x: transformer.x() + transformer.width() / 2,
               y: transformer.y() + transformer.height() / 2,
@@ -193,33 +178,63 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         }
       }}
       resizeBoundFunc={(oldBox: any, newBox: any) => {
-        // Use Konva's built-in constraint system
-        if (bounds) {
-          const constrainedBox = { ...newBox };
+        // Check if transformation would move any point out of bounds
+        // If so, prevent the transformation to avoid deformation
+        if (!bounds) return newBox;
 
-          // Constrain to left edge
-          if (constrainedBox.x < bounds.x) {
-            const deltaX = bounds.x - constrainedBox.x;
-            constrainedBox.x = bounds.x;
-            constrainedBox.width = Math.max(BBOX_MIN_WIDTH, constrainedBox.width - deltaX);
-          }
-          // Constrain to right edge
-          if (constrainedBox.x + constrainedBox.width > bounds.x + bounds.width) {
-            constrainedBox.width = bounds.x + bounds.width - constrainedBox.x;
-          }
-          // Constrain to top edge
-          if (constrainedBox.y < bounds.y) {
-            const deltaY = bounds.y - constrainedBox.y;
-            constrainedBox.y = bounds.y;
-            constrainedBox.height = Math.max(BBOX_MIN_WIDTH, constrainedBox.height - deltaY);
-          }
-          // Constrain to bottom edge
-          if (constrainedBox.y + constrainedBox.height > bounds.y + bounds.height) {
-            constrainedBox.height = bounds.y + bounds.height - constrainedBox.y;
+        const transformer = transformerRef.current;
+        if (!transformer) return newBox;
+
+        // Calculate scale changes from box dimensions
+        const scaleX = oldBox.width > 0 ? newBox.width / oldBox.width : 1;
+        const scaleY = oldBox.height > 0 ? newBox.height / oldBox.height : 1;
+        const rotation = (newBox.rotation || 0) - (oldBox.rotation || 0);
+        const rotationRadians = rotation * (Math.PI / 180);
+
+        // Use transformer center (in image coordinates)
+        const centerX = transformer.x() + transformer.width() / 2;
+        const centerY = transformer.y() + transformer.height() / 2;
+
+        // Check each selected point
+        for (const pointIndex of Array.from(selectedPoints)) {
+          const originalPoint = originalPositionsRef.current[pointIndex] || initialPoints[pointIndex];
+          if (!originalPoint) continue;
+
+          // Calculate offset from center
+          const offsetX = originalPoint.x - centerX;
+          const offsetY = originalPoint.y - centerY;
+
+          // Apply scaling
+          let scaledX = offsetX * scaleX;
+          let scaledY = offsetY * scaleY;
+
+          // Apply rotation
+          if (Math.abs(rotation) > 0.01) {
+            const cos = Math.cos(rotationRadians);
+            const sin = Math.sin(rotationRadians);
+            const rotatedX = scaledX * cos - scaledY * sin;
+            const rotatedY = scaledX * sin + scaledY * cos;
+            scaledX = rotatedX;
+            scaledY = rotatedY;
           }
 
-          return constrainedBox;
+          // Calculate final position
+          const finalX = centerX + scaledX;
+          const finalY = centerY + scaledY;
+
+          // Check if point would be out of bounds
+          if (
+            finalX < 0 ||
+            finalX > bounds.width ||
+            finalY < 0 ||
+            finalY > bounds.height
+          ) {
+            // Point would go out of bounds - prevent transformation
+            return oldBox;
+          }
         }
+
+        // All points would stay within bounds - allow transformation
         return newBox;
       }}
       onTransformStart={(_e: any) => {
@@ -274,50 +289,67 @@ export const VectorTransformer: React.FC<VectorTransformerProps> = ({
         isFirstTransformTickRef.current = true;
       }}
       boundBoxFunc={(oldBox, newBox) => {
+        // Check if rotation would move any point out of bounds
+        // If so, prevent the rotation to avoid deformation
         if (!bounds) return newBox;
 
-        // Calculate the rotated bounding box properly
-        const getCorner = (pivotX: number, pivotY: number, diffX: number, diffY: number, angle: number) => {
-          const distance = Math.sqrt(diffX * diffX + diffY * diffY);
-          angle += Math.atan2(diffY, diffX);
-          const x = pivotX + distance * Math.cos(angle);
-          const y = pivotY + distance * Math.sin(angle);
-          return { x, y };
-        };
+        // Calculate rotation change
+        const rotation = (newBox.rotation || 0) - (oldBox.rotation || 0);
+        if (Math.abs(rotation) < 0.01) {
+          // No rotation change - allow transformation
+          return newBox;
+        }
 
-        const { x, y, width, height, rotation = 0 } = newBox;
-        const rad = rotation;
+        const transformer = transformerRef.current;
+        if (!transformer) return newBox;
 
-        // Get all four corners of the rotated rectangle
-        const p1 = getCorner(x, y, 0, 0, rad);
-        const p2 = getCorner(x, y, width, 0, rad);
-        const p3 = getCorner(x, y, width, height, rad);
-        const p4 = getCorner(x, y, 0, height, rad);
+        const rotationRadians = rotation * (Math.PI / 180);
+        
+        // Get current scale from transformer
+        const scaleX = transformer.scaleX();
+        const scaleY = transformer.scaleY();
 
-        // Calculate the bounding box of the rotated rectangle
-        const rotatedBox = {
-          x: Math.min(p1.x, p2.x, p3.x, p4.x),
-          y: Math.min(p1.y, p2.y, p3.y, p4.y),
-          width: Math.max(p1.x, p2.x, p3.x, p4.x) - Math.min(p1.x, p2.x, p3.x, p4.x),
-          height: Math.max(p1.y, p2.y, p3.y, p4.y) - Math.min(p1.y, p2.y, p3.y, p4.y),
-        };
+        // Use transformer center (in image coordinates)
+        const centerX = transformer.x() + transformer.width() / 2;
+        const centerY = transformer.y() + transformer.height() / 2;
 
-        // Convert rotated box to image coordinates
-        const imageBox = {
-          x: (rotatedBox.x - transform.offsetX) / (transform.zoom * fitScale),
-          y: (rotatedBox.y - transform.offsetY) / (transform.zoom * fitScale),
-          width: rotatedBox.width / (transform.zoom * fitScale),
-          height: rotatedBox.height / (transform.zoom * fitScale),
-        };
+        // Check each selected point
+        for (const pointIndex of Array.from(selectedPoints)) {
+          const originalPoint = originalPositionsRef.current[pointIndex] || initialPoints[pointIndex];
+          if (!originalPoint) continue;
 
-        // Check if the rotated box would go out of bounds
-        const isOut =
-          imageBox.x < bounds.x ||
-          imageBox.y < bounds.y ||
-          imageBox.x + imageBox.width > bounds.x + bounds.width ||
-          imageBox.y + imageBox.height > bounds.y + bounds.height;
+          // Calculate offset from center
+          const offsetX = originalPoint.x - centerX;
+          const offsetY = originalPoint.y - centerY;
 
-        return isOut ? oldBox : newBox;
+          // Apply current scale
+          let scaledX = offsetX * scaleX;
+          let scaledY = offsetY * scaleY;
+
+          // Apply rotation
+          const cos = Math.cos(rotationRadians);
+          const sin = Math.sin(rotationRadians);
+          const rotatedX = scaledX * cos - scaledY * sin;
+          const rotatedY = scaledX * sin + scaledY * cos;
+
+          // Calculate final position
+          const finalX = centerX + rotatedX;
+          const finalY = centerY + rotatedY;
+
+          // Check if point would be out of bounds
+          if (
+            finalX < 0 ||
+            finalX > bounds.width ||
+            finalY < 0 ||
+            finalY > bounds.height
+          ) {
+            // Point would go out of bounds - prevent rotation
+            return oldBox;
+          }
+        }
+
+        // All points would stay within bounds - allow rotation
+        return newBox;
       }}
       onDragMove={(_e: any) => {
         // Apply drag movement to real points in real-time with constraints
