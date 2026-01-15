@@ -183,7 +183,8 @@ def load_tasks_json_lso(blob: bytes, key: str) -> Iterator[StorageObject]:
             row_index = 0
             with io.BytesIO(blob) as f:
                 # ijson.items parses the array incrementally, yielding one item at a time
-                for task_data in ijson.items(f, 'item'):
+                # use_float=True ensures numbers are parsed as float (not Decimal), which is JSON-serializable
+                for task_data in ijson.items(f, 'item', use_float=True):
                     yield StorageObject(key=key, task_data=task_data, row_index=row_index)
                     row_index += 1
             # Check if we got any items - if not, it's an empty array which is valid
