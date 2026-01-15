@@ -24,6 +24,9 @@ If you are using the on-premises version of Label Studio, you will need to take 
 3. Run health checks and tests. ([See below.](#Checks-after-upgrading))
 4. Perform the upgrade on your production server. 
 
+!!! attention "important"
+    Before upgrading, check the [release notes](release_notes) for any breaking changes. 
+
 ## Upgrade using Helm
 
 If you installed Label Studio Enterprise in a Kubernetes environment, you can upgrade using Helm: 
