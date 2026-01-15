@@ -872,7 +872,8 @@ export const AnnotationButton = observer(
     }, [entityIsAlive, entity, annotationStore]);
 
     // Get review status from task source (LSE-only feature)
-    // Reviews are stored in task.source.annotators[i].review where i matches the annotation index
+    // The backend builds the annotators array by iterating through annotations in order,
+    // so we match by finding the annotation's position in the backend's annotation list
     const getReviewStatus = useCallback(() => {
       // Only available in LSE for non-predictions
       const isLSE = (window as any).APP_SETTINGS?.version?.edition === "Enterprise";
@@ -880,7 +881,7 @@ export const AnnotationButton = observer(
         return null;
       }
 
-      // Parse task source to get annotators array
+      // Parse task source to get annotators array and backend annotations list
       const task = annotationStore?.store?.task;
       const sourceStr = task?.dataObj?.source;
       if (!sourceStr) return null;
@@ -888,23 +889,31 @@ export const AnnotationButton = observer(
       try {
         const taskSource = typeof sourceStr === "string" ? JSON.parse(sourceStr) : sourceStr;
         const annotators = taskSource?.annotators;
-        const annotations = annotationStore?.annotations;
+        const backendAnnotations = taskSource?.annotations;
 
-        if (!Array.isArray(annotators) || !Array.isArray(annotations)) {
+        if (!Array.isArray(annotators) || !Array.isArray(backendAnnotations)) {
           return null;
         }
 
-        // Find annotation index and get corresponding annotator review status
-        const annotationIndex = annotations.findIndex((ann: any) => ann.pk === entity.pk || ann.id === entity.id);
+        // Find the current annotation's index in the backend's annotations array
+        // The backend builds annotators array by iterating through this same list
+        const annotationIndex = backendAnnotations.findIndex((ann: any) => {
+          if (entity.pk && ann.id) {
+            return String(ann.id) === String(entity.pk);
+          }
+          return false;
+        });
+
         if (annotationIndex === -1 || annotationIndex >= annotators.length) {
           return null;
         }
 
+        // Use the same index to get the corresponding annotator's review status
         return annotators[annotationIndex]?.review ?? null;
       } catch {
         return null;
       }
-    }, [entityIsAlive, isPrediction, annotationStore, entity.pk, entity.id]);
+    }, [entityIsAlive, isPrediction, annotationStore, entity.pk]);
 
     // Return null if entity is not alive, but only after all hooks have been called
     if (!entityIsAlive) {
