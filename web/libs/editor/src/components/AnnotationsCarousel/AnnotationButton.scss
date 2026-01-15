@@ -46,23 +46,6 @@
         border-radius: 2px;
         box-shadow: 0 0 0 2px var(--color-neutral-background);
         transform: translate(2px,2px);
-  
-        svg {
-          width: 6px;
-          height: 6px;
-        }
-  
-        &_accepted {          
-          background-color: var(--color-accent-kale-base);
-        }
-  
-        &_rejected {
-          background-color: var(--color-accent-persimmon-base);
-        }
-  
-        &_fixed {
-          background-color: var(--color-accent-canteloupe-base);
-        }
       }
     }
   }
