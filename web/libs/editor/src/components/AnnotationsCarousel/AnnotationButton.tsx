@@ -148,6 +148,7 @@ const injector = inject(({ store }) => {
 const hoverIntentDelay = 300;
 
 // Helper function to create badge style objects with consistent CSS variable pattern
+// Note: CSS variables are overridden in SCSS to always use light mode values for tooltip badges
 const createBadgeStyle = (label: string, colorName: string) => ({
   label,
   backgroundColor: `var(--color-accent-${colorName}-subtle)`,
@@ -770,6 +771,9 @@ export const AnnotationButton = observer(
     );
 
     const handleTooltipLeave = useCallback((e: React.MouseEvent | React.FocusEvent) => {
+      // TEMPORARY: Disabled for testing - tooltip will stay open
+      return;
+
       // Clear any pending enter timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
