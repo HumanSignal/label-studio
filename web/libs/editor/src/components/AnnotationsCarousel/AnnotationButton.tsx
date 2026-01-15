@@ -886,7 +886,7 @@ export const AnnotationButton = observer(
       if (!sourceStr) return null;
 
       try {
-        const taskSource = typeof sourceStr === 'string' ? JSON.parse(sourceStr) : sourceStr;
+        const taskSource = typeof sourceStr === "string" ? JSON.parse(sourceStr) : sourceStr;
         const annotators = taskSource?.annotators;
         const annotations = annotationStore?.annotations;
 

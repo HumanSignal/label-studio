@@ -55,12 +55,12 @@ const TaskStore = types
         }
         return null;
       })();
-      
+
       // Add source field if available
       if (data && self.source) {
         data.source = self.source;
       }
-      
+
       return data;
     },
   }));
