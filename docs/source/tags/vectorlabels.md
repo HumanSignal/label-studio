@@ -1,5 +1,6 @@
 ---
 title: VectorLabels - Beta 🧪
+short: VectorLabels 🧪
 type: tags
 order: 433
 meta_title: Vector Label Tag for Labeling Vectors in Images

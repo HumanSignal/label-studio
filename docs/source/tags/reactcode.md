@@ -1,5 +1,6 @@
 ---
-title: ReactCode
+title: ReactCode - Beta 🧪
+short: ReactCode 🧪
 type: tags
 order: 307
 meta_title: ReactCode tag

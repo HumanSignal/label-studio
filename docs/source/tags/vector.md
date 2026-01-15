@@ -1,5 +1,6 @@
 ---
 title: Vector - Beta 🧪
+short: Vector 🧪
 type: tags
 order: 430
 meta_title: Vector Tag for Adding Vectors to Images
