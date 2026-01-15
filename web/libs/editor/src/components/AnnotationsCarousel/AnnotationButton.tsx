@@ -771,9 +771,6 @@ export const AnnotationButton = observer(
     );
 
     const handleTooltipLeave = useCallback((e: React.MouseEvent | React.FocusEvent) => {
-      // TEMPORARY: Disabled for testing - tooltip will stay open
-      return;
-
       // Clear any pending enter timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
