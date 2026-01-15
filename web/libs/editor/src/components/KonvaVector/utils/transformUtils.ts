@@ -6,6 +6,7 @@ import { constrainPointToBounds } from "./boundsChecking";
 export interface TransformResult {
   newPoints: BezierPoint[];
   transformer: Konva.Transformer;
+  wasPrevented?: boolean; // True if transformation was prevented due to boundary constraints
 }
 
 /**
@@ -195,40 +196,51 @@ export function applyTransformationToPoints(
   const scaleX = transformer.scaleX();
   const scaleY = transformer.scaleY();
 
-  // First pass: check if ANY point would go out of bounds
-  // If so, prevent the entire transformation to avoid deformation
-  let wouldAnyPointGoOutOfBounds = false;
+  // Track if any point was constrained (didn't move when transformer moved)
+  let anyPointConstrained = false;
+  
+  // First pass: check if any point at boundary would be constrained BEFORE applying transformations
+  // This prevents partial transformations where some points move and others don't
   if (bounds) {
+    const tolerance = 0.1;
+    const toleranceCheck = 0.001;
+    
     for (const node of nodes) {
       if (!node || !node.name()) continue;
-
+      
       const pointIndex = Number.parseInt(node.name().split("-")[1]);
       const originalPoint = currentPoints[pointIndex];
       if (!originalPoint) continue;
-
-      // Get the node's transformed position
-      const transformedX = node.x();
-      const transformedY = node.y();
-      const snappedPos = snapToPixel({ x: transformedX, y: transformedY }, pixelSnapping);
-
-      // Check if this point would be out of bounds
-      const wouldBeOutOfBounds =
-        snappedPos.x < 0 ||
-        snappedPos.x > bounds.width ||
-        snappedPos.y < 0 ||
-        snappedPos.y > bounds.height;
-
-      // Check if current position is within bounds
-      const currentInBounds =
-        originalPoint.x >= 0 &&
-        originalPoint.x <= bounds.width &&
-        originalPoint.y >= 0 &&
-        originalPoint.y <= bounds.height;
-
-      if (wouldBeOutOfBounds && currentInBounds) {
-        // This point would go out of bounds - prevent entire transformation
-        wouldAnyPointGoOutOfBounds = true;
-        break;
+      
+      // Check if point is at boundary
+      const atBoundary = 
+        originalPoint.x <= tolerance ||
+        originalPoint.x >= bounds.width - tolerance ||
+        originalPoint.y <= tolerance ||
+        originalPoint.y >= bounds.height - tolerance;
+      
+      if (atBoundary) {
+        // Get the node's transformed position
+        const transformedX = node.x();
+        const transformedY = node.y();
+        const snappedPos = snapToPixel({ x: transformedX, y: transformedY }, pixelSnapping);
+        
+        // Check where point would be after constraint
+        const constrainedPos = constrainPointToBounds(
+          snappedPos,
+          { width: bounds.width, height: bounds.height },
+        );
+        
+        // Check if point would actually move
+        const didPointMove =
+          Math.abs(constrainedPos.x - originalPoint.x) > toleranceCheck ||
+          Math.abs(constrainedPos.y - originalPoint.y) > toleranceCheck;
+        
+        // If point is at boundary and wouldn't move, prevent ALL transformations
+        if (!didPointMove) {
+          anyPointConstrained = true;
+          break; // Early exit - we know we need to prevent all transformations
+        }
       }
     }
   }
@@ -242,11 +254,12 @@ export function applyTransformationToPoints(
     // Use currentPoints to get original point, not initialPoints prop (which might be stale)
     const originalPoint = currentPoints[pointIndex];
 
-    if (point && originalPoint) {
-      if (wouldAnyPointGoOutOfBounds) {
+      if (point && originalPoint) {
+      if (anyPointConstrained) {
         // Prevent entire transformation - keep all points at current positions
         point.x = originalPoint.x;
         point.y = originalPoint.y;
+        // Don't update proxy nodes yet - we'll do it after reverting all points
       } else {
         // Get the node's transformed position - trust the transformer
         const transformedX = node.x();
@@ -257,24 +270,54 @@ export function applyTransformationToPoints(
         
         // Constrain point to image boundaries (point-level constraint)
         if (bounds) {
+          // Constrain point to bounds
           const constrainedPos = constrainPointToBounds(
             snappedPos,
             { width: bounds.width, height: bounds.height },
           );
+          
           point.x = constrainedPos.x;
           point.y = constrainedPos.y;
         } else {
           point.x = snappedPos.x;
           point.y = snappedPos.y;
         }
+        
+        // Update proxy node position to match point position (only if not constrained)
+        if (proxyRefs && proxyRefs.current[pointIndex]) {
+          const proxyNode = proxyRefs.current[pointIndex];
+          if (proxyNode) {
+            proxyNode.x(point.x);
+            proxyNode.y(point.y);
+          }
+        }
       }
-
-      // Don't update proxy node position - let transformer manage it
-      // This prevents the update loop
 
       // Control points will be handled separately using delta transformation
     }
   }
 
-  return { newPoints, transformer };
-}
+    // If any point at boundary didn't move, all points should already be at original positions
+    // (we prevented transformations in the loop above)
+    // But ensure proxy nodes are updated to match
+    if (anyPointConstrained) {
+      for (const node of nodes) {
+        if (!node || !node.name()) continue;
+        const pointIndex = Number.parseInt(node.name().split("-")[1]);
+        const point = newPoints[pointIndex];
+        
+        if (point && proxyRefs && proxyRefs.current[pointIndex]) {
+          const proxyNode = proxyRefs.current[pointIndex];
+          if (proxyNode) {
+            proxyNode.x(point.x);
+            proxyNode.y(point.y);
+          }
+        }
+      }
+    }
+
+    // Mark transformation as prevented if any point at boundary didn't move
+    const wasPrevented = anyPointConstrained;
+
+    return { newPoints, transformer, wasPrevented };
+  }
