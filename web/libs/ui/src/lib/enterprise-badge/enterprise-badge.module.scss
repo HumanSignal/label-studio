@@ -33,3 +33,9 @@
   font-weight: 500;
   cursor: default;
 }
+
+.compact {
+  .label {
+    padding: 2px 3px;
+  }
+}

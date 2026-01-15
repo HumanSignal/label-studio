@@ -83,6 +83,7 @@ export const TabColumn = types
     // Column alias whose filter should be joined automatically when a filter is created for this column
     child_filter: types.maybeNull(types.string),
     disabled: types.optional(types.boolean, false),
+    enterprise: types.optional(types.boolean, false),
   })
   .views((self) => ({
     get hidden() {
