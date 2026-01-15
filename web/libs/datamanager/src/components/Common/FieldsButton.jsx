@@ -1,8 +1,7 @@
-import { Button, Checkbox } from "@humansignal/ui";
+import { Button, Checkbox, Dropdown, EnterpriseBadge } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import React from "react";
 import { cn } from "../../utils/bem";
-import { Dropdown } from "@humansignal/ui";
 import { Menu } from "./Menu/Menu";
 
 const injector = inject(({ store }) => {
@@ -13,14 +12,23 @@ const injector = inject(({ store }) => {
 
 const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, selected, resetTitle }) => {
   const MenuItem = (col, onClick) => {
+    const shouldDisable = col.disabled || col.enterprise;
+
+    const titleContent = (
+      <span className="flex items-center justify-between w-full gap-base">
+        <span>{col.title}</span>
+        {col.enterprise && <EnterpriseBadge ghost />}
+      </span>
+    );
+
     return (
-      <Menu.Item key={col.key} name={col.key} onClick={onClick} disabled={col.disabled}>
+      <Menu.Item key={col.key} name={col.key} onClick={onClick} disabled={shouldDisable}>
         {WrapperComponent && col.wra !== false ? (
-          <WrapperComponent column={col} disabled={col.disabled}>
-            {col.title}
+          <WrapperComponent column={col} disabled={shouldDisable}>
+            {titleContent}
           </WrapperComponent>
         ) : (
-          col.title
+          titleContent
         )}
       </Menu.Item>
     );
@@ -134,13 +142,17 @@ export const FieldsButton = injector(
 );
 
 FieldsButton.Checkbox = observer(({ column, children, disabled }) => {
+  const isEnterpriseUser = window.APP_SETTINGS?.billing?.enterprise === true;
+  const isEnterpriseColumn = column.enterprise === true;
+  const shouldDisable = disabled || (isEnterpriseColumn && !isEnterpriseUser);
+
   return (
     <Checkbox
       size="small"
       checked={!column.hidden}
       onChange={column.toggleVisibility}
       style={{ width: "100%", height: "100%" }}
-      disabled={disabled}
+      disabled={shouldDisable}
     >
       {children}
     </Checkbox>
