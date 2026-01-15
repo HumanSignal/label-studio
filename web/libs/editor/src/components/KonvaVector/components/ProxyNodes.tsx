@@ -25,10 +25,10 @@ export const ProxyNodes: React.FC<ProxyNodesProps> = ({ selectedPoints, initialP
             }}
             x={point.x}
             y={point.y}
-            radius={10}
+            radius={0.1}
             fill="transparent"
             stroke="transparent"
-            strokeWidth={1}
+            strokeWidth={0}
             listening={true}
             name={`proxy-${pointIndex}`}
           />
