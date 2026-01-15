@@ -3,6 +3,7 @@ import { inject, observer } from "mobx-react";
 import React from "react";
 import { cn } from "../../utils/bem";
 import { Menu } from "./Menu/Menu";
+import { isReviewingAllowed } from "@humansignal/core";
 
 const injector = inject(({ store }) => {
   return {
@@ -142,9 +143,7 @@ export const FieldsButton = injector(
 );
 
 FieldsButton.Checkbox = observer(({ column, children, disabled }) => {
-  const isEnterpriseUser = window.APP_SETTINGS?.billing?.enterprise === true;
-  const isEnterpriseColumn = column.enterprise === true;
-  const shouldDisable = disabled || (isEnterpriseColumn && !isEnterpriseUser);
+  const shouldDisable = disabled || (column.enterprise === true && !isReviewingAllowed());
 
   return (
     <Checkbox

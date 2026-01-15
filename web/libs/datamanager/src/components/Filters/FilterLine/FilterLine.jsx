@@ -25,7 +25,6 @@ const Conjunction = observer(({ index, view }) => {
 
 export const FilterLine = observer(({ filter, availableFilters, index, view, sidebar, dropdownClassName }) => {
   const childFilter = filter.child_filter;
-  const isEnterpriseUser = window.APP_SETTINGS?.billing?.enterprise === true;
 
   if (sidebar) {
     // Sidebar layout uses grid structure like main layout
@@ -175,7 +174,6 @@ export const FilterLine = observer(({ filter, availableFilters, index, view, sid
           onChange={(value) => filter.setFilterDelayed(value)}
           optionRender={({ item: { original: filter } }) => {
             const isEnterpriseFilter = filter.field.enterprise === true;
-            const shouldDisable = filter.field.disabled || (isEnterpriseFilter && !isEnterpriseUser);
             return (
               <div
                 className={cn("filterLine").elem("selector")}

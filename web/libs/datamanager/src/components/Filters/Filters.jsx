@@ -5,6 +5,7 @@ import { Button } from "@humansignal/ui";
 import { FilterLine } from "./FilterLine/FilterLine";
 import { IconChevronRight, IconPlus } from "@humansignal/icons";
 import "./Filters.scss";
+import { isReviewingAllowed } from "@humansignal/core";
 
 const injector = inject(({ store }) => ({
   store,
@@ -36,7 +37,7 @@ export const Filters = injector(({ views, currentView, filters }) => {
           options: [],
         };
 
-        const shouldDisable = filter.field.disabled || filter.field.enterprise === true;
+        const shouldDisable = filter.field.disabled || (filter.field.enterprise === true && !isReviewingAllowed());
 
         group.options.push({
           value: filter.id,
