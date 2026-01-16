@@ -16,6 +16,7 @@ export const MenuItem = ({
   forceReload = false,
   active = false,
   onClick,
+  disabled,
   ...rest
 }) => {
   const { selected } = React.useContext(MenuContext);
@@ -43,6 +44,15 @@ export const MenuItem = ({
   // Support both deprecated danger prop and new variant prop
   const isNegative = danger || variant === "negative";
 
+  const handleClick = (e) => {
+    if (disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    onClick?.(e);
+  };
+
   const linkAttributes = {
     className: rootClass
       .mod({
@@ -50,11 +60,13 @@ export const MenuItem = ({
         look: isNegative && "danger", // Keep existing CSS class for compatibility
       })
       .mix(className),
-    onClick,
+    onClick: handleClick,
+    disabled: disabled || undefined,
+    "aria-disabled": disabled || undefined,
     ...rest,
   };
 
-  if (forceReload) {
+  if (forceReload && !disabled) {
     linkAttributes.onClick = () => {
       window.location.href = to ?? href;
     };
@@ -63,7 +75,7 @@ export const MenuItem = ({
   return (
     <li>
       {href ? (
-        <a href={href ?? "#"} {...linkAttributes}>
+        <a href={disabled ? undefined : (href ?? "#")} {...linkAttributes}>
           {linkContent}
         </a>
       ) : (

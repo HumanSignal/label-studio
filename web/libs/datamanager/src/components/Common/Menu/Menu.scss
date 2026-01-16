@@ -36,6 +36,7 @@
     &[disabled] {
       &:hover {
         background-color: transparent !important;
+        color: var(--color-neutral-content-subtler) !important;
         cursor: not-allowed;
       }
 
@@ -57,7 +58,7 @@
       justify-content: center;
     }
 
-    &:not(.menu-dm__item_look_danger):hover {
+    &:not(.menu-dm__item_look_danger):not([disabled]):hover {
       color: var(--color-neutral-content);
       background-color: var(--color-primary-emphasis-subtle);
     }

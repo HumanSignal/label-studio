@@ -13,22 +13,21 @@ const injector = inject(({ store }) => {
 const FieldsMenu = observer(({ columns, WrapperComponent, onClick, onReset, selected, resetTitle }) => {
   const MenuItem = (col, onClick) => {
     const shouldDisable = col.disabled;
+    const enterpriseBadge = col.enterprise_badge ?? col.original?.enterprise_badge;
 
-    const titleContent = (
-      <span className="flex items-center justify-between w-full gap-base">
-        <span>{col.title}</span>
-        {col.enterprise_badge && <EnterpriseBadge ghost />}
-      </span>
-    );
+    const titleContent = <span>{col.title}</span>;
 
     return (
       <Menu.Item key={col.key} name={col.key} onClick={onClick} disabled={shouldDisable}>
         {WrapperComponent && col.wra !== false ? (
-          <WrapperComponent column={col} disabled={shouldDisable}>
+          <WrapperComponent column={col} disabled={shouldDisable} enterpriseBadge={enterpriseBadge}>
             {titleContent}
           </WrapperComponent>
         ) : (
-          titleContent
+          <span className="flex items-center justify-between w-full gap-base">
+            {titleContent}
+            {enterpriseBadge && <EnterpriseBadge ghost />}
+          </span>
         )}
       </Menu.Item>
     );
@@ -141,18 +140,21 @@ export const FieldsButton = injector(
   },
 );
 
-FieldsButton.Checkbox = observer(({ column, children, disabled }) => {
+FieldsButton.Checkbox = observer(({ column, children, disabled, enterpriseBadge }) => {
   const shouldDisable = disabled;
 
   return (
-    <Checkbox
-      size="small"
-      checked={!column.is_hidden}
-      onChange={column.toggleVisibility}
-      style={{ width: "100%", height: "100%" }}
-      disabled={shouldDisable}
-    >
-      {children}
-    </Checkbox>
+    <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+      <div style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
+        <Checkbox size="small" checked={!column.is_hidden} onChange={column.toggleVisibility} disabled={shouldDisable}>
+          {children}
+        </Checkbox>
+      </div>
+      {enterpriseBadge && (
+        <div style={{ flexShrink: 0 }}>
+          <EnterpriseBadge ghost />
+        </div>
+      )}
+    </div>
   );
 });
