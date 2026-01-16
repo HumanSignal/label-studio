@@ -109,3 +109,9 @@ export const FF_AGREEMENT_FILTERED = "fflag_feat_utc_239_filterable_agreement_co
  * FSM State Fields
  */
 export const FF_FSM_STATE_FIELDS = "fflag_feat_fit_710_fsm_state_fields";
+
+/**
+ * Starter Cloud (Self Serve) plan
+ * @link https://app.launchdarkly.com/default/test/features/fflag_feat_front_leap_482_self_serve_short/
+ */
+export const FF_SELF_SERVE = "fflag_feat_front_leap_482_self_serve_short";
