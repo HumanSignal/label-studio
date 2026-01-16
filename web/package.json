@@ -27,6 +27,7 @@
     "dm:watch": "nx run datamanager:build:development --watch",
     "dm:unit": "nx run datamanager:unit",
     "build": "NODE_ENV=production yarn ls:build",
+    "build:win": "set NODE_ENV=production&& yarn ls:build",
     "version:libs": "nx run-many --target=version",
     "docs": "SCHEMA_JSON_PATH=$PWD/libs/core/src/lib/utils/schema/tags.json nx docs editor && biome check --write $SCHEMA_JSON_PATH",
     "watch": "NODE_ENV=development BUILD_NO_SERVER=true yarn ls:watch",
@@ -251,5 +252,6 @@
     "form-data": "4.0.4",
     "qs": ">=6.14.1",
     "stylus": "npm:empty-npm-package@1.0.0"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

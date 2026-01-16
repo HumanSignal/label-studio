@@ -51,6 +51,7 @@ def serve(request, path, document_root=None, show_indexes=False, manifest_asset_
         raise Http404(_('Directory indexes are not allowed here.'))
     if manifest_asset_prefix and not fullpath.exists():
         possible_asset = get_manifest_asset(path)
+        possible_asset = possible_asset.lstrip("/\\")
         manifest_asset_prefix = (
             f'/{manifest_asset_prefix}' if not manifest_asset_prefix.startswith('/') else manifest_asset_prefix
         )
