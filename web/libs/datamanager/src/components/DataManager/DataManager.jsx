@@ -37,7 +37,7 @@ const switchInjector = inject(({ store }) => {
   return {
     sdk: store.SDK,
     views: store.viewsStore,
-    tabs: Array.from(store.viewsStore?.all ?? []),
+    tabs: store.viewsStore?.all ?? [],
     selectedKey: store.viewsStore?.selected?.key,
   };
 });
