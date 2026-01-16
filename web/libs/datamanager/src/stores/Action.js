@@ -45,6 +45,7 @@ export const Action = types
     disabled: types.optional(types.boolean, false),
     disabled_reason: types.optional(types.string, ""),
     title: isFFLOPSE3 ? types.union(types.string, HtmlOrReact) : types.string,
+    enterprise_badge: types.optional(types.boolean, false),
     ...(isFFLOPSE3
       ? {
           children: types.optional(types.array(types.late(() => Action)), []),

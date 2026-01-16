@@ -1,5 +1,5 @@
 import { IconChevronDown, IconChevronRight, IconTrash } from "@humansignal/icons";
-import { Button, Spinner, Tooltip } from "@humansignal/ui";
+import { Button, Spinner, Tooltip, EnterpriseBadge } from "@humansignal/ui";
 import { inject, observer } from "mobx-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useActions } from "../../../hooks/useActions";
@@ -95,7 +95,10 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
         className={cn("actionButton").elem("titleContainer").toClassName()}
         {...(action.disabled ? { title: action.disabledReason } : {})}
       >
-        <div className={cn("actionButton").elem("title").toClassName()}>{action.title}</div>
+        <div className={cn("actionButton").elem("title").toClassName()}>
+          {action.title}
+          {action.enterprise_badge && <EnterpriseBadge className="ml-1" />}
+        </div>
         {hasChildren ? <IconChevronRight className={cn("actionButton").elem("icon").toClassName()} /> : null}
       </div>
     </Menu.Item>
@@ -142,7 +145,10 @@ const ActionButton = ({ action, parentRef, store, formRef }) => {
           title={action.disabled ? action.disabledReason : null}
           aria-label={action.title}
         >
-          {action.title}
+          <span className="flex items-center justify-between gap-base w-full">
+            {action.title}
+            {action.enterprise_badge && <EnterpriseBadge />}
+          </span>
         </Menu.Item>
       </div>
     </Tooltip>
